@@ -18,8 +18,7 @@ const DISMISS_EVENT = 'app-splash-dismissed';
  * The load right after a sign-out skips the splash: the class `public/splash-init.js`
  * puts on `<html>` before the first paint, for index.html's CSS and for this module,
  * when it finds this sessionStorage key — which `forceLogout()` writes
- * (`shared/auth/service.ts`, declared there so its chunk does not pull this module
- * out of the entry). On that load the splash is hidden and `#root` shown, and
+ * (`skipSplashOnNextLoad` in `shared/auth/service.ts`). On that load the splash is hidden and `#root` shown, and
  * nothing paints until the login screen has rendered — so browsers keep the page
  * being left on screen until then. The splash node stays (hidden), so the loaders'
  * holds still keep React's own full-page loader away. Pinned across the files by

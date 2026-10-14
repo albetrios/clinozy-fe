@@ -6,6 +6,7 @@ import {
 } from '@/core/config/constants.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
+import { APP_SPLASH_SKIP } from '@/lib/app-splash.ts';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
@@ -76,12 +77,6 @@ function beginAuthGeneration(): number {
   return supersedeSessionWork();
 }
 
-function reportCleanupFailure(cleanupError: unknown): void {
-  if (platformConfig.debugLogging) {
-    console.error('[Auth] Cleanup failed during logout', cleanupError);
-  }
-}
-
 /**
  * End the session in everything the screen does not show: the work in flight
  * for it, the token and its refresh timer, and what the next page load would
@@ -97,7 +92,9 @@ function endSessionOffScreen(): void {
     // load must not find it. Its in-memory copy goes with the screen.
     useOnboardingStore.persist.clearStorage();
   } catch (cleanupError) {
-    reportCleanupFailure(cleanupError);
+    if (platformConfig.debugLogging) {
+      console.error('[Auth] Cleanup failed during logout', cleanupError);
+    }
   }
 }
 
@@ -118,23 +115,19 @@ function clearLocalAuthState(): void {
     useOnboardingStore.getState().reset();
     queryClient.clear();
   } catch (cleanupError) {
-    reportCleanupFailure(cleanupError);
+    if (platformConfig.debugLogging) {
+      console.error('[Auth] Cleanup failed during logout', cleanupError);
+    }
   }
 }
 
 /**
- * The sessionStorage key `public/splash-init.js` reads — once — before the next
- * page load paints: that load skips the boot splash (`APP_SPLASH_SKIP` in
- * `lib/app-splash.ts`, which reads the class the script sets). Declared here, not
- * imported: that module lives in the entry chunk, and importing it from this one
- * split it out (+0.25 kB of first-paint JS). `service.test.ts` pins the two.
+ * Let the `/login` load a sign-out hands the tab to go straight to the login screen: the key
+ * `public/splash-init.js` reads — once — before that load paints (`APP_SPLASH_SKIP`).
  */
-const SPLASH_SKIP_KEY = 'app-splash-skip';
-
-/** Let the `/login` load a sign-out hands the tab to go straight to the login screen. */
 function skipSplashOnNextLoad(): void {
   try {
-    sessionStorage.setItem(SPLASH_SKIP_KEY, '1');
+    sessionStorage.setItem(APP_SPLASH_SKIP, '1');
   } catch {
     /* storage unavailable (private mode) — that load plays the splash */
   }
@@ -238,7 +231,7 @@ export async function silentRefresh(): Promise<void> {
 }
 
 let authBootstrapPromise: Promise<void> | null = null;
-/** A sign-out this boot is finishing on the server ({@link finishPendingRevoke}), while it runs. */
+/** The sign-out this boot finishes on the server ({@link finishPendingRevoke}); settled once done. */
 let pendingRevoke: Promise<void> | null = null;
 
 export function startAuthBootstrap(): Promise<void> {
@@ -251,9 +244,7 @@ export function startAuthBootstrap(): Promise<void> {
       // for the revoke — it finishes behind it, and a sign-in waits for it
       // instead (`settlePendingRevoke`).
       if (isRevokePending()) {
-        pendingRevoke ??= finishPendingRevoke(generation).finally(() => {
-          pendingRevoke = null;
-        });
+        pendingRevoke ??= finishPendingRevoke(generation);
         throw new Error('Signed out');
       }
       /*
@@ -673,8 +664,8 @@ async function finishPendingRevoke(generation: number): Promise<void> {
 }
 
 /**
- * Resolves once a sign-out the boot found still owed to the server has finished, or given up
- * for now.
+ * The sign-out the boot found still owed to the server, for a caller to await: it settles once the
+ * revoke has finished, or given up for now (`null` when there was none).
  *
  * @remarks
  * That boot shows the login screen at once and finishes the revoke behind it
@@ -685,8 +676,8 @@ async function finishPendingRevoke(generation: number): Promise<void> {
  * the old session's last answer is always in before the new one's first. By the
  * time anyone has typed an address it has long settled. Never rejects.
  */
-export async function settlePendingRevoke(): Promise<void> {
-  await pendingRevoke;
+export function settlePendingRevoke(): Promise<void> | null {
+  return pendingRevoke;
 }
 
 let logoutPromise: Promise<void> | null = null;

@@ -197,7 +197,7 @@ describe('auth/service — sign-outs that stay signed out', () => {
       );
       await service.startAuthBootstrap();
       let settled = false;
-      const waiting = service.settlePendingRevoke().then(() => {
+      const waiting = Promise.resolve(service.settlePendingRevoke()).then(() => {
         settled = true;
       });
 
