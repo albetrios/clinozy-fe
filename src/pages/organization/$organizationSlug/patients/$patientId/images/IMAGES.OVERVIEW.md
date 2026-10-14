@@ -54,7 +54,8 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
   "2 photos uploaded to General" (`../shared/hooks/usePatientPhotoUpload/`). A drop with no JPG
   or PNG says "Drop image files" (the API files no other type).
 - **Empty / failed:** "No photos in General yet" · "Drag photos here or upload from your
-  computer." · "Upload images"; a first read that fails says so with Retry (and the list toast).
+  computer." — no button of its own (the section's "Upload images" adds); a first read that fails
+  says so with Retry (and the list toast).
 
 ## Files
 

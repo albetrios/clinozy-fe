@@ -36,6 +36,8 @@
       "updated": "Updated"
     },
     "empty": "No leads match",
+    "emptyTitle": "No leads yet",
+    "emptyHint": "Enquiries from calls, WhatsApp and walk-ins land here.",
     "clearFilters": "Clear filters",
     "moreInterests_one": "{{count}} more: {{list}}",
     "moreInterests_other": "{{count}} more: {{list}}"

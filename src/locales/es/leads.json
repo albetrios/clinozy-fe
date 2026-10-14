@@ -37,6 +37,8 @@
       "updated": "Actualizado"
     },
     "empty": "Ningún prospecto coincide",
+    "emptyTitle": "Aún no hay prospectos",
+    "emptyHint": "Aquí llegan las consultas por llamada, WhatsApp y visitas sin cita.",
     "clearFilters": "Borrar filtros",
     "moreInterests_one": "{{count}} más: {{list}}",
     "moreInterests_many": "{{count}} más: {{list}}",

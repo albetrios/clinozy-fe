@@ -177,11 +177,6 @@ export function SalesPage() {
         filtered={filters.count > 0}
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(MEDICAL_KEYS.empty.store)}
-        emptyAction={
-          canCreate
-            ? { label: t(MEDICAL_KEYS.create.sale), onSelect: () => nav.create('sales') }
-            : undefined
-        }
         recordsLabel={t(MEDICAL_KEYS.sales.records)}
         countLabel={
           summary ? t(MEDICAL_KEYS.sales.count, { count: summary.total }) : undefined

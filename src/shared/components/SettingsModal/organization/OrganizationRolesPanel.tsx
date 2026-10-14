@@ -184,7 +184,7 @@ function RolesResults({
   if (roles.rows.length === 0) {
     return (
       <EmptyState
-        tone="slate"
+        tone="lav"
         className="pt-8 pb-9"
         icon={<ShieldCheck />}
         title={isSearching ? t(panels.noResults) : t(panels.emptyTitle)}

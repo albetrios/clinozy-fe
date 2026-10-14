@@ -103,7 +103,7 @@ link reopens them:
 `tasks-type-clear`, `tasks-rules-trigger`, `tasks-rules`, `tasks-rule-<type>` (the API's rule
 keys and `by_hand`: `tasks-rule-follow_up`, `tasks-rule-medical_rep_visit`) with
 `-switch` and `-handle`, `tasks-list`, `tasks-group-<group>`, `tasks-row` (`data-task-id`,
-`data-type`), `tasks-empty`, `tasks-empty-new` — listed in
+`data-type`), `tasks-empty` — listed in
 `docs/reference/e2e-testids-inventory.md` › Tasks room. The drawers the dialog routes open:
 `new-task-drawer` (with `new-task-…` field ids) and `task-drawer` (with `task-drawer-…` part ids), and
 `whats-next-drawer` (with `whats-next-…` ids).

@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2226 src files · ~1129 tests in src/ · 90 E2E specs · 27 shadcn UI primitives
+Stats: ~2227 src files · ~1129 tests in src/ · 90 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -303,6 +303,20 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── change-empty-states-2026-10-13-ssai/
+│   │   ├── intake-files/
+│   │   │   ├── _index.md
+│   │   │   ├── empty-states.html
+│   │   │   ├── empty-states.md
+│   │   │   ├── PRD.md
+│   │   │   ├── preset.md
+│   │   │   ├── schema-routes.md
+│   │   │   └── shell.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── change-floating-tab-bar-2026-10-13-pkhy/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
@@ -314,6 +328,21 @@ clinozy-fe/
 │   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── fix-empty-state-actions-2026-10-14-iazm/
+│   │   ├── intake-files/
+│   │   │   ├── _index.md
+│   │   │   ├── BRIEF.md
+│   │   │   ├── empty-states.html
+│   │   │   ├── empty-states.md
+│   │   │   ├── PRD.md
+│   │   │   ├── preset.md
+│   │   │   ├── schema-routes.md
+│   │   │   └── shell.md
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md
@@ -1853,6 +1882,7 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── EmptyState/
+│   │   │   │   ├── empty-state-art.ts
 │   │   │   │   ├── empty-state.constants.ts
 │   │   │   │   ├── EmptyState.tsx
 │   │   │   │   ├── index.ts

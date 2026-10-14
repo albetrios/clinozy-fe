@@ -347,15 +347,11 @@ describe('VendorsPage (Q-K1)', () => {
     expect(screen.queryByTestId('stock-vendors-new')).not.toBeInTheDocument();
   });
 
-  it('an Admin’s empty search offers "New clinic vendor"', async () => {
+  it('an Admin’s empty search draws the empty state with no button', async () => {
     vi.mocked(listStockVendors).mockResolvedValue({ rows: [], next: null, total: 0 });
     renderStockRoutes(`${VENDORS_URL}?q=nobody`, { vendors: VendorsTab });
     expect(await screen.findByText('No vendor matches')).toBeVisible();
-    expect(
-      await within(screen.getByTestId('empty-state')).findByRole('button', {
-        name: 'New clinic vendor',
-      }),
-    ).toBeVisible();
+    expect(within(screen.getByTestId('empty-state')).queryByRole('button')).toBeNull();
   });
 
   it('shows a first read that fails in place, with Retry', async () => {

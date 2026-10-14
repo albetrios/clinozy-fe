@@ -25,6 +25,7 @@ import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { FolderOpen } from '@/shared/icons/index.ts';
 
 import {
   DEFAULT_TABLE_TEST_PREFIX,
@@ -410,28 +411,40 @@ function TableBody<TData extends RowData>({
       />
     );
   };
+  const hasRows = tableWindow.windowed.length > 0;
   return (
     <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
       role="rowgroup"
       data-slot="data-table-body"
       data-refreshing={refreshing || undefined}
-      className="shrink-0 pt-(--dt-pad-top) pb-(--dt-pad-bottom)"
+      data-empty={hasRows ? undefined : true}
+      // With no rows the body, its row and its cell grow into the card, so the
+      // empty state's `my-auto` centres it there (change-empty-states, D7); a
+      // skeleton does not grow and keeps to the top.
+      className={cn(
+        'pt-(--dt-pad-top) pb-(--dt-pad-bottom)',
+        hasRows ? 'shrink-0' : 'flex flex-1 flex-col',
+      )}
     >
-      {tableWindow.windowed.length > 0 ? (
+      {hasRows ? (
         tableWindow.windowed.map(renderEntry)
       ) : (
         <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
           role="row"
+          className="flex flex-1 flex-col"
         >
           <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
             role="cell"
             aria-colspan={Math.max(1, columnCount)}
+            className="flex flex-1 flex-col"
           >
             {empty ?? (
               <EmptyState
-                variant="inline"
+                variant="compact"
+                tone="stone"
+                icon={<FolderOpen />}
                 title={emptyMessage ?? t(TABLE_KEYS.empty)}
-                className="px-(--table-pad-x) py-12 text-center text-sm"
+                className="px-(--table-pad-x) py-12"
               />
             )}
           </div>

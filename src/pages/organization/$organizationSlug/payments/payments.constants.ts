@@ -59,7 +59,6 @@ export const PAYMENTS_KEYS = {
     ledgerTitle: 'empty.ledgerTitle',
     pendingTitle: 'empty.pendingTitle',
     description: 'empty.description',
-    receive: 'empty.receive',
   },
   deleteEntry: LEDGER_KEYS.deleteEntry,
   /** A dialog route's record, as "<Record> not found · it may have been deleted" names it (`S:115`). */

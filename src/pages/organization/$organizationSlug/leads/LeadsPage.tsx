@@ -4,7 +4,7 @@
 // memoisation would hand the toolbar's Columns chooser a stale answer.
 
 import { Outlet, useLocation, useParams } from '@tanstack/react-router';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -20,7 +20,6 @@ import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import {
@@ -30,6 +29,7 @@ import {
   useReleaseLead,
   useSetLeadInvolved,
 } from '@/shared/hooks/useLeads/index.ts';
+import { Search, UserPlus } from '@/shared/icons/index.ts';
 
 import { LeadDrawer, type LeadDrawerPane } from './components/LeadDrawer/index.ts';
 import {
@@ -108,47 +108,47 @@ function offered(action: (() => void) | false): (() => void) | undefined {
 }
 
 /**
- * The list's empty line (H:1745; `leads.md:393`): "No leads match" in the soft
- * ink, with "Clear filters" while filters are on, else "New lead" for a member
- * who may create.
+ * The list's empty state (change-empty-states R8, R9): the room look in the
+ * Leads lav, centred in the table card. With filters on it keeps the design's
+ * "No leads match" (H:1745; `leads.md:393`) over the `Search` tile with "Clear
+ * filters"; otherwise the `UserPlus` tile, "No leads yet" and where enquiries
+ * come from. No "New lead" here (fix-empty-state-actions): the toolbar's is the
+ * one way to add.
  */
 function LeadsEmpty({
   filtered,
   onClearFilters,
-  onNewLead,
 }: {
   filtered: boolean;
   onClearFilters: () => void;
-  onNewLead?: () => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  let action: ReactNode;
   if (filtered) {
-    action = (
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={onClearFilters}
-        className="text-detail rounded-lg"
-      >
-        {t(LEADS_KEYS.list.clearFilters)}
-      </Button>
-    );
-  } else if (onNewLead) {
-    action = (
-      <EmptyStateAction onClick={onNewLead}>
-        {t(LEADS_KEYS.list.newLead)}
-      </EmptyStateAction>
+    return (
+      <EmptyState
+        tone="lav"
+        icon={<Search />}
+        title={t(LEADS_KEYS.list.empty)}
+        testId={LEADS_TEST_IDS.empty}
+        action={
+          <EmptyStateAction
+            icon={null}
+            data-testid="empty-state-clear-filters"
+            onClick={onClearFilters}
+          >
+            {t(LEADS_KEYS.list.clearFilters)}
+          </EmptyStateAction>
+        }
+      />
     );
   }
   return (
     <EmptyState
-      variant="inline"
-      title={t(LEADS_KEYS.list.empty)}
+      tone="lav"
+      icon={<UserPlus />}
+      title={t(LEADS_KEYS.list.emptyTitle)}
+      description={t(LEADS_KEYS.list.emptyHint)}
       testId={LEADS_TEST_IDS.empty}
-      className="text-foreground-soft flex flex-col items-center gap-3 p-5.5 text-center"
-      action={action}
     />
   );
 }
@@ -316,11 +316,7 @@ export function LeadsPage() {
       rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
     />
   ) : (
-    <LeadsEmpty
-      filtered={state.filtered}
-      onClearFilters={state.clearFilters}
-      onNewLead={canCreate ? () => newLead() : undefined}
-    />
+    <LeadsEmpty filtered={state.filtered} onClearFilters={state.clearFilters} />
   );
 
   return (

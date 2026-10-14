@@ -12,6 +12,7 @@ import {
 } from '@/shared/api/app/feedback-contracts.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { EmptyStateArt } from '@/shared/components/EmptyState/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { usePersonAppointments } from '@/shared/hooks/useAppointments/index.ts';
 import {
@@ -26,6 +27,7 @@ import {
   ChevronRight,
   MessageSquare,
   Plus,
+  Star,
 } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -253,8 +255,9 @@ function FeedbackTrack({
             onClick={canLogFeedback(access) ? onLog : undefined}
             disabled={!canLogFeedback(access)}
             data-testid={`${ID}-empty`}
-            className="border-border-strong hover:bg-muted/50 col-span-full flex min-h-30 flex-col items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed p-4 text-center"
+            className="border-border-strong hover:bg-muted/50 col-span-full flex min-h-30 flex-col items-center justify-center gap-2 rounded-xl border-[1.5px] border-dashed p-4 text-center"
           >
+            <EmptyStateArt tone="butter" icon={<Star />} size="compact" />
             <span className="text-body font-semibold">{t(K.emptyTitle)}</span>
             <span className="text-muted-foreground text-xs [text-wrap:pretty]">
               {t(K.emptySub)}

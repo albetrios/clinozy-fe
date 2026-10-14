@@ -324,7 +324,6 @@ export function TasksPage() {
         hasNextPage={view.list.hasNextPage}
         isFetchingNextPage={view.list.isFetchingNextPage}
         fetchNextPage={view.list.fetchNextPage}
-        onNewTask={newTask.open}
       />
       {dialog.kind === 'create' ? (
         <NewTaskDrawer

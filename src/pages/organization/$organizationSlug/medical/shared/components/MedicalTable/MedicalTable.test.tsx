@@ -31,7 +31,6 @@ interface Row {
 }
 
 const LIST = { hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() };
-const onNew = vi.fn();
 
 function Table({ rows, filtered = false }: { rows: Row[]; filtered?: boolean }) {
   const table = useRoomTable<Row>({
@@ -50,7 +49,6 @@ function Table({ rows, filtered = false }: { rows: Row[]; filtered?: boolean }) 
       filtered={filtered}
       onClearFilters={vi.fn()}
       emptyTitle="No MR matches"
-      emptyAction={{ label: 'New MR', onSelect: onNew }}
       recordsLabel="MRs"
       countLabel={`${rows.length} MRs`}
       minWidth={600}
@@ -61,20 +59,17 @@ function Table({ rows, filtered = false }: { rows: Row[]; filtered?: boolean }) 
 
 beforeEach(() => {
   csv.downloadCsv.mockReset();
-  onNew.mockReset();
 });
 afterEach(() => resetMedicalRoutes());
 
 describe('MedicalTable', () => {
-  it('shows the blush empty state with the tab’s New', async () => {
-    const user = userEvent.setup();
+  it('shows the blush empty state, with no button', async () => {
     const { container } = renderMedicalRoutes('/organization/acme/medical/mrs', {
       mrs: () => <Table rows={[]} />,
     });
     expect(await screen.findByText('No MR matches')).toBeVisible();
     expect(screen.getByTestId('empty-state')).toHaveAttribute('data-tone', 'blush');
-    await user.click(screen.getByRole('button', { name: 'New MR' }));
-    expect(onNew).toHaveBeenCalledOnce();
+    expect(within(screen.getByTestId('empty-state')).queryByRole('button')).toBeNull();
     expect(await axe(container)).toHaveNoViolations();
   });
 

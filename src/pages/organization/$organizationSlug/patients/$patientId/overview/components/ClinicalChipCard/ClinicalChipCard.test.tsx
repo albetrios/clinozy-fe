@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { MessageSquare } from '@/shared/icons/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import type { ClinicalChip } from '../../../shared/patient-clinical.ts';
@@ -30,6 +31,7 @@ async function renderCard(props: Partial<ClinicalChipCardProps> = {}) {
     <ClinicalChipCard
       title="Complaints"
       tone="blush"
+      icon={MessageSquare}
       items={[TANNING, UNEVEN]}
       loading={false}
       onAdd={onAdd}
@@ -108,6 +110,10 @@ describe('ClinicalChipCard (H:780; patient-file.md:53)', () => {
     await renderCard({ items: [], canEdit: false });
     const card = screen.getByTestId(ID);
     expect(card).toHaveTextContent('Nothing added yet');
+    // The compact look in the card's own tone (change-empty-states C2).
+    const empty = within(card).getByTestId('empty-state');
+    expect(empty).toHaveAttribute('data-variant', 'compact');
+    expect(empty).toHaveAttribute('data-tone', 'blush');
     expect(within(card).queryByRole('textbox')).not.toBeInTheDocument();
     expect(within(card).queryByTestId(`${ID}-new`)).not.toBeInTheDocument();
   });

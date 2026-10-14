@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 import { type PillTone, TonePill } from '@/shared/components/Cells/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
@@ -11,6 +12,10 @@ import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { type AppIcon, ChevronRight, Plus } from '@/shared/icons/index.ts';
 
+import {
+  PATIENT_FILE_SECTION_ICONS,
+  PATIENT_FILE_SECTION_TONES,
+} from '../../../shared/patient-file-nav.ts';
 import {
   OVERVIEW_CARD_TONES,
   type OverviewCard,
@@ -190,6 +195,29 @@ export function BentoRow({
   );
 }
 
+/** A card's empty state: the compact look in its section's tone and glyph (change-empty-states C7). */
+function BentoEmpty({
+  section,
+  title,
+  testId,
+}: {
+  section: PatientFileSectionSlug;
+  title: string;
+  testId: string;
+}) {
+  const Icon = PATIENT_FILE_SECTION_ICONS[section];
+  return (
+    <EmptyState
+      variant="compact"
+      tone={PATIENT_FILE_SECTION_TONES[section]}
+      icon={<Icon />}
+      title={title}
+      testId={testId}
+      className="py-4"
+    />
+  );
+}
+
 /**
  * A card's read in place while it holds nothing to list: two bars while it loads, its failure
  * with Retry (the card's own, no toast of its own), else its empty line once read.
@@ -199,6 +227,7 @@ export function BentoReadState({
   empty,
   label,
   emptyTitle,
+  section,
   testId,
 }: {
   read: BentoRead;
@@ -207,6 +236,8 @@ export function BentoReadState({
   /** What is loading, for screen readers: the card's title. */
   label: string;
   emptyTitle: string;
+  /** The patient-file section the card reads — its empty state's tone and glyph. */
+  section: PatientFileSectionSlug;
   /** The card's test id — the empty line is `<card>-empty`. */
   testId: string;
 }) {
@@ -222,6 +253,6 @@ export function BentoReadState({
   }
   if (read.isPending) return <SkeletonRows rows={2} label={label} />;
   return read.isSuccess ? (
-    <EmptyState variant="inline" testId={`${testId}-empty`} title={emptyTitle} />
+    <BentoEmpty section={section} title={emptyTitle} testId={`${testId}-empty`} />
   ) : null;
 }

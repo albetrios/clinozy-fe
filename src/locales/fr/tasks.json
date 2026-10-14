@@ -459,6 +459,7 @@
   },
   "empty": {
     "queue": "Rien ne vous attend pour l’instant. Les nouvelles tâches apparaissent ici quand les prospects écrivent, que des visites approchent et que des avis arrivent.",
+    "caughtUp": "Tout est à jour",
     "snoozed": "Aucune tâche reportée",
     "done": "Rien de résolu aujourd’hui pour l’instant"
   },

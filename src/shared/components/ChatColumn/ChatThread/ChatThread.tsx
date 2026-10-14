@@ -485,6 +485,8 @@ export function ChatThread({
       {empty ? (
         <EmptyState
           variant="card"
+          tone="sky"
+          icon={<MessageSquare />}
           className="my-auto flex-none"
           title={t(keys.empty.title)}
           description={empty.line}

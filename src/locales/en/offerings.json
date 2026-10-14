@@ -69,8 +69,7 @@
     "title": "No offerings yet",
     "description": "Add treatments and packages with prices so they can be booked and billed.",
     "noMatchTitle": "No offering matches",
-    "noMatchDescription": "Nothing here yet. Try another tab or search.",
-    "newOffering": "New offering"
+    "noMatchDescription": "Nothing here yet. Try another tab or search."
   },
   "offers": {
     "columns": {
@@ -111,8 +110,7 @@
     },
     "empty": {
       "title": "No offers yet",
-      "description": "Nothing here yet. Try another tab or search.",
-      "newOffer": "New offer"
+      "description": "Nothing here yet. Try another tab or search."
     },
     "record": "Offer"
   },
