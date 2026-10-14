@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.14.0](https://github.com/albetrios/clinozy-fe/compare/v1.13.0...v1.14.0) (2026-10-14)
+
+
+### Added
+
+* **app:** clinic setup — the setup drawer, guide and shell entries ([#73](https://github.com/albetrios/clinozy-fe/issues/73)) ([bec1a5f](https://github.com/albetrios/clinozy-fe/commit/bec1a5faace6b62cfbefd2b492f412fdfb2a53fa))
+* **auth:** redesign the sign-in screen around a journey dial ([#76](https://github.com/albetrios/clinozy-fe/issues/76)) ([7255f49](https://github.com/albetrios/clinozy-fe/commit/7255f49b3fb64afbdf68e2e023bc058f88baf301))
+* **bug-report:** our own "Report a bug" with native voice input ([#72](https://github.com/albetrios/clinozy-fe/issues/72)) ([85b9864](https://github.com/albetrios/clinozy-fe/commit/85b9864e6ae112f56e2fb284d8661568f0032085))
+* **contacts:** one person picker for every drawer, with a loading look that shows progress ([#74](https://github.com/albetrios/clinozy-fe/issues/74)) ([166960c](https://github.com/albetrios/clinozy-fe/commit/166960cba4bd5791520dd24dec9df203bfd25202))
+* **drawers:** one step pattern for every create and edit drawer ([#69](https://github.com/albetrios/clinozy-fe/issues/69)) ([75d988a](https://github.com/albetrios/clinozy-fe/commit/75d988abe8dfaf17f1e97474611f1aa50ab30a5d))
+* **empty-states:** colorful, centered empty states in every section and tab ([#65](https://github.com/albetrios/clinozy-fe/issues/65)) ([afc5610](https://github.com/albetrios/clinozy-fe/commit/afc5610c05121d165babaf07711fb19aa1a278cc))
+* **medical:** the Medical room live on clinozy-be ([#66](https://github.com/albetrios/clinozy-fe/issues/66)) ([6205d25](https://github.com/albetrios/clinozy-fe/commit/6205d259cfd35e99efbc9e736337547a7984cdd5))
+* **shell:** float the phone tab bar as a glass capsule, iPhone style ([#71](https://github.com/albetrios/clinozy-fe/issues/71)) ([9758234](https://github.com/albetrios/clinozy-fe/commit/9758234b280d3b159bfc6e2cc75e28ebf967cc96))
+
+
+### Fixed
+
+* **auth:** sign out straight to the login screen ([#64](https://github.com/albetrios/clinozy-fe/issues/64)) ([c693aad](https://github.com/albetrios/clinozy-fe/commit/c693aad80b426af41db1071b52d03ccb915b999e))
+* **settings:** draw each section's whole head row while it loads ([#70](https://github.com/albetrios/clinozy-fe/issues/70)) ([0cbac8c](https://github.com/albetrios/clinozy-fe/commit/0cbac8c54a7ae4dc6ca51ddc945466a996052dc0))
+* **today:** a sale from Dispense refreshes Today's floor ([#75](https://github.com/albetrios/clinozy-fe/issues/75)) ([f3270b4](https://github.com/albetrios/clinozy-fe/commit/f3270b45254b4b94a156b316111bb8e5112a1b1b))
+* **upload:** say upload failures in words and send the PUT fallback's signed headers ([#63](https://github.com/albetrios/clinozy-fe/issues/63)) ([0b0ea57](https://github.com/albetrios/clinozy-fe/commit/0b0ea57af418b7750cce997546d73f60b26c164c))
+
+
+### Performance
+
+* **boot:** fewer requests before the first screen, CSS headroom, deviation and OAuth docs ([#67](https://github.com/albetrios/clinozy-fe/issues/67)) ([fe32cd0](https://github.com/albetrios/clinozy-fe/commit/fe32cd007eac0da3c490d6d28733ee49bea24db4))
+* **lighthouse:** score performance on every public route, fix best-practices, keep the reports ([#61](https://github.com/albetrios/clinozy-fe/issues/61)) ([aeee944](https://github.com/albetrios/clinozy-fe/commit/aeee944f16cba76a849bca3480317d61dc23dff4))
+
 ## [1.13.0](https://github.com/albetrios/clinozy-fe/compare/v1.12.0...v1.13.0) (2026-10-13)
 
 
