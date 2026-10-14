@@ -19,15 +19,21 @@ New passwordless users → `/onboarding` → app.
 | `LoginPage.tsx`          | Thin wrapper around shared `<AuthForm />`.                |
 | `shared/forms/AuthForm/` | Unified auth UI — default email OTP + provider buttons.   |
 
-The frame is `AuthLayout` (`shared/layouts/AuthLayout/AuthLayout.tsx`): the signed-out
-canvas with the logo where the clinic header draws it, the language picker and theme
-toggle at the end, and the form in one 360px card (the design's "Signed out" card,
-H:515) — since iteration `change-shell-polish-and-sign-in` beside a showcase of what
-Clinozy is (`src/shared/layouts/AuthLayout/components/AuthShowcase/`): a hero, a patient's journey through seven
-tone-coded rooms, three moments, three reasons and a privacy line. From `lg` the hero
-and the showcase share a washed panel beside the card; below `lg` the order is hero →
-card → showcase, so the card stays above the fold. The showcase is static copy
-(`auth` › `showcase.*`, 11 locales) and stands still under reduced motion.
+The frame is `AuthLayout` (`shared/layouts/AuthLayout/AuthLayout.tsx`). From `xl` it is a
+split screen: a **stage** on the signed-out canvas — the logo, a hero (who Clinozy is for and
+the promise), three reasons, and the **journey dial** — and the form docked in its own
+full-height panel at the inline end, with the language picker and theme toggle at its top and
+"Privacy choices" at its foot. The dial
+(`src/shared/layouts/AuthLayout/components/AuthShowcase/`) draws one patient's day: seven
+tone-coded stops on a ring, the logo's green thread stepping from stop to stop, the stop it is
+on named in the centre, and three moments from a clinic day lifting as the thread passes
+their stop — one 15.4s clock for all of it, still under reduced motion. Below `xl` the order
+is hero → the form's 360px card → dial → reasons, so the card stays above the fold. The
+showcase is static copy (`auth` › `showcase.*`, 11 locales); the split's grid and the dial's
+motion ship as CSS with the lazy auth chunk
+(`src/shared/layouts/AuthLayout/auth-layout.css`,
+`src/shared/layouts/AuthLayout/components/AuthShowcase/auth-showcase.css`), never
+on the first paint.
 
 ## Flow
 

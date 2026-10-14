@@ -24,12 +24,14 @@ skip the stop after each row.
 
 **0. Confirm the iteration.** Run `pnpm iteration:list` and show
 `| Iteration | Type | Baseline | Status | Eligible | Why |` — eligible means
-Status `approved`, not yet implementing, and Baseline `none` or `done`/`frozen`.
+Status `approved`, not yet implementing, and Baseline `none` (from scratch) or a
+`done`/`frozen` iteration I named. Never ask me about the Baseline.
 Ask me (AskUserQuestion), then run **the gate**: `pnpm iteration:intake
 <iteration> --check`. **If it exits non-zero, stop now** — write nothing,
 change no status, ask nothing else; print its output and end the turn. When it
 passes: `pnpm iteration:status <iteration> implementing`, and start
-`AS-BUILT.md` with the Baseline's Standing deviations copied in.
+`AS-BUILT.md` with the Baseline's Standing deviations copied in (none from
+scratch).
 
 ## Build order — initial
 

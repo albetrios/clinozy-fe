@@ -13,8 +13,9 @@
  * both sides need one. Prints a summary (files; screens via `_index.md` Slugs; whether the PRD,
  * `schema-routes.md` or the prototype changed; the `schema-routes.md` entities, fields, enums,
  * routes and operations added, removed or changed), then the raw `git diff --no-index`. `--json`
- * prints the summary only, for skills. Without a Baseline it prints the recorded and suggested
- * Baselines and exits 2, so the user can confirm one.
+ * prints the summary only, for skills. Without a Baseline argument it prints the README's recorded
+ * Baseline, if the user named one, and exits 2; an iteration from scratch (Baseline `none`) has
+ * nothing to compare, and nothing is suggested.
  *
  * clinozy-be's `tooling/iterations/iteration-diff.util.ts` prints the same summary and JSON shape.
  */
@@ -34,7 +35,6 @@ import {
   readIterationReadme,
   readResolvedSnapshot,
   resolveIntakeSnapshot,
-  suggestBaseline,
   tableCells,
 } from './iterations.mjs';
 
@@ -324,8 +324,9 @@ export function parseDiffArguments(commandLine) {
 }
 
 /**
- * Explains what to compare against when no Baseline is given — the recorded Baseline and the
- * suggestion — so the caller can ask the user.
+ * Explains what to compare against when no Baseline is given: the Baseline the README records,
+ * when the user named one. An iteration from scratch (Baseline `none`) has nothing to compare, and
+ * nothing is suggested — a comparison with an earlier iteration is only ever the user's call.
  *
  * @param {{ repositoryRoot: string, current: string }} request
  */
@@ -337,18 +338,17 @@ export function missingBaselineMessage({ repositoryRoot, current }) {
     recorded !== undefined && recorded !== NO_BASELINE && recorded !== EMPTY_FIELD
       ? recorded
       : undefined;
-  const suggested = suggestBaseline({ repositoryRoot, excluding: current });
-  const lines = ['No Baseline given.'];
-  if (usable !== undefined) lines.push(`  Recorded in ${current}/README.md: ${usable}`);
-  lines.push(
-    suggested === undefined
-      ? '  Suggested: none — no iteration in this repository is done or frozen with a complete intake yet.'
-      : `  Suggested (latest done/frozen in this repository): ${suggested}`,
-  );
-  const pick = usable ?? suggested;
-  if (pick !== undefined)
-    lines.push(`Confirm and re-run: pnpm iteration:diff ${pick} ${current}`);
-  return lines.join('\n');
+  if (usable !== undefined) {
+    return [
+      'No Baseline given.',
+      `  Recorded in ${current}/README.md: ${usable}`,
+      `Re-run: pnpm iteration:diff ${usable} ${current}`,
+    ].join('\n');
+  }
+  return [
+    `No Baseline given — ${current} starts from scratch (Baseline ${recorded ?? NO_BASELINE}), so there is nothing to compare.`,
+    `To compare with an earlier iteration the user names: pnpm iteration:diff <baseline> ${current}`,
+  ].join('\n');
 }
 
 /**

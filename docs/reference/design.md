@@ -176,10 +176,14 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   vertical overflow — the 6px never flashes `<main>`'s scrollbar. `accordion` for
   disclosure; `shimmer` for skeleton loading. Overlays use the shadcn enter/exit
   utilities (`tw-animate-css`). The sign-in showcase is the one ambient motion —
-  `journey-wave` (8.4s), `drift` (6s), `pulse-dot` (2.4s) — and every element of it
-  carries `motion-reduce:animate-none`. Motion never takes text below WCAG AA: a
-  resting journey stop dims only to 85% opacity (its light tones fall under 4.5:1
-  below 0.79), pinned in `AuthShowcase.test.tsx`.
+  the **journey dial**: one 15.4s turn in which the logo's green thread steps round
+  the seven tone-coded stops (holding 1.54s on each, moving 0.66s), and every stop's
+  lift, the centre label and the moment cards answer it on the same clock, started
+  `--stop × 2.2s` in, so nothing drifts out of step. Its keyframes ship with the lazy
+  auth chunk (`AuthShowcase/auth-showcase.css`), not with `index.css`; only the live
+  dot's `pulse-dot` (2.4s) is global. Under reduced motion the dial stands still with
+  every stop named. Motion never takes text below WCAG AA: a stop lifts (scale) and
+  is never dimmed, pinned in `AuthShowcase.test.tsx`.
 - **Tabs keep their place.** A tab drawn bolder when current keeps its bold width
   (`WeightStableLabel`), so switching tabs never moves its neighbours.
 - **Product motion.** Prefer **Anime.js** for intentional numeric or timeline

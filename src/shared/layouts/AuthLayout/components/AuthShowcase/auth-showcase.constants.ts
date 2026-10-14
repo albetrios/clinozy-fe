@@ -90,34 +90,29 @@ export const AUTH_SHOWCASE_TEST_IDS = {
   privacy: 'auth-showcase-privacy',
 } as const;
 
-/** One stop of the patient journey: its room's tone and icon, and when the wave reaches it. */
+/** One stop of the patient journey: its room's tone and icon. */
 export interface JourneyStop {
   id: keyof ShowcaseKeys['journey']['stops'];
   tone: Tone;
   icon: AppIcon;
-  /** The wave's delay for this stop — whole literals so Tailwind sees each. */
-  delay: string;
 }
 
 /**
  * The seven stops, each in the tone of the room that owns it (`SECTION_TONES`
  * and the Today lanes): Enquiry lav (Leads) · Booked sky (Appointments) ·
  * Waiting butter · With doctor blush · Treatment sage · Checkout peach
- * (Payments) · Follow-up plum (Tasks). The wave reaches one every 600ms.
+ * (Payments) · Follow-up plum (Tasks). Clockwise from the top of the dial, in
+ * this order — `auth-showcase.css` places and times each by its `data-stop`
+ * (AuthShowcase.test.tsx pins the two together).
  */
 export const JOURNEY_STOPS: readonly JourneyStop[] = [
-  { id: 'enquiry', tone: 'lav', icon: UserPlus, delay: '[animation-delay:0ms]' },
-  { id: 'booked', tone: 'sky', icon: Calendar, delay: '[animation-delay:600ms]' },
-  { id: 'waiting', tone: 'butter', icon: Clock, delay: '[animation-delay:1200ms]' },
-  {
-    id: 'withDoctor',
-    tone: 'blush',
-    icon: Stethoscope,
-    delay: '[animation-delay:1800ms]',
-  },
-  { id: 'treatment', tone: 'sage', icon: Sparkles, delay: '[animation-delay:2400ms]' },
-  { id: 'checkout', tone: 'peach', icon: Wallet, delay: '[animation-delay:3000ms]' },
-  { id: 'followUp', tone: 'plum', icon: SquareCheck, delay: '[animation-delay:3600ms]' },
+  { id: 'enquiry', tone: 'lav', icon: UserPlus },
+  { id: 'booked', tone: 'sky', icon: Calendar },
+  { id: 'waiting', tone: 'butter', icon: Clock },
+  { id: 'withDoctor', tone: 'blush', icon: Stethoscope },
+  { id: 'treatment', tone: 'sage', icon: Sparkles },
+  { id: 'checkout', tone: 'peach', icon: Wallet },
+  { id: 'followUp', tone: 'plum', icon: SquareCheck },
 ];
 
 /** One "moment" card — an anonymous event from a clinic day (no names, no numbers: D11). */
@@ -125,15 +120,21 @@ export interface ShowcaseMoment {
   id: 'checkIn' | 'followUp' | 'invoice';
   tone: Tone;
   icon: AppIcon;
-  /** The drift's delay — the three cards breathe out of step. */
-  delay: string;
+  /**
+   * The stop that raises it: the card lifts and glows as the thread reaches
+   * that stop (`auth-showcase.css` gives it the stop's `--stop`).
+   */
+  stop: JourneyStop['id'];
 }
 
-/** An arrival (Today, sky), a follow-up set (Tasks, plum), an invoice settled (Payments, peach). */
+/**
+ * An arrival (Today, sky) as the patient waits, a follow-up set (Tasks, plum)
+ * at the last stop, an invoice settled (Payments, peach) at checkout.
+ */
 export const SHOWCASE_MOMENTS: readonly ShowcaseMoment[] = [
-  { id: 'checkIn', tone: 'sky', icon: House, delay: '[animation-delay:0ms]' },
-  { id: 'followUp', tone: 'plum', icon: Phone, delay: '[animation-delay:1200ms]' },
-  { id: 'invoice', tone: 'peach', icon: Receipt, delay: '[animation-delay:2400ms]' },
+  { id: 'checkIn', tone: 'sky', icon: House, stop: 'waiting' },
+  { id: 'followUp', tone: 'plum', icon: Phone, stop: 'followUp' },
+  { id: 'invoice', tone: 'peach', icon: Receipt, stop: 'checkout' },
 ];
 
 /** One value line: its tone, icon and copy. */
@@ -149,11 +150,3 @@ export const SHOWCASE_VALUES: readonly ShowcaseValue[] = [
   { id: 'nothingSlips', tone: 'butter', icon: Bell },
   { id: 'calm', tone: 'sage', icon: Palette },
 ];
-
-/**
- * The showcase's soft tonal canvas: three section tones washed in from the
- * corners over the card colour — tokens only, so dark mode and every preset
- * follow. One literal so Tailwind sees it.
- */
-export const SHOWCASE_WASH =
-  'bg-card bg-[radial-gradient(60%_55%_at_0%_0%,var(--color-tone-lav),transparent_70%),radial-gradient(50%_45%_at_100%_0%,var(--color-tone-sky),transparent_70%),radial-gradient(60%_50%_at_100%_100%,var(--color-tone-peach),transparent_70%)]';

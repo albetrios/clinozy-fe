@@ -195,7 +195,7 @@ describe('summarizeIntakeDiff', () => {
 });
 
 describe('without a Baseline', () => {
-  test('prints the recorded and suggested Baselines and exits 2', () => {
+  test('names the Baseline the user recorded, or says the iteration starts from scratch — never suggests one — and exits 2', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
@@ -207,18 +207,33 @@ describe('without a Baseline', () => {
     writeIteration({
       repositoryRoot,
       name: CURRENT,
-      fields: { baseline: '—' },
+      fields: { baseline: 'none' },
       intake: completeDrop(),
     });
-    const result = runDiff([CURRENT], { repositoryRoot });
-    assert.equal(result.exitCode, 2);
+    const scratch = runDiff([CURRENT], { repositoryRoot });
+    assert.equal(scratch.exitCode, 2);
     assert.match(
-      result.lines[0],
-      /Suggested \(latest done\/frozen in this repository\): launch-2026-09-30-jxmr/,
+      scratch.lines[0],
+      /starts from scratch \(Baseline none\), so there is nothing to compare/,
+    );
+    assert.doesNotMatch(scratch.lines[0], /Suggested/);
+    assert.doesNotMatch(scratch.lines[0], new RegExp(BASELINE));
+
+    writeIteration({
+      repositoryRoot,
+      name: CURRENT,
+      fields: { baseline: BASELINE },
+      intake: completeDrop(),
+    });
+    const recorded = runDiff([CURRENT], { repositoryRoot });
+    assert.equal(recorded.exitCode, 2);
+    assert.match(
+      recorded.lines[0],
+      new RegExp(`Recorded in ${CURRENT}/README.md: ${BASELINE}`),
     );
     assert.match(
-      result.lines[0],
-      new RegExp(`Confirm and re-run: pnpm iteration:diff ${BASELINE} ${CURRENT}`),
+      recorded.lines[0],
+      new RegExp(`Re-run: pnpm iteration:diff ${BASELINE} ${CURRENT}`),
     );
   });
 

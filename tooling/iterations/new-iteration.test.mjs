@@ -1,6 +1,6 @@
 /**
- * `pnpm iteration:new` — names (digit-free topic, single launch, launch first), the suggested
- * Baseline in each repository, the README-only folder, the `--both` sibling README, and the id
+ * `pnpm iteration:new` — names (digit-free topic, single launch, launch first), Baseline `none` in
+ * each repository (every iteration starts from scratch; nothing is suggested), the README-only folder, the `--both` sibling README, and the id
  * retry on a collision. The same behaviour as clinozy-be's generator.
  */
 import assert from 'node:assert/strict';
@@ -257,7 +257,7 @@ describe('planNewIteration', () => {
     );
   });
 
-  test('suggests the latest done/frozen iteration with a complete intake, else —, and records the branch', () => {
+  test('starts every iteration from scratch — Baseline none, even beside a finished one — and records the branch', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
@@ -268,7 +268,7 @@ describe('planNewIteration', () => {
     });
     git(repositoryRoot, ['switch', '-q', '-c', WORK_BRANCH]);
     const early = plan(repositoryRoot);
-    assert.equal(early.fields.baseline, '—');
+    assert.equal(early.fields.baseline, 'none');
     assert.equal(early.fields.branch, WORK_BRANCH);
 
     writeIteration({
@@ -280,7 +280,7 @@ describe('planNewIteration', () => {
     });
     assert.equal(
       plan(repositoryRoot, { type: 'fix', topic: 'rounding' }).fields.baseline,
-      'launch-2026-09-30-jxmr',
+      'none',
     );
   });
 
@@ -316,7 +316,7 @@ describe('planNewIteration', () => {
     );
   });
 
-  test("--both writes the sibling README with the sibling's own Baseline, and warns on template drift", () => {
+  test('--both writes the sibling README, from scratch too, and warns on template drift', () => {
     const repositoryRoot = createRepository();
     const siblingRoot = createRepository({
       packageName: 'demo-be',
@@ -336,12 +336,12 @@ describe('planNewIteration', () => {
     });
 
     const both = plan(repositoryRoot, { siblingRoot });
-    assert.equal(both.fields.baseline, 'launch-2026-09-30-jxmr');
-    assert.equal(both.siblingBaseline, '—');
+    assert.equal(both.fields.baseline, 'none');
+    assert.equal(both.siblingBaseline, 'none');
     const siblingReadme = both.files.find(
       (file) => file.path === join(siblingRoot, 'iterations', both.name, 'README.md'),
     );
-    assert.equal(parseIterationReadme(siblingReadme.content).get('Baseline'), '—');
+    assert.equal(parseIterationReadme(siblingReadme.content).get('Baseline'), 'none');
     assert.deepEqual(both.warnings, []);
 
     mkdirSync(join(siblingRoot, 'tooling/iterations/templates'), { recursive: true });

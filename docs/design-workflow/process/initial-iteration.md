@@ -19,9 +19,13 @@ For this process:
 - Its intake is always `--mode full`: the whole drop, exactly as delivered.
   Every later iteration's `intake-files/` stores what arrived for it — the
   whole drop (`full`), the changed files (`overlay`) or a `BRIEF.md`
-  (`brief`) — and resolves the rest from its Baseline.
-- Every later iteration runs [Incremental iteration](incremental-iteration.md)
-  against a Baseline you confirm.
+  (`brief`) — and, on a named Baseline, resolves the rest from it.
+- Every later iteration starts from scratch too — Baseline `none`, this page —
+  unless you name an earlier iteration to build on; then it runs
+  [Incremental iteration](incremental-iteration.md) against that Baseline.
+  Nothing asks you for a Baseline or suggests one. A change you only describe
+  is a `BRIEF.md` placed with `--mode brief`: on its own, its whole snapshot is
+  that one file.
 
 ---
 

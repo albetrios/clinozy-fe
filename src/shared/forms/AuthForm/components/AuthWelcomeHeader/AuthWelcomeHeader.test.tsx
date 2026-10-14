@@ -31,10 +31,10 @@ describe('AuthWelcomeHeader', () => {
     expect(results).toHaveNoViolations();
   });
 
-  it("sets the heading in the drawer title's anatomy, start-aligned", () => {
+  it('sets the heading at the sign-in screen’s display size, start-aligned', () => {
     render(<AuthWelcomeHeader />);
     const heading = screen.getByRole('heading', { level: 1, name: 'Welcome back' });
-    expect(heading).toHaveClass('text-lg', 'font-semibold', 'tracking-[-0.01em]');
+    expect(heading).toHaveClass('text-2xl', 'xl:text-3xl', 'font-semibold');
     expect(heading.parentElement).not.toHaveClass('text-center');
   });
 

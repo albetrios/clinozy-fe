@@ -208,5 +208,5 @@ pnpm type-check && pnpm lint
 ---
 
 **Next:** [Initial iteration](initial-iteration.md) when the Baseline is `none`
-(the first iteration in this repo), or [Incremental iteration](incremental-iteration.md)
-for every iteration with a Baseline.
+(every iteration by default — from scratch), or [Incremental iteration](incremental-iteration.md)
+when you named an earlier iteration to build on.

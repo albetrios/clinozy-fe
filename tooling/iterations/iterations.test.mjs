@@ -21,6 +21,7 @@ import {
 import {
   appendHistoryEntry,
   checkIntakeSet,
+  isStandaloneBrief,
   indexSlugs,
   intakeHash,
   localDate,
@@ -38,7 +39,6 @@ import {
   setReadmeField,
   siblingPackageName,
   snapshotFingerprint,
-  suggestBaseline,
   validateStatusTransition,
 } from './iterations.mjs';
 
@@ -355,12 +355,24 @@ describe('the required intake set', () => {
       intake: { 'BRIEF.md': '# Brief\n' },
       fields: { intakeMode: 'brief', baseline: 'none' },
     });
+    // From scratch the brief stands alone: BRIEF.md is the whole snapshot, nothing is missing.
+    assert.deepEqual(
+      missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
+      [],
+    );
+    // An overlay has no such reading: on Baseline none, what it does not store comes from nowhere.
+    writeIteration({
+      repositoryRoot,
+      name: 'feat-returns-2026-10-06-kqzx',
+      intake: { 'PRD.md': '# PRD\n' },
+      fields: { intakeMode: 'overlay', baseline: 'none' },
+    });
     assert.match(
       missingIntakeFiles({
         repositoryRoot,
         iteration: 'feat-returns-2026-10-06-kqzx',
       })[0],
-      /^intake-files\/ \(feat-returns-2026-10-06-kqzx is a brief intake with Baseline none/,
+      /^intake-files\/ \(feat-returns-2026-10-06-kqzx is a overlay intake with Baseline none/,
     );
   });
 
@@ -447,62 +459,40 @@ describe('the Intake hash', () => {
   });
 });
 
-describe('suggestBaseline', () => {
-  test('the latest done or frozen iteration with a complete intake, by finish date, then Opened, then name', () => {
-    const repositoryRoot = createRepository();
-    const done = (date) => [`- ${date} · implementing → done · — · A`];
-    writeIteration({
-      repositoryRoot,
-      name: 'launch-2026-09-30-jxmr',
-      fields: { status: 'frozen' },
-      history: done('2026-10-02'),
-      intake: completeDrop(),
-    });
-    writeIteration({
-      repositoryRoot,
-      name: 'feat-late-2026-10-03-aaaa',
-      fields: { status: 'done' },
-      history: done('2026-10-09'),
-      intake: completeDrop(),
-    });
-    writeIteration({
-      repositoryRoot,
-      name: 'feat-early-2026-10-05-bbbb',
-      fields: { status: 'done' },
-      history: done('2026-10-07'),
-      intake: completeDrop(),
-    });
-    writeIteration({
-      repositoryRoot,
-      name: 'feat-busy-2026-10-08-cccc',
-      fields: { status: 'implementing' },
-      intake: completeDrop(),
-    });
-    const { 'PRD.md': _prd, ...noPrd } = completeDrop();
-    writeIteration({
-      repositoryRoot,
-      name: 'fix-hollow-2026-10-09-dddd',
-      fields: { status: 'done' },
-      history: done('2026-10-10'),
-      intake: noPrd,
-    });
-
-    assert.equal(suggestBaseline({ repositoryRoot }), 'feat-late-2026-10-03-aaaa');
-    assert.equal(
-      suggestBaseline({ repositoryRoot, excluding: 'feat-late-2026-10-03-aaaa' }),
-      'feat-early-2026-10-05-bbbb',
-    );
+describe('a brief from scratch', () => {
+  test('is a brief on Baseline none — any other mode or a named Baseline is not', () => {
+    const fields = (baseline, mode) =>
+      new Map([
+        ['Baseline', baseline],
+        ['Intake mode', mode],
+      ]);
+    assert.equal(isStandaloneBrief(fields('none', 'brief')), true);
+    assert.equal(isStandaloneBrief(fields('launch-2026-09-30-jxmr', 'brief')), false);
+    assert.equal(isStandaloneBrief(fields('none', 'full')), false);
+    assert.equal(isStandaloneBrief(fields('none', 'overlay')), false);
   });
 
-  test('is undefined while nothing is done or frozen', () => {
-    const repositoryRoot = createRepository();
-    writeIteration({
-      repositoryRoot,
-      name: 'launch-2026-09-30-jxmr',
-      fields: { status: 'implementing' },
-      intake: completeDrop(),
-    });
-    assert.equal(suggestBaseline({ repositoryRoot }), undefined);
+  test('needs BRIEF.md alone; anything else is reported, never required', () => {
+    const readText = readerOf({});
+    assert.deepEqual(
+      checkIntakeSet({ names: ['BRIEF.md'], readText, mode: 'brief', standalone: true }),
+      { missing: [], extras: [], unlistedScreens: [] },
+    );
+    assert.deepEqual(
+      checkIntakeSet({
+        names: ['notes.md', 'mock.png'],
+        readText,
+        mode: 'brief',
+        standalone: true,
+      }),
+      { missing: ['BRIEF.md'], extras: ['mock.png'], unlistedScreens: ['notes.md'] },
+    );
+    // A brief on a named Baseline still needs the whole carried-forward set.
+    assert.ok(
+      checkIntakeSet({ names: ['BRIEF.md'], readText, mode: 'brief' }).missing.includes(
+        'PRD.md',
+      ),
+    );
   });
 });
 

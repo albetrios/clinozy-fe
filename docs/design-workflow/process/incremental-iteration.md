@@ -1,8 +1,11 @@
 # Incremental iteration
 
-**Run for every iteration with a Baseline** — any `feat`, `change` or `fix`
-after the first. Assumes [Adoption](adoption.md) and a Baseline that was built
-([Initial iteration](initial-iteration.md), or an earlier incremental run).
+**Run only for an iteration with a Baseline you named** — a `feat`, `change` or
+`fix` you asked to build on an earlier iteration ("build on <iteration>"). Every
+iteration starts from scratch (Baseline `none`) unless you do; nothing asks you
+for a Baseline or suggests one. Assumes [Adoption](adoption.md) and a Baseline
+that was built ([Initial iteration](initial-iteration.md), or an earlier
+incremental run).
 
 The whole goal: **touch only what changed.** If you find yourself re-building a
 screen the diff didn't touch, you've fallen back to the initial process.
@@ -22,10 +25,10 @@ For this process:
   | `overlay` | only the changed files                                                      | the changed files      | the Baseline's snapshot, with them laid over it |
   | `brief`   | no design files — a written change, e.g. "implement these kinds of screens" | `BRIEF.md`             | the Baseline's snapshot plus `BRIEF.md`         |
 
-- **The Baseline is yours to confirm.** At planning Step 0 the suggestion is the
-  latest `done` or `frozen` iteration in this repo; confirm it or pick another,
-  and it is saved with `pnpm iteration:baseline <iteration> <baseline>`. Then the
-  gate, `pnpm iteration:intake <iteration> --check --baseline <baseline>`, proves
+- **The Baseline is yours to name.** Nothing suggests one: you say which earlier
+  iteration this builds on, and it is saved with
+  `pnpm iteration:baseline <iteration> <baseline>` — before an `overlay` or
+  `brief` intake, which builds on it. Then the gate, `pnpm iteration:intake <iteration> --check --baseline <baseline>`, proves
   both snapshots are complete and unedited — when it fails, planning stops at
   once.
 - **The delta follows the mode.** `full` / `overlay`: two signals — the
@@ -59,28 +62,30 @@ The **preset never re-enters** unless the drop changes it — the diff says so.
 
 ---
 
-## ==== STEP 1 — Open, place the drop, confirm the Baseline ====
+## ==== STEP 1 — Open, record the Baseline you named, place the drop ====
 
 ```bash
 pnpm iteration:new feat pharmacy-returns                          # or change / fix; --both when clinozy-be changes too
+pnpm iteration:baseline <iteration> <baseline>                    # the earlier iteration you named (iteration:new wrote none)
 pnpm iteration:intake <iteration> <drop-folder>                   # the whole drop (--mode full)
 pnpm iteration:intake <iteration> <drop-folder> --mode overlay    # only the changed files
 pnpm iteration:intake <iteration> <brief-folder> --mode brief     # only BRIEF.md
 ```
 
-`overlay` and `brief` build on the README's Baseline, so check it before the
-intake: `iteration:new` writes the suggestion there, and another one is set with
-`pnpm iteration:baseline <iteration> <baseline>` first. The Baseline's own gate
-must pass. A single file works as the source, such as the `BRIEF.md` itself.
+`overlay` and `brief` build on the README's Baseline, so record it before the
+intake: `iteration:new` writes `none` there (from scratch), and the iteration you
+named is set with `pnpm iteration:baseline <iteration> <baseline>` first. The
+Baseline's own gate must pass. A single file works as the source, such as the
+`BRIEF.md` itself.
 
 `--both` sends `PRD.md` and `schema-routes.md` (and `BRIEF.md` in brief mode) to
 the same-named clinozy-be iteration, which builds its snapshot on its own
-Baseline.
+Baseline (`none` unless you name one there too).
 
-Planning Step 0 confirms the Baseline with you (or saves another with
-`pnpm iteration:baseline`). After an `overlay` or `brief` intake, another
-Baseline means rebuilding the snapshot — the gate fails until the intake is
-re-run with `--replace`.
+Planning Step 0 confirms the iteration with you and never asks about the
+Baseline. After an `overlay` or `brief` intake, a different Baseline means
+rebuilding the snapshot — the gate fails until the intake is re-run with
+`--replace`.
 
 ## ==== STEP 2 — Establish the delta ====
 

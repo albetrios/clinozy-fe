@@ -14,7 +14,7 @@ in [the process index](README.md).
 PHASE 1 · PLANNING  (no code — ends in your approval)
  │
  ├─ 1 NEW         pnpm iteration:new <type> <topic> [--both]
- │                → iterations/<it>/README.md · Baseline suggested          [planning]
+ │                → iterations/<it>/README.md · Baseline none (from scratch) [planning]
  │
  ├─ 2 INTAKE      pnpm iteration:intake <it> <source> [--mode full|overlay|brief] [--both]
  │                → what arrived into intake-files/, the snapshot checked   [planning]
@@ -30,7 +30,7 @@ PHASE 1 · PLANNING  (no code — ends in your approval)
 PHASE 2 · KICKOFF  (the approved plan, built one ledger row at a time)
  │
  ├─ 5 KICKOFF     "kickoff iteration <it>" → fe-kickoff-iteration
- │                Step 0 confirms, then THE GATE again · Baseline none/done/frozen
+ │                Step 0 confirms, then THE GATE again · Baseline none, or a named one done/frozen
  │                → AS-BUILT.md started, the Baseline's Standing deviations copied in
  │                                                                          [implementing]
  ├─ 6 AS-BUILT    each row: do → verify → record → impact check → review    [implementing]
@@ -167,7 +167,7 @@ Every move goes through `pnpm iteration:status`, which writes the Status row and
                               │  and Standing deviations
                               ▼
                    ┌─────────────────────┐
-                   │        done         │  can now be suggested as a Baseline
+                   │        done         │  can now be named as a Baseline
                    └──────────┬──────────┘
                               │  the last commit before the branch merges
                               ▼
@@ -187,9 +187,9 @@ Anything else is refused: no skipping steps, and nothing leaves frozen.
  │
  ├─ Step 0  CONFIRM ──── pnpm iteration:list → | Iteration | Type | Baseline | Status | Eligible | Why |
  │                       eligible = Status planning · recommends the earliest-opened (launch first)
- │                       incremental: suggests a Baseline (latest done/frozen with a complete
- │                       intake) → you confirm or pick another → pnpm iteration:baseline
- │                       always asks you (AskUserQuestion) — never picks silently
+ │                       confirms the iteration with you (AskUserQuestion) — never picks silently
+ │                       never asks for or suggests a Baseline: none (from scratch), unless you
+ │                       named an earlier iteration → pnpm iteration:baseline
  │          THE GATE ─── pnpm iteration:intake <it> --check [--baseline <baseline>]
  │                       fails → print its output, end the turn (nothing written)
  │
@@ -230,7 +230,8 @@ Anything else is refused: no skipping steps, and nothing leaves frozen.
 ```text
 "kickoff iteration <it>"
  │
- ├─ Step 0  CONFIRM ── eligible = Status approved AND Baseline none/done/frozen · AskUserQuestion
+ ├─ Step 0  CONFIRM ── eligible = Status approved AND Baseline none, or a named one done/frozen
+ │                     · AskUserQuestion (the iteration only — never the Baseline)
  │          THE GATE ─ pnpm iteration:intake <it> --check — fails → print its output, end the turn
  │                     → pnpm iteration:status <it> implementing
  │                     → AS-BUILT.md, with the Baseline's Standing deviations copied in
@@ -313,7 +314,7 @@ side without `intake-files/`.
    PRD.md and schema-routes.md (and BRIEF.md in brief mode) are the same bytes in both
    intake-files/ folders — pnpm iteration:list shows the same Schema-routes fingerprint in each.
 
- pnpm iteration:new feat <topic> --both                 README in both (each suggests its own Baseline)
+ pnpm iteration:new feat <topic> --both                 README in both (Baseline none in each)
  pnpm iteration:intake <it> <source> [--mode …] --both  the same mode in both, each on ITS OWN Baseline:
                                                         the snapshot here · PRD.md + schema-routes.md
                                                         (+ BRIEF.md in brief mode) there
@@ -329,19 +330,20 @@ side without `intake-files/`.
          ▲ merge                 ▲ merge                       ▲ merge
          │                       │                             │
    launch-2026-09-30-jxmr   feat-pharmacy-returns-…-kqzx   change-sales-filters-…-wvbn
-   Baseline none            Baseline launch                Baseline feat-pharmacy-returns
-   → initial                → incremental                  → incremental
-   intake: full (22)        intake: full (23)              intake: brief (24 = 23 + BRIEF.md)
-                 └──── diff A ↔ B ────┘        └──── diff B ↔ C: + BRIEF.md only ────┘
-   Standing deviations: 1   copied: 1 → closes with 1      copied: 1 → closes with 2
+   Baseline none            Baseline launch (you named it) Baseline none (the default)
+   → initial                → incremental                  → initial, from scratch
+   intake: full (22)        intake: full (23)              intake: brief (1 = BRIEF.md alone)
+                 └──── diff A ↔ B ────┘
+   Standing deviations: 1   copied: 1 → closes with 1      starts empty → closes with 1
 
- The latest done/frozen iteration's intake-files/ is the complete current design (after a brief,
- plus the written change); its AS-BUILT › Standing deviations is where the code differs from it.
- The chain of Baselines is the history of how both changed.
+ Every iteration starts from scratch (Baseline none) — nothing suggests a Baseline or asks for one.
+ Only when you name an earlier iteration does the next one build on it: its intake-files/ are then
+ the design you change, and its AS-BUILT › Standing deviations where the code already differs.
+ Either way the current code is read — what was built beats what was drawn.
 
  Parallel work is fine:
-   feat-a (Baseline launch) ───────────────●  merges first
-   feat-b (Baseline launch) ─────────────────────●  merges second → in review, check overlap
+   feat-a (from scratch) ──────────────────●  merges first
+   feat-b (from scratch) ────────────────────────●  merges second → in review, check overlap
                                                     with feat-a (same screen / entity / route)
 ```
 
@@ -362,12 +364,16 @@ commands, the statuses and the shape of every output are the real ones.
  YOU    pnpm iteration:new feat pharmacy-returns --both
  CMD    Created.
         Iteration: feat-pharmacy-returns-2026-10-06-kqzx
-        Baseline:  — (suggested — confirm it at planning Step 0)   ← nothing is done yet
-                   clinozy-be: —
+        Baseline:  none (from scratch — only when the user names an earlier iteration:
+                   pnpm iteration:baseline feat-…-kqzx <baseline>)
+                   clinozy-be: none
         Files:  clinozy-fe/iterations/feat-…-kqzx/README.md
                 clinozy-be/iterations/feat-…-kqzx/README.md
- STATE  Status planning · Baseline — · Drop placed — · Intake mode — · Intake hash —
+ STATE  Status planning · Baseline none · Drop placed — · Intake mode — · Intake hash —
  YOU    write the Summary row: "Medicine returns: partial/full, credit notes, a returns list"
+ YOU    "build this on the launch"   ← you name the Baseline; nothing would have suggested it
+ CMD    pnpm iteration:baseline feat-…-kqzx launch-2026-09-30-jxmr
+ STATE  History  - 2026-10-06 · Baseline none → launch-2026-09-30-jxmr · — · Nikunj Mavani
 
  ─────────────────────────────────────────────────────────────────────────────────── INTAKE
  YOU    export the FULL drop from Claude Design → ~/Downloads/clinozy-returns-drop/
@@ -393,11 +399,9 @@ commands, the statuses and the shape of every output are the real ones.
  SKILL  fe-iteration-planning
  Step 0 | Iteration      | Type   | Baseline | Status       | Eligible | Why                      |
         | launch-…-jxmr  | launch | none     | implementing | no       | not in planning          |
-        | feat-…-kqzx    | feat   | —        | planning     | YES      | earliest-opened eligible |
-        no done/frozen iteration yet → no suggestion → asks you for the Baseline
- YOU    "use the launch"  (its intake is complete; it will be done before the kickoff)
- CMD    pnpm iteration:baseline feat-…-kqzx launch-2026-09-30-jxmr
- STATE  History  - 2026-10-06 · Baseline — → launch-2026-09-30-jxmr · — · Nikunj Mavani
+        | feat-…-kqzx    | feat   | launch-… | planning     | YES      | earliest-opened eligible |
+        confirms the iteration with you; the Baseline is the launch because you named it
+        (its intake is complete; it will be done before the kickoff) — never asked for
  GATE   pnpm iteration:intake feat-…-kqzx --check --baseline launch-2026-09-30-jxmr
         ✓ iterations/feat-…-kqzx/intake-files/ — 23 files, mandatory set complete,
           Intake hash 9c41d07e5b2a unchanged (Intake mode full)
@@ -490,8 +494,8 @@ commands, the statuses and the shape of every output are the real ones.
  DAY 6 · 2026-10-11 ─────────────────────────────────────────────────────────────── FROZEN
  YOU    in the last commit before the merge: pnpm iteration:status feat-…-kqzx frozen
  STATE  History  - 2026-10-11 · done → frozen · — · Nikunj Mavani
-        merged → the folder is never edited again; the next iteration's suggested
-        Baseline is feat-pharmacy-returns-2026-10-06-kqzx
+        merged → the folder is never edited again; a later iteration builds on it only if
+        you name it as that iteration's Baseline
 ══════════════════════════════════════════════════════════════════════════════════════════════
 ```
 
@@ -546,7 +550,7 @@ hash, and everything after the intake is identical.
 
 ```text
  YOU    pnpm iteration:baseline feat-…-kqzx launch-2026-09-30-jxmr   ← first: an overlay builds on it
-        (clinozy-be confirms its own Baseline for its same-named iteration the same way)
+        (clinozy-be records the Baseline you name for its same-named iteration the same way)
  YOU    ls ~/Downloads/clinozy-returns-changes/
           Clinozy.dc.html · PRD.md · _index.md · medical.md · returns.md · schema-routes.md
  YOU    pnpm iteration:intake feat-…-kqzx ~/Downloads/clinozy-returns-changes --mode overlay --both
@@ -565,19 +569,22 @@ hash, and everything after the intake is identical.
 ## A brief iteration, end to end
 
 No new design — the change is written down ("implement filters like these on Sales and Purchases").
+It starts from scratch, the default: no Baseline is asked for, suggested or used.
 
 ```text
 ══════════════════════════════════════════════════════════════════════════════════════════════
  change-sales-filters-2026-10-14-wvbn — date and supplier filters, written as a brief
- Start: feat-pharmacy-returns-2026-10-06-kqzx is frozen, with 1 Standing deviation.
+ Start: feat-pharmacy-returns-2026-10-06-kqzx is frozen. Nobody names it as a Baseline, so this
+ iteration stands on its BRIEF.md and the current code.
 ══════════════════════════════════════════════════════════════════════════════════════════════
 
  DAY 1 · 2026-10-14 ──────────────────────────────────────────────────────────── OPEN + BRIEF
  YOU    pnpm iteration:new change sales-filters
  CMD    Iteration: change-sales-filters-2026-10-14-wvbn
-        Baseline:  feat-pharmacy-returns-2026-10-06-kqzx (suggested — confirm it at planning Step 0)
-        … only a BRIEF.md: --mode brief — both build on the README's Baseline
-          (feat-pharmacy-returns-2026-10-06-kqzx); for another one, first: pnpm iteration:baseline …
+        Baseline:  none (from scratch — only when the user names an earlier iteration:
+                   pnpm iteration:baseline change-sales-filters-2026-10-14-wvbn <baseline>)
+        … only a BRIEF.md: --mode brief (on its own, from scratch) · only the changed files:
+          --mode overlay (needs the earlier iteration the user named: pnpm iteration:baseline …)
  YOU    copy tooling/iterations/templates/BRIEF.md to ~/Desktop/BRIEF.md and fill every section:
           What changes   Sales and Purchases get a date-range filter and a supplier filter
           Why            month-end reconciliation means scrolling the whole list
@@ -588,43 +595,40 @@ No new design — the change is written down ("implement filters like these on S
           Out of scope   Payments, Clinic stock
  YOU    pnpm iteration:intake change-…-wvbn ~/Desktop/BRIEF.md --mode brief
  CMD    Placed.
-        Drop: ~/Desktop/BRIEF.md · --mode brief on feat-pharmacy-returns-2026-10-06-kqzx
+        Drop: ~/Desktop/BRIEF.md · --mode brief
         This repository (clinozy-fe/iterations/change-…-wvbn/intake-files) — Status planning:
-          24 new, 0 replaced, 0 removed, 0 unchanged
-          Intake note: 1 received (BRIEF.md) · 23 carried forward from
-          feat-pharmacy-returns-2026-10-06-kqzx · Intake hash: 7f2d915ce04b
-        (a BRIEF.md missing a section, or any other changed file, stops it with nothing written)
+          1 new, 0 replaced, 0 removed, 0 unchanged
+          Intake note: 1 received (BRIEF.md) · from scratch · Intake hash: 7f2d915ce04b
+        (a BRIEF.md missing a section, or any other file beside it, stops it with nothing written)
 
  ───────────────────────────────────────────────────────────────────────────────── PLANNING
  YOU    "plan iteration change-sales-filters-2026-10-14-wvbn"
- Step 0 eligible · Baseline feat-pharmacy-returns-… (frozen) → you confirm it
- GATE   pnpm iteration:intake change-…-wvbn --check --baseline feat-pharmacy-returns-2026-10-06-kqzx
-        → Gate passed.
- Step 1 reads BRIEF.md first, then all 24 files in full → coverage matrix
- Step 2 brief: pnpm iteration:diff feat-…-kqzx change-…-wvbn → Files + added (1): BRIEF.md and
-        nothing else ✓ · BRIEF.md is the change list
-        Standing deviations (feat AS-BUILT): Sales is paginated → the filters sit above the
+ Step 0 eligible · Baseline none → confirms the iteration with you; never asks for a Baseline
+ GATE   pnpm iteration:intake change-…-wvbn --check → Gate passed. (mandatory set: BRIEF.md)
+ Step 1 reads BRIEF.md in full → coverage matrix, 1 row
+ Step 2 n/a — initial: BRIEF.md is the whole change list, read against the current code of
+        Medical › Sales and Purchases — they are paginated today, so the filters sit above the
         paginated table and send it back to page 1
- Step 3 brief: BRIEF.md ↔ medical.md and the code — medical.md's toolbar has search only, and
-        useMedicalSales already takes a date range → reuse it (evidence: file:line)
+ Step 3 brief: BRIEF.md ↔ the code — the toolbar has search only, and useMedicalSales already
+        takes a date range → reuse it (evidence: file:line)
  Step 4 RED   on mobile, filter chips or a bottom sheet? BRIEF.md is silent → AskUserQuestion → D1
- Step 5 KICKOFF.md — §7: the filters will be a new Standing deviation (the design does not draw
-        them); §8: verify the BRIEF.md acceptance criteria + the full baseline set. The route:
+ Step 5 KICKOFF.md — §7: the filters will be a Standing deviation (no design draws them); §8:
+        verify the BRIEF.md acceptance criteria + the visual baselines of the touched screens.
+        The route:
           | 1 | Filter labels in 11 locales        | copy       | —   | fe-i18n-constants    | keys exist · parity |
           | 2 | Sales + Purchases filters (D1)     | structural | 1   | shadcn → fe-design-ditto | BRIEF criteria 1–3 |
-          | 3 | Verify BRIEF + full baseline set   | verify     | 1–2 | fe-visual-regression | no unexpected diff |
+          | 3 | Verify BRIEF + touched baselines   | verify     | 1–2 | fe-visual-regression | no unexpected diff |
  Step 6 → ready-for-approval → you approve → approved
 
  ────────────────────────────────────────────────────────────────────────────────── KICKOFF
  GATE   pnpm iteration:intake change-…-wvbn --check → Gate passed. → implementing
-        → AS-BUILT.md, with feat-pharmacy-returns' 1 Standing deviation copied in
- ROW 2  do: the filters on Sales and Purchases, the rest of each screen still to medical.md
-        verify: BRIEF.md criteria 1–3 ✓ · the touched screens still match their specs elsewhere
+        → AS-BUILT.md, Standing deviations starting empty (from scratch)
+ ROW 2  do: the filters on Sales and Purchases, the rest of each screen as it is built today
+        verify: BRIEF.md criteria 1–3 ✓ · the touched screens otherwise unchanged
         record: AS-BUILT #2 and a new Standing deviation —
-          | Medical › Sales, Purchases filters | no filters (medical.md) | date range + supplier |
+          | Medical › Sales, Purchases filters | no filters drawn | date range + supplier |
           | change-sales-filters-2026-10-14-wvbn | BRIEF.md · D1 |
- CLOSE  Standing deviations: 2 — Sales paginated (since the launch) · the filters (since this one)
-        → the next drop that draws the filters resolves that one, and its iteration removes it
+ CLOSE  Standing deviations: 1 — the filters (since this one)
 ══════════════════════════════════════════════════════════════════════════════════════════════
 ```
 
@@ -646,6 +650,13 @@ No new design — the change is written down ("implement filters like these on S
  the Baseline changes after an overlay or brief intake
    → the gate fails: "built on X, but the README's Baseline is Y" → re-run the intake with --replace
 
+ only a BRIEF.md arrived, and nobody named a Baseline
+   → nothing to ask: --mode brief from scratch — intake-files/ holds BRIEF.md alone
+
+ only the changed files arrived, and nobody named a Baseline
+   → an overlay needs one: ask which iteration the files change (pnpm iteration:baseline), or
+     have the whole drop sent and place it with --mode full
+
  a change after approval (or mid-build) is bigger than one row
    → pnpm iteration:status <it> planning --reason "<why>"
    → intake --replace if the drop changed → re-plan (Steps 0–6) → ready-for-approval → approved
@@ -654,5 +665,6 @@ No new design — the change is written down ("implement filters like these on S
    → Step 0 marks it not eligible (Baseline not done/frozen) — planning can go ahead, the build waits
 
  a mistake is found after the merge
-   → never edit the frozen folder → pnpm iteration:new fix <topic>, with this one as its Baseline
+   → never edit the frozen folder → pnpm iteration:new fix <topic> — from scratch, or with this
+     one as its Baseline if you name it
 ```

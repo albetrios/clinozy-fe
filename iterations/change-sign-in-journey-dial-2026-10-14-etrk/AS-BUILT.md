@@ -1,0 +1,39 @@
+# change-sign-in-journey-dial-2026-10-14-etrk — as built
+
+What was actually built, ledger row by ledger row, against the approved plan in
+[`KICKOFF.md`](KICKOFF.md). Built 2026-10-14 in the commit `feat(auth): redesign the sign-in screen around a journey dial`,
+before this record (D5).
+
+## Rows
+
+| #   | Ledger row | Planned                                                             | Actually built                                                                                                                                                                                                                                                                                                                                        | Difference                                                                                                                                                                          |
+| --- | ---------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #1  | L-1        | `PublicSkipLink`, `PublicPrivacyChoices`, `PublicCardHeader` `size` | Both parts exported from `PublicFrame/index.ts`; `PublicFrame` renders them as before. `CARD_HEADER_SIZES`: `card` (18px, the default) and `display` (24px, 30px from `xl`); tests                                                                                                                                                                    | As planned                                                                                                                                                                          |
+| #2  | L-2        | The split `AuthLayout` + `auth-layout.css`                          | `--auth-panel` 26rem · 28rem (`96rem`) · 32rem (`120rem`); from `xl` a grid `minmax(0,1fr) auto var(--auth-panel)`, rows `1fr auto auto 1fr`; the panel is an absolutely placed full-height `bg-background` column with `border-inline-start`; the card's chrome falls away there. Below `xl` one column. `AuthLayout` tests (order, panel from `xl`) | As planned                                                                                                                                                                          |
+| #3  | L-3        | The dial, moments, reasons, backdrop + `auth-showcase.css`          | SVG track, dotted bezel and disc; seven `data-stop` nodes on `--x` / `--y`; the thread arm; per-stop halo, node lift (116%) and centre label; moments tied by `--stop`; reasons as a ruled list; dot-grid backdrop with two tone washes; reduced-motion block; test ids `auth-showcase`, `auth-showcase-journey`, `-moments`, `-values`               | Card width 13.5rem and the dial `clamp(22rem, 30vw, 30rem)` — found in verification so the moments never cover a stop label at 1280; the centre label balances its lines for French |
+| #4  | L-4        | Display form headings                                               | `AuthWelcomeHeader` and `MfaForm` pass `size="display"`                                                                                                                                                                                                                                                                                               | As planned                                                                                                                                                                          |
+| #5  | L-5        | Retire the old journey keyframes                                    | `journey-wave` and `drift` removed from `index.css`; `pulse-dot` kept (the "Live" dot and others)                                                                                                                                                                                                                                                     | As planned                                                                                                                                                                          |
+| #6  | L-6        | Docs                                                                | `LOGIN.OVERVIEW.md` (full file paths for the two stylesheets), `docs/reference/design.md`, `docs/reference/e2e-testids-inventory.md`, `docs/reference/project-tree.txt`                                                                                                                                                                               | As planned                                                                                                                                                                          |
+| #7  | L-7        | Verify in the running app                                           | Before/after screenshots against a stubbed signed-out API: 1440 light + dark (each + the code step), 1280, 1920, 834, 390 light (+ the code step) + dark, Arabic, French, reduced motion; stills taken with the thread resting on a stop                                                                                                              | As planned; the review page the user approved shows them                                                                                                                            |
+| #8  | L-8        | Gates                                                               | `pnpm health`: 23 of 24 pass. `pnpm size` Initial CSS 35.42 kB (main 35.55, limit 35.7)                                                                                                                                                                                                                                                               | `pnpm size` fails on Initial JS in a local `.env.local` build — main fails the same way there (its multi-locale env, see the previous iteration's D18); not this change             |
+| #9  | L-9        | Close                                                               | This file; Status `done`                                                                                                                                                                                                                                                                                                                              | As planned                                                                                                                                                                          |
+
+## Revisions to upcoming rows
+
+None.
+
+## Summary
+
+- **Planned, not built:** — every ledger row is done.
+- **Planned, not kept:** —
+- **Built, not planned:** the process change that starts every iteration from scratch (D2) ships in
+  the same PR, as its own commit — tooling, skills, rules and docs, not a ledger row here.
+- **Follow-ups for the next iteration:** the Playwright visual baselines of `/login` (8 PNGs) are
+  stale until the user records them with clinozy-be running (D11); the SonarQube gate did not run
+  in this session (D12); clinozy-be still asks for a Baseline — its process can follow the same
+  rule on request (D13).
+
+## Standing deviations
+
+None. From scratch there is no Baseline list to carry, and the build matches `BRIEF.md` — the
+brief is this iteration's design.

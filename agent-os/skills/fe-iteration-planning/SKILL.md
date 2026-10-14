@@ -1,6 +1,6 @@
 ---
 name: fe-iteration-planning
-description: Plan a design iteration under iterations/<iteration>/ — NO CODE. Confirm the iteration and its Baseline, pass the intake gate (iteration:intake --check — stop on failure), read the resolved snapshot (coverage matrix), establish the delta by Intake mode (full/overlay: iteration:diff + the designer's "What changed"; brief: BRIEF.md) and the Baseline's Standing deviations, reconcile md ↔ prototype with file:line evidence, gate on blocking questions, then write KICKOFF.md with an ordered ledger and stop for approval. Use when the user says "plan iteration <name>", "iteration planning", "plan the next iteration", "plan from legacy", or asks to plan the build of a design drop. Next step after approval: fe-kickoff-iteration.
+description: Plan a design iteration under iterations/<iteration>/ — NO CODE. Confirm the iteration (it starts from scratch, Baseline none — never ask for or suggest a Baseline; use one only when the user names it), pass the intake gate (iteration:intake --check — stop on failure), read the resolved snapshot (coverage matrix), establish the change (from scratch: the drop or BRIEF.md plus the current code; with a named Baseline, by Intake mode — full/overlay: iteration:diff + the designer's "What changed"; brief: BRIEF.md — and the Baseline's Standing deviations), reconcile md ↔ prototype with file:line evidence, gate on blocking questions, then write KICKOFF.md with an ordered ledger and stop for approval. Use when the user says "plan iteration <name>", "iteration planning", "plan the next iteration", "plan from legacy", or asks to plan the build of a design drop. Next step after approval: fe-kickoff-iteration.
 ---
 
 # Iteration planning (plan from `iterations/<iteration>/intake-files/`)
@@ -31,18 +31,20 @@ iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/
 └── AS-BUILT.md          ← written by fe-kickoff-iteration; ends with the Standing deviations
 ```
 
-- **Mode.** Baseline `none` → **MODE initial** (the first iteration in this
-  repo): everything is new; read everything. Otherwise **MODE incremental**
-  against the Baseline the user confirms in Step 0 — the suggestion is the
-  latest `done` or `frozen` iteration in this repo.
+- **Mode — from scratch by default.** Every iteration opens with Baseline `none` → **MODE initial**:
+  it is planned on its own — its `intake-files/` and the current code — and no earlier iteration or
+  its files are taken into account. **Never ask for a Baseline and never suggest one.** Only when
+  the user names one ("build on <iteration>", "the last iteration") is it **MODE incremental**:
+  record it with `pnpm iteration:baseline <iteration> <baseline>`.
 - **Intake modes.** `intake-files/` stores what arrived; the snapshot is resolved from it. `full` —
   the drop as received (the launch is always full). `overlay` — only the changed files arrived and
-  are stored: the snapshot is the Baseline's with them laid over it. `brief` — no design files, only
-  a written change such as "implement these kinds of screens": `BRIEF.md` is stored, and the
-  snapshot is the Baseline's plus it. Read a file `intake-files/` does not store in the Baseline's
-  intake (and, when that one is layered too, in its Baseline's) — the gate's ✓ line counts both. The README records the Intake mode,
-  an Intake note (received versus carried forward) and an Intake hash.
-- **The delta by mode.** `full` / `overlay`: the designer's "What changed" notes plus
+  are stored: the snapshot is a named Baseline's with them laid over it. `brief` — no design files,
+  only a written change such as "implement these kinds of screens": `BRIEF.md` is stored; from
+  scratch it is the whole snapshot, and on a named Baseline the snapshot is the Baseline's plus it.
+  Read a file `intake-files/` does not store in the Baseline's intake (and, when that one is layered
+  too, in its Baseline's) — the gate's ✓ line counts both. The README records the Intake mode, an
+  Intake note (received versus carried forward, or `from scratch`) and an Intake hash.
+- **The delta by mode (named Baseline only).** `full` / `overlay`: the designer's "What changed" notes plus
   `pnpm iteration:diff <baseline> <iteration>`, which compares the two resolved intakes and
   nothing else — anything the diff shows that the notes omit is a finding. `brief`: `BRIEF.md` is
   the change list, and the diff must show nothing else changed. Always: the Baseline's Standing
@@ -65,18 +67,20 @@ Run `pnpm iteration:list` and show:
 
 Eligible = Status `planning`. Recommend the earliest-opened eligible iteration
 (the launch always comes first). If the user named one, check it against the
-rule. For an incremental iteration, suggest the Baseline — the latest `done` or
-`frozen` iteration in this repo — and let the user confirm it or pick another;
-save it with `pnpm iteration:baseline <iteration> <baseline>`. Always ask with
-**AskUserQuestion** — never pick silently. An `overlay` or `brief` snapshot was built on the
-Baseline recorded at intake; picking another means rebuilding it (the gate fails until
-`pnpm iteration:intake <iteration> <source> --mode <mode> --replace` has run).
+rule. Confirm **the iteration** with **AskUserQuestion** — never pick silently.
+
+**Do not ask about a Baseline and do not suggest one.** The iteration starts from scratch
+(Baseline `none`, which `pnpm iteration:new` wrote). Only when the user has named an earlier
+iteration to build on, record it — `pnpm iteration:baseline <iteration> <baseline>` — and plan in
+MODE incremental. An `overlay` or `brief` snapshot was built on the Baseline recorded at intake
+(`none`: a brief from scratch); recording another one later means rebuilding it (the gate fails
+until `pnpm iteration:intake <iteration> <source> --mode <mode> --replace` has run).
 
 Then **the gate**:
 
 ```bash
-pnpm iteration:intake <iteration> --check                         # MODE initial
-pnpm iteration:intake <iteration> --check --baseline <baseline>   # MODE incremental
+pnpm iteration:intake <iteration> --check                         # from scratch (the default)
+pnpm iteration:intake <iteration> --check --baseline <baseline>   # a Baseline the user named
 ```
 
 **Gate rule:** if it exits non-zero, stop now — write nothing, change no status, ask nothing
@@ -113,8 +117,10 @@ shapes, step sequences, exact timings, states. **Stop.**
 
 ### Step 2 — Delta (MODE incremental only). Stop.
 
-MODE initial: write `n/a — initial` and go on. MODE incremental: establish the delta by the
-README's Intake mode, then read what the Baseline actually built.
+MODE initial (from scratch, the default): write `n/a — initial` and go on — for a brief from
+scratch, `BRIEF.md` is the whole change list, read against the current code of the parts it
+affects. MODE incremental (a Baseline the user named): establish the delta by the README's Intake
+mode, then read what the Baseline actually built.
 
 - **`full` / `overlay`** — two signals, reconciled:
   1. **The designer's "What changed"** — the notes in the changed specs and the PRD.
@@ -286,7 +292,8 @@ Confirm every box; fix before presenting, never after:
 
 - [ ] The gate (`iteration:intake --check`) passed, and every file in `intake-files/` is read fully and owned by a plan section
 - [ ] MODE incremental: the delta follows the Intake mode (full/overlay: `iteration:diff` ⟷ "What changed"; brief: `BRIEF.md`, nothing else changed), every change classified, every omission raised as a finding
-- [ ] The Baseline's Standing deviations are read, and the ones this change touches are in §7
+- [ ] MODE incremental: the Baseline's Standing deviations are read, and the ones this change touches are in §7
+- [ ] No Baseline was asked for or suggested; one is recorded only because the user named it
 - [ ] Every screen in `_index.md` has spec + reconciliation rows + plan block + ledger rows
 - [ ] All four rebuild-forcing facts resolved (or RED question raised) per screen
 - [ ] Every reconciliation verdict carries file:line / selector evidence
@@ -362,7 +369,8 @@ the rules a plan most often gets wrong:
 
 | Failure                                                                | Prevention here                       |
 | ---------------------------------------------------------------------- | ------------------------------------- |
-| The wrong iteration planned, or against an unconfirmed Baseline        | Step 0 eligibility table + AskUserQuestion |
+| The wrong iteration planned                                            | Step 0 eligibility table + AskUserQuestion |
+| An earlier iteration's files pulled in that nobody asked for           | Step 0: from scratch unless the user names a Baseline |
 | A plan built on an incomplete or edited intake                         | Step 0 gate (`iteration:intake --check`) |
 | A plan against the design where the build already differs             | Step 2 Standing deviations            |
 | Plan built from a summary; a screen or state silently missing          | Step 1 coverage matrix                |

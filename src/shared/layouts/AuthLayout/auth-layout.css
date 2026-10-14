@@ -1,0 +1,153 @@
+/* The sign-in screen's split (AuthLayout). Loaded with the lazy auth layout
+   chunk, never on the first paint (the initial-CSS budget): these rules are
+   this one screen's, so they ride its chunk rather than the global stylesheet
+   — the same split as `bug-report.css`. Spacing is `--spacing` steps, so the
+   Density axis still reaches it; widths are the Tailwind breakpoints (`sm`
+   40rem, `xl` 80rem, `2xl` 96rem, `3xl` 120rem).
+
+   Below `xl` the page is one column — header, hero, the form's card, the dial,
+   the values, footer — and the classes here only space it. These rules are
+   unlayered, so at `xl` they win over the card's Tailwind utilities (which sit
+   in the utilities layer) without `!important`. From `xl` it is a
+   split screen: the stage on the canvas (columns 1–2: the hero and the values,
+   then the dial) and the form docked in its own panel (column 3, full height),
+   with the header's controls at its top and "Privacy choices" at its foot. */
+
+.auth-layout {
+  --auth-panel: 26rem;
+  --auth-stage-pad: calc(var(--spacing) * 14);
+  --auth-stage-gap: calc(var(--spacing) * 12);
+}
+
+.auth-layout-panel {
+  display: none;
+}
+
+.auth-layout-main {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 36rem;
+  gap: calc(var(--spacing) * 10);
+  padding: calc(var(--spacing) * 4) calc(var(--spacing) * 4) calc(var(--spacing) * 10);
+}
+
+.auth-layout-mark {
+  display: none;
+}
+
+@media (min-width: 40rem) {
+  .auth-layout-main {
+    gap: calc(var(--spacing) * 12);
+    padding-top: calc(var(--spacing) * 8);
+  }
+  .auth-layout-dial {
+    margin-block: calc(var(--spacing) * 4) calc(var(--spacing) * 14);
+  }
+  .auth-layout-values {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 32rem;
+  }
+}
+
+@media (min-width: 80rem) {
+  .auth-layout-panel {
+    display: block;
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: -10;
+    width: var(--auth-panel);
+    border-inline-start: 1px solid var(--color-border);
+    background: var(--color-background);
+  }
+  .auth-layout-backdrop {
+    inset-inline-end: var(--auth-panel);
+  }
+  .auth-layout-header {
+    padding-inline-start: var(--auth-stage-pad);
+  }
+  .auth-layout-controls {
+    width: var(--auth-panel);
+    justify-content: flex-end;
+    padding-inline-end: calc(var(--spacing) * 1);
+  }
+  .auth-layout-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto var(--auth-panel);
+    grid-template-rows: 1fr auto auto 1fr;
+    gap: 0 var(--auth-stage-gap);
+    margin-inline: 0;
+    max-width: none;
+    padding: 0;
+    padding-inline-start: var(--auth-stage-pad);
+  }
+  .auth-layout-hero {
+    grid-area: 2 / 1;
+    max-width: 36rem;
+    padding-bottom: calc(var(--spacing) * 8);
+  }
+  .auth-layout-values {
+    grid-area: 3 / 1;
+    margin-inline: 0;
+    max-width: 36rem;
+  }
+  .auth-layout-dial {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    margin-block: 0;
+    width: clamp(22rem, 30vw, 30rem);
+  }
+  /* The form owns its panel: the mark over it, and no card of its own. */
+  .auth-layout-form {
+    grid-column: 3;
+    grid-row: 1 / -1;
+    align-self: center;
+    justify-self: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 22.5rem;
+  }
+  .auth-layout-mark {
+    display: block;
+    margin-bottom: calc(var(--spacing) * 2);
+  }
+  .auth-layout-card {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+  }
+  .auth-layout-privacy {
+    margin-top: calc(var(--spacing) * 2);
+    justify-content: flex-start;
+    text-align: start;
+  }
+  .auth-layout-footer {
+    margin-inline-start: auto;
+    width: var(--auth-panel);
+  }
+}
+
+@media (min-width: 96rem) {
+  .auth-layout {
+    --auth-panel: 28rem;
+    --auth-stage-pad: calc(var(--spacing) * 20);
+    --auth-stage-gap: calc(var(--spacing) * 20);
+  }
+}
+
+@media (min-width: 120rem) {
+  .auth-layout {
+    --auth-panel: 32rem;
+    --auth-stage-pad: calc(var(--spacing) * 28);
+    --auth-stage-gap: calc(var(--spacing) * 28);
+  }
+  .auth-layout-hero {
+    max-width: 42rem;
+  }
+  .auth-layout-dial {
+    width: clamp(30rem, 28vw, 38rem);
+  }
+}
