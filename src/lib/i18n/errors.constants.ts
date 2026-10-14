@@ -115,6 +115,12 @@ export const ERRORS_KEYS = {
       avatarUpdated: 'frontend.account.avatarUpdated',
       avatarRemoved: 'frontend.account.avatarRemoved',
     },
+    upload: {
+      storageUnreachable: 'frontend.upload.storageUnreachable',
+      storageRejected: 'frontend.upload.storageRejected',
+      notConfirmed: 'frontend.upload.notConfirmed',
+      invalidFileName: 'frontend.upload.invalidFileName',
+    },
     profileUpdated: 'frontend.profileUpdated',
     hooks: {
       passkeys: {
