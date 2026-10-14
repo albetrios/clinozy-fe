@@ -18,6 +18,7 @@ export const I18N_NAMESPACES = {
   tasks: 'tasks',
   offerings: 'offerings',
   users: 'users',
+  branches: 'branches',
   app: 'app',
   print: 'print',
   setup: 'setup',

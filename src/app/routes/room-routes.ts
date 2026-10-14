@@ -112,11 +112,11 @@ export const ROOM_ROUTES = {
     ),
     'Component',
   ),
-  UsersBranchesPage: lazyRouteComponent(
+  // The Branches room reads its own words, and the Users room's days and hours (`useHoursFormat`).
+  BranchesPage: lazyRouteComponent(
     localizedRoute(
-      [I18N_NAMESPACES.users],
-      () =>
-        import('@/pages/organization/$organizationSlug/users/branches/branches.route.tsx'),
+      [I18N_NAMESPACES.branches, I18N_NAMESPACES.users],
+      () => import('@/pages/organization/$organizationSlug/branches/branches.route.tsx'),
     ),
     'Component',
   ),

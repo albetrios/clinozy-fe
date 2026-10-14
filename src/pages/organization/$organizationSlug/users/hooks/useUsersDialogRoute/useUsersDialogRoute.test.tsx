@@ -2,9 +2,9 @@ import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
+import { PLATFORM_ROLES } from '@/tests/utils/team-doubles.ts';
 
 import {
-  PLATFORM_ROLES,
   renderUsersRoutes,
   resetUsersRoutes,
 } from '../../__tests__/integration/users-test-router.tsx';

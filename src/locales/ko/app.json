@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "사용자",
-      "description": "팀, 역할 및 권한, 지점"
+      "description": "팀, 역할 및 권한"
+    },
+    "branches": {
+      "label": "지점",
+      "description": "모든 지점: 주소, 영업시간, 팀, 진료실과 장비"
     }
   },
   "tones": {

@@ -32,7 +32,7 @@ const ROOM_MODULES: Record<RoomName, string> = {
   OffersPage: `${ORG}/offerings/offers/offers.route.tsx`,
   UsersPage: `${ORG}/users/users.route.tsx`,
   UsersRolesPage: `${ORG}/users/roles/roles.route.tsx`,
-  UsersBranchesPage: `${ORG}/users/branches/branches.route.tsx`,
+  BranchesPage: `${ORG}/branches/branches.route.tsx`,
   MedicalLayout: `${ORG}/medical/medical.route.tsx`,
   MedicalSalesPage: `${ORG}/medical/sales/sales.route.tsx`,
   MedicalMedicinesPage: `${ORG}/medical/medicines/medicines.route.tsx`,

@@ -10,14 +10,12 @@ import type { MemberInvite } from '@/shared/api/organization-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { member, PLATFORM_ROLES, SELF } from '@/tests/utils/team-doubles.ts';
 
 import { UsersPage } from '../../UsersPage.tsx';
 import {
-  member,
-  PLATFORM_ROLES,
   renderUsersRoutes,
   resetUsersRoutes,
-  SELF,
   USERS_ADMIN_CODES,
 } from './users-test-router.tsx';
 

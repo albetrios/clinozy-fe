@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Benutzer",
-      "description": "Team, Rollen und Zugriff, Standorte"
+      "description": "Team, Rollen und Zugriff"
+    },
+    "branches": {
+      "label": "Filialen",
+      "description": "Jede Filiale: Adresse, Öffnungszeiten, Team, Räume und Geräte"
     }
   },
   "tones": {

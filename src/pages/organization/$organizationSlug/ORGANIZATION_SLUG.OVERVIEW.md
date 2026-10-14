@@ -11,7 +11,7 @@ permissions on change. Spec: `docs/reference/routing-and-tenancy.md`.
 | File                            | Responsibility                                                                                                                                                                                                                    |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `organization-slug.route.tsx`   | Route marker — exports `Component` rendering `OrganizationLayout`.                                                                                                                                                                |
-| `organization-slug.manifest.ts` | Manifest — `kind: 'layout'`, children `suspended` and the ten clinic rooms.                                                                                                                                                       |
+| `organization-slug.manifest.ts` | Manifest — `kind: 'layout'`, children `suspended` and the eleven clinic rooms.                                                                                                                                                    |
 | `OrganizationLayout.tsx`        | Thin wrapper mounting the shared AppLayout (the section bar header + `Outlet`) and the clinic setup drawer's host `SetupDrawerLazy` (`#setup/…` over any room — feat-clinic-setup; `docs/reference/routing-and-tenancy.md` §7.1). |
 | `hooks/useRoomLanding/`         | Takes the member off a clinic room the access in force can't view (Q-U11, below).                                                                                                                                                 |
 | `components/AppHomeEmpty/`      | The org home when no clinic room is open to the member (L-63, below). Owns `app-home-empty`.                                                                                                                                      |
@@ -33,9 +33,11 @@ blocked state renders without a redirect loop. See `app/guards/GUARDS.OVERVIEW.m
 
 ## Clinic rooms (iteration launch-2026-09-30-jxmr)
 
-The ten clinic rooms nest here as islands — `today/`, `leads/`, `appointments/`,
+The eleven clinic rooms nest here as islands — `today/`, `leads/`, `appointments/`,
 `patients/`, `medical/` (layout; `/medical` → `medical/sales`), `stock/` (layout;
-`/stock` → `stock/items`), `payments/`, `tasks/`, `offerings/`, `users/`. Each
+`/stock` → `stock/items`), `payments/`, `tasks/`, `offerings/`, `users/` and
+`branches/` (its own room since change-branches-in-navbar; `/users/branches…`
+redirects there). Each
 gates on membership and its `clinic-*` module and carries its manifest as
 `staticData` for the nav (`useAppNav`). The org index (`/organization/<slug>`)
 redirects to the member's role home (D25, `shared/app/app-home.ts`), and
