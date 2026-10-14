@@ -24,7 +24,7 @@ import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useStepUpGuard } from '@/shared/components/StepUpDialog/index.ts';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
@@ -521,10 +521,7 @@ export function AccountSecurityPanel() {
 
   return (
     <div className="flex flex-col gap-4" data-testid="settings-section-security">
-      <SectionHeader
-        title={t(SETTINGS_KEYS.security.heading)}
-        description={t(SETTINGS_KEYS.security.description)}
-      />
+      <SettingsSectionHeader section="security" />
 
       {overviewReady ? (
         <SecurityOverviewCard
