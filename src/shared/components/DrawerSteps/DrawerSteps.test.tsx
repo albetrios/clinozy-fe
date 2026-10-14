@@ -146,19 +146,26 @@ describe('DrawerSteps', () => {
     expect(card('notes')).toHaveAttribute('data-status', 'later');
   });
 
-  it('summarises a collapsed step as label / value pairs and one "Not filled" line', async () => {
+  it('reads a collapsed step back as its values — no field names on the card — and counts the empty ones', async () => {
     const user = userEvent.setup();
     render(<Steps />);
 
     await user.click(trigger('items'));
 
     const peek = screen.getByTestId('pt-step-contact-peek');
-    expect(within(peek).getByText('First name')).toBeInTheDocument();
-    expect(within(peek).getByText('Priya')).toBeInTheDocument();
-    expect(within(peek).getByText('New')).toHaveAttribute('data-slot', 'pill');
-    // No dashed tile per empty field: they fold into one muted line.
+    const [lead, status] = within(peek).getAllByRole('listitem');
+    // The lead value in the full ink; its field's name only read out and on hover.
+    expect(lead).toHaveTextContent('First name: Priya');
+    expect(lead).toHaveClass('text-foreground', 'font-medium');
+    expect(lead).toHaveAttribute('title', 'First name · Priya');
+    expect(within(lead!).getByText('First name:', { exact: false })).toHaveClass(
+      'sr-only',
+    );
+    expect(within(status!).getByText('New')).toHaveAttribute('data-slot', 'pill');
+    // No dashed tile per empty field: one quiet count, the names read out and on hover.
     expect(within(peek).queryByText('Empty')).not.toBeInTheDocument();
-    expect(within(peek).getByText('Not filled: Mobile')).toBeInTheDocument();
+    expect(within(peek).getByText('1 not filled')).toBeVisible();
+    expect(within(peek).getByText('Not filled: Mobile')).toHaveClass('sr-only');
     expect(peek.querySelector('.border-dashed')).toBeNull();
     // No sub line under the head while the summary says it all.
     expect(
@@ -177,7 +184,7 @@ describe('DrawerSteps', () => {
     render(<Steps />);
 
     const peek = screen.getByTestId('pt-step-clinic-peek');
-    expect(within(peek).getByText('Interests')).toBeInTheDocument();
+    expect(within(peek).getByRole('listitem')).toHaveAttribute('title', 'Interests');
     for (const pick of ['LHR', 'Peel', 'Botox', 'Fillers']) {
       expect(within(peek).getByText(pick)).toBeInTheDocument();
     }
@@ -185,11 +192,11 @@ describe('DrawerSteps', () => {
     expect(within(peek).getByText('+2')).toBeInTheDocument();
   });
 
-  it('shows an items table as "<N> added", six names then "+N"', () => {
+  it('shows an items table as a row of chips: six names then "+N"', () => {
     render(<Steps />);
 
     const items = screen.getByTestId('pt-step-items-peek');
-    expect(within(items).getByText('Medicine · 8 added')).toBeInTheDocument();
+    expect(within(items).getByTitle('Medicine')).toBeInTheDocument();
     expect(within(items).getByText('F')).toBeInTheDocument();
     expect(within(items).queryByText('G')).not.toBeInTheDocument();
     expect(within(items).getByText('+2')).toBeInTheDocument();

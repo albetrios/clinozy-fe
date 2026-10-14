@@ -371,11 +371,11 @@
       }
     },
     "peek": {
-      "added_one": "{{count}} जोड़ा गया",
-      "added_other": "{{count}} जोड़े गए",
       "more_one": "+{{count}} और",
       "more_other": "+{{count}} और",
-      "notFilled": "नहीं भरा: {{fields, list(type: unit)}}"
+      "notFilled": "नहीं भरा: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} नहीं भरा",
+      "notFilledCount_other": "{{count}} नहीं भरे"
     },
     "stepper": {
       "decrease": "घटाएँ",

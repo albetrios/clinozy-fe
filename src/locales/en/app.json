@@ -371,11 +371,11 @@
       }
     },
     "peek": {
-      "added_one": "{{count}} added",
-      "added_other": "{{count}} added",
       "more_one": "+{{count}} more",
       "more_other": "+{{count}} more",
-      "notFilled": "Not filled: {{fields, list(type: unit)}}"
+      "notFilled": "Not filled: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} not filled",
+      "notFilledCount_other": "{{count}} not filled"
     },
     "stepper": {
       "decrease": "Decrease",

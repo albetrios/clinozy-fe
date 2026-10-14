@@ -372,13 +372,13 @@
       }
     },
     "peek": {
-      "added_one": "{{count}} añadido",
-      "added_many": "{{count}} añadidos",
-      "added_other": "{{count}} añadidos",
       "more_one": "+{{count}} más",
       "more_many": "+{{count}} más",
       "more_other": "+{{count}} más",
-      "notFilled": "Sin rellenar: {{fields, list(type: unit)}}"
+      "notFilled": "Sin rellenar: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} sin rellenar",
+      "notFilledCount_many": "{{count}} sin rellenar",
+      "notFilledCount_other": "{{count}} sin rellenar"
     },
     "stepper": {
       "decrease": "Disminuir",

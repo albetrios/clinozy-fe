@@ -371,11 +371,11 @@
       }
     },
     "peek": {
-      "added_one": "{{count}} hinzugefügt",
-      "added_other": "{{count}} hinzugefügt",
       "more_one": "+{{count}} weiteres",
       "more_other": "+{{count}} weitere",
-      "notFilled": "Nicht ausgefüllt: {{fields, list(type: unit)}}"
+      "notFilled": "Nicht ausgefüllt: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} nicht ausgefüllt",
+      "notFilledCount_other": "{{count}} nicht ausgefüllt"
     },
     "stepper": {
       "decrease": "Verringern",

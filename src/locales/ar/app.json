@@ -375,19 +375,19 @@
       }
     },
     "peek": {
-      "added_zero": "{{count}} مُضاف",
-      "added_one": "{{count}} مُضاف",
-      "added_two": "{{count}} مُضافان",
-      "added_few": "{{count}} مُضافة",
-      "added_many": "{{count}} مُضافًا",
-      "added_other": "{{count}} مُضاف",
       "more_zero": "+{{count}} أخرى",
       "more_one": "+{{count}} أخرى",
       "more_two": "+{{count}} أخرى",
       "more_few": "+{{count}} أخرى",
       "more_many": "+{{count}} أخرى",
       "more_other": "+{{count}} أخرى",
-      "notFilled": "غير مُعبأ: {{fields, list(type: unit)}}"
+      "notFilled": "غير مُعبأ: {{fields, list(type: unit)}}",
+      "notFilledCount_zero": "{{count}} غير مُعبأ",
+      "notFilledCount_one": "{{count}} غير مُعبأ",
+      "notFilledCount_two": "{{count}} غير مُعبأ",
+      "notFilledCount_few": "{{count}} غير مُعبأ",
+      "notFilledCount_many": "{{count}} غير مُعبأ",
+      "notFilledCount_other": "{{count}} غير مُعبأ"
     },
     "stepper": {
       "decrease": "إنقاص",

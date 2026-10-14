@@ -370,9 +370,9 @@
       }
     },
     "peek": {
-      "added_other": "已添加 {{count}} 项",
       "more_other": "另有 {{count}} 项",
-      "notFilled": "未填写：{{fields, list(type: unit)}}"
+      "notFilled": "未填写：{{fields, list(type: unit)}}",
+      "notFilledCount_other": "{{count}} 项未填写"
     },
     "stepper": {
       "decrease": "减少",

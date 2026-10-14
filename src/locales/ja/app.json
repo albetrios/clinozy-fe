@@ -370,9 +370,9 @@
       }
     },
     "peek": {
-      "added_other": "{{count}} 件追加",
       "more_other": "ほか {{count}} 件",
-      "notFilled": "未入力: {{fields, list(type: unit)}}"
+      "notFilled": "未入力: {{fields, list(type: unit)}}",
+      "notFilledCount_other": "未入力 {{count}} 件"
     },
     "stepper": {
       "decrease": "減らす",

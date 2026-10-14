@@ -370,9 +370,9 @@
       }
     },
     "peek": {
-      "added_other": "{{count}}개 추가됨",
       "more_other": "+{{count}}개 더",
-      "notFilled": "미입력: {{fields, list(type: unit)}}"
+      "notFilled": "미입력: {{fields, list(type: unit)}}",
+      "notFilledCount_other": "{{count}}개 미입력"
     },
     "stepper": {
       "decrease": "줄이기",
