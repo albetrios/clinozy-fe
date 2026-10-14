@@ -15,8 +15,9 @@ describe('zod-jitless', () => {
     // From main.tsx's body it would run too late: the chunks main imports — the
     // env schema among them — evaluate first, and build their schemas on the way.
     const viteConfig = readFileSync(join(process.cwd(), 'vite.config.ts'), 'utf8');
+    // Its `codeSplitting` group in vite.config.ts names it beside zod itself.
     expect(viteConfig).toMatch(
-      /id\.includes\('node_modules\/zod'\)\s*\|\|\s*id\.endsWith\('\/src\/lib\/zod-jitless\.ts'\)\s*\)\s*\{\s*return 'zod';/,
+      /name: 'zod',\s*test: \(id\) =>\s*id\.includes\('node_modules\/zod'\)\s*\|\|\s*id\.endsWith\('\/src\/lib\/zod-jitless\.ts'\)/,
     );
   });
 });

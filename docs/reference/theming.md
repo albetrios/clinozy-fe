@@ -88,9 +88,10 @@ fallbacks (the look's own values) and the stylesheet's blocks once it has loaded
 A fresh install starts in **light** mode. Toasts are not part of the look: every toast
 is the design's bar, bottom-centre (`shared/notify/ToastBar.tsx`).
 
-It is **full-surface**: its `[data-theme]` block sets every surface token and sits after
-the base-colour blocks, so a `data-base` tint does not reach it. Dark is `@media screen`
-only — printing always uses the light tokens.
+It is **full-surface**: its `[data-theme]` block sets every surface token. (The retired
+base-colour picker's `data-base` tint blocks left `index.css` on 2026-10-13 — nothing had
+set the attribute since the studio went, and they were ~0.6 kB of every first paint's
+stylesheet.) Dark is `@media screen` only — printing always uses the light tokens.
 Inside it, `[data-surface='light-pinned']` keeps a panel on the light ramp in dark mode
 (the bulk-actions bar, the photo viewer and its captions), with primary one step softer.
 

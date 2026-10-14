@@ -169,9 +169,10 @@ describe('uploadFile', () => {
     expect(postMock).toHaveBeenCalledTimes(1);
   });
 
-  // A dropped connection keeps the shape `fetch` gave it, so error mapping still reads it as
-  // a connection failure.
-  it('rejects with a TypeError when the connection drops mid-write', async () => {
+  // A write that never answers — the connection dropped, or the bucket's CORS refused this
+  // origin (the page cannot tell them apart) — is the upload's own failure, said in words; it
+  // used to surface as the raw English "Network request failed".
+  it('rejects as unreachable when the write never answers', async () => {
     postMock.mockResolvedValueOnce({ data: PRESIGN });
     nextReply = { outcome: 'error' };
 
@@ -181,8 +182,36 @@ describe('uploadFile', () => {
         purpose: 'organization-logo',
         organizationId: 'org_a',
       }),
-    ).rejects.toBeInstanceOf(TypeError);
+    ).rejects.toMatchObject({ code: 'UPLOAD_STORAGE_UNREACHABLE', statusCode: 0 });
     expect(postMock).toHaveBeenCalledTimes(1);
+  });
+
+  // The PUT URL signs the server-side-encryption header; a PUT that leaves it out is refused
+  // with SignatureDoesNotMatch, so the client sends exactly what the presign lists.
+  it('sends the headers a PUT presign lists', async () => {
+    postMock
+      .mockResolvedValueOnce({
+        data: {
+          ...PRESIGN,
+          headers: {
+            'content-type': 'image/png',
+            'x-amz-server-side-encryption': 'AES256',
+          },
+        },
+      })
+      .mockResolvedValueOnce({ data: { id: 'upl_x', status: 'UPLOADED' } });
+
+    await uploadFile({
+      file: logoFile(),
+      purpose: 'organization-logo',
+      organizationId: 'org_a',
+    });
+
+    expect(storageWrite().headers).toEqual({
+      'content-type': 'image/png',
+      'x-amz-server-side-encryption': 'AES256',
+    });
+    expect(storageWrite().withCredentials).toBe(false);
   });
 
   it('rejects as aborted when the write is cancelled', async () => {

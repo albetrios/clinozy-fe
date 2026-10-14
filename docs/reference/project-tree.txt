@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2225 src files · ~1128 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
+Stats: ~2226 src files · ~1129 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -328,6 +328,12 @@ clinozy-fe/
 │   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── fix-upload-storage-cors-2026-10-13-lnab/
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md
@@ -2275,8 +2281,9 @@ clinozy-fe/
 │   │   │   │   └── [1 test file]
 │   │   │   ├── ThemeModeToggle/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── ThemeModeMenu.tsx
 │   │   │   │   ├── ThemeModeToggle.tsx
-│   │   │   │   └── [1 test file]
+│   │   │   │   └── [2 test files]
 │   │   │   ├── TotpCodeInput/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── TotpCodeInput.tsx
@@ -3096,7 +3103,7 @@ clinozy-fe/
 │   │   ├── lint-changed-markdown.sh
 │   │   ├── run-size-limit.mjs
 │   │   ├── strip-sourcemaps.mjs
-│   │   └── [6 test files]
+│   │   └── [7 test files]
 │   ├── codegen/
 │   │   ├── api-types.mjs
 │   │   ├── app-schema.mjs
