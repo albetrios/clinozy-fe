@@ -11,9 +11,9 @@ import {
  * "(you)" and owner filters — `undefined` while it loads, `null` when there is none.
  *
  * @remarks
- * Read once per organization and kept for the session (a membership id never changes), off the
- * session context for that organization (`findMyMembershipId` — never a context still answering
- * for the workspace the tab just left).
+ * Read once per organization and kept for the session (a membership id never changes), off a
+ * fresh session context for that organization (`findMyMembershipId` — never the cached one an
+ * organization switch leaves holding the previous workspace's membership).
  */
 export function useMyMembershipId(): string | null | undefined {
   const userId = useAuthStore((state) => state.user?.id ?? null);
@@ -23,6 +23,8 @@ export function useMyMembershipId(): string | null | undefined {
     queryFn: () => findMyMembershipId(organizationId as string),
     enabled: userId !== null && organizationId !== null,
     staleTime: Number.POSITIVE_INFINITY,
+    // A read still answering for the workspace just left retries; it is not the user's error.
+    notifyOnError: false,
   });
   return query.data;
 }

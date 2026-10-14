@@ -89,6 +89,31 @@ export interface InvoiceSaleWrite {
   create: (draft: SaleDraft) => Promise<SaleDraftOutcome>;
 }
 
+/**
+ * The sale's lines, one per medicine — clinozy-be takes each medicine once (`eachMedicineOnce`),
+ * while the quick line, Browse and a prescription can each add a medicine's row again. Rows of
+ * one medicine add up their packs; their discount is the packs-weighted one, so the bill stays
+ * what the rows showed.
+ */
+function oneLinePerMedicine(
+  lines: readonly { medicineId: string | null; qty: number; discountPct: number }[],
+): SaleDraft['items'] {
+  const merged = new Map<string, { qty: number; discounted: number }>();
+  for (const line of lines) {
+    if (!line.medicineId) continue;
+    const held = merged.get(line.medicineId) ?? { qty: 0, discounted: 0 };
+    merged.set(line.medicineId, {
+      qty: held.qty + line.qty,
+      discounted: held.discounted + line.qty * line.discountPct,
+    });
+  }
+  return [...merged].map(([medicineId, { qty, discounted }]) => ({
+    medicineId,
+    qty,
+    discountPct: qty > 0 ? Math.round((discounted / qty) * 100) / 100 : 0,
+  }));
+}
+
 /** What a sale's save hands the room's write, for the buyer's contact. */
 export function saleDraftOf(
   values: InvoiceFormValues,
@@ -100,11 +125,7 @@ export function saleDraftOf(
   return {
     branchId: values.branchId ?? fallbackBranchId,
     contactId,
-    items: lines.flatMap((line) =>
-      line.medicineId
-        ? [{ medicineId: line.medicineId, qty: line.qty, discountPct: line.discountPct }]
-        : [],
-    ),
+    items: oneLinePerMedicine(lines),
     overallDiscount: rupeesOfPaise(
       overallDiscountFromPercent(lines, percentOf(values.overallDiscountPct)),
     ),

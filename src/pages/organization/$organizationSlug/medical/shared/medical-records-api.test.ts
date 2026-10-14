@@ -337,7 +337,8 @@ describe('sales', () => {
     expect(bodyOf(vi.mocked(api.post).mock.calls[0])).toEqual({
       branch_id: TEST_MEDICAL_BRANCH_ID,
       contact_id: TEST_BUYER_CONTACT_ID,
-      items: [{ medicine_id: TEST_MEDICINE_ID, quantity: 2 }],
+      // 0% is sent: left out, the server would apply the near-expiry discount.
+      items: [{ medicine_id: TEST_MEDICINE_ID, quantity: 2, discount_percent: 0 }],
       patient_prescription_id: 'rx_rx5800000000000000000',
       payment: { splits: [{ mode: 'upi', amount: 1300 }] },
     });

@@ -242,6 +242,22 @@ describe('a Medical sale’s form (MD19: the server draws and prices it)', () =>
     });
   });
 
+  it('sends each medicine once — its rows’ packs added up, their discount weighted by packs', () => {
+    const draft = saleDraftOf(
+      sale({
+        items: [
+          { ...azel, qty: 2, discountPct: 10 },
+          { ...azel, qty: 1, discountPct: 0 },
+          blankLine(),
+        ],
+      }),
+      { contactId: TEST_MONEY_CONTACT_ID, fallbackBranchId: 'fallback' },
+    );
+    expect(draft.items).toEqual([
+      { medicineId: 'med_azel00000000000000000', qty: 3, discountPct: 6.67 },
+    ]);
+  });
+
   it('files under the fallback branch when none is set, and sends no payment when nothing is paid now', () => {
     const draft = saleDraftOf(sale({ branchId: null, remark: '' }), {
       contactId: TEST_MONEY_CONTACT_ID,

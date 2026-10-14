@@ -362,7 +362,9 @@ describe('Suppliers', () => {
   it('an Account: its orders and credits, the latest first', async () => {
     answer({
       '/app/medical-purchase-orders': () => page([purchaseOrderWire()]),
-      '/app/suppliers/{supplier_id}/credits': () => page([supplierCreditWire()]),
+      // 01:00 IST on 8 Oct is still 7 Oct in UTC: the Account reads the clinic's day.
+      '/app/suppliers/{supplier_id}/credits': () =>
+        page([supplierCreditWire({ created_at: '2026-10-07T19:30:00.000Z' })]),
     });
     expect(await fetchSupplierAccount(TEST_SUPPLIER_ID)).toEqual([
       {

@@ -497,7 +497,8 @@ export async function fetchSupplierAccount(id: string): Promise<SupplierAccountR
       kind: 'credit' as const,
       id: credit.id,
       batchNo: credit.batchNo,
-      date: credit.createdAt.slice(0, 10),
+      // The clinic's day of the instant — its UTC date is the day before until 05:30 IST.
+      date: appToday(new Date(credit.createdAt)),
       amount: credit.amount,
     })),
     ...orders.map((order) => ({

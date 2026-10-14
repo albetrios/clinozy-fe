@@ -370,7 +370,9 @@ export const saleBodyOf = (input: SaleInput): ApiBody<'/app/medical-sales', 'pos
   items: input.items.map((item) => ({
     medicine_id: item.medicineId,
     quantity: item.qty,
-    ...(item.discountPct > 0 ? { discount_percent: item.discountPct } : {}),
+    // Always sent: left out, the server applies the medicine's near-expiry discount, so a
+    // pharmacist's 0% would come back as that discount.
+    discount_percent: item.discountPct,
   })),
   ...(input.overallDiscount > 0 ? { overall_discount: input.overallDiscount } : {}),
   ...(input.memberIds.length > 0 ? { member_ids: input.memberIds } : {}),

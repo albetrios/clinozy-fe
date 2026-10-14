@@ -124,12 +124,15 @@ export function SalesPage() {
         onSelect: () => nav.saleReturn(sale.id),
       });
     }
-    offered.push({
-      id: 'print',
-      label: t(keys.print),
-      icon: Printer,
-      onSelect: () => actions.print(sale),
-    });
+    // A voided sale has no invoice left to print.
+    if (sale.invoice) {
+      offered.push({
+        id: 'print',
+        label: t(keys.print),
+        icon: Printer,
+        onSelect: () => actions.print(sale),
+      });
+    }
     if (actions.canVoid(sale)) {
       offered.push({
         id: 'void',
