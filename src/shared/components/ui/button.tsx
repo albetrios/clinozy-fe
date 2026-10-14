@@ -14,22 +14,24 @@ import { cn } from '@/lib/utils.ts';
  * destructive button, H:128) beside the red-filled `destructive`, and the
  * phone's floating `pill` (52px, 14px, the FAB shadow; H:103). A `pill`
  * carries `data-slot="pill"`, so the Sharp shape squares it. And the press
- * (change-motion-polish): every variant but `link` sinks to 97% while held —
- * `scale` rides the button's own transition — and not under reduced motion.
+ * (change-motion-polish): every variant but `link` (its `data-variant`) sinks
+ * to 97% while held — `scale` rides the button's own transition — and not
+ * under reduced motion. One base class, so the entry chunk carries it once.
  */
-const PRESS = 'motion-safe:active:scale-[0.97]';
-
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-body font-medium transition-[color,background-color,border-color,box-shadow,scale] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-body font-medium transition-[color,background-color,border-color,box-shadow,scale] motion-safe:active:not-data-[variant=link]:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
-        default: `${PRESS} bg-primary text-primary-foreground hover:bg-primary/90`,
-        destructive: `${PRESS} bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40`,
-        danger: `${PRESS} border border-destructive-border bg-destructive-tint text-destructive hover:border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40`,
-        outline: `${PRESS} border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50`,
-        secondary: `${PRESS} bg-secondary text-secondary-foreground hover:bg-secondary/80`,
-        ghost: `${PRESS} hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50`,
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
+        danger:
+          'border border-destructive-border bg-destructive-tint text-destructive hover:border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
+        outline:
+          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       // No `has-[>svg]:` re-padding: it outranked a caller's own padding whenever
