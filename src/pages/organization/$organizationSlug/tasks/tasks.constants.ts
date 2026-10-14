@@ -108,8 +108,6 @@ export const TASKS_KEYS = {
       label: 'newTask.forField.label',
       placeholder: 'newTask.forField.placeholder',
       search: 'newTask.forField.search',
-      /** The list before a search is typed. */
-      empty: 'newTask.forField.empty',
     },
     titleField: {
       label: 'newTask.titleField.label',

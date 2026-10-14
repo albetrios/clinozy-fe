@@ -8,7 +8,9 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
  * (beforeLoad guards, loaders, lazy chunks). Gives feedback for in-app
  * transitions — e.g. switching organizations — WITHOUT blanking the page to a
  * full-screen spinner, so the current screen stays put until the next is ready.
- * Indeterminate; honours reduced-motion via the global rule.
+ * Indeterminate — a `progressbar` with no value, which assistive technology
+ * already reads as work under way (no `aria-busy`); honours reduced-motion via
+ * the global rule.
  */
 export function RouteProgressBar() {
   const { t } = useTranslation(LOCALE_NS);
@@ -18,7 +20,6 @@ export function RouteProgressBar() {
     <div
       role="progressbar"
       aria-label={t(LOCALE_KEYS.loadingPage)}
-      aria-busy="true"
       data-testid="route-progress"
       className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-0.5 overflow-hidden"
     >

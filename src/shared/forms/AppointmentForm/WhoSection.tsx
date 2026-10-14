@@ -10,6 +10,10 @@ import { LEAD_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { appointmentContactCard } from '@/shared/app/appointment-display.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import {
+  CONTACT_QUICK_PICK_KEYS,
+  ContactQuickPick,
+} from '@/shared/components/ContactQuickPick/index.ts';
+import {
   DrawerField,
   DrawerInput,
   DrawerPhoneInput,
@@ -21,10 +25,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
-import { useContactSearch } from '@/shared/hooks/useContacts/index.ts';
 import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
-import { Search } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -77,105 +79,58 @@ export interface WhoSectionProps {
 }
 
 /**
- * The person search (H:2749–2753; `GET /app/contacts?q=`): from 3 letters or 4 digits, five
- * hits — a patient says so, anyone else shows their number — or "+ Create contact".
+ * The person search (H:2749–2753; `GET /app/contacts?q=`) on the shared contact picker
+ * (change-contact-quick-pick): Recent before typing, then from 3 letters or 4 digits, five
+ * hits — a patient says so, anyone else shows their number — the typed words marked, ↑ ↓ ↵;
+ * the add row's quick add takes the new person's name and mobile together.
  */
 function WhoSearch({
-  onPick,
+  onChange,
   disabled,
 }: {
-  onPick: (who: WhoDraft) => void;
+  onChange: (change: AppointmentFormChange) => void;
   disabled: boolean;
 }) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
-  const [query, setQuery] = useState('');
-  const search = useContactSearch(query);
-  const typed = query.trim();
-  const hits = search.hits.map((contact) => ({
-    who: whoOfContact(contact),
-    sub: contact.patientId ? t(K.patient) : formatAppPhone(contact.primaryPhone),
-  }));
-  const pick = (who: WhoDraft) => {
-    onPick(who);
-    setQuery('');
-  };
+  const { t } = useTranslation(APPOINTMENT_FORM_NS);
   return (
-    <>
-      <div
-        data-slot="who-search"
-        className="bg-card text-muted-foreground flex h-11 items-center gap-2 rounded-xl border px-3 shadow-xs"
-      >
-        <Search aria-hidden="true" className="size-3.75 flex-none" />
-        <input
-          type="search"
-          value={query}
-          maxLength={80}
-          disabled={disabled}
-          onChange={(event) => setQuery(event.currentTarget.value)}
-          placeholder={t(K.search)}
-          aria-label={t(K.searchLabel)}
-          data-testid={IDS.whoSearch}
-          className="text-field text-foreground placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent outline-none"
-        />
-      </div>
-      {typed.length >= 2
-        ? hits.slice(0, HIT_LIMIT).map(({ who, sub }) => (
-            <button
-              key={who.contactId}
-              type="button"
-              data-testid={IDS.whoHit}
-              onClick={() => pick(who)}
-              className="hover:bg-muted flex items-center gap-2.5 rounded-lg px-2.5 py-1.75 text-start transition-colors"
-            >
-              <PersonAvatar
-                size="cell"
-                initials={personInitials(who.name)}
-                tone={WHO_TONES[who.kind]}
-                patient={who.kind === 'patient'}
-              />
-              <span className="flex min-w-0 flex-1 flex-col leading-[1.3]">
-                <span
-                  dir="auto"
-                  className="text-field [text-align:match-parent] font-semibold"
-                >
-                  {who.name}
-                </span>
-                <span className="text-caption text-muted-foreground-strong truncate tabular-nums">
-                  {sub}
-                </span>
-              </span>
-              <span
-                data-slot="button"
-                className="bg-card flex h-6.5 flex-none items-center rounded-lg border px-2.5 text-xs font-medium"
-              >
-                {t(K.useContact)}
-              </span>
-            </button>
-          ))
-        : null}
-      {typed.length >= 2 ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          data-testid={IDS.whoCreate}
-          onClick={() =>
-            pick({
-              kind: 'new',
-              contactId: null,
-              name: typed.slice(0, APPOINTMENT_FORM_LIMITS.name),
-              phone: null,
-              patientId: null,
-              leadId: null,
-              contactNumber: null,
-            })
-          }
-          className="border-border-strong bg-card hover:bg-muted self-start border-dashed shadow-none"
-        >
-          {t(K.createContact, { query: typed })}
-        </Button>
-      ) : null}
-    </>
+    <ContactQuickPick
+      searchPlaceholder={t(K.search)}
+      searchLabel={t(K.searchLabel)}
+      limit={HIT_LIMIT}
+      disabled={disabled}
+      describe={(contact) => {
+        const who = whoOfContact(contact);
+        return {
+          line: contact.patientId ? t(K.patient) : formatAppPhone(contact.primaryPhone),
+          action: t(CONTACT_QUICK_PICK_KEYS.use),
+          tone: WHO_TONES[who.kind],
+        };
+      }}
+      onPick={(contact) => onChange({ kind: 'who', who: whoOfContact(contact) })}
+      onQuickAdd={({ name, phone }) => {
+        // A who change clears the new mobile, so the mobile follows it.
+        onChange({
+          kind: 'who',
+          who: {
+            kind: 'new',
+            contactId: null,
+            name: name.slice(0, APPOINTMENT_FORM_LIMITS.name),
+            phone: null,
+            patientId: null,
+            leadId: null,
+            contactNumber: null,
+          },
+        });
+        if (phone) onChange({ kind: 'newPhone', digits: phone });
+      }}
+      testId={IDS.who}
+      testIds={{
+        search: IDS.whoSearch,
+        hit: () => IDS.whoHit,
+        add: IDS.whoCreate,
+        noMatch: IDS.whoNoMatch,
+      }}
+    />
   );
 }
 
@@ -367,10 +322,7 @@ export function WhoSection({
   if (!who) {
     return (
       <div className="flex flex-none flex-col gap-2">
-        <WhoSearch
-          disabled={disabled}
-          onPick={(next) => onChange({ kind: 'who', who: next })}
-        />
+        <WhoSearch disabled={disabled} onChange={onChange} />
       </div>
     );
   }

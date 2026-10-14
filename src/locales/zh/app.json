@@ -893,6 +893,42 @@
     "activityLead": "潜在客户 {{id}}",
     "purchasesCount_other": "{{count}} 行"
   },
+  "contactPick": {
+    "recent": "最近",
+    "keepTyping": "请继续输入 — 3 个字母或 4 位数字",
+    "searching": "正在搜索…",
+    "found_other": "找到 {{count}} 人",
+    "noMatch": "没有匹配项",
+    "use": "使用联系人",
+    "addNamed": "将“{{name}}”添加为新联系人",
+    "addPhone": "将 {{phone}} 添加为新联系人",
+    "addNamedPhone": "将“{{name}}”· {{phone}} 添加为新联系人",
+    "enterKey": "↵",
+    "clearSearch": "清除搜索",
+    "added": "已将 {{name}} 添加到联系人",
+    "existing": "{{name}} 已是联系人 · 已选中",
+    "quickAdd": {
+      "name": "姓名",
+      "namePlaceholder": "姓名",
+      "mobile": "手机号",
+      "add": "添加联系人",
+      "more": "更多详情",
+      "back": "返回搜索",
+      "addName": "请填写姓名",
+      "needMobile": "请填写 10 位手机号",
+      "mobileDigits": "手机号需要 10 位数字"
+    },
+    "patient": {
+      "newPatient": "新患者",
+      "addNamed": "将“{{name}}”添加为新患者",
+      "addPhone": "将 {{phone}} 添加为新患者",
+      "addNamedPhone": "将“{{name}}”· {{phone}} 添加为新患者",
+      "add": "添加患者",
+      "use": "选择患者",
+      "added": "已将 {{name}} 添加为患者",
+      "existing": "{{name}} 已是患者 · 已选中"
+    }
+  },
   "contactEditor": {
     "title": "编辑联系人",
     "sub": "保存一次 · 用于每条线索、每位患者和每段聊天",
@@ -984,9 +1020,7 @@
     "who": {
       "search": "按姓名、电话、ID 搜索患者或潜在客户",
       "searchLabel": "搜索人员",
-      "useContact": "使用联系人",
       "patient": "患者",
-      "createContact": "+ 新建联系人“{{query}}”",
       "newContact": "新联系人 · 预约需补充手机号",
       "mobile": "手机号码",
       "name": "姓名",
@@ -1113,9 +1147,7 @@
   "patientPicker": {
     "label": "患者",
     "placeholder": "搜索患者",
-    "hint": "只能选择患者",
-    "due": "欠款 {{amount}}",
-    "nothingDue": "无欠款"
+    "hint": "只能选择患者"
   },
   "splitRows": {
     "mode": "方式",
@@ -1208,7 +1240,6 @@
     },
     "fields": {
       "branch": "分店",
-      "newPatient": "新患者",
       "customer": "顾客",
       "customerHint": "患者或任何联系人 · 新名字会保存为药房联系人",
       "customerPlaceholder": "搜索患者、线索或药房联系人",

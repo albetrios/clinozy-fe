@@ -42,9 +42,11 @@ A layout island over two URL-driven dialogs (D24, `S:23–25`), each a direct ch
 route renders nothing — this page reads the URL and opens the drawer over the list
 (`useLeadsDialogRoute`), so a refresh or a shared link reopens it:
 
-- `create/` — New lead (L-35), prefilled from `?name=&phone=`: the Contact step (the person
-  search `GET /app/contacts?q=` — "Open lead" for someone with one, "Re-create lead" for a
-  patient, "Use contact" — Quick start Walk-in / Instagram DM, "New contact" → the shared
+- `create/` — New lead (L-35), prefilled from `?name=&phone=`: the Contact step on the shared
+  `ContactQuickPick` (change-contact-quick-pick — Recent before typing, then the person search
+  `GET /app/contacts?q=`, the typed words marked, ↑ ↓ ↵ — "Open lead" for someone with one,
+  "Re-create lead" for a patient, "Use contact" — Quick start Walk-in / Instagram DM, and the add
+  row's quick add, Name + Mobile prefilled from the search, "More details" → the shared
   `ContactEditor`) and Lead details, locked until there is a person. Create sends the picked
   person's `contact_id` or the new one's fields; a 409 shows the server's words
   (`lead_open_exists` with "Open"). A created lead is picked out in the list; the drawer
@@ -75,7 +77,7 @@ record itself lives in `@/shared/api/app/leads-fixture-contracts.ts`, beside the
 | `components/LeadsTable/`     | The list's columns (`useLeadsTable`), cells (person, team with the hold dot, "Updated"), the claim pill and the table itself — the shared `DataTable`.                                                                                                                                                                                                                                                                  |
 | `components/LeadsToolbar/`   | Views, search, Filters (`components/LeadsToolbar/leads-filter-fields.ts`), Columns and "New lead".                                                                                                                                                                                                                                                                                                                      |
 | `components/LeadDrawer/`     | The lead drawer (L-34b) on the record drawer: its width and the chat column's (`components/LeadDrawer/lead-drawer-widths.ts`), the chat's resize handle, the title's chips, the body (strip with "Edit contact", cards) and the remove confirm; on a phone the record drawer's Details · Chat panes. The chat is the person's stream (`{ kind: 'contact' }`); "Book an appointment" returns with the Appointments room. |
-| `components/NewLeadDrawer/`  | New lead (L-35): the form and its rules (`components/NewLeadDrawer/new-lead-form.ts` — presets, picks, "Change", what Create sends), the Contact step with the search, and the drawer on the shared record drawer.                                                                                                                                                                                                      |
+| `components/NewLeadDrawer/`  | New lead (L-35): the form and its rules (`components/NewLeadDrawer/new-lead-form.ts` — presets, picks, "Change", what Create sends), the Contact step on the shared `ContactQuickPick` (Quick start as its toolbar), and the drawer on the shared record drawer.                                                                                                                                                        |
 | `components/LeadFormFields/` | The drawer's fields, shared with New lead (L-35): source and interest chips, the progress track, "Assigned & involved" with its people popover (anyone with Edit assigns anyone), the person's strip.                                                                                                                                                                                                                   |
 | `hooks/useLeadDraft/`        | The drawer's draft — source, interests, status — its dirty check, save and discard.                                                                                                                                                                                                                                                                                                                                     |
 | `hooks/useLeadsList/`        | The URL's view, search, filters and sort read against the viewer (`hooks/useLeadsList/lead-list-params.ts`, kept off the entry chunk); the list, the team, the Unreplied count; the URL writes.                                                                                                                                                                                                                         |
@@ -85,7 +87,7 @@ record itself lives in `@/shared/api/app/leads-fixture-contracts.ts`, beside the
 
 ## Test ids
 
-`leads-page`; `leads-empty`, `leads-claim`, `leads-hold-dot`; the drawer's `lead-drawer-chat`, `lead-drawer-save`, `lead-drawer-remove`, `lead-drawer-people`, `lead-drawer-resize`; New lead's `new-lead-search`, `new-lead-preset-<id>`, `new-lead-hit-<contact number>`, `new-lead-no-match`, `new-lead-new-contact`, `new-lead-change` (and the shared `contact-editor-…`); the shared toolbar's and
+`leads-page`; `leads-empty`, `leads-claim`, `leads-hold-dot`; the drawer's `lead-drawer-chat`, `lead-drawer-save`, `lead-drawer-remove`, `lead-drawer-people`, `lead-drawer-resize`; New lead's `new-lead-search`, `new-lead-preset-<id>`, `new-lead-hit-<contact number>`, `new-lead-no-match`, `new-lead-new-contact` (the add row), `new-lead-change`, the picker's own `new-lead-contact-recent`, `-loading`, `-progress`, `-quick-add-name` · `-mobile` · `-submit` · `-more` (and the shared `contact-editor-…`); the shared toolbar's and
 table's under the `leads` table id (`leads-toolbar`, `leads-tab-<view>`, `leads-search`,
 `leads-filters-trigger`, `leads-columns-trigger`, `leads-new-lead`, `leads-fab`,
 `leads-table-row` …); the drawers the dialog routes open: `new-lead-drawer` (L-35),

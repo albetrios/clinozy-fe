@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
@@ -21,29 +22,71 @@ const SHAPES = {
   field: 'h-9 w-full rounded-lg',
 } as const;
 
-/** Props for {@link SkeletonBar}: its shape and the row it is in. */
+/** The shimmer's stagger: rows sweep 0 / 90 / 180ms apart, cycled (`skeleton-sheen.css`). */
+const SWEEP_STEPS = 3;
+
+/** The sheen's stylesheet was asked for — once per page. */
+let sheenRequested = false;
+
+/**
+ * Loads `skeleton-sheen.css` the first time a bar shimmers. A dynamic import, not a static
+ * one: a stylesheet this chunk imported would be listed in the first-paint chunk's preload
+ * map (every lazy route that can reach a skeleton), and that chunk has no room for it
+ * (change-contact-quick-pick D28). Until it lands — a frame or two — the bar shows its flat
+ * fill.
+ */
+function requestSheen() {
+  if (sheenRequested) return;
+  sheenRequested = true;
+  // A failed load (offline) leaves the flat fill — nothing to report.
+  import('./skeleton-sheen.css').catch(() => {});
+}
+
+/** Props for {@link SkeletonBar}: its shape, the row it is in and whether it shimmers. */
 export interface SkeletonBarProps {
   shape?: keyof typeof SHAPES | 'avatar';
-  /** The row this bar is in — picks its width from the 64 / 48 / 60% cycle (text bars only). */
+  /**
+   * The row this bar is in — picks its width from the 64 / 48 / 60% cycle (text bars only)
+   * and, with `shimmer`, when its sheen sets off.
+   */
   index?: number;
+  /**
+   * A soft sheen sweeps along the bar in the reading direction (`skeleton-sheen.css`) — for
+   * loads someone is waiting on, such as a search. Off: the flat fill.
+   */
+  shimmer?: boolean;
   className?: string;
 }
 
 /**
- * One flat skeleton bar: `bg-muted-strong`, no shimmer — the design's
- * shimmer animates a flat fill and never moves, so none is built (§3.1).
- * Decorative; the surrounding `SkeletonRows` (or the host) announces loading.
+ * One skeleton bar on `bg-muted-strong`, the primitive's pulse off. Flat by
+ * default — the launch design's shimmer animated a flat fill and never moved, so
+ * none was built (§3.1); `shimmer` opts in to the sheen sweep
+ * (change-contact-quick-pick D11, `skeleton-sheen.css` — loaded the first
+ * time a bar shimmers, not on the first paint), which the platform's reduced-motion rule
+ * stills. Decorative; the surrounding `SkeletonRows` (or the host) announces
+ * loading.
  */
-export function SkeletonBar({ shape = 'text', index = 0, className }: SkeletonBarProps) {
+export function SkeletonBar({
+  shape = 'text',
+  index = 0,
+  shimmer = false,
+  className,
+}: SkeletonBarProps) {
+  useEffect(() => {
+    if (shimmer) requestSheen();
+  }, [shimmer]);
   return (
     <Skeleton
       aria-hidden="true"
       className={cn(
         'bg-muted-strong animate-none',
+        shimmer && 'skeleton-sheen',
         shape === 'avatar' ? 'size-8 shrink-0 rounded-full' : SHAPES[shape],
         shape === 'text' ? BAR_WIDTHS[index % BAR_WIDTHS.length] : null,
         className,
       )}
+      data-sweep={shimmer ? index % SWEEP_STEPS : undefined}
     />
   );
 }
@@ -56,20 +99,24 @@ export interface SkeletonRowsProps {
   avatar?: boolean;
   /** What is loading ("Patients"), for screen readers. */
   label?: string;
+  /** Each row's bars shimmer, staggered down the rows ({@link SkeletonBarProps.shimmer}). */
+  shimmer?: boolean;
   className?: string;
   /** Each row's own box (height, padding) — the host's row metrics. */
   rowClassName?: string;
 }
 
 /**
- * Content replaced in place by flat bars while it loads (KICKOFF §6.0 States):
+ * Content replaced in place by bars while it loads (KICKOFF §6.0 States):
  * rows of 0.72em bars at the cycling widths, an optional round avatar each,
- * clicks off. One polite announcement says what is loading.
+ * clicks off — flat, or with `shimmer` a staggered sheen. One polite
+ * announcement says what is loading.
  */
 export function SkeletonRows({
   rows = BAR_WIDTHS.length,
   avatar = false,
   label,
+  shimmer = false,
   className,
   rowClassName,
 }: SkeletonRowsProps) {
@@ -97,8 +144,10 @@ export function SkeletonRows({
               rowClassName,
             )}
           >
-            {avatar ? <SkeletonBar shape="avatar" /> : null}
-            <SkeletonBar index={row.index} />
+            {avatar ? (
+              <SkeletonBar shape="avatar" index={row.index} shimmer={shimmer} />
+            ) : null}
+            <SkeletonBar index={row.index} shimmer={shimmer} />
           </div>
         ),
       )}

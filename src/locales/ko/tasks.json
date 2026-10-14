@@ -463,8 +463,7 @@
     "forField": {
       "label": "대상",
       "placeholder": "사람 선택",
-      "search": "이름, 휴대폰 또는 번호로 검색",
-      "empty": "이름, 휴대폰 또는 연락처 번호를 입력하세요"
+      "search": "이름, 휴대폰 또는 번호로 검색"
     },
     "titleField": {
       "label": "제목",

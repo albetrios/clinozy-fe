@@ -463,8 +463,7 @@
     "forField": {
       "label": "对象",
       "placeholder": "选择人员",
-      "search": "按姓名、手机号或编号搜索",
-      "empty": "输入姓名、手机号或联系人编号"
+      "search": "按姓名、手机号或编号搜索"
     },
     "titleField": {
       "label": "标题",

@@ -469,8 +469,7 @@
     "forField": {
       "label": "For",
       "placeholder": "Pick a person",
-      "search": "Search by name, mobile or number",
-      "empty": "Type a name, mobile or contact number"
+      "search": "Search by name, mobile or number"
     },
     "titleField": {
       "label": "Title",

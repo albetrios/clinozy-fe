@@ -114,16 +114,18 @@ test.describe('Clinic rooms write through to clinozy-be', () => {
     const first = uniqueName('Meera').replace(' ', '');
     await byTestId(page, 'leads-new-lead').click();
     await expectDrawer(page, 'new-lead-drawer');
+    // The contact picker's quick add: the name from the search, the mobile beside it.
+    await page.getByTestId('new-lead-search').fill(`${first} Joshi`);
     await page.getByTestId('new-lead-new-contact').click();
-    const editor = page.getByTestId('contact-editor');
-    await expect(editor).toBeVisible();
-    await editor.getByTestId('contact-editor-first-name').fill(first);
-    await editor.getByTestId('contact-editor-last-name').fill('Joshi');
-    await editor
-      .getByTestId('contact-editor-mobile-1')
+    const quickAdd = page.getByTestId('new-lead-contact-quick-add');
+    await expect(quickAdd.getByTestId('new-lead-contact-quick-add-name')).toHaveValue(
+      `${first} Joshi`,
+    );
+    await quickAdd
+      .getByTestId('new-lead-contact-quick-add-mobile')
       .fill(`9${Date.now().toString().slice(-9)}`);
-    await editor.getByTestId('contact-editor-done').click();
-    await expect(editor).toHaveCount(0);
+    await quickAdd.getByTestId('new-lead-contact-quick-add-submit').click();
+    await expect(quickAdd).toHaveCount(0);
     await page
       .getByTestId('new-lead-drawer')
       .getByRole('button', { name: 'Google' })

@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import i18n from '@/lib/i18n/i18n.ts';
+import { fetchRecentContacts, searchContacts } from '@/shared/api/app/contacts-api.ts';
 import { fetchInvoiceTotals, listOpenInvoices } from '@/shared/api/app/invoices-api.ts';
-import { searchPatientPicker } from '@/shared/api/app/patient-search-api.ts';
 import { fetchPatient } from '@/shared/api/app/patients-api.ts';
 import {
   fetchPayment,
@@ -61,9 +61,10 @@ vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
 }));
-vi.mock('@/shared/api/app/patient-search-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  searchPatientPicker: vi.fn(),
+  searchContacts: vi.fn(),
+  fetchRecentContacts: vi.fn(),
 }));
 
 const D = 'receive-drawer';
@@ -119,22 +120,31 @@ beforeEach(() => {
   vi.mocked(listOpenInvoices).mockReset().mockResolvedValue(OPEN);
   vi.mocked(fetchInvoiceTotals).mockReset().mockResolvedValue({ due: 1350.5, paid: 400 });
   vi.mocked(fetchPatient).mockReset().mockResolvedValue(KAVYA);
-  vi.mocked(searchPatientPicker)
+  vi.mocked(fetchRecentContacts).mockReset().mockResolvedValue([]);
+  // Kavya as the patient field's search finds her (`GET /app/contacts?is_patient=true`).
+  vi.mocked(searchContacts)
     .mockReset()
-    .mockResolvedValue({
-      items: [
-        {
-          kind: 'patient',
-          id: KAVYA.id,
-          contactId: KAVYA.contactId,
-          seq: 2,
-          name: 'Kavya Mehta',
-          phone: KAVYA.phone,
-          due: null,
-        },
-      ],
-      nextCursor: null,
-    });
+    .mockResolvedValue([
+      {
+        id: KAVYA.contactId,
+        contactNumber: 4,
+        firstName: 'Kavya',
+        lastName: 'Mehta',
+        name: 'Kavya Mehta',
+        primaryPhone: KAVYA.phone,
+        email: null,
+        instagramHandles: [],
+        defaultChannel: 'whatsapp',
+        preferenceTags: [],
+        patientId: KAVYA.id,
+        patientNumber: 2,
+        openLeadId: null,
+        lastActivityAt: null,
+        lastReceivedAt: null,
+        isAwaitingReply: false,
+        updatedAt: '2026-10-09T20:01:53.622Z',
+      },
+    ]);
   vi.mocked(receivePayment).mockReset();
   vi.mocked(updatePayment).mockReset();
   vi.mocked(fetchPayment).mockReset();

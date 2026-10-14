@@ -210,6 +210,22 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   text and focus when deferred content arrives; do not replay entrance animations.
 - Keep already-loaded content visible during background refresh. Local failures
   get local retry controls without removing surrounding navigation or content.
+- **A search someone is waiting on shows it is working.** Skeletons are flat by
+  default; a wait at the desk opts in to the shimmer — `SkeletonBar` /
+  `SkeletonRows` `shimmer`: a soft sheen (the page colour over the bar's fill,
+  a faint lift of the text colour in dark) sweeping in the reading direction,
+  rows 90ms apart (`data-sweep`). Its CSS, `skeleton-sheen.css`, loads the first
+  time a bar shimmers (a dynamic import), never with the first paint. The shared `ProgressLine` (the
+  bar `RouteProgressBar` draws inline at the page top) runs under the field and the
+  glyph turns into the `Spinner`; a new answer loading over the last keeps the
+  last rows, dimmed. `ContactQuickPick` and the Picker's loading rows use all of
+  it (change-contact-quick-pick).
+- **One person picker.** Every field that picks a person — New lead, the
+  appointment's Who, New task's For, the Receive payment and Invoice patient —
+  is `ContactQuickPick`: inline where the person is the drawer's first step,
+  else behind a field in a popover (a sheet on a phone, `ContactQuickPickField`).
+  Its list stops at 20rem with the add row pinned below; a Picker popover is
+  never wider than 28rem.
 - Announce loading once per pending region, hide decorative skeletons from
   assistive technology, and respect reduced motion. The startup splash must have
   a bounded exit deadline that late loading holds cannot restart or cancel.
