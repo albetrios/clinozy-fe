@@ -13,7 +13,7 @@ import type { CreditListParams, CreditRow } from '@/shared/api/app/credits-contr
 import { CREDIT_DIRECTION_TONES, CREDIT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   type RoomFilterCopy,
@@ -27,7 +27,14 @@ import {
   type PaymentAccess,
   usePaymentAccess,
 } from '@/shared/hooks/usePaymentAccess/index.ts';
-import { PenLine, Receipt, RefreshCw, Trash, Wallet } from '@/shared/icons/index.ts';
+import {
+  Clock,
+  PenLine,
+  Receipt,
+  RefreshCw,
+  Trash,
+  Wallet,
+} from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS, PENDING_TABLE_ID } from '../payments.constants.ts';
@@ -128,17 +135,18 @@ function PendingDrawers({
   );
 }
 
-/** The skeleton, the empty state ("Nothing pending" + Add pending) or the filtered one. */
+/**
+ * The skeleton, the empty state ("Nothing pending" — no button, fix-empty-state-actions:
+ * the toolbar's Add pending is the one way to add) or the filtered one.
+ */
 function PendingEmpty({
   loading,
   filtered,
   onClearFilters,
-  onAdd,
 }: {
   loading: boolean;
   filtered: boolean;
   onClearFilters: () => void;
-  onAdd?: () => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   if (loading) {
@@ -155,16 +163,9 @@ function PendingEmpty({
   return (
     <EmptyState
       tone="butter"
-      icon={<Wallet />}
+      icon={<Clock />}
       title={t(PAYMENTS_KEYS.empty.pendingTitle)}
       description={t(PAYMENTS_KEYS.empty.description)}
-      action={
-        onAdd ? (
-          <EmptyStateAction onClick={onAdd}>
-            {t(PAYMENTS_KEYS.toolbar.addPending)}
-          </EmptyStateAction>
-        ) : undefined
-      }
     />
   );
 }
@@ -380,7 +381,6 @@ export function PendingPage() {
               loading={list.isPending}
               filtered={filters.count > 0 || Boolean(search.q)}
               onClearFilters={() => filters.apply({})}
-              onAdd={access.canCreate ? () => openCreate() : undefined}
             />
           }
           className="m-(--room-card-margin) flex-1"

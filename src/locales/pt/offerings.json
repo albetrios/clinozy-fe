@@ -75,8 +75,7 @@
     "title": "Ainda não há serviços",
     "description": "Adicione tratamentos e pacotes com preços para que possam ser agendados e cobrados.",
     "noMatchTitle": "Nenhum serviço corresponde",
-    "noMatchDescription": "Ainda não há nada aqui. Tente outra aba ou busca.",
-    "newOffering": "Novo serviço"
+    "noMatchDescription": "Ainda não há nada aqui. Tente outra aba ou busca."
   },
   "offers": {
     "columns": {
@@ -119,8 +118,7 @@
     },
     "empty": {
       "title": "Ainda não há ofertas",
-      "description": "Ainda não há nada aqui. Tente outra aba ou busca.",
-      "newOffer": "Nova oferta"
+      "description": "Ainda não há nada aqui. Tente outra aba ou busca."
     },
     "record": "Oferta"
   },

@@ -194,6 +194,20 @@ describe('the Leads list (KICKOFF §6.3)', () => {
     expect(await screen.findByText('Anaya Desai')).toBeInTheDocument();
   });
 
+  it('draws "No leads yet" in lav, with no button, when the clinic has none', async () => {
+    world.leads = [];
+    renderLeadsRoutes(`${LEADS}?view=all`, LeadsPage);
+    const empty = await screen.findByTestId('leads-empty');
+    expect(empty).toHaveAttribute('data-tone', 'lav');
+    expect(
+      within(empty).getByRole('heading', { name: 'No leads yet' }),
+    ).toBeInTheDocument();
+    expect(empty).toHaveTextContent(
+      'Enquiries from calls, WhatsApp and walk-ins land here.',
+    );
+    expect(within(empty).queryByRole('button')).toBeNull();
+  });
+
   it('claims an open lead from its row — "You now own …", no Undo', async () => {
     world.leads = [leadRecord({ heldUntil: daysAgo(1) }), KABIR];
     renderLeadsRoutes(`${LEADS}?view=all`, LeadsPage);

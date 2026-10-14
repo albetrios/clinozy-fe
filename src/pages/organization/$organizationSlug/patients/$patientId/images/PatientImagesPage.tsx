@@ -9,6 +9,7 @@ import {
 } from '@/lib/routes/patient-file-builders.ts';
 import { cn } from '@/lib/utils.ts';
 import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -18,7 +19,7 @@ import {
   type PatientPhotoList,
   usePatientPhotos,
 } from '@/shared/hooks/usePatientPhotos/index.ts';
-import { ImageIcon } from '@/shared/icons/index.ts';
+import { Camera } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -93,32 +94,21 @@ function usePrivateAlbumGuard(
   }, [refused, t, toGeneral]);
 }
 
-/** "No photos in General yet" — the dashed box, with "Upload images" for a member who may. */
-function PhotosEmpty({ album, onUpload }: { album: string; onUpload?: () => void }) {
+/**
+ * "No photos in General yet" (change-empty-states R15): the room look in the
+ * Photos blush with the `Camera` tile, centred below the toolbar. No button
+ * (fix-empty-state-actions): the section's "Upload images" is the one way to add.
+ */
+function PhotosEmpty({ album }: { album: string }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   return (
-    <div
-      data-testid={IDS.empty}
-      className="border-border-strong flex flex-col items-center gap-2.5 rounded-xl border-[1.5px] border-dashed px-(--table-pad-x) py-12 text-center"
-    >
-      <span
-        aria-hidden="true"
-        className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-xl"
-      >
-        <ImageIcon className="size-5.5" />
-      </span>
-      <span className="text-sm font-semibold">{t(K.empty.title, { album })}</span>
-      <span className="text-detail text-muted-foreground">{t(K.empty.body)}</span>
-      {onUpload ? (
-        <Button
-          type="button"
-          onClick={onUpload}
-          className="text-body h-9 rounded-lg px-3.5"
-        >
-          {t(K.upload)}
-        </Button>
-      ) : null}
-    </div>
+    <EmptyState
+      tone="blush"
+      icon={<Camera />}
+      title={t(K.empty.title, { album })}
+      description={t(K.empty.body)}
+      testId={IDS.empty}
+    />
   );
 }
 
@@ -177,13 +167,11 @@ function PhotosBody({
   read,
   album,
   access,
-  onUpload,
   onDelete,
 }: {
   read: PatientPhotoList;
   album: PhotoAlbum;
   access: PhotoAccess;
-  onUpload?: () => void;
   onDelete: (photo: PatientPhoto) => void;
 }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
@@ -194,7 +182,7 @@ function PhotosBody({
   if (read.photos.length === 0) {
     // A failed first read is not an empty album: say so, with Retry.
     if (read.isError) return <RetryError onRetry={read.refetch} />;
-    return <PhotosEmpty album={t(K.albums[album])} onUpload={onUpload} />;
+    return <PhotosEmpty album={t(K.albums[album])} />;
   }
   return (
     <>
@@ -295,13 +283,7 @@ export function PatientImagesPage() {
           size={size}
           onSizeChange={setSize}
         />
-        <PhotosBody
-          read={read}
-          album={album}
-          access={access}
-          onUpload={upload}
-          onDelete={setDeleting}
-        />
+        <PhotosBody read={read} album={album} access={access} onDelete={setDeleting} />
       </div>
       <PhotoDeleteConfirm photo={deleting} onClose={() => setDeleting(null)} />
     </PatientSection>

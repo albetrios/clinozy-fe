@@ -34,7 +34,6 @@ interface Row {
 }
 
 const LIST = { hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() };
-const onNew = vi.fn();
 const onRowClick = vi.fn();
 
 function Table({ rows, filtered = false }: { rows: Row[]; filtered?: boolean }) {
@@ -58,7 +57,6 @@ function Table({ rows, filtered = false }: { rows: Row[]; filtered?: boolean }) 
       icon={<Package />}
       emptyTitle="No vendor matches"
       emptyHint="Nothing here yet. Try another tab or search."
-      emptyAction={{ label: 'New clinic vendor', onSelect: onNew }}
       recordsLabel="vendors"
       countLabel={`${rows.length} vendors`}
       minWidth={600}
@@ -76,7 +74,6 @@ function Table({ rows, filtered = false }: { rows: Row[]; filtered?: boolean }) 
 
 beforeEach(() => {
   csv.downloadCsv.mockReset();
-  onNew.mockReset();
   onRowClick.mockReset();
   notifyMock.success.mockReset();
   holdPreset('admin');
@@ -86,16 +83,14 @@ afterEach(() => {
 });
 
 describe('RoomTable', () => {
-  it('shows the empty state in the room’s tone with the tab’s New', async () => {
-    const user = userEvent.setup();
+  it('shows the empty state in the room’s tone, with no button', async () => {
     const { container } = renderWithProviders(<Table rows={[]} />);
     expect(await screen.findByText('No vendor matches')).toBeVisible();
     expect(
       screen.getByText('Nothing here yet. Try another tab or search.'),
     ).toBeVisible();
     expect(screen.getByTestId('empty-state')).toHaveAttribute('data-tone', 'mint');
-    await user.click(screen.getByRole('button', { name: 'New clinic vendor' }));
-    expect(onNew).toHaveBeenCalledOnce();
+    expect(within(screen.getByTestId('empty-state')).queryByRole('button')).toBeNull();
     expect(await axe(container)).toHaveNoViolations();
   });
 

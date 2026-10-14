@@ -64,8 +64,8 @@
       "status": "상태"
     },
     "minutes": "{{minutes}}분",
-    "empty": "예약이 없습니다 · ",
-    "bookOne": "예약하기",
+    "empty": "예약이 없습니다",
+    "emptyHint": "선택한 날짜의 예약이 여기에 표시됩니다.",
     "day": {
       "today": "오늘",
       "tomorrow": "내일",

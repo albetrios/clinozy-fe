@@ -39,18 +39,17 @@ describe('RoomTableEmpty', () => {
     expect(onClearFilters).toHaveBeenCalledOnce();
   });
 
-  it('is the room empty state with the tab action, and accessible', async () => {
+  it('is the room empty state, with no button, and accessible', async () => {
     const { container } = render(
       <RoomTableEmpty
         {...base}
         loading={false}
         filtered={false}
         onClearFilters={vi.fn()}
-        action={<button type="button">New medicine</button>}
       />,
     );
     expect(screen.getByRole('heading', { name: 'No medicine matches' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'New medicine' })).toBeVisible();
+    expect(screen.queryByRole('button')).toBeNull();
     expect(screen.getByTestId('empty-state')).toHaveAttribute('data-tone', 'blush');
     expect(await axe(container)).toHaveNoViolations();
   });

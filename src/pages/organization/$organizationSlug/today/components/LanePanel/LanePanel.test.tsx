@@ -196,8 +196,12 @@ describe('LanePanel (KICKOFF §6.2 Selected lane panel, Visit cards)', () => {
 
   it('says so when no one is in the lane, and shows bars while the floor loads', async () => {
     const { unmount } = renderPanel({ lane: 'treatment', cards: [] });
-    expect(await screen.findByTestId('today-empty')).toHaveTextContent(
-      'No one here right now.',
+    const empty = await screen.findByTestId('today-empty');
+    expect(empty).toHaveTextContent('No one here right now.');
+    // The lane's own tone and glyph, the disc in the card colour on the tint.
+    expect(empty).toHaveAttribute('data-tone', 'sage');
+    expect(within(empty).getByTestId('empty-state-illustration').children[1]).toHaveClass(
+      'bg-card',
     );
     expect(screen.getByRole('region', { name: 'Treatment' })).toHaveTextContent(
       '0 people',

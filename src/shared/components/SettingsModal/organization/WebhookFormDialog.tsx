@@ -25,6 +25,7 @@ import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useWebhookEvents } from '@/shared/hooks/useWebhookEvents/index.ts';
 import { useCreateWebhook, useUpdateWebhook } from '@/shared/hooks/useWebhooks/index.ts';
+import { Zap } from '@/shared/icons/index.ts';
 
 /**
  * Two fields, the events a chip group of many: a heavy field, so the drawer
@@ -211,10 +212,12 @@ function WebhookEventChecklist({
   if (catalog.rows.length === 0) {
     return (
       <EmptyState
-        variant="inline"
+        variant="compact"
+        tone="plum"
+        icon={<Zap />}
         title={t(integrations.eventsEmpty)}
         testId="webhook-events-empty"
-        className="text-body"
+        className="py-4"
       />
     );
   }

@@ -38,6 +38,8 @@ export const LEADS_KEYS = {
       updated: 'list.columns.updated',
     },
     empty: 'list.empty',
+    emptyTitle: 'list.emptyTitle',
+    emptyHint: 'list.emptyHint',
     clearFilters: 'list.clearFilters',
     /** The "+N" interests pill, read out with every interest. Plural. */
     moreInterests: 'list.moreInterests',

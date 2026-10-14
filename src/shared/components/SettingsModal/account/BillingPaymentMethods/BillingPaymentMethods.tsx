@@ -211,10 +211,12 @@ export function BillingPaymentMethods({
               </SettingsList>
             ) : (
               <EmptyState
-                variant="inline"
+                variant="compact"
+                tone="peach"
+                icon={<CreditCard />}
                 title={t(METHOD_KEYS.empty)}
                 testId="billing-payment-methods-empty"
-                className="text-body"
+                className="py-4"
               />
             )
           }

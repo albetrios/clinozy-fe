@@ -21,6 +21,7 @@ import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 import { usePlanOfferings } from '@/shared/hooks/usePlan/index.ts';
+import { Package } from '@/shared/icons/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import { useTableDay } from '../shared/components/PatientSectionTable/index.ts';
@@ -189,7 +190,7 @@ export function PatientPackagesPage() {
   return (
     <>
       <PatientSection section="packages" data-testid={manifest.testId}>
-        <div className="px-(--table-pad-x) pt-3 pb-5">
+        <div className="flex min-h-full flex-col px-(--table-pad-x) pt-3 pb-5">
           {packages.isError ? (
             <RetryError
               message={t(ERRORS_KEYS.frontend.query.loadFailed, { ns: ERRORS_NS })}
@@ -212,11 +213,8 @@ export function PatientPackagesPage() {
             </div>
           )}
           {packages.isSuccess && rows.length === 0 ? (
-            <EmptyState
-              variant="inline"
-              title={t(K.empty)}
-              className="text-body p-10 text-center"
-            />
+            // The room look in the Packages mint, centred (change-empty-states R19).
+            <EmptyState tone="mint" icon={<Package />} title={t(K.empty)} />
           ) : null}
         </div>
       </PatientSection>

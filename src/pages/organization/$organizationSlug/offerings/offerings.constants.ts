@@ -61,8 +61,6 @@ export const OFFERINGS_KEYS = {
     /** A search with no hit. */
     noMatchTitle: 'empty.noMatchTitle',
     noMatchDescription: 'empty.noMatchDescription',
-    /** The empty catalogue's action (PRD.md:232, B.13 R26). */
-    newOffering: 'empty.newOffering',
   },
 } as const;
 

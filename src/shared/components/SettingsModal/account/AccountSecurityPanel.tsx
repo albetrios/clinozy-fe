@@ -420,10 +420,12 @@ function PasskeysCard() {
   const passkeysBody =
     passkeys.length === 0 ? (
       <EmptyState
-        variant="inline"
+        variant="compact"
+        tone="lav"
+        icon={<Fingerprint />}
         title={t(SETTINGS_KEYS.security.passkeys.empty)}
         testId="passkeys-empty"
-        className="text-body"
+        className="py-4"
       />
     ) : (
       <SettingsList>

@@ -37,6 +37,8 @@
       "updated": "Mis à jour"
     },
     "empty": "Aucun prospect ne correspond",
+    "emptyTitle": "Aucun prospect pour l’instant",
+    "emptyHint": "Les demandes par appel, WhatsApp et visites spontanées arrivent ici.",
     "clearFilters": "Effacer les filtres",
     "moreInterests_one": "{{count}} de plus : {{list}}",
     "moreInterests_many": "{{count}} de plus : {{list}}",

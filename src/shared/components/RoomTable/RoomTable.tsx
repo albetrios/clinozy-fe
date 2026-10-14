@@ -14,7 +14,6 @@ import {
 } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
 import { canExportRows, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import type { CursorListResult } from '@/shared/hooks/useCursorList/index.ts';
@@ -45,8 +44,6 @@ export interface RoomTableProps<TRow extends { id: string }> {
   emptyTitle: string;
   /** The rooms' hint under it ("Nothing here yet. Try another tab or search."). */
   emptyHint: string;
-  /** The tab's "New …" under its empty state (PRD.md:232). */
-  emptyAction?: { label: string; onSelect: () => void };
   /** The end line's noun ("All sales loaded"). */
   recordsLabel: string;
   /** The footer's count ("3 sales"); some tabs have none. */
@@ -77,7 +74,8 @@ export interface RoomTableProps<TRow extends { id: string }> {
  * phone, selection and the bulk bar from `md` (Export as CSV with the
  * `export` ability, Q-P8), the row actions, infinite scroll over cursor pages,
  * the footer count and end line, and the room's states — the skeleton, the
- * empty state in the room's tone with the tab's "New …", the filtered one.
+ * empty state in the room's tone (no button — the toolbar holds the tab's "New …"),
+ * the filtered one.
  */
 export function RoomTable<TRow extends { id: string }>({
   table,
@@ -91,7 +89,6 @@ export function RoomTable<TRow extends { id: string }>({
   icon,
   emptyTitle,
   emptyHint,
-  emptyAction,
   recordsLabel,
   countLabel,
   minWidth,
@@ -151,13 +148,6 @@ export function RoomTable<TRow extends { id: string }>({
           icon={icon}
           title={emptyTitle}
           description={emptyHint}
-          action={
-            emptyAction ? (
-              <EmptyStateAction onClick={emptyAction.onSelect}>
-                {emptyAction.label}
-              </EmptyStateAction>
-            ) : undefined
-          }
           label={label}
           avatar={avatar}
         />

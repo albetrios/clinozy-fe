@@ -24,7 +24,7 @@ import {
   useNotifications,
   useUnreadCount,
 } from '@/shared/hooks/useNotifications/index.ts';
-import { Bell, BellOff, Settings } from '@/shared/icons/index.ts';
+import { Bell, Settings } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { NOTIFICATION_CATEGORY_LOOK } from '@/shared/notifications/category-look.ts';
 
@@ -183,9 +183,9 @@ function NotificationInbox({
 
       {items && items.length === 0 ? (
         <EmptyState
-          tone="stone"
+          tone="butter"
           className="pt-7 pb-8"
-          icon={<BellOff />}
+          icon={<Bell />}
           title={t(LAYOUT_KEYS.app.notifications.emptyTitle)}
           description={t(LAYOUT_KEYS.app.notifications.emptyDescription)}
         />

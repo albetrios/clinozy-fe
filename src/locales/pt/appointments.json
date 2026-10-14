@@ -66,8 +66,8 @@
       "status": "Status"
     },
     "minutes": "{{minutes}} min",
-    "empty": "Nenhuma consulta aqui · ",
-    "bookOne": "agende uma",
+    "empty": "Nenhuma consulta aqui",
+    "emptyHint": "As consultas dos dias que você escolher aparecem aqui.",
     "day": {
       "today": "Hoje",
       "tomorrow": "Amanhã",

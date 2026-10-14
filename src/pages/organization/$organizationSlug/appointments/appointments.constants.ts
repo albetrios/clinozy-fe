@@ -70,7 +70,7 @@ export const APPOINTMENTS_KEYS = {
     },
     minutes: 'agenda.minutes',
     empty: 'agenda.empty',
-    bookOne: 'agenda.bookOne',
+    emptyHint: 'agenda.emptyHint',
     /** A day group's label and sub line (H:5906). */
     day: {
       today: 'agenda.day.today',
@@ -168,7 +168,6 @@ export const APPOINTMENTS_TEST_IDS = {
   periodLabel: 'appointments-period-label',
   dayGroup: 'appointments-day-group',
   empty: 'appointments-empty',
-  bookOne: 'appointments-book-one',
   quickView: 'appointments-quick-view',
   statusButton: 'appointments-status-button',
   statusPopover: 'appointments-status-popover',

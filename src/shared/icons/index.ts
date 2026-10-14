@@ -36,6 +36,7 @@ import {
   Download as LuDownload,
   Eye as LuEye,
   EyeOff as LuEyeOff,
+  Factory as LuFactory,
   File as LuFile,
   Fingerprint as LuFingerprint,
   FolderOpen as LuFolderOpen,
@@ -83,6 +84,7 @@ import {
   Shield as LuShield,
   ShieldAlert as LuShieldAlert,
   ShieldCheck as LuShieldCheck,
+  ShoppingCart as LuShoppingCart,
   SlidersHorizontal as LuSlidersHorizontal,
   Sparkles as LuSparkles,
   SquareCheck as LuSquareCheck,
@@ -92,6 +94,7 @@ import {
   Tag as LuTag,
   Trash2 as LuTrash,
   TriangleAlert as LuTriangleAlert,
+  Truck as LuTruck,
   User as LuUser,
   UserCog as LuUserCog,
   UserPlus as LuUserPlus,
@@ -153,6 +156,8 @@ export const CreditCard: AppIcon = LuCreditCard;
 export const Download: AppIcon = LuDownload;
 export const Eye: AppIcon = LuEye;
 export const EyeOff: AppIcon = LuEyeOff;
+/** Lucide `factory`: manufacturers. */
+export const Factory: AppIcon = LuFactory;
 /** Lucide `file`: files and uploads; named so it never shadows the DOM `File`. */
 export const FileIcon: AppIcon = LuFile;
 export const Fingerprint: AppIcon = LuFingerprint;
@@ -232,6 +237,8 @@ export const Settings: AppIcon = LuSettings;
 export const ShieldAlert: AppIcon = LuShieldAlert;
 export const Shield: AppIcon = LuShield;
 export const ShieldCheck: AppIcon = LuShieldCheck;
+/** Lucide `shopping-cart`: purchases and purchase orders. */
+export const ShoppingCart: AppIcon = LuShoppingCart;
 export const SlidersHorizontal: AppIcon = LuSlidersHorizontal;
 export const Sparkles: AppIcon = LuSparkles;
 /** Lucide `square-check`: tasks and checked items. */
@@ -245,6 +252,8 @@ export const Sun: AppIcon = LuSun;
 export const Tag: AppIcon = LuTag;
 export const Trash: AppIcon = LuTrash;
 export const TriangleAlert: AppIcon = LuTriangleAlert;
+/** Lucide `truck`: suppliers and vendors. */
+export const Truck: AppIcon = LuTruck;
 export const User: AppIcon = LuUser;
 export const UserCog: AppIcon = LuUserCog;
 export const UserPlus: AppIcon = LuUserPlus;

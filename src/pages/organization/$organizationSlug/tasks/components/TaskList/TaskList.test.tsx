@@ -129,20 +129,20 @@ describe('TaskList (tasks.md:18–38)', () => {
     expect(handed.map((row) => row.dataset.taskId)).toEqual(['task_soon']);
   });
 
-  it('says nothing needs you, with "New task", when To do is empty', async () => {
-    const onNewTask = vi.fn();
-    renderList({ rows: [], onNewTask });
+  it('says nothing needs you, with no button, when To do is empty', () => {
+    renderList({ rows: [] });
     expect(screen.queryAllByRole('rowgroup')).toHaveLength(1);
-    expect(screen.getByTestId('tasks-empty')).toHaveTextContent(
+    const empty = screen.getByTestId('tasks-empty');
+    expect(within(empty).getByRole('heading', { name: 'All caught up' })).toBeVisible();
+    expect(empty).toHaveTextContent(
       'Nothing needs you right now. New tasks appear here as leads write, visits come up and feedback arrives.',
     );
-    await userEvent.setup().click(screen.getByTestId('tasks-empty-new'));
-    expect(onNewTask).toHaveBeenCalledOnce();
-  });
-
-  it('keeps no "New task" for a member who cannot create one', () => {
-    renderList({ rows: [] });
-    expect(screen.queryByTestId('tasks-empty-new')).toBeNull();
+    // The plum room look, centred: the list, its row group, row and cell grow.
+    expect(within(empty).getByTestId('empty-state')).toHaveAttribute('data-tone', 'plum');
+    expect(empty).toHaveClass('flex-1');
+    expect(screen.getByTestId('tasks-list')).toHaveClass('flex-1');
+    // The toolbar's "New task" is the one way to add (fix-empty-state-actions).
+    expect(within(empty).queryByRole('button')).toBeNull();
   });
 
   it('renders the Snoozed and Done empty lines under their headers (§7.3)', () => {
@@ -152,6 +152,9 @@ describe('TaskList (tasks.md:18–38)', () => {
     expect(within(snoozed).getByTestId('tasks-empty')).toHaveTextContent(
       'No snoozed tasks',
     );
+    expect(
+      within(snoozed).getByRole('heading', { name: 'No snoozed tasks' }),
+    ).toBeVisible();
     rerenderList({ tab: 'done', rows: [] });
     const done = screen.getByTestId('tasks-group-done');
     expect(done).toHaveTextContent('Resolved');
