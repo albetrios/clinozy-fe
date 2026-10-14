@@ -168,7 +168,6 @@ export const APPOINTMENTS_TEST_IDS = {
   periodLabel: 'appointments-period-label',
   dayGroup: 'appointments-day-group',
   empty: 'appointments-empty',
-  bookOne: 'appointments-book-one',
   quickView: 'appointments-quick-view',
   statusButton: 'appointments-status-button',
   statusPopover: 'appointments-status-popover',

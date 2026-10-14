@@ -375,9 +375,8 @@ describe('AppointmentsAgenda — the rows', () => {
     expect(router.state.location.search).toEqual({ status: 'all' });
   });
 
-  it('draws the sky empty state, and "New appointment" opens New appointment', async () => {
-    const user = userEvent.setup();
-    const { router } = renderAppointmentsRoutes(`${PAGE}?q=zzzz`, Agenda);
+  it('draws the sky empty state with no button — the toolbar books', async () => {
+    renderAppointmentsRoutes(`${PAGE}?q=zzzz`, Agenda);
     const empty = await screen.findByTestId('appointments-empty');
     expect(empty).toHaveAttribute('data-tone', 'sky');
     expect(
@@ -385,11 +384,7 @@ describe('AppointmentsAgenda — the rows', () => {
     ).toBeInTheDocument();
     expect(empty).toHaveTextContent('Bookings for the days you pick show up here.');
     expect(within(empty).getByTestId('empty-state-illustration')).toBeInTheDocument();
-    const book = await screen.findByTestId('appointments-book-one');
-    expect(book).toHaveAccessibleName('New appointment');
-    await user.click(book);
-    await waitFor(() => expect(router.state.location.pathname).toBe(`${PAGE}/create`));
-    expect(router.state.location.search).toEqual({ q: 'zzzz' });
+    expect(within(empty).queryByRole('button')).toBeNull();
   });
 });
 
@@ -510,17 +505,11 @@ describe('AppointmentsAgenda — Change status', () => {
     expect(screen.queryByTestId('appointments-status-popover')).not.toBeInTheDocument();
   });
 
-  it('shows the status alone without Edit, and no "New appointment" without Create', async () => {
+  it('shows the status alone without Edit', async () => {
     grantAppAccess('none');
-    const list = renderAppointmentsRoutes(PAGE, Agenda);
+    renderAppointmentsRoutes(PAGE, Agenda);
     await rows();
     expect(screen.queryByTestId('appointments-status-button')).toBeNull();
-    list.unmount();
-    renderAppointmentsRoutes(`${PAGE}?q=zzzz`, Agenda);
-    expect(await screen.findByTestId('appointments-empty')).toHaveTextContent(
-      'No appointments here',
-    );
-    expect(screen.queryByTestId('appointments-book-one')).toBeNull();
   });
 });
 

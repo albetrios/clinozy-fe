@@ -24,7 +24,7 @@ import {
   dataTableFeatures,
   type DataTableGroup,
 } from '@/shared/components/DataTable/index.ts';
-import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import {
@@ -68,10 +68,11 @@ const AGENDA_METRICS = '[--dt-gap:0.625rem] [--dt-head-h:2.3125rem]';
 
 /**
  * The Agenda's empty state (change-empty-states R10): the room look in sky with
- * the `Calendar` tile, "No appointments here" and its line, and "New
- * appointment" for a member who can book — centred in the table card.
+ * the `Calendar` tile, "No appointments here" and its line — centred in the
+ * table card. No button (fix-empty-state-actions): the toolbar's "New
+ * appointment" is the one way to book.
  */
-function AgendaEmpty({ onBook }: { onBook?: () => void }) {
+function AgendaEmpty() {
   const { t } = useTranslation(APPOINTMENTS_NS);
   return (
     <EmptyState
@@ -80,13 +81,6 @@ function AgendaEmpty({ onBook }: { onBook?: () => void }) {
       title={t(APPOINTMENTS_KEYS.agenda.empty)}
       description={t(APPOINTMENTS_KEYS.agenda.emptyHint)}
       testId={APPOINTMENTS_TEST_IDS.empty}
-      action={
-        onBook ? (
-          <EmptyStateAction data-testid={APPOINTMENTS_TEST_IDS.bookOne} onClick={onBook}>
-            {t(APPOINTMENTS_KEYS.toolbar.newAppointment)}
-          </EmptyStateAction>
-        ) : undefined
-      }
     />
   );
 }
@@ -234,7 +228,7 @@ export function AppointmentsAgenda() {
               rowClassName="h-13 px-(--table-pad-x)"
             />
           ) : (
-            <AgendaEmpty onBook={canCreate ? () => openCreate() : undefined} />
+            <AgendaEmpty />
           )
         }
         className={`flex-1 ${AGENDA_METRICS}`}

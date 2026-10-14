@@ -271,7 +271,6 @@ export const TASKS_TEST_IDS = {
   group: (group: TaskGroupId) => `tasks-group-${group}`,
   row: 'tasks-row',
   empty: 'tasks-empty',
-  emptyNew: 'tasks-empty-new',
   /** The type dropdown (the picker derives `-trigger`, `-panel`, … from it). */
   type: 'tasks-type',
   /** The Scope tablist's prefix: `tasks-scope-tabs`, `tasks-scope-tab-mine`. */

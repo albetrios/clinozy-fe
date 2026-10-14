@@ -174,14 +174,12 @@ describe('PendingPage — the list (payments.md:41–55)', () => {
     expect(tone('Adjusted')).toBe('lav');
   });
 
-  it('says "Nothing pending" when nothing is, with Add pending', async () => {
+  it('says "Nothing pending" when nothing is, with no button', async () => {
     vi.mocked(listPendingCredits).mockResolvedValue({ rows: [], next: null, total: 0 });
     renderPendingRoutes(PENDING);
     const empty = await screen.findByTestId('empty-state');
     expect(within(empty).getByText('Nothing pending')).toBeInTheDocument();
-    expect(await within(empty).findByTestId('empty-state-action')).toHaveTextContent(
-      'Add pending',
-    );
+    expect(within(empty).queryByRole('button')).toBeNull();
   });
 
   it('shows a failed first read in place, with Retry', async () => {

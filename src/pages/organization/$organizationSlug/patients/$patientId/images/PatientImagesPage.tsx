@@ -9,7 +9,7 @@ import {
 } from '@/lib/routes/patient-file-builders.ts';
 import { cn } from '@/lib/utils.ts';
 import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts';
-import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -96,10 +96,10 @@ function usePrivateAlbumGuard(
 
 /**
  * "No photos in General yet" (change-empty-states R15): the room look in the
- * Photos blush with the `Camera` tile, centred below the toolbar, with "Upload"
- * for a member who may.
+ * Photos blush with the `Camera` tile, centred below the toolbar. No button
+ * (fix-empty-state-actions): the section's "Upload images" is the one way to add.
  */
-function PhotosEmpty({ album, onUpload }: { album: string; onUpload?: () => void }) {
+function PhotosEmpty({ album }: { album: string }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   return (
     <EmptyState
@@ -108,11 +108,6 @@ function PhotosEmpty({ album, onUpload }: { album: string; onUpload?: () => void
       title={t(K.empty.title, { album })}
       description={t(K.empty.body)}
       testId={IDS.empty}
-      action={
-        onUpload ? (
-          <EmptyStateAction onClick={onUpload}>{t(K.upload)}</EmptyStateAction>
-        ) : undefined
-      }
     />
   );
 }
@@ -172,13 +167,11 @@ function PhotosBody({
   read,
   album,
   access,
-  onUpload,
   onDelete,
 }: {
   read: PatientPhotoList;
   album: PhotoAlbum;
   access: PhotoAccess;
-  onUpload?: () => void;
   onDelete: (photo: PatientPhoto) => void;
 }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
@@ -189,7 +182,7 @@ function PhotosBody({
   if (read.photos.length === 0) {
     // A failed first read is not an empty album: say so, with Retry.
     if (read.isError) return <RetryError onRetry={read.refetch} />;
-    return <PhotosEmpty album={t(K.albums[album])} onUpload={onUpload} />;
+    return <PhotosEmpty album={t(K.albums[album])} />;
   }
   return (
     <>
@@ -290,13 +283,7 @@ export function PatientImagesPage() {
           size={size}
           onSizeChange={setSize}
         />
-        <PhotosBody
-          read={read}
-          album={album}
-          access={access}
-          onUpload={upload}
-          onDelete={setDeleting}
-        />
+        <PhotosBody read={read} album={album} access={access} onDelete={setDeleting} />
       </div>
       <PhotoDeleteConfirm photo={deleting} onClose={() => setDeleting(null)} />
     </PatientSection>

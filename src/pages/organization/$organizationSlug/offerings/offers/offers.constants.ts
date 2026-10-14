@@ -59,8 +59,6 @@ export const OFFERS_KEYS = {
   empty: {
     title: 'offers.empty.title',
     description: 'offers.empty.description',
-    /** The empty list's action. */
-    newOffer: 'offers.empty.newOffer',
   },
 } as const;
 

@@ -129,9 +129,8 @@ describe('TaskList (tasks.md:18–38)', () => {
     expect(handed.map((row) => row.dataset.taskId)).toEqual(['task_soon']);
   });
 
-  it('says nothing needs you, with "New task", when To do is empty', async () => {
-    const onNewTask = vi.fn();
-    renderList({ rows: [], onNewTask });
+  it('says nothing needs you, with no button, when To do is empty', () => {
+    renderList({ rows: [] });
     expect(screen.queryAllByRole('rowgroup')).toHaveLength(1);
     const empty = screen.getByTestId('tasks-empty');
     expect(within(empty).getByRole('heading', { name: 'All caught up' })).toBeVisible();
@@ -142,13 +141,8 @@ describe('TaskList (tasks.md:18–38)', () => {
     expect(within(empty).getByTestId('empty-state')).toHaveAttribute('data-tone', 'plum');
     expect(empty).toHaveClass('flex-1');
     expect(screen.getByTestId('tasks-list')).toHaveClass('flex-1');
-    await userEvent.setup().click(screen.getByTestId('tasks-empty-new'));
-    expect(onNewTask).toHaveBeenCalledOnce();
-  });
-
-  it('keeps no "New task" for a member who cannot create one', () => {
-    renderList({ rows: [] });
-    expect(screen.queryByTestId('tasks-empty-new')).toBeNull();
+    // The toolbar's "New task" is the one way to add (fix-empty-state-actions).
+    expect(within(empty).queryByRole('button')).toBeNull();
   });
 
   it('renders the Snoozed and Done empty lines under their headers (§7.3)', () => {

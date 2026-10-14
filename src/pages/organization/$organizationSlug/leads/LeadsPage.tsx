@@ -111,17 +111,16 @@ function offered(action: (() => void) | false): (() => void) | undefined {
  * The list's empty state (change-empty-states R8, R9): the room look in the
  * Leads lav, centred in the table card. With filters on it keeps the design's
  * "No leads match" (H:1745; `leads.md:393`) over the `Search` tile with "Clear
- * filters"; otherwise the `UserPlus` tile, "No leads yet", where enquiries come
- * from, and "New lead" for a member who may create.
+ * filters"; otherwise the `UserPlus` tile, "No leads yet" and where enquiries
+ * come from. No "New lead" here (fix-empty-state-actions): the toolbar's is the
+ * one way to add.
  */
 function LeadsEmpty({
   filtered,
   onClearFilters,
-  onNewLead,
 }: {
   filtered: boolean;
   onClearFilters: () => void;
-  onNewLead?: () => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
   if (filtered) {
@@ -150,13 +149,6 @@ function LeadsEmpty({
       title={t(LEADS_KEYS.list.emptyTitle)}
       description={t(LEADS_KEYS.list.emptyHint)}
       testId={LEADS_TEST_IDS.empty}
-      action={
-        onNewLead ? (
-          <EmptyStateAction onClick={onNewLead}>
-            {t(LEADS_KEYS.list.newLead)}
-          </EmptyStateAction>
-        ) : undefined
-      }
     />
   );
 }
@@ -324,11 +316,7 @@ export function LeadsPage() {
       rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
     />
   ) : (
-    <LeadsEmpty
-      filtered={state.filtered}
-      onClearFilters={state.clearFilters}
-      onNewLead={canCreate ? () => newLead() : undefined}
-    />
+    <LeadsEmpty filtered={state.filtered} onClearFilters={state.clearFilters} />
   );
 
   return (

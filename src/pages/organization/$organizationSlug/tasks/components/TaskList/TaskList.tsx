@@ -13,7 +13,7 @@ import type {
   TaskTab,
 } from '@/shared/api/app/tasks-contracts.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
-import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
@@ -63,8 +63,6 @@ export interface TaskListProps extends LoadMorePaging {
   /** The team the rows name their owners from. */
   team: TaskRowTeam;
   onOpen: (row: TaskRowRecord) => void;
-  /** "New task" under the To do empty line — absent without Create. */
-  onNewTask?: () => void;
   /** The contact card's actions for a row's person. */
   contactActions?: (row: TaskRowRecord) => ContactCardActions;
   className?: string;
@@ -108,10 +106,11 @@ const EMPTY_ICONS: Readonly<Record<TaskTab, AppIcon>> = {
 /**
  * A view's empty state (change-empty-states R34–R36): the room look in the
  * Tasks plum, centred in the list card — To do's "All caught up" over the
- * queue line with "New task"; Snoozed's and Done's line as the title, under
- * their group header.
+ * queue line; Snoozed's and Done's line as the title, under their group header.
+ * No button (fix-empty-state-actions): the toolbar's "New task" is the one way
+ * to add.
  */
-function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void }) {
+function EmptyLine({ tab }: { tab: TaskTab }) {
   const { t } = useTranslation(TASKS_NS);
   const Icon = EMPTY_ICONS[tab];
   const open = tab === 'open';
@@ -132,13 +131,6 @@ function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void })
           icon={<Icon />}
           title={t(open ? TASKS_KEYS.emptyCaughtUp : TASKS_KEYS.empty[tab])}
           description={open ? t(TASKS_KEYS.empty.open) : undefined}
-          action={
-            open && onNewTask ? (
-              <EmptyStateAction data-testid={TASKS_TEST_IDS.emptyNew} onClick={onNewTask}>
-                {t(TASKS_KEYS.primary.newTask)}
-              </EmptyStateAction>
-            ) : undefined
-          }
         />
       </div>
     </div>
@@ -148,15 +140,7 @@ function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void })
 /** What {@link GroupedRows} draws: the list's rows and how each reads. */
 type GroupedRowsProps = Pick<
   TaskListProps,
-  | 'tab'
-  | 'rows'
-  | 'refreshing'
-  | 'now'
-  | 'handled'
-  | 'team'
-  | 'onOpen'
-  | 'onNewTask'
-  | 'contactActions'
+  'tab' | 'rows' | 'refreshing' | 'now' | 'handled' | 'team' | 'onOpen' | 'contactActions'
 >;
 
 /** The view's groups, each under its sticky header, or the view's empty line. */
@@ -168,7 +152,6 @@ function GroupedRows({
   handled,
   team,
   onOpen,
-  onNewTask,
   contactActions,
 }: GroupedRowsProps) {
   const { t } = useTranslation(TASKS_NS);
@@ -215,7 +198,7 @@ function GroupedRows({
           role="rowgroup"
           className="flex flex-1 flex-col"
         >
-          <EmptyLine tab={tab} onNewTask={onNewTask} />
+          <EmptyLine tab={tab} />
         </div>
       ) : null}
     </div>
@@ -245,7 +228,6 @@ export function TaskList({
   handled,
   team,
   onOpen,
-  onNewTask,
   contactActions,
   hasNextPage,
   isFetchingNextPage,
@@ -288,7 +270,6 @@ export function TaskList({
         handled={handled}
         team={team}
         onOpen={onOpen}
-        onNewTask={onNewTask}
         contactActions={contactActions}
       />
     );

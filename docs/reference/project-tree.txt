@@ -317,6 +317,21 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── fix-empty-state-actions-2026-10-14-iazm/
+│   │   ├── intake-files/
+│   │   │   ├── _index.md
+│   │   │   ├── BRIEF.md
+│   │   │   ├── empty-states.html
+│   │   │   ├── empty-states.md
+│   │   │   ├── PRD.md
+│   │   │   ├── preset.md
+│   │   │   ├── schema-routes.md
+│   │   │   └── shell.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── launch-2026-09-30-jxmr/
 │   │   ├── intake-files/
 │   │   │   ├── _index.md

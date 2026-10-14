@@ -22,7 +22,6 @@ import {
   type RoomFilterFields,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useFixtureLedgerList } from '@/shared/hooks/useFixtureLedger/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
@@ -37,7 +36,6 @@ import {
 } from '../medical.search.ts';
 import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
-import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
 
 const TABLE_ID = MEDICAL_TABLE_IDS.payments;
 
@@ -112,8 +110,6 @@ export function MedicalPaymentsPage() {
   const { organizationSlug = '' } = useParams({ strict: false });
   const search = validateMedicalPaymentsSearch(useSearch({ strict: false }));
   const { preferences } = usePreferences();
-  const access = useAppAccess();
-  const nav = useMedicalNav();
   const filters = useRoomFilters(MEDICAL_LEDGER_FILTER_FIELDS);
   const filterCopy = useFilterCopy();
   const [deleting, setDeleting] = useState<PaymentDeleteTarget | null>(null);
@@ -135,7 +131,6 @@ export function MedicalPaymentsPage() {
     void navigate({ ...organizationPaymentEdit(organizationSlug, row.id), search: {} });
   };
   const rowActions = useLedgerRowActions({ onEdit: openEntry, onDelete: setDeleting });
-  const canCreate = access.isResolved && access.can('medical', 'create');
 
   return (
     <section data-testid="medical-payments-page" className="flex min-h-0 flex-1 flex-col">
@@ -152,11 +147,6 @@ export function MedicalPaymentsPage() {
         filtered={filters.count > 0}
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(MEDICAL_KEYS.payments.empty)}
-        emptyAction={
-          canCreate
-            ? { label: t(MEDICAL_KEYS.create.sale), onSelect: () => nav.create('sales') }
-            : undefined
-        }
         recordsLabel={t(MEDICAL_KEYS.payments.records)}
         minWidth={LEDGER_MIN_WIDTH}
         onRowClick={openEntry}
