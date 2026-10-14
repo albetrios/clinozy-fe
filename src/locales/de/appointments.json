@@ -65,8 +65,8 @@
       "status": "Status"
     },
     "minutes": "{{minutes}} Min.",
-    "empty": "Hier gibt es keine Termine · ",
-    "bookOne": "jetzt einen buchen",
+    "empty": "Hier gibt es keine Termine",
+    "emptyHint": "Termine für die gewählten Tage erscheinen hier.",
     "day": {
       "today": "Heute",
       "tomorrow": "Morgen",

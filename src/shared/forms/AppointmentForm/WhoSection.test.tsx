@@ -13,16 +13,20 @@ import {
   DOCTOR_NISHA,
   TEST_BRANCH_ID,
 } from '@/tests/utils/appointment-doubles.ts';
+import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
-const { notifyMock, searchContactsMock, fetchLeadMock } = vi.hoisted(() => ({
-  notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
-  searchContactsMock: vi.fn(),
-  fetchLeadMock: vi.fn(),
-}));
+const { notifyMock, searchContactsMock, fetchRecentContactsMock, fetchLeadMock } =
+  vi.hoisted(() => ({
+    notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
+    searchContactsMock: vi.fn(),
+    fetchRecentContactsMock: vi.fn(),
+    fetchLeadMock: vi.fn(),
+  }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   searchContacts: searchContactsMock,
+  fetchRecentContacts: fetchRecentContactsMock,
 }));
 vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -117,6 +121,8 @@ beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   searchContactsMock.mockReset();
   searchContactsMock.mockResolvedValue([]);
+  fetchRecentContactsMock.mockReset();
+  fetchRecentContactsMock.mockResolvedValue([]);
   fetchLeadMock.mockReset();
   fetchLeadMock.mockResolvedValue(RIYA_LEAD);
 });
@@ -138,11 +144,16 @@ describe('WhoSection — the person search (H:2749–2753)', () => {
     const search = screen.getByTestId(IDS.whoSearch);
     expect(search).toHaveAccessibleName('Search person');
     await user.type(search, 'ri');
-    expect(screen.getByTestId(IDS.whoCreate)).toHaveTextContent('+ Create contact “ri”');
+    expect(withoutBidiMarks(screen.getByTestId(IDS.whoCreate).textContent)).toBe(
+      'Add “ri” as a new contact↵',
+    );
+    expect(screen.getByTestId('appointment-form-who-hint')).toHaveTextContent(
+      'Keep typing — 3 letters or 4 digits',
+    );
     expect(searchContactsMock).not.toHaveBeenCalled();
     await user.type(search, 'y');
     const hits = await screen.findAllByTestId(IDS.whoHit);
-    expect(searchContactsMock).toHaveBeenCalledWith('riy');
+    expect(searchContactsMock).toHaveBeenCalledWith('riy', 'everyone');
     expect(hits).toHaveLength(2);
     expect(hits[0]).toHaveTextContent('Riya Mehta+91 98250 11241Use contact');
     // A patient's hit says so (its avatar carries the "P"), not their number.
@@ -184,6 +195,11 @@ describe('WhoSection — the person search (H:2749–2753)', () => {
     const { onChange } = renderWho({ draft: draftOf({ who: null }) });
     await user.type(screen.getByTestId(IDS.whoSearch), '  Meera Iyer ');
     await user.click(screen.getByTestId(IDS.whoCreate));
+    expect(screen.getByTestId('appointment-form-who-quick-add-name')).toHaveValue(
+      'Meera Iyer',
+    );
+    expect(screen.queryByTestId('appointment-form-who-quick-add-more')).toBeNull();
+    await user.click(screen.getByTestId('appointment-form-who-quick-add-submit'));
     expect(onChange).toHaveBeenCalledExactlyOnceWith({
       kind: 'who',
       who: {
@@ -195,6 +211,36 @@ describe('WhoSection — the person search (H:2749–2753)', () => {
         leadId: null,
         contactNumber: null,
       },
+    });
+  });
+
+  it('takes the new person’s mobile in the same step — a typed number fills it', async () => {
+    const user = userEvent.setup();
+    const { onChange } = renderWho({ draft: draftOf({ who: null }) });
+    await user.type(screen.getByTestId(IDS.whoSearch), 'Meera 98250 11299');
+    await screen.findByTestId(IDS.whoNoMatch);
+    await user.keyboard('{Enter}');
+    await user.click(screen.getByTestId('appointment-form-who-quick-add-submit'));
+    expect(onChange).toHaveBeenNthCalledWith(1, {
+      kind: 'who',
+      who: expect.objectContaining({ kind: 'new', name: 'Meera' }),
+    });
+    expect(onChange).toHaveBeenNthCalledWith(2, {
+      kind: 'newPhone',
+      digits: '9825011299',
+    });
+  });
+
+  it('offers the Recent people before anything is typed', async () => {
+    fetchRecentContactsMock.mockResolvedValue([contactHit()]);
+    const user = userEvent.setup();
+    const { onChange } = renderWho({ draft: draftOf({ who: null }) });
+    const recent = await screen.findByTestId('appointment-form-who-recent');
+    expect(within(recent).getByTestId(IDS.whoHit)).toHaveTextContent('Riya Mehta');
+    await user.click(within(recent).getByTestId(IDS.whoHit));
+    expect(onChange).toHaveBeenCalledExactlyOnceWith({
+      kind: 'who',
+      who: whoOfContact(contactHit()),
     });
   });
 });

@@ -360,13 +360,22 @@
       "edit": "Edit",
       "open": "Open",
       "missing": "Missing: {{fields, list(type: unit)}}",
-      "notFilled": "Not filled yet"
+      "notFilled": "Not filled yet",
+      "position": "Step {{number}} of {{total}}",
+      "state": {
+        "open": "In progress",
+        "done": "Complete",
+        "missing": "Needs attention",
+        "later": "Not started",
+        "locked": "Locked"
+      }
     },
     "peek": {
-      "empty": "Empty",
-      "added_one": "{{count}} added",
-      "added_other": "{{count}} added",
-      "noneYet": "None yet"
+      "more_one": "+{{count}} more",
+      "more_other": "+{{count}} more",
+      "notFilled": "Not filled: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} not filled",
+      "notFilledCount_other": "{{count}} not filled"
     },
     "stepper": {
       "decrease": "Decrease",
@@ -896,6 +905,43 @@
     "purchasesCount_one": "{{count}} line",
     "purchasesCount_other": "{{count}} lines"
   },
+  "contactPick": {
+    "recent": "Recent",
+    "keepTyping": "Keep typing — 3 letters or 4 digits",
+    "searching": "Searching…",
+    "found_one": "{{count}} person found",
+    "found_other": "{{count}} people found",
+    "noMatch": "No existing match",
+    "use": "Use contact",
+    "addNamed": "Add “{{name}}” as a new contact",
+    "addPhone": "Add {{phone}} as a new contact",
+    "addNamedPhone": "Add “{{name}}” · {{phone}} as a new contact",
+    "enterKey": "↵",
+    "clearSearch": "Clear search",
+    "added": "{{name}} added to contacts",
+    "existing": "{{name}} is already a contact · picked",
+    "quickAdd": {
+      "name": "Name",
+      "namePlaceholder": "First and last name",
+      "mobile": "Mobile",
+      "add": "Add contact",
+      "more": "More details",
+      "back": "Back to search",
+      "addName": "Add a name",
+      "needMobile": "Add a 10-digit mobile",
+      "mobileDigits": "Mobile needs 10 digits"
+    },
+    "patient": {
+      "newPatient": "New patient",
+      "addNamed": "Add “{{name}}” as a new patient",
+      "addPhone": "Add {{phone}} as a new patient",
+      "addNamedPhone": "Add “{{name}}” · {{phone}} as a new patient",
+      "add": "Add patient",
+      "use": "Use patient",
+      "added": "{{name}} added as a patient",
+      "existing": "{{name}} is already a patient · picked"
+    }
+  },
   "contactEditor": {
     "title": "Edit contact",
     "sub": "Saved once · used by every lead, patient and chat",
@@ -987,9 +1033,7 @@
     "who": {
       "search": "Search patient or lead by name, phone, ID",
       "searchLabel": "Search person",
-      "useContact": "Use contact",
       "patient": "Patient",
-      "createContact": "+ Create contact “{{query}}”",
       "newContact": "New contact · add their mobile to book",
       "mobile": "Mobile number",
       "name": "Name",
@@ -1025,8 +1069,6 @@
     },
     "details": {
       "title": "Appointment",
-      "notFilled": "Not filled yet",
-      "open": "Open",
       "type": "Type",
       "typeGroup": "Appointment type",
       "types": {
@@ -1072,6 +1114,7 @@
       "nextMonth": "Next month",
       "step": "Slot step",
       "stepOption": "{{minutes}} min",
+      "date": "Date",
       "time": "Time",
       "pickDate": "Pick a date to see times",
       "none": "No times to book on this day · pick another date",
@@ -1120,9 +1163,7 @@
   "patientPicker": {
     "label": "Patient",
     "placeholder": "Search patients",
-    "hint": "only patients can be picked",
-    "due": "{{amount}} due",
-    "nothingDue": "Nothing due"
+    "hint": "only patients can be picked"
   },
   "splitRows": {
     "mode": "Mode",
@@ -1216,7 +1257,6 @@
     },
     "fields": {
       "branch": "Branch",
-      "newPatient": "New patient",
       "customer": "Customer",
       "customerHint": "patient or any contact · new names are saved as a Medical contact",
       "customerPlaceholder": "Search patients, leads or medical contacts",
@@ -1383,5 +1423,31 @@
   "appHomeEmpty": {
     "title": "Nothing is switched on here yet",
     "description": "Your clinic's sections appear here as soon as they're switched on for you."
+  },
+  "bugReport": {
+    "trigger": "Report a bug",
+    "panel": {
+      "title": "Report a bug",
+      "subtitle": "What went wrong? Type it — or tap the mic and say it.",
+      "label": "Describe the bug",
+      "placeholder": "What happened, and what did you expect instead?",
+      "signedAs": "Sent as {{name}}, with this page and the app version.",
+      "close": "Close"
+    },
+    "voice": {
+      "start": "Dictate with your voice",
+      "stop": "Stop dictating",
+      "listening": "Listening…",
+      "hearing": "Hearing you…",
+      "denied": "The microphone is blocked. Allow it in your browser to dictate.",
+      "noSpeech": "Didn't catch that — tap the mic and try again.",
+      "unavailable": "Voice input isn't available right now. You can still type."
+    },
+    "send": {
+      "idle": "Send",
+      "sending": "Sending…",
+      "sent": "Thanks — the team has it.",
+      "error": "Couldn't send your report. Your words are still here — try again."
+    }
   }
 }

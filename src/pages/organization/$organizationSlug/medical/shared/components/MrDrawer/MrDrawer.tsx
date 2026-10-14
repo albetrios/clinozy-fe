@@ -18,10 +18,7 @@ import {
   DrawerStepBody,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import {
   PATIENT_DRAWER_KEYS,
   PATIENT_DRAWER_NS,
@@ -31,10 +28,6 @@ import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -281,9 +274,7 @@ function useSteps(
   readOnly: boolean,
 ): DrawerStep[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const dates = useMedicalDates();
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
   const phone = storedPhoneOf(values.phone);
   const phoneText = phone ? formatAppPhone(phone) : '';
@@ -297,7 +288,6 @@ function useSteps(
     {
       id: 'mr',
       title: t(K.steps.mr),
-      summary: drawerStepSummary([name, phoneText, next], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.name), value: name },
         { kind: 'value', label: t(K.fields.phone), value: phoneText },
@@ -313,11 +303,6 @@ function useSteps(
     {
       id: 'represents',
       title: t(K.steps.represents),
-      summary:
-        makers
-          .map((maker) => maker.label)
-          .slice(0, 4)
-          .join(' · ') || notFilled,
       peek: [{ kind: 'multi', label: t(K.fields.manufacturers), values: makers }],
       content: (
         <DrawerStepBody readOnly={readOnly}>

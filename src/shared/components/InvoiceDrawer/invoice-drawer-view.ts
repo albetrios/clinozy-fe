@@ -4,17 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { APP_KEYS } from '@/shared/app/app.constants.ts';
-import {
-  type DrawerPeekItem,
-  type DrawerPeekPill,
-  drawerStepSummary,
+import type {
+  DrawerPeekItem,
+  DrawerPeekPill,
 } from '@/shared/components/DrawerSteps/index.ts';
 import { PATIENT_PICKER_KEYS } from '@/shared/components/PatientPicker/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import {
@@ -48,7 +43,7 @@ export interface InvoiceDrawerView {
   saveLabel: string;
   steps: Record<
     InvoiceStepId,
-    { title: string; summary: string; peek: DrawerPeekItem[]; missing: string[] }
+    { title: string; peek: DrawerPeekItem[]; missing: string[] }
   >;
 }
 
@@ -64,7 +59,7 @@ export interface InvoiceDrawerViewInput {
   sessionLines: readonly { qty: number; sessionsTotal: number | null }[];
   /** Team members by id as their peek pills — short name, own tone ("Dr. Drashti"). */
   staff: ReadonlyMap<string, DrawerPeekPill>;
-  /** The picked branch — the first step's sub line and its toned peek tile. */
+  /** The picked branch — the first step's toned peek tile. */
   branch: { name: string; tone?: Tone } | null;
 }
 
@@ -136,7 +131,7 @@ function paymentPeek(
   ];
 }
 
-/** The step heads, their sub lines, their collapsed peeks and what each still misses. */
+/** The step heads, their collapsed peeks and what each still misses. */
 function stepsOf(
   input: InvoiceDrawerViewInput,
   t: TFunction,
@@ -145,7 +140,6 @@ function stepsOf(
   const { values } = input;
   const medical = values.type === 'medical';
   const lines = namedLines(values.items);
-  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled, { ns: RECORD_DRAWER_NS });
   const partyLabel = t(medical ? K.fields.customer : PATIENT_PICKER_KEYS.label);
   const teamLabel = t(medical ? K.fields.prescribedBy : K.fields.team);
   // A member the staff list has not loaded (or no longer lists) is left out, never a blank pill.
@@ -157,22 +151,10 @@ function stepsOf(
   const discount = medical
     ? `${percentOf(values.overallDiscountPct)}%`
     : formatPaise(overallDiscountPaise(values));
-  const paid = paidNowSplits(values.paidNow).map(
-    (split) => `${t(APP_KEYS.paymentModes[split.mode])} ${formatPaise(split.amount)}`,
-  );
   const remark = values.remark.trim() || undefined;
   return {
     party: {
       title: t(K.steps.party),
-      // H:3840: the step's values while it is open — "Adajan · Riya S.".
-      summary: drawerStepSummary(
-        [
-          input.branch?.name,
-          values.party?.name,
-          team.map((pill) => pill.label).join(', '),
-        ],
-        notFilled,
-      ),
       missing: values.party ? [] : [partyLabel],
       peek: [
         {
@@ -187,10 +169,6 @@ function stepsOf(
     },
     items: {
       title: t(medical ? K.steps.medicines : K.steps.items),
-      summary: drawerStepSummary(
-        [lines.length > 0 ? t(K.summaryItems, { count: lines.length }) : undefined],
-        notFilled,
-      ),
       // The rows are checked on save ("Add at least one item"), never in the head (H:3840).
       missing: [],
       peek: [
@@ -203,7 +181,6 @@ function stepsOf(
     },
     payment: {
       title: t(K.steps.payment),
-      summary: drawerStepSummary([discount, ...paid, remark], notFilled),
       missing: [],
       // The prototype's peek lists every field of the step (H:3832–3834).
       peek: [

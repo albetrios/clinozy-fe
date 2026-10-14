@@ -701,9 +701,6 @@
         "damaged": "Danificado"
       },
       "refundBy": "Reembolsar por",
-      "peek_one": "{{count}} medicamento · {{amount}}",
-      "peek_many": "{{count}} medicamentos · {{amount}}",
-      "peek_other": "{{count}} medicamentos · {{amount}}",
       "quickFill": "Devolver tudo",
       "save": "Reembolsar {{amount}}",
       "summary": "{{reason}} · {{amount}}",

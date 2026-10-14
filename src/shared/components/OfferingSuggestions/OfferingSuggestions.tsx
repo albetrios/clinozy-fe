@@ -13,7 +13,7 @@ import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
-import { ChevronDown, Eye, EyeOff, Plus } from '@/shared/icons/index.ts';
+import { ChevronDown, Eye, EyeOff, Plus, Sparkles } from '@/shared/icons/index.ts';
 
 import {
   OFFERING_SUGGESTIONS_KEYS,
@@ -245,9 +245,11 @@ function PlanBody({
       ))}
       {lines.length === 0 ? (
         <EmptyState
-          variant="inline"
+          variant="compact"
+          tone="lime"
+          icon={<Sparkles />}
           title={t(KEYS.empty, { first: firstName })}
-          className="border-muted border-b px-3.5 py-3"
+          className="border-muted border-b px-3.5 py-4"
         />
       ) : null}
       {ideas.map((idea) => (

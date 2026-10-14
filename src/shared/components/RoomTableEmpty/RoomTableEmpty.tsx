@@ -20,8 +20,6 @@ export interface RoomTableEmptyProps {
   icon: ReactNode;
   title: string;
   description: string;
-  /** The tab's "New …" button (PRD.md:232). */
-  action?: ReactNode;
   /** What is loading, for screen readers ("Medicines"). */
   label: string;
   /** Skeleton rows lead with a round avatar (person lists). */
@@ -32,7 +30,8 @@ export interface RoomTableEmptyProps {
  * What a room table shows with no rows (KICKOFF §6.0 States): the in-place
  * skeleton while it loads (the first load; a new search or filter), the
  * filtered state when filters hide everything, else the room's illustrated
- * empty state with the tab's "New …" button. Pass it as `DataTable`'s `empty`.
+ * empty state. No button (fix-empty-state-actions): the room's toolbar holds
+ * the tab's "New …". Pass it as `DataTable`'s `empty`.
  */
 export function RoomTableEmpty({
   loading,
@@ -42,7 +41,6 @@ export function RoomTableEmpty({
   icon,
   title,
   description,
-  action,
   label,
   avatar = false,
 }: RoomTableEmptyProps) {
@@ -57,13 +55,5 @@ export function RoomTableEmpty({
     );
   }
   if (filtered) return <EmptyState tone={tone} onClearFilters={onClearFilters} />;
-  return (
-    <EmptyState
-      tone={tone}
-      icon={icon}
-      title={title}
-      description={description}
-      action={action}
-    />
-  );
+  return <EmptyState tone={tone} icon={icon} title={title} description={description} />;
 }

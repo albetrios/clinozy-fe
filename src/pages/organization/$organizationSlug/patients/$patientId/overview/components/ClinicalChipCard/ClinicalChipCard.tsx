@@ -8,6 +8,7 @@ import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
+import type { AppIcon } from '@/shared/icons/index.ts';
 
 import type { ClinicalChip } from '../../../shared/patient-clinical.ts';
 import { CLINICAL_KEYS, CLINICAL_NS } from '../../overview.constants.ts';
@@ -19,6 +20,8 @@ const CHIP_MAX = 60;
 export interface ClinicalChipCardProps {
   title: string;
   tone: Tone;
+  /** The list's glyph in its empty state (change-empty-states C2–C5). */
+  icon: AppIcon;
   /** The chips — each a clinical note; the fresh ones ringed and counted in the "1 new" pill. */
   items: readonly ClinicalChip[];
   /** The notes are still being read: the chips' place shows bars, and there is no input. */
@@ -42,6 +45,7 @@ export interface ClinicalChipCardProps {
 export function ClinicalChipCard({
   title,
   tone,
+  icon: Icon,
   items,
   loading,
   onAdd,
@@ -101,7 +105,13 @@ export function ClinicalChipCard({
       </h3>
       {loading ? <SkeletonRows rows={2} label={title} /> : null}
       {!loading && items.length === 0 ? (
-        <EmptyState variant="inline" title={t(CLINICAL_KEYS.empty)} />
+        <EmptyState
+          variant="compact"
+          tone={tone}
+          icon={<Icon />}
+          title={t(CLINICAL_KEYS.empty)}
+          className="py-3"
+        />
       ) : null}
       <ul className="flex flex-wrap gap-1.5 empty:hidden">
         {items.map((item) => (

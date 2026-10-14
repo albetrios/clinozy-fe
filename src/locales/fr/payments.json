@@ -102,8 +102,7 @@
   "empty": {
     "ledgerTitle": "Aucune écriture ne correspond",
     "pendingTitle": "Rien en attente",
-    "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche.",
-    "receive": "Encaisser"
+    "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
   },
   "deleteEntry": {
     "title": "Supprimer ce paiement ?",

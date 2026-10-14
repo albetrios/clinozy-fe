@@ -2,7 +2,17 @@ import { useTranslation } from 'react-i18next';
 
 import type { MedicalTab } from '@/lib/routes/medical-builders.ts';
 import { RoomTable, type RoomTableProps } from '@/shared/components/RoomTable/index.ts';
-import { Pill } from '@/shared/icons/index.ts';
+import {
+  type AppIcon,
+  Clock,
+  Factory,
+  Pill,
+  Receipt,
+  ShoppingCart,
+  Truck,
+  User,
+  Wallet,
+} from '@/shared/icons/index.ts';
 
 import {
   MEDICAL_KEYS,
@@ -12,6 +22,19 @@ import {
 
 /** The Medical room's export code (`medicine:export`, research-users §7). */
 const MEDICAL_EXPORT_CODE = 'medicine:export';
+
+/** Each tab's own empty-state glyph (change-empty-states R21–R27), in the room's blush. */
+const MEDICAL_EMPTY_ICONS: Readonly<Record<MedicalTab, AppIcon>> = {
+  sales: Receipt,
+  medicines: Pill,
+  purchases: ShoppingCart,
+  suppliers: Truck,
+  manufacturers: Factory,
+  mrs: User,
+  payments: Wallet,
+  // The store's credits — the clock of Payments › Pending's credits (clinozy-be D90).
+  credits: Clock,
+};
 
 /** Props of {@link MedicalTable}: the shared room table's, named by the tab. */
 export interface MedicalTableProps<TRow extends { id: string }> extends Omit<
@@ -23,7 +46,8 @@ export interface MedicalTableProps<TRow extends { id: string }> extends Omit<
 
 /**
  * A Medical tab's table (KICKOFF §6.7 Tables) — the shared room table in the
- * room's blush, its `Pill` empty tile, the tab's table id and name, the
+ * room's blush, the tab's own empty tile (a receipt for Sales, a truck for
+ * Suppliers, …; change-empty-states), the tab's table id and name, the
  * room's words for the hint and Export, and Export behind `medicine:export`.
  */
 export function MedicalTable<TRow extends { id: string }>({
@@ -31,13 +55,14 @@ export function MedicalTable<TRow extends { id: string }>({
   ...props
 }: MedicalTableProps<TRow>) {
   const { t } = useTranslation(MEDICAL_NS);
+  const EmptyIcon = MEDICAL_EMPTY_ICONS[tab];
   return (
     <RoomTable
       {...props}
       tableId={MEDICAL_TABLE_IDS[tab]}
       label={t(MEDICAL_KEYS.tabs[tab])}
       tone="blush"
-      icon={<Pill />}
+      icon={<EmptyIcon />}
       emptyHint={t(MEDICAL_KEYS.empty.hint)}
       exportCode={MEDICAL_EXPORT_CODE}
       exportCopy={{

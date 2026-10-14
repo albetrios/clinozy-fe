@@ -659,7 +659,6 @@
         "damaged": "已损坏"
       },
       "refundBy": "退款方式",
-      "peek_other": "{{count}} 种药品 · {{amount}}",
       "quickFill": "全部退回",
       "save": "退款 {{amount}}",
       "summary": "{{reason}} · {{amount}}",

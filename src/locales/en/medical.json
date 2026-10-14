@@ -680,8 +680,6 @@
         "damaged": "Damaged"
       },
       "refundBy": "Refund by",
-      "peek_one": "{{count}} medicine · {{amount}}",
-      "peek_other": "{{count}} medicines · {{amount}}",
       "quickFill": "Return everything",
       "save": "Refund {{amount}}",
       "summary": "{{reason}} · {{amount}}",

@@ -143,7 +143,6 @@ export function MrsPage() {
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = mrParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useAppAccess();
   const nav = useMedicalNav();
   const filters = useRoomFilters(MR_FILTER_FIELDS);
   const stack = useMedicalStack();
@@ -168,7 +167,6 @@ export function MrsPage() {
   });
   const failed = list.isError && rows.length === 0 && !loading;
 
-  const canCreate = access.isResolved && access.can('medical', 'create');
   const keys = MEDICAL_KEYS.mrs;
 
   return (
@@ -192,11 +190,6 @@ export function MrsPage() {
           filtered={filters.count > 0}
           onClearFilters={() => filters.apply({})}
           emptyTitle={t(keys.empty)}
-          emptyAction={
-            canCreate
-              ? { label: t(MEDICAL_KEYS.create.mr), onSelect: () => nav.create('mrs') }
-              : undefined
-          }
           recordsLabel={t(keys.records)}
           countLabel={summary ? t(keys.count, { count: summary.total }) : undefined}
           minWidth={980}

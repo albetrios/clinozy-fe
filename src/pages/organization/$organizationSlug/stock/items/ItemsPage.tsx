@@ -253,7 +253,6 @@ export function ItemsPage() {
   const search = validateStockSearch(useSearch({ strict: false }));
   const params = itemParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useStockAccess();
   const nav = useStockNav();
   const { fields, copy } = useItemFilters();
   const filters = useRoomFilters(fields);
@@ -289,11 +288,6 @@ export function ItemsPage() {
         filtered={filters.count > 0}
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(STOCK_KEYS.items.empty)}
-        emptyAction={
-          access.canCreate
-            ? { label: t(STOCK_KEYS.create.item), onSelect: () => nav.create('items') }
-            : undefined
-        }
         recordsLabel={t(STOCK_KEYS.items.records)}
         minWidth={1100}
         onRowClick={(item) => nav.itemEdit(item.id)}

@@ -78,7 +78,8 @@ the permission toast.
 
 **Receive payment** (`components/ReceivePaymentDrawer/`, L-39b) — `POST /app/payments`
 (`kind: receipt`), 560px, one section, "Who is paying": Branch (two or more open branches) ·
-Patient (the shared `PatientPicker` — patients only; the receipt names their contact) · Against
+Patient (the shared `PatientPicker` — the drawers' contact picker over patients only, its quick add
+registering a new one; the receipt names their contact) · Against
 invoice (their open ones, `GET /app/invoices?patient_id=&payment_status=unpaid,partial`, oldest
 first; picking a patient takes the oldest and its due; tapping the picked one again is an advance,
 "Total ₹500 · advance") · the Mode · Amount rows (the shared `SplitRowsField`, compact, "+ Split · add

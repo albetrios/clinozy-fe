@@ -37,6 +37,8 @@
       "updated": "Atualizado"
     },
     "empty": "Nenhum lead corresponde",
+    "emptyTitle": "Nenhum lead ainda",
+    "emptyHint": "Aqui chegam os contatos por ligação, WhatsApp e visitas sem marcação.",
     "clearFilters": "Limpar filtros",
     "moreInterests_one": "Mais {{count}}: {{list}}",
     "moreInterests_many": "Mais {{count}}: {{list}}",
@@ -173,7 +175,6 @@
       "recreate": "Recriar lead",
       "useContact": "Usar contato"
     },
-    "noMatch": "Nenhuma correspondência",
     "more_one": " · +{{count}} outro",
     "more_many": " · +{{count}} outros",
     "more_other": " · +{{count}} outros",

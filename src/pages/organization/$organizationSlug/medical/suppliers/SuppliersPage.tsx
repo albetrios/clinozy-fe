@@ -246,7 +246,6 @@ export function SuppliersPage() {
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = supplierParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useAppAccess();
   const nav = useMedicalNav();
   const { fields, copy } = useSupplierFilters();
   const filters = useRoomFilters(fields);
@@ -272,7 +271,6 @@ export function SuppliersPage() {
     onSortChange: (sort) => patchSearch({ sort }),
   });
   const failed = list.isError && rows.length === 0 && !loading;
-  const canCreate = access.isResolved && access.can('medical', 'create');
   const keys = MEDICAL_KEYS.suppliers;
 
   return (
@@ -295,14 +293,6 @@ export function SuppliersPage() {
           filtered={filters.count > 0}
           onClearFilters={() => filters.apply({})}
           emptyTitle={t(keys.empty)}
-          emptyAction={
-            canCreate
-              ? {
-                  label: t(MEDICAL_KEYS.create.supplier),
-                  onSelect: () => nav.create('suppliers'),
-                }
-              : undefined
-          }
           recordsLabel={t(keys.records)}
           countLabel={countLabel}
           minWidth={980}

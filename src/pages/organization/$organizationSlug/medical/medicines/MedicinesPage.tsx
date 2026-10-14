@@ -283,14 +283,6 @@ export function MedicinesPage() {
         filtered={filters.count > 0}
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(MEDICAL_KEYS.medicines.empty)}
-        emptyAction={
-          canCreate
-            ? {
-                label: t(MEDICAL_KEYS.create.medicine),
-                onSelect: () => nav.create('medicines'),
-              }
-            : undefined
-        }
         recordsLabel={t(MEDICAL_KEYS.medicines.records)}
         minWidth={1240}
         onRowClick={(row) => nav.medicineEdit(row.id)}

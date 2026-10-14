@@ -54,15 +54,12 @@ function buildIntegrations(
     Sentry.reportingObserverIntegration(),
     Sentry.extraErrorDataIntegration({ depth: 5 }),
     Sentry.consoleLoggingIntegration({ levels: ['warn', 'error'] }),
-    Sentry.feedbackIntegration({
-      colorScheme: 'system',
-      showBranding: false,
-      autoInject: true,
-    }),
+    // No feedbackIntegration: "Report a bug" is our own widget (shared/components/BugReport), which
+    // files to clinozy-be with the signed-in person (iteration feat-bug-report-2026-10-13-dgnx).
   ];
 
-  // Session recording and profiling only while Analytics is allowed (the cookie answer); error reports,
-  // logs and feedback run whenever a DSN is configured — including local `pnpm dev`.
+  // Session recording and profiling only while Analytics is allowed (the cookie answer); error reports
+  // and logs run whenever a DSN is configured — including local `pnpm dev`.
   if (options.recording) {
     integrations.push(
       sessionReplayIntegration(Sentry),

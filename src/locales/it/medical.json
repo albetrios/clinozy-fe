@@ -701,9 +701,6 @@
         "damaged": "Danneggiato"
       },
       "refundBy": "Rimborsa con",
-      "peek_one": "{{count}} farmaco · {{amount}}",
-      "peek_many": "{{count}} farmaci · {{amount}}",
-      "peek_other": "{{count}} farmaci · {{amount}}",
       "quickFill": "Restituisci tutto",
       "save": "Rimborsa {{amount}}",
       "summary": "{{reason}} · {{amount}}",

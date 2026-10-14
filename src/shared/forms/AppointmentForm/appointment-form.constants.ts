@@ -33,11 +33,8 @@ export const APPOINTMENT_FORM_KEYS = {
   who: {
     search: 'appointmentForm.who.search',
     searchLabel: 'appointmentForm.who.searchLabel',
-    useContact: 'appointmentForm.who.useContact',
     /** A search hit with a patient file. */
     patient: 'appointmentForm.who.patient',
-    /** "+ Create contact “<query>”". */
-    createContact: 'appointmentForm.who.createContact',
     newContact: 'appointmentForm.who.newContact',
     mobile: 'appointmentForm.who.mobile',
     name: 'appointmentForm.who.name',
@@ -71,8 +68,6 @@ export const APPOINTMENT_FORM_KEYS = {
   },
   details: {
     title: 'appointmentForm.details.title',
-    notFilled: 'appointmentForm.details.notFilled',
-    open: 'appointmentForm.details.open',
     type: 'appointmentForm.details.type',
     typeGroup: 'appointmentForm.details.typeGroup',
     types: TYPE_KEYS('appointmentForm.details.types'),
@@ -110,6 +105,8 @@ export const APPOINTMENT_FORM_KEYS = {
     step: 'appointmentForm.slot.step',
     /** "<n> min". */
     stepOption: 'appointmentForm.slot.stepOption',
+    /** The collapsed card's "Date" (its pair with "Time"). */
+    date: 'appointmentForm.slot.date',
     time: 'appointmentForm.slot.time',
     pickDate: 'appointmentForm.slot.pickDate',
     /** An open day with no free start left. */
@@ -161,9 +158,13 @@ export const APPOINTMENT_FORM_TEST_IDS = {
   /** Edit and Reschedule (`$appointmentId/`). */
   drawer: 'appointment-drawer',
   form: 'appointment-form',
+  /** The root of the contact picker's own ids (`appointment-form-who-quick-add-name` …). */
+  who: 'appointment-form-who',
   whoSearch: 'appointment-form-who-search',
   whoHit: 'appointment-form-who-hit',
+  /** The contact picker's add row. */
   whoCreate: 'appointment-form-who-create',
+  whoNoMatch: 'appointment-form-who-no-match',
   whoCard: 'appointment-form-who-card',
   whoMobile: 'appointment-form-who-mobile',
   whoEdit: 'appointment-form-who-edit',
@@ -182,6 +183,8 @@ export const APPOINTMENT_FORM_TEST_IDS = {
   cancelVisit: 'appointment-form-cancel-visit',
   details: 'appointment-form-details',
   detailsToggle: 'appointment-form-details-toggle',
+  /** Step 1's "Next: Date & time →". */
+  detailsNext: 'appointment-form-details-next',
   type: 'appointment-form-type',
   treatment: 'appointment-form-treatment',
   doctor: 'appointment-form-doctor',

@@ -18,7 +18,7 @@ import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
-import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import {
   ledgerEntryEditable,
   ledgerEntryFixed,
@@ -71,7 +71,8 @@ const LEDGER_MIN_WIDTH = 1180;
 /**
  * What the table shows while the ledger's first page loads, or when nothing is
  * in it — the in-place skeleton, the room's empty state (a butter tile with
- * `Wallet`, "No entry matches", and Receive), or the filtered one
+ * `Wallet` and "No entry matches" — no button, fix-empty-state-actions: the
+ * toolbar's Receive is the one way to add), or the filtered one
  * (`payments.md:398`). A search, filter or Day close's day keeps the rows and
  * turns them to bars (the table's `refreshing`).
  */
@@ -79,12 +80,10 @@ function LedgerEmpty({
   loading,
   filtered,
   onClearFilters,
-  onReceive,
 }: {
   loading: boolean;
   filtered: boolean;
   onClearFilters: () => void;
-  onReceive?: () => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   if (loading) {
@@ -104,13 +103,6 @@ function LedgerEmpty({
       icon={<Wallet />}
       title={t(PAYMENTS_KEYS.empty.ledgerTitle)}
       description={t(PAYMENTS_KEYS.empty.description)}
-      action={
-        onReceive ? (
-          <EmptyStateAction onClick={onReceive}>
-            {t(PAYMENTS_KEYS.empty.receive)}
-          </EmptyStateAction>
-        ) : undefined
-      }
     />
   );
 }
@@ -356,7 +348,6 @@ export function PaymentsPage() {
               loading={list.isPending}
               filtered={filters.count > 0 || Boolean(search.q)}
               onClearFilters={() => filters.apply({})}
-              onReceive={access.canCreate ? openReceive : undefined}
             />
           }
           className="m-(--room-card-margin) flex-1"

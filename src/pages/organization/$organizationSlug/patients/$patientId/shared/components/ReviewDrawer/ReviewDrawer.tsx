@@ -8,15 +8,8 @@ import { feedbackQueryKeys, fetchReview } from '@/shared/api/app/feedback-api.ts
 import type { PatientReview } from '@/shared/api/app/feedback-contracts.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { REVIEW_SOURCE_TONES } from '@/shared/app/app-tones.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useEditingRecord } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -80,7 +73,6 @@ export function ReviewDrawer({
   onClose,
 }: ReviewDrawerProps) {
   const { t } = useTranslation([REVIEW_NS, APP_NS]);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const form = useForm<ReviewFormValues>({
     defaultValues: review ? reviewFormOf(review) : newReviewForm(source ?? undefined),
   });
@@ -118,17 +110,14 @@ export function ReviewDrawer({
     },
   });
 
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const where = sourceLabel(values.source);
   const rating = values.rating === null ? '' : ratingLabel(values.rating);
   const link = values.link.trim();
   const text = values.text.trim();
-  const files = values.files.map((picked) => picked.file.name).join(', ');
   const steps: DrawerStep[] = [
     {
       id: 'review',
       title: t(K.steps.review),
-      summary: drawerStepSummary([where, rating], notFilled),
       peek: [
         {
           kind: 'value',
@@ -148,16 +137,21 @@ export function ReviewDrawer({
     {
       id: 'details',
       title: t(K.steps.details),
-      summary: drawerStepSummary([link], notFilled),
       peek: [{ kind: 'value', label: t(K.link), value: link || undefined }],
       content: <ReviewLinkFields form={form} />,
     },
     {
       id: 'notes',
       title: t(K.steps.notes),
-      summary: drawerStepSummary([files, text], notFilled),
-      // The drop zone has no peek tile (H:3840 `peekOf` skips uploads).
-      peek: [{ kind: 'value', label: t(K.text), value: text || undefined }],
+      // The picked files as chips, then the text.
+      peek: [
+        {
+          kind: 'items',
+          label: t(K.files),
+          names: values.files.map((picked) => picked.file.name),
+        },
+        { kind: 'value', label: t(K.text), value: text || undefined },
+      ],
       content: (
         <ReviewNotesFields
           form={form}

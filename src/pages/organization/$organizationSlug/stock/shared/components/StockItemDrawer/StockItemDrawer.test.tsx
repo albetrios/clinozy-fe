@@ -397,8 +397,9 @@ describe('StockNewItemDrawer (clinic-stock.md:187–201)', () => {
     // Six units only.
     expect(within(drawer).queryByTestId(`${N}-unit-litre`)).not.toBeInTheDocument();
     expect(within(drawer).getByTestId(`${N}-dismiss`)).toHaveTextContent('Back');
+    // The collapsed step reads its values back; each field's name is read out with it.
     expect(within(drawer).getByTestId(`${N}-step-details-peek`)).toHaveTextContent(
-      /Minimum\s*1\s*Maximum\s*5/,
+      /Minimum:\s*1\s*Maximum:\s*5/,
     );
     const columns = (testId: string) =>
       within(drawer)

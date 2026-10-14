@@ -102,8 +102,7 @@
   "empty": {
     "ledgerTitle": "Nessun movimento corrisponde",
     "pendingTitle": "Niente in sospeso",
-    "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
-    "receive": "Incassa"
+    "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
   },
   "deleteEntry": {
     "title": "Eliminare questo pagamento?",

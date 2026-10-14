@@ -459,6 +459,7 @@
   },
   "empty": {
     "queue": "Al momento non c’è nulla per te. Le nuove attività compaiono qui quando i lead scrivono, le visite si avvicinano e arriva un feedback.",
+    "caughtUp": "Tutto in ordine",
     "snoozed": "Nessuna attività posticipata",
     "done": "Ancora nulla di risolto oggi"
   },
@@ -474,8 +475,7 @@
     "forField": {
       "label": "Per",
       "placeholder": "Scegli una persona",
-      "search": "Cerca per nome, cellulare o numero",
-      "empty": "Scrivi un nome, un cellulare o un numero di contatto"
+      "search": "Cerca per nome, cellulare o numero"
     },
     "titleField": {
       "label": "Titolo",

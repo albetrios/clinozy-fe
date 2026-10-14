@@ -37,6 +37,8 @@
       "updated": "Mis à jour"
     },
     "empty": "Aucun prospect ne correspond",
+    "emptyTitle": "Aucun prospect pour l’instant",
+    "emptyHint": "Les demandes par appel, WhatsApp et visites spontanées arrivent ici.",
     "clearFilters": "Effacer les filtres",
     "moreInterests_one": "{{count}} de plus : {{list}}",
     "moreInterests_many": "{{count}} de plus : {{list}}",
@@ -173,7 +175,6 @@
       "recreate": "Recréer le lead",
       "useContact": "Utiliser le contact"
     },
-    "noMatch": "Aucune correspondance",
     "more_one": " · +{{count}} autre",
     "more_many": " · +{{count}} autres",
     "more_other": " · +{{count}} autres",

@@ -13,19 +13,12 @@ import {
   DrawerTextarea,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -192,9 +185,7 @@ function NoteFields({ form, idPrefix, testId }: FieldsProps) {
 /** Visit → Details → Notes (`medical.md:433`), each peeking its values. */
 function useSteps(body: BodyProps): DrawerStep[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const dates = useMedicalDates();
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const { values } = body;
   const date = dates.day(values.date);
   const next = values.nextVisitOn ? dates.day(values.nextVisitOn) : '';
@@ -204,7 +195,6 @@ function useSteps(body: BodyProps): DrawerStep[] {
     {
       id: 'visit',
       title: t(K.steps.visit),
-      summary: date,
       peek: [{ kind: 'value', label: t(K.fields.date), value: date }],
       content: (
         <DrawerStepBody readOnly={false}>
@@ -215,7 +205,6 @@ function useSteps(body: BodyProps): DrawerStep[] {
     {
       id: 'details',
       title: t(K.steps.details),
-      summary: drawerStepSummary([next, samples], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.nextVisit), value: next },
         { kind: 'value', label: t(K.fields.samples), value: samples },
@@ -229,7 +218,6 @@ function useSteps(body: BodyProps): DrawerStep[] {
     {
       id: 'notes',
       title: t(K.steps.notes),
-      summary: notes || notFilled,
       peek: [{ kind: 'value', label: t(K.fields.note), value: notes }],
       content: (
         <DrawerStepBody readOnly={false}>

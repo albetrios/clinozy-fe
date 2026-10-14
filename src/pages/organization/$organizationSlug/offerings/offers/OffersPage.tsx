@@ -10,7 +10,7 @@ import { OFFER_STATE_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   type RoomFilterCopy,
@@ -76,7 +76,6 @@ function TableEmpty({
   onRetry,
   filtered,
   onClearFilters,
-  onNew,
 }: {
   loading: boolean;
   /** The read failed and there is no copy to show. */
@@ -84,8 +83,6 @@ function TableEmpty({
   onRetry: () => void;
   filtered: boolean;
   onClearFilters: () => void;
-  /** "New offer" under the empty list — absent without `offering:create`. */
-  onNew?: () => void;
 }) {
   const { t } = useTranslation(OFFERS_NS);
   if (loading) {
@@ -105,13 +102,6 @@ function TableEmpty({
       icon={<Sparkles />}
       title={t(OFFERS_KEYS.empty.title)}
       description={t(OFFERS_KEYS.empty.description)}
-      action={
-        onNew ? (
-          <EmptyStateAction onClick={onNew}>
-            {t(OFFERS_KEYS.empty.newOffer)}
-          </EmptyStateAction>
-        ) : undefined
-      }
     />
   );
 }
@@ -341,7 +331,6 @@ export function OffersPage() {
             onRetry={catalogue.refetch}
             filtered={filters.count > 0}
             onClearFilters={() => filters.apply({})}
-            onNew={onNew}
           />
         }
         className="m-(--room-card-margin) flex-1"

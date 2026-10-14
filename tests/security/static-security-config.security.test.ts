@@ -92,6 +92,18 @@ describe('security response headers (public/_headers)', () => {
     expect(headers).toMatch(pattern);
   });
 
+  // "Report a bug" dictates with the browser's own speech recognition (iteration
+  // feat-bug-report-2026-10-13-dgnx): the microphone is allowed for this origin only — never for an
+  // embedded frame — and the rest stay off.
+  it('allows the microphone to this origin alone, and nothing else the policy names', () => {
+    for (const config of [headers, netlifyToml]) {
+      expect(config).toMatch(/microphone=\(self\)/);
+      expect(config).toMatch(/camera=\(\)/);
+      expect(config).toMatch(/geolocation=\(\)/);
+      expect(config).not.toMatch(/microphone=\*/);
+    }
+  });
+
   it('never caches index.html (new-deployment detection depends on it)', () => {
     expect(headers).toMatch(/\/index\.html\n\s+Cache-Control:\s*no-store/);
   });

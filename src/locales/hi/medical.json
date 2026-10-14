@@ -680,8 +680,6 @@
         "damaged": "खराब"
       },
       "refundBy": "रिफ़ंड का तरीका",
-      "peek_one": "{{count}} दवा · {{amount}}",
-      "peek_other": "{{count}} दवाइयाँ · {{amount}}",
       "quickFill": "सब वापस लें",
       "save": "{{amount}} रिफ़ंड करें",
       "summary": "{{reason}} · {{amount}}",

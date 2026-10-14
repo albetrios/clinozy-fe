@@ -112,23 +112,22 @@ function useNewTaskWords({
   };
 }
 
-/** The steps' heads (H:4135 `accVM('tk', …)`): what each lacks, and a collapsed one's sum (H:4483). */
+/**
+ * The steps' heads (H:4135 `accVM('tk', …)`): what each lacks, and what a collapsed one
+ * summarises — the values Save would send (the title falls back to "Follow up · <first name>").
+ */
 function useStepHeads({
   values,
   person,
   owner,
-  openStep,
   words,
 }: {
   values: NewTaskForm;
   person: NewTaskPerson | null;
   owner: string | null;
-  openStep: string;
   words: NewTaskWords;
 }): Record<NewTaskStepId, Omit<DrawerStep, 'id' | 'content'>> {
   const { t } = useTranslation(TASKS_NS);
-  const sum = (stepId: NewTaskStepId, parts: readonly (string | null | undefined)[]) =>
-    openStep === stepId ? undefined : parts.filter(Boolean).join(' · ');
   const title = values.title.trim();
   // A title, or a person to name it after ("Follow up · <first name>").
   const named = person !== null || title !== '';
@@ -136,17 +135,38 @@ function useStepHeads({
     what: {
       title: t(K.steps.what),
       missing: named ? [] : [t(K.titleField.label)],
-      complete: named,
-      summary: sum('what', [person?.name, title || words.fallbackTitle]),
+      peek: [
+        { kind: 'value', label: t(K.forField.label), value: person?.name },
+        {
+          kind: 'value',
+          label: t(K.titleField.label),
+          value: title || words.fallbackTitle,
+        },
+      ],
     },
     when: {
       title: t(K.steps.when),
       missing: owner ? [] : [t(K.owner.label)],
-      summary: sum('when', [words.due, words.owner]),
+      peek: [
+        { kind: 'value', label: t(K.due.label), value: words.due },
+        {
+          kind: 'value',
+          label: t(K.owner.label),
+          value: owner ? words.owner : undefined,
+        },
+      ],
     },
     how: {
       title: t(K.steps.how),
-      summary: sum('how', [t(K.priority[values.priority])]),
+      peek: [
+        {
+          kind: 'value',
+          label: t(K.priority.label),
+          value: t(K.priority[values.priority]),
+          tone: values.priority === 'high' ? 'blush' : undefined,
+        },
+        { kind: 'value', label: t(K.notes.label), value: values.notes.trim() },
+      ],
     },
   };
 }
@@ -188,7 +208,7 @@ export function NewTaskDrawer({ prefill, onClose, onCreated }: NewTaskDrawerProp
     ownerName: ownerPicker.nameOf(owner),
     openedAt,
   });
-  const heads = useStepHeads({ values, person, owner, openStep, words });
+  const heads = useStepHeads({ values, person, owner, words });
   const { saveState, save } = useNewTaskSave({
     form,
     fields: () =>

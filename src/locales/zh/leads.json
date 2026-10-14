@@ -35,6 +35,8 @@
       "updated": "更新时间"
     },
     "empty": "没有匹配的潜在客户",
+    "emptyTitle": "还没有潜在客户",
+    "emptyHint": "来自电话、WhatsApp 和到店咨询的询问会出现在这里。",
     "clearFilters": "清除筛选",
     "moreInterests_other": "另外 {{count}} 项：{{list}}"
   },
@@ -167,7 +169,6 @@
       "recreate": "重新创建线索",
       "useContact": "使用联系人"
     },
-    "noMatch": "没有匹配项",
     "more_other": " · 另 +{{count}}",
     "change": "更换",
     "changeTitle": "选择其他联系人",

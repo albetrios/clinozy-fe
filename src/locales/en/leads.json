@@ -36,6 +36,8 @@
       "updated": "Updated"
     },
     "empty": "No leads match",
+    "emptyTitle": "No leads yet",
+    "emptyHint": "Enquiries from calls, WhatsApp and walk-ins land here.",
     "clearFilters": "Clear filters",
     "moreInterests_one": "{{count}} more: {{list}}",
     "moreInterests_other": "{{count}} more: {{list}}"
@@ -170,7 +172,6 @@
       "recreate": "Re-create lead",
       "useContact": "Use contact"
     },
-    "noMatch": "No existing match",
     "more_one": " · +{{count}} more",
     "more_other": " · +{{count}} more",
     "change": "Change",

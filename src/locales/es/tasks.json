@@ -459,6 +459,7 @@
   },
   "empty": {
     "queue": "Nada te necesita ahora. Las tareas nuevas aparecen aquí cuando escriben los prospectos, se acercan las visitas y llegan opiniones.",
+    "caughtUp": "Todo al día",
     "snoozed": "No hay tareas pospuestas",
     "done": "Nada resuelto hoy todavía"
   },
@@ -474,8 +475,7 @@
     "forField": {
       "label": "Para",
       "placeholder": "Elige una persona",
-      "search": "Busca por nombre, móvil o número",
-      "empty": "Escribe un nombre, un móvil o un número de contacto"
+      "search": "Busca por nombre, móvil o número"
     },
     "titleField": {
       "label": "Título",

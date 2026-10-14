@@ -659,7 +659,6 @@
         "damaged": "破損"
       },
       "refundBy": "返金方法",
-      "peek_other": "{{count}} 品目 · {{amount}}",
       "quickFill": "すべて返品",
       "save": "{{amount}} を返金",
       "summary": "{{reason}} · {{amount}}",

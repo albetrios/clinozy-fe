@@ -361,14 +361,24 @@
       "edit": "Modifica",
       "open": "Apri",
       "missing": "Mancano: {{fields, list(type: unit)}}",
-      "notFilled": "Non ancora compilato"
+      "notFilled": "Non ancora compilato",
+      "position": "Passo {{number}} di {{total}}",
+      "state": {
+        "open": "In corso",
+        "done": "Completato",
+        "missing": "Richiede attenzione",
+        "later": "Non iniziato",
+        "locked": "Bloccato"
+      }
     },
     "peek": {
-      "empty": "Vuoto",
-      "added_one": "{{count}} aggiunto",
-      "added_many": "{{count}} aggiunti",
-      "added_other": "{{count}} aggiunti",
-      "noneYet": "Nessuno per ora"
+      "more_one": "+{{count}} altro",
+      "more_many": "+{{count}} altri",
+      "more_other": "+{{count}} altri",
+      "notFilled": "Non compilato: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} non compilato",
+      "notFilledCount_many": "{{count}} non compilati",
+      "notFilledCount_other": "{{count}} non compilati"
     },
     "stepper": {
       "decrease": "Diminuisci",
@@ -907,6 +917,44 @@
     "purchasesCount_many": "{{count}} righe",
     "purchasesCount_other": "{{count}} righe"
   },
+  "contactPick": {
+    "recent": "Recenti",
+    "keepTyping": "Continua a scrivere — 3 lettere o 4 cifre",
+    "searching": "Ricerca in corso…",
+    "found_one": "{{count}} persona trovata",
+    "found_many": "{{count}} persone trovate",
+    "found_other": "{{count}} persone trovate",
+    "noMatch": "Nessuna corrispondenza",
+    "use": "Usa contatto",
+    "addNamed": "Aggiungi «{{name}}» come nuovo contatto",
+    "addPhone": "Aggiungi {{phone}} come nuovo contatto",
+    "addNamedPhone": "Aggiungi «{{name}}» · {{phone}} come nuovo contatto",
+    "enterKey": "↵",
+    "clearSearch": "Cancella ricerca",
+    "added": "{{name}} aggiunto ai contatti",
+    "existing": "{{name}} è già un contatto · selezionato",
+    "quickAdd": {
+      "name": "Nome",
+      "namePlaceholder": "Nome e cognome",
+      "mobile": "Cellulare",
+      "add": "Aggiungi contatto",
+      "more": "Altri dettagli",
+      "back": "Torna alla ricerca",
+      "addName": "Aggiungi un nome",
+      "needMobile": "Aggiungi un cellulare di 10 cifre",
+      "mobileDigits": "Il cellulare deve avere 10 cifre"
+    },
+    "patient": {
+      "newPatient": "Nuovo paziente",
+      "addNamed": "Aggiungi «{{name}}» come nuovo paziente",
+      "addPhone": "Aggiungi {{phone}} come nuovo paziente",
+      "addNamedPhone": "Aggiungi «{{name}}» · {{phone}} come nuovo paziente",
+      "add": "Aggiungi paziente",
+      "use": "Usa paziente",
+      "added": "{{name}} aggiunto come paziente",
+      "existing": "{{name}} è già un paziente · selezionato"
+    }
+  },
   "contactEditor": {
     "title": "Modifica contatto",
     "sub": "Salvato una volta · usato da ogni lead, paziente e chat",
@@ -998,9 +1046,7 @@
     "who": {
       "search": "Cerca paziente o lead per nome, telefono, ID",
       "searchLabel": "Cerca persona",
-      "useContact": "Usa contatto",
       "patient": "Paziente",
-      "createContact": "+ Crea contatto «{{query}}»",
       "newContact": "Nuovo contatto · aggiungi il cellulare per prenotare",
       "mobile": "Numero di cellulare",
       "name": "Nome",
@@ -1039,8 +1085,6 @@
     },
     "details": {
       "title": "Appuntamento",
-      "notFilled": "Non ancora compilato",
-      "open": "Apri",
       "type": "Tipo",
       "typeGroup": "Tipo di appuntamento",
       "types": {
@@ -1086,6 +1130,7 @@
       "nextMonth": "Mese successivo",
       "step": "Intervallo",
       "stepOption": "{{minutes}} min",
+      "date": "Data",
       "time": "Ora",
       "pickDate": "Scegli una data per vedere gli orari",
       "none": "Nessun orario prenotabile in questo giorno · scegli un’altra data",
@@ -1134,9 +1179,7 @@
   "patientPicker": {
     "label": "Paziente",
     "placeholder": "Cerca pazienti",
-    "hint": "si possono scegliere solo pazienti",
-    "due": "{{amount}} da saldare",
-    "nothingDue": "Niente da saldare"
+    "hint": "si possono scegliere solo pazienti"
   },
   "splitRows": {
     "mode": "Modalità",
@@ -1231,7 +1274,6 @@
     },
     "fields": {
       "branch": "Sede",
-      "newPatient": "Nuovo paziente",
       "customer": "Cliente",
       "customerHint": "paziente o qualsiasi contatto · i nuovi nomi si salvano come contatto medico",
       "customerPlaceholder": "Cerca pazienti, lead o contatti medici",
@@ -1402,5 +1444,31 @@
   "appHomeEmpty": {
     "title": "Qui non è ancora attivo nulla",
     "description": "Le sezioni della tua clinica appariranno qui non appena saranno attivate per te."
+  },
+  "bugReport": {
+    "trigger": "Segnala un bug",
+    "panel": {
+      "title": "Segnala un bug",
+      "subtitle": "Cosa non ha funzionato? Scrivilo, oppure tocca il microfono e dillo.",
+      "label": "Descrivi il bug",
+      "placeholder": "Cosa è successo e cosa ti aspettavi?",
+      "signedAs": "Inviato come {{name}}, con questa pagina e la versione dell'app.",
+      "close": "Chiudi"
+    },
+    "voice": {
+      "start": "Detta con la voce",
+      "stop": "Interrompi la dettatura",
+      "listening": "In ascolto…",
+      "hearing": "Ti sento…",
+      "denied": "Il microfono è bloccato. Consentilo nel browser per dettare.",
+      "noSpeech": "Non ho capito: tocca il microfono e riprova.",
+      "unavailable": "L'input vocale non è disponibile ora. Puoi comunque scrivere."
+    },
+    "send": {
+      "idle": "Invia",
+      "sending": "Invio…",
+      "sent": "Grazie, il team l'ha ricevuto.",
+      "error": "Impossibile inviare la segnalazione. Il tuo testo è ancora qui: riprova."
+    }
   }
 }

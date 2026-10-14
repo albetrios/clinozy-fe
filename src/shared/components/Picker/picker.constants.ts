@@ -86,7 +86,7 @@ export const PICKER_TRIGGER_SIZE_CLASSES: Record<PickerSize, string> = {
   lg: 'min-h-11 text-field',
 };
 
-/** Panel minimum width — width is max(trigger, this), at most the viewport − 16px. */
+/** Panel minimum width — width is max(trigger, this), at most 28rem and the viewport − 16px. */
 export const PICKER_MIN_WIDTH_CLASSES: Record<PickerMinWidthValue, string> = {
   180: 'min-w-45',
   200: 'min-w-50',

@@ -680,8 +680,6 @@
         "damaged": "Beschädigt"
       },
       "refundBy": "Erstatten per",
-      "peek_one": "{{count}} Arzneimittel · {{amount}}",
-      "peek_other": "{{count}} Arzneimittel · {{amount}}",
       "quickFill": "Alles zurücknehmen",
       "save": "{{amount}} erstatten",
       "summary": "{{reason}} · {{amount}}",

@@ -38,6 +38,8 @@ export const LEADS_KEYS = {
       updated: 'list.columns.updated',
     },
     empty: 'list.empty',
+    emptyTitle: 'list.emptyTitle',
+    emptyHint: 'list.emptyHint',
     clearFilters: 'list.clearFilters',
     /** The "+N" interests pill, read out with every interest. Plural. */
     moreInterests: 'list.moreInterests',
@@ -188,7 +190,6 @@ export const LEADS_KEYS = {
       recreate: 'newLead.hits.recreate',
       useContact: 'newLead.hits.useContact',
     },
-    noMatch: 'newLead.noMatch',
     /** " · +<n> more". Plural. */
     more: 'newLead.more',
     change: 'newLead.change',
@@ -230,6 +231,8 @@ export const LEADS_TEST_IDS = {
   drawerResize: 'lead-drawer-resize',
   /** New lead — the drawer's own parts derive theirs from it (`new-lead-drawer-save` …). */
   newLead: 'new-lead-drawer',
+  /** The root of the contact picker's own ids (`new-lead-contact-recent`, `-quick-add-name` …). */
+  newLeadContact: 'new-lead-contact',
   newLeadSearch: 'new-lead-search',
   newLeadPreset: 'new-lead-preset',
   newLeadHit: 'new-lead-hit',

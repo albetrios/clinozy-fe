@@ -16,12 +16,23 @@ import {
 } from '@/shared/components/OfferingSuggestions/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import {
+  type AppIcon,
+  Compass,
+  MessageSquare,
+  Sparkles,
+  Stethoscope,
+} from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import { useClinicalLists } from '../shared/hooks/useClinicalLists/index.ts';
 import { useReviewAccess } from '../shared/hooks/useReviewAccess/index.ts';
-import { CLINICAL_LISTS, type ClinicalChip } from '../shared/patient-clinical.ts';
+import {
+  CLINICAL_LISTS,
+  type ClinicalChip,
+  type ClinicalField,
+} from '../shared/patient-clinical.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 import { ClinicalChipCard } from './components/ClinicalChipCard/index.ts';
 import { type FeedbackAccess, FeedbackCard } from './components/FeedbackCard/index.ts';
@@ -46,6 +57,17 @@ function useFilePlanCard(canEdit: boolean) {
     onOpenChat: (leadId) => void navigate(organizationLead(organizationSlug, leadId)),
   });
 }
+
+/**
+ * Each clinical card's empty-state glyph (change-empty-states C2–C5): the
+ * patient's words, the diagnosis, a treatment to suggest, a plan ahead.
+ */
+const CLINICAL_EMPTY_ICONS: Readonly<Record<ClinicalField, AppIcon>> = {
+  complaints: MessageSquare,
+  diagnosis: Stethoscope,
+  treatmentSuggestions: Sparkles,
+  futureSuggestions: Compass,
+};
 
 /**
  * Patient file › Clinical notes (KICKOFF §6.6; H:780–826;
@@ -109,6 +131,7 @@ export function PatientOverviewPage() {
               key={field}
               title={t(CLINICAL_KEYS.titles[field])}
               tone={tone}
+              icon={CLINICAL_EMPTY_ICONS[field]}
               items={lists.items(field)}
               loading={lists.isLoading}
               onAdd={(text) => lists.add(field, text)}

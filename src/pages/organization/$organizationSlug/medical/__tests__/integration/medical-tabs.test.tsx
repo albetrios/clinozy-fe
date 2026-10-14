@@ -342,14 +342,16 @@ describe('the Medical tab row', () => {
 });
 
 describe('a Medical tab with nothing to show, or a read that fails', () => {
-  it('an empty read shows the tab’s empty state, its "New medicine" opening the create drawer', async () => {
+  it('an empty read shows the tab’s empty state with no button; the toolbar’s "New medicine" adds', async () => {
     const user = setup();
     vi.mocked(listMedicines).mockResolvedValue(medicalPage([]));
     const { router } = renderMedicalRoutes(`${ROOM}/medicines`, PAGES);
     const empty = await screen.findByTestId('empty-state');
     expect(empty).toHaveTextContent('No medicine matches');
     expect(screen.queryByTestId('medical-medicines-table-row')).not.toBeInTheDocument();
-    await user.click(within(empty).getByTestId('empty-state-action'));
+    // fix-empty-state-actions: the toolbar is the one way to add.
+    expect(within(empty).queryByTestId('empty-state-action')).not.toBeInTheDocument();
+    await user.click(screen.getByTestId('medical-medicines-new'));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${ROOM}/medicines/create`),
     );

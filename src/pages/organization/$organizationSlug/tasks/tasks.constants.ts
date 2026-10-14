@@ -85,6 +85,8 @@ export const TASKS_KEYS = {
     patient: 'sources.patient',
     contact: 'sources.contact',
   } satisfies Record<TaskLinkKind | 'patient' | 'contact', string>,
+  /** To do's empty-state title over the queue line (change-empty-states R34). */
+  emptyCaughtUp: TASK_QUEUE_KEYS.caughtUp,
   empty: {
     open: TASK_QUEUE_KEYS.empty,
     snoozed: 'empty.snoozed',
@@ -106,8 +108,6 @@ export const TASKS_KEYS = {
       label: 'newTask.forField.label',
       placeholder: 'newTask.forField.placeholder',
       search: 'newTask.forField.search',
-      /** The list before a search is typed. */
-      empty: 'newTask.forField.empty',
     },
     titleField: {
       label: 'newTask.titleField.label',
@@ -270,7 +270,6 @@ export const TASKS_TEST_IDS = {
   group: (group: TaskGroupId) => `tasks-group-${group}`,
   row: 'tasks-row',
   empty: 'tasks-empty',
-  emptyNew: 'tasks-empty-new',
   /** The type dropdown (the picker derives `-trigger`, `-panel`, … from it). */
   type: 'tasks-type',
   /** The Scope tablist's prefix: `tasks-scope-tabs`, `tasks-scope-tab-mine`. */

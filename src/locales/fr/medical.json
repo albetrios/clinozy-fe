@@ -701,9 +701,6 @@
         "damaged": "Endommagé"
       },
       "refundBy": "Rembourser par",
-      "peek_one": "{{count}} médicament · {{amount}}",
-      "peek_many": "{{count}} médicaments · {{amount}}",
-      "peek_other": "{{count}} médicaments · {{amount}}",
       "quickFill": "Tout retourner",
       "save": "Rembourser {{amount}}",
       "summary": "{{reason}} · {{amount}}",

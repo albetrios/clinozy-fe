@@ -144,7 +144,7 @@ on its surface, in both modes.
     shadow. Anything else pinned to the bottom edge rides above it through
     `--floating-bottom-offset` — the capsule's top edge less the inset, which
     every consumer adds itself (published by `index.css` via `:has()`), never
-    over it — the consent card and the Sentry feedback trigger both do, and the
+    over it — the consent card and the Report a bug trigger both do, and the
     toasts sit 16px above the whole bottom stack (`AppToaster`).
   - **Overlays are a sheet on phones and a dialog from `sm`.** The `sm:` half
     has to _undo_ the sheet (`sm:w-[calc(100%-2rem)] sm:rounded-lg`), not just
@@ -153,7 +153,7 @@ on its surface, in both modes.
     setting.
   - **User data wraps.** A name with no break opportunity (email-derived) gets
     `wrap-anywhere`, or it runs past its card and is clipped mid-word.
-  - **The end corner belongs to the feedback trigger and the edge handles.** A
+  - **The end corner belongs to the Report a bug trigger and the edge handles.** A
     new floating surface takes the bottom-_start_ corner (`start-*`, so it
     mirrors under RTL) — see `ConsentBanner`. The clinic bottom stack is the
     designed exception: a floating "New" (phone) and the upload tray (every
@@ -210,6 +210,22 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   text and focus when deferred content arrives; do not replay entrance animations.
 - Keep already-loaded content visible during background refresh. Local failures
   get local retry controls without removing surrounding navigation or content.
+- **A search someone is waiting on shows it is working.** Skeletons are flat by
+  default; a wait at the desk opts in to the shimmer — `SkeletonBar` /
+  `SkeletonRows` `shimmer`: a soft sheen (the page colour over the bar's fill,
+  a faint lift of the text colour in dark) sweeping in the reading direction,
+  rows 90ms apart (`data-sweep`). Its CSS, `skeleton-sheen.css`, loads the first
+  time a bar shimmers (a dynamic import), never with the first paint. The shared `ProgressLine` (the
+  bar `RouteProgressBar` draws inline at the page top) runs under the field and the
+  glyph turns into the `Spinner`; a new answer loading over the last keeps the
+  last rows, dimmed. `ContactQuickPick` and the Picker's loading rows use all of
+  it (change-contact-quick-pick).
+- **One person picker.** Every field that picks a person — New lead, the
+  appointment's Who, New task's For, the Receive payment and Invoice patient —
+  is `ContactQuickPick`: inline where the person is the drawer's first step,
+  else behind a field in a popover (a sheet on a phone, `ContactQuickPickField`).
+  Its list stops at 20rem with the add row pinned below; a Picker popover is
+  never wider than 28rem.
 - Announce loading once per pending region, hide decorative skeletons from
   assistive technology, and respect reduced motion. The startup splash must have
   a bounded exit deadline that late loading holds cannot restart or cancel.

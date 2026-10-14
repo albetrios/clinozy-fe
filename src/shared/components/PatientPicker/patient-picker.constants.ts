@@ -14,10 +14,6 @@ export const PATIENT_PICKER_KEYS = {
   placeholder: 'patientPicker.placeholder',
   /** "only patients can be picked" — the field's hint. */
   hint: 'patientPicker.hint',
-  /** "₹8,550 due" — a patient's dues on its option. */
-  due: 'patientPicker.due',
-  /** "Nothing due". */
-  nothingDue: 'patientPicker.nothingDue',
 } as const;
 
 /** The field's base test id; its parts derive theirs (`-option-<id>` …). */

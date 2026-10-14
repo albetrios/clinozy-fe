@@ -33,7 +33,6 @@ export const INVOICE_DRAWER_KEYS = {
   },
   fields: {
     branch: 'invoiceDrawer.fields.branch',
-    newPatient: 'invoiceDrawer.fields.newPatient',
     customer: 'invoiceDrawer.fields.customer',
     customerHint: 'invoiceDrawer.fields.customerHint',
     customerPlaceholder: 'invoiceDrawer.fields.customerPlaceholder',

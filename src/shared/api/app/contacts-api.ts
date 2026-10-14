@@ -6,6 +6,7 @@ import {
   type Contact,
   contactBodyOf,
   type ContactFields,
+  type ContactHit,
   type ContactProfile,
   contactRowWire,
   type ContactSummary,
@@ -27,12 +28,30 @@ export const contactQueryKeys = {
   all: ['app', 'contacts'] as const,
   one: (organizationId: string | null, contactId: string) =>
     [...contactQueryKeys.all, organizationId, 'one', contactId] as const,
-  search: (organizationId: string | null, query: string) =>
-    [...contactQueryKeys.all, organizationId, 'search', query] as const,
+  search: (
+    organizationId: string | null,
+    query: string,
+    scope: ContactScope = 'everyone',
+  ) => [...contactQueryKeys.all, organizationId, 'search', scope, query] as const,
+  recent: (organizationId: string | null, scope: ContactScope = 'everyone') =>
+    [...contactQueryKeys.all, organizationId, 'recent', scope] as const,
 };
+
+/**
+ * Whom a people search reads: everyone the clinic knows, or only those with a patient file
+ * (`is_patient=true` — the patient fields of Receive payment and the Invoice drawer).
+ */
+export type ContactScope = 'everyone' | 'patients';
+
+/** The list filter a scope adds. */
+const scopeQuery = (scope: ContactScope) =>
+  scope === 'patients' ? { is_patient: 'true' as const } : {};
 
 /** The most a search answers with. */
 const SEARCH_LIMIT = 8;
+
+/** The most people "Recent" shows before anything is typed (change-contact-quick-pick D7). */
+const RECENT_CONTACTS_LIMIT = 5;
 
 /** One contact with every number (`GET /app/contacts/:contact_id`). */
 export async function fetchContact(contactId: string): Promise<Contact> {
@@ -45,12 +64,15 @@ export async function fetchContact(contactId: string): Promise<Contact> {
 async function listContacts(query: {
   q?: string;
   limit: number;
-}): Promise<ContactSummary[]> {
+  sort?: 'last_activity_at';
+  order?: 'desc';
+  is_patient?: 'true';
+}): Promise<ContactHit[]> {
   const response = await api.get('/app/contacts', { query });
   return z
     .array(contactRowWire)
     .parse(response.data ?? [])
-    .map(toContactSummary);
+    .map((row) => ({ ...toContactSummary(row), patientNumber: row.patient_number }));
 }
 
 /** The most ids one `GET /app/contacts?ids=` takes (CT12). */
@@ -113,12 +135,32 @@ export function isContactSearchable(typed: string): boolean {
 
 /**
  * People matching what was typed — 3+ letters of a name or handle, 4+ digits of a number, or a
- * whole contact number (`C-12345`); best match first. Anything shorter answers nothing, unasked.
+ * whole contact number (`C-12345`); best match first — among everyone, or only patients (`scope`).
+ * Anything shorter answers nothing, unasked.
  */
-export async function searchContacts(typed: string): Promise<ContactSummary[]> {
+export async function searchContacts(
+  typed: string,
+  scope: ContactScope = 'everyone',
+): Promise<ContactHit[]> {
   const q = typed.trim();
   if (!isContactSearchable(q)) return [];
-  return listContacts({ q, limit: SEARCH_LIMIT });
+  return listContacts({ q, limit: SEARCH_LIMIT, ...scopeQuery(scope) });
+}
+
+/**
+ * The people the clinic was last in touch with (`GET /app/contacts?sort=last_activity_at`) —
+ * newest activity first, anyone without activity last; a picker's "Recent" before anything is
+ * typed — everyone, or only patients (`scope`).
+ */
+export async function fetchRecentContacts(
+  scope: ContactScope = 'everyone',
+): Promise<ContactHit[]> {
+  return listContacts({
+    sort: 'last_activity_at',
+    order: 'desc',
+    limit: RECENT_CONTACTS_LIMIT,
+    ...scopeQuery(scope),
+  });
 }
 
 /**

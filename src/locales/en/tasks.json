@@ -453,6 +453,7 @@
   },
   "empty": {
     "queue": "Nothing needs you right now. New tasks appear here as leads write, visits come up and feedback arrives.",
+    "caughtUp": "All caught up",
     "snoozed": "No snoozed tasks",
     "done": "Nothing resolved yet today"
   },
@@ -468,8 +469,7 @@
     "forField": {
       "label": "For",
       "placeholder": "Pick a person",
-      "search": "Search by name, mobile or number",
-      "empty": "Type a name, mobile or contact number"
+      "search": "Search by name, mobile or number"
     },
     "titleField": {
       "label": "Title",

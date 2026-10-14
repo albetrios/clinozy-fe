@@ -86,7 +86,7 @@ interface PickerBaseProps<T> {
   /** Text for a list with nothing in it (default "Nothing to pick yet"). */
   emptyText?: string;
   size?: PickerSize;
-  /** The panel's minimum width in px (default 240). */
+  /** The panel's minimum width in px (default 240); it grows with the trigger up to 448px. */
   minWidth?: PickerMinWidthValue;
   /** The panel's maximum height in px (default 340). */
   maxHeight?: PickerMaxHeightValue;

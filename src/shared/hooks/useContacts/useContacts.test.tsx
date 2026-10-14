@@ -7,6 +7,7 @@ import type * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
 import {
   createContact,
   fetchContact,
+  fetchRecentContacts,
   searchContacts,
   updateContact,
 } from '@/shared/api/app/contacts-api.ts';
@@ -23,12 +24,14 @@ import {
   useContact,
   useContactSearch,
   useCreateContact,
+  useRecentContacts,
   useUpdateContact,
 } from './useContacts.ts';
 
 vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ContactsApiModule>()),
   fetchContact: vi.fn(),
+  fetchRecentContacts: vi.fn(),
   searchContacts: vi.fn(),
   createContact: vi.fn(),
   updateContact: vi.fn(),
@@ -139,7 +142,7 @@ describe('useContactSearch', () => {
   it('asks nothing under 3 letters or 4 digits', async () => {
     const { result } = renderHook(() => useContactSearch(' an '), { wrapper });
     await pastDebounce();
-    expect(result.current).toEqual({ hits: [], noMatch: false });
+    expect(result.current).toEqual({ hits: [], noMatch: false, searching: false });
     expect(searchContacts).not.toHaveBeenCalled();
   });
 
@@ -155,14 +158,14 @@ describe('useContactSearch', () => {
 
     await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
     expect(searchContacts).toHaveBeenCalledTimes(1);
-    expect(searchContacts).toHaveBeenCalledWith('anaya');
+    expect(searchContacts).toHaveBeenCalledWith('anaya', 'everyone');
     expect(result.current.noMatch).toBe(false);
   });
 
   it('searches from 4 digits of a number', async () => {
     const { result } = renderHook(() => useContactSearch('9879'), { wrapper });
     await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
-    expect(searchContacts).toHaveBeenCalledWith('9879');
+    expect(searchContacts).toHaveBeenCalledWith('9879', 'everyone');
   });
 
   it('keeps the last answer up while the next loads, then says nobody matches', async () => {
@@ -173,10 +176,11 @@ describe('useContactSearch', () => {
     await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
 
     rerender({ query: 'zzqx' });
-    expect(result.current).toEqual({ hits: [ANAYA], noMatch: false });
+    expect(result.current).toEqual({ hits: [ANAYA], noMatch: false, searching: true });
 
     await waitFor(() => expect(result.current.noMatch).toBe(true));
     expect(result.current.hits).toEqual([]);
+    expect(result.current.searching).toBe(false);
   });
 
   it('clears the hits at once when the query drops under the threshold', async () => {
@@ -186,7 +190,54 @@ describe('useContactSearch', () => {
     });
     await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
     rerender({ query: 'an' });
-    expect(result.current).toEqual({ hits: [], noMatch: false });
+    expect(result.current).toEqual({ hits: [], noMatch: false, searching: false });
+  });
+
+  it('searches only patients for the patients scope, under their own key', async () => {
+    const { result } = renderHook(() => useContactSearch('anaya', 'patients'), {
+      wrapper,
+    });
+    await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
+    expect(searchContacts).toHaveBeenCalledWith('anaya', 'patients');
+  });
+
+  it('says it is searching from the keystroke until the answer is in', async () => {
+    const { result } = renderHook(() => useContactSearch('anaya'), { wrapper });
+    expect(result.current.searching).toBe(true);
+    await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
+    expect(result.current.searching).toBe(false);
+  });
+});
+
+describe('useRecentContacts', () => {
+  it('reads the people last in touch, loading until they are in', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([ANAYA]);
+    const { result } = renderHook(() => useRecentContacts(true), { wrapper });
+    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.people).toEqual([ANAYA]));
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('reads only patients for the patients scope', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([ANAYA]);
+    const { result } = renderHook(() => useRecentContacts(true, 'patients'), { wrapper });
+    await waitFor(() => expect(result.current.people).toEqual([ANAYA]));
+    expect(fetchRecentContacts).toHaveBeenCalledWith('patients');
+  });
+
+  it('stays idle while off', async () => {
+    const { result } = renderHook(() => useRecentContacts(false), { wrapper });
+    await pastDebounce();
+    expect(result.current).toEqual({ people: [], loading: false });
+    expect(fetchRecentContacts).not.toHaveBeenCalled();
+  });
+
+  it('fails quietly — nobody, no toast', async () => {
+    vi.mocked(fetchRecentContacts).mockRejectedValue(new Error('offline'));
+    const { result } = renderHook(() => useRecentContacts(true), { wrapper });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.people).toEqual([]);
+    expect(notify.error).not.toHaveBeenCalled();
   });
 });
 

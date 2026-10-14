@@ -64,8 +64,8 @@
       "status": "状态"
     },
     "minutes": "{{minutes}} 分钟",
-    "empty": "这里没有预约 · ",
-    "bookOne": "新建一个",
+    "empty": "这里没有预约",
+    "emptyHint": "所选日期的预约会显示在这里。",
     "day": {
       "today": "今天",
       "tomorrow": "明天",

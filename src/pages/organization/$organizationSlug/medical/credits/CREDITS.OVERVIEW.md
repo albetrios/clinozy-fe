@@ -19,7 +19,8 @@ one tab beside its Payments, in "More"'s Money group, with a segmented switch be
   State, Created, and the search (the person or a `CR-` number). A row opens it in Payments ›
   Pending (`/payments/pending/$creditId/edit` — Edit, Use on next bill); Give back
   (`payment:create` + `payment:delete`) and Got it back (`payment:create`) settle an open one here
-  through the shared Settle drawer; Add credit, under the empty state, opens Pending's.
+  through the shared Settle drawer. An empty side shows the room's empty state with no button of
+  its own (fix-empty-state-actions) — a credit is added in Payments › Pending.
 
 Each side's footer counts its credits ("2 credits") — one read of a single row for the side's
 filters: the `supplierCredits` summary on suppliers, `fetchStoreCreditCount` on customers.

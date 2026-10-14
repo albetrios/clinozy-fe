@@ -359,12 +359,20 @@
       "edit": "編集",
       "open": "開く",
       "missing": "未入力: {{fields, list(type: unit)}}",
-      "notFilled": "未入力"
+      "notFilled": "未入力",
+      "position": "ステップ {{number}}/{{total}}",
+      "state": {
+        "open": "入力中",
+        "done": "完了",
+        "missing": "要確認",
+        "later": "未着手",
+        "locked": "ロック中"
+      }
     },
     "peek": {
-      "empty": "空欄",
-      "added_other": "{{count}} 件追加",
-      "noneYet": "まだありません"
+      "more_other": "ほか {{count}} 件",
+      "notFilled": "未入力: {{fields, list(type: unit)}}",
+      "notFilledCount_other": "未入力 {{count}} 件"
     },
     "stepper": {
       "decrease": "減らす",
@@ -885,6 +893,42 @@
     "activityLead": "リード {{id}}",
     "purchasesCount_other": "{{count}} 件"
   },
+  "contactPick": {
+    "recent": "最近",
+    "keepTyping": "続けて入力してください — 3 文字または 4 桁",
+    "searching": "検索中…",
+    "found_other": "{{count}} 人見つかりました",
+    "noMatch": "一致する人はいません",
+    "use": "連絡先を使う",
+    "addNamed": "「{{name}}」を新しい連絡先として追加",
+    "addPhone": "{{phone}} を新しい連絡先として追加",
+    "addNamedPhone": "「{{name}}」· {{phone}} を新しい連絡先として追加",
+    "enterKey": "↵",
+    "clearSearch": "検索をクリア",
+    "added": "{{name}} を連絡先に追加しました",
+    "existing": "{{name}} はすでに連絡先です · 選択しました",
+    "quickAdd": {
+      "name": "名前",
+      "namePlaceholder": "姓と名",
+      "mobile": "携帯",
+      "add": "連絡先を追加",
+      "more": "詳細を入力",
+      "back": "検索に戻る",
+      "addName": "名前を入力してください",
+      "needMobile": "10 桁の携帯番号を入力してください",
+      "mobileDigits": "携帯番号は10桁必要です"
+    },
+    "patient": {
+      "newPatient": "新しい患者",
+      "addNamed": "「{{name}}」を新しい患者として追加",
+      "addPhone": "{{phone}} を新しい患者として追加",
+      "addNamedPhone": "「{{name}}」· {{phone}} を新しい患者として追加",
+      "add": "患者を追加",
+      "use": "この患者を使う",
+      "added": "{{name}} を患者として追加しました",
+      "existing": "{{name}} はすでに患者です · 選択しました"
+    }
+  },
   "contactEditor": {
     "title": "連絡先を編集",
     "sub": "一度保存 · すべてのリード、患者、チャットで使用",
@@ -976,9 +1020,7 @@
     "who": {
       "search": "患者またはリードを名前・電話・IDで検索",
       "searchLabel": "人を検索",
-      "useContact": "連絡先を使う",
       "patient": "患者",
-      "createContact": "+ 連絡先「{{query}}」を作成",
       "newContact": "新しい連絡先 · 予約には携帯番号を追加",
       "mobile": "携帯番号",
       "name": "名前",
@@ -1011,8 +1053,6 @@
     },
     "details": {
       "title": "予約",
-      "notFilled": "未入力",
-      "open": "開く",
       "type": "種類",
       "typeGroup": "予約の種類",
       "types": {
@@ -1058,6 +1098,7 @@
       "nextMonth": "次の月",
       "step": "枠の間隔",
       "stepOption": "{{minutes}} 分",
+      "date": "日付",
       "time": "時刻",
       "pickDate": "日付を選ぶと時刻が表示されます",
       "none": "この日は予約できる時間がありません · 別の日付を選んでください",
@@ -1106,9 +1147,7 @@
   "patientPicker": {
     "label": "患者",
     "placeholder": "患者を検索",
-    "hint": "選べるのは患者のみ",
-    "due": "未払い {{amount}}",
-    "nothingDue": "未払いなし"
+    "hint": "選べるのは患者のみ"
   },
   "splitRows": {
     "mode": "方法",
@@ -1201,7 +1240,6 @@
     },
     "fields": {
       "branch": "店舗",
-      "newPatient": "新しい患者",
       "customer": "顧客",
       "customerHint": "患者または任意の連絡先 · 新しい名前は薬局の連絡先として保存されます",
       "customerPlaceholder": "患者・リード・薬局の連絡先を検索",
@@ -1364,5 +1402,31 @@
   "appHomeEmpty": {
     "title": "まだ何も有効になっていません",
     "description": "クリニックのセクションは、有効になり次第ここに表示されます。"
+  },
+  "bugReport": {
+    "trigger": "不具合を報告",
+    "panel": {
+      "title": "不具合を報告",
+      "subtitle": "何が起きましたか？入力するか、マイクをタップして話してください。",
+      "label": "不具合の内容",
+      "placeholder": "何が起きて、本来どうなるはずでしたか？",
+      "signedAs": "{{name}} として、このページとアプリのバージョンを添えて送信します。",
+      "close": "閉じる"
+    },
+    "voice": {
+      "start": "音声で入力",
+      "stop": "音声入力を停止",
+      "listening": "聞き取り中…",
+      "hearing": "聞こえています…",
+      "denied": "マイクがブロックされています。音声入力するにはブラウザで許可してください。",
+      "noSpeech": "聞き取れませんでした。マイクをタップしてもう一度お試しください。",
+      "unavailable": "現在、音声入力は利用できません。入力は引き続き可能です。"
+    },
+    "send": {
+      "idle": "送信",
+      "sending": "送信中…",
+      "sent": "ありがとうございます。チームに届きました。",
+      "error": "報告を送信できませんでした。入力内容は残っています。もう一度お試しください。"
+    }
   }
 }

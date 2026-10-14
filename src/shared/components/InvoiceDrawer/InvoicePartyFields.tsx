@@ -124,18 +124,16 @@ export interface InvoicePartyFieldsProps {
   onParty: (party: InvoicePartyForm | null) => void;
   /** The member changed the team themself: no prefill replaces it any more. */
   onTeamChange: () => void;
-  /** "New patient · “q”" — the full form stacked on top (Q-P2); absent, the picker has no create. */
-  onNewPatient?: (query: string) => void;
 }
 
 /**
  * The first step, "Patient & team" (`payments.md:136–139`; H:5051): Branch (two or more open
- * branches; a saved invoice keeps its own), then Patient — the shared search over clinozy-be's
- * patients (`GET /app/contacts?is_patient=true`), a pick carrying the contact the invoice bills
- * — or, for a Medical sale, Customer: clinozy-be's contacts as patients, leads and Medical
- * contacts (`GET /app/contacts?q=`), "Add contact “q”" a new customer with a Mobile field under
- * it, saved with the sale — then Team (clinozy-be's members; a sale's "Prescribed by"), multi,
- * "from Rhea’s team" once a patient is picked.
+ * branches; a saved invoice keeps its own), then Patient — the drawers' shared contact picker over
+ * clinozy-be's patients (`GET /app/contacts?is_patient=true`), its quick add registering a new one,
+ * a pick carrying the contact the invoice bills — or, for a Medical sale, Customer: clinozy-be's
+ * contacts as patients, leads and Medical contacts (`GET /app/contacts?q=`), "Add contact “q”" a
+ * new customer with a Mobile field under it, saved with the sale — then Team (clinozy-be's
+ * members; a sale's "Prescribed by"), multi, "from Rhea’s team" once a patient is picked.
  */
 export function InvoicePartyFields({
   form,
@@ -146,7 +144,6 @@ export function InvoicePartyFields({
   lockedParty,
   onParty,
   onTeamChange,
-  onNewPatient,
 }: InvoicePartyFieldsProps) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const medical = values.type === 'medical';
@@ -193,7 +190,6 @@ export function InvoicePartyFields({
           party={party}
           disabled={readOnly || lockedParty}
           onParty={onParty}
-          onNewPatient={readOnly ? undefined : onNewPatient}
         />
       )}
       {medical && party?.kind === 'contact' && party.contactId === null ? (
@@ -240,21 +236,20 @@ export function InvoicePartyFields({
 type GridWidth = Pick<DrawerFieldProps, 'span' | 'stretch'>;
 
 /**
- * An invoice's Patient: clinozy-be's patients (`GET /app/contacts?is_patient=true`) — a pick
- * carries the contact the invoice bills.
+ * An invoice's Patient: clinozy-be's patients (`GET /app/contacts?is_patient=true`) on the shared
+ * patient field — a pick, or a patient its quick add registered, carries the contact the invoice
+ * bills.
  */
 function PatientField({
   id,
   party,
   disabled,
   onParty,
-  onNewPatient,
 }: GridWidth & {
   id: string;
   party: InvoicePartyForm | null;
   disabled: boolean;
   onParty: (party: InvoicePartyForm | null) => void;
-  onNewPatient?: (query: string) => void;
 }) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   return (
@@ -281,8 +276,6 @@ function PatientField({
           )
         }
         disabled={disabled}
-        onCreateFull={onNewPatient}
-        createFullLabel={t(K.fields.newPatient)}
         testId={INVOICE_DRAWER_TEST_IDS.patient}
       />
     </DrawerField>

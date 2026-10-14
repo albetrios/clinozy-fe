@@ -16,6 +16,7 @@ import {
   Bell as LuBell,
   BellOff as LuBellOff,
   Boxes as LuBoxes,
+  Bug as LuBug,
   Building2 as LuBuilding,
   Calendar as LuCalendar,
   Camera as LuCamera,
@@ -35,6 +36,7 @@ import {
   Download as LuDownload,
   Eye as LuEye,
   EyeOff as LuEyeOff,
+  Factory as LuFactory,
   File as LuFile,
   Fingerprint as LuFingerprint,
   FolderOpen as LuFolderOpen,
@@ -53,6 +55,7 @@ import {
   MapPin as LuMapPin,
   Maximize2 as LuMaximize,
   MessageSquare as LuMessageSquare,
+  Mic as LuMic,
   Minimize as LuMinimize,
   Minus as LuMinus,
   Monitor as LuMonitor,
@@ -81,6 +84,7 @@ import {
   Shield as LuShield,
   ShieldAlert as LuShieldAlert,
   ShieldCheck as LuShieldCheck,
+  ShoppingCart as LuShoppingCart,
   SlidersHorizontal as LuSlidersHorizontal,
   Sparkles as LuSparkles,
   SquareCheck as LuSquareCheck,
@@ -90,6 +94,7 @@ import {
   Tag as LuTag,
   Trash2 as LuTrash,
   TriangleAlert as LuTriangleAlert,
+  Truck as LuTruck,
   User as LuUser,
   UserCog as LuUserCog,
   UserPlus as LuUserPlus,
@@ -124,6 +129,8 @@ export const ArrowUpRight: AppIcon = LuArrowUpRight;
 export const Bell: AppIcon = LuBell;
 export const BellOff: AppIcon = LuBellOff;
 export const Boxes: AppIcon = LuBoxes;
+/** Lucide `bug`: report a bug (the floating trigger and its panel). */
+export const Bug: AppIcon = LuBug;
 export const Building: AppIcon = LuBuilding;
 /** Lucide `calendar`: appointments and dates. */
 export const Calendar: AppIcon = LuCalendar;
@@ -149,6 +156,8 @@ export const CreditCard: AppIcon = LuCreditCard;
 export const Download: AppIcon = LuDownload;
 export const Eye: AppIcon = LuEye;
 export const EyeOff: AppIcon = LuEyeOff;
+/** Lucide `factory`: manufacturers. */
+export const Factory: AppIcon = LuFactory;
 /** Lucide `file`: files and uploads; named so it never shadows the DOM `File`. */
 export const FileIcon: AppIcon = LuFile;
 export const Fingerprint: AppIcon = LuFingerprint;
@@ -182,6 +191,8 @@ export const MapPin: AppIcon = LuMapPin;
 export const Maximize: AppIcon = LuMaximize;
 /** Lucide `message-square`: notes, SMS and chat. */
 export const MessageSquare: AppIcon = LuMessageSquare;
+/** Lucide `mic`: dictate with the browser's own speech recognition. */
+export const Mic: AppIcon = LuMic;
 /** Lucide `minimize`: fit the table to its width. */
 export const Minimize: AppIcon = LuMinimize;
 export const Minus: AppIcon = LuMinus;
@@ -226,6 +237,8 @@ export const Settings: AppIcon = LuSettings;
 export const ShieldAlert: AppIcon = LuShieldAlert;
 export const Shield: AppIcon = LuShield;
 export const ShieldCheck: AppIcon = LuShieldCheck;
+/** Lucide `shopping-cart`: purchases and purchase orders. */
+export const ShoppingCart: AppIcon = LuShoppingCart;
 export const SlidersHorizontal: AppIcon = LuSlidersHorizontal;
 export const Sparkles: AppIcon = LuSparkles;
 /** Lucide `square-check`: tasks and checked items. */
@@ -239,6 +252,8 @@ export const Sun: AppIcon = LuSun;
 export const Tag: AppIcon = LuTag;
 export const Trash: AppIcon = LuTrash;
 export const TriangleAlert: AppIcon = LuTriangleAlert;
+/** Lucide `truck`: suppliers and vendors. */
+export const Truck: AppIcon = LuTruck;
 export const User: AppIcon = LuUser;
 export const UserCog: AppIcon = LuUserCog;
 export const UserPlus: AppIcon = LuUserPlus;

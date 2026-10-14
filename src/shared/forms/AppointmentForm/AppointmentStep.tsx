@@ -1,21 +1,46 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import {
+  type DrawerPeekItem,
+  DrawerStepCircle,
+  DrawerStepHeadText,
+  DrawerStepPeek,
+  type DrawerStepStatus,
+  peekHasValue,
+} from '@/shared/components/DrawerSteps/index.ts';
+import {
+  RECORD_DRAWER_KEYS,
+  RECORD_DRAWER_NS,
+} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 
 /** Props for {@link AppointmentStep}. */
 export interface AppointmentStepProps {
   number: number;
+  /** How many step cards the form shows (read out with the head). */
+  total: number;
   title: string;
   /** The body shows. */
   open: boolean;
   /** Its fields are set: the circle turns green (H:6037). */
   done: boolean;
-  /** The line under the title while the body is closed. */
-  summary?: string;
-  /** At the inline end while closed: "Open" — or "Locked". */
+  /** Date & time after check-in: a lock, its hint, and a tap that only explains. */
+  locked?: boolean;
+  /** What the collapsed card summarises. */
+  peek?: readonly DrawerPeekItem[];
+  /**
+   * The collapsed head's sub line — the locked slot's "<day> · <time> · locked …";
+   * "Not filled yet" by default while the step holds nothing.
+   */
+  line?: string;
+  /** At the inline end while closed: "Edit" / "Open" — or "Locked". */
   hint?: string;
-  /** The head's press: toggles step 1, toasts on a locked step 2; none for a step that never closes. */
-  onToggle?: () => void;
+  /** The room's section tone — the open step's circle takes its ink. */
+  tone: Tone;
+  /** The head's press: opens or folds the step; toasts on a locked one. */
+  onToggle: () => void;
   bodyClassName?: string;
   testId: string;
   toggleTestId: string;
@@ -23,79 +48,81 @@ export interface AppointmentStepProps {
 }
 
 /**
- * One of the appointment form's two step cards (H:2763, H:2775; `acc`,
- * H:6037): a head with the 24px number circle — green once its fields are
- * set, dark while open, grey otherwise — the title, the summary while closed
- * and the "Open" / "Locked" hint; then the body, which rises in 240ms. Unlike
- * the record drawer's accordion, the two cards open on their own: step 1
- * toggles, step 2 stays open until check-in locks it.
+ * One of the appointment form's two step cards (H:2763, H:2775), drawn as every
+ * drawer's step card (`DrawerSteps`, `change-drawer-steps`): the number circle
+ * (the section tone while open, green ✓ once its fields are set, grey before, a
+ * lock after check-in), the title, the collapsed card's summary and its hint
+ * with the chevron; one card open at a time — the form holds which. The whole
+ * collapsed card is the button and lifts on hover; the body rises in 240ms.
  */
 export function AppointmentStep({
   number,
+  total,
   title,
   open,
   done,
-  summary,
+  locked = false,
+  peek,
+  line,
   hint,
+  tone,
   onToggle,
   bodyClassName,
   testId,
   toggleTestId,
   children,
 }: AppointmentStepProps) {
-  let circle = 'bg-border text-muted-foreground-strong';
-  if (done) circle = 'bg-success text-success-foreground';
-  else if (open) circle = 'bg-primary text-primary-foreground';
-  const head = (
-    <>
-      <span
-        aria-hidden="true"
-        data-slot="pill"
-        className={cn(
-          'text-micro flex size-6 flex-none items-center justify-center rounded-full font-semibold tabular-nums',
-          circle,
-        )}
-      >
-        {number}
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col leading-[1.3]">
-        <span className="text-field font-semibold">{title}</span>
-        {!open && summary ? (
-          <span className="text-muted-foreground truncate text-xs">{summary}</span>
-        ) : null}
-      </span>
-      {hint ? (
-        <span className="text-muted-foreground flex-none text-xs">{hint}</span>
-      ) : null}
-    </>
-  );
+  const { t } = useTranslation(RECORD_DRAWER_NS);
+  const subLine =
+    line ?? (peekHasValue(peek) ? undefined : t(RECORD_DRAWER_KEYS.step.notFilled));
+  let status: DrawerStepStatus = 'later';
+  if (open) status = 'open';
+  else if (done) status = 'done';
   return (
     <section
       aria-label={title}
       data-testid={testId}
       data-open={open}
+      data-status={status}
       className={cn(
-        'flex flex-none flex-col overflow-hidden rounded-xl border',
-        open ? 'border-border-strong bg-card' : 'bg-canvas',
+        'relative flex flex-none flex-col rounded-xl border transition-colors',
+        open
+          ? 'border-border-strong bg-card'
+          : 'bg-canvas hover:border-border-strong hover:bg-card',
       )}
     >
-      {onToggle ? (
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={onToggle}
-          data-testid={toggleTestId}
-          className="hover:bg-canvas flex w-full items-center gap-2.5 px-4 py-3.5 text-start transition-colors"
-        >
-          {head}
-        </button>
-      ) : (
-        <div
-          data-testid={toggleTestId}
-          className="flex w-full items-center gap-2.5 px-4 py-3.5"
-        >
-          {head}
-        </div>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-disabled={locked ? true : undefined}
+        onClick={onToggle}
+        data-testid={toggleTestId}
+        // The theme's focus personality owns the ring (`data-focus`).
+        data-slot="accordion-trigger"
+        className={cn(
+          'flex w-full items-center gap-2.5 rounded-xl px-4 py-3.5 text-start',
+          // Collapsed, the whole card opens it — its summary included.
+          !open && 'after:absolute after:inset-0',
+        )}
+      >
+        <DrawerStepCircle status={status} number={number} tone={tone} locked={locked} />
+        <DrawerStepHeadText
+          title={title}
+          status={status}
+          number={number}
+          total={total}
+          locked={locked}
+          line={subLine}
+          hint={hint}
+        />
+      </button>
+      {open || locked ? null : (
+        <DrawerStepPeek
+          items={peek ?? []}
+          testId={`${testId}-peek`}
+          // The button's own padding, then the circle's column (as `DrawerSteps`).
+          className="ms-8.5 -mt-2 mb-3.5 px-4"
+        />
       )}
       {open ? (
         <div className={cn('animate-reveal flex flex-col', bodyClassName)}>

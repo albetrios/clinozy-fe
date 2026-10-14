@@ -94,8 +94,7 @@
   "empty": {
     "ledgerTitle": "没有匹配的记录",
     "pendingTitle": "没有待处理项",
-    "description": "这里还没有内容。试试其他标签页或搜索。",
-    "receive": "收款"
+    "description": "这里还没有内容。试试其他标签页或搜索。"
   },
   "deleteEntry": {
     "title": "删除这笔付款?",

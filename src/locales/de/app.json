@@ -360,13 +360,22 @@
       "edit": "Bearbeiten",
       "open": "Öffnen",
       "missing": "Fehlt: {{fields, list(type: unit)}}",
-      "notFilled": "Noch nicht ausgefüllt"
+      "notFilled": "Noch nicht ausgefüllt",
+      "position": "Schritt {{number}} von {{total}}",
+      "state": {
+        "open": "In Bearbeitung",
+        "done": "Vollständig",
+        "missing": "Braucht Aufmerksamkeit",
+        "later": "Nicht begonnen",
+        "locked": "Gesperrt"
+      }
     },
     "peek": {
-      "empty": "Leer",
-      "added_one": "{{count}} hinzugefügt",
-      "added_other": "{{count}} hinzugefügt",
-      "noneYet": "Noch keine"
+      "more_one": "+{{count}} weiteres",
+      "more_other": "+{{count}} weitere",
+      "notFilled": "Nicht ausgefüllt: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} nicht ausgefüllt",
+      "notFilledCount_other": "{{count}} nicht ausgefüllt"
     },
     "stepper": {
       "decrease": "Verringern",
@@ -896,6 +905,43 @@
     "purchasesCount_one": "{{count}} Position",
     "purchasesCount_other": "{{count}} Positionen"
   },
+  "contactPick": {
+    "recent": "Zuletzt",
+    "keepTyping": "Weiter tippen — 3 Buchstaben oder 4 Ziffern",
+    "searching": "Suche läuft…",
+    "found_one": "{{count}} Person gefunden",
+    "found_other": "{{count}} Personen gefunden",
+    "noMatch": "Kein vorhandener Treffer",
+    "use": "Kontakt verwenden",
+    "addNamed": "„{{name}}“ als neuen Kontakt anlegen",
+    "addPhone": "{{phone}} als neuen Kontakt anlegen",
+    "addNamedPhone": "„{{name}}“ · {{phone}} als neuen Kontakt anlegen",
+    "enterKey": "↵",
+    "clearSearch": "Suche leeren",
+    "added": "{{name}} als Kontakt angelegt",
+    "existing": "{{name}} ist bereits ein Kontakt · ausgewählt",
+    "quickAdd": {
+      "name": "Name",
+      "namePlaceholder": "Vor- und Nachname",
+      "mobile": "Mobilnummer",
+      "add": "Kontakt anlegen",
+      "more": "Weitere Angaben",
+      "back": "Zurück zur Suche",
+      "addName": "Geben Sie einen Namen ein",
+      "needMobile": "Geben Sie eine 10-stellige Mobilnummer ein",
+      "mobileDigits": "Die Mobilnummer braucht 10 Ziffern"
+    },
+    "patient": {
+      "newPatient": "Neuer Patient",
+      "addNamed": "„{{name}}“ als neuen Patienten anlegen",
+      "addPhone": "{{phone}} als neuen Patienten anlegen",
+      "addNamedPhone": "„{{name}}“ · {{phone}} als neuen Patienten anlegen",
+      "add": "Patient anlegen",
+      "use": "Patient wählen",
+      "added": "{{name}} als Patient angelegt",
+      "existing": "{{name}} ist bereits Patient · ausgewählt"
+    }
+  },
   "contactEditor": {
     "title": "Kontakt bearbeiten",
     "sub": "Einmal gespeichert · für jeden Lead, Patienten und Chat verwendet",
@@ -987,9 +1033,7 @@
     "who": {
       "search": "Patient oder Lead nach Name, Telefon, ID suchen",
       "searchLabel": "Person suchen",
-      "useContact": "Kontakt verwenden",
       "patient": "Patient",
-      "createContact": "+ Kontakt „{{query}}“ anlegen",
       "newContact": "Neuer Kontakt · Mobilnummer zum Buchen ergänzen",
       "mobile": "Mobilnummer",
       "name": "Name",
@@ -1025,8 +1069,6 @@
     },
     "details": {
       "title": "Termin",
-      "notFilled": "Noch nicht ausgefüllt",
-      "open": "Öffnen",
       "type": "Art",
       "typeGroup": "Terminart",
       "types": {
@@ -1072,6 +1114,7 @@
       "nextMonth": "Nächster Monat",
       "step": "Zeitraster",
       "stepOption": "{{minutes}} Min.",
+      "date": "Datum",
       "time": "Uhrzeit",
       "pickDate": "Wählen Sie ein Datum, um Zeiten zu sehen",
       "none": "An diesem Tag sind keine Zeiten buchbar · wählen Sie ein anderes Datum",
@@ -1120,9 +1163,7 @@
   "patientPicker": {
     "label": "Patient",
     "placeholder": "Patienten suchen",
-    "hint": "nur Patienten wählbar",
-    "due": "{{amount}} offen",
-    "nothingDue": "Nichts offen"
+    "hint": "nur Patienten wählbar"
   },
   "splitRows": {
     "mode": "Zahlart",
@@ -1216,7 +1257,6 @@
     },
     "fields": {
       "branch": "Filiale",
-      "newPatient": "Neuer Patient",
       "customer": "Kunde",
       "customerHint": "Patient oder ein Kontakt · neue Namen werden als Medizinkontakt gespeichert",
       "customerPlaceholder": "Patienten, Leads oder Medizinkontakte suchen",
@@ -1383,5 +1423,31 @@
   "appHomeEmpty": {
     "title": "Hier ist noch nichts eingeschaltet",
     "description": "Die Bereiche Ihrer Praxis erscheinen hier, sobald sie für Sie eingeschaltet sind."
+  },
+  "bugReport": {
+    "trigger": "Fehler melden",
+    "panel": {
+      "title": "Fehler melden",
+      "subtitle": "Was ist schiefgelaufen? Tippen Sie es ein – oder tippen Sie aufs Mikrofon und sagen Sie es.",
+      "label": "Fehler beschreiben",
+      "placeholder": "Was ist passiert, und was hätten Sie erwartet?",
+      "signedAs": "Gesendet als {{name}}, mit dieser Seite und der App-Version.",
+      "close": "Schließen"
+    },
+    "voice": {
+      "start": "Per Sprache diktieren",
+      "stop": "Diktat beenden",
+      "listening": "Hört zu…",
+      "hearing": "Ich höre Sie…",
+      "denied": "Das Mikrofon ist blockiert. Erlauben Sie es im Browser, um zu diktieren.",
+      "noSpeech": "Nicht verstanden – tippen Sie aufs Mikrofon und versuchen Sie es erneut.",
+      "unavailable": "Spracheingabe ist gerade nicht verfügbar. Sie können weiterhin tippen."
+    },
+    "send": {
+      "idle": "Senden",
+      "sending": "Wird gesendet…",
+      "sent": "Danke – das Team hat es.",
+      "error": "Die Meldung konnte nicht gesendet werden. Ihr Text ist noch da – versuchen Sie es erneut."
+    }
   }
 }

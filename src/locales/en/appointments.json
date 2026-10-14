@@ -65,8 +65,8 @@
       "status": "Status"
     },
     "minutes": "{{minutes}} min",
-    "empty": "No appointments here · ",
-    "bookOne": "book one",
+    "empty": "No appointments here",
+    "emptyHint": "Bookings for the days you pick show up here.",
     "day": {
       "today": "Today",
       "tomorrow": "Tomorrow",

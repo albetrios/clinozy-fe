@@ -364,17 +364,30 @@
       "edit": "تعديل",
       "open": "فتح",
       "missing": "ناقص: {{fields, list(type: unit)}}",
-      "notFilled": "لم يُملأ بعد"
+      "notFilled": "لم يُملأ بعد",
+      "position": "الخطوة {{number}} من {{total}}",
+      "state": {
+        "open": "قيد التعبئة",
+        "done": "مكتملة",
+        "missing": "تحتاج إلى انتباه",
+        "later": "لم تبدأ",
+        "locked": "مقفلة"
+      }
     },
     "peek": {
-      "empty": "فارغ",
-      "added_zero": "{{count}} مُضاف",
-      "added_one": "{{count}} مُضاف",
-      "added_two": "{{count}} مُضافان",
-      "added_few": "{{count}} مُضافة",
-      "added_many": "{{count}} مُضافًا",
-      "added_other": "{{count}} مُضاف",
-      "noneYet": "لا شيء بعد"
+      "more_zero": "+{{count}} أخرى",
+      "more_one": "+{{count}} أخرى",
+      "more_two": "+{{count}} أخرى",
+      "more_few": "+{{count}} أخرى",
+      "more_many": "+{{count}} أخرى",
+      "more_other": "+{{count}} أخرى",
+      "notFilled": "غير مُعبأ: {{fields, list(type: unit)}}",
+      "notFilledCount_zero": "{{count}} غير مُعبأ",
+      "notFilledCount_one": "{{count}} غير مُعبأ",
+      "notFilledCount_two": "{{count}} غير مُعبأ",
+      "notFilledCount_few": "{{count}} غير مُعبأ",
+      "notFilledCount_many": "{{count}} غير مُعبأ",
+      "notFilledCount_other": "{{count}} غير مُعبأ"
     },
     "stepper": {
       "decrease": "إنقاص",
@@ -940,6 +953,47 @@
     "purchasesCount_many": "{{count}} بندًا",
     "purchasesCount_other": "{{count}} بند"
   },
+  "contactPick": {
+    "recent": "الأخيرة",
+    "keepTyping": "تابع الكتابة — 3 أحرف أو 4 أرقام",
+    "searching": "جارٍ البحث…",
+    "found_zero": "لم يُعثر على أحد",
+    "found_one": "عُثر على شخص واحد",
+    "found_two": "عُثر على شخصين",
+    "found_few": "عُثر على {{count}} أشخاص",
+    "found_many": "عُثر على {{count}} شخصًا",
+    "found_other": "عُثر على {{count}} شخص",
+    "noMatch": "لا توجد نتيجة مطابقة",
+    "use": "استخدام جهة الاتصال",
+    "addNamed": "إضافة «{{name}}» كجهة اتصال جديدة",
+    "addPhone": "إضافة {{phone}} كجهة اتصال جديدة",
+    "addNamedPhone": "إضافة «{{name}}» · {{phone}} كجهة اتصال جديدة",
+    "enterKey": "↵",
+    "clearSearch": "مسح البحث",
+    "added": "تمت إضافة {{name}} إلى جهات الاتصال",
+    "existing": "{{name}} جهة اتصال بالفعل · تم اختياره",
+    "quickAdd": {
+      "name": "الاسم",
+      "namePlaceholder": "الاسم الأول واسم العائلة",
+      "mobile": "الجوال",
+      "add": "إضافة جهة الاتصال",
+      "more": "مزيد من التفاصيل",
+      "back": "العودة إلى البحث",
+      "addName": "أضف اسمًا",
+      "needMobile": "أضف رقم جوال من 10 أرقام",
+      "mobileDigits": "يجب أن يتكوّن الجوال من 10 أرقام"
+    },
+    "patient": {
+      "newPatient": "مريض جديد",
+      "addNamed": "إضافة «{{name}}» كمريض جديد",
+      "addPhone": "إضافة {{phone}} كمريض جديد",
+      "addNamedPhone": "إضافة «{{name}}» · {{phone}} كمريض جديد",
+      "add": "إضافة المريض",
+      "use": "اختيار المريض",
+      "added": "تمت إضافة {{name}} كمريض",
+      "existing": "{{name}} مريض بالفعل · تم اختياره"
+    }
+  },
   "contactEditor": {
     "title": "تعديل جهة الاتصال",
     "sub": "يُحفظ مرة واحدة · يُستخدم في كل عميل محتمل ومريض ومحادثة",
@@ -1031,9 +1085,7 @@
     "who": {
       "search": "ابحث عن مريض أو عميل محتمل بالاسم أو الهاتف أو المعرّف",
       "searchLabel": "البحث عن شخص",
-      "useContact": "استخدام جهة الاتصال",
       "patient": "مريض",
-      "createContact": "+ إنشاء جهة اتصال «{{query}}»",
       "newContact": "جهة اتصال جديدة · أضف الجوال للحجز",
       "mobile": "رقم الجوال",
       "name": "الاسم",
@@ -1081,8 +1133,6 @@
     },
     "details": {
       "title": "الموعد",
-      "notFilled": "لم يُملأ بعد",
-      "open": "فتح",
       "type": "النوع",
       "typeGroup": "نوع الموعد",
       "types": {
@@ -1128,6 +1178,7 @@
       "nextMonth": "الشهر التالي",
       "step": "الفاصل الزمني",
       "stepOption": "{{minutes}} د",
+      "date": "التاريخ",
       "time": "الوقت",
       "pickDate": "اختر تاريخًا لعرض الأوقات",
       "none": "لا أوقات متاحة للحجز في هذا اليوم · اختر تاريخًا آخر",
@@ -1176,9 +1227,7 @@
   "patientPicker": {
     "label": "المريض",
     "placeholder": "ابحث عن المرضى",
-    "hint": "يمكن اختيار المرضى فقط",
-    "due": "مستحق {{amount}}",
-    "nothingDue": "لا مستحقات"
+    "hint": "يمكن اختيار المرضى فقط"
   },
   "splitRows": {
     "mode": "الطريقة",
@@ -1276,7 +1325,6 @@
     },
     "fields": {
       "branch": "الفرع",
-      "newPatient": "مريض جديد",
       "customer": "العميل",
       "customerHint": "مريض أو أي جهة اتصال · تُحفظ الأسماء الجديدة كجهة اتصال طبية",
       "customerPlaceholder": "ابحث عن المرضى أو العملاء المحتملين أو جهات الاتصال الطبية",
@@ -1459,5 +1507,31 @@
   "appHomeEmpty": {
     "title": "لم يُفعَّل أي شيء هنا بعد",
     "description": "ستظهر أقسام عيادتك هنا فور تفعيلها لك."
+  },
+  "bugReport": {
+    "trigger": "الإبلاغ عن خطأ",
+    "panel": {
+      "title": "الإبلاغ عن خطأ",
+      "subtitle": "ما الذي حدث؟ اكتبه، أو اضغط على الميكروفون وقُله.",
+      "label": "صِف الخطأ",
+      "placeholder": "ماذا حدث، وماذا كنت تتوقع؟",
+      "signedAs": "يُرسَل باسم {{name}}، مع هذه الصفحة وإصدار التطبيق.",
+      "close": "إغلاق"
+    },
+    "voice": {
+      "start": "أملِ بصوتك",
+      "stop": "إيقاف الإملاء",
+      "listening": "جارٍ الاستماع…",
+      "hearing": "أسمعك…",
+      "denied": "الميكروفون محظور. اسمح به في المتصفح لتتمكن من الإملاء.",
+      "noSpeech": "لم أفهم — اضغط على الميكروفون وحاول مرة أخرى.",
+      "unavailable": "الإدخال الصوتي غير متاح الآن. يمكنك الكتابة."
+    },
+    "send": {
+      "idle": "إرسال",
+      "sending": "جارٍ الإرسال…",
+      "sent": "شكرًا — وصل البلاغ إلى الفريق.",
+      "error": "تعذّر إرسال البلاغ. نصك ما زال هنا — حاول مرة أخرى."
+    }
   }
 }

@@ -36,6 +36,8 @@
       "updated": "Aktualisiert"
     },
     "empty": "Keine passenden Leads",
+    "emptyTitle": "Noch keine Leads",
+    "emptyHint": "Anfragen per Anruf, WhatsApp und von Laufkundschaft landen hier.",
     "clearFilters": "Filter löschen",
     "moreInterests_one": "{{count}} weiteres: {{list}}",
     "moreInterests_other": "{{count}} weitere: {{list}}"
@@ -170,7 +172,6 @@
       "recreate": "Lead neu anlegen",
       "useContact": "Kontakt verwenden"
     },
-    "noMatch": "Kein vorhandener Treffer",
     "more_one": " · +{{count}} weitere",
     "more_other": " · +{{count}} weitere",
     "change": "Ändern",

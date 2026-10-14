@@ -12,7 +12,14 @@ import {
 import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { contactQueryKeys, fetchContact } from '@/shared/api/app/contacts-api.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
+import {
+  RECORD_DRAWER_KEYS,
+  RECORD_DRAWER_NS,
+} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   CONTACT_EDITOR_KEYS,
   contactFieldsOf,
@@ -39,11 +46,7 @@ import {
   slotDone,
   type WhoDraft,
 } from './appointment-form-model.ts';
-import {
-  cancelReasonText,
-  detailsSummaryText,
-  rescheduledText,
-} from './appointment-form-words.ts';
+import { cancelReasonText, rescheduledText } from './appointment-form-words.ts';
 import { AppointmentDetails } from './AppointmentDetails.tsx';
 import { AppointmentStep } from './AppointmentStep.tsx';
 import { DateTimeStep } from './DateTimeStep.tsx';
@@ -55,10 +58,14 @@ const K = APPOINTMENT_FORM_KEYS;
 const IDS = APPOINTMENT_FORM_TEST_IDS;
 const APPT = APP_KEYS.appointments;
 
+/** The form's step cards: step 1 Appointment, step 2 Date & time — '' when both are folded. */
+export type AppointmentStepId = 'details' | 'slot' | '';
+
 /** The form's open and collapsed parts, and the stacked dialogs it raises. */
 export interface AppointmentFormUi {
-  detailsOpen: boolean;
-  setDetailsOpen: (open: boolean | ((open: boolean) => boolean)) => void;
+  /** The one open step card. */
+  openStep: AppointmentStepId;
+  setOpenStep: (step: AppointmentStepId) => void;
   /** The calendar's month, `YYYY-MM-01` — the draft's until the member pages it. */
   month: string;
   setMonth: (month: string) => void;
@@ -173,7 +180,7 @@ export function StatusBlock({
       canEdit={canEdit}
       onPick={(status) => {
         state.change({ kind: 'status', status });
-        if (isAppointmentSlotLocked(status)) ui.setDetailsOpen(false);
+        if (isAppointmentSlotLocked(status)) ui.setOpenStep('');
       }}
       onNeedsPatient={() => notify.warning(t(APPT.guards.needsPatient, { ns: APP_NS }))}
       cancelReason={cancelReasonText(t, row)}
@@ -186,7 +193,40 @@ export function StatusBlock({
   );
 }
 
-/** Step 1 Appointment and step 2 Date & time (H:2763–2794). */
+/** What each collapsed step card summarises — the values the save sends. */
+function useStepPeeks(state: AppointmentFormState) {
+  const { t } = useTranslation(APPOINTMENT_FORM_NS);
+  const slotLabel = useAppointmentSlotLabel();
+  const { draft } = state;
+  const doctor = state.staff.find((member) => member.id === draft.doctorId);
+  const slot = draft.date && draft.time ? slotLabel(draft.date, draft.time) : null;
+  const details: DrawerPeekItem[] = [
+    { kind: 'value', label: t(K.details.type), value: draft.serviceLabel.trim() },
+    { kind: 'value', label: t(K.details.doctor), value: doctor?.name },
+    {
+      kind: 'value',
+      label: t(K.details.length),
+      value: t(K.footer.minutes, { minutes: draft.durationMin }),
+    },
+    { kind: 'value', label: t(K.details.reason), value: draft.reason.trim() },
+    { kind: 'value', label: t(K.details.notes), value: draft.notes.trim() },
+  ];
+  const time: DrawerPeekItem[] = [
+    { kind: 'value', label: t(K.slot.date), value: slot?.day },
+    { kind: 'value', label: t(K.slot.time), value: slot?.time },
+  ];
+  return {
+    details,
+    slot: time,
+    lockedLine: slot ? t(K.slot.lockedSummary, slot) : undefined,
+  };
+}
+
+/**
+ * Step 1 Appointment and step 2 Date & time (H:2763–2794), as every drawer's
+ * step cards: one open at a time, step 1 ending with "Next: Date & time →";
+ * after check-in step 2 is locked — a tap explains why.
+ */
 export function StepsBlock({
   state,
   ui,
@@ -197,23 +237,28 @@ export function StepsBlock({
   idPrefix: string;
 }) {
   const { t } = useTranslation(APPOINTMENT_FORM_NS);
-  const slotLabel = useAppointmentSlotLabel();
+  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const { draft, locked } = state;
-  const doctor = state.staff.find((member) => member.id === draft.doctorId);
-  const lockedSummary =
-    locked && draft.date && draft.time
-      ? t(K.slot.lockedSummary, slotLabel(draft.date, draft.time))
-      : undefined;
+  const peeks = useStepPeeks(state);
+  const tone = SECTION_TONES.appointments;
+  const toggle = (step: Exclude<AppointmentStepId, ''>) =>
+    ui.setOpenStep(ui.openStep === step ? '' : step);
+  const hint = (done: boolean) =>
+    tDrawer(done ? RECORD_DRAWER_KEYS.step.edit : RECORD_DRAWER_KEYS.step.open);
+  const detailsIsDone = detailsDone(draft);
+  const slotIsDone = slotDone(draft);
   return (
     <>
       <AppointmentStep
         number={1}
+        total={2}
         title={t(K.details.title)}
-        open={ui.detailsOpen}
-        done={detailsDone(draft)}
-        summary={detailsSummaryText(t, draft, doctor)}
-        hint={ui.detailsOpen ? undefined : t(K.details.open)}
-        onToggle={() => ui.setDetailsOpen((open) => !open)}
+        open={ui.openStep === 'details'}
+        done={detailsIsDone}
+        peek={peeks.details}
+        hint={hint(detailsIsDone)}
+        tone={tone}
+        onToggle={() => toggle('details')}
         bodyClassName="gap-4 px-4 pt-1 pb-4.5"
         testId={IDS.details}
         toggleTestId={IDS.detailsToggle}
@@ -226,15 +271,37 @@ export function StepsBlock({
           disabled={state.inert}
           idPrefix={idPrefix}
         />
+        {locked ? null : (
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              data-testid={IDS.detailsNext}
+              className="text-detail h-8 max-w-full rounded-lg px-3"
+              onClick={() => ui.setOpenStep('slot')}
+            >
+              <span className="truncate">
+                {tDrawer(RECORD_DRAWER_KEYS.step.next, { step: t(K.slot.title) })}
+              </span>
+            </Button>
+          </div>
+        )}
       </AppointmentStep>
       <AppointmentStep
         number={2}
+        total={2}
         title={t(K.slot.title)}
-        open={!locked}
-        done={slotDone(draft)}
-        summary={lockedSummary}
-        hint={locked ? t(K.slot.locked) : undefined}
-        onToggle={locked ? () => notify.info(t(K.slot.lockedToast)) : undefined}
+        open={!locked && ui.openStep === 'slot'}
+        done={slotIsDone}
+        locked={locked}
+        peek={peeks.slot}
+        line={locked ? peeks.lockedLine : undefined}
+        hint={locked ? t(K.slot.locked) : hint(slotIsDone)}
+        tone={tone}
+        onToggle={
+          locked ? () => notify.info(t(K.slot.lockedToast)) : () => toggle('slot')
+        }
         bodyClassName="px-4 pb-4"
         testId={IDS.slot}
         toggleTestId={IDS.slotToggle}

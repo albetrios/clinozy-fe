@@ -44,7 +44,6 @@ import {
 import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
 import { useStoreLedger } from '../shared/hooks/useMedicalLists/index.ts';
-import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
 
 const TABLE_ID = MEDICAL_TABLE_IDS.payments;
 
@@ -153,7 +152,6 @@ export function MedicalPaymentsPage() {
   const search = validateMedicalPaymentsSearch(useSearch({ strict: false }));
   const { preferences } = usePreferences();
   const access = useAppAccess();
-  const nav = useMedicalNav();
   const filters = useRoomFilters(MEDICAL_LEDGER_FILTER_FIELDS);
   const filterCopy = useFilterCopy();
   const [deleting, setDeleting] = useState<PaymentDeleteTarget | null>(null);
@@ -185,7 +183,6 @@ export function MedicalPaymentsPage() {
     onDelete: setDeleting,
     onReverse: setReversing,
   });
-  const canCreate = access.isResolved && access.can('medical', 'create');
   const canExport = canExportRows(access, 'medicine:export');
 
   return (
@@ -204,11 +201,6 @@ export function MedicalPaymentsPage() {
         filtered={filters.count > 0}
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(MEDICAL_KEYS.payments.empty)}
-        emptyAction={
-          canCreate
-            ? { label: t(MEDICAL_KEYS.create.sale), onSelect: () => nav.create('sales') }
-            : undefined
-        }
         recordsLabel={t(MEDICAL_KEYS.payments.records)}
         minWidth={LEDGER_MIN_WIDTH}
         onRowClick={openEntry}

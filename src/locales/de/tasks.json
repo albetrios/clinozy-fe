@@ -453,6 +453,7 @@
   },
   "empty": {
     "queue": "Gerade braucht Sie nichts. Neue Aufgaben erscheinen hier, sobald Leads schreiben, Besuche anstehen und Feedback eintrifft.",
+    "caughtUp": "Alles erledigt",
     "snoozed": "Keine zurückgestellten Aufgaben",
     "done": "Heute noch nichts erledigt"
   },
@@ -468,8 +469,7 @@
     "forField": {
       "label": "Für",
       "placeholder": "Eine Person auswählen",
-      "search": "Nach Name, Mobilnummer oder Nummer suchen",
-      "empty": "Geben Sie einen Namen, eine Mobilnummer oder eine Kontaktnummer ein"
+      "search": "Nach Name, Mobilnummer oder Nummer suchen"
     },
     "titleField": {
       "label": "Titel",

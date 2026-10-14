@@ -659,7 +659,6 @@
         "damaged": "파손"
       },
       "refundBy": "환불 방법",
-      "peek_other": "의약품 {{count}}개 · {{amount}}",
       "quickFill": "모두 반품",
       "save": "{{amount}} 환불",
       "summary": "{{reason}} · {{amount}}",

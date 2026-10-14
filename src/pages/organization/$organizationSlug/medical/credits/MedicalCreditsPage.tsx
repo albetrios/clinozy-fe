@@ -3,10 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationMedicalTab } from '@/lib/routes/medical-builders.ts';
-import {
-  organizationPendingCreate,
-  organizationPendingEdit,
-} from '@/lib/routes/payments-builders.ts';
+import { organizationPendingEdit } from '@/lib/routes/payments-builders.ts';
 import type { CreditListParams, CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import { CREDIT_DIRECTION_TONES, CREDIT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -204,7 +201,7 @@ const customerParamsOf = (search: MedicalCreditsSearch): CreditListParams => ({
  * "With customers" (clinozy-be MD32, MD33): the store's credits on its sales — a return kept as
  * store credit, money owed either way — as the Payments room's Pending holds them, newest first.
  * A row opens it in Pending (Edit, Use on next bill); Give back and Got it back settle an open
- * one here, by the member's `payment:*` codes; Add credit opens Pending's. The footer counts them
+ * one here, by the member's `payment:*` codes. The footer counts them
  * for the filters and search.
  */
 function CustomerCredits({ search }: { search: MedicalCreditsSearch }) {
@@ -278,18 +275,6 @@ function CustomerCredits({ search }: { search: MedicalCreditsSearch }) {
         filtered={filters.count > 0 || Boolean(search.q)}
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(K.empty.customers)}
-        emptyAction={
-          access.canCreate
-            ? {
-                label: t(K.addCredit),
-                onSelect: () =>
-                  void navigate({
-                    ...organizationPendingCreate(nav.organizationSlug),
-                    search: {},
-                  }),
-              }
-            : undefined
-        }
         recordsLabel={t(K.records)}
         countLabel={count === null ? undefined : t(K.count, { count })}
         minWidth={MIN_WIDTH}
