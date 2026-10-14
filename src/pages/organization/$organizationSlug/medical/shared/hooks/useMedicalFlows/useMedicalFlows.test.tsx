@@ -13,6 +13,7 @@ vi.mock('../../medical-records-api.ts', async (importOriginal) => ({
   collectSale: vi.fn(),
   returnSale: vi.fn(),
   voidSale: vi.fn(),
+  restoreSale: vi.fn(),
   createSupplierCredit: vi.fn(),
   voidSupplierCredit: vi.fn(),
 }));
@@ -35,6 +36,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 import { creditQueryKeys } from '@/shared/api/app/credits-api.ts';
 import { medicineQueryKeys } from '@/shared/api/app/medicines-api.ts';
 import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
+import { todayQueryKeys } from '@/shared/api/app/today-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
@@ -44,7 +46,11 @@ import {
   saleRow,
   supplierCreditRow,
   TEST_BATCH_ID,
+  TEST_BUYER_CONTACT_ID,
+  TEST_MEDICAL_AUTHOR_ID,
+  TEST_MEDICAL_BRANCH_ID,
   TEST_MEDICINE_ID,
+  TEST_PRESCRIPTION_ID,
   TEST_SALE_INVOICE_ITEM_ID,
   TEST_SUPPLIER_CREDIT_ID,
   TEST_SUPPLIER_ID,
@@ -56,8 +62,10 @@ import {
   cancelPurchaseOrder,
   collectSale,
   createPurchaseOrder,
+  createSale,
   createSupplierCredit,
   receivePurchaseOrder,
+  restoreSale,
   returnSale,
   voidSale,
   voidSupplierCredit,
@@ -66,8 +74,10 @@ import {
   useCancelPurchaseOrder,
   useCollectSale,
   useCreatePurchaseOrder,
+  useCreateSale,
   usePrescriptionsToFill,
   useReceivePurchaseOrder,
+  useRestoreSale,
   useReturnExpiringStock,
   useReturnSale,
   useVoidSale,
@@ -81,9 +91,11 @@ function useAll() {
     create: useCreatePurchaseOrder(quiet),
     cancel: useCancelPurchaseOrder(quiet),
     receive: useReceivePurchaseOrder(quiet),
+    createSale: useCreateSale(quiet),
     collect: useCollectSale(quiet),
     returnSale: useReturnSale(quiet),
     voidSale: useVoidSale(quiet),
+    restoreSale: useRestoreSale(quiet),
     returnExpiring: useReturnExpiringStock(quiet),
     voidCredit: useVoidSupplierCredit(quiet),
   };
@@ -196,6 +208,46 @@ describe('the sale writes', () => {
       }),
     );
     expect(voidSale).toHaveBeenCalledWith(saleRow().id, 'wrong_items', null);
+  });
+
+  it('a sale, a void and its Undo refresh Today’s floor — Dispense follows the prescription', async () => {
+    vi.mocked(createSale).mockResolvedValue(saleRow());
+    vi.mocked(voidSale).mockResolvedValue(undefined);
+    vi.mocked(restoreSale).mockResolvedValue(saleRow());
+    const { result } = renderHook(useAll, { wrapper });
+    const floorRefreshes = (spy: ReturnType<typeof vi.spyOn>) =>
+      invalidated(spy).filter(
+        (key) => JSON.stringify(key) === JSON.stringify(todayQueryKeys.floors()),
+      ).length;
+
+    const afterSale = vi.spyOn(client, 'invalidateQueries');
+    await act(() =>
+      result.current.createSale.mutateAsync({
+        branchId: TEST_MEDICAL_BRANCH_ID,
+        contactId: TEST_BUYER_CONTACT_ID,
+        items: [{ medicineId: TEST_MEDICINE_ID, qty: 1, discountPct: 0 }],
+        overallDiscount: 0,
+        memberIds: [TEST_MEDICAL_AUTHOR_ID],
+        prescriptionId: TEST_PRESCRIPTION_ID,
+        remark: null,
+        payment: null,
+      }),
+    );
+    expect(floorRefreshes(afterSale)).toBe(1);
+    afterSale.mockClear();
+
+    await act(() =>
+      result.current.voidSale.mutateAsync({
+        id: saleRow().id,
+        reason: 'wrong_items',
+        note: null,
+      }),
+    );
+    expect(floorRefreshes(afterSale)).toBe(1);
+    afterSale.mockClear();
+
+    await act(() => result.current.restoreSale.mutateAsync(saleRow().id));
+    expect(floorRefreshes(afterSale)).toBe(1);
   });
 });
 

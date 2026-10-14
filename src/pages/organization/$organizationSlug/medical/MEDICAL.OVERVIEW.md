@@ -86,7 +86,9 @@ The partners' writes are `shared/medical-records-api.ts` (hooks in
   credits on sales (`GET /app/medical-pending-credits`).
 
 The flows' writes are `shared/medical-records-api.ts` (hooks in `shared/hooks/useMedicalFlows/`);
-money goes through the ledger's own routes, and a closed day answers `409 day_closed`.
+money goes through the ledger's own routes, and a closed day answers `409 day_closed`. A sale write
+also refreshes Today's floor, whose pharmacy cards offer Dispense on the prescriptions still to fill
+(`fix-today-dispense-refresh-2026-10-14-zwaa`).
 
 The search, filters and sort of every tab live in the URL (`medical.search.ts`, one reader for
 all tabs, on the entry chunk); each tab's list read is its own `<tab>.params.ts`.
