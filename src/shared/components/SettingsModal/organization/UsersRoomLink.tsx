@@ -10,7 +10,7 @@ import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { ArrowUpRight, ShieldCheck, Users } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -43,7 +43,7 @@ export function UsersRoomLink({ section }: { section: 'members' | 'roles' }) {
       className="flex flex-col gap-4"
       data-testid={`settings-organization-${section}`}
     >
-      <SectionHeader title={t(keys.title)} description={t(keys.description)} />
+      <SettingsSectionHeader section={section} />
       {/* The Users room's own tile (slate, its section tone) beside what moved. */}
       <SettingsCard>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

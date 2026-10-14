@@ -1,5 +1,6 @@
 import type { AccessContext, OrganizationPermission } from '@/core/rbac/policies.ts';
 import { hasPermission } from '@/core/rbac/policies.ts';
+import type { AccessCheck } from '@/shared/hooks/useCan/index.ts';
 
 import { isSettingsModuleEnabled } from './settings-modules.ts';
 import type {
@@ -41,6 +42,21 @@ const ACCOUNT_SECTION_PERMISSION: Partial<
   billing: 'organization:read',
   integrations: 'api-key:read',
 };
+
+/**
+ * Who sees the webhooks half of Integrations: `webhook:read`, in a team organization.
+ *
+ * @remarks
+ * One check for the two places that ask it — the panel, which shows or hides its webhooks
+ * section, and the section's head row, whose sub line names webhooks only when they are on
+ * screen ("API keys and webhooks." vs "API keys."). The head row is also drawn by the
+ * drawer's stand-in while the panel's code loads, so a second copy of the check could let
+ * the stand-in and the panel disagree.
+ */
+export const INTEGRATIONS_WEBHOOKS_CHECK = {
+  permission: 'webhook:read',
+  teamOrganizationOnly: true,
+} as const satisfies AccessCheck;
 
 export function canViewSettingsSection(
   ref: SettingsSectionRef,

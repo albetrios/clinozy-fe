@@ -20,7 +20,7 @@ import { NOTIFICATION_CATEGORY_LOOK } from '@/shared/notifications/category-look
 import { requestDesktopPermission } from '@/shared/notifications/desktop.ts';
 
 import { SETTINGS_KEYS, SETTINGS_NS } from '../settings.constants.ts';
-import { SectionHeader } from '../SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '../SettingsPanelShell.tsx';
 
 /**
  * Category and channel rows carry translation KEYS, not English. The labels are
@@ -252,7 +252,7 @@ export function AccountNotificationsPanel() {
   const panel = SETTINGS_KEYS.panels.notifications;
   return (
     <div className="flex flex-col gap-4" data-testid="settings-section-notifications">
-      <SectionHeader title={t(panel.title)} description={t(panel.description)} />
+      <SettingsSectionHeader section="notifications" />
       <SettingsCard
         title={t(panel.deliveryTitle)}
         description={t(panel.deliveryDescription)}
