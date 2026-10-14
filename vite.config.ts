@@ -201,32 +201,60 @@ export default defineConfig(({ command, mode }) => {
           entryFileNames: 'assets/[name]-[hash].js',
           chunkFileNames: 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash][extname]',
-          manualChunks(id) {
-            if (id.includes('node_modules/@sentry')) return 'sentry';
-            if (id.includes('node_modules/posthog-js')) return 'posthog';
-            // src/lib/zod-jitless.ts rides in the zod chunk so it runs before any
-            // chunk builds a schema — see that module.
-            if (
-              id.includes('node_modules/zod') ||
-              id.endsWith('/src/lib/zod-jitless.ts')
-            ) {
-              return 'zod';
-            }
-            if (id.includes('node_modules/react-hook-form')) return 'rhf';
-            if (
-              id.includes('node_modules/react/') ||
-              id.includes('node_modules/react-dom/') ||
-              id.includes('node_modules/@tanstack/react-router')
-            ) {
-              return 'vendor';
-            }
-            if (id.includes('node_modules/@tanstack/react-query')) return 'query';
-            // NO manual chunk for cmdk (the command palette): it is only ever
-            // reached via a dynamic import (CommandPaletteLazy), so natural
-            // splitting already isolates it. Forcing such a lib into a named chunk
-            // makes rollup hoist a shared helper there, statically chaining the
-            // whole chunk to the entry (this regressed first-paint when `recharts`
-            // was a 'charts' chunk — see tooling/ci/check-preload-graph.mjs).
+          // Named chunks, then ONE chunk for the rest of the first paint.
+          //
+          // A group takes the modules it matches AND what they import, so the
+          // order matters: `vendor` claims React first (priority 3) — otherwise
+          // the first library group to import React (`sentry`, `query`) takes it,
+          // and Sentry's 150 kB chunk becomes a static import of the entry.
+          codeSplitting: {
+            groups: [
+              {
+                name: 'vendor',
+                test: (id) =>
+                  id.includes('node_modules/react/') ||
+                  id.includes('node_modules/react-dom/') ||
+                  id.includes('node_modules/@tanstack/react-router'),
+                priority: 3,
+              },
+              { name: 'sentry', test: /node_modules[\\/]@sentry/, priority: 2 },
+              { name: 'posthog', test: /node_modules[\\/]posthog-js/, priority: 2 },
+              {
+                // src/lib/zod-jitless.ts rides in the zod chunk so it runs before
+                // any chunk builds a schema — see that module.
+                name: 'zod',
+                test: (id) =>
+                  id.includes('node_modules/zod') ||
+                  id.endsWith('/src/lib/zod-jitless.ts'),
+                priority: 2,
+              },
+              { name: 'rhf', test: /node_modules[\\/]react-hook-form/, priority: 2 },
+              {
+                name: 'query',
+                test: /node_modules[\\/]@tanstack[\\/]react-query/,
+                priority: 2,
+              },
+              // Everything else the entry imports statically — `main.tsx`,
+              // `routeTree.tsx` and their whole static graph. The group holds the
+              // entry module, so it is emitted AS the entry chunk (`index-*.js`),
+              // not beside it. Every byte of it loads on every boot anyway; left to
+              // automatic splitting it shipped as ~20 small chunks (a module the
+              // entry shares with a lazy chunk gets a chunk of its own), and each
+              // one is a request before the first screen: on a slow connection
+              // the router waited on round trips, not bytes. Lazy chunks import
+              // what they share with the entry from the entry chunk, which is
+              // already loaded. The deferred libraries above stay their own
+              // chunks, so `pnpm build:check` still names one that leaks onto the
+              // first paint (and it reads their code too, now that a leak no
+              // longer has to arrive as a chunk of its own).
+              { name: 'boot', tags: ['$initial'], priority: 1 },
+              // NO group for cmdk (the command palette): it is only ever reached
+              // via a dynamic import (CommandPaletteLazy), so natural splitting
+              // already isolates it. Forcing such a lib into a named chunk hoists
+              // a shared helper there, statically chaining the whole chunk to the
+              // entry (this regressed first-paint when `recharts` was a 'charts'
+              // chunk — see tooling/ci/check-preload-graph.mjs).
+            ],
           },
         },
       },
