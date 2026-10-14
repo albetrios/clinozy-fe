@@ -6,6 +6,7 @@ import {
 } from '@/core/config/constants.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
+import { APP_SPLASH_SKIP } from '@/lib/app-splash.ts';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
@@ -62,26 +63,49 @@ let authGeneration = 0;
 let refreshPromise: Promise<void> | null = null;
 let tokenRefreshPromise: Promise<void> | null = null;
 
-/** Logout and new login supersede all work from the previous session. */
-function beginAuthGeneration(): number {
+/** Drop whatever work in flight for the current session resolves to. */
+function supersedeSessionWork(): number {
   authGeneration += 1;
-  invalidateSessionContext();
   refreshPromise = null;
   tokenRefreshPromise = null;
   return authGeneration;
 }
 
-function clearLocalAuthState(): void {
-  beginAuthGeneration();
+/** Logout and new login supersede all work from the previous session. */
+function beginAuthGeneration(): number {
+  invalidateSessionContext();
+  return supersedeSessionWork();
+}
+
+/**
+ * End the session in everything the screen does not show: the work in flight
+ * for it, the token and its refresh timer, and what the next page load would
+ * read from storage — the session hint and the onboarding wizard's progress.
+ */
+function endSessionOffScreen(): void {
+  supersedeSessionWork();
   try {
     cancelTokenRefresh();
     clearAccessToken();
     clearSessionStart();
+    // The wizard's saved progress holds PII (names, invite emails); the next
+    // load must not find it. Its in-memory copy goes with the screen.
+    useOnboardingStore.persist.clearStorage();
+  } catch (cleanupError) {
+    if (platformConfig.debugLogging) {
+      console.error('[Auth] Cleanup failed during logout', cleanupError);
+    }
+  }
+}
+
+function clearLocalAuthState(): void {
+  invalidateSessionContext();
+  endSessionOffScreen();
+  try {
     useAuthStore.getState().clearAuth();
     // Wipe the active-org context too — it holds the RBAC `permissions` that
-    // `useCan` reads. Clearing it here (not just relying on the post-logout
-    // full-page reload) keeps a non-reloading logout path — e.g. cross-tab
-    // logout while already on /login — from leaving one user's grants in the
+    // `useCan` reads. A sign-out that stays on this page — cross-tab logout
+    // while already on /login — would otherwise leave one user's grants in the
     // store for the next sign-in.
     useOrganizationStore.getState().clearOrganization();
     // Onboarding progress persists to localStorage (resumable wizard) and
@@ -95,6 +119,48 @@ function clearLocalAuthState(): void {
       console.error('[Auth] Cleanup failed during logout', cleanupError);
     }
   }
+}
+
+/**
+ * Let the `/login` load a sign-out hands the tab to go straight to the login screen: the key
+ * `public/splash-init.js` reads — once — before that load paints (`APP_SPLASH_SKIP`).
+ */
+function skipSplashOnNextLoad(): void {
+  try {
+    sessionStorage.setItem(APP_SPLASH_SKIP, '1');
+  } catch {
+    /* storage unavailable (private mode) — that load plays the splash */
+  }
+}
+
+/** A page the back/forward cache kept after a sign-out loads again instead of showing. */
+function reloadIfRestored(event: PageTransitionEvent): void {
+  if (event.persisted) window.location.reload();
+}
+
+/**
+ * Hand the tab to `/login`, keeping the screen as it is until the login screen
+ * replaces it.
+ *
+ * @remarks
+ * Wiping the stores and the query cache while the page was still up repainted
+ * the app the user was leaving: the account menu emptied, sections behind a
+ * permission vanished and every list fell back to loading and refetched without
+ * a token — then the boot splash played before the login screen. So the
+ * screen's half of the session ends with the page, on `pagehide` (which also
+ * fires for a page the back/forward cache keeps; one restored from there loads
+ * again), the next load skips the splash, and the caller ends the rest at once
+ * ({@link endSessionOffScreen}).
+ *
+ * The full page load stays on purpose: it is what guarantees nothing of this
+ * session survives into the next one — the drafts, outboxes and file links
+ * that modules keep in memory included.
+ */
+function leaveForLogin(): void {
+  window.addEventListener('pagehide', clearLocalAuthState, { once: true });
+  window.addEventListener('pageshow', reloadIfRestored);
+  skipSplashOnNextLoad();
+  window.location.href = AUTH_ROUTES.LOGIN;
 }
 
 /**
@@ -115,6 +181,9 @@ export type SessionEndReason =
  * Clear every local trace of the session and hand the tab to `/login`.
  *
  * @remarks
+ * The screen stays as it is until the login screen replaces it: what it shows
+ * is cleared as the page goes ({@link leaveForLogin}), everything else at once.
+ *
  * **Local only — this does NOT revoke the server session.** The refresh cookie
  * is HttpOnly and stays valid, so calling this on its own for a session that is
  * still alive signs nobody out: `/login` boots, the silent refresh succeeds, and
@@ -132,9 +201,9 @@ export function forceLogout(opts: { reason?: SessionEndReason } = {}): void {
   // the user back in without a single click. A dead session (`force_logout`)
   // keeps the convenience — nobody asked to leave.
   if (reason !== 'force_logout') skipAutoGoogleSignIn();
-  clearLocalAuthState();
+  endSessionOffScreen();
   broadcastLogout();
-  window.location.href = AUTH_ROUTES.LOGIN;
+  leaveForLogin();
 }
 
 export function handleCrossTabLogout(): void {
@@ -143,10 +212,13 @@ export function handleCrossTabLogout(): void {
   // the case that must not be undone: a sibling that auto-started Google here
   // would sign the user back in behind the tab they just signed out of.
   skipAutoGoogleSignIn();
-  clearLocalAuthState();
-  if (window.location.pathname !== AUTH_ROUTES.LOGIN) {
-    window.location.href = AUTH_ROUTES.LOGIN;
+  if (window.location.pathname === AUTH_ROUTES.LOGIN) {
+    // Already on the login screen: nothing on it shows the session, and no page load follows.
+    clearLocalAuthState();
+    return;
   }
+  endSessionOffScreen();
+  leaveForLogin();
 }
 
 export async function silentRefresh(): Promise<void> {
@@ -159,15 +231,20 @@ export async function silentRefresh(): Promise<void> {
 }
 
 let authBootstrapPromise: Promise<void> | null = null;
+/** The sign-out this boot finishes on the server ({@link finishPendingRevoke}); settled once done. */
+let pendingRevoke: Promise<void> | null = null;
 
 export function startAuthBootstrap(): Promise<void> {
   authBootstrapPromise ??= (async () => {
     const generation = authGeneration;
     try {
       // A sign-out the server never heard about comes first: restoring that
-      // session is exactly what the user asked not to happen.
+      // session is exactly what the user asked not to happen. This boot is a
+      // guest's whatever the server answers, so the login screen does not wait
+      // for the revoke — it finishes behind it, and a sign-in waits for it
+      // instead (`settlePendingRevoke`).
       if (isRevokePending()) {
-        await finishPendingRevoke(generation);
+        pendingRevoke ??= finishPendingRevoke(generation);
         throw new Error('Signed out');
       }
       /*
@@ -542,7 +619,7 @@ function isRevokePending(): boolean {
  * usually arrives too late to observe — which is why the caller marks the revoke pending FIRST and
  * treats this resolving as the bonus, not the guarantee.
  *
- * Takes the token explicitly because the instant path reads it before `clearLocalAuthState()` wipes
+ * Takes the token explicitly because the instant path reads it before `forceLogout()` wipes
  * it: clinozy-be identifies the session to revoke BY the bearer token and 401s without one — expired
  * is fine, absent is not. Without it the refresh cookie survives and the `/login` bootstrap signs
  * the user straight back in.
@@ -586,6 +663,23 @@ async function finishPendingRevoke(generation: number): Promise<void> {
   }
 }
 
+/**
+ * The sign-out the boot found still owed to the server, for a caller to await: it settles once the
+ * revoke has finished, or given up for now (`null` when there was none).
+ *
+ * @remarks
+ * That boot shows the login screen at once and finishes the revoke behind it
+ * ({@link startAuthBootstrap}). The revoke refreshes first, and a refresh answer
+ * sets the refresh cookie: one landing after a new sign-in's would put the
+ * signed-out session's cookie back over the new one. So every sign-in request
+ * waits for this before it goes (`authFetch` in `shared/api/auth-api.ts`), and
+ * the old session's last answer is always in before the new one's first. By the
+ * time anyone has typed an address it has long settled. Never rejects.
+ */
+export function settlePendingRevoke(): Promise<void> | null {
+  return pendingRevoke;
+}
+
 let logoutPromise: Promise<void> | null = null;
 
 /**
@@ -618,11 +712,11 @@ async function doLogout(reason: SessionEndReason): Promise<void> {
   // just asked to leave — the one moment where a spinner reads as "did that work?".
   //
   // Leaving instantly is only safe because of the two lines below. The refresh cookie is HttpOnly
-  // and survives `clearLocalAuthState()`, so a redirect with a live server session would let the
+  // and survives `forceLogout()`, so a redirect with a live server session would let the
   // /login bootstrap silently refresh and bounce the user back into the app. Marking the revoke
   // pending BEFORE leaving is what stops that: the bootstrap sees the marker, refuses to restore
-  // the session, and finishes the revoke itself (`finishPendingRevoke`). Pessimistic on purpose —
-  // the marker is cleared only by a revoke we actually saw succeed.
+  // the session, and finishes the revoke itself behind the login screen (`finishPendingRevoke`).
+  // Pessimistic on purpose — the marker is cleared only by a revoke we actually saw succeed.
   const token = getAccessToken();
   markRevokePending();
   void revokeServerSession(token, { keepalive: true })
