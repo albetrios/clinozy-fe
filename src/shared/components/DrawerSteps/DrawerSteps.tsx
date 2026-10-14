@@ -22,8 +22,6 @@ import {
   peekHasValue,
 } from './drawer-step-status.ts';
 
-export type { DrawerPeekItem, DrawerPeekPill } from './drawer-step-peek.tsx';
-
 /** A step card a screen declares, in order (`_patterns.md:40–49`). */
 export interface DrawerStep {
   /** Stable id — the accordion value and the test-id suffix. */
