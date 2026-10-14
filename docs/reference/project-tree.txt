@@ -327,9 +327,7 @@ clinozy-fe/
 │   │   └── README.md
 │   ├── feat-clinic-setup-2026-10-13-sltd/
 │   │   ├── intake-files/
-│   │   │   ├── BRIEF.md
-│   │   │   ├── PRD.md
-│   │   │   └── schema-routes.md
+│   │   │   └── BRIEF.md
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md

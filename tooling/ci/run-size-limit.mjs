@@ -527,8 +527,19 @@ const config = [
            * set `data-base` since the theme studio went (L-65), so no screen
            * changes. `pnpm perf:routes`' `cssKb` (35.4, measured 34.8) keeps its
            * pin — it only ever comes down. ~0.45 kB of headroom.
+           *
+           * 35.7 → 36.0 kB: a declared exemption, itemised — the clinic setup
+           * (iterations/feat-clinic-setup-2026-10-13-sltd, AS-BUILT row 14; for
+           * the owner's review). +0.25 kB: 35.58 → 35.83 kB, main (afc5610) and
+           * the merged branch built the same way (no env file), 19 new rules:
+           * the avatar's progress ring (its arc, stroke, rotation and
+           * reduced-motion transition), the setup drawer's and guide's progress
+           * bars, the starter list's grid and the "You're live" indent, and the
+           * branch drawer's Places & days holiday rows (their 480px container
+           * re-grid). Tailwind emits them with their files although the drawer
+           * and the guide load on demand. ~0.17 kB of headroom.
            */
-          limit: '35.7 kB',
+          limit: '36.0 kB',
           gzip: true,
         },
       ]
