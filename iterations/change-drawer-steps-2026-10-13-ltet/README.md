@@ -9,11 +9,11 @@
 | Branch | feat/drawer-step-pattern |
 | Baseline | launch-2026-09-30-jxmr |
 | Status | done |
-| Summary | One step pattern for every create and edit drawer — one open step at a time (the appointment form too), honest step states (no red before a step is reached, a saved record's steps read done), the same head with a chevron, and a redesigned collapsed step: label / value pairs without tile borders and one "Not filled: …" line in place of a dashed tile per empty field |
+| Summary | One step pattern for every create and edit drawer — one open step at a time (the appointment form too), honest step states (no red before a step is reached, a saved record's steps read done), the same head with a chevron, and a redesigned collapsed step that reads its values back without field names: one hairline-split strip and one "+N more · N not filled" line in place of a dashed tile per empty field |
 | Drop placed | 2026-10-13 |
 | Drop source | /tmp/claude-0/-home-user/64bf0233-3e5b-5d73-beee-8c8f8a913952/scratchpad/brief |
 | Intake mode | brief |
-| Intake note | 1 received (BRIEF.md) · 22 carried forward from launch-2026-09-30-jxmr |
+| Intake note | 1 received (BRIEF.md) · the 22 files carried forward from launch-2026-09-30-jxmr removed at the user's request (D17) — read them in that iteration's `intake-files/`; the Intake hash is the full snapshot's |
 | Schema-routes | 5f90325208e1 |
 | Intake hash | 9142681352a4 |
 
