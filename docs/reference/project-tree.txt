@@ -363,6 +363,13 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── feat-write-less-2026-10-14-oixr/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── fix-empty-state-actions-2026-10-14-iazm/
 │   │   ├── intake-files/
 │   │   │   ├── _index.md
