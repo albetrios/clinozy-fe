@@ -120,7 +120,8 @@ export function AppointmentStep({
         <DrawerStepPeek
           items={peek ?? []}
           testId={`${testId}-peek`}
-          className="ms-12.5 me-4 -mt-2 mb-3.5"
+          // The button's own padding, then the circle's column (as `DrawerSteps`).
+          className="ms-8.5 -mt-2 mb-3.5 px-4"
         />
       )}
       {open ? (

@@ -91,11 +91,12 @@ function StripValue({
     <li
       title={item.kind === 'value' ? `${item.label} · ${item.value ?? ''}` : item.label}
       className={cn(
-        // A hairline, not a dot: values like "Main · head office" carry their own dots.
-        "text-detail before:bg-border inline-flex max-w-full min-w-0 items-center before:me-2.5 before:inline-block before:h-3 before:w-px before:shrink-0 before:content-['']",
+        'text-detail inline-flex max-w-full min-w-0 items-center gap-2',
         lead ? 'text-foreground font-medium' : 'text-muted-foreground-strong',
       )}
     >
+      {/* A hairline, not a dot: values like "Main · head office" carry their own dots. */}
+      <span aria-hidden="true" className="bg-border -ms-px h-3 w-px shrink-0" />
       <FieldName label={item.label} />
       <span dir="auto" className="min-w-0 truncate">
         {value}
@@ -184,7 +185,7 @@ export function DrawerStepPeek({
         // The list starts one hairline and its space early, under the clip: the
         // hairline of the value that opens a line falls outside it.
         <div className="min-w-0 overflow-hidden">
-          <ul className="ms-[calc(-0.625rem-1px)] flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
+          <ul className="-ms-2 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
             {shown.map((item, index) => (
               <StripValue key={keys[index]} item={item} lead={index === 0} />
             ))}

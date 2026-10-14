@@ -1,6 +1,7 @@
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -135,7 +136,13 @@ function StepCard({
       data-testid={id}
       data-status={status}
       data-slot="accordion-item"
-      className="data-[state=open]:border-border-strong data-[state=open]:bg-card data-[state=closed]:bg-canvas data-[state=closed]:hover:border-border-strong data-[state=closed]:hover:bg-card relative flex flex-col gap-3 rounded-xl border p-(--step-pad) transition-colors last:border-b"
+      // The appointment form's cards spell the same open and closed looks.
+      className={cn(
+        'relative flex flex-col gap-3 rounded-xl border p-(--step-pad) transition-colors last:border-b',
+        isOpen
+          ? 'border-border-strong bg-card'
+          : 'bg-canvas hover:border-border-strong hover:bg-card',
+      )}
     >
       <AccordionTrigger
         ref={(node) => registerTrigger(step.id, node)}
@@ -147,7 +154,11 @@ function StepCard({
           event.preventDefault();
           locked.onAttempt();
         }}
-        className="min-w-0 items-center justify-start gap-2.5 py-0 text-start hover:no-underline data-[state=closed]:after:absolute data-[state=closed]:after:inset-0 [&>svg:not([data-slot=step-chevron])]:hidden"
+        className={cn(
+          'min-w-0 items-center justify-start gap-2.5 py-0 text-start hover:no-underline [&>svg:not([data-slot=step-chevron])]:hidden',
+          // Collapsed, the whole card opens it — its summary included.
+          !isOpen && 'after:absolute after:inset-0',
+        )}
       >
         <DrawerStepCircle
           status={status}

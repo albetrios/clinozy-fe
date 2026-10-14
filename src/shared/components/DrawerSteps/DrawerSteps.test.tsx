@@ -286,12 +286,14 @@ describe('DrawerSteps', () => {
 
     expect(card('items')).toHaveClass(
       'relative',
-      'data-[state=closed]:hover:border-border-strong',
+      'bg-canvas',
+      'hover:border-border-strong',
     );
-    expect(trigger('items')).toHaveClass(
-      'data-[state=closed]:after:absolute',
-      'data-[state=closed]:after:inset-0',
-    );
+    expect(trigger('items')).toHaveClass('after:absolute', 'after:inset-0');
+    // The open card neither lifts nor covers its own fields.
+    expect(card('contact')).toHaveClass('border-border-strong', 'bg-card');
+    expect(card('contact')).not.toHaveClass('hover:border-border-strong');
+    expect(trigger('contact')).not.toHaveClass('after:absolute');
   });
 
   it('collapses the open step: a reached step reads done, an untouched one stays later', async () => {
