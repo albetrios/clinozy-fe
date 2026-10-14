@@ -4948,6 +4948,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/bug-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Report a bug */
+        post: operations["postUsersMeBugReports"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me/data-export": {
         parameters: {
             query?: never;
@@ -32994,6 +33011,66 @@ export interface operations {
             403: components["responses"]["ApiError"];
             404: components["responses"]["ApiError"];
             409: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    postUsersMeBugReports: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    app_version?: string | null;
+                    description: string;
+                    /** @enum {string} */
+                    input_method: "typed" | "voice" | "mixed";
+                    /** Format: starts_with */
+                    page_path?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    "X-Idempotency-Replay"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            app_version?: string | null;
+                            /** Format: date-time */
+                            created_at: string;
+                            description: string;
+                            id: string;
+                            /** @enum {string} */
+                            input_method: "typed" | "voice" | "mixed";
+                            organization_id?: string | null;
+                            page_path?: string | null;
+                            reporter_name?: string | null;
+                            user_id: string;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            413: components["responses"]["ApiError"];
+            415: components["responses"]["ApiError"];
             422: components["responses"]["ApiError"];
             429: components["responses"]["ApiError"];
             500: components["responses"]["ApiError"];
