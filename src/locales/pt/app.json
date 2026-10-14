@@ -1414,5 +1414,31 @@
   "appHomeEmpty": {
     "title": "Nada foi ativado aqui ainda",
     "description": "As seções da sua clínica aparecerão aqui assim que forem ativadas para você."
+  },
+  "bugReport": {
+    "trigger": "Reportar um erro",
+    "panel": {
+      "title": "Reportar um erro",
+      "subtitle": "O que deu errado? Digite — ou toque no microfone e fale.",
+      "label": "Descreva o erro",
+      "placeholder": "O que aconteceu e o que você esperava?",
+      "signedAs": "Enviado como {{name}}, com esta página e a versão do app.",
+      "close": "Fechar"
+    },
+    "voice": {
+      "start": "Ditar com a sua voz",
+      "stop": "Parar de ditar",
+      "listening": "Ouvindo…",
+      "hearing": "Estou ouvindo…",
+      "denied": "O microfone está bloqueado. Permita-o no navegador para ditar.",
+      "noSpeech": "Não entendi — toque no microfone e tente de novo.",
+      "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar."
+    },
+    "send": {
+      "idle": "Enviar",
+      "sending": "Enviando…",
+      "sent": "Obrigado — a equipe já recebeu.",
+      "error": "Não foi possível enviar o relato. Seu texto continua aqui — tente de novo."
+    }
   }
 }

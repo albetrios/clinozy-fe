@@ -1,7 +1,7 @@
 # Sentry — React frontend observability
 
 Clinozy-fe ships a **production-only** Sentry integration for errors, performance,
-session replay, profiling, logs, and user feedback. PostHog owns product analytics;
+session replay, profiling and logs. PostHog owns product analytics;
 Sentry owns reliability observability.
 
 **Related:** [Source map upload](./sentry-sourcemaps.md) · [Credentials](./credentials-and-env.md) · [Security model](../reference/security-model.md)
@@ -179,11 +179,13 @@ Use replays to reproduce UI bugs with masked DOM — no readable user input.
 **Sentry → Logs**; since SDK v11 the integration alone turns logs on (`enableLogs` is
 gone). Useful for correlating warnings with errors in the same trace.
 
-### User Feedback (production)
+### User feedback — not Sentry's
 
-`feedbackIntegration` injects Sentry’s feedback widget (bottom-right). Users can
-attach context to an issue. CSP already allows `*.sentry.io` and `*.ingest.sentry.io`
-(`index.html` + `lib/csp-api-origin.ts`).
+Sentry's `feedbackIntegration` is **not** used. "Report a bug" is the app's own widget
+(`shared/components/BugReport/`, iteration `feat-bug-report-2026-10-13-dgnx`): one textbox with
+the browser's native speech-to-text, sent to clinozy-be (`POST /api/v1/users/me/bug-reports`),
+which stamps the signed-in person from the session and keeps the report in Postgres. A test in
+`app/observability/sentry.test.ts` pins that the SDK's widget is never injected.
 
 ### Releases & source maps
 
@@ -264,4 +266,3 @@ When creating or tuning the Sentry project for this app:
 - [TanStack Router integration](https://docs.sentry.io/platforms/javascript/guides/react/features/tanstack-router/)
 - [Session Replay](https://docs.sentry.io/platforms/javascript/session-replay/)
 - [Browser profiling](https://docs.sentry.io/platforms/javascript/profiling/)
-- [User Feedback widget](https://docs.sentry.io/platforms/javascript/user-feedback/)

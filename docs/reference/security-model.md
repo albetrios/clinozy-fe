@@ -199,6 +199,14 @@ not fail) on a deploy environment that leaves it unset. Steps:
    default source is widened. A report file opens in its own tab, outside this policy. Narrow
    it to the bucket's host if one deployment's storage ever needs it.
 
+7. **`Permissions-Policy: microphone=(self)`.** "Report a bug" dictates with the browser's own
+   speech recognition (iteration `feat-bug-report-2026-10-13-dgnx`), so the microphone is allowed
+   to this origin — never to an embedded frame. The browser asks the person first and shows its
+   own recording indicator; the app only starts listening on a press of the voice button and
+   stops when the panel closes. Audio never passes through clinozy-fe or clinozy-be (Chrome sends
+   it to its own speech service, Safari recognizes on device). Camera, geolocation and payment
+   stay `()`. Pinned by `tests/security/static-security-config.security.test.ts`.
+
 ## Backend's half (confirm, don't implement here)
 
 - The refresh cookie must be `SameSite=Lax` (or stricter) and the backend must
