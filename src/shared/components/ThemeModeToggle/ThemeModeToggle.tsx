@@ -1,17 +1,21 @@
+import { type KeyboardEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
+import { onceAsync } from '@/lib/lazy-module.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu.tsx';
 import { Monitor, Moon, Sun } from '@/shared/icons/index.ts';
-import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
+
+/** The menu's chunk — fetched on the visitor's first reach for the trigger, once. */
+const loadThemeModeMenu = onceAsync(() => import('./ThemeModeMenu.tsx'));
+
+/** How the menu arrived: the module, and whether the button it replaces had focus. */
+interface MenuArrival {
+  module: Awaited<ReturnType<typeof loadThemeModeMenu>>;
+  focusTrigger: boolean;
+}
 
 /**
  * Light / Dark / System mode toggle (shadcn-style ModeToggle). The trigger icon
@@ -20,6 +24,14 @@ import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
  * switchable before sign-in too. The look itself is the app's one look; there
  * is nothing else to pick. A theme-locked deployment (`VITE_THEME_LOCK`) pins
  * the mode, so there the toggle renders nothing.
+ *
+ * The menu is its own chunk (`ThemeModeMenu`): Radix's menu, popper and
+ * floating-ui are ~28 kB gzipped that every signed-out page used to fetch before
+ * its first screen, for a menu most visitors never open. Until it arrives the
+ * same button stands in — same look, label and test id, announced as a menu
+ * button — and pointing at it, focusing it or pressing it fetches the menu; a
+ * press made before it arrives opens it when it does, and focus moves to the
+ * real trigger. A failed fetch leaves the button, and the next reach retries.
  */
 export function ThemeModeToggle({
   surface = 'default',
@@ -31,9 +43,13 @@ export function ThemeModeToggle({
   surface?: 'default' | 'frame';
 }) {
   const { t: tLocale } = useTranslation(LOCALE_NS);
-  const { t } = useTranslation(LAYOUT_NS);
   const theme = useThemeStore((s) => s.theme);
-  const setTheme = useThemeStore((s) => s.setTheme);
+  const standInRef = useRef<HTMLButtonElement>(null);
+  const [arrival, setArrival] = useState<MenuArrival | undefined>(() => {
+    const module = loadThemeModeMenu.peek();
+    return module ? { module, focusTrigger: false } : undefined;
+  });
+  const [openOnArrival, setOpenOnArrival] = useState(false);
 
   // The deployment pins the mode: nothing here may change it.
   if (platformConfig.themeLock) return null;
@@ -47,30 +63,68 @@ export function ThemeModeToggle({
   const surfaceTriggerClass =
     surface === 'frame' ? 'text-foreground-soft rounded-lg' : undefined;
 
+  const triggerProps = {
+    variant: surface === 'frame' ? ('outline' as const) : ('ghost' as const),
+    size: surface === 'frame' ? ('icon-sm' as const) : ('icon' as const),
+    className: surfaceTriggerClass,
+    'aria-label': tLocale(LOCALE_KEYS.toggleTheme),
+    'data-testid': 'theme-toggle',
+  };
+  const icon = <ThemeIcon className="h-4 w-4" />;
+
+  if (arrival) {
+    const { ThemeModeMenu } = arrival.module;
+    return (
+      <ThemeModeMenu
+        trigger={<Button {...triggerProps}>{icon}</Button>}
+        defaultOpen={openOnArrival}
+        focusTrigger={arrival.focusTrigger}
+      />
+    );
+  }
+
+  const fetchMenu = () => {
+    loadThemeModeMenu().then(
+      (module) =>
+        setArrival({
+          module,
+          focusTrigger: document.activeElement === standInRef.current,
+        }),
+      // Speculative until pressed, and the button stays usable: the next reach
+      // retries (`onceAsync` keeps no rejection).
+      () => undefined,
+    );
+  };
+  const openWhenReady = () => {
+    setOpenOnArrival(true);
+    fetchMenu();
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant={surface === 'frame' ? 'outline' : 'ghost'}
-          size={surface === 'frame' ? 'icon-sm' : 'icon'}
-          className={surfaceTriggerClass}
-          aria-label={tLocale(LOCALE_KEYS.toggleTheme)}
-          data-testid="theme-toggle"
-        >
-          <ThemeIcon className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme('light')} data-testid="theme-light">
-          <Sun className="me-2 h-4 w-4" /> {t(LAYOUT_KEYS.app.theme.light)}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')} data-testid="theme-dark">
-          <Moon className="me-2 h-4 w-4" /> {t(LAYOUT_KEYS.app.theme.dark)}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')} data-testid="theme-system">
-          <Monitor className="me-2 h-4 w-4" /> {t(LAYOUT_KEYS.app.theme.system)}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      {...triggerProps}
+      ref={standInRef}
+      type="button"
+      aria-haspopup="menu"
+      aria-expanded={false}
+      onPointerEnter={fetchMenu}
+      onFocus={fetchMenu}
+      // A press opens on pointerdown, as Radix's trigger does — so a menu that
+      // lands between pointerdown and click still opens; Enter and Space arrive
+      // as a click.
+      onPointerDown={(event) => {
+        if (event.button === 0) openWhenReady();
+      }}
+      onClick={openWhenReady}
+      onKeyDown={(event: KeyboardEvent<HTMLButtonElement>) => {
+        // Radix opens a menu on ArrowDown too.
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          openWhenReady();
+        }
+      }}
+    >
+      {icon}
+    </Button>
   );
 }

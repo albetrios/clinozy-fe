@@ -74,6 +74,27 @@ down) and itemise each change in `tests/performance/README.md` → Re-pins.
    never through the `@/lib/routes/index.ts` barrel. `pnpm build:check`
    (`check-entry-routes.mjs`) trips on a dialog manifest or a room builder in
    the first-paint chunks.
+9. **The first paint is a handful of files, not a crowd.** Left to automatic
+   splitting, every module the entry shares with a lazy chunk became a chunk of
+   its own — the first paint shipped as ~24 files, and on a slow connection the
+   router waited on round trips, not bytes. `vite.config.ts`'s `codeSplitting`
+   gives `vendor`, `zod`, `query` (and the deferred `sentry`, `posthog`, `rhf`)
+   their own groups and collects the rest of the static entry graph in one
+   `boot` group (`tags: ['$initial']`), which is emitted as the entry chunk:
+   five files, ~6.5 kB less gzipped. `vendor` has the highest priority — a
+   group takes what its modules import, so the first library group to import
+   React would take it (Sentry's 150 kB chunk then became a static import of the
+   entry). Because a leak no longer has to arrive as a chunk of its own,
+   `check-preload-graph.mjs` reads the first-paint code for each deferred
+   library's signature as well as its chunk name.
+10. **A control most visitors never open loads on intent.** The signed-out
+    header's theme toggle drew Radix's menu — its popper, floating-ui and focus
+    management, ~28 kB gzipped — onto every public page's first screen.
+    `ThemeModeToggle` now draws the same trigger and fetches `ThemeModeMenu` on
+    pointer-enter, focus or press (a press made before it lands opens it when it
+    does; focus moves to the real trigger). The pattern for any such control:
+    same markup and test id up front, `onceAsync` for the chunk, never a
+    module-scope `import()`.
 
 ## Attribute a regression before you chase it
 

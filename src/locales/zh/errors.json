@@ -98,6 +98,12 @@
       "avatarUpdated": "头像已更新。",
       "avatarRemoved": "头像已移除。"
     },
+    "upload": {
+      "storageUnreachable": "无法将文件发送到存储。请检查网络连接后重试；如果仍然失败，请联系支持团队。",
+      "storageRejected": "存储拒绝了该文件。请重新上传。",
+      "notConfirmed": "上传后无法验证该文件。请重新上传。",
+      "invalidFileName": "请重命名文件后重试：文件名不能包含斜杠、“..”或控制字符。"
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "无法添加通行密钥",

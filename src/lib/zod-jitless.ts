@@ -13,7 +13,7 @@
  *
  * It has to run before ANY object schema exists, and schemas are built at module
  * scope in many chunks that evaluate before `main.tsx`'s own body. So this module
- * is bundled INTO the `zod` chunk (`manualChunks` in `vite.config.ts`): a chunk
+ * is bundled INTO the `zod` chunk (its `codeSplitting` group in `vite.config.ts`): a chunk
  * that builds a schema imports that chunk, and every module in a chunk runs before
  * the chunks that import it. `main.tsx` imports it only to keep it in the graph.
  */
