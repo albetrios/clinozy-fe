@@ -3,9 +3,11 @@
    direction (reversed on a right-to-left page), each row 90ms after the one
    above (`data-sweep`, cycled by three) so the rows sweep as one wave.
 
-   Loaded with the skeleton bars' own chunk, not on every first paint: the
-   initial stylesheet is a ratchet (`pnpm size`), and only a wait someone is
-   watching — a search, a picker — shimmers.
+   Loaded the first time a bar shimmers (`SkeletonBar`'s dynamic import), not on
+   every first paint: the initial stylesheet is a ratchet (`pnpm size`), a CSS
+   file the skeleton chunk imported statically would sit in the first-paint
+   chunk's preload map (D28), and only a wait someone is watching — a search, a
+   picker — shimmers.
 
    The colour comes from the theme's tokens: the page colour over the bar's
    muted-strong fill in light; a faint lift of the text colour in dark. The

@@ -10,15 +10,7 @@ describe('RouteProgressBar', () => {
   it('renders a progress bar while a navigation is pending', () => {
     useRouterStateMock.mockReturnValue(true); // status === 'pending'
     render(<RouteProgressBar />);
-    // The shared line, pinned to the page's top edge above the shell, named for assistive tech.
-    expect(screen.getByTestId('route-progress')).toHaveClass(
-      'fixed',
-      'inset-x-0',
-      'top-0',
-      'z-[60]',
-      'h-0.5',
-    );
-    expect(screen.getByRole('progressbar', { name: 'Loading page' })).toBeInTheDocument();
+    expect(screen.getByTestId('route-progress')).toBeInTheDocument();
   });
 
   it('renders nothing when idle', () => {

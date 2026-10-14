@@ -214,9 +214,9 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   default; a wait at the desk opts in to the shimmer — `SkeletonBar` /
   `SkeletonRows` `shimmer`: a soft sheen (the page colour over the bar's fill,
   a faint lift of the text colour in dark) sweeping in the reading direction,
-  rows 90ms apart (`data-sweep`). Its CSS, `skeleton-sheen.css`, loads with the
-  skeleton bars' chunk, not on the first paint. The shared `ProgressLine` (the
-  same line `RouteProgressBar` pins to the page top) runs under the field and the
+  rows 90ms apart (`data-sweep`). Its CSS, `skeleton-sheen.css`, loads the first
+  time a bar shimmers (a dynamic import), never with the first paint. The shared `ProgressLine` (the
+  bar `RouteProgressBar` draws inline at the page top) runs under the field and the
   glyph turns into the `Spinner`; a new answer loading over the last keeps the
   last rows, dimmed. `ContactQuickPick` and the Picker's loading rows use all of
   it (change-contact-quick-pick).

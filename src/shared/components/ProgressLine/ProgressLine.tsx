@@ -11,10 +11,12 @@ export interface ProgressLineProps {
 
 /**
  * The indeterminate progress line: a 2px track with a primary bar that sweeps
- * across it on `route-progress` (1.1s) — the page-top bar while a navigation
- * resolves (`RouteProgressBar`), and the line under a search while its answer
- * loads (`ContactQuickPick`). Assistive technology reads a native, valueless
- * (indeterminate) `<progress>` named by `label`; the drawn bar is decorative.
+ * across it on `route-progress` (1.1s) — the line under a search while its
+ * answer loads (`ContactQuickPick`). The page-top `RouteProgressBar` draws the
+ * same bar inline: it is on the first paint, whose budget has no room for a
+ * shared component (change-contact-quick-pick D28). Assistive technology reads
+ * a native, valueless (indeterminate) `<progress>` named by `label`; the drawn
+ * bar is decorative.
  * Shown only while something is in flight: the host mounts it then and drops it
  * after. Reduced motion stills it (the global rule).
  */

@@ -1,5 +1,4 @@
-import './skeleton-sheen.css';
-
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
@@ -26,6 +25,23 @@ const SHAPES = {
 /** The shimmer's stagger: rows sweep 0 / 90 / 180ms apart, cycled (`skeleton-sheen.css`). */
 const SWEEP_STEPS = 3;
 
+/** The sheen's stylesheet was asked for — once per page. */
+let sheenRequested = false;
+
+/**
+ * Loads `skeleton-sheen.css` the first time a bar shimmers. A dynamic import, not a static
+ * one: a stylesheet this chunk imported would be listed in the first-paint chunk's preload
+ * map (every lazy route that can reach a skeleton), and that chunk has no room for it
+ * (change-contact-quick-pick D28). Until it lands — a frame or two — the bar shows its flat
+ * fill.
+ */
+function requestSheen() {
+  if (sheenRequested) return;
+  sheenRequested = true;
+  // A failed load (offline) leaves the flat fill — nothing to report.
+  import('./skeleton-sheen.css').catch(() => {});
+}
+
 /** Props for {@link SkeletonBar}: its shape, the row it is in and whether it shimmers. */
 export interface SkeletonBarProps {
   shape?: keyof typeof SHAPES | 'avatar';
@@ -46,8 +62,8 @@ export interface SkeletonBarProps {
  * One skeleton bar on `bg-muted-strong`, the primitive's pulse off. Flat by
  * default — the launch design's shimmer animated a flat fill and never moved, so
  * none was built (§3.1); `shimmer` opts in to the sheen sweep
- * (change-contact-quick-pick D11, `skeleton-sheen.css` — loaded with this
- * chunk, not on the first paint), which the platform's reduced-motion rule
+ * (change-contact-quick-pick D11, `skeleton-sheen.css` — loaded the first
+ * time a bar shimmers, not on the first paint), which the platform's reduced-motion rule
  * stills. Decorative; the surrounding `SkeletonRows` (or the host) announces
  * loading.
  */
@@ -57,6 +73,9 @@ export function SkeletonBar({
   shimmer = false,
   className,
 }: SkeletonBarProps) {
+  useEffect(() => {
+    if (shimmer) requestSheen();
+  }, [shimmer]);
   return (
     <Skeleton
       aria-hidden="true"
