@@ -164,8 +164,50 @@ describe('auth/service — sign-outs that stay signed out', () => {
   });
 
   describe('boot with a pending revoke', () => {
+    /** The boot, then the revoke it finishes behind the login screen. */
+    async function bootAndFinishTheRevoke(): Promise<void> {
+      await service.startAuthBootstrap();
+      await service.settlePendingRevoke();
+    }
+
     beforeEach(() => {
       localStorage.setItem(REVOKE_PENDING_KEY, '1');
+    });
+
+    it('settles as a guest at once — the login screen does not wait for the server', async () => {
+      // The revoke used to run inside the boot, so the login screen stayed behind
+      // the splash for its round trips — up to two 5s refresh timeouts offline.
+      const refresh = new Promise<Response>(() => {});
+      fetchMock.mockReturnValueOnce(refresh);
+
+      await service.startAuthBootstrap();
+
+      expect(useAuthStore.getState().isAuthenticated).toBe(false);
+      expect(useAuthStore.getState().isLoading).toBe(false);
+      expect(requests(fetchMock)).toEqual(['POST /auth/refresh']);
+      expect(localStorage.getItem(REVOKE_PENDING_KEY)).toBe('1');
+    });
+
+    it('lets a sign-in wait for the revoke it is finishing', async () => {
+      let answerRefresh: (response: Response) => void = () => {};
+      fetchMock.mockReturnValueOnce(
+        new Promise<Response>((resolve) => {
+          answerRefresh = resolve;
+        }),
+      );
+      await service.startAuthBootstrap();
+      let settled = false;
+      const waiting = Promise.resolve(service.settlePendingRevoke()).then(() => {
+        settled = true;
+      });
+
+      await Promise.resolve();
+      expect(settled).toBe(false);
+      answerRefresh(json({ error: { detail: 'no session' } }, 401));
+      await waiting;
+
+      expect(settled).toBe(true);
+      expect(localStorage.getItem(REVOKE_PENDING_KEY)).toBeNull();
     });
 
     it('mints a token, spends it on the revoke, and stays a guest', async () => {
@@ -173,7 +215,7 @@ describe('auth/service — sign-outs that stay signed out', () => {
         .mockResolvedValueOnce(json({ data: { access_token: TOKEN } }))
         .mockResolvedValueOnce(json({}));
 
-      await service.startAuthBootstrap();
+      await bootAndFinishTheRevoke();
 
       expect(requests(fetchMock)).toEqual(['POST /auth/refresh', 'POST /auth/logout']);
       expect(fetchMock.mock.calls[1]?.[1]).toEqual(
@@ -192,7 +234,7 @@ describe('auth/service — sign-outs that stay signed out', () => {
     it('clears the marker when the server says there is no session left', async () => {
       fetchMock.mockResolvedValueOnce(json({ error: { detail: 'no session' } }, 401));
 
-      await service.startAuthBootstrap();
+      await bootAndFinishTheRevoke();
 
       expect(requests(fetchMock)).toEqual(['POST /auth/refresh']);
       expect(localStorage.getItem(REVOKE_PENDING_KEY)).toBeNull();
@@ -202,7 +244,7 @@ describe('auth/service — sign-outs that stay signed out', () => {
     it('keeps the marker while the outcome is unknown (still offline)', async () => {
       fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
 
-      await service.startAuthBootstrap();
+      await bootAndFinishTheRevoke();
 
       expect(localStorage.getItem(REVOKE_PENDING_KEY)).toBe('1');
       expect(useAuthStore.getState().isAuthenticated).toBe(false);
@@ -214,7 +256,7 @@ describe('auth/service — sign-outs that stay signed out', () => {
         .mockResolvedValueOnce(json({ data: { access_token: TOKEN } }))
         .mockResolvedValueOnce(json({ error: { detail: 'try later' } }, 503));
 
-      await service.startAuthBootstrap();
+      await bootAndFinishTheRevoke();
 
       expect(localStorage.getItem(REVOKE_PENDING_KEY)).toBe('1');
       expect(token.getAccessToken()).toBeNull();

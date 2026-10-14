@@ -8,6 +8,12 @@ const platformConfig = vi.hoisted(() => ({
 }));
 vi.mock('@/core/config/env.ts', () => ({ platformConfig }));
 
+// The sign-out a login screen's boot may still be finishing (see `settlePendingRevoke`).
+const { settlePendingRevoke } = vi.hoisted(() => ({
+  settlePendingRevoke: vi.fn(async () => undefined),
+}));
+vi.mock('@/shared/auth/service.ts', () => ({ settlePendingRevoke }));
+
 import {
   CAPTCHA_TOKEN_HEADER,
   DEV_CAPTCHA_TOKEN,
@@ -54,6 +60,38 @@ describe('authApi.mfaVerify second factor', () => {
       mfa_session_token: 'mfa_sess',
       recovery_code: 'abcd-efgh',
     });
+  });
+});
+
+describe('authApi after a sign-out the boot is still finishing', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    settlePendingRevoke.mockReset().mockImplementation(async () => undefined);
+  });
+
+  it('sends a sign-in only once that revoke has finished', async () => {
+    // Its refresh answer sets the refresh cookie; landing after the sign-in's,
+    // it would put the signed-out session's cookie back over the new one.
+    let finishRevoke: () => void = () => {};
+    settlePendingRevoke.mockImplementation(
+      () =>
+        new Promise<undefined>((resolve) => {
+          finishRevoke = () => resolve(undefined);
+        }),
+    );
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ data: { access_token: 'acc' } }), { status: 200 }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const signIn = authApi.emailLogin({ email: 'a@b.test', code: 'AB2CD3' });
+    await Promise.resolve();
+    expect(fetchMock).not.toHaveBeenCalled();
+    finishRevoke();
+
+    await expect(signIn).resolves.toEqual({ accessToken: 'acc' });
+    expect(fetchMock).toHaveBeenCalledOnce();
   });
 });
 

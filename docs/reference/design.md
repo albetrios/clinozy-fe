@@ -231,6 +231,13 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   by `tests/e2e/boot-splash.e2e.test.ts`: the splash fades **exactly once**, and
   the page is **never blank** behind it. Numbers and method:
   [local-production-perf.md](local-production-perf.md#cold-load-timeline).
+- **Signing out goes straight to the login screen.** The app stays exactly as it
+  is until the login screen replaces it: nothing it shows is cleared before the
+  page goes (`pagehide`), and the `/login` load a sign-out hands the tab to skips
+  the splash (`forceLogout` → `public/splash-init.js` → `APP_SPLASH_SKIP`: the splash is
+  hidden and `#root` shown before the first paint, so the browser keeps the page
+  being left on screen until the login screen paints). The login screen does not
+  wait for a revoke still owed to the server — that finishes behind it.
 - Verify first-open and repeat-open behavior with delayed chunks on desktop and
   mobile. Test close, keyboard focus, switching sections, and retry after failure.
 
