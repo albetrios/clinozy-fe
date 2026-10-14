@@ -8,7 +8,7 @@
 | Opened | 2026-10-14 |
 | Branch | feat/colorful-empty-states |
 | Baseline | change-empty-states-2026-10-13-ssai |
-| Status | done |
+| Status | frozen |
 | Summary | An empty list no longer offers its create/add button — the colorful empty state only says what is empty and why; the room's toolbar keeps the one way to add. |
 | Drop placed | 2026-10-14 |
 | Drop source | /tmp/claude-0/-home-user/0f8fc4fe-4ceb-5913-9e1e-0bcc0e1e4c22/scratchpad/drop-fix |
@@ -23,3 +23,4 @@
 - 2026-10-14 · ready-for-approval → approved · — · Claude
 - 2026-10-14 · approved → implementing · — · Claude
 - 2026-10-14 · implementing → done · — · Claude
+- 2026-10-14 · done → frozen · — · Claude
