@@ -11,8 +11,11 @@ What was actually built, ledger row by ledger row, against the approved plan in
 | #2  | 2          | `TENANCY.FLOWS.md` — `/` root resolution                        | `TENANCY.FLOWS.md` › `/` root resolution gains "Which org is active after a sign-in" (clinozy-be decides; last clinic → newest clinic → personal; nothing stored in the browser); `docs/reference/routing-and-tenancy.md` § 2 says the same                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `routing-and-tenancy.md` also updated                                              | it carries the same `/` description                                                                                      | D3       | (this commit) |
 
 **Verified:** `organization-resolver.test.ts` and `OrganizationPickerPage.test.tsx` 38/38 ✓ ·
-`pnpm docs:lint` ✓ · `pnpm sync:check` ✓. No source file changed, so the code gates have nothing new
-to check.
+`pnpm docs:lint` ✓ · `pnpm sync:check` ✓ · the pre-push hook: `biome:check`, `type-check`, `build`,
+`build:check`, `docs:lint:changed`, the full Vitest suite (**1206 files / 9771 tests**) and
+`contracts:drift` ✓. Its last step, `api:types:check`, found `src/core/http/openapi-types.d.ts` stale
+against clinozy-be's `main` (release 9.1.0 — only the header's version, 9.0.1 → 9.1.0); regenerated
+with `pnpm api:types` in its own commit. No source file of this iteration changed.
 
 **Found while recording (not a change):** driven from `http://127.0.0.1:5173`, a clinic switch whose
 in-flight request still carried the retired token fell back to `POST /auth/refresh`, which clinozy-be
