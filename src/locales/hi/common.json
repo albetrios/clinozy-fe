@@ -218,7 +218,7 @@
     "date": {
       "label": "तारीख",
       "placeholder": "तारीख चुनें",
-      "search": "तारीख लिखें · जैसे 12 sep",
+      "search": "तारीख लिखें · 12 sep, 2w, fri",
       "today": "आज",
       "tomorrow": "आने वाला कल",
       "yesterday": "बीता कल",

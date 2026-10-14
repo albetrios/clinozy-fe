@@ -5,6 +5,7 @@ import {
   dateOption,
   type DateOptionFormat,
   ENGLISH_MONTH_NAMES,
+  parseRelativeDate,
   parseTypedDate,
   type TypedDateLocale,
   withinRange,
@@ -136,5 +137,68 @@ describe('parseTypedDate', () => {
     expect(parseTypedDate('ma 3', TODAY, DAY_FIRST)).toBeNull();
     expect(parseTypedDate('12 sep x', TODAY, DAY_FIRST)).toBeNull();
     expect(parseTypedDate('1 2 3 4', TODAY, DAY_FIRST)).toBeNull();
+  });
+});
+
+describe('parseRelativeDate — shorthand from today (feat-write-less)', () => {
+  // TODAY, 2026-10-03, is a Saturday.
+  it.each([
+    ['today', '2026-10-03'],
+    ['Tomorrow', '2026-10-04'],
+    ['yesterday', '2026-10-02'],
+    ['3d', '2026-10-06'],
+    ['2w', '2026-10-17'],
+    ['1m', '2026-11-03'],
+    ['1y', '2027-10-03'],
+    ['+10', '2026-10-13'],
+    ['-2d', '2026-10-01'],
+    ['in 3 days', '2026-10-06'],
+    ['in 2 weeks', '2026-10-17'],
+    ['in 10', '2026-10-13'],
+    ['2 weeks ago', '2026-09-19'],
+    ['6 months', '2027-04-03'],
+  ])('%s → %s', (typed, date) => {
+    expect(parseRelativeDate(typed, TODAY, DAY_FIRST)).toBe(date);
+    expect(parseTypedDate(typed, TODAY, DAY_FIRST)).toBe(date);
+  });
+
+  it('reads a weekday as the next such day after today', () => {
+    expect(parseTypedDate('fri', TODAY, DAY_FIRST)).toBe('2026-10-09');
+    expect(parseTypedDate('Friday', TODAY, DAY_FIRST)).toBe('2026-10-09');
+    expect(parseTypedDate('next fri', TODAY, DAY_FIRST)).toBe('2026-10-09');
+    expect(parseTypedDate('mon', TODAY, DAY_FIRST)).toBe('2026-10-05');
+    // Today is a Saturday: "sat" is a week from now, never today.
+    expect(parseTypedDate('sat', TODAY, DAY_FIRST)).toBe('2026-10-10');
+  });
+
+  it('understands the locale weekday names alongside English ones', () => {
+    const german: TypedDateLocale = {
+      ...DAY_FIRST,
+      weekdays: [
+        ['so', 'sonntag'],
+        ['mo', 'montag'],
+        ['di', 'dienstag'],
+        ['mi', 'mittwoch'],
+        ['do', 'donnerstag'],
+        ['fr', 'freitag'],
+        ['sa', 'samstag'],
+      ],
+    };
+    expect(parseTypedDate('freitag', TODAY, german)).toBe('2026-10-09');
+    expect(parseTypedDate('fri', TODAY, german)).toBe('2026-10-09');
+  });
+
+  it('keeps a month’s last day when a month is shorter', () => {
+    expect(parseRelativeDate('1m', '2026-01-31', DAY_FIRST)).toBe('2026-02-28');
+  });
+
+  it('leaves absolute dates and noise to the rest of the reader', () => {
+    expect(parseRelativeDate('12', TODAY, DAY_FIRST)).toBeNull();
+    expect(parseRelativeDate('12 sep', TODAY, DAY_FIRST)).toBeNull();
+    expect(parseRelativeDate('next', TODAY, DAY_FIRST)).toBeNull();
+    expect(parseRelativeDate('in', TODAY, DAY_FIRST)).toBeNull();
+    expect(parseRelativeDate('3x', TODAY, DAY_FIRST)).toBeNull();
+    expect(parseRelativeDate('next 3d', TODAY, DAY_FIRST)).toBeNull();
+    expect(parseRelativeDate('fri ago', TODAY, DAY_FIRST)).toBeNull();
   });
 });

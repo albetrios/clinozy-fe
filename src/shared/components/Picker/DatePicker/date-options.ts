@@ -108,7 +108,23 @@ export interface TypedDateLocale {
   months: readonly (readonly string[])[];
   /** Numeric dates read day first: 12/9 is 12 September. */
   dayFirst: boolean;
+  /**
+   * Lower-case weekday names per day (index 0 = Sunday), any lengths — "fri", "next friday"
+   * (feat-write-less). English is used when left out.
+   */
+  weekdays?: readonly (readonly string[])[];
 }
+
+/** English weekday names (index 0 = Sunday), always understood alongside the locale's. */
+export const ENGLISH_WEEKDAY_NAMES: readonly (readonly string[])[] = [
+  ['sun', 'sunday'],
+  ['mon', 'monday'],
+  ['tue', 'tues', 'tuesday'],
+  ['wed', 'wednesday'],
+  ['thu', 'thur', 'thurs', 'thursday'],
+  ['fri', 'friday'],
+  ['sat', 'saturday'],
+];
 
 /** English month names, always understood alongside the locale's. */
 export const ENGLISH_MONTH_NAMES: readonly (readonly string[])[] = [
@@ -198,17 +214,165 @@ function fromWords(tokens: string[], today: string, locale: TypedDateLocale) {
   return NUMERIC.test(third) ? civilOf(fullYear(third), month, day) : null;
 }
 
+/** The units a relative date counts in, by what may be typed for each. */
+const RELATIVE_UNITS: Readonly<Record<string, 'day' | 'week' | 'month' | 'year'>> = {
+  d: 'day',
+  day: 'day',
+  days: 'day',
+  w: 'week',
+  wk: 'week',
+  wks: 'week',
+  week: 'week',
+  weeks: 'week',
+  m: 'month',
+  mo: 'month',
+  mos: 'month',
+  month: 'month',
+  months: 'month',
+  y: 'year',
+  yr: 'year',
+  yrs: 'year',
+  year: 'year',
+  years: 'year',
+};
+
+/** The English words for the days next to today. */
+const NEXT_TO_TODAY: Readonly<Record<string, number>> = {
+  today: 0,
+  tomorrow: 1,
+  tmrw: 1,
+  yesterday: -1,
+};
+
+/** `date` moved by whole months, the day kept or clamped to the month's last (31 Jan + 1m = 28 Feb). */
+function addCivilMonths(date: string, months: number): string {
+  const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
+  const first = new Date(Date.UTC(year, month - 1 + months, 1));
+  const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0));
+  first.setUTCDate(Math.min(day, last.getUTCDate()));
+  return first.toISOString().slice(0, 10);
+}
+
+/**
+ * An amount and unit — "3d", "+10", "2weeks", "-2d" — counted from today, or `null`.
+ *
+ * @param count.text - The amount and unit, spaces removed.
+ * @param count.direction - `-1` for "… ago".
+ * @param count.counting - "in" or "ago" was typed: a bare figure counts days.
+ */
+function fromCount({
+  text,
+  today,
+  direction,
+  counting,
+}: {
+  text: string;
+  today: string;
+  direction: 1 | -1;
+  counting: boolean;
+}): string | null {
+  const match = /^([+-]?)(\d{1,3})([a-z]*)$/.exec(text);
+  if (!match) return null;
+  const [, sign = '', digits = '', unitWord = ''] = match;
+  // A bare figure is a day of the month elsewhere: only a sign, "in" or "ago" makes it a count.
+  if (!unitWord && !sign && !counting) return null;
+  const unit = unitWord ? RELATIVE_UNITS[unitWord] : 'day';
+  if (!unit) return null;
+  const amount = Number(digits) * (sign === '-' ? -1 : 1) * direction;
+  if (unit === 'day') return addCivilDays(today, amount);
+  if (unit === 'week') return addCivilDays(today, amount * 7);
+  return addCivilMonths(today, unit === 'month' ? amount : amount * 12);
+}
+
+/** The weekday a word names (an exact name, or a prefix of 3+ letters naming one day), or -1. */
+function weekdayIndex(word: string, locale: TypedDateLocale): number {
+  const typed = word.replace(/\.$/, '');
+  const names = (locale.weekdays ?? []).map((own, index) => [
+    ...own,
+    ...(ENGLISH_WEEKDAY_NAMES[index] ?? []),
+  ]);
+  const hits = new Set<number>();
+  (names.length ? names : ENGLISH_WEEKDAY_NAMES).forEach((day, index) => {
+    if (
+      day.some((name) => name === typed || (typed.length >= 3 && name.startsWith(typed)))
+    ) {
+      hits.add(index);
+    }
+  });
+  const [only] = hits;
+  return hits.size === 1 && only !== undefined ? only : -1;
+}
+
+/**
+ * Read a relative date (feat-write-less-2026-10-14-oixr, D10): `today`, `tomorrow`, `yesterday`;
+ * a count — `3d`, `2w`, `1m`, `1y`, `+10`, `-2d`, `in 3 days`, `2 weeks ago`; or a weekday — `fri`,
+ * `friday`, `next fri` — the next such day after today. English words and the `d / w / m / y`
+ * units always work, plus the locale's weekday names.
+ *
+ * @param query - What was typed.
+ * @param today - The clinic's civil today, `YYYY-MM-DD`.
+ * @param locale - The locale's weekday names.
+ * @returns The civil date, or `null` when the text is not a relative date.
+ */
+export function parseRelativeDate(
+  query: string,
+  today: string,
+  locale: TypedDateLocale,
+): string | null {
+  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const [first = ''] = words;
+  const next = NEXT_TO_TODAY[first];
+  if (words.length === 1 && next !== undefined) return addCivilDays(today, next);
+  const lead = ['in', 'next', 'this'].includes(first) ? first : '';
+  const rest = lead ? words.slice(1) : words;
+  const ago = rest.at(-1) === 'ago';
+  const counted = ago ? rest.slice(0, -1) : rest;
+  if (counted.length === 0 || counted.length > 2) return null;
+  const weekday = fromWeekday({ words: counted, today, locale, ago });
+  if (weekday) return weekday;
+  if (lead === 'next' || lead === 'this') return null;
+  return fromCount({
+    text: counted.join(''),
+    today,
+    direction: ago ? -1 : 1,
+    counting: lead === 'in' || ago,
+  });
+}
+
+/** One weekday word — "fri", "friday" — as the next such day after today, or `null`. */
+function fromWeekday({
+  words,
+  today,
+  locale,
+  ago,
+}: {
+  words: readonly string[];
+  today: string;
+  locale: TypedDateLocale;
+  ago: boolean;
+}): string | null {
+  if (words.length !== 1 || ago) return null;
+  const weekday = weekdayIndex(words[0] ?? '', locale);
+  if (weekday < 0) return null;
+  const from = new Date(`${today}T00:00:00Z`).getUTCDay();
+  return addCivilDays(today, (weekday - from + 7) % 7 || 7);
+}
+
 /**
  * Read a typed date — "12 sep", "sep 12", "12 september 2026", "12/9",
  * "12/09/26", "2026-09-12" — in the locale's day/month order and month names
  * (English names always work). Without a year, the nearest such day to today
- * wins. Returns the civil date, or `null` when the text is not a date.
+ * wins. A relative date — "3d", "2w", "fri", "in 2 weeks" — reads through
+ * {@link parseRelativeDate} first. Returns the civil date, or `null` when the
+ * text is not a date.
  */
 export function parseTypedDate(
   query: string,
   today: string,
   locale: TypedDateLocale,
 ): string | null {
+  const relative = parseRelativeDate(query, today, locale);
+  if (relative) return relative;
   const tokens = query
     .trim()
     .toLowerCase()

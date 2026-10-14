@@ -6,6 +6,7 @@ import {
   MONEY_SCALE,
   numberFromText,
   paiseOfRupees,
+  readTypedNumber,
   rupeesOfPaise,
   sanitizeNumberText,
   textFromNumber,
@@ -91,5 +92,39 @@ describe('paiseOfRupees / rupeesOfPaise — clinozy-be’s rupees and the fields
     expect(rupeesOfPaise(480050)).toBeCloseTo(4800.5, 2);
     expect(rupeesOfPaise(30)).toBeCloseTo(0.3, 2);
     expect(rupeesOfPaise(1234.4)).toBeCloseTo(12.34, 2);
+  });
+});
+
+describe('readTypedNumber — a figure, or a sum and its result (feat-write-less)', () => {
+  it('sanitizes a plain figure as before', () => {
+    expect(readTypedNumber('₹ 12,500.755', 2)).toEqual({
+      kind: 'figure',
+      text: '12500.75',
+    });
+    expect(readTypedNumber('abc', 2)).toEqual({ kind: 'figure', text: '' });
+  });
+
+  it('keeps a sum as typed and works it out to the field’s places', () => {
+    expect(readTypedNumber('1500+300', 2)).toEqual({
+      kind: 'sum',
+      typed: '1500+300',
+      result: 1800,
+    });
+    expect(readTypedNumber('1000/3', 2)).toMatchObject({ result: 333.33 });
+    expect(readTypedNumber('1000/3', 0)).toMatchObject({ result: 333 });
+    expect(readTypedNumber('1.5k', 0)).toMatchObject({ result: 1500 });
+    expect(readTypedNumber('₹2 lakh', 2)).toMatchObject({
+      typed: '2 lakh',
+      result: 200_000,
+    });
+  });
+
+  it('has no result while the sum is unfinished or below zero', () => {
+    expect(readTypedNumber('1500+', 2)).toEqual({
+      kind: 'sum',
+      typed: '1500+',
+      result: null,
+    });
+    expect(readTypedNumber('100-300', 2)).toMatchObject({ result: null });
   });
 });

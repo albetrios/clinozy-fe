@@ -218,7 +218,7 @@
     "date": {
       "label": "Datum",
       "placeholder": "Datum wählen",
-      "search": "Datum eingeben · z. B. 12 sep",
+      "search": "Datum eingeben · 12 sep, 2w, fr",
       "today": "Heute",
       "tomorrow": "Morgen",
       "yesterday": "Gestern",
