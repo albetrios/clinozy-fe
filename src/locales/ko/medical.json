@@ -231,6 +231,7 @@
   },
   "credits": {
     "records": "약국 크레딧",
+    "count_other": "크레딧 {{count}}건",
     "sides": {
       "label": "크레딧 상대",
       "suppliers": "공급업체에서",
@@ -612,6 +613,7 @@
       "payable": "미지급 {{amount}}",
       "paid": "지급 {{amount}}",
       "paidOf": "{{total}} 중 {{paid}} 지급",
+      "paidWithCredits": "{{paid}} 지급 + 공급업체 크레딧 {{credited}}",
       "pay": "{{amount}} 지불",
       "print": "인쇄"
     },
@@ -638,7 +640,7 @@
     },
     "saleReturn": {
       "title": "환자 반품",
-      "sub": "{{customer}} · 반품된 재고는 원래 배치로 돌아갑니다",
+      "sub": "{{customer}} · 반품된 팩은 원래 배치로 돌아갑니다. 파손되었거나 부작용으로 반품된 팩은 폐기 처리됩니다",
       "steps": {
         "back": "반품되는 품목",
         "reason": "사유 및 환불"

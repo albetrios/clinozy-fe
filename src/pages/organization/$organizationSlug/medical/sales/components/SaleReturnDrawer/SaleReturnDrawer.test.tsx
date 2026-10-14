@@ -132,7 +132,7 @@ describe('SaleReturnDrawer (medical.md:283–295)', () => {
       'Return from patient',
     );
     expect(drawer).toHaveTextContent(
-      `${fsi('Priya Shah')} · returned stock goes back into its batch`,
+      `${fsi('Priya Shah')} · returned packs go back into their batch; damaged or reaction packs are written off`,
     );
     expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(2);
 

@@ -281,6 +281,12 @@
   },
   "credits": {
     "records": "أرصدة الصيدلية",
+    "count_few": "{{count}} أرصدة",
+    "count_many": "{{count}} رصيدًا",
+    "count_one": "رصيد واحد",
+    "count_other": "{{count}} رصيد",
+    "count_two": "رصيدان",
+    "count_zero": "لا أرصدة",
     "sides": {
       "label": "أرصدة من",
       "suppliers": "من الموردين",
@@ -707,6 +713,7 @@
       "payable": "مستحق {{amount}}",
       "paid": "مدفوع {{amount}}",
       "paidOf": "مدفوع {{paid}} من {{total}}",
+      "paidWithCredits": "مدفوع {{paid}} + {{credited}} من أرصدة المورد",
       "pay": "ادفع {{amount}}",
       "print": "طباعة"
     },
@@ -738,7 +745,7 @@
     },
     "saleReturn": {
       "title": "إرجاع من المريض",
-      "sub": "{{customer}} · يعود المخزون المُرتجع إلى تشغيلته",
+      "sub": "{{customer}} · تعود العبوات المُرتجعة إلى تشغيلتها، وتُشطب التالفة أو التي سببت تفاعلًا",
       "steps": {
         "back": "ما الذي يُرجَع",
         "reason": "السبب والاسترداد"

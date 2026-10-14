@@ -50,6 +50,9 @@ export const creditQueryKeys = {
   /** The medical store's customer credits (`/app/medical-pending-credits`) — under `lists`, so every write refreshes them. */
   store: (organizationId: string | null, params: CreditListParams) =>
     [...creditQueryKeys.lists(organizationId), 'store', params] as const,
+  /** How many of the store's customer credits its params match — under `lists`, so every write refreshes it. */
+  storeCount: (organizationId: string | null, params: CreditListParams) =>
+    [...creditQueryKeys.lists(organizationId), 'store', 'count', params] as const,
   detail: (organizationId: string | null, creditId: string) =>
     [...creditQueryKeys.all, organizationId, 'detail', creditId] as const,
   /** Add pending's Who picker — its pages, by the text searched. */
@@ -126,6 +129,19 @@ export async function listPendingCredits(
     rows: await creditRowsOf(records),
     ...pageOf(response.meta?.pagination),
   };
+}
+
+/**
+ * How many of the store's customer credits its params match — the API's count of the whole list
+ * (`estimated_total`), read with one row; null when left out. Medical › Credits' footer.
+ */
+export async function fetchStoreCreditCount(
+  params: CreditListParams,
+): Promise<number | null> {
+  const response = await api.get('/app/medical-pending-credits', {
+    query: { ...creditListQuery(params), limit: 1 },
+  });
+  return pageOf(response.meta?.pagination).total;
 }
 
 /**

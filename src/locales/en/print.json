@@ -118,6 +118,7 @@
     "free": "Free",
     "rate": "Rate",
     "paid": "Paid:",
+    "credited": "Supplier credits:",
     "issuedBy": "Purchase order from {{clinic}}"
   }
 }

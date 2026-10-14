@@ -119,6 +119,7 @@
     "free": "Omaggio",
     "rate": "Prezzo",
     "paid": "Pagato:",
+    "credited": "Crediti fornitore:",
     "issuedBy": "Ordine d’acquisto di {{clinic}}"
   }
 }

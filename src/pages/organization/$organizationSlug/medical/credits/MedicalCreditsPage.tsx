@@ -35,6 +35,8 @@ import {
 import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
 import {
+  useMedicalSummary,
+  useStoreCreditCount,
   useStoreCreditList,
   useSupplierCreditList,
 } from '../shared/hooks/useMedicalLists/index.ts';
@@ -112,7 +114,7 @@ function CreditSideSwitch({ side }: { side: CreditSide }) {
 /**
  * "From suppliers" (clinozy-be MD34): every supplier credit for returned stock, newest first —
  * a row opens its supplier (the Account lists it); Void, for members with Medical Delete, puts
- * its packs back and the supplier's dues up, with Undo.
+ * its packs back and the supplier's dues up, with Undo. The footer counts them for the State.
  */
 function SupplierCredits({ search }: { search: MedicalCreditsSearch }) {
   const { t } = useTranslation(MEDICAL_NS);
@@ -122,6 +124,7 @@ function SupplierCredits({ search }: { search: MedicalCreditsSearch }) {
   const [voiding, setVoiding] = useState<SupplierCreditRow | null>(null);
   const params: SupplierCreditListParams = { status: search.state };
   const list = useSupplierCreditList(params);
+  const summary = useMedicalSummary('supplierCredits', params).data;
   const { rows, loading } = useRoomList(
     list,
     TABLE_ID,
@@ -177,6 +180,7 @@ function SupplierCredits({ search }: { search: MedicalCreditsSearch }) {
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(K.empty.suppliers)}
         recordsLabel={t(K.records)}
+        countLabel={summary ? t(K.count, { count: summary.total }) : undefined}
         minWidth={MIN_WIDTH}
         onRowClick={(credit) => nav.supplierEdit(credit.supplierId)}
         rowTone={(credit) => SUPPLIER_CREDIT_STATE_TONES[credit.status]}
@@ -200,7 +204,8 @@ const customerParamsOf = (search: MedicalCreditsSearch): CreditListParams => ({
  * "With customers" (clinozy-be MD32, MD33): the store's credits on its sales — a return kept as
  * store credit, money owed either way — as the Payments room's Pending holds them, newest first.
  * A row opens it in Pending (Edit, Use on next bill); Give back and Got it back settle an open
- * one here, by the member's `payment:*` codes; Add credit opens Pending's.
+ * one here, by the member's `payment:*` codes; Add credit opens Pending's. The footer counts them
+ * for the filters and search.
  */
 function CustomerCredits({ search }: { search: MedicalCreditsSearch }) {
   const { t } = useTranslation(MEDICAL_NS);
@@ -211,6 +216,7 @@ function CustomerCredits({ search }: { search: MedicalCreditsSearch }) {
   const [settling, setSettling] = useState<CreditRow | null>(null);
   const params = customerParamsOf(search);
   const list = useStoreCreditList(params);
+  const count = useStoreCreditCount(params).data ?? null;
   const { rows, loading } = useRoomList(
     list,
     TABLE_ID,
@@ -285,6 +291,7 @@ function CustomerCredits({ search }: { search: MedicalCreditsSearch }) {
             : undefined
         }
         recordsLabel={t(K.records)}
+        countLabel={count === null ? undefined : t(K.count, { count })}
         minWidth={MIN_WIDTH}
         onRowClick={
           access.canRead

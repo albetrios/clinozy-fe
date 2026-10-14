@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import { listStoreCredits } from '@/shared/api/app/credits-api.ts';
+import { fetchStoreCreditCount, listStoreCredits } from '@/shared/api/app/credits-api.ts';
 import {
   fetchAllMedicines,
   fetchMedicine,
@@ -315,6 +315,7 @@ const SUMMARIES: Record<MedicalSummaryTab, MedicalListSummary> = {
   suppliers: { total: SUPPLIER_ROWS.length, payable: 827 },
   manufacturers: { total: MANUFACTURER_ROWS.length, payable: 0 },
   mrs: { total: MR_ROWS.length, payable: 0 },
+  supplierCredits: { total: SUPPLIER_CREDIT_ROWS.length, payable: 0 },
 };
 
 /** A record read by id over `rows` — an unknown id fails as the API's 404 would. */
@@ -369,4 +370,5 @@ export function primeMedicalRoom() {
 
   vi.mocked(listStoreLedger).mockResolvedValue(medicalPage(LEDGER_ROWS));
   vi.mocked(listStoreCredits).mockResolvedValue(medicalPage(STORE_CREDIT_ROWS));
+  vi.mocked(fetchStoreCreditCount).mockResolvedValue(STORE_CREDIT_ROWS.length);
 }

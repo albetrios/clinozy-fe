@@ -33,4 +33,12 @@ describe('usePurchaseOrderColumns', () => {
     expect(fold('total')).toBe('₹4,236');
     expect(fold('stage')).toMatchObject({ value: 'Received' });
   });
+
+  it('folds an order without a supplier bill into its number alone, no dash', () => {
+    const order = purchaseOrderRow({ seq: 4, supplierBillNo: null });
+    const { result } = renderHook(() => usePurchaseOrderColumns());
+    expect(
+      result.current.find((column) => column.id === 'seq')?.meta?.foldValue?.(order),
+    ).toBe('#4');
+  });
 });

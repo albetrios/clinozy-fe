@@ -40,6 +40,7 @@ describe('useMyMembershipId', () => {
 
     await waitFor(() => expect(result.current).toBe('mem_me'));
     expect(findMyMembershipId).toHaveBeenCalledTimes(1);
+    expect(findMyMembershipId).toHaveBeenCalledWith('org_a');
   });
 
   it('waits — undefined, no lookup — until both the user and the organization are known', () => {

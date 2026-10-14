@@ -675,7 +675,7 @@ export function fetchMrVisits(mrId: string): Promise<MrVisitRow[]> {
 
 /** The tabs with a footer. */
 export type MedicalSummaryTab =
-  'sales' | 'purchases' | 'suppliers' | 'manufacturers' | 'mrs';
+  'sales' | 'purchases' | 'suppliers' | 'manufacturers' | 'mrs' | 'supplierCredits';
 
 /** A footer read: how many rows match, read with one. */
 const countOf = (response: { meta?: { pagination?: object } }): MedicalListSummary => ({
@@ -729,6 +729,12 @@ const SUMMARY_READS: Readonly<
       }),
     );
   },
+  supplierCredits: async (params) =>
+    countOf(
+      await api.get('/app/supplier-credits', {
+        query: { status: (params as SupplierCreditListParams).status, limit: 1 },
+      }),
+    ),
 };
 
 /**

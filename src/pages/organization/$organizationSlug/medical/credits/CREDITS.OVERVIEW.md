@@ -21,6 +21,9 @@ one tab beside its Payments, in "More"'s Money group, with a segmented switch be
   (`payment:create` + `payment:delete`) and Got it back (`payment:create`) settle an open one here
   through the shared Settle drawer; Add credit, under the empty state, opens Pending's.
 
+Each side's footer counts its credits ("2 credits") — one read of a single row for the side's
+filters: the `supplierCredits` summary on suppliers, `fetchStoreCreditCount` on customers.
+
 ## Files
 
 | File                                    | Responsibility                                                     |

@@ -241,6 +241,8 @@
   },
   "credits": {
     "records": "Apothekengutschriften",
+    "count_one": "{{count}} Gutschrift",
+    "count_other": "{{count}} Gutschriften",
     "sides": {
       "label": "Wessen Gutschriften",
       "suppliers": "Von Lieferanten",
@@ -631,6 +633,7 @@
       "payable": "Offen {{amount}}",
       "paid": "Bezahlt {{amount}}",
       "paidOf": "{{paid}} von {{total}} bezahlt",
+      "paidWithCredits": "{{paid}} bezahlt + {{credited}} Lieferantengutschriften",
       "pay": "{{amount}} zahlen",
       "print": "Drucken"
     },
@@ -658,7 +661,7 @@
     },
     "saleReturn": {
       "title": "Rückgabe vom Patienten",
-      "sub": "{{customer}} · zurückgegebener Bestand geht in seine Charge zurück",
+      "sub": "{{customer}} · zurückgegebene Packungen gehen in ihre Charge zurück; beschädigte oder nach einer Reaktion zurückgegebene werden ausgebucht",
       "steps": {
         "back": "Was zurückkommt",
         "reason": "Grund & Erstattung"

@@ -252,6 +252,8 @@ export const MEDICAL_KEYS = {
   /** Medical › Credits (clinozy-be D90): from suppliers and with customers. */
   credits: {
     records: 'credits.records',
+    /** The footer: "2 credits". */
+    count: 'credits.count',
     sides: {
       label: 'credits.sides.label',
       suppliers: 'credits.sides.suppliers',

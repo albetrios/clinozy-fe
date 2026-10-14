@@ -119,6 +119,7 @@
     "free": "Gratuit",
     "rate": "Tarif",
     "paid": "Payé :",
+    "credited": "Avoirs fournisseur :",
     "issuedBy": "Bon de commande de {{clinic}}"
   }
 }

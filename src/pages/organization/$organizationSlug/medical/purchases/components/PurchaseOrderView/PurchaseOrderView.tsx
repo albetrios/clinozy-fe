@@ -137,8 +137,8 @@ function OrderLines({ order, testId }: { order: PurchaseOrderRow; testId: string
 }
 
 /**
- * "Payable ₹2,980", "Paid ₹1,296" or "Paid ₹1,200 of ₹1,296" (`medical.md:334`) — the server's
- * due and paid, rupees (a paid order's credits make up the rest).
+ * "Payable ₹2,980", "Paid ₹1,296", "Paid ₹1,200 + ₹96 in supplier credits" or "Paid ₹1,200 of
+ * ₹1,296" (`medical.md:334`, MD11) — the server's due, paid and credited, rupees.
  */
 function summaryOf(
   order: PurchaseOrderRow,
@@ -147,7 +147,13 @@ function summaryOf(
 ): string {
   if (order.stage === 'received')
     return t(K.payable, { amount: formatRupees(order.due) });
-  if (order.paid >= order.total) return t(K.paid, { amount: formatRupees(order.total) });
+  if (order.paid + order.credited >= order.total) {
+    if (order.credited <= 0) return t(K.paid, { amount: formatRupees(order.total) });
+    return t(K.paidWithCredits, {
+      paid: formatRupees(order.paid),
+      credited: formatRupees(order.credited),
+    });
+  }
   return t(K.paidOf, {
     paid: formatRupees(order.paid),
     total: formatRupees(order.total),
@@ -179,6 +185,7 @@ function purchaseOrderPrintOf({
         received: line.received ?? false,
       })),
       paid: paiseOfRupees(order.paid),
+      credited: paiseOfRupees(order.credited),
     },
     itemNames: order.lines.map((line) => line.medicineName),
     supplier: {

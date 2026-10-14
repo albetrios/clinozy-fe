@@ -251,6 +251,9 @@
   },
   "credits": {
     "records": "crediti della farmacia",
+    "count_many": "{{count}} crediti",
+    "count_one": "{{count}} credito",
+    "count_other": "{{count}} crediti",
     "sides": {
       "label": "Di chi sono i crediti",
       "suppliers": "Dai fornitori",
@@ -650,6 +653,7 @@
       "payable": "Da pagare {{amount}}",
       "paid": "Pagato {{amount}}",
       "paidOf": "Pagato {{paid}} di {{total}}",
+      "paidWithCredits": "Pagato {{paid}} + {{credited}} in crediti fornitore",
       "pay": "Paga {{amount}}",
       "print": "Stampa"
     },
@@ -678,7 +682,7 @@
     },
     "saleReturn": {
       "title": "Reso del paziente",
-      "sub": "{{customer}} · le scorte rese tornano nel loro lotto",
+      "sub": "{{customer}} · le confezioni rese tornano nel loro lotto; quelle danneggiate o per reazione vengono stornate",
       "steps": {
         "back": "Cosa torna",
         "reason": "Motivo e rimborso"

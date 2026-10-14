@@ -413,6 +413,14 @@ describe('Suppliers', () => {
     });
     expect(queryOf('/app/suppliers')).toMatchObject({ has_payable: 'true', limit: 1 });
   });
+
+  it('the Credits footer counts the credits in the state picked', async () => {
+    answer({ '/app/supplier-credits': () => page([supplierCreditWire()]) });
+    expect(
+      await medicalListSummary('supplierCredits', { status: 'open' }, TODAY),
+    ).toEqual({ total: 1, payable: 0 });
+    expect(queryOf('/app/supplier-credits')).toMatchObject({ status: 'open', limit: 1 });
+  });
 });
 
 describe('Manufacturers and MRs', () => {

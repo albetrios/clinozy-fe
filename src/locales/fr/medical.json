@@ -251,6 +251,9 @@
   },
   "credits": {
     "records": "avoirs pharmacie",
+    "count_many": "{{count}} avoirs",
+    "count_one": "{{count}} avoir",
+    "count_other": "{{count}} avoirs",
     "sides": {
       "label": "Avoirs de qui",
       "suppliers": "Des fournisseurs",
@@ -650,6 +653,7 @@
       "payable": "À payer {{amount}}",
       "paid": "Payé {{amount}}",
       "paidOf": "Payé {{paid}} sur {{total}}",
+      "paidWithCredits": "Payé {{paid}} + {{credited}} en avoirs fournisseur",
       "pay": "Payer {{amount}}",
       "print": "Imprimer"
     },
@@ -678,7 +682,7 @@
     },
     "saleReturn": {
       "title": "Retour du patient",
-      "sub": "{{customer}} · le stock retourné revient dans son lot",
+      "sub": "{{customer}} · les boîtes retournées reviennent dans leur lot ; celles abîmées ou rendues après une réaction sont sorties du stock",
       "steps": {
         "back": "Ce qui revient",
         "reason": "Motif et remboursement"

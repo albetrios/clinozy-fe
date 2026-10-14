@@ -164,7 +164,8 @@ export function InvoicePrint({
             />
             <PrintField
               className="gap-[3mm]"
-              label={t(form.number)}
+              // The sale's own number under "Sale #"; without the sale, the invoice's under its name.
+              label={t(sale ? form.number : keys.invoiceNumber)}
               value={sale ? displayId.sale(sale.seq) : invoice.number}
               strong
             />

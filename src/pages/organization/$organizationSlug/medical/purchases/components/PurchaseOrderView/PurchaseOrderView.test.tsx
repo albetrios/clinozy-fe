@@ -123,9 +123,9 @@ describe('PurchaseOrderView (medical.md:333–334)', () => {
     );
     let drawer = await screen.findByTestId(D);
     expect(drawer).toHaveTextContent(`${fsi('Akshar Medicines')} · paid, locked`);
-    // ₹1,200 paid of ₹1,296 — still Paid, nothing owed (H:5421).
+    // ₹1,200 paid and ₹96 set off by the supplier's credits — Paid, nothing owed (H:5421, MD11).
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent(
-      'Paid ₹1,200 of ₹1,296',
+      'Paid ₹1,200 + ₹96 in supplier credits',
     );
     // Its primary is Print (Q-M7), never Pay.
     expect(within(drawer).getByTestId(`${D}-save`)).toHaveTextContent('Print');
@@ -141,6 +141,16 @@ describe('PurchaseOrderView (medical.md:333–334)', () => {
     );
     drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('Paid ₹1,296');
+  });
+
+  it('a paid order short of its total, with no credits, says what was paid of what', async () => {
+    renderMedicalDrawer(
+      <PurchaseOrderView open order={{ ...PAID, credited: 0 }} onClose={vi.fn()} />,
+    );
+    const drawer = await screen.findByTestId(D);
+    expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent(
+      'Paid ₹1,200 of ₹1,296',
+    );
   });
 
   it('prints a paid order’s A4 purchase order (Q-M7); a failed read is told', async () => {

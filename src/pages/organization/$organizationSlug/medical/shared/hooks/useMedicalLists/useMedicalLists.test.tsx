@@ -23,9 +23,10 @@ vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
 vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listStoreCredits: vi.fn(),
+  fetchStoreCreditCount: vi.fn(),
 }));
 
-import { listStoreCredits } from '@/shared/api/app/credits-api.ts';
+import { fetchStoreCreditCount, listStoreCredits } from '@/shared/api/app/credits-api.ts';
 import { listStoreLedger } from '@/shared/api/app/payments-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
@@ -60,6 +61,7 @@ import {
   useMrList,
   usePurchaseOrderList,
   useSaleList,
+  useStoreCreditCount,
   useStoreCreditList,
   useStoreLedger,
   useSupplierCatalogue,
@@ -93,6 +95,7 @@ beforeEach(() => {
     total: 1,
   });
   vi.mocked(medicalListSummary).mockResolvedValue({ total: 1, payable: 827 });
+  vi.mocked(fetchStoreCreditCount).mockResolvedValue(3);
   vi.mocked(fetchAllManufacturers).mockResolvedValue([manufacturerRow()]);
   vi.mocked(fetchAllSuppliers).mockResolvedValue([supplierRow()]);
   vi.mocked(fetchAllMedicalReps).mockResolvedValue([mrRow()]);
@@ -135,6 +138,7 @@ describe('useMedicalLists', () => {
     const { result } = renderHook(
       () => ({
         summary: useMedicalSummary('suppliers', {}),
+        customerCredits: useStoreCreditCount({ status: ['open'] }),
         makers: useManufacturerCatalogue(),
         suppliers: useSupplierCatalogue(),
         mrs: useMrCatalogue(),
@@ -144,6 +148,8 @@ describe('useMedicalLists', () => {
     await waitFor(() =>
       expect(result.current.summary.data).toEqual({ total: 1, payable: 827 }),
     );
+    await waitFor(() => expect(result.current.customerCredits.data).toBe(3));
+    expect(fetchStoreCreditCount).toHaveBeenCalledWith({ status: ['open'] });
     await waitFor(() => expect(result.current.makers.data).toHaveLength(1));
     await waitFor(() => expect(result.current.suppliers.data).toHaveLength(1));
     await waitFor(() => expect(result.current.mrs.data).toHaveLength(1));

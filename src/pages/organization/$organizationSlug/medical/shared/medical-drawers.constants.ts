@@ -284,6 +284,8 @@ export const MEDICAL_DRAWER_KEYS = {
     paid: 'drawers.orderView.paid',
     /** "Paid ₹1,200 of ₹1,296". */
     paidOf: 'drawers.orderView.paidOf',
+    /** "Paid ₹9,120 + ₹1,410 in supplier credits" — a paid order its credits helped settle. */
+    paidWithCredits: 'drawers.orderView.paidWithCredits',
     /** "Pay ₹2,980" (Q-M1). */
     pay: 'drawers.orderView.pay',
     /** A paid order's primary: its A4 purchase order (`medical.md:339`, Q-M7). */
@@ -321,7 +323,7 @@ export const MEDICAL_DRAWER_KEYS = {
   /** Return from patient (`medical.md:283–295`). */
   saleReturn: {
     title: 'drawers.saleReturn.title',
-    /** "Rhea Shah · returned stock goes back into its batch". */
+    /** "Rhea Shah · returned packs go back into their batch; damaged or reaction packs are written off". */
     sub: 'drawers.saleReturn.sub',
     steps: {
       back: 'drawers.saleReturn.steps.back',

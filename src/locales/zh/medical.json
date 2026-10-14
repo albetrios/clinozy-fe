@@ -231,6 +231,7 @@
   },
   "credits": {
     "records": "药房抵扣",
+    "count_other": "{{count}} 笔抵扣",
     "sides": {
       "label": "抵扣对象",
       "suppliers": "来自供应商",
@@ -612,6 +613,7 @@
       "payable": "应付 {{amount}}",
       "paid": "已付 {{amount}}",
       "paidOf": "已付 {{paid}} / {{total}}",
+      "paidWithCredits": "已付 {{paid}} + 供应商抵扣 {{credited}}",
       "pay": "支付 {{amount}}",
       "print": "打印"
     },
@@ -638,7 +640,7 @@
     },
     "saleReturn": {
       "title": "患者退货",
-      "sub": "{{customer}} · 退回的库存回到原批次",
+      "sub": "{{customer}} · 退回的药品回到原批次；破损或因不良反应退回的作报废处理",
       "steps": {
         "back": "退回什么",
         "reason": "原因和退款"

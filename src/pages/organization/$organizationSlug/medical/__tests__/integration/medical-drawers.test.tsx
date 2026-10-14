@@ -54,6 +54,7 @@ vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
 vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listStoreCredits: vi.fn(),
+  fetchStoreCreditCount: vi.fn(),
 }));
 
 import {

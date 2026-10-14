@@ -40,6 +40,7 @@ vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
 vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listStoreCredits: vi.fn(),
+  fetchStoreCreditCount: vi.fn(),
 }));
 
 import { listStoreCredits } from '@/shared/api/app/credits-api.ts';
@@ -274,6 +275,7 @@ describe('Medical on clinozy-be — each tab’s rows from its read', () => {
     expect(rowOf('credits', '026-312')).toHaveTextContent('Open');
     expect(rowOf('credits', '026-298')).toHaveTextContent('Adjusted');
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    await waitFor(() => expect(footer('credits')).toHaveTextContent('2 credits'));
 
     await user.click(screen.getByTestId('medical-credits-side-customers'));
     await waitFor(() =>
@@ -283,6 +285,7 @@ describe('Medical on clinozy-be — each tab’s rows from its read', () => {
     await waitFor(() => expect(rows('credits')).toHaveLength(1));
     expect(rowOf('credits', 'Priya Shah')).toBeInTheDocument();
     expect(listStoreCredits).toHaveBeenCalled();
+    await waitFor(() => expect(footer('credits')).toHaveTextContent('1 credit'));
   });
 });
 

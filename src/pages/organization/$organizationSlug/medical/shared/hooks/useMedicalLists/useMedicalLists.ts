@@ -1,4 +1,8 @@
-import { creditQueryKeys, listStoreCredits } from '@/shared/api/app/credits-api.ts';
+import {
+  creditQueryKeys,
+  fetchStoreCreditCount,
+  listStoreCredits,
+} from '@/shared/api/app/credits-api.ts';
 import type { CreditListParams, CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import { listStoreLedger, paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
 import type { LedgerListParams, LedgerRow } from '@/shared/api/app/payments-contracts.ts';
@@ -145,6 +149,17 @@ export function useStoreCreditList(params: CreditListParams) {
   return useCursorList<CreditRow>({
     queryKey: creditQueryKeys.store(organizationId, params),
     queryFn: async (after) => asListPage(await listStoreCredits(params, after)),
+    notifyOnError: false,
+    enabled: organizationId !== null,
+  });
+}
+
+/** Medical › Credits' footer, with customers: how many of the store's credits match (D90). */
+export function useStoreCreditCount(params: CreditListParams) {
+  const organizationId = useOrganizationId();
+  return useAppQuery({
+    queryKey: creditQueryKeys.storeCount(organizationId, params),
+    queryFn: () => fetchStoreCreditCount(params),
     notifyOnError: false,
     enabled: organizationId !== null,
   });

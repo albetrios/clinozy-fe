@@ -166,6 +166,22 @@ describe('InvoicePrint', () => {
     );
   });
 
+  it('a Medical invoice printed without its sale names the invoice number as one', () => {
+    render(
+      <InvoicePrint
+        {...propsFor(
+          peelInvoice({
+            type: 'medical',
+            items: [{ ...PEEL_LINE, name: 'Admosh UV Sunscreen 60g', offeringId: null }],
+          }),
+        )}
+      />,
+    );
+    expect(screen.getByText('Sale Details')).toBeInTheDocument();
+    expect(field('Invoice #:')).toHaveTextContent('2026-27/0005');
+    expect(screen.queryByText('Sale #:')).not.toBeInTheDocument();
+  });
+
   it('prints a line’s own pack size, else the one in its name', () => {
     render(
       <InvoicePrint

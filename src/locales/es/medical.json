@@ -251,6 +251,9 @@
   },
   "credits": {
     "records": "créditos de farmacia",
+    "count_many": "{{count}} créditos",
+    "count_one": "{{count}} crédito",
+    "count_other": "{{count}} créditos",
     "sides": {
       "label": "De quién son los créditos",
       "suppliers": "De proveedores",
@@ -650,6 +653,7 @@
       "payable": "Por pagar {{amount}}",
       "paid": "Pagado {{amount}}",
       "paidOf": "Pagado {{paid}} de {{total}}",
+      "paidWithCredits": "Pagado {{paid}} + {{credited}} en créditos del proveedor",
       "pay": "Pagar {{amount}}",
       "print": "Imprimir"
     },
@@ -678,7 +682,7 @@
     },
     "saleReturn": {
       "title": "Devolución del paciente",
-      "sub": "{{customer}} · las existencias devueltas vuelven a su lote",
+      "sub": "{{customer}} · los envases devueltos vuelven a su lote; los dañados o por reacción se dan de baja",
       "steps": {
         "back": "Qué se devuelve",
         "reason": "Motivo y reembolso"

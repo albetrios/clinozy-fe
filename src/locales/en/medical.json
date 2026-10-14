@@ -241,6 +241,8 @@
   },
   "credits": {
     "records": "Medical credits",
+    "count_one": "{{count}} credit",
+    "count_other": "{{count}} credits",
     "sides": {
       "label": "Whose credits",
       "suppliers": "From suppliers",
@@ -631,6 +633,7 @@
       "payable": "Payable {{amount}}",
       "paid": "Paid {{amount}}",
       "paidOf": "Paid {{paid}} of {{total}}",
+      "paidWithCredits": "Paid {{paid}} + {{credited}} in supplier credits",
       "pay": "Pay {{amount}}",
       "print": "Print"
     },
@@ -658,7 +661,7 @@
     },
     "saleReturn": {
       "title": "Return from patient",
-      "sub": "{{customer}} · returned stock goes back into its batch",
+      "sub": "{{customer}} · returned packs go back into their batch; damaged or reaction packs are written off",
       "steps": {
         "back": "What is coming back",
         "reason": "Reason & refund"

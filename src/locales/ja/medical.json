@@ -231,6 +231,7 @@
   },
   "credits": {
     "records": "薬局のクレジット",
+    "count_other": "{{count}} 件のクレジット",
     "sides": {
       "label": "クレジットの相手",
       "suppliers": "仕入先から",
@@ -612,6 +613,7 @@
       "payable": "未払い {{amount}}",
       "paid": "支払済み {{amount}}",
       "paidOf": "{{total}} のうち {{paid}} 支払済み",
+      "paidWithCredits": "{{paid}} 支払済み + 仕入先クレジット {{credited}}",
       "pay": "{{amount}} を支払う",
       "print": "印刷"
     },
@@ -638,7 +640,7 @@
     },
     "saleReturn": {
       "title": "患者からの返品",
-      "sub": "{{customer}} · 返品された在庫は元のロットに戻ります",
+      "sub": "{{customer}} · 返品されたパックは元のロットに戻ります。破損品や副作用による返品は廃棄扱いです",
       "steps": {
         "back": "返品されるもの",
         "reason": "理由と返金"

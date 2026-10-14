@@ -199,6 +199,20 @@ describe('PurchaseOrderPrint (Q-M7)', () => {
     expect(summaryValue('Balance Due:')).toHaveTextContent('₹0.00');
   });
 
+  it('prints the supplier’s credits that set off part of the bill (MD11)', () => {
+    // #428 paid ₹1,200 and its ₹96 rest was a credit; #431 owes ₹2,980 less a ₹500 credit.
+    const { unmount } = render(
+      <PurchaseOrderPrint {...propsFor(428, { credited: 9_600 })} />,
+    );
+    expect(summaryValue('Supplier credits:')).toHaveTextContent('₹96.00');
+    expect(summaryValue('Balance Due:')).toHaveTextContent('₹0.00');
+    unmount();
+
+    render(<PurchaseOrderPrint {...propsFor(431, { credited: 50_000 })} />);
+    expect(summaryValue('Supplier credits:')).toHaveTextContent('₹500.00');
+    expect(summaryValue('Balance Due:')).toHaveTextContent('₹2,480.00');
+  });
+
   it('notes nothing, and signs off from the clinic, not to a patient', () => {
     const props = propsFor(428);
     render(<PurchaseOrderPrint {...props} />);

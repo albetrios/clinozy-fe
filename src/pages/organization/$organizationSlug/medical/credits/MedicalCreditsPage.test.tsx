@@ -6,6 +6,7 @@ import { axe } from 'vitest-axe';
 vi.mock('../shared/medical-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listSupplierCredits: vi.fn(),
+  medicalListSummary: vi.fn(),
 }));
 vi.mock('../shared/medical-records-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -15,9 +16,10 @@ vi.mock('../shared/medical-records-api.ts', async (importOriginal) => ({
 vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listStoreCredits: vi.fn(),
+  fetchStoreCreditCount: vi.fn(),
 }));
 
-import { listStoreCredits } from '@/shared/api/app/credits-api.ts';
+import { fetchStoreCreditCount, listStoreCredits } from '@/shared/api/app/credits-api.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import {
   medicalPage,
@@ -31,7 +33,7 @@ import {
   renderMedicalRoutes,
   resetMedicalRoutes,
 } from '../__tests__/integration/medical-test-router.tsx';
-import { listSupplierCredits } from '../shared/medical-api.ts';
+import { listSupplierCredits, medicalListSummary } from '../shared/medical-api.ts';
 import { voidSupplierCredit } from '../shared/medical-records-api.ts';
 import { MedicalCreditsPage } from './MedicalCreditsPage.tsx';
 
@@ -84,6 +86,10 @@ beforeEach(() => {
     next: null,
     total: 1,
   });
+  vi.mocked(medicalListSummary).mockReset();
+  vi.mocked(medicalListSummary).mockResolvedValue({ total: 2, payable: 0 });
+  vi.mocked(fetchStoreCreditCount).mockReset();
+  vi.mocked(fetchStoreCreditCount).mockResolvedValue(1);
   vi.mocked(voidSupplierCredit).mockReset();
   vi.mocked(voidSupplierCredit).mockResolvedValue(undefined);
 });
@@ -103,6 +109,9 @@ describe('MedicalCreditsPage', () => {
     expect(rows()[0]).toHaveTextContent('Open');
     expect(rows()[1]).toHaveTextContent('Adjusted');
     expect(screen.queryByRole('searchbox')).toBeNull();
+    await waitFor(() =>
+      expect(medicalListSummary).toHaveBeenCalledWith('supplierCredits', {}),
+    );
     expect(await axe(container)).toHaveNoViolations();
   });
 
@@ -169,6 +178,7 @@ describe('MedicalCreditsPage', () => {
     expect(rows()[0]).toHaveTextContent('CR-');
     expect(rows()[0]).toHaveTextContent('We give back');
     expect(screen.getByRole('searchbox')).toBeInTheDocument();
+    await waitFor(() => expect(fetchStoreCreditCount).toHaveBeenCalled());
   });
 
   it('reads the customers’ credits with the URL’s filters', async () => {

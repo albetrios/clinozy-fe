@@ -60,11 +60,13 @@ export function usePurchaseOrderColumns(): ColumnDef<
       ),
       meta: {
         track: '130px',
-        // First on a phone's meta line ("PO #431, 1631"), never the key.
+        // First on a phone's meta line ("PO #431, 1631"; "PO #4" without a bill), never the key.
         priority: 5,
         foldValue: (original) => {
           const order = rowOf(original);
-          return `#${order.seq}, ${order.supplierBillNo ?? noValue}`;
+          return order.supplierBillNo
+            ? `#${order.seq}, ${order.supplierBillNo}`
+            : `#${order.seq}`;
         },
       },
     },

@@ -12,14 +12,15 @@ import {
  *
  * @remarks
  * Read once per organization and kept for the session (a membership id never changes), off the
- * session context (`findMyMembershipId`).
+ * session context for that organization (`findMyMembershipId` — never a context still answering
+ * for the workspace the tab just left).
  */
 export function useMyMembershipId(): string | null | undefined {
   const userId = useAuthStore((state) => state.user?.id ?? null);
   const organizationId = useOrganizationStore((state) => state.organizationId);
   const query = useAppQuery({
     queryKey: myMembershipQueryKey(organizationId),
-    queryFn: () => findMyMembershipId(),
+    queryFn: () => findMyMembershipId(organizationId as string),
     enabled: userId !== null && organizationId !== null,
     staleTime: Number.POSITIVE_INFINITY,
   });

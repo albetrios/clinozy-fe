@@ -251,6 +251,9 @@
   },
   "credits": {
     "records": "créditos da farmácia",
+    "count_many": "{{count}} créditos",
+    "count_one": "{{count}} crédito",
+    "count_other": "{{count}} créditos",
     "sides": {
       "label": "De quem são os créditos",
       "suppliers": "De fornecedores",
@@ -650,6 +653,7 @@
       "payable": "A pagar {{amount}}",
       "paid": "Pago {{amount}}",
       "paidOf": "Pago {{paid}} de {{total}}",
+      "paidWithCredits": "Pago {{paid}} + {{credited}} em créditos do fornecedor",
       "pay": "Pagar {{amount}}",
       "print": "Imprimir"
     },
@@ -678,7 +682,7 @@
     },
     "saleReturn": {
       "title": "Devolução do paciente",
-      "sub": "{{customer}} · o estoque devolvido volta ao seu lote",
+      "sub": "{{customer}} · as embalagens devolvidas voltam ao seu lote; as danificadas ou por reação são baixadas",
       "steps": {
         "back": "O que está voltando",
         "reason": "Motivo e reembolso"
