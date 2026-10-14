@@ -147,8 +147,11 @@ function BugReportToolbar({
         data-testid={BUG_REPORT_TEST_IDS.voiceStatus}
         aria-live="polite"
         className={cn(
-          'min-w-0 flex-1 truncate text-xs',
-          speech.problem ? 'text-destructive' : 'text-muted-foreground',
+          'min-w-0 flex-1 text-xs',
+          // A problem says what to do next, so it wraps; "Listening…" is one short line.
+          speech.problem
+            ? 'text-destructive leading-snug'
+            : 'text-muted-foreground truncate',
         )}
       >
         {statusKey ? t(statusKey) : ''}

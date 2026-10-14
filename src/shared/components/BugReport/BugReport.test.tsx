@@ -206,9 +206,10 @@ describe('BugReport', () => {
     act(() => lastRecognition?.onerror?.({ error: 'not-allowed' }));
     act(() => lastRecognition?.onend?.());
 
-    expect(screen.getByTestId(BUG_REPORT_TEST_IDS.voiceStatus)).toHaveTextContent(
-      'The microphone is blocked',
-    );
+    const status = screen.getByTestId(BUG_REPORT_TEST_IDS.voiceStatus);
+    expect(status).toHaveTextContent('The microphone is blocked');
+    // The whole sentence stays readable — it tells the user how to fix it.
+    expect(status).not.toHaveClass('truncate');
   });
 
   it('the closed trigger has no a11y violations', async () => {

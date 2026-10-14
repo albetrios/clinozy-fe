@@ -37,6 +37,9 @@ session's disk allowance reads 8.9% free); no repository change.
 - Not verified here: a real microphone in a real browser — jsdom has no speech recognition, so the
   voice path is proven with a stand-in recognizer; try it in Chrome or Safari (Firefox shows the
   textbox alone). Playwright E2E needs clinozy-be on `:3000` and was not run.
+- Found while recording each improvement against the local stack: a voice problem (blocked
+  microphone, silence, no service) was truncated beside the voice button, hiding what to do. It now
+  wraps; `BugReport.test.tsx` pins it.
 - Follow-ups: `pnpm iteration:status feat-bug-report-2026-10-13-dgnx frozen` in the last commit
   before the merge (D13).
 
