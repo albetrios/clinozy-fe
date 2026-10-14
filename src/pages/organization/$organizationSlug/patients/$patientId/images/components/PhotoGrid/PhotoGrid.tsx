@@ -7,7 +7,7 @@ import {
   photoName,
 } from '@/shared/api/app/patient-images-contracts.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
-import { PenLine, Trash } from '@/shared/icons/index.ts';
+import { Check, PenLine, Trash } from '@/shared/icons/index.ts';
 import type { PhotoSize } from '@/shared/store/useDevicePrefsStore/index.ts';
 
 import { PhotoThumb } from '../../../shared/components/PhotoThumb/index.ts';
@@ -36,6 +36,18 @@ export interface PhotoGridProps {
   onEdit?: (photo: PatientPhoto) => void;
   /** Delete — hidden without `patient:update`. */
   onDelete?: (photo: PatientPhoto) => void;
+  /** Picking photos to compare; none — the grid only opens them. */
+  selection?: PhotoGridSelection;
+}
+
+/** The grid's part in the selection (change-patient-overview-photos `BRIEF.md:32–36`). */
+export interface PhotoGridSelection {
+  /** Selecting: a tap picks the photo instead of opening it. */
+  active: boolean;
+  ids: ReadonlySet<string>;
+  /** Eight picked: the rest dim their check. */
+  full: boolean;
+  onToggle: (photo: PatientPhoto) => void;
 }
 
 /** A tile's pill at the top start: the body part or the stage, in its tone. */
@@ -130,14 +142,140 @@ function TileBar({
 }
 
 /**
+ * A tile's check circle at the top end (24px): it picks the photo. Over a photo
+ * it shows on hover and focus where hover exists, and always while selecting —
+ * filled with the primary and a tick once picked. While selecting the tile
+ * itself picks, so the circle is only its mark for the pointer: out of the tab
+ * order and hidden from assistive tech, never a second "Select …".
+ */
+function TileCheck({
+  photo,
+  selection,
+}: {
+  photo: PatientPhoto;
+  selection: PhotoGridSelection;
+}) {
+  const { t } = useTranslation(PATIENT_PHOTOS_NS);
+  const picked = selection.ids.has(photo.id);
+  return (
+    <button
+      type="button"
+      onClick={() => selection.onToggle(photo)}
+      aria-label={t(K.select.toggle, { name: photoName(photo) })}
+      aria-pressed={picked}
+      aria-hidden={selection.active || undefined}
+      tabIndex={selection.active ? -1 : undefined}
+      data-testid={PHOTO_GRID_TEST_IDS.check}
+      data-slot="pill"
+      className={cn(
+        'absolute end-1.5 top-1.5 z-1 flex size-6 items-center justify-center rounded-full border-2 transition-[opacity,background-color,border-color]',
+        picked
+          ? 'bg-primary border-primary text-primary-foreground'
+          : 'border-canvas bg-overlay/25 hover:bg-overlay/45 text-transparent',
+        !picked && selection.full && 'opacity-50',
+        !selection.active &&
+          '[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within/tile:opacity-100 [@media(hover:hover)]:group-hover/tile:opacity-100 [@media(hover:none)]:hidden',
+      )}
+    >
+      <Check aria-hidden="true" className="size-3.5" strokeWidth={3} />
+    </button>
+  );
+}
+
+/** A tile's body-part and stage pills at the top start, clear of the check circle. */
+function TilePills({ photo }: { photo: PatientPhoto }) {
+  const { t } = useTranslation(PATIENT_PHOTOS_NS);
+  if (photo.bodyPart === null && photo.stage === null) return null;
+  return (
+    <span className="pointer-events-none absolute start-1.5 end-9 top-1.5 flex flex-wrap gap-1">
+      {photo.bodyPart ? (
+        <TilePill tone={PHOTO_BODY_PART_TONES[photo.bodyPart]}>
+          {t(K.bodyParts[photo.bodyPart])}
+        </TilePill>
+      ) : null}
+      {photo.stage ? (
+        <TilePill tone={PHOTO_STAGE_TONES[photo.stage]}>
+          {t(K.stages[photo.stage])}
+        </TilePill>
+      ) : null}
+    </span>
+  );
+}
+
+/** One tile: the photo (it opens, or picks while selecting), its pills, its check, its caption. */
+function PhotoTile({
+  photo,
+  size,
+  date,
+  onOpen,
+  onEdit,
+  onDelete,
+  selection,
+}: {
+  photo: PatientPhoto;
+  size: PhotoSize;
+  date: string;
+  onOpen: (photo: PatientPhoto) => void;
+  onEdit?: (photo: PatientPhoto) => void;
+  onDelete?: (photo: PatientPhoto) => void;
+  selection?: PhotoGridSelection;
+}) {
+  const { t } = useTranslation(PATIENT_PHOTOS_NS);
+  const look = PHOTO_SIZE_LOOK[size];
+  const selecting = selection?.active ?? false;
+  const picked = selection?.ids.has(photo.id) ?? false;
+  const name = photoName(photo);
+  return (
+    <li
+      data-testid={PHOTO_GRID_TEST_IDS.tile}
+      data-picked={picked || undefined}
+      className={cn(
+        'group/tile bg-muted relative aspect-square flex-none overflow-hidden rounded-lg border transition-shadow',
+        look.tile,
+        picked && 'ring-primary ring-offset-card ring-2 ring-offset-2',
+      )}
+    >
+      <button
+        type="button"
+        onClick={() =>
+          selecting && selection ? selection.onToggle(photo) : onOpen(photo)
+        }
+        aria-label={selecting ? t(K.select.toggle, { name }) : t(K.tile.open, { name })}
+        aria-pressed={selecting ? picked : undefined}
+        className={cn(
+          'absolute inset-0 size-full transition-transform duration-150',
+          picked && 'scale-[0.94]',
+        )}
+      >
+        <PhotoThumb src={photo.fileUrl} className={cn(picked && 'rounded-md')} />
+      </button>
+      <TilePills photo={photo} />
+      {selection ? <TileCheck photo={photo} selection={selection} /> : null}
+      <TileBar
+        photo={photo}
+        size={size}
+        date={date}
+        onEdit={selecting ? undefined : onEdit}
+        onDelete={selecting ? undefined : onDelete}
+      />
+    </li>
+  );
+}
+
+/**
  * The Photos grid (H:829; `patient-file.md:62–65`): a group per day — "24 Sep"
- * or "Today" (13/600) with its visit's service (12px) — over
- * `repeat(auto-fill, minmax(<tile>, 1fr))` at the size picked. A tile is a
- * square on a muted fill (10px corners): the photo from its `file_url`
- * (clinozy-be D86; the image glyph when its upload is gone), the body-part and
- * stage pills at the top start, and the caption bar — the name over the day —
- * on a dark scrim, fading in on hover over a photo. A tile opens the viewer. The design's "3 photos · …" per day goes: a day can run
- * across pages, and the API counts by album only.
+ * or "Today" (13/600) with its visit's service (12px) — over its tiles at the
+ * size picked. The groups flow side by side and wrap, each only as wide as its
+ * photos (change-patient-overview-photos `BRIEF.md:30–31`), so a run of
+ * single-photo visits sits in one row; the day's heading never widens its
+ * group. A tile is a square on a muted fill (10px corners): the photo from its
+ * `file_url` (clinozy-be D86; the image glyph when its upload is gone), the
+ * body-part and stage pills at the top start, the check circle at the top end,
+ * and the caption bar — the name over the day — on a dark scrim, fading in on
+ * hover over a photo. A tile opens the viewer; while selecting it is picked
+ * instead, with a ring and a filled check, and Edit and Delete step aside. The
+ * design's "3 photos · …" per day goes: a day can run across pages, and the API
+ * counts by album only.
  */
 export function PhotoGrid({
   days,
@@ -146,11 +284,14 @@ export function PhotoGrid({
   onOpen,
   onEdit,
   onDelete,
+  selection,
 }: PhotoGridProps) {
-  const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const look = PHOTO_SIZE_LOOK[size];
   return (
-    <div className="flex flex-col gap-3">
+    <div
+      data-selecting={selection?.active || undefined}
+      className="flex flex-wrap items-start gap-x-6 gap-y-4"
+    >
       {days.map((day) => {
         const date = dayLabel(day.date);
         return (
@@ -158,59 +299,32 @@ export function PhotoGrid({
             key={day.date}
             aria-label={date}
             data-testid={PHOTO_GRID_TEST_IDS.day}
-            className="flex flex-col gap-2"
+            className="flex max-w-full min-w-0 flex-col gap-2"
           >
-            <div className="flex items-center gap-2">
+            {/* No intrinsic width: the tiles set the group's, the heading truncates in it. */}
+            <div className="flex w-0 min-w-full items-center gap-2">
               <h3 className="text-body leading-[normal] font-semibold whitespace-nowrap">
                 {date}
               </h3>
               {day.serviceLabel ? (
-                <span className="text-muted-foreground truncate text-xs leading-[normal]">
+                <span className="text-muted-foreground min-w-0 truncate text-xs leading-[normal]">
                   {day.serviceLabel}
                 </span>
               ) : null}
             </div>
-            <ul className={cn('grid', look.grid)}>
-              {day.photos.map((photo) => {
-                const pills = photo.bodyPart !== null || photo.stage !== null;
-                return (
-                  <li
-                    key={photo.id}
-                    data-testid={PHOTO_GRID_TEST_IDS.tile}
-                    className="group/tile bg-muted relative aspect-square overflow-hidden rounded-lg border"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => onOpen(photo)}
-                      aria-label={t(K.tile.open, { name: photoName(photo) })}
-                      className="absolute inset-0 size-full"
-                    >
-                      <PhotoThumb src={photo.fileUrl} />
-                    </button>
-                    {pills ? (
-                      <span className="pointer-events-none absolute start-1.5 end-1.5 top-1.5 flex flex-wrap gap-1">
-                        {photo.bodyPart ? (
-                          <TilePill tone={PHOTO_BODY_PART_TONES[photo.bodyPart]}>
-                            {t(K.bodyParts[photo.bodyPart])}
-                          </TilePill>
-                        ) : null}
-                        {photo.stage ? (
-                          <TilePill tone={PHOTO_STAGE_TONES[photo.stage]}>
-                            {t(K.stages[photo.stage])}
-                          </TilePill>
-                        ) : null}
-                      </span>
-                    ) : null}
-                    <TileBar
-                      photo={photo}
-                      size={size}
-                      date={date}
-                      onEdit={onEdit}
-                      onDelete={onDelete}
-                    />
-                  </li>
-                );
-              })}
+            <ul className={cn('flex flex-wrap', look.row)}>
+              {day.photos.map((photo) => (
+                <PhotoTile
+                  key={photo.id}
+                  photo={photo}
+                  size={size}
+                  date={date}
+                  onOpen={onOpen}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  selection={selection}
+                />
+              ))}
             </ul>
           </section>
         );

@@ -244,6 +244,42 @@
     "stages": {
       "before": "Before",
       "after": "After"
+    },
+    "dropzone": {
+      "title": "Drop photos here",
+      "body": "or paste a copied image · JPG or PNG up to 10 MB",
+      "target": "Adds to {{album}}",
+      "choose": "Choose photos",
+      "camera": "Take photo",
+      "veil": "Drop to add to {{album}}"
+    },
+    "select": {
+      "start": "Select",
+      "done": "Done",
+      "startHint": "Select photos to compare",
+      "toggle": "Select {{name}}",
+      "hint": "Pick 2 to 8 photos to compare",
+      "limit": "You can compare up to {{max}} photos at a time",
+      "clear": "Clear",
+      "compare": "Compare",
+      "bar": "Selected photos",
+      "count_one": "{{count}} selected",
+      "count_other": "{{count}} selected"
+    },
+    "compare": {
+      "title": "Compare photos",
+      "layout": "Layout",
+      "row": "One row",
+      "grid": "Grid",
+      "remove": "Remove {{name}} from the comparison",
+      "start": "Start",
+      "close": "Close comparison",
+      "since_one": "+{{count}} day",
+      "since_other": "+{{count}} days",
+      "hints": {
+        "zoom": "Scroll or pinch to zoom every photo",
+        "pan": "Drag to move them together · double-click to reset"
+      }
     }
   },
   "rx": {
@@ -915,7 +951,10 @@
     },
     "photos": {
       "upload": "Upload",
-      "empty": "No photos yet · upload the first"
+      "empty": "No photos yet · upload the first",
+      "add": "Add photos",
+      "drop": "Drop photos here or click to upload",
+      "dropBody": "JPG or PNG up to 10 MB · paste works too"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",

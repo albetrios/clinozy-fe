@@ -8,4 +8,6 @@ export const PHOTO_GRID_TEST_IDS = {
   edit: 'patient-photo-edit',
   /** A tile's "Delete photo". */
   delete: 'patient-photo-delete',
+  /** A tile's check circle — it picks the photo to compare. */
+  check: 'patient-photo-check',
 } as const;

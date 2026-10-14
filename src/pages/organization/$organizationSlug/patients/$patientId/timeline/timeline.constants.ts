@@ -1,5 +1,8 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+import { kebabCase } from '@/lib/kebab-case.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
+
+import type { ClinicalField } from '../shared/patient-clinical.ts';
 
 /** The Overview reads the patient file's namespace. */
 export const TIMELINE_NS = I18N_NAMESPACES.patientFile;
@@ -36,6 +39,8 @@ export const TIMELINE_KEYS = {
     /** The placeholder's example in the UI language — one the note reads (L-64). */
     smartExample: 'timeline.clinical.smartExample',
     add: 'timeline.clinical.add',
+    /** "Nothing added yet" — an empty list's panel (the chip cards' own words). */
+    empty: 'clinical.empty',
     /** "3 items added from your note" (plural). */
     added: 'timeline.clinical.added',
     nothing: 'timeline.clinical.nothing',
@@ -48,6 +53,11 @@ export const TIMELINE_KEYS = {
   photos: {
     upload: 'timeline.photos.upload',
     empty: 'timeline.photos.empty',
+    /** "Add photos" — the card's first tile. */
+    add: 'timeline.photos.add',
+    /** The empty card's drop zone: "Drop photos here or click to upload" over its line. */
+    drop: 'timeline.photos.drop',
+    dropBody: 'timeline.photos.dropBody',
     albums: {
       general: 'photos.albums.general',
       private: 'photos.albums.private',
@@ -158,8 +168,15 @@ export const OVERVIEW_CARD_TONES: Readonly<Record<OverviewCard, Tone>> = {
 /** The Overview's test ids. */
 export const TIMELINE_TEST_IDS = {
   bento: 'overview-bento',
+  /** A row of cards: `overview-row-care`, `-files`, `-money`. */
+  row: (name: string) => `overview-row-${name}`,
   /** A card: `overview-card-<card>`; its parts `-open`, `-new`, `-row`, `-empty`. */
   card: (card: OverviewCard) => `overview-card-${card}`,
+  /** A Clinical list's panel: `overview-clinical-<field>` (`complaints`, `treatment-suggestions`, …). */
+  clinicalGroup: (field: ClinicalField) => `overview-clinical-${kebabCase(field)}`,
+  /** The Photos card's "Add photos" tile and its drop zone (empty). */
+  photosAdd: 'overview-card-photos-add',
+  photosDrop: 'overview-card-photos-drop',
   smartInput: 'overview-smart-note',
   smartAdd: 'overview-smart-note-add',
   noteInput: 'overview-note-input',

@@ -103,4 +103,42 @@ describe('PhotoGrid', () => {
     );
     expect(container.querySelector('ul')).toHaveClass('gap-3');
   });
+
+  it('lets the day groups flow side by side at the tile’s width', () => {
+    renderGrid();
+    const [day] = screen.getAllByTestId('patient-photos-day');
+    expect(day?.parentElement?.className).toContain('flex-wrap');
+    const [tile] = screen.getAllByTestId('patient-photo-tile');
+    expect(tile?.className).toContain('w-40');
+  });
+
+  it('picks a photo from its check circle, and opens it otherwise', async () => {
+    const user = userEvent.setup();
+    const onToggle = vi.fn();
+    const { onOpen } = renderGrid({
+      selection: { active: false, ids: new Set(), full: false, onToggle },
+    });
+    await user.click(screen.getByRole('button', { name: 'Select IMG_5100' }));
+    expect(onToggle).toHaveBeenCalledWith(expect.objectContaining({ id: 'pimg_a' }));
+    await user.click(screen.getByRole('button', { name: 'Open IMG_5100' }));
+    expect(onOpen).toHaveBeenCalled();
+  });
+
+  it('picks instead of opening while selecting, rings what is picked and steps Edit aside', async () => {
+    const user = userEvent.setup();
+    const onToggle = vi.fn();
+    const { onOpen, container } = renderGrid({
+      onEdit: vi.fn(),
+      onDelete: vi.fn(),
+      selection: { active: true, ids: new Set(['pimg_b']), full: false, onToggle },
+    });
+    const picked = screen.getByRole('button', { name: 'Select Left cheek' });
+    expect(picked).toHaveAttribute('aria-pressed', 'true');
+    expect(picked.closest('li')).toHaveAttribute('data-picked', 'true');
+    await user.click(screen.getByRole('button', { name: 'Select IMG_5100' }));
+    expect(onToggle).toHaveBeenCalledWith(expect.objectContaining({ id: 'pimg_a' }));
+    expect(onOpen).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('patient-photo-edit')).not.toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
+  });
 });

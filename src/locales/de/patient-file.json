@@ -244,6 +244,42 @@
     "stages": {
       "before": "Vorher",
       "after": "Nachher"
+    },
+    "dropzone": {
+      "title": "Fotos hierher ziehen",
+      "body": "oder ein kopiertes Bild einfügen · JPG oder PNG bis 10 MB",
+      "target": "Landet in {{album}}",
+      "choose": "Fotos auswählen",
+      "camera": "Foto aufnehmen",
+      "veil": "Loslassen, um zu {{album}} hinzuzufügen"
+    },
+    "select": {
+      "start": "Auswählen",
+      "done": "Fertig",
+      "startHint": "Fotos zum Vergleichen auswählen",
+      "toggle": "{{name}} auswählen",
+      "hint": "Wähle 2 bis 8 Fotos zum Vergleichen",
+      "limit": "Du kannst höchstens {{max}} Fotos gleichzeitig vergleichen",
+      "clear": "Leeren",
+      "compare": "Vergleichen",
+      "bar": "Ausgewählte Fotos",
+      "count_one": "{{count}} ausgewählt",
+      "count_other": "{{count}} ausgewählt"
+    },
+    "compare": {
+      "title": "Fotos vergleichen",
+      "layout": "Anordnung",
+      "row": "Eine Reihe",
+      "grid": "Raster",
+      "remove": "{{name}} aus dem Vergleich entfernen",
+      "start": "Start",
+      "close": "Vergleich schließen",
+      "since_one": "+{{count}} Tag",
+      "since_other": "+{{count}} Tage",
+      "hints": {
+        "zoom": "Scrollen oder ziehen, um alle Fotos zu zoomen",
+        "pan": "Ziehen, um alle gemeinsam zu bewegen · Doppelklick setzt zurück"
+      }
     }
   },
   "rx": {
@@ -915,7 +951,10 @@
     },
     "photos": {
       "upload": "Hochladen",
-      "empty": "Noch keine Fotos · laden Sie das erste hoch"
+      "empty": "Noch keine Fotos · laden Sie das erste hoch",
+      "add": "Fotos hinzufügen",
+      "drop": "Fotos hierher ziehen oder zum Hochladen klicken",
+      "dropBody": "JPG oder PNG bis 10 MB · Einfügen geht auch"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",

@@ -15,22 +15,42 @@ export type PhotoAlbum = (typeof PHOTO_ALBUMS)[number];
 /** The visit filter's "Not attached to a visit" (`NO_PHOTO_VISIT`, `has_appointment=false`). */
 export const NO_VISIT = 'none';
 
+/** How many photos a comparison takes (change-patient-overview-photos `BRIEF.md:32–46`). */
+export const PHOTO_COMPARE = { min: 2, max: 8 } as const;
+
 /** Validated `?…` params of the Photos section, and so of the viewer and Photo details. */
 export interface PatientImagesSearch {
   /** The album on screen; General when absent. */
   album?: Exclude<PhotoAlbum, 'general'>;
   /** The visit filter: a visit's id (`appt_…`), or "none" — every photo of the album when absent. */
   appointment?: string;
+  /** The comparison open over the section: 2–8 photo ids (`pimg_…`), comma-joined. */
+  compare?: string;
 }
 
-/** Parse the Photos section's params; General and an unknown value are dropped. */
+/** The photos a `?compare=` names: distinct public ids, the first eight; none below two. */
+export function compareIdsOf(value: unknown): string[] {
+  const ids = [
+    ...new Set(
+      textOf(value)
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => PUBLIC_ID.test(id)),
+    ),
+  ].slice(0, PHOTO_COMPARE.max);
+  return ids.length >= PHOTO_COMPARE.min ? ids : [];
+}
+
+/** Parse the Photos section's params; General, an unknown value and a comparison of fewer than two are dropped. */
 export function validatePatientImagesSearch(
   search: Record<string, unknown>,
 ): PatientImagesSearch {
   const album = oneOf(PHOTO_ALBUMS, search.album);
   const visit = textOf(search.appointment);
+  const compare = compareIdsOf(search.compare);
   return {
     album: album === 'general' ? undefined : album,
     appointment: visit === NO_VISIT || PUBLIC_ID.test(visit) ? visit : undefined,
+    compare: compare.length > 0 ? compare.join(',') : undefined,
   };
 }

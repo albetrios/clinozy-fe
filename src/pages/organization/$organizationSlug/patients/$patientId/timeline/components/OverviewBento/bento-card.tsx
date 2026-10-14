@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 import { type PillTone, TonePill } from '@/shared/components/Cells/index.ts';
-import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -84,14 +83,14 @@ interface BentoCardProps {
   icon: AppIcon;
   /** The count beside the title; none for none. */
   count?: number;
-  /** Two columns wide when the grid has two or more (H:4985 `span2`). */
-  wide?: boolean;
   /** The head's own actions, before "New …" and "Open". */
   actions?: ReactNode;
   /** "New prescription" … — the head's plus, for a member who may add one. */
   onNew?: { label: string; run: () => void } | null;
   /** "Open <Card>" — the card's section, for a member who may open it. */
   onOpen?: (() => void) | null;
+  /** The card's place in its row (a span). */
+  className?: string;
   children: ReactNode;
 }
 
@@ -99,16 +98,18 @@ interface BentoCardProps {
  * One bento card (H:769–779; KICKOFF §6.6 Overview): padding 14, radius 12, a
  * 1px divider; the head — the 28px tone tile with its icon, the title, the
  * count, the card's actions, "New …" and "Open <Card>" — over its content.
+ * It fills its cell (change-patient-overview-photos D9): every card in a row
+ * is one height, and its content column grows so an empty slot takes the rest.
  */
 export function BentoCard({
   card,
   title,
   icon: Icon,
   count,
-  wide = false,
   actions,
   onNew,
   onOpen,
+  className,
   children,
 }: BentoCardProps) {
   const { t } = useTranslation(TIMELINE_NS);
@@ -119,8 +120,8 @@ export function BentoCard({
       data-testid={testId}
       aria-label={title}
       className={cn(
-        'bg-card flex min-w-0 flex-col gap-3 rounded-xl border p-3.5',
-        wide && '@min-[640px]:col-span-2',
+        'bg-card flex h-full min-w-0 flex-col gap-3 rounded-xl border p-3.5',
+        className,
       )}
     >
       <div className="flex min-h-7 items-center gap-2">
@@ -156,7 +157,7 @@ export function BentoCard({
           />
         ) : null}
       </div>
-      {children}
+      <div className="flex min-h-0 flex-1 flex-col gap-3">{children}</div>
     </section>
   );
 }
@@ -195,26 +196,75 @@ export function BentoRow({
   );
 }
 
-/** A card's empty state: the compact look in its section's tone and glyph (change-empty-states C7). */
+/** A card's add, offered in its empty slot: "Book", "New prescription", the photo picker. */
+export interface BentoEmptyAction {
+  label: string;
+  run: () => void;
+}
+
+/**
+ * A card's empty state (change-patient-overview-photos D10): a dashed slot in
+ * the section's tone filling what the card has left — its 32px tone tile, the
+ * empty line and, when the card has its add, that add under it, the whole slot
+ * then one button that runs it. No illustration, so a row of empty cards stays
+ * calm and the cards with records read first.
+ */
 function BentoEmpty({
   section,
   title,
   testId,
+  action,
 }: {
   section: PatientFileSectionSlug;
   title: string;
   testId: string;
+  action?: BentoEmptyAction | null;
 }) {
   const Icon = PATIENT_FILE_SECTION_ICONS[section];
+  const body = (
+    <>
+      <span
+        aria-hidden="true"
+        className={cn(
+          'flex size-8 flex-none items-center justify-center rounded-lg',
+          TONE_CLASSES[PATIENT_FILE_SECTION_TONES[section]].surface,
+        )}
+      >
+        <Icon className="size-4" />
+      </span>
+      <span className="text-detail text-foreground-soft leading-snug font-medium text-pretty">
+        {title}
+      </span>
+      {action ? (
+        <span className="text-foreground inline-flex items-center gap-1 text-xs font-semibold">
+          <Plus aria-hidden="true" className="size-3.5" />
+          {action.label}
+        </span>
+      ) : null}
+    </>
+  );
+  const look =
+    'border-border-strong flex min-h-24 flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-5 text-center';
+  if (!action) {
+    return (
+      <div data-testid={testId} data-slot="bento-empty" className={look}>
+        {body}
+      </div>
+    );
+  }
   return (
-    <EmptyState
-      variant="compact"
-      tone={PATIENT_FILE_SECTION_TONES[section]}
-      icon={<Icon />}
-      title={title}
-      testId={testId}
-      className="py-4"
-    />
+    <button
+      type="button"
+      onClick={action.run}
+      data-testid={testId}
+      data-slot="bento-empty"
+      className={cn(
+        look,
+        'hover:bg-canvas hover:border-muted-foreground transition-colors',
+      )}
+    >
+      {body}
+    </button>
   );
 }
 
@@ -229,6 +279,7 @@ export function BentoReadState({
   emptyTitle,
   section,
   testId,
+  emptyAction,
 }: {
   read: BentoRead;
   /** Nothing to list — the state shows only then. */
@@ -240,6 +291,8 @@ export function BentoReadState({
   section: PatientFileSectionSlug;
   /** The card's test id — the empty line is `<card>-empty`. */
   testId: string;
+  /** The card's add, offered in the empty slot; none for a member who may not. */
+  emptyAction?: BentoEmptyAction | null;
 }) {
   const { t } = useTranslation(ERRORS_NS);
   if (!empty) return null;
@@ -253,6 +306,11 @@ export function BentoReadState({
   }
   if (read.isPending) return <SkeletonRows rows={2} label={label} />;
   return read.isSuccess ? (
-    <BentoEmpty section={section} title={emptyTitle} testId={`${testId}-empty`} />
+    <BentoEmpty
+      section={section}
+      title={emptyTitle}
+      testId={`${testId}-empty`}
+      action={emptyAction}
+    />
   ) : null;
 }

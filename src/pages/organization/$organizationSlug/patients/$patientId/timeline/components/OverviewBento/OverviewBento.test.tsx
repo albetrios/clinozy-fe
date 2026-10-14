@@ -1,4 +1,4 @@
-import { act, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -38,6 +38,7 @@ import {
   renderInPatientFile,
   resetPatientFile,
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
+import type { PatientPhotoUploads } from '../../../shared/hooks/usePatientPhotoUpload/index.ts';
 import { OverviewBento } from './OverviewBento.tsx';
 import type * as SmartNoteModule from './smart-note.ts';
 import { loadSmartNoteReading } from './smart-note.ts';
@@ -338,7 +339,9 @@ async function openBento({
   nextVisit = true,
   masked = true,
   toggleMasked,
+  photos,
 }: {
+  photos?: PatientPhotoUploads;
   role?: 'admin' | 'owner' | 'doctor';
   codes?: readonly OrganizationPermission[];
   viewable?: readonly PatientFileSectionSlug[];
@@ -358,6 +361,7 @@ async function openBento({
       viewable,
       masked,
       ...(toggleMasked ? { toggleMasked } : {}),
+      ...(photos ? { photos } : {}),
       section: 'timeline',
       file: patientFile({
         nextVisit: nextVisit
@@ -799,5 +803,95 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     await card('visits');
     expect(screen.queryByTestId('overview-card-billing')).not.toBeInTheDocument();
     expect(listInvoices).not.toHaveBeenCalled();
+  });
+  it('sets the cards in fixed rows — Care, then Photos with Reports, then Billing with Team notes', async () => {
+    await openBento();
+    await card('visits');
+    const rows = {
+      care: ['visits', 'treatments', 'packages', 'prescriptions'],
+      files: ['photos', 'reports'],
+      money: ['billing', 'notes'],
+    };
+    for (const [row, cards] of Object.entries(rows)) {
+      const shown = within(screen.getByTestId(`overview-row-${row}`));
+      for (const name of cards) {
+        expect(shown.getByTestId(`overview-card-${name}`)).toBeInTheDocument();
+      }
+    }
+    // Clinical stands alone, the full width, above the rows.
+    expect(screen.getByTestId('overview-row-care')).not.toContainElement(
+      screen.getByTestId('overview-card-clinical'),
+    );
+  });
+
+  it('shows each Clinical list as a panel — "Nothing added yet" when empty', async () => {
+    await openBento();
+    const complaints = await screen.findByTestId('overview-clinical-complaints');
+    expect(within(complaints).getByText('Tanning')).toBeInTheDocument();
+    expect(within(complaints).getByText('1')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('overview-clinical-diagnosis')).getByText(
+        'Nothing added yet',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('offers a card’s add in its empty slot, and keeps a slot without one plain', async () => {
+    vi.mocked(listPatientPrescriptions).mockResolvedValue([]);
+    const { user, router } = await openBento({ role: 'owner' });
+    const prescriptions = await card('prescriptions');
+    const slot = await within(prescriptions).findByTestId(
+      'overview-card-prescriptions-empty',
+    );
+    expect(slot.tagName).toBe('BUTTON');
+    expect(slot).toHaveTextContent('New prescription');
+    await user.click(slot);
+    await waitFor(() => expect(path(router)).toBe(`${FILE}/prescriptions/create`));
+  });
+
+  it('makes the Photos card an upload target — the Add photos tile, a drop, a paste', async () => {
+    const photos = { pick: vi.fn(), capture: vi.fn(), upload: vi.fn() };
+    const { user } = await openBento({ role: 'owner', photos });
+    const shown = await card('photos');
+    await user.click(await within(shown).findByTestId('overview-card-photos-add'));
+    expect(photos.pick).toHaveBeenCalledWith('general');
+
+    const files = [new File(['x'], 'cheek.jpg', { type: 'image/jpeg' })];
+    fireEvent.drop(shown.parentElement!, { dataTransfer: { files } });
+    expect(photos.upload).toHaveBeenCalledWith(files, 'general');
+
+    const pasted = new Event('paste', { bubbles: true, cancelable: true });
+    Object.defineProperty(pasted, 'clipboardData', { value: { files } });
+    act(() => {
+      document.body.dispatchEvent(pasted);
+    });
+    expect(photos.upload).toHaveBeenLastCalledWith(files, 'general');
+  });
+
+  it('turns the empty Photos card into one drop zone for a member who uploads', async () => {
+    vi.mocked(listPatientPhotos).mockResolvedValue({
+      rows: [],
+      next: null,
+      hasMore: false,
+      total: 0,
+      albumCounts: { general: 0, lhr: 0, private: null },
+    });
+    const photos = { pick: vi.fn(), capture: vi.fn(), upload: vi.fn() };
+    const { user } = await openBento({ role: 'owner', photos });
+    const zone = await within(await card('photos')).findByTestId(
+      'overview-card-photos-empty',
+    );
+    expect(zone).toHaveTextContent('Drop photos here or click to upload');
+    await user.click(zone);
+    expect(photos.pick).toHaveBeenCalledWith('general');
+  });
+
+  it('keeps the Photos card read-only for a member who may not upload', async () => {
+    await openBento({ codes: READS_ONLY });
+    const shown = await card('photos');
+    await within(shown).findAllByTestId('overview-card-photos-thumb');
+    expect(
+      within(shown).queryByTestId('overview-card-photos-add'),
+    ).not.toBeInTheDocument();
   });
 });

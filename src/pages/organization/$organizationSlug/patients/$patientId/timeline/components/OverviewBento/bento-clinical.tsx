@@ -25,34 +25,58 @@ const K = TIMELINE_KEYS.clinical;
 /** The smart note's most (H:770 `maxLength`). */
 const SMART_NOTE_MAX = 300;
 
-/** The four lists as groups, each its chips or "—". */
+/**
+ * The four lists as panels (change-patient-overview-photos D9): each its dot,
+ * its name and its count over its chips — a chip wraps to two lines rather
+ * than being cut to one — or "Nothing added yet". One column, two from 480px
+ * of the content column, four from 860px.
+ */
 function ClinicalGroups({ lists }: { lists: ClinicalLists }) {
   const { t } = useTranslation(TIMELINE_NS);
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-x-4 gap-y-3">
+    <div className="grid grid-cols-1 gap-2 @min-[480px]:grid-cols-2 @min-[860px]:grid-cols-4">
       {CLINICAL_LISTS.map(({ field, tone }) => {
         const items = lists.items(field);
         return (
-          <div key={field} className="flex min-w-0 flex-col gap-1.5">
-            <span className="text-caption text-muted-foreground flex items-center gap-1.5">
+          <section
+            key={field}
+            aria-label={t(K.groups[field])}
+            data-testid={TIMELINE_TEST_IDS.clinicalGroup(field)}
+            className="bg-canvas flex min-w-0 flex-col gap-2 rounded-lg p-2.5"
+          >
+            <span className="text-caption text-muted-foreground-strong flex items-center gap-1.5 font-medium">
               <span
                 aria-hidden="true"
-                className={cn('size-1.5 rounded-full', TONE_CLASSES[tone].fill)}
+                data-slot="pill"
+                className={cn('size-1.5 flex-none rounded-full', TONE_CLASSES[tone].fill)}
               />
-              {t(K.groups[field])}
-            </span>
-            <div className="flex flex-wrap gap-1">
+              <span className="min-w-0 truncate">{t(K.groups[field])}</span>
               {items.length > 0 ? (
-                items.map((item) => (
-                  <TonePill key={item.id} tone={tone} className="max-w-full truncate">
-                    {item.text}
-                  </TonePill>
-                ))
-              ) : (
-                <span className="text-muted-foreground text-xs">—</span>
-              )}
-            </div>
-          </div>
+                <span className="text-muted-foreground ms-auto tabular-nums">
+                  {items.length}
+                </span>
+              ) : null}
+            </span>
+            {items.length > 0 ? (
+              <ul className="flex flex-wrap gap-1">
+                {items.map((item) => (
+                  <li key={item.id} className="max-w-full min-w-0">
+                    <TonePill
+                      tone={tone}
+                      title={item.text}
+                      className="h-auto max-w-full py-0.5 leading-[1.35] whitespace-normal"
+                    >
+                      <span className="line-clamp-2 [overflow-wrap:anywhere] whitespace-normal">
+                        {item.text}
+                      </span>
+                    </TonePill>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span className="text-muted-foreground text-xs">{t(K.empty)}</span>
+            )}
+          </section>
         );
       })}
     </div>
@@ -60,10 +84,10 @@ function ClinicalGroups({ lists }: { lists: ClinicalLists }) {
 }
 
 /**
- * The Clinical card (two columns wide; H:770, H:4989): the smart note — its
+ * The Clinical card (the Overview's first row, full width; H:770, H:4989): the smart note — its
  * input and "Add", for a member who edits the patient — over the four lists
- * as groups: Complaints · Diagnosis · Suggested · Later, each its chips (the
- * patient's clinical notes, api-integration §5.4) or "—". Bars while the
+ * as panels: Complaints · Diagnosis · Suggested · Later, each its chips (the
+ * patient's clinical notes, api-integration §5.4) or "Nothing added yet". Bars while the
  * notes load; their failed read says so with Retry, and the smart note waits
  * for them. None of it for a member who may not read the clinical record.
  */
@@ -82,7 +106,7 @@ export function ClinicalBentoCard({
   const title = t(TIMELINE_KEYS.cards.clinical);
   const loaded = !(lists.isLoading || lists.isError);
   return (
-    <BentoCard card="clinical" title={title} icon={Stethoscope} wide onOpen={onOpen}>
+    <BentoCard card="clinical" title={title} icon={Stethoscope} onOpen={onOpen}>
       {smart && loaded ? (
         <form
           className="flex gap-2"
