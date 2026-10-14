@@ -29,11 +29,12 @@ every step. **Write no code** — no component, token, route or test.
 **0. Confirm the iteration.** Run `pnpm iteration:list` and show
 `| Iteration | Type | Baseline | Status | Eligible | Why |` — eligible means
 Status `planning`. Recommend the earliest-opened eligible one (the launch
-first). For an incremental iteration, suggest the Baseline — the latest `done`
-or `frozen` iteration in this repo — and let me confirm or pick another; save it
-with `pnpm iteration:baseline`. Ask me (AskUserQuestion) before going on.
+first), and ask me (AskUserQuestion) before going on. Do not ask me for a
+Baseline and do not suggest one: the iteration starts from scratch (Baseline
+`none`). Only if I have named an earlier iteration to build on, save it with
+`pnpm iteration:baseline <iteration> <baseline>`.
 Then run **the gate**: `pnpm iteration:intake <iteration> --check` (add
-`--baseline <baseline>` when incremental). **If it exits non-zero, stop now** —
+`--baseline <baseline>` when I named one). **If it exits non-zero, stop now** —
 write nothing, change no status, ask nothing else; print its output and end the
 turn.
 

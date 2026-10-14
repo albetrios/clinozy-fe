@@ -5,12 +5,12 @@ phases, **planning** (no code; it ends in your approval) and **kickoff** (the
 approved plan built one ledger row at a time) — and how every iteration after
 the first costs a fraction of the first.
 
-| Page                                              | When                                                                              |
-| ------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [Adoption](adoption.md)                           | Always — the skills, rules and gates both phases share                            |
-| [Initial iteration](initial-iteration.md)         | Baseline `none` — the first iteration in this repo (the launch)                   |
-| [Incremental iteration](incremental-iteration.md) | Every later iteration, against a Baseline you confirm                             |
-| [Iteration walkthrough](iteration-walkthrough.md) | The whole flow as text diagrams, plus one incremental iteration traced end to end |
+| Page                                              | When                                                                                  |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [Adoption](adoption.md)                           | Always — the skills, rules and gates both phases share                                |
+| [Initial iteration](initial-iteration.md)         | Baseline `none` — every iteration by default: the launch, and any change from scratch |
+| [Incremental iteration](incremental-iteration.md) | Only when you name an earlier iteration to build on                                   |
+| [Iteration walkthrough](iteration-walkthrough.md) | The whole flow as text diagrams, plus one incremental iteration traced end to end     |
 
 ## The flow
 
@@ -51,21 +51,23 @@ commands are in [`iterations/README.md`](../../../iterations/README.md); in shor
   `feat-pharmacy-returns-2026-10-06-kqzx`. `pnpm iteration:list` lists them.
 - **`intake-files/`** is always a **full snapshot**, whatever arrived — the
   Intake mode says how it was built: `full` (the whole drop; the launch),
-  `overlay` (only the changed files, laid over the Baseline's snapshot) or
+  `overlay` (only the changed files, laid over a named Baseline's snapshot) or
   `brief` (no design files — a written `BRIEF.md`, such as "implement these
-  kinds of screens", added to the Baseline's snapshot). **`plans/decisions.md`**
+  kinds of screens": on its own from scratch, or added to a named Baseline's
+  snapshot). **`plans/decisions.md`**
   holds every blocking answer and scope decision. **`KICKOFF.md`** is the plan;
   **`AS-BUILT.md`** is what was actually built, ending with the **Standing
   deviations** — the complete list of where the code differs from the design.
-- **Mode.** Baseline `none` → **initial**. Otherwise **incremental** against
-  the Baseline you confirm at planning Step 0 — the suggestion is the latest
-  `done` or `frozen` iteration in this repo. The delta: in `full` / `overlay`
-  mode, the designer's "What changed" plus
-  `pnpm iteration:diff <baseline> <iteration>`, which compares the two
-  `intake-files/` folders only; in `brief` mode, `BRIEF.md` itself, with
-  nothing else changed. Either way planning reads
-  the Baseline's Standing deviations. The Baseline's `intake-files/` are
-  mandatory.
+- **Mode — from scratch by default.** Every iteration opens with Baseline
+  `none` → **initial**: it is planned on its own drop or `BRIEF.md` and the
+  current code, and no earlier iteration or its files are pulled in. Nobody
+  asks you for a Baseline or suggests one. Only when **you name** an earlier
+  iteration to build on is it recorded (`pnpm iteration:baseline`) and the
+  iteration **incremental**. The delta then: in `full` / `overlay` mode, the
+  designer's "What changed" plus `pnpm iteration:diff <baseline> <iteration>`,
+  which compares the two `intake-files/` folders only; in `brief` mode,
+  `BRIEF.md` itself, with nothing else changed. Planning also reads the named
+  Baseline's Standing deviations, and its `intake-files/` are mandatory.
 - Each iteration's `README.md` records Type, Topic, Owner, Opened, Branch,
   Baseline, Status, Summary, Drop placed, Drop source, Intake mode, Intake note,
   Schema-routes and Intake hash, and a History of every Status and Baseline
@@ -94,12 +96,13 @@ are the explicit start buttons for the skills — saying "plan iteration
 
 | Situation                                        | Path                                                               |
 | ------------------------------------------------ | ------------------------------------------------------------------ |
-| The first iteration in this repo (Baseline none) | **Initial**                                                        |
-| A new feature, change or fix                     | **Incremental**, against the Baseline you confirm                  |
-| Structural change to an existing screen          | **Incremental**, full RED gate on that screen                      |
-| New screen in an existing design                 | **Incremental** for the delta, **Initial**'s rigour for the screen |
-| A correction to a frozen iteration               | A new `fix` iteration — **Incremental**                            |
-| A change described in words, no design files     | **Incremental**, `--mode brief` (`BRIEF.md`)                       |
+| The first iteration in this repo (the launch)    | **Initial**                                                        |
+| A new feature, change or fix (the default)       | **Initial** — from scratch, Baseline `none`                        |
+| A change described in words, no design files     | **Initial**, `--mode brief` — `BRIEF.md` alone                     |
+| You name an earlier iteration to build on        | **Incremental**, against that Baseline                             |
+| Structural change, Baseline named                | **Incremental**, full RED gate on that screen                      |
+| New screen in an existing design, Baseline named | **Incremental** for the delta, **Initial**'s rigour for the screen |
+| A correction to a frozen iteration               | A new `fix` iteration — from scratch unless you name the original  |
 
 ## The one habit that unlocks everything
 

@@ -6,10 +6,12 @@
  *   pnpm iteration:new launch
  *   pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--dry-run]
  *
- * Creates `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/README.md` — Owner, Opened, Branch, a
- * suggested Baseline and Status `planning` filled in. An iteration starts with its README only;
- * `pnpm iteration:intake` writes its snapshot into `intake-files/`. `--both` opens the same folder in the sibling
- * repository (clinozy-be), whose README suggests its own Baseline. The model: iterations/README.md.
+ * Creates `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/README.md` — Owner, Opened, Branch,
+ * Baseline `none` and Status `planning` filled in. Every iteration starts from scratch: nothing
+ * suggests a Baseline, and one is recorded (`pnpm iteration:baseline`) only when the user names an
+ * earlier iteration. An iteration starts with its README only; `pnpm iteration:intake` writes its
+ * snapshot into `intake-files/`. `--both` opens the same folder in the sibling repository
+ * (clinozy-be), from scratch too. The model: iterations/README.md.
  */
 import { randomInt } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -26,7 +28,6 @@ import {
   parseCommandLine,
   parseIterationName,
   resolveSiblingRoot,
-  suggestBaseline,
   gitUserName,
   tryGit,
   workingTreeIterationNames,
@@ -195,20 +196,14 @@ function pickUniqueName({ type, topic, opened, takenNames, folderExists, nextId 
   );
 }
 
-/** `none` for the launch; otherwise the repository's suggestion, or `—` until the user confirms one. */
-function suggestedBaseline({ repositoryRoot, type }) {
-  if (type === 'launch') return NO_BASELINE;
-  return suggestBaseline({ repositoryRoot }) ?? EMPTY_FIELD;
-}
-
 /**
  * Decides everything `pnpm iteration:new` will do, without writing anything.
  *
  * Validates type and topic; collects the iterations already known (this working tree, the base
  * branch, and the sibling's working tree under `--both`); refuses a second launch and any
  * non-launch before an iteration exists; draws a name with a fresh random id, retrying while it is
- * taken; suggests each repository's Baseline from its own iterations; reads Owner and Branch from
- * git; renders the README for this repository and, under `--both`, the sibling.
+ * taken; starts every iteration from scratch (Baseline `none`, in both repositories); reads Owner
+ * and Branch from git; renders the README for this repository and, under `--both`, the sibling.
  *
  * @param {{ repositoryRoot: string, baseBranch: string, type: string | undefined, topic: string | undefined, siblingRoot: string | undefined, today?: string, nextId?: () => string }} request
  * @throws with a terminal-ready message on any refusal, a missing `user.name` or a detached HEAD
@@ -261,7 +256,7 @@ export function planNewIteration(request) {
     owner,
     opened,
     branch,
-    baseline: suggestedBaseline({ repositoryRoot, type }),
+    baseline: NO_BASELINE,
     status: INITIAL_ITERATION_STATUS,
     summary: EMPTY_FIELD,
     dropPlaced: EMPTY_FIELD,
@@ -283,7 +278,7 @@ export function planNewIteration(request) {
   let siblingBaseline;
   if (siblingRoot !== undefined) {
     siblingFolder = join(siblingRoot, ITERATIONS_DIRECTORY, name);
-    siblingBaseline = suggestedBaseline({ repositoryRoot: siblingRoot, type });
+    siblingBaseline = NO_BASELINE;
     files.push({
       path: join(siblingFolder, 'README.md'),
       content: renderIterationReadme({
@@ -331,11 +326,13 @@ export function writeIterationPlan(plan) {
 
 function describePlan(plan, repositoryRoot) {
   const workspace = resolve(repositoryRoot, '..');
-  const suggested =
-    plan.fields.type === 'launch' ? '' : ' (suggested — confirm it at planning Step 0)';
+  const scratch =
+    plan.fields.type === 'launch'
+      ? ''
+      : ` (from scratch — only when the user names an earlier iteration: pnpm iteration:baseline ${plan.name} <baseline>)`;
   return [
     `Iteration: ${plan.name}`,
-    `Baseline:  ${plan.fields.baseline}${suggested}`,
+    `Baseline:  ${plan.fields.baseline}${scratch}`,
     ...(plan.siblingRoot === undefined
       ? []
       : [`           ${basename(plan.siblingRoot)}: ${plan.siblingBaseline}`]),
@@ -352,14 +349,14 @@ function nextSteps(plan) {
     plan.fields.type === 'launch'
       ? []
       : [
-          `     Only the changed files: --mode overlay · only a BRIEF.md: --mode brief — both build on the README's Baseline (${plan.fields.baseline}); for another one, first: pnpm iteration:baseline ${plan.name} <baseline>`,
+          `     Only a BRIEF.md: --mode brief (on its own, from scratch) · only the changed files: --mode overlay (needs the earlier iteration the user named: pnpm iteration:baseline ${plan.name} <baseline>)`,
         ];
   return [
     'Next:',
     `  1. Write the Summary line in ${ITERATIONS_DIRECTORY}/${plan.name}/README.md.`,
     `  2. Place the drop: pnpm iteration:intake ${plan.name} <drop-folder>${both}`,
     ...modes,
-    `  3. Say "plan iteration ${plan.name}" — fe-iteration-planning runs the gate, confirms the Baseline and writes KICKOFF.md.`,
+    `  3. Say "plan iteration ${plan.name}" — fe-iteration-planning runs the gate and writes KICKOFF.md.`,
   ];
 }
 

@@ -50,15 +50,16 @@ change touches; `pnpm iteration:new <type> <topic> --both` creates it in both.
 `pnpm iteration:intake <iteration> <source-folder> [--mode full|overlay|brief]` turns what arrived
 into the full snapshot in `intake-files/`; `--mode` defaults to `full`.
 
-| Mode      | What arrived                                                                        | How the snapshot is built                                              | Needs                                            |
-| --------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------ |
-| `full`    | the whole drop                                                                      | the drop as received                                                   | — (the launch is always `full`)                  |
-| `overlay` | only the changed files                                                              | the Baseline's `intake-files/`, then the received files laid over them | a Baseline, at least one received file           |
-| `brief`   | no design files — a written change (for example "implement these kinds of screens") | the Baseline's `intake-files/` unchanged, plus the received `BRIEF.md` | a Baseline, `BRIEF.md` and no other changed file |
+| Mode      | What arrived                                                                        | How the snapshot is built                                                                                                   | Needs                                                       |
+| --------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `full`    | the whole drop                                                                      | the drop as received                                                                                                        | — (the launch is always `full`)                             |
+| `overlay` | only the changed files                                                              | the Baseline's `intake-files/`, then the received files laid over them                                                      | a Baseline the user named, at least one received file       |
+| `brief`   | no design files — a written change (for example "implement these kinds of screens") | from scratch (Baseline `none`): the received `BRIEF.md` alone; on a named Baseline: its `intake-files/` plus the `BRIEF.md` | `BRIEF.md`; on a named Baseline, also no other changed file |
 
 - **Mandatory** is the frontend core set, checked on the **resulting snapshot**: `PRD.md`,
   `schema-routes.md`, the prototype `*.html` and every `*.js` it loads, `_index.md`, one `<slug>.md`
-  per Slug in `_index.md`'s table, `preset.md`, `shell.md` (and `BRIEF.md` in `brief` mode). Optional
+  per Slug in `_index.md`'s table, `preset.md`, `shell.md` (and `BRIEF.md` in `brief` mode). A
+  brief from scratch has no design files to carry, so its whole mandatory set is `BRIEF.md`. Optional
   files — `_`-prefixed shared files (`_patterns.md`, `_report.md`), design-brief / auth /
   system-surface notes, `preset.json`, `design-overview.md` — are checked only when something
   references them, such as a file named in `_index.md`. Anything else is warned about, and so is a
@@ -66,12 +67,13 @@ into the full snapshot in `intake-files/`; `--mode` defaults to `full`.
 - **`BRIEF.md`** follows the template in `tooling/iterations/templates/BRIEF.md`: what changes · why ·
   affected screens, entities and routes · rules · acceptance criteria · out of scope.
 - **Intake note** records what was received versus carried forward (for `overlay`, the overlaid
-  files). **Intake hash** is the first 12 characters of a sha256 over every file in `intake-files/`
+  files; for a brief from scratch, `1 received (BRIEF.md) · from scratch`). **Intake hash** is the first 12 characters of a sha256 over every file in `intake-files/`
   — names in sorted order, each name then its bytes — so any later edit is detected.
 - `<source-folder>` may also be a single file, such as the `BRIEF.md` itself.
 - An overlay adds and replaces files but never removes one — removing a screen needs a `full` drop.
-  `overlay` and `brief` build on the Baseline recorded when the intake runs (its own gate must
-  pass), so confirm the Baseline first; choosing another one later means rebuilding the snapshot.
+  `overlay`, and a `brief` on a named Baseline, build on the Baseline recorded when the intake runs
+  (its own gate must pass), so record the Baseline the user named first; choosing another one later
+  means rebuilding the snapshot.
 - A re-intake that would change an existing snapshot shows the difference and stops unless
   `--replace`, which works only while the Status is `planning`.
 
@@ -80,7 +82,8 @@ into the full snapshot in `intake-files/`; `--mode` defaults to `full`.
 `pnpm iteration:intake <iteration> --check [--baseline <iteration>]` checks, per the iteration's
 Intake mode, that every mandatory file is in its `intake-files/` (and in the Baseline's, when given)
 and that each recomputed Intake hash equals its README row. With `--baseline` it also checks that
-this is the README's Baseline — the one an `overlay` or `brief` snapshot was built on. On a failure
+this is the README's Baseline — the one an `overlay` or `brief` snapshot was built on (a brief from
+scratch was built on none). On a failure
 it prints exactly what is missing or changed (naming the file when git can tell), in which folder,
 and the command that fixes it, and exits non-zero.
 
@@ -90,22 +93,22 @@ nothing, changes no status and asks nothing else; it prints the command's output
 
 ## README fields
 
-| Field         | Value                                                                                   |
-| ------------- | --------------------------------------------------------------------------------------- |
-| Type          | `launch`, `feat`, `change` or `fix`                                                     |
-| Topic         | the kebab-case topic; `—` for launch                                                    |
-| Owner         | the person driving it (`git config user.name`)                                          |
-| Opened        | `YYYY-MM-DD`                                                                            |
-| Branch        | the branch it is built on                                                               |
-| Baseline      | `none` (initial), an earlier iteration (incremental), or `—` until the user confirms it |
-| Status        | `planning`, `ready-for-approval`, `approved`, `implementing`, `done` or `frozen`        |
-| Summary       | one line on what it changes — the one field you write by hand                           |
-| Drop placed   | the day `iteration:intake` placed the drop                                              |
-| Drop source   | where the drop came from                                                                |
-| Intake mode   | `full`, `overlay` or `brief`                                                            |
-| Intake note   | what was received versus carried forward                                                |
-| Schema-routes | the first 12 characters of the sha256 of `intake-files/schema-routes.md`                |
-| Intake hash   | the first 12 characters of the sha256 over every file in `intake-files/`                |
+| Field         | Value                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| Type          | `launch`, `feat`, `change` or `fix`                                                      |
+| Topic         | the kebab-case topic; `—` for launch                                                     |
+| Owner         | the person driving it (`git config user.name`)                                           |
+| Opened        | `YYYY-MM-DD`                                                                             |
+| Branch        | the branch it is built on                                                                |
+| Baseline      | `none` (from scratch, the default), or an earlier iteration the user named (incremental) |
+| Status        | `planning`, `ready-for-approval`, `approved`, `implementing`, `done` or `frozen`         |
+| Summary       | one line on what it changes — the one field you write by hand                            |
+| Drop placed   | the day `iteration:intake` placed the drop                                               |
+| Drop source   | where the drop came from                                                                 |
+| Intake mode   | `full`, `overlay` or `brief`                                                             |
+| Intake note   | what was received versus carried forward                                                 |
+| Schema-routes | the first 12 characters of the sha256 of `intake-files/schema-routes.md`                 |
+| Intake hash   | the first 12 characters of the sha256 over every file in `intake-files/`                 |
 
 Below the table, a `## History` list records every Status and Baseline change, one line each:
 `- <date> · <from> → <to> · <reason or —> · <git user.name>` (a Baseline change reads
@@ -115,19 +118,22 @@ template (`tooling/iterations/templates/README.md`) is byte-identical to clinozy
 
 ## Mode and Baseline
 
-- **Baseline `none` → MODE initial** — the first iteration in this repository: everything is new.
-- **Otherwise MODE incremental**, against a Baseline **the user confirms** at planning Step 0 (saved
-  with `pnpm iteration:baseline`). The suggestion is the latest `done` / `frozen` iteration in this
-  repository.
-- The incremental delta depends on the Intake mode:
+- **Every iteration starts from scratch: Baseline `none` → MODE initial.** `pnpm iteration:new`
+  writes `none`, and nothing suggests a Baseline or asks for one — no earlier iteration and none of
+  its files are taken into account unless the user asks for it.
+- **MODE incremental only when the user names a Baseline** — "build on <iteration>", "the last
+  iteration", a specific earlier drop. Record it with `pnpm iteration:baseline <iteration>
+<baseline>`; that is the only way an iteration gets one.
+- With a Baseline the user named, the incremental delta depends on the Intake mode:
   - `full` / `overlay` — the designer's "What changed" notes **plus**
     `pnpm iteration:diff <baseline> <iteration>`, which compares the two `intake-files/` **only**
     (never the README, `KICKOFF.md`, `plans/` or `AS-BUILT.md`). Anything the diff shows that the
     notes omit is a finding.
   - `brief` — `BRIEF.md` is the change list, and `iteration:diff` must show nothing else changed.
-- Planning also reads the Baseline's Standing deviations: wherever the build differs from the drop,
-  it plans against what was actually built.
-- The Baseline's `intake-files/` is mandatory: `iteration:baseline` refuses a Baseline without the
+- Planning then also reads the Baseline's Standing deviations: wherever the build differs from the
+  drop, it plans against what was actually built. From scratch, planning reads the current code
+  instead — what is built is still the truth for anything the iteration touches.
+- A named Baseline's `intake-files/` is mandatory: `iteration:baseline` refuses a Baseline without the
   required set, and `iteration:diff` refuses an iteration without `intake-files/`.
 - Parallel branches are fine. Before merging, if another iteration reached `main` meanwhile, check
   overlap — the same screen, entity or route changed by both — and resolve it in review.
@@ -154,16 +160,17 @@ Status moves one step at a time with `pnpm iteration:status <iteration> <status>
 ```bash
 pnpm iteration:new feat pharmacy-returns --both                    # open (README only)
 pnpm iteration:intake <iteration> <source-folder> --both           # place a full drop + check it
-pnpm iteration:intake <iteration> <source-folder> --mode overlay   # only the changed files arrived
+pnpm iteration:intake <iteration> <source-folder> --mode overlay   # only the changed files arrived (named Baseline)
 pnpm iteration:intake <iteration> <source-folder> --mode brief     # only BRIEF.md arrived
 pnpm iteration:intake <iteration> --check [--baseline <iteration>] # the gate
-pnpm iteration:baseline <iteration> <baseline|none>                # record the confirmed Baseline
+pnpm iteration:baseline <iteration> <baseline|none>                # record the Baseline the user named
 pnpm iteration:diff <baseline> <iteration> [--json]                # the delta: intake-files/ only
 pnpm iteration:status <iteration> <status> [--reason "<text>"]
 pnpm iteration:list   # Name · Type · Owner · Opened · Baseline · Status · Intake mode · Schema-routes · Intake hash · Drop placed
 ```
 
 Every command takes `--help`. `iteration:new` and `iteration:intake` take `--dry-run`; `--both` works
-on the same-named folder in the sibling repository with that repository's own Baseline, sending
+on the same-named folder in the sibling repository with that repository's own Baseline (`none` by
+default), sending
 `PRD.md` and `schema-routes.md` (and `BRIEF.md` in `brief` mode); `--sibling <path>` overrides where
 it is.

@@ -99,26 +99,30 @@ A design change from Claude Design is an **iteration**: `iterations/<type>-<topi
    frozen iteration is never edited; a correction is a new `fix`.
 
 - **Intake modes.** `full` — the whole drop (the launch is always full). `overlay` — only the changed
-  files, laid over the Baseline's snapshot. `brief` — no design files, only a written `BRIEF.md` ("implement
-  these kinds of screens"; template `tooling/iterations/templates/BRIEF.md`) added to the Baseline's
-  snapshot. The README records the Intake mode, an Intake note and the Intake hash.
+  files, laid over a named Baseline's snapshot. `brief` — no design files, only a written `BRIEF.md`
+  ("implement these kinds of screens"; template `tooling/iterations/templates/BRIEF.md`): on its own
+  from scratch, or added to a named Baseline's snapshot. The README records the Intake mode, an Intake
+  note and the Intake hash.
 - **The gate.** `pnpm iteration:intake <iteration> --check [--baseline <baseline>]` proves the mandatory
   files are present and each Intake hash still matches; both skills run it first. When it exits
   non-zero, **stop at once** — write nothing, change no status, ask nothing else; print its output and
   end the turn.
 
-- **Mode.** Baseline `none` is MODE initial; otherwise incremental against the Baseline the user
-  confirms at planning Step 0 (`pnpm iteration:baseline`). The delta is the designer's "What changed"
-  plus `pnpm iteration:diff <baseline> <iteration>`, which compares the two `intake-files/` folders only
-  (in `brief` mode, `BRIEF.md` itself) — so the Baseline's intake is mandatory. Planning also reads the
-  Baseline's Standing deviations and the current code: what was built beats what was drawn.
+- **Mode — from scratch by default.** Every iteration opens with Baseline `none` (MODE initial):
+  never ask for a Baseline or suggest one, and take no earlier iteration or its files into account.
+  Only when the user names one ("build on <iteration>") is it recorded (`pnpm iteration:baseline`) and
+  the iteration incremental: the delta is then the designer's "What changed" plus
+  `pnpm iteration:diff <baseline> <iteration>`, which compares the two `intake-files/` folders only (in
+  `brief` mode, `BRIEF.md` itself) — so a named Baseline's intake is mandatory — and planning reads its
+  Standing deviations. Either way planning reads the current code: what was built beats what was drawn.
 - **Status** moves `planning → ready-for-approval → approved → implementing → done → frozen` only
   through `pnpm iteration:status` (back to `planning` with `--reason`); it and `iteration:baseline`
   append the README's History. Never edit `intake-files/` or a README's values by hand (Summary
   excepted); `pnpm iteration:list` is the index.
 - **Both repos.** clinozy-be uses the same names, commands and README template (`--both` opens and
-  fills the same-named folder there, in the same Intake mode against its own Baseline; `PRD.md` and
-  `schema-routes.md` — and `BRIEF.md` in brief mode — stay byte-identical).
+  fills the same-named folder there, in the same Intake mode, from scratch too unless the user names a
+  Baseline there; `PRD.md` and `schema-routes.md` — and `BRIEF.md` in brief mode — stay
+  byte-identical).
 
 ## Agent-os naming
 

@@ -8,14 +8,15 @@
  *
  * `intake-files/` always holds a full snapshot, whatever arrived. `full` (the default, and always
  * the launch's): the drop as received. `overlay`: the Baseline's snapshot with the received files
- * laid over it. `brief`: the Baseline's snapshot plus the received `BRIEF.md`, and no other changed
- * file. `<source>` is a folder or one file; received files are copied flat and exactly as
+ * laid over it — it needs a Baseline the user named. `brief`: the received `BRIEF.md` alone when the
+ * iteration starts from scratch (Baseline `none`, the default), or added to the Baseline's
+ * snapshot, with no other changed file, when the user named one. `<source>` is a folder or one file; received files are copied flat and exactly as
  * delivered (never `README.md`). The frontend's mandatory set is checked on the resulting
  * snapshot, and the README's Drop placed, Drop source, Intake mode, Intake note, Schema-routes and
  * Intake hash rows are filled. Replacing a different existing snapshot needs `--replace`, which
  * works only while planning; the intake is locked once the iteration is approved. Under `--both`
- * the sibling repository's same-named iteration gets a snapshot in the same mode, built on its own
- * Baseline, with `PRD.md` and `schema-routes.md` (and `BRIEF.md` in brief mode) from this one. Any
+ * the sibling repository's same-named iteration gets a snapshot in the same mode, on its own
+ * Baseline (or from scratch), with `PRD.md` and `schema-routes.md` (and `BRIEF.md` in brief mode) from this one. Any
  * problem stops the intake with nothing written.
  *
  * `--check` is the gate the iteration skills run before planning and before building: every
@@ -51,6 +52,7 @@ import {
   iterationFolder,
   localDate,
   LOCKED_INTAKE_STATUSES,
+  isStandaloneBrief,
   missingBriefSections,
   NO_BASELINE,
   parseCommandLine,
@@ -84,8 +86,9 @@ const USAGE = `Usage:
 
   <source>          the folder (or the one file) that arrived
   --mode full       the whole drop (the default; always the launch)
-  --mode overlay    only the changed files, laid over the Baseline's snapshot
-  --mode brief      only ${BRIEF_FILE} (template: ${BRIEF_TEMPLATE}), added to the Baseline's snapshot
+  --mode overlay    only the changed files, laid over the Baseline's snapshot (needs a Baseline)
+  --mode brief      only ${BRIEF_FILE} (template: ${BRIEF_TEMPLATE}): on its own from scratch
+                    (Baseline none, the default), or added to a named Baseline's snapshot
   --both            also build the sibling repository's same-named iteration, in the same mode on its own
                     Baseline, with PRD.md and schema-routes.md (and ${BRIEF_FILE} in brief mode)
   --sibling <path>  sibling repository path (default: ../<package name with -fe → -be>)
@@ -214,12 +217,15 @@ export function readReceived(source) {
 /**
  * The Intake note: what was received versus carried forward — `<n> received` for a full drop;
  * `<n> received (<names>) · <m> carried forward from <baseline>` for an overlay or a brief, whose
- * last word is the Baseline the gate checks the snapshot was built on.
+ * last word is the Baseline the gate checks the snapshot was built on; `… · from scratch` for a
+ * brief on Baseline `none`, which carries nothing forward.
  *
  * @param {{ mode: string, taken: readonly string[], total: number, baseline: string | undefined }} intake
  */
 export function renderIntakeNote({ mode, taken, total, baseline }) {
   if (mode === DEFAULT_INTAKE_MODE) return `${taken.length} received`;
+  if (baseline === undefined)
+    return `${taken.length} received (${taken.join(', ')}) · from scratch`;
   return `${taken.length} received (${taken.join(', ')}) · ${total - taken.length} carried forward from ${baseline}`;
 }
 
@@ -325,6 +331,7 @@ export function gateFailures({ repositoryRoot, iteration }) {
     names,
     readText: (name) => readFileSync(join(folder, name), 'utf-8'),
     mode,
+    standalone: isStandaloneBrief(fields),
   });
   if (missing.length > 0) {
     failures.push({
@@ -347,11 +354,14 @@ export function gateFailures({ repositoryRoot, iteration }) {
     });
   }
   if (mode !== DEFAULT_INTAKE_MODE) {
-    const builtOn = BUILT_ON.exec(fields.get('Intake note') ?? '')?.[1];
+    const builtOn =
+      BUILT_ON.exec(fields.get('Intake note') ?? '')?.[1] ??
+      (mode === 'brief' ? NO_BASELINE : undefined);
     const baseline = fields.get('Baseline') ?? EMPTY_FIELD;
     if (builtOn !== baseline) {
+      const from = builtOn === NO_BASELINE ? 'no Baseline (from scratch)' : builtOn;
       failures.push({
-        what: `the ${mode} snapshot was built on ${builtOn ?? 'no recorded Baseline'}, but the README's Baseline is ${baseline}`,
+        what: `the ${mode} snapshot was built on ${from ?? 'no recorded Baseline'}, but the README's Baseline is ${baseline}`,
         details: [],
         fix: `rebuild it on ${baseline} — ${reintake}`,
       });
@@ -426,11 +436,13 @@ export function runGate({ repositoryRoot, iteration, baseline }) {
 }
 
 /**
- * The snapshot an overlay or a brief builds on: the README's Baseline — an earlier iteration whose
- * intake passes the gate (`checkGate`) or, for the sibling repository, which has one.
+ * The snapshot an overlay or a brief builds on: the README's Baseline — an earlier iteration the
+ * user named, whose intake passes the gate (`checkGate`) or, for the sibling repository, which
+ * has one. A brief on Baseline `none` starts from scratch and builds on nothing (`null`); an
+ * overlay always needs a named Baseline.
  *
- * @returns {{ name: string, files: Map<string, string> } | undefined} file name → path, or
- *   `undefined` after recording why it cannot be used
+ * @returns {{ name: string, files: Map<string, string> } | null | undefined} file name → path;
+ *   `null` for a brief from scratch; `undefined` after recording why it cannot be used
  */
 function baselineSnapshot({
   repositoryRoot,
@@ -442,9 +454,16 @@ function baselineSnapshot({
   checkGate,
 }) {
   const baseline = fields.get('Baseline') ?? EMPTY_FIELD;
-  if (baseline === NO_BASELINE || baseline === EMPTY_FIELD) {
+  if (baseline === NO_BASELINE && mode === 'brief') return null;
+  if (baseline === NO_BASELINE) {
     problems.push(
-      `${label}: --mode ${mode} builds on the Baseline's snapshot, and ${iteration} has Baseline ${baseline} — confirm it first: pnpm iteration:baseline ${iteration} <baseline>.`,
+      `${label}: --mode ${mode} lays the received files over a Baseline's snapshot, and ${iteration} starts from scratch (Baseline none) — send the whole drop with --mode full or a ${BRIEF_FILE} with --mode brief; only when the user names an earlier iteration, record it first: pnpm iteration:baseline ${iteration} <baseline>.`,
+    );
+    return undefined;
+  }
+  if (baseline === EMPTY_FIELD) {
+    problems.push(
+      `${label}: ${iteration} has no Baseline (—) — record none, the default (pnpm iteration:baseline ${iteration} none), or the earlier iteration the user named.`,
     );
     return undefined;
   }
@@ -471,15 +490,34 @@ function baselineSnapshot({
  * Builds a snapshot by mode — file name → the path it is copied from — and the names taken from
  * what came in. `full`: what came in. `overlay`: the Baseline's files with what came in laid over
  * them (at least one file). `brief`: the Baseline's files plus the `BRIEF.md` that came in; any
- * other file that came in must match the Baseline's.
+ * other file that came in must match the Baseline's. A brief from scratch (`baseline` `null`) is
+ * the `BRIEF.md` alone, and nothing else may come in with it.
  *
- * @param {{ mode: string, incoming: Map<string, string>, baseline: { name: string, files: Map<string, string> } | undefined, label: string, problems: string[] }} intake
+ * @param {{ mode: string, incoming: Map<string, string>, baseline: { name: string, files: Map<string, string> } | null | undefined, label: string, problems: string[] }} intake
  * @returns {{ files: Map<string, string>, taken: string[] }}
  */
 function buildSnapshot({ mode, incoming, baseline, label, problems }) {
   const names = [...incoming.keys()];
   if (mode === DEFAULT_INTAKE_MODE || baseline === undefined)
     return { files: new Map(incoming), taken: names };
+  if (baseline === null) {
+    if (!incoming.has(BRIEF_FILE)) {
+      problems.push(
+        `${label}: --mode brief needs a received ${BRIEF_FILE} — start from ${BRIEF_TEMPLATE}.`,
+      );
+      return { files: new Map(), taken: [] };
+    }
+    const others = names.filter((name) => name !== BRIEF_FILE);
+    if (others.length > 0) {
+      problems.push(
+        `${label}: a brief from scratch is ${BRIEF_FILE} alone, but ${others.join(', ')} also came in — send design files with --mode full.`,
+      );
+    }
+    return {
+      files: new Map([[BRIEF_FILE, incoming.get(BRIEF_FILE)]]),
+      taken: [BRIEF_FILE],
+    };
+  }
   if (mode === 'overlay') {
     if (names.length === 0)
       problems.push(`${label}: --mode overlay needs at least one received file.`);
@@ -621,7 +659,8 @@ function planSide({
  * Decides everything `pnpm iteration:intake` will do, without writing anything.
  *
  * Reads what arrived ({@link readReceived}); builds the snapshot for the mode — on the README's
- * Baseline, which must pass the gate, for an overlay or a brief; checks it against the frontend's
+ * Baseline, which must pass the gate, for an overlay or for a brief on a Baseline the user named,
+ * or the `BRIEF.md` alone for a brief from scratch; checks it against the frontend's
  * mandatory set and a received `BRIEF.md` against its template, warning about extras and screen
  * files `_index.md` does not list; compares it with `intake-files/` file by file. Under `--both`
  * the sibling's same-named iteration (which must exist) gets a snapshot in the same mode on its
@@ -696,6 +735,7 @@ export function planIntake(request) {
     names: [...snapshot.files.keys()],
     readText: (name) => readFileSync(snapshot.files.get(name), 'utf-8'),
     mode,
+    standalone: baseline === null,
   });
   if (missing.length > 0)
     problems.push(`The snapshot is missing mandatory file(s): ${missing.join(', ')}.`);

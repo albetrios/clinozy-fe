@@ -1,7 +1,7 @@
 /**
  * Design-iteration model behind the `pnpm iteration:*` commands: names, the README field table
  * and its History, the Status lifecycle, the intake modes, the snapshot's required set and its
- * Intake hash, the Baseline suggestion and the sibling repository. The rules: iterations/README.md.
+ * Intake hash, the from-scratch default and the sibling repository. The rules: iterations/README.md.
  *
  * clinozy-be's `tooling/iterations/iteration.util.ts` implements the same rules, and the README
  * template is byte-identical to its own, so an iteration reads the same in both repositories.
@@ -41,7 +41,10 @@ export const ITERATIONS_DIRECTORY = 'iterations';
 /** Folder inside an iteration holding the files received from outside, exactly as delivered. */
 export const INTAKE_DIRECTORY = 'intake-files';
 
-/** Baseline of an initial iteration — the first one in a repository. */
+/**
+ * Baseline of an iteration that starts from scratch — every new iteration's default. Only the
+ * user names an earlier iteration as a Baseline (`pnpm iteration:baseline`); nothing suggests one.
+ */
 export const NO_BASELINE = 'none';
 
 /** Placeholder for an empty README field. */
@@ -119,11 +122,9 @@ const ITERATION_NAME_PATTERN = new RegExp(
 );
 const FIELD_LABEL = /^[A-Za-z][A-Za-z -]*$/;
 const HISTORY_HEADING = '## History';
-const FINISHED_ENTRY = /^- (\d{4}-\d{2}-\d{2}) · \S+ → (done|frozen) · /;
 const SCRIPT_SOURCE = /<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi;
 const FILE_REFERENCE = /[\w.-]+\.(?:md|json)\b/g;
 const EXTERNAL_SOURCE = /^(?:[a-z]+:|\/\/|\/)/i;
-const BASELINE_STATUSES = new Set(['done', 'frozen']);
 const SIBLING_SUFFIXES = { '-fe': '-be', '-be': '-fe' };
 
 /** Forward Status moves: one step along the lifecycle at a time. */
@@ -479,14 +480,29 @@ export function referencedOptionalFiles(indexMarkdown) {
  * `_index.md` names, a prototype `*.html`, every local `*.js` it loads, and `BRIEF.md` in `brief`
  * mode. Everything else is optional (`_`-prefixed shared files, design-brief / auth /
  * system-surface notes, `preset.json`, `design-overview.md`, a carried-forward `BRIEF.md`) or an
- * extra.
+ * extra. A brief that starts from scratch (`standalone`: Baseline `none`) has no design files to
+ * carry, so its whole mandatory set is `BRIEF.md`.
  *
- * @param {{ names: readonly string[], readText: (name: string) => string, mode?: string }} snapshot
- *   the flat file names, a reader for their text, and the Intake mode (default `full`)
+ * @param {{ names: readonly string[], readText: (name: string) => string, mode?: string, standalone?: boolean }} snapshot
+ *   the flat file names, a reader for their text, the Intake mode (default `full`), and whether
+ *   it is a brief from scratch
  * @returns {{ missing: string[], extras: string[], unlistedScreens: string[] }} `unlistedScreens`
  *   are `.md` files outside the required and optional sets that `_index.md` does not list
  */
-export function checkIntakeSet({ names, readText, mode = DEFAULT_INTAKE_MODE }) {
+export function checkIntakeSet({
+  names,
+  readText,
+  mode = DEFAULT_INTAKE_MODE,
+  standalone = false,
+}) {
+  if (mode === 'brief' && standalone) {
+    const others = names.filter((name) => name !== BRIEF_FILE);
+    return {
+      missing: names.includes(BRIEF_FILE) ? [] : [BRIEF_FILE],
+      extras: others.filter((name) => !name.endsWith('.md')),
+      unlistedScreens: others.filter((name) => name.endsWith('.md')),
+    };
+  }
   const present = new Set(names);
   const index = present.has('_index.md') ? readText('_index.md') : undefined;
   const pages = names.filter((name) => name.endsWith('.html'));
@@ -537,6 +553,16 @@ export function recordedIntakeMode(fields) {
 }
 
 /**
+ * Whether a README records a brief that starts from scratch — Intake mode `brief` on Baseline
+ * `none` — whose snapshot is its `BRIEF.md` alone.
+ *
+ * @param {Map<string, string>} fields
+ */
+export function isStandaloneBrief(fields) {
+  return recordedIntakeMode(fields) === 'brief' && fields.get('Baseline') === NO_BASELINE;
+}
+
+/**
  * The mandatory files an iteration's `intake-files/` is missing, for the Intake mode its README
  * records — empty when the snapshot is complete.
  *
@@ -547,12 +573,14 @@ export function missingIntakeFiles(location) {
   const folder = intakeFolder(location);
   if (!existsSync(folder)) return [`${INTAKE_DIRECTORY}/`];
   const readme = join(iterationFolder(location), 'README.md');
+  const fields = existsSync(readme)
+    ? parseIterationReadme(readFileSync(readme, 'utf-8'))
+    : new Map();
   return checkIntakeSet({
     names: flatFileNames(folder),
     readText: (name) => readFileSync(join(folder, name), 'utf-8'),
-    mode: existsSync(readme)
-      ? recordedIntakeMode(parseIterationReadme(readFileSync(readme, 'utf-8')))
-      : DEFAULT_INTAKE_MODE,
+    mode: recordedIntakeMode(fields),
+    standalone: isStandaloneBrief(fields),
   }).missing;
 }
 
@@ -632,49 +660,6 @@ export function readSnapshot(folder) {
  */
 export function intakeHash(folder) {
   return snapshotFingerprint(readSnapshot(folder));
-}
-
-// ── Baseline ─────────────────────────────────────────────────────────────────
-
-/** The date of the last History line that moved an iteration to `done` or `frozen`, if any. */
-function finishedDate(readme) {
-  let finished = '';
-  for (const line of readme.split('\n')) {
-    const match = FINISHED_ENTRY.exec(line.trim());
-    if (match && match[1] > finished) finished = match[1];
-  }
-  return finished;
-}
-
-/**
- * Suggests a Baseline: the latest `done` or `frozen` iteration in this repository whose
- * `intake-files/` holds the required set — the one that finished last (its latest History move to
- * `done` or `frozen`), then the latest Opened, then the name. The user confirms or picks another at
- * planning Step 0 (`pnpm iteration:baseline`).
- *
- * @param {{ repositoryRoot: string, excluding?: string }} location
- * @returns {string | undefined} `undefined` when no iteration qualifies
- */
-export function suggestBaseline({ repositoryRoot, excluding }) {
-  const candidates = [];
-  for (const [name, readme] of readAllIterationReadmes(repositoryRoot)) {
-    const fields = parseIterationReadme(readme);
-    if (name === excluding || !BASELINE_STATUSES.has(fields.get('Status') ?? ''))
-      continue;
-    if (missingIntakeFiles({ repositoryRoot, iteration: name }).length > 0) continue;
-    candidates.push({
-      name,
-      finished: finishedDate(readme),
-      opened: fields.get('Opened') ?? parseIterationName(name)?.opened ?? '',
-    });
-  }
-  candidates.sort(
-    (left, right) =>
-      right.finished.localeCompare(left.finished) ||
-      right.opened.localeCompare(left.opened) ||
-      right.name.localeCompare(left.name),
-  );
-  return candidates[0]?.name;
 }
 
 // ── sibling repository ──────────────────────────────────────────────────────

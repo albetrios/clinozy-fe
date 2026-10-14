@@ -740,16 +740,16 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 **Path:** `agent-os/skills/fe-iteration-planning/SKILL.md`
 
-**Purpose:** Plan a design iteration from its `intake-files/` — **no code**: confirm the iteration and Baseline, pass the intake gate and read the full snapshot, establish the incremental delta by Intake mode, reconcile md ↔ prototype with evidence, gate on blocking questions, write `KICKOFF.md` with its ordered ledger, and stop for approval. The planning half of the iteration workflow.
+**Purpose:** Plan a design iteration from its `intake-files/` — **no code**: confirm the iteration (from scratch, Baseline `none`, unless the user names one — a Baseline is never asked for or suggested), pass the intake gate and read the full snapshot, establish the change (with a named Baseline, the incremental delta by Intake mode), reconcile md ↔ prototype with evidence, gate on blocking questions, write `KICKOFF.md` with its ordered ledger, and stop for approval. The planning half of the iteration workflow.
 
 **Trigger keywords:** "plan iteration <name>", "iteration planning", "plan the next iteration", "make a plan from legacy", "plan from legacy", "review the legacy version"
 
 **Key behaviors:**
 
-- Step 0 shows the eligibility table (Status `planning`) and confirms the iteration and its Baseline with AskUserQuestion (`pnpm iteration:baseline`)
+- Step 0 shows the eligibility table (Status `planning`) and confirms the iteration with AskUserQuestion; it never asks for or suggests a Baseline — `none` (from scratch) unless the user named one, then recorded with `pnpm iteration:baseline`
 - The intake gate `pnpm iteration:intake <it> --check [--baseline <b>]` runs at Step 0; on failure the skill stops at once (writes nothing, changes no status) and prints the output
 - Every intake file is read in full and proved with a coverage matrix
-- MODE incremental, by Intake mode: full/overlay — `pnpm iteration:diff` of the two `intake-files/` folders reconciled with the designer's "What changed"; brief — `BRIEF.md` is the change list and nothing else may differ. Always the Baseline's Standing deviations; every change classified, omissions raised as findings
+- From scratch (the default), the drop or `BRIEF.md` is the whole change, read against the current code. MODE incremental (a named Baseline), by Intake mode: full/overlay — `pnpm iteration:diff` of the two `intake-files/` folders reconciled with the designer's "What changed"; brief — `BRIEF.md` is the change list and nothing else may differ; plus the Baseline's Standing deviations. Every change classified, omissions raised as findings
 - Every md ↔ prototype verdict carries file:line or selector evidence; RED questions go to AskUserQuestion and `plans/decisions.md`, never a guess
 - Writes every KICKOFF section (`n/a — reason` allowed, absent not) with the route-ordered ledger (Kind, Depends on, Skill/driver, Acceptance, Assignee, Status), then `iteration:status ready-for-approval` and stops; `approved` on the user's go-ahead
 
@@ -761,7 +761,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 **Path:** `agent-os/skills/fe-kickoff-iteration/SKILL.md`
 
-**Purpose:** Implement an approved design iteration: confirm it (Status `approved`, Baseline `none` or done/frozen), move it to `implementing`, then follow the `KICKOFF.md` ledger one row at a time — do, verify, record in `AS-BUILT.md`, check the impact on upcoming rows, stop for review — and close with the static design gates and `iteration:status done`.
+**Purpose:** Implement an approved design iteration: confirm it (Status `approved`, Baseline `none` — from scratch — or a done/frozen iteration the user named), move it to `implementing`, then follow the `KICKOFF.md` ledger one row at a time — do, verify, record in `AS-BUILT.md`, check the impact on upcoming rows, stop for review — and close with the static design gates and `iteration:status done`.
 
 **Trigger keywords:** "kickoff", "kickoff iteration <name>", "start implementing <iteration>"
 

@@ -20,11 +20,12 @@ Run `pnpm iteration:list` and show:
 | Iteration | Type | Baseline | Status | Eligible | Why |
 | --------- | ---- | -------- | ------ | -------- | --- |
 
-Eligible = Status `approved` (not yet `implementing`), and Baseline `none` or an
-iteration that is `done` or `frozen` — a build never starts on an unbuilt
-Baseline. Recommend the earliest-opened eligible iteration (the launch always
-comes first). If the user named one, check it against the rule. Always ask with
-**AskUserQuestion** — never pick silently.
+Eligible = Status `approved` (not yet `implementing`), and Baseline `none` (from
+scratch, the default) or an iteration the user named that is `done` or `frozen` —
+a build never starts on an unbuilt Baseline. Recommend the earliest-opened eligible
+iteration (the launch always comes first). If the user named one, check it against
+the rule. Confirm the iteration with **AskUserQuestion** — never pick silently —
+and never ask about or suggest a Baseline: it is whatever planning recorded.
 
 Once confirmed, **the gate**:
 
@@ -38,7 +39,7 @@ re-approved if it changed) before any build.
 
 When it passes: `pnpm iteration:status <iteration> implementing`, and create `AS-BUILT.md` from
 the skeleton below, dated today, with the Baseline's Standing deviations copied in as the starting
-list (empty for an initial iteration).
+list (empty for an iteration from scratch).
 
 ## Step 1 — Read the approved plan. Stop.
 
@@ -96,8 +97,9 @@ Follow the ledger in its order (respecting Depends on). For each row:
 - **`AS-BUILT.md` › Summary:** planned but not built (deferred, user OK), built
   but not planned, follow-ups for the next iteration.
 - **`AS-BUILT.md` › Standing deviations:** the complete list of where the code
-  now differs from the design — the Baseline's list, minus what this iteration
-  resolved, plus its new ones. The next iteration plans against it.
+  now differs from the design — the Baseline's list (none from scratch), minus
+  what this iteration resolved, plus its new ones. A later iteration reads it
+  when the user names this one as its Baseline.
 - `pnpm iteration:status <iteration> done`. `frozen` goes in the last commit
   before the iteration's branch merges; after that the folder is never edited —
   a correction is a new `fix` iteration.

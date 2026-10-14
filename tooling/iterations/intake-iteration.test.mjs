@@ -361,15 +361,24 @@ describe('overlay mode', () => {
     );
   });
 
-  test('needs a Baseline and at least one received file', () => {
-    const repositoryRoot = withBaseline({ fields: { baseline: '—' } });
+  test('needs a Baseline the user named and at least one received file', () => {
     const received = writeDrop(join(scratchFolder(), 'changes'), { 'alpha.md': 'x\n' });
+    const scratch = runIntake([NAME, received, '--mode', 'overlay'], {
+      repositoryRoot: withBaseline({ fields: { baseline: 'none' } }),
+    });
+    assert.equal(scratch.exitCode, 1);
+    assert.ok(hasLine(scratch, `${NAME} starts from scratch (Baseline none)`));
+    assert.ok(
+      hasLine(scratch, `record it first: pnpm iteration:baseline ${NAME} <baseline>`),
+    );
+
+    const repositoryRoot = withBaseline({ fields: { baseline: '—' } });
     const noBaseline = runIntake([NAME, received, '--mode', 'overlay'], {
       repositoryRoot,
     });
     assert.equal(noBaseline.exitCode, 1);
     assert.ok(
-      hasLine(noBaseline, `confirm it first: pnpm iteration:baseline ${NAME} <baseline>`),
+      hasLine(noBaseline, `${NAME} has no Baseline (—) — record none, the default`),
     );
 
     const withLaunch = withBaseline();
@@ -401,6 +410,79 @@ describe('overlay mode', () => {
     const result = runIntake([NAME, received, '--mode', 'overlay'], { repositoryRoot });
     assert.equal(result.exitCode, 1);
     assert.ok(hasLine(result, 'The snapshot is missing mandatory file(s): gamma.md'));
+  });
+});
+
+describe('brief from scratch (Baseline none, the default)', () => {
+  /** A repository whose iteration under test starts from scratch, beside a finished launch. */
+  function fromScratch() {
+    const repositoryRoot = createRepository();
+    writeIteration({
+      repositoryRoot,
+      name: LAUNCH,
+      fields: { status: 'done' },
+      intake: completeDrop(),
+    });
+    writeIteration({ repositoryRoot, name: NAME, fields: { baseline: 'none' } });
+    return repositoryRoot;
+  }
+
+  test('is the BRIEF.md alone — nothing carried forward — and passes the gate', () => {
+    const repositoryRoot = fromScratch();
+    const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
+    const result = runIntake([NAME, folder, '--mode', 'brief'], {
+      repositoryRoot,
+      today: TODAY,
+    });
+    assert.equal(result.exitCode, 0, result.lines.join('\n'));
+    assert.deepEqual(intakeNames(repositoryRoot), ['BRIEF.md']);
+    const fields = readmeFields(repositoryRoot);
+    assert.equal(fields.get('Intake mode'), 'brief');
+    assert.equal(fields.get('Intake note'), '1 received (BRIEF.md) · from scratch');
+    assert.equal(fields.get('Baseline'), 'none');
+    assert.equal(runIntake([NAME, '--check'], { repositoryRoot }).exitCode, 0);
+  });
+
+  test('refuses design files beside the BRIEF.md — those go in with --mode full', () => {
+    const repositoryRoot = fromScratch();
+    const folder = writeDrop(join(scratchFolder(), 'brief'), {
+      'BRIEF.md': brief(),
+      'alpha.md': '# Screen: Alpha\n',
+    });
+    const result = runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot });
+    assert.equal(result.exitCode, 1);
+    assert.ok(
+      hasLine(
+        result,
+        'a brief from scratch is BRIEF.md alone, but alpha.md also came in',
+      ),
+    );
+    assert.equal(existsSync(intakePath(repositoryRoot)), false);
+  });
+
+  test('the gate fails when its BRIEF.md is gone or a Baseline is recorded after the intake', () => {
+    const repositoryRoot = fromScratch();
+    const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
+    assert.equal(
+      runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot }).exitCode,
+      0,
+    );
+    const readme = join(repositoryRoot, 'iterations', NAME, 'README.md');
+    writeFileSync(
+      readme,
+      readFileSync(readme, 'utf-8').replace(
+        '| Baseline | none |',
+        `| Baseline | ${LAUNCH} |`,
+      ),
+    );
+    const moved = runIntake([NAME, '--check'], { repositoryRoot });
+    assert.equal(moved.exitCode, 1);
+    assert.ok(
+      hasLine(
+        moved,
+        `built on no Baseline (from scratch), but the README's Baseline is ${LAUNCH}`,
+      ),
+    );
   });
 });
 
@@ -746,9 +828,7 @@ describe('--both', () => {
       repositoryRoot: local,
     });
     assert.equal(noBaseline.exitCode, 1);
-    assert.ok(
-      hasLine(noBaseline, 'Sibling repository: --mode overlay builds on the Baseline'),
-    );
+    assert.ok(hasLine(noBaseline, `Sibling repository: ${NAME} has no Baseline (—)`));
   });
 
   test('a differing sibling copy shows the diff and stops, unless --replace while the sibling is planning', () => {
