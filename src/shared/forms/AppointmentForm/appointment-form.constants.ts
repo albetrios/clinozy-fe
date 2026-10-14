@@ -33,7 +33,6 @@ export const APPOINTMENT_FORM_KEYS = {
   who: {
     search: 'appointmentForm.who.search',
     searchLabel: 'appointmentForm.who.searchLabel',
-    useContact: 'appointmentForm.who.useContact',
     /** A search hit with a patient file. */
     patient: 'appointmentForm.who.patient',
     newContact: 'appointmentForm.who.newContact',

@@ -903,11 +903,14 @@
     "found_one": "{{count}} person found",
     "found_other": "{{count}} people found",
     "noMatch": "No existing match",
+    "use": "Use contact",
     "addNamed": "Add “{{name}}” as a new contact",
     "addPhone": "Add {{phone}} as a new contact",
     "addNamedPhone": "Add “{{name}}” · {{phone}} as a new contact",
     "enterKey": "↵",
     "clearSearch": "Clear search",
+    "added": "{{name}} added to contacts",
+    "existing": "{{name}} is already a contact · picked",
     "quickAdd": {
       "name": "Name",
       "namePlaceholder": "First and last name",
@@ -918,6 +921,16 @@
       "addName": "Add a name",
       "needMobile": "Add a 10-digit mobile",
       "mobileDigits": "Mobile needs 10 digits"
+    },
+    "patient": {
+      "newPatient": "New patient",
+      "addNamed": "Add “{{name}}” as a new patient",
+      "addPhone": "Add {{phone}} as a new patient",
+      "addNamedPhone": "Add “{{name}}” · {{phone}} as a new patient",
+      "add": "Add patient",
+      "use": "Use patient",
+      "added": "{{name}} added as a patient",
+      "existing": "{{name}} is already a patient · picked"
     }
   },
   "contactEditor": {
@@ -1011,7 +1024,6 @@
     "who": {
       "search": "Search patient or lead by name, phone, ID",
       "searchLabel": "Search person",
-      "useContact": "Use contact",
       "patient": "Patient",
       "newContact": "New contact · add their mobile to book",
       "mobile": "Mobile number",
@@ -1143,9 +1155,7 @@
   "patientPicker": {
     "label": "Patient",
     "placeholder": "Search patients",
-    "hint": "only patients can be picked",
-    "due": "{{amount}} due",
-    "nothingDue": "Nothing due"
+    "hint": "only patients can be picked"
   },
   "splitRows": {
     "mode": "Mode",
@@ -1239,7 +1249,6 @@
     },
     "fields": {
       "branch": "Branch",
-      "newPatient": "New patient",
       "customer": "Customer",
       "customerHint": "patient or any contact · new names are saved as a Medical contact",
       "customerPlaceholder": "Search patients, leads or medical contacts",

@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
-import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import type { ContactScope } from '@/shared/api/app/contacts-api.ts';
+import type { ContactHit } from '@/shared/api/app/contacts-contracts.ts';
 import { APP_PHONE_PREFIX, formatAppPhoneDigits } from '@/shared/app/app-phone-field.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import { ProgressLine } from '@/shared/components/ProgressLine/index.ts';
@@ -17,13 +18,10 @@ import {
   CommandItem,
   CommandList,
 } from '@/shared/components/ui/command.tsx';
-import {
-  CONTACT_EDITOR_KEYS,
-  CONTACT_EDITOR_NS,
-} from '@/shared/forms/ContactEditor/index.ts';
 import { Plus, Search, X } from '@/shared/icons/index.ts';
 
 import {
+  CONTACT_QUICK_PICK_ADD_KEYS,
   CONTACT_QUICK_PICK_KEYS,
   CONTACT_QUICK_PICK_NS,
   CONTACT_QUICK_PICK_TEST_IDS,
@@ -65,7 +63,7 @@ export interface ContactQuickPickRow {
 /** The host's own test ids, kept from the searches the picker replaced. */
 export interface ContactQuickPickTestIds {
   search: string;
-  hit: (hit: ContactSummary) => string;
+  hit: (hit: ContactHit) => string;
   /** The add row ("New contact" / "Add “…” as a new contact"). */
   add: string;
   /** "No existing match". */
@@ -79,11 +77,19 @@ export interface ContactQuickPickProps {
   searchLabel: string;
   /** The most people a search shows (the API answers eight at most). */
   limit?: number;
-  describe: (hit: ContactSummary) => ContactQuickPickRow;
+  describe: (hit: ContactHit) => ContactQuickPickRow;
+  /**
+   * Whom the search and Recent read — everyone (default) or only patients, whose add row and
+   * quick add then speak of a new patient.
+   */
+  scope?: ContactScope;
   /** A person picked — by click, tap or ↵. */
-  onPick: (hit: ContactSummary) => void;
-  /** "Add contact" in the quick add, its values checked. */
-  onQuickAdd: (draft: QuickAddDraft) => void;
+  onPick: (hit: ContactHit) => void;
+  /**
+   * "Add contact" in the quick add, its values checked. A promise keeps the quick add open, its
+   * button busy, until it settles — and open when it fails (the host says why).
+   */
+  onQuickAdd: (draft: QuickAddDraft) => void | Promise<void>;
   /** "More details" in the quick add — the full contact editor from its values. */
   onMoreDetails?: (draft: QuickAddDraft) => void;
   /** The quick add also needs a 10-digit mobile. */
@@ -141,12 +147,12 @@ function PersonRow({
   onPick,
   testId,
 }: {
-  hit: ContactSummary;
+  hit: ContactHit;
   typed: string;
   row: ContactQuickPickRow;
   /** The row ↵ picks: it shows the ↵ hint. */
   highlighted: boolean;
-  onPick: (hit: ContactSummary) => void;
+  onPick: (hit: ContactHit) => void;
   testId: string;
 }) {
   const { t } = useTranslation(CONTACT_QUICK_PICK_NS);
@@ -212,39 +218,44 @@ function LoadingRows({ testId }: { testId: string }) {
   );
 }
 
-/** The add row's words: what the search would start the new person with. */
-function useAddLabel() {
+/** The add row's words: what the search would start the new contact — or patient — with. */
+function useAddLabel(scope: ContactScope) {
   const { t } = useTranslation(CONTACT_QUICK_PICK_NS);
-  const { t: tEditor } = useTranslation(CONTACT_EDITOR_NS);
+  const words = CONTACT_QUICK_PICK_ADD_KEYS[scope];
   return ({ name, phone }: QuickAddDraft) => {
     const shown = isolateValues({
       name,
       phone: `${APP_PHONE_PREFIX} ${formatAppPhoneDigits(phone)}`,
     });
-    if (name && phone) return t(K.addNamedPhone, shown);
-    if (name) return t(K.addNamed, shown);
-    if (phone) return t(K.addPhone, shown);
-    return tEditor(CONTACT_EDITOR_KEYS.newContact);
+    if (name && phone) return t(words.addNamedPhone, shown);
+    if (name) return t(words.addNamed, shown);
+    if (phone) return t(words.addPhone, shown);
+    return t(words.newPerson);
   };
 }
 
-/** The add row: "New contact", or what the search would start the new person with. */
+/**
+ * The add row: "New contact", or what the search would start the new person with — pinned to the
+ * list's foot, so a long answer never scrolls it away.
+ */
 function AddRow({
   draft,
+  scope,
   keyHint,
   onSelect,
   testId,
 }: {
   draft: QuickAddDraft;
+  scope: ContactScope;
   /** The ↵ hint: highlighted, and not while ↵ waits for the first answer. */
   keyHint: boolean;
   onSelect: () => void;
   testId: string;
 }) {
   const { t } = useTranslation(CONTACT_QUICK_PICK_NS);
-  const addLabel = useAddLabel();
+  const addLabel = useAddLabel(scope);
   return (
-    <CommandGroup className="p-0">
+    <CommandGroup className="sticky bottom-0 p-0">
       <CommandItem
         value={QUICK_PICK_ADD_VALUE}
         onSelect={onSelect}
@@ -347,12 +358,12 @@ function PeopleGroup({
   testIds,
   ...group
 }: {
-  people: readonly ContactSummary[];
+  people: readonly ContactHit[];
   typed: string;
   /** The highlighted row's value. */
   highlighted: string;
   describe: ContactQuickPickProps['describe'];
-  onPick: (hit: ContactSummary) => void;
+  onPick: (hit: ContactHit) => void;
   testIds: ContactQuickPickTestIds;
   heading?: ReactNode;
   className?: string;
@@ -378,6 +389,7 @@ function PeopleGroup({
 /** The list under the search: Recent or the search's people, the loading rows, notes, the add row. */
 function PickList({
   view,
+  scope,
   highlighted,
   label,
   describe,
@@ -387,10 +399,11 @@ function PickList({
   testIds,
 }: {
   view: QuickPickView;
+  scope: ContactScope;
   highlighted: string;
   label: string;
   describe: ContactQuickPickProps['describe'];
-  onPick: (hit: ContactSummary) => void;
+  onPick: (hit: ContactHit) => void;
   onAdd: () => void;
   testId: string;
   testIds: ContactQuickPickTestIds;
@@ -402,7 +415,9 @@ function PickList({
       label={label}
       // A cmdk group is presentational, so the busy state sits on the listbox itself.
       aria-busy={view.refreshing || view.waiting}
-      className="max-h-none overflow-visible [&_[cmdk-list-sizer]]:flex [&_[cmdk-list-sizer]]:flex-col"
+      // 20rem holds Recent whole; eight people scroll under the add row, pinned below them
+      // (the scroll padding keeps a row the keys move to clear of it).
+      className="max-h-80 scroll-pb-10 overscroll-contain [&_[cmdk-list-sizer]]:flex [&_[cmdk-list-sizer]]:flex-col"
     >
       {view.recent.length > 0 ? (
         <PeopleGroup
@@ -441,6 +456,7 @@ function PickList({
       ) : null}
       <AddRow
         draft={view.draft}
+        scope={scope}
         keyHint={highlighted === QUICK_PICK_ADD_VALUE && !view.waiting}
         onSelect={onAdd}
         testId={testIds.add}
@@ -471,6 +487,7 @@ export function ContactQuickPick({
   searchPlaceholder,
   searchLabel,
   limit = 8,
+  scope = 'everyone',
   describe,
   onPick,
   onQuickAdd,
@@ -483,13 +500,13 @@ export function ContactQuickPick({
   testIds,
   className,
 }: ContactQuickPickProps) {
-  const pickState = useContactQuickPick({ limit, disabled });
+  const pickState = useContactQuickPick({ limit, disabled, scope });
   const { view, setQuery, setAdding } = pickState;
   const done = () => {
     setAdding(null);
     setQuery('');
   };
-  const pick = (hit: ContactSummary) => {
+  const pick = (hit: ContactHit) => {
     onPick(hit);
     setQuery('');
   };
@@ -518,9 +535,10 @@ export function ContactQuickPick({
       {pickState.adding ? (
         <ContactQuickAdd
           draft={pickState.adding}
+          scope={scope}
           requirePhone={requirePhone}
-          onAdd={(values) => {
-            onQuickAdd(values);
+          onAdd={async (values) => {
+            await onQuickAdd(values);
             done();
           }}
           onMoreDetails={
@@ -558,6 +576,7 @@ export function ContactQuickPick({
           {disabled ? null : (
             <PickList
               view={view}
+              scope={scope}
               highlighted={pickState.highlighted}
               label={searchLabel}
               describe={describe}

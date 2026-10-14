@@ -915,11 +915,14 @@
     "found_many": "{{count}} personnes trouvées",
     "found_other": "{{count}} personnes trouvées",
     "noMatch": "Aucune correspondance",
+    "use": "Utiliser le contact",
     "addNamed": "Ajouter « {{name}} » comme nouveau contact",
     "addPhone": "Ajouter le {{phone}} comme nouveau contact",
     "addNamedPhone": "Ajouter « {{name}} » · {{phone}} comme nouveau contact",
     "enterKey": "↵",
     "clearSearch": "Effacer la recherche",
+    "added": "{{name}} ajouté aux contacts",
+    "existing": "{{name}} est déjà un contact · sélectionné",
     "quickAdd": {
       "name": "Nom",
       "namePlaceholder": "Prénom et nom",
@@ -930,6 +933,16 @@
       "addName": "Ajoutez un nom",
       "needMobile": "Ajoutez un mobile à 10 chiffres",
       "mobileDigits": "Le mobile doit compter 10 chiffres"
+    },
+    "patient": {
+      "newPatient": "Nouveau patient",
+      "addNamed": "Ajouter « {{name}} » comme nouveau patient",
+      "addPhone": "Ajouter {{phone}} comme nouveau patient",
+      "addNamedPhone": "Ajouter « {{name}} » · {{phone}} comme nouveau patient",
+      "add": "Ajouter le patient",
+      "use": "Choisir le patient",
+      "added": "{{name}} ajouté comme patient",
+      "existing": "{{name}} est déjà patient · sélectionné"
     }
   },
   "contactEditor": {
@@ -1023,7 +1036,6 @@
     "who": {
       "search": "Rechercher un patient ou un prospect par nom, téléphone, ID",
       "searchLabel": "Rechercher une personne",
-      "useContact": "Utiliser le contact",
       "patient": "Patient",
       "newContact": "Nouveau contact · ajoutez le mobile pour réserver",
       "mobile": "Numéro de mobile",
@@ -1158,9 +1170,7 @@
   "patientPicker": {
     "label": "Patient",
     "placeholder": "Rechercher des patients",
-    "hint": "seuls les patients peuvent être choisis",
-    "due": "{{amount}} dû",
-    "nothingDue": "Rien de dû"
+    "hint": "seuls les patients peuvent être choisis"
   },
   "splitRows": {
     "mode": "Mode",
@@ -1255,7 +1265,6 @@
     },
     "fields": {
       "branch": "Site",
-      "newPatient": "Nouveau patient",
       "customer": "Client",
       "customerHint": "patient ou tout contact · les nouveaux noms sont enregistrés comme contact médical",
       "customerPlaceholder": "Rechercher patients, prospects ou contacts médicaux",

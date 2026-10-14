@@ -130,7 +130,7 @@ async function searchFor(user: ReturnType<typeof userEvent.setup>, typed: string
   const search = screen.getByTestId('new-lead-search');
   await user.type(search, typed);
   const query = (search as HTMLInputElement).value;
-  await waitFor(() => expect(searchContacts).toHaveBeenCalledWith(query));
+  await waitFor(() => expect(searchContacts).toHaveBeenCalledWith(query, 'everyone'));
 }
 
 describe('NewLeadDrawer (KICKOFF §6.3)', () => {

@@ -891,11 +891,14 @@
     "searching": "検索中…",
     "found_other": "{{count}} 人見つかりました",
     "noMatch": "一致する人はいません",
+    "use": "連絡先を使う",
     "addNamed": "「{{name}}」を新しい連絡先として追加",
     "addPhone": "{{phone}} を新しい連絡先として追加",
     "addNamedPhone": "「{{name}}」· {{phone}} を新しい連絡先として追加",
     "enterKey": "↵",
     "clearSearch": "検索をクリア",
+    "added": "{{name}} を連絡先に追加しました",
+    "existing": "{{name}} はすでに連絡先です · 選択しました",
     "quickAdd": {
       "name": "名前",
       "namePlaceholder": "姓と名",
@@ -906,6 +909,16 @@
       "addName": "名前を入力してください",
       "needMobile": "10 桁の携帯番号を入力してください",
       "mobileDigits": "携帯番号は10桁必要です"
+    },
+    "patient": {
+      "newPatient": "新しい患者",
+      "addNamed": "「{{name}}」を新しい患者として追加",
+      "addPhone": "{{phone}} を新しい患者として追加",
+      "addNamedPhone": "「{{name}}」· {{phone}} を新しい患者として追加",
+      "add": "患者を追加",
+      "use": "この患者を使う",
+      "added": "{{name}} を患者として追加しました",
+      "existing": "{{name}} はすでに患者です · 選択しました"
     }
   },
   "contactEditor": {
@@ -999,7 +1012,6 @@
     "who": {
       "search": "患者またはリードを名前・電話・IDで検索",
       "searchLabel": "人を検索",
-      "useContact": "連絡先を使う",
       "patient": "患者",
       "newContact": "新しい連絡先 · 予約には携帯番号を追加",
       "mobile": "携帯番号",
@@ -1128,9 +1140,7 @@
   "patientPicker": {
     "label": "患者",
     "placeholder": "患者を検索",
-    "hint": "選べるのは患者のみ",
-    "due": "未払い {{amount}}",
-    "nothingDue": "未払いなし"
+    "hint": "選べるのは患者のみ"
   },
   "splitRows": {
     "mode": "方法",
@@ -1223,7 +1233,6 @@
     },
     "fields": {
       "branch": "店舗",
-      "newPatient": "新しい患者",
       "customer": "顧客",
       "customerHint": "患者または任意の連絡先 · 新しい名前は薬局の連絡先として保存されます",
       "customerPlaceholder": "患者・リード・薬局の連絡先を検索",

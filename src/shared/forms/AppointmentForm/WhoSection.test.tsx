@@ -153,7 +153,7 @@ describe('WhoSection — the person search (H:2749–2753)', () => {
     expect(searchContactsMock).not.toHaveBeenCalled();
     await user.type(search, 'y');
     const hits = await screen.findAllByTestId(IDS.whoHit);
-    expect(searchContactsMock).toHaveBeenCalledWith('riy');
+    expect(searchContactsMock).toHaveBeenCalledWith('riy', 'everyone');
     expect(hits).toHaveLength(2);
     expect(hits[0]).toHaveTextContent('Riya Mehta+91 98250 11241Use contact');
     // A patient's hit says so (its avatar carries the "P"), not their number.

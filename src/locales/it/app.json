@@ -915,11 +915,14 @@
     "found_many": "{{count}} persone trovate",
     "found_other": "{{count}} persone trovate",
     "noMatch": "Nessuna corrispondenza",
+    "use": "Usa contatto",
     "addNamed": "Aggiungi «{{name}}» come nuovo contatto",
     "addPhone": "Aggiungi {{phone}} come nuovo contatto",
     "addNamedPhone": "Aggiungi «{{name}}» · {{phone}} come nuovo contatto",
     "enterKey": "↵",
     "clearSearch": "Cancella ricerca",
+    "added": "{{name}} aggiunto ai contatti",
+    "existing": "{{name}} è già un contatto · selezionato",
     "quickAdd": {
       "name": "Nome",
       "namePlaceholder": "Nome e cognome",
@@ -930,6 +933,16 @@
       "addName": "Aggiungi un nome",
       "needMobile": "Aggiungi un cellulare di 10 cifre",
       "mobileDigits": "Il cellulare deve avere 10 cifre"
+    },
+    "patient": {
+      "newPatient": "Nuovo paziente",
+      "addNamed": "Aggiungi «{{name}}» come nuovo paziente",
+      "addPhone": "Aggiungi {{phone}} come nuovo paziente",
+      "addNamedPhone": "Aggiungi «{{name}}» · {{phone}} come nuovo paziente",
+      "add": "Aggiungi paziente",
+      "use": "Usa paziente",
+      "added": "{{name}} aggiunto come paziente",
+      "existing": "{{name}} è già un paziente · selezionato"
     }
   },
   "contactEditor": {
@@ -1023,7 +1036,6 @@
     "who": {
       "search": "Cerca paziente o lead per nome, telefono, ID",
       "searchLabel": "Cerca persona",
-      "useContact": "Usa contatto",
       "patient": "Paziente",
       "newContact": "Nuovo contatto · aggiungi il cellulare per prenotare",
       "mobile": "Numero di cellulare",
@@ -1158,9 +1170,7 @@
   "patientPicker": {
     "label": "Paziente",
     "placeholder": "Cerca pazienti",
-    "hint": "si possono scegliere solo pazienti",
-    "due": "{{amount}} da saldare",
-    "nothingDue": "Niente da saldare"
+    "hint": "si possono scegliere solo pazienti"
   },
   "splitRows": {
     "mode": "Modalità",
@@ -1255,7 +1265,6 @@
     },
     "fields": {
       "branch": "Sede",
-      "newPatient": "Nuovo paziente",
       "customer": "Cliente",
       "customerHint": "paziente o qualsiasi contatto · i nuovi nomi si salvano come contatto medico",
       "customerPlaceholder": "Cerca pazienti, lead o contatti medici",

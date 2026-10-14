@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2231 src files · ~1131 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
+Stats: ~2233 src files · ~1130 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1504,7 +1504,6 @@ clinozy-fe/
 │   │   │   │   ├── patient-packages-contracts.ts
 │   │   │   │   ├── patient-reports-api.ts
 │   │   │   │   ├── patient-reports-contracts.ts
-│   │   │   │   ├── patient-search-api.ts
 │   │   │   │   ├── patients-api.ts
 │   │   │   │   ├── patients-contracts.ts
 │   │   │   │   ├── patients-fixture-api.ts
@@ -1534,7 +1533,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [65 test files]
+│   │   │   │   └── [64 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1746,8 +1745,10 @@ clinozy-fe/
 │   │   │   │   ├── contact-quick-pick.constants.ts
 │   │   │   │   ├── ContactQuickAdd.tsx
 │   │   │   │   ├── ContactQuickPick.tsx
+│   │   │   │   ├── ContactQuickPickField.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── use-contact-quick-pick.ts
+│   │   │   │   ├── use-quick-add-contact.ts
 │   │   │   │   └── [2 test files]
 │   │   │   ├── CreateOrganizationDialog/
 │   │   │   │   ├── CreateOrganizationDialog.tsx
@@ -1962,9 +1963,10 @@ clinozy-fe/
 │   │   │   │   └── [3 test files]
 │   │   │   ├── PatientPicker/
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── patient-picker-options.ts
+│   │   │   │   ├── patient-pick.ts
 │   │   │   │   ├── patient-picker.constants.ts
 │   │   │   │   ├── PatientPicker.tsx
+│   │   │   │   ├── use-quick-add-patient.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── PaymentDeleteConfirm/
 │   │   │   │   ├── index.ts

@@ -1,20 +1,19 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { ContactScope } from '@/shared/api/app/contacts-api.ts';
 import {
   DrawerField,
   DrawerInput,
   DrawerPhoneInput,
 } from '@/shared/components/DrawerField/index.ts';
+import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  CONTACT_EDITOR_KEYS,
-  CONTACT_EDITOR_NS,
-} from '@/shared/forms/ContactEditor/index.ts';
 import { ChevronLeft, UserPlus } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
+  CONTACT_QUICK_PICK_ADD_KEYS,
   CONTACT_QUICK_PICK_KEYS,
   CONTACT_QUICK_PICK_NS,
   CONTACT_QUICK_PICK_TEST_IDS,
@@ -28,9 +27,12 @@ const IDS = CONTACT_QUICK_PICK_TEST_IDS;
 export interface ContactQuickAddProps {
   /** What the search held — the fields start from it. */
   draft: QuickAddDraft;
+  /** A new contact (default) or a new patient — the title's and the button's words. */
+  scope?: ContactScope;
   /** "Add contact" also needs a 10-digit mobile (New lead: the lead cannot be made without one). */
   requirePhone: boolean;
-  onAdd: (draft: QuickAddDraft) => void;
+  /** The checked values; a promise holds the button busy until it settles. */
+  onAdd: (draft: QuickAddDraft) => void | Promise<void>;
   /** "More details": the full contact editor, from these values. */
   onMoreDetails?: (draft: QuickAddDraft) => void;
   /** "Back to search" — the search keeps what was typed. */
@@ -42,10 +44,13 @@ export interface ContactQuickAddProps {
  * The contact picker's inline quick add (change-contact-quick-pick D8): Name and Mobile (+91)
  * prefilled from the search, the focus on the first empty one; ↵ in either field adds. "Add
  * contact" checks a name ("Add a name") and the mobile — ten digits when one is required ("Add
- * a 10-digit mobile"), or when one is typed ("Mobile needs 10 digits").
+ * a 10-digit mobile"), or when one is typed ("Mobile needs 10 digits"). While the host's add is
+ * on its way (a patient being registered) the button spins and a second press waits; a failed
+ * add leaves the fields as they are.
  */
 export function ContactQuickAdd({
   draft,
+  scope = 'everyone',
   requirePhone,
   onAdd,
   onMoreDetails,
@@ -53,10 +58,11 @@ export function ContactQuickAdd({
   testId,
 }: ContactQuickAddProps) {
   const { t } = useTranslation(CONTACT_QUICK_PICK_NS);
-  const { t: tEditor } = useTranslation(CONTACT_EDITOR_NS);
+  const words = CONTACT_QUICK_PICK_ADD_KEYS[scope];
   const id = useId();
   const [name, setName] = useState(draft.name);
   const [phone, setPhone] = useState(draft.phone);
+  const [adding, setAdding] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
@@ -87,9 +93,17 @@ export function ContactQuickAdd({
   return (
     <form
       noValidate
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault();
-        if (valid()) onAdd(values());
+        if (adding || !valid()) return;
+        setAdding(true);
+        try {
+          await onAdd(values());
+        } catch {
+          // The host said why; the fields stay for another try.
+        } finally {
+          setAdding(false);
+        }
       }}
       aria-labelledby={`${id}-title`}
       data-testid={IDS.quickAdd(testId)}
@@ -109,7 +123,7 @@ export function ContactQuickAdd({
           <ChevronLeft aria-hidden="true" className="rtl:rotate-180" />
         </Button>
         <span id={`${id}-title`} className="text-body font-semibold">
-          {tEditor(CONTACT_EDITOR_KEYS.newContact)}
+          {t(words.newPerson)}
         </span>
         {onMoreDetails ? (
           <Button
@@ -147,9 +161,13 @@ export function ContactQuickAdd({
             data-testid={IDS.quickAddMobile(testId)}
           />
         </DrawerField>
-        <Button type="submit" data-testid={IDS.quickAddSubmit(testId)}>
-          <UserPlus aria-hidden="true" />
-          {t(K.add)}
+        <Button
+          type="submit"
+          aria-busy={adding || undefined}
+          data-testid={IDS.quickAddSubmit(testId)}
+        >
+          {adding ? <Spinner /> : <UserPlus aria-hidden="true" />}
+          {t(words.submit)}
         </Button>
       </div>
     </form>

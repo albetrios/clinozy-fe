@@ -462,8 +462,7 @@
     "forField": {
       "label": "対象",
       "placeholder": "人を選択",
-      "search": "名前、携帯番号、番号で検索",
-      "empty": "名前、携帯番号、連絡先番号を入力してください"
+      "search": "名前、携帯番号、番号で検索"
     },
     "titleField": {
       "label": "タイトル",

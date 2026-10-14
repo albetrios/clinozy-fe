@@ -177,6 +177,22 @@ describe('searchContacts', () => {
     vi.mocked(api.get).mockResolvedValueOnce({ data: undefined } as never);
     expect(await searchContacts('anaya')).toEqual([]);
   });
+
+  it('searches only patients for the patients scope, each with their file’s number', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: [contactRow({ patient_id: 'pat_anaya00000000000000', patient_number: 3441 })],
+    } as never);
+    const hits = await searchContacts('anaya', 'patients');
+    expect(api.get).toHaveBeenCalledWith('/app/contacts', {
+      query: { q: 'anaya', limit: 8, is_patient: 'true' },
+    });
+    expect(hits).toEqual([
+      expect.objectContaining({
+        patientId: 'pat_anaya00000000000000',
+        patientNumber: 3441,
+      }),
+    ]);
+  });
 });
 
 describe('fetchRecentContacts', () => {
@@ -189,6 +205,14 @@ describe('fetchRecentContacts', () => {
     expect(people).toEqual([
       expect.objectContaining({ id: CONTACT_ID, name: 'Anaya Desai' }),
     ]);
+  });
+
+  it('reads only patients for the patients scope', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ data: [] } as never);
+    await fetchRecentContacts('patients');
+    expect(api.get).toHaveBeenCalledWith('/app/contacts', {
+      query: { sort: 'last_activity_at', order: 'desc', limit: 5, is_patient: 'true' },
+    });
   });
 });
 

@@ -474,8 +474,7 @@
     "forField": {
       "label": "Pour",
       "placeholder": "Choisissez une personne",
-      "search": "Rechercher par nom, mobile ou numéro",
-      "empty": "Saisissez un nom, un mobile ou un numéro de contact"
+      "search": "Rechercher par nom, mobile ou numéro"
     },
     "titleField": {
       "label": "Titre",

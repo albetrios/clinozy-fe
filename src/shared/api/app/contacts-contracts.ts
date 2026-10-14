@@ -156,6 +156,12 @@ export interface ContactProfile {
   patientNumber: number | null;
 }
 
+/**
+ * A people-search row (the contact pickers' search and Recent): the summary, with the patient
+ * file's number ("#3441") for a patient — left out by the doubles that predate it.
+ */
+export type ContactHit = ContactSummary & Partial<Pick<ContactProfile, 'patientNumber'>>;
+
 /** A person with every number — the contact editor's record. */
 export interface Contact extends ContactSummary, ContactProfile {
   phones: ContactPhone[];

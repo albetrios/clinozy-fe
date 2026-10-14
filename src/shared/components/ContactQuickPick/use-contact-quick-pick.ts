@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isContactSearchable } from '@/shared/api/app/contacts-api.ts';
-import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import { type ContactScope, isContactSearchable } from '@/shared/api/app/contacts-api.ts';
+import type { ContactHit } from '@/shared/api/app/contacts-contracts.ts';
 import { useContactSearch, useRecentContacts } from '@/shared/hooks/useContacts/index.ts';
 
 import {
@@ -23,9 +23,9 @@ export interface QuickPickView {
   /** The text is a search the API takes (3 letters, 4 digits, a whole `C-12345`). */
   live: boolean;
   /** "Recent", before anything is typed. */
-  recent: readonly ContactSummary[];
+  recent: readonly ContactHit[];
   /** The search's people — the last answer while the next one loads. */
-  hits: readonly ContactSummary[];
+  hits: readonly ContactHit[];
   /** Nothing to show yet while an answer is on its way: the shimmer rows stand in. */
   waiting: boolean;
   /** A new answer is loading over the last: its rows stay, dimmed. */
@@ -74,22 +74,25 @@ function highlightOf(view: QuickPickView, active: ActiveRow): string {
 /**
  * The contact picker's state: the search text, the quick add (open with its start, or not), the
  * highlight, and what the list shows — the search (`useContactSearch`) and, before anything is
- * typed, Recent (`useRecentContacts`, read only while it can be seen).
+ * typed, Recent (`useRecentContacts`, read only while it can be seen), among everyone or only
+ * patients (`scope`).
  */
 export function useContactQuickPick({
   limit,
   disabled,
+  scope,
 }: {
   limit: number;
   disabled: boolean;
+  scope: ContactScope;
 }) {
   const [query, setQuery] = useState('');
   const [adding, setAdding] = useState<QuickAddDraft | null>(null);
   const [activeRow, setActiveRow] = useState<ActiveRow>({ value: '', rows: '' });
   const typed = query.trim();
   const live = isContactSearchable(typed);
-  const search = useContactSearch(query);
-  const recent = useRecentContacts(!disabled && adding === null && typed === '');
+  const search = useContactSearch(query, scope);
+  const recent = useRecentContacts(!disabled && adding === null && typed === '', scope);
   const hits = live ? search.hits.slice(0, limit) : [];
 
   const view: QuickPickView = {

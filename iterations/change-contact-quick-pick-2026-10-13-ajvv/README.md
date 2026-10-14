@@ -9,7 +9,7 @@
 | Branch | feat/contact-quick-pick |
 | Baseline | launch-2026-09-30-jxmr |
 | Status | done |
-| Summary | One shared contact picker for the New lead and appointment drawers — Recent people before typing, highlighted matches, ↑ ↓ ↵ to pick, a quick add prefilled from what was typed — and a shared loading look (a shimmer sweep on skeleton bars, a progress line, a spinning search glyph) that every drawer picker uses |
+| Summary | One shared contact picker for every person field — New lead, the appointment's Who, New task's For, the Receive payment and Invoice patient — with Recent people before typing, highlighted matches, ↑ ↓ ↵ to pick and a quick add prefilled from what was typed; bounded dropdowns on big screens; and a shared loading look (a shimmer sweep on skeleton bars, a progress line, a spinning search glyph) that every drawer picker uses |
 | Drop placed | 2026-10-13 |
 | Drop source | /tmp/claude-0/-home-user/82eed7e6-60aa-5063-ae07-b0d9505d3082/scratchpad/brief |
 | Intake mode | brief |

@@ -2,6 +2,7 @@ import { keepPreviousData } from '@tanstack/react-query';
 
 import {
   contactQueryKeys,
+  type ContactScope,
   createContact,
   fetchContact,
   fetchRecentContacts,
@@ -12,7 +13,7 @@ import {
 import type {
   Contact,
   ContactFields,
-  ContactSummary,
+  ContactHit,
 } from '@/shared/api/app/contacts-contracts.ts';
 import { leadQueryKeys } from '@/shared/api/app/leads-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
@@ -43,7 +44,7 @@ const CONTACT_SEARCH_DEBOUNCE_MS = 250;
 /** A person search as a picker reads it. */
 export interface ContactSearch {
   /** The people for the query as typed — or, while it loads, for the last one asked. */
-  hits: readonly ContactSummary[];
+  hits: readonly ContactHit[];
   /** The query as typed has its answer and it is empty: "No existing match". */
   noMatch: boolean;
   /**
@@ -54,16 +55,20 @@ export interface ContactSearch {
 }
 
 /**
- * The person search (`GET /app/contacts?q=`): debounced 250ms, from 3 letters or 4 digits; the
- * previous answer stays up while the next one loads, and `searching` says one is on its way.
+ * The person search (`GET /app/contacts?q=`): debounced 250ms, from 3 letters or 4 digits, among
+ * everyone or only patients (`scope`); the previous answer stays up while the next one loads, and
+ * `searching` says one is on its way.
  */
-export function useContactSearch(query: string): ContactSearch {
+export function useContactSearch(
+  query: string,
+  scope: ContactScope = 'everyone',
+): ContactSearch {
   const organizationId = useOrganizationId();
   const typed = query.trim();
   const { debounced, isPending } = useDebouncedSearch(typed, CONTACT_SEARCH_DEBOUNCE_MS);
   const search = useAppQuery({
-    queryKey: contactQueryKeys.search(organizationId, debounced.toLowerCase()),
-    queryFn: () => searchContacts(debounced),
+    queryKey: contactQueryKeys.search(organizationId, debounced.toLowerCase(), scope),
+    queryFn: () => searchContacts(debounced, scope),
     enabled: isContactSearchable(debounced),
     placeholderData: keepPreviousData,
   });
@@ -79,21 +84,24 @@ export function useContactSearch(query: string): ContactSearch {
 
 /** The people a picker shows before anything is typed. */
 export interface RecentContacts {
-  people: readonly ContactSummary[];
+  people: readonly ContactHit[];
   /** The first read is in flight (its shimmer rows). */
   loading: boolean;
 }
 
 /**
  * "Recent" (`GET /app/contacts?sort=last_activity_at`, change-contact-quick-pick D7): the five
- * people the clinic was last in touch with — idle while `enabled` is off, quiet on failure (the
- * search still works, so no toast), fresh for 30s.
+ * people — or patients (`scope`) — the clinic was last in touch with; idle while `enabled` is
+ * off, quiet on failure (the search still works, so no toast), fresh for 30s.
  */
-export function useRecentContacts(enabled: boolean): RecentContacts {
+export function useRecentContacts(
+  enabled: boolean,
+  scope: ContactScope = 'everyone',
+): RecentContacts {
   const organizationId = useOrganizationId();
   const recent = useAppQuery({
-    queryKey: contactQueryKeys.recent(organizationId),
-    queryFn: fetchRecentContacts,
+    queryKey: contactQueryKeys.recent(organizationId, scope),
+    queryFn: () => fetchRecentContacts(scope),
     enabled,
     staleTime: 30_000,
     notifyOnError: false,

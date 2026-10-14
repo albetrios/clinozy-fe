@@ -158,14 +158,14 @@ describe('useContactSearch', () => {
 
     await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
     expect(searchContacts).toHaveBeenCalledTimes(1);
-    expect(searchContacts).toHaveBeenCalledWith('anaya');
+    expect(searchContacts).toHaveBeenCalledWith('anaya', 'everyone');
     expect(result.current.noMatch).toBe(false);
   });
 
   it('searches from 4 digits of a number', async () => {
     const { result } = renderHook(() => useContactSearch('9879'), { wrapper });
     await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
-    expect(searchContacts).toHaveBeenCalledWith('9879');
+    expect(searchContacts).toHaveBeenCalledWith('9879', 'everyone');
   });
 
   it('keeps the last answer up while the next loads, then says nobody matches', async () => {
@@ -193,6 +193,14 @@ describe('useContactSearch', () => {
     expect(result.current).toEqual({ hits: [], noMatch: false, searching: false });
   });
 
+  it('searches only patients for the patients scope, under their own key', async () => {
+    const { result } = renderHook(() => useContactSearch('anaya', 'patients'), {
+      wrapper,
+    });
+    await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
+    expect(searchContacts).toHaveBeenCalledWith('anaya', 'patients');
+  });
+
   it('says it is searching from the keystroke until the answer is in', async () => {
     const { result } = renderHook(() => useContactSearch('anaya'), { wrapper });
     expect(result.current.searching).toBe(true);
@@ -208,6 +216,13 @@ describe('useRecentContacts', () => {
     expect(result.current.loading).toBe(true);
     await waitFor(() => expect(result.current.people).toEqual([ANAYA]));
     expect(result.current.loading).toBe(false);
+  });
+
+  it('reads only patients for the patients scope', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([ANAYA]);
+    const { result } = renderHook(() => useRecentContacts(true, 'patients'), { wrapper });
+    await waitFor(() => expect(result.current.people).toEqual([ANAYA]));
+    expect(fetchRecentContacts).toHaveBeenCalledWith('patients');
   });
 
   it('stays idle while off', async () => {

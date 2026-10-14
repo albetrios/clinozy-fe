@@ -16,3 +16,9 @@ export {
   type ContactQuickPickRow,
   type ContactQuickPickTestIds,
 } from './ContactQuickPick.tsx';
+export {
+  ContactQuickPickField,
+  type ContactQuickPickFieldProps,
+  type ContactQuickPickFieldValue,
+} from './ContactQuickPickField.tsx';
+export { findQuickAddMobile, useQuickAddContact } from './use-quick-add-contact.ts';

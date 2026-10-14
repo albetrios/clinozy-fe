@@ -40,6 +40,9 @@ vi.mock('@/shared/notify/index.ts', () => ({
 vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ContactsApiModule>()),
   searchContacts: vi.fn(),
+  fetchRecentContacts: vi.fn(),
+  findContactByPhone: vi.fn(),
+  createContact: vi.fn(),
   fetchContact: vi.fn(),
 }));
 vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
@@ -62,7 +65,13 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   findMyMembershipId: async () => 'mem_yls33gz5jj66ful8q4ads',
 }));
 
-const { searchContacts, fetchContact } = ContactsApiModule;
+const {
+  searchContacts,
+  fetchRecentContacts,
+  findContactByPhone,
+  createContact,
+  fetchContact,
+} = ContactsApiModule;
 const { fetchLead } = LeadsApiModule;
 const { addTask, fetchTaskWorkerIds } = TasksApiModule;
 
@@ -176,6 +185,11 @@ beforeEach(() => {
   vi.mocked(fetchTaskWorkerIds).mockReset();
   vi.mocked(fetchTaskWorkerIds).mockResolvedValue([RIYA.id, ASHA.id]);
   vi.mocked(searchContacts).mockReset();
+  vi.mocked(fetchRecentContacts).mockReset();
+  vi.mocked(fetchRecentContacts).mockResolvedValue([]);
+  vi.mocked(findContactByPhone).mockReset();
+  vi.mocked(findContactByPhone).mockResolvedValue(null);
+  vi.mocked(createContact).mockReset();
   // As the API: 3+ letters, else nothing asked.
   vi.mocked(searchContacts).mockImplementation(async (typed) =>
     typed.trim().length < 3
@@ -237,12 +251,19 @@ const sentFields = (): TaskFields => {
   return call.fields;
 };
 
-/** Search the "For" picker and take the hit named `name`. */
+/** Search the "For" picker and take the hit named `name` — not the add row that names it too. */
 async function pickPerson(user: ReturnType<typeof userEvent.setup>, name: string) {
   await user.click(screen.getByTestId('new-task-for'));
   await user.type(await screen.findByTestId('new-task-for-search'), name);
   const panel = await screen.findByTestId('new-task-for-panel');
-  await user.click(await within(panel).findByRole('option', { name: new RegExp(name) }));
+  const hit = await waitFor(() => {
+    const found = within(panel)
+      .getAllByRole('option', { name: new RegExp(name) })
+      .find((option) => option.getAttribute('data-value') !== 'add');
+    if (!found) throw new Error(`no hit for ${name} yet`);
+    return found;
+  });
+  await user.click(hit);
 }
 
 /** Open "Assign to" and pick the option named `name`. */
@@ -281,7 +302,7 @@ describe('NewTaskDrawer on clinozy-be (KICKOFF §6.10 New task, Q-T4)', () => {
   it('adds a patient’s task from the search — on her contact, to the member, the due as picked', async () => {
     const { user, drawer } = await openNewTask();
     await pickPerson(user, 'Kavya');
-    expect(searchContacts).toHaveBeenCalledWith('Kavya');
+    expect(searchContacts).toHaveBeenCalledWith('Kavya', 'everyone');
     expect(drawer).toHaveAccessibleDescription(
       `For ${fsi('Kavya Mehta')} · shows in Tasks and on this person’s timeline`,
     );
@@ -375,6 +396,70 @@ describe('NewTaskDrawer on clinozy-be (KICKOFF §6.10 New task, Q-T4)', () => {
     await user.click(save());
     await waitFor(() => expect(addTask).toHaveBeenCalledOnce());
     expect(sentFields()).toMatchObject({ contactId: null, link: null });
+  });
+
+  it('adds someone the search did not find — the contact made at once, the task on them', async () => {
+    const meera = hit({
+      id: 'con_meera0000000000000000',
+      contactNumber: 10301,
+      firstName: 'Meera',
+      lastName: 'Rao',
+      name: 'Meera Rao',
+      primaryPhone: '+919825011299',
+      openLeadId: null,
+    });
+    vi.mocked(createContact).mockResolvedValue({ ...meera, phones: [] } as never);
+    const { drawer, user } = await openNewTask();
+    await user.click(screen.getByTestId('new-task-for'));
+    await user.type(
+      await screen.findByTestId('new-task-for-search'),
+      'Meera Rao 9825011299',
+    );
+    await user.click(await screen.findByTestId('new-task-for-create'));
+    expect(screen.getByTestId('new-task-for-quick-add-name')).toHaveValue('Meera Rao');
+    await user.click(screen.getByTestId('new-task-for-quick-add-submit'));
+
+    await waitFor(() =>
+      expect(drawer).toHaveAccessibleDescription(
+        `For ${fsi('Meera Rao')} · shows in Tasks and on this person’s timeline`,
+      ),
+    );
+    expect(findContactByPhone).toHaveBeenCalledWith('+919825011299');
+    expect(createContact).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fields: expect.objectContaining({
+          firstName: 'Meera',
+          lastName: 'Rao',
+          phones: [expect.objectContaining({ phone: '+919825011299' })],
+        }),
+      }),
+    );
+    expect(notify.success).toHaveBeenCalledWith(`${fsi('Meera Rao')} added to contacts`);
+    await user.click(save());
+    await waitFor(() => expect(addTask).toHaveBeenCalledOnce());
+    expect(sentFields()).toMatchObject({
+      contactId: 'con_meera0000000000000000',
+      link: null,
+    });
+  });
+
+  it('takes the person already on that mobile instead of making a second contact', async () => {
+    vi.mocked(findContactByPhone).mockResolvedValue(KAVYA as never);
+    const { drawer, user } = await openNewTask();
+    await user.click(screen.getByTestId('new-task-for'));
+    await user.type(await screen.findByTestId('new-task-for-search'), 'Kavi 9825005865');
+    await user.click(await screen.findByTestId('new-task-for-create'));
+    await user.click(screen.getByTestId('new-task-for-quick-add-submit'));
+
+    await waitFor(() =>
+      expect(drawer).toHaveAccessibleDescription(
+        `For ${fsi('Kavya Mehta')} · shows in Tasks and on this person’s timeline`,
+      ),
+    );
+    expect(createContact).not.toHaveBeenCalled();
+    expect(notify.info).toHaveBeenCalledWith(
+      `${fsi('Kavya Mehta')} is already a contact · picked`,
+    );
   });
 
   it('assigns to a role queue, and the toast names the queue', async () => {
