@@ -212,6 +212,13 @@ describe('BugReport', () => {
     expect(status).not.toHaveClass('truncate');
   });
 
+  it('the trigger is the bug icon alone, named by its aria-label', async () => {
+    renderWithProviders(<BugReport />);
+    const trigger = await screen.findByRole('button', { name: 'Report a bug' });
+    expect(trigger).toHaveAttribute('data-testid', BUG_REPORT_TEST_IDS.trigger);
+    expect(trigger).not.toHaveTextContent('Report a bug');
+  });
+
   it('the closed trigger has no a11y violations', async () => {
     const { container } = renderWithProviders(<BugReport />);
     await screen.findByTestId(BUG_REPORT_TEST_IDS.trigger);

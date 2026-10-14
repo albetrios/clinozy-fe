@@ -24,7 +24,8 @@ describe('BugReportLazy', () => {
     });
     renderWithProviders(<BugReportLazy />);
 
-    expect(await screen.findByTestId(BUG_REPORT_TEST_IDS.trigger)).toHaveTextContent(
+    // Icon only: the copy is the button's accessible name.
+    expect(await screen.findByTestId(BUG_REPORT_TEST_IDS.trigger)).toHaveAccessibleName(
       'Report a bug',
     );
   });

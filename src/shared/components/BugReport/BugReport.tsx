@@ -24,6 +24,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover.tsx';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip.tsx';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import {
   resolveSpeechLanguage,
@@ -317,8 +323,9 @@ function BugReportPanel({ onClose }: { onClose: () => void }) {
 
 /**
  * Report a bug — our own, in place of Sentry's feedback widget (iteration
- * feat-bug-report-2026-10-13-dgnx): a floating pill in the bottom-end corner that unfolds into a
- * non-modal panel with one textbox and a native voice button. The report goes to clinozy-be
+ * feat-bug-report-2026-10-13-dgnx): a round bug button in the bottom-end corner — icon only, named
+ * by its aria-label and a tooltip (D18) — that unfolds into a non-modal panel with one textbox and
+ * a native voice button. The report goes to clinozy-be
  * (`POST /users/me/bug-reports`), which stamps the signed-in person from the session.
  *
  * @remarks Placement lives in `index.css` (`[data-slot='feedback-trigger']`): above the phone tab
@@ -333,23 +340,32 @@ export function BugReport() {
     document.getElementById(DESCRIPTION_ID)?.focus();
   }, []);
   const close = useCallback(() => setOpen(false), []);
+  const triggerLabel = t(BUG_REPORT_KEYS.trigger);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <div data-slot="feedback-trigger" className="fixed z-40">
-        <PopoverTrigger asChild>
-          <Button
-            type="button"
-            size="pill"
-            variant="outline"
-            data-testid={BUG_REPORT_TEST_IDS.trigger}
-            data-open={open || undefined}
-            className="bug-report-trigger bug-report-press bg-background/90 h-10 backdrop-blur-sm"
-          >
-            <Bug className="bug-report-trigger-icon" aria-hidden="true" />
-            {t(BUG_REPORT_KEYS.trigger)}
-          </Button>
-        </PopoverTrigger>
+        {/* Icon only (D18): the name is the button's aria-label, and the tooltip on hover. */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  size="pill"
+                  variant="outline"
+                  aria-label={triggerLabel}
+                  data-testid={BUG_REPORT_TEST_IDS.trigger}
+                  data-open={open || undefined}
+                  className="bug-report-trigger bug-report-press bg-background/90 size-11 p-0 backdrop-blur-sm"
+                >
+                  <Bug className="bug-report-trigger-icon size-5" aria-hidden="true" />
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            {open ? null : <TooltipContent side="top">{triggerLabel}</TooltipContent>}
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <PopoverContent
         side="top"

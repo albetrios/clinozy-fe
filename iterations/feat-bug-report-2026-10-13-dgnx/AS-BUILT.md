@@ -33,13 +33,17 @@ session's disk allowance reads 8.9% free); no repository change.
 ## Summary
 
 - Planned, not built (deferred — user OK): none.
-- Built, not planned: `Permissions-Policy: microphone=(self)` (D16); the size exemption (D17).
+- Built, not planned: `Permissions-Policy: microphone=(self)` (D16); the size exemption (D17); the
+  icon-only trigger (D18).
 - Not verified here: a real microphone in a real browser — jsdom has no speech recognition, so the
   voice path is proven with a stand-in recognizer; try it in Chrome or Safari (Firefox shows the
   textbox alone). Playwright E2E needs clinozy-be on `:3000` and was not run.
 - Found while recording each improvement against the local stack: a voice problem (blocked
   microphone, silence, no service) was truncated beside the voice button, hiding what to do. It now
   wraps; `BugReport.test.tsx` pins it.
+- Changed after the recordings, at the user's request (D18): the trigger is the bug icon alone — a
+  round 44px button named by its `aria-label` and the app's tooltip on hover; `BugReport.test.tsx`
+  pins the name and the missing visible label.
 - Follow-ups: `pnpm iteration:status feat-bug-report-2026-10-13-dgnx frozen` in the last commit
   before the merge (D13).
 
