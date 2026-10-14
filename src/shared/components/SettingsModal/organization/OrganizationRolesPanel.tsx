@@ -22,7 +22,7 @@ import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   DropdownMenu,
@@ -275,7 +275,7 @@ function RolesManager() {
 
   return (
     <section className="flex flex-col gap-4" data-testid="settings-organization-roles">
-      <SectionHeader title={t(panels.title)} description={t(panels.description)} />
+      <SettingsSectionHeader section="roles" />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <OrgListControls

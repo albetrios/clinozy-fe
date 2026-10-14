@@ -14,7 +14,7 @@ import {
   settingsRowActionClass,
   SettingsRowTile,
 } from '@/shared/components/SettingsCard/index.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { useStepUpGuard } from '@/shared/components/StepUpDialog/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useRevokeSession, useSessions } from '@/shared/hooks/useSessions/index.ts';
@@ -62,7 +62,7 @@ export function AccountSessionsPanel() {
 
   return (
     <section className="flex flex-col gap-4" data-testid="settings-account-sessions">
-      <SectionHeader title={t(panels.title)} description={t(panels.description)} />
+      <SettingsSectionHeader section="sessions" />
 
       {isLoading ? <PanelSkeleton testId="sessions-loading" /> : null}
 
