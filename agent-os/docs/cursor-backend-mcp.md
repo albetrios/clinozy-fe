@@ -56,13 +56,14 @@ sequenceDiagram
 
 The login flow and Google OAuth are wired to the backend. The frontend expects:
 
-| Endpoint              | Method | Purpose                                                                                                                          |
-| --------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `/api/v1/auth/login`  | POST   | Body: `{ email, password }`. Response: `{ accessToken }`. Frontend then calls `/auth/me` with the token.                         |
-| `/api/v1/auth/me`     | GET    | Header: `Authorization: Bearer <accessToken>`. Response: user object (`id`, `email`, `role`, `tenantId`, `name?`, `avatarUrl?`). |
-| `/api/v1/auth/google` | GET    | Redirect to Google OAuth; after callback, backend sets refresh cookie and redirects user back to frontend (e.g. `/`).            |
+| Endpoint                                | Method | Purpose                                                                                                                                                                                                                                    |
+| --------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/api/v1/auth/login`                    | POST   | Body: `{ email, password }`. Response: `{ accessToken }`. Frontend then calls `/auth/me` with the token.                                                                                                                                   |
+| `/api/v1/auth/me`                       | GET    | Header: `Authorization: Bearer <accessToken>`. Response: user object (`id`, `email`, `role`, `tenantId`, `name?`, `avatarUrl?`).                                                                                                           |
+| `/api/v1/auth/oauth/:provider`          | GET    | Answers the provider's authorize URL (`redirect_url`); the browser goes there, and the provider returns it to `/callback/<provider>?code=…&state=…`.                                                                                       |
+| `/api/v1/auth/oauth/:provider/callback` | GET    | `code` + `state`, relayed by `CallbackPage` in an XHR that carries the `oauth_nonce` cookie. The backend checks the state, nonce and PKCE, exchanges the code, sets the refresh cookie and returns the access token (or the MFA hand-off). |
 
-If the backend does not implement `/auth/google` yet, "Sign in with Google" will navigate to that URL and the backend may return 404 until the route is added.
+A visit to `/callback/<provider>` without `code` + `state` asks `/auth/refresh` only when the browser holds the session hint; otherwise it goes straight back to `/login?error=oauth_failed` (`src/pages/callback/CALLBACK.OVERVIEW.md`).
 
 ---
 

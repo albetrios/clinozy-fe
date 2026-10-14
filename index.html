@@ -54,6 +54,9 @@
     <script src="/theme-init.js"></script>
     <!-- Prevent locale/dir FOUC: apply lang + dir from locale-preference before paint -->
     <script src="/locale-init.js"></script>
+    <!-- Skip the boot splash on the load right after a sign-out: the page being left
+         stays until the login screen paints (APP_SPLASH_SKIP, app-splash.ts) -->
+    <script src="/splash-init.js"></script>
     <!-- Boot splash (KICKOFF §6.1; splash.md). Frames 1–4 — the mark, its halo,
          the "C", the dot and the wordmark — are CSS keyframes here, so they play
          before any JS. theme-init.js sets `.dark` and the look first, so every
@@ -125,6 +128,17 @@
          src/lib/app-splash.ts) runs the transition above from where it is. */
       #app-splash.app-splash-exiting ~ #root {
         transition-delay: -16ms;
+      }
+      /* The load right after a sign-out (splash-init.js): no splash, and the app at
+         once — nothing paints until the login screen does, so the browser keeps the
+         page being left on screen until then. */
+      .app-splash-skip #app-splash {
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .app-splash-skip #app-splash ~ #root {
+        opacity: 1;
+        transition: none;
       }
       .app-splash-emblem {
         position: relative;
@@ -278,9 +292,16 @@
         align-items: center;
         gap: 10px;
       }
+      /* The mark starts at 2%, not 0 — the root fade's rule above, for First
+         Contentful Paint: a paint at opacity 0 is not contentful, and the fade
+         runs on the compositor without painting again, so the browser never
+         recorded the mark it was showing — FCP waited for the "C" to start
+         drawing, or for the app. From 2% the first paint counts. Invisible
+         (and the frames' timing is unchanged); it is still the splash, not the
+         app, so LCP stays the page's own content. */
       @keyframes app-splash-mark {
         from {
-          opacity: 0;
+          opacity: 0.02;
           transform: scale(0.6);
         }
         to {

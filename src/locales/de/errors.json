@@ -98,6 +98,12 @@
       "avatarUpdated": "Avatar aktualisiert.",
       "avatarRemoved": "Avatar entfernt."
     },
+    "upload": {
+      "storageUnreachable": "Die Datei konnte nicht an den Speicher gesendet werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut; wenn es weiterhin fehlschlägt, wenden Sie sich an den Support.",
+      "storageRejected": "Der Speicher hat die Datei abgelehnt. Versuchen Sie, sie erneut hochzuladen.",
+      "notConfirmed": "Die Datei konnte nach dem Hochladen nicht geprüft werden. Versuchen Sie, sie erneut hochzuladen.",
+      "invalidFileName": "Benennen Sie die Datei um und versuchen Sie es erneut: Der Name darf keine Schrägstriche, „..“ oder Steuerzeichen enthalten."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Passkey konnte nicht hinzugefügt werden",

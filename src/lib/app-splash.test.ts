@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 
 import {
+  APP_SPLASH_SKIP,
   appSplashElapsedMs,
   appSplashSlotHost,
   dismissAppSplash,
@@ -586,6 +587,64 @@ describe('app-splash', () => {
 
   // ── index.html owns the frames and the fade; this module owns when they end ──
 
+  describe('skipped after a sign-out (APP_SPLASH_SKIP)', () => {
+    const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+
+    afterEach(() => {
+      document.documentElement.classList.remove(APP_SPLASH_SKIP);
+    });
+
+    it('leaves as soon as the screen is up — no frames to wait for, nothing to fade', () => {
+      // public/splash-init.js marked this load before the first paint.
+      document.documentElement.classList.add(APP_SPLASH_SKIP);
+      vi.useFakeTimers();
+      vi.advanceTimersByTime(120); // React's first paint
+      dismissAppSplash();
+      markAppContentSettled();
+
+      vi.advanceTimersByTime(32);
+      expect(isFading()).toBe(true);
+      vi.advanceTimersByTime(80);
+      expect(isGone()).toBe(true);
+    });
+
+    it('still keeps a loader from flashing in its place while it is held', () => {
+      document.documentElement.classList.add(APP_SPLASH_SKIP);
+      vi.useFakeTimers();
+      const release = holdAppSplash(); // the boot's pending loader
+      dismissAppSplash();
+
+      vi.advanceTimersByTime(1000);
+      expect(isAppSplashActive()).toBe(true);
+      markAppContentSettled();
+      release();
+      vi.advanceTimersByTime(32 + 80);
+      expect(isGone()).toBe(true);
+    });
+
+    it('splash-init.js reads the same key, once, and marks <html> with the same class', () => {
+      const script = readFileSync(join(root, 'public/splash-init.js'), 'utf8');
+
+      expect(script).toContain(`sessionStorage.getItem('${APP_SPLASH_SKIP}') === '1'`);
+      expect(script).toContain(`sessionStorage.removeItem('${APP_SPLASH_SKIP}')`);
+      expect(script).toContain(`classList.add('${APP_SPLASH_SKIP}')`);
+    });
+
+    it('index.html runs it before the splash and hides the splash under that class', () => {
+      const html = readFileSync(join(root, 'index.html'), 'utf8');
+
+      const script = html.indexOf('<script src="/splash-init.js"></script>');
+      expect(script).toBeGreaterThan(-1);
+      expect(script).toBeLessThan(html.indexOf('<div id="app-splash"'));
+      expect(html).toMatch(
+        new RegExp(`\\.${APP_SPLASH_SKIP} #app-splash \\{\\s*visibility: hidden;`),
+      );
+      expect(html).toMatch(
+        new RegExp(`\\.${APP_SPLASH_SKIP} #app-splash ~ #root \\{\\s*opacity: 1;`),
+      );
+    });
+  });
+
   describe('index.html drift', () => {
     const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
     const html = readFileSync(join(root, 'index.html'), 'utf8');
@@ -694,6 +753,17 @@ describe('app-splash', () => {
       expect(html).not.toMatch(
         /#app-splash:not\(\.app-splash-exiting\) ~ #root \{[^}]*transition-delay/,
       );
+    });
+
+    it('draws the mark from a first frame above 0, so Chrome records the first paint', () => {
+      // The same compositor rule as the app's fade, for First Contentful Paint: a
+      // mark fading in from exactly 0 is never painted as content, so FCP waited
+      // for the "C" to start drawing (or for the app). Its first frame stays
+      // invisible — the frames' beat is pinned above — but it is no longer 0.
+      const start = html.indexOf('@keyframes app-splash-mark');
+      const from = /from \{\s*opacity: ([\d.]+);/.exec(html.slice(start))?.[1];
+      expect(Number(from)).toBeGreaterThan(0);
+      expect(Number(from)).toBeLessThanOrEqual(0.05);
     });
 
     it('never cuts that fade short, and never outlives it by much', () => {
