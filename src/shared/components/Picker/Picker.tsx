@@ -52,10 +52,14 @@ function clearShown<T>(props: PickerProps<T>, pickedCount: number): boolean {
   );
 }
 
-/** Popover width (max(trigger, min width)) and height for the props. */
+/**
+ * Popover width (max(trigger, min width), at most 28rem) and height for the props. The cap keeps
+ * a full-width drawer field's list a menu, not a 640px band with each row's details far from its
+ * name (change-contact-quick-pick D21).
+ */
 function panelClassFor<T>(props: PickerProps<T>): string {
   return cn(
-    'w-(--radix-popover-trigger-width)',
+    'w-(--radix-popover-trigger-width) max-w-md',
     PICKER_MIN_WIDTH_CLASSES[props.minWidth ?? 240],
     PICKER_MAX_HEIGHT_CLASSES[props.maxHeight ?? 340],
   );

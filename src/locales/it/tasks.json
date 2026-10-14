@@ -475,8 +475,7 @@
     "forField": {
       "label": "Per",
       "placeholder": "Scegli una persona",
-      "search": "Cerca per nome, cellulare o numero",
-      "empty": "Scrivi un nome, un cellulare o un numero di contatto"
+      "search": "Cerca per nome, cellulare o numero"
     },
     "titleField": {
       "label": "Titolo",

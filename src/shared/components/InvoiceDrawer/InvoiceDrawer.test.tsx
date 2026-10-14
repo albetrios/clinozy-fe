@@ -32,9 +32,10 @@ vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
 }));
-vi.mock('@/shared/api/app/patient-search-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  searchPatientPicker: vi.fn(),
+  searchContacts: vi.fn(async () => []),
+  fetchRecentContacts: vi.fn(async () => []),
 }));
 vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),

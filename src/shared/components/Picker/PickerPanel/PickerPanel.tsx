@@ -86,14 +86,29 @@ const LOADING_MORE_ROWS = [
   { title: 'w-[48%]', sub: 'w-[40%]' },
 ] as const;
 
-/** Skeletons are a flat fill, no pulse (KICKOFF §3.1 motion). */
-function SkeletonRow({ title, sub }: { title: string; sub: string }) {
+/**
+ * A loading row: the shared shimmer, its sheen staggered by `index` so the
+ * rows sweep as one wave (change-contact-quick-pick D11; reduced motion stills it).
+ */
+function SkeletonRow({
+  title,
+  sub,
+  index,
+}: {
+  title: string;
+  sub: string;
+  index: number;
+}) {
   return (
     <div className="flex h-9 shrink-0 items-center gap-2.5 px-2">
-      <SkeletonBar shape="avatar" className="bg-muted size-5.5" />
+      <SkeletonBar shape="avatar" index={index} shimmer className="bg-muted size-5.5" />
       <span className="flex flex-1 flex-col gap-1.25">
-        <SkeletonBar className={cn('h-2.25 rounded-sm', title)} />
-        <SkeletonBar className={cn('bg-muted h-1.75 rounded-sm', sub)} />
+        <SkeletonBar index={index} shimmer className={cn('h-2.25 rounded-sm', title)} />
+        <SkeletonBar
+          index={index}
+          shimmer
+          className={cn('bg-muted h-1.75 rounded-sm', sub)}
+        />
       </span>
     </div>
   );
@@ -259,8 +274,13 @@ export function PickerPanel<T>({
         {skeleton ? (
           <output data-testid={testIds.loading} className="flex flex-col">
             <span className="sr-only">{t(PICKER_KEYS.loading)}</span>
-            {SKELETON_ROWS.map((row) => (
-              <SkeletonRow key={row.title} title={row.title} sub={row.sub} />
+            {SKELETON_ROWS.map((row, index) => (
+              <SkeletonRow
+                key={row.title}
+                title={row.title}
+                sub={row.sub}
+                index={index}
+              />
             ))}
           </output>
         ) : null}
@@ -326,8 +346,13 @@ export function PickerPanel<T>({
             data-testid={testIds.loadingMore}
             className="flex shrink-0 flex-col px-1 py-0.5"
           >
-            {LOADING_MORE_ROWS.map((row) => (
-              <SkeletonRow key={row.title} title={row.title} sub={row.sub} />
+            {LOADING_MORE_ROWS.map((row, index) => (
+              <SkeletonRow
+                key={row.title}
+                title={row.title}
+                sub={row.sub}
+                index={index}
+              />
             ))}
           </output>
         ) : null}

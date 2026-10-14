@@ -919,6 +919,44 @@
     "purchasesCount_many": "{{count}} linhas",
     "purchasesCount_other": "{{count}} linhas"
   },
+  "contactPick": {
+    "recent": "Recentes",
+    "keepTyping": "Continue digitando — 3 letras ou 4 dígitos",
+    "searching": "Buscando…",
+    "found_one": "{{count}} pessoa encontrada",
+    "found_many": "{{count}} pessoas encontradas",
+    "found_other": "{{count}} pessoas encontradas",
+    "noMatch": "Nenhuma correspondência",
+    "use": "Usar contato",
+    "addNamed": "Adicionar “{{name}}” como novo contato",
+    "addPhone": "Adicionar {{phone}} como novo contato",
+    "addNamedPhone": "Adicionar “{{name}}” · {{phone}} como novo contato",
+    "enterKey": "↵",
+    "clearSearch": "Limpar busca",
+    "added": "{{name}} adicionado aos contatos",
+    "existing": "{{name}} já é um contato · selecionado",
+    "quickAdd": {
+      "name": "Nome",
+      "namePlaceholder": "Nome e sobrenome",
+      "mobile": "Celular",
+      "add": "Adicionar contato",
+      "more": "Mais detalhes",
+      "back": "Voltar à busca",
+      "addName": "Adicione um nome",
+      "needMobile": "Adicione um celular de 10 dígitos",
+      "mobileDigits": "O celular precisa de 10 dígitos"
+    },
+    "patient": {
+      "newPatient": "Novo paciente",
+      "addNamed": "Adicionar “{{name}}” como novo paciente",
+      "addPhone": "Adicionar {{phone}} como novo paciente",
+      "addNamedPhone": "Adicionar “{{name}}” · {{phone}} como novo paciente",
+      "add": "Adicionar paciente",
+      "use": "Usar paciente",
+      "added": "{{name}} adicionado como paciente",
+      "existing": "{{name}} já é paciente · selecionado"
+    }
+  },
   "contactEditor": {
     "title": "Editar contato",
     "sub": "Salvo uma vez · usado em cada lead, paciente e chat",
@@ -1010,9 +1048,7 @@
     "who": {
       "search": "Busque paciente ou lead por nome, telefone, ID",
       "searchLabel": "Buscar pessoa",
-      "useContact": "Usar contato",
       "patient": "Paciente",
-      "createContact": "+ Criar contato “{{query}}”",
       "newContact": "Novo contato · adicione o celular para agendar",
       "mobile": "Número de celular",
       "name": "Nome",
@@ -1145,9 +1181,7 @@
   "patientPicker": {
     "label": "Paciente",
     "placeholder": "Buscar pacientes",
-    "hint": "só é possível escolher pacientes",
-    "due": "{{amount}} em aberto",
-    "nothingDue": "Nada em aberto"
+    "hint": "só é possível escolher pacientes"
   },
   "splitRows": {
     "mode": "Forma",
@@ -1242,7 +1276,6 @@
     },
     "fields": {
       "branch": "Unidade",
-      "newPatient": "Novo paciente",
       "customer": "Cliente",
       "customerHint": "paciente ou qualquer contato · nomes novos são salvos como contato médico",
       "customerPlaceholder": "Buscar pacientes, leads ou contatos médicos",

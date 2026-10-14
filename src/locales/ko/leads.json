@@ -169,7 +169,6 @@
       "recreate": "리드 다시 만들기",
       "useContact": "연락처 사용"
     },
-    "noMatch": "일치하는 항목 없음",
     "more_other": " · +{{count}}개 더",
     "change": "변경",
     "changeTitle": "다른 연락처 선택",

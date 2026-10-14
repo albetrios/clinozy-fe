@@ -7,8 +7,10 @@ the New task drawer over the list, so a refresh or a shared link reopens it. `?l
 `?contact=con_…` name whom the task is for when it is opened from a lead or a person (a plan
 addition, AMBER) — parsed by `validateTaskCreateSearch` in the parent's
 `../tasks.dialog-search.ts` (a public id of that kind, else nothing); from the toolbar the
-drawer's "For" field searches the clinic's people (`GET /app/contacts?q=`), and may stay empty —
-a task can be about no one.
+drawer's "For" field is the shared contact picker in a field (`ContactQuickPickField`): Recent,
+then the clinic's people (`GET /app/contacts?q=`), ↵ the first; its quick add makes a contact for
+someone not on file (`POST /app/contacts`, the mobile looked up first). It may stay empty — a task
+can be about no one.
 
 On clinozy-be: the drawer writes `POST /app/tasks` (`task:create`) — title (empty with a
 person: "Follow up · <first name>"), why (Notes), `due_at` (the picked clinic day and time),

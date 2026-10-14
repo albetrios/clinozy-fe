@@ -175,7 +175,6 @@
       "recreate": "Ricrea lead",
       "useContact": "Usa contatto"
     },
-    "noMatch": "Nessuna corrispondenza",
     "more_one": " · +{{count}} altro",
     "more_many": " · +{{count}} altri",
     "more_other": " · +{{count}} altri",

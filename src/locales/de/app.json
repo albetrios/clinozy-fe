@@ -907,6 +907,43 @@
     "purchasesCount_one": "{{count}} Position",
     "purchasesCount_other": "{{count}} Positionen"
   },
+  "contactPick": {
+    "recent": "Zuletzt",
+    "keepTyping": "Weiter tippen — 3 Buchstaben oder 4 Ziffern",
+    "searching": "Suche läuft…",
+    "found_one": "{{count}} Person gefunden",
+    "found_other": "{{count}} Personen gefunden",
+    "noMatch": "Kein vorhandener Treffer",
+    "use": "Kontakt verwenden",
+    "addNamed": "„{{name}}“ als neuen Kontakt anlegen",
+    "addPhone": "{{phone}} als neuen Kontakt anlegen",
+    "addNamedPhone": "„{{name}}“ · {{phone}} als neuen Kontakt anlegen",
+    "enterKey": "↵",
+    "clearSearch": "Suche leeren",
+    "added": "{{name}} als Kontakt angelegt",
+    "existing": "{{name}} ist bereits ein Kontakt · ausgewählt",
+    "quickAdd": {
+      "name": "Name",
+      "namePlaceholder": "Vor- und Nachname",
+      "mobile": "Mobilnummer",
+      "add": "Kontakt anlegen",
+      "more": "Weitere Angaben",
+      "back": "Zurück zur Suche",
+      "addName": "Geben Sie einen Namen ein",
+      "needMobile": "Geben Sie eine 10-stellige Mobilnummer ein",
+      "mobileDigits": "Die Mobilnummer braucht 10 Ziffern"
+    },
+    "patient": {
+      "newPatient": "Neuer Patient",
+      "addNamed": "„{{name}}“ als neuen Patienten anlegen",
+      "addPhone": "{{phone}} als neuen Patienten anlegen",
+      "addNamedPhone": "„{{name}}“ · {{phone}} als neuen Patienten anlegen",
+      "add": "Patient anlegen",
+      "use": "Patient wählen",
+      "added": "{{name}} als Patient angelegt",
+      "existing": "{{name}} ist bereits Patient · ausgewählt"
+    }
+  },
   "contactEditor": {
     "title": "Kontakt bearbeiten",
     "sub": "Einmal gespeichert · für jeden Lead, Patienten und Chat verwendet",
@@ -998,9 +1035,7 @@
     "who": {
       "search": "Patient oder Lead nach Name, Telefon, ID suchen",
       "searchLabel": "Person suchen",
-      "useContact": "Kontakt verwenden",
       "patient": "Patient",
-      "createContact": "+ Kontakt „{{query}}“ anlegen",
       "newContact": "Neuer Kontakt · Mobilnummer zum Buchen ergänzen",
       "mobile": "Mobilnummer",
       "name": "Name",
@@ -1130,9 +1165,7 @@
   "patientPicker": {
     "label": "Patient",
     "placeholder": "Patienten suchen",
-    "hint": "nur Patienten wählbar",
-    "due": "{{amount}} offen",
-    "nothingDue": "Nichts offen"
+    "hint": "nur Patienten wählbar"
   },
   "splitRows": {
     "mode": "Zahlart",
@@ -1226,7 +1259,6 @@
     },
     "fields": {
       "branch": "Filiale",
-      "newPatient": "Neuer Patient",
       "customer": "Kunde",
       "customerHint": "Patient oder ein Kontakt · neue Namen werden als Medizinkontakt gespeichert",
       "customerPlaceholder": "Patienten, Leads oder Medizinkontakte suchen",

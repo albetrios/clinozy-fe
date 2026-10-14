@@ -216,6 +216,8 @@ vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => {
   return {
     ...(await importOriginal<object>()),
     fetchContact: vi.fn(async (id: string) => structuredClone(find(id))),
+    // Recent stays empty here: the who search's own suite covers it.
+    fetchRecentContacts: vi.fn(async () => []),
     searchContacts: vi.fn(async (typed: string) =>
       structuredClone(
         world.contacts.filter((entry) =>
@@ -681,6 +683,8 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
     const panel = await form(NEW);
     await user.type(within(panel).getByTestId(IDS.whoSearch), 'Meera Iyer');
     await user.click(await within(panel).findByTestId(IDS.whoCreate));
+    // The quick add, its mobile left empty: the card's own field still takes it.
+    await user.click(within(panel).getByTestId(`${IDS.who}-quick-add-submit`));
     const card = within(panel).getByTestId(IDS.whoCard);
     expect(card).toHaveTextContent('Meera Iyer');
     expect(card).toHaveTextContent('New contact · add their mobile to book');

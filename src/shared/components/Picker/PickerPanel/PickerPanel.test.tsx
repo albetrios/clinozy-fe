@@ -82,6 +82,10 @@ describe('PickerPanel', () => {
     // An `<output>`: its implicit role is `status`.
     expect(screen.getAllByRole('status')).toContain(loading);
     expect(loading).toHaveTextContent('Loading');
+    // The loading rows shimmer, each row's sheen a beat after the one above.
+    const sheens = loading.querySelectorAll('.skeleton-sheen');
+    expect(sheens.length).toBeGreaterThan(0);
+    expect([...sheens].some((bar) => bar.getAttribute('data-sweep') === '1')).toBe(true);
   });
 
   it('groups rows under tone-squared headers and marks the pick', () => {

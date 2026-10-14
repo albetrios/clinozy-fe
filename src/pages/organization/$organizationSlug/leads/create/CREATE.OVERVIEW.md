@@ -9,8 +9,9 @@ reopens it. `?name=&phone=` prefill the drawer (⌘K "New lead", the contact car
 telemetry (`SENSITIVE_QUERY_PARAMS`). Gated like the room — membership
 (`organization:read`) and the `app-leads` module, then `requireOrgStatus`; in-room
 Create is `useAppAccess`. The drawer is `NewLeadDrawer`
-(`../components/NewLeadDrawer/`, L-35): a 640px record drawer — Contact (the person search
-`GET /app/contacts?q=`, Quick start, "New contact" → the shared `ContactEditor`) and Lead details,
+(`../components/NewLeadDrawer/`, L-35): a 640px record drawer — Contact (the shared `ContactQuickPick`:
+Recent, the person search `GET /app/contacts?q=` with ↑ ↓ ↵, Quick start, and the quick add — Name and
+Mobile from the search, "More details" → the shared `ContactEditor`) and Lead details,
 locked until there is a person; with a prefill or a picked person, the person's strip with "Change"
 and Lead details alone. Someone with an open lead opens it instead ("Open lead", one open lead each).
 "Create lead" checks a new person's first name and 10-digit mobile, then sends `POST /app/leads` with
@@ -31,4 +32,6 @@ the prefill.
 `new-lead-drawer` — the drawer the Leads page opens for this URL (L-35); the route renders
 no element of its own (`tooling/validate/test-ids-allowlist.txt`). Its parts: the record drawer's
 (`new-lead-drawer-save` …) and `new-lead-search`, `new-lead-preset-<id>`, `new-lead-hit-<contact number>`,
-`new-lead-no-match`, `new-lead-new-contact`, `new-lead-change` (`../leads.constants.ts`).
+`new-lead-no-match`, `new-lead-new-contact` (the add row), `new-lead-change`, and the picker's own
+`new-lead-contact-…` ids — `-recent`, `-loading`, `-progress`, `-status`, `-quick-add-name` · `-mobile` ·
+`-submit` · `-more` · `-back` (`../leads.constants.ts`, `CONTACT_QUICK_PICK_TEST_IDS`).

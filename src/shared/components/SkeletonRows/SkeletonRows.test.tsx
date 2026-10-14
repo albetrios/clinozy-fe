@@ -35,6 +35,30 @@ describe('SkeletonRows', () => {
     expect(bar).not.toHaveClass('animate-pulse');
   });
 
+  it('opts in to a staggered sheen sweep (shimmer)', () => {
+    render(<SkeletonRows rows={3} avatar shimmer />);
+    const [first, second] = bars();
+    // The sweep is `skeleton-sheen.css`; the primitive's pulse stays off.
+    expect(first).toHaveClass('bg-muted-strong', 'skeleton-sheen', 'animate-none');
+    expect(first).not.toHaveClass('animate-pulse');
+    expect(first).toHaveAttribute('data-sweep', '0');
+    expect(second).toHaveAttribute('data-sweep', '1');
+    // The avatar sweeps with its row.
+    const avatar = screen
+      .getAllByTestId('skeleton-row')[1]
+      ?.querySelector('[data-slot="skeleton"]');
+    expect(avatar).toHaveClass('skeleton-sheen', 'rounded-full');
+    expect(avatar).toHaveAttribute('data-sweep', '1');
+  });
+
+  it('keeps flat bars free of the sheen', () => {
+    render(<SkeletonRows rows={2} />);
+    for (const bar of bars()) {
+      expect(bar).not.toHaveClass('skeleton-sheen');
+      expect(bar).not.toHaveAttribute('data-sweep');
+    }
+  });
+
   it('keeps avatars round', () => {
     render(<SkeletonRows rows={2} avatar />);
     const [row] = screen.getAllByTestId('skeleton-row');
@@ -68,6 +92,11 @@ describe('SkeletonBar', () => {
     const { container } = render(<SkeletonBar index={1} className="w-3/5" />);
     expect(container.firstChild).toHaveClass('w-3/5');
     expect(container.firstChild).not.toHaveClass('w-[48%]');
+  });
+
+  it('cycles the shimmer stagger every three rows', () => {
+    const { container } = render(<SkeletonBar index={4} shimmer />);
+    expect(container.firstChild).toHaveAttribute('data-sweep', '1');
   });
 
   it('turns an input into a 36px rounded-lg bar', () => {
