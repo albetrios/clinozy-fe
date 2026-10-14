@@ -1,23 +1,26 @@
 #!/usr/bin/env node
 /**
- * pnpm iteration:diff — compare a Baseline's `intake-files/` with the current iteration's.
+ * pnpm iteration:diff — compare a Baseline's intake with the current iteration's.
  *
  * Usage:
  *   pnpm iteration:diff [<baseline>] <current> [--json]
  *
- * Every iteration's intake holds a full snapshot, so the delta of an incremental iteration is this
+ * Both sides are compared as resolved snapshots — an overlay or a brief stores only what arrived
+ * and takes the rest from its Baseline — so the delta of an incremental iteration is this
  * comparison plus the designer's "What changed" notes (in brief mode, `BRIEF.md` — and the
- * comparison shows nothing else); anything the comparison shows that the notes omit is a finding. Only `intake-files/` is compared — never the README, `KICKOFF.md`,
- * `plans/` or `AS-BUILT.md` — so both sides need theirs. Prints a summary (files; screens via
- * `_index.md` Slugs; whether the PRD, `schema-routes.md` or the prototype changed; the
- * `schema-routes.md` entities, fields, enums, routes and operations added, removed or changed),
- * then the raw `git diff --no-index`. `--json` prints the summary only, for skills. Without a
- * Baseline it prints the recorded and suggested Baselines and exits 2, so the user can confirm one.
+ * comparison shows nothing else); anything the comparison shows that the notes omit is a finding.
+ * Only the intake is compared — never the README, `KICKOFF.md`, `plans/` or `AS-BUILT.md` — so
+ * both sides need one. Prints a summary (files; screens via `_index.md` Slugs; whether the PRD,
+ * `schema-routes.md` or the prototype changed; the `schema-routes.md` entities, fields, enums,
+ * routes and operations added, removed or changed), then the raw `git diff --no-index`. `--json`
+ * prints the summary only, for skills. Without a Baseline it prints the recorded and suggested
+ * Baselines and exits 2, so the user can confirm one.
  *
  * clinozy-be's `tooling/iterations/iteration-diff.util.ts` prints the same summary and JSON shape.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -29,7 +32,8 @@ import {
   ITERATIONS_DIRECTORY,
   NO_BASELINE,
   readIterationReadme,
-  readSnapshot,
+  readResolvedSnapshot,
+  resolveIntakeSnapshot,
   suggestBaseline,
   tableCells,
 } from './iterations.mjs';
@@ -168,8 +172,8 @@ export function compareSchemaRoutes({ before, after }) {
  * `schema-routes.md` files compared ({@link compareSchemaRoutes}).
  *
  * @param {{ repositoryRoot: string, baseline: string, current: string }} request
- * @throws when either iteration has no README or no `intake-files/` — the comparison covers
- *   `intake-files/` only, so both sides are mandatory
+ * @throws when either iteration has no README, no `intake-files/` or a snapshot that cannot be
+ *   resolved — the comparison covers the intake only, so both sides are mandatory
  */
 export function summarizeIntakeDiff({ repositoryRoot, baseline, current }) {
   readIterationReadme({ repositoryRoot, iteration: baseline });
@@ -180,9 +184,15 @@ export function summarizeIntakeDiff({ repositoryRoot, baseline, current }) {
         `${iteration} has no ${INTAKE_DIRECTORY}/ — the incremental delta is a diff of ${INTAKE_DIRECTORY}/ only, so both iterations need theirs: pnpm iteration:intake ${iteration} <source-folder>.`,
       );
     }
+    const { problem } = resolveIntakeSnapshot({ repositoryRoot, iteration });
+    if (problem !== undefined) {
+      throw new Error(
+        `${iteration}'s snapshot cannot be resolved — ${problem}: pnpm iteration:intake ${iteration} --check.`,
+      );
+    }
   }
-  const before = readSnapshot(intakeFolder({ repositoryRoot, iteration: baseline }));
-  const after = readSnapshot(intakeFolder({ repositoryRoot, iteration: current }));
+  const before = readResolvedSnapshot({ repositoryRoot, iteration: baseline });
+  const after = readResolvedSnapshot({ repositoryRoot, iteration: current });
   const files = compareMaps({ before, after, same: (left, right) => left.equals(right) });
   const touched = new Set([...files.added, ...files.removed, ...files.changed]);
   const slugs = new Set([
@@ -249,28 +259,43 @@ export function formatIntakeDiffSummary(summary) {
 }
 
 /**
- * Runs `git diff --no-index` between the two iterations' `intake-files/` and returns its output.
+ * Runs `git diff --no-index` between the two iterations' resolved snapshots and returns its output.
+ * Each snapshot is laid out in a temporary folder as `iterations/<name>/intake-files/`, so the
+ * paths read as they would between two full intakes in the repository; the folder is removed
+ * afterwards.
  *
  * @param {{ repositoryRoot: string, baseline: string, current: string }} request
  */
 export function rawIntakeDiff({ repositoryRoot, baseline, current }) {
-  const result = spawnSync(
-    'git',
-    [
-      'diff',
-      '--no-index',
-      '--',
-      join(ITERATIONS_DIRECTORY, baseline, INTAKE_DIRECTORY),
-      join(ITERATIONS_DIRECTORY, current, INTAKE_DIRECTORY),
-    ],
-    {
-      cwd: repositoryRoot,
-      encoding: 'utf-8',
-      env: gitEnvironment(),
-      maxBuffer: 256 * 1024 * 1024,
-    },
-  );
-  return result.stdout ?? '';
+  const workspace = mkdtempSync(join(tmpdir(), 'iteration-diff-'));
+  try {
+    for (const iteration of [baseline, current]) {
+      const folder = join(workspace, ITERATIONS_DIRECTORY, iteration, INTAKE_DIRECTORY);
+      mkdirSync(folder, { recursive: true });
+      for (const [name, path] of resolveIntakeSnapshot({ repositoryRoot, iteration })
+        .files)
+        copyFileSync(path, join(folder, name));
+    }
+    const result = spawnSync(
+      'git',
+      [
+        'diff',
+        '--no-index',
+        '--',
+        join(ITERATIONS_DIRECTORY, baseline, INTAKE_DIRECTORY),
+        join(ITERATIONS_DIRECTORY, current, INTAKE_DIRECTORY),
+      ],
+      {
+        cwd: workspace,
+        encoding: 'utf-8',
+        env: gitEnvironment(),
+        maxBuffer: 256 * 1024 * 1024,
+      },
+    );
+    return result.stdout ?? '';
+  } finally {
+    rmSync(workspace, { recursive: true, force: true });
+  }
 }
 
 /**

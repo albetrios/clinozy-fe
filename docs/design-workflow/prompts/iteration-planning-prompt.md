@@ -46,7 +46,7 @@ states — **and stop.**
 **2. The delta (incremental only)**, by the README's Intake mode:
 
 - **full / overlay** — run `pnpm iteration:diff <baseline> <iteration>` (it
-  compares the two `intake-files/` folders) and read the designer's **"What
+  compares the two resolved intakes) and read the designer's **"What
   changed"** notes. Anything the diff shows that the notes omit is a finding:
   surface it, don't silently plan it.
 - **brief** — `BRIEF.md` is the change list, and `iteration:diff` must show

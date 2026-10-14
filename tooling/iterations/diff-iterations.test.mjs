@@ -148,6 +148,41 @@ describe('summarizeIntakeDiff', () => {
     assert.match(text, /── git diff --no-index ──\ndiff --git/);
   });
 
+  test('compares a brief that stores only BRIEF.md as its resolved snapshot, paths as in the repository', () => {
+    const repositoryRoot = createRepository();
+    writeIteration({
+      repositoryRoot,
+      name: BASELINE,
+      fields: { status: 'done' },
+      intake: completeDrop(),
+    });
+    writeIteration({
+      repositoryRoot,
+      name: CURRENT,
+      fields: {
+        baseline: BASELINE,
+        intakeMode: 'brief',
+        intakeNote: `1 received (BRIEF.md) · ${Object.keys(completeDrop()).length} carried forward from ${BASELINE}`,
+      },
+      intake: { 'BRIEF.md': '# Brief\n' },
+    });
+    const summary = summarizeIntakeDiff({
+      repositoryRoot,
+      baseline: BASELINE,
+      current: CURRENT,
+    });
+    assert.deepEqual(summary.files, { added: ['BRIEF.md'], removed: [], changed: [] });
+    assert.equal(summary.schemaRoutesChanged, false);
+    const text = runDiff([BASELINE, CURRENT], { repositoryRoot }).lines.join('\n');
+    assert.match(
+      text,
+      new RegExp(
+        `diff --git a/iterations/${CURRENT}/intake-files/BRIEF\\.md b/iterations/${CURRENT}/intake-files/BRIEF\\.md\nnew file mode`,
+      ),
+    );
+    assert.doesNotMatch(text, /deleted file mode/);
+  });
+
   test('refuses an iteration without intake-files/ — the delta is a diff of intake-files/ only', () => {
     const repositoryRoot = createRepository();
     writeIteration({ repositoryRoot, name: BASELINE, fields: { status: 'done' } });

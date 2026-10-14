@@ -3,6 +3,7 @@ import type { QueryKey } from '@tanstack/react-query';
 import { creditQueryKeys } from '@/shared/api/app/credits-api.ts';
 import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
 import type { LedgerRow, MoneyMode } from '@/shared/api/app/payments-contracts.ts';
+import { todayQueryKeys } from '@/shared/api/app/today-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -97,11 +98,16 @@ const BILL_KEYS: readonly QueryKey[] = [
   paymentQueryKeys.openBills(),
 ];
 
-/** A sale's money and stock: the ledger and its readers, the credits, the room and its medicines. */
+/**
+ * A sale's money and stock: the ledger and its readers, the credits, the room and its medicines —
+ * and Today's floor, whose pharmacy cards offer Dispense on the prescriptions still to fill, which a
+ * sale fills and a void empties again (as a prescription write refreshes it, `usePrescriptions`).
+ */
 const SALE_KEYS: readonly QueryKey[] = [
   ...MEDICINE_WRITE_KEYS,
   ...MONEY_WRITE_KEYS,
   creditQueryKeys.all,
+  todayQueryKeys.floors(),
 ];
 
 /** A supplier credit moves stock and what the supplier is owed — the bills Send payment offers. */

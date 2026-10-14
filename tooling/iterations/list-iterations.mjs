@@ -8,15 +8,16 @@
  * both, so an edited snapshot stands out. There is no shared index file — this listing is the index.
  * The model: iterations/README.md.
  */
-import { join, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   EMPTY_FIELD,
-  intakeFolder,
-  intakeHash,
   parseIterationReadme,
   readAllIterationReadmes,
+  resolveIntakeSnapshot,
   schemaRoutesHash,
+  snapshotFingerprint,
 } from './iterations.mjs';
 
 const LIST_COLUMNS = [
@@ -34,8 +35,9 @@ const LIST_COLUMNS = [
 
 /**
  * Reads every working-tree iteration into list rows, oldest first (Opened, then name). A missing
- * README or field shows as `—`; an Intake hash that differs from the README's reads
- * `<live> ≠ README <recorded>`.
+ * README or field shows as `—`. Schema-routes and the Intake hash come from the resolved snapshot
+ * (an overlay or a brief stores only what arrived); an Intake hash that differs from the README's
+ * reads `<live> ≠ README <recorded>`.
  *
  * @param {string} repositoryRoot
  * @returns {{ name: string, type: string, owner: string, opened: string, baseline: string, status: string, intakeMode: string, schemaRoutes: string, intakeHash: string, dropPlaced: string }[]}
@@ -45,8 +47,10 @@ export function readIterationListings(repositoryRoot) {
     .map(([name, readme]) => {
       const fields = parseIterationReadme(readme);
       const field = (label) => fields.get(label) ?? EMPTY_FIELD;
-      const folder = intakeFolder({ repositoryRoot, iteration: name });
-      const liveHash = intakeHash(folder);
+      const { files } = resolveIntakeSnapshot({ repositoryRoot, iteration: name });
+      const liveHash = snapshotFingerprint(
+        new Map([...files].map(([file, path]) => [file, readFileSync(path)])),
+      );
       return {
         name,
         type: field('Type'),
@@ -55,7 +59,7 @@ export function readIterationListings(repositoryRoot) {
         baseline: field('Baseline'),
         status: field('Status'),
         intakeMode: field('Intake mode'),
-        schemaRoutes: schemaRoutesHash(join(folder, 'schema-routes.md')),
+        schemaRoutes: schemaRoutesHash(files.get('schema-routes.md')),
         intakeHash:
           liveHash === field('Intake hash')
             ? liveHash

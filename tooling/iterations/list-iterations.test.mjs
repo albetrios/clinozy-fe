@@ -5,7 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, test } from 'node:test';
 import {
@@ -13,6 +13,7 @@ import {
   completeDrop,
   createRepository,
   SCHEMA_ROUTES,
+  scratchFolder,
   writeIteration,
 } from './iteration-fixtures.mjs';
 import { intakeHash } from './iterations.mjs';
@@ -102,4 +103,49 @@ test('shows — for an iteration folder without a README', () => {
       dropPlaced: '—',
     },
   ]);
+});
+
+test('a brief that stores only BRIEF.md lists the fingerprints of the snapshot it resolves to', () => {
+  const repositoryRoot = createRepository();
+  writeIteration({
+    repositoryRoot,
+    name: 'launch-2026-09-30-jxmr',
+    fields: { status: 'done' },
+    intake: completeDrop(),
+  });
+  const briefFolder = writeIteration({
+    repositoryRoot,
+    name: 'feat-returns-2026-10-06-kqzx',
+    fields: {
+      baseline: 'launch-2026-09-30-jxmr',
+      intakeMode: 'brief',
+      intakeNote: '1 received (BRIEF.md) · 9 carried forward from launch-2026-09-30-jxmr',
+    },
+    intake: { 'BRIEF.md': '# Brief\n' },
+  });
+  const full = join(scratchFolder(), 'full');
+  mkdirSync(full, { recursive: true });
+  for (const [name, text] of Object.entries({
+    ...completeDrop(),
+    'BRIEF.md': '# Brief\n',
+  }))
+    writeFileSync(join(full, name), text);
+  const resolvedHash = intakeHash(full);
+  const readme = join(briefFolder, 'README.md');
+  writeFileSync(
+    readme,
+    readFileSync(readme, 'utf-8').replace(
+      /\| Intake hash \| \w+ \|/,
+      `| Intake hash | ${resolvedHash} |`,
+    ),
+  );
+
+  const listing = readIterationListings(repositoryRoot).find(
+    (row) => row.name === 'feat-returns-2026-10-06-kqzx',
+  );
+  assert.equal(listing.intakeHash, resolvedHash);
+  assert.equal(
+    listing.schemaRoutes,
+    createHash('sha256').update(SCHEMA_ROUTES).digest('hex').slice(0, 12),
+  );
 });
