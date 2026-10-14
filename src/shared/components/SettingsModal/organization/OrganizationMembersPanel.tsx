@@ -32,7 +32,7 @@ import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
@@ -598,7 +598,7 @@ function MembersManager() {
 
   return (
     <section className="flex flex-col gap-4" data-testid="settings-organization-members">
-      <SectionHeader title={t(panels.title)} description={t(panels.description)} />
+      <SettingsSectionHeader section="members" />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <OrgListControls

@@ -1,9 +1,15 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { act, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type { AuthUser } from '@/shared/auth/types.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+
 import { SettingsSectionContext } from './settings-section-context.ts';
-import { SectionHeader } from './SettingsPanelShell.tsx';
+import { SectionHeader, SettingsSectionHeader } from './SettingsPanelShell.tsx';
+
+const USER = { id: 'usr_1', email: 'u@e.com', role: 'user' } as AuthUser;
 
 describe('SectionHeader', () => {
   it('renders title, description, and meta', () => {
@@ -64,5 +70,71 @@ describe('SectionHeader', () => {
       </SettingsSectionContext>,
     );
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('SettingsSectionHeader', () => {
+  beforeEach(() => {
+    useAuthStore.setState({ user: null });
+    useOrganizationStore.getState().clearOrganization();
+  });
+
+  it.each([
+    [
+      'profile',
+      'Profile',
+      'How you appear in the app. Visible to people in your organization.',
+    ],
+    ['account', 'Account', 'Account metadata and irreversible actions.'],
+    ['security', 'Security', 'Two-factor authentication and passkeys.'],
+    ['notifications', 'Notifications', "Choose what you're notified about, and how."],
+    ['sessions', 'Sessions', 'Devices currently signed in to your account.'],
+    ['billing', 'Billing', 'Your plan, payment methods, and invoices.'],
+    [
+      'general',
+      'Organization · General',
+      'Identity for your organization across the platform.',
+    ],
+    ['members', 'Members', 'People in this organization.'],
+    ['roles', 'Roles', 'Permission sets you can assign to members.'],
+  ] as const)(
+    'draws the %s section’s own title and sub line',
+    (section, title, description) => {
+      render(<SettingsSectionHeader section={section} />);
+      expect(screen.getByRole('heading', { name: title })).toBeInTheDocument();
+      expect(screen.getByText(description)).toBeInTheDocument();
+    },
+  );
+
+  it('names webhooks in Integrations’ sub line only when the caller sees them', () => {
+    useAuthStore.setState({ user: USER });
+    const { rerender } = render(<SettingsSectionHeader section="integrations" />);
+    expect(screen.getByRole('heading', { name: 'Integrations' })).toBeInTheDocument();
+    expect(screen.getByText('API keys.')).toBeInTheDocument();
+
+    act(() => {
+      useOrganizationStore.setState({
+        organizationType: 'TEAM',
+        permissions: ['api-key:read', 'webhook:read'],
+        permissionsResolved: true,
+      });
+    });
+    rerender(<SettingsSectionHeader section="integrations" />);
+    expect(screen.getByText('API keys and webhooks.')).toBeInTheDocument();
+  });
+
+  it('opens Profile on the signed-in profile’s completeness, and takes the live value over it', () => {
+    useAuthStore.setState({ user: { ...USER, name: 'Riya Shah' } });
+    const { rerender } = render(<SettingsSectionHeader section="profile" />);
+    expect(screen.getByText('Profile 50% complete')).toBeInTheDocument();
+
+    rerender(<SettingsSectionHeader section="profile" meta="Profile 100% complete" />);
+    expect(screen.getByText('Profile 100% complete')).toBeInTheDocument();
+    expect(screen.queryByText('Profile 50% complete')).not.toBeInTheDocument();
+  });
+
+  it('draws no meta for a section that has none', () => {
+    render(<SettingsSectionHeader section="sessions" />);
+    expect(screen.queryByText(/complete/)).not.toBeInTheDocument();
   });
 });

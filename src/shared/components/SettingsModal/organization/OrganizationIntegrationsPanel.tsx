@@ -20,7 +20,8 @@ import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { INTEGRATIONS_WEBHOOKS_CHECK } from '@/shared/components/SettingsModal/settings-permissions.ts';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useApiKeys, useRevokeApiKey } from '@/shared/hooks/useApiKeys/index.ts';
 import { useAccessResolved, useCan } from '@/shared/hooks/useCan/index.ts';
@@ -476,31 +477,20 @@ function WebhooksSection() {
  * since the role builder grants those codes independently.
  */
 export function OrganizationIntegrationsPanel() {
-  const { t: tSettings } = useTranslation(SETTINGS_NS);
   // Webhooks are only shown when the caller can actually read them; API keys are
   // the always-available part of this section (see settings-permissions.ts).
   // `useAccessResolved` distinguishes "not allowed" from "not resolved yet" — without it a
   // corrected gate renders hidden on first paint and pops in a beat later (SET-23).
-  const canReadWebhooks = useCan({
-    permission: 'webhook:read',
-    teamOrganizationOnly: true,
-  });
+  const canReadWebhooks = useCan(INTEGRATIONS_WEBHOOKS_CHECK);
   return (
     <section
       className="flex flex-col gap-4"
       data-testid="settings-organization-integrations"
     >
-      <SectionHeader
-        title={tSettings(SETTINGS_KEYS.panels.integrations.title)}
-        // Describe what is on screen. This panel is an Account section, so a personal
-        // workspace reaches it too — and there the webhooks half stays hidden, which made
-        // "API keys and webhooks." a promise the panel could not keep.
-        description={tSettings(
-          canReadWebhooks
-            ? SETTINGS_KEYS.panels.integrations.description
-            : SETTINGS_KEYS.panels.integrations.descriptionApiKeysOnly,
-        )}
-      />
+      {/* Its sub line describes what is on screen — "API keys." where the webhooks half
+          stays hidden (a personal workspace reaches this Account section too), by the
+          same check as above. */}
+      <SettingsSectionHeader section="integrations" />
       <ApiKeysSection />
       {canReadWebhooks ? <WebhooksSection /> : null}
     </section>
