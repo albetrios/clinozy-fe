@@ -17,7 +17,7 @@ PHASE 1 · PLANNING  (no code — ends in your approval)
  │                → iterations/<it>/README.md · Baseline none (from scratch) [planning]
  │
  ├─ 2 INTAKE      pnpm iteration:intake <it> <source> [--mode full|overlay|brief] [--both]
- │                → the FULL snapshot, checked, into intake-files/          [planning]
+ │                → what arrived into intake-files/, the snapshot checked   [planning]
  │                  README: Intake mode · Intake note · Intake hash
  │
  ├─ 3 PLANNING    "plan iteration <it>" → fe-iteration-planning
@@ -52,9 +52,9 @@ iterations/feat-pharmacy-returns-2026-10-06-kqzx/
 ├── README.md ........... field table + "## History"            values: the commands (Summary: you)
 │     Type · Topic · Owner · Opened · Branch · Baseline · Status · Summary
 │     Drop placed · Drop source · Intake mode · Intake note
-│     Schema-routes (12-char sha256 of schema-routes.md) · Intake hash (12-char sha256 of every file)
+│     Schema-routes (12-char sha256 of schema-routes.md) · Intake hash (12-char sha256 of the snapshot)
 │
-├── intake-files/ ....... the FULL snapshot, flat, never edited  written by iteration:intake
+├── intake-files/ ....... what arrived, flat, never edited       written by iteration:intake
 │     PRD.md · schema-routes.md · _index.md · preset.md · shell.md    LOCKED from approved
 │     one <slug>.md per Slug in _index.md
 │     <prototype>.html + every *.js it loads
@@ -77,10 +77,13 @@ iterations/feat-pharmacy-returns-2026-10-06-kqzx/
 
 ## How the snapshot is built — the three intake modes
 
-`intake-files/` always holds the complete current design, however little arrived.
+The snapshot is always the complete current design, however little arrived. `intake-files/` stores
+only what arrived; an overlay or a brief takes every other file from its Baseline (up the Baseline
+chain) — the gate, the Intake hash, `iteration:diff` and `iteration:list` all read that resolved
+snapshot.
 
 ```text
-                 what arrived                                intake-files/ — the FULL snapshot
+                 what arrived                                the snapshot (intake-files/ stores the received)
  --mode full    ┌───────────────────────────┐
  (default;      │ the whole drop: PRD.md,   │ ───────────────► exactly the drop
   the launch)   │ schema-routes.md, every   │                  note: "23 received"

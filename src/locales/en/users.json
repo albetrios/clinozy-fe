@@ -316,7 +316,8 @@
       "steps": {
         "place": "Branch & address",
         "contact": "Contact & opening hours",
-        "people": "People"
+        "people": "People",
+        "places": "Places & days"
       },
       "groups": {
         "branch": "Branch",
@@ -392,7 +393,79 @@
       "added": "{{name}} branch added",
       "saved": "{{name}} saved",
       "contactMissing": "Add the phone and email",
-      "pinInvalid": "PIN code needs 6 digits"
+      "pinInvalid": "PIN code needs 6 digits",
+      "places": {
+        "sections": {
+          "room": "Rooms",
+          "machine": "Machines",
+          "holiday": "Holidays"
+        },
+        "hints": {
+          "room": "where patients are seen",
+          "machine": "booked with a treatment",
+          "holiday": "closed all day · no bookings"
+        },
+        "counts": {
+          "room_one": "{{count}} room",
+          "room_other": "{{count}} rooms",
+          "machine_one": "{{count}} machine",
+          "machine_other": "{{count}} machines",
+          "holiday_one": "{{count}} holiday",
+          "holiday_other": "{{count}} holidays"
+        },
+        "nothingYet": "No rooms, machines or holidays yet",
+        "empty": {
+          "room": "No rooms yet",
+          "machine": "No machines yet",
+          "holiday": "No holidays coming up"
+        },
+        "newLabel": {
+          "room": "New room",
+          "machine": "New machine",
+          "holiday": "New holiday"
+        },
+        "placeholders": {
+          "room": "e.g. Room 1",
+          "machine": "e.g. Laser machine",
+          "holiday": "e.g. Diwali"
+        },
+        "fields": {
+          "name": "Name",
+          "date": "Date",
+          "label": "Holiday"
+        },
+        "add": "Add",
+        "rename": "Rename",
+        "save": "Save",
+        "cancel": "Cancel",
+        "remove": "Remove",
+        "toggle": {
+          "on": "In use",
+          "off": "Switched off",
+          "label": "{{name}} in use"
+        },
+        "removeTitle": {
+          "room": "Remove this room?",
+          "machine": "Remove this machine?",
+          "holiday": "Remove this holiday?"
+        },
+        "duplicate": {
+          "room": "A room called {{name}} already exists",
+          "machine": "A machine called {{name}} already exists",
+          "holiday": "{{date}} is already a holiday"
+        },
+        "nameMissing": "Add a name",
+        "nameTooLong": "At most 60 characters",
+        "dateMissing": "Pick the date",
+        "labelMissing": "Name the holiday",
+        "labelTooLong": "At most 60 characters",
+        "added": "{{name}} added",
+        "renamed": "{{name}} renamed",
+        "switchedOn": "{{name}} switched on",
+        "switchedOff": "{{name}} switched off",
+        "removed": "{{name}} removed",
+        "loadFailed": "Couldn't load the rooms, machines and holidays"
+      }
     }
   }
 }

@@ -102,6 +102,13 @@
       "dark": "ダーク",
       "system": "システム"
     },
+    "setup": {
+      "finishSetup": "設定を完了 · {{total}} 件中 {{done}} 件",
+      "clinicSettings": "クリニックの設定",
+      "ringLabel": "設定 {{total}} 件中 {{done}} 件完了",
+      "memberNotice": "クリニックはまだ設定中です。準備が整うと予約を受け付けます。",
+      "drawerName": "クリニックの初期設定"
+    },
     "sectionBar": {
       "nav": "セクション",
       "allSections": "すべてのセクション",

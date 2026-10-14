@@ -24,7 +24,7 @@ describe('ProfileStep', () => {
   /*
    * ONB-13. `useOnboardingStore()` with no selector subscribes to the whole
    * store, and `patch` replaces the entire `data` object — so typing in the
-   * questions step, or anywhere else in the wizard, re-rendered this component
+   * workspace step, or anywhere else in the wizard, re-rendered this component
    * too. A `Profiler` commit is the observable: no re-render, no commit.
    */
   it('does not re-render when an unrelated field changes', async () => {
@@ -42,11 +42,10 @@ describe('ProfileStep', () => {
     const afterMount = commits;
     expect(afterMount).toBeGreaterThan(0);
 
-    // Fields this step does not read: the questions step and the workspace step.
+    // Fields this step does not read: the workspace step's.
     await act(async () => {
-      useOnboardingStore.getState().patch({ teamSize: '2–10' });
-      useOnboardingStore.getState().patch({ referralSource: 'search' });
       useOnboardingStore.getState().patch({ organizationName: 'Acme Inc.' });
+      useOnboardingStore.getState().patch({ organizationSlug: 'acme' });
     });
     expect(commits).toBe(afterMount);
 

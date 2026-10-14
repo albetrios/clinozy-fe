@@ -1,4 +1,4 @@
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -140,26 +140,18 @@ vi.mock('@/shared/tenancy/my-organizations.ts', async (importOriginal) => ({
   createOrganization: (...args: unknown[]) => createOrganization(...args),
 }));
 
+/*
+ * The invitation and role calls the wizard used to make on finish. It makes none
+ * now — inviting is the setup guide's, with real roles and the main branch
+ * (clinic-setup D4) — and these spies are what prove it stays that way.
+ */
 const inviteMember = vi.fn();
-const listRoles = vi.fn();
 const createRole = vi.fn();
-vi.mock('@/shared/api/organization-api.ts', () => ({
+vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   inviteMember: (...args: unknown[]) => inviteMember(...args),
-  listRoles: (...args: unknown[]) => listRoles(...args),
   createRole: (...args: unknown[]) => createRole(...args),
 }));
-
-/** A non-system role row shaped like organization-api's RoleSummary. */
-function memberRole(id = 'rol_member') {
-  return {
-    id,
-    name: 'Member',
-    description: '',
-    permissions: [],
-    memberCount: 0,
-    isSystem: false,
-  };
-}
 
 /**
  * `DoneStep` that can be made to throw on demand — the containment test needs a
@@ -195,11 +187,6 @@ import { OnboardingPage } from './OnboardingPage.tsx';
 const SESSION_USER_ID = 'usr_1';
 
 /**
- * Drop the wizard on the final step with a chosen org name + invites. The store
- * is claimed for the session user FIRST: the mount effect claims it too, and an
- * unclaimed store is wiped — taking the seed with it.
- */
-/**
  * Structurally valid base64url JWT — `setAccessToken` validates the shape, so a
  * bare string is rejected. Shared by every test that needs a token in scope.
  */
@@ -209,12 +196,17 @@ const FAKE_JWT = (() => {
   return `${b64u({ alg: 'none' })}.${b64u({ sub: 'usr_1', exp: 9999999999 })}.sig`;
 })();
 
-function seedDoneStep(invites: string[] = []) {
+/**
+ * Drop the wizard on the final step with a chosen org name. The store is claimed
+ * for the session user FIRST: the route guard claims it too, and an unclaimed
+ * store is wiped — taking the seed with it.
+ */
+function seedDoneStep() {
   const store = useOnboardingStore.getState();
   store.reset();
   store.claimForUser(SESSION_USER_ID);
-  store.patch({ organizationName: 'Acme Inc.', invites });
-  store.setStepIndex(5); // team-only: welcome/profile/questions/workspace/invite/done
+  store.patch({ organizationName: 'Acme Inc.' });
+  store.setStepIndex(3); // team-only: welcome/profile/workspace/done
 }
 
 const TS = '2026-01-01T00:00:00.000Z';
@@ -357,10 +349,6 @@ describe('OnboardingPage', () => {
       ]);
       return org;
     });
-    // A just-activated org already has an assignable role, so invites reuse it.
-    listRoles.mockResolvedValue({ rows: [memberRole()] });
-    createRole.mockResolvedValue(memberRole('rol_created'));
-    inviteMember.mockResolvedValue({ id: 'mem_1', email: 'a@acme.com' });
     useOnboardingStore.getState().reset();
     useWorkspaceSwitchStore.getState().endSwitch();
   });
@@ -389,7 +377,7 @@ describe('OnboardingPage', () => {
   it("shows nothing of a previous user's wizard once the store is claimed", async () => {
     const store = useOnboardingStore.getState();
     store.claimForUser('usr_previous');
-    store.patch({ firstName: 'Prev', lastName: 'User', teamSize: '2–10' });
+    store.patch({ firstName: 'Prev', lastName: 'User', organizationName: 'Prev Clinic' });
     store.setStepIndex(2);
 
     // What the guard does before this page is allowed to render.
@@ -400,6 +388,7 @@ describe('OnboardingPage', () => {
 
     await screen.findByTestId('onboarding-page');
     expect(screen.queryByDisplayValue('Prev')).not.toBeInTheDocument();
+    expect(screen.queryByText('Prev Clinic')).not.toBeInTheDocument();
     const state = useOnboardingStore.getState();
     expect(state.forUserId).toBe('usr_next');
     expect(state.stepIndex).toBe(0);
@@ -408,7 +397,7 @@ describe('OnboardingPage', () => {
 
   it('creates the org once and navigates to its home', async () => {
     const user = userEvent.setup();
-    seedDoneStep(['a@acme.com']);
+    seedDoneStep();
     renderWithProviders(<OnboardingPage />);
 
     await user.click(await screen.findByTestId('onboarding-finish'));
@@ -429,7 +418,7 @@ describe('OnboardingPage', () => {
   // It read as a click that did nothing, and users reloaded to escape it.
   it('covers the hand-off to the workspace until the destination lands', async () => {
     const user = userEvent.setup();
-    seedDoneStep([]);
+    seedDoneStep();
     let switchingDuringNavigation: string | null = null;
     let finishStillDisabled = false;
     navigate.mockImplementation(async () => {
@@ -453,7 +442,7 @@ describe('OnboardingPage', () => {
 
   it('does NOT re-create the org on a retry after a partial failure', async () => {
     const user = userEvent.setup();
-    seedDoneStep(['a@acme.com']);
+    seedDoneStep();
     fetchSummaries.mockResolvedValue([
       {
         id: 'org_existing',
@@ -490,7 +479,7 @@ describe('OnboardingPage', () => {
     const store = useOnboardingStore.getState();
     store.reset();
     store.claimForUser(SESSION_USER_ID);
-    store.setStepIndex(4); // hybrid+team steps: welcome/profile/questions/invite/done
+    store.setStepIndex(2); // hybrid+team steps: welcome/profile/done
     renderWithProviders(<OnboardingPage />);
 
     await user.click(await screen.findByTestId('onboarding-finish'));
@@ -512,7 +501,7 @@ describe('OnboardingPage', () => {
     const store = useOnboardingStore.getState();
     store.reset();
     store.claimForUser(SESSION_USER_ID);
-    store.setStepIndex(4);
+    store.setStepIndex(2);
     renderWithProviders(<OnboardingPage />);
 
     await user.click(await screen.findByTestId('onboarding-finish'));
@@ -639,86 +628,6 @@ describe('OnboardingPage', () => {
     expect(useOnboardingStore.getState().createdOrganizationSlug).toBe('acme');
   });
 
-  it('still finishes when an invite fails (best-effort, no trap)', async () => {
-    const user = userEvent.setup();
-    inviteMember.mockRejectedValueOnce(new Error('bad invite'));
-    seedDoneStep(['good@acme.com', 'bad@acme.com']);
-    renderWithProviders(<OnboardingPage />);
-
-    await user.click(await screen.findByTestId('onboarding-finish'));
-
-    // Org created exactly once, user is sent through despite the invite failure.
-    await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
-    expect(createOrganization).toHaveBeenCalledTimes(1);
-  });
-
-  it('invites teammates as members via POST /memberships with a real role id', async () => {
-    // Regression: the finish step hit the non-existent POST /invitations (404).
-    // It now creates INVITED memberships (inviteMember) with a real role_id,
-    // AFTER the token has switched to the new org.
-    const user = userEvent.setup();
-    seedDoneStep(['a@acme.com', 'b@acme.com']);
-    renderWithProviders(<OnboardingPage />);
-
-    await user.click(await screen.findByTestId('onboarding-finish'));
-
-    await waitFor(() => expect(navigate).toHaveBeenCalled());
-    // Token switched to the new org before inviting.
-    expect(switchToOrganization).toHaveBeenCalledWith('org_new');
-    expect(inviteMember).toHaveBeenCalledTimes(2);
-    expect(inviteMember).toHaveBeenCalledWith({
-      invite: { email: 'a@acme.com', roleIds: ['rol_member'] },
-    });
-    expect(inviteMember).toHaveBeenCalledWith({
-      invite: { email: 'b@acme.com', roleIds: ['rol_member'] },
-    });
-    // The org already had an assignable role, so none was provisioned.
-    expect(createRole).not.toHaveBeenCalled();
-  });
-
-  it('provisions a default Member role when the organization has only presets', async () => {
-    // The presets each carry a clinic job the wizard does not ask about, so the
-    // finish step provisions one "Member" role to invite with.
-    const user = userEvent.setup();
-    listRoles.mockResolvedValueOnce({
-      rows: [{ ...memberRole('rol_owner'), name: 'Owner', isSystem: true }],
-    });
-    createRole.mockResolvedValueOnce(memberRole('rol_provisioned'));
-    seedDoneStep(['a@acme.com']);
-    renderWithProviders(<OnboardingPage />);
-
-    await user.click(await screen.findByTestId('onboarding-finish'));
-
-    await waitFor(() => expect(navigate).toHaveBeenCalled());
-    expect(createRole).toHaveBeenCalledTimes(1);
-    // One call: the codes ride the create (no separate PUT).
-    expect(createRole).toHaveBeenCalledWith({
-      input: expect.objectContaining({
-        permissions: ['organization:read', 'membership:read'],
-      }),
-    });
-    expect(inviteMember).toHaveBeenCalledWith({
-      invite: { email: 'a@acme.com', roleIds: ['rol_provisioned'] },
-    });
-  });
-
-  it('finishes even when no invite role can be provisioned (best-effort)', async () => {
-    // Fresh org has only Owner AND createRole fails → resolveInviteRoleId throws;
-    // invites are all counted failed but the wizard still completes.
-    const user = userEvent.setup();
-    listRoles.mockResolvedValueOnce({
-      rows: [{ ...memberRole('rol_owner'), name: 'Owner', isSystem: true }],
-    });
-    createRole.mockRejectedValueOnce(new Error('nope'));
-    seedDoneStep(['a@acme.com']);
-    renderWithProviders(<OnboardingPage />);
-
-    await user.click(await screen.findByTestId('onboarding-finish'));
-
-    await waitFor(() => expect(navigate).toHaveBeenCalled());
-    expect(inviteMember).not.toHaveBeenCalled();
-  });
-
   it('finishes both mode on the organization picker without creating a team org', async () => {
     useHybridSession();
     const user = userEvent.setup();
@@ -726,7 +635,7 @@ describe('OnboardingPage', () => {
     store.reset();
     store.claimForUser(SESSION_USER_ID);
     store.patch({ firstName: 'Ada', lastName: 'Lovelace' });
-    store.setStepIndex(3);
+    store.setStepIndex(2); // welcome/profile/done
     renderWithProviders(<OnboardingPage />);
 
     await user.click(await screen.findByTestId('onboarding-finish'));
@@ -754,7 +663,7 @@ describe('OnboardingPage', () => {
     store.reset();
     store.claimForUser(SESSION_USER_ID);
     store.patch({ firstName: 'Ada', lastName: 'Lovelace' });
-    store.setStepIndex(3);
+    store.setStepIndex(2); // welcome/profile/done
     renderWithProviders(<OnboardingPage />);
 
     await user.click(await screen.findByTestId('onboarding-finish'));
@@ -786,7 +695,7 @@ describe('OnboardingPage', () => {
     store.reset();
     store.claimForUser(SESSION_USER_ID);
     store.patch({ firstName: 'Ada', lastName: 'Lovelace' });
-    store.setStepIndex(3);
+    store.setStepIndex(2); // welcome/profile/done
     renderWithProviders(<OnboardingPage />);
 
     await user.click(await screen.findByTestId('onboarding-finish'));
@@ -799,81 +708,10 @@ describe('OnboardingPage', () => {
     );
   });
 
-  // ── ONB-1: invites keyed off the ACTIVATED org, not the created one ────────
-
-  // personal-and-team mode where the user ALREADY belongs to a team:
-  // deriveOnboardingSteps shows the invite step, but the wizard creates no org.
-  // Gating the send on the *created* org id therefore skipped every invite —
-  // and the success toast still told the user their workspace was ready.
-  it('sends the invites into the existing team it activated (creates no org)', async () => {
-    const user = userEvent.setup();
-    useHybridSession([teamOrg('acme')]);
-    const successSpy = vi.spyOn(notify, 'success').mockImplementation(() => '');
-    const warningSpy = vi.spyOn(notify, 'warning').mockImplementation(() => '');
-    try {
-      const store = useOnboardingStore.getState();
-      store.reset();
-      store.claimForUser(SESSION_USER_ID);
-      store.patch({ invites: ['a@acme.com', 'b@acme.com', 'c@acme.com'] });
-      store.setStepIndex(4); // welcome/profile/questions/invite/done
-      renderWithProviders(<OnboardingPage />);
-
-      await user.click(await screen.findByTestId('onboarding-finish'));
-
-      await waitFor(() => expect(navigate).toHaveBeenCalled());
-      expect(createOrganization).not.toHaveBeenCalled();
-      expect(switchToOrganization).toHaveBeenCalledWith('org_acme');
-      // All three go out. This is exactly what silently sent nothing before.
-      expect(inviteMember).toHaveBeenCalledTimes(3);
-      expect(inviteMember).toHaveBeenCalledWith({
-        invite: { email: 'c@acme.com', roleIds: ['rol_member'] },
-      });
-      expect(successSpy).toHaveBeenCalledTimes(1);
-      // The toast NAMES how many invitations went out — "your workspace is
-      // ready" alone left the user with no confirmation that the teammates
-      // they had just typed were invited at all.
-      expect(successSpy).toHaveBeenCalledWith(expect.stringContaining('3'));
-      expect(successSpy.mock.calls[0]?.[0]).toMatch(/invitation/i);
-      expect(warningSpy).not.toHaveBeenCalled();
-    } finally {
-      successSpy.mockRestore();
-      warningSpy.mockRestore();
-    }
-  });
-
-  it('warns rather than claiming success when there is no team to invite into', async () => {
-    // Several teams → activation falls back to the personal workspace, which
-    // cannot hold invited members. Nothing can be sent, so the user is told
-    // instead of being shown a success toast that lies.
-    const user = userEvent.setup();
-    useHybridSession([teamOrg('acme'), teamOrg('beta')]);
-    const successSpy = vi.spyOn(notify, 'success').mockImplementation(() => '');
-    const warningSpy = vi.spyOn(notify, 'warning').mockImplementation(() => '');
-    try {
-      const store = useOnboardingStore.getState();
-      store.reset();
-      store.claimForUser(SESSION_USER_ID);
-      store.patch({ invites: ['a@acme.com', 'b@acme.com'] });
-      store.setStepIndex(4);
-      renderWithProviders(<OnboardingPage />);
-
-      await user.click(await screen.findByTestId('onboarding-finish'));
-
-      await waitFor(() => expect(navigate).toHaveBeenCalled());
-      expect(switchToPersonal).toHaveBeenCalledTimes(1);
-      expect(inviteMember).not.toHaveBeenCalled();
-      expect(warningSpy).toHaveBeenCalledTimes(1);
-      expect(successSpy).not.toHaveBeenCalled();
-    } finally {
-      successSpy.mockRestore();
-      warningSpy.mockRestore();
-    }
-  });
-
   // ── Single-flight: one gesture, one set of writes ──────────────────────────
 
-  it('drops a double-click on Finish — one org created, one invite sent', async () => {
-    seedDoneStep(['a@acme.com']);
+  it('drops a double-click on Finish — one org created, one switch', async () => {
+    seedDoneStep();
     renderWithProviders(<OnboardingPage />);
     const finishButton = await screen.findByTestId('onboarding-finish');
 
@@ -888,7 +726,6 @@ describe('OnboardingPage', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
     expect(createOrganization).toHaveBeenCalledTimes(1);
     expect(switchToOrganization).toHaveBeenCalledTimes(1);
-    expect(inviteMember).toHaveBeenCalledTimes(1);
   });
 
   it('marks Finish busy, not just disabled, while the workspace is set up', async () => {
@@ -928,16 +765,15 @@ describe('OnboardingPage', () => {
      * the navigation — `void navigate`, not awaited — while the destination's
      * guard chain is still doing async network work. The wizard is still on
      * screen with a live button for all of it, and a second click re-ran the
-     * whole finish: `completeOnboarding`, the profile PATCH, the org switch and
-     * every invitation a second time, so the user got duplicate invitations or a
-     * bogus "couldn't be sent" warning right after being told it worked.
+     * whole finish: `completeOnboarding`, the profile PATCH and the org switch a
+     * second time, with a second success toast right after the first.
      */
     const user = userEvent.setup();
     const { authApi } = await import('@/shared/api/auth-api.ts');
     const { setAccessToken, clearAccessToken } = await import('@/shared/auth/token.ts');
     setAccessToken(FAKE_JWT);
     try {
-      seedDoneStep(['a@acme.com']);
+      seedDoneStep();
       // A name to PATCH: persistOnboardingResult skips the call outright when
       // both name fields are blank, and the duplicate PATCH is half the bug.
       useOnboardingStore.getState().patch({ firstName: 'Ada' });
@@ -961,7 +797,6 @@ describe('OnboardingPage', () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
-      expect(inviteMember).toHaveBeenCalledTimes(1);
       expect(authApi.completeOnboarding).toHaveBeenCalledTimes(1);
       expect(authApi.updateProfile).toHaveBeenCalledTimes(1);
       expect(switchToOrganization).toHaveBeenCalledTimes(1);
@@ -996,14 +831,14 @@ describe('OnboardingPage', () => {
     const { setAccessToken, clearAccessToken } = await import('@/shared/auth/token.ts');
     setAccessToken(FAKE_JWT);
     try {
-      seedDoneStep(['a@acme.com']);
+      seedDoneStep();
       renderWithProviders(<OnboardingPage />);
       const finishButton = await screen.findByTestId('onboarding-finish');
 
       await user.click(finishButton);
       await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
       expect(authApi.completeOnboarding).toHaveBeenCalledTimes(1);
-      expect(inviteMember).toHaveBeenCalledTimes(1);
+      expect(switchToOrganization).toHaveBeenCalledTimes(1);
 
       // The router leaves for the clinic, whose guard refuses us and
       // redirects back — the page stays mounted through both.
@@ -1016,7 +851,6 @@ describe('OnboardingPage', () => {
 
       // A real finish, not a replayed navigation: the writes go out again.
       await waitFor(() => expect(authApi.completeOnboarding).toHaveBeenCalledTimes(2));
-      expect(inviteMember).toHaveBeenCalledTimes(2);
       expect(switchToOrganization).toHaveBeenCalledTimes(2);
       expect(navigate).toHaveBeenCalledTimes(2);
       expect(navigate).toHaveBeenLastCalledWith(
@@ -1043,7 +877,7 @@ describe('OnboardingPage', () => {
     setAccessToken(FAKE_JWT);
     createOrganization.mockRejectedValueOnce(new Error('workspace create failed'));
     try {
-      seedDoneStep(['a@acme.com']);
+      seedDoneStep();
       renderWithProviders(<OnboardingPage />);
       const finishButton = await screen.findByTestId('onboarding-finish');
 
@@ -1060,7 +894,6 @@ describe('OnboardingPage', () => {
       await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
       expect(createOrganization).toHaveBeenCalledTimes(2); // the failure, then the retry
       expect(authApi.completeOnboarding).toHaveBeenCalledTimes(1);
-      expect(inviteMember).toHaveBeenCalledTimes(1);
     } finally {
       clearAccessToken();
     }
@@ -1191,7 +1024,7 @@ describe('OnboardingPage', () => {
     // leaving the user "onboarded" with no workspace.
     const user = userEvent.setup();
     const { authApi } = await import('@/shared/api/auth-api.ts');
-    seedDoneStep(['a@acme.com']);
+    seedDoneStep();
     failMeContext();
     renderWithProviders(<OnboardingPage />);
 
@@ -1204,7 +1037,6 @@ describe('OnboardingPage', () => {
 
     expect(authApi.completeOnboarding).not.toHaveBeenCalled();
     expect(createOrganization).not.toHaveBeenCalled();
-    expect(inviteMember).not.toHaveBeenCalled();
     expect(switchToOrganization).not.toHaveBeenCalled();
     expect(switchToPersonal).not.toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
@@ -1233,25 +1065,25 @@ describe('OnboardingPage', () => {
   });
 
   it('does not fall back to a shorter flow when me/context fails', async () => {
-    // Hybrid deployment, user already in a team: with the context LOADED step 3
-    // is the invite step. Derived from a null context the invite step vanishes,
-    // so index 3 clamps to 'done' — the old build showed a finished-looking
-    // wizard that never asked for invites and let the user commit it.
-    useHybridSession([teamOrg('acme')]);
+    // Team-only deployment, no clinic yet: with the context LOADED step 2 is the
+    // clinic-name step. Derived from a null context (the permissive
+    // personal-and-team fallback) that step vanishes, so index 2 clamps to
+    // 'done' — a finished-looking wizard that never asked for the clinic's name
+    // and let the user commit it.
     const store = useOnboardingStore.getState();
     store.reset();
     store.claimForUser(SESSION_USER_ID);
-    store.setStepIndex(3);
+    store.setStepIndex(2);
     failMeContext();
     renderWithProviders(<OnboardingPage />);
 
     expect(await screen.findByTestId('onboarding-context-gate')).toBeInTheDocument();
-    expect(screen.queryByTestId('onboarding-invite-email')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('onboarding-organization-name')).not.toBeInTheDocument();
     expect(screen.queryByTestId('onboarding-finish')).not.toBeInTheDocument();
   });
 
-  it('does not mention invitations when the flow sent none', async () => {
-    // team-only default: the wizard creates the org, and no teammates were typed.
+  it('announces the ready workspace without mentioning invitations', async () => {
+    // team-only default: the wizard creates the org and invites nobody.
     const user = userEvent.setup();
     const successSpy = vi.spyOn(notify, 'success').mockImplementation(() => '');
     try {
@@ -1286,9 +1118,9 @@ describe('OnboardingPage', () => {
     );
 
     // The first Back click moves: one step back from the clamped last step
-    // (welcome/profile/questions/workspace/INVITE/done), not a no-op from 99.
+    // (welcome/profile/WORKSPACE/done), not a no-op from 99.
     await user.click(screen.getByTestId('onboarding-back'));
-    expect(useOnboardingStore.getState().stepIndex).toBe(4);
+    expect(useOnboardingStore.getState().stepIndex).toBe(2);
   });
 
   it('moves forward on Continue and back on Back', async () => {
@@ -1303,6 +1135,52 @@ describe('OnboardingPage', () => {
     expect(useOnboardingStore.getState().stepIndex).toBe(0);
   });
 
+  // ── Clinic setup (D4): four steps, and no invitation sent from here ─────────
+
+  it('walks Welcome → Your name → Clinic name → Done, then finishes without inviting anyone', async () => {
+    const user = userEvent.setup();
+    const { authApi } = await import('@/shared/api/auth-api.ts');
+    const { setAccessToken, clearAccessToken } = await import('@/shared/auth/token.ts');
+    setAccessToken(FAKE_JWT);
+    try {
+      useOnboardingStore.getState().claimForUser(SESSION_USER_ID);
+      renderWithProviders(<OnboardingPage />);
+
+      // Four circles across the card, the first one current.
+      const progress = await screen.findByRole('list', { name: 'Onboarding progress' });
+      const circles = within(progress).getAllByRole('listitem');
+      expect(circles).toHaveLength(4);
+      const stepTitle = () => screen.getByTestId('onboarding-step-title');
+      expect(stepTitle()).toHaveTextContent('Welcome aboard');
+
+      await user.click(screen.getByTestId('onboarding-next'));
+      expect(stepTitle()).toHaveTextContent('About you');
+      await user.type(screen.getByTestId('onboarding-first-name'), 'Ada');
+
+      await user.click(screen.getByTestId('onboarding-next'));
+      expect(stepTitle()).toHaveTextContent('Your workspace');
+      await user.type(screen.getByTestId('onboarding-organization-name'), 'Acme Inc.');
+
+      await user.click(screen.getByTestId('onboarding-next'));
+      expect(stepTitle()).toHaveTextContent("You're all set");
+      expect(screen.queryByTestId('onboarding-next')).not.toBeInTheDocument();
+
+      await user.click(screen.getByTestId('onboarding-finish'));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
+      expect(createOrganization).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Acme Inc.' }),
+      );
+      // The account is still marked onboarded…
+      expect(authApi.completeOnboarding).toHaveBeenCalledTimes(1);
+      // …and nobody is invited, nor a role made to invite them with.
+      expect(inviteMember).not.toHaveBeenCalled();
+      expect(createRole).not.toHaveBeenCalled();
+    } finally {
+      clearAccessToken();
+    }
+  });
+
   // Regression (ONB-6): the slug was free text with a live URL preview and no
   // validation, so an uppercase or spaced value passed Continue and only failed
   // at Finish, two steps away, as a generic toast.
@@ -1311,7 +1189,7 @@ describe('OnboardingPage', () => {
     store.reset();
     store.claimForUser(SESSION_USER_ID);
     store.patch({ organizationName: 'Acme Inc.', organizationSlug: 'Not A Slug' });
-    store.setStepIndex(3); // welcome/profile/questions/WORKSPACE/invite/done
+    store.setStepIndex(2); // welcome/profile/WORKSPACE/done
 
     renderWithProviders(<OnboardingPage />);
     await screen.findByTestId('onboarding-organization-slug');
@@ -1324,7 +1202,7 @@ describe('OnboardingPage', () => {
     store.reset();
     store.claimForUser(SESSION_USER_ID);
     store.patch({ organizationName: 'Acme Inc.', organizationSlug: 'acme-inc' });
-    store.setStepIndex(3);
+    store.setStepIndex(2);
 
     renderWithProviders(<OnboardingPage />);
     await screen.findByTestId('onboarding-organization-slug');

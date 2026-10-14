@@ -1,0 +1,613 @@
+{
+  "370001": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bhagadia",
+      "Bhuj",
+      "Bhuj Darbargadh Chowk",
+      "Bhuj Din Dayal Nagar",
+      "Bhuj Ravalwadi",
+      "Bibar",
+      "Dhori",
+      "Dhrang",
+      "Habay",
+      "Kotay",
+      "Kunariya",
+      "Lodai",
+      "Loria",
+      "Mirzapar",
+      "Nagor",
+      "Nirona",
+      "Sumrasar S",
+      "Vang",
+      "Zinkdi",
+      "Zura"
+    ]
+  ],
+  "370015": ["Kachchh", "Gujarat", ["Haripar", "Kachchh University DSO"]],
+  "370020": [
+    "Kachchh",
+    "Gujarat",
+    ["Bhujodi", "Dhaneti", "Madhapar", "Mamuara", "Nadapa"]
+  ],
+  "370030": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bharasar",
+      "Bhitara",
+      "Jiyapar",
+      "Kodki",
+      "Kotda Roha",
+      "Kurbai",
+      "Mangvana",
+      "Mankuwa",
+      "Naredi",
+      "Roha",
+      "Sanosara",
+      "Sukhpar Roha",
+      "Sumrasar Jat",
+      "Vibhapar"
+    ]
+  ],
+  "370040": ["Kachchh", "Gujarat", ["Deshalpar", "Fotdi", "Ratiya", "Samtra", "Sukhpar"]],
+  "370105": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Ashram Chakar",
+      "Chapredi",
+      "Hajapar",
+      "Kali Talawali",
+      "Kotda Reha",
+      "Kukma",
+      "Lakhond",
+      "Mota Bandra",
+      "Ningal",
+      "Padhar",
+      "Ratnal",
+      "Reha",
+      "Sapeda",
+      "Sugaria"
+    ]
+  ],
+  "370110": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Anjar",
+      "Bitta Valadia",
+      "Devalia",
+      "Khambhara",
+      "Kumbharia",
+      "Lakhapar",
+      "Meghpar Borichi",
+      "Modvadar",
+      "Nagalpar",
+      "Satapar",
+      "Sinugara",
+      "Tappar",
+      "Varsamedi",
+      "Vidi",
+      "Vira",
+      "Zaru"
+    ]
+  ],
+  "370115": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Baniyari",
+      "Budharmora",
+      "Chandrani",
+      "Dagara",
+      "Dhamadka",
+      "Javaharnagar",
+      "Kanaiyabe",
+      "Khokhara",
+      "Kotda C",
+      "Navagam",
+      "New Dudhai",
+      "Rahpar Khokhara",
+      "Sukhpar B"
+    ]
+  ],
+  "370130": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bhalot",
+      "Bhuvad",
+      "Chandia",
+      "Chandroda",
+      "Khedoi",
+      "Loharia",
+      "Mathada",
+      "Mindhiara",
+      "Varli"
+    ]
+  ],
+  "370135": ["Kachchh", "Gujarat", ["Adhoi", "Halra", "Kanthkot", "Vamka"]],
+  "370140": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Amardi",
+      "Bandhadi",
+      "Bhachau",
+      "Bharudia",
+      "Chhadwara",
+      "Chirai",
+      "Chobari",
+      "Chopadva",
+      "Kadol",
+      "Kakarva",
+      "Kharoi",
+      "Kumbharadi",
+      "Manfara",
+      "Maye",
+      "Meghpar",
+      "Ner",
+      "Rampar B",
+      "Shikara",
+      "Vijapasar",
+      "Vondh",
+      "Vondhada"
+    ]
+  ],
+  "370145": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Badalpar",
+      "Chitrod",
+      "Gagodar",
+      "Khodasar",
+      "Kidiyanagar",
+      "Kumbharia",
+      "Lakadia",
+      "Manaba",
+      "Sany",
+      "Shivlakha",
+      "Thoriyari",
+      "Vallabhapar K"
+    ]
+  ],
+  "370150": [
+    "Kachchh",
+    "Gujarat",
+    ["Amaliyara", "Gharana", "Jangi", "Laliyana", "Samkhiyali", "Sikarpur", "Vandhiya"]
+  ],
+  "370155": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Adesar",
+      "Bhutakia",
+      "Fatehgadh",
+      "Ghanithar",
+      "Hamirpar",
+      "Kanmer",
+      "Khandek",
+      "Lakhagadh",
+      "Makhel",
+      "Mamaymora",
+      "Moda",
+      "Palansava",
+      "Praghpar",
+      "Sanva",
+      "Sukhpar V",
+      "Taga",
+      "Umaiya",
+      "Vallabhapar"
+    ]
+  ],
+  "370160": ["Kachchh", "Gujarat", ["Bhimasar", "Padampar"]],
+  "370165": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Anandpar",
+      "Badargadh",
+      "Balasar",
+      "Bela",
+      "Dabhunda",
+      "Davri",
+      "Deshalpar V",
+      "Dholavira",
+      "Gadhda Khadir",
+      "Ganeshpar",
+      "Gedi",
+      "Janan",
+      "Jatavada",
+      "Jesda",
+      "Kalyanpar",
+      "Kalyanpar Gadhda",
+      "Khengarpar",
+      "Kherai",
+      "Lodrani",
+      "Mauvana",
+      "Nandasar",
+      "Nilpar",
+      "Rahpar",
+      "Ramvav",
+      "Rav",
+      "Sai",
+      "Selari",
+      "Suvai",
+      "Tindalva",
+      "Trambau",
+      "Umrapar",
+      "Vanoi",
+      "Vijayapar"
+    ]
+  ],
+  "370201": ["Kachchh", "Gujarat", ["Gandhidham", "Ganeshnagar"]],
+  "370203": ["Kachchh", "Gujarat", ["Udaynagar"]],
+  "370205": [
+    "Kachchh",
+    "Gujarat",
+    ["Adipur", "Antarjar", "Kidana", "Mathak", "Sanghad", "Sinay", "Tuna"]
+  ],
+  "370210": ["Kachchh", "Gujarat", ["Kandla Port"]],
+  "370230": ["Kachchh", "Gujarat", ["Kandla Free Trade Zone"]],
+  "370240": [
+    "Kachchh",
+    "Gujarat",
+    ["Bhimasar", "Gadpadar", "Gopalpuri", "Khari Rohar", "Mithi Rohar", "Padana"]
+  ],
+  "370405": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Beraja",
+      "Bhujpur",
+      "Deshalpar",
+      "Gelda",
+      "Navinal",
+      "Pratappar",
+      "Ramania",
+      "Zarpara"
+    ]
+  ],
+  "370410": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bhadreshwar",
+      "Bhorara",
+      "Chhasara",
+      "Gundala",
+      "Hatdi",
+      "Kundrodi",
+      "Luni",
+      "Mokha",
+      "Ratadiya",
+      "Vadala",
+      "Vaghura",
+      "Vovar"
+    ]
+  ],
+  "370415": [
+    "Kachchh",
+    "Gujarat",
+    ["Baraya", "Kapaya", "Karaghogha", "Pragpar", "Samaghogha", "Toda"]
+  ],
+  "370421": ["Kachchh", "Gujarat", ["Adani Port", "Baroi", "Dhrab", "Mundra", "Sadau"]],
+  "370425": ["Kachchh", "Gujarat", ["Kanjara", "Lakhapar", "Patri", "Tappar S", "Vanki"]],
+  "370427": ["Kachchh", "Gujarat", ["Baladia", "Bharapar", "Tb Sanatorium", "Vadzar"]],
+  "370430": ["Kachchh", "Gujarat", ["Chundi", "Gajod", "Kera", "Meghpar", "Naranpar"]],
+  "370435": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bidada",
+      "Depa",
+      "Kandagara",
+      "Moti Khakhar",
+      "Nani Khakhar",
+      "Pharadi",
+      "Siracha",
+      "Tumbadi",
+      "Tunda"
+    ]
+  ],
+  "370445": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Darshadi",
+      "Devpar Gadh",
+      "Gadhasisa",
+      "Ludva",
+      "Makda",
+      "Mau",
+      "Momaymora",
+      "Rajpar",
+      "Rampar Vekra",
+      "Vadasar",
+      "Vadva",
+      "Virani Gadh"
+    ]
+  ],
+  "370450": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bhojay",
+      "Dedhiya",
+      "Godhra",
+      "Halapar",
+      "Karodiya Mota",
+      "Kokalia",
+      "Kotdi M",
+      "Nagrecha",
+      "Poladia",
+      "Sambharai",
+      "Undoth",
+      "Vidh"
+    ]
+  ],
+  "370455": ["Kachchh", "Gujarat", ["Baug", "Gundiyali", "Mota Bhadia", "Nana Bhadia"]],
+  "370460": ["Kachchh", "Gujarat", ["Koday", "Talwana"]],
+  "370465": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bhadai Moti",
+      "Don",
+      "Durgapur",
+      "Kachchh Mandvi",
+      "Kathda",
+      "Manjal H",
+      "Maska",
+      "Merau",
+      "Nagalpar Dhindh",
+      "Ratadia",
+      "Rayan Moti",
+      "Salaya Mota",
+      "Sherdi",
+      "Shirva",
+      "Vada"
+    ]
+  ],
+  "370475": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bada",
+      "Bambhadai",
+      "Bayath",
+      "Bhinsara",
+      "Laija",
+      "Mapar",
+      "Nana Laija",
+      "Panchotiya"
+    ]
+  ],
+  "370485": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Asambia Mota",
+      "Dahisara",
+      "Dhunai",
+      "Godpar",
+      "Goniasar",
+      "Kojachora",
+      "Nana Asambia",
+      "Pundi",
+      "Sarli",
+      "Vandh"
+    ]
+  ],
+  "370490": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Dumara",
+      "Khirsara Vinjhan",
+      "Lathedi",
+      "Manjal R",
+      "Raydhanjar",
+      "Sandhan",
+      "Suthri",
+      "Varadia",
+      "Varandi Moti",
+      "Vinjhan"
+    ]
+  ],
+  "370510": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bhirandiara",
+      "Bsf Camp Khavda",
+      "Dhoravar",
+      "Dhrobana",
+      "Dinara",
+      "Dumado",
+      "Gorevali",
+      "Hodka",
+      "Juna",
+      "Khari",
+      "Khavda",
+      "Kunariya K",
+      "Kuran",
+      "Misariado",
+      "Mithadi"
+    ]
+  ],
+  "370601": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "ATPS Nani Chher",
+      "Guvar Moti",
+      "Koriyani",
+      "Mindhiari",
+      "Narayan Sarovar",
+      "Panandhro",
+      "Shyamji Krishna Varma Nagar",
+      "Subhashpar"
+    ]
+  ],
+  "370605": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Aiyar",
+      "Amara",
+      "Desalpar N",
+      "Hajipir",
+      "Jadodar",
+      "Jinjay",
+      "KotdaN",
+      "Mathal",
+      "Muru",
+      "Nara",
+      "Ratadia N",
+      "Ugedi",
+      "Vigodi"
+    ]
+  ],
+  "370610": [
+    "Kachchh",
+    "Gujarat",
+    ["Anandpar", "Anandsar", "Kalyanpar", "Manjal", "Sanyra J"]
+  ],
+  "370615": ["Kachchh", "Gujarat", ["Nakhatrana", "Naranpar R", "Rampar R"]],
+  "370620": [
+    "Kachchh",
+    "Gujarat",
+    ["Bandiya", "Khirsara", "Laxmipar N", "Netra", "Rampar N", "Ustiya"]
+  ],
+  "370625": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bhadra",
+      "Bharapar",
+      "Gadani",
+      "Haripar",
+      "Kotda Madh",
+      "Madh",
+      "Meghpar Lakhpat",
+      "Ravapar",
+      "Valka Mota"
+    ]
+  ],
+  "370627": [
+    "Kachchh",
+    "Gujarat",
+    ["Dhareshi", "Fulra", "Gaduli", "Guneri", "Lakhapar", "Lakhpat", "Mudhan", "Siyot"]
+  ],
+  "370630": ["Kachchh", "Gujarat", ["Daypar", "Dolatpar", "Paneli", "Virani Nani"]],
+  "370641": ["Kachchh", "Gujarat", ["Jakhau", "Lala", "Moti Sindhodi", "Parjau"]],
+  "370645": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Arikhana",
+      "Bhachunda",
+      "Bhanada",
+      "Khirsara",
+      "Kothara",
+      "Rapar Gadhvali",
+      "Rava",
+      "Sandhav",
+      "Vadapadhar",
+      "Vanku"
+    ]
+  ],
+  "370650": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Balachod Moti",
+      "Balachod Nani",
+      "Balapar B",
+      "Bhavanipar",
+      "Bitta",
+      "Chiyasar",
+      "Dhanavada",
+      "Hajapar",
+      "Kanakpar",
+      "Kanday",
+      "Khanay",
+      "Kharuva",
+      "Mothara",
+      "Nundhatad",
+      "Vamoti Moti",
+      "Vamoti Nani"
+    ]
+  ],
+  "370655": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Aida",
+      "Akri Moti",
+      "Ashapar",
+      "Baranda",
+      "Ber Moti",
+      "Butta",
+      "Charopadi Moti",
+      "Chhadura",
+      "Chhasara",
+      "Fulay",
+      "Goyala Mokhra",
+      "Jangadia",
+      "Jashapar",
+      "Kervandh",
+      "Moti Sudadhro",
+      "Naliya",
+      "Pipar",
+      "Rampar Abda",
+      "Sanghipuram",
+      "Sukhpar S",
+      "Valsara",
+      "Vayor"
+    ]
+  ],
+  "370660": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Bara Mota",
+      "Bharapar",
+      "Dhufi Moti",
+      "Hamripar",
+      "Kalatalav",
+      "Lakhania",
+      "Nangia",
+      "Sujapar",
+      "Tera"
+    ]
+  ],
+  "370665": [
+    "Kachchh",
+    "Gujarat",
+    [
+      "Aral Moti",
+      "Devisar",
+      "Fulay Chhari",
+      "Hirapar",
+      "Jatavira",
+      "Lakhiyarvira",
+      "Nani Aral",
+      "Virani"
+    ]
+  ],
+  "370670": [
+    "Kachchh",
+    "Gujarat",
+    ["Kadia Mota", "Kadia Nana", "Khombhadi", "Rasalia", "Todiya", "Ukheda"]
+  ],
+  "370675": [
+    "Kachchh",
+    "Gujarat",
+    ["Angiya Mota", "Bhadli", "Devpar Jakh", "Dhavda", "Nana Angia", "Sangnara", "Vithon"]
+  ]
+}

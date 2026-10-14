@@ -27,6 +27,7 @@ import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
+import { useRequireOpenBranch } from '@/shared/hooks/useRequireOpenBranch/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { FileIcon, PenLine, Receipt, Trash, Users } from '@/shared/icons/index.ts';
@@ -103,8 +104,13 @@ export function PatientsPage() {
     );
   const editPatient = (patient: PatientRow) =>
     go(appCommandNavigation('patientEdit', { organizationSlug, recordId: patient.id }));
+  // A new patient or bill needs an open branch: a manager without one lands on setup (§6.3).
+  const requireOpenBranch = useRequireOpenBranch();
   const openCreate = () =>
-    void navigate({ ...organizationPatientCreate(organizationSlug), search: true });
+    requireOpenBranch(
+      () =>
+        void navigate({ ...organizationPatientCreate(organizationSlug), search: true }),
+    );
 
   const contactActions = (patient: PatientRow): ContactCardActions => ({
     onOpenPatientFile: () => openFile(patient),
@@ -148,12 +154,14 @@ export function PatientsPage() {
         label: t(PATIENTS_KEYS.rowActions.newInvoice),
         icon: Receipt,
         onSelect: () =>
-          go(
-            appCommandNavigation('newInvoice', {
-              organizationSlug,
-              referrer: 'patients',
-              search: { type: 'clinic', patient: patient.id },
-            }),
+          requireOpenBranch(() =>
+            go(
+              appCommandNavigation('newInvoice', {
+                organizationSlug,
+                referrer: 'patients',
+                search: { type: 'clinic', patient: patient.id },
+              }),
+            ),
           ),
       });
     }

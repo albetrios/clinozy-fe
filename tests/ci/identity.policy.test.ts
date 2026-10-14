@@ -161,7 +161,7 @@ describe('product identity', () => {
     it.each(LOCALES)('%s locale uses the variable, not the product name', (locale) => {
       // The shared namespaces that name the product. (`layout` no longer does: its only
       // brand line was the old login hero, removed with the preview layouts — 889d150e.)
-      for (const namespace of ['common', 'onboarding']) {
+      for (const namespace of ['common']) {
         const json = read(`src/locales/${locale}/${namespace}.json`);
         expect(json).toContain('{{productName}}');
       }

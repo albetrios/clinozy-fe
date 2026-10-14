@@ -2,6 +2,13 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type * as BranchPlacesApiModule from '@/shared/api/app/branch-places-api.ts';
+import type {
+  BranchHoliday,
+  BranchPlace,
+  BranchPlaceKind,
+} from '@/shared/api/app/branch-places-contracts.ts';
 import type * as BranchesApiModule from '@/shared/api/app/branches-api.ts';
 import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type { AppBranch, BranchSave } from '@/shared/api/app/branches-contracts.ts';
@@ -68,6 +75,23 @@ vi.mock('@/shared/api/app/branches-api.ts', async (importOriginal) => ({
   fetchActiveBranches: api.fetchActiveBranches,
 }));
 
+/** "Places & days" on clinozy-be: a branch's rooms, machines and holidays. */
+const placesApi = vi.hoisted(() => ({
+  fetchBranchPlaces: vi.fn(),
+  addBranchPlace: vi.fn(),
+  changeBranchPlace: vi.fn(),
+  removeBranchPlace: vi.fn(),
+  restoreBranchPlace: vi.fn(),
+  fetchBranchHolidays: vi.fn(),
+  addBranchHoliday: vi.fn(),
+  removeBranchHoliday: vi.fn(),
+  restoreBranchHoliday: vi.fn(),
+}));
+vi.mock('@/shared/api/app/branch-places-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof BranchPlacesApiModule>()),
+  ...placesApi,
+}));
+
 const ADAJAN = appBranch({
   id: 'brn_adajan000000000000000',
   name: 'Adajan',
@@ -116,10 +140,97 @@ function serverSave({ save }: { save: BranchSave }): AppBranch {
     const others = person.branchIds.filter((id) => id !== saved.id);
     return {
       ...person,
-      branchIds: save.memberIds.includes(person.id) ? [...others, saved.id] : others,
+      branchIds: save.memberIds?.includes(person.id) ? [...others, saved.id] : others,
     };
   });
   return saved;
+}
+
+/** A room or machine of Vesu, as clinozy-be keeps it. */
+const place = (
+  kind: BranchPlaceKind,
+  name: string,
+  patch: Partial<BranchPlace> = {},
+) => ({
+  id: `${kind === 'room' ? 'brm' : 'bmc'}_${name.toLowerCase().replaceAll(' ', '').padEnd(21, '0')}`,
+  branchId: VESU.id,
+  name,
+  active: true,
+  createdAt: '2026-10-01T05:00:00.000Z',
+  updatedAt: '2026-10-01T05:00:00.000Z',
+  ...patch,
+});
+
+/** What clinozy-be holds of Vesu's places and days for the run. */
+const placesServer = {
+  room: [] as BranchPlace[],
+  machine: [] as BranchPlace[],
+  holiday: [] as BranchHoliday[],
+};
+
+/** A reasonless 409 — a name (or a day) the branch already has. */
+const taken = () => new HttpError('Conflict', 409, '/app/branches', 'POST', {});
+
+/** clinozy-be's places routes over `placesServer`: a taken name or day is a reasonless 409. */
+function servePlaces() {
+  placesApi.fetchBranchPlaces.mockImplementation(
+    async ({ kind }: { kind: BranchPlaceKind }) => [...placesServer[kind]],
+  );
+  placesApi.fetchBranchHolidays.mockImplementation(async () => [...placesServer.holiday]);
+  placesApi.addBranchPlace.mockImplementation(
+    async ({ kind, name }: { kind: BranchPlaceKind; name: string }) => {
+      if (
+        placesServer[kind].some((row) => row.name.toLowerCase() === name.toLowerCase())
+      ) {
+        throw taken();
+      }
+      const added = place(kind, name, { updatedAt: '2026-10-13T05:00:00.000Z' });
+      placesServer[kind] = [...placesServer[kind], added];
+      return added;
+    },
+  );
+  placesApi.changeBranchPlace.mockImplementation(
+    async ({
+      kind,
+      place: before,
+      change,
+    }: {
+      kind: BranchPlaceKind;
+      place: BranchPlace;
+      change: { name: string } | { active: boolean };
+    }) => {
+      const saved = { ...before, ...change, updatedAt: '2026-10-13T06:00:00.000Z' };
+      placesServer[kind] = placesServer[kind].map((row) =>
+        row.id === saved.id ? saved : row,
+      );
+      return saved;
+    },
+  );
+  placesApi.removeBranchPlace.mockImplementation(
+    async ({ kind, place: gone }: { kind: BranchPlaceKind; place: BranchPlace }) => {
+      placesServer[kind] = placesServer[kind].filter((row) => row.id !== gone.id);
+    },
+  );
+  placesApi.addBranchHoliday.mockImplementation(
+    async ({ date, label }: { date: string; label: string }) => {
+      if (placesServer.holiday.some((row) => row.date === date)) throw taken();
+      const added: BranchHoliday = {
+        id: `bhd_${label.toLowerCase().padEnd(21, '0')}`,
+        branchId: VESU.id,
+        date,
+        label,
+        createdAt: '2026-10-13T05:00:00.000Z',
+        updatedAt: '2026-10-13T05:00:00.000Z',
+      };
+      placesServer.holiday = [...placesServer.holiday, added];
+      return added;
+    },
+  );
+  placesApi.removeBranchHoliday.mockImplementation(
+    async ({ holiday }: { holiday: BranchHoliday }) => {
+      placesServer.holiday = placesServer.holiday.filter((row) => row.id !== holiday.id);
+    },
+  );
 }
 
 /** `GET /app/branches/my` for an admin: every open branch, main first. */
@@ -204,6 +315,14 @@ beforeEach(() => {
   api.saveBranch.mockImplementation(async (input: { save: BranchSave }) =>
     serverSave(input),
   );
+  for (const fn of Object.values(placesApi)) fn.mockReset();
+  placesServer.room = [
+    place('room', 'Room 1'),
+    place('room', 'Room 2', { active: false }),
+  ];
+  placesServer.machine = [];
+  placesServer.holiday = [];
+  servePlaces();
 });
 afterEach(() => resetUsersRoutes());
 
@@ -426,5 +545,413 @@ describe('the branch drawer — Edit branch', () => {
     const panel = await drawer();
     expect(within(panel).getByTestId('branch-drawer-name')).toBeDisabled();
     expect(within(panel).queryByTestId('branch-drawer-save')).toBeNull();
+  });
+});
+
+/** Vesu's drawer with "Places & days" open, its lists read. */
+async function openPlaces(
+  user: ReturnType<typeof userEvent.setup>,
+  codes?: Parameters<typeof renderUsersRoutes>[2],
+) {
+  renderBranches(`/organization/acme/users/branches/${VESU.id}/edit`, codes);
+  const panel = await drawer();
+  await user.click(await within(panel).findByTestId('branch-drawer-step-places-trigger'));
+  await within(panel).findByTestId('branch-drawer-places');
+  return panel;
+}
+
+/** The list's rows, by what each reads. */
+const rowTexts = (list: HTMLElement, testId: string) =>
+  within(list)
+    .queryAllByTestId(testId)
+    .map((row) => row.textContent);
+
+describe('the branch drawer — Places & days (KICKOFF §6.6, D23)', () => {
+  it('is a fourth step on an existing branch only', async () => {
+    renderBranches('/organization/acme/users/branches/create');
+    const panel = await drawer();
+    expect(within(panel).queryByTestId('branch-drawer-step-places')).toBeNull();
+    expect(placesApi.fetchBranchPlaces).not.toHaveBeenCalled();
+  });
+
+  it('peeks at each list while collapsed, then lists them — switched-off rooms too', async () => {
+    const user = userEvent.setup();
+    renderBranches(`/organization/acme/users/branches/${VESU.id}/edit`);
+    const panel = await drawer();
+    const step = within(panel).getByTestId('branch-drawer-step-places');
+    expect(within(step).getByText('Places & days')).toBeInTheDocument();
+    // The shared step pattern: each list's names as chips, an empty list counted as not filled;
+    // a step with a peek shows no sub line.
+    await waitFor(() =>
+      expect(
+        within(step).getByTestId('branch-drawer-step-places-peek'),
+      ).toHaveTextContent('Rooms: Room 1Room 2'),
+    );
+    expect(within(step).getByTestId('branch-drawer-step-places-peek')).toHaveTextContent(
+      'Not filled: Machines, Holidays',
+    );
+    expect(placesApi.fetchBranchPlaces).toHaveBeenCalledWith({
+      kind: 'room',
+      branchId: VESU.id,
+    });
+    expect(placesApi.fetchBranchHolidays).toHaveBeenCalledWith({
+      branchId: VESU.id,
+      from: appToday(),
+    });
+
+    await user.click(within(panel).getByTestId('branch-drawer-step-places-trigger'));
+    await within(panel).findByTestId('branch-drawer-places');
+    const rooms = within(panel).getByTestId('branch-drawer-rooms');
+    const rows = within(rooms).getAllByTestId('branch-drawer-rooms-row');
+    expect(rows.map((row) => row.textContent)).toEqual([
+      expect.stringContaining('Room 1'),
+      expect.stringContaining('Room 2'),
+    ]);
+    expect(
+      within(rows[0] as HTMLElement).getByRole('switch', { name: 'Room 1 in use' }),
+    ).toHaveAttribute('aria-checked', 'true');
+    expect(
+      within(rows[1] as HTMLElement).getByTestId('branch-drawer-rooms-active'),
+    ).toHaveAttribute('aria-checked', 'false');
+    expect(within(panel).getByTestId('branch-drawer-machines-empty')).toHaveTextContent(
+      'No machines yet',
+    );
+    expect(within(panel).getByTestId('branch-drawer-holidays-empty')).toHaveTextContent(
+      'No holidays coming up',
+    );
+    expect(await axeForDialog(panel)).toHaveNoViolations();
+  });
+
+  it('adds a room on its own — never through the drawer’s Save — and clears the row', async () => {
+    const user = userEvent.setup();
+    const panel = await openPlaces(user);
+    const add = within(panel).getByTestId('branch-drawer-rooms-add');
+    await user.type(
+      within(add).getByTestId('branch-drawer-rooms-add-name'),
+      'laser room',
+    );
+    await user.click(within(add).getByTestId('branch-drawer-rooms-add-submit'));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Laser room added',
+        expect.anything(),
+      ),
+    );
+    expect(placesApi.addBranchPlace).toHaveBeenCalledWith({
+      kind: 'room',
+      branchId: VESU.id,
+      name: 'Laser room',
+      idempotencyKey: expect.any(String),
+    });
+    await waitFor(() =>
+      expect(rowTexts(panel, 'branch-drawer-rooms-row')).toEqual([
+        expect.stringContaining('Room 1'),
+        expect.stringContaining('Room 2'),
+        expect.stringContaining('Laser room'),
+      ]),
+    );
+    expect(within(add).getByTestId('branch-drawer-rooms-add-name')).toHaveValue('');
+    expect(api.saveBranch).not.toHaveBeenCalled();
+  });
+
+  it('asks for a name, and refuses one the branch already has (409) at the field', async () => {
+    const user = userEvent.setup();
+    const panel = await openPlaces(user);
+    const add = within(panel).getByTestId('branch-drawer-rooms-add');
+    await user.click(within(add).getByTestId('branch-drawer-rooms-add-submit'));
+    expect(
+      await within(add).findByTestId('branch-drawer-rooms-add-error'),
+    ).toHaveTextContent('Add a name');
+    expect(placesApi.addBranchPlace).not.toHaveBeenCalled();
+
+    const name = within(add).getByTestId('branch-drawer-rooms-add-name');
+    await user.type(name, 'room 2');
+    await user.click(within(add).getByTestId('branch-drawer-rooms-add-submit'));
+    await waitFor(() =>
+      expect(within(add).getByTestId('branch-drawer-rooms-add-error')).toHaveTextContent(
+        'A room called Room 2 already exists',
+      ),
+    );
+    expect(name).toHaveAttribute('aria-invalid', 'true');
+    // The text is kept to fix.
+    expect(name).toHaveValue('Room 2');
+    expect(placesServer.room).toHaveLength(2);
+  });
+
+  it('renames a room in its row with the read’s updated_at; Esc cancels without closing the drawer', async () => {
+    const user = userEvent.setup();
+    const panel = await openPlaces(user);
+    const [first] = within(panel).getAllByTestId('branch-drawer-rooms-row');
+    await user.click(
+      within(first as HTMLElement).getByTestId('branch-drawer-rooms-row-action-rename'),
+    );
+    let input = await within(panel).findByTestId('branch-drawer-rooms-rename-name');
+    expect(input).toHaveFocus();
+    await user.keyboard('{Escape}');
+    expect(within(panel).queryByTestId('branch-drawer-rooms-rename')).toBeNull();
+    expect(screen.getByTestId('branch-drawer')).toBeInTheDocument();
+
+    const [again] = within(panel).getAllByTestId('branch-drawer-rooms-row');
+    await user.click(
+      within(again as HTMLElement).getByTestId('branch-drawer-rooms-row-action-rename'),
+    );
+    input = await within(panel).findByTestId('branch-drawer-rooms-rename-name');
+    await user.clear(input);
+    await user.type(input, 'Consultation room');
+    await user.click(within(panel).getByTestId('branch-drawer-rooms-rename-submit'));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Consultation room renamed',
+        expect.anything(),
+      ),
+    );
+    expect(placesApi.changeBranchPlace).toHaveBeenCalledWith({
+      kind: 'room',
+      place: expect.objectContaining({
+        name: 'Room 1',
+        updatedAt: '2026-10-01T05:00:00.000Z',
+      }),
+      change: { name: 'Consultation room' },
+      idempotencyKey: expect.any(String),
+    });
+    await waitFor(() =>
+      expect(within(panel).queryByTestId('branch-drawer-rooms-rename')).toBeNull(),
+    );
+    expect(rowTexts(panel, 'branch-drawer-rooms-row')[0]).toContain('Consultation room');
+  });
+
+  it('switches a room off and back on, each on its own', async () => {
+    const user = userEvent.setup();
+    const panel = await openPlaces(user);
+    const toggle = within(panel).getByRole('switch', { name: 'Room 1 in use' });
+    await user.click(toggle);
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Room 1 switched off',
+        expect.anything(),
+      ),
+    );
+    expect(placesApi.changeBranchPlace).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'room', change: { active: false } }),
+    );
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-checked', 'false'));
+    await waitFor(() => expect(toggle).toBeEnabled());
+    await user.click(toggle);
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Room 1 switched on',
+        expect.anything(),
+      ),
+    );
+    // The second change carries the first one's updated_at.
+    expect(placesApi.changeBranchPlace).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        place: expect.objectContaining({ updatedAt: '2026-10-13T06:00:00.000Z' }),
+        change: { active: true },
+      }),
+    );
+  });
+
+  it('puts the switch back and says why when someone else changed the room first', async () => {
+    const user = userEvent.setup();
+    placesApi.changeBranchPlace.mockRejectedValue(
+      new HttpError('Conflict', 409, '/app/branches', 'PATCH', {
+        error: { reason: 'record_changed', detail: 'Someone else changed this room' },
+      }),
+    );
+    const panel = await openPlaces(user);
+    const toggle = within(panel).getByRole('switch', { name: 'Room 1 in use' });
+    const reads = placesApi.fetchBranchPlaces.mock.calls.length;
+    await user.click(toggle);
+    // Our own words for someone else's change first (the reason, mapped), as a toast.
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-checked', 'true'));
+    // The list is read again.
+    await waitFor(() =>
+      expect(placesApi.fetchBranchPlaces.mock.calls.length).toBeGreaterThan(reads),
+    );
+  });
+
+  it('removes a machine through the reason confirm, with Undo', async () => {
+    const user = userEvent.setup();
+    placesServer.machine = [place('machine', 'Laser')];
+    const panel = await openPlaces(user);
+    const [laser] = within(panel).getAllByTestId('branch-drawer-machines-row');
+    await user.click(
+      within(laser as HTMLElement).getByTestId(
+        'branch-drawer-machines-row-action-remove',
+      ),
+    );
+    const confirm = await screen.findByTestId('confirm-dialog');
+    expect(within(confirm).getByText('Remove this machine?')).toBeInTheDocument();
+    expect(within(confirm).getByTestId('confirm-record')).toHaveTextContent('Laser');
+    await user.click(within(confirm).getByTestId('confirm-reason-not-needed'));
+    await user.click(within(confirm).getByTestId('confirm-accept'));
+    await waitFor(() =>
+      expect(placesApi.removeBranchPlace).toHaveBeenCalledWith({
+        kind: 'machine',
+        place: expect.objectContaining({ name: 'Laser' }),
+        reason: 'not_needed',
+        note: null,
+      }),
+    );
+    await waitFor(() =>
+      expect(notifyMock.undo).toHaveBeenCalledWith('Laser removed', expect.anything()),
+    );
+    await waitFor(() =>
+      expect(
+        within(panel).getByTestId('branch-drawer-machines-empty'),
+      ).toBeInTheDocument(),
+    );
+  });
+
+  it('adds a holiday with its date and label, and refuses a second one on that day', async () => {
+    const user = userEvent.setup();
+    const today = appToday();
+    const panel = await openPlaces(user);
+    const add = within(panel).getByTestId('branch-drawer-holidays-add');
+    await user.type(
+      within(add).getByTestId('branch-drawer-holidays-add-label'),
+      'Diwali',
+    );
+    await user.click(within(add).getByTestId('branch-drawer-holidays-add-submit'));
+    expect(
+      await within(add).findByTestId('branch-drawer-holidays-add-error'),
+    ).toHaveTextContent('Pick the date');
+    expect(placesApi.addBranchHoliday).not.toHaveBeenCalled();
+
+    await user.click(within(add).getByTestId('branch-drawer-holidays-add-date'));
+    await user.click(
+      await screen.findByTestId(`branch-drawer-holidays-add-date-option-${today}`),
+    );
+    await user.click(within(add).getByTestId('branch-drawer-holidays-add-submit'));
+    await waitFor(() =>
+      expect(placesApi.addBranchHoliday).toHaveBeenCalledWith({
+        branchId: VESU.id,
+        date: today,
+        label: 'Diwali',
+        idempotencyKey: expect.any(String),
+      }),
+    );
+    await waitFor(() =>
+      expect(rowTexts(panel, 'branch-drawer-holidays-row')).toEqual([
+        expect.stringContaining('Diwali'),
+      ]),
+    );
+    expect(within(add).getByTestId('branch-drawer-holidays-add-label')).toHaveValue('');
+
+    await user.type(
+      within(add).getByTestId('branch-drawer-holidays-add-label'),
+      'Bhai dooj',
+    );
+    await user.click(within(add).getByTestId('branch-drawer-holidays-add-date'));
+    await user.click(
+      await screen.findByTestId(`branch-drawer-holidays-add-date-option-${today}`),
+    );
+    await user.click(within(add).getByTestId('branch-drawer-holidays-add-submit'));
+    await waitFor(() =>
+      expect(
+        within(add).getByTestId('branch-drawer-holidays-add-error'),
+      ).toHaveTextContent('is already a holiday'),
+    );
+    expect(placesServer.holiday).toHaveLength(1);
+  });
+
+  it('removes a holiday through the reason confirm', async () => {
+    const user = userEvent.setup();
+    placesServer.holiday = [
+      {
+        id: 'bhd_diwali00000000000000',
+        branchId: VESU.id,
+        date: appToday(),
+        label: 'Diwali',
+        createdAt: '2026-10-01T05:00:00.000Z',
+        updatedAt: '2026-10-01T05:00:00.000Z',
+      },
+    ];
+    const panel = await openPlaces(user);
+    const [diwali] = within(panel).getAllByTestId('branch-drawer-holidays-row');
+    await user.click(
+      within(diwali as HTMLElement).getByTestId(
+        'branch-drawer-holidays-row-action-remove',
+      ),
+    );
+    const confirm = await screen.findByTestId('confirm-dialog');
+    await user.click(within(confirm).getByTestId('confirm-reason-mistake'));
+    await user.click(within(confirm).getByTestId('confirm-accept'));
+    await waitFor(() =>
+      expect(placesApi.removeBranchHoliday).toHaveBeenCalledWith({
+        holiday: expect.objectContaining({ label: 'Diwali' }),
+        reason: 'mistake',
+        note: null,
+      }),
+    );
+    await waitFor(() =>
+      expect(
+        within(panel).getByTestId('branch-drawer-holidays-empty'),
+      ).toBeInTheDocument(),
+    );
+  });
+
+  it('offers each control on its own code: add on branch:create, rename and the switch on branch:update, remove on branch:delete', async () => {
+    const user = userEvent.setup();
+    const panel = await openPlaces(user, {
+      codes: ['organization:read', 'membership:read', 'role:read', 'branch:read'],
+    });
+    expect(within(panel).getAllByTestId('branch-drawer-rooms-row')).toHaveLength(2);
+    expect(within(panel).queryByTestId('branch-drawer-rooms-add')).toBeNull();
+    expect(within(panel).queryByTestId('branch-drawer-holidays-add')).toBeNull();
+    expect(
+      within(panel).queryByTestId('branch-drawer-rooms-row-action-rename'),
+    ).toBeNull();
+    expect(
+      within(panel).queryByTestId('branch-drawer-rooms-row-action-remove'),
+    ).toBeNull();
+    // The switch still says whether the room is in use.
+    expect(within(panel).getByRole('switch', { name: 'Room 1 in use' })).toBeDisabled();
+    expect(await axeForDialog(panel)).toHaveNoViolations();
+  });
+
+  it('adds without editing: branch:create alone offers the add rows and nothing else', async () => {
+    const user = userEvent.setup();
+    const panel = await openPlaces(user, {
+      codes: [
+        'organization:read',
+        'membership:read',
+        'role:read',
+        'branch:read',
+        'branch:create',
+      ],
+    });
+    expect(within(panel).getByTestId('branch-drawer-rooms-add')).toBeInTheDocument();
+    expect(within(panel).getByTestId('branch-drawer-holidays-add')).toBeInTheDocument();
+    expect(
+      within(panel).queryByTestId('branch-drawer-rooms-row-action-rename'),
+    ).toBeNull();
+    expect(
+      within(panel).queryByTestId('branch-drawer-rooms-row-action-remove'),
+    ).toBeNull();
+  });
+
+  it('asks before closing over a name typed and not added', async () => {
+    const user = userEvent.setup();
+    const panel = await openPlaces(user);
+    await user.type(within(panel).getByTestId('branch-drawer-rooms-add-name'), 'Room 3');
+    await user.click(within(panel).getByTestId('branch-drawer-close'));
+    expect(await screen.findByText('Discard')).toBeInTheDocument();
+  });
+
+  it('says when the lists could not be read, and reads again on Retry', async () => {
+    const user = userEvent.setup();
+    placesApi.fetchBranchPlaces.mockRejectedValueOnce(new Error('offline'));
+    renderBranches(`/organization/acme/users/branches/${VESU.id}/edit`);
+    const panel = await drawer();
+    await user.click(within(panel).getByTestId('branch-drawer-step-places-trigger'));
+    expect(
+      await within(panel).findByText("Couldn't load the rooms, machines and holidays"),
+    ).toBeInTheDocument();
+    await user.click(within(panel).getByTestId('retry-button'));
+    expect(await within(panel).findByTestId('branch-drawer-places')).toBeInTheDocument();
+    expect(within(panel).getAllByTestId('branch-drawer-rooms-row')).toHaveLength(2);
   });
 });

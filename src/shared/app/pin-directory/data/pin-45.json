@@ -1,0 +1,2686 @@
+{
+  "450001": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Ahmedpur Khaigaon",
+      "Amulla",
+      "Badgaon Gujar",
+      "Badgaon Mali",
+      "Bagmar",
+      "Bhamgarh",
+      "Borgaon Khurd",
+      "Devla",
+      "Dharampuri",
+      "Dongargaon",
+      "Ganesh Talai Khandwa",
+      "Ghaspura Khandwa",
+      "Khandwa",
+      "Khandwa Ratagarh",
+      "Khedi",
+      "Kohdar",
+      "Padawa Khandwa",
+      "Padlya",
+      "Piplya Tahar",
+      "Rajur",
+      "Sihada",
+      "Taklikalan",
+      "Temi Kalan",
+      "Temi Khurd",
+      "Vidhya Nagar Khandwa"
+    ]
+  ],
+  "450051": [
+    "East Nimar",
+    "Madhya Pradesh",
+    ["Bhagwanpura", "Devalikalan", "Kharkalan", "Sirpur", "Sukva"]
+  ],
+  "450110": [
+    "East Nimar",
+    "Madhya Pradesh",
+    ["Bhagwanpura", "Bir", "Borkheda Kalan", "Borkheda Singaji", "Somgaon"]
+  ],
+  "450112": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Gulgaon Raiyat",
+      "Guyada",
+      "Jalwa Bujurg",
+      "Jamkota",
+      "Mundi",
+      "Purani",
+      "Sindhkhal"
+    ]
+  ],
+  "450114": [
+    "East Nimar",
+    "Madhya Pradesh",
+    ["Gujarkhedi", "Indhawadi", "Kelwakhurd", "Punasa"]
+  ],
+  "450116": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Barud",
+      "Billod",
+      "Borisaray",
+      "Bothiya",
+      "Chanera",
+      "Dagadkhedi",
+      "Gadbadi",
+      "Harsud R.S.",
+      "Jaitapur",
+      "Killod",
+      "Kukshi Raiyat",
+      "Lahadpur",
+      "Malud",
+      "Mojwadi",
+      "Naya Harsud",
+      "Nazarpura",
+      "Nishania",
+      "Piplani",
+      "Somgaon",
+      "Sonkhedi"
+    ]
+  ],
+  "450117": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Adakheda",
+      "Ashapur",
+      "Awliya",
+      "Bhaganwa",
+      "Dhawadi",
+      "Gulai",
+      "Jamnapur",
+      "Kalamkhurd",
+      "Khalwa",
+      "Khokaria",
+      "Kotha",
+      "Nagotar",
+      "Padlya",
+      "Patajan",
+      "Phiphari",
+      "Roshni",
+      "Sendhwal",
+      "Sunderdev"
+    ]
+  ],
+  "450119": ["East Nimar", "Madhya Pradesh", ["Narmada Nagar"]],
+  "450221": [
+    "Burhanpur",
+    "Madhya Pradesh",
+    [
+      "Bhatkheda",
+      "Chandani",
+      "Dabhiyakheda",
+      "Ghagharla",
+      "Haidarpur",
+      "Nawara",
+      "Nepanagar",
+      "Palasur",
+      "Siwal"
+    ]
+  ],
+  "450331": [
+    "Burhanpur",
+    "Madhya Pradesh",
+    [
+      "Ambada",
+      "Asirgarh",
+      "Bahadarpur",
+      "Basad",
+      "Biroda",
+      "Bodarli",
+      "Bori Bujurg",
+      "Burhanpur",
+      "Burhanpur City",
+      "Burhanpur R.S.",
+      "Burhanpur Rajpura",
+      "Dargah E Hakimi",
+      "Daryapur",
+      "Dhulkot",
+      "Doifodia",
+      "Gulai",
+      "Hasinabad",
+      "Jainabad",
+      "Jasondi",
+      "Loni",
+      "Mahalgurada",
+      "Nimbola",
+      "Patonda",
+      "Sarola",
+      "Shahbazar Burhanpur",
+      "Sirpur"
+    ]
+  ],
+  "450332": [
+    "Burhanpur",
+    "Madhya Pradesh",
+    [
+      "Dedtalai",
+      "Khaknar",
+      "Manjrodkala",
+      "Nagjhiri",
+      "Paretha",
+      "Pipalpani",
+      "Raitalai",
+      "Sheikhpur",
+      "Sheikhpura",
+      "Tukaithad"
+    ]
+  ],
+  "450337": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Aabud",
+      "Borgaon Bujurg",
+      "Khirala",
+      "Kumthi",
+      "Rustampur",
+      "Saiyadpur",
+      "Suktanagar"
+    ]
+  ],
+  "450445": [
+    "Burhanpur",
+    "Madhya Pradesh",
+    [
+      "Bambhada",
+      "Bhawasa",
+      "Borsar",
+      "Chapora",
+      "Dapora",
+      "Dhamangaon",
+      "Ichhapur",
+      "Khamni",
+      "Mohad",
+      "Nachankheda",
+      "Phophanar",
+      "Sangrampur",
+      "Shahpur (Nimar)",
+      "Turakgurada"
+    ]
+  ],
+  "450551": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Attar",
+      "Atud",
+      "Bangarda",
+      "Bhomwada",
+      "Boradi",
+      "Dhangaon",
+      "Ghoghalgaon",
+      "Goul",
+      "Kalmukhi",
+      "Kesun",
+      "Khutla",
+      "Malgaon",
+      "Matpur",
+      "Mohana",
+      "Netangaon",
+      "Nimarkhedi",
+      "Sulgaon"
+    ]
+  ],
+  "450554": [
+    "East Nimar",
+    "Madhya Pradesh",
+    ["Bhagawa", "Mandhata Omkareshwar", "Mortakka", "Thapna"]
+  ],
+  "450661": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Arud",
+      "Aulia",
+      "Bilud",
+      "Dabhi",
+      "Diwal",
+      "Ghatakhedi",
+      "Goradiya",
+      "Kalanka",
+      "Kharwa",
+      "Khatla",
+      "Mitawal",
+      "Pandhana"
+    ]
+  ],
+  "450771": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Barud",
+      "Bhairukheda",
+      "Bhojakhedi",
+      "Chhegaon Makhan",
+      "Chirwel",
+      "Deshgaon",
+      "Haraswada",
+      "Kondawat",
+      "Mokalgaon",
+      "Roshiya",
+      "Sirra",
+      "Sirsod",
+      "Surgaonjoshi",
+      "Taklimori"
+    ]
+  ],
+  "450881": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Balwada",
+      "Bamanda",
+      "Gandhwa",
+      "Gudi",
+      "Jaswadi",
+      "Karpur",
+      "Khidgaon",
+      "Kumtha",
+      "Piplod",
+      "Rajgadh",
+      "Singot"
+    ]
+  ],
+  "450991": [
+    "East Nimar",
+    "Madhya Pradesh",
+    [
+      "Bhakrada",
+      "Jawar",
+      "Kehlari",
+      "Kolgaon",
+      "Mandla",
+      "Rangaon",
+      "Rohini",
+      "Sahejla",
+      "Sanvkheda",
+      "Selda"
+    ]
+  ],
+  "451001": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Adhawan",
+      "Aurangpura",
+      "Badgaon",
+      "Balakwada",
+      "Balwadi",
+      "Bamkhal",
+      "Barud Tanda",
+      "Chandanpuri",
+      "Khargone",
+      "Khargone Municipal Col.",
+      "Khargone Tawnhall",
+      "Kothakhurd",
+      "Kukdhal",
+      "Lohari",
+      "Mangral Khurd",
+      "Nagjhiri",
+      "Pandhaniya",
+      "Piprata",
+      "Singun",
+      "Sinkheda",
+      "Siptan",
+      "Temla",
+      "Temrani"
+    ]
+  ],
+  "451111": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Ali Bujurg",
+      "Badud",
+      "Baswa",
+      "Bhanbarad",
+      "Dhakalgaon",
+      "Dodwan",
+      "Hirapur",
+      "Khangwada",
+      "Sanawad",
+      "Satajana"
+    ]
+  ],
+  "451113": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Ahirkheda",
+      "Anjangaon",
+      "Badgaon",
+      "Bagda Bujurg",
+      "Bedia",
+      "Bhulgaon",
+      "Chhirwa",
+      "Kanapur",
+      "Khedi Bujurg",
+      "Mardana",
+      "Pitnagar",
+      "Rahatkot",
+      "Rawerkhedi",
+      "Rodia"
+    ]
+  ],
+  "451115": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Badel",
+      "Balwada",
+      "Barjhar",
+      "Barwaha",
+      "Dariya Mahal",
+      "Jagatpura",
+      "Jethway",
+      "Jhigadi",
+      "Katkut",
+      "Kithud",
+      "Mukhatyra",
+      "Nandia",
+      "Navghatkhedi",
+      "Naya",
+      "Ratanpur",
+      "Tharwar",
+      "Umaria Chowki"
+    ]
+  ],
+  "451220": [
+    "Khargone",
+    "Madhya Pradesh",
+    ["Bagod", "Bawi", "Bhudari", "Ghatyabedi", "Karhi", "Methawa", "Padlya", "Vani"]
+  ],
+  "451221": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Bablai",
+      "Choli",
+      "Choti Khargone",
+      "Dhargaon",
+      "Karondiya",
+      "Kavdiya",
+      "Mandleshwar",
+      "Somakhedi",
+      "Thangaon"
+    ]
+  ],
+  "451224": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Ashapur",
+      "Badwell",
+      "Itawadi",
+      "Kharadi",
+      "Maheshwar",
+      "Makshi",
+      "Matmur",
+      "Mehatwada"
+    ]
+  ],
+  "451225": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Baddiya",
+      "Bhampura",
+      "Katargaon",
+      "Kodlya Khedi",
+      "Kogawan",
+      "Machalpur",
+      "Nandra",
+      "Pathrad",
+      "Piplya Buzurg",
+      "Sejgaon"
+    ]
+  ],
+  "451228": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Amlatha",
+      "Badi",
+      "Balkhad",
+      "Balsamund",
+      "Bamandi",
+      "Bhilgaon",
+      "Borawa",
+      "Choti Kasrawad",
+      "Dogawa",
+      "Kasrawad",
+      "Ojhara",
+      "Pipalgaon",
+      "Regwa",
+      "Satkut"
+    ]
+  ],
+  "451331": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Bamnala",
+      "Banjhar",
+      "Behrampur",
+      "Bhatalpura",
+      "Bhikangaon",
+      "Birul",
+      "Deola",
+      "Kaldha",
+      "Kanjhar",
+      "Lalkheda",
+      "Nargaon",
+      "Piprad",
+      "Sagur Bhagur",
+      "Saikhedi",
+      "Selda",
+      "Shakargaon",
+      "Sundrel",
+      "Tinsya"
+    ]
+  ],
+  "451332": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Abhapuri",
+      "Chainpur",
+      "Chiriya",
+      "Goradia",
+      "Helapadawa",
+      "Igriya",
+      "Jhirnia",
+      "Padlya",
+      "Ratanpur",
+      "Shivana"
+    ]
+  ],
+  "451335": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Andad",
+      "Dasnawal",
+      "Dayalpura",
+      "Ghugharya Khedi",
+      "Gogawa",
+      "Kamodwada",
+      "Khamkheda",
+      "Mohammadpur",
+      "Multhan",
+      "Rehgaon",
+      "Thibgaon",
+      "Vithnera"
+    ]
+  ],
+  "451440": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Gandhawal",
+      "Likhi",
+      "Nandgaon",
+      "Pipari",
+      "Raibidpur",
+      "Satawad",
+      "Shri Khandi",
+      "Surpala",
+      "Talakpura",
+      "Un"
+    ]
+  ],
+  "451441": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Bahadarpur",
+      "Banher",
+      "Bhagwanpur",
+      "Bhagyapur",
+      "Bistan",
+      "Damkheda",
+      "Dhulkot",
+      "Kabri",
+      "Mongargaon",
+      "Penpur",
+      "Pipaljhopa",
+      "Samarpat",
+      "Sirwel",
+      "Umarkhali"
+    ]
+  ],
+  "451442": [
+    "Khargone",
+    "Madhya Pradesh",
+    [
+      "Chitawal",
+      "Dasnawal",
+      "Dongargaon",
+      "Ghegaon",
+      "Golwadi",
+      "Keli",
+      "Lehaku",
+      "Lonara",
+      "Rasgaon",
+      "Segaon"
+    ]
+  ],
+  "451447": [
+    "Barwani",
+    "Madhya Pradesh",
+    [
+      "Badgaon",
+      "Chikliya",
+      "Danod",
+      "Haribad",
+      "Matali",
+      "Menimata",
+      "Palsud",
+      "Pipari Bujurg",
+      "Rajpur Barwani",
+      "Rangaon Deb",
+      "Revaja",
+      "Sangaon",
+      "Sustikheda",
+      "Upla",
+      "Wajhar"
+    ]
+  ],
+  "451449": [
+    "Barwani",
+    "Madhya Pradesh",
+    [
+      "Baghadi",
+      "Bakwadi",
+      "Balsamund",
+      "Baruphatak",
+      "Baswi",
+      "Bhorwada",
+      "Ghusgaon",
+      "Indrapur",
+      "Julwania",
+      "Khajuri",
+      "Nagalwadi",
+      "Ojhar",
+      "Rangaon Road",
+      "Rui",
+      "Salikalan"
+    ]
+  ],
+  "451551": [
+    "Barwani",
+    "Madhya Pradesh",
+    [
+      "Anjarada",
+      "Attarsambha",
+      "Barwani",
+      "Bawangaja",
+      "Bhawati",
+      "Bokrata",
+      "Borlay",
+      "Gandhawal",
+      "Kasrawad (S)",
+      "Limbi",
+      "Panchpula (N)",
+      "Pati",
+      "Piplaj",
+      "Sajwani",
+      "Semali",
+      "Silawad",
+      "Sondul",
+      "Talun Khurd"
+    ]
+  ],
+  "451556": [
+    "Barwani",
+    "Madhya Pradesh",
+    [
+      "Anjad",
+      "Balkuwan",
+      "Barda",
+      "Bilwa Road",
+      "Fatyapur",
+      "Koradiya",
+      "Lonsara Khurd",
+      "Mandwada",
+      "Mohipura",
+      "Sali",
+      "Surana",
+      "Talwada Bujurg",
+      "Talwada Deb",
+      "Uchawad"
+    ]
+  ],
+  "451660": [
+    "Barwani",
+    "Madhya Pradesh",
+    [
+      "Bhoinda",
+      "Brahamngaon",
+      "Chichali (D)",
+      "Chichali (N)",
+      "Dawana",
+      "Deola",
+      "Ghatwa",
+      "Khadakwani",
+      "Khal Bujurg",
+      "Khurrampura",
+      "Kuwan",
+      "Lakhangaon",
+      "Maltar",
+      "Maral Sarovar",
+      "Mehgaon Deb",
+      "Nimarani",
+      "Satrati",
+      "Segwal",
+      "Thikari"
+    ]
+  ],
+  "451666": [
+    "Barwani",
+    "Madhya Pradesh",
+    [
+      "Achli",
+      "Balwadi",
+      "Bawdad",
+      "Bhakarli",
+      "Chachariya",
+      "Chatli",
+      "Dhanora",
+      "Dhawali",
+      "Diwaniya",
+      "Dugani",
+      "Goi",
+      "Jamathi",
+      "Jhopali",
+      "Jogwada",
+      "Kunjari",
+      "Mahitgaon",
+      "Malwan",
+      "Nawalpura",
+      "Sendhwa",
+      "Shahpura",
+      "Solwan",
+      "Warla"
+    ]
+  ],
+  "451770": [
+    "Barwani",
+    "Madhya Pradesh",
+    [
+      "Bandhara Bujurg",
+      "Dondwada",
+      "Jalgone",
+      "Junapani",
+      "Kansul",
+      "Moida",
+      "Niwali",
+      "Pansemal"
+    ]
+  ],
+  "451881": [
+    "Barwani",
+    "Madhya Pradesh",
+    [
+      "Bhatki",
+      "Jahur",
+      "Khetia",
+      "Malfa",
+      "Mortalai",
+      "Nisarpur",
+      "Rakhibujurg",
+      "Temala"
+    ]
+  ],
+  "452001": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Indore",
+      "Indore CGO Complex",
+      "Indore Manorama Ganj",
+      "Indore Takshashila",
+      "Indore Tukoganj",
+      "Indore Uchchanyayalay",
+      "Radio Colony Indore"
+    ]
+  ],
+  "452002": ["Indore", "Madhya Pradesh", ["Indore City 2", "Indore Cloth Market"]],
+  "452003": ["Indore", "Madhya Pradesh", ["Indore Pardesipura", "Vallabhnagar"]],
+  "452005": ["Indore", "Madhya Pradesh", ["Bijasan Road"]],
+  "452006": ["Indore", "Madhya Pradesh", ["Army Head Quarter"]],
+  "452007": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Gurunanak Chauk",
+      "Indore Collectorate",
+      "Indore Courts",
+      "Indore Nagar",
+      "Indore Ram Bagh",
+      "Indore Siyaganj"
+    ]
+  ],
+  "452009": ["Indore", "Madhya Pradesh", ["Lokmanya Nagar Indore", "Sudama Nagar"]],
+  "452010": [
+    "Indore",
+    "Madhya Pradesh",
+    ["Indore DDU Nagar", "Indore Nipaniya", "Sanwer Link Road Indore", "Vijay Nagar"]
+  ],
+  "452011": ["Indore", "Madhya Pradesh", ["Indore R.S.S.Nagar", "Nanda Nagar"]],
+  "452012": ["Indore", "Madhya Pradesh", ["Rajendra Nagar"]],
+  "452013": ["Indore", "Madhya Pradesh", ["Indore Cat"]],
+  "452014": ["Indore", "Madhya Pradesh", ["Khatiwala Tank"]],
+  "452015": ["Indore", "Madhya Pradesh", ["Indore Kumar Khadi", "Industrial Estate"]],
+  "452016": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Baolia Khurd",
+      "Bicholi Mardana",
+      "Buranakhedi",
+      "Dudhia",
+      "Indore Kanadia Road",
+      "Indore Khajrana",
+      "Jhalaria",
+      "Kanadia",
+      "Khudel",
+      "Sanawadia",
+      "Semlia Chau",
+      "Sivani"
+    ]
+  ],
+  "452018": ["Indore", "Madhya Pradesh", ["Indore Tillaknagar"]],
+  "452020": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Datoda",
+      "Joshi Guradia",
+      "Kampel",
+      "Kasturbagram",
+      "Kelod Kartal",
+      "Machala",
+      "Palda",
+      "Pedmi",
+      "Pipalda",
+      "Piwdai",
+      "Tillor Bujurg",
+      "Tillor Khurd"
+    ]
+  ],
+  "453001": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Atawda",
+      "Aurangpura",
+      "Betma",
+      "Bisnawada",
+      "Dhannad",
+      "Kalaria",
+      "Kalibillod",
+      "Karadia",
+      "Machal",
+      "Maithwada",
+      "Rangwasa",
+      "Rolai",
+      "Sagdod"
+    ]
+  ],
+  "453111": [
+    "Indore",
+    "Madhya Pradesh",
+    ["Alwasa", "Baghana", "Hatod", "Jamburdi Sarwar", "Kalmer", "Palia"]
+  ],
+  "453112": ["Indore", "Madhya Pradesh", ["Gandhinagar", "Jamburdi Hapsi", "Palakhedi"]],
+  "453115": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Agra",
+      "Attaheda",
+      "Banedia",
+      "Depalpur",
+      "Gokulpur",
+      "Limbodapar",
+      "Murkheda",
+      "Neori",
+      "Sumtha"
+    ]
+  ],
+  "453220": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Bachhoda",
+      "Bhilbadoli",
+      "Chambal",
+      "Chhadoda",
+      "Farkoda",
+      "Gautampura",
+      "Girota",
+      "Jalodia Gyan",
+      "Kanwasa",
+      "Mendakwas"
+    ]
+  ],
+  "453331": [
+    "Indore",
+    "Madhya Pradesh",
+    ["Pigdambar", "Rangwasa", "Rao", "Tihi", "Umria"]
+  ],
+  "453441": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Amba Chandan",
+      "Badgonda",
+      "Bai",
+      "Bhagora",
+      "Bhatkhedi",
+      "Choral",
+      "Chordia",
+      "Dharnaka",
+      "Dongargaon",
+      "Gawli Palasia",
+      "Gujarkheda",
+      "Harsola",
+      "Jamli",
+      "Kelod",
+      "Kishanganj",
+      "Kodariya",
+      "Men",
+      "Mhow",
+      "Mhow Cantt",
+      "Mhowgaon"
+    ]
+  ],
+  "453446": ["Indore", "Madhya Pradesh", ["Rasalpura"]],
+  "453551": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Ajnod",
+      "Badodia Khan",
+      "Baloda Takun",
+      "Chhitoda",
+      "Fatehabad Chandrawati Ganj",
+      "Guran",
+      "Jindakheda",
+      "Kachaliya",
+      "Kankaria Pal",
+      "Kudana",
+      "Rajoda",
+      "Sanwer",
+      "Solsinda"
+    ]
+  ],
+  "453552": ["Indore", "Madhya Pradesh", ["Simrol"]],
+  "453555": ["Indore", "Madhya Pradesh", ["Shri Aurobindo"]],
+  "453556": ["Indore", "Madhya Pradesh", ["Iim Campus Rao"]],
+  "453661": [
+    "Indore",
+    "Madhya Pradesh",
+    [
+      "Hasalpur",
+      "Kamadpur",
+      "Khedi Sihod",
+      "Khurdi",
+      "Manpur",
+      "Phaphund",
+      "Yeshwant Nagar"
+    ]
+  ],
+  "453771": [
+    "Indore",
+    "Madhya Pradesh",
+    ["Barlai Jagir", "Dakachiya", "Kadwali Bujurg", "Lasudia", "Manglia", "Panod", "Todi"]
+  ],
+  "454001": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Ahoo",
+      "Anarad",
+      "Bagdi",
+      "Bijur",
+      "Biloda",
+      "Chiklya",
+      "Chilur",
+      "Dedla",
+      "Dhar",
+      "Dhar Collectorate",
+      "Gardawad",
+      "Gulwa",
+      "Gunawad",
+      "Jetpura",
+      "Kachroda",
+      "Kalsada",
+      "Kesur",
+      "Kherod",
+      "Kot Bhidota",
+      "Labrawada",
+      "Manasa",
+      "Mohanpura",
+      "Nagda",
+      "Nagora",
+      "Nalcha",
+      "Padlya",
+      "Palwada",
+      "Sadalpur",
+      "Salkanpur",
+      "Sultanpur",
+      "Tirla",
+      "Tisgaon",
+      "Tornod",
+      "Utawad"
+    ]
+  ],
+  "454010": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Bachanpur",
+      "Bilodakhurd",
+      "Kunjrod",
+      "Kuradia",
+      "Lunhera",
+      "Mandu",
+      "Sarai",
+      "Sodpur",
+      "Talwada"
+    ]
+  ],
+  "454111": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Badodiya",
+      "Barkheda",
+      "Barmandal",
+      "Bhopawar",
+      "Bola",
+      "Jolana",
+      "Khareli",
+      "Khutpala",
+      "Labriya",
+      "Ledgaon",
+      "Phulgawdi",
+      "Salwa",
+      "Sardarpur"
+    ]
+  ],
+  "454116": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Bhangarh",
+      "Bimrod",
+      "Chalnimata",
+      "Chhadawad",
+      "Dattigaon",
+      "Dhulet",
+      "Gumanpura",
+      "Kunjrota",
+      "Mohankheda",
+      "Narwali",
+      "Piparani",
+      "Rajgarh (Dhar)",
+      "Ringnod",
+      "Timaichi",
+      "Tirla"
+    ]
+  ],
+  "454221": [
+    "Dhar",
+    "Madhya Pradesh",
+    ["Akhada", "Bagh", "Dehri", "Ghatbori", "Longsari", "Pipariapani", "Tanda"]
+  ],
+  "454331": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Ali",
+      "Ambada",
+      "Badwaniya",
+      "Dahi",
+      "Dharamrai",
+      "Dholiya",
+      "Gajgota",
+      "Girwaniya",
+      "Haldi",
+      "Kapsi",
+      "Kukshi",
+      "Kundara",
+      "Loni",
+      "Padiyal",
+      "Susari",
+      "Talanpur",
+      "Talwada",
+      "Talwadi"
+    ]
+  ],
+  "454335": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Bhavria",
+      "Chikhalda",
+      "Deshwalia",
+      "Kadmal",
+      "Konda",
+      "Limbol",
+      "Lingwa",
+      "Lohari",
+      "Mandvi",
+      "Nanoda",
+      "Narmadanagar",
+      "Nisarpur",
+      "Piplia",
+      "Sirsi"
+    ]
+  ],
+  "454441": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Amjhera",
+      "Balendi",
+      "Bandedi",
+      "Chalni",
+      "Chotya Balod",
+      "Dasai",
+      "Dhamanda",
+      "Hatod",
+      "Keshvi",
+      "Khiledi",
+      "Sagwal",
+      "Takraoda"
+    ]
+  ],
+  "454446": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Ajanda",
+      "Ajandikot",
+      "Awaldaman",
+      "Baglia",
+      "Bakaner",
+      "Balipur",
+      "Barda",
+      "Bilda",
+      "Borud",
+      "Ekalwara",
+      "Gandhwani",
+      "Jajamkhedi",
+      "Jatpura",
+      "Jeerabad",
+      "Jotpur",
+      "Kachhawada",
+      "Kalwani",
+      "Karoli",
+      "Khandlai",
+      "Kuwad",
+      "Luneherasadak",
+      "Manawar",
+      "Mirjapur",
+      "Nagur",
+      "Panwa",
+      "Pipli",
+      "Rantalab",
+      "Singhana",
+      "Tonki"
+    ]
+  ],
+  "454449": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Bohrala",
+      "Dharampuri",
+      "Kalibawdi",
+      "Kothada",
+      "Lunherabujurg",
+      "Pagara",
+      "Pipaldagadi",
+      "Sakalda",
+      "Tawlai",
+      "Umarban",
+      "Zirvi"
+    ]
+  ],
+  "454552": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Balwari",
+      "Bharudpura",
+      "Bhavaniabujurg",
+      "Bikhron",
+      "Dahiwar",
+      "Dhamnod",
+      "Dhani",
+      "Dudhi",
+      "Gujri",
+      "Khalghat",
+      "Piplaj",
+      "Semalda",
+      "Sundrel",
+      "Tarapur"
+    ]
+  ],
+  "454660": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Badnawar",
+      "Bakhatgarh",
+      "Baloda",
+      "Bhainsola",
+      "Chhayan",
+      "Dhamanna",
+      "Dholana",
+      "Dotrya",
+      "Ghatgara",
+      "Kachibadoda",
+      "Kheda",
+      "Multhan",
+      "Panchakwasa",
+      "Rajod",
+      "Sandla",
+      "Tilgara"
+    ]
+  ],
+  "454665": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Bamandakalan",
+      "Bhatbamanda",
+      "Bidwal",
+      "Chhokla",
+      "Gajnod",
+      "Kadod",
+      "Kanwan",
+      "Khandigara",
+      "Kod",
+      "Semlia",
+      "Shergarh"
+    ]
+  ],
+  "454773": [
+    "Dhar",
+    "Madhya Pradesh",
+    [
+      "Bad Chapra",
+      "Dehri Ghata Billod",
+      "Dighthan",
+      "Ekalduna",
+      "Kalsoda Khurd",
+      "Lebadchowki"
+    ]
+  ],
+  "454774": [
+    "Dhar",
+    "Madhya Pradesh",
+    ["Khandwa", "Kunwarsi", "Mandlawada", "Pithampur Sector III", "Sagore", "Sulawad"]
+  ],
+  "454775": ["Dhar", "Madhya Pradesh", ["Pithampur"]],
+  "455001": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Aalri",
+      "Agrod",
+      "Bairagarh",
+      "Bangar",
+      "Bangarda",
+      "Barotha",
+      "Bilawali",
+      "Binjana",
+      "Chidawad",
+      "Dattotar Mandi",
+      "Dewas",
+      "Dewas Bada Bazar",
+      "Dewas Bank Note Press",
+      "Dewas Bhavanisagar",
+      "Dewas Industrial Estate",
+      "Dewas Radhaganj",
+      "Kalma",
+      "Kelod",
+      "Khareli",
+      "Kshipra",
+      "Mundaheda",
+      "Nipania",
+      "Padliya",
+      "Patlawada",
+      "Rajoda",
+      "Randankhedi",
+      "Salamkhedi",
+      "Singawada",
+      "Siroliya",
+      "Siya",
+      "Sunwani Gopal",
+      "Tonk Kala",
+      "Vijayganj Mandi"
+    ]
+  ],
+  "455111": [
+    "Dewas",
+    "Madhya Pradesh",
+    ["Balgarh", "Nagda", "Tigariya Goga", "Tigriya Chota"]
+  ],
+  "455115": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Anwalia Piplia",
+      "Bhonrasa",
+      "Churlai Badi",
+      "Jamgod",
+      "Kokhriya",
+      "Sadikheda",
+      "Sanwanrsi"
+    ]
+  ],
+  "455116": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Agrod",
+      "Amona",
+      "Balon",
+      "Bhutia Bujurg",
+      "Chaubara Dhira",
+      "Eklera Mataji",
+      "Gorba",
+      "Harnoada",
+      "Jamoniya",
+      "Jiyajigarh",
+      "Lasudia Brahmin",
+      "Lasudia Kulmi",
+      "Mundladangi",
+      "Nandel",
+      "Ranyal Kalan",
+      "Tonkhurd"
+    ]
+  ],
+  "455118": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Anabad",
+      "Babai",
+      "Bisakhedi",
+      "Chaubara Jagir",
+      "Daulatpur",
+      "Deoguradia",
+      "Gandharvpuri",
+      "Garhkhajuria",
+      "Kankakhajuriya",
+      "Kheriyajagir",
+      "Khutkheda",
+      "Nipaniya Hur Hur",
+      "Pandajagir",
+      "Pipalrawa",
+      "Polai",
+      "Sonkutch",
+      "Talod"
+    ]
+  ],
+  "455221": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Barkheda Soma",
+      "Chaubapipliya",
+      "Dehriya Sahu",
+      "Double Chowki",
+      "Karnawad",
+      "Patadi",
+      "Raghogarh",
+      "Sannod",
+      "Zikrakheda"
+    ]
+  ],
+  "455223": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Amlataj",
+      "Arlaoda",
+      "Barkheda Purvaiya",
+      "Deogarh",
+      "Hatpipliya",
+      "Khajuriabina",
+      "Limboda",
+      "Mankund",
+      "Maukheda",
+      "Nanukheda",
+      "Neori",
+      "Tappa Suklia"
+    ]
+  ],
+  "455227": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Agurli",
+      "Bagli",
+      "Bhamori",
+      "Chandupura",
+      "Chapda",
+      "Guradiya Kala",
+      "Kamlapur",
+      "Matmor",
+      "Pandutalab",
+      "Pankunwa",
+      "Pipri",
+      "Punjapura",
+      "Ratanpur",
+      "Udaynagar"
+    ]
+  ],
+  "455332": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Amla",
+      "Bagankheda",
+      "Bahirawad",
+      "Bamnikhurd",
+      "Baodi Kheda",
+      "Dokakui",
+      "Kalwar",
+      "Kannod",
+      "Katkut",
+      "Kusmania",
+      "Omkara",
+      "Patrani",
+      "Piplani",
+      "Sonkhedi",
+      "Thuria",
+      "Vikrampur"
+    ]
+  ],
+  "455336": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Ajnas",
+      "Bhandariya",
+      "Chandwana",
+      "Chichli Rajor",
+      "Ganora",
+      "Harangaon",
+      "Jiyagaon",
+      "Kankariya",
+      "Khategaon",
+      "Nanasa",
+      "Pipalkota",
+      "Richhi",
+      "Sukardi",
+      "Sulgaon",
+      "Tiwdiya",
+      "Umariya"
+    ]
+  ],
+  "455339": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Bijalgaon",
+      "Burada",
+      "Deepgaon",
+      "Eklera",
+      "Khal",
+      "Kolari",
+      "Murjhal",
+      "Nemawar",
+      "Piplianankar",
+      "Sandalpur",
+      "Sawasada"
+    ]
+  ],
+  "455440": [
+    "Dewas",
+    "Madhya Pradesh",
+    [
+      "Bedgaon",
+      "Bhesun",
+      "Bijwad",
+      "Chandrakeshar Dam",
+      "Godna",
+      "Jinwani",
+      "Kantaphod",
+      "Loharda",
+      "Panigaon",
+      "Sundrel",
+      "Surmania"
+    ]
+  ],
+  "455459": [
+    "Dewas",
+    "Madhya Pradesh",
+    ["Atwas", "Baijagwada", "Dangarakheda", "Dhasad", "Khiroda", "Mohai", "Satwas"]
+  ],
+  "456001": ["Ujjain", "Madhya Pradesh", ["Ujjain"]],
+  "456003": [
+    "Ujjain",
+    "Madhya Pradesh",
+    ["Goyalabujurg", "Kaliadeh", "Rooi", "Sodang", "Ujjain Bherugarh"]
+  ],
+  "456006": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Amodiya",
+      "Chintaman Jawasia",
+      "Jethal",
+      "Kagdikaradia",
+      "Kaluheda",
+      "Karohan",
+      "Lekoda",
+      "Mangrola",
+      "Navakheda",
+      "Ninora",
+      "Panbihar",
+      "Panthpiplai",
+      "Pipliahama",
+      "Ratadia",
+      "Surasa",
+      "Takwasa",
+      "Talod",
+      "Ujjain City",
+      "Ujjain Factory",
+      "Ujjain Gujrati Samaj",
+      "Ujjain Nayapura",
+      "Ujjain Ramghatmarg",
+      "Undasa"
+    ]
+  ],
+  "456010": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Ujjain Kothi",
+      "Ujjain M.L.Nagar",
+      "Ujjain Madhonagar",
+      "Ujjain Nanakheda",
+      "Ujjain Rishi Nagar",
+      "Ujjain Vikram University"
+    ]
+  ],
+  "456221": [
+    "Ujjain",
+    "Madhya Pradesh",
+    ["Alot Jagir", "Barkheda Madan", "Bedavan", "Paslod", "Unhel"]
+  ],
+  "456222": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Akasoda",
+      "Baledi",
+      "Bamnapati",
+      "Chikli",
+      "Dangwada",
+      "Ghudawan",
+      "Harnawada",
+      "Ingoria",
+      "Khandoda",
+      "Kharsod Khurd",
+      "Nalva",
+      "Nimboda",
+      "Sijavta"
+    ]
+  ],
+  "456224": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Akya Jagir",
+      "Batlawdi",
+      "Bhainsoda",
+      "Bhatkhedi",
+      "Buranabad",
+      "Chapakhedi",
+      "Chapaner",
+      "Ghinoda",
+      "Kanwas",
+      "Kesaria",
+      "Khachraud",
+      "Khachraud Rs",
+      "Pachlasi",
+      "Run Kheda",
+      "Shrivatsa"
+    ]
+  ],
+  "456313": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Bhatpachlana",
+      "Bhikampur",
+      "Chirola",
+      "Chirola Chhota",
+      "Kamthana",
+      "Kharsodkalan",
+      "Madawda",
+      "Nandiyasi",
+      "Narsingarh"
+    ]
+  ],
+  "456331": [
+    "Ujjain",
+    "Madhya Pradesh",
+    ["Bhatisuda", "Birlagram Nagda", "Durgapura", "Mehatvas"]
+  ],
+  "456335": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Banbana",
+      "Barkheda Pitramal",
+      "Hatai",
+      "Nagda",
+      "Nagda Town",
+      "Rohil Khurd",
+      "Rupeta"
+    ]
+  ],
+  "456337": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Aslavada",
+      "Badagaon",
+      "Jahagirpur",
+      "Lekoda Anjana",
+      "Makdavan",
+      "Palsoda Makdavan",
+      "Piploda Baghla",
+      "Sandla",
+      "Suwasa"
+    ]
+  ],
+  "456440": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Bappiya",
+      "Berchha",
+      "Delchi Buzurg",
+      "Jhutawad",
+      "Mehidpur Road",
+      "Sagwali",
+      "Tutiya Khedi"
+    ]
+  ],
+  "456441": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Aajmabad",
+      "Gogakheda",
+      "Indokh",
+      "Jharda",
+      "Kachria",
+      "Kundikheda",
+      "Lalgarh",
+      "Lotiyajunarda",
+      "Makla",
+      "Rnayarapeer"
+    ]
+  ],
+  "456443": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Barkheda Buzurg",
+      "Chitavad",
+      "Dharakheda",
+      "Khedakhajuria",
+      "Mahu",
+      "Mehidpur",
+      "Semliya",
+      "Shakkar Khedi"
+    ]
+  ],
+  "456550": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Dhabla Hardu",
+      "Dungarkheda",
+      "Ghattia",
+      "Ghonsla",
+      "Jagoti",
+      "Jalwa",
+      "Jhitarkhedi",
+      "Keson",
+      "Mahudi",
+      "Malikhedi",
+      "Nazarpur",
+      "Parsoli",
+      "Pat",
+      "Tulaheda",
+      "Ujjainiya"
+    ]
+  ],
+  "456661": ["Ujjain", "Madhya Pradesh", ["Badkummed", "Harsodhan", "Tajpur"]],
+  "456664": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Bolasa",
+      "Chandesara",
+      "Kachnariya",
+      "Matana Kalan",
+      "Narwar",
+      "Nauganwa",
+      "Piploda Dwarkadhish"
+    ]
+  ],
+  "456665": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Bichrod",
+      "Chadawad",
+      "Karanj",
+      "Kathbarod",
+      "Kaytha",
+      "Khajuria",
+      "Nogaova",
+      "Sumrakheda",
+      "Tarana"
+    ]
+  ],
+  "456668": [
+    "Ujjain",
+    "Madhya Pradesh",
+    ["Etawa", "Kadoudiya", "Kapeli", "Makdone", "Nanded", "Roopakhedi", "Tilawad"]
+  ],
+  "456770": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Baghera",
+      "Berchhi",
+      "Jawasia Kumar",
+      "Kanardi",
+      "Kanasia",
+      "Karedimataji",
+      "Nainawad",
+      "Samgi"
+    ]
+  ],
+  "456771": [
+    "Ujjain",
+    "Madhya Pradesh",
+    [
+      "Amla",
+      "Asawata",
+      "Bangred",
+      "Barnagar",
+      "Barnagar Bunglow",
+      "Barnagar Town",
+      "Birakhedi",
+      "Jalodia",
+      "Lohana",
+      "Molana",
+      "Palduna",
+      "Peerjhalar",
+      "Piplu"
+    ]
+  ],
+  "456776": [
+    "Ujjain",
+    "Madhya Pradesh",
+    ["Aajdawada", "Badagaon", "Baloda Lakkha", "Khedavada", "Runija", "Sundarabad"]
+  ],
+  "457001": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Bangrod",
+      "Banjali",
+      "Basindra",
+      "Bhatibarodia",
+      "Bibrod",
+      "Bildi",
+      "Devla",
+      "Dhamnod",
+      "Dhanasuta",
+      "Dilipnagar",
+      "Ghatalia",
+      "Harthali",
+      "Isarthuni",
+      "Itawakhurd",
+      "Jadwasakalan",
+      "Kaneri",
+      "Kangsi",
+      "Lunera",
+      "Malwasa",
+      "Malwasi",
+      "Mundri",
+      "Nagra",
+      "Naugawa",
+      "Nayan",
+      "Palas",
+      "Palsoda",
+      "Palsodi",
+      "Pipalkhunta",
+      "Ranisingh",
+      "Raoti",
+      "Ratlam",
+      "Ratlam City",
+      "Ratlam Collectorate",
+      "Ratlam Ghatla Colony",
+      "Ratlam Jawahar Nagar",
+      "Ratlam Kasara Bazar",
+      "Ratlam Rly Colony",
+      "Ratlam Stn.Road",
+      "Ratlam Surajpole",
+      "Sejawata",
+      "Shivgarh",
+      "Shivpur",
+      "Tambolia",
+      "Titari",
+      "Umar"
+    ]
+  ],
+  "457114": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Alote",
+      "Barkhedakalan",
+      "Bhim",
+      "Bhojakhedi",
+      "Dhaturia",
+      "Kanadia",
+      "Khajuri Devda",
+      "Patan",
+      "Piplia Sisodia",
+      "Richha",
+      "Sherpurkhurd",
+      "Talod",
+      "Vikramgarh"
+    ]
+  ],
+  "457118": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Bardiagoyal",
+      "Bhutia",
+      "Gulbalod",
+      "Hatpiplia",
+      "Jamuniashankar",
+      "Kachhalia",
+      "Karadia",
+      "Karwakhedi",
+      "Kharuakhurd",
+      "Lodh",
+      "Madhopur",
+      "Mundlakala",
+      "Panthpiploda",
+      "Pir Hingoriya",
+      "Tal",
+      "Uni"
+    ]
+  ],
+  "457119": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Kasari",
+      "Kharwa Kalan",
+      "Lasudiya Surajmal",
+      "Luni",
+      "Mandawal",
+      "Minawada",
+      "Nipania Leela",
+      "Thambguradiya"
+    ]
+  ],
+  "457222": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Amleta",
+      "Barbodna",
+      "Baroda",
+      "Bhadwasa",
+      "Dhonswas",
+      "Gunawad",
+      "Hasanpalia",
+      "Kanderwasa",
+      "Namli",
+      "Negarda",
+      "Palduna",
+      "Panched",
+      "Semlia"
+    ]
+  ],
+  "457226": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Bahadurpur Jagir",
+      "Barawada",
+      "Chourasi Barayla",
+      "Husaintekri",
+      "Jaora",
+      "Jaora Choupati",
+      "Jaora Kutchery",
+      "Jhalwa",
+      "Lalakheda",
+      "Lasudia",
+      "Luhari",
+      "Rewas",
+      "Rojana",
+      "Sarsi",
+      "Uparwada",
+      "Uplai"
+    ]
+  ],
+  "457331": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Baraylamataji",
+      "Borkheda",
+      "Dhamedi",
+      "Guderkheda",
+      "Hatnara",
+      "Nandleta",
+      "Piploda",
+      "Sherpur"
+    ]
+  ],
+  "457333": [
+    "Ratlam",
+    "Madhya Pradesh",
+    ["Maukhedi", "Panchewa", "Ranigaon", "Riyawan", "Sujapur", "Sukheda"]
+  ],
+  "457336": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Asawati",
+      "Banwada",
+      "Gondishankar",
+      "Kalalia",
+      "Mandvi",
+      "Martandganj",
+      "Ringnod",
+      "Rola"
+    ]
+  ],
+  "457339": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Chiklana",
+      "Dhodhar RS",
+      "Hanumaniya",
+      "Jadwasa",
+      "Moriya",
+      "Pingrala",
+      "Piplia Jodha"
+    ]
+  ],
+  "457340": [
+    "Ratlam",
+    "Madhya Pradesh",
+    ["Kalukheda", "Mamatkheda", "Maota", "Mundlaram", "Naveli", "Ranayra", "Talidana"]
+  ],
+  "457441": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Bilpank",
+      "Birmawal",
+      "Dantodia",
+      "Dharad",
+      "Dhikwa",
+      "Itawakalan",
+      "Mangrol",
+      "Pritamnagar",
+      "Rattagarh",
+      "Sarwad",
+      "Simlaoda"
+    ]
+  ],
+  "457550": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Aamba",
+      "Advania",
+      "Amargarh",
+      "Ambapada",
+      "Bodina",
+      "Karia",
+      "Khokhra",
+      "Kunda",
+      "Sailana",
+      "Sakraoda",
+      "Sarwan"
+    ]
+  ],
+  "457555": [
+    "Ratlam",
+    "Madhya Pradesh",
+    [
+      "Amarpurkala",
+      "Bajna",
+      "Bajranggarh",
+      "Bhadankala",
+      "Chandragarh",
+      "Chhaoni Dodia",
+      "Devli",
+      "Gadhigamna",
+      "Jambukhadan",
+      "Kelkachh",
+      "Kherda",
+      "Kundanpur",
+      "Rajapura Mataji",
+      "Thikria"
+    ]
+  ],
+  "457661": [
+    "Jhabua",
+    "Madhya Pradesh",
+    [
+      "Baodibadi",
+      "Bhimfalia",
+      "Devjhiri Panda",
+      "Dhekal",
+      "Jhabua",
+      "Jhabua Collectorate",
+      "Kalmoda",
+      "Kardawad Badi",
+      "Khardubadi",
+      "Khedi",
+      "Kundanpur",
+      "Machhlia",
+      "Para",
+      "Pipliya",
+      "Pithanpur",
+      "Pitol",
+      "Rajla",
+      "Rama",
+      "Rehanda",
+      "Rotla"
+    ]
+  ],
+  "457770": [
+    "Jhabua",
+    "Madhya Pradesh",
+    [
+      "Amargarh",
+      "Bamnia",
+      "Bherogarh",
+      "Bodayta",
+      "Chapaner",
+      "Chhayan Paschim",
+      "Gangakhedi",
+      "Ghughri",
+      "Karangarh",
+      "Karwad",
+      "Mandan",
+      "Mathmath",
+      "Mohanpura",
+      "Panchpiplia",
+      "Rampuria",
+      "Sarangi"
+    ]
+  ],
+  "457772": [
+    "Jhabua",
+    "Madhya Pradesh",
+    ["Bhamel", "Khawasa", "Kukdipada", "Makodia", "Narela", "Sagwa", "Semlia"]
+  ],
+  "457773": [
+    "Jhabua",
+    "Madhya Pradesh",
+    [
+      "Anantkhedi",
+      "Baodi",
+      "Barvet",
+      "Dehandi Chhoti",
+      "Kardawad",
+      "Kodli",
+      "Petlawad",
+      "Ramgarh",
+      "Rupgarh",
+      "Temria"
+    ]
+  ],
+  "457775": [
+    "Jhabua",
+    "Madhya Pradesh",
+    [
+      "Bani",
+      "Bekalda",
+      "Bolasa",
+      "Dhaturia",
+      "Hamirgarh",
+      "Jamli",
+      "Jhaknawda",
+      "Kumarkhedi",
+      "Mohankot",
+      "Paledi",
+      "Raipuria",
+      "Tarkhedi",
+      "Umarkot"
+    ]
+  ],
+  "457777": [
+    "Jhabua",
+    "Madhya Pradesh",
+    [
+      "Bajranggarh",
+      "Balwasa",
+      "Bedawa",
+      "Bhimkund",
+      "Devigarh",
+      "Harinagar",
+      "Kakanwani",
+      "Khajuri",
+      "Khalkhandwi",
+      "Miyati",
+      "Morjhari",
+      "Parwalia",
+      "Sajelimaljisath",
+      "Shivgarh",
+      "Talawali",
+      "Thandla",
+      "Udaigarh R.S."
+    ]
+  ],
+  "457779": [
+    "Jhabua",
+    "Madhya Pradesh",
+    [
+      "Agral",
+      "Antarwelia",
+      "Bhagor",
+      "Guwali",
+      "Hatyadeli",
+      "Kachaldara",
+      "Kajlidungari",
+      "Kalyanpura",
+      "Kheda",
+      "Madrani",
+      "Meghnagar",
+      "Panchkui",
+      "Rambhapur",
+      "Sad"
+    ]
+  ],
+  "457882": [
+    "Alirajpur",
+    "Madhya Pradesh",
+    [
+      "Amankunwa",
+      "Badakhuntaja",
+      "Barzar",
+      "Bhabhra",
+      "Ghodamandan",
+      "Jheeran",
+      "Mathna",
+      "Meda",
+      "Ringol",
+      "Sejawad"
+    ]
+  ],
+  "457885": [
+    "Alirajpur",
+    "Madhya Pradesh",
+    ["Dhyana", "Kachhala", "Kadwal", "Katthiwada", "Motibadoi"]
+  ],
+  "457887": [
+    "Alirajpur",
+    "Madhya Pradesh",
+    [
+      "Ajanda",
+      "Alirajpur",
+      "Ambadaberi",
+      "Ambari",
+      "Amkhut",
+      "Badaundwa",
+      "Badisardi",
+      "Bardala",
+      "Bokadia",
+      "Borkua",
+      "Chandpur",
+      "Chotabhavta",
+      "Fata",
+      "Haraswat",
+      "Laxmani",
+      "Malwai",
+      "Nanpur",
+      "Sejgaon",
+      "Sorwa",
+      "Titi",
+      "Vadi",
+      "Walwai"
+    ]
+  ],
+  "457888": [
+    "Alirajpur",
+    "Madhya Pradesh",
+    [
+      "Andharkanch",
+      "Attha",
+      "Bakhatgarh",
+      "Chhaktala",
+      "Darkali",
+      "Foolmal",
+      "Mathwad",
+      "Pipliawat",
+      "Silota",
+      "Sondwa",
+      "Umrali",
+      "Walpur"
+    ]
+  ],
+  "457990": [
+    "Alirajpur",
+    "Madhya Pradesh",
+    [
+      "Badaguda",
+      "Bhilkhedi",
+      "Bori",
+      "Borjhad",
+      "Chhotaitara",
+      "Dabdi",
+      "Jobat",
+      "Kanwada",
+      "Khandala",
+      "Khattali",
+      "Kolyabardi",
+      "Kundalwasa",
+      "Thandla",
+      "Ublet",
+      "Udaygarh Kanas",
+      "Umda",
+      "Undari"
+    ]
+  ],
+  "457993": [
+    "Jhabua",
+    "Madhya Pradesh",
+    [
+      "Andharwad",
+      "Ban",
+      "Kanakakad",
+      "Kanjwanikhas",
+      "Mandlinathu",
+      "Matasula",
+      "Mordundia",
+      "Ranapur",
+      "Samoi"
+    ]
+  ],
+  "458001": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    ["Mandsaur", "Mandsaur Nai Abadi", "Shri Ramtekri Mandsaur"]
+  ],
+  "458002": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Amlawad",
+      "Bhalot",
+      "Bhardawad",
+      "Dhariya Khedi",
+      "Dhikola",
+      "Gogarpura",
+      "Gujarda",
+      "Guradia Deda",
+      "Guradia Lalmuha",
+      "Jaggakhedi",
+      "Jawasia",
+      "Khilchipura",
+      "Mandsaur City",
+      "Mandsaur Fort",
+      "Multanpura",
+      "Rewas Devra",
+      "Sabakheda"
+    ]
+  ],
+  "458110": [
+    "Neemuch",
+    "Madhya Pradesh",
+    [
+      "Alheda Jagir",
+      "Bardia",
+      "Bhatkhedi",
+      "Chokadi",
+      "Chukani",
+      "Hadi Piplia",
+      "Hanspur",
+      "Jaliner",
+      "Jamunia",
+      "Kanjarda",
+      "Khedali",
+      "Manasa",
+      "Naya Malaheda",
+      "Parda",
+      "Piplia Raoji"
+    ]
+  ],
+  "458113": [
+    "Neemuch",
+    "Madhya Pradesh",
+    [
+      "Aankali",
+      "Aantri",
+      "Barthun",
+      "Bhadva",
+      "Chaplana",
+      "Denthal",
+      "Devari Khawasa",
+      "Khajuri",
+      "Kundla",
+      "Mahagarh",
+      "Moya",
+      "Nalkheda",
+      "Nalwa"
+    ]
+  ],
+  "458116": [
+    "Neemuch",
+    "Madhya Pradesh",
+    [
+      "Barlai",
+      "Chachor",
+      "Danta",
+      "Hanumantia",
+      "Khadawda",
+      "Kukdeshwar",
+      "Piplia Ghota",
+      "Tamoti"
+    ]
+  ],
+  "458118": [
+    "Neemuch",
+    "Madhya Pradesh",
+    [
+      "Baisala",
+      "Bhadana",
+      "Bhamesar",
+      "Booj",
+      "Chandrapura",
+      "Devran",
+      "Dudhlai",
+      "Jannod",
+      "Lasudia",
+      "Majiria",
+      "Rampura"
+    ]
+  ],
+  "458220": [
+    "Neemuch",
+    "Madhya Pradesh",
+    [
+      "Bangred",
+      "Dadoli",
+      "Dhamnia",
+      "Janakpur",
+      "Lasur",
+      "Modi",
+      "Morwan",
+      "Ramnagar",
+      "Sarwania Maharaj",
+      "Semali Chandrawat"
+    ]
+  ],
+  "458226": [
+    "Neemuch",
+    "Madhya Pradesh",
+    [
+      "Athva",
+      "Deeken",
+      "Dorai",
+      "Garwada Alori",
+      "Jat",
+      "Kankria Talai",
+      "Luharia",
+      "Ratangarh",
+      "Umar"
+    ]
+  ],
+  "458228": [
+    "Neemuch",
+    "Madhya Pradesh",
+    ["Dhangaon", "Dhardi", "Jhantla", "Kadwasa", "Kojya", "Singoli", "Tal"]
+  ],
+  "458330": [
+    "Neemuch",
+    "Madhya Pradesh",
+    ["Athana", "Bawal Nai", "Jawad", "Meghpura", "Saroda", "Suwakheda", "Tarapur"]
+  ],
+  "458336": ["Neemuch", "Madhya Pradesh", ["Harkia Khal", "Harwar", "Jeeran"]],
+  "458339": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    ["Barkheda Dev Dungari", "Chaldu", "Kunchrod", "Malhargarh", "Paheda", "Sunthod"]
+  ],
+  "458389": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Bhagor",
+      "Dalawda",
+      "Deepakheda",
+      "Jhangria",
+      "Khajuri Nag",
+      "Laduna",
+      "Lawari",
+      "Manpura",
+      "Sedaramata"
+    ]
+  ],
+  "458441": [
+    "Neemuch",
+    "Madhya Pradesh",
+    [
+      "Amawali Jagir",
+      "Baghana Neemuch",
+      "Bhadwamata",
+      "Bharbhadia",
+      "Bhatkheda",
+      "Bisalwasa Kalan",
+      "Borkhedi Panedi",
+      "Chhayan",
+      "Chitakheda",
+      "Daroo",
+      "Jamuniya Kala",
+      "Javi",
+      "Kanakheda",
+      "Kanawati",
+      "Karadia Maharaj",
+      "Malkheda",
+      "Neemuch",
+      "Neemuch City",
+      "Neemuch Ghanta Ghar",
+      "Neemuch Jawahar Nagar",
+      "Neemuch R.S.",
+      "Neemuch Victoria Barracks",
+      "Newad",
+      "Palsoda",
+      "Piplone",
+      "Rabdia",
+      "Revali Devali",
+      "Sawan",
+      "Sirkheda",
+      "Thadoli"
+    ]
+  ],
+  "458468": ["Neemuch", "Madhya Pradesh", ["Kesharpura", "Nayagaon C F"]],
+  "458470": ["Neemuch", "Madhya Pradesh", ["Khor"]],
+  "458553": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    ["Admalya", "Bordia Kalan", "Harsol", "Jharda", "Narayangarh", "Somia"]
+  ],
+  "458556": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Barkheda Dangi",
+      "Billod",
+      "Budha",
+      "Dhabla",
+      "Dobra",
+      "Dorwada",
+      "Hingoria",
+      "Khadpalia",
+      "Limbavas",
+      "Magrana",
+      "Piplia Jodha",
+      "Ranayara",
+      "Sanjeet",
+      "Sarwania",
+      "Takrawad"
+    ]
+  ],
+  "458558": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Aera",
+      "Bajkhedi",
+      "Jhalara",
+      "Kachnara",
+      "Kayampur",
+      "Khajuri Goud",
+      "Khanderia Kachar",
+      "Khatia Khedi",
+      "Kotda Bahadur",
+      "Motipura",
+      "Nahargarh",
+      "Nataram",
+      "Ranayara",
+      "Sunthi",
+      "Vishnia Dak Bunglow"
+    ]
+  ],
+  "458664": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Bahi Parshwanath",
+      "Balaguda",
+      "Barkheda Panth",
+      "Botalganj",
+      "Devari",
+      "Kachria Chandrawat",
+      "Kanghatti",
+      "Lasudia Rathor",
+      "Lunaheda",
+      "Munderi",
+      "Piplia",
+      "Semali",
+      "Soni"
+    ]
+  ],
+  "458667": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Akodara",
+      "Badwan",
+      "Bani",
+      "Bhaugarh",
+      "Dalauda",
+      "Dalauda Rail",
+      "Dhamnar",
+      "Dhundharka",
+      "Elachi",
+      "Fatehgarh",
+      "Garoda",
+      "Hatunia",
+      "Karju",
+      "Ladusa",
+      "Nandawta",
+      "Patela",
+      "Reenda",
+      "Sagwali",
+      "Semalia Heera"
+    ]
+  ],
+  "458669": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Akya Umaheda",
+      "Behpur",
+      "Dhandhora",
+      "Kachnara Flag",
+      "Khajuria Sarang",
+      "Lasudia Ila",
+      "Nagari",
+      "Nandwel",
+      "Nimbod",
+      "Patlawad",
+      "Richalal Muha",
+      "Sarsod"
+    ]
+  ],
+  "458771": ["Mandsaur", "Madhya Pradesh", ["C.C. Camp", "Gandhi Sagar"]],
+  "458775": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Antralia",
+      "Babulda",
+      "Bhanpura",
+      "Dhabla Madho Singh",
+      "Hamirgarh",
+      "Kaithuli",
+      "Kalakot",
+      "Kanwla",
+      "Kukdeshwara",
+      "Lotkhedi",
+      "Naoli",
+      "Nimthur",
+      "Prempuria",
+      "Sandalpur",
+      "Sandhara",
+      "Sandla"
+    ]
+  ],
+  "458778": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    ["Bhensoda Mandi", "Bhensoda Town", "Borda", "Dhuan Khedi", "Osara", "Satalkhedi"]
+  ],
+  "458880": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Bardia Amra",
+      "Bardia Istamurar",
+      "Barkheda Gangasa",
+      "Barkheda Loya",
+      "Bolia",
+      "Chiknia",
+      "Denthali Bujurg",
+      "Dhalmu",
+      "Garoth",
+      "Khadawda",
+      "Khajuri Runda",
+      "Kharkheda",
+      "Kotda Bujurg",
+      "Kurlasi",
+      "Paoti",
+      "Piplia Jatti",
+      "Sathkheda"
+    ]
+  ],
+  "458883": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Aankali Deewan",
+      "Asawati",
+      "Baghunia",
+      "Barkehda Nayak",
+      "Bhundia",
+      "Chandwasa",
+      "Dhabla Deval",
+      "Dhabla Gujar",
+      "Dhabla Mohan",
+      "Hatunia",
+      "Khajuri Panth",
+      "Lasudia",
+      "Melkheda",
+      "Parasali Ghata",
+      "Parasali Tirth",
+      "Sagoria",
+      "Shamgarh",
+      "Shamgarh Gaon",
+      "Tolakhedi",
+      "Umria Baloda"
+    ]
+  ],
+  "458888": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Ajaypur",
+      "Angari",
+      "Bani",
+      "Borkhedi",
+      "Champakhedi",
+      "Devpura Bamni",
+      "Dhabla Bhagwan",
+      "Dhalpat",
+      "Dhodhar",
+      "Ghasoi",
+      "Guradia Vijay",
+      "Kantia",
+      "Kishorepura",
+      "Kurawan",
+      "Runija",
+      "Suwasara Gaon",
+      "Suwasara Mandi",
+      "Tarnod",
+      "Tonkada"
+    ]
+  ],
+  "458895": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Afzalpur",
+      "Degaon Mali",
+      "Gujar Bardia",
+      "Jaggakhedi",
+      "Jhawal",
+      "Kunchrod",
+      "Lodh",
+      "Maliya Kherkheda",
+      "Panpur",
+      "Piplia Karadia",
+      "Sihor",
+      "Udpura"
+    ]
+  ],
+  "458990": [
+    "Mandsaur",
+    "Madhya Pradesh",
+    [
+      "Basai",
+      "Bilantri",
+      "Dhiknia",
+      "Kheda",
+      "Khejdia",
+      "Kheta Kheda",
+      "Mahua",
+      "Rathana",
+      "Rawta",
+      "Saktali",
+      "Sitamau",
+      "Titrod"
+    ]
+  ]
+}

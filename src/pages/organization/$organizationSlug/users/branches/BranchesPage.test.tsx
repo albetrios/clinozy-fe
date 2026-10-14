@@ -5,6 +5,7 @@ import { axe } from 'vitest-axe';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type * as CsvModule from '@/lib/csv.ts';
+import type * as BranchPlacesApiModule from '@/shared/api/app/branch-places-api.ts';
 import type * as BranchesManageApiModule from '@/shared/api/app/branches-manage-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -62,6 +63,12 @@ vi.mock('@/shared/api/app/branches-manage-api.ts', async (importOriginal) => ({
 vi.mock('@/lib/csv.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof CsvModule>()),
   downloadCsv: api.downloadCsv,
+}));
+// An edit drawer reads its branch's rooms, machines and holidays ("Places & days"): none here.
+vi.mock('@/shared/api/app/branch-places-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof BranchPlacesApiModule>()),
+  fetchBranchPlaces: async () => [],
+  fetchBranchHolidays: async () => [],
 }));
 
 const NISHA = member('nisha', 'nisha@cresence.skin', PLATFORM_ROLES.doctor, {

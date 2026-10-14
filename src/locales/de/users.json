@@ -316,7 +316,8 @@
       "steps": {
         "place": "Filiale & Adresse",
         "contact": "Kontakt & Öffnungszeiten",
-        "people": "Personen"
+        "people": "Personen",
+        "places": "Räume & Tage"
       },
       "groups": {
         "branch": "Filiale",
@@ -392,7 +393,79 @@
       "added": "Filiale {{name}} hinzugefügt",
       "saved": "{{name}} gespeichert",
       "contactMissing": "Telefon und E-Mail angeben",
-      "pinInvalid": "Die PIN braucht 6 Ziffern"
+      "pinInvalid": "Die PIN braucht 6 Ziffern",
+      "places": {
+        "sections": {
+          "room": "Räume",
+          "machine": "Geräte",
+          "holiday": "Schließtage"
+        },
+        "hints": {
+          "room": "wo Patienten behandelt werden",
+          "machine": "mit einer Behandlung gebucht",
+          "holiday": "ganztägig geschlossen · keine Termine"
+        },
+        "counts": {
+          "room_one": "{{count}} Raum",
+          "room_other": "{{count}} Räume",
+          "machine_one": "{{count}} Gerät",
+          "machine_other": "{{count}} Geräte",
+          "holiday_one": "{{count}} Schließtag",
+          "holiday_other": "{{count}} Schließtage"
+        },
+        "nothingYet": "Noch keine Räume, Geräte oder Schließtage",
+        "empty": {
+          "room": "Noch keine Räume",
+          "machine": "Noch keine Geräte",
+          "holiday": "Keine anstehenden Schließtage"
+        },
+        "newLabel": {
+          "room": "Neuer Raum",
+          "machine": "Neues Gerät",
+          "holiday": "Neuer Schließtag"
+        },
+        "placeholders": {
+          "room": "z. B. Raum 1",
+          "machine": "z. B. Lasergerät",
+          "holiday": "z. B. Diwali"
+        },
+        "fields": {
+          "name": "Name",
+          "date": "Datum",
+          "label": "Schließtag"
+        },
+        "add": "Hinzufügen",
+        "rename": "Umbenennen",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "remove": "Entfernen",
+        "toggle": {
+          "on": "In Betrieb",
+          "off": "Ausgeschaltet",
+          "label": "{{name}} in Betrieb"
+        },
+        "removeTitle": {
+          "room": "Diesen Raum entfernen?",
+          "machine": "Dieses Gerät entfernen?",
+          "holiday": "Diesen Schließtag entfernen?"
+        },
+        "duplicate": {
+          "room": "Einen Raum namens {{name}} gibt es bereits",
+          "machine": "Ein Gerät namens {{name}} gibt es bereits",
+          "holiday": "{{date}} ist bereits ein Schließtag"
+        },
+        "nameMissing": "Namen eingeben",
+        "nameTooLong": "Höchstens 60 Zeichen",
+        "dateMissing": "Datum wählen",
+        "labelMissing": "Schließtag benennen",
+        "labelTooLong": "Höchstens 60 Zeichen",
+        "added": "{{name}} hinzugefügt",
+        "renamed": "{{name}} umbenannt",
+        "switchedOn": "{{name}} eingeschaltet",
+        "switchedOff": "{{name}} ausgeschaltet",
+        "removed": "{{name}} entfernt",
+        "loadFailed": "Räume, Geräte und Schließtage konnten nicht geladen werden"
+      }
     }
   }
 }

@@ -318,7 +318,8 @@
       "steps": {
         "place": "Unidade e endereço",
         "contact": "Contato e horário",
-        "people": "Pessoas"
+        "people": "Pessoas",
+        "places": "Locais e dias"
       },
       "groups": {
         "branch": "Unidade",
@@ -394,7 +395,82 @@
       "added": "Unidade {{name}} adicionada",
       "saved": "{{name}} salva",
       "contactMissing": "Adicione o telefone e o e-mail",
-      "pinInvalid": "O código PIN precisa de 6 dígitos"
+      "pinInvalid": "O código PIN precisa de 6 dígitos",
+      "places": {
+        "sections": {
+          "room": "Salas",
+          "machine": "Máquinas",
+          "holiday": "Feriados"
+        },
+        "hints": {
+          "room": "onde os pacientes são atendidos",
+          "machine": "reservadas com um tratamento",
+          "holiday": "fechado o dia todo · sem agendamentos"
+        },
+        "counts": {
+          "room_one": "{{count}} sala",
+          "room_many": "{{count}} salas",
+          "room_other": "{{count}} salas",
+          "machine_one": "{{count}} máquina",
+          "machine_many": "{{count}} máquinas",
+          "machine_other": "{{count}} máquinas",
+          "holiday_one": "{{count}} feriado",
+          "holiday_many": "{{count}} feriados",
+          "holiday_other": "{{count}} feriados"
+        },
+        "nothingYet": "Ainda não há salas, máquinas nem feriados",
+        "empty": {
+          "room": "Ainda não há salas",
+          "machine": "Ainda não há máquinas",
+          "holiday": "Nenhum feriado próximo"
+        },
+        "newLabel": {
+          "room": "Nova sala",
+          "machine": "Nova máquina",
+          "holiday": "Novo feriado"
+        },
+        "placeholders": {
+          "room": "ex.: Sala 1",
+          "machine": "ex.: Máquina de laser",
+          "holiday": "ex.: Diwali"
+        },
+        "fields": {
+          "name": "Nome",
+          "date": "Data",
+          "label": "Feriado"
+        },
+        "add": "Adicionar",
+        "rename": "Renomear",
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "remove": "Remover",
+        "toggle": {
+          "on": "Em uso",
+          "off": "Desativada",
+          "label": "{{name}} em uso"
+        },
+        "removeTitle": {
+          "room": "Remover esta sala?",
+          "machine": "Remover esta máquina?",
+          "holiday": "Remover este feriado?"
+        },
+        "duplicate": {
+          "room": "Já existe uma sala chamada {{name}}",
+          "machine": "Já existe uma máquina chamada {{name}}",
+          "holiday": "{{date}} já é feriado"
+        },
+        "nameMissing": "Adicione um nome",
+        "nameTooLong": "No máximo 60 caracteres",
+        "dateMissing": "Escolha a data",
+        "labelMissing": "Dê um nome ao feriado",
+        "labelTooLong": "No máximo 60 caracteres",
+        "added": "Adicionado: {{name}}",
+        "renamed": "Renomeado: {{name}}",
+        "switchedOn": "Ativado: {{name}}",
+        "switchedOff": "Desativado: {{name}}",
+        "removed": "Removido: {{name}}",
+        "loadFailed": "Não foi possível carregar as salas, as máquinas e os feriados"
+      }
     }
   }
 }

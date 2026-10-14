@@ -102,6 +102,7 @@ describe('SettingsModal', () => {
     ['account/sessions', 'settings-account-sessions'],
     ['account/billing', 'settings-account-billing'],
     ['organization/general', 'settings-section-org-general'],
+    ['organization/clinic', 'settings-section-org-clinic'],
     ['organization/members', 'settings-organization-members'],
     ['organization/roles', 'settings-organization-roles'],
     ['account/integrations', 'settings-organization-integrations'],

@@ -21,7 +21,10 @@ export const COMMAND_MENU_KEYS = {
     newPatient: 'commandMenu.actions.newPatient',
     newReceipt: 'commandMenu.actions.newReceipt',
     openTasks: 'commandMenu.actions.openTasks',
+    finishSetup: 'commandMenu.actions.finishSetup',
   },
+  /** "Finish setup"'s sub — the setup's "n of 3" (feat-clinic-setup KICKOFF §3). */
+  setupSub: 'commandMenu.setupSub',
   screen: 'commandMenu.screen',
   personSub: 'commandMenu.personSub',
   move: 'commandMenu.move',

@@ -36,9 +36,6 @@ describe('i18n bootstrap', () => {
 describe('Arabic plural categories', () => {
   /** Every plural-suffixed key in `src/locales/ar`, with its namespace. */
   const PLURAL_KEYS = [
-    [I18N_NAMESPACES.onboarding, 'toast.finishSuccessWithInvites'],
-    [I18N_NAMESPACES.onboarding, 'toast.invitePartialFailure'],
-    [I18N_NAMESPACES.onboarding, 'done.invitesPending'],
     [I18N_NAMESPACES.settings, 'security.overview.passkeysOn'],
     [I18N_NAMESPACES.settings, 'panels.roles.memberCount'],
   ] as const;
@@ -66,10 +63,10 @@ describe('Arabic plural categories', () => {
   });
 
   it('resolves a count of 3 to Arabic instead of the English fallback', () => {
-    const key = 'toast.finishSuccessWithInvites';
-    const options = { ns: I18N_NAMESPACES.onboarding, count: 3 };
+    const key = 'panels.roles.memberCount';
+    const options = { ns: I18N_NAMESPACES.settings, count: 3 };
 
-    expect(i18n.t(key, options)).toBe('أهلاً بك! مساحة عملك جاهزة — تم إرسال 3 دعوات.');
+    expect(i18n.t(key, options)).toBe('3 أعضاء');
     expect(i18n.t(key, options)).not.toBe(i18n.t(key, { ...options, lng: 'en' }));
   });
 
@@ -122,9 +119,6 @@ describe('Arabic plural categories', () => {
 describe('plural coverage in every locale', () => {
   /** Every count-keyed base in the bundle, with its namespace. */
   const COUNT_KEYED = [
-    [I18N_NAMESPACES.onboarding, 'toast.finishSuccessWithInvites'],
-    [I18N_NAMESPACES.onboarding, 'toast.invitePartialFailure'],
-    [I18N_NAMESPACES.onboarding, 'done.invitesPending'],
     [I18N_NAMESPACES.settings, 'security.overview.passkeysOn'],
     [I18N_NAMESPACES.settings, 'panels.roles.memberCount'],
   ] as const;

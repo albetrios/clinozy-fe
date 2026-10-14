@@ -102,6 +102,13 @@
       "dark": "深色",
       "system": "跟随系统"
     },
+    "setup": {
+      "finishSetup": "完成设置 · {{done}}/{{total}}",
+      "clinicSettings": "诊所设置",
+      "ringLabel": "设置已完成 {{done}}/{{total}}",
+      "memberNotice": "您的诊所仍在设置中——准备就绪后即可开放预约。",
+      "drawerName": "诊所初始设置"
+    },
     "sectionBar": {
       "nav": "版块",
       "allSections": "所有版块",

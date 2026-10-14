@@ -1,19 +1,24 @@
 #!/usr/bin/env node
 /**
- * pnpm iteration:intake — write an iteration's full snapshot into `intake-files/`, or check it.
+ * pnpm iteration:intake — place what arrived for an iteration in `intake-files/`, check it, or
+ * compact it.
  *
  * Usage:
  *   pnpm iteration:intake <iteration> <source> [--mode full|overlay|brief] [--both] [--sibling <path>] [--replace] [--dry-run]
  *   pnpm iteration:intake <iteration> --check [--baseline <iteration>]
+ *   pnpm iteration:intake <iteration> --compact [--dry-run]
  *
- * `intake-files/` always holds a full snapshot, whatever arrived. `full` (the default, and always
- * the launch's): the drop as received. `overlay`: the Baseline's snapshot with the received files
- * laid over it — it needs a Baseline the user named. `brief`: the received `BRIEF.md` alone when the
- * iteration starts from scratch (Baseline `none`, the default), or added to the Baseline's
- * snapshot, with no other changed file, when the user named one. `<source>` is a folder or one file; received files are copied flat and exactly as
- * delivered (never `README.md`). The frontend's mandatory set is checked on the resulting
+ * `intake-files/` stores what arrived; the iteration's snapshot is resolved from it
+ * (`resolveIntakeSnapshot`). `full` (the default, and always the launch's): the drop as received
+ * is the snapshot. `overlay`: the received files are stored, and the snapshot is the Baseline's
+ * with them laid over it — it needs a Baseline the user named. `brief`: only the received
+ * `BRIEF.md` is stored; from scratch (Baseline `none`, the default) it is the whole snapshot, and on
+ * a Baseline the user named the snapshot is the Baseline's plus it — no other file may differ from
+ * the Baseline's. `<source>` is a folder or one file; received files are copied flat and exactly
+ * as delivered (never `README.md`). The frontend's mandatory set is checked on the resolved
  * snapshot, and the README's Drop placed, Drop source, Intake mode, Intake note, Schema-routes and
- * Intake hash rows are filled. Replacing a different existing snapshot needs `--replace`, which
+ * Intake hash rows are filled — the Intake hash covers the resolved snapshot. Replacing a
+ * different existing snapshot needs `--replace`, which
  * works only while planning; the intake is locked once the iteration is approved. Under `--both`
  * the sibling repository's same-named iteration gets a snapshot in the same mode, on its own
  * Baseline (or from scratch), with `PRD.md` and `schema-routes.md` (and `BRIEF.md` in brief mode) from this one. Any
@@ -22,7 +27,12 @@
  * `--check` is the gate the iteration skills run before planning and before building: every
  * mandatory file is present and the recomputed Intake hash equals the README's, for the iteration
  * and, with `--baseline`, its Baseline. A failure names the folder, what is missing or changed and
- * the fix, and exits 1. The model: iterations/README.md.
+ * the fix, and exits 1.
+ *
+ * `--compact` removes, from an overlay or a brief that still stores the Baseline's files (as every
+ * intake did before), each copy identical to the Baseline's, keeping the received files. The
+ * resolved snapshot and its Intake hash do not change, so it works at any Status and never writes
+ * the README. The model: iterations/README.md.
  */
 import { spawnSync } from 'node:child_process';
 import {
@@ -48,8 +58,8 @@ import {
   INTAKE_DIRECTORY,
   INTAKE_MODES,
   intakeFolder,
-  intakeHash,
   iterationFolder,
+  LAYERED_INTAKE_MODES,
   localDate,
   LOCKED_INTAKE_STATUSES,
   isStandaloneBrief,
@@ -59,7 +69,9 @@ import {
   parseIterationName,
   README_FIELD_LABELS,
   readIterationReadme,
+  readResolvedSnapshot,
   recordedIntakeMode,
+  resolveIntakeSnapshot,
   resolveSiblingRoot,
   schemaRoutesHash,
   setReadmeField,
@@ -73,8 +85,8 @@ export const SHARED_INTAKE_FILES = ['PRD.md', 'schema-routes.md'];
 /** Lines of a differing file's diff shown before stopping. */
 const DIFF_PREVIEW_LINES = 120;
 
-/** The end of an overlay or brief Intake note, naming the Baseline the snapshot was built on. */
-const BUILT_ON = / carried forward from (\S+)$/;
+/** The part of an overlay or brief Intake note naming the Baseline the snapshot was built on. */
+const BUILT_ON = / carried forward from ([a-z0-9-]+)/;
 
 const BRIEF_TEMPLATE = 'tooling/iterations/templates/BRIEF.md';
 
@@ -83,11 +95,12 @@ const REPOSITORY_ROOT = resolve(import.meta.dirname, '../..');
 const USAGE = `Usage:
   pnpm iteration:intake <iteration> <source> [--mode full|overlay|brief] [--both] [--sibling <path>] [--replace] [--dry-run]
   pnpm iteration:intake <iteration> --check [--baseline <iteration>]
+  pnpm iteration:intake <iteration> --compact [--dry-run]
 
   <source>          the folder (or the one file) that arrived
   --mode full       the whole drop (the default; always the launch)
-  --mode overlay    only the changed files, laid over the Baseline's snapshot (needs a Baseline)
-  --mode brief      only ${BRIEF_FILE} (template: ${BRIEF_TEMPLATE}): on its own from scratch
+  --mode overlay    only the changed files — stored, laid over the Baseline's snapshot (needs a Baseline)
+  --mode brief      only ${BRIEF_FILE} (template: ${BRIEF_TEMPLATE}) — stored; on its own from scratch
                     (Baseline none, the default), or added to a named Baseline's snapshot
   --both            also build the sibling repository's same-named iteration, in the same mode on its own
                     Baseline, with PRD.md and schema-routes.md (and ${BRIEF_FILE} in brief mode)
@@ -95,21 +108,24 @@ const USAGE = `Usage:
   --replace         replace a different existing snapshot (only while Status is planning)
   --dry-run         check and report; write nothing
   --check           the gate: every mandatory file present and the Intake hash unchanged
-  --baseline <it>   with --check: check that iteration too, and that it is the README's Baseline`;
+  --baseline <it>   with --check: check that iteration too, and that it is the README's Baseline
+  --compact         an overlay or a brief: remove the stored copies identical to the Baseline's,
+                    keeping what was received (any Status; the snapshot and its hash do not change)`;
 
 /**
- * Parses `<iteration> <source> [--mode <mode>] [--both] [--sibling <path>] [--replace] [--dry-run]`
- * or `<iteration> --check [--baseline <iteration>]`.
+ * Parses `<iteration> <source> [--mode <mode>] [--both] [--sibling <path>] [--replace] [--dry-run]`,
+ * `<iteration> --check [--baseline <iteration>]` or `<iteration> --compact [--dry-run]`.
  *
  * @param {readonly string[]} commandLine
- * @throws on an unknown mode, `--check` mixed with intake options, or `--baseline` without `--check`
+ * @throws on an unknown mode, `--check` or `--compact` mixed with intake options, or `--baseline`
+ *   without `--check`
  */
 export function parseIntakeArguments(commandLine) {
   const parsed = parseCommandLine(commandLine, {
-    flags: ['--both', '--replace', '--dry-run', '--check'],
+    flags: ['--both', '--replace', '--dry-run', '--check', '--compact'],
     values: ['--mode', '--baseline'],
     maxPositionals: 2,
-    usage: 'expected <iteration> <source>, or <iteration> --check.',
+    usage: 'expected <iteration> <source>, <iteration> --check or <iteration> --compact.',
   });
   const mode = parsed.values.get('--mode') ?? DEFAULT_INTAKE_MODE;
   if (!INTAKE_MODES.includes(mode))
@@ -119,6 +135,7 @@ export function parseIntakeArguments(commandLine) {
     source: parsed.positionals[1],
     mode,
     check: parsed.flags.has('--check'),
+    compact: parsed.flags.has('--compact'),
     baseline: parsed.values.get('--baseline'),
     createInSibling: parsed.createInSibling,
     siblingPath: parsed.siblingPath,
@@ -134,6 +151,13 @@ export function parseIntakeArguments(commandLine) {
     options.dryRun;
   if (options.check && intakeOptions)
     throw new Error('--check takes only <iteration> [--baseline <iteration>].');
+  const placeOptions =
+    options.source !== undefined ||
+    parsed.values.has('--mode') ||
+    options.createInSibling ||
+    options.replace;
+  if (options.compact && (options.check || placeOptions))
+    throw new Error('--compact takes only <iteration> [--dry-run].');
   if (!options.check && options.baseline !== undefined) {
     throw new Error(
       "--baseline works only with --check — an intake builds on the README's Baseline (pnpm iteration:baseline).",
@@ -291,10 +315,82 @@ function gitIntakeChanges({ repositoryRoot, iteration }) {
 }
 
 /**
+ * The gate's checks on a resolved snapshot: a mandatory file missing for the recorded mode, and a
+ * recomputed Intake hash that differs from the README's.
+ *
+ * @returns {{ what: string, details: string[], fix: string }[]}
+ */
+function snapshotFailures({
+  repositoryRoot,
+  iteration,
+  resolved,
+  mode,
+  fields,
+  reintake,
+}) {
+  const failures = [];
+  const { missing } = checkIntakeSet({
+    names: [...resolved.files.keys()],
+    readText: (name) => readFileSync(resolved.files.get(name), 'utf-8'),
+    mode,
+    standalone: resolved.standalone,
+  });
+  if (missing.length > 0) {
+    failures.push({
+      what: `missing mandatory file(s): ${missing.join(', ')}`,
+      details: [],
+      fix: reintake,
+    });
+  }
+  const recorded = fields.get('Intake hash') ?? EMPTY_FIELD;
+  const actual = snapshotFingerprint(readResolvedSnapshot({ repositoryRoot, iteration }));
+  if (actual === recorded) return failures;
+  const { details, restore } = gitIntakeChanges({ repositoryRoot, iteration });
+  const chain =
+    resolved.baseline === undefined
+      ? []
+      : [
+          `The hash covers the resolved snapshot, so a change anywhere in the Baseline chain (${resolved.baseline}) changes it too: pnpm iteration:intake ${resolved.baseline} --check`,
+        ];
+  failures.push({
+    what: `changed since the intake — the Intake hash is ${actual}, the README records ${recorded}`,
+    details: [...details, ...chain],
+    fix:
+      restore === '' ? reintake : `${restore} — or, for a deliberate change, ${reintake}`,
+  });
+  return failures;
+}
+
+/**
+ * The gate's check that an overlay or a brief was built on the Baseline the README records (the
+ * Intake note's `carried forward from <baseline>`); a brief whose note carries nothing forward was
+ * built from scratch, on Baseline `none`.
+ *
+ * @returns {{ what: string, details: string[], fix: string }[]}
+ */
+function builtOnFailures({ fields, mode, reintake }) {
+  if (mode === DEFAULT_INTAKE_MODE) return [];
+  const builtOn =
+    BUILT_ON.exec(fields.get('Intake note') ?? '')?.[1] ??
+    (mode === 'brief' ? NO_BASELINE : undefined);
+  const baseline = fields.get('Baseline') ?? EMPTY_FIELD;
+  if (builtOn === baseline) return [];
+  const from = builtOn === NO_BASELINE ? 'no Baseline (from scratch)' : builtOn;
+  return [
+    {
+      what: `the ${mode} snapshot was built on ${from ?? 'no recorded Baseline'}, but the README's Baseline is ${baseline}`,
+      details: [],
+      fix: `rebuild it on ${baseline} — ${reintake}`,
+    },
+  ];
+}
+
+/**
  * What the gate finds wrong with one iteration's intake — empty when it passes: no intake yet; an
- * unknown Intake mode; a mandatory file missing for the recorded mode; a recomputed Intake hash
- * that differs from the README's; an overlay or brief snapshot built on another Baseline than the
- * README records.
+ * unknown Intake mode; an overlay or a brief whose snapshot cannot be resolved from its Baseline;
+ * a mandatory file missing from the resolved snapshot for the recorded mode; a recomputed Intake
+ * hash that differs from the README's; an overlay or brief snapshot built on another Baseline than
+ * the README records.
  *
  * @param {{ repositoryRoot: string, iteration: string }} location
  * @returns {{ what: string, details: string[], fix: string }[]}
@@ -302,9 +398,8 @@ function gitIntakeChanges({ repositoryRoot, iteration }) {
  */
 export function gateFailures({ repositoryRoot, iteration }) {
   const { fields } = readIterationReadme({ repositoryRoot, iteration });
-  const folder = intakeFolder({ repositoryRoot, iteration });
-  const names = flatFileNames(folder);
-  if (names.length === 0) {
+  const resolved = resolveIntakeSnapshot({ repositoryRoot, iteration });
+  if (resolved.stored.length === 0) {
     return [
       {
         what: 'no intake yet',
@@ -327,47 +422,38 @@ export function gateFailures({ repositoryRoot, iteration }) {
       fix: reintake,
     });
   }
-  const { missing } = checkIntakeSet({
-    names,
-    readText: (name) => readFileSync(join(folder, name), 'utf-8'),
-    mode,
-    standalone: isStandaloneBrief(fields),
-  });
-  if (missing.length > 0) {
+  if (resolved.problem === undefined) {
+    failures.push(
+      ...snapshotFailures({
+        repositoryRoot,
+        iteration,
+        resolved,
+        mode,
+        fields,
+        reintake,
+      }),
+    );
+  } else {
     failures.push({
-      what: `missing mandatory file(s): ${missing.join(', ')}`,
+      what: `the ${mode} snapshot cannot be resolved — ${resolved.problem}`,
       details: [],
-      fix: reintake,
+      fix: `record a Baseline whose intake passes the gate (pnpm iteration:baseline ${iteration} <baseline>), then ${reintake}`,
     });
   }
-  const recorded = fields.get('Intake hash') ?? EMPTY_FIELD;
-  const actual = intakeHash(folder);
-  if (actual !== recorded) {
-    const { details, restore } = gitIntakeChanges({ repositoryRoot, iteration });
-    failures.push({
-      what: `changed since the intake — the Intake hash is ${actual}, the README records ${recorded}`,
-      details,
-      fix:
-        restore === ''
-          ? reintake
-          : `${restore} — or, for a deliberate change, ${reintake}`,
-    });
-  }
-  if (mode !== DEFAULT_INTAKE_MODE) {
-    const builtOn =
-      BUILT_ON.exec(fields.get('Intake note') ?? '')?.[1] ??
-      (mode === 'brief' ? NO_BASELINE : undefined);
-    const baseline = fields.get('Baseline') ?? EMPTY_FIELD;
-    if (builtOn !== baseline) {
-      const from = builtOn === NO_BASELINE ? 'no Baseline (from scratch)' : builtOn;
-      failures.push({
-        what: `the ${mode} snapshot was built on ${from ?? 'no recorded Baseline'}, but the README's Baseline is ${baseline}`,
-        details: [],
-        fix: `rebuild it on ${baseline} — ${reintake}`,
-      });
-    }
-  }
+  failures.push(...builtOnFailures({ fields, mode, reintake }));
   return failures;
+}
+
+/**
+ * How many files a resolved snapshot has, and where they are: `23 files` for a full intake;
+ * `23 files (1 stored, 22 from <baseline>)` for an overlay or a brief.
+ *
+ * @param {ReturnType<typeof resolveIntakeSnapshot>} resolved
+ */
+function describeResolved({ files, stored, baseline }) {
+  const total = `${files.size} ${files.size === 1 ? 'file' : 'files'}`;
+  if (baseline === undefined) return total;
+  return `${total} (${stored.length} stored, ${files.size - stored.length} from ${baseline})`;
 }
 
 /**
@@ -410,7 +496,7 @@ export function runGate({ repositoryRoot, iteration, baseline }) {
     if (failures.length === 0) {
       const { fields } = readIterationReadme({ repositoryRoot, iteration: name });
       lines.push(
-        `✓ ${folder} — ${flatFileNames(intakeFolder({ repositoryRoot, iteration: name })).length} files, mandatory set complete, Intake hash ${fields.get('Intake hash')} unchanged (Intake mode ${recordedIntakeMode(fields)})`,
+        `✓ ${folder} — ${describeResolved(resolveIntakeSnapshot({ repositoryRoot, iteration: name }))}, mandatory set complete, Intake hash ${fields.get('Intake hash')} unchanged (Intake mode ${recordedIntakeMode(fields)})`,
       );
       continue;
     }
@@ -435,11 +521,143 @@ export function runGate({ repositoryRoot, iteration, baseline }) {
   return { exitCode: 0, lines: [...lines, 'Gate passed.'] };
 }
 
+/** The received names an Intake note lists: `1 received (BRIEF.md) · …` → `['BRIEF.md']`. */
+const RECEIVED_NAMES = /^\d+ received \(([^)]*)\)/;
+
 /**
- * The snapshot an overlay or a brief builds on: the README's Baseline — an earlier iteration the
- * user named, whose intake passes the gate (`checkGate`) or, for the sibling repository, which
- * has one. A brief on Baseline `none` starts from scratch and builds on nothing (`null`); an
- * overlay always needs a named Baseline.
+ * Plans `--compact`: which files an overlay or a brief stores that are byte-identical to its
+ * Baseline's resolved snapshot and were not received — the copies every intake used to store. The
+ * received files (the Intake note's list) always stay. Refused for a `full` intake, when the gate
+ * fails, and when the resolved Intake hash would change.
+ *
+ * @param {{ repositoryRoot: string, iteration: string }} location
+ * @returns {{ iteration: string, folder: string, baseline: string | undefined, removable: string[], kept: string[], hash: string, problems: string[] }}
+ * @throws when the iteration has no README
+ */
+export function planCompaction({ repositoryRoot, iteration }) {
+  const { fields } = readIterationReadme({ repositoryRoot, iteration });
+  const folder = intakeFolder({ repositoryRoot, iteration });
+  const mode = recordedIntakeMode(fields);
+  const recorded = fields.get('Intake hash') ?? EMPTY_FIELD;
+  const plan = {
+    iteration,
+    folder,
+    baseline: undefined,
+    removable: [],
+    kept: [],
+    hash: recorded,
+    problems: [],
+  };
+  if (!LAYERED_INTAKE_MODES.has(mode)) {
+    plan.problems.push(
+      `${iteration} is a ${mode} intake — it stores the whole drop, so there is nothing to compact.`,
+    );
+    return plan;
+  }
+  if (isStandaloneBrief(fields)) {
+    plan.problems.push(
+      `${iteration} is a brief from scratch — it stores only its ${BRIEF_FILE} and has no Baseline, so there is nothing to compact.`,
+    );
+    return plan;
+  }
+  const failures = gateFailures({ repositoryRoot, iteration });
+  if (failures.length > 0) {
+    plan.problems.push(
+      ...failures.map(
+        (failure) =>
+          `the gate fails first — ${failure.what} (pnpm iteration:intake ${iteration} --check)`,
+      ),
+    );
+    return plan;
+  }
+  const resolved = resolveIntakeSnapshot({ repositoryRoot, iteration });
+  const baseline = resolveIntakeSnapshot({
+    repositoryRoot,
+    iteration: resolved.baseline,
+  });
+  plan.baseline = resolved.baseline;
+  const received = new Set(
+    (RECEIVED_NAMES.exec(fields.get('Intake note') ?? '')?.[1] ?? '')
+      .split(', ')
+      .filter(Boolean),
+  );
+  for (const name of resolved.stored) {
+    const from = baseline.files.get(name);
+    const identical =
+      !received.has(name) && from !== undefined && sameBytes(join(folder, name), from);
+    (identical ? plan.removable : plan.kept).push(name);
+  }
+  if (plan.kept.length === 0) {
+    plan.problems.push(
+      `every stored file is a copy of the Baseline's and the Intake note names none as received — ${INTAKE_DIRECTORY}/ would be empty, so nothing is removed.`,
+    );
+    return plan;
+  }
+  const after = new Map(baseline.files);
+  for (const name of plan.kept) after.set(name, join(folder, name));
+  plan.hash = snapshotFingerprint(
+    new Map([...after].map(([name, path]) => [name, readFileSync(path)])),
+  );
+  if (plan.hash !== recorded) {
+    plan.problems.push(
+      `compacting would change the Intake hash (${recorded} → ${plan.hash}), so nothing is removed.`,
+    );
+  }
+  return plan;
+}
+
+/**
+ * Runs `pnpm iteration:intake <iteration> --compact [--dry-run]`: removes the files
+ * {@link planCompaction} finds. The resolved snapshot, its Intake hash and the README stay as
+ * they are, so it works at any Status.
+ *
+ * @param {{ repositoryRoot: string, iteration: string, dryRun: boolean }} request
+ * @returns {{ exitCode: number, lines: string[] }}
+ */
+export function runCompaction({ repositoryRoot, iteration, dryRun }) {
+  const plan = planCompaction({ repositoryRoot, iteration });
+  const folder = relativeIntakeFolder(iteration);
+  if (plan.problems.length > 0) {
+    return {
+      exitCode: 1,
+      lines: [
+        ...plan.problems.map((problem) => `✗ ${folder}: ${problem}`),
+        'Nothing removed.',
+      ],
+    };
+  }
+  const kept = `kept ${plan.kept.join(', ')}`;
+  if (plan.removable.length === 0) {
+    return {
+      exitCode: 0,
+      lines: [
+        `${folder} already stores only what arrived — ${kept} · Intake hash ${plan.hash}`,
+      ],
+    };
+  }
+  const removed = `${plan.removable.length} ${plan.removable.length === 1 ? 'copy' : 'copies'} identical to ${plan.baseline} (${plan.removable.join(', ')})`;
+  if (dryRun) {
+    return {
+      exitCode: 0,
+      lines: [
+        `Dry run — nothing removed; would remove ${removed} from ${folder} · ${kept} · Intake hash ${plan.hash} unchanged`,
+      ],
+    };
+  }
+  for (const name of plan.removable) rmSync(join(plan.folder, name));
+  return {
+    exitCode: 0,
+    lines: [
+      `Compacted ${folder}: removed ${removed} · ${kept} · Intake hash ${plan.hash} unchanged`,
+    ],
+  };
+}
+
+/**
+ * The snapshot an overlay or a brief builds on: the README's Baseline's resolved snapshot — an
+ * earlier iteration the user named, whose intake passes the gate (`checkGate`) or, for the sibling
+ * repository, which has one that resolves. A brief on Baseline `none` starts from scratch and
+ * builds on nothing (`null`); an overlay always needs a named Baseline.
  *
  * @returns {{ name: string, files: Map<string, string> } | null | undefined} file name → path;
  *   `null` for a brief from scratch; `undefined` after recording why it cannot be used
@@ -467,10 +685,12 @@ function baselineSnapshot({
     );
     return undefined;
   }
-  const folder = intakeFolder({ repositoryRoot, iteration: baseline });
+  const resolved = resolveIntakeSnapshot({ repositoryRoot, iteration: baseline });
   let failures = [];
   if (checkGate) failures = gateFailures({ repositoryRoot, iteration: baseline });
-  else if (flatFileNames(folder).length === 0) failures = [{ what: 'no intake yet' }];
+  else if (resolved.stored.length === 0) failures = [{ what: 'no intake yet' }];
+  else if (resolved.problem !== undefined)
+    failures = [{ what: `its snapshot cannot be resolved — ${resolved.problem}` }];
   if (failures.length > 0) {
     problems.push(
       ...failures.map(
@@ -480,32 +700,31 @@ function baselineSnapshot({
     );
     return undefined;
   }
-  return {
-    name: baseline,
-    files: new Map(flatFileNames(folder).map((name) => [name, join(folder, name)])),
-  };
+  return { name: baseline, files: resolved.files };
 }
 
 /**
- * Builds a snapshot by mode — file name → the path it is copied from — and the names taken from
- * what came in. `full`: what came in. `overlay`: the Baseline's files with what came in laid over
- * them (at least one file). `brief`: the Baseline's files plus the `BRIEF.md` that came in; any
- * other file that came in must match the Baseline's. A brief from scratch (`baseline` `null`) is
- * the `BRIEF.md` alone, and nothing else may come in with it.
+ * Builds a snapshot by mode — the resolved snapshot (file name → the path it is read from), the
+ * files `intake-files/` stores (file name → the path it is copied from) and the names taken from
+ * what came in. `full`: what came in, stored whole. `overlay`: the Baseline's files with what came
+ * in laid over them (at least one file); only what came in is stored. `brief`: the Baseline's
+ * files plus the `BRIEF.md` that came in, which is all that is stored; any other file that came in
+ * must match the Baseline's. A brief from scratch (`baseline` `null`) is the `BRIEF.md` alone, and
+ * nothing else may come in with it.
  *
  * @param {{ mode: string, incoming: Map<string, string>, baseline: { name: string, files: Map<string, string> } | null | undefined, label: string, problems: string[] }} intake
- * @returns {{ files: Map<string, string>, taken: string[] }}
+ * @returns {{ files: Map<string, string>, stored: Map<string, string>, taken: string[] }}
  */
 function buildSnapshot({ mode, incoming, baseline, label, problems }) {
   const names = [...incoming.keys()];
   if (mode === DEFAULT_INTAKE_MODE || baseline === undefined)
-    return { files: new Map(incoming), taken: names };
+    return { files: new Map(incoming), stored: new Map(incoming), taken: names };
   if (baseline === null) {
     if (!incoming.has(BRIEF_FILE)) {
       problems.push(
         `${label}: --mode brief needs a received ${BRIEF_FILE} — start from ${BRIEF_TEMPLATE}.`,
       );
-      return { files: new Map(), taken: [] };
+      return { files: new Map(), stored: new Map(), taken: [] };
     }
     const others = names.filter((name) => name !== BRIEF_FILE);
     if (others.length > 0) {
@@ -513,22 +732,24 @@ function buildSnapshot({ mode, incoming, baseline, label, problems }) {
         `${label}: a brief from scratch is ${BRIEF_FILE} alone, but ${others.join(', ')} also came in — send design files with --mode full.`,
       );
     }
-    return {
-      files: new Map([[BRIEF_FILE, incoming.get(BRIEF_FILE)]]),
-      taken: [BRIEF_FILE],
-    };
+    const brief = new Map([[BRIEF_FILE, incoming.get(BRIEF_FILE)]]);
+    return { files: brief, stored: new Map(brief), taken: [BRIEF_FILE] };
   }
   if (mode === 'overlay') {
     if (names.length === 0)
       problems.push(`${label}: --mode overlay needs at least one received file.`);
-    return { files: new Map([...baseline.files, ...incoming]), taken: names };
+    return {
+      files: new Map([...baseline.files, ...incoming]),
+      stored: new Map(incoming),
+      taken: names,
+    };
   }
   const files = new Map(baseline.files);
   if (!incoming.has(BRIEF_FILE)) {
     problems.push(
       `${label}: --mode brief needs a received ${BRIEF_FILE} — start from ${BRIEF_TEMPLATE}.`,
     );
-    return { files, taken: [] };
+    return { files, stored: new Map(), taken: [] };
   }
   files.set(BRIEF_FILE, incoming.get(BRIEF_FILE));
   const changed = names.filter(
@@ -544,7 +765,11 @@ function buildSnapshot({ mode, incoming, baseline, label, problems }) {
       `${label}: --mode brief changes only ${BRIEF_FILE}, but ${changed.join(', ')} ${changed.length === 1 ? 'differs' : 'differ'} from the Baseline ${baseline.name} — use --mode overlay when other files change.`,
     );
   }
-  return { files, taken: [BRIEF_FILE] };
+  return {
+    files,
+    stored: new Map([[BRIEF_FILE, incoming.get(BRIEF_FILE)]]),
+    taken: [BRIEF_FILE],
+  };
 }
 
 function describeChanges(changes) {
@@ -562,8 +787,9 @@ function describeChanges(changes) {
 }
 
 /**
- * Plans one repository's side: compares the snapshot with `intake-files/` file by file (add,
- * unchanged, replace, remove) and fills the README rows. Replacing a different existing snapshot
+ * Plans one repository's side: compares the files the snapshot stores with `intake-files/` file by
+ * file (add, unchanged, replace, remove) and fills the README rows — the Intake hash and
+ * Schema-routes from the resolved snapshot. Replacing a different existing snapshot
  * needs `--replace` while Status is planning; nothing changes once the intake is locked.
  */
 function planSide({
@@ -589,13 +815,13 @@ function planSide({
   }
   const folder = intakeFolder({ repositoryRoot, iteration });
   const existing = flatFileNames(folder);
-  const files = [...snapshot.files].map(([name, from]) => {
+  const files = [...snapshot.stored].map(([name, from]) => {
     const to = join(folder, name);
     if (!existing.includes(name)) return { name, from, to, action: 'add' };
     return { name, from, to, action: sameBytes(from, to) ? 'unchanged' : 'replace' };
   });
   for (const name of existing) {
-    if (!snapshot.files.has(name))
+    if (!snapshot.stored.has(name))
       files.push({ name, from: undefined, to: join(folder, name), action: 'remove' });
   }
   const changes = files.filter((file) => file.action !== 'unchanged');
@@ -886,6 +1112,14 @@ export function runIntake(commandLine, context = {}) {
       repositoryRoot,
       iteration: options.iteration,
       baseline: options.baseline,
+    });
+  }
+  if (options.compact) {
+    if (options.iteration === undefined) return { exitCode: 1, lines: [USAGE] };
+    return runCompaction({
+      repositoryRoot,
+      iteration: options.iteration,
+      dryRun: options.dryRun,
     });
   }
   if (options.source === undefined) return { exitCode: 1, lines: [USAGE] };

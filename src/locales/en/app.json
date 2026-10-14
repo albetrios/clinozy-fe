@@ -560,14 +560,16 @@
       "newAppointment": "New appointment",
       "newPatient": "New patient",
       "newReceipt": "New receipt",
-      "openTasks": "Open tasks"
+      "openTasks": "Open tasks",
+      "finishSetup": "Finish setup"
     },
     "screen": "Screen",
     "move": "move",
     "open": "open",
     "hint": "Type 3+ letters or 4+ digits to search people",
     "empty": "No matches. Try a name, phone or C-number.",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{done}} of {{total}}"
   },
   "lists": {
     "loadError": "Couldn’t load this list · connection dropped. Showing the last copy.",

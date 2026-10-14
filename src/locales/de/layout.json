@@ -102,6 +102,13 @@
       "dark": "Dunkel",
       "system": "System"
     },
+    "setup": {
+      "finishSetup": "Einrichtung abschließen · {{done}} von {{total}}",
+      "clinicSettings": "Klinikeinstellungen",
+      "ringLabel": "Einrichtung: {{done}} von {{total}} erledigt",
+      "memberNotice": "Ihre Klinik wird noch eingerichtet — Buchungen sind möglich, sobald sie bereit ist.",
+      "drawerName": "Klinik-Einrichtung"
+    },
     "sectionBar": {
       "nav": "Bereiche",
       "allSections": "Alle Bereiche",

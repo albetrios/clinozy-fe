@@ -324,7 +324,8 @@
       "steps": {
         "place": "الفرع والعنوان",
         "contact": "التواصل وساعات العمل",
-        "people": "الأشخاص"
+        "people": "الأشخاص",
+        "places": "الأماكن والأيام"
       },
       "groups": {
         "branch": "الفرع",
@@ -400,7 +401,91 @@
       "added": "تمت إضافة فرع {{name}}",
       "saved": "تم حفظ {{name}}",
       "contactMissing": "أضف الهاتف والبريد الإلكتروني",
-      "pinInvalid": "الرمز البريدي يحتاج 6 أرقام"
+      "pinInvalid": "الرمز البريدي يحتاج 6 أرقام",
+      "places": {
+        "sections": {
+          "room": "الغرف",
+          "machine": "الأجهزة",
+          "holiday": "أيام الإغلاق"
+        },
+        "hints": {
+          "room": "حيث يُستقبل المرضى",
+          "machine": "تُحجز مع العلاج",
+          "holiday": "مغلق طوال اليوم · بلا مواعيد"
+        },
+        "counts": {
+          "room_zero": "{{count}} غرفة",
+          "room_one": "غرفة واحدة",
+          "room_two": "غرفتان",
+          "room_few": "{{count}} غرف",
+          "room_many": "{{count}} غرفةً",
+          "room_other": "{{count}} غرفة",
+          "machine_zero": "{{count}} جهاز",
+          "machine_one": "جهاز واحد",
+          "machine_two": "جهازان",
+          "machine_few": "{{count}} أجهزة",
+          "machine_many": "{{count}} جهازًا",
+          "machine_other": "{{count}} جهاز",
+          "holiday_zero": "{{count}} يوم إغلاق",
+          "holiday_one": "يوم إغلاق واحد",
+          "holiday_two": "يوما إغلاق",
+          "holiday_few": "{{count}} أيام إغلاق",
+          "holiday_many": "{{count}} يومَ إغلاق",
+          "holiday_other": "{{count}} يوم إغلاق"
+        },
+        "nothingYet": "لا توجد غرف أو أجهزة أو أيام إغلاق بعد",
+        "empty": {
+          "room": "لا توجد غرف بعد",
+          "machine": "لا توجد أجهزة بعد",
+          "holiday": "لا توجد أيام إغلاق قادمة"
+        },
+        "newLabel": {
+          "room": "غرفة جديدة",
+          "machine": "جهاز جديد",
+          "holiday": "يوم إغلاق جديد"
+        },
+        "placeholders": {
+          "room": "مثال: غرفة 1",
+          "machine": "مثال: جهاز الليزر",
+          "holiday": "مثال: ديوالي"
+        },
+        "fields": {
+          "name": "الاسم",
+          "date": "التاريخ",
+          "label": "يوم الإغلاق"
+        },
+        "add": "إضافة",
+        "rename": "إعادة التسمية",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "remove": "إزالة",
+        "toggle": {
+          "on": "قيد الاستخدام",
+          "off": "متوقف",
+          "label": "{{name}} قيد الاستخدام"
+        },
+        "removeTitle": {
+          "room": "إزالة هذه الغرفة؟",
+          "machine": "إزالة هذا الجهاز؟",
+          "holiday": "إزالة يوم الإغلاق هذا؟"
+        },
+        "duplicate": {
+          "room": "توجد غرفة باسم {{name}} بالفعل",
+          "machine": "يوجد جهاز باسم {{name}} بالفعل",
+          "holiday": "{{date}} يوم إغلاق بالفعل"
+        },
+        "nameMissing": "أضف اسمًا",
+        "nameTooLong": "60 حرفًا كحد أقصى",
+        "dateMissing": "اختر التاريخ",
+        "labelMissing": "سمِّ يوم الإغلاق",
+        "labelTooLong": "60 حرفًا كحد أقصى",
+        "added": "تمت إضافة {{name}}",
+        "renamed": "تمت إعادة التسمية إلى {{name}}",
+        "switchedOn": "تم تشغيل {{name}}",
+        "switchedOff": "تم إيقاف {{name}}",
+        "removed": "تمت إزالة {{name}}",
+        "loadFailed": "تعذّر تحميل الغرف والأجهزة وأيام الإغلاق"
+      }
     }
   }
 }

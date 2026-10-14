@@ -8,13 +8,13 @@ permissions on change. Spec: `docs/reference/routing-and-tenancy.md`.
 
 ## Files
 
-| File                            | Responsibility                                                                               |
-| ------------------------------- | -------------------------------------------------------------------------------------------- |
-| `organization-slug.route.tsx`   | Route marker — exports `Component` rendering `OrganizationLayout`.                           |
-| `organization-slug.manifest.ts` | Manifest — `kind: 'layout'`, children `suspended` and the ten clinic rooms.                  |
-| `OrganizationLayout.tsx`        | Thin wrapper mounting the shared AppLayout (the section bar header + `Outlet`).              |
-| `hooks/useRoomLanding/`         | Takes the member off a clinic room the access in force can't view (Q-U11, below).            |
-| `components/AppHomeEmpty/`      | The org home when no clinic room is open to the member (L-63, below). Owns `app-home-empty`. |
+| File                            | Responsibility                                                                                                                                                                                                                    |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `organization-slug.route.tsx`   | Route marker — exports `Component` rendering `OrganizationLayout`.                                                                                                                                                                |
+| `organization-slug.manifest.ts` | Manifest — `kind: 'layout'`, children `suspended` and the ten clinic rooms.                                                                                                                                                       |
+| `OrganizationLayout.tsx`        | Thin wrapper mounting the shared AppLayout (the section bar header + `Outlet`) and the clinic setup drawer's host `SetupDrawerLazy` (`#setup/…` over any room — feat-clinic-setup; `docs/reference/routing-and-tenancy.md` §7.1). |
+| `hooks/useRoomLanding/`         | Takes the member off a clinic room the access in force can't view (Q-U11, below).                                                                                                                                                 |
+| `components/AppHomeEmpty/`      | The org home when no clinic room is open to the member (L-63, below). Owns `app-home-empty`.                                                                                                                                      |
 
 ## Guard chain (routeTree `beforeLoad`)
 

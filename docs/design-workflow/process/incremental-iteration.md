@@ -15,15 +15,15 @@ screen the diff didn't touch, you've fallen back to the initial process.
 The rules and commands are in [`iterations/README.md`](../../../iterations/README.md).
 For this process:
 
-- **Every intake is a full snapshot** — every screen, the full PRD and the full
-  `schema-routes.md` — however little arrived. The Intake mode says how it was
-  built:
+- **Every intake resolves to a full snapshot** — every screen, the full PRD and
+  the full `schema-routes.md` — however little arrived. `intake-files/` stores
+  only what arrived; the Intake mode says how the snapshot is resolved:
 
-  | Mode      | What arrived                                                                | The snapshot                                    |
-  | --------- | --------------------------------------------------------------------------- | ----------------------------------------------- |
-  | `full`    | the whole drop                                                              | the drop as received                            |
-  | `overlay` | only the changed files                                                      | the Baseline's snapshot, with them laid over it |
-  | `brief`   | no design files — a written change, e.g. "implement these kinds of screens" | the Baseline's snapshot plus `BRIEF.md`         |
+  | Mode      | What arrived                                                                | `intake-files/` stores | The snapshot                                    |
+  | --------- | --------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------- |
+  | `full`    | the whole drop                                                              | the drop as received   | what it stores                                  |
+  | `overlay` | only the changed files                                                      | the changed files      | the Baseline's snapshot, with them laid over it |
+  | `brief`   | no design files — a written change, e.g. "implement these kinds of screens" | `BRIEF.md`             | the Baseline's snapshot plus `BRIEF.md`         |
 
 - **The Baseline is yours to name.** Nothing suggests one: you say which earlier
   iteration this builds on, and it is saved with
@@ -34,7 +34,7 @@ For this process:
 - **The delta follows the mode.** `full` / `overlay`: two signals — the
   designer's "What changed" notes and
   `pnpm iteration:diff <baseline> <iteration>`, which compares the two
-  `intake-files/` folders and nothing else; anything the diff shows that the
+  resolved intakes and nothing else; anything the diff shows that the
   notes omit is a **finding**. `brief`: `BRIEF.md` is the change list, and the
   diff must show nothing else changed. The Baseline's `intake-files/` are
   mandatory either way.

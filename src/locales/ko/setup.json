@@ -1,0 +1,172 @@
+{
+  "drawer": {
+    "title": "{{clinic}} 설정하기",
+    "sub": "약 1분 · {{total}}단계 중 {{step}}단계",
+    "progressLabel": "설정 진행률",
+    "stepAnnounce": "{{total}}단계 중 {{step}}단계",
+    "exploreFirst": "먼저 둘러보기",
+    "next": "다음: {{step}}",
+    "goLive": "운영 시작",
+    "goingLive": "운영 시작 중…",
+    "saving": "저장 중…",
+    "notSaved": "저장되지 않음 · 변경 사항은 유지됩니다",
+    "lockedHint": "‘{{step}}’ 다음",
+    "lockedToast": "먼저 ‘{{step}}’ 단계를 완료하세요",
+    "saveFailed": "이 단계를 저장하지 못했습니다. 답변은 유지됩니다 — 다시 시도하세요.",
+    "loadFailed": "클리닉 초기 설정을 불러오지 못했습니다."
+  },
+  "steps": {
+    "clinicType": {
+      "title": "어떤 클리닉인가요?",
+      "why": "서비스와 청구서가 여기서 시작됩니다.",
+      "label": "진료 분야",
+      "hint": "하나 이상 선택",
+      "required": "진료 분야를 하나 이상 선택하세요."
+    },
+    "location": {
+      "title": "클리닉은 어디에 있나요?",
+      "why": "예약과 청구에는 장소가 필요합니다.",
+      "pin": "우편번호",
+      "pinHint": "지역, 도시, 주를 자동으로 채웁니다",
+      "pinUnknown": "알 수 없는 우편번호입니다 — 지역, 도시, 주를 입력하세요.",
+      "areaPick": "지역 선택",
+      "area": "지역",
+      "city": "도시",
+      "state": "주",
+      "address": "주소",
+      "phone": "전화",
+      "email": "이메일",
+      "branchName": "지점 이름",
+      "hours": "영업 {{days}} · {{opens}}–{{closes}}",
+      "change": "변경",
+      "done": "완료",
+      "days": "영업일",
+      "opens": "여는 시간",
+      "closes": "닫는 시간",
+      "closesAfterOpens": "닫는 시간은 여는 시간보다 늦어야 합니다.",
+      "requiredField": "{{field}} 항목은 필수입니다.",
+      "pinInvalid": "6자리 우편번호를 입력하세요.",
+      "emailInvalid": "올바른 이메일을 입력하세요.",
+      "phoneInvalid": "올바른 전화번호를 입력하세요.",
+      "mainExists": "클리닉에 이미 본점이 있습니다 — 설정에서 이 본점을 사용합니다."
+    },
+    "you": {
+      "title": "직접 환자를 진료하시나요?",
+      "why": "첫날부터 환자가 회원님께 예약할 수 있도록 합니다.",
+      "label": "직접 환자를 진료하시나요?",
+      "doctor": "예, 의사로서",
+      "therapist": "예, 치료사로서",
+      "no": "아니요",
+      "noHint": "다음 단계에서 의사를 초대할 수 있습니다.",
+      "required": "하나를 선택하세요."
+    }
+  },
+  "peek": {
+    "specialties": "진료 분야",
+    "branch": "지점",
+    "hours": "영업시간",
+    "seesPatients": "직접 진료"
+  },
+  "checks": {
+    "clinic_type": "클리닉 유형",
+    "main_branch": "위치",
+    "services": "서비스 1개"
+  },
+  "goLiveRefused": "아직 운영을 시작할 수 없습니다 — 누락된 항목: {{missing}}.",
+  "live": {
+    "title": "운영을 시작했습니다",
+    "sub": "이제 {{clinic}}에서 예약과 청구를 할 수 있습니다.",
+    "setUp": "설정한 항목:",
+    "branch": "{{branch}} 지점",
+    "consultation": "{{name}} {{price}}",
+    "youAsDoctor": "회원님(의사)",
+    "youAsTherapist": "회원님(치료사)",
+    "book": "첫 예약 잡기",
+    "done": "완료",
+    "heardAbout": {
+      "label": "어떻게 알게 되셨나요?",
+      "options": {
+        "search": "검색",
+        "socialMedia": "소셜 미디어",
+        "friendOrColleague": "친구 또는 동료",
+        "blogOrArticle": "블로그 또는 기사",
+        "other": "기타"
+      },
+      "thanks": "감사합니다 — 큰 도움이 됩니다."
+    }
+  },
+  "guide": {
+    "title": "{{clinic}} 설정 마무리하기",
+    "count": "{{total}}개 중 {{done}}개 완료",
+    "consultationAdded": "상담 추가됨",
+    "items": {
+      "treatments": {
+        "title": "시술 추가",
+        "sub": "기본 목록에서 선택",
+        "action": "추가"
+      },
+      "inviteTeam": {
+        "title": "팀 초대",
+        "sub": "의사, 프런트 데스크",
+        "action": "초대"
+      },
+      "inviteDoctor": {
+        "title": "의사 초대",
+        "sub": "아직 예약할 수 있는 사람이 없습니다",
+        "action": "초대"
+      },
+      "firstAppointment": {
+        "title": "첫 예약 잡기",
+        "action": "예약"
+      }
+    },
+    "skip": "건너뛰기",
+    "undoSkip": "건너뛰기 취소",
+    "skipped": "건너뜀",
+    "done": "완료",
+    "hide": "이 가이드 숨기기",
+    "hidden": "가이드를 숨겼습니다 — 클리닉 설정에서 다시 열 수 있습니다.",
+    "ready": {
+      "title": "클리닉 준비 완료",
+      "sub": "그 밖의 모든 것(영업시간, 진료실, 알림)은 클리닉 설정에 있습니다.",
+      "settings": "클리닉 설정"
+    }
+  },
+  "starter": {
+    "title": "시술 추가",
+    "sub": "제공하는 항목을 선택하고, 추가하기 전에 이름, 시간(분), 가격, GST를 수정하세요.",
+    "back": "가이드로 돌아가기",
+    "name": "이름",
+    "minutes": "분",
+    "price": "가격",
+    "gst": "GST",
+    "rowLabel": "{{name}} 추가",
+    "exists": "추가됨",
+    "add_other": "시술 {{count}}개 추가",
+    "adding": "추가 중…",
+    "added_other": "시술 {{count}}개 추가됨",
+    "addOwn": "직접 추가",
+    "nothingTicked": "시술을 하나 이상 선택하세요.",
+    "consultationNamed": "{{specialty}} 상담",
+    "names": {
+      "consultation": "상담",
+      "chemicalPeel": "화학 박피",
+      "hydrafacial": "Hydrafacial",
+      "laserHairRemovalFullFace": "LHR 얼굴 전체 (1회)",
+      "acneScarTreatment": "여드름 흉터 치료",
+      "prpSession": "PRP (1회)",
+      "prpPack": "PRP 패키지",
+      "scalpTreatment": "두피 관리",
+      "scalingPolishing": "스케일링 및 폴리싱",
+      "toothFilling": "치아 충전",
+      "rootCanal": "신경 치료",
+      "teethWhitening": "치아 미백",
+      "papSmear": "자궁경부 세포검사",
+      "pelvicUltrasound": "골반 초음파",
+      "physioSession": "물리치료 (1회)",
+      "physioPack": "물리치료 패키지",
+      "followUpVisit": "재진",
+      "dressing": "드레싱"
+    }
+  }
+}

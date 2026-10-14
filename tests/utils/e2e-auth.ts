@@ -3,6 +3,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { withApiRetry } from '@/tests/utils/e2e-api-retry.ts';
 import { installE2eCaptchaHeadersOnAuthApi } from '@/tests/utils/e2e-captcha.ts';
+import { exploreClinicSetupFirst } from '@/tests/utils/e2e-clinic-setup.ts';
 import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import {
   e2eDisplayName,
@@ -63,6 +64,8 @@ export async function establishSessionInPage(
   page: Page,
   accessToken: string,
 ): Promise<void> {
+  // A session opened this way lands in clinics as an owner who chose "Explore first".
+  await exploreClinicSetupFirst(page);
   await page.waitForFunction(() => globalThis.__clinozyFeEstablishSession != null, null, {
     timeout: 10_000,
   });
@@ -133,7 +136,7 @@ export interface OnboardingProfile {
 
 /**
  * Walks the onboarding wizard through to the workspace when the user still needs it.
- * Skips workspace/invite steps when they are hidden for the deployment mode. A team-only
+ * Skips the clinic-name step when it is hidden for the deployment mode. A team-only
  * deployment creates the clinic in the wizard and lands on its role home (Today for its
  * owner); where personal workspaces still exist the wizard creates none, and the user
  * lands on the organization picker (D44: a personal workspace has no clinic).
@@ -151,16 +154,9 @@ export async function completeOnboardingWizard(
   await fillTestId(page, 'onboarding-first-name', profile.firstName ?? e2eDisplayName());
   await clickTestId(page, 'onboarding-next');
 
-  await clickTestId(page, 'onboarding-next');
-
   const orgName = page.getByTestId('onboarding-organization-name');
   if (await orgName.isVisible()) {
     await orgName.fill(e2eOrganizationName());
-    await clickTestId(page, 'onboarding-next');
-  }
-
-  const inviteEmail = page.getByTestId('onboarding-invite-email');
-  if (await inviteEmail.isVisible()) {
     await clickTestId(page, 'onboarding-next');
   }
 
@@ -407,6 +403,7 @@ export async function createTeamOrgAndOpenToday(
   page: Page,
   opts?: { name?: string; slug?: string },
 ): Promise<{ slug: string; name: string }> {
+  await exploreClinicSetupFirst(page);
   const { slug, name } = await createTeamOrgViaApi(page, opts);
   await navigateInApp(page, `/organization/${slug}`);
   await expect(page).toHaveURL(new RegExp(`/organization/${slug}/today(?:[?#]|$)`), {

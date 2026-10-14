@@ -7,15 +7,16 @@ import { Rocket } from '@/shared/icons/index.ts';
 import { ONBOARDING_KEYS, ONBOARDING_NS } from '../../onboarding.constants.ts';
 
 interface WelcomeStepProps {
-  /** Whether this flow's derived steps include creating an org + inviting. */
+  /** Whether this flow's derived steps include naming and creating the clinic. */
   teamSetupIncluded?: boolean;
 }
 
 /**
  * First onboarding step — short pitch for the setup flow. The pitch must match
  * the steps that actually follow: only team-setup flows may promise "create
- * your first organization, and invite your team" — hybrid/personal flows have
- * no such steps, so they get the profile-focused copy instead. Drawn as the
+ * your first organization" — hybrid/personal flows have no such step, so they
+ * get the profile-focused copy instead. No flow promises inviting the team:
+ * that is the setup guide's now (clinic-setup D4). Drawn as the
  * design's 40px tile (the empty state's, in the neutral stone tone) beside the
  * 13px line.
  */

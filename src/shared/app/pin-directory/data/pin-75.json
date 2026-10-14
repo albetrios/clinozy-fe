@@ -1,0 +1,6189 @@
+{
+  "751001": [
+    "Khordha",
+    "Odisha",
+    ["A G", "Bhubaneswar", "Bhubaneswar Secretariate", "Odisha Assembly"]
+  ],
+  "751002": [
+    "Khordha",
+    "Odisha",
+    [
+      "Bankual",
+      "Bhimatangi",
+      "Gopinathpur",
+      "Harachandi Sahi",
+      "Itipur",
+      "Kalyanpur Sasan",
+      "Kausalyaganga",
+      "Kedargouri",
+      "Kuha",
+      "Old Town",
+      "Santarapur",
+      "Sisupalgarh",
+      "Sundarpada"
+    ]
+  ],
+  "751003": [
+    "Khordha",
+    "Odisha",
+    ["Andharua", "Baramunda Colony", "Bharatpur", "Ghatikia", "Malipada", "Suryanagar"]
+  ],
+  "751004": ["Khordha", "Odisha", ["Utkal University"]],
+  "751005": ["Khordha", "Odisha", ["Sainik School"]],
+  "751006": ["Khordha", "Odisha", ["Budheswari Colony", "Kalpana Square", "Laxmisagar"]],
+  "751007": ["Khordha", "Odisha", ["Saheed Nagar", "Satyanagar", "V S S Nagar"]],
+  "751008": ["Khordha", "Odisha", ["Rajbhawan"]],
+  "751009": ["Khordha", "Odisha", ["Ashok Nagar", "Bapujee Nagar", "Udyan Marg"]],
+  "751010": ["Khordha", "Odisha", ["Rasulgarh"]],
+  "751011": ["Khordha", "Odisha", ["C R P Lines"]],
+  "751012": ["Khordha", "Odisha", ["Nayapalli"]],
+  "751013": ["Khordha", "Odisha", ["Regional Research Laboratory"]],
+  "751014": ["Khordha", "Odisha", ["B J B Nagar", "Bhubaneswar Court"]],
+  "751015": ["Khordha", "Odisha", ["I R C Village"]],
+  "751016": ["Khordha", "Odisha", ["Chandra Sekhar Pur"]],
+  "751017": [
+    "Khordha",
+    "Odisha",
+    ["Mancheswar", "Mancheswar R S", "Mancheswar Railway Colony", "Osap Campus"]
+  ],
+  "751018": ["Khordha", "Odisha", ["Badagarh Brit Colony"]],
+  "751019": [
+    "Khordha",
+    "Odisha",
+    [
+      "Aiginia",
+      "Aiims Ndbo",
+      "Dumduma Housing Board Colony",
+      "Jadupur",
+      "Kalinga Vihar",
+      "Patrapada",
+      "Sarakantara"
+    ]
+  ],
+  "751020": ["Khordha", "Odisha", ["Aerodrome Area", "Airport", "Pokhariput"]],
+  "751021": ["Khordha", "Odisha", ["Sailashree Vihar"]],
+  "751022": ["Khordha", "Odisha", ["Acharya Vihar", "Bhoinagar", "Madhusudan Nagar"]],
+  "751023": ["Khordha", "Odisha", ["S.E Rly.Proj. Complex"]],
+  "751024": ["Khordha", "Odisha", ["K I I T", "Kalarahanga"]],
+  "751025": ["Khordha", "Odisha", ["G.G.P.Colony"]],
+  "751026": ["Khordha", "Odisha", ["N.M.D Parcel Centre Bhubaneswar"]],
+  "751027": ["Khordha", "Odisha", ["International Business Centre"]],
+  "751028": ["Khordha", "Odisha", ["Tamando"]],
+  "751029": ["Khordha", "Odisha", ["Mahalaxmivihar"]],
+  "751030": ["Khordha", "Odisha", ["Khandagiri"]],
+  "751031": ["Khordha", "Odisha", ["Patia"]],
+  "751032": ["Khordha", "Odisha", ["Pahal"]],
+  "751033": ["Khordha", "Odisha", []],
+  "751034": ["Khordha", "Odisha", []],
+  "752001": [
+    "Puri",
+    "Odisha",
+    [
+      "Balisahi",
+      "Baselisahi",
+      "Jagannath Ballav",
+      "Kalikadevisahi",
+      "Kundhebentasahi",
+      "Labanikhiachhak",
+      "Manikarnika",
+      "Puri",
+      "Puri Seabeach",
+      "S C S College",
+      "Singhadwar",
+      "Subhas Chandra Bose Chowk NDTSO",
+      "Swargadwar"
+    ]
+  ],
+  "752002": [
+    "Puri",
+    "Odisha",
+    [
+      "B S Nagar",
+      "Badagaon",
+      "Baliguali",
+      "Baniasahi",
+      "Bantaligram",
+      "Biraharekrushnapur",
+      "Chhaitana",
+      "D. A. G.",
+      "Garhbhingura",
+      "Gopinathpur",
+      "Gorual",
+      "Khadipada",
+      "Mahapur",
+      "Mahodadhi",
+      "Markandeswar Sahi",
+      "Police Line",
+      "Puri Station Road",
+      "Sasana Damodarpur",
+      "Talajanga"
+    ]
+  ],
+  "752003": ["Puri", "Odisha", ["Srivihar"]],
+  "752004": ["Puri", "Odisha", ["Baliguali"]],
+  "752010": [
+    "Puri",
+    "Odisha",
+    [
+      "Arakhakuda",
+      "Berhampur",
+      "Bhagabanpur",
+      "Bhubanapur",
+      "Gopinathpur",
+      "Nuagaonbadabhuin",
+      "Panaspada",
+      "Satapada"
+    ]
+  ],
+  "752011": [
+    "Puri",
+    "Odisha",
+    [
+      "Ambapada",
+      "Bentapur",
+      "Bhandarikuda",
+      "Brahmagiri",
+      "Brahmania",
+      "Chapamanika",
+      "Chhatabar",
+      "Chilikanuapada",
+      "Dimirisena",
+      "Garhkokala",
+      "Garhrodanga",
+      "Kandagoda",
+      "Khajuria",
+      "Kusubenti",
+      "Manapada",
+      "Palank",
+      "Palli",
+      "Rebena Nuagaon"
+    ]
+  ],
+  "752012": [
+    "Puri",
+    "Odisha",
+    [
+      "Alasana",
+      "Bijayaramachandrapur",
+      "Birabalabhadrapur",
+      "Biranarasinghpur",
+      "Birapratappur",
+      "Chandanpur",
+      "Ganganarayanpur",
+      "Garhmrugasira",
+      "Kanheibidyadharpur",
+      "Pratappurusottampur",
+      "Rua",
+      "Siruli",
+      "Tadasaramahansapur"
+    ]
+  ],
+  "752013": [
+    "Puri",
+    "Odisha",
+    ["Basudevpur", "Ghanapana", "Hantuka", "Kapileswarpur", "Kerandipur", "Rahadamalla"]
+  ],
+  "752014": [
+    "Puri",
+    "Odisha",
+    [
+      "Alagum",
+      "Balipada",
+      "Biragobindapur",
+      "Biraramachandrapur",
+      "Biswanathpur",
+      "Brahmanapada",
+      "Dahan",
+      "Mula Alasa",
+      "Nua Someswarpur",
+      "Ola",
+      "Raichakradharpur",
+      "Sakhigopal",
+      "Sandarahat",
+      "Sarangajodi",
+      "Sriramachandrapur",
+      "Sukal"
+    ]
+  ],
+  "752015": [
+    "Puri",
+    "Odisha",
+    [
+      "Delang",
+      "Ghoradia",
+      "Jorakani",
+      "Kalyanpur",
+      "Motari",
+      "Muninda",
+      "Sadangoi",
+      "Singhbrahmapur",
+      "Trilochanpur"
+    ]
+  ],
+  "752016": [
+    "Puri",
+    "Odisha",
+    [
+      "Abhayamukhi Ramachandrapur",
+      "Arisala",
+      "Badagualipada",
+      "Berboi",
+      "Bhimpur",
+      "Bilaspur",
+      "Hakapada",
+      "Indipurdeuli",
+      "Jenapur",
+      "Khellore",
+      "Nalibasanta",
+      "Praharajpur",
+      "Sirpurusottampur"
+    ]
+  ],
+  "752017": [
+    "Puri",
+    "Odisha",
+    [
+      "Alibada",
+      "Badas",
+      "Basantapur",
+      "Gadisagoda",
+      "Garhbadaput",
+      "Garhbalabhadrapur",
+      "Garhmatiapada",
+      "Garhsahi",
+      "Jagannathpur",
+      "Kalapadar",
+      "Kanas",
+      "Khandahata",
+      "Nandigoda",
+      "Santidham",
+      "Sirei",
+      "Tipuri"
+    ]
+  ],
+  "752018": [
+    "Khordha",
+    "Odisha",
+    ["Brajamohanpur", "Hadapada", "Malipada", "Narangarh", "Nijigarhtapang", "Ramchandi"]
+  ],
+  "752019": [
+    "Puri",
+    "Odisha",
+    [
+      "Baku",
+      "Bhatapada",
+      "Garhkharad",
+      "Kesharpur",
+      "Lendu",
+      "Nilgiripatna",
+      "Nirakarpur",
+      "Odal",
+      "Olhan",
+      "Raigurupur"
+    ]
+  ],
+  "752020": [
+    "Khordha",
+    "Odisha",
+    [
+      "Birakesharpur",
+      "Chhanagiri",
+      "Damanbhuin",
+      "Golabai",
+      "Haja",
+      "Jankia",
+      "Motta",
+      "Nidhipur",
+      "Olasingh",
+      "Raipur",
+      "Rameswar"
+    ]
+  ],
+  "752021": [
+    "Khordha",
+    "Odisha",
+    [
+      "Abhimanpur",
+      "Achyutpur",
+      "Bhusundapur",
+      "Haripur",
+      "Kamaguru",
+      "Kusumi",
+      "Singipur",
+      "Sundarpur",
+      "Tankol"
+    ]
+  ],
+  "752022": ["Khordha", "Odisha", ["Jaripada", "Kaluparaghat"]],
+  "752023": [
+    "Khordha",
+    "Odisha",
+    ["Badapari", "Chandeswar", "Mangalajodi", "Pariorada", "Patiamal", "Tangi"]
+  ],
+  "752024": [
+    "Nayagarh",
+    "Odisha",
+    ["B M S Nivas", "Champagarh", "Chandapur", "Kandhanayagarh", "Kerandatangi"]
+  ],
+  "752025": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Badabaramul",
+      "Bandhamunda",
+      "Gopalpur",
+      "Jasodapur",
+      "Jharapada",
+      "Mahatapalla",
+      "Mayurjhalia",
+      "Nakithana",
+      "Sinduria"
+    ]
+  ],
+  "752026": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Balabhadrapur",
+      "Basudia",
+      "Baunsagada",
+      "Brajarajpur",
+      "Garhbanikilo",
+      "Gourangapur",
+      "Khairapalli",
+      "Lodhachua",
+      "Narasinghpur",
+      "Natimi",
+      "Pimpal",
+      "Rajranpur",
+      "Sarangadharpur",
+      "Taria"
+    ]
+  ],
+  "752027": ["Khordha", "Odisha", ["Baradihi", "Biribadi", "Kuhuri", "Kunjuri", "Soran"]],
+  "752030": [
+    "Khordha",
+    "Odisha",
+    [
+      "Ankulachati",
+      "Badakul",
+      "Bajrakote",
+      "Balugaon",
+      "Balugaon Bazar Nd",
+      "Belapada",
+      "Ghiakhala",
+      "Khanat",
+      "Malud",
+      "Rahanbeli",
+      "Ramlenka",
+      "Sial",
+      "Singheswar",
+      "Titipa"
+    ]
+  ],
+  "752031": [
+    "Khordha",
+    "Odisha",
+    [
+      "Antarkiari",
+      "Badasereipur",
+      "Badhantuad",
+      "Balidihi",
+      "Banpur",
+      "Bheteswar",
+      "Bhimpur",
+      "Dibyasinghpur",
+      "Godabaris Mahavidyalaya",
+      "Kumaranga",
+      "Narendrapur",
+      "Pratap",
+      "Punjiama Sasan",
+      "Sahaspur",
+      "Saliadam",
+      "Sanahantuad"
+    ]
+  ],
+  "752032": ["Puri", "Odisha", ["Badajhad", "Parikudgarh"]],
+  "752034": [
+    "Khordha",
+    "Odisha",
+    [
+      "Baradiharikunda",
+      "Baulabandha",
+      "Gangadharpur",
+      "Haripursasan",
+      "Kulei",
+      "Nachuni",
+      "Nairi",
+      "Salapdihi",
+      "Sunakhala"
+    ]
+  ],
+  "752035": [
+    "Khordha",
+    "Odisha",
+    [
+      "Ayatapur",
+      "Banpur Odagaon",
+      "Damiabarabara",
+      "Gambharimunda",
+      "Harichandanpur",
+      "Niladriprasad",
+      "Panchugaon"
+    ]
+  ],
+  "752037": ["Khordha", "Odisha", ["Navalbasechilika"]],
+  "752038": [
+    "Khordha",
+    "Odisha",
+    ["Botalama", "Chhatrapada", "Godikilo", "Goudapatna", "Sagadabhanga", "Siko"]
+  ],
+  "752045": [
+    "Puri",
+    "Odisha",
+    [
+      "Balaramapurgarh",
+      "Baliput",
+      "Charishree",
+      "Dubaipur",
+      "Gabakunda",
+      "Gualigorada",
+      "Lalitapahandi",
+      "Mahura",
+      "Parakena"
+    ]
+  ],
+  "752046": [
+    "Puri",
+    "Odisha",
+    [
+      "Balapur",
+      "Baralabalunkeswar",
+      "Birapurusottampur",
+      "Deypursasan",
+      "Kothasahi",
+      "Pattanaikia",
+      "Satasankha",
+      "Teisipur"
+    ]
+  ],
+  "752050": [
+    "Khordha",
+    "Odisha",
+    [
+      "Arugul",
+      "Badatota",
+      "Bhimpur Padanpur",
+      "Godiput Matiapada",
+      "Harirajpur",
+      "Jatni",
+      "Kantia",
+      "Khurda Road Rs",
+      "Kudiari",
+      "Kusumati",
+      "Loco Settlement",
+      "Niser",
+      "Orissa Engineering College",
+      "Panchagaon",
+      "Rajabazar Nd",
+      "Retang Colony",
+      "Taraboi",
+      "Turumal"
+    ]
+  ],
+  "752054": [
+    "Khordha",
+    "Odisha",
+    [
+      "Angarpada",
+      "Dandichhatabar",
+      "Gangapada",
+      "Janla",
+      "Kaimatia",
+      "Kantabad",
+      "Madanpur",
+      "Mahura",
+      "Mendhasala",
+      "Paikerapur",
+      "Palaspur",
+      "Retanga R.S."
+    ]
+  ],
+  "752055": ["Khordha", "Odisha", ["Khurda"]],
+  "752056": [
+    "Khordha",
+    "Odisha",
+    [
+      "Bangida",
+      "Dadhimachhagadia",
+      "Dalatola",
+      "Daleiput",
+      "Gudum",
+      "Kaipadar",
+      "Kalyanpur",
+      "Karadgadia",
+      "Kunjuri",
+      "Pallahat",
+      "Panabaraj"
+    ]
+  ],
+  "752057": [
+    "Khordha",
+    "Odisha",
+    [
+      "Bagheitangi",
+      "Garhnial",
+      "Gurujanga",
+      "Haladia",
+      "Keranga",
+      "Kumarbasta",
+      "Muktapur",
+      "Mukunda Prasad",
+      "Nalipada Arjunpur",
+      "P N College",
+      "Paikatigiria",
+      "Pubusahi",
+      "Saradhapur",
+      "Sarua",
+      "Tartua"
+    ]
+  ],
+  "752060": [
+    "Khordha",
+    "Odisha",
+    ["Anda", "Bajpur", "Chhatipur", "Garhsanput", "Haldiapada"]
+  ],
+  "752061": [
+    "Khordha",
+    "Odisha",
+    [
+      "Badaberena",
+      "Baghamari",
+      "Bhogada",
+      "Bhuasunipatna",
+      "Gediapalli",
+      "Kantabad",
+      "Kotapalla",
+      "Malipadar",
+      "Pangarsingh",
+      "Podadihi",
+      "Simor",
+      "Thanapalli"
+    ]
+  ],
+  "752062": [
+    "Khordha",
+    "Odisha",
+    [
+      "Barikilo",
+      "Begunia",
+      "Chakapada",
+      "Dingar",
+      "Garhmanitri",
+      "Goda",
+      "Kadab",
+      "Narayanipada",
+      "Parichhala",
+      "Routapada"
+    ]
+  ],
+  "752063": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Badasahara",
+      "Baunsabati",
+      "Bhapur",
+      "Bijipur",
+      "Chakradharprasad",
+      "Fategarh",
+      "Gobardhan Prasad",
+      "Golapokhari",
+      "Kainfulia",
+      "Karabar",
+      "Nilakantheswarpur",
+      "Nimani",
+      "Padmabati",
+      "Rakama",
+      "Salapada",
+      "Tarabalo",
+      "Tikiripada"
+    ]
+  ],
+  "752064": [
+    "Khordha",
+    "Odisha",
+    [
+      "Arikama",
+      "Asaral",
+      "Chhamundiapalli",
+      "Deuli",
+      "Manibandha",
+      "Pichikuli",
+      "Sanapadar"
+    ]
+  ],
+  "752065": [
+    "Nayagarh",
+    "Odisha",
+    ["Badakumari", "Kansada", "Kulasar", "Narendrapur", "Rajsunakhala", "Surukabadi"]
+  ],
+  "752066": [
+    "Khordha",
+    "Odisha",
+    [
+      "Arakhapalli",
+      "Bankoi",
+      "Baradangi",
+      "Bolagarh",
+      "Dabardhuapatna",
+      "Dighiri",
+      "Gopalipada",
+      "Haripur",
+      "Kalanga",
+      "Manikagoda",
+      "Mordabadi",
+      "Patabandha",
+      "Sagargaon",
+      "Sampur",
+      "Tangisahi"
+    ]
+  ],
+  "752068": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Badpandusar",
+      "Baunsiapada",
+      "Biruda",
+      "Champatipur",
+      "Gadadharprasad",
+      "Gunthuni",
+      "Harakrushnapur",
+      "Itamati",
+      "Saradhapur"
+    ]
+  ],
+  "752069": ["Nayagarh", "Odisha", ["Nayagarh", "Nayagarh College", "Sinduria"]],
+  "752070": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Balugaon",
+      "Barapalli",
+      "Bhatasahi",
+      "Gambharidihi",
+      "Golagola",
+      "Gotisahi",
+      "Kalyanpur",
+      "Kridaspur",
+      "Lenkudipada",
+      "Machhipada",
+      "Malisahi",
+      "Nabaghanapur",
+      "Nayagarh Bazar",
+      "Padmadeipur"
+    ]
+  ],
+  "752077": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Baigania",
+      "Baladianuagaon",
+      "Banmalipurpatna",
+      "Barabati",
+      "Benagadia",
+      "Bhagabanpur",
+      "Bodas",
+      "Gohiripada",
+      "Jadunathpur",
+      "Jagannathprasad",
+      "K .Sikharpur",
+      "Kalapangi",
+      "Khalisahi",
+      "Khandapadagarh",
+      "Kiajhar",
+      "Purusottamprasad",
+      "Salajharia",
+      "Singhapada"
+    ]
+  ],
+  "752078": [
+    "Nayagarh",
+    "Odisha",
+    ["Badabanpur", "Dhanchangada", "Kantilo", "Madhapur", "Sidhamula"]
+  ],
+  "752079": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Darpanarayanpur",
+      "Ekiri",
+      "Gambharidihi",
+      "Jamusahi",
+      "Kalikaprasad",
+      "Kendudhipi",
+      "Kesharpur",
+      "Khatia",
+      "Khuntabandha",
+      "Lathipara",
+      "Mandhatapur",
+      "Notar"
+    ]
+  ],
+  "752080": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Barasahi",
+      "Baunsagadia",
+      "Binayakpur",
+      "Hariharpur",
+      "Kajaliapalli",
+      "Pancharida",
+      "Sarankul",
+      "Sikharpur"
+    ]
+  ],
+  "752081": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Banthapur",
+      "Gaudaput",
+      "Kaibalyapur",
+      "Korapitha",
+      "Kurumabankatara",
+      "Nandighore",
+      "Odagaon",
+      "Rabera",
+      "Ranganipatna",
+      "Sakeri"
+    ]
+  ],
+  "752082": [
+    "Nayagarh",
+    "Odisha",
+    ["Bahadajhola", "Beruanbadi", "Gumi", "Kaptapalli", "Singarpalli"]
+  ],
+  "752083": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Dimiripali",
+      "Jakeda",
+      "Khalamada",
+      "Korada",
+      "Nuagaon",
+      "Sampada",
+      "Sikrida",
+      "Udayapur"
+    ]
+  ],
+  "752084": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Badasilinga",
+      "Daspalla",
+      "Ghugudipada",
+      "Jamusahi",
+      "Neliguda",
+      "Srirampur",
+      "Takera",
+      "Tumandi"
+    ]
+  ],
+  "752085": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Balaramaprasad",
+      "Belapadapatna",
+      "Chhamundia",
+      "Gania",
+      "Karadapada",
+      "Kishoreprasad",
+      "Patanda",
+      "Raitadholamara",
+      "Rajingi",
+      "Rasanga"
+    ]
+  ],
+  "752089": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Banigochha",
+      "Chadeyapalli",
+      "Duda",
+      "Kankanamendhi",
+      "Kujamendhi",
+      "Kulurukumpa",
+      "Nuagaon",
+      "Poda Sahi"
+    ]
+  ],
+  "752090": [
+    "Nayagarh",
+    "Odisha",
+    ["Dandor", "Giridipalli", "Komand", "Kural", "Madanpur", "Rohibanka", "Sunamuhin"]
+  ],
+  "752091": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Bhogabadi",
+      "Khamarasahi",
+      "Poibadi",
+      "Pokharigochha",
+      "Satpatna",
+      "Similisahi",
+      "Subalaya",
+      "Tendabadi"
+    ]
+  ],
+  "752092": [
+    "Nayagarh",
+    "Odisha",
+    ["Baulasahi", "Bhaliadihi", "Damasahi", "Dimisar", "Godipada"]
+  ],
+  "752093": [
+    "Nayagarh",
+    "Odisha",
+    [
+      "Adakata",
+      "Dihagaon",
+      "Gobindapurpanta",
+      "Jagannathprasad",
+      "Koska",
+      "Kumbharapada",
+      "Madhyakhand",
+      "Nuapada"
+    ]
+  ],
+  "752094": [
+    "Nayagarh",
+    "Odisha",
+    ["Badagotha", "Chahali", "Durdura", "Mahipur", "Malisar", "Paradhip", "Similisahi"]
+  ],
+  "752100": [
+    "Khordha",
+    "Odisha",
+    [
+      "Balakati",
+      "Bhainchua",
+      "Brahman Suanlo",
+      "Garh Srirampur",
+      "Jhinti Sasan",
+      "Laxminarayanpur",
+      "Sarakana",
+      "Satyabhamapur",
+      "Sisilo",
+      "Trahi Achyut Nagar"
+    ]
+  ],
+  "752101": [
+    "Khordha",
+    "Odisha",
+    ["Balianta", "Benupur", "Jagannathpur", "Jayapur", "Naharakanta"]
+  ],
+  "752102": [
+    "Khordha",
+    "Odisha",
+    [
+      "Athantar",
+      "Balipatna",
+      "Biswanathpur",
+      "Brahmanasarangi",
+      "Chanahat",
+      "Darada",
+      "Dolakasati",
+      "Garidipanchana",
+      "Kakarudrapur",
+      "Mahukhanda",
+      "Nuapada",
+      "Prataprudrapur",
+      "Raghuagorada",
+      "Sasan",
+      "Turintira"
+    ]
+  ],
+  "752103": [
+    "Khordha",
+    "Odisha",
+    [
+      "Abhayamukhi",
+      "Amankud",
+      "Banamalipur",
+      "Bhakarsahi",
+      "Bhanranizigarh",
+      "Deulidharpur",
+      "Kantapada",
+      "Majhihara",
+      "Padmapur"
+    ]
+  ],
+  "752104": [
+    "Puri",
+    "Odisha",
+    [
+      "Bantalsingh",
+      "Binayakpur",
+      "Bindha",
+      "Dandamakundpur",
+      "Dangohiri",
+      "Govindpur",
+      "Haripur",
+      "Kairi",
+      "Kanti",
+      "Mangalpur",
+      "Mukundadaspur",
+      "Nuasasana",
+      "Pipili",
+      "Rainsol",
+      "Sangalaisasana",
+      "Siula",
+      "Sompur"
+    ]
+  ],
+  "752105": [
+    "Puri",
+    "Odisha",
+    [
+      "Bakugram",
+      "Balanga",
+      "Dandipur",
+      "Dipideuli",
+      "Garhchandpur",
+      "Jopan",
+      "Kamakantia",
+      "Kumarpada",
+      "Nuagopalpur",
+      "Nuasantha",
+      "Rupadeipur",
+      "Sahadapada",
+      "Saraswatipur",
+      "Uchhupur"
+    ]
+  ],
+  "752106": [
+    "Puri",
+    "Odisha",
+    [
+      "Alipingala",
+      "Arisandha",
+      "Badalasasan",
+      "Bantugram",
+      "Bhogasalada",
+      "Bishnupur",
+      "Charanapada",
+      "Dighalo",
+      "Dola Bedi Chhak NDT",
+      "Nahantara",
+      "Nimapara",
+      "Salanga",
+      "Taradapada",
+      "Terundia",
+      "Viligram"
+    ]
+  ],
+  "752107": [
+    "Puri",
+    "Odisha",
+    ["Baulanga", "Desthali", "Mahadevbasta", "Nayahat", "Sorava", "Suhagur"]
+  ],
+  "752108": [
+    "Puri",
+    "Odisha",
+    [
+      "Bhandisahi",
+      "Gambharipada",
+      "Kahala",
+      "Kakatpur",
+      "Krushnanagarpatna",
+      "Othaka",
+      "Patapur",
+      "Patasundarpur"
+    ]
+  ],
+  "752109": [
+    "Puri",
+    "Odisha",
+    [
+      "Alasahi",
+      "Astarang",
+      "Jharling",
+      "Kusumber",
+      "Nagar",
+      "Namaro",
+      "Nuagarh",
+      "Patalda",
+      "Sisua",
+      "Udaypur"
+    ]
+  ],
+  "752110": [
+    "Puri",
+    "Odisha",
+    [
+      "Alichar",
+      "Bhairipur",
+      "Ganeswarpur",
+      "Garhrupas",
+      "Gop",
+      "Khadiso",
+      "Kusupur",
+      "Mallagaon",
+      "Nagapur",
+      "Narua",
+      "Siso",
+      "Tampalo"
+    ]
+  ],
+  "752111": [
+    "Puri",
+    "Odisha",
+    [
+      "Balidokan",
+      "Chitreswari",
+      "Dhanitri",
+      "Junei",
+      "Karamanga",
+      "Khalkatapatna",
+      "Konark",
+      "Kurujanga",
+      "Matiapada",
+      "Sarada"
+    ]
+  ],
+  "752113": [
+    "Puri",
+    "Odisha",
+    ["Bhodar", "Brahmakundi", "Chhanijanga", "Tentuligaon", "Tulasipur"]
+  ],
+  "752114": [
+    "Puri",
+    "Odisha",
+    [
+      "Bhanpur",
+      "Biswalpada",
+      "Dakhinradas",
+      "Dhaleswar",
+      "Manijanga",
+      "Olikana",
+      "Palasahi",
+      "Rajas",
+      "Ratilo",
+      "Rench",
+      "Renghalo",
+      "Sagada",
+      "Sunugoradi"
+    ]
+  ],
+  "752115": ["Khordha", "Odisha", ["Bhatpatna"]],
+  "752116": ["Puri", "Odisha", ["Birtung", "Erbong", "Garhkarmala", "Mahalpada"]],
+  "752118": ["Puri", "Odisha", ["Bangurigaon", "Jaleswarpada", "Kotang", "Kundeihat"]],
+  "752119": [
+    "Puri",
+    "Odisha",
+    ["Derunia", "Khandasahi", "Lataharan", "Rasulpur", "Risol"]
+  ],
+  "752120": ["Puri", "Odisha", ["Amareswar", "Baharana", "Nuapalamhat"]],
+  "752121": [
+    "Puri",
+    "Odisha",
+    ["Badaninigaon", "Bamanal", "Dovar", "Ohal", "Rahangagorada", "Siaro"]
+  ],
+  "753001": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Bajrakabari Road",
+      "Cantonment Road",
+      "Choudhury Bazar",
+      "Cuttack",
+      "Dargha Bazar",
+      "Gandhi Bhawan",
+      "Kazibazar",
+      "Mangalabag",
+      "Meria Bazar",
+      "Nimasahi",
+      "Pattapole"
+    ]
+  ],
+  "753002": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Binod Bihari",
+      "Chandinchowk",
+      "Dagarpara",
+      "Kafla",
+      "Orissa High Court",
+      "Prajatantra",
+      "Swaraj Ashram"
+    ]
+  ],
+  "753003": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Chhatra Bazar",
+      "College Square",
+      "Jobra",
+      "Mahanadi Vihar",
+      "Malgodown",
+      "Ravenshaw University",
+      "Sikharpur"
+    ]
+  ],
+  "753004": ["Cuttack", "Odisha", ["Chauliaganj", "Nayabazar", "O M P"]],
+  "753006": ["Cuttack", "Odisha", ["C R R I"]],
+  "753007": ["Cuttack", "Odisha", ["Medical College", "O S E"]],
+  "753008": [
+    "Cuttack",
+    "Odisha",
+    ["Kanika Rajbati", "Khatbin Sahi", "Madhusudan Nagar", "Shelter Chhak", "Tulasipur"]
+  ],
+  "753009": ["Cuttack", "Odisha", ["Rajabagicha", "Telenga Bazar"]],
+  "753010": [
+    "Cuttack",
+    "Odisha",
+    ["Industrial Estate", "Madhupatna", "O G Press", "Rajendra Nagar"]
+  ],
+  "753011": [
+    "Cuttack",
+    "Odisha",
+    ["Bhanpur", "Gopalpur", "Khalarda", "Khandeita", "Sankhatras", "Urali", "Uttampur"]
+  ],
+  "753012": ["Cuttack", "Odisha", ["A D Market", "Khannagar"]],
+  "753013": ["Cuttack", "Odisha", ["Kalyani Nagar", "Sri Aurobinda Marg"]],
+  "753014": ["Cuttack", "Odisha", ["Avinab Bidanasi", "Bidanasi"]],
+  "753015": ["Cuttack", "Odisha", ["Sector Ll CDA, Cuttack"]],
+  "753016": ["Cuttack", "Odisha", []],
+  "754001": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Banguary",
+      "Barimunda",
+      "Fulnakhara",
+      "Gobabasta",
+      "Kalyanpur",
+      "Kothapatna",
+      "Mahidharpara",
+      "Raipur Cuttack",
+      "Telengapentha"
+    ]
+  ],
+  "754002": ["Cuttack", "Odisha", ["Kantapada", "Khandol", "Sundargram"]],
+  "754003": [
+    "Cuttack",
+    "Odisha",
+    ["Bramhanda", "G.Nahalpur", "Govindpur", "Sadar Harianta", "Sailo Jharpada"]
+  ],
+  "754004": [
+    "Cuttack",
+    "Odisha",
+    [
+      "B B Garh",
+      "Bagalsahi",
+      "Bilasuni",
+      "Jallarpur",
+      "Kapasi",
+      "Karanga",
+      "Krushnaprasad",
+      "Madhab",
+      "Nariso",
+      "Niali",
+      "Nuagaon",
+      "Nuapatna",
+      "Pahanga"
+    ]
+  ],
+  "754005": [
+    "Khordha",
+    "Odisha",
+    [
+      "B G P Pur",
+      "Barang",
+      "Belgachhia",
+      "Chandaka",
+      "Dara",
+      "Daruthenga",
+      "Gandarpur",
+      "Raghunathpur"
+    ]
+  ],
+  "754006": ["Cuttack", "Odisha", ["Banra", "Godisahi", "Mundali Colony", "Naraj"]],
+  "754007": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Dompara",
+      "Dulhanpur",
+      "Gayalbanka",
+      "Govindpur Ramachandrapur",
+      "Kuspangi",
+      "Padanpur",
+      "Pathapur",
+      "Talabasta"
+    ]
+  ],
+  "754008": [
+    "Cuttack",
+    "Odisha",
+    [
+      "B Harirajpur",
+      "Banki",
+      "Banki College",
+      "Banki Tulasipur",
+      "Bilipada",
+      "Brahmapura",
+      "Dhansarpatna",
+      "Durgapur",
+      "Ghasiput",
+      "Narganga",
+      "Nuagaon",
+      "Patapur",
+      "Pathuriapada",
+      "Ragadi"
+    ]
+  ],
+  "754009": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Annuary",
+      "Baideswar",
+      "Balabhadrapur",
+      "Bania",
+      "Kalapathar",
+      "Kantakai",
+      "Kendupalli",
+      "Krishnapallipatna",
+      "Pandalam",
+      "Puinchha",
+      "Rajib"
+    ]
+  ],
+  "754010": ["Cuttack", "Odisha", ["Anlo", "Bairoi", "Uaradha"]],
+  "754011": ["Cuttack", "Odisha", ["Adaspur"]],
+  "754012": ["Khordha", "Odisha", ["Bhola"]],
+  "754013": ["Cuttack", "Odisha", ["CISF Mundali"]],
+  "754018": [
+    "Cuttack",
+    "Odisha",
+    ["Badamulei", "Bramhansailo", "Patasundarpur", "Postal", "Sailo Badbail"]
+  ],
+  "754021": ["Cuttack", "Odisha", ["Jagatpur", "Nimpur"]],
+  "754022": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Bainchuan",
+      "Bhagatpur",
+      "Bhatimunda",
+      "Garudagaon",
+      "Kairapari",
+      "Karanji",
+      "Kotasahi",
+      "Safa",
+      "Uchapada"
+    ]
+  ],
+  "754023": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Bajapura",
+      "Bandalo",
+      "Chhatia",
+      "GobindpurSidhagiri",
+      "Kaitha",
+      "Rudrapur",
+      "Samsarpur"
+    ]
+  ],
+  "754024": ["Jajapur", "Odisha", ["Bantala", "Barithengada", "Chandital", "Dhanmandal"]],
+  "754025": [
+    "Cuttack",
+    "Odisha",
+    ["Birol", "Choudwar", "Choudwar Bazar", "Harianta", "Nakhara", "Narpada", "Salagaon"]
+  ],
+  "754026": ["Cuttack", "Odisha", ["Daulatabad"]],
+  "754027": [
+    "Cuttack",
+    "Odisha",
+    ["Chasapara", "Dhurusia", "Kakhadi", "Kayalpada", "Mancheswar"]
+  ],
+  "754028": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Agrahat",
+      "Badasamantarapur",
+      "Charbatia",
+      "Chhagaon",
+      "Dalijoda Berhampur",
+      "Gobara",
+      "Gurudijhatia",
+      "Kumarpur",
+      "Mangarajpur",
+      "Sankarpur"
+    ]
+  ],
+  "754029": ["Cuttack", "Odisha", ["Athagarh", "Athagarh College"]],
+  "754030": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Achalkote",
+      "Badanauput",
+      "Bandalo",
+      "Baunsput",
+      "Bindhanima",
+      "Gadadharpur",
+      "Panchagaon",
+      "Puruna Tigiria",
+      "Tigiria",
+      "Viruda"
+    ]
+  ],
+  "754031": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Badakambilo",
+      "Banamalipur",
+      "Bangirisingha",
+      "Barambagarh",
+      "Beliapal",
+      "Damangadia",
+      "Dasarathipur",
+      "Gadapokhari",
+      "Gopamathura",
+      "Gopapur",
+      "Ichhapur",
+      "Jhajia",
+      "Jodumuhan",
+      "Karadibandha",
+      "Khuntakata",
+      "Mahulia",
+      "Mugagahira",
+      "Ragadipada",
+      "Sankhameri",
+      "Sasang",
+      "Singhanathpitha"
+    ]
+  ],
+  "754032": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Alara",
+      "Balisahi",
+      "Bandhahuda",
+      "Debabumi",
+      "Jillinda",
+      "Jodumu",
+      "Kamaladiha",
+      "Kokalaba",
+      "Narasinghpur",
+      "Nimasahi",
+      "Nuapatna",
+      "Nukhapada",
+      "Paikabarabati",
+      "Phulpada",
+      "Regeda",
+      "Saradhapur"
+    ]
+  ],
+  "754034": ["Cuttack", "Odisha", ["Maniabandha"]],
+  "754035": ["Cuttack", "Odisha", ["Abhimanpur", "Kankadajodi", "Nuapatna"]],
+  "754037": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Adheigundi",
+      "Balijhari",
+      "Champeswar",
+      "Ekdal",
+      "Godibandha",
+      "Kanpur",
+      "Padamal",
+      "Ratapat",
+      "Rusipada",
+      "Sagar",
+      "Siaria"
+    ]
+  ],
+  "754071": ["Cuttack", "Odisha", ["Kapaleswar"]],
+  "754082": ["Jajapur", "Odisha", ["Barunia", "Byree", "Kalakala", "Salapada"]],
+  "754100": [
+    "Cuttack",
+    "Odisha",
+    ["Biribati", "Fakirpada", "Gatiroutpatna", "Kandarpur", "Paramahansa", "Sidheswarpur"]
+  ],
+  "754102": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Adhangagarh",
+      "Anakhia",
+      "Bagalpur",
+      "Baredia",
+      "Chasikhand",
+      "Puran",
+      "Rambhadeipur",
+      "Tarikund"
+    ]
+  ],
+  "754103": ["Jagatsinghapur", "Odisha", ["Jagatsinghpur", "Svm College"]],
+  "754104": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Dedhasurdeuli",
+      "Gopalpur",
+      "Nalibar",
+      "Purunabasanta",
+      "Radhanga",
+      "Rahadinga",
+      "Rasulpur",
+      "Redhua",
+      "Sanra"
+    ]
+  ],
+  "754105": ["Cuttack", "Odisha", ["Eranch", "Kasarda", "Kulashree", "Noda", "Uttaran"]],
+  "754106": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Baijanga",
+      "Chasapada",
+      "Kaduapada",
+      "Katara",
+      "Khorat",
+      "Kotian",
+      "Krushnadaspur",
+      "Mahilo",
+      "Mudupur",
+      "Mulugaon",
+      "Nandan",
+      "Peteipur",
+      "Sarana",
+      "Sidhal"
+    ]
+  ],
+  "754107": [
+    "Jagatsinghapur",
+    "Odisha",
+    ["Alanahat", "Chanarpur", "Ghodansa", "Goudunipadia", "Jamugaon", "Kundeswar"]
+  ],
+  "754108": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Alabol",
+      "Alavar",
+      "Alikanta",
+      "Baharana",
+      "Baigani",
+      "Balikuda",
+      "Ichhapur",
+      "Kalio",
+      "Naradia",
+      "Parahat",
+      "Sangrampur",
+      "Tertang"
+    ]
+  ],
+  "754109": [
+    "Jagatsinghapur",
+    "Odisha",
+    ["Ashrampatana", "Debidol", "Galadhari", "Kortal", "Nowgang"]
+  ],
+  "754110": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Borikina",
+      "Garhbisunpur",
+      "Goda",
+      "Janakadeipur",
+      "Kanjiakan",
+      "Olarah",
+      "Panchapalli",
+      "Sompur Benahar",
+      "Titira"
+    ]
+  ],
+  "754111": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Biridiroad",
+      "Hajipur",
+      "Kulakaijanga",
+      "Madhyasasan",
+      "Parbatipur",
+      "S.Basandhara",
+      "Ukundara"
+    ]
+  ],
+  "754112": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Bentakar",
+      "Dadhibabanpur",
+      "Jharkata",
+      "Jhinkiria Berhampur",
+      "Kalapada",
+      "Sarichuan"
+    ]
+  ],
+  "754113": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Angeswarpada",
+      "Bachhalo",
+      "Bansa",
+      "Bodal",
+      "Deriki",
+      "Korua",
+      "Nandigram",
+      "Naugaonhat",
+      "Rohia",
+      "Shikhar",
+      "Tentoi"
+    ]
+  ],
+  "754114": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "B.Jankoti",
+      "Badamundilo",
+      "Dihatartanga",
+      "Madhusudanpursasan",
+      "Mandasahi",
+      "Nabapatna",
+      "Palasa",
+      "Sabhamul",
+      "Saibirikantilo"
+    ]
+  ],
+  "754119": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Adhanga",
+      "Ambasal",
+      "Anantapur",
+      "Apandara",
+      "Baramundali",
+      "Khalagaon",
+      "Machhagaon",
+      "Marichapur",
+      "Oskana",
+      "Rahana",
+      "Tentulibelari"
+    ]
+  ],
+  "754120": ["Jagatsinghapur", "Odisha", ["Atharbanki Rly Colony"]],
+  "754130": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Alando",
+      "Arilo",
+      "Bodhapur",
+      "Damodarpur",
+      "Jasapada",
+      "Kosida",
+      "Praharrajpur",
+      "Sompur"
+    ]
+  ],
+  "754131": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Ayatpur",
+      "Barda",
+      "Khentalo",
+      "Kishorenagar",
+      "Purunahat Sasan",
+      "Samitanga",
+      "Tarito",
+      "Totapada"
+    ]
+  ],
+  "754132": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Adheikul",
+      "Alla",
+      "Gadama",
+      "Gothina",
+      "Purana Odapada",
+      "Raghunathpur",
+      "Sadeipur",
+      "Samanga",
+      "Sirlonabagram"
+    ]
+  ],
+  "754133": ["Jagatsinghapur", "Odisha", ["Jaipur", "Nuapada", "Patenigaon", "Tarpur"]],
+  "754134": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Babujang",
+      "Benirampur",
+      "Bhagabanpur",
+      "Dharibil",
+      "Gadijanga",
+      "Korua",
+      "Kudanagari",
+      "Kusumandal Gopinathpur",
+      "Lankapada",
+      "Narada",
+      "Nischintasasan",
+      "Putling",
+      "Sana Adhanga",
+      "Talakusuma",
+      "Tentol",
+      "Tyandakura",
+      "Uttarkul"
+    ]
+  ],
+  "754135": [
+    "Jagatsinghapur",
+    "Odisha",
+    ["Bishanpur", "Kadamchhanda", "Krishnanandapur"]
+  ],
+  "754136": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Begunia",
+      "Govindpur",
+      "Harisinghpur",
+      "Kabalpur",
+      "Kanakpur",
+      "Kuradha",
+      "Malanda",
+      "Sardola",
+      "Tentulipada"
+    ]
+  ],
+  "754137": [
+    "Jagatsinghapur",
+    "Odisha",
+    ["Dainlo", "Dhanua", "Narijanga", "Sankheswar", "Tarajanga", "Tirtol"]
+  ],
+  "754138": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Arodei",
+      "Bhiranga",
+      "Dhunpur",
+      "Dihasahi",
+      "Garam",
+      "Ibrisingh",
+      "Jhankad",
+      "Nimol",
+      "Paida",
+      "Pokhariapada",
+      "S. Hazipur",
+      "Salamanga",
+      "Srirampur",
+      "Tandikul",
+      "Tiran",
+      "Tulang"
+    ]
+  ],
+  "754139": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Ambiki",
+      "Bhitarandhari",
+      "Ersama",
+      "Japabhuan",
+      "Jirailo",
+      "Kanipada",
+      "Kunjakothi"
+    ]
+  ],
+  "754140": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Anolipatna",
+      "Batira",
+      "Bharalo",
+      "Borikhi",
+      "Kiadingiri",
+      "Kothamula",
+      "Lathanga",
+      "Mahimadeipur",
+      "Pandua",
+      "Pankapal",
+      "Potanai",
+      "Rahama"
+    ]
+  ],
+  "754141": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Balia",
+      "Balisuan",
+      "Balitutha",
+      "Bhutmundai",
+      "Chatua",
+      "Dhinkia",
+      "Gatanai",
+      "Gopiakud",
+      "IOCL (Paradeep)",
+      "Jhimani",
+      "Kujang",
+      "M.G Khamar",
+      "Mangarajpur",
+      "Nuagaon",
+      "Paradeepgarh",
+      "Paradeeplock",
+      "Patalipank",
+      "S.Nalakani",
+      "Taladanda",
+      "Tikhiri"
+    ]
+  ],
+  "754142": ["Jagatsinghapur", "Odisha", ["Barakolikhala", "Madhuban", "Paradip"]],
+  "754143": ["Jagatsinghapur", "Odisha", ["Sector 21"]],
+  "754145": ["Jagatsinghapur", "Odisha", ["Ppl Township"]],
+  "754153": [
+    "Kendrapara",
+    "Odisha",
+    ["Bamara Cuttack", "Garadpur", "Kalabuda", "Naindipur", "Pakhad", "Tikanpur"]
+  ],
+  "754160": [
+    "Jagatsinghapur",
+    "Odisha",
+    ["Dagrpada", "Gobardhanpur", "Gorada", "Manijanga", "Pipalamadhaba", "Porgadei"]
+  ],
+  "754162": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Amberi",
+      "Antei",
+      "Bilaspur",
+      "Kolar",
+      "P.Srichandanpur",
+      "Pailo",
+      "Samantarapur",
+      "Sudarsan"
+    ]
+  ],
+  "754200": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Bahugram",
+      "Bhairapur",
+      "Bhatapada",
+      "Gopinathpur",
+      "Madhyakachha",
+      "Mahajanpur",
+      "Mahasingpur",
+      "Padmapur",
+      "Patapur",
+      "Satyabhamapur",
+      "Tentol"
+    ]
+  ],
+  "754201": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Bhimrajpur",
+      "Jaripada",
+      "Kukudanga",
+      "Lekhanpur",
+      "Malasasan",
+      "Mohana",
+      "Mohanpur",
+      "Odasingh",
+      "Ramakrishnapur",
+      "Rameswar"
+    ]
+  ],
+  "754202": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Bodamundai",
+      "Chhanipur",
+      "Jignipur",
+      "Manoharpur",
+      "Patapur",
+      "Salipur",
+      "Salipur College",
+      "Sisua",
+      "Sunakhandi"
+    ]
+  ],
+  "754203": ["Cuttack", "Odisha", ["Gopinathpur", "Kendupatna", "Lendura"]],
+  "754204": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Basudevpur",
+      "Bhakuda",
+      "Chayanpal",
+      "Dharmadaspur",
+      "Kuanpal",
+      "Kuhunda",
+      "Kumudajaipur",
+      "Madhupur",
+      "Mulabasanta",
+      "Nurtanga",
+      "Rahania"
+    ]
+  ],
+  "754205": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Achyut Basant",
+      "Balichandrapur",
+      "Barada Cuttack",
+      "Kusupur",
+      "Lalitgiri",
+      "Nalipur",
+      "Palei",
+      "Sipura"
+    ]
+  ],
+  "754206": [
+    "Cuttack",
+    "Odisha",
+    ["Champatipur", "Gokan", "Mahanga", "Osanga", "Podamarai"]
+  ],
+  "754207": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Bodhanga",
+      "Gopalpur",
+      "Gotara",
+      "Goudagop",
+      "Haladia",
+      "Jhadeswarpur",
+      "Khandasahi",
+      "Kusunpur",
+      "Narsinghpur",
+      "Natkai",
+      "Nischintakoili",
+      "Olakana",
+      "Ostapur",
+      "Pithapara",
+      "Sahaniajpur"
+    ]
+  ],
+  "754208": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Baghilo Bamanpur",
+      "Bhagabatpur",
+      "Chandol",
+      "Jahangar",
+      "Janhimula",
+      "Kurujanga",
+      "Palei Derakundi",
+      "Sabalanga Kanipara"
+    ]
+  ],
+  "754209": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Agyanpur",
+      "Asureswar",
+      "Baghuni",
+      "Ghantalo",
+      "Harirajpur",
+      "Katikata",
+      "Kulasukarapada",
+      "Kusunpur",
+      "Sukarpada",
+      "Tarotasasan"
+    ]
+  ],
+  "754210": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Chanchol",
+      "Danpur",
+      "Gahaga Narasinghpur",
+      "Harianka",
+      "Indalo",
+      "Janra Barimul",
+      "Mahal",
+      "Pakhyat",
+      "Sorisia"
+    ]
+  ],
+  "754211": [
+    "Kendrapara",
+    "Odisha",
+    ["Kendrapara", "Kendrapara College", "Keshpur Bazar", "Tinimuhani"]
+  ],
+  "754212": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Alailo",
+      "Anduli",
+      "Angulai",
+      "Ayaba",
+      "Bagada",
+      "Balipal",
+      "Deulipara",
+      "Kalapara",
+      "Mantiri",
+      "Nembra",
+      "Ostapur",
+      "Purusottampur",
+      "Rajgarh",
+      "Sribaldevjew",
+      "Thauri"
+    ]
+  ],
+  "754213": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Ashram Balikuda",
+      "Badakula",
+      "Balana",
+      "Dumuka",
+      "Garjanga",
+      "Jadupur",
+      "Marsaghai",
+      "Naupada",
+      "Pikarali",
+      "Sasanipada",
+      "Silipur",
+      "Talasanga"
+    ]
+  ],
+  "754214": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Alapua",
+      "Aliabad",
+      "Amathpur",
+      "Baragaon Mahakalpara",
+      "Chhoti",
+      "Ghagra",
+      "Gommu",
+      "Indupur",
+      "Kampagarh",
+      "Kolangiri",
+      "Kutranga",
+      "Nikirai",
+      "Palli Raghunathpur",
+      "Ratnagiri",
+      "Rout Sahi"
+    ]
+  ],
+  "754215": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Ainipara",
+      "Amber",
+      "Badamulabasanta",
+      "Baliapatna",
+      "Bankeswar",
+      "Beltal",
+      "Bilikana (Gopalpur)",
+      "Kasananta",
+      "Khadianta",
+      "Malapatna",
+      "Manikapatna",
+      "Narsinghpur Dihasahi",
+      "Patrapur",
+      "Pattamundai",
+      "Pattamundai College",
+      "Sahira",
+      "Sandhapalli",
+      "Sekhpur",
+      "Singiri"
+    ]
+  ],
+  "754216": ["Kendrapara", "Odisha", ["Gunupur", "Jaria", "Jigiran", "Sana Jaria"]],
+  "754217": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Alba",
+      "Badapalli",
+      "Balabhadrapur",
+      "Chandan Nagar",
+      "Damarpur",
+      "Dosia",
+      "Kakharuni",
+      "Oudapada",
+      "Sansarphal",
+      "Sasan",
+      "Srirampalpatna",
+      "Terohi"
+    ]
+  ],
+  "754218": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Amrutamanohi",
+      "Baluria",
+      "Batipada",
+      "Nuapada",
+      "Sanamanga",
+      "Sansidha Mangarajpur"
+    ]
+  ],
+  "754219": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Aul",
+      "Balakati",
+      "Dasipur",
+      "Mendhapur",
+      "Nihala",
+      "Podamarai Alakana",
+      "Sitaleswar"
+    ]
+  ],
+  "754220": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Achyutpur",
+      "Ayatan",
+      "Baradia",
+      "Barunadiha",
+      "Bharigada",
+      "Dalikainda",
+      "Giria",
+      "Jagulaipara",
+      "Jaynagar",
+      "Katna",
+      "Koilipur",
+      "Pimpudi",
+      "Rajkanika",
+      "Siko",
+      "Sikudi",
+      "Taras"
+    ]
+  ],
+  "754221": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Badagotha",
+      "Bhimdaspur",
+      "Kood",
+      "Kusumbi",
+      "Mirzapur",
+      "Pallisahi",
+      "Pikol",
+      "Sukleswar",
+      "Sungra"
+    ]
+  ],
+  "754222": [
+    "Kendrapara",
+    "Odisha",
+    ["Basupur", "Chaudakulat", "Gogua", "Kadaliban", "Kora", "Palasingha"]
+  ],
+  "754223": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Aitipur",
+      "Aripada",
+      "Bharatpur",
+      "Chakroda",
+      "Gopei",
+      "Kantia",
+      "Karilopatna",
+      "Nadia Barei",
+      "Purusottampur",
+      "Raichand"
+    ]
+  ],
+  "754224": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Balia",
+      "Baradanga",
+      "Barakanda",
+      "Bijayanagar",
+      "Gojabandha",
+      "Jamboo",
+      "Jasuapalli",
+      "Kansar Badadandua",
+      "Karanja",
+      "Kharinasi",
+      "Kiarbanka",
+      "Kochila",
+      "Mahakalpara",
+      "Maliancha",
+      "Nantar",
+      "Ramnagar Refugee Colony",
+      "Suniti",
+      "Teragaon"
+    ]
+  ],
+  "754225": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Badanaukana",
+      "Bhitaragarh",
+      "Dera",
+      "Gopalpur Rajnagar",
+      "Gupti",
+      "Junapangara",
+      "Kandira",
+      "Kurunti",
+      "Mahulia",
+      "Rajnagar",
+      "Satabhaya"
+    ]
+  ],
+  "754227": [
+    "Kendrapara",
+    "Odisha",
+    ["Bahmanda", "Baruna", "Chhadesh", "Manapur", "Nuagaon", "Olavar", "Pegarpara"]
+  ],
+  "754228": ["Kendrapara", "Odisha", ["Akhua Dakhini", "Patakura", "Pundalo"]],
+  "754231": ["Kendrapara", "Odisha", ["Areikana", "Atal", "Mahu", "Namouza"]],
+  "754239": ["Kendrapara", "Odisha", ["Bhuinpur", "Kalaspur", "Padanipal"]],
+  "754240": ["Kendrapara", "Odisha", ["Andara", "Dandisahi", "Penthapal", "Taradapal"]],
+  "754244": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Bachharai",
+      "Bandhakata",
+      "Jampara",
+      "Mahendinagar",
+      "Pentha",
+      "Raghunathpur K Patna"
+    ]
+  ],
+  "754245": ["Kendrapara", "Odisha", ["Babar", "Badihi", "Barpada", "Chakada Gogua"]],
+  "754246": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Bandhapatna",
+      "Bhatapada (R)",
+      "Jagannathpur Sasan",
+      "Keradagada",
+      "Koilipur",
+      "Madanpur"
+    ]
+  ],
+  "754248": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Dangamal",
+      "Ghadiamal",
+      "Iswarpur",
+      "Krishnanagar",
+      "Manjulapalli",
+      "Nalitapatia",
+      "Rangani",
+      "Talachua",
+      "Yunus Nagar"
+    ]
+  ],
+  "754250": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Alati Bharatpur",
+      "Badagaon",
+      "Barua",
+      "Belarpur",
+      "Bira Nilakanthapur",
+      "Fakirabad",
+      "Gopaljewpatna",
+      "Gulnagar",
+      "Jamdhar",
+      "Kapaleswar",
+      "Kusiapal",
+      "Panasudha",
+      "Pandiri",
+      "Thakurpatna",
+      "Tilotamadeipur"
+    ]
+  ],
+  "754253": ["Kendrapara", "Odisha", ["Bedari", "Mandia", "Padmapur"]],
+  "754289": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Balia Bibhutipara",
+      "Chatrachakada",
+      "Derabish",
+      "Jagulaipara",
+      "Laxminarayanpur",
+      "Nuahat"
+    ]
+  ],
+  "754290": ["Cuttack", "Odisha", ["Bhera", "Chasakhanda", "Mouda", "Tilda"]],
+  "754292": [
+    "Jajapur",
+    "Odisha",
+    ["Benipur", "Chandia", "Charinangal", "Kalashree Gopalpur", "Raipur", "Saudia"]
+  ],
+  "754293": ["Cuttack", "Odisha", ["Bhagabanpur", "Charirakaba", "Lemalo", "Orikanta"]],
+  "754294": [
+    "Jagatsinghapur",
+    "Odisha",
+    [
+      "Alipingal",
+      "Chatra",
+      "Mohiuddinpur",
+      "Nati",
+      "Odisso",
+      "Palasol",
+      "Palli",
+      "Punanga",
+      "Sagadailo",
+      "Sitahlo",
+      "Taradapada"
+    ]
+  ],
+  "754295": [
+    "Cuttack",
+    "Odisha",
+    [
+      "Arakhapatna",
+      "Athagarh Bazar",
+      "Badabhuin",
+      "Balarampur",
+      "Bali",
+      "Bentapada",
+      "Bisnupur",
+      "Chakada",
+      "Dhaipur",
+      "Dorada",
+      "Gholapur",
+      "Ichhapur",
+      "Jenapada",
+      "Kadalibadi",
+      "Kandarai",
+      "Kandarpur",
+      "Karikol",
+      "Khuntakata",
+      "Kulailo",
+      "Mahakalbasta",
+      "Megha",
+      "Oranda",
+      "Radhakishorepur",
+      "Sahangagopalpur",
+      "Samsarpur",
+      "Subarnapur",
+      "Tarading"
+    ]
+  ],
+  "754296": [
+    "Jajapur",
+    "Odisha",
+    ["Arakhpur", "Barchana", "Bidyadharpur", "Koudikol", "Sakuntalapur", "Sunguda"]
+  ],
+  "754297": ["Cuttack", "Odisha", ["Khuntuni"]],
+  "754298": ["Cuttack", "Odisha", ["Kalarabanka"]],
+  "755001": ["Jajapur", "Odisha", ["Ankula", "Jajpur", "Jajpur Bazar", "Jajpur College"]],
+  "755003": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Balibili",
+      "Bari Cuttack",
+      "Bari Kalamatia",
+      "Dharpur",
+      "Mandari",
+      "Meduakul",
+      "Nathapur",
+      "Rajapur",
+      "Ramachandrapur",
+      "Sahupara"
+    ]
+  ],
+  "755004": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Angalo",
+      "Angalo Madhusudanpur",
+      "Barapada",
+      "Binjharpur",
+      "Kantipur",
+      "Kapila",
+      "Mohanpur",
+      "Ratalang",
+      "Talabandha"
+    ]
+  ],
+  "755005": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Abhimanyu Balia",
+      "Arabal",
+      "Bandhadihi",
+      "Brahmabarada",
+      "Deoda",
+      "Golkunda",
+      "Haripur",
+      "Isanpur",
+      "Janakanalkul",
+      "Janapada",
+      "Jhalpada",
+      "Kakudikuda",
+      "Rudrapur"
+    ]
+  ],
+  "755006": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Dasarathpur",
+      "Dehurianandapur",
+      "Jayantara",
+      "Kantapari",
+      "Khosalpur",
+      "Mamadulla",
+      "Merdakatia Chhak",
+      "Nandipur",
+      "Pubasahi",
+      "Taranga Sagarpur"
+    ]
+  ],
+  "755007": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Aranga Purusottampur",
+      "Baidyarajpur",
+      "Bankamuhani",
+      "Debidwar",
+      "Jahanpur",
+      "Khairabad",
+      "Kodandpur",
+      "Lalbag",
+      "Nakhei",
+      "Nathsahi",
+      "Simulia",
+      "Solempur"
+    ]
+  ],
+  "755008": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Areikana",
+      "Banamalipur",
+      "Barabati",
+      "Dharmasala",
+      "Kadampal",
+      "Kaima",
+      "Kalan",
+      "Kotapur",
+      "Kundapatna",
+      "Mirzapur",
+      "Nahangapatna",
+      "Oddisso Andeigoda",
+      "Prathamakhandi",
+      "Singhapur"
+    ]
+  ],
+  "755009": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Badabanta",
+      "Bahdalpur",
+      "Haripur Hat",
+      "Kabirpur",
+      "Kutchery Gaon",
+      "Mangarajpur",
+      "Mugupal",
+      "Rajendrapur",
+      "Rakabi Bazar",
+      "Samantarapur"
+    ]
+  ],
+  "755010": ["Jajapur", "Odisha", ["Anikana", "Kaipara", "Sherpur"]],
+  "755011": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Dhanipur",
+      "Dubakana",
+      "Iswarpur",
+      "Kamardihi",
+      "Kanikapara",
+      "Kayan",
+      "Khannagar",
+      "Mangalpur",
+      "Palatpur",
+      "Paripada Nizampur",
+      "Sanakuanlo"
+    ]
+  ],
+  "755012": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Bachhalo",
+      "Balamukulihat",
+      "Banshipur",
+      "Fatehpur",
+      "Kalyanpur",
+      "Mashra",
+      "Ranpur",
+      "Tina"
+    ]
+  ],
+  "755013": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Alakundanuagaon",
+      "Aunri",
+      "Biripatta",
+      "Chasakhanda",
+      "Chhatrapara",
+      "Dolagram Damodarpur",
+      "Kuanlo",
+      "Pritipur",
+      "Uttarkulhat"
+    ]
+  ],
+  "755014": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Bamdevpur",
+      "Barikul",
+      "Katikata",
+      "Kuanrapur",
+      "Nehapara",
+      "Rambag",
+      "Udranga",
+      "Uttangara"
+    ]
+  ],
+  "755015": [
+    "Jajapur",
+    "Odisha",
+    ["Badabiruan", "Jabara", "Laxminagar", "Pahanga", "Sankhachilla", "Sribantapur"]
+  ],
+  "755016": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Abdalpur",
+      "Bada Damodarpur",
+      "Bangra",
+      "Deulatara",
+      "Haladidiha",
+      "Hatasahi Kutchery",
+      "Jari",
+      "Kandiahat",
+      "Namtara",
+      "Olei Chandanpur",
+      "Singhpur"
+    ]
+  ],
+  "755017": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Bainsiria",
+      "Bhurunga",
+      "Chhatisdebil",
+      "Erabanka",
+      "Hasinpur",
+      "Kujhalo",
+      "M.D.Jemapur",
+      "Sujanpur",
+      "Udaypur"
+    ]
+  ],
+  "755018": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Amploba",
+      "Atta",
+      "Damodarpur",
+      "Haripur Jemadeipur",
+      "Hatibari",
+      "Kankadapal",
+      "Kuhika",
+      "Lembo",
+      "Mangalpur",
+      "Sansailo",
+      "Sukinda"
+    ]
+  ],
+  "755019": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Andhari",
+      "Aswasthapal",
+      "Balibaruan",
+      "Chitri Gobardhanpur",
+      "Dala",
+      "Dankarisahi",
+      "Dolipur",
+      "Gobardhanpur",
+      "Jajpur Road RS",
+      "Janha",
+      "Kiajhar",
+      "Nachhipura",
+      "Naguan",
+      "Odapada",
+      "Pachhikote",
+      "Patranga",
+      "Patuli",
+      "Rachhipur",
+      "Ragadi",
+      "Ranipada",
+      "Sobra",
+      "Taharpur"
+    ]
+  ],
+  "755020": ["Jajapur", "Odisha", ["Ferro Chrome Project"]],
+  "755022": [
+    "Jajapur",
+    "Odisha",
+    ["Dhaneswar", "Kantar", "Korei", "Purbakote", "Ramakrishnapur", "Tulati"]
+  ],
+  "755023": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Antia",
+      "Balarampur Talagada",
+      "Batijoda",
+      "Endal",
+      "Garhmadhupur",
+      "Jenapur",
+      "Kabatabandha",
+      "Madhusudanpur",
+      "Mahisara",
+      "Marjitpur",
+      "Purunabaulamal",
+      "Rekhideipur",
+      "Sarada Mukundapur"
+    ]
+  ],
+  "755024": ["Jajapur", "Odisha", ["Aruha", "Haridaspur", "Neulpur", "Thannual"]],
+  "755025": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Barundai",
+      "Dulakhapatna",
+      "Gopalpur Taranda",
+      "Mukundapur",
+      "Ranigoda",
+      "Tarakote",
+      "Tulasipur"
+    ]
+  ],
+  "755026": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Dangadi",
+      "Duburi",
+      "Gobarghati",
+      "Jakhapura",
+      "Kalinga Nagar",
+      "Khurunti",
+      "Kumbhiragadia",
+      "Manitira",
+      "Nadiabhanga",
+      "Ollalo",
+      "Pankapal Sasan",
+      "Pingal",
+      "Ranagundi",
+      "Salijanga"
+    ]
+  ],
+  "755027": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Arei",
+      "Baniapal",
+      "Bodua",
+      "Brahamanigaon",
+      "Guhali",
+      "Kumbhuka",
+      "Sasanda",
+      "Sayedpur"
+    ]
+  ],
+  "755028": [
+    "Jajapur",
+    "Odisha",
+    ["Chingudipal", "Kalaringatta", "Kaliapani", "Kansa", "Ransol"]
+  ],
+  "755036": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Ahiyas",
+      "Ardaulia",
+      "Arjunpur Brahmachari Patna",
+      "Gopabandhunagar",
+      "Kamalpur",
+      "Mallikapur",
+      "Mohantypatna",
+      "Narangochha"
+    ]
+  ],
+  "755043": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Beruda",
+      "Bhubaneswarpur",
+      "Bhuinpur",
+      "Hatsahi",
+      "Kamagarh",
+      "Malapara",
+      "Masudpur",
+      "Panikoili",
+      "Rurhiya"
+    ]
+  ],
+  "755044": ["Jajapur", "Odisha", ["Chandikhol", "Darpanigarh", "Siha"]],
+  "755049": ["Jajapur", "Odisha", ["Kantigadia", "Khadianga", "Krushnapur Sasan"]],
+  "755050": ["Jajapur", "Odisha", ["Jaraka"]],
+  "755051": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Adampur",
+      "Derakundi",
+      "Khanditar",
+      "Madhubanhat",
+      "Rasulpur",
+      "Sadanandapur",
+      "Votka"
+    ]
+  ],
+  "755061": [
+    "Kendrapara",
+    "Odisha",
+    [
+      "Aragal",
+      "Dadhibamanpur",
+      "Erdang Natra",
+      "Govindpur Kutchery",
+      "Madhuban",
+      "Palimi"
+    ]
+  ],
+  "755062": [
+    "Jajapur",
+    "Odisha",
+    [
+      "Bandhamunda",
+      "Chitalo",
+      "Jharanga",
+      "Kapasichhaka",
+      "Khandara",
+      "Markandapur",
+      "Mirchandpur",
+      "Rahasoi",
+      "Sridharpur"
+    ]
+  ],
+  "756001": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Azimabad",
+      "Balasore",
+      "Balasore Court",
+      "Balasore RS",
+      "Fakirmohan College",
+      "Issannagar",
+      "Nayabazar Balasore",
+      "Sahadevkhunta",
+      "Sovarampur",
+      "Srikanthapur"
+    ]
+  ],
+  "756002": [
+    "Baleshwar",
+    "Odisha",
+    ["Manikula", "Panjibag", "Puruna Balasore", "Ranasahi", "Sahada", "Sargaon", "Sunhat"]
+  ],
+  "756003": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Badasindhia",
+      "Barabati",
+      "Bhimpura",
+      "Chasakhand",
+      "Dahapada",
+      "Fulwar Kaswa",
+      "Ghodapada",
+      "Haripur",
+      "Makalpur",
+      "Motiganj",
+      "Nijampur",
+      "Reserve Police Line",
+      "Sahid Park",
+      "Sahupada",
+      "Sindhia"
+    ]
+  ],
+  "756019": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Armala",
+      "Badapal",
+      "Gobindpur",
+      "Gududapatna",
+      "Januganj",
+      "Kanrali",
+      "Kashimpur",
+      "Khirachora Gopinath",
+      "Naraharipur",
+      "Remuna",
+      "Somnathpur",
+      "Udambar"
+    ]
+  ],
+  "756020": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Begunia",
+      "Bhounriabad",
+      "Dharaganj",
+      "Durgadevi",
+      "Kans",
+      "Machhua",
+      "Mahispata",
+      "Mitrapur",
+      "Narasingpur",
+      "Nimpal",
+      "Patna",
+      "Pundala",
+      "Rasaslpur",
+      "Sathilabalbalia",
+      "Singiri",
+      "Tikirapal"
+    ]
+  ],
+  "756021": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Bankeswar",
+      "Bardhanpur",
+      "Bhimpur",
+      "Inchudi",
+      "Jaydev Kasba",
+      "Kuanrpur",
+      "Rasalpur"
+    ]
+  ],
+  "756022": [
+    "Baleshwar",
+    "Odisha",
+    ["Barada", "Chakrada", "Darada", "Kothapada", "Kothia", "Mukulisi"]
+  ],
+  "756023": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Baliapal Katisahi",
+      "Beladandia",
+      "Belli",
+      "Debhog",
+      "Gadasahi Baliapal",
+      "Ghantua",
+      "Jathia",
+      "Khalamuhani",
+      "Kumbhari",
+      "Machharanka Simulia",
+      "Nepura",
+      "Nikhira",
+      "Singla",
+      "Srirampur Road"
+    ]
+  ],
+  "756024": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Badakuruda",
+      "Balarampur",
+      "Bolang",
+      "Jambhirai",
+      "Kashafal",
+      "Mandhatabazar",
+      "Nadbani",
+      "Nangaleswar",
+      "Nuagaon",
+      "Panchupalli",
+      "Saudi"
+    ]
+  ],
+  "756025": [
+    "Baleshwar",
+    "Odisha",
+    ["Balaramgadi", "Chandipur", "Gudupai", "Hidigaon", "Parkhi", "Srikona"]
+  ],
+  "756026": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Asti",
+      "Badasimulia",
+      "Badhapal",
+      "Baliapal",
+      "Bishnupur",
+      "Dalua",
+      "Ghantiary",
+      "Jamkunda",
+      "Jharapimpal",
+      "Panchurukhi",
+      "Paschima Bad",
+      "Rella"
+    ]
+  ],
+  "756027": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Alumeda",
+      "Ambapunja",
+      "Bahabalpur",
+      "Buanl",
+      "Chaksartha",
+      "Chhanua",
+      "Digdha",
+      "Dublagadi",
+      "Haldipada",
+      "Jhinkiria",
+      "Nagram",
+      "Odangi",
+      "Olipur",
+      "Panchupada",
+      "Sargaon",
+      "Sartha",
+      "Solpata"
+    ]
+  ],
+  "756028": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Anko",
+      "Bamada",
+      "Hatiadiha",
+      "Lachman Khunta",
+      "Nalabahar",
+      "Nuagaon",
+      "Routpada",
+      "Rupsa"
+    ]
+  ],
+  "756029": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Baharda Bazar",
+      "Barunagadia",
+      "Basta",
+      "Bidyadharpur",
+      "Dandika",
+      "Dhobachakurai",
+      "Haladiapada",
+      "Jamalpur",
+      "Khadikapada",
+      "Kushadiha (A)",
+      "Kushadiha (B)Church",
+      "Machhadiha",
+      "Mandrukula",
+      "Mathani",
+      "Pandurangi",
+      "Sadanandapur",
+      "Srirampur",
+      "Uitikiri"
+    ]
+  ],
+  "756030": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Amarda Road",
+      "Chasipada",
+      "Chinchlagadia",
+      "Dhitpura",
+      "Gopinathpur",
+      "Gudikhal",
+      "Kuldiha",
+      "Mohammad Nagar",
+      "Vellora"
+    ]
+  ],
+  "756032": ["Baleshwar", "Odisha", ["Jaleswar", "Nayabazar Jaleswar"]],
+  "756033": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Ashabandha",
+      "Baradiha",
+      "Bhandarikuli",
+      "Chudamanipur",
+      "Hatigarh",
+      "Kabataghati",
+      "Kalama",
+      "Kankei",
+      "Khanabad",
+      "Khuard",
+      "Mahuduma",
+      "Mankidia",
+      "Munutunia",
+      "Olmara",
+      "Raibania"
+    ]
+  ],
+  "756034": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Ambadiha",
+      "Budhakusumi",
+      "Demuria",
+      "Ikida",
+      "Kamarsalia",
+      "Kasida",
+      "Khalina",
+      "Khuluda",
+      "Masanbaria",
+      "Nampo"
+    ]
+  ],
+  "756035": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Baharda",
+      "Balim",
+      "Baunsadiha",
+      "Belda",
+      "Chakaisab",
+      "Chandakusumi",
+      "Dahunda",
+      "Dakhinanadbani",
+      "Dubsahi",
+      "Durpal",
+      "Kachuadi",
+      "Kamarda",
+      "Karihanda",
+      "Khairda",
+      "Kotisahi",
+      "Kusuda",
+      "Madhupura",
+      "Mahagab",
+      "Nachinda",
+      "Putina",
+      "Upla Hat"
+    ]
+  ],
+  "756036": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Alalbindha",
+      "Baitpur",
+      "Batagramghat",
+      "Dehurda",
+      "Deulahat",
+      "Gopinathpur",
+      "Guneibasan",
+      "Haridaspur",
+      "Jaleswarpur",
+      "Kumarjalina",
+      "Kumarmuli",
+      "Mankunda",
+      "Narayanpur",
+      "Nimatpur",
+      "Nishanpur",
+      "Pasarbindha",
+      "Soharia",
+      "Sukhsandhapatna",
+      "Sultanpur",
+      "Tarapur"
+    ]
+  ],
+  "756037": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Ausha",
+      "Bichitrapur",
+      "Fulbani",
+      "Nafrai",
+      "Naranmohantypadia",
+      "Sankhari",
+      "Sardhapur",
+      "Tukurihazira"
+    ]
+  ],
+  "756038": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Adangapantei",
+      "Bartana",
+      "Bhograi",
+      "Iswarpur",
+      "Jayarampur",
+      "Khalabadia",
+      "Malaruan",
+      "Pithapur",
+      "Rasalpur"
+    ]
+  ],
+  "756039": ["Baleshwar", "Odisha", ["Barbatia Bazar", "Kakhra", "Udayganjapatna"]],
+  "756040": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Dhobasila",
+      "Hatsahi",
+      "Kahalia",
+      "Mirigini",
+      "Nilgiri College",
+      "Podasul",
+      "Raj Nilgiri",
+      "Shyamsundarpur",
+      "Siadimal"
+    ]
+  ],
+  "756041": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Garadihi",
+      "Gopalpur",
+      "Jadibali",
+      "Jamudiha",
+      "Kalakad",
+      "Kharadiha",
+      "Matiali",
+      "Narayanapur",
+      "Sajanagarh",
+      "Telipal",
+      "Tenda"
+    ]
+  ],
+  "756042": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Bahanaga",
+      "Bidubazar",
+      "Gandasthapur",
+      "Iswarpur",
+      "Kandagaridi",
+      "Kochiakoili",
+      "Santragadia Bazar",
+      "Saud",
+      "Thalasada"
+    ]
+  ],
+  "756043": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Alasuan",
+      "Boita",
+      "Chakajagannathpur",
+      "Jirtal",
+      "Kasba Jaipur",
+      "Khantapada",
+      "Kuligaon",
+      "Nachinta",
+      "Padagaon",
+      "Panpana",
+      "Pratapada",
+      "Sarsatia"
+    ]
+  ],
+  "756044": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Aruhabad",
+      "Dwarika",
+      "Gopalpur",
+      "Jagannathpur",
+      "Jageswarpada",
+      "Kalyani",
+      "Karanjabindha",
+      "Maharudrapur",
+      "Pandasuni",
+      "Rahaniaganj",
+      "Srijang",
+      "Talakurunia"
+    ]
+  ],
+  "756045": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Angula",
+      "Attapur",
+      "Bainanda Mangarajpur",
+      "Dahisada",
+      "Hatikhulia",
+      "Janhia",
+      "Kedarpur",
+      "Kesharipur",
+      "Kudei Nadigaon",
+      "Mahu Muhana",
+      "Mangalapur",
+      "Mobarakpur",
+      "Mulisingh",
+      "Radhaballavpur",
+      "Sabira R.S.",
+      "Sajanpur",
+      "Sarsankha",
+      "Simulia",
+      "Singa Khunta",
+      "Soro",
+      "Soro Bazar",
+      "Soro College",
+      "Soro RS",
+      "Wada"
+    ]
+  ],
+  "756046": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Anantapur",
+      "Balanga",
+      "Barahapur",
+      "Gud",
+      "Jagannathpur Bachhada",
+      "Kharsahapur",
+      "Kumarpur",
+      "Kuruda Soro",
+      "Padhuan",
+      "Pakhar",
+      "Sahaspura",
+      "Sankhapodadiha",
+      "Tentei"
+    ]
+  ],
+  "756047": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Achutipur",
+      "Asuria",
+      "Badapokhari",
+      "Bana Bishnupur",
+      "Dagarpada",
+      "Dalanga",
+      "Gandibed",
+      "Kurunta",
+      "Makhanpur",
+      "Manipur",
+      "Sampei",
+      "Saundia",
+      "Turigaria"
+    ]
+  ],
+  "756048": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Arjunpur",
+      "Fatehpur",
+      "Khaira",
+      "Mahatipur",
+      "Mituani",
+      "Nachhipur",
+      "Rairamchandrapur",
+      "Sarkana"
+    ]
+  ],
+  "756049": [
+    "Baleshwar",
+    "Odisha",
+    ["Aghirapada", "Darkholi", "Khairagobindapur", "Oupada", "Sarugaon", "Srirampur"]
+  ],
+  "756051": ["Baleshwar", "Odisha", ["Avana", "Bishnupur", "Rupkhand"]],
+  "756055": [
+    "Baleshwar",
+    "Odisha",
+    ["Chakabarahapur", "Ghasua", "Santhapada", "Sirapur"]
+  ],
+  "756056": [
+    "Baleshwar",
+    "Odisha",
+    ["Balia Farm", "Basantapur", "Chhanapur", "Genguti", "Kuruda"]
+  ],
+  "756058": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Arabandha",
+      "Chhatrapur",
+      "Jamuna",
+      "Kishorchandrapur",
+      "Pithahat",
+      "Raj Berhampur",
+      "Tentulia",
+      "Uppardiha"
+    ]
+  ],
+  "756059": [
+    "Baleshwar",
+    "Odisha",
+    ["Guapal", "Kaithagadia", "Kupari", "Nahanga", "Pani Chhatra", "Sundarpur"]
+  ],
+  "756060": ["Baleshwar", "Odisha", ["Bahala", "Barun Singh", "Khan Nagar", "Sergarh"]],
+  "756079": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Aruhabruti",
+      "Baiganabadia",
+      "Barbatia",
+      "Dahamunda",
+      "Nayapalli",
+      "Nilpura",
+      "Rasalpur"
+    ]
+  ],
+  "756080": [
+    "Baleshwar",
+    "Odisha",
+    ["Badhan", "Irda", "Kainagari", "Machhada", "Nimpada", "Panasha", "Sahada"]
+  ],
+  "756081": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Baliapati",
+      "Dundukut",
+      "Gilajodi",
+      "Jamsuli",
+      "Nabra",
+      "Naikudi",
+      "Paunsakuli",
+      "Putura",
+      "Remu",
+      "Tadada"
+    ]
+  ],
+  "756083": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Badas",
+      "Bagada",
+      "Baliapal Narayanpur",
+      "Betagadia",
+      "Chandamani",
+      "Chaumukh",
+      "Dagra",
+      "Dangapita",
+      "Jagai",
+      "Jamatkula",
+      "Karanja",
+      "Pratappur"
+    ]
+  ],
+  "756084": ["Baleshwar", "Odisha", ["Dhansimulia", "Netua", "Sugo"]],
+  "756085": ["Baleshwar", "Odisha", ["Bajitpur", "Chandaneswar", "Naskarpur"]],
+  "756086": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Bartana",
+      "Chalanti",
+      "Chhamouza",
+      "Jaleswar Railway Station",
+      "Jamalpur",
+      "Keshpura",
+      "Mohammad Nagarpatna",
+      "Paiksida",
+      "Rairamchandrapur",
+      "Rajpur",
+      "Salikotha"
+    ]
+  ],
+  "756087": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Alalpur",
+      "Ambliatha",
+      "Chamara Gaon",
+      "Gop",
+      "Lakhananath",
+      "Lakhananath Road",
+      "Malipal",
+      "Mathuranath",
+      "Sikharpur"
+    ]
+  ],
+  "756088": ["Baleshwar", "Odisha", ["Chormara"]],
+  "756089": ["Baleshwar", "Odisha", ["Vyasavihar"]],
+  "756100": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Bhadrak",
+      "Bhadrak Banka Bazar",
+      "Bhadrak College",
+      "Bhadrak Court",
+      "Bhadrak Naya Bazar",
+      "Bhadrak Puruna Bazar",
+      "Ghosrabazar",
+      "Kuans",
+      "Nangamahalla",
+      "Salandi Colony",
+      "Uttarbahini"
+    ]
+  ],
+  "756101": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Amroli",
+      "Bandhagaon",
+      "Banitia",
+      "Baralpokhari",
+      "Bhadrak R S",
+      "Chandigaon",
+      "Charampa",
+      "Kudabarua",
+      "Saragadia"
+    ]
+  ],
+  "756111": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Balanta",
+      "Champulipada",
+      "Gourgadi",
+      "Kalasuni",
+      "Maitapur",
+      "Rahanja",
+      "Rambhila",
+      "Ranital"
+    ]
+  ],
+  "756112": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Andheipalli",
+      "Bahudarada",
+      "Barikpur Bazar",
+      "Bhagibindha",
+      "Gobindpur",
+      "Ichhada",
+      "Jalamandua",
+      "Kenduapada",
+      "Naguan",
+      "Nalanga",
+      "Patuli",
+      "Piripur",
+      "R N Betra",
+      "Todanga"
+    ]
+  ],
+  "756113": [
+    "Bhadrak",
+    "Odisha",
+    ["Alauti", "Barapada", "Chardia", "Kaupur", "Nalgira", "Ramakrishnapur"]
+  ],
+  "756114": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Adalpanka",
+      "Adia",
+      "Andhia",
+      "Bangarpadi",
+      "Bant",
+      "Begana",
+      "Chhayalsingh",
+      "Dolapadi",
+      "Ganijang",
+      "Kantia",
+      "Padhanpara",
+      "Ramachandrapur",
+      "Sendtira",
+      "Tarago",
+      "Tillo Barasahi"
+    ]
+  ],
+  "756115": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Anijo",
+      "B T Pur",
+      "Badanuagaon",
+      "Bartana",
+      "Gopinath Tejpur",
+      "Haripur",
+      "Mohantipada",
+      "Ratina",
+      "Sandado"
+    ]
+  ],
+  "756116": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Anandabazar",
+      "Arnapal",
+      "Balabhadrapur",
+      "Bishnupurbindha",
+      "Kalai",
+      "Khaparpada",
+      "Korkora",
+      "Langudi",
+      "Lunia",
+      "Nandore",
+      "Rajmukundapur",
+      "Sahidnagar",
+      "Sriganga",
+      "Susua",
+      "Talagopabindha"
+    ]
+  ],
+  "756117": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Angeipal",
+      "Bandhatia",
+      "Chudakuti Palasa",
+      "D.B. Colony",
+      "Dakhinabad",
+      "Dhamnagar",
+      "Dobal",
+      "Jahangir",
+      "Khadipada",
+      "Kurigaon",
+      "Narayanpur",
+      "Padhani",
+      "Palikiri",
+      "Rameswarpur",
+      "Sohara"
+    ]
+  ],
+  "756118": ["Bhadrak", "Odisha", ["Ambiligaon", "Kalyani", "Kothar", "Nuahat"]],
+  "756119": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Bamkura",
+      "Betaligaon",
+      "Brahmanpal",
+      "Dhusuri",
+      "Khadimahara",
+      "Nadigaon",
+      "Pandarbatia",
+      "Pangata",
+      "Sahaspur",
+      "Sahusahi",
+      "Sanalpur",
+      "Shyamsundarpur",
+      "Sunderpur",
+      "Suryapur"
+    ]
+  ],
+  "756120": ["Bhadrak", "Odisha", ["Bhandari Pokhari", "Malada", "Rahania", "Sarasada"]],
+  "756121": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Babalpur",
+      "Bandalo",
+      "Danar",
+      "Deopada",
+      "Dimiria",
+      "Gedma",
+      "Kulana",
+      "Manjuri Road",
+      "Naami",
+      "Sadanga",
+      "Salinia",
+      "Tesinga"
+    ]
+  ],
+  "756122": [
+    "Bhadrak",
+    "Odisha",
+    ["Akhuapada", "Kumbharia", "Manjuri", "Nerada", "Paramanandapur"]
+  ],
+  "756123": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Andrai",
+      "Atto",
+      "Baranga",
+      "Erada",
+      "Goramati",
+      "Sabrang",
+      "Sahada Sabrang",
+      "Samian"
+    ]
+  ],
+  "756124": [
+    "Bhadrak",
+    "Odisha",
+    ["Albaga", "Ertal", "Gopaljew Sugo", "Guagadia", "Lunga", "Padamapur"]
+  ],
+  "756125": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Adhuan",
+      "Arandua",
+      "Basudevpur",
+      "Basudevpur College",
+      "Bedeipurpal",
+      "Bhairabpur",
+      "Binayakpur",
+      "Biras",
+      "Chudamani",
+      "K K Pur",
+      "Mandari",
+      "Matipaka",
+      "Prabodhpur",
+      "Radhaballavpur",
+      "Sanakrishnapur"
+    ]
+  ],
+  "756126": [
+    "Baleshwar",
+    "Odisha",
+    [
+      "Anandapur",
+      "Bari",
+      "Bariha",
+      "Bati",
+      "Govindapur",
+      "Jamjhadi",
+      "Markona",
+      "Mohammadpur",
+      "Rudhunga",
+      "Sahigaon",
+      "Simulia",
+      "Simulia Bazar"
+    ]
+  ],
+  "756127": [
+    "Bhadrak",
+    "Odisha",
+    ["Dolasahi", "Ganjeibari", "Ichhapur", "Jitanaga", "Moharampur", "Nandapur", "Serpur"]
+  ],
+  "756128": ["Bhadrak", "Odisha", ["Aharapada", "Gujidarada", "Keshpur"]],
+  "756129": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Amrutpur",
+      "Andiapat",
+      "Biriadia",
+      "Ghanteswar",
+      "Ghanteswar Baliapal",
+      "Haladia",
+      "Hatapur",
+      "Kandaragadia",
+      "Narendrapur",
+      "Panchutikiri",
+      "Raipur",
+      "Subudhia",
+      "Totapada"
+    ]
+  ],
+  "756130": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Bahabalpur",
+      "Balichaturi",
+      "Baro",
+      "Bhatapada",
+      "Chabispara Sasan",
+      "Dhulipada",
+      "Golapokhari",
+      "Kanpada",
+      "Kolha",
+      "Mangalpur",
+      "Matiasahi",
+      "Patnamishrapur",
+      "Saya",
+      "Sindol",
+      "Tihidi"
+    ]
+  ],
+  "756131": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Arjunbindha",
+      "Balimeda",
+      "Bamanbindha",
+      "Barsar",
+      "Chandrakat Bindha",
+      "Ghatapur",
+      "Govindpur Hanspat",
+      "Hengupati",
+      "Jamjodi",
+      "Kheranga",
+      "Mudusuli",
+      "Pirahatbazar",
+      "Pirhat",
+      "Rajgharpokhari",
+      "Sahapur",
+      "Smantraipur",
+      "Tiadisahi"
+    ]
+  ],
+  "756132": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Chardia",
+      "Goudunipokhari",
+      "Harekrishnapur",
+      "Jaleswarpur",
+      "Karanpokhari",
+      "Kuda",
+      "Madhapur",
+      "Madhupur",
+      "Motto",
+      "Mousudha Bazar",
+      "Nalagohira",
+      "Nalgunda",
+      "Nuagaon Ichhapur",
+      "Paramanandapur",
+      "Rampur",
+      "Sailendrapalli"
+    ]
+  ],
+  "756133": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Baligaon",
+      "Bentalpur",
+      "Bijayanagar",
+      "Bouljoda",
+      "Chandbali",
+      "Chandbali Bazar",
+      "Goladia",
+      "Gopalpur",
+      "Orasahi",
+      "Panchpada",
+      "Sukleswar",
+      "Tentulidihi",
+      "Ugratara"
+    ]
+  ],
+  "756134": [
+    "Baleshwar",
+    "Odisha",
+    ["Ada", "Antara", "Barada", "Chandarpada", "Garasang", "Jalanga Gandibed", "Mirjapur"]
+  ],
+  "756135": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Badabarchikayan",
+      "Bodakpatna",
+      "Kadabaranga",
+      "Odanga",
+      "Olanga",
+      "Randiahat",
+      "Saramara"
+    ]
+  ],
+  "756137": [
+    "Bhadrak",
+    "Odisha",
+    ["Asurali", "Fatepur", "Gadiali", "Govindapur", "Kasimpur", "Korua"]
+  ],
+  "756138": [
+    "Bhadrak",
+    "Odisha",
+    ["Aradi", "Batula", "Bhuinpur", "Nandapur", "Olaga", "Sathibankuda"]
+  ],
+  "756139": ["Bhadrak", "Odisha", ["Arsa", "Bidyadharpur", "Talapada"]],
+  "756144": ["Bhadrak", "Odisha", ["Apanda", "Basantia", "Silandi"]],
+  "756162": ["Bhadrak", "Odisha", ["Eram", "Nuagaon", "Suan"]],
+  "756163": [
+    "Bhadrak",
+    "Odisha",
+    ["Bhuianwash", "Bilana", "Bodak", "Galagandapur", "Guamal", "Jaipur", "Kubera"]
+  ],
+  "756164": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Baincha",
+      "Balimunda",
+      "Bansada Kuamara",
+      "Bedeipur",
+      "Govindpur",
+      "Karanjamal",
+      "Karanpalli",
+      "Naikanidihi",
+      "Sanahavelisahi"
+    ]
+  ],
+  "756165": ["Bhadrak", "Odisha", ["Bachhipur", "Brahmanigaon", "Kiapada"]],
+  "756166": [
+    "Baleshwar",
+    "Odisha",
+    ["Balikhanda", "Kalaspur", "Kanchpada", "Parbatipur", "Ramakrishnapur", "Srimantapur"]
+  ],
+  "756167": ["Bhadrak", "Odisha", ["Barunai", "Paliabindha"]],
+  "756168": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Aruha",
+      "Barandua",
+      "Betada",
+      "Chalunigaon",
+      "Kanheibindha",
+      "Khirkona",
+      "Narasinghpur"
+    ]
+  ],
+  "756171": [
+    "Bhadrak",
+    "Odisha",
+    ["Dhamara", "Dosinga", "Kaithkhola", "Kishore Prasad", "Narasinghpurhat", "Saraswati"]
+  ],
+  "756181": [
+    "Bhadrak",
+    "Odisha",
+    [
+      "Bhadrak Bypass",
+      "Garadapur",
+      "Gelpur",
+      "Geltua",
+      "Jalanga",
+      "Madhabnagar",
+      "Mouda",
+      "Prachinagar",
+      "Tihiri"
+    ]
+  ],
+  "756182": [
+    "Baleshwar",
+    "Odisha",
+    ["Aliha", "Arakhpur", "Baghua", "Damodarpur", "Dungura"]
+  ],
+  "757001": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Ambikasahi",
+      "Baripada",
+      "Baripada Bazar",
+      "Baripada Court",
+      "Baripada Hospital",
+      "Baripada Municipal Market",
+      "Baripada R.S.",
+      "Deulasahi",
+      "Palabani Chhak",
+      "Tulasichoura"
+    ]
+  ],
+  "757002": ["Mayurbhanj", "Odisha", ["Belgadia", "Bhanjpur", "Bijay Ramchandrapur"]],
+  "757003": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Baghra Road",
+      "Dakoipodadiha",
+      "Damodar Pur",
+      "Goudadiha",
+      "Raikad Jharan",
+      "Sripad Ganja",
+      "Takatpur"
+    ]
+  ],
+  "757014": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Baghuasole",
+      "Bhugudakata",
+      "Chandua Ashram",
+      "Dardara",
+      "Gayalkata",
+      "Kakharusole",
+      "Keutunimari",
+      "Kuabuda",
+      "Kusumasole",
+      "Marangtandi",
+      "Saragchhida",
+      "Tadki"
+    ]
+  ],
+  "757016": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bachhuripal",
+      "Debsole",
+      "Gobra",
+      "Jharia",
+      "Kamardiha",
+      "M. Kanpur",
+      "Patagadia",
+      "Rasgovindpur"
+    ]
+  ],
+  "757017": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bijipur",
+      "Chandanpur",
+      "Deopara",
+      "Kuradiha",
+      "Mantri",
+      "Mirigidari",
+      "Nakhra",
+      "Nankua",
+      "Narangaon",
+      "Pruthunathpur",
+      "Salgaon"
+    ]
+  ],
+  "757018": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Anua",
+      "Bhairangisole",
+      "Bhaliadiha",
+      "Bholaghati",
+      "Chandabilla",
+      "Chhatna",
+      "Chitrada",
+      "Dhansole",
+      "Gadigaon",
+      "Gholmuhan",
+      "Idar",
+      "Kapoi",
+      "Maigaon",
+      "Makunda",
+      "Musagadia",
+      "Nichuapada",
+      "Paramananda",
+      "Patpur",
+      "Sunahaja"
+    ]
+  ],
+  "757019": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Atanati",
+      "Badkaranjia",
+      "Badmamundia",
+      "Baldiha Khunta",
+      "Banakati",
+      "Bhandagaon",
+      "Hirapur",
+      "Karkachia",
+      "Khunta",
+      "Silaghati",
+      "Tikarpada"
+    ]
+  ],
+  "757020": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badampur",
+      "Baincha Nuagaon",
+      "Baladia",
+      "Barkand",
+      "Bhatchhatar",
+      "Chakulia",
+      "Ghodabandha Khuntapal",
+      "Jhinkiria",
+      "Khuntapal",
+      "Manida",
+      "Moroda",
+      "N. Chhotraipur",
+      "Rakhinisahi",
+      "Rukuni"
+    ]
+  ],
+  "757021": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Anlakuda",
+      "Chaksuliapada",
+      "Chuhat",
+      "Deuli",
+      "Dhemnasole",
+      "Kanimahuli",
+      "Nuagaon Talakchuin",
+      "Sarasposi"
+    ]
+  ],
+  "757022": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Baghra",
+      "Bari",
+      "Darudihi",
+      "Dhatika",
+      "Mahabila",
+      "Pokharia",
+      "Saluadahar",
+      "Saradiha",
+      "Singda",
+      "Suliapada",
+      "Ufalgadia"
+    ]
+  ],
+  "757023": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badfera",
+      "Badmundhabani",
+      "Dhenkinenjia",
+      "Futukisole",
+      "Garia",
+      "Kandana",
+      "Keshrasole",
+      "Khalapada",
+      "Kui",
+      "Kujidihi",
+      "Lunia",
+      "Nuhamalia",
+      "Sanmundhabani"
+    ]
+  ],
+  "757024": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bajratundi",
+      "Baunsbilla",
+      "Belam",
+      "Gudialbandh",
+      "Jadunathpur",
+      "Kadualbandh",
+      "Kerko Baiganbaria",
+      "Paikabasa",
+      "Sankerko",
+      "Talanda",
+      "Tangasole",
+      "Uthani Nuagaon"
+    ]
+  ],
+  "757025": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Agria",
+      "Aguad",
+      "Bartana",
+      "Betnoti",
+      "Dalki",
+      "Durgapur",
+      "Gobapal",
+      "Kanchisole",
+      "Kochilakhunta",
+      "Kuliana Barsahi",
+      "Nuagaon",
+      "Paunsia",
+      "Rangapani",
+      "Sakua",
+      "Sialighati"
+    ]
+  ],
+  "757026": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "B. Chhelia",
+      "Barsahi",
+      "Chadada",
+      "Chhelia",
+      "Deulia",
+      "Gendagadia",
+      "Kendudiha",
+      "Khuntapal",
+      "Patarapada",
+      "Ranibandh",
+      "Singtia",
+      "Suhagpura",
+      "Talpada"
+    ]
+  ],
+  "757027": ["Mayurbhanj", "Odisha", ["Kuamara", "Sikidia", "Talakadada"]],
+  "757028": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Ambagadia",
+      "Badkhiripada",
+      "Baisinga",
+      "Bidukudia",
+      "Kadalia",
+      "Khuntapur",
+      "Mahulpatna",
+      "Nachhipuria",
+      "Patalipura",
+      "Purunia",
+      "Raghupur",
+      "Singlamundali"
+    ]
+  ],
+  "757029": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Asanbani",
+      "Badjod",
+      "Bhalia",
+      "Budhikhamari",
+      "Dantiamuhan",
+      "Dhanpur",
+      "Hatikote",
+      "Jamdapal",
+      "Jamsole",
+      "Karamsole",
+      "Krushnachandrapur",
+      "Sureidihi",
+      "Tasarda"
+    ]
+  ],
+  "757030": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Ambapunja",
+      "Digar Astia",
+      "Gendapokhari",
+      "Ghodapal",
+      "Goudruma",
+      "Jagannathkhunta",
+      "Kalabadia",
+      "Kathsirsi",
+      "Koilisuta",
+      "Kudiapal",
+      "Kuliana",
+      "Nabedhi",
+      "Nuagaon",
+      "Parulia",
+      "Pathuri",
+      "Patihinja",
+      "Sansarasposi"
+    ]
+  ],
+  "757031": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bagjhumpa",
+      "Baunsda",
+      "Ekdali",
+      "Gandipani",
+      "Pandra Rolasahi",
+      "Sankachimbila",
+      "Shirsa"
+    ]
+  ],
+  "757032": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Asana",
+      "Bangriposi",
+      "Bankati",
+      "Bedhakudar",
+      "Danadar",
+      "Dhobanisole",
+      "Dighi",
+      "Ghatkuanri",
+      "Golamundhakata",
+      "Gosanipal",
+      "Katra Chandan Pur",
+      "Manbhanj",
+      "Nafree",
+      "Nischinta",
+      "Pandhada",
+      "Patharkham",
+      "Puruna Pani"
+    ]
+  ],
+  "757033": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Asana",
+      "Badnalua",
+      "Baneikala",
+      "Bautibeda",
+      "Bisoi",
+      "Kaduani",
+      "Khadambeda",
+      "Kundulia",
+      "Majhigaon",
+      "Manada",
+      "N.B.Pokharia",
+      "Nuagaon Kurkutia",
+      "Sanjambilla",
+      "Sanpurunapani",
+      "Sargoda Jashipur",
+      "Sunajodia"
+    ]
+  ],
+  "757034": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Alkudar",
+      "Astakuanr",
+      "Barehipani",
+      "Baunsnali",
+      "Chakidi",
+      "Chheligudhudi",
+      "Dhalabani",
+      "Durdura",
+      "Gudugudia",
+      "Jamukeswar",
+      "Jashipur",
+      "Moudi",
+      "Podagarh"
+    ]
+  ],
+  "757035": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Angarpada",
+      "Baidyanath",
+      "Brahmaniposi",
+      "Budamara",
+      "Budhigambharia",
+      "Denua",
+      "Ghagarbeda",
+      "Hindala",
+      "Jamuti",
+      "Khuntapada",
+      "Naksara",
+      "Nuagaon",
+      "Raikala",
+      "Raruan",
+      "Righa"
+    ]
+  ],
+  "757036": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badgaon",
+      "Bakartala",
+      "Bala",
+      "Barakamuda",
+      "Baria",
+      "Batpalasa",
+      "Chanchbani",
+      "Dari",
+      "Dudhiani",
+      "Hatibari",
+      "Moto",
+      "Pantho",
+      "Rugudi",
+      "Salarapada",
+      "Tato",
+      "Tongabilla"
+    ]
+  ],
+  "757037": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bhadubeda",
+      "Bhanra",
+      "Chitraposi",
+      "Ghagarda",
+      "Ghosada",
+      "Indupur",
+      "Karanjia",
+      "Karanjia Bazar",
+      "Karanjia Court",
+      "Karanjia Golei",
+      "Kendujiani",
+      "Kendumundi",
+      "Kerkera",
+      "Kuliposi",
+      "Kushpada",
+      "Nedhuapal",
+      "Patbil",
+      "Rasamtala",
+      "San Deuli"
+    ]
+  ],
+  "757038": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Baunsdiha",
+      "Bharandia",
+      "Champajhar",
+      "Digdhar",
+      "Hatigoda",
+      "Jarak",
+      "Keshdiha",
+      "Khandabandh",
+      "Mahuldiha",
+      "Mituani",
+      "Padiabeda",
+      "Patarapada",
+      "Salchua",
+      "Saleibeda",
+      "Satkosia",
+      "Talpada",
+      "Taramara",
+      "Thakurmunda"
+    ]
+  ],
+  "757039": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Arjunbilla",
+      "Badterenti",
+      "Bramarposi",
+      "Chaturanjali",
+      "Galusahi",
+      "Haldia",
+      "Jamunti",
+      "Jhadghosada",
+      "Khiching",
+      "Kumbhirda",
+      "Nuabeda",
+      "Pandarsil",
+      "Singada",
+      "Sukruli",
+      "Talgaon"
+    ]
+  ],
+  "757040": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badgudugudia",
+      "Badkhaladi",
+      "Badsimulia",
+      "Chuinposi",
+      "Golagadia",
+      "Goudagaon",
+      "Jaida",
+      "Jambani",
+      "Kaladahi",
+      "Kaptipada",
+      "Mankadapada",
+      "Mirigothana",
+      "Parasbani",
+      "Peragari",
+      "Sanbisole"
+    ]
+  ],
+  "757041": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Ambadiha",
+      "Badsingaria",
+      "Bahubandh",
+      "Bhimtali",
+      "Dughdha",
+      "Jaida",
+      "Jualia",
+      "Kainsari",
+      "Khaladi",
+      "Kutling",
+      "Nayarangamatia",
+      "Patpur",
+      "Salmundali",
+      "Udala",
+      "Udala Bazar",
+      "Udala College"
+    ]
+  ],
+  "757042": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Anlajo R.S.",
+      "Badgaon",
+      "Badmouda",
+      "Badra",
+      "Bhimkhanda",
+      "Gorumahisani",
+      "Guhaldangri",
+      "Hatia",
+      "Kukudimundi",
+      "Mahadevdihi",
+      "Sanpakhana",
+      "Sudarsanpur",
+      "Sundhal",
+      "Tikhia"
+    ]
+  ],
+  "757043": [
+    "Mayurbhanj",
+    "Odisha",
+    ["Anladuva", "Mahuldiha", "Rairangpur", "Rairangpur Bazar", "Rairangpur R.S"]
+  ],
+  "757045": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badkuleibira",
+      "Halda",
+      "Jamda",
+      "Jarkani",
+      "Khairpal",
+      "Pasana",
+      "Talgaon",
+      "Tarana",
+      "Tendra"
+    ]
+  ],
+  "757046": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bahalda",
+      "Basingi",
+      "Binjhua",
+      "Dundu",
+      "Gambharia",
+      "Indukhali",
+      "Kulgi",
+      "Moronda",
+      "Purunapani",
+      "Soso",
+      "Tamalbandh"
+    ]
+  ],
+  "757047": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badampahar",
+      "Basilapir",
+      "Dova",
+      "Jhipabandh",
+      "Jorda",
+      "Kathbharia",
+      "Padhia",
+      "Talakpokhari"
+    ]
+  ],
+  "757048": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Ambadiha",
+      "Badamtalia",
+      "Banakati",
+      "Bijatala",
+      "Damudigoda",
+      "Luhakani",
+      "Luhasila",
+      "Manikpur",
+      "Raihari",
+      "Sargoda"
+    ]
+  ],
+  "757049": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Balidiha",
+      "Bhaluki",
+      "Chandanpur",
+      "Chhadkata",
+      "Haldibani",
+      "Jagannathpur",
+      "Kendua",
+      "Kisandahi",
+      "Kochilaghaty",
+      "Palpala Ambadali",
+      "Poda Astia",
+      "Rangamatia",
+      "Saratchandrapur",
+      "Shyamakhunta",
+      "Sindurgoura",
+      "Sirishbani"
+    ]
+  ],
+  "757050": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Aharbandh",
+      "Bhalubasa",
+      "Chuapani",
+      "Hatbadra",
+      "Hesda",
+      "Kumudasole",
+      "Kusumi",
+      "Pratapgarh",
+      "Purunaghati",
+      "Purunapani",
+      "Shyamsundar",
+      "Suleipat",
+      "Ukam",
+      "Uparbeda"
+    ]
+  ],
+  "757051": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bagbuda",
+      "Kherna",
+      "Mahulbarei",
+      "Murunia",
+      "Palasbani",
+      "Pokharia",
+      "Ratila",
+      "Saraskana",
+      "Silfodi",
+      "Unchagaon"
+    ]
+  ],
+  "757052": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Aldia Bartana",
+      "Anla",
+      "Bhudurbani",
+      "Durgapur",
+      "Hatijhari",
+      "Jugal",
+      "Jugpura",
+      "Khadikapada",
+      "Kuradhika",
+      "Machhapada",
+      "Merda",
+      "Paika Sahi",
+      "Raghavpur",
+      "Raikama",
+      "Saitpur",
+      "Sansa",
+      "Tilapada",
+      "Totapada"
+    ]
+  ],
+  "757053": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Baddalima",
+      "Badpalasa",
+      "Bhagabandi",
+      "Changua",
+      "Dharamdihi",
+      "Jirei",
+      "Lupung",
+      "Maghua",
+      "Pandupani",
+      "Sanbhundu",
+      "Tiring"
+    ]
+  ],
+  "757054": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Asana",
+      "Badkedam",
+      "Bahalda Rd RS",
+      "Bhitaramda",
+      "Dolsara",
+      "Soroda Jashipur",
+      "Tarana"
+    ]
+  ],
+  "757055": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Amarda",
+      "Brahmapura",
+      "Haripur",
+      "Mangalpur",
+      "Panisapada",
+      "Purnachandrapur",
+      "Sarisa"
+    ]
+  ],
+  "757073": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bhaduasole",
+      "Harekrushnapur",
+      "Khuruntia",
+      "Mahulia",
+      "Nalagaja",
+      "Rangiam",
+      "Tukpalasia"
+    ]
+  ],
+  "757074": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badfeni",
+      "Badpathara",
+      "Bahalda",
+      "Bandhagoda",
+      "Bangra",
+      "Basipitha",
+      "Sapanchua",
+      "Talakunda",
+      "Tangana"
+    ]
+  ],
+  "757075": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Ambadali",
+      "Astajharan",
+      "Bireswarpur",
+      "Chandrapur",
+      "Dukura",
+      "Itamundia",
+      "Kamalasole",
+      "Kamali",
+      "Khanua",
+      "Lakhanasahi",
+      "Narankhunta",
+      "Salbani"
+    ]
+  ],
+  "757077": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badkhaman",
+      "Chakradharpur",
+      "Hill Block 24",
+      "Kolialam",
+      "Manikpur",
+      "Nudadiha",
+      "Podadiha",
+      "Potaldiha",
+      "Sarbanghati"
+    ]
+  ],
+  "757079": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Dewan Bahali",
+      "Gour Chandra Pur",
+      "Kalamgodia",
+      "Katuria",
+      "Labanyadeipur",
+      "Nedam",
+      "Rajat Nagar",
+      "Saradiha",
+      "Sarat"
+    ]
+  ],
+  "757081": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Budama R.S.",
+      "Dhangudisole",
+      "Dudhiasole",
+      "Kesharpur",
+      "Khairbani",
+      "Kothabila",
+      "Kumbharmundakata",
+      "Nodhana",
+      "Sankucha"
+    ]
+  ],
+  "757082": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Alda",
+      "Balka",
+      "Durgapur",
+      "Garhdeulia",
+      "Gosaingaon",
+      "Hempur",
+      "Kalama",
+      "Kantipur",
+      "Palasia"
+    ]
+  ],
+  "757083": [
+    "Mayurbhanj",
+    "Odisha",
+    ["Arpata", "Bhimda", "C.Mangalpur", "Daundia", "Patisari", "Tentuligaon"]
+  ],
+  "757084": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badbhalia",
+      "Baddhenkia",
+      "Brahmanmara",
+      "Chadheigaon",
+      "Dharampura",
+      "Fania",
+      "Gouduniduba",
+      "Kaduani",
+      "Kostha",
+      "Marudihi",
+      "Naupada",
+      "Nuhajhalia",
+      "Paktia"
+    ]
+  ],
+  "757085": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Baradihi",
+      "Debgaon",
+      "Jaipur",
+      "Kushalda",
+      "Pathurikata",
+      "Srinathpur",
+      "Taradasole"
+    ]
+  ],
+  "757086": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badchatra",
+      "Badsole",
+      "Belbaria",
+      "Bhursani",
+      "Jalda",
+      "Jharpokharia",
+      "Khadiasole",
+      "Kuanrdihi",
+      "Nuhamalia",
+      "Padmapur Deuli",
+      "Rajaloka"
+    ]
+  ],
+  "757087": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Ambikadeipur",
+      "Athapara",
+      "Balichhatra",
+      "Brundaban Chandrapur",
+      "Chadada",
+      "Chandrapur",
+      "Dhanghera",
+      "Gadigaon",
+      "Hatisahi",
+      "Kundabai",
+      "Patsanipur",
+      "Sridamchandrapur"
+    ]
+  ],
+  "757091": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bakla",
+      "Begunia",
+      "Bhanjkia",
+      "Ektali",
+      "Gadapalasa",
+      "Jharbeda",
+      "Khairi Jashipur",
+      "M.Beuinria",
+      "Matiagarh",
+      "Neuti",
+      "Sirakuli",
+      "Tilakothi"
+    ]
+  ],
+  "757092": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badgaon",
+      "Bhuasuni",
+      "Budhikhamari",
+      "Hinjili",
+      "Jaldiha",
+      "Kanchhinda",
+      "Kundulia",
+      "Kusumbandi",
+      "Labania",
+      "Sarisapal",
+      "Shyamsundarpur"
+    ]
+  ],
+  "757093": [
+    "Mayurbhanj",
+    "Odisha",
+    ["Dumurdiha", "Joka", "Paktia", "Pokhardiha", "Pokpoka", "Sankhabhanga"]
+  ],
+  "757100": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Badchhuruni",
+      "Bahanada Sathilo",
+      "Dahikoti",
+      "Muktapur",
+      "Purikhunta",
+      "Purinda",
+      "Saria",
+      "Tarakothi"
+    ]
+  ],
+  "757101": [
+    "Mayurbhanj",
+    "Odisha",
+    ["Bairatpur", "Dihirakul", "Dimagadia", "Radho", "Teldihudi"]
+  ],
+  "757102": [
+    "Mayurbhanj",
+    "Odisha",
+    ["Chaturi", "Pasuda", "Puruna Baripada", "Sainkula", "Sanbelakuti", "Sirathali"]
+  ],
+  "757103": [
+    "Mayurbhanj",
+    "Odisha",
+    ["Haripur", "Madhopur", "Orachandbilla", "Pratappur"]
+  ],
+  "757104": [
+    "Mayurbhanj",
+    "Odisha",
+    ["Bahanada", "Bholagadia", "Dengam", "Gayalmara", "Nuagaon"]
+  ],
+  "757105": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Aniapal",
+      "Asanjoda",
+      "Baiganbaria",
+      "Dumurdiha",
+      "Gangraj",
+      "Haldia (Baripada)",
+      "Kantapal",
+      "Kuchei"
+    ]
+  ],
+  "757106": [
+    "Mayurbhanj",
+    "Odisha",
+    ["Mahulpankha", "Majhigadia", "Padmapokhari", "Raipal", "Salchua", "Sundhal"]
+  ],
+  "757107": [
+    "Mayurbhanj",
+    "Odisha",
+    [
+      "Bankisole",
+      "Bhudrubani",
+      "Garudnesa",
+      "Kainfulia",
+      "Laxmiposi",
+      "Patharchakuli",
+      "Rajabasa",
+      "Sanfutuka",
+      "Sankhabhanga"
+    ]
+  ],
+  "758001": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Keonjhar Court",
+      "Keonjhar Mining School",
+      "Keonjhar New Markt",
+      "Keonjhar Science College",
+      "Keonjhargarh",
+      "Madhapur"
+    ]
+  ],
+  "758002": [
+    "Kendujhar",
+    "Odisha",
+    ["Bodapalasa", "Ghutur", "Keonjhar Atopur", "Keonjhar Bazar", "Nelung", "Ranki"]
+  ],
+  "758013": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Bauripada",
+      "Birakishorepur",
+      "Dhrupada",
+      "Gobardhan",
+      "Kadagarh",
+      "Kempasada",
+      "Kusumita",
+      "Mahadeijoda",
+      "Nuagaon",
+      "Padmapur",
+      "Raisuan",
+      "Sankir",
+      "Sendkap",
+      "Tikarpada"
+    ]
+  ],
+  "758014": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Badaposi",
+      "Bolaniposi",
+      "Dimba",
+      "Dimirimunda",
+      "Haladharpur",
+      "Kudipasa",
+      "Maidankela",
+      "Mandua",
+      "Naranpur",
+      "Raghunathpur",
+      "Sirishpal"
+    ]
+  ],
+  "758015": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Atasahi",
+      "Bada Ektali",
+      "Biragobindapur",
+      "Dhakotha",
+      "Ghasipura",
+      "Gohira",
+      "Kanto",
+      "Khaliamenta",
+      "Kolimati",
+      "Naduan",
+      "Sailong",
+      "Santoshpur",
+      "Trilochanpur"
+    ]
+  ],
+  "758016": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Badabaliposi",
+      "Baratania",
+      "Begna",
+      "Bholapada",
+      "Digiposi",
+      "Gujitangiri",
+      "Kapundi",
+      "Raidiha",
+      "Saharpada",
+      "Tanda",
+      "Tavasarua",
+      "Tendra"
+    ]
+  ],
+  "758017": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Badagambharia",
+      "Chakundapal",
+      "Jadichatar",
+      "Jamunaposi",
+      "Kantiapada",
+      "Kendeiposi",
+      "Murusuan",
+      "Rajanagar",
+      "Silida"
+    ]
+  ],
+  "758018": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Barhagarh",
+      "Bayakumutia",
+      "Champei",
+      "Guptaganga",
+      "Kanjipani",
+      "Kuanr",
+      "Pandadar",
+      "Suakati"
+    ]
+  ],
+  "758019": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Deoladiha",
+      "Doblapal",
+      "Goda",
+      "Jata",
+      "Karadangi",
+      "Khuntapada Charigarh",
+      "Oriya",
+      "Talapada",
+      "Telkoi"
+    ]
+  ],
+  "758020": [
+    "Kendujhar",
+    "Odisha",
+    ["Bailo", "Belabahali", "Panchupally", "Purunia", "Salapada", "Tolankapada", "Tukuna"]
+  ],
+  "758021": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Anandapur",
+      "Anandapur College",
+      "Angarua",
+      "Badapadana",
+      "Baladuan",
+      "Bankhidi",
+      "Baunsagarh",
+      "Gayalamunda",
+      "Kantipal",
+      "Kathakata",
+      "Kodapada",
+      "Manoharpur",
+      "Nuagaon",
+      "Padmapur",
+      "Panasadiha",
+      "Purunaghati",
+      "Raitola",
+      "Salabani",
+      "Taneipal",
+      "Taratara"
+    ]
+  ],
+  "758022": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Ambagadia",
+      "Ambo",
+      "Bancho",
+      "Biridi",
+      "Fakirpur",
+      "Girigaon",
+      "Jambhara",
+      "Karagola",
+      "Mugupur",
+      "Samana",
+      "Sankho",
+      "Sulana"
+    ]
+  ],
+  "758023": [
+    "Kendujhar",
+    "Odisha",
+    ["Balibarei", "Bangore", "Dhenka", "Hadagarh", "Podasingidi", "Sadha"]
+  ],
+  "758025": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Balarampur",
+      "Balipal",
+      "Bangarkota",
+      "Baripal",
+      "Bhandaridiha",
+      "Daradipal",
+      "Jalasuanpatna",
+      "Kanpur",
+      "Keshudurapal",
+      "Khalapal",
+      "Kochianandi",
+      "Kushaleswar",
+      "Radhikadeipur",
+      "Samukanandi",
+      "Tarimul",
+      "Toraniapal",
+      "Uchaabali"
+    ]
+  ],
+  "758026": ["Kendujhar", "Odisha", ["Baliparbata", "Talapada"]],
+  "758027": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Badajamposi",
+      "Baiganpal",
+      "Balipokhari",
+      "Bandakanda Haladharpur",
+      "Barahatipura",
+      "Dhangadadiha",
+      "Gadadharpur",
+      "Ghatagaon",
+      "Kendudiha",
+      "Kundapitha",
+      "Kusunpur",
+      "Manata",
+      "Mukundapur Patna",
+      "Nusuriposi",
+      "Rajabandha",
+      "Tara"
+    ]
+  ],
+  "758028": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Badanuagaon",
+      "Badasialimal",
+      "Bhawanarpur",
+      "Chakradharpur",
+      "Gandadiha",
+      "Harichandanpur",
+      "Hundapalasapal",
+      "Jiranga",
+      "Kaduadiha",
+      "Kuntla",
+      "Pitapiti",
+      "Pithagola",
+      "Sunapentha",
+      "Tambahara",
+      "Thakurapada"
+    ]
+  ],
+  "758029": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Bholabeda",
+      "Chinamaliposi",
+      "Dhenkikote",
+      "Kathabari",
+      "Katrabeda",
+      "Ketanga",
+      "Manoharpur",
+      "Muktapur",
+      "Palanghati",
+      "Pipilia",
+      "Poipani",
+      "Sanamasinabila",
+      "Santrapur",
+      "Toranipokhari"
+    ]
+  ],
+  "758030": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Brahmanideo",
+      "Dumuria",
+      "Erendei",
+      "Gobarbeda",
+      "Mushakhari",
+      "Saraskela",
+      "Swampatna",
+      "Tangarpada"
+    ]
+  ],
+  "758031": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Arsala",
+      "Balibandha",
+      "Chipinda",
+      "Handibhanga",
+      "Jhumpura",
+      "Kandraposi",
+      "Kanjipani",
+      "Kasipal",
+      "Kathabaunsuli",
+      "Kaunrikala (B)",
+      "Khendra",
+      "Khuntapada",
+      "Malda",
+      "Nahabeda",
+      "Palasapanga",
+      "Parajanpur",
+      "Raikala",
+      "Silisuan"
+    ]
+  ],
+  "758032": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Asanpat",
+      "Badadumuria",
+      "Badaneuli",
+      "Baria",
+      "Baunsuli",
+      "Bhodaposi",
+      "Bhuinpur",
+      "Bhulda",
+      "Gidhibas",
+      "Jally",
+      "Kaunrikala (A)",
+      "Niundi",
+      "Padua",
+      "Radhikadeipur",
+      "Rasabantala",
+      "Sarasinga",
+      "Silitia",
+      "Tukudiha",
+      "Ukhunda"
+    ]
+  ],
+  "758034": [
+    "Kendujhar",
+    "Odisha",
+    ["Bansapani", "Bichakundi", "Gurutuan", "Jajanga", "Joda", "Khandabandha"]
+  ],
+  "758035": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Barbil",
+      "Bhadrasahi",
+      "Bhuyanroida",
+      "Guali",
+      "Kasia (KA)",
+      "Nalda",
+      "Serenda",
+      "Sundara Shiv Mandir",
+      "Thakurani"
+    ]
+  ],
+  "758036": ["Kendujhar", "Odisha", ["Kolhabarapada", "Matkambeda"]],
+  "758037": ["Kendujhar", "Odisha", ["Balagoda", "Bolani"]],
+  "758038": [
+    "Kendujhar",
+    "Odisha",
+    ["Baneikala", "Bileipada", "Birikala", "Daduan", "Deojhar", "Kolhahundula"]
+  ],
+  "758040": ["Kendujhar", "Odisha", ["Dhanurjaypur Haramatha", "Kiriburu Hill Top"]],
+  "758041": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Chamakpur",
+      "Champua",
+      "Dhobakuchuda",
+      "Jagannathpur Ashram",
+      "Jamudalak",
+      "Kadagadia",
+      "Kainta",
+      "Panchapokharia",
+      "Sarei",
+      "Sasanga",
+      "Sunaposi"
+    ]
+  ],
+  "758043": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Alati",
+      "Batto",
+      "Bhaganai",
+      "Bhaluka",
+      "Garabandagoda",
+      "Jalasuan",
+      "Kendukhunta",
+      "Khalana",
+      "Machhala",
+      "Madanpur",
+      "Madhukeshari",
+      "Nandabara",
+      "Pandua",
+      "Patsura",
+      "Purunabandagoda",
+      "Ramachandrapur",
+      "Sainkul",
+      "Taruan"
+    ]
+  ],
+  "758044": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Badanai",
+      "Bankia",
+      "Bhanda",
+      "Chauthia",
+      "Gundunia",
+      "Kalinga",
+      "Kanjiasula",
+      "Karanjia",
+      "Kasipal",
+      "Nandapur",
+      "Padmapur",
+      "Pokharia",
+      "Rangamatia",
+      "Raruanguda",
+      "Sologuda",
+      "Uchhabali"
+    ]
+  ],
+  "758045": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Baikala",
+      "Jamuda",
+      "Khajirapat",
+      "Khuntapada",
+      "Khuntapingu",
+      "Malarpada",
+      "Silipada",
+      "Udayapur"
+    ]
+  ],
+  "758046": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Budhikapudi",
+      "Chemana",
+      "Childa",
+      "Jyotipur",
+      "Kankada",
+      "Khireitangiri",
+      "Phulkanlei",
+      "Putugaon",
+      "Sadangi",
+      "Turumunga"
+    ]
+  ],
+  "758047": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Amalanigoda",
+      "Anseikala",
+      "Balabhadrapur",
+      "Basira",
+      "Basudevpur",
+      "Gumura",
+      "Kalikaprasad",
+      "Kandra",
+      "Naradapur",
+      "Nayakrihsnapur",
+      "Nischintapur",
+      "Parsala",
+      "Rajia",
+      "Remuli",
+      "Taduabahal"
+    ]
+  ],
+  "758076": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Akula",
+      "Balabhadrapur",
+      "Bhimkand",
+      "Bimala",
+      "Birabarpur Nuagaon",
+      "Kaliahata",
+      "Karamangi",
+      "Nuagaon",
+      "Podanga",
+      "Purujoda",
+      "Raisuan Patkholi",
+      "Sirigida",
+      "Sunduria"
+    ]
+  ],
+  "758078": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Barigaon",
+      "Bidyadharpur",
+      "Dhanurjaypur",
+      "Kahaliagadia",
+      "Kanpur",
+      "Padhiaripally",
+      "Raighati",
+      "Soso"
+    ]
+  ],
+  "758079": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Baxibarigaon",
+      "Hunda",
+      "Janghira",
+      "Junga",
+      "Khajuribani",
+      "Masinajodi",
+      "Mishramala",
+      "Somagiri",
+      "Tentlaposi"
+    ]
+  ],
+  "758080": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Bhagamunda",
+      "Billa",
+      "Chilikdhara",
+      "Karadapal",
+      "Masinajoda",
+      "Nuagaon",
+      "Revanapalaspal",
+      "Sagadapata"
+    ]
+  ],
+  "758081": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Banabir",
+      "Damahuda",
+      "Gholkunda",
+      "Goras",
+      "Khadikapada",
+      "Machhagarh",
+      "Mirigikhoji"
+    ]
+  ],
+  "758082": ["Kendujhar", "Odisha", ["Alutuma", "Brahmanipal", "Kansa", "Tangiriapal"]],
+  "758083": [
+    "Kendujhar",
+    "Odisha",
+    ["Badarampas", "Chhenapadi", "Hatadihi", "Inchola", "Mareigaon", "Orali"]
+  ],
+  "758084": [
+    "Kendujhar",
+    "Odisha",
+    ["Binjabahal", "Chhamunda", "Jagamohanpur", "Nuadihi", "Saleikana", "Saruali", "Tana"]
+  ],
+  "758085": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Banspal",
+      "Baragoda",
+      "Fuljhar",
+      "Jatra",
+      "Kadakala",
+      "Karangadihi",
+      "Kumundi (KHA)",
+      "Kushakala",
+      "Nayakote",
+      "Raigoda",
+      "Singpur",
+      "Taramakanta",
+      "Urumunda"
+    ]
+  ],
+  "758086": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Balada",
+      "Bamebari",
+      "Basantapur",
+      "Belda",
+      "Chormalda",
+      "Dabuna",
+      "Guruda",
+      "Palasa (KHA)",
+      "Silijoda"
+    ]
+  ],
+  "758087": [
+    "Kendujhar",
+    "Odisha",
+    [
+      "Badapichhula",
+      "Balabhadrapur",
+      "Basantapur",
+      "Binida",
+      "Jharbeda",
+      "Pandapada",
+      "Patilo",
+      "Purumunda",
+      "Rutisila"
+    ]
+  ],
+  "759001": ["Dhenkanal", "Odisha", ["Dhenkanal", "Dhenkanal College", "Jubuli Town"]],
+  "759013": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Bajichowk",
+      "Barada",
+      "Chaulia",
+      "Dhenkanal R S",
+      "Gengutia",
+      "Kankadpal",
+      "Korian",
+      "Mahisapat",
+      "Saptasajya",
+      "Shankarpur",
+      "Tarava"
+    ]
+  ],
+  "759014": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Badanagena",
+      "Bainsia",
+      "Banasingh",
+      "Chirulei",
+      "Kabera Madhapur",
+      "Kaluria",
+      "Karamul",
+      "Kendupada",
+      "Khankar",
+      "Mahapada",
+      "Mahimagadi",
+      "Neulpoi",
+      "Radhadeipur"
+    ]
+  ],
+  "759015": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Bhaliabolkateni",
+      "Bhapur",
+      "Chandrasekharaprasad",
+      "Dhirapatna",
+      "Ghatipiri",
+      "Govindprasad",
+      "Kakudibhag",
+      "Kalanga",
+      "Kalikaprasad",
+      "Kamadhenukote",
+      "Kankadahad Sadar",
+      "Kottam",
+      "Mangalpur",
+      "Sarakpatana"
+    ]
+  ],
+  "759016": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Barada",
+      "Bidharpur",
+      "Gondiapatna",
+      "Kalunigoda",
+      "Kapilash",
+      "Kashipur",
+      "Khankira",
+      "Lauloi",
+      "Letheka",
+      "Mandar",
+      "Mathatentulia",
+      "Nihalprasad",
+      "Nuagarh",
+      "Pingua",
+      "Raitala",
+      "Sadangi",
+      "Santhapur",
+      "Sorisiapada"
+    ]
+  ],
+  "759017": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Anantapur",
+      "Anlajhari",
+      "Balibo",
+      "Bhuban",
+      "Bhusal",
+      "Chandipal",
+      "Dhalapada",
+      "Ekatali",
+      "Mahulapal",
+      "Ramakrishnapur",
+      "Rendapatana"
+    ]
+  ],
+  "759018": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Batagaon",
+      "Baunsapal",
+      "Bhagirathipur",
+      "Jayapurakateni",
+      "Kamakhyanagar",
+      "Kamarda",
+      "Kanapura",
+      "Khajuria",
+      "Mahulpal",
+      "Malapura",
+      "Motta",
+      "Muktapasi",
+      "Pipala",
+      "Samatangi",
+      "Saruali",
+      "Sibulapasi"
+    ]
+  ],
+  "759019": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Babandha",
+      "Balaramprasad",
+      "Bangursinga",
+      "Bedapada",
+      "Chandpur",
+      "Dhalapur",
+      "Hindol Road R.S.",
+      "Kumusi",
+      "Nadhara",
+      "Saanda"
+    ]
+  ],
+  "759020": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Badalo",
+      "Balimi",
+      "Chitalpur",
+      "Dudurkote",
+      "Giridharaprasad",
+      "Hatura",
+      "Kalanda",
+      "Karanda",
+      "Krishnachandrapur",
+      "Panchapada",
+      "Ranjagol",
+      "Thokar"
+    ]
+  ],
+  "759021": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Buhalipal",
+      "Chhotapada",
+      "Gandanali",
+      "Kalingapal",
+      "Khaliborei",
+      "Kunua",
+      "Nuabag",
+      "Rasol"
+    ]
+  ],
+  "759022": [
+    "Dhenkanal",
+    "Odisha",
+    ["Baunsapokhari", "Hindol", "Kansara", "Maidharpur", "Phulapada"]
+  ],
+  "759023": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Bankual",
+      "Bhairpur",
+      "Dighi",
+      "Gobinda Bidyadharpur",
+      "Gorodia",
+      "Guneibil",
+      "Jineilo",
+      "Jiral",
+      "Khurusia",
+      "Marthapur"
+    ]
+  ],
+  "759024": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Anal",
+      "Baruan",
+      "Garh Nrusinghaprasad",
+      "Jamunakote",
+      "Mathakargola",
+      "Odisha",
+      "Surapratapapur"
+    ]
+  ],
+  "759025": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Balarampur",
+      "Bampa",
+      "Baulpur",
+      "Belapada",
+      "Brahmaniapal",
+      "Gadasila",
+      "Gunadei",
+      "Gundichapada",
+      "Indipur",
+      "Kandabindha",
+      "Kasiadihi",
+      "Sadasivapur",
+      "Siminai"
+    ]
+  ],
+  "759026": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Aluajharan",
+      "Anlabereni",
+      "Bamuan",
+      "Gangijodi",
+      "Ichhabatipur",
+      "Kantapal",
+      "Kantiokateni",
+      "Kantioputasahi",
+      "Kotagara",
+      "Kusumjodi",
+      "Rainrusinghpur",
+      "Sogar",
+      "Tumusinga"
+    ]
+  ],
+  "759027": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Baladiabandha",
+      "Belatikiri",
+      "Gahamkhunti",
+      "Govindpur",
+      "Kaimati",
+      "Mahulapada",
+      "Manipur",
+      "Nadiali",
+      "Talabarkote"
+    ]
+  ],
+  "759028": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Bam",
+      "Kandhara",
+      "Kankadahad",
+      "Kantapal",
+      "Kantol",
+      "Karagola",
+      "Kerjoli",
+      "Tariniposi"
+    ]
+  ],
+  "759029": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Ambapalas",
+      "Bhejia",
+      "Biribolei",
+      "Chandapur",
+      "Dashipur",
+      "Garh Palasuni",
+      "Ghagarmunda",
+      "Jhili",
+      "Kuturia",
+      "Mahabirod",
+      "Pangatira"
+    ]
+  ],
+  "759037": ["Anugul", "Odisha", ["Samal Barrage Township"]],
+  "759039": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Badasuanlo",
+      "Baisingha",
+      "Baligoroda",
+      "Birasal",
+      "Jagannathpur",
+      "Kanheipal",
+      "Khatakhura",
+      "Makuakateni",
+      "Maruabil",
+      "Raibol"
+    ]
+  ],
+  "759040": ["Anugul", "Odisha", ["Talmul"]],
+  "759100": [
+    "Anugul",
+    "Odisha",
+    [
+      "Arkil",
+      "Biru",
+      "Burukuna",
+      "Dharampur",
+      "Durgapur",
+      "Ekagharia",
+      "Gaham",
+      "Gurujang",
+      "Handidhua",
+      "Kandhalo",
+      "Kankili",
+      "Kantiapasi",
+      "Parabil",
+      "Radharamanpur",
+      "Samal",
+      "Saradhapur",
+      "Seepur",
+      "Talcher",
+      "Talcher R.S."
+    ]
+  ],
+  "759101": ["Anugul", "Odisha", ["Gurujanguli", "Talcher Thermal"]],
+  "759102": ["Anugul", "Odisha", ["Deulbera Colliery"]],
+  "759103": [
+    "Anugul",
+    "Odisha",
+    [
+      "Badajarada",
+      "Danra",
+      "Dera",
+      "Ghantapada",
+      "Gobara",
+      "Gopalprasad",
+      "Hensamul",
+      "Kalamchhuin",
+      "Karnapur",
+      "Kumunda",
+      "Padmabatipur",
+      "Solada",
+      "Tentulei"
+    ]
+  ],
+  "759104": [
+    "Anugul",
+    "Odisha",
+    ["Ballahar Chhak", "Chainpal Colony", "Jagannathpur", "Santhapada"]
+  ],
+  "759105": [
+    "Anugul",
+    "Odisha",
+    [
+      "Bajrakote",
+      "Balipasi",
+      "Gandamala",
+      "Kuluma",
+      "Podagarh",
+      "Rengali",
+      "Rengali Dam Site",
+      "Susuba"
+    ]
+  ],
+  "759106": ["Anugul", "Odisha", ["Vikrampur"]],
+  "759107": ["Anugul", "Odisha", ["Talcher Town"]],
+  "759111": ["Anugul", "Odisha", ["Jindal Nagar"]],
+  "759116": ["Anugul", "Odisha", ["Balanda"]],
+  "759117": [
+    "Anugul",
+    "Odisha",
+    [
+      "Badagundari",
+      "Badatribida",
+      "Bijigol",
+      "Dalak",
+      "Derang",
+      "Hanumanpur",
+      "Jarada",
+      "Kakudia",
+      "Kaniha",
+      "Kansamunda",
+      "Nalam",
+      "Poipal",
+      "Sanatribida"
+    ]
+  ],
+  "759118": [
+    "Anugul",
+    "Odisha",
+    [
+      "Badasada",
+      "Barkotia",
+      "Injidi",
+      "Khamar",
+      "Kunjam",
+      "Munduribeda",
+      "Odasha",
+      "Rajdang",
+      "Sankhamur"
+    ]
+  ],
+  "759119": [
+    "Anugul",
+    "Odisha",
+    [
+      "Bandhabhuin",
+      "Baradiha",
+      "Chasagurjang",
+      "Dimiria",
+      "Iswarnagar",
+      "Jamardihi",
+      "Jharabeda",
+      "Karadapal",
+      "Khemla",
+      "Nagira",
+      "Pallahara",
+      "Phapanda",
+      "Sahara Gurjang",
+      "Saida",
+      "Seegarh",
+      "Siarimalia"
+    ]
+  ],
+  "759120": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Badajhara",
+      "Badakamar",
+      "Barihapur",
+      "Basoi",
+      "Damal",
+      "Kandarsinga",
+      "Kankadasoda",
+      "Kankili",
+      "Kantor",
+      "Kuanlo",
+      "Lodhani",
+      "Mundeilo",
+      "Parjang",
+      "Patamandir",
+      "Pitiri",
+      "Roda"
+    ]
+  ],
+  "759121": [
+    "Dhenkanal",
+    "Odisha",
+    [
+      "Beruanpal",
+      "Bido",
+      "Chintapokhari",
+      "Haladiabahal",
+      "Kadala",
+      "Kamalanga",
+      "Kankalu",
+      "Kantimili",
+      "Kharagprasad",
+      "Kusupanga",
+      "Meramandali",
+      "Nimabahali",
+      "Paikapurunakote",
+      "Patala",
+      "Sibapur"
+    ]
+  ],
+  "759122": ["Dhenkanal", "Odisha", ["Angul", "Angul Bazar"]],
+  "759123": [
+    "Anugul",
+    "Odisha",
+    [
+      "Kuio",
+      "Kukudang",
+      "Kurudol",
+      "Natada",
+      "P.T.C.,Angul",
+      "Ranigoda",
+      "Sakasingha",
+      "Turang"
+    ]
+  ],
+  "759124": [
+    "Anugul",
+    "Odisha",
+    [
+      "Balipatta",
+      "Chhendipada",
+      "Kukurpeta",
+      "Kusakila",
+      "Machhakuta",
+      "Nuapada",
+      "Podapada",
+      "Tentuloi"
+    ]
+  ],
+  "759125": [
+    "Anugul",
+    "Odisha",
+    [
+      "Aida",
+      "Ambasarmunda",
+      "Athamallik",
+      "Bhejigotha",
+      "Bileinali",
+      "Jamudoli",
+      "Kampala",
+      "Kandhapada",
+      "Kantapada",
+      "Krutibaspur",
+      "Kudugaon",
+      "Luhasinga",
+      "Lunahandi",
+      "Madhapur",
+      "Maimura",
+      "Nagaon",
+      "Paiksahi",
+      "Puruna Manitiri",
+      "Rainali",
+      "Sanahulla",
+      "Thakurgarh"
+    ]
+  ],
+  "759126": [
+    "Anugul",
+    "Odisha",
+    [
+      "Ambapal",
+      "Angapada",
+      "Bamur",
+      "Ghosar",
+      "Himitira",
+      "Kadalimunda",
+      "Kalyanpur",
+      "Kiakata",
+      "Nakchi",
+      "Oskapalli",
+      "Rajkishorenagar",
+      "Raniakata",
+      "Sanjamura",
+      "Tusar",
+      "Urukela"
+    ]
+  ],
+  "759127": [
+    "Anugul",
+    "Odisha",
+    [
+      "Bimalabeda",
+      "Dandasinga",
+      "Durgapur",
+      "Handapa",
+      "Jarada",
+      "Jarapada",
+      "Jeranga Dehuri Sahi",
+      "Kanteikolia",
+      "Katada",
+      "Kishoreganj",
+      "Korada",
+      "Kothabhuin",
+      "Luhamunda",
+      "Papsara",
+      "Para",
+      "Pedipathar",
+      "Tainsi",
+      "Tapdhol",
+      "Tukuda",
+      "Ugi"
+    ]
+  ],
+  "759128": [
+    "Anugul",
+    "Odisha",
+    [
+      "Arahat",
+      "Badakhali",
+      "Balaramprasad",
+      "Banarpal",
+      "Bonda",
+      "Budhapanka",
+      "Garh Santiri",
+      "Gotamara",
+      "Kalandapal",
+      "Khalibereni",
+      "Nuahata",
+      "Sanjapada",
+      "Tulasipal"
+    ]
+  ],
+  "759129": [
+    "Anugul",
+    "Odisha",
+    [
+      "Badakantakul",
+      "Balasinga",
+      "Baluakata",
+      "Bantala",
+      "Baragounia",
+      "Basala",
+      "Bedasasan",
+      "Dhokuta",
+      "Garh Taras",
+      "Hamamira",
+      "Inkarabandha",
+      "Khinda",
+      "Kumursinga",
+      "Manapur",
+      "Nuakheta",
+      "Pokatunga",
+      "Sankapur",
+      "Talagarh"
+    ]
+  ],
+  "759130": [
+    "Anugul",
+    "Odisha",
+    [
+      "Brahmanbil",
+      "Changudia",
+      "Kampsala",
+      "Kosala",
+      "Nisha",
+      "Raijharan",
+      "Santarabandha"
+    ]
+  ],
+  "759132": [
+    "Anugul",
+    "Odisha",
+    [
+      "Ankula",
+      "Badakera",
+      "Balanga",
+      "Champatimunda",
+      "Hulurisinga",
+      "Jagannathpur",
+      "Kangula",
+      "Karadagadia",
+      "Khalari",
+      "Khandahatta",
+      "Nandapur",
+      "Paratara",
+      "Purunagarh",
+      "Purunakote",
+      "Rantalei",
+      "Saradhapur",
+      "Tikarapada",
+      "Tubey"
+    ]
+  ],
+  "759141": [
+    "Anugul",
+    "Odisha",
+    [
+      "Bagedia",
+      "Barasahi",
+      "Basantapur",
+      "Kanaloi",
+      "Nuagaon",
+      "Patakumunda",
+      "Patrapada",
+      "Pipalabahal",
+      "Sapoinali",
+      "Tangiri"
+    ]
+  ],
+  "759143": [
+    "Anugul",
+    "Odisha",
+    ["Badkerjang", "Golabandha", "Hakimpada", "Jarasingha", "Kumanda", "Parang"]
+  ],
+  "759145": ["Anugul", "Odisha", ["Kandasar", "Kulad", "Nalconagar"]],
+  "759146": [
+    "Dhenkanal",
+    "Odisha",
+    ["Akhuapal", "Gengutia", "Igit Sarang", "Kulei", "Manikmara", "Saranga"]
+  ],
+  "759147": ["Anugul", "Odisha", ["Deepasikha", "Gadasila"]],
+  "759148": ["Anugul", "Odisha", ["Nehru Satabdi Nagar (Bharatpu)"]],
+  "759149": ["Anugul", "Odisha", ["Jarapada"]],
+  "759151": ["Dhenkanal", "Odisha", ["Pabitranagar"]]
+}

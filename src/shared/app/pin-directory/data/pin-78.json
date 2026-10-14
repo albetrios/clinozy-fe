@@ -1,0 +1,5479 @@
+{
+  "781001": ["Kamrup Metro", "Assam", ["Fancy Bazar", "Guwahati", "Uzanbazar"]],
+  "781002": ["Kamrup Metro", "Assam", ["IBC Guwahati P.O"]],
+  "781003": ["Kamrup Metro", "Assam", ["Assam Tribune", "Silpukhuri"]],
+  "781004": ["Kamrup Metro", "Assam", ["Kharguli"]],
+  "781005": ["Kamrup Metro", "Assam", ["Dispur", "Japorigog"]],
+  "781006": ["Kamrup Metro", "Assam", ["Assam Sachivalaya"]],
+  "781007": ["Kamrup Metro", "Assam", ["Lachitnagar", "Ulubari"]],
+  "781008": ["Kamrup Metro", "Assam", ["Paltanbazar", "Rehabari"]],
+  "781009": ["Kamrup Metro", "Assam", ["Bharalumukh"]],
+  "781010": ["Kamrup Metro", "Assam", ["Kamakhya"]],
+  "781011": ["Kamrup Metro", "Assam", ["Debgotanagar", "Gotanagar", "Mlg Rly Hqs"]],
+  "781012": [
+    "Kamrup Metro",
+    "Assam",
+    ["Dehangarigaon", "Pandu", "Pandu Rly Colony", "Sadilapur"]
+  ],
+  "781013": ["Kamrup Metro", "Assam", ["Jalukbari"]],
+  "781014": ["Kamrup Metro", "Assam", ["Guwahati University"]],
+  "781015": ["Kamrup Metro", "Assam", ["Bongra", "Guwahati Airport"]],
+  "781016": ["Kamrup Metro", "Assam", ["Gopinathnagar"]],
+  "781017": ["Kamrup Metro", "Assam", ["Azara", "Bhattaparagaral", "Dharapur"]],
+  "781018": ["Kamrup Metro", "Assam", ["Binovanagar"]],
+  "781019": ["Kamrup Metro", "Assam", ["Kahilipara"]],
+  "781020": ["Kamrup Metro", "Assam", ["Noonmati"]],
+  "781021": ["Kamrup Metro", "Assam", ["Bamunimaidan"]],
+  "781022": ["Kamrup Metro", "Assam", ["Khanapara"]],
+  "781023": ["Kamrup Metro", "Assam", ["Amerigog", "Jorabat"]],
+  "781024": ["Kamrup Metro", "Assam", ["Gitanagar", "Zoo Road"]],
+  "781025": ["Kamrup Metro", "Assam", ["Ambari Fatasil", "Dhirenpara"]],
+  "781026": ["Kamrup Metro", "Assam", ["Bonda", "Narangi", "Panikhaiti"]],
+  "781027": ["Kamrup Metro", "Assam", ["Amsinggaon E (S 85)", "Satgaon"]],
+  "781028": ["Kamrup Metro", "Assam", ["Beltola"]],
+  "781029": ["Kamrup Metro", "Assam", ["Basistha", "Pillangkata"]],
+  "781030": [
+    "Kamrup",
+    "Assam",
+    ["Barbaka", "Dopdar", "Madhyamkhanda", "North Guwahati", "Rongmahal"]
+  ],
+  "781031": ["Kamrup", "Assam", ["Amingaon", "Collegenagar"]],
+  "781032": ["Kamrup Metro", "Assam", ["Indrapur"]],
+  "781034": ["Kamrup Metro", "Assam", ["Odalbakra"]],
+  "781035": ["Kamrup Metro", "Assam", ["Garchuk"]],
+  "781036": ["Kamrup Metro", "Assam", ["Hengrabari"]],
+  "781037": ["Kamrup Metro", "Assam", ["Panjabari"]],
+  "781038": ["Kamrup Metro", "Assam", ["Hatigaon Chariali"]],
+  "781039": ["Kamrup", "Assam", ["I I T"]],
+  "781040": ["Kamrup Metro", "Assam", ["Sawkuchi"]],
+  "781101": [
+    "Kamrup",
+    "Assam",
+    ["Baralabari", "Changsari", "Deoduar", "Dorakahara", "Panitema", "Pubborka"]
+  ],
+  "781102": [
+    "Kamrup",
+    "Assam",
+    [
+      "Akadi",
+      "Bagta",
+      "Bhelkarbazar",
+      "Borni",
+      "Dampur",
+      "Gerua",
+      "Hablaka",
+      "Hajo",
+      "Kalitakuchi",
+      "Khapenikuchi",
+      "Khetri Hardia",
+      "Kuwarpur",
+      "Nampara Majarkuri",
+      "Ramdia",
+      "Soniadi",
+      "Tokradia",
+      "Topabari",
+      "Uzankuri"
+    ]
+  ],
+  "781103": [
+    "Kamrup",
+    "Assam",
+    ["Bamundi", "Bongshor", "Gandhmow", "Halogaon", "Siliguri", "Soalkuchi", "Srihati"]
+  ],
+  "781104": [
+    "Kamrup",
+    "Assam",
+    [
+      "Bargaon",
+      "Boromboi",
+      "Dadara",
+      "Kulhati",
+      "Nizmanakuchi",
+      "Pacharia",
+      "Rowmari",
+      "Tetelia"
+    ]
+  ],
+  "781120": ["Kamrup", "Assam", ["Borduar", "Loharghat", "Mataikhar", "Rajapara"]],
+  "781121": [
+    "Kamrup",
+    "Assam",
+    [
+      "Barpalaha",
+      "Bezera",
+      "Bhomolahati",
+      "Dumunichowki",
+      "Halda",
+      "Kendua",
+      "Mandakata",
+      "Saledal"
+    ]
+  ],
+  "781122": [
+    "Kamrup",
+    "Assam",
+    [
+      "Batarhat",
+      "Bijoynagar",
+      "Dakhala",
+      "Dehaligaon",
+      "Futuri",
+      "Rangamati",
+      "Sarpara",
+      "Simina"
+    ]
+  ],
+  "781123": [
+    "Kamrup",
+    "Assam",
+    [
+      "Bhalukghata",
+      "Birpara",
+      "Boko",
+      "Boko Agchia",
+      "Boko Rajapara",
+      "Durapara",
+      "Gohalkona",
+      "Kinangaon",
+      "Mauman Ashram",
+      "Paneri"
+    ]
+  ],
+  "781124": [
+    "Kamrup",
+    "Assam",
+    [
+      "Bakalipara",
+      "Balapukhuri",
+      "Baniapara",
+      "Borjhar",
+      "Champaknagar",
+      "Chhaygaon",
+      "Ghoramara",
+      "Kaimari",
+      "Natun Jharobari",
+      "Pachim Dhuligaon",
+      "Ratanpur",
+      "Sidilapara",
+      "Ukiam"
+    ]
+  ],
+  "781125": [
+    "Kamrup",
+    "Assam",
+    [
+      "Amranga",
+      "Dhengargaon",
+      "Gosaihat",
+      "Kulsirange",
+      "Maniari Tiniali",
+      "Mirza",
+      "Sikarhati"
+    ]
+  ],
+  "781126": [
+    "Nalbari",
+    "Assam",
+    [
+      "Adabari",
+      "Balikuchi",
+      "Bhangnamari",
+      "Chanda",
+      "Dagapara",
+      "Jaysagar",
+      "Kandhbari",
+      "Loharkatha",
+      "Lowpara",
+      "Lowtola",
+      "Meruattari",
+      "Mukalmua",
+      "Narayanpur"
+    ]
+  ],
+  "781127": [
+    "Kamrup",
+    "Assam",
+    [
+      "Alupati",
+      "Badlabazar",
+      "Bagmarachar",
+      "Hekra",
+      "Jamlai",
+      "Kachumara",
+      "Kalardia",
+      "Kalubari",
+      "Kholabandha",
+      "Mandira",
+      "Nagarbera",
+      "Naitar",
+      "Palahartari",
+      "Pathimari",
+      "Pijupara",
+      "Tupamari"
+    ]
+  ],
+  "781128": ["Kamrup Metro", "Assam", ["Agchia", "Majirgaon", "Palashbari"]],
+  "781129": ["Kamrup", "Assam", ["Hahimbazar", "Lower Lumpi", "Nalapara", "Samuka"]],
+  "781131": ["Ri Bhoi", "Meghalaya", ["Jirang", "Patharkhmah", "Rani", "Warmawsaw"]],
+  "781132": ["Kamrup", "Assam", ["Bhagawatipara", "Nahira", "Rampur", "Satpakhali"]],
+  "781133": ["Kamrup", "Assam", ["Dagaon"]],
+  "781134": ["Kamrup", "Assam", ["Amtala", "Jiakur", "Kukurmara"]],
+  "781135": [
+    "Kamrup",
+    "Assam",
+    [
+      "Bargaon Khaliha",
+      "Bondapara",
+      "Damalchos",
+      "Gamarimura",
+      "Pachia",
+      "Saraibaha",
+      "Simlatarabari",
+      "Singra",
+      "Singra Rajapara"
+    ]
+  ],
+  "781136": [
+    "Kamrup",
+    "Assam",
+    [
+      "Baruapathar",
+      "Bhauriabhita",
+      "Champaparabazar",
+      "Dekachang",
+      "Jogiparapathar",
+      "Kalatoli",
+      "Mahtoli",
+      "Malibaribazar",
+      "Malibaripathar",
+      "Pachim Samaria"
+    ]
+  ],
+  "781137": [
+    "Kamrup",
+    "Assam",
+    [
+      "Aggumi",
+      "Alikash",
+      "Batahidia",
+      "Bhitarduar",
+      "Hatipara",
+      "Jahirpur",
+      "Mahimari",
+      "Panikhaiti",
+      "Toparpathar",
+      "Tukrapara"
+    ]
+  ],
+  "781138": [
+    "Nalbari",
+    "Assam",
+    [
+      "Bartola",
+      "Hidilatari",
+      "Kachuapathar",
+      "Kaplabari",
+      "Kekankuchi",
+      "Larkuchi",
+      "Narua",
+      "Pachim Kajia Gaon"
+    ]
+  ],
+  "781141": ["Kamrup", "Assam", ["Bamunigaon", "Choudhurykhat", "Jambari", "Santipur"]],
+  "781150": ["Kamrup Metro", "Assam", ["Chandrapur", "Gobardhan"]],
+  "781171": ["Kamrup Metro", "Assam", ["Patharquerry", "Udayan Vihar"]],
+  "781301": ["Barpeta", "Assam", ["Barpeta", "Thakurbazar"]],
+  "781302": ["Barpeta", "Assam", ["Baharihat", "Barghol", "Gomafulbari", "Nizbahari"]],
+  "781303": [
+    "Nalbari",
+    "Assam",
+    [
+      "Banagram",
+      "Banagram Chowk",
+      "Barnaddi",
+      "Batsar",
+      "Bihampur",
+      "Mularkuchi",
+      "Panigaon"
+    ]
+  ],
+  "781304": [
+    "Nalbari",
+    "Assam",
+    ["Barnibari", "Belsor", "Bonmaza", "Dirua", "Gandhia", "Kakaya"]
+  ],
+  "781305": [
+    "Barpeta",
+    "Assam",
+    [
+      "Bhogdia",
+      "Chenga",
+      "Chenimari",
+      "Jatradia",
+      "Khangra",
+      "Makrikuchi",
+      "Pacim Mazdia"
+    ]
+  ],
+  "781306": [
+    "Nalbari",
+    "Assam",
+    ["Amani", "Chamata", "Gamerimuri", "Pachimchamata", "Rupia Bathan"]
+  ],
+  "781307": [
+    "Barpeta",
+    "Assam",
+    [
+      "Amrikhowa",
+      "Barkapla",
+      "Byaskuchi",
+      "Kamalabari",
+      "Karaguri",
+      "Namsala",
+      "Nasatraphulbari",
+      "Parakuchi",
+      "Sarthebari"
+    ]
+  ],
+  "781308": [
+    "Barpeta",
+    "Assam",
+    [
+      "Baghbar",
+      "Balajan",
+      "Bhoirarpam",
+      "Chakabausi",
+      "Deoldi",
+      "Dharampur",
+      "Habidongra Bazar",
+      "Kadomtola",
+      "Mandia",
+      "Manikpur",
+      "Nirala",
+      "Pahumara",
+      "Ramaparapam",
+      "Satrakanara Bazar",
+      "Sitoli"
+    ]
+  ],
+  "781309": [
+    "Barpeta",
+    "Assam",
+    [
+      "Bhella",
+      "Bheraldi",
+      "Bhogerpar",
+      "Dhakua",
+      "Keotkuchi",
+      "Khardhara",
+      "Palhaji",
+      "Radhakuchi"
+    ]
+  ],
+  "781310": [
+    "Nalbari",
+    "Assam",
+    ["Bagurihati", "Balowa", "Deharkalakuchi", "Jagra", "Khakharisal"]
+  ],
+  "781311": [
+    "Barpeta",
+    "Assam",
+    [
+      "Bagodi",
+      "Bhairaguri",
+      "Burikhamar",
+      "Erabamundi",
+      "Gahia",
+      "Garatari",
+      "Nagaon Bazar",
+      "Rangia Bhaithabhangahat",
+      "Raoli"
+    ]
+  ],
+  "781312": [
+    "Nalbari",
+    "Assam",
+    [
+      "Bamunbari",
+      "Barghopa",
+      "Chatla",
+      "Chinadi",
+      "Daulasal",
+      "Kalarchar",
+      "Lachima",
+      "Mugdi",
+      "Peradhara",
+      "Rampur",
+      "Raumaripathar"
+    ]
+  ],
+  "781313": [
+    "Barpeta",
+    "Assam",
+    ["Balabhitha", "Guagacha", "Mazgaon", "Mespara", "Simlaguri"]
+  ],
+  "781314": [
+    "Barpeta",
+    "Assam",
+    [
+      "Baradi",
+      "Barpalli",
+      "Bhatkuchi",
+      "Gajia",
+      "Ganakkuchi",
+      "Garaimari",
+      "Jahurpam",
+      "Jania",
+      "Jarabari",
+      "Kadang",
+      "Patbaushi",
+      "Santinagar",
+      "Sonkuchi",
+      "Sundaridia"
+    ]
+  ],
+  "781315": [
+    "Barpeta",
+    "Assam",
+    [
+      "Barengabari",
+      "Barpeta Road",
+      "Bilashi Para Bazar",
+      "Gobardhana",
+      "Kalahbhanga",
+      "Kalapani Bazar",
+      "Katajhar",
+      "Khairabari",
+      "Kohitama",
+      "Labdangguri Gaon",
+      "Mainamata",
+      "Mairajar",
+      "Nimua"
+    ]
+  ],
+  "781316": [
+    "Barpeta",
+    "Assam",
+    [
+      "Ambari",
+      "Barbala",
+      "Dabaliapara",
+      "Ghilajari",
+      "Howly",
+      "Jasihatipara",
+      "Khatalpara",
+      "Kujarpith",
+      "Moutupuri",
+      "Sukmanah"
+    ]
+  ],
+  "781317": [
+    "Barpeta",
+    "Assam",
+    [
+      "Amguri",
+      "B Noontola",
+      "Balapet",
+      "Barnagarcollege",
+      "Bhalukadoba",
+      "C Bazar",
+      "Chachaka",
+      "Chukurngbari",
+      "Duramari",
+      "Kamargaon",
+      "Sorbhog",
+      "Suliakata"
+    ]
+  ],
+  "781318": [
+    "Barpeta",
+    "Assam",
+    [
+      "Anandabazar",
+      "Barbhitha Dolarpathar",
+      "Barmazra",
+      "Bhalaguri",
+      "Chamuagati",
+      "Chenglimari",
+      "Hudukhata",
+      "Kardoiguri",
+      "Puranbhowanipur",
+      "Rupahi",
+      "Salbari",
+      "Sarupeta",
+      "Saudarvitha",
+      "Sonafuli"
+    ]
+  ],
+  "781319": [
+    "Barpeta",
+    "Assam",
+    [
+      "Balagaon",
+      "Balikuri",
+      "Bankubhanga",
+      "Charcharia",
+      "Ghugubari",
+      "Gunialguri",
+      "Kalgachia",
+      "Langla",
+      "Niz Rampur",
+      "Sawpur"
+    ]
+  ],
+  "781320": ["Baksa", "Assam", ["Salbari"]],
+  "781321": [
+    "Barpeta",
+    "Assam",
+    [
+      "Bonghugi",
+      "Chandmama",
+      "DP Deoldi",
+      "Ishabpur",
+      "Kapahtolichikni",
+      "Mayanbari",
+      "Patharchali Chatala",
+      "Sonabari",
+      "Tarakandi"
+    ]
+  ],
+  "781325": [
+    "Barpeta",
+    "Assam",
+    [
+      "Amdah",
+      "Bajali College",
+      "Bamakhata",
+      "Barbang",
+      "Bhakuamari",
+      "Bhethua",
+      "Bhotantasaderi",
+      "Dubi",
+      "Hathinapur",
+      "Muguria",
+      "Odalguri",
+      "Pathsala",
+      "Raypur"
+    ]
+  ],
+  "781326": [
+    "Barpeta",
+    "Assam",
+    ["Bamunkuchi", "Barbatabari", "Gobindapur", "Patacharkuchi"]
+  ],
+  "781327": [
+    "Baksa",
+    "Assam",
+    ["Anchali", "Bakua", "Bamunkata", "Betbari", "Gandhipur", "Golagaon", "Jalahghat"]
+  ],
+  "781328": [
+    "Barpeta",
+    "Assam",
+    ["Baghmarabazar", "Bhotanta Mohitara", "Charnabazar", "Kathalmurighat"]
+  ],
+  "781329": [
+    "Barpeta",
+    "Assam",
+    [
+      "Akaya",
+      "Bhogpur",
+      "Daisingri",
+      "Maripur Anandapur",
+      "Nityananda",
+      "Pubrihabari",
+      "Sarumanikpur",
+      "Tuplaipanbari"
+    ]
+  ],
+  "781330": [
+    "Baksa",
+    "Assam",
+    ["Barghogra", "Kamardisa", "Koklabari", "Lowkata", "Simla"]
+  ],
+  "781333": [
+    "Baksa",
+    "Assam",
+    [
+      "Barimakha",
+      "Bennabari",
+      "Dalbari",
+      "Dangarmakha",
+      "Debachara",
+      "Nizbangalipara",
+      "Pub Baramchari",
+      "Saukuchi",
+      "Thanguri"
+    ]
+  ],
+  "781334": [
+    "Nalbari",
+    "Assam",
+    [
+      "Arara",
+      "Balilecha",
+      "Barazara",
+      "Bardigheli",
+      "Bhadra",
+      "Chandkuchi",
+      "Chowkbazar",
+      "Gopalthan",
+      "Janigog",
+      "Mugkuchi",
+      "Niz Bahjani",
+      "Terechia"
+    ]
+  ],
+  "781335": ["Nalbari", "Assam", ["Bidyapur", "Khatabari", "Nalbari"]],
+  "781337": [
+    "Nalbari",
+    "Assam",
+    ["Barkhanajan", "Chengnoi", "Hatinamati", "Milanpur", "Sondha"]
+  ],
+  "781338": [
+    "Nalbari",
+    "Assam",
+    ["Bori", "Helacha", "Lakhopur", "Niztapa", "Piplibari", "Solmara"]
+  ],
+  "781339": ["Nalbari", "Assam", ["Arikuchi", "Bala", "Karia", "Ulabari"]],
+  "781340": ["Nalbari", "Assam", ["Bakuajari", "Banekuchi", "Khukhundi", "Suradi"]],
+  "781341": ["Nalbari", "Assam", ["Balikaria", "Burinagar", "Kazipara", "Kendukuchi"]],
+  "781343": [
+    "Baksa",
+    "Assam",
+    ["Amingaon Chowk", "Chaibari", "Dhanbil", "Dighaldonga", "Japadang", "Pakhamara"]
+  ],
+  "781344": [
+    "Baksa",
+    "Assam",
+    [
+      "Angardhowa",
+      "Baganpara",
+      "Bagulamari",
+      "Gerua",
+      "Khagrabari",
+      "Muktapur",
+      "Nayabasti"
+    ]
+  ],
+  "781346": [
+    "Baksa",
+    "Assam",
+    [
+      "Barama",
+      "Barsimlaguri",
+      "Dahkaunia",
+      "Kaljar",
+      "Kathalbari",
+      "Kharua",
+      "Madhapur",
+      "Merkuchi",
+      "Murmela"
+    ]
+  ],
+  "781347": ["Nalbari", "Assam", ["Arangmow", "Athgharia", "Kamarkuchi"]],
+  "781348": [
+    "Nalbari",
+    "Assam",
+    ["Bagalsroad Chowk", "Barkuriha", "Budrukuchi", "Marowa", "Pubkalakuchi"]
+  ],
+  "781349": [
+    "Nalbari",
+    "Assam",
+    [
+      "Balitara",
+      "Mahina",
+      "Naherbari",
+      "Nichalamari",
+      "Nizdhamdhama",
+      "Nizsantipur",
+      "Uttarbarsiral"
+    ]
+  ],
+  "781350": [
+    "Nalbari",
+    "Assam",
+    [
+      "Balisatra",
+      "Barenghati",
+      "Chatama",
+      "Dakhingaon",
+      "Dhuhi",
+      "Kamrupbarkhola",
+      "Lahkarpara",
+      "Sanekuchi",
+      "Sauramari"
+    ]
+  ],
+  "781351": ["Nalbari", "Assam", ["Barbari", "Baridatara", "Kalag"]],
+  "781352": [
+    "Barpeta",
+    "Assam",
+    [
+      "Bhowanipur",
+      "Chaparbari Bazar",
+      "Galia",
+      "Kamalpur",
+      "Kayakuchi Bazar",
+      "Khablarvitha",
+      "Kurobaha",
+      "Nakuchi Pathar",
+      "Naligaon",
+      "Paka Bet Bari Pathar",
+      "Sarutapa"
+    ]
+  ],
+  "781353": ["Nalbari", "Assam", ["Gopalbazar", "Niz Pakowa", "Sandheli"]],
+  "781354": [
+    "Kamrup",
+    "Assam",
+    [
+      "Bangaon",
+      "Bardal",
+      "Barghuli",
+      "Chapania",
+      "Deolkuchi",
+      "Dhepargaon",
+      "Gopalpur",
+      "Kachari Solmari",
+      "Madhukuchi",
+      "Maranjana",
+      "Pitambarhat Bazali",
+      "Rangia",
+      "Tarani",
+      "Titkuri",
+      "Udiana"
+    ]
+  ],
+  "781355": [
+    "Nalbari",
+    "Assam",
+    [
+      "Assam Syntex",
+      "Baramchari",
+      "Geruapara",
+      "Karemura",
+      "Medaghat",
+      "Nathkuchi",
+      "Niz Namati",
+      "Sathimuka"
+    ]
+  ],
+  "781360": [
+    "Baksa",
+    "Assam",
+    [
+      "Angarkata",
+      "Chechapani",
+      "Darangamela",
+      "Darangapar",
+      "Haziragaon",
+      "Kalipur",
+      "Kauli",
+      "Kumarikata",
+      "Menaka",
+      "Paharpur",
+      "Pakribari",
+      "Patkijuli"
+    ]
+  ],
+  "781364": [
+    "Baksa",
+    "Assam",
+    [
+      "Bangalipara",
+      "Barpathar",
+      "Betagaon",
+      "Bholebatabari",
+      "Chenigaon",
+      "Deosunga",
+      "Maharipara",
+      "Nawkata",
+      "Suagpur",
+      "Tengajhar"
+    ]
+  ],
+  "781365": ["Kamrup", "Assam", ["Bihapara", "Jamtala", "Rangia R.S.", "Tinali"]],
+  "781366": [
+    "Baksa",
+    "Assam",
+    [
+      "Baghdoba",
+      "Bardangrikuchi",
+      "Betna",
+      "Bhogpur",
+      "Goreswar",
+      "Gurmow",
+      "Karparbhitha",
+      "Mahajanpara",
+      "Silkijhar"
+    ]
+  ],
+  "781367": [
+    "Baksa",
+    "Assam",
+    [
+      "Amayapur",
+      "Barkhopa",
+      "Dumuria",
+      "Gandhibari",
+      "Ghogpar",
+      "Kachubari",
+      "Kachukata",
+      "Kalakuchi",
+      "Kalbari",
+      "Mazdia",
+      "Natunhowly",
+      "Nizdafeli",
+      "Pachimjargaon",
+      "Paddapar",
+      "Tambulpur",
+      "Tinpukhuri",
+      "Ulubari",
+      "Zarkona"
+    ]
+  ],
+  "781368": [
+    "Baksa",
+    "Assam",
+    [
+      "Bagrikhuti",
+      "Dangargaon",
+      "Dhekipota",
+      "Dongpar",
+      "Kalcheni",
+      "Latibari",
+      "Nagrijuli",
+      "Sidhinathpur",
+      "Tebitola"
+    ]
+  ],
+  "781369": [
+    "Nalbari",
+    "Assam",
+    [
+      "Allia",
+      "Barajol",
+      "Chilling",
+      "Ghograpar",
+      "Guakuchi",
+      "Khatikuchi",
+      "Nankarbhaira"
+    ]
+  ],
+  "781370": ["Nalbari", "Assam", ["Gobradal", "Kaithalkuchi", "Kharsitha"]],
+  "781371": ["Nalbari", "Assam", ["Bhaluki", "Digheli", "Nakhara", "Sialmari", "Tihu"]],
+  "781372": [
+    "Baksa",
+    "Assam",
+    [
+      "Adalbari",
+      "Banbari",
+      "Barimukh",
+      "Dihira",
+      "Kataligaon",
+      "Motipur",
+      "Mussalpur",
+      "Narayanpur",
+      "Nikashi",
+      "Pamuapathar",
+      "Subankhata",
+      "Uttarkuchi"
+    ]
+  ],
+  "781373": ["Baksa", "Assam", ["Ahopa", "Barchakadal", "Doomni", "Jalagaon"]],
+  "781374": ["Nalbari", "Assam", ["Bhojkuchi", "Jalkhana", "Makhibaha"]],
+  "781375": ["Barpeta", "Assam", ["Bangaon", "Golibandha", "Helana", "Rampur Dekapara"]],
+  "781376": ["Baksa", "Assam", ["Darkuchi", "Tulsibari"]],
+  "781377": [
+    "Baksa",
+    "Assam",
+    ["Athiabari", "Charaimari", "Garamdew", "Lafakuchi", "Rampur", "Thamna"]
+  ],
+  "781378": ["Nalbari", "Assam", ["Bali", "Barpit", "Haribhanga"]],
+  "781380": [
+    "Kamrup",
+    "Assam",
+    [
+      "Baihata",
+      "Baruajani",
+      "Chanmaguri",
+      "Dobok",
+      "Hinguli",
+      "Kalajalchowk",
+      "Kaniha",
+      "Kharikot",
+      "Puthimari"
+    ]
+  ],
+  "781381": [
+    "Kamrup",
+    "Assam",
+    [
+      "Baihata Chariali",
+      "Balikuchi",
+      "Bihdia",
+      "Karora",
+      "Loch",
+      "Pingaleswar",
+      "Sutargaon"
+    ]
+  ],
+  "781382": [
+    "Kamrup",
+    "Assam",
+    ["Bardekpar", "Dihina", "Helecha", "Japia", "Khudradimu", "Soneswar"]
+  ],
+  "782001": ["Nagaon", "Assam", ["Nagaon", "Nagaon Girls College"]],
+  "782002": [
+    "Nagaon",
+    "Assam",
+    [
+      "Aibheti",
+      "Bihlangani",
+      "Chillangani",
+      "Haiborgaon",
+      "Herapatty",
+      "Huzrangagarah",
+      "Kachamari Boragaon",
+      "Khutikatia",
+      "Majarati",
+      "Senchowa",
+      "Solmari"
+    ]
+  ],
+  "782003": [
+    "Nagaon",
+    "Assam",
+    [
+      "Amolapatty",
+      "Chottahaibor",
+      "Dakarghat",
+      "Dimaruguri",
+      "Hatipara",
+      "Itachali",
+      "Madhupur",
+      "Majpathori",
+      "Mohkhuli",
+      "Nagaon Padel",
+      "Palasani",
+      "Pathori",
+      "Uriagaon"
+    ]
+  ],
+  "782101": [
+    "Nagaon",
+    "Assam",
+    ["Biharigaon", "Nonoi", "Oper Uzaragaon", "Rantholi", "Tulashimukh"]
+  ],
+  "782102": [
+    "Nagaon",
+    "Assam",
+    ["Bamuni", "Barhampur", "Kandali", "Nibukali", "Potani Gomothagaon"]
+  ],
+  "782103": [
+    "Nagaon",
+    "Assam",
+    [
+      "Bagariguri",
+      "Bamunbori",
+      "Barapujia",
+      "Dighaldori",
+      "Dighaliati",
+      "Fulaguri",
+      "Gandhibori",
+      "Hariamukh",
+      "Kapahera",
+      "Khaigarh",
+      "Khaplangkuchi",
+      "Molankata",
+      "Raha",
+      "Rahagaon",
+      "Ramjanati",
+      "Saragaon"
+    ]
+  ],
+  "782104": [
+    "Marigaon",
+    "Assam",
+    [
+      "Bhurbandha",
+      "Goroimari",
+      "Jaluguti",
+      "Kachadhara Nakhanda",
+      "Nizdandua",
+      "Patidaya",
+      "Patrabori",
+      "Patuakata",
+      "Sapmarigaon",
+      "Solmari Mikirgaon",
+      "Sukdal Sarubori",
+      "Tarabori Kalsila Satra",
+      "Tokonabori"
+    ]
+  ],
+  "782105": [
+    "Marigaon",
+    "Assam",
+    [
+      "Azarbari",
+      "Baghara",
+      "Bangalpara",
+      "Damal",
+      "Dighalbori",
+      "Doloichuba",
+      "Ghagua",
+      "Karatipam",
+      "Komoraguri",
+      "Manipur",
+      "Morigaon",
+      "Natuagaon",
+      "Sarubori",
+      "Udari"
+    ]
+  ],
+  "782106": [
+    "Marigaon",
+    "Assam",
+    [
+      "Alikuchi",
+      "Barchala",
+      "Bhomoraguri",
+      "Chabukdhara",
+      "Charaibahi",
+      "Chatabar",
+      "Garukhuti",
+      "Habibarangabari",
+      "Mikirbheta",
+      "Nagabandha"
+    ]
+  ],
+  "782120": [
+    "Nagaon",
+    "Assam",
+    [
+      "Ambagan",
+      "Bagamukh",
+      "Bharidhua",
+      "Borghuli Sapmar",
+      "Burhachaparigao",
+      "Dakhin Beloguri",
+      "Hatlaokhowa",
+      "Kathpara Bazar",
+      "Lailuri"
+    ]
+  ],
+  "782121": [
+    "Marigaon",
+    "Assam",
+    [
+      "Baralimari",
+      "Bhuragaon",
+      "Dungarpar",
+      "Gagalmari",
+      "Geruagaon",
+      "Haloakanda",
+      "Lengeribori",
+      "Pukarkata",
+      "Sandahkhaiti",
+      "Sondoba",
+      "Toptola"
+    ]
+  ],
+  "782122": [
+    "Nagaon",
+    "Assam",
+    [
+      "Amlakhi",
+      "Balikatia",
+      "Balisatra",
+      "Batadraba",
+      "Batamari",
+      "Borbheti",
+      "Chalapathar",
+      "Dhaniabheti",
+      "Hatizuzua",
+      "Jengani",
+      "Kadomoni",
+      "Lalunggaon",
+      "Patiachapari"
+    ]
+  ],
+  "782123": [
+    "Nagaon",
+    "Assam",
+    [
+      "Akorabori",
+      "Bechamari",
+      "Borbheti Dhing",
+      "Chamuagaon",
+      "Dhing",
+      "Dhing Bazar",
+      "Dhupaguri",
+      "Kandhulimari",
+      "Niz Dhing",
+      "Rowmari Bill",
+      "Silpukhuri",
+      "Sologuri",
+      "Sonarigaon",
+      "Tuktuki"
+    ]
+  ],
+  "782124": [
+    "Nagaon",
+    "Assam",
+    [
+      "Alitangani",
+      "Chitalmari Beel",
+      "Dagaon",
+      "Fakali Pathar",
+      "Juria",
+      "Kashari",
+      "Leteripar Bazar",
+      "Mithapukhuripar",
+      "Pub Baralimari",
+      "Singari Madrassa",
+      "Sutirpar",
+      "Teliabebejia",
+      "Tinsukia Juria"
+    ]
+  ],
+  "782125": [
+    "Nagaon",
+    "Assam",
+    [
+      "Barghat",
+      "Dighali",
+      "Gatonga",
+      "Hatipukhuri",
+      "Kanchanpur",
+      "Kumargaon",
+      "Pub Amarakanda",
+      "Pubsalpara",
+      "Puthikhaiti",
+      "Rowmari",
+      "Rupahi",
+      "Saidoria",
+      "Singimari",
+      "Tarabari",
+      "Teliachapari"
+    ]
+  ],
+  "782126": [
+    "Marigaon",
+    "Assam",
+    [
+      "Datialbori",
+      "Doloigaon",
+      "Goroimaripathar",
+      "Hahcharagaon",
+      "Lochanabori",
+      "Moirabari",
+      "No.1 Gayangaon",
+      "Sagunbahipathar",
+      "Sahariagaon",
+      "Salkati Pathar"
+    ]
+  ],
+  "782127": [
+    "Marigaon",
+    "Assam",
+    [
+      "Barangani",
+      "Barbori",
+      "Baribandha",
+      "Chetwaikhaitee",
+      "Dewaguri",
+      "Dumkura Bazar",
+      "Falihamari Pathar",
+      "Jalakiabari",
+      "Katanigaon",
+      "Lahorighat",
+      "Satiantoli",
+      "Tengaguri"
+    ]
+  ],
+  "782128": [
+    "Nagaon",
+    "Assam",
+    [
+      "Garajan Bazar",
+      "Ghehua Chalchali",
+      "Kaliadinga",
+      "Pub Futaljar",
+      "Uttar Garanjan",
+      "Uttar Khatowal"
+    ]
+  ],
+  "782135": ["Nagaon", "Assam", ["Chapanalla", "Kathalguri", "Parkup Pahar"]],
+  "782136": [
+    "Nagaon",
+    "Assam",
+    [
+      "Amguri",
+      "Bagari",
+      "Burapahar",
+      "Hatbor",
+      "Jakhalabandha",
+      "Kathterongaon",
+      "Kuthori",
+      "Seconee Borhola"
+    ]
+  ],
+  "782137": ["Nagaon", "Assam", ["Bengenaati", "Kuworitul", "Pubthoria"]],
+  "782138": ["Nagaon", "Assam", ["Amoni", "Barbhagia", "Missa"]],
+  "782139": ["Nagaon", "Assam", ["Anjukpani", "Barjuri", "Salana", "Sarishabari"]],
+  "782140": [
+    "Nagaon",
+    "Assam",
+    [
+      "Bajiagaon",
+      "Bheleoguri",
+      "Chakitop",
+      "Geruaati Bazar",
+      "Kawaimari",
+      "Magurmari",
+      "Mowamari",
+      "Padumoni",
+      "Rangagarah",
+      "Samaguri",
+      "Sibasthan",
+      "Singia",
+      "Udmari"
+    ]
+  ],
+  "782141": [
+    "Nagaon",
+    "Assam",
+    [
+      "Barangatoli",
+      "Barpanigaon",
+      "Chalchali",
+      "Halowagaon",
+      "Kakhorigaon",
+      "Kalongpar Halowagaon",
+      "Marangialgaon",
+      "Puranigudam",
+      "Teliagaon"
+    ]
+  ],
+  "782142": [
+    "Nagaon",
+    "Assam",
+    [
+      "Barchila",
+      "Barmanipur",
+      "Bebejia",
+      "Chakalaghat",
+      "Gakhajua",
+      "Gosaibori",
+      "Hatichung",
+      "Jajori",
+      "Jamuguri",
+      "Majgaon"
+    ]
+  ],
+  "782143": [
+    "Nagaon",
+    "Assam",
+    ["Bhomoraguri", "Borghuli", "Kurhimari", "Silghat", "Sonarigaon"]
+  ],
+  "782144": [
+    "Nagaon",
+    "Assam",
+    ["Baligaon", "Borkola", "Deorigaon", "Ghahibhatikuri", "Uttar Petboha"]
+  ],
+  "782401": ["Kamrup Metro", "Assam", ["Digaru", "Panbari"]],
+  "782402": [
+    "Kamrup Metro",
+    "Assam",
+    ["Chamatapathar", "Hahara", "Nartap", "Sonai Kamalajari", "Sonapur", "Tepesia"]
+  ],
+  "782403": [
+    "Kamrup Metro",
+    "Assam",
+    [
+      "Dhopguri",
+      "Durungpahar",
+      "Gandhinagar",
+      "Khetri",
+      "Malaybari",
+      "Nizdemoria",
+      "Topatali"
+    ]
+  ],
+  "782410": [
+    "Marigaon",
+    "Assam",
+    ["Dayang Beloguri", "Dongarbori", "Jagiroad", "Umlapher"]
+  ],
+  "782411": [
+    "Marigaon",
+    "Assam",
+    [
+      "Barkuloi",
+      "Barpak",
+      "Buraburi",
+      "Burgaon",
+      "Hatiamukh",
+      "Jagi",
+      "Jagibhakatgaon",
+      "Jhargaon",
+      "Khulagaon",
+      "Kuranibori",
+      "Manaha Kacharigaon",
+      "Mayang Kamarpur",
+      "Natun Bangalbori",
+      "Raja Mayang"
+    ]
+  ],
+  "782412": ["Marigaon", "Assam", ["Ahatguri", "Bangaldhara", "Dharamtul", "Silchung"]],
+  "782413": [
+    "Marigaon",
+    "Assam",
+    [
+      "Amguri",
+      "Amlighat",
+      "Deosal",
+      "Kagajnagar",
+      "Killing Valley",
+      "Nellie",
+      "Patsari",
+      "Ulukunchi",
+      "Umpanai",
+      "Umswai"
+    ]
+  ],
+  "782425": [
+    "Nagaon",
+    "Assam",
+    [
+      "Amsoi Bazar",
+      "Bajbatamari",
+      "Bamunijan",
+      "Bargaon",
+      "Beltola",
+      "Chaparmukh",
+      "Gaspara",
+      "Kakatigaon",
+      "Laopani",
+      "Pubguimari",
+      "Salmora"
+    ]
+  ],
+  "782426": [
+    "Nagaon",
+    "Assam",
+    [
+      "Dakhin Sangchaki",
+      "Debnarikoli",
+      "Gerjaipam",
+      "Ghilani",
+      "Jurirpar",
+      "Kachua",
+      "Kampur",
+      "Niz Narikoli",
+      "Patiapam",
+      "Puthimari Bazar",
+      "Satlanga",
+      "Simaluguri",
+      "Tetelisara"
+    ]
+  ],
+  "782427": ["Nagaon", "Assam", ["Jumurmur", "Kathiatoli", "Rengbeng"]],
+  "782428": [
+    "Hojai",
+    "Assam",
+    ["Barapatia", "Dumaihagi Dapara", "Garukhunda", "Jamunamukh", "Jungle Block"]
+  ],
+  "782429": ["Hojai", "Assam", ["Jogijan Bazar", "Radhanagar", "Sibpur"]],
+  "782435": [
+    "Hojai",
+    "Assam",
+    [
+      "Amtola",
+      "Dimrupar",
+      "Golaghatiabasti",
+      "Gopalnagar",
+      "Hojai",
+      "Hojai Bazar",
+      "Hojai R.S.",
+      "Komorakata",
+      "Menmeji",
+      "Nandapur Chariali",
+      "Padumpukhuri",
+      "Siliguri",
+      "Singaribasti",
+      "Telibasti"
+    ]
+  ],
+  "782439": [
+    "Hojai",
+    "Assam",
+    [
+      "Barhawar",
+      "Charing",
+      "Choudhury Bazar",
+      "Dighaljar",
+      "Karayani",
+      "Murazar Bazar",
+      "Samarail"
+    ]
+  ],
+  "782440": [
+    "Hojai",
+    "Assam",
+    ["Changmaji", "Daboka", "Hindu Block", "Koroiguri", "Modertoli"]
+  ],
+  "782441": [
+    "Karbi Anglong",
+    "Assam",
+    [
+      "Baghpani",
+      "Bheleoghat",
+      "Biswanathpathar",
+      "Cherakani",
+      "Danghap",
+      "Dentaghat",
+      "Dokmaka",
+      "Duarbamuni",
+      "Kajesara Matikhola",
+      "Langhin Manikpur",
+      "Langhin Tiniali",
+      "Langlakso",
+      "Padumpukhuri",
+      "Panjuri",
+      "Parakhowa Bazar",
+      "Phulani",
+      "Samelangso",
+      "Sildharampur",
+      "Wirwar"
+    ]
+  ],
+  "782442": [
+    "Hojai",
+    "Assam",
+    [
+      "Azarbari Krishna Nagar",
+      "Bhalukmari",
+      "Borboha",
+      "Jurapukhuri",
+      "Kaki",
+      "Kaki Chalchali",
+      "Purana Kaki",
+      "Sankardev Nagar"
+    ]
+  ],
+  "782445": [
+    "Hojai",
+    "Assam",
+    ["Ambari", "Barangatoli Bazar", "Joynagar Madrassa", "Kapashbari", "Nilbagan"]
+  ],
+  "782446": [
+    "Hojai",
+    "Assam",
+    [
+      "Anneria",
+      "Derapathar",
+      "Fultoli Bazar",
+      "Gosaigaon",
+      "Hawaipur",
+      "Kharikhana",
+      "Lachit Pathar",
+      "Lamsakhang",
+      "Lanka",
+      "Lankeswarigrant",
+      "Laskarpathar",
+      "Mailoo Bazar",
+      "Mainapur Bazar",
+      "Nakhuti Bazar",
+      "Pipal Pukhuri",
+      "Sambari Dagaon",
+      "Sankarpur",
+      "Teralangso",
+      "Thaisupar",
+      "Tiniali Bazar",
+      "Udalani Bazar",
+      "Watijor"
+    ]
+  ],
+  "782447": [
+    "Hojai",
+    "Assam",
+    [
+      "Barlongpher",
+      "Harlongpher",
+      "Khengergaon",
+      "Langcholiet",
+      "Lumding",
+      "Lumding Bazar",
+      "Nailalung",
+      "Pub Lumding Bazar",
+      "Taralangso No 1"
+    ]
+  ],
+  "782448": [
+    "West Karbi Anglong",
+    "Assam",
+    [
+      "Amrang",
+      "Dayangmukh",
+      "Diyungbra",
+      "Forest Bazar",
+      "Jengkha",
+      "Jirikinding",
+      "Kheroni",
+      "Sangsiga Bazar"
+    ]
+  ],
+  "782450": [
+    "West Karbi Anglong",
+    "Assam",
+    [
+      "Amtreng",
+      "Baithalangsho",
+      "Barpani",
+      "Honkram",
+      "Paharguri",
+      "Panjaborpathar",
+      "Tengralangso",
+      "Tikahill"
+    ]
+  ],
+  "782460": ["Karbi Anglong", "Assam", ["Diphu"]],
+  "782461": [
+    "Karbi Anglong",
+    "Assam",
+    ["Amlakhi Bazar", "Kheronigaon", "Longnit", "Mahendijua", "Manja", "Rongplimplam"]
+  ],
+  "782462": [
+    "Karbi Anglong",
+    "Assam",
+    [
+      "Baghmari",
+      "Dewanbasti",
+      "Dilaji",
+      "Diphu Bazar",
+      "Diphu Govt.College",
+      "Disama",
+      "Lurulangso",
+      "Phanglangso",
+      "Rengkimi Village",
+      "Rongkhelon"
+    ]
+  ],
+  "782470": [
+    "Karbi Anglong",
+    "Assam",
+    [
+      "Balipathar",
+      "Daldali",
+      "Deopani",
+      "Dhansripar",
+      "Dwajungphang",
+      "Japrajan",
+      "Neparpatty",
+      "Rangapahar Siding",
+      "Tengelijan"
+    ]
+  ],
+  "782480": [
+    "Karbi Anglong",
+    "Assam",
+    [
+      "Bokajan",
+      "Deithor",
+      "Dillai",
+      "Dillai Parbat",
+      "Gautambasti",
+      "Golaibasti",
+      "Hidipi",
+      "Kailajan",
+      "Karagaon",
+      "Khatkhati",
+      "Kuligaon",
+      "Laharijan",
+      "Morakordoiguri",
+      "Sarihajan"
+    ]
+  ],
+  "782481": [
+    "Karbi Anglong",
+    "Assam",
+    [
+      "Amonigaon",
+      "Baligaon Tiniali",
+      "Bobilgaon",
+      "Borbali",
+      "Dakhin Dighalipar",
+      "Debasthan Bazar",
+      "Eradighalpani",
+      "Hidibonglong",
+      "Howraghat",
+      "Okrang",
+      "Palakamati",
+      "Panditghat",
+      "Rajapathar",
+      "Rongkut",
+      "Uttar Borbil"
+    ]
+  ],
+  "782482": [
+    "Karbi Anglong",
+    "Assam",
+    [
+      "Bakalighat",
+      "Disobai",
+      "Kachupukhuri",
+      "Langbangdingpi",
+      "Lorenthepi",
+      "Pub Silputa",
+      "Samaguri Bazar",
+      "Shyampathar",
+      "Silputa Tiniali",
+      "Tarabasa",
+      "Teteliguri",
+      "Udali No 1"
+    ]
+  ],
+  "782485": [
+    "West Karbi Anglong",
+    "Assam",
+    [
+      "Borthal",
+      "Donkamokam",
+      "Honlokrok",
+      "Jaljuri",
+      "Kalanga",
+      "Phangtrengphang",
+      "Satgaon",
+      "Taradubi",
+      "Tumpreng"
+    ]
+  ],
+  "782486": ["West Karbi Anglong", "Assam", ["Hamren", "Khanduli", "Umcherra"]],
+  "782490": [
+    "Karbi Anglong",
+    "Assam",
+    ["Bogijan", "Bokajan C F", "Chakihola", "Deihari", "Jongpha", "Vitorkaliani"]
+  ],
+  "783101": [
+    "Goalpara",
+    "Assam",
+    [
+      "Baladmari",
+      "Baladmarirchar",
+      "Barbhita",
+      "Bhalukdubi",
+      "Dakurbhita",
+      "Dariduri",
+      "Dubapara",
+      "Goalpara",
+      "Govindapur",
+      "Kalyanpur",
+      "Kharmuza",
+      "Mornai",
+      "Rakhasini",
+      "Ramharirchar",
+      "Simlabari",
+      "Uzirahar"
+    ]
+  ],
+  "783120": [
+    "Goalpara",
+    "Assam",
+    [
+      "Agia",
+      "Badahapur",
+      "Baida",
+      "Balbala Kalapani",
+      "Bardamal",
+      "Barjhora",
+      "Depalsung",
+      "Dwarka",
+      "Jurigaon",
+      "Maladhara",
+      "Markula",
+      "Suarmari",
+      "Tisimpur"
+    ]
+  ],
+  "783122": ["Goalpara", "Assam", ["Damra", "Nishangram"]],
+  "783123": [
+    "Goalpara",
+    "Assam",
+    [
+      "Ambari",
+      "Ambuk",
+      "Bagdoba",
+      "Chekowary",
+      "Dhupdhara",
+      "Dighali",
+      "Kothakuthi",
+      "Salpara",
+      "Tingba"
+    ]
+  ],
+  "783124": [
+    "Goalpara",
+    "Assam",
+    [
+      "Amjonga",
+      "Bandarshi",
+      "Darakh",
+      "Dudhnoi",
+      "Khusdhowa",
+      "Lela",
+      "Manupara",
+      "Upartala"
+    ]
+  ],
+  "783125": [
+    "Goalpara",
+    "Assam",
+    [
+      "Bahati",
+      "Bakaitari",
+      "Chakla",
+      "Dahela",
+      "Dalgoma",
+      "Gossaibari",
+      "Matia",
+      "Matia Bazar",
+      "Sutarpara"
+    ]
+  ],
+  "783126": [
+    "Goalpara",
+    "Assam",
+    [
+      "Chotipara",
+      "Chotomatia",
+      "Dhaigaon",
+      "Harimura",
+      "Khardang",
+      "Krishnai",
+      "Kukurkata",
+      "Lalabari",
+      "Misilkhowa",
+      "Tukura",
+      "Zira"
+    ]
+  ],
+  "783127": [
+    "South Salmara Mancachar",
+    "Assam",
+    [
+      "Bauskata",
+      "Patakata",
+      "Pocharchar",
+      "Ravatari",
+      "Salmara South",
+      "Sarkarergaon",
+      "Tumni"
+    ]
+  ],
+  "783128": [
+    "South Salmara Mancachar",
+    "Assam",
+    ["Hazirhat", "Kokradanga", "Muhurirchar", "Nilokhia", "Piazbari", "Sukchar"]
+  ],
+  "783129": [
+    "Goalpara",
+    "Assam",
+    [
+      "Ambari Bazar",
+      "Aolatoli",
+      "Baguan",
+      "Balarbhita",
+      "Bashbari",
+      "Beserkona",
+      "Chunari",
+      "Dhamer Reserve",
+      "Fetangapara",
+      "Hashdoba",
+      "Joybhum",
+      "Joypur Bazar",
+      "Joyramkuchi",
+      "Lakhipur",
+      "Meserbhita",
+      "Nidanpur",
+      "Panisali",
+      "Rajmita Pantai",
+      "Rowkhowa",
+      "Takimari"
+    ]
+  ],
+  "783130": [
+    "Goalpara",
+    "Assam",
+    ["Athiabari", "Dhanubhanga", "Kahibari", "Patpara", "Rangjuli", "Simlitola", "Tiplai"]
+  ],
+  "783131": [
+    "South Salmara Mancachar",
+    "Assam",
+    ["Barkona", "Jhowdanga", "Kakripara", "Mankachar", "Radhamadhabhat"]
+  ],
+  "783132": [
+    "Goalpara",
+    "Assam",
+    ["Dharai", "Gaurnagar", "Jaleswar", "Katarihara", "Tulsibari"]
+  ],
+  "783133": ["Goalpara", "Assam", ["Rajapara"]],
+  "783134": ["Goalpara", "Assam", ["Darrangiri", "Kachadal", "Melopara", "Sesapani"]],
+  "783135": [
+    "South Salmara Mancachar",
+    "Assam",
+    [
+      "Dhanuagaon",
+      "Fekamari",
+      "Fulerchar",
+      "Hatsingimari",
+      "Kalapani",
+      "Kanaimara",
+      "Manullapara",
+      "Purandiara"
+    ]
+  ],
+  "783301": ["Dhubri", "Assam", ["Bhotgaon", "Dhubri", "Dhubri Bazar"]],
+  "783323": [
+    "Dhubri",
+    "Assam",
+    ["Aironjongla", "Amco Road", "Dhubri Balurchar", "Muthakhowa"]
+  ],
+  "783324": [
+    "Dhubri",
+    "Assam",
+    ["Bidyapara", "Chagalchara", "Dharmasala", "Howrarpar", "Patamari", "Tistarpar"]
+  ],
+  "783325": [
+    "Dhubri",
+    "Assam",
+    ["Falimari Pt I", "Jhagrarpar", "Khalilpur", "Majerchar"]
+  ],
+  "783330": [
+    "Dhubri",
+    "Assam",
+    [
+      "Airkata Bazar",
+      "Barkaila Serso",
+      "Chirakuti Bazar",
+      "Dhumerghat",
+      "Fakirganj",
+      "Hamidabad",
+      "Jamadarhat",
+      "Khalisabhita",
+      "Madartari",
+      "Simlabari"
+    ]
+  ],
+  "783331": [
+    "Dhubri",
+    "Assam",
+    [
+      "Asharikandi",
+      "Balajan",
+      "Banyaguri",
+      "Gauripur",
+      "Khudimari",
+      "Madhusoulmari",
+      "Rupsi",
+      "Sahebganj Naicherkuti",
+      "Silairpar",
+      "South Geramari",
+      "Tiamari"
+    ]
+  ],
+  "783332": [
+    "Kokrajhar",
+    "Assam",
+    [
+      "Barjan",
+      "Kamandanga",
+      "Lalmati Tumbagan",
+      "Petlagaon",
+      "Srinagar",
+      "Tamarhat",
+      "Uzanpetla"
+    ]
+  ],
+  "783333": ["Kokrajhar", "Assam", ["Dingdinga", "Failaguri", "Grahampur"]],
+  "783334": [
+    "Dhubri",
+    "Assam",
+    [
+      "Baladoba",
+      "Barundanga",
+      "Belguri",
+      "Bhatipetla",
+      "Bichandai",
+      "Bishkhowa",
+      "Borocharaikhola",
+      "Dafarpur",
+      "Debottar Hasdaha",
+      "Dimakuri",
+      "Golakganj",
+      "Kachakhana",
+      "Kacharihat",
+      "Kismat Hasdaha",
+      "Lakhimari",
+      "Molandubi",
+      "Moterjhar",
+      "Paglahat",
+      "Raipur",
+      "Ratiadaha",
+      "Sonahat",
+      "Tokrerchara"
+    ]
+  ],
+  "783335": [
+    "Dhubri",
+    "Assam",
+    [
+      "Agomoni",
+      "Bidyardabri",
+      "Chagolia",
+      "Chatoguma",
+      "Dighaltari",
+      "Jhapsabari",
+      "Jhaskal",
+      "Kaimari",
+      "Kaldoba",
+      "Kherbari",
+      "Mahamayahat",
+      "Maragadadhar",
+      "Pabarchara",
+      "Pokalagi",
+      "Satrasal",
+      "South Jhapsabari"
+    ]
+  ],
+  "783336": [
+    "Kokrajhar",
+    "Assam",
+    ["Bhowraguri", "Binnyakhata", "Gambaribil", "Kamalsing"]
+  ],
+  "783337": [
+    "Dhubri",
+    "Assam",
+    [
+      "Aminkata",
+      "Bashbari",
+      "Bhumka",
+      "Dhanpur",
+      "Duligaon",
+      "Haraltari",
+      "Kartimari",
+      "Monglajhora",
+      "Pratapkhata",
+      "Sapatgram",
+      "Tipkai",
+      "Tulsibil"
+    ]
+  ],
+  "783339": [
+    "Dhubri",
+    "Assam",
+    [
+      "Alamganj",
+      "Boraibari Pt V",
+      "Borshijhora",
+      "Debitola",
+      "Geramari",
+      "Jharnerchar",
+      "Kazigaon",
+      "Khopati",
+      "Podmeralga",
+      "Rangamati"
+    ]
+  ],
+  "783345": [
+    "Kokrajhar",
+    "Assam",
+    [
+      "Baghmari",
+      "Baruapara",
+      "Fakiragram",
+      "Futkibari",
+      "Helaguri",
+      "Lakhiganj Bazar",
+      "Raniganj",
+      "Shesergaon"
+    ]
+  ],
+  "783346": [
+    "Kokrajhar",
+    "Assam",
+    [
+      "Aflagaon",
+      "Athiabari",
+      "Gossainichina",
+      "Jharbari",
+      "Kakormari",
+      "Pakriguri",
+      "Patgaon",
+      "Ramfalbil",
+      "Serfanguri",
+      "Shialmari",
+      "Shyamthaibari"
+    ]
+  ],
+  "783347": [
+    "Kokrajhar",
+    "Assam",
+    [
+      "Banargaon",
+      "Batabari",
+      "Bhalukmari",
+      "Dotma",
+      "Dumeriguri",
+      "Hakamabil",
+      "Lawdanga",
+      "Puthimari",
+      "Tetliguri"
+    ]
+  ],
+  "783348": [
+    "Dhubri",
+    "Assam",
+    [
+      "Bangalipara",
+      "Barkanda",
+      "Bilasipara",
+      "Boalkamari",
+      "Chirakuti Pt I",
+      "Dhirbil",
+      "Gashbari",
+      "Gobardhanpara",
+      "Hakama",
+      "Hatipota",
+      "Jalabila",
+      "Jamduar",
+      "Kadamtala Pt IIi",
+      "Kajaikata",
+      "Nayeralga",
+      "Salkocha",
+      "Silgara",
+      "Suapata",
+      "Tilapara"
+    ]
+  ],
+  "783349": [
+    "Dhubri",
+    "Assam",
+    [
+      "Bagribari",
+      "Bondihana",
+      "Choudhurirchar",
+      "Gutipara",
+      "Khanabari Araiani",
+      "Mahamayadham",
+      "Piazbari Makrijhora"
+    ]
+  ],
+  "783350": [
+    "Kokrajhar",
+    "Assam",
+    ["Bairali", "Gangia", "Jaleswari", "Kachugaon", "Raimona", "Saraibil", "Takampur"]
+  ],
+  "783354": ["Kokrajhar", "Assam", ["Chitila Bhubannagar", "Mainaguri", "Saktiashram"]],
+  "783360": [
+    "Kokrajhar",
+    "Assam",
+    [
+      "Anthaibari",
+      "Ballimari",
+      "Bhodeaguri",
+      "Chakma",
+      "Garufela Bazar",
+      "Gossaigaon",
+      "Gossaigaon No.II",
+      "Guabari",
+      "Jambuguri",
+      "Joyma",
+      "Joyma Bazar",
+      "Kashiabari",
+      "Koimari",
+      "Maktaigaon",
+      "Padmabil",
+      "Panbari Bazar",
+      "Patakata",
+      "Rajadabri",
+      "Sapkata",
+      "Satyapur"
+    ]
+  ],
+  "783361": [
+    "Kokrajhar",
+    "Assam",
+    ["Goladangi", "Haraputa", "Jaraguri", "Simultapu", "Srirampur"]
+  ],
+  "783369": ["Kokrajhar", "Assam", ["Kalipukhuri", "Salakati", "Salakati Project"]],
+  "783370": [
+    "Kokrajhar",
+    "Assam",
+    [
+      "Bishmuri",
+      "Boro Gendrabil",
+      "Chandrapara",
+      "Daloabari",
+      "Haloadal",
+      "Haltugaon",
+      "Kashipara Bhotgaon",
+      "Khargaon",
+      "Kokrajhar",
+      "Kokrajhar Bagicha",
+      "Magurmari",
+      "Rainadabri",
+      "Rangalikhata",
+      "Shantinagar",
+      "Simbargaon",
+      "Titaguri",
+      "Ultapani"
+    ]
+  ],
+  "783371": [
+    "Dhubri",
+    "Assam",
+    ["Chapar", "Kheluapara", "Raijhora Bahalpur", "Simlabari"]
+  ],
+  "783372": [
+    "Chirang",
+    "Assam",
+    [
+      "Basugaon",
+      "Bidyapur",
+      "Bilaspur",
+      "Dhantala Bazar",
+      "Dologaon",
+      "Fulguri",
+      "Kokragaon",
+      "Ranchaidham",
+      "Tilakgaon"
+    ]
+  ],
+  "783373": [
+    "Chirang",
+    "Assam",
+    [
+      "Champabati Bazar",
+      "Duttapur",
+      "Garubhasa",
+      "Karigaon",
+      "Kashikotra",
+      "Mozabari",
+      "Sidli"
+    ]
+  ],
+  "783375": [
+    "Chirang",
+    "Assam",
+    ["Deosiri", "Khungring", "Ranipur", "Runikhata", "Santipur"]
+  ],
+  "783376": [
+    "Kokrajhar",
+    "Assam",
+    ["Choibari", "Choraikhola", "Dabargaon", "Majergaon", "Nayekgaon"]
+  ],
+  "783380": [
+    "Bongaigaon",
+    "Assam",
+    [
+      "Barpara",
+      "Bongaigaon",
+      "Chakapara",
+      "Chapaguri",
+      "Chaprakata",
+      "Chipansila",
+      "Dongaigaon",
+      "Khagrabari",
+      "Khwaja Dolaigaon",
+      "Mulagaon",
+      "Natunpara",
+      "North Baitamari",
+      "North Bongaigaon",
+      "Popragaon"
+    ]
+  ],
+  "783381": ["Bongaigaon", "Assam", ["New Bongaigaon", "Simlaguri"]],
+  "783382": ["Bongaigaon", "Assam", ["Barjana", "Jogighopa", "Malegarh", "Pachania"]],
+  "783383": [
+    "Bongaigaon",
+    "Assam",
+    [
+      "Bhotguti Huramara",
+      "Garugaon",
+      "Ghilaguri",
+      "Kakaijana",
+      "Khagarpur",
+      "Salmara North",
+      "Sidalsati"
+    ]
+  ],
+  "783384": [
+    "Bongaigaon",
+    "Assam",
+    [
+      "Abhayapuri",
+      "Ambari",
+      "B.S.Gram",
+      "Barigaon",
+      "Deohati",
+      "Dumerguri",
+      "Dumuria Piradhara",
+      "Golapara",
+      "Kirtanpara",
+      "Kushbari",
+      "Lalmati",
+      "Latibari",
+      "Lengtisinga",
+      "Madrasapara",
+      "Nararbhita",
+      "Nayagaon",
+      "Nayasatra",
+      "Rangapani",
+      "Santoshpur",
+      "Tilpukhuri",
+      "Topgaon"
+    ]
+  ],
+  "783385": ["Chirang", "Assam", ["Dhaligaon", "Kajalgaon"]],
+  "783388": [
+    "Bongaigaon",
+    "Assam",
+    ["A.P.Mill", "Balapara", "Chalantapara", "Koreya", "Majharalga"]
+  ],
+  "783389": ["Bongaigaon", "Assam", ["Boitamari", "Kayetpara"]],
+  "783390": [
+    "Chirang",
+    "Assam",
+    [
+      "Ananda Bazar",
+      "Bagargaon",
+      "Bangalijhora",
+      "Bhandra Bazar",
+      "Bholatol",
+      "Bijni",
+      "Chatianguri",
+      "Dakshin Bijni",
+      "Fagunagaon",
+      "Gerukabari",
+      "Goraimari",
+      "Hanchara",
+      "Hapachara",
+      "Jharbishpani",
+      "Kaliagaon",
+      "Kawatika",
+      "Mongolian Bazar",
+      "Silkhaguri"
+    ]
+  ],
+  "783391": [
+    "Chirang",
+    "Assam",
+    ["Alukhunda Bazar", "Barpathar", "Monakocha", "Panbari", "Patiladaha", "Sonaikhola"]
+  ],
+  "783392": [
+    "Bongaigaon",
+    "Assam",
+    [
+      "Adlaguri",
+      "Aolaguri",
+      "Chakihali",
+      "Chakla",
+      "Dompara",
+      "Kokila",
+      "Manikpur",
+      "Nowagaon",
+      "Nowapara",
+      "Numberpara",
+      "Salabila Bazar"
+    ]
+  ],
+  "783393": [
+    "Chirang",
+    "Assam",
+    [
+      "Amguri Bazar",
+      "Amteka Bazar",
+      "B.Ladanguri",
+      "Ballamguri Bazar",
+      "Betini",
+      "Betnapara",
+      "Boro Bazar",
+      "Dongshia Para",
+      "Joypur",
+      "Khungkhurajhara",
+      "Koilamoila",
+      "Malibhita",
+      "Malipara",
+      "Nehru Bazar",
+      "Silbari Abdaipara"
+    ]
+  ],
+  "783394": [
+    "Chirang",
+    "Assam",
+    ["Bengtal", "Chatonilibari", "Ouguri", "Patabari", "Tukrijhora"]
+  ],
+  "784001": [
+    "Sonitpur",
+    "Assam",
+    ["Hazarapar", "Kacharigaon", "Mahabhairab", "Sonitpur", "Tezpur", "Tezpur Bazar"]
+  ],
+  "784010": ["Sonitpur", "Assam", ["Tezpur Medical College"]],
+  "784025": ["Sonitpur", "Assam", ["Panchmile", "Singitoli", "Tengabasti", "Uriamguri"]],
+  "784026": ["Sonitpur", "Assam", ["Khalihamari"]],
+  "784027": [
+    "Sonitpur",
+    "Assam",
+    ["Balichapori", "Bhojkhowa Chapori", "Dolabari", "Kaliabhomora"]
+  ],
+  "784028": ["Sonitpur", "Assam", ["Napaam"]],
+  "784101": [
+    "Sonitpur",
+    "Assam",
+    [
+      "Ameribari",
+      "Balipara",
+      "Godamghat",
+      "Khelmati Bazar",
+      "Nankey Patgaon",
+      "Silonigaon"
+    ]
+  ],
+  "784102": ["Sonitpur", "Assam", ["Lokra", "Sonaipam"]],
+  "784103": [
+    "Sonitpur",
+    "Assam",
+    [
+      "Aujuli Rangagora",
+      "Bhalukpong",
+      "Chariduar",
+      "Chengelimara",
+      "Gamani",
+      "Uttar Amloga"
+    ]
+  ],
+  "784104": ["Sonitpur", "Assam", ["Haleswar", "Shalonibari"]],
+  "784105": [
+    "Sonitpur",
+    "Assam",
+    ["Bokajan", "Ghoramari", "Mansiri", "Natun Baithabhonga"]
+  ],
+  "784110": [
+    "Sonitpur",
+    "Assam",
+    [
+      "Chitalmari",
+      "Dhekiajuli",
+      "Farshipam",
+      "Ghogra",
+      "Keherukhanda",
+      "Mitham Bangali",
+      "Pirakata No.2",
+      "Rangagora Darrang",
+      "Singri",
+      "Upper Panbari"
+    ]
+  ],
+  "784111": [
+    "Sonitpur",
+    "Assam",
+    ["Batashipur", "Darrang Panbari", "Dibru Darrang", "Gormara", "Mejengjuli"]
+  ],
+  "784112": [
+    "Sonitpur",
+    "Assam",
+    [
+      "Alisinga",
+      "Bhangamandir",
+      "Bogipukhuri",
+      "Natun Sirajuli",
+      "Orientoli",
+      "Palasbasti Pathar"
+    ]
+  ],
+  "784113": ["Udalguri", "Assam", ["Bongaligaon", "Dalakati Borobazar", "Kopati"]],
+  "784114": [
+    "Udalguri",
+    "Assam",
+    [
+      "Borjhar Bazar",
+      "Dafalapota",
+      "Dhansiri Bazar",
+      "Jamuguri",
+      "No.2 Saikia Chuburi",
+      "Orang",
+      "Silbori"
+    ]
+  ],
+  "784115": [
+    "Darrang",
+    "Assam",
+    [
+      "Galandi",
+      "Ghansimali",
+      "Kharupetiaghat",
+      "Kharupetiaghat Bazar",
+      "Kunwari Pukhuri",
+      "Niz Kharupetia",
+      "Punia No.1"
+    ]
+  ],
+  "784116": [
+    "Darrang",
+    "Assam",
+    ["Chakrabasti", "Dalgaon", "Jangalpara", "No.2 Sialmari"]
+  ],
+  "784117": [
+    "Sonitpur",
+    "Assam",
+    [
+      "Balipukhuri Joradia",
+      "Biskhuti",
+      "Borsola",
+      "Fatasimalugaon",
+      "Kacharison",
+      "Mazrowmari",
+      "Sirajuli"
+    ]
+  ],
+  "784125": ["Darrang", "Assam", ["Mangaldoi"]],
+  "784144": [
+    "Darrang",
+    "Assam",
+    ["Barampur", "Dighirpar", "Dipila Chowka", "Hatimara", "Pathorighat", "Santipukhuri"]
+  ],
+  "784145": [
+    "Darrang",
+    "Assam",
+    [
+      "Bajanapathar",
+      "Bordolguri",
+      "Byaspara",
+      "Chengeliajhar",
+      "Dhekipara",
+      "Dholpur",
+      "Ganesh Kunwari",
+      "Garukhuti",
+      "Hazarikapara",
+      "Khandajan",
+      "Kuruwa",
+      "Maroi",
+      "Marowachowka",
+      "Muslimghopa",
+      "Sanowa",
+      "Satkhali",
+      "Sipajhar"
+    ]
+  ],
+  "784146": ["Darrang", "Assam", ["Balabari", "Dhula", "Minapara", "Mudoibari"]],
+  "784147": [
+    "Darrang",
+    "Assam",
+    [
+      "Barigaon No.2",
+      "Burargarh",
+      "Burhi Nagar",
+      "Chamatiapara",
+      "Deodhani Ghat",
+      "Deomornoi",
+      "Naharbari",
+      "Pati Darrang"
+    ]
+  ],
+  "784148": [
+    "Darrang",
+    "Assam",
+    ["Andherighat", "Burha", "Duni", "Hengalpara", "Kenduguri", "Tengara"]
+  ],
+  "784149": [
+    "Sonitpur",
+    "Assam",
+    [
+      "Bargaon",
+      "Bhergaon Kochgaon",
+      "Borbil Kachari",
+      "Garuduba",
+      "Ghatua",
+      "Jahamari",
+      "Kalakuchi",
+      "Silikhabari",
+      "Teliagaon",
+      "Thelamara",
+      "Ulubari"
+    ]
+  ],
+  "784150": ["Sonitpur", "Assam", ["Besseria", "Da Besseria", "Da Parbatia", "Dipota"]],
+  "784153": [
+    "Sonitpur",
+    "Assam",
+    ["Bandarmari", "Bapubheti", "Bihaguri", "Gabharu", "Khelmati", "Pithakhowa"]
+  ],
+  "784154": ["Sonitpur", "Assam", ["Balipukhuri Tiniali", "Ketekibari", "Nikamul Satra"]],
+  "784160": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Dharmapur",
+      "Gabharu Tunijan",
+      "Haribor Naharoni",
+      "Harmoti Merbil",
+      "Joriguri",
+      "Lakhanabari",
+      "Laluk",
+      "Merbil",
+      "Parbatipur",
+      "Sonapur"
+    ]
+  ],
+  "784161": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Badati",
+      "Bahgora Deurigaon",
+      "Bihupuria",
+      "Dongibill",
+      "Hamarathan",
+      "Japjup",
+      "Kachikota Mirideurigaon",
+      "Laholial",
+      "Morichapathar",
+      "Pokadal",
+      "Rajabari"
+    ]
+  ],
+  "784163": ["Lakhimpur", "Assam", ["Barbali", "Pathalipahar", "Pithguri"]],
+  "784164": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Bordeurigaon",
+      "Dikrong",
+      "Duliapthar",
+      "Jorabari",
+      "Kamalpur",
+      "Kinapathar",
+      "Madhavpur",
+      "Meramukh",
+      "Padmapur",
+      "Panbari",
+      "Raidongia"
+    ]
+  ],
+  "784165": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Arimora Tiniali",
+      "Bhatowkuchi",
+      "Bonpuroi",
+      "Dhalpur",
+      "Dharmagarh Sevashram",
+      "Kachua",
+      "Kamalpur Chariali",
+      "Kuksabari",
+      "Puli Naharani",
+      "Rangati Charali",
+      "Ruptali Adarshagaon",
+      "Simaluguri"
+    ]
+  ],
+  "784166": ["Biswanath", "Assam", ["Behali"]],
+  "784167": [
+    "Biswanath",
+    "Assam",
+    ["Arragaon No.1", "Bhimdanga", "Borgong", "Cherelia", "Gangmouthan", "Rampur Darrang"]
+  ],
+  "784168": [
+    "Biswanath",
+    "Assam",
+    [
+      "Ghogra Basti",
+      "Gobinda Elengisatra",
+      "Gohpur",
+      "Kakila Chariali",
+      "Magoni",
+      "Milanpur",
+      "Poken No.1",
+      "Rajabari",
+      "Simaluguri",
+      "Sonapur"
+    ]
+  ],
+  "784169": [
+    "Biswanath",
+    "Assam",
+    [
+      "Diphalu Satra",
+      "Howajan",
+      "Kamdewal",
+      "Kharaiguri",
+      "Khatargaon",
+      "Lohitmukh",
+      "Rawanmukh",
+      "Subansirimukh"
+    ]
+  ],
+  "784170": [
+    "Biswanath",
+    "Assam",
+    [
+      "Amlakhi Dalani",
+      "Ghahigaon Chariali",
+      "Halem",
+      "Karibil Bangali",
+      "Kauri Pathar",
+      "Mail Bazar",
+      "Mukoli Gaon"
+    ]
+  ],
+  "784171": ["Biswanath", "Assam", ["Balijan Barua", "Daflagarh", "Tetenbari"]],
+  "784172": [
+    "Biswanath",
+    "Assam",
+    [
+      "Bakori Doloni",
+      "Balijan",
+      "Barangabari",
+      "Brahmajan",
+      "Dipara Pukhuri",
+      "Gameri",
+      "Helemguri"
+    ]
+  ],
+  "784173": ["Biswanath", "Assam", ["Mijikajan", "Tinikhuti"]],
+  "784174": [
+    "Biswanath",
+    "Assam",
+    ["Balichang", "DhuliKuhiarbari", "Pabhoi", "Salaikati"]
+  ],
+  "784175": [
+    "Biswanath",
+    "Assam",
+    [
+      "Bakrapatta",
+      "Bokabil",
+      "Borpam Tiniali",
+      "Chamardoloni",
+      "Chengamari",
+      "Garpal",
+      "Khanaguri",
+      "Niz Sootea",
+      "No.2 Ghahigaon",
+      "No.3 Nalbari",
+      "Pratapgarh",
+      "Solal Sonari",
+      "Sootea",
+      "Tewaripal"
+    ]
+  ],
+  "784176": [
+    "Biswanath",
+    "Assam",
+    [
+      "Burigong",
+      "Chariali MDG",
+      "Gelapukhuri",
+      "Geruabari",
+      "Kunwari",
+      "Lahorijan",
+      "Lehugaon",
+      "Monabari",
+      "Panibharal",
+      "Sakomato"
+    ]
+  ],
+  "784177": ["Biswanath", "Assam", ["Biswanathghat", "Solemari No.1"]],
+  "784178": [
+    "Biswanath",
+    "Assam",
+    [
+      "Alupara",
+      "Bordupsonalibari",
+      "Dubia",
+      "Kalabari",
+      "Kalmouguri",
+      "Mazukuchi",
+      "Mikirborachuk",
+      "Pulisomoni No.1",
+      "Santipurdeorigaon"
+    ]
+  ],
+  "784179": [
+    "Biswanath",
+    "Assam",
+    ["Batiamari", "Bedeti", "Bihmari", "Borjuli Nepaligaon", "Buroi Ghat", "Janata"]
+  ],
+  "784180": [
+    "Sonitpur",
+    "Assam",
+    ["Gameripal", "Jamugurihat", "Nandikeswar", "Panpur", "Solaguri"]
+  ],
+  "784182": [
+    "Sonitpur",
+    "Assam",
+    [
+      "Bakola",
+      "Balijuri",
+      "Bordikorai",
+      "Hatinga",
+      "Itakhola",
+      "Naharbari",
+      "Rangachakua",
+      "Towbhanga"
+    ]
+  ],
+  "784184": ["Biswanath", "Assam", ["Borjharani", "Gingia"]],
+  "784189": ["Biswanath", "Assam", ["Karsontala", "Nagsankar"]],
+  "784190": ["Udalguri", "Assam", ["Barbagan", "Bhakatpara", "Chamuakhat", "Shamtilla"]],
+  "784501": ["Sonitpur", "Assam", ["Dekargaon", "Rangapukhuri", "Solmara"]],
+  "784502": ["Sonitpur", "Assam", ["Bahbari", "Bindukuri", "Manijharni"]],
+  "784504": ["Sonitpur", "Assam", ["Borjuli", "Dhendoi", "Phulaguri"]],
+  "784505": [
+    "Sonitpur",
+    "Assam",
+    ["Dopdopi", "Kailajuli", "Rangapara", "Thakurbari", "Urahiloga"]
+  ],
+  "784506": [
+    "Sonitpur",
+    "Assam",
+    [
+      "Bansbera",
+      "Dhankhana",
+      "Dighalijuli",
+      "Garubandha",
+      "Jiagabharu",
+      "Missamari",
+      "Nepalibasti"
+    ]
+  ],
+  "784507": [
+    "Udalguri",
+    "Assam",
+    [
+      "Batabari",
+      "Hoograjuli",
+      "Khuchurabari",
+      "Mahalia Para",
+      "Mazbat",
+      "Narengkati",
+      "Pathakpur",
+      "Rakhsyashmari"
+    ]
+  ],
+  "784508": [
+    "Udalguri",
+    "Assam",
+    ["Bhalukmari", "Rowta", "Rowta Chariali", "Shillongkhuti"]
+  ],
+  "784509": [
+    "Udalguri",
+    "Assam",
+    [
+      "Bandarguri",
+      "Barnagram",
+      "Garaibari",
+      "Kajiamati",
+      "Khowrang",
+      "Khuchurabari Habigaon",
+      "Mazkhuti",
+      "Mohanpur",
+      "Nalkhamara",
+      "Thana Udalguri",
+      "Udalguri"
+    ]
+  ],
+  "784510": [
+    "Udalguri",
+    "Assam",
+    [
+      "Ambagan",
+      "Barigoan",
+      "Batakuchi",
+      "Harisinga",
+      "No.1 Amjuli",
+      "Sastrapara",
+      "Tamulbari"
+    ]
+  ],
+  "784513": ["Udalguri", "Assam", ["Bhairakunda", "Sapangaon"]],
+  "784514": [
+    "Darrang",
+    "Assam",
+    [
+      "Aminpara",
+      "Bechimari",
+      "Daipam",
+      "Ekrabari",
+      "Gerua Bazar",
+      "Lalpul Bazar",
+      "Padupuri Mazgaon"
+    ]
+  ],
+  "784521": [
+    "Udalguri",
+    "Assam",
+    [
+      "Barjalah",
+      "Chamuapara",
+      "Mechakapukhuri",
+      "Murmela",
+      "Palahgarh",
+      "Purandia",
+      "Tangla"
+    ]
+  ],
+  "784522": [
+    "Udalguri",
+    "Assam",
+    [
+      "Bahmola",
+      "Baralakhat",
+      "Barangabari",
+      "Bhergaon",
+      "Bholaguri",
+      "Bogpuri",
+      "Jalukbari",
+      "Khoirabari",
+      "Kuhiarkuchi",
+      "Malmura",
+      "Nichilamari",
+      "Panishali",
+      "Rangajuli",
+      "Thakuriapara"
+    ]
+  ],
+  "784523": [
+    "Udalguri",
+    "Assam",
+    ["Bengbari", "Goriajhar", "Kachubilhat", "Panerihat", "Ratanpur"]
+  ],
+  "784524": ["Udalguri", "Assam", ["Ajodhyapur", "Ghograbazar", "Hatigarh", "Teliapara"]],
+  "784525": [
+    "Udalguri",
+    "Assam",
+    [
+      "Barampur Kalaigaon",
+      "Barkalachowka",
+      "Bhekulikanda",
+      "Bherbheribill",
+      "Bholabari",
+      "Chengapathar",
+      "Kabir Ali",
+      "Kalaigaon",
+      "Lakhimpur",
+      "Majorchuba",
+      "Outola",
+      "Ranipukhuri",
+      "Tengabari"
+    ]
+  ],
+  "784526": ["Udalguri", "Assam", ["Dimakuchi", "Kalikhola", "Pachim Patla"]],
+  "784527": [
+    "Udalguri",
+    "Assam",
+    ["Atterikhat", "Khagrabari", "No.2 Barangajuli", "No.3 Rajagarh", "Suklai"]
+  ],
+  "784528": [
+    "Udalguri",
+    "Assam",
+    [
+      "Bhuyankhat",
+      "Dalong Ghat",
+      "Dhopguri",
+      "Maugaon",
+      "Nashanshali",
+      "Purani Tangla",
+      "Sikari Banglow"
+    ]
+  ],
+  "784529": [
+    "Darrang",
+    "Assam",
+    [
+      "Aulachowka",
+      "Chamuapara",
+      "Chapaichowka",
+      "Dahinagaon",
+      "Howli Mohanpur",
+      "Jaljali",
+      "Jonaramchowka",
+      "Mangalanagar",
+      "Rajghat",
+      "Ramhari Chowka",
+      "Rangamati"
+    ]
+  ],
+  "785001": [
+    "Jorhat",
+    "Assam",
+    ["Bhogdaimukh", "Dhalarsatra", "Garali", "Jorhat", "Macharhat", "Tarajan"]
+  ],
+  "785004": ["Jorhat", "Assam", ["Barbheta", "Chalihagaon", "Pokamura"]],
+  "785006": [
+    "Jorhat",
+    "Assam",
+    [
+      "Bor Ahom Kathani",
+      "Charingia",
+      "Dahotia",
+      "Jorhat Reserch Lab",
+      "Panichokua",
+      "Parbatia",
+      "Pulibor",
+      "Tilikiaam"
+    ]
+  ],
+  "785007": ["Jorhat", "Assam", ["Hatigarh", "Itakhuli", "Jorhat Engg College"]],
+  "785008": [
+    "Jorhat",
+    "Assam",
+    ["Cinnamara", "Gojpuria", "Konwaripukhuri", "Koronga", "Lichubari"]
+  ],
+  "785009": ["Jorhat", "Assam", ["Bajalani Kohar", "Na Ali Dhekiajuli"]],
+  "785010": [
+    "Jorhat",
+    "Assam",
+    ["Chengeli Gaon", "Chenijaan", "Kachagoral", "Kalakhowa", "Pub Charigaon", "Sotai"]
+  ],
+  "785013": ["Jorhat", "Assam", ["Assam Agriculture University"]],
+  "785014": ["Jorhat", "Assam", ["Bongalpukhuri", "Rajabari"]],
+  "785015": [
+    "Jorhat",
+    "Assam",
+    ["Desoinagar", "Dhekorgorah", "Gorokhiadol", "Korokatoly"]
+  ],
+  "785101": [
+    "Jorhat",
+    "Assam",
+    [
+      "Baghmora",
+      "Bahana",
+      "Bahana Tiniali",
+      "Borkhelia Goon",
+      "Chowkhat",
+      "Chowtang",
+      "Hatigarh Balichapori",
+      "Moutgaon",
+      "Potiagaon",
+      "Rongdoi Chariali"
+    ]
+  ],
+  "785102": ["Majuli", "Assam", ["Chumaimari Missing Gaon", "Dakhin Pat Satra"]],
+  "785104": [
+    "Majuli",
+    "Assam",
+    [
+      "Balichapori",
+      "Bargayan",
+      "Bhuramora",
+      "Chitadarchuk",
+      "Garmursatra",
+      "Goalgaon",
+      "Hazarikagaon",
+      "Jokaibowa",
+      "Kamalpur",
+      "Karatipar",
+      "Kulamua Missing",
+      "Madhupur",
+      "Majorchapori",
+      "Missamora Missing Gaon",
+      "Phulanibari",
+      "Phutuki Chapori",
+      "Rangachahi Nikinikhowa",
+      "Rongachahi",
+      "Taburam Lahon"
+    ]
+  ],
+  "785105": [
+    "Majuli",
+    "Assam",
+    [
+      "Borpomua Lakhimi",
+      "Chamahiati",
+      "Jengraichapori",
+      "Jengraikumarbari",
+      "Jengraimukh",
+      "Karki Chuk Missing Gaon",
+      "Majordeori",
+      "Mudoibil",
+      "Murmuria Missing Gaon",
+      "Ratanpur Mirigaon",
+      "Sri Ram Bonomali"
+    ]
+  ],
+  "785106": [
+    "Majuli",
+    "Assam",
+    [
+      "Auniati Satra",
+      "Bengenati Satra",
+      "Botiamari",
+      "Kamalabari",
+      "Morituni",
+      "Potiagaon",
+      "Totoya"
+    ]
+  ],
+  "785107": [
+    "Jorhat",
+    "Assam",
+    [
+      "Bailunggaon",
+      "Dewangaon",
+      "Dharigaon",
+      "Kakajan",
+      "Kakajan Duliagaon",
+      "Kamarkhatowal",
+      "Pirakota",
+      "Rajoi",
+      "Sundarpur"
+    ]
+  ],
+  "785108": [
+    "Jorhat",
+    "Assam",
+    [
+      "Alengmora",
+      "Bahphola",
+      "Barchapori Khakanguri",
+      "Charighoria",
+      "Kakilamukh",
+      "Koliani",
+      "Malowpathar",
+      "Nahatia",
+      "Namdeori",
+      "Takaruchuk"
+    ]
+  ],
+  "785110": [
+    "Majuli",
+    "Assam",
+    [
+      "Bhakatiduar",
+      "Chamaguri Kamalabari",
+      "Gayengaon",
+      "Gezera",
+      "Majulibongaon",
+      "Miligaon Tiniali",
+      "New Bessamora",
+      "Ratanpur",
+      "Solmora",
+      "Sonowal Kachari"
+    ]
+  ],
+  "785111": ["Jorhat", "Assam", ["Fakalapather", "Neamatighat", "Purani Gohaingaon"]],
+  "785112": [
+    "Jorhat",
+    "Assam",
+    [
+      "Bejorchiga",
+      "Boloma",
+      "Bormathauri",
+      "Dulakhoria",
+      "Jakharia",
+      "Jhanjimukh",
+      "Jogduar",
+      "Jogduar Sonari",
+      "Koliapani",
+      "Majkuri",
+      "Mudoijan Tiniali",
+      "Ouguri Missing",
+      "Teok",
+      "Teok Rajabari",
+      "Uttar Dulia"
+    ]
+  ],
+  "785601": [
+    "Golaghat",
+    "Assam",
+    [
+      "Chukiapather",
+      "Chungajan",
+      "Dhupguri",
+      "Gohaingaon",
+      "Naojan",
+      "Panjan Sarupathar",
+      "Rajapukhuri",
+      "Sarupathar",
+      "Tengabari",
+      "Uriamghat"
+    ]
+  ],
+  "785602": [
+    "Golaghat",
+    "Assam",
+    [
+      "Barpathar",
+      "Bilgaon",
+      "Dapathar",
+      "Disirigayan Satra",
+      "Kordoiguri",
+      "Mirigaon",
+      "Premhara",
+      "Silonijan",
+      "Upper Lengtha"
+    ]
+  ],
+  "785603": [
+    "Golaghat",
+    "Assam",
+    [
+      "Barua Gaon",
+      "Ghiladhari",
+      "Habichukia",
+      "Jamuguri",
+      "Lakhibari Tiniali",
+      "Nogora Grant",
+      "Oating"
+    ]
+  ],
+  "785609": [
+    "Golaghat",
+    "Assam",
+    ["Hatikhuli", "Kaziranga", "Kaziranga National Park", "Mohpara"]
+  ],
+  "785610": ["Golaghat", "Assam", ["Borjan", "Furkating"]],
+  "785611": [
+    "Golaghat",
+    "Assam",
+    [
+      "Badulipaar",
+      "Bholaguri",
+      "Bongaon",
+      "Dabidubi",
+      "Dusutimukh",
+      "Goriajan",
+      "Nakkati",
+      "Rongagora Ghat"
+    ]
+  ],
+  "785612": [
+    "Golaghat",
+    "Assam",
+    [
+      "Balijan Aamtenga",
+      "Bokakhat",
+      "Bokakhat Rajabari",
+      "Borjuri",
+      "Dhansirimukh",
+      "Diffolu T.E.",
+      "Dofalada",
+      "Dolamara",
+      "Kakachang",
+      "Khotiakhuli",
+      "Lakhowjaan Tiniali",
+      "Naharjaan",
+      "Siljuri"
+    ]
+  ],
+  "785613": ["Golaghat", "Assam", ["Bokial", "Dholaguri", "Letekujaan"]],
+  "785614": [
+    "Golaghat",
+    "Assam",
+    [
+      "Ahatguri",
+      "Amgurinabhanga",
+      "Bahguri",
+      "Bongalgaon",
+      "Dadhara",
+      "Dani Chapori",
+      "Dergaon",
+      "Dergaon Chariali",
+      "Hahpani",
+      "Joraguri",
+      "Kaliagaon",
+      "Kamargaonchariali",
+      "Khangia",
+      "Madhya Ahatguri",
+      "Mudoigaon",
+      "Rangamati",
+      "Rowmara"
+    ]
+  ],
+  "785615": [
+    "Golaghat",
+    "Assam",
+    [
+      "Behora",
+      "Cinakon Chariali",
+      "Dhodang",
+      "Karuabahi Satra",
+      "Kuruabahi Tiniali",
+      "Numaligarh"
+    ]
+  ],
+  "785616": [
+    "Jorhat",
+    "Assam",
+    [
+      "Charaibahi",
+      "Chungi",
+      "Dhalajan",
+      "Gatanga",
+      "Kachamari",
+      "Namchungi",
+      "Satriagaon",
+      "Tamulbari",
+      "Tekelagaon"
+    ]
+  ],
+  "785618": [
+    "Golaghat",
+    "Assam",
+    [
+      "Baruabamungaon",
+      "Batiporia",
+      "Dhodang Gaon",
+      "Dubialgaon",
+      "Haladhibari",
+      "Missamora",
+      "Naharani"
+    ]
+  ],
+  "785619": [
+    "Golaghat",
+    "Assam",
+    [
+      "Bonkowal",
+      "Goriatika Barpathar",
+      "Kachupathar",
+      "Kamargaon",
+      "Khumtai",
+      "Mohoramukh"
+    ]
+  ],
+  "785621": ["Golaghat", "Assam", ["Golaghat"]],
+  "785622": [
+    "Golaghat",
+    "Assam",
+    [
+      "Alengmuria",
+      "Betioni",
+      "Chinatoli",
+      "Dhekial",
+      "Doria T.E.",
+      "Ganakpukhuri",
+      "Kathalguri",
+      "Moluahabi",
+      "Nabheta",
+      "Pub Khumtai",
+      "Rahdhala"
+    ]
+  ],
+  "785625": [
+    "Golaghat",
+    "Assam",
+    [
+      "Athabari",
+      "Bokalaigaon",
+      "Borjan",
+      "Kamarbandha Ali",
+      "Napamuakamargaon",
+      "Salikihaat"
+    ]
+  ],
+  "785626": [
+    "Golaghat",
+    "Assam",
+    ["Barting Naochalia", "Hatiekhowa", "Hukurakhat", "Maheema", "Namkhatoal"]
+  ],
+  "785630": [
+    "Jorhat",
+    "Assam",
+    [
+      "Baruajan",
+      "Deogharia",
+      "Dihingia",
+      "Fulbari",
+      "Jalukonibari",
+      "Madhapur",
+      "Morangaon",
+      "Rongajan",
+      "Sodial Kochari Gaon",
+      "Tipomia",
+      "Titabor",
+      "Titabor Mohimabari",
+      "Titabor Tiniali"
+    ]
+  ],
+  "785631": [
+    "Jorhat",
+    "Assam",
+    [
+      "Borholla",
+      "Gorajan",
+      "Ikarani",
+      "Kakodonga Bekajan",
+      "Mirigaon",
+      "Mohimabari",
+      "Mokrong",
+      "Muktinagar",
+      "Paanjaan Borholla",
+      "Pulikaitoni",
+      "Raidangjuri",
+      "Rajabahar",
+      "Rajabari",
+      "Ujanitarani",
+      "Urongial"
+    ]
+  ],
+  "785632": [
+    "Jorhat",
+    "Assam",
+    ["Birina Shayek", "Bogargaon", "Chakial", "Melamati", "Purana Titabor"]
+  ],
+  "785633": [
+    "Jorhat",
+    "Assam",
+    ["Bahoni", "Bandor Chaliha", "Kachukhat", "Khorikotia", "Nagadhuli", "Sycotta"]
+  ],
+  "785634": [
+    "Jorhat",
+    "Assam",
+    ["Doklongia", "Mariani", "Meleng", "Nagajanka", "Namrupia"]
+  ],
+  "785635": [
+    "Jorhat",
+    "Assam",
+    [
+      "Balijan Te",
+      "Chungi Lahing",
+      "Fechual",
+      "Gohainbari",
+      "Khatisona",
+      "Lahinggaon",
+      "Lakhibari",
+      "Meleng Grant",
+      "Mogroigaon",
+      "Morongial",
+      "Naginijan",
+      "Nakachari",
+      "Ujani Rajabari"
+    ]
+  ],
+  "785636": [
+    "Jorhat",
+    "Assam",
+    [
+      "Gabharu Konwargaon",
+      "Halowapathar",
+      "Hemlai",
+      "Japichajia",
+      "Kukurachowa",
+      "Majnoi",
+      "Namsisu",
+      "Seleng Lawjan",
+      "Selenghat"
+    ]
+  ],
+  "785640": [
+    "Sivasagar",
+    "Assam",
+    ["Betbari", "Phukannagar", "Rongpurnagar", "Sivasagar", "Towkok"]
+  ],
+  "785661": [
+    "Sivasagar",
+    "Assam",
+    ["Baruatigaon", "Chamua Khanikar", "Charing", "Hafaluting"]
+  ],
+  "785662": [
+    "Sivasagar",
+    "Assam",
+    ["Dehajan", "Demow", "Khorahat", "Konwar Dihingia", "Nahat", "Udaypur"]
+  ],
+  "785663": [
+    "Sivasagar",
+    "Assam",
+    ["Afala", "Banmukh", "Betena", "Chenimora", "Demowmukh", "Disangmukh", "Panbessa"]
+  ],
+  "785664": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Ailamukh",
+      "Bharalua Tiniali",
+      "Dekhowmukh",
+      "Gaurisagar",
+      "Hatighuli",
+      "Kaliori",
+      "Khona Khokora",
+      "Komorajan",
+      "Nakhana",
+      "Silpukhuri",
+      "Teliadunga"
+    ]
+  ],
+  "785665": ["Sivasagar", "Assam", ["Joysagar", "Rong Ghar Chariali", "Rudrasagar"]],
+  "785666": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Charaimuria",
+      "Chirakhunda",
+      "Jatakia",
+      "Kaloogaon",
+      "Khemdeo Pukhuri",
+      "Mogorahat",
+      "Namtial Gaon",
+      "Sologuri"
+    ]
+  ],
+  "785667": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Baliaghat",
+      "Bhatiapar",
+      "Chaulkara",
+      "Karigaon",
+      "Konwarpur",
+      "Nakatani",
+      "Santipur"
+    ]
+  ],
+  "785669": ["Sivasagar", "Assam", ["Deorihabi Chakalia", "Mohkhuti", "Moran"]],
+  "785670": [
+    "Charaideo",
+    "Assam",
+    [
+      "Batomora",
+      "Bishrampur",
+      "Dichow Botua",
+      "Kachumari",
+      "Moranhat",
+      "Photikachowa",
+      "Rangoli"
+    ]
+  ],
+  "785671": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Bam Rajabari",
+      "Dihing Mukh",
+      "Dihing Than",
+      "Dihingia Gaon",
+      "Gorbhanga",
+      "Nitaipukhuri",
+      "Paraliguri",
+      "Samukjan",
+      "Tengaponia"
+    ]
+  ],
+  "785672": [
+    "Sivasagar",
+    "Assam",
+    ["Charagua", "Desanghat", "Koibarta Dolonigaon", "Palengi", "Rajmai"]
+  ],
+  "785673": [
+    "Charaideo",
+    "Assam",
+    [
+      "Chakalia",
+      "Domar Dolong",
+      "Dubba",
+      "Hologuri",
+      "Moranjan",
+      "Moudumoni",
+      "Patsaku",
+      "Sepon"
+    ]
+  ],
+  "785674": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Bakhor Bengena",
+      "Bokota Chand Bessa",
+      "Charubhanga Dihingia",
+      "Nemuguri",
+      "Nongalmora Tiniali"
+    ]
+  ],
+  "785675": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Buri Khowang",
+      "Dhemechi",
+      "Dihingia Gaon",
+      "Dikari Morang Gaon",
+      "Dikhari Kinar Gaon",
+      "Ghuguloni Ahumgaon",
+      "Gozpuria",
+      "Kathalguri",
+      "Khowang",
+      "Krisipam Nigam",
+      "Lukumai",
+      "Majbam Chariali",
+      "Nahazhar",
+      "Pathalibam",
+      "Rangchali",
+      "Sechowapukhuri",
+      "Tarajan",
+      "Thengal",
+      "Tiloinagar",
+      "Tinthengia"
+    ]
+  ],
+  "785676": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Adarsha Deurigaon",
+      "Balai Nagaon",
+      "Baligaon",
+      "Barpathar Gaon",
+      "Bhogamurgaon",
+      "Chaharikata",
+      "Erameshlow Gaon",
+      "Goroimarigaon",
+      "Haladhibari",
+      "Khowang Chariali",
+      "Khowang Ghat",
+      "Kolowlowa",
+      "Kotoha",
+      "Nagargaon",
+      "Nakhat Sonowal Gaon",
+      "Padumoni Gaon No 1",
+      "Sessughat",
+      "Silputa"
+    ]
+  ],
+  "785680": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Amguri",
+      "Bhuyanhat",
+      "Borahibari",
+      "Borbam Te",
+      "Charingia Pukhuri",
+      "Chataichiga Kakotigaon",
+      "Deoraja Maidum",
+      "Jalukgaon",
+      "Lalimchiga",
+      "Majbari",
+      "Morabazar",
+      "Samaguri"
+    ]
+  ],
+  "785681": [
+    "Sivasagar",
+    "Assam",
+    ["Amguri Haloating", "Baghjan Grant", "Dopdhar", "Halouating Grant", "Madhavnagar"]
+  ],
+  "785682": [
+    "Jorhat",
+    "Assam",
+    [
+      "Amtoll Chintamoni",
+      "Bhitarual",
+      "Bhogamukh",
+      "Chintamoni",
+      "Dagaon",
+      "Jelengitup",
+      "Khonamukh",
+      "Lahowal",
+      "Mori Jhanji",
+      "Napam Bekajan",
+      "Tamulichiga"
+    ]
+  ],
+  "785683": [
+    "Jorhat",
+    "Assam",
+    [
+      "Bamunpukhuri",
+      "Bonai",
+      "Jhanji",
+      "Jhanji Hah Chara",
+      "Jhanji Jamuguri",
+      "Jorabari",
+      "Kawaimari Gohaingaon",
+      "Moranchiga",
+      "Pathalial",
+      "Phulpanichiga",
+      "Robigaon",
+      "Teteliguri"
+    ]
+  ],
+  "785684": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Barua Ali",
+      "Baulipukhuri Sensua",
+      "Chetia Gaon",
+      "Deopani",
+      "Dikshu",
+      "Karchowa",
+      "Missajan",
+      "Na Pam Baruati",
+      "Namti Bamungaon",
+      "Namti Chariali",
+      "Namti Pathar",
+      "Namtidoll",
+      "Tiphuk"
+    ]
+  ],
+  "785685": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Bamunpukhuri",
+      "Bauli Maidam",
+      "Bihubar Te",
+      "Bortol",
+      "Chakimukh",
+      "Chepangani",
+      "Dhitaipukhuri",
+      "Gargaon",
+      "Hudupara",
+      "Lakhimi Jan",
+      "Ligiripukhuri",
+      "Mackeypur",
+      "Maduri",
+      "Mezenga",
+      "Namati",
+      "Nazira",
+      "Panibill",
+      "Pioli Pukhuri",
+      "Rajapool",
+      "Rajmao",
+      "Upper Nazira"
+    ]
+  ],
+  "785686": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Dholebagan",
+      "Moutgaon",
+      "Ramaniali",
+      "Ramugaon",
+      "Silasaku",
+      "Simaluguri",
+      "Tengapukhuri"
+    ]
+  ],
+  "785687": [
+    "Sivasagar",
+    "Assam",
+    ["Bihubar", "Dhopabar", "Gormur Miri Gaon", "Nagaon", "Nimaigarh Habi", "Santak"]
+  ],
+  "785688": [
+    "Charaideo",
+    "Assam",
+    ["Chalapather", "Khaloighogora", "Lakowah", "Saru Mothura"]
+  ],
+  "785689": [
+    "Charaideo",
+    "Assam",
+    [
+      "Bonomali",
+      "Desangpani",
+      "Maibella",
+      "Mon Mohan Gaon",
+      "Mothurapur",
+      "Naphuk",
+      "Nimonagarh",
+      "Suffry"
+    ]
+  ],
+  "785690": [
+    "Charaideo",
+    "Assam",
+    ["Aideopukhuri", "Bekadolong", "Bengenabari", "Namtola", "Sonari", "Teokghat"]
+  ],
+  "785691": [
+    "Charaideo",
+    "Assam",
+    [
+      "Bhalukaguri",
+      "Bharali Pukhuri",
+      "Bhojo",
+      "Borahigaon",
+      "Deepling",
+      "Kakotibari",
+      "Korokani",
+      "Mahmora Balijan",
+      "Miripather",
+      "Pohuchungi Pather",
+      "Ronga Bam Habi",
+      "Teok Gaon",
+      "Timon"
+    ]
+  ],
+  "785692": [
+    "Charaideo",
+    "Assam",
+    [
+      "Barbaruakhat",
+      "Baregaon",
+      "Baruanagar",
+      "Bhogbari Kanugaon",
+      "Chotianaguri",
+      "Dhuniapathar",
+      "Ghorajaan",
+      "Longpotia",
+      "Nagahat",
+      "Ouguri Shyam",
+      "Rahan",
+      "Sapekhati",
+      "Ujanikuri"
+    ]
+  ],
+  "785693": [
+    "Charaideo",
+    "Assam",
+    [
+      "Barpatra Te",
+      "Barua Chali",
+      "Borhat",
+      "Changmai",
+      "Deopani Habigaon",
+      "Dillighat",
+      "Lefera",
+      "Siloni Nagar",
+      "Titlagarh Chariali"
+    ]
+  ],
+  "785696": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Athkhel",
+      "Deogharia",
+      "Geleky",
+      "Hatipoti Grant",
+      "Nazira Dulakakharia",
+      "Singibill"
+    ]
+  ],
+  "785697": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Akhoi Phutia",
+      "Amkotia",
+      "Arjun Guri",
+      "Baghshumout",
+      "Barhoiting",
+      "Bogidole",
+      "Dhai Ali",
+      "Duliagaon",
+      "Gohaingaon",
+      "Joirapar",
+      "Kenduguri",
+      "Khamon",
+      "Messagarh",
+      "Meteka",
+      "Mithapukhuri",
+      "Namtial Pathar",
+      "ONGC Colony",
+      "Sukan Pukhuri"
+    ]
+  ],
+  "785698": ["Charaideo", "Assam", ["Lakwah R.S.", "Silakuti"]],
+  "785699": ["Golaghat", "Assam", ["Kanaighat", "Numaligarh Refinery Project"]],
+  "785700": [
+    "Jorhat",
+    "Assam",
+    ["Dhekiakhowa", "Hulalbari", "Kopradhara", "Lahdoigarh Chariali", "Meleng Te"]
+  ],
+  "785701": [
+    "Sivasagar",
+    "Assam",
+    [
+      "Bhadhara",
+      "Cherekapar",
+      "Daya Chariali",
+      "Hahchara",
+      "Khelua",
+      "Nogagaon",
+      "Singhaduar"
+    ]
+  ],
+  "785702": [
+    "Golaghat",
+    "Assam",
+    [
+      "Adharsatra",
+      "Bamborahi",
+      "Barpatharua",
+      "Bengenakhowa",
+      "Doigrung",
+      "Falangani",
+      "Halmira Te",
+      "Howtoly",
+      "Kacharihat",
+      "Marangi",
+      "Marangi Chariali",
+      "Melamora",
+      "Missionpatty",
+      "Moukhowa",
+      "Murphulani",
+      "Padumani",
+      "Pulibar Bidyapith",
+      "Ultajaan"
+    ]
+  ],
+  "785703": [
+    "Golaghat",
+    "Assam",
+    [
+      "Bormukoli",
+      "Fetagaon",
+      "Garumora",
+      "Goalgaon Baliati",
+      "Negheriting",
+      "Ptc Dergaon",
+      "Sitalpather",
+      "Sockolatinga",
+      "Sohoguri Kachari"
+    ]
+  ],
+  "785704": ["Jorhat", "Assam", ["Murmuria", "Ongc Jorhat"]],
+  "785705": [
+    "Golaghat",
+    "Assam",
+    [
+      "Chalangpathar",
+      "Chowdangpathar",
+      "Gomariguri",
+      "Kachamari",
+      "Merapani",
+      "Ratanpur Sishupani",
+      "Sapekhati",
+      "Telishal"
+    ]
+  ],
+  "786001": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Dibrugarh",
+      "Graham Bazar",
+      "Kadamoni",
+      "Khaliamari",
+      "Naliapool",
+      "Panchali",
+      "Santipara"
+    ]
+  ],
+  "786002": ["Dibrugarh", "Assam", ["Assam Medical College", "Hiloidhari"]],
+  "786003": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Bairagimath",
+      "Banipur",
+      "Bhurburi",
+      "Central Revenue Building",
+      "Chowkidingee",
+      "Harak Pathar",
+      "Jokai",
+      "Jokai Bongaon",
+      "Khamti Ghat",
+      "Khania Gaon",
+      "Mancotta",
+      "Nirmaligaon",
+      "Purnananda Road",
+      "Ratanpur",
+      "Sessa"
+    ]
+  ],
+  "786004": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Barpathar",
+      "Behating Tiniali",
+      "Bogibil",
+      "Chaulkhowa",
+      "Dhamalgaon",
+      "Dibrugarh University",
+      "Jagoloni Grant",
+      "Jamirah"
+    ]
+  ],
+  "786005": ["Dibrugarh", "Assam", ["Jalan Nagar"]],
+  "786006": ["Dibrugarh", "Assam", ["Lepetkata"]],
+  "786007": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Balaibari",
+      "Bam Kolakhowa",
+      "Barbaruah",
+      "Deurigaon",
+      "Dighaliagaon",
+      "Garudharia",
+      "Gohaingaon",
+      "Itakhuli",
+      "Kalakhowa Chariali",
+      "Lalmati Gaon",
+      "Lezai",
+      "Medela"
+    ]
+  ],
+  "786008": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Konwar Handique Gaon",
+      "Kumar Gaon",
+      "Mohanaghat",
+      "Raja Bheta",
+      "Tingkhong Dighalia"
+    ]
+  ],
+  "786010": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Bokul",
+      "Chiringhula",
+      "Dibrugarh Polytechnic",
+      "Hatkhula",
+      "Konwaripathar",
+      "Lahoal",
+      "Melengial Gaon",
+      "Puthahula",
+      "Romai Te",
+      "Sarbodaya",
+      "Timonagaon"
+    ]
+  ],
+  "786012": [
+    "Dibrugarh",
+    "Assam",
+    ["Harabari", "Mohanbari Air Field", "Naga Ghuli Kanaigaon"]
+  ],
+  "786101": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Alimur",
+      "Bachapathar",
+      "Dighalia",
+      "Dihing Hola",
+      "Dikom",
+      "Garpara",
+      "Hazelbank",
+      "Mahmora",
+      "Moderkhat",
+      "Nadua",
+      "Oakland",
+      "Phukanarkhat"
+    ]
+  ],
+  "786102": ["Dibrugarh", "Assam", ["Chabua Air Field"]],
+  "786103": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Bhajoni",
+      "Borabhayapuri",
+      "Chenibill Chungipathar",
+      "Hatibondha",
+      "Lengrai",
+      "Na Deoghoria",
+      "Niz Bhekulajan",
+      "Pan Dhua Tiniali",
+      "Tengakhat"
+    ]
+  ],
+  "786125": [
+    "Tinsukia",
+    "Assam",
+    ["Durgabari", "Parbotia", "Prakash Bazar", "Senairam Bazar", "Tinsukia"]
+  ],
+  "786126": ["Tinsukia", "Assam", ["Borguri", "Gellapukhuri"]],
+  "786145": ["Tinsukia", "Assam", ["Kadamoni", "Sripuria", "Sripuria Bengali Gaon"]],
+  "786146": [
+    "Tinsukia",
+    "Assam",
+    ["Chalihanagar", "Lohari", "Pakharijan", "Sukhanpukhuri"]
+  ],
+  "786147": ["Tinsukia", "Assam", ["Khamti Gowali", "Laika", "Limbuguri", "Rangagora"]],
+  "786148": ["Tinsukia", "Assam", ["Khetopathergaon", "Monkhooli"]],
+  "786150": ["Tinsukia", "Assam", ["Barhapjan", "Santipur"]],
+  "786151": [
+    "Tinsukia",
+    "Assam",
+    [
+      "Bordubi Te",
+      "Dighal Tarrang",
+      "Dohotiagaon",
+      "Doom Dooma",
+      "Kakojan",
+      "Koomsang",
+      "Rupbon"
+    ]
+  ],
+  "786152": [
+    "Tinsukia",
+    "Assam",
+    [
+      "Borali",
+      "Bordirak",
+      "Bormuchai",
+      "Chellenguri",
+      "Dirak Maithong",
+      "Kachari Maithong",
+      "Kailash Pur",
+      "Kakapathar",
+      "Kashijan",
+      "Navajyoti",
+      "Talpathar",
+      "Tinali Nowgong",
+      "Tonganabazar",
+      "Tonganagaon"
+    ]
+  ],
+  "786153": ["Tinsukia", "Assam", ["Rupaisiding"]],
+  "786154": [
+    "Tinsukia",
+    "Assam",
+    ["Aroimuria", "Hahkhati", "Hatighuli", "Megela", "Saikhowaghat"]
+  ],
+  "786155": ["Tinsukia", "Assam", ["Sadiya"]],
+  "786156": [
+    "Tinsukia",
+    "Assam",
+    [
+      "Bordoloinagar",
+      "Dangrigaon",
+      "Gakhirbheti",
+      "Kordoiguri",
+      "Lainagaon",
+      "Laupati",
+      "Sarudhadum",
+      "Talap"
+    ]
+  ],
+  "786157": [
+    "Tinsukia",
+    "Assam",
+    ["Amarpur", "Buraburi Than", "Chapakhowa", "Islampur", "Santipur Bazar"]
+  ],
+  "786158": ["Tinsukia", "Assam", ["Kukuremara", "Kundil", "Natun Balijan"]],
+  "786159": ["Tinsukia", "Assam", ["Netaji Road", "Sukriting"]],
+  "786160": [
+    "Tinsukia",
+    "Assam",
+    [
+      "Amguri",
+      "Arunodaya",
+      "Barhullung",
+      "Chikarajan",
+      "Gobarbheti",
+      "Hollong Gutibari",
+      "Phillobari"
+    ]
+  ],
+  "786170": [
+    "Tinsukia",
+    "Assam",
+    ["Ashok Nagar", "Borgaon", "Langkashi", "Makum Junction"]
+  ],
+  "786171": [
+    "Tinsukia",
+    "Assam",
+    [
+      "3 No Borbil",
+      "Balijan",
+      "Bhimpathar",
+      "Bogapani",
+      "Dhekiajan",
+      "Digboi",
+      "Digboi Charali",
+      "Golai",
+      "Lakhipather",
+      "Muliabari",
+      "Nazirating",
+      "Powai",
+      "Tingrai"
+    ]
+  ],
+  "786173": ["Tinsukia", "Assam", ["Jubilee Digboi"]],
+  "786174": [
+    "Tinsukia",
+    "Assam",
+    ["Adarshgaon", "Barmajan", "Inthemgaon", "Kathalguri", "Pengri", "Purani Pukhuri"]
+  ],
+  "786179": ["Tinsukia", "Assam", ["Challet", "Tipong"]],
+  "786181": [
+    "Tinsukia",
+    "Assam",
+    [
+      "Alubari",
+      "Borgolai",
+      "Dibong",
+      "Ketetong",
+      "Lamagaon",
+      "Margherita",
+      "Margherita New Colony",
+      "Ulup Gaon"
+    ]
+  ],
+  "786182": [
+    "Tinsukia",
+    "Assam",
+    [
+      "Bisagaon",
+      "Hamuk Jan",
+      "Kumchai",
+      "Ledo",
+      "Ledo Tikok",
+      "Lekhapani",
+      "Long Gaon",
+      "Mullang",
+      "Tirap",
+      "Udai Pur"
+    ]
+  ],
+  "786183": [
+    "Tinsukia",
+    "Assam",
+    [
+      "Barchapri",
+      "Baruahola",
+      "Bhardhara",
+      "Bogdung",
+      "Gahoripam",
+      "Kanjikhowa",
+      "Kukurekhowa",
+      "Laipuli",
+      "Panitola"
+    ]
+  ],
+  "786184": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Balijan North Te",
+      "Bismile",
+      "Chabua",
+      "Chetia Gaon",
+      "Dinjoy",
+      "Hatiali Siding",
+      "Matiakhana",
+      "Pakharijania",
+      "Pulunga",
+      "Rang Changi"
+    ]
+  ],
+  "786187": [
+    "Tinsukia",
+    "Assam",
+    ["Agbandha Bengali Gaon", "Makum Pathar", "Makumkilla"]
+  ],
+  "786188": ["Tinsukia", "Assam", ["Bishnupur", "Jagun", "Laklapathar", "Rampur"]],
+  "786189": ["Tinsukia", "Assam", ["Baghbari Gaon", "Bindhakata", "Dinjan"]],
+  "786190": ["Tinsukia", "Assam", ["Hansara", "Samdang"]],
+  "786191": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Bhadoi Pachali",
+      "Bokuloni Chariali",
+      "Kamini Tea Estate",
+      "Nagajan",
+      "Naoholia",
+      "Zutlibari"
+    ]
+  ],
+  "786192": ["Tinsukia", "Assam", ["Dihingia Gaon", "Hijiguri"]],
+  "786601": ["Tinsukia", "Assam", ["Balijan T.E.", "Bisfootia", "Hoogrijan"]],
+  "786602": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Duliajan",
+      "Jaloni Dibruduar",
+      "Kachari Pathar",
+      "Kathalguri",
+      "Kendriya Vidyalaya",
+      "Lilapur",
+      "Raja Ali",
+      "Tingrai Chariali"
+    ]
+  ],
+  "786610": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Balimora",
+      "Bamunibill",
+      "Borbamgaon",
+      "Desam",
+      "Dhaman",
+      "Dibru Amguri",
+      "Dihing Kinar",
+      "Fakialgaon",
+      "Gojpuria",
+      "Koliapani",
+      "Konwarigaon",
+      "Mathawani",
+      "Naharkatia",
+      "Rangalipathar",
+      "Salmari",
+      "Sasoni",
+      "Tiniali Tea Estate",
+      "Tipling Bhadoi Gaon"
+    ]
+  ],
+  "786611": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Barbam",
+      "Dangopara Chariali",
+      "Dhuapathar",
+      "Dirai Te",
+      "Kenduguri Te",
+      "Lachit Nagar",
+      "Mahkhowa",
+      "Pithaguti",
+      "Rajgarh (Dibrugarh)"
+    ]
+  ],
+  "786612": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Bogadat",
+      "Dillibari",
+      "Garguri",
+      "Kasulugaon",
+      "Nilmoni Te",
+      "Ouguri",
+      "Ratanpur",
+      "Sisumari Barpathar",
+      "Tingkhong"
+    ]
+  ],
+  "786613": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Aghunibari",
+      "Baji Pohumara",
+      "Bamunbari",
+      "Borpathar",
+      "Diksam Ouphulia",
+      "Domur Dolong",
+      "Garbandhi Bamunpukhuri",
+      "Garpthar",
+      "Kekuri Sonowal",
+      "Lengeri Bazar",
+      "Nachani",
+      "Naharpara Barbil",
+      "Nemupathar",
+      "Ouphulia Chariali",
+      "Sologuri"
+    ]
+  ],
+  "786614": [
+    "Dibrugarh",
+    "Assam",
+    ["Jeypore", "Jeypore Mobile", "Kamargaon", "Tipam", "Ushapur"]
+  ],
+  "786621": [
+    "Dibrugarh",
+    "Assam",
+    [
+      "Ashabam",
+      "Borkhermia",
+      "Ghinai",
+      "Mahmora Ali Kinar",
+      "Namrup",
+      "Nigam",
+      "Silgrant"
+    ]
+  ],
+  "786622": ["Dibrugarh", "Assam", ["Namrup Thermal Power Station"]],
+  "786623": ["Dibrugarh", "Assam", ["Parbatpur"]],
+  "786692": ["Dibrugarh", "Assam", ["Anandapara"]],
+  "787001": ["Lakhimpur", "Assam", ["North Lakhimpur"]],
+  "787023": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Bongalchuk",
+      "Borshala",
+      "Doolahat",
+      "Fulbari Bokanadi",
+      "Kalakhowa Adarsha Gaon",
+      "Naoboicha",
+      "Sagarpur",
+      "Singra"
+    ]
+  ],
+  "787026": [
+    "Dhemaji",
+    "Assam",
+    [
+      "Bordoloni",
+      "Deuribarbam",
+      "Hollowdanga",
+      "Jairampur",
+      "Missamari",
+      "Salmari No.2",
+      "Samarajan Tiniali"
+    ]
+  ],
+  "787031": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Angerkhowa",
+      "Azad",
+      "Bahadurchuk",
+      "Bogolijan",
+      "Borgaya Khagori",
+      "Bormuriachuk",
+      "Budhbazar",
+      "Dejoo Te",
+      "Hatilung",
+      "Japisajia",
+      "Khelmati",
+      "Khonajan",
+      "Kowadonga",
+      "Pohumara",
+      "Rampur Deurigaon",
+      "Silonibari"
+    ]
+  ],
+  "787032": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "2 No Bokanala",
+      "Badhakhara",
+      "Bhimpara Balijan",
+      "Boginadi",
+      "Borkhelia",
+      "Charaimoria",
+      "Dirgha Majgaon",
+      "Gereki",
+      "Gharmora",
+      "Ghunasuti",
+      "Goroimari",
+      "Gorumoria",
+      "Hindugaon",
+      "Kadam",
+      "Konwargaon",
+      "Mahaijan",
+      "Moidumia",
+      "Rongpuria",
+      "Tariani Berbhanga",
+      "Uttar Kulabali"
+    ]
+  ],
+  "787033": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Bhogpur Chariali",
+      "Bholabari",
+      "Deotala",
+      "Durpang",
+      "Gosaibari",
+      "Kerekjuli",
+      "Letekupukhuri",
+      "Madhupur"
+    ]
+  ],
+  "787034": [
+    "Dhemaji",
+    "Assam",
+    [
+      "Gogamukh",
+      "Kadamguri",
+      "Kaupatani",
+      "Khorachukgaon",
+      "Lotakigaon",
+      "Moinapara",
+      "Na Nadi Bhebeli Kahcari Gaon"
+    ]
+  ],
+  "787035": ["Dhemaji", "Assam", ["Gerukamukh", "Mingmang", "Nalbari Kachari"]],
+  "787051": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Chaboti",
+      "Joyhing Te",
+      "Kakoi Rajgarh",
+      "Lilabari AF",
+      "Moitri Ashram",
+      "Rongajan Borbil"
+    ]
+  ],
+  "787052": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Ahomoni",
+      "Amtola Jaintpur",
+      "Dafalakata",
+      "Echarikata Balijan",
+      "Fukhanarhat",
+      "Garchiga",
+      "Kambong Gaon",
+      "Kharkati",
+      "Khoga",
+      "Kuhiarbari",
+      "Na Ali Mirigaon",
+      "Naragaon",
+      "Panigaon",
+      "Salmora Tiniali",
+      "Sonardheki"
+    ]
+  ],
+  "787053": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Batamari Tiniali",
+      "Bilmukh",
+      "Bordoibam",
+      "Deuliagaon",
+      "Dhenukhana",
+      "Ga Dangar Chuk",
+      "Ghatapara",
+      "Ghilamara",
+      "Ghughuhadal",
+      "Kaligaon",
+      "Khalihamari",
+      "Laguaborah",
+      "Purana Parghat"
+    ]
+  ],
+  "787054": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Adi Alengi Satra",
+      "Bor Alengi Satra",
+      "Daulatpur",
+      "Dhunaguri",
+      "Islamgaon",
+      "Kutubpur",
+      "Likhakchapori",
+      "Mornoikhora",
+      "Sandowkhowa",
+      "Sonapur"
+    ]
+  ],
+  "787055": [
+    "Lakhimpur",
+    "Assam",
+    [
+      "Bahpara",
+      "Barkhamukh",
+      "Begumgaon",
+      "Bokulguri",
+      "Dhakuakhana",
+      "Dighalia Hiloidhari",
+      "Gobindapur",
+      "Jalbhari",
+      "Joysagar",
+      "Kankan Chapori",
+      "Kekuri",
+      "Kekuri Pamuagaon",
+      "Khajuapatir",
+      "Kherkatamukh",
+      "Manikachuk",
+      "Medhisutigaon",
+      "Moderguri",
+      "Mohemari",
+      "Mornoi Bebejia",
+      "Neogaghuli",
+      "Ouguri Dangdhara",
+      "Patrichuk",
+      "Sundia"
+    ]
+  ],
+  "787056": [
+    "Lakhimpur",
+    "Assam",
+    ["Katri Chapori", "Pathalipam", "Subansiri Koibarta Adarsha Gao", "Ukhamati"]
+  ],
+  "787057": [
+    "Dhemaji",
+    "Assam",
+    [
+      "Aradhal",
+      "Batgharia",
+      "Bauli",
+      "Bishnupur",
+      "Borachira Gaon",
+      "Borlung",
+      "Bulakata",
+      "Dhemaji",
+      "Goalchapori",
+      "Gohaingaon",
+      "Guttung",
+      "Hatigarh",
+      "Jamuguri Panchali",
+      "Jiadhal",
+      "Khubalia",
+      "Lakhipathar",
+      "Matikhola",
+      "Moridhal",
+      "Nagakhelia",
+      "Perabari",
+      "Raiting",
+      "Subahi"
+    ]
+  ],
+  "787058": [
+    "Dhemaji",
+    "Assam",
+    [
+      "Bengenagarah",
+      "Dhubabari",
+      "Dighali Debera",
+      "Gandhia Tiniali",
+      "Hapotia",
+      "Jorkata",
+      "Jugisuti",
+      "Kachari Pathar",
+      "Kaitung",
+      "Kalakata",
+      "Khaliamari Pamuagaon",
+      "Machkhowa",
+      "Nemutengani",
+      "Norowathan",
+      "Seujiapathar",
+      "Sissimukh"
+    ]
+  ],
+  "787059": [
+    "Dhemaji",
+    "Assam",
+    [
+      "Akajan Bormuria",
+      "Betanipam",
+      "Bhagwan",
+      "Cementmukh",
+      "Demow Chariali",
+      "Madhuripathar",
+      "Majorbari Budhbaria Bazar",
+      "Namgharia",
+      "Silabaligaon",
+      "Silapathar"
+    ]
+  ],
+  "787060": [
+    "Dhemaji",
+    "Assam",
+    [
+      "Gali Borbali",
+      "Jonai",
+      "Kabu Chapori",
+      "Laimekuri",
+      "Leku",
+      "Ramdhan Dikhari",
+      "Ratanpur",
+      "Zonekareng"
+    ]
+  ],
+  "787061": [
+    "Dhemaji",
+    "Assam",
+    ["Dekapam", "Dipa", "Simen Chapori", "Somkong Pagar", "Talem"]
+  ],
+  "787110": [
+    "Dhemaji",
+    "Assam",
+    [
+      "Aktai",
+      "Batuamukh",
+      "Bhebeli Gaon",
+      "Burisuti",
+      "Dhunaguri Borgaya Deori Gaon",
+      "Janakalyan Chariali",
+      "Kerekani Majgaon",
+      "Kulajan Tiniali",
+      "Mechaki Tongani Mirigaon",
+      "Muktiar Chapori",
+      "Nilakh Chariali",
+      "Palengi Pachali",
+      "Pipalguri",
+      "Pukia",
+      "Ramyapur",
+      "Sissiborgaon"
+    ]
+  ],
+  "788001": [
+    "Cachar",
+    "Assam",
+    ["Dewanji Bazar", "Madhurbond", "Silchar", "Silchar Court"]
+  ],
+  "788002": [
+    "Cachar",
+    "Assam",
+    [
+      "Chhoto Dudpatil PT I",
+      "Choto Dudpatil Grant",
+      "Haticherra Grant PT VII",
+      "Itkhola",
+      "Larsingpar",
+      "Leburbond",
+      "Malugram",
+      "Sibbari Road"
+    ]
+  ],
+  "788003": [
+    "Cachar",
+    "Assam",
+    [
+      "Chirukandi",
+      "Dudpatil",
+      "Machughat",
+      "Ramnagar Tarapur",
+      "Subedar Basti",
+      "Tarapur",
+      "Tarapur Khelma",
+      "Tarapur Part VII",
+      "Topkhana"
+    ]
+  ],
+  "788004": ["Cachar", "Assam", ["G C College", "Sarboday Nagar"]],
+  "788005": [
+    "Cachar",
+    "Assam",
+    [
+      "Berenga",
+      "Bethukandi",
+      "Bhakatpur Pt VIII",
+      "C R Avenue",
+      "Hospital Road",
+      "Jaiforpur",
+      "Kanakpur Pt II",
+      "Kathal TE",
+      "Rangirkhari"
+    ]
+  ],
+  "788006": ["Cachar", "Assam", ["Kanakpur", "Link Road", "Uttar Krishnapur"]],
+  "788007": [
+    "Cachar",
+    "Assam",
+    ["Chincuri T E", "Kanchanpur", "R K Mission Road", "Singari", "Vivekananda Road"]
+  ],
+  "788009": [
+    "Cachar",
+    "Assam",
+    [
+      "Arkatipur",
+      "Badripar",
+      "Cossipur",
+      "Machpara",
+      "Nutan Dayapur",
+      "Rongpur",
+      "Rongpur PT II"
+    ]
+  ],
+  "788010": ["Cachar", "Assam", ["Bharakhai", "Ghungoor Kuarpar", "Silchar REC"]],
+  "788011": ["Cachar", "Assam", ["Assam University", "Harinetilla", "Irongmara Bazar"]],
+  "788013": [
+    "Cachar",
+    "Assam",
+    ["Dhanehari", "Neairgram", "Saidpur", "Saidpur PT II", "Satkarakandi", "Sonabarighat"]
+  ],
+  "788014": ["Cachar", "Assam", ["Silchar Medical College"]],
+  "788015": ["Cachar", "Assam", ["Batertal", "Meherpur"]],
+  "788025": [
+    "Cachar",
+    "Assam",
+    [
+      "Arunachal",
+      "Buribail",
+      "Dudpur",
+      "Ganirgram",
+      "Ganirgram PT II",
+      "Krishnapur",
+      "Mahadevpur",
+      "Nizjoynagar",
+      "Rakhal Khalerpar"
+    ]
+  ],
+  "788026": ["Cachar", "Assam", ["Baglaghat", "Digar Srikona", "Rajnagar", "Srikona"]],
+  "788030": [
+    "Cachar",
+    "Assam",
+    [
+      "Amaranagar T E",
+      "Chandighat T E",
+      "Dayapur",
+      "Dayapur T E",
+      "Durganagar T E",
+      "Gossaipur",
+      "Gossaipur PT I",
+      "Haticherra T E",
+      "Jaffirbond Pt I",
+      "Larsing T E",
+      "Lathigram",
+      "Madhura",
+      "Nagar T E",
+      "Pangram",
+      "Udarbond"
+    ]
+  ],
+  "788031": ["Cachar", "Assam", ["Dumurghat", "Salganga", "Thaligram"]],
+  "788098": [
+    "Cachar",
+    "Assam",
+    [
+      "Kalachandpur",
+      "Labacpar PT III",
+      "Lallong Pt II",
+      "Maniupr PT II",
+      "Pailapool",
+      "Sibpur",
+      "Ujan Tarapur",
+      "Uttar Sonpur"
+    ]
+  ],
+  "788099": [
+    "Cachar",
+    "Assam",
+    [
+      "Bhuban Valley",
+      "Boali Basti",
+      "Didarkush Basti",
+      "Ganganagar",
+      "Maniarkhal",
+      "Matinagar",
+      "Saint Katharine",
+      "Sundari"
+    ]
+  ],
+  "788101": [
+    "Cachar",
+    "Assam",
+    [
+      "Algapur",
+      "Bagpur",
+      "Banskandi",
+      "Chandrapur",
+      "Daluagram",
+      "Dungripar",
+      "Govindapur East",
+      "Hazarigram Bazar",
+      "Kakmara",
+      "Karaikandi",
+      "Madripar",
+      "Manipur Pti",
+      "Pallorbond"
+    ]
+  ],
+  "788102": [
+    "Cachar",
+    "Assam",
+    ["Barthal T E", "Dewan", "Laboc T E", "Lallong T E", "Thailoo T E"]
+  ],
+  "788103": ["Cachar", "Assam", ["Lakhipur"]],
+  "788104": ["Cachar", "Assam", ["Jirighat", "Uttar Lalpani"]],
+  "788106": ["Cachar", "Assam", ["Dilkhush T E", "Fulertal", "Hmarkhawlin"]],
+  "788107": [
+    "Cachar",
+    "Assam",
+    [
+      "Baladhan T E",
+      "Bararkap",
+      "Diska Grant",
+      "Harinagar Bazar",
+      "Joypur Rajabazar",
+      "Joyput PT III",
+      "Kamranga",
+      "Kanakpur East",
+      "Kumacherra",
+      "Leiri",
+      "Mahalthal",
+      "Marchakhal",
+      "Mauchar",
+      "Saradapally"
+    ]
+  ],
+  "788108": [
+    "Cachar",
+    "Assam",
+    ["Kumbhir", "Langlacherra", "Lodikachari", "Martycherra", "Tolengram"]
+  ],
+  "788109": ["Cachar", "Assam", ["Kumbhirgram Airport"]],
+  "788110": [
+    "Cachar",
+    "Assam",
+    [
+      "Balacherra T E",
+      "Barjatrapur",
+      "Borkhola",
+      "Chandpur",
+      "Naraincherra",
+      "Purandarpur"
+    ]
+  ],
+  "788111": ["Cachar", "Assam", ["Dalu", "Subhang"]],
+  "788112": ["Cachar", "Assam", ["Clever House", "Derby", "Sildhubi"]],
+  "788113": [
+    "Cachar",
+    "Assam",
+    [
+      "Bag O Bahar",
+      "Barthal",
+      "Borakhai T E",
+      "Borodukan",
+      "Chotojalenga",
+      "Dwarband",
+      "Loharband",
+      "New Bag O Bahar",
+      "Pratapur"
+    ]
+  ],
+  "788114": [
+    "Cachar",
+    "Assam",
+    [
+      "Bhubandhar T E",
+      "Debipur",
+      "Dholai Bazar",
+      "Dulalgram",
+      "Gojalghat",
+      "Gurudayalpur",
+      "Jibangram",
+      "Mahadebpur PT I",
+      "Saptagram",
+      "Suktola"
+    ]
+  ],
+  "788115": [
+    "Cachar",
+    "Assam",
+    [
+      "Atharotilla",
+      "Berabak PT II",
+      "Boaljur",
+      "Jogiabasti",
+      "Kajidahar",
+      "Narsingpur",
+      "Nutan Bazar"
+    ]
+  ],
+  "788116": [
+    "Cachar",
+    "Assam",
+    [
+      "Chekarcham",
+      "Darmikhal",
+      "Hatikhal Bazar",
+      "Kalakhal",
+      "Palonghat",
+      "Rammanikpur",
+      "Rukni",
+      "Rukni PT I",
+      "Rukni T E",
+      "Sachinpur",
+      "Sundari PT II"
+    ]
+  ],
+  "788117": [
+    "Cachar",
+    "Assam",
+    [
+      "Barjalenga",
+      "Barsangam",
+      "Nayabeel",
+      "Nunapani T E",
+      "Rosekandi",
+      "Sahapur",
+      "Sarbantilla",
+      "Taranathpur"
+    ]
+  ],
+  "788118": ["Cachar", "Assam", ["Silcuri"]],
+  "788119": [
+    "Cachar",
+    "Assam",
+    [
+      "Amjurghat",
+      "Dhakin Mohonpur",
+      "Gobindanagar",
+      "Jhanjarbali",
+      "Jhoragul",
+      "Kachudaram",
+      "Kachudaram PT I",
+      "Kaptanpur",
+      "Kaptanpur PT 18",
+      "Mangalpur",
+      "Selurpar",
+      "Sonaimukh",
+      "Thanjanlaikai",
+      "Tulargram PT II"
+    ]
+  ],
+  "788120": [
+    "Cachar",
+    "Assam",
+    [
+      "Bhaga Bazar",
+      "Bidyaratanpur",
+      "Channighat",
+      "Dhanipur",
+      "Hawaithang",
+      "Jamalpur",
+      "Lailapur",
+      "Shyamacharanpur"
+    ]
+  ],
+  "788121": ["Cachar", "Assam", ["Baromuni", "Kabuganj Bazar", "Nagdirgram"]],
+  "788123": [
+    "Cachar",
+    "Assam",
+    ["Bekirpar", "Paloi", "Panibhora", "Punimukh", "Santipur"]
+  ],
+  "788126": [
+    "Cachar",
+    "Assam",
+    [
+      "Binnakandi",
+      "Binnakandi Ghat",
+      "Chengjui Grant",
+      "Chhotomanda",
+      "Nutan Ramnagar",
+      "Singerbond",
+      "Swastipally"
+    ]
+  ],
+  "788127": ["Cachar", "Assam", ["Hiyairbond", "Jarailtala Bazar"]],
+  "788150": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Algapur PT II",
+      "Algapur PT V",
+      "Chandipur",
+      "Chibitabichia",
+      "Kalibari Bazar",
+      "Matirgram",
+      "Mohanpur",
+      "Saidband PT II"
+    ]
+  ],
+  "788151": ["Hailakandi", "Assam", ["Hailakandi"]],
+  "788152": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Bansbari PT II",
+      "Bhairabnagar",
+      "Bhatirkupa",
+      "Bishnunagar East",
+      "Chandpur West",
+      "Gangpar Dhumkar",
+      "Hailakandi Bazar",
+      "Hailakandi College",
+      "Hailakandi East",
+      "Kanchanpur PT II",
+      "Lakshmisahar",
+      "Madanmohan",
+      "Narainpur",
+      "Rakhalbasti",
+      "Ratakandi",
+      "Uzankupa"
+    ]
+  ],
+  "788155": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Baliura",
+      "Bar Hailakandi",
+      "Boalipar Bazar",
+      "Brojapur",
+      "Kuchila Bazar",
+      "Lakhirbond PT II",
+      "Matijuri",
+      "Nitainagar",
+      "Paikan",
+      "Purba Sonapur",
+      "Rangauti",
+      "Rangauti PT II",
+      "Ratanpur",
+      "Ratanpur Road",
+      "Rongpur North",
+      "Samarikona",
+      "Vichingcha"
+    ]
+  ],
+  "788156": [
+    "Karimganj",
+    "Assam",
+    ["Anilgarh", "Brojendrapur", "Dargarband Bazar", "Gamaria", "Muktaranpur"]
+  ],
+  "788160": ["Hailakandi", "Assam", ["Jaffirband", "Sudarshanpur"]],
+  "788161": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Alexanderpur",
+      "Appin",
+      "Dholai Malai",
+      "Dholai South",
+      "Dinanathpur PT I",
+      "Harishnagar",
+      "Katlacherra",
+      "Katlacherra Bazar",
+      "Rangabawk",
+      "Rongpur Boalipar",
+      "Rupacherra Basti",
+      "Telkatta"
+    ]
+  ],
+  "788162": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Gharmura Bazar",
+      "Gharmura Bus Stand",
+      "Jamira Bazar",
+      "Ramnathpur",
+      "Sultanicherra"
+    ]
+  ],
+  "788163": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Chandrapur PT II",
+      "Kacharitol",
+      "Lala",
+      "Lalamukh",
+      "Madaripar",
+      "Rajyeswarpur Pt II",
+      "Rongpur South",
+      "Sahabad",
+      "Sarbanandapur",
+      "Tantoo Maniknagar",
+      "Umednagar",
+      "Vernerpur"
+    ]
+  ],
+  "788164": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Amala",
+      "Aynakhal Bazar",
+      "Barband",
+      "Bowarghat",
+      "Kayah T E",
+      "Lakhinagar T E",
+      "Lala Deb Block",
+      "Monacherra",
+      "Nischintapur",
+      "Singala"
+    ]
+  ],
+  "788165": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Dharirghat Grant",
+      "Dholai T E",
+      "Karicherra Bazar",
+      "Kukicherra",
+      "Lalpani",
+      "Manipur Bagan"
+    ]
+  ],
+  "788166": [
+    "Karimganj",
+    "Assam",
+    [
+      "Chamela Bazar",
+      "Daluganj",
+      "Kadamtala",
+      "Kalachup",
+      "Kalinagar T E",
+      "Maniknagar",
+      "Netaji Nagar",
+      "Ramkrishnanagar",
+      "Sripur"
+    ]
+  ],
+  "788168": [
+    "Hailakandi",
+    "Assam",
+    ["Katagaon", "Mirirgool", "Nimaichandpur PT II", "Nityanandapur", "Rajyeswarpur"]
+  ],
+  "788701": [
+    "Karimganj",
+    "Assam",
+    [
+      "Adarkona",
+      "Bhanga Bazaar",
+      "Lamajuar",
+      "Mahakhal",
+      "Marjatkandi",
+      "Mirzapur",
+      "Rajpasa",
+      "Rakeshnagar"
+    ]
+  ],
+  "788709": [
+    "Karimganj",
+    "Assam",
+    ["Jagannathi", "Lakhibazar", "Nayagram", "Panighat", "Sadarashi", "Tillabazar"]
+  ],
+  "788710": [
+    "Karimganj",
+    "Assam",
+    [
+      "Banamali",
+      "Char Bazar",
+      "Karimganj",
+      "Karimganj Court",
+      "Karimganj Station Road",
+      "Longai Road",
+      "Longaighat",
+      "Subashnagar"
+    ]
+  ],
+  "788711": [
+    "Karimganj",
+    "Assam",
+    ["Girishganj Bazar", "Kanishail", "Karimganj Bazar", "Nathupur", "Telikhalerpar"]
+  ],
+  "788712": [
+    "Karimganj",
+    "Assam",
+    [
+      "Ambarkhani",
+      "Aylabari",
+      "Dharakuna",
+      "Jalalnagar",
+      "Kalima",
+      "Karnamadhu",
+      "Kurikala",
+      "Maizgram",
+      "Manikganj",
+      "Settlement Road",
+      "Sutarkandi"
+    ]
+  ],
+  "788713": [
+    "Karimganj",
+    "Assam",
+    ["Barkatpur", "Chargola Bazar", "Jobainpur", "Lalarchak", "Nairgram", "Silchar Road"]
+  ],
+  "788719": ["Karimganj", "Assam", ["Kayasthagram", "Mullaganj Bazar", "Singaria Bazar"]],
+  "788720": [
+    "Karimganj",
+    "Assam",
+    [
+      "Bagbari",
+      "Chaitanyanagar",
+      "Chatal",
+      "Gulcherra",
+      "Jadutilla",
+      "Janakalyan Bazar",
+      "Kaliganj Bazar",
+      "Shyamnagar",
+      "Siberchak"
+    ]
+  ],
+  "788722": [
+    "Karimganj",
+    "Assam",
+    [
+      "Alamkhani",
+      "Brahmansashan",
+      "Dasgram",
+      "Durganagar",
+      "Duttagram",
+      "Nilam Bazar",
+      "Promodenagar",
+      "Ramanikrishna",
+      "Ranibari"
+    ]
+  ],
+  "788723": [
+    "Karimganj",
+    "Assam",
+    ["Asalkandi", "Baraigram", "Basudevnagar", "Eraligool", "Fakuagram", "Madandighirpar"]
+  ],
+  "788724": [
+    "Karimganj",
+    "Assam",
+    [
+      "Bhurunga",
+      "Bubrighat",
+      "Duhalia",
+      "Jurbari",
+      "Kanaibazar",
+      "Pathar Kandi Bazar",
+      "Patharkandi",
+      "Patharkandi Anchalik",
+      "Tinokhal"
+    ]
+  ],
+  "788725": [
+    "Karimganj",
+    "Assam",
+    [
+      "Basantinagar",
+      "Chandkhira",
+      "Kalkalighat",
+      "Kathaltoli Bazar",
+      "Medley",
+      "Puthini",
+      "Tilbhum"
+    ]
+  ],
+  "788726": [
+    "Karimganj",
+    "Assam",
+    ["Baithakhal Basti", "Hatikhira", "Katabari", "Lowairpoa", "Solgoi"]
+  ],
+  "788727": ["Karimganj", "Assam", ["Bazaricherra Bazar"]],
+  "788728": [
+    "Karimganj",
+    "Assam",
+    ["Balipipla Bazar", "Isabeel", "Kotamani Bazar", "Longai", "Manikbond"]
+  ],
+  "788733": ["Karimganj", "Assam", ["Bazarghat", "Govindaganj Bazar", "Nagendranagar"]],
+  "788734": [
+    "Karimganj",
+    "Assam",
+    [
+      "Anipur",
+      "Baruala",
+      "Bidyanagar",
+      "Dhalibeel PT II",
+      "Leelachela",
+      "Pechaala",
+      "Purba Harinagar",
+      "Sibbari Krishna Nagar",
+      "West Harinagar"
+    ]
+  ],
+  "788735": ["Karimganj", "Assam", ["Dalgram PT II", "Muliala", "Ratabari", "Tongibari"]],
+  "788736": [
+    "Karimganj",
+    "Assam",
+    [
+      "Banskhantilla",
+      "Chamtilla",
+      "Chantilla",
+      "Damcherra Bagan",
+      "Dullabcherra",
+      "Dullabcherra Bazar",
+      "Singlacherra Bazar",
+      "Vetarbond"
+    ]
+  ],
+  "788737": [
+    "Karimganj",
+    "Assam",
+    [
+      "Cheragi",
+      "Fenairbond",
+      "Ghambhira Basti",
+      "Kalamagura",
+      "Olivacherra",
+      "South Sonapur"
+    ]
+  ],
+  "788738": ["Hailakandi", "Assam", ["Bidyanagar"]],
+  "788781": [
+    "Karimganj",
+    "Assam",
+    ["Baropunji", "Bishnunagar", "Latu", "Mahisashan", "Pathu"]
+  ],
+  "788801": [
+    "Hailakandi",
+    "Assam",
+    [
+      "Bakrihawar PT III",
+      "Burnibrease T E",
+      "Chiparsangam",
+      "Jankibazar",
+      "Kalinagar",
+      "Narainpur North",
+      "Polarpar",
+      "Salchapra"
+    ]
+  ],
+  "788802": ["Cachar", "Assam", ["Fulbari", "Panchgram", "Sialtek"]],
+  "788803": ["Karimganj", "Assam", ["Badarpurghat"]],
+  "788804": ["Cachar", "Assam", ["Gangapur", "Govindapur West", "Katirail"]],
+  "788805": [
+    "Cachar",
+    "Assam",
+    ["Harinagar Pt IV", "Jagadishpur", "Katigorah", "Lathimara", "Rajartilla"]
+  ],
+  "788806": [
+    "Karimganj",
+    "Assam",
+    [
+      "Anglarbazar",
+      "Badarpur",
+      "Badarpur Bazar",
+      "Hasanpur",
+      "Kalairbond",
+      "Malua",
+      "Srigouri",
+      "Umarpur"
+    ]
+  ],
+  "788815": [
+    "Cachar",
+    "Assam",
+    [
+      "Baroitoli",
+      "Bhairabpur",
+      "Chaligram",
+      "Digarkhal Bazar",
+      "Gumrah Bazar",
+      "Hilara Colony",
+      "Kalain",
+      "Kalaincherra",
+      "Karkori",
+      "Khelma PT VII",
+      "Sadirkhal",
+      "Sayedpur Amtala"
+    ]
+  ],
+  "788816": ["Cachar", "Assam", ["Jalalpur", "Purnagar", "Rajyeshpur West"]],
+  "788817": [
+    "Cachar",
+    "Assam",
+    [
+      "Behara Bazar",
+      "Behara PT IV",
+      "Bhangarpar",
+      "Bhubaneswarnagar",
+      "Bilburunga",
+      "Chandranathpur",
+      "Damcherra",
+      "Dinanathpur",
+      "Sonapur",
+      "Tikarburunga"
+    ]
+  ],
+  "788818": [
+    "Dima Hasao",
+    "Assam",
+    [
+      "Bandarkhal",
+      "Baro Mulkoi",
+      "Dittakcherra",
+      "Harengajao",
+      "Jatinga",
+      "Kharthang",
+      "Mailongdisha",
+      "Narainpur",
+      "Redzol"
+    ]
+  ],
+  "788819": [
+    "Dima Hasao",
+    "Assam",
+    [
+      "Christiankempai",
+      "Dibari",
+      "Dihangi",
+      "Dintharveng",
+      "Fengpui",
+      "Gunjung",
+      "Haflong",
+      "Haflong Bazar",
+      "Jatinga Tenali",
+      "Kalibari 3Rd PWD Colony",
+      "Kanaan",
+      "Kanabasti",
+      "Michidui",
+      "Mulhoi",
+      "Narsingwari",
+      "Santilla",
+      "Sonpijang"
+    ]
+  ],
+  "788820": [
+    "Dima Hasao",
+    "Assam",
+    [
+      "Bagetar",
+      "Electric Veng",
+      "Haflo R.S.",
+      "Haflong Ptc",
+      "Sarkari Bagan",
+      "Topadisa",
+      "Zion"
+    ]
+  ],
+  "788830": [
+    "Dima Hasao",
+    "Assam",
+    [
+      "Dautohaza",
+      "Hange",
+      "Hangrum",
+      "Impui Hindu",
+      "Khognam",
+      "Kholjang",
+      "Laisang",
+      "Laisang Bagan",
+      "Lasang",
+      "Mahur",
+      "Pangmoul",
+      "Saran",
+      "Tulpoi",
+      "Vawngzawl"
+    ]
+  ],
+  "788831": [
+    "Dima Hasao",
+    "Assam",
+    [
+      "Hajang",
+      "Hazadisha",
+      "Kaprey",
+      "Khejurbond",
+      "Maibong",
+      "Manigipur",
+      "Nablaidisha",
+      "Simtuilong",
+      "Wardendisha"
+    ]
+  ],
+  "788832": [
+    "Dima Hasao",
+    "Assam",
+    ["Dezabra", "Hatikhali", "Langting", "Langting Hasin", "Mandardisha", "Mupa"]
+  ],
+  "788931": [
+    "Dima Hasao",
+    "Assam",
+    [
+      "Assam Quary",
+      "Borolabang",
+      "Garampani",
+      "Govindanagar",
+      "Longkhu",
+      "Panch Kilometer",
+      "Sangbar",
+      "Umrangshu"
+    ]
+  ]
+}

@@ -314,13 +314,65 @@ describe('the required intake set', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
+      name: 'launch-2026-09-30-jxmr',
+      intake: completeDrop(),
+      fields: { status: 'done' },
+    });
+    writeIteration({
+      repositoryRoot,
       name: 'feat-returns-2026-10-06-kqzx',
       intake: completeDrop(),
-      fields: { intakeMode: 'brief' },
+      fields: { intakeMode: 'brief', baseline: 'launch-2026-09-30-jxmr' },
     });
     assert.deepEqual(
       missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
       ['BRIEF.md'],
+    );
+  });
+
+  test("checks a brief that stores only BRIEF.md on its Baseline's snapshot", () => {
+    const repositoryRoot = createRepository();
+    const { 'shell.md': _shell, ...withoutShell } = completeDrop();
+    writeIteration({
+      repositoryRoot,
+      name: 'launch-2026-09-30-jxmr',
+      intake: withoutShell,
+      fields: { status: 'done' },
+    });
+    writeIteration({
+      repositoryRoot,
+      name: 'feat-returns-2026-10-06-kqzx',
+      intake: { 'BRIEF.md': '# Brief\n' },
+      fields: { intakeMode: 'brief', baseline: 'launch-2026-09-30-jxmr' },
+    });
+    assert.deepEqual(
+      missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
+      ['shell.md'],
+    );
+    writeIteration({
+      repositoryRoot,
+      name: 'feat-returns-2026-10-06-kqzx',
+      intake: { 'BRIEF.md': '# Brief\n' },
+      fields: { intakeMode: 'brief', baseline: 'none' },
+    });
+    // From scratch the brief stands alone: BRIEF.md is the whole snapshot, nothing is missing.
+    assert.deepEqual(
+      missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
+      [],
+    );
+    // An overlay has no such reading: on Baseline none, what it does not store comes from nowhere.
+    writeIteration({
+      repositoryRoot,
+      name: 'feat-returns-2026-10-06-kqzx',
+      intake: { 'PRD.md': '# PRD\n' },
+      fields: { intakeMode: 'overlay', baseline: 'none' },
+    });
+    assert.match(
+      missingIntakeFiles({
+        repositoryRoot,
+        iteration: 'feat-returns-2026-10-06-kqzx',
+      })[0],
+      /^intake-files\/ \(feat-returns-2026-10-06-kqzx is a overlay intake with Baseline none/,
     );
   });
 

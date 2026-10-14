@@ -44,11 +44,11 @@ function SummaryTile({
 }
 
 /**
- * Review summary shown before the final "Enter workspace" action. Only rows
- * this flow actually collected are shown: `organizationName` exists only when
- * the `workspace` step ran (team-only mode) and invites only when the `invite`
- * step ran — rendering them unconditionally showed a dangling "Organization: —"
- * in personal/hybrid flows that never asked for one.
+ * Review summary shown before the final "Enter workspace" action: the name, and
+ * the clinic name when this flow asked for it. `organizationName` exists only
+ * when the `workspace` step ran (team-only mode) — rendering it unconditionally
+ * showed a dangling "Organization: —" in personal/hybrid flows that never asked
+ * for one.
  *
  * `steps` arrives as a prop rather than being re-derived here. This component
  * used to call `deriveOnboardingSteps` a second time off its own `useMeContext`,
@@ -66,7 +66,6 @@ export function DoneStep({ steps }: { steps: readonly OnboardingStep[] }) {
   const firstName = useOnboardingStore((s) => s.data.firstName);
   const lastName = useOnboardingStore((s) => s.data.lastName);
   const organizationName = useOnboardingStore((s) => s.data.organizationName);
-  const inviteCount = useOnboardingStore((s) => s.data.invites.length);
   const empty = t(ONBOARDING_KEYS.done.emptyValue);
   const name = [firstName, lastName].filter(Boolean).join(' ');
 
@@ -83,13 +82,6 @@ export function DoneStep({ steps }: { steps: readonly OnboardingStep[] }) {
           label={t(ONBOARDING_KEYS.done.organizationLabel)}
           value={organizationName || empty}
           empty={!organizationName}
-        />
-      ) : null}
-      {steps.includes('invite') ? (
-        <SummaryTile
-          label={t(ONBOARDING_KEYS.done.invitesLabel)}
-          value={t(ONBOARDING_KEYS.done.invitesPending, { count: inviteCount })}
-          empty={false}
         />
       ) : null}
     </dl>

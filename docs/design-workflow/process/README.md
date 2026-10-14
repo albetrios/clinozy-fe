@@ -18,16 +18,16 @@ the first costs a fraction of the first.
 new ─► intake ─► planning ─► approval ─► kickoff ─► AS-BUILT ─► done ─► frozen
 ```
 
-| #   | Step     | How                                                                                                                   | Status after         |
-| --- | -------- | --------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| 1   | New      | `pnpm iteration:new <type> [topic] [--both]` — the folder and its README                                              | `planning`           |
-| 2   | Intake   | `pnpm iteration:intake <iteration> <drop-folder> [--mode full\|overlay\|brief] [--both]` — the full snapshot, checked | `planning`           |
-| 3   | Planning | "plan iteration <iteration>" → **`fe-iteration-planning`**: the gate, then Steps 0–6, no code                         | `ready-for-approval` |
-| 4   | Approval | You approve `KICKOFF.md` → `pnpm iteration:status <iteration> approved`                                               | `approved`           |
-| 5   | Kickoff  | "kickoff iteration <iteration>" → **`fe-kickoff-iteration`**: the gate, then build                                    | `implementing`       |
-| 6   | AS-BUILT | One ledger row at a time: build → verify → `AS-BUILT.md` entry → review                                               | `implementing`       |
-| 7   | Done     | Gates green, every row done or deferred (your OK), AS-BUILT summary + Standing deviations                             | `done`               |
-| 8   | Frozen   | `pnpm iteration:status <iteration> frozen` in the last commit before the merge                                        | `frozen`             |
+| #   | Step     | How                                                                                                                         | Status after         |
+| --- | -------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| 1   | New      | `pnpm iteration:new <type> [topic] [--both]` — the folder and its README                                                    | `planning`           |
+| 2   | Intake   | `pnpm iteration:intake <iteration> <drop-folder> [--mode full\|overlay\|brief] [--both]` — what arrived, stored and checked | `planning`           |
+| 3   | Planning | "plan iteration <iteration>" → **`fe-iteration-planning`**: the gate, then Steps 0–6, no code                               | `ready-for-approval` |
+| 4   | Approval | You approve `KICKOFF.md` → `pnpm iteration:status <iteration> approved`                                                     | `approved`           |
+| 5   | Kickoff  | "kickoff iteration <iteration>" → **`fe-kickoff-iteration`**: the gate, then build                                          | `implementing`       |
+| 6   | AS-BUILT | One ledger row at a time: build → verify → `AS-BUILT.md` entry → review                                                     | `implementing`       |
+| 7   | Done     | Gates green, every row done or deferred (your OK), AS-BUILT summary + Standing deviations                                   | `done`               |
+| 8   | Frozen   | `pnpm iteration:status <iteration> frozen` in the last commit before the merge                                              | `frozen`             |
 
 **The gate** — `pnpm iteration:intake <iteration> --check [--baseline <baseline>]` — proves the
 snapshot (and the Baseline's) holds every mandatory file and that nothing changed since the intake.
@@ -49,12 +49,13 @@ commands are in [`iterations/README.md`](../../../iterations/README.md); in shor
 - Folders are `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/` — type `launch`,
   `feat`, `change` or `fix`, e.g. `launch-2026-09-30-jxmr` or
   `feat-pharmacy-returns-2026-10-06-kqzx`. `pnpm iteration:list` lists them.
-- **`intake-files/`** is always a **full snapshot**, whatever arrived — the
-  Intake mode says how it was built: `full` (the whole drop; the launch),
-  `overlay` (only the changed files, laid over a named Baseline's snapshot) or
-  `brief` (no design files — a written `BRIEF.md`, such as "implement these
-  kinds of screens": on its own from scratch, or added to a named Baseline's
-  snapshot). **`plans/decisions.md`**
+- **`intake-files/`** stores **what arrived**, and the iteration's snapshot is
+  resolved from it — the Intake mode says how: `full` (the whole drop; the
+  launch), `overlay` (only the changed files, laid over a named Baseline's
+  snapshot) or `brief` (no design files — a written `BRIEF.md`, such as
+  "implement these kinds of screens": on its own from scratch, or added to a
+  named Baseline's snapshot). An overlay, or a brief on a named Baseline, takes
+  everything it does not store from that Baseline. **`plans/decisions.md`**
   holds every blocking answer and scope decision. **`KICKOFF.md`** is the plan;
   **`AS-BUILT.md`** is what was actually built, ending with the **Standing
   deviations** — the complete list of where the code differs from the design.
@@ -65,9 +66,9 @@ commands are in [`iterations/README.md`](../../../iterations/README.md); in shor
   iteration to build on is it recorded (`pnpm iteration:baseline`) and the
   iteration **incremental**. The delta then: in `full` / `overlay` mode, the
   designer's "What changed" plus `pnpm iteration:diff <baseline> <iteration>`,
-  which compares the two `intake-files/` folders only; in `brief` mode,
-  `BRIEF.md` itself, with nothing else changed. Planning also reads the named
-  Baseline's Standing deviations, and its `intake-files/` are mandatory.
+  which compares the two resolved intakes only; in `brief` mode, `BRIEF.md`
+  itself, with nothing else changed. Planning also reads the named Baseline's
+  Standing deviations, and its intake is mandatory.
 - Each iteration's `README.md` records Type, Topic, Owner, Opened, Branch,
   Baseline, Status, Summary, Drop placed, Drop source, Intake mode, Intake note,
   Schema-routes and Intake hash, and a History of every Status and Baseline
@@ -107,10 +108,11 @@ are the explicit start buttons for the skills — saying "plan iteration
 ## The one habit that unlocks everything
 
 Start every design change as a **new iteration** (`pnpm iteration:new`) whose
-`intake-files/` is a **full snapshot** — however little arrived — and never
-edit a frozen one. Because every snapshot is complete, `pnpm iteration:diff`
-(or the brief) turns the Baseline and the new snapshot into the work list, and
-the incremental process costs what changed — not what exists.
+`intake-files/` holds **what arrived** — however little — on a Baseline that
+holds the rest, and never edit a frozen one. Because every snapshot resolves
+complete, `pnpm iteration:diff` (or the brief) turns the Baseline and the new
+snapshot into the work list, and the incremental process costs what changed —
+not what exists.
 
 ## Do this before your next iteration
 

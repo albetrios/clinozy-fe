@@ -1,0 +1,5053 @@
+{
+  "520001": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chittinagar",
+      "Vijayawada",
+      "Vja Railway Junction",
+      "Vja Rly Divl Office",
+      "Wnchipet"
+    ]
+  ],
+  "520002": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Buckinghampet", "Civil Coursts", "Durga Agraharam", "Suryaraopet"]
+  ],
+  "520003": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["A.C.Company", "Durgapuram", "Gandhinagaram", "Purnanandampet", "Ramakrishnapuram"]
+  ],
+  "520004": ["Krishna", "Andhra Pradesh", ["Gunadala", "Machavaram"]],
+  "520007": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Autonagar",
+      "Industrial Estate",
+      "Kanuru",
+      "Krishnanagar",
+      "Vasanthanagar",
+      "Yanamalakuduru"
+    ]
+  ],
+  "520008": ["Krishna", "Andhra Pradesh", ["Apuhs", "Currency Nagar", "Vj Polytechnic"]],
+  "520010": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Moghalrajpuram", "Punnamathota", "Venkateswarapuram"]
+  ],
+  "520011": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Lakshminagar", "Madhuranagar", "Satyanarayanapuram"]
+  ],
+  "520012": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "A.P.H.B.Colony",
+      "Ambapuram",
+      "Bhavanipuram",
+      "Jaccampudi",
+      "Kamakotinagar",
+      "Tadepalli"
+    ]
+  ],
+  "520013": ["Krishna", "Andhra Pradesh", ["Krishnalanka", "Ramalingeswar Nagar"]],
+  "520015": ["Krishna", "Andhra Pradesh", ["Azitnagar", "Payakapuram.", "Wambay Colony"]],
+  "521001": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Balaramunipet",
+      "Batchupet",
+      "Bhaskarapuram",
+      "Desaipet",
+      "Godugupet",
+      "Inagudurupet",
+      "Machilipatnam",
+      "Malakapatnam",
+      "Rajupet",
+      "U.G.C.Works"
+    ]
+  ],
+  "521002": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chilakalapudi",
+      "Dt.Court",
+      "K.P.Pur",
+      "Kanuru",
+      "Karagraharam",
+      "Manginapudi",
+      "Mekavanipalem",
+      "Pedapatnam",
+      "Pothepalli",
+      "Pothireddipalem",
+      "Tallapalem",
+      "Valandapalem",
+      "Yadlavanipalem"
+    ]
+  ],
+  "521003": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chinnapuram",
+      "Chintaguntapalem",
+      "Gilakaladindi",
+      "Gundupalem",
+      "Kammavaricheruvu",
+      "Mpm Fort",
+      "Pedayadara",
+      "Polatitippa",
+      "Rudravaram",
+      "S.N.Gollapalem",
+      "Saradanagar",
+      "Tummalacheruvu",
+      "Vadapalem"
+    ]
+  ],
+  "521004": ["Krishna", "Andhra Pradesh", ["Krishna University"]],
+  "521101": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Allapuram",
+      "Azzampudi",
+      "Bahubalendrunigudem",
+      "Budhavaram",
+      "Buthumillipadu",
+      "Chikkavaram",
+      "Gannavaram",
+      "Gannavaram Centre",
+      "Gollanapalli",
+      "Gopavarapugudem",
+      "Purushothapatnam",
+      "Roynagar"
+    ]
+  ],
+  "521102": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Bacon Factory", "Kesarapalli", "Zakkulanekkalam"]
+  ],
+  "521104": ["Krishna", "Andhra Pradesh", ["Gudavalli", "Nidamanuru", "Velpuru"]],
+  "521105": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Bapulapadu",
+      "Bommuluru",
+      "Hanuman Junction",
+      "Koyyuru",
+      "Madicherla",
+      "Pallerlamudi",
+      "Perikeedu Bridge",
+      "Serinarasannapalem",
+      "Sitaramapuram"
+    ]
+  ],
+  "521106": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Aripirala",
+      "Arugolanu",
+      "Kakulapadu",
+      "Kanumolu",
+      "Pedalingala",
+      "Puttagunta",
+      "Ramannagudem",
+      "Tippanagunta"
+    ]
+  ],
+  "521107": ["Krishna", "Andhra Pradesh", ["Mustabad", "Savaragudem"]],
+  "521108": ["Krishna", "Andhra Pradesh", ["Enikepadu", "Ramavarappadu"]],
+  "521109": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Ampapuram", "Bandarugudem", "Chiravada", "Galigopuram", "Suravaram", "Telaprolu"]
+  ],
+  "521110": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Kodurupadu",
+      "Rajagopalapuram",
+      "Rangannagudem",
+      "Remalle",
+      "Umamaheswarapuram",
+      "Veeravalli",
+      "Veleru"
+    ]
+  ],
+  "521111": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Billanapalli",
+      "Devaragunta",
+      "Gollapalli",
+      "Jangamgudem",
+      "Kothapalli",
+      "Mallavalli",
+      "Mirzapuram",
+      "Morsapudi",
+      "Polasanipalli",
+      "Tukkuluru"
+    ]
+  ],
+  "521120": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Bhavadevarapalli",
+      "Chodavaram",
+      "Dd.Puram",
+      "Edurumondi",
+      "Etimogga",
+      "Ganapeswaram",
+      "Kammanamoulu",
+      "Nagayalanka",
+      "Nagayalanka East",
+      "Nali",
+      "Nangegadda",
+      "Parrachivara",
+      "Pedakammavaripalem",
+      "Sorlagondhi",
+      "T.Kothapalem",
+      "Talagadadeevi"
+    ]
+  ],
+  "521121": ["Krishna", "Andhra Pradesh", ["Avanigadda"]],
+  "521122": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Aswaraopalem",
+      "Bandlaicheruvu",
+      "Edlalanka",
+      "Gandhikshetram",
+      "Kothapet (Divi)",
+      "Modumudi",
+      "Pittalalanka",
+      "Puligadda",
+      "Ramachandrapuram (Divi)",
+      "V.Kothapalem",
+      "Vekanuru",
+      "Viswanadhapalli"
+    ]
+  ],
+  "521125": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chiruvolulanka",
+      "K.Kothapalem",
+      "Kokkiligadda",
+      "Mopidevi",
+      "Nagayatippa",
+      "Pedaprolu"
+    ]
+  ],
+  "521126": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Challapalli", "Nadakuduru", "Pagolu", "Vakkalagadda", "Yarlagadda"]
+  ],
+  "521130": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Kummaripalem", "Pedakallepalli", "Venaktapuram"]
+  ],
+  "521131": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Bhogireddipalli",
+      "Daliparru",
+      "Endakuduru",
+      "Lakshmipuram",
+      "Lankapalli",
+      "Majeru",
+      "Mangalapuram"
+    ]
+  ],
+  "521132": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chinakallepalli",
+      "Chitturupu",
+      "Kodali",
+      "Papanasanam",
+      "Srikakulam",
+      "Tadepalli",
+      "Velivolu"
+    ]
+  ],
+  "521133": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Devarakota", "Ghantasala", "Ghantasalapalem", "V.Rudravaram"]
+  ],
+  "521134": ["Krishna", "Andhra Pradesh", ["Pedapulipaka", "Tadigadapa"]],
+  "521135": ["Krishna", "Andhra Pradesh", ["Gudapadu", "Movva", "Vemulamada"]],
+  "521136": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Barlapudi", "Chinamuttevi", "Eddanapudi", "K.P.Centre", "Pedamuttevi"]
+  ],
+  "521137": ["Krishna", "Andhra Pradesh", ["Poranki"]],
+  "521138": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Ayyanki", "Bhatlapenumarru", "Inampudi", "Pedasanagallu"]
+  ],
+  "521139": ["Krishna", "Andhra Pradesh", ["Chodavaram", "Ganguru", "Penamaluru"]],
+  "521148": ["Krishna", "Andhra Pradesh", ["Chinaparupudi", "Edulamaddali", "Elamarru"]],
+  "521149": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Akumarru", "Chittiguduru", "Guduru", "Kankata", "Kokanarayanapalem"]
+  ],
+  "521150": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chitturu",
+      "Kaja",
+      "Kanchakoduru",
+      "Kosuru",
+      "Maddipatla",
+      "Mallampalli",
+      "Turakapalem"
+    ]
+  ],
+  "521151": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Boddapadu",
+      "Edupugallu",
+      "Godavarru",
+      "Gosala",
+      "Kankipadu",
+      "Madduru",
+      "Manthena",
+      "Proddutur",
+      "Punadipadu",
+      "Royyur",
+      "Uppaluru",
+      "Vanukuru"
+    ]
+  ],
+  "521153": ["Krishna", "Andhra Pradesh", ["Kolavennu"]],
+  "521156": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Elakurru", "Mantripalem", "Nidumolu", "P.G.Lanka", "Tarakaturu"]
+  ],
+  "521157": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Daggumilli (Z)",
+      "Jujjuvaram",
+      "Kondiparru",
+      "Kurumaddali",
+      "Pamarru",
+      "Pamarru Bazar",
+      "Pasumarru",
+      "Perisepalli",
+      "Rimmanapudi",
+      "Undrapudi",
+      "Uruturu"
+    ]
+  ],
+  "521158": ["Krishna", "Andhra Pradesh", ["Nimmakuru", "Nimmaluru", "Palankipadu"]],
+  "521162": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Mallavolu", "Polavaram (K)", "Ramannapet", "Rayavaram"]
+  ],
+  "521163": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Bhadrirajupalem",
+      "Chagantipadu",
+      "Devarapalli",
+      "Pamulalanka",
+      "Thotlavalluru",
+      "Valluripalem"
+    ]
+  ],
+  "521164": ["Krishna", "Andhra Pradesh", ["Kadavakollu", "Kalavapamula", "Katuru"]],
+  "521165": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Ambedkarnagar",
+      "Gandigunta",
+      "Garikiparru",
+      "Kanakavalli",
+      "Lakshmana Nagar",
+      "Penamakuru",
+      "Vuyyuru",
+      "Yakamuru"
+    ]
+  ],
+  "521170": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chowtapalli",
+      "Damulur",
+      "Doddadevarapadu",
+      "Jayanthi",
+      "Konathamatmakur",
+      "Veerullapadu"
+    ]
+  ],
+  "521175": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Anumanchipalli",
+      "Balusupadu",
+      "Budavada",
+      "Gandrai",
+      "Jaggaiahpet",
+      "Jami Annavaram",
+      "Lime Stone Town Ship",
+      "Malkapuram",
+      "Shermohammadpet",
+      "Srinivasa Nagar Colony",
+      "Takkellapadu"
+    ]
+  ],
+  "521178": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Bandipalem",
+      "Bhimavaram",
+      "Chillakallu",
+      "Gowravaram",
+      "Konakanchi",
+      "Mangollu",
+      "Peda Modugapalli",
+      "Pochampalli",
+      "Tirumalagiri"
+    ]
+  ],
+  "521180": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chevitikallu",
+      "Damuluru",
+      "Gani Atkuru",
+      "Gottumukkala",
+      "Jammavaram",
+      "Kanchikacharla",
+      "Moguluru",
+      "Munnaluru",
+      "Paritala",
+      "Ponnavaram"
+    ]
+  ],
+  "521181": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Alluru",
+      "Chennaraopalem",
+      "Dachavaram",
+      "Gudem Madhavaram",
+      "Juzzuru",
+      "Kontalapalli",
+      "Narasimharaopalem",
+      "Peddapuram",
+      "Vellanki"
+    ]
+  ],
+  "521182": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Bobbellapadu",
+      "Chandarlapadu",
+      "Gudimetla",
+      "Kasarabad",
+      "Kodavatikallu",
+      "Konayapalem",
+      "Pokkunuru",
+      "Popuru",
+      "Punnavalli",
+      "Veladikothapalem",
+      "Vibharintapadu"
+    ]
+  ],
+  "521183": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chintalapadu",
+      "Eturu",
+      "Guttavaripalem",
+      "Muppalla",
+      "Thotaravulapadu",
+      "Turlapadu"
+    ]
+  ],
+  "521184": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Gollamudi",
+      "Jonnalagadda",
+      "Kammavaripalem",
+      "Konduru",
+      "Magallu",
+      "Pallagiri",
+      "Raghavapuram",
+      "Ramireddipalli",
+      "Rudravaram",
+      "Somavaram",
+      "Torragudipadu"
+    ]
+  ],
+  "521185": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chandapuram",
+      "Cheruvukommupalem",
+      "Gandepalli",
+      "Ithavaram",
+      "Kanchala",
+      "Keesara",
+      "Kethaveerunipadu",
+      "Lingalapadu",
+      "Munagacherla",
+      "Nandigama",
+      "Nawabpet",
+      "Pendyala",
+      "Sanagapadu",
+      "Vemulapalli"
+    ]
+  ],
+  "521190": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Anigandlapadu",
+      "Gopinenipalem",
+      "Gummadidurru",
+      "Kannevidu",
+      "Lingagudem",
+      "Makkapeta",
+      "Muchintala",
+      "Mundlapadu",
+      "Penuganchiprolu",
+      "Singavaram",
+      "Sivapuram",
+      "Subbayyagudem",
+      "Vemavaram",
+      "Venkatapuram"
+    ]
+  ],
+  "521201": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Dum Dum Gardens", "Nuzvid", "Nuzvid Bazar", "Vidyanagar"]
+  ],
+  "521202": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Annavaram",
+      "Apiiit",
+      "Boruvancha",
+      "Enamadala",
+      "Hanumanthunigudem",
+      "Ravicherla",
+      "Siddharthanagar"
+    ]
+  ],
+  "521207": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Balive",
+      "Chintalavalli",
+      "Ellapuram",
+      "Gopavaram",
+      "Katrenipadu",
+      "Korlagunta",
+      "Mukkollupadu",
+      "Musunuru",
+      "Pothureddipalli",
+      "Velpucherla"
+    ]
+  ],
+  "521211": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Aukiripalli",
+      "Chopparametla",
+      "Edara",
+      "Idulagudem",
+      "Kotha Edara",
+      "Krishnavaram",
+      "Narasingapalem",
+      "Nugondapalli",
+      "Sagguru",
+      "Seetharampuram",
+      "Sobhanapuram",
+      "Thotapalli",
+      "Vattigudipadu"
+    ]
+  ],
+  "521212": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Adavinekkalam", "Kanasanapalli", "Nunna", "Pathapadu", "Surampalli"]
+  ],
+  "521213": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Akkireddygudem",
+      "Chekkapalli",
+      "Chittapur",
+      "Digavalli",
+      "Gudipadu",
+      "Gullapudi",
+      "Kondaparva",
+      "Lopudi",
+      "Ramanakkapet",
+      "Somavaram",
+      "Surepalli",
+      "Tummagudem",
+      "Valasapalli"
+    ]
+  ],
+  "521214": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chatrai",
+      "Chinnampet",
+      "Gudipadu",
+      "Janardhanavaram",
+      "Kalagara",
+      "Korlamanda",
+      "Kotapadu",
+      "Krishnaraopalem",
+      "Polavaram",
+      "Pothanapalli",
+      "Tsanubanda"
+    ]
+  ],
+  "521215": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Annaraopet",
+      "Chandrupatla",
+      "Jagannadhapuram",
+      "Kudapa",
+      "Kunaparajaparva",
+      "Maddulaparva",
+      "Muchinapalli",
+      "Narasapuram",
+      "Reddigudem",
+      "Tatakuntla",
+      "Telladevarapalli",
+      "Vissannapet"
+    ]
+  ],
+  "521225": ["Krishna", "Andhra Pradesh", ["Gollapudi"]],
+  "521226": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["A.Konduru", "Cheemalapadu", "Krishnaraopalem", "Ramachandrapuram", "Repudi"]
+  ],
+  "521227": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chavutapalli",
+      "Ganugapadu",
+      "Gollamandala",
+      "Kakarla",
+      "Khambhampadu",
+      "Koduru",
+      "Polisettipadu",
+      "Putrela",
+      "Rudravaram",
+      "Vallampatla",
+      "Vemireddipalle"
+    ]
+  ],
+  "521228": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Ida Kondaplli", "Ilaprolu", "Kattubadipalem", "Kavuluru", "Kondapalli", "Pinapaka"]
+  ],
+  "521229": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Atkuru",
+      "Cheruvu Madhavaram",
+      "Chevutur",
+      "Duggiralapadu",
+      "G Konduru",
+      "Ganginenipalem",
+      "H Mutyalampadu",
+      "Sunnampadu",
+      "Velagaleru",
+      "Vellaturu"
+    ]
+  ],
+  "521230": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chandrala",
+      "Chandrgudem",
+      "China Nandigama",
+      "Ganapavaram",
+      "Koduru",
+      "Kuntamukkala",
+      "Morusumilli",
+      "Mylavaram",
+      "Naguluru",
+      "Pondugula",
+      "Pulluru",
+      "Tolukodu",
+      "Velvdam",
+      "Venkatapuram"
+    ]
+  ],
+  "521231": ["Krishna", "Andhra Pradesh", ["JNNURM Colony"]],
+  "521235": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chintalapadu",
+      "Kokilampadu",
+      "Kommireddipalli",
+      "Lakshmipuram",
+      "Munukulla",
+      "Rolupadu",
+      "Sriniketan",
+      "Tiruvuru",
+      "Vamukuntla",
+      "Vavilala"
+    ]
+  ],
+  "521241": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Guntupalli", "Paidurupadu", "Railway Wagon Work Shop", "Rayanapadu"]
+  ],
+  "521245": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Akunuru", "Chinaogirala", "Kunderu", "Nepalli", "Pedaogirala"]
+  ],
+  "521246": ["Krishna", "Andhra Pradesh", ["Hanumanthapuram", "Kapileswarapuram"]],
+  "521247": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Guruvindapalli",
+      "Iluru",
+      "Inapur",
+      "Kuderu",
+      "Madhurapuram",
+      "Meduru",
+      "Patamatalankapalli",
+      "Srirangapuram"
+    ]
+  ],
+  "521250": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Agniparru",
+      "Aminapuram",
+      "Choragudi",
+      "Krishnapuram",
+      "Pamidimukkala",
+      "Penumatcha",
+      "Virankilock"
+    ]
+  ],
+  "521256": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Gopuvanipalem",
+      "Gurazada",
+      "Kanumuru",
+      "Mantada",
+      "Marrivada",
+      "Saipuram",
+      "Tadanki",
+      "Velpuru"
+    ]
+  ],
+  "521260": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Bokinala",
+      "Komatigunta Lock",
+      "Manikonda",
+      "Tarigoppula R.S.",
+      "Tenneru",
+      "Vempadu"
+    ]
+  ],
+  "521261": ["Krishna", "Andhra Pradesh", ["Appikatla", "Bollapadu", "Mudunuru"]],
+  "521263": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Bhushanagulla", "Guruvindagunta", "Pedaparupudi", "Vanapumala", "Ventrapragada"]
+  ],
+  "521286": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Atkur", "Pedavutapalli", "Pottipadu", "Tempalli", "Veerapanenigudem"]
+  ],
+  "521301": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Gudivada", "Rajendranagar Colony", "Satyanarayanapuram"]
+  ],
+  "521311": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Indupalli", "Lankapalli Agraharam", "Nandamuru", "Vemanda"]
+  ],
+  "521312": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Amudalapalli",
+      "Garapadu",
+      "Koyyagurapadu",
+      "Ponukumadu",
+      "Veldipadu",
+      "Velinuthala",
+      "Vunguturu"
+    ]
+  ],
+  "521320": ["Krishna", "Andhra Pradesh", ["Kruthivennu"]],
+  "521321": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Dosapadu",
+      "Ilaparru",
+      "Janardhanapuram",
+      "Kudaravalli",
+      "Lakshminarasimhapuram",
+      "Moparru",
+      "Nandivada",
+      "Pedavirivada",
+      "Ramapuram",
+      "Tummalapalli",
+      "Vennanapudi"
+    ]
+  ],
+  "521322": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Chinayerukapadu", "Gandhi Asramam", "Golvepalli (Zami)", "Komaravolu", "Tativarru"]
+  ],
+  "521323": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chowtapalli",
+      "Dondapadu",
+      "Guntakoduru",
+      "Moturu",
+      "Pedapalaparru",
+      "Serigolvepalli"
+    ]
+  ],
+  "521324": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Amudalapalli",
+      "Bantumilli",
+      "Cherukumilli",
+      "Chorampudi",
+      "Jayapuram",
+      "Komallapudi",
+      "Korlapadu",
+      "Krithivennu",
+      "Lakshmipuram",
+      "Malleswaram",
+      "Matlam",
+      "Mulaparru",
+      "Munipeda",
+      "Neelipudi",
+      "Nidamarru",
+      "Pandraka",
+      "Pendurru"
+    ]
+  ],
+  "521325": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chinapalaparru",
+      "Guraza",
+      "K.P.Agraharam",
+      "Kanukollu",
+      "Koduru",
+      "Komarru",
+      "Lingala",
+      "Mudinepalli",
+      "Pedakamanapudi",
+      "Peruru",
+      "Peyyeru",
+      "Sankarshanapuram",
+      "Vadali",
+      "Vinnakota"
+    ]
+  ],
+  "521326": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Gunnanapudi",
+      "Ingilipakalanka",
+      "Nandigamalanka",
+      "Putlacheruvu",
+      "Rudrapaka",
+      "Unikili"
+    ]
+  ],
+  "521327": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Anamanapudi",
+      "Dandiganapudi",
+      "Lingavaram",
+      "Polukonda",
+      "Ponukumada",
+      "Tamirisa",
+      "Valivarthipadu"
+    ]
+  ],
+  "521328": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Divigollapalem",
+      "Hamsaladeevi",
+      "Jayapuram",
+      "Koduru",
+      "Lingareddipalem",
+      "Mandapakala",
+      "Salempalem",
+      "Swatantrapuram",
+      "Ullipalem"
+    ]
+  ],
+  "521329": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chevuru",
+      "Chinatummidi",
+      "Korraguntapalem",
+      "Pedagonnuru",
+      "Pedatummidi",
+      "Singarayapalem",
+      "Urivi",
+      "Utukuru",
+      "Vadavalli",
+      "Vaivaka",
+      "Vanudurru"
+    ]
+  ],
+  "521330": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Angaluru", "Bommuluru", "Chandrala", "Nuzella", "Serikalavapudi", "Siddantham"]
+  ],
+  "521331": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Kavipuram", "Kavutaram", "Kongamcherla", "Nagavaram", "Vadlamannadu", "Vemavaram"]
+  ],
+  "521332": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Dokiparru", "Jakkamcherla", "Mukkollu", "Pesaramilli", "Venturumilli"]
+  ],
+  "521333": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Achavaram",
+      "Atapaka",
+      "Chavalipadu",
+      "China Tadinada",
+      "Chintapadu",
+      "Gopavaram",
+      "Kaikalur",
+      "Kallapalem",
+      "Konduru",
+      "Tadinada",
+      "Varahapatnam",
+      "Vinjaram"
+    ]
+  ],
+  "521340": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Alapadu R.S.",
+      "Bhujabalapatnam",
+      "Doddipatla",
+      "Kolletikota",
+      "Kottada",
+      "Pallevada",
+      "Penchikalamarru",
+      "Seetanapalli",
+      "Vadarlapadu"
+    ]
+  ],
+  "521343": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Alluru",
+      "Bomminampadu",
+      "Devapudi",
+      "Korukollu",
+      "Prodduvaka",
+      "Sanarudravaram",
+      "Tamarakollu",
+      "Vemavarappadu"
+    ]
+  ],
+  "521344": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Kalidindi",
+      "Kondangi",
+      "Lodidalanka",
+      "Mattagunta",
+      "Mulaupparagudem",
+      "Pedalanka",
+      "Pothumarru",
+      "Santhoshapuram",
+      "Venkatapuram"
+    ]
+  ],
+  "521345": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Ayyavarirudravaram",
+      "Bhyravapatnam",
+      "Chigurukota",
+      "Gannavaram",
+      "Korlapadu",
+      "Mandavalli",
+      "Mokasakalvapudi",
+      "Perekegudem",
+      "Prathipadu",
+      "Singanapudi",
+      "Takkellapadu"
+    ]
+  ],
+  "521356": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Daggumailli", "Gudlavalleru", "Kurada", "Mamidikolla", "Penjendra"]
+  ],
+  "521366": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Akulamannadu",
+      "Borrapothupalem",
+      "Brahmapuram",
+      "Chennuru",
+      "Chevendra",
+      "Chittipalem",
+      "K.P.Lock",
+      "Kappaladoddi",
+      "Konkepudi",
+      "L.K.Gunta",
+      "Lellagaruvu",
+      "Mutcherla",
+      "Nadupuru",
+      "Nandigama",
+      "Pedana"
+    ]
+  ],
+  "521369": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Arthamuru",
+      "Jinjeru",
+      "Kakarlamudi",
+      "Kanchadam",
+      "Munjuluru",
+      "Nandamuru",
+      "Penumalli",
+      "Satulru"
+    ]
+  ],
+  "521390": ["Krishna", "Andhra Pradesh", ["Addada", "Pedamaddali"]],
+  "521401": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chintalanerva",
+      "Dundiralapadu",
+      "Konijerla",
+      "Nemali",
+      "Penugolanu",
+      "Satyalapadu",
+      "Tunikipadu",
+      "Vutukuru"
+    ]
+  ],
+  "521402": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Dabbakupalli",
+      "Kakaravai",
+      "Khambampadu",
+      "Lingala",
+      "Machinenipalem",
+      "Pentalavarigudem",
+      "Polampalli",
+      "Talluru",
+      "Vatsavai",
+      "Vemulanarva"
+    ]
+  ],
+  "521403": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Ammireddigudem",
+      "Arlapadu",
+      "Erramadu",
+      "Gampalagudem",
+      "Gosavedu",
+      "Gullapudi",
+      "Kanumuru",
+      "Kothapalli",
+      "Vinagadapa"
+    ]
+  ],
+  "521456": [
+    "Krishna",
+    "Andhra Pradesh",
+    [
+      "Chilukuru",
+      "Ibrahimpatnam",
+      "Jupudi",
+      "Ketanakonda",
+      "Kotikalapudi",
+      "Mulapadu",
+      "VTPS"
+    ]
+  ],
+  "521457": [
+    "Krishna",
+    "Andhra Pradesh",
+    ["Jayanthipuram", "Kumaraswamy Raja Nagar", "Muktyala", "Vedadri"]
+  ],
+  "522001": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bus Stand (Guntur)",
+      "College Road (Guntur)",
+      "Govt. General Hospital",
+      "Kothapeta (Guntur)",
+      "Nehru Nagar (Guntur)",
+      "Old Guntur",
+      "Railpet (Guntur)"
+    ]
+  ],
+  "522002": ["Guntur", "Andhra Pradesh", ["Brodipet (Guntur)", "Guntur"]],
+  "522003": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Choutra (Guntur)",
+      "Etukuru Road (Guntur)",
+      "Factories Ward",
+      "Guntur Bazar",
+      "S.K.P.Temple (Guntur)"
+    ]
+  ],
+  "522004": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "A.T.Agraharam (Guntur)",
+      "Guntur Collectorate",
+      "Trunk Road (Guntur)",
+      "Venugopalanagar Colony"
+    ]
+  ],
+  "522005": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Ankireddypalem", "Nallapadu", "Obulanaidupalem", "Pothuru", "Vengalayapalem"]
+  ],
+  "522006": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Chowdaripeta (Guntur)", "Pattabhipuram (Guntur)", "S.V.N.Colony (Guntur)"]
+  ],
+  "522007": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Amaravathi Road (Guntur)",
+      "Chandramoulinagar",
+      "Koritepadu (Guntur)",
+      "L.W.Works (Guntur)"
+    ]
+  ],
+  "522009": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Pedapalakaluru", "Perecherla", "Perecherla Junction"]
+  ],
+  "522015": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Abbineniguntapalem", "Gogulamudi", "Kopparru", "Ravipadu", "Vangipuram"]
+  ],
+  "522016": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Endroy",
+      "Karlapudi",
+      "Kaza",
+      "Latchannagudipudi",
+      "Lemalle",
+      "Mothadaka",
+      "Mukkamala",
+      "Narukullapadu",
+      "Nevalikallu",
+      "Nidumukkala",
+      "Vunguturu"
+    ]
+  ],
+  "522017": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Ananthavarappadu",
+      "Budampadu",
+      "Chamallamudi",
+      "Chintapallipadu",
+      "Etukuru",
+      "Garapadu",
+      "Katrapadu",
+      "Kornepadu",
+      "Kurnuthala",
+      "Lalpuram",
+      "Pallapadu",
+      "Vinjanampadu",
+      "Yamarru"
+    ]
+  ],
+  "522018": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bandarupalle",
+      "Bejathpuram",
+      "Damarapalle",
+      "Garikapadu",
+      "Gorlavaripalem",
+      "Mandepudi",
+      "Pamulapadu",
+      "Ponnekallu",
+      "Ravela"
+    ]
+  ],
+  "522019": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Chowdavaram",
+      "Enamadala",
+      "Ganikapudi",
+      "Gottipadu",
+      "Kondepadu",
+      "Koyavaripalem",
+      "Mallayapalem",
+      "Nadimpalem",
+      "Nimmagaddavaripalem",
+      "Prathipadu",
+      "Tikkireddyvaripalem"
+    ]
+  ],
+  "522020": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Amaravathi",
+      "Dharanikota",
+      "Didugu",
+      "Harischandrapuram",
+      "Malladi",
+      "Muthayapalem",
+      "Pedamadduru",
+      "Vykuntapuram"
+    ]
+  ],
+  "522034": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Chalapathi Nagar",
+      "Gorantla",
+      "Industrial Estate",
+      "Jonnalagadda",
+      "Lam",
+      "Lam Ars"
+    ]
+  ],
+  "522101": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Bapatla", "Railpeta Bapatla", "Rangaraothota", "Snpagraharam"]
+  ],
+  "522102": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "A F Station",
+      "Bapatla Engg College",
+      "Maruproluvaripalem",
+      "Muthayapalem",
+      "Nandirajuthota"
+    ]
+  ],
+  "522111": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Buddam",
+      "Chintayapalem",
+      "Ganapavaram",
+      "Karlapalem",
+      "Nalamothuvaripalem",
+      "Pedagollapalem",
+      "Pedapuluguvaripalem",
+      "Perali",
+      "Yazali"
+    ]
+  ],
+  "522112": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Appapuram",
+      "Ballukanudivari Palem",
+      "Garikapadu",
+      "Kakumanu",
+      "Kondapaturu",
+      "Pedapalem"
+    ]
+  ],
+  "522113": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Cheruvu", "Jillellamudi", "Mulapalem", "Narasayapalem", "Reteru"]
+  ],
+  "522124": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Aluru",
+      "Chinalingayapalem",
+      "Chintalapudi",
+      "Kondabalavaripalem",
+      "Nidubrole",
+      "Pandrapadu",
+      "Ponnur",
+      "Ponnur Bazar",
+      "Tallapalem",
+      "Vaddemukkala",
+      "Vallabharaopalem",
+      "Valluru",
+      "Vupparapalem"
+    ]
+  ],
+  "522201": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "China Ravuru Tenali",
+      "Gandhinagar",
+      "Ithanagar",
+      "Kothapeta",
+      "Tenali",
+      "Tenali Bazar",
+      "Wahabchowk Tenali"
+    ]
+  ],
+  "522202": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Kancherlapalem",
+      "Katevaram",
+      "Morrispeta",
+      "Nelapadu",
+      "Pedaravuru",
+      "Pinapad Tenali",
+      "Satyanarayanapuram"
+    ]
+  ],
+  "522211": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Angalakudur", "Edlapalli", "Penugudurupadu", "Valiveru"]
+  ],
+  "522212": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Brahmanakoduru",
+      "Chebrole",
+      "Godavarru",
+      "Gollamudipadu",
+      "Gundavaram",
+      "Jupudi",
+      "Kothapalli Narikellapalli",
+      "Kothareddypalem",
+      "Kovelamudi",
+      "Lemellepadu",
+      "Lingamguntlapalem",
+      "Manchala",
+      "Mutluru",
+      "Narakoduru",
+      "Pathareddypalem",
+      "Srirangapuram",
+      "Vatticheruku",
+      "Vellaluru",
+      "Vetapalem"
+    ]
+  ],
+  "522213": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Anamarlapudi",
+      "Sangamjagarlamudi",
+      "Sekuru",
+      "Selapadu",
+      "Suddapalli",
+      "Vadlamudi",
+      "Vejendla"
+    ]
+  ],
+  "522233": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Edlapadu",
+      "Jaggapuram",
+      "Jaladi",
+      "Karuchola",
+      "Thimmapuram",
+      "Unnava",
+      "Vankayalapadu"
+    ]
+  ],
+  "522234": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Chirumamilla", "Jangalapalle", "Lingaraopalem", "Nadendla", "Solasa", "Tubadu"]
+  ],
+  "522235": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Anaparru",
+      "Garlapadu",
+      "Katrapadu",
+      "Kommuru",
+      "Nagualapadu",
+      "Palaparru",
+      "Pedanandipadu",
+      "Pusuluru",
+      "Rajupalem",
+      "Varagani"
+    ]
+  ],
+  "522236": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Anantavaram", "Nekkallu", "Pedaparimi", "Tadikonda", "Vaddamanu"]
+  ],
+  "522237": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Abbarajupalem",
+      "Ainavolu",
+      "Borupalem",
+      "Dondapadu",
+      "Mandadam",
+      "Nelapadu",
+      "Rayapudi",
+      "Sakhamuru",
+      "Tulluru",
+      "Velagapudi",
+      "Venkatapalem"
+    ]
+  ],
+  "522238": ["Guntur", "Andhra Pradesh", ["A.P.Secretariat"]],
+  "522239": ["Guntur", "Andhra Pradesh", ["A.P.High Court"]],
+  "522240": ["Guntur", "Andhra Pradesh", ["SRM University"]],
+  "522256": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Allamudi", "Bhattiprolu", "Konetipuram", "Pallekona", "Penumarru", "Surepalli"]
+  ],
+  "522257": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Amudarlanka", "Chinapulivarru", "Pedapulivarru", "Pesarlanka", "Vellaturu"]
+  ],
+  "522258": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Dhulipudi", "Kolaganivaripalem", "Pamidimarru", "Venigallavaripalem"]
+  ],
+  "522259": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Allavaripalem",
+      "Gudavalli",
+      "Ilavaram",
+      "Kanagala",
+      "Nadimpalli",
+      "Peddavaram",
+      "Ponnapalli Agraharam",
+      "Rajavole",
+      "Thotapalli"
+    ]
+  ],
+  "522261": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Balijepalli",
+      "Butumalli",
+      "Champadu",
+      "Chavali",
+      "Jampani",
+      "Kuchellapadu",
+      "Peravali",
+      "Peravalipalem",
+      "Varahapuram Agraharam",
+      "Vemuru"
+    ]
+  ],
+  "522262": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Adavuladivi",
+      "Allaparru",
+      "Chinkapalem",
+      "Dindi",
+      "Gurunadhanagar",
+      "Kallipalem",
+      "Kuchinapudi",
+      "Mantripalem",
+      "Pallapatla",
+      "Pragnam"
+    ]
+  ],
+  "522264": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Chodayapalem",
+      "Gangadipalem",
+      "Kaithepalle",
+      "Mrutyumjayapalem",
+      "Piratlanka",
+      "Pothumeraka",
+      "Singupalem",
+      "Tummala",
+      "Vaddevaripalem",
+      "Visweswaram"
+    ]
+  ],
+  "522265": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bethapudi",
+      "Chatragadda",
+      "Guddikayalanka",
+      "Isukapalle",
+      "Kannegantivaripalem",
+      "Karumuru",
+      "Murthota",
+      "Nalluru",
+      "Nallurupalem",
+      "Penumudi",
+      "Peteru",
+      "Railpeta Repale",
+      "Repalle",
+      "Sajjavaripalem",
+      "Voleru",
+      "Vullipalem",
+      "Vuppudi"
+    ]
+  ],
+  "522268": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bellamvaripalem",
+      "Idupalli",
+      "Karankivaripalem",
+      "Muttupalli Agraharam",
+      "Nagaram",
+      "Pudivada",
+      "Pushadapuvaripalem",
+      "Yeletipalem"
+    ]
+  ],
+  "522301": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Anantavaram",
+      "Annavaram",
+      "Annavarapulanka",
+      "Burripalem",
+      "Chadalavada",
+      "Chilumuru",
+      "Hanumanpalem",
+      "Ipuru"
+    ]
+  ],
+  "522302": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Atmakuru",
+      "Ippatam",
+      "K.L.University",
+      "Kolanukonda",
+      "Pedavadlapudi",
+      "Revendrapadu",
+      "Vaddeswaram"
+    ]
+  ],
+  "522303": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Chirravuru", "Gundimeda", "Mellempudi", "Nutakki"]
+  ],
+  "522304": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Chivaluru",
+      "Davuluru",
+      "Gudibandivaripalem",
+      "Kollipara",
+      "Munnangi",
+      "Pidaparru",
+      "Tumuluru"
+    ]
+  ],
+  "522305": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Chinapalem",
+      "Godavarru Agraharam",
+      "Pedakonduru",
+      "Pedapalem",
+      "Perikalapudi",
+      "Srungarapuram",
+      "Veerlapalem"
+    ]
+  ],
+  "522306": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Athota", "Dantaluru", "Kunchavaram", "Nandivelugu", "Yerukalapudi"]
+  ],
+  "522307": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Gudivada", "Kazipeta", "Kolakaluru", "Kopalle"]
+  ],
+  "522308": ["Guntur", "Andhra Pradesh", ["Emani", "Vallabhapuram"]],
+  "522309": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Arepalle Agraharam",
+      "Arumbaka",
+      "Balusulapalem",
+      "Cherukupalle",
+      "Gullapalli",
+      "Kavuru",
+      "Ramabhotlapalem",
+      "Vinayasramam"
+    ]
+  ],
+  "522310": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Appikatla", "Gopapuram", "Gudipudiagraharam", "Iteru", "Marripudi", "Poondla"]
+  ],
+  "522311": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Bhavanamvaripalem", "Bhoolayapalem", "Chandole", "Koduru Komali", "Sangupalem"]
+  ],
+  "522312": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Alapadu", "Korutadiparru", "Moparru", "Turumella"]
+  ],
+  "522313": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Chinagadelavarru", "Chinaparimi", "Kuchipudi", "Manduru", "Mulpuru", "Yadavuru"]
+  ],
+  "522314": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Alluru", "Amudalapalli", "Bavajipalem", "Nizampatnam", "Pedamatlapudi"]
+  ],
+  "522315": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Bodipalem", "Itikampadu", "Komali", "Machavaram", "Mulukuduru", "Nanduru"]
+  ],
+  "522316": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Aremanda",
+      "Dandamudi",
+      "Doppalapudi",
+      "Kollimarla",
+      "Mannava",
+      "Munipalli",
+      "Patsalatadiparru"
+    ]
+  ],
+  "522317": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Kankatapalem", "Murukondapadu", "Stuvartpuram", "Stuvartpuram Colony"]
+  ],
+  "522318": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Mamillapalli", "Modukur", "Nadigaddapalem", "Pedagadelavarru", "Tsunduru"]
+  ],
+  "522324": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Boddulurupadu",
+      "Chintallanka",
+      "Donepudi",
+      "Gajullanka",
+      "Kolluru",
+      "Krapa",
+      "Potharlanka",
+      "Ravikampadu"
+    ]
+  ],
+  "522325": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Amartaluru", "Govada", "Panchalavaram", "Pedapudi"]
+  ],
+  "522329": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Khajipalem", "Manthenavaripalem", "Peddapalle", "Pittalavanipalem", "Siripudi"]
+  ],
+  "522330": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Chiluvuru",
+      "Duggirala",
+      "Kantamrajukonduru",
+      "Manchikalapudi",
+      "Morampudi",
+      "Penumuli",
+      "Tummapudi"
+    ]
+  ],
+  "522341": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Bodapadu", "Elavarru", "Intur", "Kondamudi", "Pyaparru"]
+  ],
+  "522401": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Garnepudi", "Mandapadu", "Paladugu", "Podapadu", "Siripuram", "Varagani"]
+  ],
+  "522402": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Abburu",
+      "Bayyavaram",
+      "Bhatluru",
+      "Bhimavaram",
+      "Garapadu",
+      "Gudipudi",
+      "Hussainnagaram",
+      "Kattamuru",
+      "Lagadapadu",
+      "Lingamguntla",
+      "Munugodu",
+      "Nandigama",
+      "Panidem",
+      "Patibandla",
+      "Pedakurapadu",
+      "Pedamakkena"
+    ]
+  ],
+  "522403": ["Guntur", "Andhra Pradesh", ["Gandhi Chowk", "Sattenapalle"]],
+  "522408": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bollavaram",
+      "Dammalapadu",
+      "Kunduruvaripalem",
+      "Lankalakurapadu",
+      "Madala",
+      "Muppalla",
+      "Narnepadu",
+      "Paludevarlapadu",
+      "Rudravaram",
+      "Turkapalem"
+    ]
+  ],
+  "522409": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Atchampet",
+      "Challagariga",
+      "Chamarru",
+      "Cherukumpalem",
+      "Chintapalle",
+      "Kogantivaripalem",
+      "Kothapalle",
+      "Madipadu",
+      "Neeleswarapalem",
+      "Putlagudem",
+      "Taduvai",
+      "Tallacheruvu"
+    ]
+  ],
+  "522410": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Ananthavaram",
+      "Andukuru",
+      "Balemarru",
+      "Dodleru",
+      "Gandluru",
+      "Gogulapadu",
+      "Gorantla",
+      "Grandhasiri",
+      "Gudipadu",
+      "Kastala",
+      "Konduru",
+      "Konuru",
+      "Krosuru",
+      "Pakalapadu",
+      "Pedapalem",
+      "Peesapadu",
+      "Rentapalla",
+      "Talluru",
+      "Velpuru",
+      "Vipparla",
+      "Voravakallu",
+      "Vutukuru"
+    ]
+  ],
+  "522411": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bellamkonda",
+      "Bodanam",
+      "Chandrajupalem",
+      "Chityala",
+      "Chityala Thanda",
+      "Chowtapapayapalem",
+      "Emmajigudem",
+      "Hassannabad",
+      "Machayapalem",
+      "Mannesultanpalem",
+      "Papayapalem",
+      "Perikapadu Thanda",
+      "Vannayapalem",
+      "Venkatayapalem"
+    ]
+  ],
+  "522412": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Balijepalle",
+      "Bhrugubanda",
+      "Brahmanapalle",
+      "Dhulipalla",
+      "Ganapavaram",
+      "Kandulavaripalem",
+      "Kankanalapalle",
+      "Mokkapadu",
+      "Nagavaram",
+      "Rajupalem",
+      "Reddigudem",
+      "Tondapi"
+    ]
+  ],
+  "522413": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Beeravallipaya",
+      "Devarampadu",
+      "Govindapuram",
+      "Guttikonda",
+      "Janapadu",
+      "Konanki",
+      "Kotanemalipuri",
+      "Kothaganesunipadu",
+      "Kubadpuram",
+      "Morjampadu",
+      "Nemalipuri",
+      "Panditivaripalem",
+      "Piduguralla",
+      "Pillutla",
+      "Sitarampuram Mines",
+      "Sri Rukminipuram",
+      "Zulakallu"
+    ]
+  ],
+  "522414": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Batrupalem",
+      "Dachpalle",
+      "Gamalapadu",
+      "Gogulapadu",
+      "Katrapadu",
+      "Kesanapalle",
+      "Madinapadu",
+      "Mutyalampadu",
+      "Nadikudi",
+      "Pondugula",
+      "Ramapuram",
+      "Sarangapalle",
+      "Srinagar",
+      "Tangeda"
+    ]
+  ],
+  "522415": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Ambapuram",
+      "Cherlagudipadu",
+      "Daida",
+      "Gangavaram",
+      "Gottimukkala",
+      "Gurazalla",
+      "Jangamaheswarapuram",
+      "Madugula",
+      "Miriyala",
+      "Pallegunta",
+      "Pulipadu"
+    ]
+  ],
+  "522421": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Goli",
+      "Jettipalem",
+      "Mallavaram",
+      "Manchikallu",
+      "Mittagudipadu",
+      "Paluvai",
+      "Paluvai Gate",
+      "Pasarlapadu",
+      "Rentachintala",
+      "Rentala",
+      "Tummercode"
+    ]
+  ],
+  "522426": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Econampet",
+      "Gannavaram",
+      "Kambhampadu",
+      "Koppunuru",
+      "Kothapalle",
+      "Kotturu",
+      "Macherla",
+      "Mandadi",
+      "Nagulavaram",
+      "Pasivemula",
+      "PWD Colony",
+      "Rachamallapadu",
+      "Rayavaram",
+      "Tallapalle",
+      "Zammalamadaka"
+    ]
+  ],
+  "522435": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Chennayapalem", "Kothapalem", "Machavaram", "Pinnelli", "Velampalle", "Vemavaram"]
+  ],
+  "522436": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Abbarajupalem",
+      "Attaluru",
+      "Balusupadu",
+      "Jalalapuram",
+      "Jupudi",
+      "Kambhampadu",
+      "Kasipadu",
+      "Lingapuram",
+      "Parastyalluru",
+      "Ramapuram",
+      "Tammavaram"
+    ]
+  ],
+  "522437": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Brahmanapalle",
+      "China Garlapadu",
+      "Chinaagraharam",
+      "Karalapadu",
+      "Pedagarlapadu",
+      "Tummalacheruvu",
+      "Veerapuram"
+    ]
+  ],
+  "522438": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Gundlapalem",
+      "Kattavaripalem",
+      "Komerapudi",
+      "Korrapadu",
+      "Medikonduru",
+      "Takkellapadu",
+      "Turakapalem",
+      "Velavarthipadu",
+      "Visadala"
+    ]
+  ],
+  "522439": ["Guntur", "Andhra Pradesh", ["Thimmareddipuram", "Vijayapuri South"]],
+  "522501": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Kunchanapalle",
+      "Penumaka",
+      "Polakampadu Ind. Area",
+      "Prathuru",
+      "Tadepalle",
+      "Undavalli"
+    ]
+  ],
+  "522502": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bethapudi",
+      "K.C.Works",
+      "Krishnayapalem",
+      "Kuragallu",
+      "Navuluru",
+      "Neerukonda",
+      "Nidamarru",
+      "Yerrabalem"
+    ]
+  ],
+  "522503": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Apsp Colony (Mangalagiri)",
+      "Mangalagiri",
+      "Mangalagiri Busstand",
+      "Old Mangalagiri"
+    ]
+  ],
+  "522508": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Chinakakani", "Kanteru", "Koppuravuru", "Namburu", "Rain Tree Park"]
+  ],
+  "522509": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Gollamudi",
+      "Pedakakani",
+      "Reddypalem",
+      "Takkellapadu",
+      "Uppalapadu",
+      "Venigandla",
+      "Venkatakrishnapuram"
+    ]
+  ],
+  "522510": ["Guntur", "Andhra Pradesh", ["Nagarjuna Nagar"]],
+  "522529": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Ameenabad",
+      "Kandrika",
+      "Kondaveedu",
+      "Lakkarajugarlapadu",
+      "Nudurupadu",
+      "Phirangipuram",
+      "Singhiskhanpet",
+      "Talluru",
+      "Vemavaram",
+      "Yerraguntlapadu"
+    ]
+  ],
+  "522549": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bethapudi",
+      "Bukkapuram",
+      "Chandavaram",
+      "Dondapadu",
+      "Ellamanda",
+      "Endugumpalem",
+      "Gorizavole",
+      "Gundalapadu",
+      "Guravayapalem",
+      "Jonnalagadda",
+      "Kanaparru",
+      "Kesanapalle",
+      "Merikapudi",
+      "Munagapadu",
+      "Pamidimarru",
+      "Ponugupadu",
+      "Sankurathripadu",
+      "Satuluru"
+    ]
+  ],
+  "522601": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Arundalpet (NSV)",
+      "N.S.C.Colony",
+      "Narasaraopet",
+      "Narasaraopet Bazar",
+      "Prakashnagar"
+    ]
+  ],
+  "522603": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Annavaram",
+      "Arvapalli",
+      "Chagallu",
+      "Dechavaram",
+      "Ikkurru",
+      "Kakani",
+      "Kandlagunta",
+      "Lingamguntla Agraharam",
+      "Mulakaluru",
+      "Palapadu",
+      "Pamidipadu Agraharam",
+      "Petlurivaripalem",
+      "Ravipadu",
+      "Reddipalem",
+      "Rupenagunta",
+      "Tungapadu",
+      "Turakapalem",
+      "Uppalapadu",
+      "Vipparlapalle"
+    ]
+  ],
+  "522611": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Appapuram",
+      "Gangannapalem",
+      "Gonepudi",
+      "Govindapuram",
+      "Irlapadu",
+      "Kammavaripalem",
+      "Kattubadivaripalem",
+      "Kavuru"
+    ]
+  ],
+  "522612": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Adigoppula",
+      "Atmakuru",
+      "Dharmavaram",
+      "Durgi",
+      "Jangamaheswarapadu",
+      "Kakirala",
+      "Kolagutla",
+      "Mutukuru",
+      "Narmalapadu",
+      "Obulesunipalle",
+      "Patlaveedu",
+      "Polepalle",
+      "Rajanagar",
+      "Syamarajapuram",
+      "Terala"
+    ]
+  ],
+  "522613": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bodilaveedu",
+      "Gottipalla",
+      "Gundalapadu",
+      "Kandlagunta",
+      "Kothapullareddipuram",
+      "Latchambhavi",
+      "Loyapalli",
+      "Sirigiripadu",
+      "Uppalapadu",
+      "Vajralapadu",
+      "Veldurthy"
+    ]
+  ],
+  "522614": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Ayyannapalem",
+      "Chinakodamagundla",
+      "Chintapalle",
+      "Gadevaripalle",
+      "Garikapadu",
+      "Gummanampadu",
+      "Jayanthi Ramapuram",
+      "Kachavaram",
+      "Karempudi",
+      "Marripalem",
+      "Mellavagu",
+      "Narasimhapuri",
+      "Pamidipadu",
+      "Pedakodamagundla",
+      "Petasannegandla",
+      "Reddypalem",
+      "Sankarapuram",
+      "Voppicherla"
+    ]
+  ],
+  "522615": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Cheemalamarri",
+      "Chejerla",
+      "Edwardpet",
+      "Gundlapalle",
+      "Inumetla",
+      "Karlakunta",
+      "Kothapalem",
+      "Kothapalle",
+      "Kunkalagunta",
+      "Machavaram",
+      "Narasingapadu",
+      "Nekarikallu",
+      "Santhagudipadu",
+      "Tripurapuram",
+      "Tsallagundla",
+      "Uppalapadu",
+      "Vipparla"
+    ]
+  ],
+  "522616": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Annavaram",
+      "Chilakaluripet",
+      "Chilakaluripet Bazar",
+      "Edavalli",
+      "Gottipadu",
+      "Komaravallipadu",
+      "Maddirala",
+      "Manukondavaripalem",
+      "Pasumarru",
+      "Pothavaram",
+      "Purushothapatnam",
+      "Subbaiah Thota",
+      "Uppalapadu"
+    ]
+  ],
+  "522617": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Alavala",
+      "Annavarappadu",
+      "Atchaiahpalem",
+      "Gogulapadu",
+      "Konakanchivaripalem",
+      "Ramireddipalem",
+      "Rompicherla",
+      "Turumella",
+      "Vadlamudivaripalem"
+    ]
+  ],
+  "522619": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Ganapavaram", "Sandepudi", "Turlapadu", "Veluru"]
+  ],
+  "522626": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Boppudi", "Gopalamvaripalem", "Murikipudi", "Rajapeta", "Tatapudi"]
+  ],
+  "522646": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Guntupalem",
+      "Irlapadu",
+      "Kanumarlapudi",
+      "Karumanchi",
+      "Kothaluru",
+      "Mathukumalli",
+      "Potluru",
+      "Sanampudi",
+      "Savalyapuram",
+      "Vayyakallu",
+      "Velpuru"
+    ]
+  ],
+  "522647": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Agnigundala",
+      "Andugula Kothapalem",
+      "Brahmanapalle",
+      "Chatragaddapadu",
+      "Cheekateegalapalem",
+      "Dondapadu",
+      "Jalalapalem",
+      "Jangalapalle",
+      "Kondramutla",
+      "Koppukonda",
+      "Kotcherla",
+      "Kothapet (VKD)",
+      "Nadigadda",
+      "Neelagangavaram",
+      "Nirmalanagar",
+      "NSP Colony",
+      "Sivapuram",
+      "Tellabadu",
+      "Thimmayapalem",
+      "Vinukonda",
+      "Vittamrajupalle",
+      "Vupparapalem"
+    ]
+  ],
+  "522649": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Chinakancherla",
+      "Enugupalem",
+      "Gokanakonda",
+      "Hassannayunipalem",
+      "Nagulavaram",
+      "Pedakancherla",
+      "Perumallapalli",
+      "Pitchikalapalem",
+      "Pittambanda"
+    ]
+  ],
+  "522657": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Gutlapalle",
+      "Kandrika",
+      "Kanumalacheruvu",
+      "Naidupalem",
+      "Perurupadu",
+      "Vaddemgunta",
+      "Vellatur"
+    ]
+  ],
+  "522658": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Angaluru",
+      "Bommarajupalle",
+      "Chittapuram",
+      "Gundepalle",
+      "Ipuru",
+      "Kondayapalem",
+      "Udjerla",
+      "Vanikunta"
+    ]
+  ],
+  "522659": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Ainavole",
+      "Cheruvukommupalem",
+      "Chintalacheruvu",
+      "Lingamukkapalle",
+      "Mukkellapadu",
+      "Murthuzapuram",
+      "Nagireddipalle",
+      "Pathazaddavaripalem",
+      "Peddavaram"
+    ]
+  ],
+  "522660": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Kambhampadu",
+      "Mulakaluru",
+      "Mupparajuvaripalem",
+      "Nuzendla",
+      "Pamidipadu",
+      "Pathakothapalem",
+      "Puvvada",
+      "Ramudipalem",
+      "Ravvavaram",
+      "Reddipalem",
+      "Talarlapalle",
+      "Vetrayuni Appapuram"
+    ]
+  ],
+  "522661": [
+    "Guntur",
+    "Andhra Pradesh",
+    ["Butchipapannapalem", "Inumella", "Muppalla (VKD)"]
+  ],
+  "522663": [
+    "Guntur",
+    "Andhra Pradesh",
+    [
+      "Bandlamottu",
+      "Domalagundam",
+      "Gandiganumala",
+      "Mugachintalapalem",
+      "Ravulapuram",
+      "Remidicherla"
+    ]
+  ],
+  "523001": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Addanki Gate",
+      "Dcp (O)",
+      "Gopala Nagar (O)",
+      "N.S.C Colony (O)",
+      "Ongole",
+      "Ongole Bazar",
+      "Prakasam Bhavan",
+      "Ramnagar (O)",
+      "Santhapeta (O)",
+      "Thurupupalem"
+    ]
+  ],
+  "523002": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Kurnool Road (O)", "Lawyer Pet (O)", "M.M.Donka (O)"]
+  ],
+  "523101": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ananandapuram",
+      "Kalikavaya",
+      "Kalikavayabitragunta",
+      "Kanumalla",
+      "Kondikandukur",
+      "M L Engg. College",
+      "Mahadevapuram",
+      "Nandanavanam",
+      "Oguru",
+      "Old Singarayakonda",
+      "Pakala",
+      "Palukur",
+      "Paluru",
+      "S.Konda",
+      "Sanampudi",
+      "Somarajupalli",
+      "Vikkirallapeta"
+    ]
+  ],
+  "523104": ["Prakasam", "Andhra Pradesh", ["Binginapalli", "Woollapalem"]],
+  "523105": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Kandukur", "Kandukur Cutchery", "Kandukur South"]
+  ],
+  "523108": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Bukkapuram",
+      "Chilamkur",
+      "Dubagunta",
+      "Guravajipet",
+      "Inimerla",
+      "Kattakindipalli",
+      "Naddimallapuram",
+      "Narramarella",
+      "Pamur",
+      "Pedarajupalem",
+      "Turupukodigundlapadu",
+      "Vaggampalli",
+      "Vangapadu",
+      "Venkatapuram"
+    ]
+  ],
+  "523109": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chavatapalem",
+      "Cherukur",
+      "Dubagunta",
+      "Edlurapadu",
+      "Ippagunta",
+      "Jillellamudi",
+      "Kovur Kandukur",
+      "Malepadu",
+      "Muppalla",
+      "Pandalapadu",
+      "Ponnalore",
+      "Ravulakollu",
+      "Singarabotlapalem",
+      "Timmapalem",
+      "Venkupalem"
+    ]
+  ],
+  "523110": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ayyavaripalli",
+      "Balijapalem",
+      "Botlagudur",
+      "Eastkattakindapalli",
+      "Guntupalli",
+      "Khambaladinne",
+      "Kodigumpala",
+      "Lakshminarasapuram",
+      "Mopadu",
+      "Raghunadhapuram",
+      "Tumativaripalem"
+    ]
+  ],
+  "523111": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chinnipadu",
+      "Gudevaripalem",
+      "Gudipadu",
+      "K.Agraharam",
+      "Murugummi",
+      "Neredupalli",
+      "Pa Padu",
+      "Talluru",
+      "Vemavaram",
+      "Vengalapuram",
+      "Venkateswarapuram"
+    ]
+  ],
+  "523112": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ambavaram Kothapalli",
+      "Anikalapalli",
+      "Arivemula",
+      "Ayyalurivaripalli",
+      "C.S.Puram",
+      "Chennapanayunipalli",
+      "Chintapadu",
+      "Darsiguntapeta",
+      "Kondaboinapalli",
+      "Kovilampadu",
+      "Mundlapadu",
+      "Musunurukothapalli",
+      "Nallamadugula",
+      "Uppalapadu",
+      "Votlabailu"
+    ]
+  ],
+  "523113": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Badevaripalem",
+      "Dappalampadu",
+      "Kalavalla",
+      "Kondamudusupalem",
+      "Machavaram",
+      "Naldalpur",
+      "Nekunampuram",
+      "Parikondapadu",
+      "Pedamopadu",
+      "Pokur",
+      "Sakhavaram",
+      "Singamanenipalli",
+      "V.R.Kota"
+    ]
+  ],
+  "523114": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Bodawada", "Linga Samudram", "Mogilicherla", "Rallapadu Project", "Timmareddipalem"]
+  ],
+  "523115": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Annaboinapalli",
+      "Chinalatrip",
+      "Chinapavani",
+      "Medarametlapalem",
+      "Mutyalapadu",
+      "Nayudupalem",
+      "Peda Pavani"
+    ]
+  ],
+  "523116": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ammapalem",
+      "Ayyavaripalli",
+      "Chundi",
+      "Kondasamudram",
+      "Polinenicheruvu",
+      "Polinenipalem",
+      "Sameeripalem",
+      "V V Palem"
+    ]
+  ],
+  "523117": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chintagumpalli",
+      "Kodandaramapuram",
+      "Marella",
+      "Marrikuntapalli",
+      "P.C.Palli",
+      "Pedairlapadu",
+      "Thalakondapadu",
+      "Vengalayapalli"
+    ]
+  ],
+  "523135": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Chinaganjam", "Pallepalem", "Rajubangarupalem"]
+  ],
+  "523155": ["Prakasam", "Andhra Pradesh", ["Bosenagar", "Chirala", "Santha Bazar"]],
+  "523156": ["Prakasam", "Andhra Pradesh", ["Mgc Market (C)"]],
+  "523157": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Burlavaripalem",
+      "Chirala Bazar",
+      "Kothapeta",
+      "Kurthula",
+      "Papayapalem",
+      "Perala",
+      "Prasad Nagar",
+      "Vadarevu"
+    ]
+  ],
+  "523165": ["Prakasam", "Andhra Pradesh", ["Gandhinagar", "Jandrapet", "Pathachirala"]],
+  "523166": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Gavinivaripalem", "Ipurupalem", "Thotavaripalem"]
+  ],
+  "523167": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Bhimavaram",
+      "Bodavada",
+      "Gangavaram",
+      "Hanumoji Palem",
+      "Inkollu",
+      "Koniki",
+      "Naidu Vari Palem",
+      "Pavulur"
+    ]
+  ],
+  "523168": ["Prakasam", "Andhra Pradesh", ["Karamchedu", "Kunkalamarru"]],
+  "523169": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Adusumalli",
+      "Budavada",
+      "Cherukuru",
+      "Chinanandipadu",
+      "Devarapalli",
+      "Gollapudiagraharam",
+      "Jagarlamudi",
+      "Kollavaripalem",
+      "Komaranenivaripalem",
+      "Munnagivaripalem",
+      "Nagulapalem",
+      "Nuthalapadu",
+      "Parchur",
+      "Pothukatla",
+      "Punuru",
+      "Ramanayyapalem",
+      "Upputuru",
+      "Veerannapalem",
+      "Yerramvaripalem"
+    ]
+  ],
+  "523170": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Audipudi", "Kesavarappadu", "Kodavalivaripalem", "Swarna", "Timidithapadu"]
+  ],
+  "523171": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["A.B.V.Palem", "Edubadu", "Garnepudi", "Inagallu", "Poluru", "Timmarajupalem"]
+  ],
+  "523180": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Ammanabrolu", "Chavatapalem", "Chervanuppalapadu", "Kanuparthi", "Raparala"]
+  ],
+  "523181": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Chinagumpalle", "Gonasapudu", "Kadavakuduru", "Maddirallamuppalla"]
+  ],
+  "523182": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Aluru", "Dasarajupalli", "Devarampadu", "Karavadi", "Panakalapalem", "Ulichi"]
+  ],
+  "523183": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Brahmananidamanuru",
+      "Chadalavada",
+      "Hanumapuram",
+      "Kandlagunta",
+      "N.G.Padu",
+      "Pothavaram",
+      "Prasangulapadu"
+    ]
+  ],
+  "523184": ["Prakasam", "Andhra Pradesh", ["Motupalli", "Pandillapalli"]],
+  "523185": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Jarbulavaripale", "Santharavur", "Timmasamudram"]
+  ],
+  "523186": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Duddukur", "Edumudi", "Pedaganjam", "Rachapudi", "Uppugundur"]
+  ],
+  "523187": ["Prakasam", "Andhra Pradesh", ["Desaipet", "Ravuri Pet", "Vetapalem"]],
+  "523190": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Daggubadu", "Dronadula", "Idupulapadu", "Nagandla", "Pusapadu", "Vankayalapadu"]
+  ],
+  "523201": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Addanki",
+      "Bommnampadu",
+      "Chakrayapalem",
+      "Kalavakur",
+      "Kasyapuram",
+      "Khambampadu",
+      "Kotikalapudi",
+      "Mailavaram",
+      "Makkenavaripalem",
+      "Marella",
+      "Nagulapadu",
+      "Nuzellpalli",
+      "Ramnagar (A)",
+      "Sunkaravaripalem",
+      "Thimmayapalem",
+      "Uppalapadu",
+      "Vemparala",
+      "Venkatapuram",
+      "Zammalamadaka"
+    ]
+  ],
+  "523211": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Annangi",
+      "Basavannapalem",
+      "Doddavarappadu",
+      "Gullapalli",
+      "Guravareddipalem",
+      "Inamanamelluru",
+      "Maddipadu",
+      "Nelaturu",
+      "Pedakothapalli",
+      "Rachavaripalem",
+      "Vellampalli"
+    ]
+  ],
+  "523212": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Alavalapadu",
+      "Anamanamuru",
+      "Bodduvaripalem",
+      "Bollavarappadu",
+      "Daivalaravuru",
+      "K.Thakkellapadu",
+      "Korisapadu",
+      "M.M.T. Road",
+      "Pitchikalagudipadu",
+      "Thammavaram",
+      "Thimmana Palem",
+      "Yerrapalem"
+    ]
+  ],
+  "523213": ["Prakasam", "Andhra Pradesh", ["Kopperapadu", "Paidipadu", "Ravinuthala"]],
+  "523214": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Arikatlavaripalem",
+      "Chandalur",
+      "J.Pangulur",
+      "Janakavaram",
+      "Kotapadu",
+      "Nuzellapalli"
+    ]
+  ],
+  "523223": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ballavaram",
+      "Gollaplli",
+      "Kotalapalli",
+      "Mogallur",
+      "Morapagunta",
+      "Nagireddipalli",
+      "Narasamambapuram",
+      "Pedagogulapalli"
+    ]
+  ],
+  "523224": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Gannavaram",
+      "Gokulam",
+      "Immadicheruvu",
+      "Jallapaem",
+      "Kanakanampadu",
+      "Panduvanagulavaram",
+      "Pulikuntla",
+      "Rallapalli",
+      "Ramagopalapuram",
+      "Vedullacheruvu",
+      "Veligandla"
+    ]
+  ],
+  "523225": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "B.Machavaram",
+      "Enikapadu",
+      "Gangavaram",
+      "Gummalampadu",
+      "Maddulur",
+      "Mainampadu",
+      "Mangamuru",
+      "Pernamitta",
+      "Pidathalagudipadu",
+      "Rudravaram",
+      "Santhanuthalapadu",
+      "Y.Laxmipuram",
+      "Yendluru"
+    ]
+  ],
+  "523226": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Bandlamudi",
+      "Bhusarapalli",
+      "Chilamkur",
+      "Chimakurty",
+      "Chinaravipadu",
+      "G.L.Puram",
+      "Gonugunta",
+      "Kunamnenivaripalem",
+      "Manchikalapadu",
+      "Pulikonda",
+      "R.L.Puram"
+    ]
+  ],
+  "523227": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chinmuppalapadu",
+      "Doddichintala",
+      "Edaravaripalli",
+      "H.M.Padu",
+      "Hazipuram",
+      "Kutagundla",
+      "Pedadasaripalli",
+      "Pedadasullapalli",
+      "Seetharampuram"
+    ]
+  ],
+  "523228": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Gudipatipalli",
+      "Kudumalaguntla",
+      "Mangampalli",
+      "Nallagandla",
+      "Nandanavanam",
+      "Narayapalli",
+      "P.G.Palli",
+      "Timmareddypalli",
+      "Ummanapalli",
+      "Valicherla"
+    ]
+  ],
+  "523230": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ballipalli",
+      "Botikarlapadu",
+      "Chakirala",
+      "Cheerladinne",
+      "Kancharlavaripalem",
+      "Kanigiri",
+      "Lingareddipalli",
+      "Markondapuram",
+      "Pathapadu",
+      "Raviguntapalli",
+      "Tummagunta"
+    ]
+  ],
+  "523240": ["Prakasam", "Andhra Pradesh", ["Podili"]],
+  "523241": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Igalapadu",
+      "Kaluzuvvalapadu",
+      "Konakana Metla",
+      "Mugachintala",
+      "Munagapadu",
+      "Nagarajukunta",
+      "Regadipalli",
+      "Siddavaram",
+      "Tuvvapadu",
+      "Vaddimadugu",
+      "Veligandla"
+    ]
+  ],
+  "523245": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Akkacheruvu",
+      "Baduguleru",
+      "Buchannapalem",
+      "Challagirigala",
+      "Chinarikatla",
+      "Dirisavancha",
+      "Irsalagundam",
+      "Kambalapadu",
+      "Madalavaripalem",
+      "Nandanamarella",
+      "Pedarikatla",
+      "Sudanagunta",
+      "Yadavalli",
+      "Zuvvaleru"
+    ]
+  ],
+  "523246": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Batchalakurapadu",
+      "Chinamanagundam",
+      "Gajulaplli",
+      "Garimenapenta",
+      "Gayamvaripalli",
+      "Gotlagattu",
+      "Katragunta",
+      "Mohammadapuram",
+      "Nagampalli",
+      "Naidupet",
+      "Pathapadu",
+      "Perareddipalli",
+      "Vemulapadu"
+    ]
+  ],
+  "523247": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chalivendram",
+      "Darsi",
+      "Devavaram",
+      "Gollapalli",
+      "Kothapalli",
+      "Kunchepalli",
+      "Nimmareddipalem",
+      "Pothavaram",
+      "Pulipadu",
+      "Raja,Mpalli",
+      "Ramachandrapuram",
+      "Ramulaveedu",
+      "Thurupuchavatapalem",
+      "Venkatachalampalli",
+      "Venkatapur"
+    ]
+  ],
+  "523252": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Bellamkondavaripalem",
+      "Botlapalem",
+      "East Veerayapalem",
+      "Pothakamur",
+      "Singanapalem",
+      "Thotavenganapalem"
+    ]
+  ],
+  "523253": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ankepalli",
+      "Annavaram",
+      "Bodavada",
+      "Boddikurapadu",
+      "Chimata",
+      "Devarapalem",
+      "Gundlasamudram",
+      "Kakarla",
+      "Kellampalli",
+      "Marripudi",
+      "Nippatlapadu",
+      "Sivarayunipeta",
+      "Talamalla",
+      "Tripurasundaripuram",
+      "Uppalapadu (P)",
+      "Vallayapalem",
+      "Veluru"
+    ]
+  ],
+  "523254": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Bommireddipalli",
+      "Chinairlapadu",
+      "Garlapeta",
+      "Kalagotla",
+      "Kothayeruvaripalli",
+      "Sankavaram"
+    ]
+  ],
+  "523260": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chimmiribanda",
+      "Chinakothapalli",
+      "Darsiagraharam",
+      "Dharmavaram",
+      "Komminenivaripalem",
+      "Konanki",
+      "Pedjangalapalli",
+      "Ramkur",
+      "Sankavarappadu",
+      "Valaparla"
+    ]
+  ],
+  "523261": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Baitamanjuluru",
+      "Bollapalli",
+      "Kolalapudi",
+      "Kondamanjulur",
+      "Kondamuru",
+      "Muppavaram",
+      "Reningavaram"
+    ]
+  ],
+  "523262": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chekurapadu",
+      "Lingamgunta",
+      "Maddiralapadu",
+      "Manduvavaripalem",
+      "Mukthinuthalapadu",
+      "Throvagunta",
+      "Yedugundlapadu"
+    ]
+  ],
+  "523263": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chandrapadu",
+      "Dhenuvakonda",
+      "Doddavaram",
+      "Ilapavuluru",
+      "Mallavaram",
+      "Nekunambadu",
+      "Pallamalli",
+      "Tellapadu"
+    ]
+  ],
+  "523264": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Eastgangavaram",
+      "Korrapativaripalem",
+      "Kunkupadu",
+      "Lakkavaram",
+      "Madhavaram",
+      "Mannepalli",
+      "Modepalli",
+      "Nagambotlavaripalem",
+      "Rajanagaram",
+      "Sivarampuram",
+      "Tallur",
+      "Turakapalem",
+      "Vittalapuram"
+    ]
+  ],
+  "523265": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Boppidivaripalem",
+      "Idara",
+      "Kellampalli",
+      "Mundlamur",
+      "Naidupalem",
+      "Pasupugallu",
+      "Pedavullagallu",
+      "Polavaram",
+      "Purimetla",
+      "Sankarapuram",
+      "Umamaheswarapuram",
+      "Vemula"
+    ]
+  ],
+  "523270": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Anakarlapudi",
+      "Dharmavarm",
+      "Goginenivari Palaem",
+      "Kattavarpalem",
+      "Kondepi",
+      "Kuchipudi",
+      "Mugachinala",
+      "Nennurapadu",
+      "Pedakandlagunta",
+      "Petlur",
+      "Polireddipalem",
+      "Ramayyapalem",
+      "Regalagaddapalem",
+      "Tatakulapalem",
+      "Zuvvigunta"
+    ]
+  ],
+  "523271": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ayyaparajupalem",
+      "Chirrikurapadu",
+      "Gongotireddipalem",
+      "Jallapalem",
+      "Janardhnapuram",
+      "Kamepalli",
+      "Kattugudipalem",
+      "N.N.Kandrika",
+      "Narasingole",
+      "Netivaripalem",
+      "Paidipadu",
+      "Patchava",
+      "Tangella",
+      "Uppaledinne",
+      "Verdhinenivaripalem"
+    ]
+  ],
+  "523272": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Kandulur",
+      "Karumanchi",
+      "Konizedu",
+      "Mallavarappadu",
+      "Marlapadu",
+      "Pellur",
+      "Savireddi Palem",
+      "Thurpu Naidu Palem",
+      "Vallur",
+      "Vengamukka Palem",
+      "Yerazerla"
+    ]
+  ],
+  "523273": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Muppavaram", "Peridepi", "Ponduru", "Vemulapadu"]
+  ],
+  "523274": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Alakurapadu",
+      "Ananthavaram",
+      "Chintalapalem",
+      "Devagudur",
+      "Jammulapalem",
+      "Jarugumalli",
+      "Jayavaram",
+      "Kakuturivaripalem",
+      "Tangutur",
+      "Tanguturu Bus Stand",
+      "Vaviletipadu",
+      "Velagapudi"
+    ]
+  ],
+  "523279": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chinavenkannapalem",
+      "Chodavaram",
+      "M.Nidamanur",
+      "Paletipadu",
+      "Tumadu",
+      "Uppalapadu (K)",
+      "Vennuru"
+    ]
+  ],
+  "523280": ["Prakasam", "Andhra Pradesh", ["Ethamukkala", "Madanur", "Rajupalem"]],
+  "523281": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ammavaripalem",
+      "Baddepudi",
+      "Chimidithapadu",
+      "Darakanipadu",
+      "Gudluru",
+      "Kothapeta",
+      "Potluru",
+      "Puretipalli"
+    ]
+  ],
+  "523286": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Alluru", "Koppole", "Kothapatnam", "Motumala", "Padarthi"]
+  ],
+  "523291": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Chevuru", "Mocherla", "Ramapatnam", "Ravuru", "Tettu"]
+  ],
+  "523292": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Atmakur",
+      "Bhimavaram",
+      "Chagallu",
+      "Chakicherla",
+      "K.Rajupalem",
+      "Karedu",
+      "Krishnapuram",
+      "Mannetikota",
+      "Ulavapadu",
+      "Veerepalli"
+    ]
+  ],
+  "523301": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ananthavaram",
+      "Ballikurva",
+      "Bobbepalli",
+      "Degaramudi",
+      "Guntupalli",
+      "Jonnatali",
+      "Konidena",
+      "Mallayapalem",
+      "Marturu",
+      "Nagarajupalli",
+      "Pedaambadipudi",
+      "Rajugaripalem",
+      "Rajupalem",
+      "Uppumagulur",
+      "Vemavaramagraharam",
+      "Vinjanampadu",
+      "Yanamadala",
+      "Yeddanapudi"
+    ]
+  ],
+  "523302": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Kamepalli",
+      "Kopparam",
+      "Kopperapalem",
+      "Minnekallu",
+      "Pathamagulur",
+      "Santhamagulur",
+      "Tangedumalli",
+      "Vellalacheruvu"
+    ]
+  ],
+  "523303": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chennupalli",
+      "Elchuru",
+      "Kommalapadu",
+      "Kopperapadu",
+      "Kukutlapalli",
+      "Kunduru",
+      "Makkenavaripalem",
+      "Muktheswaram",
+      "Paritalavaripalem",
+      "S.L. Gudipadu",
+      "Surepalli",
+      "Vaidena"
+    ]
+  ],
+  "523304": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Alavalapadu",
+      "Ats Palem",
+      "Bandiveli Gandla",
+      "Bodanampadu",
+      "Darsichandalur",
+      "Gangadonakonda",
+      "Kalluru",
+      "Kurichedu",
+      "Namasivayapuram",
+      "Peddavaram",
+      "Potlapadu",
+      "West Gangavaram",
+      "West Veerayapalem",
+      "Yerraobanapalem"
+    ]
+  ],
+  "523305": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Aravallipadu",
+      "Badapuram",
+      "Chandavaram",
+      "Donakonda R.S.",
+      "Donakonda Rly.Colony",
+      "Gangadevipalle",
+      "Gudipadu",
+      "Indlacheruvu",
+      "Lakshmipuram",
+      "Nallabothulavaripalem",
+      "Polepalle",
+      "Ramapuram",
+      "Rudrasamudram",
+      "Thummedalapadu",
+      "Vaddipadu",
+      "Vekatapuram"
+    ]
+  ],
+  "523315": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Anantavaram",
+      "Bodapadu",
+      "Gajjalakonda",
+      "Ganugapenta",
+      "Kalivelapalle",
+      "Kocherlakota",
+      "Mallampeta",
+      "Manginapudi",
+      "Pedda Yachavaram",
+      "Pothalapadu"
+    ]
+  ],
+  "523316": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Markapur", "Markapur Bazar", "Markapur East"]
+  ],
+  "523320": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "B.Cherlopalle",
+      "Chatlamada",
+      "Chatlamitta",
+      "Darimadugu",
+      "Devarajugattu",
+      "Gobbur",
+      "Idupur",
+      "Maddalakatta",
+      "Peddaraveedu",
+      "Pregallapadu",
+      "Sgit",
+      "Thangirallapalle",
+      "Tokapalle"
+    ]
+  ],
+  "523326": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Annasamudram",
+      "G.Ummadivaram",
+      "Ganapavaram",
+      "Isukatripuravaram",
+      "Kankanalapalle",
+      "Medepi",
+      "Miriyampalle",
+      "Mudivemula",
+      "Rajupalem",
+      "Ramasamudram",
+      "Tripurantakam"
+    ]
+  ],
+  "523327": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Block Area",
+      "Boyalapalle",
+      "Chapalamadugu",
+      "Endrapalle",
+      "Erragondapalem",
+      "Gangapalem",
+      "Ganjivaripalle",
+      "Gollavidipi",
+      "Gurijepalle",
+      "Kavalakuntla",
+      "Komarole",
+      "Mallapalem",
+      "Muraripalle",
+      "Naidupalem",
+      "Narasayapalem",
+      "Peddakolukula",
+      "Veerabhadrapuram",
+      "Venkatadripalem"
+    ]
+  ],
+  "523328": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Akkapalem",
+      "Errabalem",
+      "Gangavaram",
+      "Manepalle",
+      "Marrivemula",
+      "Mutukula",
+      "Pullala Cheruvu",
+      "R.Ummadivaram",
+      "Sathakodu",
+      "Venkatareddypalle"
+    ]
+  ],
+  "523329": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Chintakunta",
+      "Gottipadia",
+      "Jammanapalle",
+      "Kalanuthala",
+      "Kondepalle",
+      "Nikarampalle",
+      "Puchakayalapalle",
+      "Ramachandrapuram",
+      "Sunkesula",
+      "Thippayapalem",
+      "Vemulakota"
+    ]
+  ],
+  "523330": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ammanigudipadu",
+      "Cumbumpadu",
+      "Dupadu",
+      "Gangupalle",
+      "Gollapalle",
+      "Gurrapusala",
+      "Hasanapuram",
+      "Lellapalle",
+      "Nadigadda",
+      "Obulakkapalli",
+      "Vadampalli",
+      "Vellampalle",
+      "Viswanadhapuram"
+    ]
+  ],
+  "523331": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ayanamukkala",
+      "Chinna Dornala",
+      "Chinnagudipadu",
+      "Chintala",
+      "Eguvacherlopalle",
+      "Jammidornala",
+      "Katakanipalle",
+      "Nallaguntla",
+      "Pedda Bommalapuram",
+      "Pedda Dornala",
+      "Ramachandrakota",
+      "Sanikavaram",
+      "Thammadapalle",
+      "Yadavalli"
+    ]
+  ],
+  "523332": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Bhupathipalle",
+      "Bondalapadu",
+      "Gollapalle",
+      "Malyavanthunipadu",
+      "Meerjampeta",
+      "Seethanagulavaram",
+      "Tadivaripalle",
+      "Tarlupadu",
+      "Tarlupadumission Compound"
+    ]
+  ],
+  "523333": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Basireddypalle",
+      "Bommilingam",
+      "Chinnacumbum",
+      "Chinnayachavaram",
+      "Cumbum",
+      "Cumbum East",
+      "Gannepalle",
+      "Hazarathgudem",
+      "J.Krishnapuram",
+      "Jangamguntla",
+      "Kakarla",
+      "Kandulapuram",
+      "Magatur",
+      "Maratithanda",
+      "Nagulavaram",
+      "Rangapuram",
+      "Velagalapaya"
+    ]
+  ],
+  "523334": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Besthavari Peta",
+      "Darga",
+      "Mokshagundam",
+      "Nekunambad",
+      "Pandillapalle",
+      "Pusalapadu"
+    ]
+  ],
+  "523335": [
+    "Prakasam",
+    "Andhra Pradesh",
+    ["Ardhaveedu", "Atchampeta", "Bollupalle", "Narayanapalle", "Papinenipalle"]
+  ],
+  "523336": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ayyavaripalle",
+      "Bogolu",
+      "Donakonda",
+      "Lingapuram",
+      "Maddalamadaka",
+      "Mittameedipalle",
+      "Mohiddin Puram",
+      "Veerabhadrapuram",
+      "Yerrabalem"
+    ]
+  ],
+  "523346": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Basinepalle",
+      "Galizerugulla",
+      "Janapalacheruvu",
+      "Khajipuram",
+      "Konapalle",
+      "Kothapeta",
+      "M.Pullacheruvu",
+      "P.Venkatapuram",
+      "Pitikayagulla",
+      "Singarapalle"
+    ]
+  ],
+  "523356": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Akkapalli",
+      "Ankireddypalle",
+      "Daddavada",
+      "Edavalli",
+      "Gudimetta",
+      "Oddualvagupalle",
+      "Satyavolu",
+      "Thaticherla"
+    ]
+  ],
+  "523357": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Ambavaram",
+      "Brahmanapalle",
+      "Diguvametta",
+      "Giddalur",
+      "Giddalur Bazar",
+      "Giddalur West",
+      "Kongalaveedu",
+      "Krishnam Setty Palle",
+      "Narava",
+      "Podilikondapalle",
+      "Thimmapuram",
+      "Yellupalle"
+    ]
+  ],
+  "523367": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Burjupalle",
+      "Gadikota",
+      "Kommanuru",
+      "Mundlapadu",
+      "Obulapuram",
+      "Sanjeevaraopeta",
+      "Vuyyalawada"
+    ]
+  ],
+  "523368": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Anumalapalle",
+      "Anumalaveedu",
+      "Gowthavaram",
+      "J.Pullalacheruvu",
+      "Kalavapalle",
+      "Palakaveedu",
+      "Racherla",
+      "Somidevipalle"
+    ]
+  ],
+  "523369": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Idamakallu",
+      "Makthapuram",
+      "Nallaguntla",
+      "Narashimapalle",
+      "Rajupalem",
+      "Thamballapalle"
+    ]
+  ],
+  "523370": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Aurangabad",
+      "Chinnaobanayunipalle",
+      "Kalugotla",
+      "Lanjakota",
+      "Lingojipalle",
+      "Peddaobanayunipalle",
+      "Ravipadu",
+      "Salakalaveedu"
+    ]
+  ],
+  "523371": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Kethagudipi",
+      "Mangalikunta",
+      "Nagellamudipi",
+      "Nasarsahebpalle",
+      "Rayavaram",
+      "Thummalacheruvu"
+    ]
+  ],
+  "523372": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Akaveedu",
+      "Akkapalle",
+      "Araveetikota",
+      "Chollaveedu",
+      "Madarpalle",
+      "Narasireddypalle",
+      "Peddanallakalva",
+      "Thurimella"
+    ]
+  ],
+  "523373": [
+    "Prakasam",
+    "Andhra Pradesh",
+    [
+      "Allinagaram",
+      "Badinenipalle",
+      "Chintalapalle",
+      "Gopalunipalle",
+      "Hanumantharayunipalli",
+      "Komarole",
+      "Pamurupalle",
+      "Posupalle",
+      "Reddi Cherla",
+      "Yerramsettyvaripalle"
+    ]
+  ],
+  "524001": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    ["Nellore", "Nellore Bazar", "Pogathota", "Ranganayakulapeta", "Trunk Road"]
+  ],
+  "524002": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "A.C.Nagar",
+      "Allipuram",
+      "Balajinagar",
+      "Chinacherukuru",
+      "Chintopu",
+      "Kodur",
+      "Kotha Kodur",
+      "Kothapalem",
+      "Lakshmipuram",
+      "Mahalakshmipuram",
+      "Narukuru",
+      "Navalakh Gardens",
+      "Nellimitta Kandriga",
+      "Ntr Nagar",
+      "Potlapudi",
+      "South Amaluru",
+      "Stonehousepet",
+      "Venkannapalem"
+    ]
+  ],
+  "524003": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Bhaktavatsalanagar",
+      "Chintareddypalem",
+      "Dargamitta",
+      "Dcbc",
+      "Fathekhanpeta",
+      "Gundlapalem",
+      "Kallurpalli",
+      "Kanuparthipadu",
+      "Kondayapalem",
+      "Mulapeta",
+      "Nellore Ceremic Factory",
+      "P.S.R Nagar",
+      "Ramalingapuram"
+    ]
+  ],
+  "524004": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Andhrakesari Nagar",
+      "Buja Buja Nellore",
+      "Devarapalem",
+      "Kommarapudi",
+      "Kondlapudi",
+      "Kottur",
+      "Mulumudi",
+      "Pottepalem",
+      "South Mopur",
+      "Vedayapalem"
+    ]
+  ],
+  "524005": ["SPSR Nellore", "Andhra Pradesh", ["Polytechnic"]],
+  "524101": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    ["Gudur", "Gudur Bazar", "Gudur East", "Malavyanagar"]
+  ],
+  "524121": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Akkampeta",
+      "Damanellore",
+      "Dos Colony",
+      "Kadalur",
+      "Karijatha",
+      "Mambathi",
+      "Manganellore",
+      "Mannarpolur (Urban Area)",
+      "Pulicotnagar",
+      "Sullurpeta",
+      "Uchur",
+      "Uggumudi",
+      "Vatambedu",
+      "Velagalaponnur"
+    ]
+  ],
+  "524123": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Anepudi",
+      "Doravarisatram",
+      "Kallur",
+      "Kattuvapalli",
+      "Kotapolur",
+      "Minamanamudi",
+      "Mizur",
+      "Polireddipalem",
+      "Sreedhanamalli",
+      "Togaramudi",
+      "Venumbaka"
+    ]
+  ],
+  "524124": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    ["Pernadu", "Phase II", "Sriharikota Range", "Venadu"]
+  ],
+  "524126": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Annamedu",
+      "Beripeta",
+      "Chavali",
+      "Juvvalapalem",
+      "Kanururajupalem",
+      "Kapulur",
+      "Muchalagunta",
+      "Nayudupeta",
+      "Nelaballi",
+      "Pudur",
+      "Rajupalem",
+      "Talvaipadu",
+      "Thummur",
+      "Vinnamala",
+      "Yakasiri"
+    ]
+  ],
+  "524127": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Aravapalem",
+      "Aruru",
+      "Chillamur",
+      "Chittamur",
+      "Eswrawaka",
+      "Gottirprolu",
+      "Kogili",
+      "Molakalapudi",
+      "Uppalamarthy",
+      "Yellasiri"
+    ]
+  ],
+  "524129": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Akkagaripeta",
+      "Chembedu",
+      "Chintapudi",
+      "Jeelapatur",
+      "Pellakur",
+      "Punabaka",
+      "Sirasanambedu"
+    ]
+  ],
+  "524131": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Alimili",
+      "Gottikadu",
+      "Hastakaveri",
+      "Jayampu",
+      "Kamakur",
+      "Kandra",
+      "Kondagunta",
+      "Kundakur",
+      "Kundam",
+      "Mannur",
+      "P.R.Palem",
+      "Vajjavaripalem",
+      "Vedicherla",
+      "Vendodu"
+    ]
+  ],
+  "524132": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Althurupadu",
+      "Amuduru",
+      "Chilakampadu",
+      "Chillamanur",
+      "Chinnapareddypalli",
+      "Chintagunta",
+      "Lalapeta",
+      "Manulalpeta",
+      "Palemkota",
+      "Paravolu",
+      "Periavaram",
+      "Petlur",
+      "Telugugangaproject",
+      "Vallivedu",
+      "Venkatagiri Bazar",
+      "Venkatagiri Town",
+      "Yathalur"
+    ]
+  ],
+  "524134": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chapalapalli",
+      "Dakkili",
+      "Lingasamudram",
+      "Madhavayapalem",
+      "Mopur",
+      "Palugodu",
+      "Velampalli",
+      "Velikallu",
+      "Vembuluru"
+    ]
+  ],
+  "524137": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Cherlopalem",
+      "Damaramadugu",
+      "Gangavaram",
+      "Gummalladibba",
+      "Inamadugu",
+      "Kovur",
+      "Kovur Cutchery",
+      "Leguntapadu",
+      "Mudivarthi",
+      "Padugupadu",
+      "Patur",
+      "Pothireddypalem",
+      "Vegur"
+    ]
+  ],
+  "524142": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Akkarajuvari Kandriga",
+      "Bitragunta",
+      "Chemadala",
+      "Gowravaram",
+      "Kovurpalli",
+      "Mungamuru",
+      "Nagulavaram",
+      "Patha Bitragunta",
+      "Talluru",
+      "Zakkepalligudur"
+    ]
+  ],
+  "524152": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Allimadugu",
+      "Damavaram",
+      "Kapparallatippa",
+      "Kothapalli Kovurgunta",
+      "Ulavapalle",
+      "Venkatesupalem",
+      "Zuvvaladinne"
+    ]
+  ],
+  "524201": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    ["Janathapeta", "Kavali", "Kavali Bazar", "Kavali Co Op Colony", "Musunur"]
+  ],
+  "524203": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Alliguntapalem",
+      "Anemadugu",
+      "Annagaripalem",
+      "Chennayapalem",
+      "Lingamgunta",
+      "Moddurupadu",
+      "Mondidinnepalem",
+      "Rudrakota",
+      "Tallapalem",
+      "Thummalapenta"
+    ]
+  ],
+  "524221": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chakalakonda",
+      "Ganeswarapuram",
+      "Garimenapenta",
+      "Isaka Damerla",
+      "Kothapeta",
+      "Narasimhapuram",
+      "Thurupurompi Dodla",
+      "Vengannapalem"
+    ]
+  ],
+  "524222": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Appasamudram",
+      "Dasaripalli",
+      "Duthalur",
+      "Lakshmipuram",
+      "Mandalanaidupalli",
+      "Narrawada",
+      "Rachavaripalli",
+      "Somalaregada"
+    ]
+  ],
+  "524223": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Annavaram",
+      "Brahmanakraka",
+      "Brahmanakraka Agraharam",
+      "Budamgunta",
+      "Chalamcherla",
+      "Chinnakraka",
+      "Choudaripalem",
+      "Gattupalli",
+      "Gopannapalem Kandriga",
+      "Jaladanki",
+      "Jammalapalem",
+      "Kammavaripalem",
+      "Kothapalli",
+      "Lingaraju Agraharam",
+      "Rajuvari Chintalapalem",
+      "Siripuram",
+      "Somavarappadu",
+      "Thimmasamudram"
+    ]
+  ],
+  "524224": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chinna Annalur",
+      "Jirravaripalem",
+      "Kaligiri",
+      "Nagasamudram",
+      "Polampadu",
+      "Rajupalem",
+      "Veerannakollu",
+      "Vepanapi"
+    ]
+  ],
+  "524225": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Ananthapuram",
+      "Gudladona",
+      "Krakatur",
+      "Kummarakondur",
+      "Lakshmipuram",
+      "Parikota",
+      "Peddakondur",
+      "Siddanakonduru",
+      "Turupur"
+    ]
+  ],
+  "524226": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Balayapalli",
+      "Basinenipalli",
+      "Gaddamvaripalli",
+      "Krishnampalli",
+      "Kurrapalli",
+      "Masaipeta",
+      "Pullayapalli",
+      "Udayagiri"
+    ]
+  ],
+  "524227": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chinna Kaniyampadu",
+      "Dakkanuru",
+      "Damncherla",
+      "Jaladevi",
+      "Kakolluvaripalli",
+      "Thimmareddypalli",
+      "Thurupuchennampalli",
+      "Varikuntapadu",
+      "Vempadu"
+    ]
+  ],
+  "524228": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Bhairavaram",
+      "Chandrapadia",
+      "Dubagunta",
+      "Gangireddypalem",
+      "Gottigundala",
+      "Gundemadakala",
+      "Katepalli",
+      "Nallagonda",
+      "Nandigunta",
+      "Tellapadu",
+      "Utukur",
+      "Vinjamur",
+      "Yerikollu"
+    ]
+  ],
+  "524230": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Bijjampalle",
+      "Brahmanapalli",
+      "Chabolu",
+      "Chinnamachanur",
+      "Gangulavaricheruvupalli",
+      "Kampasamudram",
+      "Krishnapuram",
+      "Nandipadu",
+      "Timmanaidupeta",
+      "Timmayapalem",
+      "Venkatampeta",
+      "Yepilagunta"
+    ]
+  ],
+  "524234": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Gudipadu",
+      "Gumparlapadu",
+      "Kakarlapadu",
+      "Kammavaripalem",
+      "Kavali Mustapuram",
+      "Kavali Yadavalli",
+      "Pathanapuram",
+      "Velpulagunta",
+      "Zammavaram"
+    ]
+  ],
+  "524236": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Arlapadia",
+      "Gandipalem",
+      "Gudinarava",
+      "Guvvadi",
+      "Kondayapalem",
+      "Papannagaripalli",
+      "Peddireddypalli",
+      "Thotlacheruvupalli",
+      "Thurpuboyamadugula",
+      "Tsoudepalli",
+      "Virur"
+    ]
+  ],
+  "524239": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chintaladevi",
+      "Chodavaram",
+      "Dubagunta",
+      "Ganugapenta",
+      "Kommi",
+      "Kondapuram",
+      "Kunkuvaripalem",
+      "Mudimurthypuram",
+      "Nekunampeta",
+      "Ramavarapadu SC Colony",
+      "Ramavarappadu",
+      "Saipeta",
+      "Thoorpupalem",
+      "Thurupu Yerraballi",
+      "Veligandla"
+    ]
+  ],
+  "524240": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Bodagudipadu",
+      "Chennuru",
+      "Chowtaputtedu",
+      "Dagadarthi",
+      "Katrayapadu",
+      "Lingalapadu",
+      "Manubolupadu",
+      "Rangasamudram",
+      "Tadakalur",
+      "Vellupodu"
+    ]
+  ],
+  "524300": ["SPSR Nellore", "Andhra Pradesh", ["Somasila Hill Colony"]],
+  "524302": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Anantasagaram",
+      "Bedusupalli",
+      "Bommavaram",
+      "Chaparallapalli",
+      "Chilakalamarri",
+      "Chunchuluru",
+      "Gowravaram",
+      "Gudigunta",
+      "Kamireddypadu",
+      "Kethugunta",
+      "Lingamgunta",
+      "Manchalapalli",
+      "Mangupalli",
+      "Padamatikhambampadu",
+      "Padamatinaidupalli",
+      "Pathapalli",
+      "Ponguru",
+      "Somasila",
+      "Upplapadu",
+      "Varikuntapadu"
+    ]
+  ],
+  "524303": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Amani Chiruvella",
+      "Bandarupalli",
+      "Devarayapalli",
+      "Kothapalli",
+      "Pathadevarayapalli",
+      "Revur",
+      "Vengampalli"
+    ]
+  ],
+  "524304": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Anumasamudram",
+      "Anumasamudrampeta",
+      "Chavatabheemavaram",
+      "Pandipadu",
+      "Panugodu",
+      "Peddabbipuram",
+      "Tellapadu"
+    ]
+  ],
+  "524305": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Buchireddypalem",
+      "Chellayapalem",
+      "Isakapalem",
+      "Jonnavada",
+      "Kalayakagollu",
+      "Kattubadipalem",
+      "Minagallu",
+      "Penuballi",
+      "Rebala",
+      "Reddypalem",
+      "Vavveru"
+    ]
+  ],
+  "524306": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Annareddypalem",
+      "Duvvur",
+      "Makthapuram",
+      "Marripadu",
+      "Padamatipalem",
+      "Panchedu",
+      "Siddipuram",
+      "Vangallu"
+    ]
+  ],
+  "524307": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Aravedu",
+      "Basavarajupalem",
+      "Botikerlapadu",
+      "Boyila Chiruvella",
+      "Dharmarao Cheruvupalli",
+      "Gandlavedu",
+      "Karatampadu",
+      "Kona Samudram",
+      "Mahimalur",
+      "Nandavaram",
+      "Narampeta",
+      "Peda Kandla",
+      "Ramanaidupalli",
+      "Ramaswamypalli",
+      "Vennavada"
+    ]
+  ],
+  "524308": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chiramana",
+      "Dundigam",
+      "Hasanapuram",
+      "Jangaladoruvu",
+      "Kolagatla",
+      "Kondameedikondur",
+      "Korimerla",
+      "Kuppurupadu",
+      "Madarabadara",
+      "Peramana",
+      "Sangam",
+      "Srikolanu",
+      "Tarunavoya",
+      "Vasili"
+    ]
+  ],
+  "524309": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Bathulapalli",
+      "Gollakandukur",
+      "Kandamur",
+      "Mamudur",
+      "Mohammadapuram",
+      "Nedurupalli",
+      "Pathapadu",
+      "Pelleru",
+      "Surayapalem",
+      "Tatiparthi",
+      "Vellanti",
+      "Virur"
+    ]
+  ],
+  "524310": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Ayyavaripalem",
+      "Bodasi Idayapalli",
+      "Chinna Nagampalli",
+      "Jayapuram",
+      "Maramreddipalli",
+      "Narayanappapeta",
+      "Nemalladinna",
+      "Seetaramapuram",
+      "Singareddipalli"
+    ]
+  ],
+  "524311": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Eduru",
+      "Macherlavaripalem",
+      "Mandapam",
+      "Papireddypalem",
+      "Pedur",
+      "Thotapalli",
+      "Thotapalliguduru",
+      "Varakavipadu",
+      "Varigonda"
+    ]
+  ],
+  "524312": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Allampadu",
+      "Bheemavaram",
+      "Chilakapadu",
+      "Irlapadu",
+      "Khaderpur",
+      "Marripadu",
+      "Pegallapadu",
+      "Tikkavaram"
+    ]
+  ],
+  "524313": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Gangapatnam",
+      "Koruturu",
+      "Kudithipalem",
+      "Mudivarthipalem",
+      "Mypadu",
+      "Narasapuram",
+      "Nidi Musali",
+      "Ramudupalem",
+      "Somarajupalli"
+    ]
+  ],
+  "524314": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Gudipallipadu",
+      "Indukurpeta",
+      "Jagdevipeta",
+      "Kodurupadu",
+      "Komarika",
+      "Kothur Bit II",
+      "Lebur",
+      "Narayanareddypeta",
+      "Pallipadu",
+      "Punnur"
+    ]
+  ],
+  "524315": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Allur",
+      "Batrakagallu",
+      "Chennarayunipalem",
+      "Gogulapalli",
+      "Indupur",
+      "Iskapalli",
+      "North Amaluru",
+      "North Mopur",
+      "Purini",
+      "Singapeta",
+      "Talamanchi",
+      "Taticherlapalem",
+      "Velicherla"
+    ]
+  ],
+  "524316": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chowkacherla",
+      "Damagunta",
+      "Gundlammapalem",
+      "Kodavaluru",
+      "Padmanabhasatram",
+      "Venkanapuram"
+    ]
+  ],
+  "524317": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Elamanchipadu",
+      "Gandavaram",
+      "Kothavangallu",
+      "Peddaputtedu",
+      "Turimerla",
+      "Uppalapadu"
+    ]
+  ],
+  "524318": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Alaganipadu",
+      "Annareddypalem",
+      "Dampur",
+      "Parlapalli",
+      "Ponnapudipeddapalem",
+      "Ramatheertham",
+      "Thummagunta",
+      "Utukur",
+      "Varini",
+      "Vavilla",
+      "Vidavalur"
+    ]
+  ],
+  "524319": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    ["Bodduvaripalem", "Kammapalem", "Naidupalem", "Peyyalapalem", "Racherlapadu"]
+  ],
+  "524320": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chemudugunta",
+      "Chowtapalem",
+      "Dontali",
+      "Guruvindapudi",
+      "Kakutur",
+      "Kanupuru",
+      "Kasumur",
+      "Palicherlapadu",
+      "Tikkavarapadu",
+      "Venkatachalasatram"
+    ]
+  ],
+  "524321": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Anikepalli",
+      "Edagali",
+      "Golagamudi",
+      "Idimepalli",
+      "Josephpet",
+      "Pudiparthi",
+      "Survepalli"
+    ]
+  ],
+  "524322": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Apparaopalem",
+      "Atmakur (NL)",
+      "Battepadu",
+      "Cherloyadavalli",
+      "Depur",
+      "Murugalla",
+      "Nagulapadu",
+      "Nuvvurupadu",
+      "Rajavolu",
+      "Venkataraopalli"
+    ]
+  ],
+  "524323": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Doruvulapalem",
+      "Gudluruvaripalem",
+      "Ipuru",
+      "Iskapalem",
+      "Nidiguntapalem",
+      "Pantapalem",
+      "Tatipartipalem",
+      "Tirumalammapalem"
+    ]
+  ],
+  "524324": ["SPSR Nellore", "Andhra Pradesh", ["Vikramasimhapuri University"]],
+  "524341": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chejerla",
+      "Chejerla Kandriga",
+      "Chinnagopavaram",
+      "Chittalur",
+      "Kotitheertham",
+      "Madapalli",
+      "Paderu",
+      "Perumallapadu",
+      "Thurpu Kambampadu",
+      "Ulavapalli",
+      "Vavileru"
+    ]
+  ],
+  "524342": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    ["Adurupalli", "Dachur", "Kollapanayunipalli"]
+  ],
+  "524343": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Brahmanapalli",
+      "Chintalapalem",
+      "Chintalatmakur",
+      "Chipinapi",
+      "Kakivoya",
+      "Kaluvoya",
+      "Kanupurpalli",
+      "Kullur",
+      "Nagulavellatur",
+      "Nookanapalli",
+      "Telugurayapuram",
+      "Tirumalapadu",
+      "Topugunta",
+      "Virubhotlapalli"
+    ]
+  ],
+  "524344": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Damayapalem",
+      "Gopalapuram",
+      "Krishnapatnam",
+      "Muthukur",
+      "Narikellapalli",
+      "Vallur"
+    ]
+  ],
+  "524345": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Althurthi",
+      "Amancherla",
+      "Ammavaripalem",
+      "Biradavolu",
+      "Chatagotla",
+      "Chittepalli",
+      "Kanuparthi",
+      "Marupur",
+      "Mogallur",
+      "Navur",
+      "Podalakur",
+      "Toderu",
+      "Vavintaparthi",
+      "Venkatapuram",
+      "Yetur"
+    ]
+  ],
+  "524346": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Brahmadevam",
+      "Kakupalli",
+      "Kalvelapalem",
+      "Madiraja Guduru",
+      "Mamidipudi",
+      "Penubarthi",
+      "Pidathapoluru",
+      "Pottempadu",
+      "Pynapuram"
+    ]
+  ],
+  "524347": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    ["Ananthapuram", "AP Genco Nelatur", "Nelltur"]
+  ],
+  "524366": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Maneguntapadu",
+      "Mikkilimpeta",
+      "Northrajupalem",
+      "Ramannapalem",
+      "Ramapuram",
+      "Tatakaladinne",
+      "Yellayapalem"
+    ]
+  ],
+  "524401": ["SPSR Nellore", "Andhra Pradesh", ["Irakam", "Karur", "Ramapuram", "Tada"]],
+  "524402": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Armenipadu",
+      "Bhatlakanupur",
+      "Chilamanchenu",
+      "Gunupadu",
+      "Gurramkonda",
+      "Karaballavolu",
+      "Kurugonda",
+      "Peddapariya",
+      "Sagutur",
+      "Vojili",
+      "Vojilirajupalem"
+    ]
+  ],
+  "524403": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Buradagalikothapalem",
+      "Chinnathota",
+      "Dugarajapatnam",
+      "Karikadu",
+      "Mallam",
+      "Mulapadava",
+      "Nidigurthi",
+      "Raviguntapalem",
+      "Thirumur",
+      "Vallamedu",
+      "Yellore"
+    ]
+  ],
+  "524404": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Ammapalem",
+      "Balayapalli",
+      "Bangarupeta",
+      "Kadagunta",
+      "Kayyur",
+      "Matumadugu",
+      "Nadimpalli",
+      "Nidigallu",
+      "Pigilam",
+      "Yachavaram",
+      "Zangalapalli"
+    ]
+  ],
+  "524405": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Akkampeta",
+      "Baddevolu",
+      "Bandepalli",
+      "Cherlopalli",
+      "Cherukumudi",
+      "Kattuvapalli",
+      "Kolanukuduru",
+      "Kommalapudi",
+      "Kuricherlapadu",
+      "Madamanur",
+      "Manubolu",
+      "Pidur",
+      "Vadlapudi",
+      "Veerampalli",
+      "Venkannapalem"
+    ]
+  ],
+  "524406": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Chennur",
+      "Kandali",
+      "Kommaneturu",
+      "Nellatur",
+      "Nindali",
+      "Thippavarappadu",
+      "Vindur"
+    ]
+  ],
+  "524407": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Ananthamadugu",
+      "Chaganam",
+      "Chikavolu",
+      "Daggavolu",
+      "Gulimcherla",
+      "Jogipalli",
+      "Lingasamudram",
+      "Marlapudi",
+      "Palur",
+      "Perumallapadu",
+      "Pokkandala",
+      "Pothegunta",
+      "Sydapuram",
+      "Thoorpupundla",
+      "Utukur",
+      "Vemulachedu"
+    ]
+  ],
+  "524408": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Cheropalli",
+      "Gilakapadu",
+      "Kandaleru Dam",
+      "Maddurupalli",
+      "Nawabpeta",
+      "Rapur",
+      "Sanayapalem",
+      "Siddavaram",
+      "Tanamcherla",
+      "Vepinapi"
+    ]
+  ],
+  "524409": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Degapudi",
+      "Devaravemuru",
+      "Duggunta",
+      "Griddalur",
+      "Inukurthi",
+      "Kalichedu",
+      "Mittatmakur",
+      "Talupur",
+      "Turimerla"
+    ]
+  ],
+  "524410": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    ["Ayyavaripalem", "Budanam", "Chittedu", "Kadivedu", "Kesavaram", "Vodur"]
+  ],
+  "524411": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Kokkupadu",
+      "Kota (NL)",
+      "Kothapatnam",
+      "Molaganur",
+      "Pedavanjivaka",
+      "Siddavaram",
+      "Zarugumalli"
+    ]
+  ],
+  "524412": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Ballavolu",
+      "Chillakur",
+      "Chintavaram",
+      "Momidi",
+      "Palicherlavaripalem",
+      "Tamminapatnam",
+      "Tikkavaram",
+      "Tippaguntapalem",
+      "Udathavaripalem",
+      "Varagali",
+      "Yerur"
+    ]
+  ],
+  "524413": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Gudali",
+      "Kothapalem",
+      "Mettu",
+      "Tinnelapudi",
+      "Vallipedu",
+      "Vidyanagar",
+      "Vunuguntapalem"
+    ]
+  ],
+  "524414": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Bojjanapalli",
+      "Gonupalli",
+      "Gundavolu",
+      "Penubarthi",
+      "Ramakur",
+      "Sydadupalli",
+      "Tegacherla",
+      "Thumaya",
+      "Yepur"
+    ]
+  ],
+  "524415": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Balireddypalem",
+      "Kallur",
+      "Kasipuram",
+      "Muttembaka",
+      "Nellipudi",
+      "Vakadu",
+      "Valamedu"
+    ]
+  ],
+  "524421": [
+    "SPSR Nellore",
+    "Andhra Pradesh",
+    [
+      "Athivaram",
+      "Bheemavaram",
+      "Bhyravaram",
+      "Chigurupadu",
+      "Graddagunta",
+      "Kotambedu",
+      "Menakur",
+      "Palachur",
+      "Perimidi",
+      "Punnepalli",
+      "Thimmajikandriga"
+    ]
+  ]
+}

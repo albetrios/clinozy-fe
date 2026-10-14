@@ -41,8 +41,11 @@ export interface BranchFormValues {
   defaults: Record<BranchDefaultRole, string | null>;
 }
 
-/** The branch drawer's three steps (`users.md:281–288`), for every viewport. */
-export type BranchDrawerStepId = 'place' | 'contact' | 'people';
+/**
+ * The branch drawer's steps (`users.md:281–288`), for every viewport: three, and on an existing
+ * branch a fourth, "Places & days" (D23).
+ */
+export type BranchDrawerStepId = 'place' | 'contact' | 'people' | 'places';
 
 /** The Colour field's swatches, in the design's order (`users.md:180`). */
 export const BRANCH_TONES = [

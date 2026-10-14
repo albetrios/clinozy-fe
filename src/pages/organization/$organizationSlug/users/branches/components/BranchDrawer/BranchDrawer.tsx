@@ -9,12 +9,9 @@ import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
+import { type HoursFormat, useHoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import {
-  type HoursFormat,
-  useHoursFormat,
-} from '../../../shared/hooks/useHoursFormat/index.ts';
 import {
   type RoleDirectory,
   useRoleDirectory,
@@ -30,10 +27,19 @@ import {
   missingPlaceFields,
 } from './branch-form.ts';
 import {
+  type BranchPlacesAccess,
+  isInlineEditEscape,
+  type PlaceDraftReport,
+  READ_ONLY_PLACES,
+  usePlaceDrafts,
+} from './branch-places-form.ts';
+import { type BranchPlacesView, useBranchPlacesView } from './branch-places-view.ts';
+import {
   BranchContactFields,
   BranchPeopleFields,
   BranchPlaceFields,
 } from './BranchDrawerFields.tsx';
+import { BranchPlacesFields } from './BranchPlacesFields.tsx';
 import { type BranchSaveOutcome, useBranchSave } from './use-branch-save.ts';
 
 const K = USERS_KEYS.branches.drawer;
@@ -50,6 +56,11 @@ export interface BranchDrawerAccess {
   resolved: boolean;
   /** New: "New branch" is allowed; edit: the branch may be edited. Else view only. */
   canWrite: boolean;
+  /**
+   * Edit only: what "Places & days" offers — add (`branch:create`), rename and switch off
+   * (`branch:update`), remove (`branch:delete`). Absent: the lists, read only.
+   */
+  places?: BranchPlacesAccess;
 }
 
 interface BranchDrawerBaseProps {
@@ -129,7 +140,7 @@ function useSaveOutcome(props: BranchDrawerProps) {
   };
 }
 
-/** The drawer's three step cards (`users.md:281–288`). */
+/** The drawer's three form steps (`users.md:281–288`); "Places & days" follows on an edit. */
 function branchDrawerSteps({
   form,
   values,
@@ -200,6 +211,43 @@ function branchDrawerSteps({
   ];
 }
 
+/**
+ * "Places & days" — the fourth step, on an existing branch only (KICKOFF §6.6, D23): its rows
+ * save on their own, so it has nothing missing and nothing for the footer's Save.
+ */
+function placesSteps({
+  branchId,
+  view,
+  access,
+  onDraft,
+  t,
+}: {
+  branchId: string | null;
+  view: BranchPlacesView;
+  access: BranchPlacesAccess;
+  onDraft: PlaceDraftReport;
+  t: TFunction;
+}): DrawerStep[] {
+  if (branchId === null) return [];
+  return [
+    {
+      id: 'places',
+      title: t(K.steps.places),
+      summary: view.summary,
+      peek: view.peek,
+      content: (
+        <BranchPlacesFields
+          branchId={branchId}
+          view={view}
+          access={access}
+          onDraft={onDraft}
+          testId={BRANCH_DRAWER_TEST_ID}
+        />
+      ),
+    },
+  ];
+}
+
 /** The drawer's words and mode-only parts (`users.md:228–236`). */
 function drawerChrome(props: BranchDrawerProps, row: BranchRow | null, t: TFunction) {
   const create = props.mode === 'create';
@@ -228,6 +276,10 @@ function BranchDrawerSession(props: BranchDrawerProps) {
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<BranchDrawerStepId>('place');
   const readouts = useBranchDrawerView({ values, members: props.members, format });
+  // The fourth step's rows save on their own; text typed there and not yet saved still asks.
+  const drafts = usePlaceDrafts();
+  const placesId = row?.branch.id ?? null;
+  const placesView = useBranchPlacesView(placesId);
   const { saveState, save } = useBranchSave({
     form,
     branch: row?.branch ?? null,
@@ -252,17 +304,26 @@ function BranchDrawerSession(props: BranchDrawerProps) {
       steps={
         loading
           ? []
-          : branchDrawerSteps({
-              form,
-              values,
-              view: readouts,
-              format,
-              directory,
-              people,
-              readOnly,
-              idPrefix,
-              t,
-            })
+          : [
+              ...branchDrawerSteps({
+                form,
+                values,
+                view: readouts,
+                format,
+                directory,
+                people,
+                readOnly,
+                idPrefix,
+                t,
+              }),
+              ...placesSteps({
+                branchId: placesId,
+                view: placesView,
+                access: props.access.places ?? READ_ONLY_PLACES,
+                onDraft: drafts.report,
+                t,
+              }),
+            ]
       }
       openStep={openStep}
       onOpenStepChange={(step) => setOpenStep(step as BranchDrawerStepId)}
@@ -272,7 +333,11 @@ function BranchDrawerSession(props: BranchDrawerProps) {
       saveLabel={chrome.saveLabel}
       onSave={() => void save()}
       saveState={saveState}
-      dirty={isDirty}
+      dirty={isDirty || drafts.dirty}
+      onEscapeKeyDown={(event) => {
+        // An open rename in "Places & days" cancels on Esc; the drawer stays.
+        if (isInlineEditEscape(event)) event.preventDefault();
+      }}
       testId={BRANCH_DRAWER_TEST_ID}
     >
       {loading ? (
@@ -284,9 +349,10 @@ function BranchDrawerSession(props: BranchDrawerProps) {
 
 /**
  * The branch drawer (KICKOFF §6.12 Branch drawer; `users.md:176–198, 226–236`)
- * on the shared record drawer: New branch and Edit branch, always three steps
- * — "Branch & address", "Contact & opening hours", "People" — for every role
- * and viewport. New starts not main, Open, Mon–Sat 10:00–19:00 in the next
+ * on the shared record drawer: New branch and Edit branch, three steps —
+ * "Branch & address", "Contact & opening hours", "People" — for every role
+ * and viewport, and on an existing branch a fourth, "Places & days" (KICKOFF
+ * §6.6, D23): its rooms, machines and holidays, each row saved on its own. New starts not main, Open, Mon–Sat 10:00–19:00 in the next
  * tone, City and State from the main branch, you on its team. Save never
  * disables: an empty required field — Name, the address, Area, City, PIN code,
  * Phone, Email — opens its step. A branch is closed, never deleted: Status

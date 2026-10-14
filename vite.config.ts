@@ -115,6 +115,10 @@ export default defineConfig(({ command, mode }) => {
             '**/SettingsModal-*.js',
             '**/CommandPalette-*.js',
             '**/AppearanceDialog-*.js',
+            // The PIN directory's 71 parts (~846 kB gzipped): fetched only when a PIN is typed in
+            // the clinic setup, then kept offline by the `app-assets` runtime cache — not
+            // downloaded by every install (feat-clinic-setup G6).
+            '**/pin-[0-9][0-9]-*.js',
           ],
         },
       }),

@@ -35,6 +35,21 @@ if (jsPaths.length === 0) {
 // ever set to false). Re-adding it without that plugin fails the run outright
 // with "Config option running needs @size-limit/time plugin".
 const config = [
+  // The PIN directory (feat-clinic-setup G6): one lazy chunk per PIN prefix, loaded only when a
+  // six-digit PIN is typed — never on first paint. Measured 30.45 kB (pin-50, the largest) and
+  // 845.94 kB for all 71 parts.
+  {
+    name: 'PIN directory: largest part (pin-50)',
+    path: ['dist/assets/pin-50-*.js'],
+    limit: '31 kB',
+    gzip: true,
+  },
+  {
+    name: 'PIN directory: all parts',
+    path: ['dist/assets/pin-[0-9][0-9]-*.js'],
+    limit: '850 kB',
+    gzip: true,
+  },
   {
     name: 'Initial JS (entry + vendor)',
     path: jsPaths,
@@ -343,8 +358,27 @@ const config = [
      *   the one-file icon-library swap.
      * Trimmed first: the widget, its voice hook, its copy and its motion stylesheet load on
      * demand (their own chunk and `BugReport-*.css`); initial CSS is 0.01 kB smaller than main.
+     *
+     * 238.9 → 239.4 kB: a declared exemption, itemised — the clinic setup
+     * (iterations/feat-clinic-setup-2026-10-13-sltd, AS-BUILT row 14; for the
+     * owner's review). +0.46 kB, all in the `boot` entry chunk: 238.85 → 239.31 kB,
+     * main (85b9864) and the merged branch built the same way on one machine (no
+     * env file, no ambient VITE_ variables; main's 238.85 matches its CI 238.87):
+     * - The onboarding store's version-1 migration: the wizard lost two steps,
+     *   and a half-finished onboarding must resume on the right one. The store
+     *   is read at boot.
+     * - The `setup` namespace's loader and the shell's setup keys
+     *   (`layout` › `app.setup.*`, Settings › Clinic).
+     * - The setup's eight event names in the analytics catalog — the catalog is
+     *   the one source of event names.
+     * - The route preload map naming the setup's shared chunks
+     *   (`setup-hash-grammar`, `useOnboardingSetup`): the account menu, ⌘K and
+     *   the create-action guard read the setup.
+     * Trimmed first: "Finish setup" draws the registry's `ClipboardList` instead
+     * of adding `ListChecks` to the icon set; the drawer, the guide, the starter
+     * list and the PIN directory load on demand. ~0.1 kB of headroom.
      */
-    limit: '238.9 kB',
+    limit: '239.4 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -505,8 +539,19 @@ const config = [
            * set `data-base` since the theme studio went (L-65), so no screen
            * changes. `pnpm perf:routes`' `cssKb` (35.4, measured 34.8) keeps its
            * pin — it only ever comes down. ~0.45 kB of headroom.
+           *
+           * 35.7 → 36.0 kB: a declared exemption, itemised — the clinic setup
+           * (iterations/feat-clinic-setup-2026-10-13-sltd, AS-BUILT row 14; for
+           * the owner's review). +0.26 kB: 35.57 → 35.83 kB, main (85b9864) and
+           * the merged branch built the same way (no env file), 19 new rules:
+           * the avatar's progress ring (its arc, stroke, rotation and
+           * reduced-motion transition), the setup drawer's and guide's progress
+           * bars, the starter list's grid and the "You're live" indent, and the
+           * branch drawer's Places & days holiday rows (their 480px container
+           * re-grid). Tailwind emits them with their files although the drawer
+           * and the guide load on demand. ~0.17 kB of headroom.
            */
-          limit: '35.7 kB',
+          limit: '36.0 kB',
           gzip: true,
         },
       ]

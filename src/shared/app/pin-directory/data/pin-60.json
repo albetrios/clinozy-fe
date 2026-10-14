@@ -1,0 +1,3848 @@
+{
+  "600001": [
+    "Chennai",
+    "Tamil Nadu",
+    [
+      "Chennai",
+      "Flower Bazaar",
+      "Govt Stanley Hospital",
+      "Mannady",
+      "Mint Building",
+      "Sowcarpet NDSO"
+    ]
+  ],
+  "600002": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Anna Road", "Chintadripet", "Madras Electricity System"]
+  ],
+  "600003": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Madras Medical College", "Park Town", "Ripon Buildings"]
+  ],
+  "600004": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Mandaveli", "Mylapore", "Vivekananda College Madras"]
+  ],
+  "600005": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Chepauk", "Madras University", "Parthasarathykoil", "Tiruvallikeni"]
+  ],
+  "600006": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Dpi", "Greams Road", "Shastri Bhavan", "Teynampet West"]
+  ],
+  "600007": ["Chennai", "Tamil Nadu", ["Vepery"]],
+  "600008": ["Chennai", "Tamil Nadu", ["Egmore Mdo", "Egmore Ndso", "Ethiraj Salai"]],
+  "600009": ["Chennai", "Tamil Nadu", ["Fort St George"]],
+  "600010": ["Chennai", "Tamil Nadu", ["Kilpauk", "Kilpauk Medical College"]],
+  "600011": ["Chennai", "Tamil Nadu", ["Perambur", "Perambur North", "Sembiam"]],
+  "600012": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Perambur Barracks", "Puliyanthope", "Venkatesapuram"]
+  ],
+  "600013": ["Chennai", "Tamil Nadu", ["Rayapuram"]],
+  "600014": ["Chennai", "Tamil Nadu", ["Lloyds Estate", "Royapettah"]],
+  "600015": ["Chennai", "Tamil Nadu", ["Guindy North", "Saidapet"]],
+  "600016": [
+    "Chennai",
+    "Tamil Nadu",
+    [
+      "Alandur (Reopened W.E.F.6.6.05)",
+      "Chennai Airport",
+      "Meenambakkam",
+      "St Thomas Mount"
+    ]
+  ],
+  "600017": [
+    "Chennai",
+    "Tamil Nadu",
+    [
+      "Hindi Prachar Sabha",
+      "Thygarayanagar",
+      "Thygarayanagar North",
+      "Thygarayanagar South"
+    ]
+  ],
+  "600018": ["Chennai", "Tamil Nadu", ["Pr. Accountant General", "Teynampet"]],
+  "600019": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Kaladipet",
+      "Shanmugapuram",
+      "Tiruvottiyur",
+      "Tiruvottiyur West",
+      "Tondiarpet Rly Colony"
+    ]
+  ],
+  "600020": ["Chennai", "Tamil Nadu", ["Adyar", "Kasturibai Nagar", "Shastri Nagar"]],
+  "600021": ["Chennai", "Tamil Nadu", ["Washermanpet", "Washermanpet East"]],
+  "600022": ["Chennai", "Tamil Nadu", ["Rajbhavan"]],
+  "600023": ["Chennai", "Tamil Nadu", ["Aynavaram"]],
+  "600024": ["Chennai", "Tamil Nadu", ["Kodambakkam"]],
+  "600025": ["Chennai", "Tamil Nadu", ["Engineering College"]],
+  "600026": ["Chennai", "Tamil Nadu", ["Vadapalani"]],
+  "600028": ["Chennai", "Tamil Nadu", ["Raja Annamalaipuram", "Ramakrishna Nagar"]],
+  "600030": ["Chennai", "Tamil Nadu", ["Aminjikarai", "Shenoy Nagar"]],
+  "600031": ["Chennai", "Tamil Nadu", ["Chetput", "World University Service Centre"]],
+  "600032": ["Chennai", "Tamil Nadu", ["Ekkaduthangal", "Guindy Industrial Estate"]],
+  "600033": ["Chennai", "Tamil Nadu", ["Mambalam R.S.", "West Mambalam"]],
+  "600034": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Loyola College", "Nungambakkam High Road", "Nungambakkam MDO"]
+  ],
+  "600035": ["Chennai", "Tamil Nadu", ["Nandanam"]],
+  "600036": ["Chennai", "Tamil Nadu", ["Indian Institute Of Technology"]],
+  "600037": ["Chennai", "Tamil Nadu", ["Mogappair", "Mogappair West"]],
+  "600038": ["Chennai", "Tamil Nadu", ["Icf Colony"]],
+  "600039": ["Chennai", "Tamil Nadu", ["Vyasar Nagar Colony", "Vyasarpadi"]],
+  "600040": ["Chennai", "Tamil Nadu", ["Anna Nagar"]],
+  "600041": ["Chennai", "Tamil Nadu", ["Palavakkam", "Tiruvanmiyur", "Valmiki Nagar"]],
+  "600042": ["Chennai", "Tamil Nadu", ["Velacheri"]],
+  "600043": ["Chengalpattu", "Tamil Nadu", ["Pallavaram", "Rajajinagar", "Tirusulam"]],
+  "600044": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Bharathipuram",
+      "Chromepet",
+      "GanapathipuramCMT",
+      "Nagalkeni",
+      "Nehrunagar",
+      "Nemilichery",
+      "Radhanagar"
+    ]
+  ],
+  "600045": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Irumbuliyur", "Kasthuribainagar", "MEPZ Tambaram", "Tambaram", "Tambaram West"]
+  ],
+  "600046": ["Chengalpattu", "Tamil Nadu", ["Tambaram IAF"]],
+  "600047": ["Chengalpattu", "Tamil Nadu", ["Kadaperi", "Tambaram Sanatorium"]],
+  "600048": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Kolathur", "Mambakkam", "Mannivakkam", "Mudichur", "Otteri Extension", "Vandalur"]
+  ],
+  "600049": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Rajajinagar", "Srinivasanagar", "Tirumangalam Road", "Villivakkam"]
+  ],
+  "600050": ["Chennai", "Tamil Nadu", ["Korattur", "Padi"]],
+  "600051": ["Chennai", "Tamil Nadu", ["Madhavaram Milk Colony"]],
+  "600052": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Alamathi",
+      "Boochiathipattu",
+      "Edapalayam",
+      "Guruvoyal",
+      "Padianallur",
+      "Pammadukulam",
+      "Redhills",
+      "Vadakarai",
+      "Vilangadupakkam"
+    ]
+  ],
+  "600053": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Ambattur",
+      "Menambedu",
+      "Oragadam",
+      "Prithivipakkam",
+      "Thiruvengadnagar",
+      "Vijayalakshmipuram"
+    ]
+  ],
+  "600054": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Avadi", "Avadi Camp", "Cvrde", "Gandhinagar", "Tank Factory Avadi"]
+  ],
+  "600055": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Avadi IAF",
+      "CRP Camp",
+      "Koduvalli",
+      "Mittanamalli",
+      "Morai",
+      "Palavedu",
+      "Pandeeswaram"
+    ]
+  ],
+  "600056": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Kattupakkam", "Poonamallee", "Senneerkuppam"]
+  ],
+  "600057": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Ennore Thermal Station", "Ernavur", "Kamarajnagar"]
+  ],
+  "600058": ["Chennai", "Tamil Nadu", ["Ambattur Indl Estate", "Athipattu"]],
+  "600059": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Christian College Tambaram", "LIC Colony", "Tambaram East"]
+  ],
+  "600060": ["Chennai", "Tamil Nadu", ["Madhavaram", "Moolakadai", "Vadaperumbakkam"]],
+  "600061": ["Chennai", "Tamil Nadu", ["Nanganallur", "Pazhavanthangal"]],
+  "600062": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Kovilpadagai",
+      "Railway Carshed Complex",
+      "Senthilnagar",
+      "Tirumullaivoyal",
+      "Vellanur",
+      "Velnagar Vellanur"
+    ]
+  ],
+  "600063": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Old Perungalathur", "Srinivasanagar", "Srinivasanagar East"]
+  ],
+  "600064": ["Chengalpattu", "Tamil Nadu", ["Chitlapakkam", "Hasthinapuram"]],
+  "600066": ["Chennai", "Tamil Nadu", ["Pozhal"]],
+  "600067": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Alinjivakkam",
+      "Budur",
+      "Erumaivettipalayam",
+      "Jagannathapuram",
+      "Nayar",
+      "Orakadu",
+      "Sholavaram"
+    ]
+  ],
+  "600068": ["Chennai", "Tamil Nadu", ["Manali"]],
+  "600069": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    ["Kunnathur", "Nandambakkam", "Sirukalathur", "Somangalam", "South Malayambakkam"]
+  ],
+  "600070": ["Chengalpattu", "Tamil Nadu", ["Anakaputhur"]],
+  "600071": ["Thiruvallur", "Tamil Nadu", ["Kamarajnagar", "Paruthipattu"]],
+  "600072": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Arignar Anna Nagar",
+      "Kolappancheri",
+      "Pattabiram",
+      "Soranjeri",
+      "Thandarai",
+      "Voyalanallur"
+    ]
+  ],
+  "600073": ["Chengalpattu", "Tamil Nadu", ["Gowriwakkam", "Rajakilpakkam", "Selaiyur"]],
+  "600074": ["Chengalpattu", "Tamil Nadu", ["Polichalur"]],
+  "600075": ["Chengalpattu", "Tamil Nadu", ["Pammal", "Pammal East"]],
+  "600076": ["Chennai", "Tamil Nadu", ["Korattur RS"]],
+  "600077": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Ayapakkam", "Numbal", "Thiruverkadu", "Veeraraghavapuram"]
+  ],
+  "600078": ["Chennai", "Tamil Nadu", ["Kalaignar Karunanidhi Nagar"]],
+  "600081": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Tondiarpet", "Tondiarpet Bazaar", "Tondiarpet West"]
+  ],
+  "600082": ["Chennai", "Tamil Nadu", ["G K M Colony", "Kumaran Nagar", "Periyar Nagar"]],
+  "600083": ["Chennai", "Tamil Nadu", ["Ashoknagar", "Jafferkhanpet"]],
+  "600084": ["Chennai", "Tamil Nadu", ["Flowers Road"]],
+  "600085": ["Chennai", "Tamil Nadu", ["Kotturpuram"]],
+  "600086": ["Chennai", "Tamil Nadu", ["Gopalapuram"]],
+  "600087": ["Chennai", "Tamil Nadu", ["Alwarthirunagar", "Valasaravakkam"]],
+  "600088": ["Chennai", "Tamil Nadu", ["Adambakkam", "Nilamangai Nagar"]],
+  "600089": ["Chennai", "Tamil Nadu", ["Nandambakkam Kudiyiruppu", "Ramapuram"]],
+  "600090": ["Chennai", "Tamil Nadu", ["Besantnagar", "Rajaji Bhavan"]],
+  "600091": ["Chennai", "Tamil Nadu", ["Madipakkam", "Madipakkam South", "Ram Nagar"]],
+  "600092": ["Chennai", "Tamil Nadu", ["Virugambakkam"]],
+  "600093": ["Chennai", "Tamil Nadu", ["Saligramam"]],
+  "600094": ["Chennai", "Tamil Nadu", ["Choolaimedu"]],
+  "600095": ["Thiruvallur", "Tamil Nadu", ["Ayanambakkam", "Maduravoyal", "Vanagaram"]],
+  "600096": ["Chennai", "Tamil Nadu", ["Dr Ambedkar Law Univeristy", "Perungudi"]],
+  "600097": ["Chennai", "Tamil Nadu", ["Karapakkam", "Oggiamthoraipakkam"]],
+  "600099": ["Chennai", "Tamil Nadu", ["Kolathur", "Lakshmipuram"]],
+  "600100": ["Chengalpattu", "Tamil Nadu", ["Medavakkam", "Pallikaranai", "Perumbakkam"]],
+  "600101": ["Chennai", "Tamil Nadu", ["Anna Nagar Western Extn"]],
+  "600102": ["Chennai", "Tamil Nadu", ["Anna Nagar East"]],
+  "600103": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Andarkuppam", "Manali New Town", "Vellivoyalchavadi", "Vichoor"]
+  ],
+  "600104": ["Chennai", "Tamil Nadu", ["High Court Building"]],
+  "600106": ["Chennai", "Tamil Nadu", ["Arumbakkam", "Arumbakkam North"]],
+  "600107": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Koyambedu", "Koyambedu Wholesale Market Complex", "Nerkundram"]
+  ],
+  "600110": ["Thiruvallur", "Tamil Nadu", ["Ponniammanmedu"]],
+  "600113": ["Chennai", "Tamil Nadu", ["Tidel Park", "TTTI Taramani"]],
+  "600115": ["Chennai", "Tamil Nadu", ["Injambakkam", "Neelangarai"]],
+  "600116": [
+    "Chennai",
+    "Tamil Nadu",
+    ["Alapakkam", "Porur", "Sriramachandra Deemed Uty"]
+  ],
+  "600117": ["Chengalpattu", "Tamil Nadu", ["Keelakattalai", "Old Pallavaram"]],
+  "600118": ["Chennai", "Tamil Nadu", ["Erukkancheri", "Kodungaiyur", "Rv Nagar"]],
+  "600119": ["Chennai", "Tamil Nadu", ["Sholinganallur"]],
+  "600120": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Nandiambakkam", "North Chennai Thermal PP", "Subbareddypalayam", "Vallur"]
+  ],
+  "600122": ["Kanchipuram", "Tamil Nadu", ["Mangadu", "Paraniputhur"]],
+  "600123": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Malayambakkam", "Nazarethpettai", "Sembarambakkam"]
+  ],
+  "600124": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Kuttambakkam", "Nemam", "Puduchatram", "Thirumushi", "Udayarkoil", "Vellavedu"]
+  ],
+  "600125": ["Chennai", "Tamil Nadu", ["Manapakkam", "Mugalivakkam"]],
+  "600126": ["Chengalpattu", "Tamil Nadu", ["Madambakkam", "Mappedu"]],
+  "600127": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Kolapakkam", "Melakkottaiyur", "Nallambakkam", "Ponmar"]
+  ],
+  "600128": ["Kanchipuram", "Tamil Nadu", ["Gerugambakkam", "Kovur", "Thandalam"]],
+  "600129": ["Chengalpattu", "Tamil Nadu", ["Kovilambakkam"]],
+  "600130": ["Chengalpattu", "Tamil Nadu", ["Navalur", "Ottiyambakkam", "Thazambur"]],
+  "600131": ["Chengalpattu", "Tamil Nadu", ["Sithalapakkam"]],
+  "600132": ["Kanchipuram", "Tamil Nadu", ["Darkash", "Tirumudivakkam", "Tiruneermalai"]],
+  "601101": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Arni CPT", "Panayancheri", "Pondavakkam", "Rallapadi"]
+  ],
+  "601102": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Athivakkam",
+      "Kannigaipair",
+      "Majankaranai",
+      "Mukkarambakkam",
+      "Nelvoy",
+      "Periapalayam",
+      "Thandalam",
+      "Vadamadurai"
+    ]
+  ],
+  "601103": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Damaraipakkam",
+      "Enambakkam",
+      "Kalpattu",
+      "Meyyur",
+      "Poorivakkam",
+      "Sembedu",
+      "Tirukandalam",
+      "Velliyur",
+      "Vengal"
+    ]
+  ],
+  "601201": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Arambakkam",
+      "Devampattu",
+      "Edoor",
+      "Elavur",
+      "Gummidipundi",
+      "Iguvarpalayam",
+      "Kallur",
+      "Mangavaram",
+      "New Gummidipundi",
+      "Periaobulapuam",
+      "Podiyarankulam",
+      "Siddharajakandigai",
+      "Sirupulalpettai",
+      "Sunnambukulam",
+      "Tervali"
+    ]
+  ],
+  "601202": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Kannankottai",
+      "Madarpakkam",
+      "Manellore",
+      "Pallavada",
+      "Roshanagaram",
+      "Thanipoondi",
+      "Thervoy"
+    ]
+  ],
+  "601203": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Anuppampattu",
+      "Devadanam",
+      "Jothi Nagar",
+      "Kattur",
+      "Minjur",
+      "Neidavoyal",
+      "Seemapuram South",
+      "Thriuvellavoyal",
+      "Velur",
+      "Voyalur"
+    ]
+  ],
+  "601204": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Aladu",
+      "Amoor",
+      "Arasur",
+      "Krishnapuram",
+      "Medur",
+      "Panjetti",
+      "Perumbedu",
+      "Ponneri",
+      "Ponneri Public Office",
+      "Reddipalayam"
+    ]
+  ],
+  "601205": ["Thiruvallur", "Tamil Nadu", ["Kolur", "Pulicat", "Thirupalavanam"]],
+  "601206": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Chinnambedu",
+      "Kavarapettai",
+      "Kilikodi",
+      "Kilmudalambedu",
+      "Puduvoyal",
+      "Puvalambedu"
+    ]
+  ],
+  "601301": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    ["Malaipattu", "Manimangalam", "Padappai", "Serpananchery"]
+  ],
+  "602001": ["Thiruvallur", "Tamil Nadu", ["Nggo Colony Tiruvallur", "Tiruvallur"]],
+  "602002": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Illupur",
+      "Kilnallathur",
+      "Manavalanagar",
+      "Melnallathur",
+      "Nungambakkam",
+      "Polivakkam",
+      "Sengadu"
+    ]
+  ],
+  "602003": ["Thiruvallur", "Tamil Nadu", ["Kakalur Ind Estate"]],
+  "602021": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Ikkadu",
+      "Karikalavakkam",
+      "Kilanur",
+      "Monnavedu",
+      "Odikkadu",
+      "Perattur",
+      "Thalakancheri"
+    ]
+  ],
+  "602023": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Allikuzhi",
+      "Devandavakkam",
+      "Nambakkam",
+      "Neiveli",
+      "Nelvoy",
+      "Odappai",
+      "Placepalayam",
+      "Poondi",
+      "Pullarambakkam",
+      "Sandarayanpalayam",
+      "Timmaboopalapuram",
+      "Vellathukottai"
+    ]
+  ],
+  "602024": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Karlapakkam",
+      "Komakkambedu",
+      "Kottamedu",
+      "Pakkam",
+      "Perumalpattu",
+      "Sivanvoyal",
+      "Tiruninravur",
+      "Tiruninravur Rs",
+      "Vadattur",
+      "Veppambattu"
+    ]
+  ],
+  "602025": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Aranvoyal",
+      "Kalambakkam",
+      "Koppur",
+      "Papparambakkam",
+      "Putlur",
+      "Thozhur",
+      "Tirur Cpt"
+    ]
+  ],
+  "602026": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    [
+      "Goonipalayam",
+      "Mambakkam",
+      "Palavakkam",
+      "Pennaluripeta",
+      "Perandur",
+      "Pondavakkam",
+      "Seethanjeri",
+      "Sulaimeni",
+      "Tharakshi",
+      "Uttukottai"
+    ]
+  ],
+  "602105": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    [
+      "Gunduperumbedu",
+      "Mathur",
+      "Pattunoolchatram",
+      "Pillaipakkam",
+      "Pondur",
+      "Sriperumbudur",
+      "Thandalam",
+      "Thodukadu",
+      "Ulundai",
+      "Valarpuram",
+      "Vayalur"
+    ]
+  ],
+  "602106": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    ["Mambakkam", "Sendamangalam", "Sunguvarchatram"]
+  ],
+  "602108": [
+    "Thiruvallur",
+    "Tamil Nadu",
+    ["Kandoor", "Kannur", "Maduramangalam", "Pannur", "Tirupandiyur"]
+  ],
+  "602117": ["Kanchipuram", "Tamil Nadu", ["Irungattukottai"]],
+  "603001": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Chengalpattu", "Chengalpattu Cutcherry", "Chengalpattu MedCollege"]
+  ],
+  "603002": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Chengalpattu Bazaar",
+      "Gundurchengalpattu",
+      "Kunnavakkam",
+      "Nathamchengalpattu",
+      "Paranur",
+      "Pulipakkam"
+    ]
+  ],
+  "603003": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Meleripakkam", "Nenmeli", "Tiruvadisoolam", "Vallam"]
+  ],
+  "603004": ["Chengalpattu", "Tamil Nadu", ["Ammanambakkam", "Mahindra World City"]],
+  "603101": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Athurchengalpattu", "Palur", "Reddipalayam", "Thimmavaram", "Villiambakkam"]
+  ],
+  "603102": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Ayapakkam",
+      "Kalpakkam",
+      "Manamai",
+      "Melperumalcheri",
+      "Pattaraikalani",
+      "Pudupattinam Colony",
+      "Reactor Research Centre",
+      "Suradimangalam",
+      "Vayalur",
+      "Vazhuvadur",
+      "Vengapakkam",
+      "Vittilapuram"
+    ]
+  ],
+  "603103": ["Chengalpattu", "Tamil Nadu", ["Kelambakkam", "Padur", "Pudupakkam"]],
+  "603104": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Kadambadi",
+      "Kokilamedu",
+      "Koothavakkam",
+      "Mamallapuram",
+      "Pattipulam",
+      "Perur",
+      "Poonjeri",
+      "Vadakadambadi",
+      "Zamin Paiyanur"
+    ]
+  ],
+  "603105": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Kuzhipanthandalam", "Manambathi", "Mullipakkam", "Peria Irumbedu", "Sirudavur"]
+  ],
+  "603106": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    [
+      "Arumbuliyur",
+      "Orakattupettai",
+      "Sathanjeri",
+      "Seethananjeri",
+      "Tiruvanaikoil",
+      "Vitchur"
+    ]
+  ],
+  "603107": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    [
+      "Anambakkam",
+      "Chithanakkavur",
+      "Edayambudur",
+      "Kilakadi",
+      "Kunnavakkam",
+      "Nelvoy",
+      "Olaiyur",
+      "Palliagaram",
+      "Porpandal",
+      "Salavakkam",
+      "Valathodu"
+    ]
+  ],
+  "603108": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Hanumanthapuram",
+      "Kalvoy",
+      "Karumbakkam",
+      "Kottamedu",
+      "Madayathur",
+      "Melaiyur",
+      "Nellikuppam",
+      "Sembakkam",
+      "Senneri",
+      "Sirukundram"
+    ]
+  ],
+  "603109": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Ammanambakkam",
+      "Desumugipettai",
+      "Edaiyur",
+      "Irumbulicheri",
+      "Mullikolathur",
+      "Oragadam",
+      "Pandur",
+      "Puliyur",
+      "Thathalur",
+      "Tirukalikundram",
+      "Tirukalikundram Bazaar",
+      "Veerapuram"
+    ]
+  ],
+  "603110": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Alathur Industrial Estate", "Illalur", "Kayar", "Tiruporur", "Venbedu"]
+  ],
+  "603111": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Mamandur",
+      "Manapakkam",
+      "Meyyur",
+      "Ozhalur",
+      "Pazhamathur",
+      "Tirumani",
+      "Venpakkam"
+    ]
+  ],
+  "603112": ["Chengalpattu", "Tamil Nadu", ["Kovalam", "Muttukadu", "Thiruvidanthai"]],
+  "603127": ["Chengalpattu", "Tamil Nadu", ["Anupuram"]],
+  "603201": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Elapakkam", "Kattukaranai", "Madhur", "Padiri", "Ramapuram"]
+  ],
+  "603202": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Adhanur",
+      "Guduvancheri",
+      "Kannivakkam",
+      "Karanaipuduchery",
+      "Kayarambedu",
+      "Madambakkam",
+      "Thangappapuram"
+    ]
+  ],
+  "603203": ["Chengalpattu", "Tamil Nadu", ["Kattankolathur", "Kavanur", "Ninnakarai"]],
+  "603204": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Anjur",
+      "Appur",
+      "Chettipunniam",
+      "Elutchur",
+      "Karunilam",
+      "Melrosapuram",
+      "Singaperumalkoil",
+      "Tirukatchur",
+      "Vadakkupattu",
+      "Venkatapuram"
+    ]
+  ],
+  "603209": ["Chengalpattu", "Tamil Nadu", ["Maraimalai Nagar", "Panangottur"]],
+  "603210": ["Chengalpattu", "Tamil Nadu", ["Urapakkam"]],
+  "603211": ["Chengalpattu", "Tamil Nadu", ["Annai Anjugam Nagar"]],
+  "603301": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Acharapakkam",
+      "Indalur",
+      "Irumbuli",
+      "Kattugudalur",
+      "Kayapakkam",
+      "Parukkal",
+      "Seethapuram"
+    ]
+  ],
+  "603302": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Chengattur",
+      "Cheyur",
+      "Irumbedu",
+      "Nainarkuppam",
+      "Palaiyur",
+      "Panaiyur",
+      "Perumbakkam",
+      "Zamin Budur"
+    ]
+  ],
+  "603303": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Janakipuram",
+      "Karunguli",
+      "Kathiricheri",
+      "Keelavalam",
+      "Kinar",
+      "KinarKandigaiPudur",
+      "Malapalayam",
+      "Malayalipettai",
+      "Melavalam",
+      "Pudupattu",
+      "Vedavakkam"
+    ]
+  ],
+  "603304": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Kolathur", "Kottaikadu", "Kudapakkam", "Sembulipuram", "Vedal", "Vilambur"]
+  ],
+  "603305": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Kadalur",
+      "Kodoovur",
+      "Kuvathur",
+      "Mugaiyur",
+      "Nedumaram",
+      "Nerkunapattu",
+      "Seekanankuppam",
+      "Vepancheri"
+    ]
+  ],
+  "603306": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Arungunam",
+      "Madurantakam",
+      "Morapakkam",
+      "Murugambakkam",
+      "New Mambakkam",
+      "Pakkam",
+      "Perumbakkam",
+      "Senguntharpettai",
+      "Thatchur",
+      "Unamalai",
+      "Veeranakunnam"
+    ]
+  ],
+  "603307": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Ananthamangalam", "Minnal Sithamur", "Orathy", "Sirudamur", "Vadamanipakkam"]
+  ],
+  "603308": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Budur",
+      "Bukkathurai",
+      "Isur",
+      "Kallabiranpuram",
+      "Kolampakkam",
+      "Padalam",
+      "Palayanur",
+      "Tiruvandavar"
+    ]
+  ],
+  "603309": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Chitrvadi", "Mugundagiri", "Paiyambadi", "Perukkaranai", "Polambakkam"]
+  ],
+  "603310": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Ayakonamkolathur",
+      "Isur",
+      "Karasangal",
+      "Nerkunam",
+      "Perumberkandigai",
+      "Sirumailur",
+      "Sirunagar",
+      "Thozhupedu"
+    ]
+  ],
+  "603311": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Ozhavetti", "Peria Venmani", "Zamin Endathur"]
+  ],
+  "603312": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Anaicut",
+      "Iranyasidhi",
+      "Kalkulam",
+      "KNelvoy",
+      "Lathur",
+      "Palur",
+      "Pavunjur",
+      "Seevadi"
+    ]
+  ],
+  "603313": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Chithamur", "Kattudevadur", "Neerpair", "Nugumbal", "Onambakkam", "Vilanganur"]
+  ],
+  "603314": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    [
+      "Kattiampandal",
+      "Malaivaiyavur",
+      "Perungozhi",
+      "Pulithivakkam",
+      "Vedanthangal",
+      "Vellaputhur"
+    ]
+  ],
+  "603319": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Melmaruvathur", "Sendivakkam", "Sirunagalur"]
+  ],
+  "603401": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Andarkuppam", "Chunampet", "Kadukkalur", "Puthirankottai", "Vannianallur", "Velur"]
+  ],
+  "603402": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    [
+      "Alisoor",
+      "Arasanimangalam",
+      "Elaganar",
+      "Hanumanthandalam",
+      "Kaliyampoondi",
+      "Pennalur"
+    ]
+  ],
+  "603403": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    ["Manampathi", "Manampathikandigai", "Perunagar", "R.N.Kandigai", "Thandarai"]
+  ],
+  "603405": [
+    "Chengalpattu",
+    "Tamil Nadu",
+    ["Anur", "Ponpathirkoodam", "Ponvilainthakalathur", "Salur", "Sogandi", "Vallipuram"]
+  ],
+  "603406": [
+    "Kanchipuram",
+    "Tamil Nadu",
+    [
+      "Agaramduli",
+      "Kammalampoondi",
+      "Kavanur Pudhucheri",
+      "Kiliyanagar",
+      "L.Endathur",
+      "Malliyankaranai",
+      "Maruthuvambadi",
+      "Sirungoli",
+      "Tirupulivanam",
+      "Tittalam",
+      "Uttiramerur",
+      "Vadanallur"
+    ]
+  ],
+  "604001": ["Villupuram", "Tamil Nadu", ["Tindivanam", "Tindivanam Bazaar"]],
+  "604101": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Akshipakkam", "Andapattu", "Avanipur", "Kilsevur", "Kunnapakkam", "Pankolathur"]
+  ],
+  "604102": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Eraiyanur",
+      "Kiliyanur",
+      "Molasur",
+      "Omandur",
+      "Thailapuram",
+      "Thenkodipakkam",
+      "Thensiruvalur"
+    ]
+  ],
+  "604151": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Alampoondi",
+      "Devadanampettai",
+      "Kalleri",
+      "Kanakkankuppam",
+      "Manalapadi",
+      "Nayambadi",
+      "Padipallam",
+      "Periyamur",
+      "Perungappur",
+      "Thandavasamudram",
+      "Thenpalai"
+    ]
+  ],
+  "604152": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Athipattu", "Nallanpillaipetral", "Sepettai", "Thadagam", "Velanthangal"]
+  ],
+  "604153": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Pakkam", "Palapadi", "Sathyamangalam", "Semmedu", "Sokuppam"]
+  ],
+  "604154": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Karattai", "Nallavur", "Olagapuram", "Velur SA"]
+  ],
+  "604201": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Avalurpet",
+      "Idapattu",
+      "Kappalambadi",
+      "Kottapoondi",
+      "Kovilporaiyur",
+      "Melvailamur",
+      "Naranamangalam",
+      "Nochalur",
+      "Thalangunam"
+    ]
+  ],
+  "604202": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Anathur",
+      "Gingee MDG",
+      "Jayankondam",
+      "Melacheri",
+      "Melidayalam",
+      "Neganur",
+      "Sevalapuri"
+    ]
+  ],
+  "604203": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Anangur", "Arugavur", "Aviyur", "Eachur", "Melolakkur", "Pallikulam", "Viranamur"]
+  ],
+  "604204": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Eyyakunam",
+      "Eyyal",
+      "Manandal",
+      "Melmalayanur",
+      "Melsevalambadi",
+      "Periyanolambai",
+      "Sathambadi",
+      "Siruthalaipoondi",
+      "Thayanur",
+      "Theppirampattu",
+      "Thorapadi",
+      "Vadapalai"
+    ]
+  ],
+  "604205": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Kappai",
+      "Konai",
+      "Kurinjipai",
+      "Minambur",
+      "Palapattu",
+      "Thaiyur",
+      "Thalavanur",
+      "Thiruvampattu",
+      "Thiruvathikunnam"
+    ]
+  ],
+  "604206": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Kadambur",
+      "Kalaiyur",
+      "Kollar",
+      "Melsithambur",
+      "Modaiyur",
+      "Tivanur",
+      "Vallam",
+      "Vilukkam"
+    ]
+  ],
+  "604207": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Akkur",
+      "Athipakkam",
+      "Dadapuram",
+      "Karuvambakkam",
+      "Kattusiviri",
+      "Kilmavilangai",
+      "Kodiyam",
+      "Melathipakkam",
+      "Naduvanandal",
+      "Thaniyal",
+      "Vairapuram",
+      "Vellimedupettai"
+    ]
+  ],
+  "604208": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Devandavadi",
+      "Devanur",
+      "Guduvampoondi",
+      "Kallapuliyur",
+      "Marakonam",
+      "Melmannur",
+      "Peruvalur",
+      "Valathi"
+    ]
+  ],
+  "604210": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Annamangalam",
+      "Illodu",
+      "Kadali",
+      "Mahadevimangalam",
+      "Pennagar",
+      "Sholangunam",
+      "Thamanur"
+    ]
+  ],
+  "604301": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Adavallikoothan",
+      "Alankuppam",
+      "Brahmadesam",
+      "Kilsiviri",
+      "Kolathur",
+      "Munnur",
+      "Nagar",
+      "Omipper",
+      "Perumukkal",
+      "Siruvadi",
+      "Vadanerkunam",
+      "Vaidapakkam"
+    ]
+  ],
+  "604302": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Alagramam",
+      "Chendur",
+      "Chinnanerkunam",
+      "Karnavur",
+      "Kiledayalam",
+      "Kutteripattu",
+      "Muppuli",
+      "Pelakuppam",
+      "Peramandur",
+      "Singanur",
+      "Thenkalavoy",
+      "Thenpasiyar"
+    ]
+  ],
+  "604303": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Alathur",
+      "Anumandai",
+      "Kandadu",
+      "Kunimedu",
+      "Mandava",
+      "Markanum",
+      "Nadukuppam",
+      "Pudupakkam",
+      "Thalangadu"
+    ]
+  ],
+  "604304": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Eraiyur",
+      "Mailam",
+      "Padirapuliyur",
+      "Perumbakkam",
+      "Thaludali",
+      "Tiruvakkarai",
+      "Veliyanur"
+    ]
+  ],
+  "604305": ["Villupuram", "Tamil Nadu", ["Kiladanur", "Olakkur", "Ongur"]],
+  "604306": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Kongarapattu", "Melsevur", "Nedimoliyanur", "Rettanai", "Thenputhur", "Vengandur"]
+  ],
+  "604307": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Athur",
+      "Ayyanthoppu",
+      "Endiyur",
+      "Kattalai",
+      "Melpettai",
+      "Nallathur",
+      "Nolambur",
+      "Panchalam",
+      "Saram Tindivanam",
+      "Ural"
+    ]
+  ],
+  "604401": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Anapathur",
+      "Anukkavoor",
+      "Cheyyaturvendran",
+      "Elaneerkundram",
+      "Erumaivetti",
+      "Perumbalai",
+      "Purisai"
+    ]
+  ],
+  "604402": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Alividaithangi",
+      "Hasanamapettai",
+      "Kunnathur",
+      "Kuthanur",
+      "Ramakrishnapuram",
+      "Sumangali",
+      "Vadamanapakkam"
+    ]
+  ],
+  "604403": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Adiyanur",
+      "Badur",
+      "Irumbedu",
+      "Kilkodungalur",
+      "Kilnarma",
+      "Kottai",
+      "Kuvalai",
+      "Salvedu",
+      "Ulundai",
+      "Velliambakkam"
+    ]
+  ],
+  "604404": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Echur", "Erumbur", "Kilkovalavedu", "Kovilur", "Tirumpundi"]
+  ],
+  "604405": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Amudur", "Kodanallur", "Marudadu", "Nelliyankulam", "Osur", "Punnai", "Vazhur"]
+  ],
+  "604406": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Embalam",
+      "Japthikarani",
+      "Kodiyalam",
+      "Mavalavadi",
+      "Nallur",
+      "Nerkunam",
+      "Pennattagaram",
+      "Senal",
+      "Tellar",
+      "Thaiyar",
+      "Therasapuram",
+      "Vayalamoor"
+    ]
+  ],
+  "604407": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Arugavur",
+      "Cheyyar",
+      "Irungur",
+      "Kaliyur",
+      "Kodanagar",
+      "Moranam",
+      "Murukattampundi",
+      "Nedumbarai",
+      "Palli",
+      "Pappanthangal",
+      "Perungulathur",
+      "Randam",
+      "Sengattankundil",
+      "Tiruvettipuram",
+      "Tiruvettipuram Cutcherry",
+      "Vinnavadi"
+    ]
+  ],
+  "604408": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Alathur",
+      "Ammayapattu",
+      "Arasur",
+      "Elangadu",
+      "Kilsathamangalam",
+      "Kilvillivalam",
+      "Manganallur",
+      "Melma",
+      "Ponnur",
+      "Salukkai",
+      "Sennavaram",
+      "Shro Navalpakkam",
+      "Thenelapakkam",
+      "Thennankur",
+      "Thethurai",
+      "Vandavasi",
+      "Veerambakkampudur",
+      "Vengaram"
+    ]
+  ],
+  "604409": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Korakkai",
+      "Maligaipattu",
+      "Mukkur",
+      "Parasur",
+      "Thozhupedu",
+      "Vadathinallur",
+      "Valkadai"
+    ]
+  ],
+  "604410": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Chithathur",
+      "Kaganam",
+      "Namandi",
+      "Pillanthangal",
+      "Tiruppanangadu",
+      "Vembakkam",
+      "Vengalathur"
+    ]
+  ],
+  "604501": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Arunthodu",
+      "Chitragavur Pudur",
+      "Desur",
+      "Kilnamandi",
+      "Kilputhur",
+      "Kunnakampoondi",
+      "Mahamayee Tirumani",
+      "Sattapundi",
+      "Thennathur",
+      "Thenthinnalur",
+      "Vayalur",
+      "Vedal"
+    ]
+  ],
+  "604502": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Endal", "Kadambai", "Kandavaratti", "Malayur", "Matam", "Melachery"]
+  ],
+  "604503": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Alliyandal",
+      "Injimedu",
+      "Kaduganur",
+      "Melmattaivinnamangalam",
+      "Mosavadi",
+      "Navalpakkam",
+      "Pernamallur",
+      "Ragunathasamudram"
+    ]
+  ],
+  "604504": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Anmarudai", "Avaniapuram", "Melsishamangalam", "Munugapattu", "Tirumani"]
+  ],
+  "604505": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Ayalpadi",
+      "Melnemili",
+      "Melpathi",
+      "Nambedu",
+      "Sengadu",
+      "Vadavanakkambadi",
+      "Vallam Arni"
+    ]
+  ],
+  "604601": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Erumpoondi",
+      "Kikkalur",
+      "Kilpennathur",
+      "Mekkalur",
+      "Rayampettai",
+      "Sirunathur",
+      "Valudalangunam"
+    ]
+  ],
+  "605001": ["Pondicherry", "Puducherry", ["Pondicherry"]],
+  "605002": ["Pondicherry", "Puducherry", ["Sri Aurobindo Ashram"]],
+  "605003": ["Pondicherry", "Puducherry", ["Muthialpet"]],
+  "605004": [
+    "Pondicherry",
+    "Puducherry",
+    ["Mouroungapakkam", "Mudaliarpet", "Pondicherry Courts", "Thengaithittu"]
+  ],
+  "605005": ["Pondicherry", "Puducherry", ["Nellithope"]],
+  "605006": ["Pondicherry", "Puducherry", ["Dhanvantri Nagar"]],
+  "605007": [
+    "Pondicherry",
+    "Puducherry",
+    [
+      "Abishegapakkam",
+      "Ariyankuppam",
+      "Karikkalampakkam",
+      "Mathalapattu",
+      "Nallavadu",
+      "Poornankuppam",
+      "Singirikoil",
+      "Thimmappanaickenpalayam",
+      "Veerampattinam"
+    ]
+  ],
+  "605008": ["Pondicherry", "Puducherry", ["Lawspet"]],
+  "605009": [
+    "Pondicherry",
+    "Puducherry",
+    ["Moutrepalayam", "Mouttoupalayam", "Thattanchavady", "Vimacoundanpalayam"]
+  ],
+  "605010": ["Pondicherry", "Puducherry", ["Olugarai", "Reddiarpalayam"]],
+  "605011": ["Pondicherry", "Puducherry", ["Venkata Nagar"]],
+  "605013": ["Pondicherry", "Puducherry", ["SaramPy"]],
+  "605014": [
+    "Pondicherry",
+    "Puducherry",
+    ["Calapet", "Kaluperumbakkam", "Kilpudupattu", "Pondicherry University"]
+  ],
+  "605101": ["Villupuram", "Tamil Nadu", ["Auroville", "Kuilapalayam", "Morattandi"]],
+  "605102": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Ariyur",
+      "Chinnababusamudram",
+      "Kandamangalam",
+      "Pallithennal",
+      "Periyababusamudram",
+      "Thiruvandarkoil"
+    ]
+  ],
+  "605103": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Anangur",
+      "Koliyanur",
+      "Melpathi",
+      "Panampattu",
+      "Pillur",
+      "Poyyapakkam",
+      "Serndanur",
+      "Tirupachanur"
+    ]
+  ],
+  "605104": ["Villupuram", "Tamil Nadu", ["Bommayarpalayam", "Kottakuppam"]],
+  "605105": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Kallipattu",
+      "Maducore",
+      "Mettupalayam",
+      "Mokshakulam",
+      "Poovarasankuppam",
+      "PVilliyanur",
+      "Rampakkam",
+      "Venkatadri Agaram"
+    ]
+  ],
+  "605106": [
+    "Pondicherry",
+    "Puducherry",
+    [
+      "Chellancherry",
+      "Embalam",
+      "Karayamputhur",
+      "Kariyamanikam",
+      "Kijour",
+      "Mandagapet",
+      "Nallathur",
+      "Nettapakkam",
+      "Pakkam",
+      "Viranam"
+    ]
+  ],
+  "605107": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Kumulam",
+      "Lingareddipalayam",
+      "Madagadipet",
+      "Palayam",
+      "Pallineliyanur",
+      "Puranasingapalayam",
+      "Thirubuvanai",
+      "VMathur"
+    ]
+  ],
+  "605108": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Arpisampalayam",
+      "Gengarampalayam",
+      "Kallapattu",
+      "Kumarakuppam",
+      "Naraiyur",
+      "Salayampalayam",
+      "Valavanur",
+      "VBudur"
+    ]
+  ],
+  "605109": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Katrampakkam",
+      "Olundiyapattu",
+      "Pulichapallam",
+      "Semangalam",
+      "Vanur",
+      "VParangini"
+    ]
+  ],
+  "605110": [
+    "Pondicherry",
+    "Puducherry",
+    [
+      "Arumparthapuram",
+      "Kilinjikuppam",
+      "Korkadu",
+      "Mangalam",
+      "Odiampattu",
+      "Sulthanpet",
+      "Villiyanur"
+    ]
+  ],
+  "605111": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Hemerjickz Centre",
+      "Irumbai",
+      "Poothurai",
+      "Rayapudupakkam",
+      "Sedarapet",
+      "Tiruchitambalam"
+    ]
+  ],
+  "605201": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Anaiyeri",
+      "Ananthapuram",
+      "Athiyur",
+      "Karai",
+      "Karuvakshi",
+      "Konalur",
+      "Panamalai",
+      "Ponnankuppam",
+      "VMathur"
+    ]
+  ],
+  "605202": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Anniyur", "Kalayampoondi", "Melkaranai", "Nangathur", "Porur", "Sangeethamangalam"]
+  ],
+  "605203": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Asokapuri",
+      "Brahmadesam",
+      "Kanjanur",
+      "Kottiyampoondi",
+      "Kundalapuliyur",
+      "Muttathur",
+      "Nemur",
+      "Vembi"
+    ]
+  ],
+  "605301": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Kanai", "Kappur", "Kondangi", "Konur", "Nannadu", "Orukodi", "Perumbakkam"]
+  ],
+  "605302": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Kalpattu", "Kangiyanur", "Mambazhapattu", "Teli"]
+  ],
+  "605401": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Athiyur Thiruvadi",
+      "Kandamanadi",
+      "Kandambakkam",
+      "Maragadhapuram",
+      "Pidagam",
+      "Salamedu",
+      "Valudareddy"
+    ]
+  ],
+  "605402": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Adanur",
+      "Ariyalur Tirukkai",
+      "Kakkanur",
+      "Kedar",
+      "Palliandur",
+      "Siruvalai",
+      "Thiruvamathur",
+      "Vengandur",
+      "Viramur"
+    ]
+  ],
+  "605403": ["Villupuram", "Tamil Nadu", ["Valudareddy"]],
+  "605501": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Kodukkur",
+      "Korakeni",
+      "Madurapakkam",
+      "Mannadipattu",
+      "Mutrampattu",
+      "Radhapuram",
+      "Sellipet",
+      "Seshanganur",
+      "Sorapattu",
+      "Tirukkanur",
+      "Tirumangalam",
+      "Vadhanur",
+      "Vakkur",
+      "VNerkunam"
+    ]
+  ],
+  "605502": [
+    "Pondicherry",
+    "Puducherry",
+    [
+      "Coudapakkam",
+      "Kadaperikuppam",
+      "Katterikuppam",
+      "Suthukeni",
+      "Thondamanatham",
+      "Valudavur"
+    ]
+  ],
+  "605601": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Ayyur Agaram",
+      "Chinthamani",
+      "Kappiyampuliyur",
+      "Mundiyambakkam",
+      "Orathur",
+      "Panayapuram",
+      "Thoravi",
+      "TMettupalayam"
+    ]
+  ],
+  "605602": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Kamala Nagar",
+      "Kilperumbakkam",
+      "Maharajapuram",
+      "Santhanagopalapuram",
+      "Villupuram",
+      "Villupuram Collectorate",
+      "Villupuram East",
+      "Villupuram West"
+    ]
+  ],
+  "605651": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Anilady",
+      "Kilmambattu",
+      "Negandur",
+      "Perani",
+      "Periyathatchur",
+      "Pidaripattu",
+      "SeKunnatur",
+      "VNallalam"
+    ]
+  ],
+  "605652": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Asur",
+      "Avadayarpattu",
+      "Melakondai",
+      "Pombur",
+      "Sithani",
+      "TPudupalayam",
+      "Vidur",
+      "Vidur Dam",
+      "Vikravandi",
+      "Vikravandi RS",
+      "VSalai",
+      "VSathanur"
+    ]
+  ],
+  "605701": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Alambadi",
+      "Athiyur Thirukkai",
+      "Kandachipuram",
+      "Malavanthangal",
+      "Melvalai",
+      "Nallapalayam",
+      "Odiyathur",
+      "Pilrampattu",
+      "Sithathur",
+      "Vengamur"
+    ]
+  ],
+  "605702": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "B. Arulambadi",
+      "Brammakundam",
+      "Irudayampattu",
+      "Melsiruvallur",
+      "Michaelpuram",
+      "Moongilthuraipattu",
+      "Porasapattu",
+      "Pounjipattu",
+      "Vadaponparappi"
+    ]
+  ],
+  "605751": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Ariyur",
+      "Cholavandipuram",
+      "Kattu Edaiyur",
+      "Memalur",
+      "Padiyandal",
+      "Pazhangur",
+      "Vengur"
+    ]
+  ],
+  "605752": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Arakandanallur", "Devanur", "V . Puthur", "Vadakaraithayanur"]
+  ],
+  "605754": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Devaradiyarkuppam",
+      "Jambai",
+      "Kangeyanur",
+      "Kazhumalam",
+      "Manalurpet",
+      "Murukkambadi",
+      "Sangiyam"
+    ]
+  ],
+  "605755": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Arcadu",
+      "Arulavadi",
+      "Ayandur",
+      "Kadaganur",
+      "Karanai",
+      "Mogaiyur",
+      "Paranur",
+      "S.Kodungal",
+      "Sathiyakandanur",
+      "Sennakunam"
+    ]
+  ],
+  "605756": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Kottamarudur", "Kuladeepamangalam", "Thapovanam", "Vilandai"]
+  ],
+  "605757": ["Kallakurichi", "Tamil Nadu", ["Tirukkoyilur", "Tirukkoyilur Bazaar"]],
+  "605758": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Adichanur", "Oddampattu", "Vasanthakrishnapuram", "Virapandi"]
+  ],
+  "605759": ["Kallakurichi", "Tamil Nadu", ["Madam", "Manampoondi", "T Athipakkam"]],
+  "605766": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Aruthangudi",
+      "Deviagaram",
+      "Karadi",
+      "Kattupaiyur",
+      "Keelathalanur",
+      "Kuvanur",
+      "Santhapettai",
+      "Thagadi",
+      "Tiruppalapandal"
+    ]
+  ],
+  "605801": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Ariyalur (Villupuram)",
+      "Endal",
+      "Kaduvanur",
+      "Maiyanur",
+      "Pakkam",
+      "Periyakolliyur",
+      "Tholuvanthangal"
+    ]
+  ],
+  "605802": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Eduthanur",
+      "Elayanarkuppam",
+      "Kadambur",
+      "Sirpadanallur",
+      "Sirpanandal",
+      "Tiruvarangam"
+    ]
+  ],
+  "605803": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Andrayanur",
+      "Arunkurukkai",
+      "C Meyyur",
+      "Edapalayam",
+      "Elrampattu",
+      "Sithalingamadam",
+      "T . Kunnathur",
+      "T . Pudupalayam",
+      "Vadamarudur"
+    ]
+  ],
+  "606001": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Vriddhachalam", "Vriddhachalam Bazaar", "Vriddhachalam Cutchery"]
+  ],
+  "606003": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Budamur",
+      "Erumanur",
+      "Kargudal",
+      "Ko Adhanur",
+      "Kuppanatham",
+      "Manavalanallur",
+      "Paravalur",
+      "Sathamangalam",
+      "T Gopurapuram",
+      "Thoravalur"
+    ]
+  ],
+  "606102": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Adhanur",
+      "Attur",
+      "Kalamarudur",
+      "Kiliyur",
+      "Kuvagam",
+      "Ma Kunnathur",
+      "Nannaram",
+      "Nathamur",
+      "Orathur",
+      "Pandur",
+      "Velur"
+    ]
+  ],
+  "606103": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Dharmanallur",
+      "Gopalapuram",
+      "Kammapuram",
+      "Kathazhai",
+      "Kilapalaiyur",
+      "Ottimedu",
+      "Periyakottumulai",
+      "Sathapadi"
+    ]
+  ],
+  "606104": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Chinnaparur",
+      "Idaichittur",
+      "Karnatham",
+      "Ko Pavalangudi",
+      "Konankuppam",
+      "Mangalam (SA)",
+      "Mathur",
+      "Mukhasaparur",
+      "Palayapattinam",
+      "Pali",
+      "Puvanur",
+      "Vijayamanagaram"
+    ]
+  ],
+  "606105": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Kilimangalam", "Konur", "Kosapallam", "Murugangudi", "Pelandurai", "Pennadam"]
+  ],
+  "606106": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Akkanur",
+      "E.Keeranur",
+      "Kilacheruvoi",
+      "Perumulai",
+      "Sevveri",
+      "Sirumulai",
+      "Tittagudi",
+      "Vagaiyur"
+    ]
+  ],
+  "606107": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Anganur",
+      "Edaikkal",
+      "Kanaiyar",
+      "Madiyanur",
+      "Moolasamudram",
+      "Pu Killanur",
+      "Pu Konalavadi",
+      "Pu.Mambakkam",
+      "Puliyur",
+      "Semmanangur",
+      "Ulundurpet",
+      "Ulundurpet Busstand",
+      "Vellaiyur"
+    ]
+  ],
+  "606108": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Alambadi", "Avatti", "Ma Podaiyur", "Malayanur", "Mangalur", "Poynapadi"]
+  ],
+  "606109": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Adari", "Orangur", "Rettakurichi", "Sirupakkam", "Vallimaduram"]
+  ],
+  "606110": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "C Keeranur",
+      "Deevalur",
+      "Karmangudi",
+      "Karuvepilankurichi",
+      "Sathiyavadi",
+      "Sathukudal",
+      "Therku Vadakku Puthur"
+    ]
+  ],
+  "606111": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Avinangudi",
+      "Gudalur",
+      "Kothattai",
+      "Melur",
+      "Pennadam R.S.",
+      "Pothiramangalam",
+      "Sathanatham",
+      "Tholar",
+      "Tiruvattathurai"
+    ]
+  ],
+  "606115": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    ["Aladi", "Irulakurichi", "Koo Kallakurichi", "Padur", "Palakollai", "Senkurichi"]
+  ],
+  "606201": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Ammaiagaram",
+      "Chinnasalem",
+      "Dagamtheerthapuram",
+      "Kaniyamur",
+      "Melnariyappanur",
+      "Melur",
+      "Moongilpadi",
+      "Paithanthurai",
+      "Pandiyankuppam",
+      "Pethanur",
+      "Siruvathur",
+      "Thengiyanatham",
+      "Thottiyam",
+      "Vettiperumalagaram"
+    ]
+  ],
+  "606202": ["Kallakurichi", "Tamil Nadu", ["Kallakurichi"]],
+  "606203": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Kongarayapalayam",
+      "Malaikottalam",
+      "Mudiyanur",
+      "Nagalur",
+      "Porasakurichi",
+      "Pudu Uchimedu",
+      "Sethuvarayankuppam",
+      "Varanjaram",
+      "Virugavur"
+    ]
+  ],
+  "606204": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Ammakalathur",
+      "Asakalathur",
+      "Eyyanur",
+      "Iriyur",
+      "Maligaimedu",
+      "Olagiyanallur",
+      "Perumangalam",
+      "Pukkiravari",
+      "S. Ohaiyur",
+      "Thensiruvalur",
+      "Thenthorasalur"
+    ]
+  ],
+  "606205": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Komalur",
+      "La Gudalur",
+      "Mandagapadi",
+      "Munivalai",
+      "Nurolai",
+      "Pasar",
+      "Rishivandiyam",
+      "Sathaputhur",
+      "Seedevi",
+      "Sikkadu"
+    ]
+  ],
+  "606206": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Madur",
+      "Palayasiruvangur",
+      "Pallagacherry",
+      "Peelamedu",
+      "Periyamampattu",
+      "Prithivimangalam",
+      "Sithalur",
+      "Sulankurichi",
+      "Timmalai",
+      "Tiyagadrug",
+      "Tiyagai",
+      "Vadathorasalur",
+      "Veeracholapuram",
+      "Vengaivadi",
+      "Vilakkur"
+    ]
+  ],
+  "606207": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Chellampattu",
+      "Eduthavainatham",
+      "Eruvaipattinam",
+      "Kachirapalayam",
+      "Karadichittur",
+      "Madavacherry",
+      "Malliyapadi",
+      "Manmalai",
+      "Mathur",
+      "Mattaparai",
+      "Pottiyam",
+      "Vadakkanandal",
+      "Venkatampettai"
+    ]
+  ],
+  "606208": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    ["Alathur", "Cholampattu", "Kilapattu", "Manjaputhur", "Murarbad", "Nedumanur"]
+  ],
+  "606209": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Arampoondi",
+      "Innadu",
+      "Kariyalur",
+      "Kodumathi",
+      "Kottapudur",
+      "Madhur",
+      "Maniyampalayam",
+      "Mundiyur",
+      "Nochimedu",
+      "Thoradipattu",
+      "Uppur",
+      "Vazhapadi",
+      "Vellimalai"
+    ]
+  ],
+  "606213": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Agarakottalam",
+      "K.Alambalam",
+      "Kallakurichi South",
+      "Kudiraichandal",
+      "Nallathur",
+      "Neelamangalam",
+      "Olagankathan",
+      "Siruvangur",
+      "Somandargudi",
+      "Thachur",
+      "Thandalai",
+      "Thenkeeranur",
+      "Vilambar"
+    ]
+  ],
+  "606301": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Anumanandal",
+      "Karunthalakurichi",
+      "Kugaiyur",
+      "Nainarpalayam",
+      "Pakkampadi",
+      "S. Naraiyur",
+      "Thottapadi",
+      "V Alambalam",
+      "V Mamandur"
+    ]
+  ],
+  "606302": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Edaiyur",
+      "Nagar",
+      "Nallur",
+      "Perambalur",
+      "Sathiyam",
+      "Seppakkam",
+      "Sirumangalam",
+      "Varambanur",
+      "Vilangattur"
+    ]
+  ],
+  "606303": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Alathur",
+      "Eluthur",
+      "Kilakalpoondi",
+      "Korakkavadi",
+      "Lakkur",
+      "Thachur",
+      "Toludur",
+      "Vaithiyanathapuram",
+      "Venganur"
+    ]
+  ],
+  "606304": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Kaludur",
+      "Kattumailur",
+      "N. Naraiyur",
+      "Nithinatham",
+      "Pasar",
+      "Periyanesalur",
+      "Pillur",
+      "Poolambadi",
+      "Veppur (SA)"
+    ]
+  ],
+  "606305": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Asanur",
+      "Eranji",
+      "Gurupeedapuram",
+      "Koothakudi",
+      "Ninnaiyur",
+      "Parindal",
+      "T.Mavidanthal",
+      "Tiruppayar"
+    ]
+  ],
+  "606401": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Arasampattu",
+      "Kilakkadu",
+      "Kosapadi",
+      "Mottampatti",
+      "Perumbur",
+      "Pootai",
+      "Poykunam",
+      "Pudupalapattu",
+      "Sankarapuram (Villupuram)",
+      "Serapattu",
+      "Soundaravallipalayam",
+      "Thekkampattu",
+      "Vanjikuli",
+      "Vellarikadu",
+      "Vengodu"
+    ]
+  ],
+  "606402": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Arur",
+      "Lakkinayakkanpatti",
+      "Mookanur",
+      "Pandalam",
+      "Pudupattu",
+      "Puthirampattu",
+      "Rangappanur",
+      "Ravathanallur",
+      "S.Kolathur",
+      "Viriyur"
+    ]
+  ],
+  "606601": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Ayyankulam",
+      "Kalnagar",
+      "Kilnathur",
+      "Saron",
+      "Tiruvannamalai",
+      "Tiruvannamalai Bazaar",
+      "Tiruvannamalai RS"
+    ]
+  ],
+  "606603": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Ayyampalayam", "Nallavanpalayam", "Pandithapattu", "Sriramanashramam", "Thenmathur"]
+  ],
+  "606604": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Adaiyur",
+      "Adiannamalai",
+      "Esanyamadam",
+      "Inamkariyandal",
+      "Kiliyapattu",
+      "Vengikkal"
+    ]
+  ],
+  "606611": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Kanalapadi",
+      "Kilnachipattu",
+      "Malappambadi",
+      "Pallikondapattu",
+      "Somasipadi",
+      "Vedanatham"
+    ]
+  ],
+  "606701": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Chengam", "Chennasamudram", "Kayambattu", "Thithandapattu", "Valayampattu"]
+  ],
+  "606702": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Alathur",
+      "C Nammiandal",
+      "Japthikariandal",
+      "Kallarai Padi",
+      "Kanji",
+      "Melpadur",
+      "Vadamathur"
+    ]
+  ],
+  "606703": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Andipattu",
+      "Arasankanni",
+      "Elangunni",
+      "Melarvandavadi",
+      "Melchengam",
+      "Melpallipattu",
+      "Melvanakakambadi",
+      "Neepathurai",
+      "Puliyampatti"
+    ]
+  ],
+  "606704": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Eraiyur",
+      "Kilpaliyapattu",
+      "Melmudiyanur",
+      "Melnachipattu",
+      "Melpennathur",
+      "Pachal",
+      "Periyakolapadi",
+      "Thorapadi",
+      "Vasudevampattu"
+    ]
+  ],
+  "606705": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Karapattu",
+      "Kilkuppam",
+      "Munnurmangalam",
+      "Padiagraharam",
+      "Pudupalayam",
+      "Pudur Chengam",
+      "Veeranandal"
+    ]
+  ],
+  "606706": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Kolundampattu", "S Sorpanandal", "Sathanur", "Sathanurdam", "Veppurchekkadi"]
+  ],
+  "606707": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Edathanur",
+      "Kilsirupakkam",
+      "Kilvanakkambadi",
+      "Radhapuram",
+      "Tandarampattu",
+      "Taradapattu",
+      "Thenmudiyanur"
+    ]
+  ],
+  "606708": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Athipadi",
+      "Bhimarapatti",
+      "Chinnaimpettai",
+      "Kuttar",
+      "Malamanjanur",
+      "Mottakkal",
+      "Narayanakuppam",
+      "P Quilam",
+      "Perunkolathur",
+      "Pudur Chekkadi",
+      "Rayandapuram",
+      "Reddiarpalayam",
+      "Tanipadi",
+      "Tiruvadathanur"
+    ]
+  ],
+  "606709": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Arattavadi",
+      "Kariamangalam",
+      "Melpuludiyur",
+      "Nachipattu",
+      "Pakkiripalayam",
+      "Pinjur",
+      "Thukkapettai"
+    ]
+  ],
+  "606710": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Kallathur",
+      "Kilaiyur",
+      "Kuppanatham",
+      "Kuyilam",
+      "Oorgoundanur",
+      "Paramanandal",
+      "Pudupattu"
+    ]
+  ],
+  "606751": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Kalasapakkam",
+      "Kalur",
+      "Kappalur",
+      "Karkonam",
+      "Kuruvimalai",
+      "Ladavaram",
+      "Palankoil",
+      "Pathiyavadi",
+      "Pundi Polur",
+      "Thenpallipattu"
+    ]
+  ],
+  "606752": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Arpakkam",
+      "Kothandavadi",
+      "Mangalam",
+      "Nookambadi",
+      "Palanandal",
+      "Vallivagai",
+      "Vedandavadi"
+    ]
+  ],
+  "606753": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Allikondapattu",
+      "Elayankanni",
+      "Meyyur",
+      "Nariyapattu",
+      "Palayanur",
+      "Perunthuraipattu",
+      "Serpapattu",
+      "Thenkarimbalur",
+      "Valavachanur",
+      "Vanapuram",
+      "Varagur",
+      "Velayampakkam"
+    ]
+  ],
+  "606754": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Kallayee Sorathur",
+      "Naraiyur",
+      "Neivanatham",
+      "Olaipadi",
+      "Palavalam",
+      "Vaipur",
+      "Vettavalam"
+    ]
+  ],
+  "606755": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Avur",
+      "Chellankuppam",
+      "Gudalur",
+      "Kilkarippur",
+      "Konalur",
+      "Kulathur",
+      "Rajapalayam",
+      "Sanipundi"
+    ]
+  ],
+  "606801": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Chettupattu Polur", "Maruthuvambadi", "Morakaniyanur", "Palampettai", "Ulagampattu"]
+  ],
+  "606802": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Devanampattu",
+      "Maruthuvambadi",
+      "Nayudumangalam",
+      "Northampoondi",
+      "Periyakilambadi",
+      "Porkunam",
+      "Sorakulathur",
+      "Thennagaram",
+      "Veluganandal"
+    ]
+  ],
+  "606803": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Athimoor Tindivanam",
+      "Kangeyanur",
+      "Karapundi",
+      "Mambattu",
+      "Murugapadi",
+      "Pelasur",
+      "Periagaram",
+      "Polur",
+      "Polur Town",
+      "Potharai",
+      "RKunnathur",
+      "Sanikkavadi",
+      "Sengunam",
+      "Thumbakkadu",
+      "Tirusur",
+      "Vasur"
+    ]
+  ],
+  "606804": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Andampallam",
+      "Gangapattu",
+      "Isukkalikatteri",
+      "Kadagaman",
+      "Kattumalayanur",
+      "Madurampattu",
+      "Tandarai"
+    ]
+  ],
+  "606805": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Kalasthambadi", "Kolakkaravadi", "Mallavadi", "Turinjapuram"]
+  ],
+  "606806": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Arudirapattu",
+      "Chinnakallapadi",
+      "Devanur",
+      "Pavithiram",
+      "Perumanam",
+      "Su Valavetti",
+      "Veraiyur"
+    ]
+  ],
+  "606807": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Arasampattu", "Melathangal", "Nedungunam", "Veppambattu"]
+  ],
+  "606808": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Aradapattu",
+      "Kattampoondi",
+      "Kolakudi",
+      "Parayampattu",
+      "Su Andapattu",
+      "Su Pappambadi"
+    ]
+  ],
+  "606811": ["Tiruvannamalai", "Tamil Nadu", ["Thachampattu"]],
+  "606901": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Adamangalam",
+      "Gangavaram",
+      "Kanthapalayam",
+      "Kettavarampalayam",
+      "Kidampalayam",
+      "Melsolankuppam",
+      "Viralur"
+    ]
+  ],
+  "606902": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Athurai",
+      "Budamangalam",
+      "Devikapuram",
+      "Mansurabad",
+      "Modaiyur",
+      "Nambedu",
+      "Narasingapuram",
+      "Sevarapundi",
+      "Thatchambadi",
+      "Thumbur"
+    ]
+  ],
+  "606903": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Kalambur",
+      "Kalvasal",
+      "Kamakkur",
+      "Kasthambadi",
+      "Mukkurumbai",
+      "Nadukuppam",
+      "Pulavanpadi",
+      "Pungambadi"
+    ]
+  ],
+  "606904": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Allialamangalam",
+      "Mandakolathur",
+      "Padagam",
+      "Pulivanandal",
+      "Semmiyamangalam",
+      "Vilapakkam"
+    ]
+  ],
+  "606905": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "A K Padavedu",
+      "Arjunapuram",
+      "Kesavapuram",
+      "Krishnapuram",
+      "Ramanathapuram",
+      "Santhavasal",
+      "Vellur"
+    ]
+  ],
+  "606906": ["Tiruvannamalai", "Tamil Nadu", ["Elathur", "Siruvallur", "Vilvarani"]],
+  "606907": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    [
+      "Athuvambadi",
+      "Ettivadi",
+      "Gudalur",
+      "Kelur",
+      "Saduperipalayam",
+      "Tirumalai",
+      "Vadamadimangalam"
+    ]
+  ],
+  "606908": [
+    "Tiruvannamalai",
+    "Tamil Nadu",
+    ["Banambattu", "Kadaladi", "Kilpalur", "Thenmahadevamangalam"]
+  ],
+  "607001": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Cuddalore",
+      "Cuddalore Court Buildings",
+      "Cuddalore Public Offices",
+      "Fort St.David",
+      "Manjakkuppam",
+      "Semmandalam"
+    ]
+  ],
+  "607002": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Tirupadiripuliyur", "Tiruppadiripuliyur Bazaar", "Tiruppadiripuliyur West"]
+  ],
+  "607003": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Akkarai Gori",
+      "Annavalli",
+      "Cuddalore Old Town",
+      "Cuddalore Ot Bazaar",
+      "Cuddalore Port",
+      "Kodukkanpalayam",
+      "Pachayankuppam",
+      "Ramapuram",
+      "Sedapalayam",
+      "Sellankuppam",
+      "Valisodanaipalayam",
+      "Vasantharayanpalayam",
+      "Vellakarai"
+    ]
+  ],
+  "607004": ["Cuddalore", "Tamil Nadu", ["M.Pudur", "Sathankuppam", "Vandipalayam"]],
+  "607005": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Capperquary", "Poondiyankuppam", "Sangolikuppam", "Sipcot Cuddalore"]
+  ],
+  "607006": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Gundu Uppalavadi", "Kondur", "Suba Uppalavadi"]
+  ],
+  "607101": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Alagaperumalkuppam",
+      "Anathur",
+      "Andarmullipallam",
+      "Aviyanur",
+      "Kudimiyankuppam",
+      "Manamthavizhnthaputhur",
+      "Melthaniyalampattu",
+      "Natham",
+      "Pythambadi",
+      "Sirugramam",
+      "Somasipalayam",
+      "Veerraperumanallur"
+    ]
+  ],
+  "607102": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Badrakottai",
+      "Chinnapanaickenpalayam",
+      "Edayarkuppam",
+      "N.Moolakuppam",
+      "Naduveerappattu",
+      "Pallavarayanatham",
+      "Palur",
+      "Silambinathanpettai"
+    ]
+  ],
+  "607103": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Arasadikkuppam",
+      "Kadambuliyur",
+      "Kiliruppu",
+      "Marungur",
+      "Melmampattu",
+      "Nadukkuppam",
+      "Siruthondamadevi"
+    ]
+  ],
+  "607104": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Elumedu",
+      "Kalinjikuppam",
+      "Kongarayanur",
+      "Melpattambakkam",
+      "Perumalnaickenpalayam",
+      "Sornavur Melpathi"
+    ]
+  ],
+  "607105": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Gudithangi",
+      "Kilarungunam",
+      "Nellikkuppam",
+      "Nellikuppam Bazaar",
+      "Sholavalli",
+      "Tirukandeeswaram",
+      "Vanamadevi",
+      "Vanpakkam"
+    ]
+  ],
+  "607106": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Anguchettipalayam",
+      "Kanisapakkam",
+      "Kilmampattu",
+      "Lakshminarayanapuram",
+      "Maligampattu",
+      "Panikuppam",
+      "Panruti",
+      "Panruti East",
+      "Panruti West",
+      "Sathipattu",
+      "Semmedu",
+      "Semokottai",
+      "Siruvathur",
+      "Tiruvamur"
+    ]
+  ],
+  "607107": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Arasur",
+      "Arumpattu",
+      "Enathimangalam",
+      "Eruvelipattu",
+      "Perangiyur",
+      "Semmar",
+      "Sithanangur",
+      "Valayampattu"
+    ]
+  ],
+  "607108": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Bandarakottai", "Enathirimangalam", "Karumbur", "Oraiyur", "Puthupet (CDL)"]
+  ],
+  "607109": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Alaginatham",
+      "Gunamangalam",
+      "Kalaiyur",
+      "Marudadu",
+      "Nathapattu",
+      "Varakalpattu",
+      "Vellapakkam"
+    ]
+  ],
+  "607112": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Kilkavarappattu", "Maligaimedu", "Melkavrapattu", "Pagandai"]
+  ],
+  "607201": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Adaiyur",
+      "Ellaigramam",
+      "Eraiyur",
+      "Kunjaram",
+      "Kuvadu",
+      "Pallavadi",
+      "Periyakurukkai"
+    ]
+  ],
+  "607202": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    ["Elavanasur", "Pinnalavadi", "Pu Malayanur", "Pugaipatti", "Sembiamadevi"]
+  ],
+  "607203": [
+    "Villupuram",
+    "Tamil Nadu",
+    [
+      "Emappur",
+      "Gramam",
+      "Kannarampattu",
+      "Kongarayanur",
+      "Marangiyur",
+      "Paiyur",
+      "Sirumadurai",
+      "T . Edayar",
+      "Thaduthatkondur",
+      "Tiruvennainallur"
+    ]
+  ],
+  "607204": [
+    "Kallakurichi",
+    "Tamil Nadu",
+    [
+      "Eswarakandanallur",
+      "Irundai",
+      "Kizakkumarudur",
+      "Madapattu",
+      "Parikkal",
+      "Periyakuppam",
+      "Perumbakkam",
+      "Sendamangalam",
+      "Sendanadu",
+      "Tirunavalur",
+      "Vanampattu"
+    ]
+  ],
+  "607205": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Akkadavalli",
+      "Kandrakottai",
+      "Kattamuthupalayam",
+      "Kumaramangalam",
+      "Pulavanur",
+      "Thattampalayam",
+      "Tiruthuraiyur",
+      "Varinjipakkam"
+    ]
+  ],
+  "607209": [
+    "Villupuram",
+    "Tamil Nadu",
+    ["Amur", "Manakuppam", "Pavandur", "Periyasevalai", "Saravanapakkam", "T . Kolathur"]
+  ],
+  "607301": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Ambalavananpettai",
+      "Anukkampattu",
+      "Ayikuppam",
+      "Krishnankuppam",
+      "Kullanchavadi",
+      "Kundiyamallur",
+      "Madanagopalapuram",
+      "Puliyur",
+      "Samattikuppam",
+      "Subramaniyapuram",
+      "T.Palayam",
+      "Thondamanatham",
+      "Valudalampattu",
+      "Vasanankuppam"
+    ]
+  ],
+  "607302": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Adur Agaram",
+      "Arangamangalam",
+      "Chinnakannadi",
+      "Guruvappanpettai",
+      "Kalkunam",
+      "Kilur",
+      "Kurinjipadi",
+      "Pethanaickenkuppam",
+      "Vehakollai",
+      "Venkatampettai",
+      "Virupakshi"
+    ]
+  ],
+  "607303": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Karunguli",
+      "Maruvai",
+      "Moolakuppam",
+      "Serakuppam",
+      "Vadakuthu",
+      "Vadalur",
+      "Vanathirayapuram"
+    ]
+  ],
+  "607308": ["Cuddalore", "Tamil Nadu", ["Gandhi Nagar"]],
+  "607401": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Padirikuppam", "Sundaravandi", "Tirumanikuzhi", "Tiruvendhipuram"]
+  ],
+  "607402": [
+    "Pondicherry",
+    "Puducherry",
+    ["Bahoor", "Courouvinatham", "Manamedu", "Manapet", "Seliyamedu", "Thookkanambakkam"]
+  ],
+  "607403": [
+    "Pondicherry",
+    "Puducherry",
+    ["Kirumambakkam", "Pillayarkuppam", "Reddichavadi"]
+  ],
+  "607801": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Block 1, Neyveli", "Block 10,Neyveli", "Block 24, Neyveli", "Neyveli 1"]
+  ],
+  "607802": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "A.Kuravankuppam",
+      "Ammeri",
+      "Kottagam",
+      "Melakolakudi",
+      "Melakuppam",
+      "Mettukkuppam",
+      "Neyveli 2",
+      "Neyveli Second Mines",
+      "Periyakappankulam",
+      "Seplanatham",
+      "Vadakkuvelur"
+    ]
+  ],
+  "607803": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Block 18, Neyveli", "Block 26, Neyveli", "Block 5, Neyveli", "Neyveli 3"]
+  ],
+  "607804": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Kotteri", "Mudanai", "Oomangalam", "U Agaram", "Uttangal"]
+  ],
+  "607805": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Iruppu",
+      "Kattugudalur",
+      "Kilkangeyankuppam",
+      "Mudapuli",
+      "Odappankuppam",
+      "Perperiyankuppam",
+      "Sorathur",
+      "Vallam",
+      "Visoor"
+    ]
+  ],
+  "607807": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Block 29, Neyveli", "Neyveli II Thermal Station", "Neyveli Thermal Bus Stand"]
+  ],
+  "608001": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Chidambaram",
+      "Chidambaram Cutcherry",
+      "Chidambaram East",
+      "Chidambaram North",
+      "Chidambaram West",
+      "Muthukamatchithottam"
+    ]
+  ],
+  "608002": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Annamalai University",
+      "Annamalainagar",
+      "Gavarappattu",
+      "Jayankondapattinam",
+      "Kodiyampalayam",
+      "Kovilampoondi",
+      "Nakkaravanthankudi",
+      "Perampattu",
+      "Pichavaram",
+      "Sivapuri",
+      "Uthamacholamangalam"
+    ]
+  ],
+  "608102": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "C.Mutlur",
+      "Keelamoongiladi",
+      "Keelanuvampattu",
+      "Killai",
+      "Nanjamahathuvazkai",
+      "Pinnathur",
+      "Ponnanthittu",
+      "Thillaividangan"
+    ]
+  ],
+  "608201": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Ayyanur Akkaramangalam",
+      "C.Sathamangalam",
+      "Maduranthaganallur",
+      "Odakkanallur",
+      "Orathur",
+      "Pannapattu",
+      "Paradur",
+      "Sakkangudi",
+      "Vakkur"
+    ]
+  ],
+  "608301": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Arantangi",
+      "Kandamangalam",
+      "Karunakaranallur",
+      "Kattumannarkoil",
+      "M.Kolakudi",
+      "Melapalachanallur",
+      "Nattarmangalam",
+      "Rajendra Cholagam",
+      "Sithamalli",
+      "Udayargudi",
+      "Veeranandapuram"
+    ]
+  ],
+  "608302": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "C.Arasur",
+      "Komaratchi",
+      "M.Puliyangudi",
+      "Melaparuthikudi",
+      "Melavanniyur",
+      "Mullangudi",
+      "Nanjalur",
+      "Pulamedu",
+      "Suravilandur",
+      "Temmur",
+      "Vannaiyur"
+    ]
+  ],
+  "608303": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Elleri",
+      "Kollimalai Kilpathi",
+      "Kollumedu",
+      "Lalpet",
+      "M.Odaiyur",
+      "Maniadur",
+      "Neyvasal",
+      "Pillaiyarthangal",
+      "Tirunaraiyur"
+    ]
+  ],
+  "608304": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Chettithangal",
+      "Eyyalur",
+      "Kanjankollai",
+      "M.Adhanur",
+      "Melakadambur",
+      "Reddiyur",
+      "Shandan",
+      "Sirukattur"
+    ]
+  ],
+  "608305": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Alkondanatham",
+      "Kandakumaran",
+      "Kothavasal",
+      "Kuduveli",
+      "Mogaiyur",
+      "Perungalur",
+      "T.Nedunjeri",
+      "Terkuviruthangam",
+      "Vilagam"
+    ]
+  ],
+  "608306": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Ayangudi", "Kunjimedu", "Movur", "Muttam", "Omampuliyur"]
+  ],
+  "608401": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Ammapettai",
+      "Athipatu",
+      "Karuppur",
+      "Salianthoppu",
+      "Vadakkumangudi",
+      "Vaiyur",
+      "Vallampadugai"
+    ]
+  ],
+  "608501": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "B.Adivaraganallur",
+      "B.Mutlur",
+      "Kothattai",
+      "Kuriamangalam",
+      "Manikollai",
+      "Manjakuli",
+      "Periyakomatti",
+      "Puduchatram",
+      "Thatchakadu",
+      "Theethampalayam",
+      "Villiyanallur"
+    ]
+  ],
+  "608502": [
+    "Cuddalore",
+    "Tamil Nadu",
+    ["Agaram", "Ariyakoshti", "C.Pudupettai", "Parangipettai", "Samiyarpettai"]
+  ],
+  "608601": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Azhisikudi",
+      "B.Odaiyur",
+      "Bhuvanagiri",
+      "Budavarayanpettai",
+      "Kothavacheri",
+      "Kummidimulai",
+      "Manjakollai",
+      "Melamanakudi",
+      "Miralur",
+      "Puvalai",
+      "Sathapadi"
+    ]
+  ],
+  "608602": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "C.Veeracholagam",
+      "Ennanagaram",
+      "K.Adur",
+      "K.Alambadi",
+      "Keerapalayam",
+      "Krishnapuram",
+      "Lalpuram",
+      "Vayalur"
+    ]
+  ],
+  "608701": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Kanur",
+      "Kondasamudram",
+      "Mamangalam",
+      "Palayamkottai (CDL)",
+      "Palayamkottai Melpathy",
+      "Perur",
+      "Pudaiyur",
+      "Ramapuram",
+      "Sholathiram",
+      "Vadakkupalayam",
+      "Valasakkadu",
+      "Vanamadevi"
+    ]
+  ],
+  "608702": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Agara Alambadi",
+      "Budangudi",
+      "Kavalakudi",
+      "Kumarakudi",
+      "Mudikandanallur",
+      "Nandesswaramangalam",
+      "Nangudi",
+      "Sethiathope",
+      "Valakollai",
+      "Vattathur",
+      "Veeramudayanatham"
+    ]
+  ],
+  "608703": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Kavanur",
+      "Kozhai",
+      "Kunamangalam",
+      "Marungur",
+      "Nagarapadi",
+      "Poondi",
+      "Rajendra Pattinam",
+      "Sri Adivaraganallur",
+      "Sri Pudur",
+      "Sri Vakkaramari",
+      "Srimushnam",
+      "Srinedunjeri",
+      "Sriraman"
+    ]
+  ],
+  "608704": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Ambapuram",
+      "B.Kolakudi",
+      "Chinnanargunam",
+      "Erumbur",
+      "Marudur",
+      "Periyanellikkollai",
+      "Pinnalur",
+      "Vadathalaikulam",
+      "Valayamadevi"
+    ]
+  ],
+  "608801": [
+    "Cuddalore",
+    "Tamil Nadu",
+    [
+      "Adinarayananpuram",
+      "Alapakkam",
+      "Periyakuppam",
+      "Poochimedu",
+      "Poovanikkuppam",
+      "Silambimangalam",
+      "Theerthanagiri",
+      "Thiyagavalli"
+    ]
+  ],
+  "608901": [
+    "Ariyalur",
+    "Tamil Nadu",
+    [
+      "Alagapuram",
+      "Attukurichi",
+      "Ayyur",
+      "Kavarapalayam",
+      "Nagampandal",
+      "Olaiyur",
+      "Rangiam",
+      "Silambur"
+    ]
+  ],
+  "609001": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Dharmapuram",
+      "Koranad",
+      "Mayiladuthurai",
+      "Mayiladuthurai Bazaar",
+      "Mayiladuthurai Cutchery",
+      "Mayiladuthurai North",
+      "Mayiladuthurai South",
+      "Nallathukudi",
+      "Pattamangalam",
+      "Tiruvilandur"
+    ]
+  ],
+  "609003": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Chittarkadu",
+      "Koranad South",
+      "Mappadugai",
+      "Mayiladuthurai R.S",
+      "Mayiladuthurai West",
+      "Sholampettai"
+    ]
+  ],
+  "609101": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Achalpuram",
+      "Alakkudi",
+      "Arapallam",
+      "Kodakkaramoolai",
+      "Kothandapuram",
+      "Mahendrapalli",
+      "Palayapalayam",
+      "Palayar",
+      "Pudupattinam",
+      "Puliyanthurai",
+      "Thandavankulam"
+    ]
+  ],
+  "609102": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Anaikaranchatram",
+      "Anaikaranchatram South",
+      "Hanumanthapuram",
+      "Madervelur",
+      "Nallanayagapuram"
+    ]
+  ],
+  "609103": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Anandatandavapuram", "Keelamaruthandanallur"]
+  ],
+  "609104": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Kadavasal",
+      "Kannukiniyanar Koil",
+      "Madanam",
+      "Pachaiperumal Nallur",
+      "Semmangudi (SRK)",
+      "Umayalpathi"
+    ]
+  ],
+  "609105": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Kaveripattinam", "Kaveripattinam Beach", "Neidavasal", "Vanagiri"]
+  ],
+  "609106": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Kilasattanathapuram",
+      "Mangamadam",
+      "Nangur",
+      "Neipathur",
+      "Perunthottam",
+      "Puduthurai",
+      "Thennampattinam",
+      "Tirunagari"
+    ]
+  ],
+  "609107": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Kilaperumpallam",
+      "Melaiyur TVG",
+      "Melaperumpallam",
+      "Natarajapillai Chavadi",
+      "Talachangadu"
+    ]
+  ],
+  "609108": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Erukkur",
+      "Gopalasamudram",
+      "Kunnam",
+      "Perambur (AKC)",
+      "Puthur (SRK)",
+      "Sodiyakudi",
+      "Tirumailadi"
+    ]
+  ],
+  "609109": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Annamperumalkoil",
+      "Karaimedu",
+      "Kattiyaniruppu",
+      "Sattanathapuram",
+      "Sembadaniruppu",
+      "Tiruvali"
+    ]
+  ],
+  "609110": ["Mayiladuthurai", "Tamil Nadu", ["Sirkali"]],
+  "609111": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Arappakkam",
+      "Koilthirukolakkal",
+      "Kovilpathu",
+      "Sirkali East",
+      "Sirkali Thenpathi",
+      "Sirkali West",
+      "Tittai (SRK)",
+      "Vilanthida Samudram"
+    ]
+  ],
+  "609112": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Karkoil", "Mannipallam", "Seithur Srk", "Tirupungur"]
+  ],
+  "609113": ["Mayiladuthurai", "Tamil Nadu", ["Koolaiyar", "Tirumullaivasal"]],
+  "609114": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Manigramam", "Radhanallur (TVG)", "Tiruvengadu"]
+  ],
+  "609115": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Edamanal", "Keeranallur", "Radhanallur (SRK)", "Varisapathu Vadagal", "Vettangudi"]
+  ],
+  "609116": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Elathur", "Kilmathur", "Nemmeli (SRK)", "Pattavilagam", "Valluvakudi"]
+  ],
+  "609117": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Athukudi",
+      "Idaikudi Vadapathy",
+      "Kondathur",
+      "Pagasalai",
+      "Punganur",
+      "Vaithiswarankoil",
+      "Vaithiswarankoil West"
+    ]
+  ],
+  "609118": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Alaveli",
+      "Manakudi",
+      "Molaiyur",
+      "Solasakkaranallur",
+      "Tirunandriyur",
+      "Vallalagaram"
+    ]
+  ],
+  "609201": ["Mayiladuthurai", "Tamil Nadu", ["Ilanthope", "Talanayar Vsk"]],
+  "609202": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Kiloy", "Manalmedu", "Manalmedu East", "Mudikondanallur"]
+  ],
+  "609203": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Arulmozhithevan",
+      "Aruvapadi",
+      "Kalukkanimuttam",
+      "Kanganamputhur",
+      "Korukkai",
+      "Nidur",
+      "Pandur",
+      "Villiyanallur"
+    ]
+  ],
+  "609204": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Athur", "Marathurai", "Tiruchitrambalam", "Tirumeniarkoil"]
+  ],
+  "609205": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Pulavanur", "Siddamalli", "Tiruvalaputhur"]
+  ],
+  "609301": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Akkur", "Kalamanallur", "Mamakudi", "Maruthampallam", "Mathur", "Umayalpuram"]
+  ],
+  "609302": ["Mayiladuthurai", "Tamil Nadu", ["Arangakudi", "Elayalur", "Muthur"]],
+  "609303": ["Mayiladuthurai", "Tamil Nadu", ["Ayappadi", "Kattuchery"]],
+  "609304": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Kanjanagaram", "Karuvazhakarai", "Kidarankondan", "Kilaiyur", "Melapathi"]
+  ],
+  "609305": ["Mayiladuthurai", "Tamil Nadu", ["Mannampandal"]],
+  "609306": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Nalladai", "Tiruvilayattam", "Velampudukudi"]
+  ],
+  "609307": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Chandrapadi",
+      "Erukkattanchery",
+      "Kaliyappanallur",
+      "Porayar",
+      "Porayar Market",
+      "Porayar R.S."
+    ]
+  ],
+  "609308": ["Mayiladuthurai", "Tamil Nadu", ["Iluppur", "Nalluchery", "Sankaranpandal"]],
+  "609309": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Arupathy",
+      "Kalahasthinapuram",
+      "Memathur",
+      "Mudikondanallur",
+      "Parasalur",
+      "Sembanarkoil",
+      "Tiruchempalli"
+    ]
+  ],
+  "609310": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Sendamangalam", "Tillaiyadi", "Tiruvidaikali"]
+  ],
+  "609311": ["Mayiladuthurai", "Tamil Nadu", ["Tirucadaiyur", "Tirumeignanam"]],
+  "609312": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Buthanur", "Eduthukatti", "Tirukkalachery"]
+  ],
+  "609313": ["Mayiladuthurai", "Tamil Nadu", ["Manickapangu", "Tarangambadi"]],
+  "609314": ["Mayiladuthurai", "Tamil Nadu", ["Kodangudi", "Vadakarai"]],
+  "609401": ["Mayiladuthurai", "Tamil Nadu", ["Elandangudi", "Valuvur"]],
+  "609402": ["Mayiladuthurai", "Tamil Nadu", ["Kiliyanur", "Perambur"]],
+  "609403": [
+    "Thiruvarur",
+    "Tamil Nadu",
+    [
+      "A. Kiliyanur",
+      "Kaliyakudi",
+      "Keeranur",
+      "Kollumangudi",
+      "Nedungulam",
+      "Pavattakudi",
+      "Pillur",
+      "Sirupuliyur"
+    ]
+  ],
+  "609404": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Manganallur", "Manganallur Bazaar", "Peruncheri"]
+  ],
+  "609405": [
+    "Thiruvarur",
+    "Tamil Nadu",
+    ["Alathur", "Injikudi", "Peralam", "Tirumeichur"]
+  ],
+  "609501": [
+    "Thiruvarur",
+    "Tamil Nadu",
+    [
+      "Eravancheri",
+      "Kadalangudi",
+      "Kundalur",
+      "Pudukudi",
+      "Sarguneswarapuram",
+      "Tiruvizhimizhalai",
+      "Vilagam",
+      "Vishnupuram"
+    ]
+  ],
+  "609502": ["Thiruvarur", "Tamil Nadu", ["Alangudi", "Mudikondan"]],
+  "609503": [
+    "Thiruvarur",
+    "Tamil Nadu",
+    [
+      "Agarathirumalam",
+      "Ambal",
+      "Koothanur",
+      "Manandakudi",
+      "Maruduvancheri",
+      "Punthottam",
+      "Sarabojirajapuram",
+      "Sembiyanallur"
+    ]
+  ],
+  "609504": ["Thiruvarur", "Tamil Nadu", ["Panangudi", "Sannanallur", "Thuthukudi"]],
+  "609601": ["Karaikal", "Puducherry", ["Ambagarathur", "Nallambal", "Seithur"]],
+  "609602": [
+    "Karaikal",
+    "Puducherry",
+    ["Dharmapuram", "Karaikal", "Karaikal Bazaar", "Karaikal South", "Madagadi"]
+  ],
+  "609603": [
+    "Karaikal",
+    "Puducherry",
+    [
+      "Kurumbagaram",
+      "Melakasakudi",
+      "Nallathur",
+      "Nedungadu",
+      "Tirukottaram",
+      "Velangudi"
+    ]
+  ],
+  "609604": ["Karaikal", "Puducherry", ["Akkaraivattam", "Alathur", "Neravy"]],
+  "609605": ["Karaikal", "Puducherry", ["Karaikalmedu", "Karaikoilpathu", "Thalatheru"]],
+  "609606": ["Karaikal", "Puducherry", ["T.R.Pattinam South", "Tirumalairayanpattinam"]],
+  "609607": [
+    "Karaikal",
+    "Puducherry",
+    ["Karukkangudi", "Sellur", "Surakudi", "Tirunallar", "Vizhithiyur"]
+  ],
+  "609608": [
+    "Thiruvarur",
+    "Tamil Nadu",
+    ["Kollapuram", "Kurungulam", "Menangudi", "Ubayavedanthapuram"]
+  ],
+  "609609": ["Karaikal", "Puducherry", ["Kottuchery", "Tiruvettakudi", "Varichikudi"]],
+  "609701": ["Nagapattinam", "Tamil Nadu", ["Enangudi", "Pakkamkottur", "Vadagarai"]],
+  "609702": [
+    "Nagapattinam",
+    "Tamil Nadu",
+    ["Ervadi", "Marungur", "Polagam", "Seeyathamangai", "Seshamoolai", "Tirumarugal"]
+  ],
+  "609703": [
+    "Nagapattinam",
+    "Tamil Nadu",
+    [
+      "Agara Kondagai",
+      "Alangudichery",
+      "Gopurajapuram",
+      "P.Kondagai",
+      "Pragramam",
+      "Tittachery"
+    ]
+  ],
+  "609704": [
+    "Nagapattinam",
+    "Tamil Nadu",
+    ["Pillali", "Tiruchenkattangudi", "Tirukannapuram", "Tirupugalur"]
+  ],
+  "609801": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    [
+      "Alangudi",
+      "Kuttalam",
+      "Kuttalam East",
+      "Madirimangalam",
+      "Palayagudalur",
+      "Tirumananjeri",
+      "Villiyanallur"
+    ]
+  ],
+  "609802": [
+    "Thanjavur",
+    "Tamil Nadu",
+    ["Narasinganpettai", "Sathanur", "Tirukodikaval", "Tiyagarajapuram"]
+  ],
+  "609803": ["Mayiladuthurai", "Tamil Nadu", ["Tiruvavaduthurai"]],
+  "609804": ["Thanjavur", "Tamil Nadu", ["Kanjanur", "Manalur", "Thuhili", "Tiruloki"]],
+  "609805": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Edakiam", "Gangadarapuram", "Komal", "Kozhaiyur"]
+  ],
+  "609806": [
+    "Mayiladuthurai",
+    "Tamil Nadu",
+    ["Malliyam", "Maraiyur", "Moovalur", "Vanathirajapuram"]
+  ],
+  "609807": [
+    "Thanjavur",
+    "Tamil Nadu",
+    [
+      "Kamakshipuram",
+      "Karuppur",
+      "Kilakattur",
+      "Konulampallam",
+      "Pandanallur",
+      "Tirumangaicherry"
+    ]
+  ],
+  "609808": ["Mayiladuthurai", "Tamil Nadu", ["Terizhandur"]],
+  "609810": ["Mayiladuthurai", "Tamil Nadu", ["Tiruvalangadu"]],
+  "609811": ["Mayiladuthurai", "Tamil Nadu", ["Kali", "Namasivayapuram", "Tirumangalam"]]
+}

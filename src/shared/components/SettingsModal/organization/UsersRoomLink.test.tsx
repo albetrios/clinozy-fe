@@ -13,20 +13,26 @@ import { axe } from 'vitest-axe';
 import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-import { UsersRoomLink } from './UsersRoomLink.tsx';
+import { UsersRoomLink, UsersRoomLinkCard } from './UsersRoomLink.tsx';
 
 function hold(codes: OrganizationPermission[]) {
   useOrganizationStore.getState().setOrganization('org_test', 'acme');
   useOrganizationStore.getState().setPermissions(codes);
 }
 
-/** The link inside Settings (the hash) over a page, beside the two room routes. */
-function renderLink(section: 'members' | 'roles') {
+/** The link inside Settings (the hash) over a page, beside the three room routes. */
+function renderLink(section: 'members' | 'roles' | 'branches') {
   const root = createRootRoute();
   const page = createRoute({
     getParentRoute: () => root,
     path: '/organization/$organizationSlug/today',
-    component: () => <UsersRoomLink section={section} />,
+    // Branches has no section of its own: Settings › Clinic draws its card.
+    component: () =>
+      section === 'branches' ? (
+        <UsersRoomLinkCard target="branches" />
+      ) : (
+        <UsersRoomLink section={section} />
+      ),
   });
   const team = createRoute({
     getParentRoute: () => root,
@@ -38,10 +44,17 @@ function renderLink(section: 'members' | 'roles') {
     path: '/organization/$organizationSlug/users/roles',
     component: () => <p data-testid="room">roles</p>,
   });
+  const branches = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/users/branches',
+    component: () => <p data-testid="room">branches</p>,
+  });
   const router = createRouter({
-    routeTree: root.addChildren([page, team, roles]),
+    routeTree: root.addChildren([page, team, roles, branches]),
     history: createMemoryHistory({
-      initialEntries: [`/organization/acme/today#settings/organization/${section}`],
+      initialEntries: [
+        `/organization/acme/today#settings/organization/${section === 'branches' ? 'clinic' : section}`,
+      ],
     }),
   });
   const view = render(<RouterProvider router={router} />);
@@ -78,5 +91,18 @@ describe('UsersRoomLink', () => {
     await user.click(screen.getByTestId('settings-roles-open-users'));
     await waitFor(() => expect(screen.getByTestId('room')).toHaveTextContent('roles'));
     expect(router.state.location.pathname).toBe('/organization/acme/users/roles');
+  });
+
+  it('opens Users › Branches from the Clinic section, leaving the Settings hash behind', async () => {
+    const user = userEvent.setup();
+    hold(['organization:read', 'branch:read']);
+    const { router, container } = renderLink('branches');
+    const open = await screen.findByTestId('settings-branches-open-users');
+    expect(open.closest('section')).toHaveTextContent('Each branch holds the rest');
+    expect(await axe(container)).toHaveNoViolations();
+    await user.click(open);
+    await waitFor(() => expect(screen.getByTestId('room')).toHaveTextContent('branches'));
+    expect(router.state.location.pathname).toBe('/organization/acme/users/branches');
+    expect(router.state.location.hash).toBe('');
   });
 });

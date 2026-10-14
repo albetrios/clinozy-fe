@@ -1,0 +1,176 @@
+{
+  "drawer": {
+    "title": "Configura {{clinic}}",
+    "sub": "Circa un minuto · Passo {{step}} di {{total}}",
+    "progressLabel": "Avanzamento della configurazione",
+    "stepAnnounce": "Passo {{step}} di {{total}}",
+    "exploreFirst": "Prima esplora",
+    "next": "Avanti: {{step}}",
+    "goLive": "Attiva",
+    "goingLive": "Attivazione…",
+    "saving": "Salvataggio…",
+    "notSaved": "Non salvato · le tue modifiche sono conservate",
+    "lockedHint": "Dopo «{{step}}»",
+    "lockedToast": "Prima completa «{{step}}»",
+    "saveFailed": "Impossibile salvare questo passo. Le tue risposte sono conservate — riprova.",
+    "loadFailed": "Impossibile caricare la configurazione della clinica."
+  },
+  "steps": {
+    "clinicType": {
+      "title": "Che tipo di clinica è?",
+      "why": "Da qui partono i tuoi servizi e le tue fatture.",
+      "label": "Specialità",
+      "hint": "Scegline una o più",
+      "required": "Scegli almeno una specialità."
+    },
+    "location": {
+      "title": "Dov’è la tua clinica?",
+      "why": "Prenotazioni e fatture hanno bisogno di un luogo.",
+      "pin": "CAP",
+      "pinHint": "Compila zona, città e stato",
+      "pinUnknown": "Non conosciamo questo CAP — inserisci zona, città e stato.",
+      "areaPick": "Scegli la tua zona",
+      "area": "Zona",
+      "city": "Città",
+      "state": "Stato",
+      "address": "Indirizzo",
+      "phone": "Telefono",
+      "email": "Email",
+      "branchName": "Nome della sede",
+      "hours": "Aperto {{days}} · {{opens}}–{{closes}}",
+      "change": "Modifica",
+      "done": "Fatto",
+      "days": "Giorni lavorativi",
+      "opens": "Apre",
+      "closes": "Chiude",
+      "closesAfterOpens": "L’orario di chiusura deve essere successivo a quello di apertura.",
+      "requiredField": "Il campo {{field}} è obbligatorio.",
+      "pinInvalid": "Inserisci il CAP di sei cifre.",
+      "emailInvalid": "Inserisci un’email valida.",
+      "phoneInvalid": "Inserisci un numero di telefono valido.",
+      "mainExists": "La tua clinica ha già una sede principale — la configurazione usa quella."
+    },
+    "you": {
+      "title": "Visiti anche tu i pazienti?",
+      "why": "Così i pazienti possono prenotare con te fin dal primo giorno.",
+      "label": "Visiti anche tu i pazienti?",
+      "doctor": "Sì, come medico",
+      "therapist": "Sì, come terapista",
+      "no": "No",
+      "noHint": "Subito dopo puoi invitare il tuo medico.",
+      "required": "Scegli un’opzione."
+    }
+  },
+  "peek": {
+    "specialties": "Specialità",
+    "branch": "Sede",
+    "hours": "Orari",
+    "seesPatients": "Visita pazienti"
+  },
+  "checks": {
+    "clinic_type": "il tipo di clinica",
+    "main_branch": "dove si trova",
+    "services": "un servizio"
+  },
+  "goLiveRefused": "Non puoi ancora attivare — manca ancora: {{missing}}.",
+  "live": {
+    "title": "Si parte!",
+    "sub": "{{clinic}} ora può prenotare e fatturare.",
+    "setUp": "Abbiamo configurato:",
+    "branch": "Sede {{branch}}",
+    "consultation": "{{name}} {{price}}",
+    "youAsDoctor": "tu come medico",
+    "youAsTherapist": "tu come terapista",
+    "book": "Prenota il primo appuntamento",
+    "done": "Fatto",
+    "heardAbout": {
+      "label": "Come hai saputo di noi?",
+      "options": {
+        "search": "Ricerca",
+        "socialMedia": "Social media",
+        "friendOrColleague": "Amico o collega",
+        "blogOrArticle": "Blog o articolo",
+        "other": "Altro"
+      },
+      "thanks": "Grazie — ci è utile."
+    }
+  },
+  "guide": {
+    "title": "Completa la configurazione di {{clinic}}",
+    "count": "{{done}} di {{total}} completati",
+    "consultationAdded": "Consulenza aggiunta",
+    "items": {
+      "treatments": {
+        "title": "Aggiungi i tuoi trattamenti",
+        "sub": "Scegli dall’elenco iniziale",
+        "action": "Aggiungi"
+      },
+      "inviteTeam": {
+        "title": "Invita il tuo team",
+        "sub": "Medici, reception",
+        "action": "Invita"
+      },
+      "inviteDoctor": {
+        "title": "Invita il tuo medico",
+        "sub": "Nessuno è ancora prenotabile",
+        "action": "Invita"
+      },
+      "firstAppointment": {
+        "title": "Prenota il primo appuntamento",
+        "action": "Prenota"
+      }
+    },
+    "skip": "Salta",
+    "undoSkip": "Annulla salto",
+    "skipped": "Saltato",
+    "done": "Fatto",
+    "hide": "Nascondi questa guida",
+    "hidden": "Guida nascosta — riaprila da Impostazioni della clinica.",
+    "ready": {
+      "title": "La tua clinica è pronta",
+      "sub": "Tutto il resto — orari, sale, promemoria — è in Impostazioni della clinica.",
+      "settings": "Impostazioni della clinica"
+    }
+  },
+  "starter": {
+    "title": "Aggiungi i tuoi trattamenti",
+    "sub": "Spunta ciò che offri; modifica nome, minuti, prezzo e GST prima di aggiungere.",
+    "back": "Torna alla guida",
+    "name": "Nome",
+    "minutes": "Minuti",
+    "price": "Prezzo",
+    "gst": "GST",
+    "rowLabel": "Aggiungi {{name}}",
+    "exists": "Aggiunto",
+    "add_one": "Aggiungi {{count}} trattamento",
+    "add_many": "Aggiungi {{count}} di trattamenti",
+    "add_other": "Aggiungi {{count}} trattamenti",
+    "adding": "Aggiunta in corso…",
+    "added_one": "{{count}} trattamento aggiunto",
+    "added_many": "{{count}} di trattamenti aggiunti",
+    "added_other": "{{count}} trattamenti aggiunti",
+    "addOwn": "Aggiungi il tuo",
+    "nothingTicked": "Spunta almeno un trattamento.",
+    "consultationNamed": "Consulenza {{specialty}}",
+    "names": {
+      "consultation": "Consulenza",
+      "chemicalPeel": "Peeling chimico",
+      "hydrafacial": "Hydrafacial",
+      "laserHairRemovalFullFace": "LHR viso completo (seduta)",
+      "acneScarTreatment": "Trattamento cicatrici da acne",
+      "prpSession": "Seduta PRP",
+      "prpPack": "Pacchetto PRP",
+      "scalpTreatment": "Trattamento del cuoio capelluto",
+      "scalingPolishing": "Detartrasi e lucidatura",
+      "toothFilling": "Otturazione",
+      "rootCanal": "Devitalizzazione",
+      "teethWhitening": "Sbiancamento dentale",
+      "papSmear": "Pap test",
+      "pelvicUltrasound": "Ecografia pelvica",
+      "physioSession": "Seduta di fisioterapia",
+      "physioPack": "Pacchetto fisioterapia",
+      "followUpVisit": "Visita di controllo",
+      "dressing": "Medicazione"
+    }
+  }
+}

@@ -15,6 +15,8 @@
    utilities no screen draws until a sheet does, so they load with the sheets
    (`shared/components/PrintTemplate/print-template.css`). */
 @source not './shared/components/PrintTemplate';
+/* …nor the PIN directory's data parts — ~4 MB of place names, no class among them. */
+@source not './shared/app/pin-directory/data';
 /* …all but the sheets' token utilities no screen spells: those need the app's
    theme, which only this stylesheet has (`print-template-css.test.ts` keeps the
    list whole). */

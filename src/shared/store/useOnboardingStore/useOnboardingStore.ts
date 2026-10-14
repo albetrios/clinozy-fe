@@ -3,15 +3,12 @@ import { persist } from 'zustand/middleware';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 
-/** Ordered steps of the post-signup onboarding wizard. */
-export const ONBOARDING_STEPS = [
-  'welcome',
-  'profile',
-  'questions',
-  'workspace',
-  'invite',
-  'done',
-] as const;
+/**
+ * Ordered steps of the post-signup onboarding wizard: Welcome → Your name →
+ * Clinic name → Done. Questions and invitations are not asked here (clinic-setup
+ * D4): inviting is the setup guide's, with real roles and the main branch.
+ */
+export const ONBOARDING_STEPS = ['welcome', 'profile', 'workspace', 'done'] as const;
 
 export type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
 
@@ -20,17 +17,12 @@ interface OnboardingData {
   /** Profile name — split fields mirror clinozy-be `first_name` / `last_name`. */
   firstName: string;
   lastName: string;
-  /** Qualifying questions — drive segmentation + smart defaults. */
-  teamSize: string;
-  primaryUseCase: string;
-  referralSource: string;
   organizationName: string;
   organizationSlug: string;
-  invites: string[];
 }
 
 interface OnboardingStore {
-  /** Current step index into {@link ONBOARDING_STEPS}. */
+  /** Current step index into the derived step list (`deriveOnboardingSteps`). */
   stepIndex: number;
   data: OnboardingData;
   completed: boolean;
@@ -45,8 +37,9 @@ interface OnboardingStore {
   forUserId: string | null;
   /**
    * Id of the organization created by the finish step, if any. Set the moment
-   * creation succeeds so a partial failure (e.g. an invite rejects) never
-   * re-creates a DUPLICATE org when the user retries — the retry reuses this.
+   * creation succeeds so a partial failure (e.g. the profile or the switch
+   * rejects) never re-creates a DUPLICATE org when the user retries — the retry
+   * reuses this.
    */
   createdOrganizationId: string | null;
   /**
@@ -77,16 +70,74 @@ interface OnboardingStore {
   claimForUser: (userId: string) => void;
 }
 
+/** The persisted part of {@link OnboardingStore} — everything but the actions. */
+type OnboardingProgress = Pick<
+  OnboardingStore,
+  | 'stepIndex'
+  | 'data'
+  | 'completed'
+  | 'forUserId'
+  | 'createdOrganizationId'
+  | 'createdOrganizationSlug'
+>;
+
 const INITIAL_DATA: OnboardingData = {
   firstName: '',
   lastName: '',
-  teamSize: '',
-  primaryUseCase: '',
-  referralSource: '',
   organizationName: '',
   organizationSlug: '',
-  invites: [],
 };
+
+/**
+ * Version of the persisted shape. Version 1 dropped the Questions step (third in
+ * every flow) and the Invite step (always just before Done) with their fields.
+ */
+const ONBOARDING_STORE_VERSION = 1;
+
+/** Index of the step every version-0 flow had third: Questions. */
+const REMOVED_QUESTIONS_STEP_INDEX = 2;
+
+function textOrEmpty(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+function idOrNull(value: unknown): string | null {
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+/**
+ * Bring progress persisted by an earlier version up to the current shape.
+ *
+ * Version 0 still holds the removed steps: Questions was the third step of every
+ * flow and Invite always sat just before Done, so a step past Questions moves
+ * back by one — Questions itself lands on the step that followed it, Invite on
+ * Done (the page clamps whatever runs past the end). What the removed steps
+ * collected (team size, use case, referral, invite emails) is dropped.
+ */
+function migrateOnboardingProgress(
+  persisted: unknown,
+  version: number,
+): OnboardingProgress {
+  const stored = (persisted ?? {}) as Partial<Record<keyof OnboardingProgress, unknown>>;
+  const data = (stored.data ?? {}) as Partial<Record<keyof OnboardingData, unknown>>;
+  const stepIndex = typeof stored.stepIndex === 'number' ? stored.stepIndex : 0;
+  return {
+    stepIndex:
+      version < ONBOARDING_STORE_VERSION && stepIndex > REMOVED_QUESTIONS_STEP_INDEX
+        ? stepIndex - 1
+        : stepIndex,
+    data: {
+      firstName: textOrEmpty(data.firstName),
+      lastName: textOrEmpty(data.lastName),
+      organizationName: textOrEmpty(data.organizationName),
+      organizationSlug: textOrEmpty(data.organizationSlug),
+    },
+    completed: stored.completed === true,
+    forUserId: idOrNull(stored.forUserId),
+    createdOrganizationId: idOrNull(stored.createdOrganizationId),
+    createdOrganizationSlug: idOrNull(stored.createdOrganizationSlug),
+  };
+}
 
 /**
  * Client-side onboarding progress. Persisted to localStorage so a user can
@@ -137,6 +188,11 @@ export const useOnboardingStore = create<OnboardingStore>()(
               },
         ),
     }),
-    { name: `${PRODUCT_NAMESPACE}-onboarding` },
+    {
+      name: `${PRODUCT_NAMESPACE}-onboarding`,
+      version: ONBOARDING_STORE_VERSION,
+      migrate: (persisted, version) =>
+        migrateOnboardingProgress(persisted, version) as OnboardingStore,
+    },
   ),
 );

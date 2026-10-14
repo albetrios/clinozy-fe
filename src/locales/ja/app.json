@@ -556,14 +556,16 @@
       "newAppointment": "新規予約",
       "newPatient": "新規患者",
       "newReceipt": "新規入金",
-      "openTasks": "タスクを開く"
+      "openTasks": "タスクを開く",
+      "finishSetup": "設定を完了"
     },
     "screen": "画面",
     "move": "移動",
     "open": "開く",
     "hint": "人物を検索するには3文字以上または4桁以上を入力してください",
     "empty": "一致するものがありません。名前、電話番号、または C 番号でお試しください。",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{total}} 件中 {{done}} 件"
   },
   "lists": {
     "loadError": "このリストを読み込めませんでした · 接続が切れました。最後のコピーを表示しています。",

@@ -564,14 +564,16 @@
       "newAppointment": "Nuovo appuntamento",
       "newPatient": "Nuovo paziente",
       "newReceipt": "Nuovo incasso",
-      "openTasks": "Apri attività"
+      "openTasks": "Apri attività",
+      "finishSetup": "Completa la configurazione"
     },
     "screen": "Schermata",
     "move": "spostarsi",
     "open": "aprire",
     "hint": "Digita 3+ lettere o 4+ cifre per cercare persone",
     "empty": "Nessun risultato. Prova un nome, un telefono o un numero C.",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{done}} di {{total}}"
   },
   "lists": {
     "loadError": "Impossibile caricare questo elenco · connessione persa. Viene mostrata l’ultima copia.",

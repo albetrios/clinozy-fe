@@ -44,6 +44,7 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { useLedgerCount, useLedgerList } from '@/shared/hooks/usePayments/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
+import { useRequireOpenBranch } from '@/shared/hooks/useRequireOpenBranch/index.ts';
 import { ArrowDownLeft, ArrowUpRight, FileIcon, Wallet } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -253,10 +254,17 @@ export function PaymentsPage() {
   const table = useLedgerTable(rows, LEDGER_TABLE_ID);
   const failed = list.isError && rows.length === 0 && !list.isPending;
 
+  // Receiving or paying needs an open branch: a manager without one lands on setup (§6.3).
+  const requireOpenBranch = useRequireOpenBranch();
   const openReceive = () =>
-    void navigate({ ...organizationPaymentReceive(organizationSlug), search: {} });
+    requireOpenBranch(
+      () =>
+        void navigate({ ...organizationPaymentReceive(organizationSlug), search: {} }),
+    );
   const openPay = () =>
-    void navigate({ ...organizationPaymentPay(organizationSlug), search: {} });
+    requireOpenBranch(
+      () => void navigate({ ...organizationPaymentPay(organizationSlug), search: {} }),
+    );
   const openEntry = (row: LedgerRow) => {
     const lock = ledgerEntryLock(row, t);
     if (lock) {

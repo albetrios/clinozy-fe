@@ -12,22 +12,27 @@ renders, wiping progress a different user left on the same browser — the page 
 longer does it, so no previous user's name or workspace paints for a frame (ONB-4). Only
 the wizard steps differ per mode.
 
+The wizard is **Welcome → Your name → Clinic name → Done** — four steps at most, about
+thirty seconds (clinic-setup D4). It asks nothing about the team and **sends no
+invitations**: inviting is the setup guide's (`#setup`, with real roles and the main
+branch), and "How did you hear about us?" is the setup drawer's "You're live" step. Team
+size and use case are no longer asked anywhere.
+
 ## Files
 
-| File                      | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `onboarding.route.tsx`    | Route marker — exports `Component` rendering `OnboardingPage`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `onboarding.manifest.ts`  | Page manifest — `testId` + document title from `onboarding.constants.ts` + i18n.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `onboarding.constants.ts` | i18n keys, test ids, analytics events, API defaults for this island.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `OnboardingPage.tsx`      | Multi-step wizard (welcome → profile → questions → workspace → invite → done; steps derived per mode — in team-only mode someone who already belongs to a clinic, an invitee who accepted, gets the profile steps only and the finish creates nothing, D84). Reads/writes progress from `@/shared/store/useOnboardingStore/` so a refresh resumes mid-flow. On finish it creates the org (team modes), marks onboarding complete (`POST /users/me/onboarding/complete`) **before** refreshing `me/context`, activates the workspace, and navigates **directly** to the resolved workspace. |
+| File                      | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onboarding.route.tsx`    | Route marker — exports `Component` rendering `OnboardingPage`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `onboarding.manifest.ts`  | Page manifest — `testId` + document title, written out locally (pinned to `onboarding.constants.ts` by its test) so the key table stays off the entry chunk.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `onboarding.constants.ts` | i18n keys, test ids and motion timings for this island.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `OnboardingPage.tsx`      | Multi-step wizard (welcome → profile → workspace → done; steps derived per mode by `onboarding-flow.ts` — the clinic-name step only in team-only mode for someone who belongs to no clinic yet; someone who already belongs to one, an invitee who accepted, gets Welcome → Your name → Done and the finish creates nothing, D84). Reads/writes progress from `@/shared/store/useOnboardingStore/` so a refresh resumes mid-flow. On finish it creates the org (team-only), marks onboarding complete (`POST /users/me/onboarding/complete`) **before** refreshing `me/context`, activates the workspace, and navigates **directly** to the resolved workspace. No invitation is sent. |
 
-Step UIs live in `components/` (folder-per-unit): `WelcomeStep`, `ProfileStep`
-(**first name + last name** — maps 1:1 to clinozy-be `first_name` / `last_name`),
-`QuestionsStep` (optional team-size / use-case / referral chips — the drawer's `DrawerChips`,
-one clearable pick each), `WorkspaceStep` (org name +
-live `{{productDomain}}/<slug>` preview, work-email-domain prefill), `InviteStep` (validated teammate
-emails, listed as person rows), `DoneStep` (a drawer step's peek tiles), plus `StepIndicator`
-(the drawer's 24px step circles).
+Step UIs live in `components/` (folder-per-unit): `WelcomeStep` (the pitch — names creating
+the organization only when that step follows), `ProfileStep` ("Your name": **first name + last
+name** — maps 1:1 to clinozy-be `first_name` / `last_name`), `WorkspaceStep` ("Clinic name": org
+name + live `{{productDomain}}/<slug>` preview, work-email-domain prefill), `DoneStep` (a drawer
+step's peek tiles: the name, and the clinic name when it was asked), plus `StepIndicator` (the
+drawer's 24px step circles — four at most).
 
 The wizard sits in the public layout's signed-out canvas as one 480px `PublicCard`,
 built like a drawer (L-65): the step circles and the step's heading, the body, then
@@ -42,10 +47,10 @@ at Finish, as a generic error (ONB-6). An empty slug stays valid — the backend
 
 `finish()` is safe to retry. The created org id is stashed in the store the moment creation
 succeeds, so a retry after a partial failure **reuses** it instead of creating a duplicate.
-Invitations are sent with `Promise.allSettled` — a single bad address never strands the user;
-failures are surfaced as a toast and resendable from Members. Profile (first + last name) and
-the qualifying-question answers are persisted **best-effort** (`authApi.updateProfile` +
-a PostHog `onboarding_completed` segmentation event) and never block entry to the workspace.
+The profile (first + last name) is persisted **best-effort** (`authApi.updateProfile`, a
+warning toast naming Settings when it fails) and a PostHog `onboarding_completed` event fires
+with no properties — neither ever blocks entry to the workspace. No invitation and no role is
+created here.
 
 The stored org id is re-checked against the user's real organizations before it is
 trusted — a persisted id from an earlier session can name an org the user no longer
@@ -65,8 +70,8 @@ covers the longer window after that — `finishingRef` clears the moment the pos
 navigation _starts_, while the destination's guard chain is still on the network and the
 wizard is still mounted and clickable. Once a finish has succeeded, that ref holds the
 context it resolved and a further click **replays the navigation** rather than re-sending
-the profile PATCH, `completeOnboarding`, the org switch, the analytics event and every
-invitation. It is a mount-scoped ref, not the store's persisted `completed` flag, which
+the profile PATCH, `completeOnboarding`, the org switch and the analytics event. It is a
+mount-scoped ref, not the store's persisted `completed` flag, which
 would permanently dead-end a user whose store says done while the guard still routes them
 here. `useReleaseFinishLatchOnReturn` disarms it once the router settles back on
 `/onboarding` — the bounce case, where the destination refused us and a still-armed latch
@@ -85,7 +90,10 @@ creates + lands on the clinic's home (the role home: Today for the owner); **per
 
 ## State
 
-Wizard progress (current step, collected data, `createdOrganizationId` +
+Wizard progress (current step, the name and the clinic name, `createdOrganizationId` +
 `createdOrganizationSlug`, and the `forUserId` owner the route guard stamps) lives in
 `useOnboardingStore` (Zustand, persisted to `localStorage`) so a refresh resumes mid-flow.
-Server writes (create org, invitations, profile) go through the normal API layer, not the store.
+Its persisted shape is **version 1**: progress saved by the six-step wizard (version 0) is
+migrated on load — a step past Questions moves back one (Invite lands on Done) and the
+removed steps' answers are dropped. Server writes (create org, profile, onboarding complete)
+go through the normal API layer, not the store.

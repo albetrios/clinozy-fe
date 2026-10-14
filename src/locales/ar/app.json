@@ -576,14 +576,16 @@
       "newAppointment": "موعد جديد",
       "newPatient": "مريض جديد",
       "newReceipt": "تحصيل جديد",
-      "openTasks": "فتح المهام"
+      "openTasks": "فتح المهام",
+      "finishSetup": "إكمال الإعداد"
     },
     "screen": "شاشة",
     "move": "تنقّل",
     "open": "فتح",
     "hint": "اكتب 3 أحرف أو 4 أرقام أو أكثر للبحث عن الأشخاص",
     "empty": "لا توجد نتائج مطابقة. جرّب اسمًا أو رقم هاتف أو رقم C.",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{done}} من {{total}}"
   },
   "lists": {
     "loadError": "تعذّر تحميل هذه القائمة · انقطع الاتصال. يتم عرض آخر نسخة.",

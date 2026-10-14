@@ -18,7 +18,10 @@ function hasTeamOrganization(
 }
 
 /**
- * Steps shown for this deployment mode + current org inventory.
+ * Steps shown for this deployment mode + current org inventory: Welcome → Your
+ * name → (Clinic name) → Done — four at most. Nothing is asked about the team
+ * here and no invitation is sent: inviting is the setup guide's, with real roles
+ * and the main branch (clinic-setup D4).
  *
  * `ctx` is deliberately NOT nullable. The step list, the create-an-org decision
  * and the finish destination are all derived from it, and `useDeploymentFlags`
@@ -33,15 +36,13 @@ export function deriveOnboardingSteps(
   organizations: readonly { type: OrganizationType }[],
 ): readonly OnboardingStep[] {
   const mode = resolveDeploymentMode(flags);
-  const hasTeam = hasTeamOrganization(organizations);
+  const steps: OnboardingStep[] = ['welcome', 'profile'];
 
-  const steps: OnboardingStep[] = ['welcome', 'profile', 'questions'];
-
-  // Team-only: the wizard creates the person's first clinic and invites their team — unless they
-  // already belong to one (they accepted an invitation, D84), when it is only their profile.
-  if (mode === 'team-only' && !hasTeam) steps.push('workspace', 'invite');
-
-  if (mode === 'personal-and-team' && hasTeam) steps.push('invite');
+  // Team-only: the wizard names and creates the person's first clinic — unless they already
+  // belong to one (they accepted an invitation, D84), when it is only their name.
+  if (mode === 'team-only' && !hasTeamOrganization(organizations)) {
+    steps.push('workspace');
+  }
 
   steps.push('done');
   return steps;

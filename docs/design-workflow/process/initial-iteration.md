@@ -17,8 +17,9 @@ For this process:
   `launch-2026-09-30-jxmr`. It is opened with `pnpm iteration:new launch`, and
   its Baseline is `none`: MODE `initial`.
 - Its intake is always `--mode full`: the whole drop, exactly as delivered.
-  Every later iteration's `intake-files/` is a full snapshot too, built in
-  `full`, `overlay` or `brief` mode.
+  Every later iteration's `intake-files/` stores what arrived for it — the
+  whole drop (`full`), the changed files (`overlay`) or a `BRIEF.md`
+  (`brief`) — and, on a named Baseline, resolves the rest from it.
 - Every later iteration starts from scratch too — Baseline `none`, this page —
   unless you name an earlier iteration to build on; then it runs
   [Incremental iteration](incremental-iteration.md) against that Baseline.
@@ -158,8 +159,8 @@ git add iterations/<iteration>/ && git commit -m "chore: freeze <iteration> (as 
 ```
 
 After the merge the folder is never edited. The next design change is a new
-iteration — its intake a full snapshot, from a whole drop, an overlay or a
-brief — and this one is its Baseline.
+iteration — its intake what arrived, from a whole drop, an overlay or a
+brief — and this one is its Baseline, holding everything it does not.
 
 ---
 

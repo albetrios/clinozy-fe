@@ -102,6 +102,13 @@
       "dark": "Scuro",
       "system": "Sistema"
     },
+    "setup": {
+      "finishSetup": "Completa la configurazione · {{done}} di {{total}}",
+      "clinicSettings": "Impostazioni della clinica",
+      "ringLabel": "Configurazione: {{done}} di {{total}} completati",
+      "memberNotice": "La tua clinica è ancora in configurazione — le prenotazioni si apriranno quando sarà pronta.",
+      "drawerName": "Configurazione della clinica"
+    },
     "sectionBar": {
       "nav": "Sezioni",
       "allSections": "Tutte le sezioni",

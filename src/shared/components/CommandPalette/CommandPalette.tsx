@@ -97,12 +97,13 @@ function OrganizationCommandMenu({ organizationSlug }: { organizationSlug: strin
   // The same entries as the shell's nav: manifest-driven, and narrowed by the
   // member's clinic access and any View-as preview.
   const { entries } = useAppNav();
-  const { go } = usePaletteCommands();
+  const { go, runCommand } = usePaletteCommands();
   const appCommands = useAppCommandGroups({
     query,
     organizationSlug,
     navEntries: entries,
     go,
+    run: runCommand,
   });
   return <CommandMenu organizationSlug={organizationSlug} appCommands={appCommands} />;
 }
