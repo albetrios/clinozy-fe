@@ -8,7 +8,7 @@
 | Opened | 2026-10-14 |
 | Branch | feat/compact-contact-picker |
 | Baseline | none |
-| Status | implementing |
+| Status | done |
 | Summary | A shorter contact picker everywhere a person is picked or added — Recent as one line of faces, results in a short window that fades where there is more, a slimmer add row and a tighter quick add — so New lead, New appointment, New task and the patient pickers stop growing down the screen |
 | Drop placed | 2026-10-14 |
 | Drop source | /tmp/claude-0/-home-user/862304ca-e9ee-5484-aaa8-b95afdaca266/scratchpad/brief |
@@ -22,3 +22,4 @@
 - 2026-10-14 · planning → ready-for-approval · — · Claude
 - 2026-10-14 · ready-for-approval → approved · — · Claude
 - 2026-10-14 · approved → implementing · — · Claude
+- 2026-10-14 · implementing → done · — · Claude

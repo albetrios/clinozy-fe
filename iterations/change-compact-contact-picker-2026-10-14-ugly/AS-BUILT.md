@@ -22,7 +22,28 @@ so no Standing deviations were carried in.
 - **Built, not planned:** the theme-axis gate's `<SkeletonBar>` case (#5).
 - **Open for the user's review:** D12 (a vertical wheel scrolls the rail sideways) and D13 (chip and
   row shimmer) are AMBER defaults; the short chip name (D6) — first name and initial.
-- **Follow-ups for the next iteration:** none.
+- **Follow-ups for the next iteration:** none in the frontend. Seen while verifying, in clinozy-be:
+  at 19:17 the local worker's seat job suspended every demo-clinic member but the owner (ceiling 1)
+  and logged `billing.suspend_excess_failed` with `WorkerDatabaseContextError` ("Worker process must
+  not use unpinned database access") for the same organization — worth its own `fix` iteration
+  there. The before / after captures were taken as the clinic's owner for that reason.
+
+### Measured (L-6)
+
+The picker's height on screen in CSS px (the card, or the popover / sheet for New task's "For"),
+same scripted steps on `main` and on this branch, demo clinic, signed in as its owner. The demo clinic
+has 34 contacts, so no search there returns more than four people; with eight, the list now stops at
+12.5rem instead of 20rem (the CSS caps).
+
+| Picker state                          | 1440 × 900 before → after | 375 × 812 before → after |
+| ------------------------------------- | ------------------------- | ------------------------ |
+| New appointment · Recent              | 363 → 131 (−64%)          | 363 → 131 (−64%)         |
+| New task · For, open                  | 363 → 131 (−64%)          | 362 → 130 (−64%)         |
+| New lead · Recent (with Quick start)  | 403 → 171 (−58%)          | 403 → 171 (−58%)         |
+| New lead · search "ana" (four people) | 329 → 286 (−13%)          | 329 → 286 (−13%)         |
+| New appointment · search "dwi" (two)  | 188 → 176 (−6%)           | 188 → 176 (−6%)          |
+| New task · For, search "sin" (two)    | 188 → 176 (−6%)           | 187 → 175 (−6%)          |
+| New lead · quick add                  | 123 → 121                 | 232 → 186 (−20%)         |
 
 ## Standing deviations
 
