@@ -228,8 +228,13 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   appointment's Who, New task's For, the Receive payment and Invoice patient —
   is `ContactQuickPick`: inline where the person is the drawer's first step,
   else behind a field in a popover (a sheet on a phone, `ContactQuickPickField`).
-  Its list stops at 20rem with the add row pinned below; a Picker popover is
-  never wider than 28rem.
+  It is short by design (change-compact-contact-picker): Recent is one line of
+  chips (avatar and short name, the whole name to hover and to a screen reader)
+  that scrolls sideways with a fade where there is more, ← → moving along it;
+  results show in a window of about three and a half rows (12.5rem with the
+  36px add row pinned below) and fade above the add row while there is more; on
+  a narrow card the quick add is Name, then Mobile beside the Add glyph. A
+  Picker popover is never wider than 28rem.
 - Announce loading once per pending region, hide decorative skeletons from
   assistive technology, and respect reduced motion. The startup splash must have
   a bounded exit deadline that late loading holds cannot restart or cancel.

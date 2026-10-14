@@ -71,3 +71,17 @@ export function markMatch(name: string, typed: string): MarkedName | null {
     after: name.slice(end),
   };
 }
+
+/**
+ * A Recent chip's short name (change-compact-contact-picker D6): the first word and the last
+ * word's initial — "Kavya Shah" → "Kavya S.", "Dayaananda Namboothiri" → "Dayaananda N." — and a
+ * one-word name whole. The chip still carries the whole name (its title and accessible name).
+ */
+export function railName(name: string): string {
+  const words = name.trim().split(/\s+/);
+  const first = words[0] ?? '';
+  const last = words.length > 1 ? words.at(-1) : undefined;
+  // The initial is the last word's first character, a whole code point (`Array.from`).
+  const initial = last ? Array.from(last)[0] : undefined;
+  return initial ? `${first} ${initial.toLocaleUpperCase()}.` : first;
+}

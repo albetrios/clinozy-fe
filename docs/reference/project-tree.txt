@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2277 src files · ~1158 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
+Stats: ~2279 src files · ~1159 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -287,6 +287,14 @@ clinozy-fe/
 │   │   └── README.md
 │   └── README.md
 ├── iterations/
+│   ├── change-compact-contact-picker-2026-10-14-ugly/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── change-contact-quick-pick-2026-10-13-ajvv/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
@@ -2956,6 +2964,10 @@ clinozy-fe/
 │   │   │   ├── useSavedViews/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSavedViews.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useScrollEdges/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useScrollEdges.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useSessions/
 │   │   │   │   ├── index.ts

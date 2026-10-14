@@ -412,3 +412,93 @@ describe('ContactQuickPick — states', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 });
+
+describe('ContactQuickPick — a short picker (change-compact-contact-picker)', () => {
+  it('draws Recent as one line of chips: a short name to see, the whole person to hear', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([KAVYA, ASHWIN]);
+    renderPick();
+    const kavya = await screen.findByTestId('who-hit-10236');
+    const recent = screen.getByTestId(IDS.recent(ROOT));
+    expect(within(recent).getAllByRole('option')).toHaveLength(2);
+    expect(kavya).toHaveAttribute('data-slot', 'pill');
+    expect(kavya).toHaveAttribute('title', 'Kavya Shah');
+    // The short name is seen, not heard; the whole name, line and action are heard.
+    const short = within(kavya).getByText('Kavya S.');
+    expect(short).toHaveAttribute('aria-hidden', 'true');
+    expect(kavya).toHaveAccessibleName('Kavya Shah +919825011243 Use contact');
+    expect(screen.getByTestId('who-hit-10235')).toHaveAccessibleName(
+      'Ashwin Rao Patient Use contact',
+    );
+  });
+
+  it('shimmers chip-shaped bars on Recent’s line while it loads', async () => {
+    vi.mocked(fetchRecentContacts).mockReturnValue(new Promise(() => {}));
+    renderPick();
+    const loading = await screen.findByTestId(IDS.loading(ROOT));
+    expect(loading).toHaveTextContent('Recent');
+    const bars = loading.querySelectorAll('.skeleton-sheen');
+    expect(bars).toHaveLength(3);
+    for (const bar of bars) expect(bar).toHaveClass('h-8', 'rounded-full');
+  });
+
+  it('moves along the rail with ← / →, held at the ends, and ↵ picks the chip', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([KAVYA, ASHA, ASHWIN]);
+    const { user } = renderPick();
+    const kavya = await screen.findByTestId('who-hit-10236');
+    await user.click(search());
+    expect(kavya).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{ArrowLeft}');
+    expect(kavya).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{ArrowRight}{ArrowRight}');
+    expect(screen.getByTestId('who-hit-10235')).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByTestId('who-hit-10235')).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{ArrowLeft}');
+    expect(screen.getByTestId('who-hit-10234')).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{Enter}');
+    expect(callbacks.onPick).toHaveBeenCalledWith(
+      expect.objectContaining({ id: ASHA.id }),
+    );
+  });
+
+  it('mirrors the rail’s keys on a right-to-left page: ← is forward', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([KAVYA, ASHA]);
+    const computed = window.getComputedStyle;
+    const spy = vi
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation((element) =>
+        Object.assign(computed(element), { direction: 'rtl' }),
+      );
+    try {
+      const { user } = renderPick();
+      await screen.findByTestId('who-hit-10236');
+      await user.click(search());
+      await user.keyboard('{ArrowLeft}');
+      expect(screen.getByTestId('who-hit-10234')).toHaveAttribute(
+        'data-selected',
+        'true',
+      );
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('leaves ← / → to the caret once something is typed', async () => {
+    const { user } = renderPick();
+    await screen.findByTestId('who-hit-10236');
+    await user.type(search(), 'ash');
+    const asha = await screen.findByTestId('who-hit-10234');
+    await waitFor(() => expect(asha).toHaveAttribute('data-selected', 'true'));
+    await user.keyboard('{ArrowRight}');
+    expect(asha).toHaveAttribute('data-selected', 'true');
+    expect(screen.queryByTestId(IDS.recent(ROOT))).toBeNull();
+  });
+
+  it('keeps the results to a short window above a 36px add row', async () => {
+    const { user } = renderPick();
+    await user.type(search(), 'ash');
+    await screen.findByTestId('who-hit-10234');
+    expect(screen.getByRole('listbox')).toHaveClass('max-h-50');
+    expect(screen.getByTestId('who-add')).toHaveClass('h-9');
+  });
+});

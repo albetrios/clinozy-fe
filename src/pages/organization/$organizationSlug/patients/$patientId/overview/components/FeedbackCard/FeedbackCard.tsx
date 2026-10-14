@@ -222,8 +222,7 @@ function FeedbackTrack({
   onLogAction,
 }: FeedbackTrackProps) {
   const { t } = useTranslation(CLINICAL_NS);
-  const { trackRef, onScroll, canPrevious, canNext, previous, next } =
-    useFeedbackCarousel();
+  const { trackRef, canPrevious, canNext, previous, next } = useFeedbackCarousel();
   return (
     <div className="bg-canvas relative">
       {canPrevious ? (
@@ -244,7 +243,6 @@ function FeedbackTrack({
       ) : null}
       <div
         ref={trackRef}
-        onScroll={onScroll}
         // The scroll padding matches the side padding, so the first card snaps
         // at the start and "‹" stays hidden until there is something before it.
         className="grid snap-x snap-mandatory scroll-px-3.5 [scrollbar-width:none] auto-cols-[calc((100%-0.625rem)/2)] grid-flow-col gap-2.5 overflow-x-auto overscroll-x-contain scroll-smooth px-3.5 pt-3 pb-3.5 @min-[760px]:auto-cols-[calc((100%-1.25rem)/3)]"

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { markMatch, quickAddDraftOf } from './contact-quick-pick-query.ts';
+import { markMatch, quickAddDraftOf, railName } from './contact-quick-pick-query.ts';
 
 describe('quickAddDraftOf — the quick add’s start from the search', () => {
   it.each([
@@ -68,5 +68,18 @@ describe('markMatch — the hit’s highlight', () => {
     expect(markMatch('Asha Patel', '98250')).toBeNull();
     expect(markMatch('Asha Patel', 'C-12345')).toBeNull();
     expect(markMatch('Asha Patel', 'asha.p@example.test')).toBeNull();
+  });
+});
+
+describe('railName — a Recent chip’s short name', () => {
+  it.each([
+    ['Kavya Shah', 'Kavya S.'],
+    ['Dayaananda Namboothiri', 'Dayaananda N.'],
+    ['  Asha   Rani  Patel ', 'Asha P.'],
+    ['Meera', 'Meera'],
+    ['meera iyer', 'meera I.'],
+    ['', ''],
+  ])('"%s" → "%s"', (name, short) => {
+    expect(railName(name)).toBe(short);
   });
 });
