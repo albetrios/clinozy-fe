@@ -1,0 +1,267 @@
+/* Report a bug — motion (iteration feat-bug-report-2026-10-13-dgnx, D7).
+   Loaded with the lazy BugReport chunk, never on the first paint (the initial-CSS budget).
+   Placement stays in index.css (`[data-slot='feedback-trigger']`), where the corner rules live.
+
+   A rare, deliberate act, so it may delight — within the house rules: enter on a
+   strong ease-out from the trigger's corner (never from nothing), leave faster
+   than it came, press feedback on every button, hover motion only for a fine
+   pointer, and only transform / opacity / filter animated. The global
+   reduced-motion block in index.css collapses every loop to its resting frame. */
+/* Every pressable here answers the press. */
+.bug-report-press {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bug-report-press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.bug-report-trigger-icon {
+  transform-origin: 50% 60%;
+}
+@media (hover: hover) and (pointer: fine) {
+  .bug-report-trigger:hover .bug-report-trigger-icon {
+    animation: bug-report-wiggle 620ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+}
+.bug-report-trigger[data-open] .bug-report-trigger-icon {
+  rotate: -12deg;
+  transition: rotate 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* The panel unfolds out of the trigger (Radix publishes the origin), blurring
+   in so it reads as one surface growing rather than a box appearing. */
+.bug-report-panel {
+  width: min(24rem, calc(100vw - 2rem));
+  transform-origin: var(--radix-popover-content-transform-origin);
+}
+.bug-report-textarea {
+  min-height: 6rem;
+  max-height: 15rem;
+}
+.bug-report-field[data-listening] {
+  border-color: color-mix(in oklch, var(--color-brand-mark-strong) 60%, transparent);
+}
+.bug-report-panel[data-state='open'] {
+  animation: bug-report-unfold 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bug-report-panel[data-state='closed'] {
+  animation: bug-report-fold 160ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+/* Its rows arrive a beat apart: title, field, the footnote. */
+.bug-report-stagger > * {
+  animation: bug-report-rise 280ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.bug-report-stagger > :nth-child(2) {
+  animation-delay: 45ms;
+}
+.bug-report-stagger > :nth-child(3) {
+  animation-delay: 90ms;
+}
+.bug-report-stagger > :nth-child(4) {
+  animation-delay: 135ms;
+}
+
+/* Listening: the mic becomes a glowing orb with two ripple rings, half a
+   cycle apart, so a ring is always leaving. */
+.bug-report-orb {
+  isolation: isolate;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 240ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bug-report-orb[data-listening],
+.bug-report-orb[data-listening]:hover {
+  background-color: var(--color-brand-mark-strong);
+  color: var(--color-brand-foreground);
+  box-shadow: 0 0 22px -2px color-mix(in oklch, var(--color-brand-mark) 70%, transparent);
+}
+.bug-report-orb:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.bug-report-orb[data-listening]::before,
+.bug-report-orb[data-listening]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-brand-mark);
+  animation: bug-report-ripple 1.8s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+}
+.bug-report-orb[data-listening]::after {
+  animation-delay: 0.9s;
+}
+
+/* The meter: it breathes while the room is quiet and jumps while the browser
+   hears speech — five bars on different beats so it never looks like a loop. */
+.bug-report-bars {
+  animation: bug-report-rise 200ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.bug-report-bars > span {
+  background-color: var(--color-brand-mark-strong);
+  transform: scaleY(0.25);
+  animation: bug-report-breathe 1.8s ease-in-out infinite;
+}
+.bug-report-bars[data-hearing] > span {
+  animation: bug-report-bar 760ms cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+.bug-report-bars > span:nth-child(2) {
+  animation-delay: 120ms;
+}
+.bug-report-bars > span:nth-child(3) {
+  animation-delay: 240ms;
+}
+.bug-report-bars > span:nth-child(4) {
+  animation-delay: 60ms;
+}
+.bug-report-bars > span:nth-child(5) {
+  animation-delay: 300ms;
+}
+.bug-report-bars[data-hearing] > span:nth-child(2) {
+  animation-duration: 640ms;
+}
+.bug-report-bars[data-hearing] > span:nth-child(3) {
+  animation-duration: 820ms;
+}
+.bug-report-bars[data-hearing] > span:nth-child(4) {
+  animation-duration: 700ms;
+}
+.bug-report-bars[data-hearing] > span:nth-child(5) {
+  animation-duration: 900ms;
+}
+
+/* Words still being recognised shimmer, then settle into the text. */
+.bug-report-interim {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted-foreground) 0%,
+    var(--color-foreground) 45%,
+    var(--color-muted-foreground) 90%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: bug-report-shimmer 2.2s linear infinite;
+}
+
+/* Sent: the panel's body crossfades (blurred, so it reads as one morph) into
+   a check that draws itself. */
+.bug-report-sent {
+  animation: bug-report-rise 260ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.bug-report-check {
+  width: 3.5rem;
+  height: 3.5rem;
+  animation: bug-report-pop 420ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.bug-report-check circle {
+  stroke-dasharray: 145;
+  stroke-dashoffset: 145;
+  animation: bug-report-draw 420ms cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+.bug-report-check path {
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: bug-report-draw 300ms cubic-bezier(0.23, 1, 0.32, 1) 300ms forwards;
+}
+
+@keyframes bug-report-wiggle {
+  20% {
+    rotate: -16deg;
+  }
+  40% {
+    rotate: 12deg;
+  }
+  60% {
+    rotate: -7deg;
+  }
+  80% {
+    rotate: 3deg;
+  }
+}
+@keyframes bug-report-unfold {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+    filter: blur(6px);
+  }
+}
+@keyframes bug-report-fold {
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+    filter: blur(2px);
+  }
+}
+@keyframes bug-report-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(2px);
+  }
+}
+@keyframes bug-report-ripple {
+  from {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+@keyframes bug-report-breathe {
+  0%,
+  100% {
+    transform: scaleY(0.22);
+  }
+  50% {
+    transform: scaleY(0.42);
+  }
+}
+@keyframes bug-report-bar {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes bug-report-shimmer {
+  from {
+    background-position: 110% 0;
+  }
+  to {
+    background-position: -110% 0;
+  }
+}
+@keyframes bug-report-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+@keyframes bug-report-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+/* Reduced motion keeps what aids reading: the interim words in a plain muted
+   tone instead of a moving gradient (the global block in index.css stops the loops). */
+@media (prefers-reduced-motion: reduce) {
+  .bug-report-interim {
+    background: none;
+    color: var(--color-muted-foreground);
+  }
+  .bug-report-check circle,
+  .bug-report-check path {
+    stroke-dashoffset: 0;
+  }
+}

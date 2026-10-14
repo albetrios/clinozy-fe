@@ -109,8 +109,17 @@ describe('initSentry', () => {
     const names = (initConfig().integrations as { name: string }[]).map((i) => i.name);
     expect(names).not.toContain('replay');
     expect(names).not.toContain('profiling');
-    // Error reports, logs and feedback still run.
-    expect(names).toEqual(expect.arrayContaining(['router', 'logs', 'feedback']));
+    // Error reports and logs still run.
+    expect(names).toEqual(expect.arrayContaining(['router', 'logs']));
+  });
+
+  it('never injects Sentry\'s own feedback widget — "Report a bug" is ours (feat-bug-report D3)', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    await initSentry(ROUTER);
+
+    const names = (initConfig().integrations as { name: string }[]).map((i) => i.name);
+    expect(names).not.toContain('feedback');
+    expect(Sentry.feedbackIntegration).not.toHaveBeenCalled();
   });
 
   it('adds session recording on a later grant and stops it on a withdrawal', async () => {

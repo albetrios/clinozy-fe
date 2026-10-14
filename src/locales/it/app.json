@@ -1438,5 +1438,31 @@
   "appHomeEmpty": {
     "title": "Qui non è ancora attivo nulla",
     "description": "Le sezioni della tua clinica appariranno qui non appena saranno attivate per te."
+  },
+  "bugReport": {
+    "trigger": "Segnala un bug",
+    "panel": {
+      "title": "Segnala un bug",
+      "subtitle": "Cosa non ha funzionato? Scrivilo, oppure tocca il microfono e dillo.",
+      "label": "Descrivi il bug",
+      "placeholder": "Cosa è successo e cosa ti aspettavi?",
+      "signedAs": "Inviato come {{name}}, con questa pagina e la versione dell'app.",
+      "close": "Chiudi"
+    },
+    "voice": {
+      "start": "Detta con la voce",
+      "stop": "Interrompi la dettatura",
+      "listening": "In ascolto…",
+      "hearing": "Ti sento…",
+      "denied": "Il microfono è bloccato. Consentilo nel browser per dettare.",
+      "noSpeech": "Non ho capito: tocca il microfono e riprova.",
+      "unavailable": "L'input vocale non è disponibile ora. Puoi comunque scrivere."
+    },
+    "send": {
+      "idle": "Invia",
+      "sending": "Invio…",
+      "sent": "Grazie, il team l'ha ricevuto.",
+      "error": "Impossibile inviare la segnalazione. Il tuo testo è ancora qui: riprova."
+    }
   }
 }
