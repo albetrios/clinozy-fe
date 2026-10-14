@@ -102,8 +102,8 @@ function PanelPill({ tone, children }: { tone: Tone; children: string }) {
     <span
       data-slot="pill"
       className={cn(
-        // A phone's half-width panel keeps its room for the name and the days.
-        'text-tiny h-5 flex-none items-center rounded-full px-1.75 font-semibold whitespace-nowrap max-md:hidden md:inline-flex',
+        // A narrow panel (a phone, eight in one row) keeps its room for the name and the days.
+        'text-tiny hidden h-5 flex-none items-center rounded-full px-1.75 font-semibold whitespace-nowrap @min-[17rem]:inline-flex',
         TONE_CLASSES[tone].surface,
       )}
     >
@@ -147,7 +147,7 @@ function ComparePanel({
     <figure
       data-testid={PHOTO_COMPARE_TEST_IDS.panel}
       data-photo={photo.id}
-      className="bg-overlay border-canvas/12 relative m-0 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border"
+      className="bg-overlay border-canvas/12 @container relative m-0 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border"
     >
       <div
         {...zoom.stage}
@@ -243,7 +243,7 @@ function PendingPanel() {
  * `?compare=` on the Photos URL, D11): full screen on the viewer's dark chrome —
  * the bar ("Compare photos", "4 photos · 23 Jul – 15 Oct", One row ↔ Grid, the
  * zoom group, Close), the photos side by side oldest first (D13) and the hint
- * row (from `md`; a phone pinches, and its captions drop the pills). **One zoom for every panel** (the viewer's `usePhotoZoom`, D12): the
+ * row (from `md`; a phone pinches). A panel narrower than 17rem drops its pills. **One zoom for every panel** (the viewer's `usePhotoZoom`, D12): the
  * wheel, the buttons, a double-click, a pinch or a drag on any panel moves them
  * all, so one spot is compared across visits. One row up to four photos, a grid
  * from five; a phone shows two columns. × takes a photo out while more than two
