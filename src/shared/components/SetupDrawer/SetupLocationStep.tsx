@@ -220,7 +220,7 @@ export function SetupLocationStep({
   });
   const { isDirty } = useFormState({ control: form.control });
   const [problems, setProblems] = useState<ReturnType<typeof locationProblems>>({});
-  const { place, lookUp } = usePinPlace();
+  const { place, lookUp, areaFor } = usePinPlace();
   const [hoursOpen, setHoursOpen] = useState(false);
   const values = useFormValues(form);
 
@@ -256,8 +256,8 @@ export function SetupLocationStep({
     if (!found) return;
     form.setValue('city', found.district, { shouldDirty: true });
     form.setValue('state', found.state, { shouldDirty: true });
-    if (found.areas.length === 1)
-      form.setValue('area', found.areas[0] ?? '', { shouldDirty: true });
+    const area = areaFor(found, form.getValues('area'));
+    if (area !== undefined) form.setValue('area', area, { shouldDirty: true });
   };
 
   const submit = async (event: SubmitEvent<HTMLFormElement>) => {

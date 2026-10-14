@@ -174,7 +174,7 @@ export const SEND_QUICK_FILLS = [
 }[];
 
 /** How many of the clinic's recent payees "Paid to" offers as chips, before "Electricity". */
-export const RECENT_PAYEES_LIMIT = 4;
+const RECENT_PAYEES_LIMIT = 4;
 
 /**
  * The "Paid to" quick chips (`payments.md:119`; feat-write-less, D14): the clinic's own most

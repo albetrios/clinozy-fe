@@ -56,7 +56,7 @@ export function DrawerInput({
 }
 
 /** A chip under a note field that writes its text into it (the check-in's last plan). */
-export interface DrawerTextSuggestion {
+interface DrawerTextSuggestion {
   /** Stable id — the chip's test-id suffix. */
   id: string;
   /** The chip's words ("Same plan as last time"). */

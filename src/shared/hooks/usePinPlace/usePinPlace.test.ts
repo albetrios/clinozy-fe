@@ -60,4 +60,18 @@ describe('usePinPlace', () => {
     });
     expect(result.current.place).toBeNull();
   });
+
+  it('fills a single area, and clears it for a PIN of several only when it filled it', () => {
+    const { result } = renderHook(() => usePinPlace());
+    const manjalpur = {
+      pin: '390011',
+      district: 'Vadodara',
+      state: 'Gujarat',
+      areas: ['Manjalpur'],
+    };
+    expect(result.current.areaFor(manjalpur, '')).toBe('Manjalpur');
+    expect(result.current.areaFor(SURAT, 'Manjalpur')).toBe('');
+    // Typed by hand: never touched.
+    expect(result.current.areaFor(SURAT, 'Piplod Plaza')).toBeUndefined();
+  });
 });

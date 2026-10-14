@@ -122,7 +122,7 @@ export function BranchPlaceFields({
   const { t: tPin } = useTranslation(PIN_PLACE_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const pin = field('pin');
-  const { place, lookUp } = usePinPlace();
+  const { place, lookUp, areaFor } = usePinPlace();
 
   /** The sixth digit fills City and State — and Area when the PIN has one (feat-write-less, D13). */
   const fillFromPin = async (typed: string) => {
@@ -130,8 +130,8 @@ export function BranchPlaceFields({
     if (!found) return;
     form.setValue('city', found.district, { shouldDirty: true });
     form.setValue('state', found.state, { shouldDirty: true });
-    if (found.areas.length === 1)
-      form.setValue('area', found.areas[0] ?? '', { shouldDirty: true });
+    const area = areaFor(found, form.getValues('area'));
+    if (area !== undefined) form.setValue('area', area, { shouldDirty: true });
   };
 
   return (

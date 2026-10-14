@@ -437,6 +437,13 @@ describe('the branch drawer — New branch (users.md:176–198)', () => {
     expect(within(panel).getByTestId('branch-drawer-state')).toHaveValue('Gujarat');
     expect(within(panel).getByTestId('branch-drawer-area')).toHaveValue('Manjalpur');
     expect(within(panel).queryByTestId('branch-drawer-area-pick')).toBeNull();
+
+    // A PIN of several areas clears the one the last PIN filled, and offers its own.
+    const pin = within(panel).getByTestId('branch-drawer-pin');
+    await user.clear(pin);
+    await user.type(pin, '395007');
+    await within(panel).findByTestId('branch-drawer-area-pick');
+    expect(within(panel).getByTestId('branch-drawer-area')).toHaveValue('');
   });
 
   it('offers a PIN’s areas as chips, and says so for a PIN it does not know', async () => {

@@ -116,7 +116,7 @@ export interface TypedDateLocale {
 }
 
 /** English weekday names (index 0 = Sunday), always understood alongside the locale's. */
-export const ENGLISH_WEEKDAY_NAMES: readonly (readonly string[])[] = [
+const ENGLISH_WEEKDAY_NAMES: readonly (readonly string[])[] = [
   ['sun', 'sunday'],
   ['mon', 'monday'],
   ['tue', 'tues', 'tuesday'],

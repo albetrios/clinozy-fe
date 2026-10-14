@@ -14,7 +14,7 @@ export function saveShortcutLabel(apple: boolean): string {
 }
 
 /** ⌘ Enter or Ctrl Enter alone — not mid-composition, not already taken by a field inside. */
-export function isSaveShortcut(event: KeyboardEvent<HTMLElement>): boolean {
+function isSaveShortcut(event: KeyboardEvent<HTMLElement>): boolean {
   return (
     event.key === 'Enter' &&
     (event.metaKey || event.ctrlKey) &&

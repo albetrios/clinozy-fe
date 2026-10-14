@@ -16,6 +16,12 @@ export interface PinPlaceState {
    * leaves the place to that one.
    */
   lookUp: (pin: string) => Promise<PinPlace | null>;
+  /**
+   * What Area should become for a place found: its one area; `''` for a PIN of several areas when
+   * Area still holds the one an earlier PIN filled in; `undefined` (leave it) otherwise — an area
+   * typed by hand is never touched.
+   */
+  areaFor: (found: PinPlace, current: string) => string | undefined;
 }
 
 /**
@@ -30,6 +36,7 @@ export interface PinPlaceState {
 export function usePinPlace(): PinPlaceState {
   const [place, setPlace] = useState<PinPlace | null | undefined>(undefined);
   const latest = useRef('');
+  const filledArea = useRef<string | null>(null);
   const lookUp = useCallback(async (pin: string) => {
     latest.current = pin;
     if (!PIN_CODE_PATTERN.test(pin)) {
@@ -41,5 +48,15 @@ export function usePinPlace(): PinPlaceState {
     setPlace(found);
     return found;
   }, []);
-  return { place, lookUp };
+  const areaFor = useCallback((found: PinPlace, current: string) => {
+    const [only] = found.areas;
+    if (found.areas.length === 1 && only !== undefined) {
+      filledArea.current = only;
+      return only;
+    }
+    const stale = filledArea.current !== null && current === filledArea.current;
+    filledArea.current = null;
+    return stale ? '' : undefined;
+  }, []);
+  return { place, lookUp, areaFor };
 }
