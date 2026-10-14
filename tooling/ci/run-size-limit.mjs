@@ -331,8 +331,20 @@ const config = [
      * bindings; in one chunk the minifier also inlines and mangles across them.
      * Every lazy chunk now imports those modules from the entry chunk, which is
      * loaded anyway. ~0.4 kB of headroom.
+     *
+     * 238.6 → 238.9 kB: a declared exemption, itemised — "Report a bug" with native voice
+     * (iteration feat-bug-report-2026-10-13-dgnx, D20), replacing Sentry's injected widget. The
+     * merges since the lowering (#64, #70, #71) left main at ~238.6 kB; built the same way side by
+     * side, this adds ~0.27 kB to the entry chunk (CI: 238.87 kB):
+     * - the `BugReportLazy` shell the clinic layout mounts (the signed-in check, its error
+     *   boundary and the on-demand loader of the widget and its copy);
+     * - two registry glyphs, `Bug` (the trigger) and `Mic` (the voice button) — every registry
+     *   icon ships in the first-paint chunk, and drawing them outside the registry would break
+     *   the one-file icon-library swap.
+     * Trimmed first: the widget, its voice hook, its copy and its motion stylesheet load on
+     * demand (their own chunk and `BugReport-*.css`); initial CSS is 0.01 kB smaller than main.
      */
-    limit: '238.6 kB',
+    limit: '238.9 kB',
     gzip: true,
   },
   ...(cssPaths.length

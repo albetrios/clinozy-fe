@@ -2,6 +2,7 @@ import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import { BugReportLazy } from '@/shared/components/BugReport/index.ts';
 import { CommandPaletteLazy } from '@/shared/components/CommandPalette/index.ts';
 import { KeyboardShortcutsLazy } from '@/shared/components/KeyboardShortcutsDialog/KeyboardShortcutsLazy.tsx';
 import { SessionTimeoutDialog } from '@/shared/components/SessionTimeoutDialog/index.ts';
@@ -48,6 +49,10 @@ export function Component() {
           and a Retry on the shell boundary must not drop it. Renders nothing
           when idle. */}
       <UploadTray />
+      {/* Report a bug — the bottom-end corner, for the signed-in person (iteration
+          feat-bug-report-2026-10-13-dgnx). Beside the tray, outside the shell boundary, so a
+          Retry there never drops a report being written. */}
+      <BugReportLazy />
     </div>
   );
 }

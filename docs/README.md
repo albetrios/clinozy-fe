@@ -83,7 +83,7 @@ flowchart TB
 | [credentials-and-env.md](integrations/credentials-and-env.md)                                   | Where to get credentials and env vars (API, Sentry, PostHog, Netlify, GitHub Secrets)                        |
 | [../deployment/runbooks/environment-variables.md](deployment/runbooks/environment-variables.md) | Canonical env runbook — schema, auth switches, module keys, `config.js`                                      |
 | [sentry-sourcemaps.md](integrations/sentry-sourcemaps.md)                                       | Sentry source map upload (Vite plugin)                                                                       |
-| [sentry-frontend.md](integrations/sentry-frontend.md)                                           | Sentry React SDK — errors, replay, performance, logs, feedback (full data catalog)                           |
+| [sentry-frontend.md](integrations/sentry-frontend.md)                                           | Sentry React SDK — errors, replay, performance, logs (full data catalog)                                     |
 | [posthog-frontend.md](integrations/posthog-frontend.md)                                         | PostHog product analytics — events, funnels, flags, Web Vitals (full event catalog)                          |
 | [cursor-mcp-setup.md](../agent-os/docs/cursor-mcp-setup.md)                                     | **Local setup:** Cursor MCP servers (Context7, shadcn, Tailwind, clinozy-be-api) — required for Cursor users |
 | [cursor-agent-environments.md](../agent-os/docs/cursor-agent-environments.md)                   | Multi-root workspaces and Cursor agent environments (clinozy-fe + clinozy-be)                                |
