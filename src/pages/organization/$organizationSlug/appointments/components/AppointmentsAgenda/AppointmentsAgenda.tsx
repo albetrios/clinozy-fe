@@ -36,6 +36,7 @@ import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { Calendar } from '@/shared/icons/index.ts';
 
 import {
   APPOINTMENTS_KEYS,
@@ -65,27 +66,21 @@ const AGENDA_MIN_WIDTH = 790;
  */
 const AGENDA_METRICS = '[--dt-gap:0.625rem] [--dt-head-h:2.3125rem]';
 
-/** "No appointments here · book one" — "book one" only for a member who can book (H:2050). */
-function AgendaEmpty({ onBook }: { onBook?: () => void }) {
+/**
+ * The Agenda's empty state (change-empty-states R10): the room look in sky with
+ * the `Calendar` tile, "No appointments here" and its line — centred in the
+ * table card. No button (fix-empty-state-actions): the toolbar's "New
+ * appointment" is the one way to book.
+ */
+function AgendaEmpty() {
   const { t } = useTranslation(APPOINTMENTS_NS);
   return (
     <EmptyState
-      variant="inline"
+      tone="sky"
+      icon={<Calendar />}
       title={t(APPOINTMENTS_KEYS.agenda.empty)}
+      description={t(APPOINTMENTS_KEYS.agenda.emptyHint)}
       testId={APPOINTMENTS_TEST_IDS.empty}
-      className="text-body p-10 text-center"
-      action={
-        onBook ? (
-          <button
-            type="button"
-            data-testid={APPOINTMENTS_TEST_IDS.bookOne}
-            onClick={onBook}
-            className="text-foreground underline underline-offset-2"
-          >
-            {t(APPOINTMENTS_KEYS.agenda.bookOne)}
-          </button>
-        ) : undefined
-      }
     />
   );
 }
@@ -233,7 +228,7 @@ export function AppointmentsAgenda() {
               rowClassName="h-13 px-(--table-pad-x)"
             />
           ) : (
-            <AgendaEmpty onBook={canCreate ? () => openCreate() : undefined} />
+            <AgendaEmpty />
           )
         }
         className={`flex-1 ${AGENDA_METRICS}`}

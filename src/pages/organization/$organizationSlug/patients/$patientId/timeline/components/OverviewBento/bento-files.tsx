@@ -112,6 +112,7 @@ export function PhotosBentoCard({
         empty={rows.length === 0}
         label={title}
         emptyTitle={t(TIMELINE_KEYS.photos.empty)}
+        section="images"
         testId={testId}
       />
     </BentoCard>
@@ -160,6 +161,7 @@ export function ReportsBentoCard({ onOpen, onNew }: NewCardLinks) {
         empty={rows.length === 0}
         label={title}
         emptyTitle={t(TIMELINE_KEYS.reports.empty)}
+        section="reports"
         testId={testId}
       />
     </BentoCard>
@@ -263,6 +265,7 @@ export function NotesBentoCard({ onOpen, canPost }: CardLinks & { canPost: boole
         empty={rows.length === 0}
         label={title}
         emptyTitle={t(K.empty)}
+        section="notes"
         testId={TIMELINE_TEST_IDS.card('notes')}
       />
     </BentoCard>

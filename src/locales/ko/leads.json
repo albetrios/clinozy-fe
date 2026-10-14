@@ -35,6 +35,8 @@
       "updated": "업데이트"
     },
     "empty": "일치하는 리드가 없습니다",
+    "emptyTitle": "아직 리드가 없습니다",
+    "emptyHint": "전화, WhatsApp, 방문 문의가 여기에 모입니다.",
     "clearFilters": "필터 지우기",
     "moreInterests_other": "외 {{count}}개: {{list}}"
   },

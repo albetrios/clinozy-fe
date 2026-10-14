@@ -12,7 +12,7 @@ import {
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useWebhookDeliveryAttempts } from '@/shared/hooks/useWebhooks/index.ts';
-import { Boxes } from '@/shared/icons/index.ts';
+import { Send } from '@/shared/icons/index.ts';
 
 /** One "field" — the history list: the light 560px (`_patterns.md:28`). */
 const DELIVERY_ATTEMPTS_PROFILE = { fieldCount: 1 } as const;
@@ -97,7 +97,8 @@ export function WebhookDeliveryAttemptsDialog({
 
       {!(isError || isLoading) && rows.length === 0 ? (
         <EmptyState
-          icon={<Boxes />}
+          tone="plum"
+          icon={<Send />}
           title={t(integrations.deliveryAttemptsEmptyTitle)}
           description={t(integrations.deliveryAttemptsEmptyDescription)}
         />

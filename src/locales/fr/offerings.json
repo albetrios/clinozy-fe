@@ -75,8 +75,7 @@
     "title": "Aucune prestation pour l’instant",
     "description": "Ajoutez des soins et des forfaits avec leurs prix pour pouvoir les réserver et les facturer.",
     "noMatchTitle": "Aucune prestation ne correspond",
-    "noMatchDescription": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche.",
-    "newOffering": "Nouvelle prestation"
+    "noMatchDescription": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
   },
   "offers": {
     "columns": {
@@ -119,8 +118,7 @@
     },
     "empty": {
       "title": "Aucune offre pour l’instant",
-      "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche.",
-      "newOffer": "Nouvelle offre"
+      "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
     },
     "record": "Offre"
   },

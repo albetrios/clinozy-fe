@@ -459,6 +459,7 @@
   },
   "empty": {
     "queue": "Al momento non c’è nulla per te. Le nuove attività compaiono qui quando i lead scrivono, le visite si avvicinano e arriva un feedback.",
+    "caughtUp": "Tutto in ordine",
     "snoozed": "Nessuna attività posticipata",
     "done": "Ancora nulla di risolto oggi"
   },

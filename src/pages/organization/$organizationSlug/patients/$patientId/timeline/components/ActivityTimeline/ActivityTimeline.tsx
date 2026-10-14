@@ -30,7 +30,7 @@ import {
   useContactActivities,
   useContactActivityAccess,
 } from '@/shared/hooks/useContactActivities/index.ts';
-import { ClipboardList } from '@/shared/icons/index.ts';
+import { ClipboardList, Clock } from '@/shared/icons/index.ts';
 
 import {
   type StaffChip,
@@ -356,7 +356,8 @@ export function ActivityTimeline() {
         </Button>
       ) : null}
       {stream.isSuccess && rows.length === 0 ? (
-        <EmptyState variant="inline" title={t(K.empty)} />
+        // The compact look in the timeline's sage (change-empty-states C8).
+        <EmptyState variant="compact" tone="sage" icon={<Clock />} title={t(K.empty)} />
       ) : null}
     </section>
   );

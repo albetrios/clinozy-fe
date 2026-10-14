@@ -102,8 +102,7 @@
   "empty": {
     "ledgerTitle": "Nenhum lançamento corresponde",
     "pendingTitle": "Nada pendente",
-    "description": "Ainda não há nada aqui. Tente outra aba ou busca.",
-    "receive": "Receber"
+    "description": "Ainda não há nada aqui. Tente outra aba ou busca."
   },
   "deleteEntry": {
     "title": "Excluir este pagamento?",

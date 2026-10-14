@@ -17,9 +17,11 @@ import {
   TASK_RULES_NS,
 } from '@/shared/app/task-rules.constants.ts';
 import { personFirstName, shortPersonName } from '@/shared/components/Cells/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
+import { SquareCheck } from '@/shared/icons/index.ts';
 
 import type { WorkQueueEntry, WorkQueueScope } from '../../hooks/useWorkQueue/index.ts';
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
@@ -325,12 +327,15 @@ export function WorkQueue({
               />
             ))}
         {!loading && entries.length === 0 ? (
-          <p
-            data-testid={TODAY_TEST_IDS.queueEmpty}
-            className="text-detail text-muted-foreground-strong px-1"
-          >
-            {tTasks(TASK_QUEUE_KEYS.empty)}
-          </p>
+          // The compact look in the Tasks plum, centred (change-empty-states C1).
+          <EmptyState
+            variant="compact"
+            tone="plum"
+            icon={<SquareCheck />}
+            title={tTasks(TASK_QUEUE_KEYS.caughtUp)}
+            description={tTasks(TASK_QUEUE_KEYS.empty)}
+            testId={TODAY_TEST_IDS.queueEmpty}
+          />
         ) : null}
       </div>
     </aside>

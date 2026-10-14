@@ -36,6 +36,8 @@
       "updated": "अपडेट"
     },
     "empty": "कोई मेल खाती लीड नहीं",
+    "emptyTitle": "अभी कोई लीड नहीं",
+    "emptyHint": "कॉल, WhatsApp और सीधे आने वालों की पूछताछ यहाँ आती है।",
     "clearFilters": "फ़िल्टर हटाएँ",
     "moreInterests_one": "{{count}} और: {{list}}",
     "moreInterests_other": "{{count}} और: {{list}}"

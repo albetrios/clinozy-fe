@@ -32,10 +32,10 @@ import {
   useWebhooks,
 } from '@/shared/hooks/useWebhooks/index.ts';
 import {
-  Boxes,
   Eye,
   LinkIcon,
   Lock,
+  Plug,
   Plus,
   SlidersHorizontal,
   Trash,
@@ -186,9 +186,9 @@ function ApiKeysSection() {
       ) : null}
       {!(keys.isPending || keys.isError) && keys.rows.length === 0 ? (
         <EmptyState
-          tone="stone"
+          tone="lav"
           className="pt-6 pb-7"
-          icon={<Boxes />}
+          icon={<Lock />}
           title={tSettings(
             isSearching ? integrations.apiKeysNoResults : integrations.apiKeysEmptyTitle,
           )}
@@ -337,9 +337,9 @@ function WebhooksSection() {
 
       {!isError && hooks && hooks.length === 0 ? (
         <EmptyState
-          tone="stone"
+          tone="plum"
           className="pt-6 pb-7"
-          icon={<Boxes />}
+          icon={<Plug />}
           title={tSettings(integrations.webhooksEmptyTitle)}
           description={tSettings(integrations.webhooksEmptyDescription)}
         />

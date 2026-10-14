@@ -353,14 +353,12 @@ describe('the read’s states (KICKOFF §6.11 States)', () => {
     expect(await screen.findByTestId('skeleton-rows')).toBeInTheDocument();
   });
 
-  it('shows the empty line with "New offer" when there is none', async () => {
+  it('shows the empty line, with no button, when there is none', async () => {
     world.offers = [];
     renderOffersRoutes(OFFERS_URL);
     const empty = await screen.findByTestId('empty-state');
     expect(empty).toHaveTextContent('No offers yet');
-    expect(
-      await within(empty).findByRole('button', { name: 'New offer' }),
-    ).toBeInTheDocument();
+    expect(within(empty).queryByRole('button')).toBeNull();
   });
 
   it('offers Retry in place when the read fails, and loads on Retry', async () => {

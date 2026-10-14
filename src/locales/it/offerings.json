@@ -75,8 +75,7 @@
     "title": "Ancora nessun servizio",
     "description": "Aggiungi trattamenti e pacchetti con i prezzi per poterli prenotare e fatturare.",
     "noMatchTitle": "Nessun servizio corrisponde",
-    "noMatchDescription": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
-    "newOffering": "Nuovo servizio"
+    "noMatchDescription": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
   },
   "offers": {
     "columns": {
@@ -119,8 +118,7 @@
     },
     "empty": {
       "title": "Ancora nessuna offerta",
-      "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
-      "newOffer": "Nuova offerta"
+      "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca."
     },
     "record": "Offerta"
   },

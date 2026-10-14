@@ -18,7 +18,7 @@ describe('AppHomeEmpty', () => {
         "Your clinic's sections appear here as soon as they're switched on for you.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('empty-state')).toHaveAttribute('data-tone', 'stone');
+    expect(screen.getByTestId('empty-state')).toHaveAttribute('data-tone', 'sky');
   });
 
   it('offers nothing to press — it is a state, never a way off the page', async () => {

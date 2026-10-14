@@ -65,6 +65,29 @@ describe('DataTable', () => {
     expect(screen.getByText('No patients match')).toBeInTheDocument();
   });
 
+  it('grows an empty body into the card so the empty state centres there', () => {
+    function Empty() {
+      const table = useTable({ features: dataTableFeatures, data: [], columns: COLUMNS });
+      return <DataTable table={table} emptyMessage="Nothing yet" />;
+    }
+    const { unmount } = render(<Empty />);
+    const body = screen.getByText('Nothing yet').closest('[data-slot="data-table-body"]');
+    expect(body).toHaveAttribute('data-empty', 'true');
+    expect(body).toHaveClass('flex-1', 'flex-col');
+    expect(body).not.toHaveClass('shrink-0');
+    const cell = screen.getByRole('cell');
+    expect(cell).toHaveClass('flex-1');
+    expect(cell.parentElement).toHaveClass('flex-1');
+    // The default empty line is the compact look, centred in that cell.
+    expect(screen.getByTestId('empty-state')).toHaveAttribute('data-variant', 'compact');
+    unmount();
+
+    render(<Harness />);
+    const filled = screen.getByText('Ada').closest('[data-slot="data-table-body"]');
+    expect(filled).not.toHaveAttribute('data-empty');
+    expect(filled).toHaveClass('shrink-0');
+  });
+
   it("keeps the open record's row on the muted fill", () => {
     function Active() {
       const table = useTable({

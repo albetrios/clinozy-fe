@@ -459,6 +459,7 @@
   },
   "empty": {
     "queue": "Nada precisa de você agora. Novas tarefas aparecem aqui quando leads escrevem, visitas se aproximam e chega feedback.",
+    "caughtUp": "Tudo em dia",
     "snoozed": "Nenhuma tarefa adiada",
     "done": "Nada resolvido hoje ainda"
   },

@@ -12,7 +12,6 @@ import { OFFERING_CATEGORY_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
 import {
@@ -80,7 +79,10 @@ const OFFERING_CODES = {
   export: 'offering:export',
 } as const;
 
-/** What the table shows with no rows (KICKOFF §6.11 States). */
+/**
+ * What the table shows with no rows (KICKOFF §6.11 States). No button
+ * (fix-empty-state-actions): the toolbar's "New offering" is the one way to add.
+ */
 function TableEmpty({
   loading,
   failed,
@@ -88,7 +90,6 @@ function TableEmpty({
   searched,
   onClearFilters,
   onRetry,
-  onNew,
 }: {
   loading: boolean;
   /** The catalogue's read failed with nothing read before: the error in place, with Retry. */
@@ -97,8 +98,6 @@ function TableEmpty({
   searched: boolean;
   onClearFilters: () => void;
   onRetry: () => void;
-  /** "New offering" under the empty catalogue — absent without `offering:create`. */
-  onNew?: () => void;
 }) {
   const { t } = useTranslation(OFFERINGS_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
@@ -123,13 +122,6 @@ function TableEmpty({
           ? OFFERINGS_KEYS.empty.noMatchDescription
           : OFFERINGS_KEYS.empty.description,
       )}
-      action={
-        !searched && onNew ? (
-          <EmptyStateAction onClick={onNew}>
-            {t(OFFERINGS_KEYS.empty.newOffering)}
-          </EmptyStateAction>
-        ) : undefined
-      }
       label={t(OFFERINGS_KEYS.manifest.title)}
     />
   );
@@ -380,7 +372,6 @@ export function OfferingsPage() {
             searched={Boolean(search.q)}
             onClearFilters={() => filters.apply({})}
             onRetry={catalogue.refetch}
-            onNew={canCreate ? openCreate : undefined}
           />
         }
         className="m-(--room-card-margin) flex-1"

@@ -98,8 +98,7 @@
   "empty": {
     "ledgerTitle": "Keine passende Buchung",
     "pendingTitle": "Nichts offen",
-    "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
-    "receive": "Einnehmen"
+    "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
   },
   "deleteEntry": {
     "title": "Diese Zahlung löschen?",

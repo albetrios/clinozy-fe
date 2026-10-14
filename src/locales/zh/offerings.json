@@ -63,8 +63,7 @@
     "title": "还没有服务项目",
     "description": "添加带价格的治疗和套餐，即可用于预约和开票。",
     "noMatchTitle": "没有匹配的服务项目",
-    "noMatchDescription": "这里还没有内容。试试其他标签页或搜索。",
-    "newOffering": "新建服务项目"
+    "noMatchDescription": "这里还没有内容。试试其他标签页或搜索。"
   },
   "offers": {
     "columns": {
@@ -103,8 +102,7 @@
     },
     "empty": {
       "title": "还没有优惠活动",
-      "description": "这里还没有内容。试试其他标签页或搜索。",
-      "newOffer": "新建优惠"
+      "description": "这里还没有内容。试试其他标签页或搜索。"
     },
     "record": "优惠"
   },
