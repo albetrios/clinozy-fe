@@ -4,15 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { localDateOf } from '@/shared/api/app/app-time.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -47,7 +40,7 @@ export interface ReportDrawerProps {
  * Upload report — `reports/create/` (KICKOFF §6.6 Drawers; H:4829–4832;
  * `patient-file.md:143–157, 374–381`): 560px, "Upload report" over the
  * patient's name; steps "Report" (Type, Name) → "Details" (Date) → "Notes"
- * (File, Note), each head naming its values; the summary "Lab · 0 files";
+ * (File, Note), each peeking its values; the summary "Lab · 0 files";
  * "Upload". A blank name → "Name the report"; else "Report uploaded", the row
  * appears in Reports, and the picked files follow through the upload tray.
  */
@@ -58,7 +51,6 @@ export function ReportDrawer({
   onClose,
 }: ReportDrawerProps) {
   const { t } = useTranslation(REPORT_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const { formatDate } = useLocaleFormat();
   const form = useForm<ReportFormValues>({ defaultValues: newReportForm(today) });
   const values = useFormValues(form);
@@ -75,7 +67,6 @@ export function ReportDrawer({
     },
   });
 
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const type = t(K.types[values.type]);
   const name = values.name.trim();
   const note = values.note.trim();
@@ -89,7 +80,6 @@ export function ReportDrawer({
     {
       id: 'report',
       title: t(K.steps.report),
-      summary: drawerStepSummary([type, name], notFilled),
       peek: [
         {
           kind: 'value',
@@ -104,16 +94,21 @@ export function ReportDrawer({
     {
       id: 'details',
       title: t(K.steps.details),
-      summary: drawerStepSummary([date], notFilled),
       peek: [{ kind: 'value', label: t(K.date), value: date }],
       content: <ReportDateFields form={form} values={values} today={today} />,
     },
     {
       id: 'notes',
       title: t(K.steps.notes),
-      summary: drawerStepSummary([values.files.length ? files : '', note], notFilled),
-      // The drop zone has no peek tile (H:3840 `peekOf` skips uploads).
-      peek: [{ kind: 'value', label: t(K.upload.note), value: note || undefined }],
+      // The picked files as chips, then the note.
+      peek: [
+        {
+          kind: 'items',
+          label: t(K.file),
+          names: values.files.map((picked) => picked.file.name),
+        },
+        { kind: 'value', label: t(K.upload.note), value: note || undefined },
+      ],
       content: <ReportNotesFields form={form} values={values} />,
     },
   ];

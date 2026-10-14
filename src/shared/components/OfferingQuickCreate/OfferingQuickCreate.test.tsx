@@ -131,7 +131,9 @@ describe('OfferingQuickCreate (KICKOFF §6.11, L-30e)', () => {
     expect(within(part('step-offering')).getByText('Offering')).toBeVisible();
     expect(within(part('step-details')).getByText('Details')).toBeVisible();
     expect(within(part('step-payment')).getByText('Payment')).toBeVisible();
-    expect(part('step-payment')).toHaveTextContent('Missing: Price');
+    // Not reached yet: grey, not flagged, until opened or a save is tried.
+    expect(part('step-payment')).toHaveAttribute('data-status', 'later');
+    expect(part('step-payment')).not.toHaveTextContent('Missing: Price');
     expect(part('dismiss')).toHaveTextContent('Back');
     expect(part('save')).toHaveTextContent('Add offering');
     expect(await axeForDialog(panel)).toHaveNoViolations();

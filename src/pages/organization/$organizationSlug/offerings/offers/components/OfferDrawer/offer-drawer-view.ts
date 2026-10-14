@@ -5,10 +5,7 @@ import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
 import { offerPreview } from '@/shared/api/app/offerings-pricing.ts';
 import { OFFER_KIND_TONES } from '@/shared/app/app-tones.ts';
-import {
-  type DrawerPeekItem,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -34,11 +31,10 @@ const F = K.fields;
 /** The drawer's three step cards (`offerings.md:246–253`). */
 export type OfferStepId = 'offer' | 'where' | 'notes';
 
-/** A step card's head: what it peeks while closed, its sub line, and its gaps. */
+/** A step card's head: what it peeks while closed, and its gaps. */
 interface OfferStepView {
   id: OfferStepId;
   peek: DrawerPeekItem[];
-  summary: string;
   missing: string[];
 }
 
@@ -116,11 +112,6 @@ function offerStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
         tone: values.tone,
       },
     ],
-    // The head names values, never the colour (H:3840).
-    summary: drawerStepSummary(
-      [values.name.trim(), values.code, kind, value],
-      tApp(RECORD_DRAWER_KEYS.step.notFilled),
-    ),
     missing: missingOfferFields(values).includes('name') ? [t(F.name)] : [],
   };
 }
@@ -131,7 +122,7 @@ function whereStepOf(
   input: Pick<OfferDrawerViewInput, 'offerings' | 'branches'>,
   words: ViewWords,
 ): OfferStepView {
-  const { t, tApp, labels } = words;
+  const { t, labels } = words;
   const picked = values.offeringIds.flatMap(
     (id) => input.offerings.find((offering) => offering.id === id) ?? [],
   );
@@ -167,33 +158,19 @@ function whereStepOf(
       { kind: 'value', label: t(F.starts), value: starts },
       { kind: 'value', label: t(F.ends), value: ends },
     ],
-    summary: drawerStepSummary(
-      [
-        picked.map((offering) => offering.name).join(', '),
-        branchesShown
-          ? branches.map((branch) => branch.name).join(', ') || allBranches
-          : undefined,
-        starts,
-        ends,
-      ],
-      tApp(RECORD_DRAWER_KEYS.step.notFilled),
-    ),
     missing: missingOfferFields(values).includes('offeringIds') ? [t(F.offerings)] : [],
   };
 }
 
 /** Step 3, "Notes": Note · Status. */
 function notesStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
-  const { t, tApp } = words;
-  const note = values.note.trim();
-  const status = t(values.live ? F.live : F.paused);
+  const { t } = words;
   return {
     id: 'notes',
     peek: [
-      { kind: 'value', label: t(F.note), value: note },
-      { kind: 'value', label: t(F.status), value: status },
+      { kind: 'value', label: t(F.note), value: values.note.trim() },
+      { kind: 'value', label: t(F.status), value: t(values.live ? F.live : F.paused) },
     ],
-    summary: drawerStepSummary([note, status], tApp(RECORD_DRAWER_KEYS.step.notFilled)),
     missing: [],
   };
 }
@@ -230,7 +207,7 @@ function previewsOf(
  * What the Offer drawer shows of its form outside the fields
  * (`offerings.md:145–157, 246–253`; H:5509–5527): the badges, the footer
  * summary, one preview per picked offering (the offer alone, as if it ran
- * everywhere) and each step's peek, head line and gaps.
+ * everywhere) and each step's peek and gaps.
  */
 export function useOfferDrawerView({
   values,

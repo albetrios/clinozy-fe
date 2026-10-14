@@ -17,10 +17,6 @@ import {
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
 import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import {
   type ItemsColumn,
   ItemsField,
   ItemsQtyCell,
@@ -201,29 +197,47 @@ function ReasonStep({ form, readOnly, testId }: BodyProps) {
   );
 }
 
-/** The two step cards, with what each holds in its head. */
+/** The two step cards, and what each collapsed one summarises. */
 function useSteps(body: BodyProps, values: SaleReturnFormValues): DrawerStep[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatPaise = usePaiseFormat();
   const back = linesBack(values.lines);
   return [
     {
       id: 'back',
       title: t(K.steps.back),
-      summary:
-        back.length > 0
-          ? t(K.peek, {
-              count: back.length,
-              amount: formatPaise(returnAmount(values.lines)),
-            })
-          : tDrawer(RECORD_DRAWER_KEYS.step.notFilled),
+      peek: [
+        {
+          kind: 'items',
+          label: t(K.medicine),
+          names: back.map((line) => `${line.name} × ${line.qty}`),
+        },
+        {
+          kind: 'value',
+          label: t(K.refund),
+          value: back.length > 0 ? formatPaise(returnAmount(values.lines)) : undefined,
+        },
+      ],
       content: <LinesStep {...body} />,
     },
     {
       id: 'reason',
       title: t(K.steps.reason),
-      summary: t(K.reasons[values.reason]),
+      peek: [
+        {
+          kind: 'value',
+          label: t(K.reason),
+          value: t(K.reasons[values.reason]),
+          tone: RETURN_REASON_TONES[values.reason],
+        },
+        {
+          kind: 'value',
+          label: t(K.refundBy),
+          value: tApp(APP_KEYS.paymentModes[values.mode]),
+          tone: PAYMENT_MODE_TONES[values.mode],
+        },
+      ],
       content: <ReasonStep {...body} />,
     },
   ];

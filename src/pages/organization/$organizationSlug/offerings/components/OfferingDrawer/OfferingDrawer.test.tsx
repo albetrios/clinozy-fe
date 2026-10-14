@@ -270,10 +270,12 @@ describe('OfferingDrawer — New offering (KICKOFF §6.11)', () => {
     expect(
       within(stepOf('offering')).getByText('Offering, price & sessions'),
     ).toBeVisible();
-    // No GST rate is picked: the server applies the category's until one is.
-    expect(withoutBidiMarks(stepOf('offering').textContent)).toContain(
+    // The open step shows its fields, not a summary line under its title.
+    expect(stepOf('offering')).toHaveAttribute('data-status', 'open');
+    expect(withoutBidiMarks(stepOf('offering').textContent)).not.toContain(
       'Treatment · All branches · 1 · Exclusive',
     );
+    // No GST rate is picked: the server applies the category's until one is.
     for (const rate of [0, 5, 12, 18, 28]) {
       expect(part(`gst-rate-${rate}`)).toHaveAttribute('aria-pressed', 'false');
     }

@@ -136,7 +136,7 @@ function useSummary(values: CreditFormValues): string | undefined {
   return `${line} · ${reason}`;
 }
 
-/** The step cards: each step's heads (peek, summary, what is missing) and its body. */
+/** The step cards: each step's heads (peek, what is missing) and its body. */
 function useSteps({
   values,
   invoices,
@@ -165,9 +165,6 @@ function useSteps({
       id: 'way',
       title: t(K.steps.way),
       missing: missingWay,
-      summary: [way, values.party?.name, amount > 0 ? formatPaise(amount) : '']
-        .filter(Boolean)
-        .join(' · '),
       peek: [
         {
           kind: 'value',
@@ -188,7 +185,6 @@ function useSteps({
       id: 'why',
       title: t(K.steps.why),
       missing: values.reasonKey ? [] : [t(K.reason)],
-      summary: reason,
       peek: [
         {
           kind: 'value',

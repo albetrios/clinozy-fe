@@ -15,19 +15,12 @@ import {
   DrawerStepBody,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import {
   type DrawerBadge,
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -211,10 +204,8 @@ function makerOf(pickers: MedicalPickers, id: string | null) {
 /** The step cards: "Medicine, price & stock" → "Batches & supplier prices" (`medical.md:433`). */
 function useSteps(body: BodyProps): DrawerStep[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const formatPaise = usePaiseFormat();
   const { values, pickers, readOnly } = body;
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
   const maker = makerOf(pickers, values.manufacturerId);
   const composition = values.composition.trim();
@@ -232,10 +223,6 @@ function useSteps(body: BodyProps): DrawerStep[] {
     {
       id: 'medicine',
       title: t(K.steps.main),
-      summary: drawerStepSummary(
-        [name, maker?.label, mrpText, `${values.gstPct}%`],
-        notFilled,
-      ),
       peek: [
         { kind: 'value', label: t(F.name), value: name },
         {
@@ -270,7 +257,6 @@ function useSteps(body: BodyProps): DrawerStep[] {
     {
       id: 'batches',
       title: t(K.steps.batches),
-      summary: t(K.batches.total, { count: formStock(values) }),
       peek: [
         {
           kind: 'items',

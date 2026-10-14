@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone, toAppPhone } from '@/shared/app/app-phone.ts';
 import {
   PersonAvatar,
   personInitials,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
-import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
+import type {
+  DrawerPeekItem,
+  DrawerStep,
+} from '@/shared/components/DrawerSteps/index.ts';
 import {
   KIND_TINT,
   KIND_TONE,
@@ -32,6 +36,7 @@ import {
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 
 import {
+  CONTACT_CHANNEL_STYLES,
   CONTACT_EDITOR_KEYS,
   CONTACT_EDITOR_NS,
   CONTACT_EDITOR_TEST_ID,
@@ -41,7 +46,12 @@ import {
   type ContactLinkedNotice,
   ContactPreferenceFields,
 } from './contact-editor-fields.tsx';
-import { type ContactEditorValue, contactValueName } from './contact-editor-value.ts';
+import {
+  type ContactEditorValue,
+  contactValueName,
+  customPreferenceLabel,
+  isPresetPreference,
+} from './contact-editor-value.ts';
 
 const K = CONTACT_EDITOR_KEYS;
 
@@ -205,6 +215,48 @@ function ContactEditorBand({
   );
 }
 
+/** What each collapsed step summarises: the values "Done" would keep. */
+function useContactPeeks(draft: ContactEditorValue) {
+  const { t } = useTranslation(CONTACT_EDITOR_NS);
+  const { t: tApp } = useTranslation(APP_NS);
+  const phones = draft.phones.map((entry) => entry.digits).filter(Boolean);
+  const handles = draft.instagram.map((handle) => handle.trim()).filter(Boolean);
+  const identity: DrawerPeekItem[] = [
+    { kind: 'value', label: t(K.firstName), value: draft.firstName.trim() },
+    { kind: 'value', label: t(K.lastName), value: draft.lastName.trim() },
+    {
+      kind: 'value',
+      label: t(K.mobiles),
+      value: phones
+        .map((digits) => formatAppPhone(toAppPhone(digits) ?? digits))
+        .join(' · '),
+    },
+    {
+      kind: 'value',
+      label: tApp(APP_KEYS.channels.instagram),
+      value: handles.join(' · '),
+    },
+    {
+      kind: 'value',
+      label: t(K.defaultChannel),
+      value: tApp(APP_KEYS.channels[draft.defaultChannel]),
+      tone: CONTACT_CHANNEL_STYLES[draft.defaultChannel].tone,
+    },
+  ];
+  const preferences: DrawerPeekItem[] = [
+    {
+      kind: 'multi',
+      label: t(K.steps.preferences),
+      values: draft.preferences.map((preference) => ({
+        label: isPresetPreference(preference)
+          ? t(K.preferences[preference])
+          : customPreferenceLabel(preference),
+      })),
+    },
+  ];
+  return { identity, preferences };
+}
+
 /**
  * One opening of the editor (keyed on its session): its own copy of the
  * values, kept only by "Done" — ×, the backdrop and Esc ask first when it was
@@ -227,13 +279,14 @@ function ContactEditorPanel({
   const [adding, setAdding] = useState(false);
 
   const name = contactValueName(draft);
+  const peeks = useContactPeeks(draft);
   const steps: DrawerStep[] = [
     {
       id: 'identity',
       title: t(K.steps.identity),
-      // Collapsed, the card names the contact; green once it has a first name (H:4483, `accVM`).
-      summary: step === 'identity' || name === '' ? undefined : isolateText(name),
+      // Complete once named (H:4483) — the default channel alone is no answer.
       complete: draft.firstName.trim() !== '',
+      peek: peeks.identity,
       content: (
         <ContactIdentityFields
           value={draft}
@@ -247,6 +300,7 @@ function ContactEditorPanel({
     {
       id: 'preferences',
       title: t(K.steps.preferences),
+      peek: peeks.preferences,
       content: (
         <ContactPreferenceFields
           value={draft}

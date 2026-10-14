@@ -9,10 +9,6 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -102,7 +98,6 @@ function NewItemSession({
   testId,
 }: Required<StockNewItemDrawerProps>) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const words = useStockWords();
   const idPrefix = `stock-new-item-${useId().replace(/:/g, '')}`;
   const form = useForm<StockItemFormValues>({
@@ -146,16 +141,11 @@ function NewItemSession({
   });
 
   const body = { form, idPrefix, testId };
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const category = words.category(values.category);
   const steps: DrawerStep[] = [
     {
       id: 'item',
       title: t(K.steps.item),
-      summary:
-        [values.name.trim(), category.label, words.unit(values.unit)]
-          .filter(Boolean)
-          .join(' · ') || notFilled,
       peek: [
         { kind: 'value', label: t(F.name), value: values.name.trim() },
         {
@@ -181,7 +171,6 @@ function NewItemSession({
     {
       id: 'details',
       title: t(K.steps.details),
-      summary: `${values.minQty}–${values.maxQty}`,
       peek: [
         { kind: 'value', label: t(F.min), value: String(values.minQty) },
         { kind: 'value', label: t(F.max), value: String(values.maxQty) },
