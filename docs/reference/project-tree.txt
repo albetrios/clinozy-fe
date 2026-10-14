@@ -295,6 +295,14 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── change-floating-tab-bar-2026-10-13-pkhy/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
