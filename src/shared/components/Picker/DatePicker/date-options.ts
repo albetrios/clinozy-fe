@@ -275,7 +275,8 @@ function fromCount({
   if (!match) return null;
   const [, sign = '', digits = '', unitWord = ''] = match;
   // A bare figure is a day of the month elsewhere: only a sign, "in" or "ago" makes it a count.
-  if (!unitWord && !sign && !counting) return null;
+  const bareFigure = !(unitWord || sign || counting);
+  if (bareFigure) return null;
   const unit = unitWord ? RELATIVE_UNITS[unitWord] : 'day';
   if (!unit) return null;
   const amount = Number(digits) * (sign === '-' ? -1 : 1) * direction;

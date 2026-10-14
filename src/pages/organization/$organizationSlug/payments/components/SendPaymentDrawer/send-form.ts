@@ -192,9 +192,9 @@ export function paidToQuick(
   const seen = new Set<string>();
   const payees: string[] = [];
   for (const row of rows) {
-    const name = row.payeeName?.trim();
-    const key = name?.toLocaleLowerCase();
-    if (!name || !key || seen.has(key)) continue;
+    const name = row.payeeName?.trim() ?? '';
+    const key = name.toLocaleLowerCase();
+    if (!name || seen.has(key)) continue;
     seen.add(key);
     payees.push(name);
     if (payees.length === RECENT_PAYEES_LIMIT) break;
