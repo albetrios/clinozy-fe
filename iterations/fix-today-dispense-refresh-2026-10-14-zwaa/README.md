@@ -8,7 +8,7 @@
 | Opened | 2026-10-14 |
 | Branch | fix/today-dispense-refresh |
 | Baseline | launch-2026-09-30-jxmr |
-| Status | done |
+| Status | frozen |
 | Summary | A sale saved from Today’s Dispense refreshes the floor, so the visit’s Pharmacy card stops offering Dispense without a reload; every sale write refreshes Today the way prescription writes already do. |
 | Drop placed | 2026-10-14 |
 | Drop source | /tmp/claude-0/-home-user/018665d9-3f58-5305-9126-2d5eb301562a/scratchpad/drop-today-dispense |
@@ -24,3 +24,4 @@
 - 2026-10-14 · ready-for-approval → approved · — · Claude
 - 2026-10-14 · approved → implementing · — · Claude
 - 2026-10-14 · implementing → done · — · Claude
+- 2026-10-14 · done → frozen · — · Claude
