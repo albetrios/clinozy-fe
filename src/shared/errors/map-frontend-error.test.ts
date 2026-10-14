@@ -10,6 +10,29 @@ import { HttpError } from './HttpError.ts';
 import { mapFrontendError, resolveKnownFrontendError } from './map-frontend-error.ts';
 
 describe('mapFrontendError', () => {
+  // Each used to toast its bare code — or, for a storage write that never answered (a CORS
+  // refusal, a dropped connection), the raw English "Network request failed".
+  it.each([
+    [
+      FRONTEND_ERROR_CODES.UPLOAD_STORAGE_UNREACHABLE,
+      "Couldn't send the file to storage. Check your connection and try again; if it keeps failing, contact support.",
+    ],
+    [
+      FRONTEND_ERROR_CODES.UPLOAD_STORAGE_REJECTED,
+      'Storage refused the file. Try uploading it again.',
+    ],
+    [
+      FRONTEND_ERROR_CODES.UPLOAD_NOT_CONFIRMED,
+      "The file couldn't be verified after upload. Try uploading it again.",
+    ],
+    [
+      FRONTEND_ERROR_CODES.UPLOAD_INVALID_FILE_NAME,
+      "Rename the file and try again: its name can't contain slashes, “..” or control characters.",
+    ],
+  ])('says the upload failure %s in words', (code, message) => {
+    expect(mapFrontendError(new AppError(code, 0, code))).toBe(message);
+  });
+
   it('maps invalid credentials AppError to localized auth message', () => {
     const err = new AppError(
       FRONTEND_ERROR_CODES.AUTH_INVALID_CREDENTIALS,

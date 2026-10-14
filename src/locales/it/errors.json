@@ -98,6 +98,12 @@
       "avatarUpdated": "Avatar aggiornato.",
       "avatarRemoved": "Avatar rimosso."
     },
+    "upload": {
+      "storageUnreachable": "Impossibile inviare il file all'archivio. Controlla la connessione e riprova; se il problema persiste, contatta l'assistenza.",
+      "storageRejected": "L'archivio ha rifiutato il file. Prova a caricarlo di nuovo.",
+      "notConfirmed": "Impossibile verificare il file dopo il caricamento. Prova a caricarlo di nuovo.",
+      "invalidFileName": "Rinomina il file e riprova: il nome non può contenere barre, «..» o caratteri di controllo."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Impossibile aggiungere la passkey",

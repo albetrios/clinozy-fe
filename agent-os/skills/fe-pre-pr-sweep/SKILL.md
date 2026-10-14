@@ -51,7 +51,7 @@ Removing a component is not removing a file. When deleting a surface, sweep ever
 place it was registered:
 
 - `src/app/routes/routeTree.tsx` (lazy mount)
-- `src/sw.ts` precache patterns and `vite.config.ts` manual chunk lists
+- `src/sw.ts` precache patterns and `vite.config.ts` `codeSplitting` groups
 - `src/shared/analytics/analytics.constants.ts` (events)
 - store slices that only that surface set (`useUIStore.languageOpen`)
 - locale JSON keys + the `*.constants.ts` key paths and test ids

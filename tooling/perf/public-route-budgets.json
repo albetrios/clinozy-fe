@@ -3,44 +3,44 @@
   "routes": {
     "/": {
       "url": "/",
-      "firstPaintJsKb": 275.8,
-      "totalJsKb": 342.2,
+      "firstPaintJsKb": 239.9,
+      "totalJsKb": 304,
       "cssKb": 35.4
     },
     "/login": {
       "url": "/login",
       "firstPaintJsKb": 238.3,
-      "totalJsKb": 342.2,
+      "totalJsKb": 304,
       "cssKb": 35.4
     },
     "/mfa": {
       "url": "/mfa",
       "firstPaintJsKb": 236.7,
-      "totalJsKb": 344.1,
+      "totalJsKb": 305.8,
       "cssKb": 35.4
     },
     "/unauthorized": {
       "url": "/unauthorized",
-      "firstPaintJsKb": 249.5,
-      "totalJsKb": 345.4,
+      "firstPaintJsKb": 239.9,
+      "totalJsKb": 307,
       "cssKb": 35.4
     },
     "/accept-invite/$id": {
       "url": "/accept-invite/inv_budgetprobe000000000",
-      "firstPaintJsKb": 244.9,
-      "totalJsKb": 342.2,
+      "firstPaintJsKb": 239.9,
+      "totalJsKb": 304,
       "cssKb": 35.4
     },
     "/callback/$provider": {
       "url": "/callback/google",
       "firstPaintJsKb": 235.4,
-      "totalJsKb": 355.1,
+      "totalJsKb": 318.9,
       "cssKb": 35.4
     },
     "/not-found": {
       "url": "/no-such-route-budget-probe",
       "firstPaintJsKb": 237.8,
-      "totalJsKb": 343.2,
+      "totalJsKb": 304.9,
       "cssKb": 35.4
     }
   },
