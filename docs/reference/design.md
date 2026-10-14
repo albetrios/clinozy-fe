@@ -132,9 +132,18 @@ on its surface, in both modes.
   - **There is no sidebar on any viewport.** The app's one shell is the section
     bar (`AppLayoutSectionBar.tsx`, `shell.md`): a single header holds the nav —
     All sections and the pinned tabs from `md`, the section chip on a phone.
-  - **Below `md` there is a bottom tab bar** (`data-slot="mobile-nav"`). Anything
-    else pinned to the bottom edge rides above it through
-    `--floating-bottom-offset` (published by `index.css` via `:has()`), never
+  - **Below `md` there is a bottom tab bar** (`data-slot="mobile-nav"`): a
+    floating glass capsule in the style of the iPhone tab bar (iteration
+    `change-floating-tab-bar-2026-10-13-pkhy`) — 62px tall, 12px from the sides,
+    lifted off the bottom by `--tab-bar-gap` (12px, or the safe-area inset less
+    12px over a home indicator), with a selection lens that slides to the current
+    room in its tone and a scroll-edge fade under it. Its geometry and its
+    glass live in `index.css` (`--tab-bar-height`, `--tab-bar-gap`, two token
+    `::before` layers — no `color-mix()`, which ships twice); the capsule is a
+    `floating-edge` slot, so the Shape and Elevation axes own its corners and
+    shadow. Anything else pinned to the bottom edge rides above it through
+    `--floating-bottom-offset` — the capsule's top edge less the inset, which
+    every consumer adds itself (published by `index.css` via `:has()`), never
     over it — the consent card and the Report a bug trigger both do, and the
     toasts sit 16px above the whole bottom stack (`AppToaster`).
   - **Overlays are a sheet on phones and a dialog from `sm`.** The `sm:` half
