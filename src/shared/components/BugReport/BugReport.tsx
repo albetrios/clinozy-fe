@@ -30,6 +30,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
+import {
+  VOICE_INPUT_KEYS,
+  VoiceInputButton,
+  voiceStatusKey,
+} from '@/shared/components/VoiceInputButton/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import {
   resolveSpeechLanguage,
@@ -46,8 +51,7 @@ import {
   BUG_REPORT_SENT_HOLD_MS,
   BUG_REPORT_TEST_IDS,
 } from './bug-report.constants.ts';
-import { appendPhrase, inputMethodOf, voiceStatusKey } from './bug-report-text.ts';
-import { VoiceInputButton } from './VoiceInputButton/index.ts';
+import { appendPhrase, inputMethodOf } from './bug-report-text.ts';
 
 const DESCRIPTION_ID = 'bug-report-description';
 
@@ -133,9 +137,7 @@ function BugReportToolbar({
 }) {
   const { t } = useTranslation(BUG_REPORT_NS);
   const statusKey = voiceStatusKey(speech);
-  const voiceLabel = t(
-    speech.listening ? BUG_REPORT_KEYS.voiceStop : BUG_REPORT_KEYS.voiceStart,
-  );
+  const voiceLabel = t(speech.listening ? VOICE_INPUT_KEYS.stop : VOICE_INPUT_KEYS.start);
   const SendIcon = pending ? Loader : Send;
 
   return (
@@ -147,6 +149,7 @@ function BugReportToolbar({
           label={voiceLabel}
           onToggle={onToggleVoice}
           disabled={pending}
+          testId={BUG_REPORT_TEST_IDS.voice}
         />
       ) : null}
       <p
@@ -291,7 +294,7 @@ function BugReportPanel({ onClose }: { onClose: () => void }) {
           <p
             data-testid={BUG_REPORT_TEST_IDS.interim}
             aria-hidden="true"
-            className="bug-report-interim px-3 pb-1 text-sm"
+            className="voice-interim px-3 pb-1 text-sm"
           >
             {interim}
           </p>

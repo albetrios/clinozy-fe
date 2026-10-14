@@ -3,10 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { NativeSpeechRecognition } from '@/shared/hooks/useSpeechRecognition/useSpeechRecognition.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+import {
+  installFakeSpeechRecognition,
+  lastSpeechRecognition,
+} from '@/tests/utils/speech-recognition-doubles.ts';
 
 const { createBugReportMock } = vi.hoisted(() => ({ createBugReportMock: vi.fn() }));
 vi.mock('@/shared/api/bug-report-api.ts', () => ({
@@ -16,32 +19,6 @@ vi.mock('@/shared/api/bug-report-api.ts', () => ({
 
 import { BUG_REPORT_SENT_HOLD_MS, BUG_REPORT_TEST_IDS } from './bug-report.constants.ts';
 import { BugReport } from './BugReport.tsx';
-
-/** The browser's recognizer, driven by the test. */
-let lastRecognition: FakeRecognition | null = null;
-
-class FakeRecognition implements NativeSpeechRecognition {
-  lang = '';
-  continuous = false;
-  interimResults = false;
-  maxAlternatives = 0;
-  onresult: NativeSpeechRecognition['onresult'] = null;
-  onerror: NativeSpeechRecognition['onerror'] = null;
-  onend: NativeSpeechRecognition['onend'] = null;
-  onspeechstart: NativeSpeechRecognition['onspeechstart'] = null;
-  onspeechend: NativeSpeechRecognition['onspeechend'] = null;
-  onsoundend: NativeSpeechRecognition['onsoundend'] = null;
-  start = vi.fn();
-  stop = vi.fn(() => this.onend?.());
-  abort = vi.fn(() => this.onend?.());
-  constructor() {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias -- the test drives the latest instance
-    lastRecognition = this;
-  }
-  say(transcript: string, isFinal: boolean) {
-    this.onresult?.({ resultIndex: 0, results: [{ isFinal, 0: { transcript } }] });
-  }
-}
 
 const STORED = {
   id: 'bug_aaaaaaaaaaaaaaaaaaaaa',
@@ -79,7 +56,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.useRealTimers();
-  lastRecognition = null;
 });
 
 describe('BugReport', () => {
@@ -148,7 +124,7 @@ describe('BugReport', () => {
   });
 
   it('dictates into the textbox, shows interim words live, and records voice', async () => {
-    vi.stubGlobal('webkitSpeechRecognition', FakeRecognition);
+    installFakeSpeechRecognition();
     const user = await openPanel();
 
     const voice = screen.getByTestId(BUG_REPORT_TEST_IDS.voice);
@@ -158,17 +134,18 @@ describe('BugReport', () => {
     expect(screen.getByTestId(BUG_REPORT_TEST_IDS.voiceStatus)).toHaveTextContent(
       'Listening…',
     );
-    expect(lastRecognition?.lang).toMatch(/^en/);
+    expect(lastSpeechRecognition()?.lang).toMatch(/^en/);
 
-    act(() => lastRecognition?.onspeechstart?.());
+    act(() => lastSpeechRecognition()?.onspeechstart?.());
     expect(screen.getByTestId(BUG_REPORT_TEST_IDS.voiceStatus)).toHaveTextContent(
       'Hearing you…',
     );
-    act(() => lastRecognition?.say('the invoice total', true));
-    act(() => lastRecognition?.say('does not upd', false));
+    act(() => lastSpeechRecognition()?.say('the invoice total', true));
+    act(() => lastSpeechRecognition()?.say('does not upd', false));
 
+    // The shared insert starts a sentence with a capital (feat-write-less, D6).
     expect(screen.getByTestId(BUG_REPORT_TEST_IDS.description)).toHaveValue(
-      'the invoice total',
+      'The invoice total',
     );
     expect(screen.getByTestId(BUG_REPORT_TEST_IDS.interim)).toHaveTextContent(
       'does not upd',
@@ -178,16 +155,16 @@ describe('BugReport', () => {
     await user.click(screen.getByTestId(BUG_REPORT_TEST_IDS.send));
     await waitFor(() => expect(createBugReportMock).toHaveBeenCalledOnce());
     expect(createBugReportMock.mock.calls[0]?.[0].input).toMatchObject({
-      description: 'the invoice total does not upd',
+      description: 'The invoice total does not upd',
       input_method: 'voice',
     });
   });
 
   it('records mixed when dictation is edited by hand', async () => {
-    vi.stubGlobal('webkitSpeechRecognition', FakeRecognition);
+    installFakeSpeechRecognition();
     const user = await openPanel();
     await user.click(screen.getByTestId(BUG_REPORT_TEST_IDS.voice));
-    act(() => lastRecognition?.say('It froze', true));
+    act(() => lastSpeechRecognition()?.say('It froze', true));
     await user.click(screen.getByTestId(BUG_REPORT_TEST_IDS.voice));
     await user.type(screen.getByTestId(BUG_REPORT_TEST_IDS.description), ' on save');
     await user.click(screen.getByTestId(BUG_REPORT_TEST_IDS.send));
@@ -200,11 +177,11 @@ describe('BugReport', () => {
   });
 
   it('says when the microphone is blocked', async () => {
-    vi.stubGlobal('webkitSpeechRecognition', FakeRecognition);
+    installFakeSpeechRecognition();
     const user = await openPanel();
     await user.click(screen.getByTestId(BUG_REPORT_TEST_IDS.voice));
-    act(() => lastRecognition?.onerror?.({ error: 'not-allowed' }));
-    act(() => lastRecognition?.onend?.());
+    act(() => lastSpeechRecognition()?.onerror?.({ error: 'not-allowed' }));
+    act(() => lastSpeechRecognition()?.onend?.());
 
     const status = screen.getByTestId(BUG_REPORT_TEST_IDS.voiceStatus);
     expect(status).toHaveTextContent('The microphone is blocked');

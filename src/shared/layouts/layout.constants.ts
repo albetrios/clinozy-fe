@@ -148,6 +148,7 @@ export const LAYOUT_KEYS = {
       commandPalette: 'app.shortcuts.commandPalette',
       showShortcuts: 'app.shortcuts.showShortcuts',
       showShortcutsAlt: 'app.shortcuts.showShortcutsAlt',
+      saveForm: 'app.shortcuts.saveForm',
       closeDialog: 'app.shortcuts.closeDialog',
       allSections: 'app.shortcuts.allSections',
       jumpToSection: 'app.shortcuts.jumpToSection',

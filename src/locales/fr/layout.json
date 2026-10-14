@@ -69,7 +69,8 @@
       "jumpToSection": "Aller à une section",
       "listSearch": "Rechercher dans la liste",
       "leadRows": "Prospect suivant ou précédent (dans Prospects)",
-      "closeDialog": "Fermer la boîte de dialogue"
+      "closeDialog": "Fermer la boîte de dialogue",
+      "saveForm": "Enregistrer le formulaire ouvert"
     },
     "emailVerify": {
       "message": "Vérifiez votre e-mail pour sécuriser votre compte.",

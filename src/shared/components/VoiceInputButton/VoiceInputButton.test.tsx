@@ -3,8 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { BUG_REPORT_TEST_IDS } from '../bug-report.constants.ts';
 import { VoiceInputButton } from './VoiceInputButton.tsx';
+
+const TEST_ID = 'voice';
 
 describe('VoiceInputButton', () => {
   it('is a quiet, labelled toggle at rest, with no meter', async () => {
@@ -15,13 +16,14 @@ describe('VoiceInputButton', () => {
         hearing={false}
         label="Dictate with your voice"
         onToggle={onToggle}
+        testId={TEST_ID}
       />,
     );
 
     const button = screen.getByRole('button', { name: 'Dictate with your voice' });
     expect(button).toHaveAttribute('aria-pressed', 'false');
     expect(button).not.toHaveAttribute('data-listening');
-    expect(container.querySelector('.bug-report-bars')).toBeNull();
+    expect(container.querySelector('.voice-bars')).toBeNull();
     await userEvent.click(button);
     expect(onToggle).toHaveBeenCalledOnce();
     expect(await axe(container)).toHaveNoViolations();
@@ -34,27 +36,44 @@ describe('VoiceInputButton', () => {
         hearing={false}
         label="Stop dictating"
         onToggle={vi.fn()}
+        testId={TEST_ID}
       />,
     );
 
-    expect(screen.getByTestId(BUG_REPORT_TEST_IDS.voice)).toHaveAttribute(
-      'data-listening',
-      'true',
-    );
-    expect(screen.getByTestId(BUG_REPORT_TEST_IDS.voice)).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    const bars = container.querySelector('.bug-report-bars');
+    expect(screen.getByTestId(TEST_ID)).toHaveAttribute('data-listening', 'true');
+    expect(screen.getByTestId(TEST_ID)).toHaveAttribute('aria-pressed', 'true');
+    const bars = container.querySelector('.voice-bars');
     expect(bars?.children).toHaveLength(5);
     expect(bars).not.toHaveAttribute('data-hearing');
 
     rerender(
-      <VoiceInputButton listening hearing label="Stop dictating" onToggle={vi.fn()} />,
+      <VoiceInputButton
+        listening
+        hearing
+        label="Stop dictating"
+        onToggle={vi.fn()}
+        testId={TEST_ID}
+      />,
     );
-    expect(container.querySelector('.bug-report-bars')).toHaveAttribute(
+    expect(container.querySelector('.voice-bars')).toHaveAttribute(
       'data-hearing',
       'true',
     );
+  });
+
+  it('draws the 28px corner button with no meter for a note field', () => {
+    const { container } = render(
+      <VoiceInputButton
+        listening
+        hearing
+        size="sm"
+        meter={false}
+        label="Stop dictating"
+        onToggle={vi.fn()}
+        testId={TEST_ID}
+      />,
+    );
+    expect(screen.getByTestId(TEST_ID)).toHaveClass('size-7');
+    expect(container.querySelector('.voice-bars')).toBeNull();
   });
 });

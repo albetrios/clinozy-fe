@@ -1436,20 +1436,20 @@
       "signedAs": "Sent as {{name}}, with this page and the app version.",
       "close": "Close"
     },
-    "voice": {
-      "start": "Dictate with your voice",
-      "stop": "Stop dictating",
-      "listening": "Listening…",
-      "hearing": "Hearing you…",
-      "denied": "The microphone is blocked. Allow it in your browser to dictate.",
-      "noSpeech": "Didn't catch that — tap the mic and try again.",
-      "unavailable": "Voice input isn't available right now. You can still type."
-    },
     "send": {
       "idle": "Send",
       "sending": "Sending…",
       "sent": "Thanks — the team has it.",
       "error": "Couldn't send your report. Your words are still here — try again."
     }
+  },
+  "voice": {
+    "start": "Dictate with your voice",
+    "stop": "Stop dictating",
+    "listening": "Listening…",
+    "hearing": "Hearing you…",
+    "denied": "The microphone is blocked. Allow it in your browser to dictate.",
+    "noSpeech": "Didn't catch that — tap the mic and try again.",
+    "unavailable": "Voice input isn't available right now. You can still type."
   }
 }

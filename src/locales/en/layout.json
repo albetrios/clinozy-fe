@@ -69,7 +69,8 @@
       "jumpToSection": "Jump to a section",
       "listSearch": "Search the list",
       "leadRows": "Next or previous lead (in Leads)",
-      "closeDialog": "Close dialog"
+      "closeDialog": "Close dialog",
+      "saveForm": "Save the open form"
     },
     "emailVerify": {
       "message": "Verify your email to secure your account.",

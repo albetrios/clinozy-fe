@@ -69,7 +69,8 @@
       "jumpToSection": "Vai a una sezione",
       "listSearch": "Cerca nell’elenco",
       "leadRows": "Lead successivo o precedente (in Lead)",
-      "closeDialog": "Chiudi finestra di dialogo"
+      "closeDialog": "Chiudi finestra di dialogo",
+      "saveForm": "Salva il modulo aperto"
     },
     "emailVerify": {
       "message": "Verifica la tua e-mail per proteggere l'account.",

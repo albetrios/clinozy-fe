@@ -69,7 +69,8 @@
       "jumpToSection": "섹션으로 이동",
       "listSearch": "목록 검색",
       "leadRows": "다음 또는 이전 리드 (리드에서)",
-      "closeDialog": "대화상자 닫기"
+      "closeDialog": "대화상자 닫기",
+      "saveForm": "열려 있는 양식 저장"
     },
     "emailVerify": {
       "message": "계정을 보호하려면 이메일을 확인하세요.",
