@@ -43,6 +43,8 @@ const presignWire = z.object({
   key: z.string(),
   upload_method: z.enum(['PUT', 'POST']),
   fields: z.record(z.string(), z.string()).optional(),
+  /** A PUT's signed request headers (clinozy-be sends them beside `upload_method: 'PUT'`). */
+  headers: z.record(z.string(), z.string()).optional(),
 });
 
 const confirmWire = z.object({
@@ -84,9 +86,11 @@ function assertSafeFileName(fileName: string): void {
  *   origin, and it carries no credential of ours. It is an XHR rather than `fetch` because
  *   only XHR reports upload progress, which the upload tray shows as "<n>%".
  * - **Failure modes:** a refused presign (403 without `upload:manage` on the organization),
- *   a storage write that does not return 2xx, or a confirm that comes back anything other
- *   than `UPLOADED` all throw. Nothing is attached until confirm succeeds, so a failure
- *   leaves the existing logo/avatar in place.
+ *   a storage write that does not return 2xx (`UPLOAD_STORAGE_REJECTED`) or never answers
+ *   (`UPLOAD_STORAGE_UNREACHABLE` — offline, or the bucket's CORS refusing this origin), or a
+ *   confirm that comes back anything other than `UPLOADED` (`UPLOAD_NOT_CONFIRMED`) all throw,
+ *   each said in words by `mapApiError`. Nothing is attached until confirm succeeds, so a
+ *   failure leaves the existing logo/avatar in place.
  *
  * @param input - The file, its clinozy-be purpose (an organization-owned purpose also needs
  *   `organizationId`), and an optional `onProgress` that receives the storage write's
@@ -132,9 +136,12 @@ export async function uploadFile(input: {
  * Write the bytes to the presigned destination.
  *
  * @remarks
- * The only header is the content type, and `withCredentials` stays off, so neither a token
- * nor a cookie of ours reaches the storage host. A dropped connection rejects with a
- * `TypeError`, the shape `fetch` gives the same failure, so callers classify it as before.
+ * A PUT carries exactly the headers clinozy-be signed into its URL (`headers` — the content
+ * type and the server-side-encryption header; without the latter S3 answers
+ * `SignatureDoesNotMatch`), falling back to the content type alone; a POST carries none. Either
+ * way `withCredentials` stays off, so neither a token nor a cookie of ours reaches the storage
+ * host. A write that never answers — the connection dropped, or the bucket's CORS refused this
+ * origin, which the page cannot tell apart — rejects with `UPLOAD_STORAGE_UNREACHABLE`.
  * An `upload` progress listener makes the browser preflight a cross-origin POST, so it is
  * registered only when someone is listening.
  */
@@ -167,7 +174,13 @@ function putBytes(
       );
     });
     request.addEventListener('error', () => {
-      reject(new TypeError('Network request failed'));
+      reject(
+        new AppError(
+          FRONTEND_ERROR_CODES.UPLOAD_STORAGE_UNREACHABLE,
+          0,
+          FRONTEND_ERROR_CODES.UPLOAD_STORAGE_UNREACHABLE,
+        ),
+      );
     });
     request.addEventListener('abort', () => {
       reject(new DOMException('The upload was aborted', 'AbortError'));
@@ -176,7 +189,9 @@ function putBytes(
       request.send(toMultipart(presign.fields ?? {}, file));
       return;
     }
-    request.setRequestHeader('Content-Type', file.type);
+    const headers = presign.headers ?? { 'Content-Type': file.type };
+    for (const [name, value] of Object.entries(headers))
+      request.setRequestHeader(name, value);
     request.send(file);
   });
 }

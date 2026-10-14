@@ -14,20 +14,16 @@ const EXTERNAL_BASE_URL = process.env.E2E_BASE_URL;
 const E2E_BASE_URL = EXTERNAL_BASE_URL ?? `http://localhost:${E2E_PORT}`;
 
 /**
- * The shared storage state (cookie consent pre-answered) is keyed by origin, so it is
- * re-pointed at the origin under test — otherwise the consent card sits over every spec.
- * The answer is stamped with the run's start: one older than six months counts as not
- * answered (D161), so a committed date would bring the card back over every spec one day.
+ * The shared storage state pre-answers the cookie card (Reject all, in the consent cookie) so it
+ * never sits over another spec's button. A cookie is keyed by host, so it is re-pointed at the host
+ * under test. It is a session cookie: nothing ages it during a run.
  */
 const storageState = {
   ...committedState,
-  origins: committedState.origins.map((entry) => ({
-    ...entry,
-    origin: new URL(E2E_BASE_URL).origin,
-    localStorage: entry.localStorage.map((item) => ({
-      ...item,
-      value: item.value.replace('STAMPED_AT_RUN_START', new Date().toISOString()),
-    })),
+  cookies: committedState.cookies.map((cookie) => ({
+    ...cookie,
+    domain: new URL(E2E_BASE_URL).hostname,
+    sameSite: cookie.sameSite as 'Lax',
   })),
 };
 

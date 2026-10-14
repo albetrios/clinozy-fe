@@ -20,9 +20,11 @@ import { isSettingsPathAllowed } from './settings-route-policy.ts';
 
 const loadSettingsSurface = onceAsync(async () => {
   const locale = useLocaleStore.getState().locale;
-  const [, , , module] = await Promise.all([
+  const [, , , , module] = await Promise.all([
     ensureNamespace(locale, I18N_NAMESPACES.auth),
     ensureNamespace(locale, I18N_NAMESPACES.settings),
+    // Account › Privacy draws the cookie card's category rows, whose copy is `consent`.
+    ensureNamespace(locale, I18N_NAMESPACES.consent),
     // The drawer chrome its child drawers read ("Back", "Saving…") is `app`
     // copy, which otherwise loads only with the org shell — and Settings also
     // opens over the organization picker.

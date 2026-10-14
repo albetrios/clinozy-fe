@@ -25,8 +25,9 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   offering category's and a photo album's (`OFFERING_CATEGORY_TONES`,
   `IMAGE_ALBUM_TONES`), and
   `TONE_CLASSES`: every tone's utilities as full literals (bg, ink, surface,
-  fill, border, dot, halo, ring, tab hover, and a list row's active 55% and
-  picked 70%) — never build `bg-tone-${tone}`; `toneForLabel`: the design's
+  fill, border, dot, halo, ring and a picked badge's `selected` / `selectedHover`
+  — both in the tone's `-edge`, never its ink — tab hover, and a list row's
+  active 55% and picked 70%) — never build `bg-tone-${tone}`; `toneForLabel`: the design's
   hash that gives an untoned label (a picker option, a tag) a stable tone.
 - `app-section-icons.ts` — each section's icon.
 - `task-rules.constants.ts` — the task rule catalogue's copy in the `tasks`

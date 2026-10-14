@@ -679,6 +679,34 @@ describe('app-splash', () => {
       );
     });
 
+    it('enters the app from a first frame above 0, so Chrome records its LCP', () => {
+      // Chrome records no Largest Contentful Paint for a paint at opacity 0, and a
+      // composited fade from exactly 0 never paints the page again — every boot
+      // ended without an LCP and Lighthouse's performance score was empty. A
+      // negative delay starts the entering fade one frame in; only the entering
+      // rule carries it, so a fade taken back still runs from where it is.
+      const delay =
+        /#app-splash\.app-splash-exiting ~ #root \{\s*transition-delay: (-?\d+)ms;/.exec(
+          html,
+        )?.[1];
+      expect(Number(delay)).toBeLessThan(0);
+      expect(Number(delay)).toBeGreaterThan(-50);
+      expect(html).not.toMatch(
+        /#app-splash:not\(\.app-splash-exiting\) ~ #root \{[^}]*transition-delay/,
+      );
+    });
+
+    it('draws the mark from a first frame above 0, so Chrome records the first paint', () => {
+      // The same compositor rule as the app's fade, for First Contentful Paint: a
+      // mark fading in from exactly 0 is never painted as content, so FCP waited
+      // for the "C" to start drawing (or for the app). Its first frame stays
+      // invisible — the frames' beat is pinned above — but it is no longer 0.
+      const start = html.indexOf('@keyframes app-splash-mark');
+      const from = /from \{\s*opacity: ([\d.]+);/.exec(html.slice(start))?.[1];
+      expect(Number(from)).toBeGreaterThan(0);
+      expect(Number(from)).toBeLessThanOrEqual(0.05);
+    });
+
     it('never cuts that fade short, and never outlives it by much', () => {
       // `transitionend` normally removes the node. The timer is the fallback for
       // a tab that never fires it — too short and it hard-cuts the fade, too long

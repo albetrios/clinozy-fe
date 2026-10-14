@@ -123,7 +123,6 @@
     "loadingNamed": "正在加载 {{name}}…",
     "loadingPage": "正在加载页面",
     "toggleTheme": "切换主题",
-    "cookieConsent": "Cookie 同意",
     "rowsPerPage": "每页行数",
     "goFirstPage": "第一页",
     "goPreviousPage": "上一页",
@@ -187,11 +186,8 @@
     }
   },
   "consent": {
-    "description": "经您同意，我们会使用 PostHog 分析和 Sentry 会话录制来改进 {{productName}}。其他一切功能（包括错误报告）无需它们即可运行。关闭即表示拒绝。",
-    "privacyPolicy": "隐私政策",
-    "accept": "接受",
-    "decline": "拒绝",
-    "closeAndDecline": "关闭（视为拒绝）"
+    "title": "Cookie 设置",
+    "privacyChoices": "隐私选项"
   },
   "confirm": {
     "accept": "确认",

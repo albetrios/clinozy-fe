@@ -200,7 +200,11 @@ function PhoneRow({
           className={cn(
             'flex h-9 flex-none items-center gap-1.5 rounded-lg border ps-2 pe-2.5 text-xs font-medium whitespace-nowrap transition-colors',
             row.whatsapp
-              ? cn(TONE_CLASSES.sage.surface, 'border-current')
+              ? cn(
+                  TONE_CLASSES.sage.surface,
+                  'border-transparent',
+                  TONE_CLASSES.sage.selected,
+                )
               : 'bg-card text-muted-foreground',
           )}
         >

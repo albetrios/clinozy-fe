@@ -19,11 +19,15 @@ New passwordless users → `/onboarding` → app.
 | `LoginPage.tsx`          | Thin wrapper around shared `<AuthForm />`.                |
 | `shared/forms/AuthForm/` | Unified auth UI — default email OTP + provider buttons.   |
 
-The frame is `AuthLayout`, the launch's sign-in canvas (L-65,
-`shared/layouts/AuthLayout/AuthLayout.tsx`): the signed-out canvas with the logo where
-the clinic header draws it, the language picker and theme toggle at the end, and the
-form in one 360px card (the design's "Signed out" card, H:515). One design — the
-earlier previews are gone.
+The frame is `AuthLayout` (`shared/layouts/AuthLayout/AuthLayout.tsx`): the signed-out
+canvas with the logo where the clinic header draws it, the language picker and theme
+toggle at the end, and the form in one 360px card (the design's "Signed out" card,
+H:515) — since iteration `change-shell-polish-and-sign-in` beside a showcase of what
+Clinozy is (`src/shared/layouts/AuthLayout/components/AuthShowcase/`): a hero, a patient's journey through seven
+tone-coded rooms, three moments, three reasons and a privacy line. From `lg` the hero
+and the showcase share a washed panel beside the card; below `lg` the order is hero →
+card → showcase, so the card stays above the fold. The showcase is static copy
+(`auth` › `showcase.*`, 11 locales) and stands still under reduced motion.
 
 ## Flow
 

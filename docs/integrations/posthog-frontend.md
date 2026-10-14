@@ -13,8 +13,10 @@ Core Web Vitals (feature flags are planned — see [Feature flags](#feature-flag
 
 PostHog runs only when **all** of the following are true:
 
-1. The person's **standing** answer is a grant (`hasAnalyticsConsent()` — given on the card or in
-   Settings › Account › Privacy, to the current policy version, within six months; D161)
+1. This browser's **standing** answer allows Analytics (`hasAnalyticsConsent()` — Accept all or
+   Analytics on, from the cookie card, "Privacy choices" or Settings › Account › Privacy; kept in the
+   `clinozy-consent-preferences` cookie for a year, to the current policy version) and the browser
+   does not send Global Privacy Control — iteration `change-cookie-consent-2026-10-13-fmal`
 2. **`VITE_POSTHOG_KEY`** is set at build time (or `window.__CONFIG__.POSTHOG_KEY`)
 3. Boot completes — `initPostHog(router)` runs from `main.tsx` after splash + idle
 
@@ -27,7 +29,7 @@ Without consent or key, all `captureAnalyticsEvent()` calls are no-ops.
 ```mermaid
 flowchart TB
   subgraph consent [Consent gate]
-    B[ConsentBanner Accept] --> S[useConsentStore granted]
+    B[ConsentBanner Accept all / Analytics on] --> S[useConsentStore cookie: analytics true]
     S --> M[main.tsx startAnalytics]
   end
 
@@ -82,20 +84,21 @@ Every custom event includes **shared context** from `getAnalyticsContext()`:
 
 ### Consent
 
-| Event                        | When                    | Extra properties                                 |
-| ---------------------------- | ----------------------- | ------------------------------------------------ |
-| `analytics_consent_decision` | Analytics consent given | `decision`, `source: consent_banner \| settings` |
+| Event                        | When              | Extra properties                                 |
+| ---------------------------- | ----------------- | ------------------------------------------------ |
+| `analytics_consent_decision` | Analytics allowed | `decision`, `source: consent_banner \| settings` |
 
 ### Auth funnel
 
-| Event                      | When                      | Extra properties                                                                                                                                                                                                          |
-| -------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth_email_code_sent`     | Email OTP sent            | `step: verify`                                                                                                                                                                                                            |
-| `auth_email_code_verified` | Code accepted             | —                                                                                                                                                                                                                         |
-| `auth_oauth_started`       | OAuth redirect begins     | `provider`                                                                                                                                                                                                                |
-| `auth_oauth_completed`     | OAuth callback refresh OK | —                                                                                                                                                                                                                         |
-| `session_started`          | Successful sign-in        | `method`: `email_code` \| `oauth`                                                                                                                                                                                         |
-| `session_ended`            | Every way a session ends  | `reason`: `logout` (user asked) \| `idle_timeout` (idle dialog button or its deadline) \| `session_expired` (absolute 12 h cap) \| `cross_tab` (a sibling tab ended it) \| `force_logout` (the server killed the session) |
+| Event                      | When                                                                                    | Extra properties                                                                                                                                                                                                          |
+| -------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth_email_code_sent`     | Email OTP sent                                                                          | `step: verify`                                                                                                                                                                                                            |
+| `auth_email_code_verified` | Code accepted                                                                           | —                                                                                                                                                                                                                         |
+| `auth_oauth_started`       | OAuth redirect begins                                                                   | `provider`                                                                                                                                                                                                                |
+| `auth_oauth_completed`     | The OAuth callback signed in (code exchanged, or a session restored)                    | —                                                                                                                                                                                                                         |
+| `auth_oauth_failed`        | The OAuth callback failed (exchange refused, provider denial, or no session to restore) | `provider`                                                                                                                                                                                                                |
+| `session_started`          | Successful sign-in                                                                      | `method`: `email_code` \| `oauth`                                                                                                                                                                                         |
+| `session_ended`            | Every way a session ends                                                                | `reason`: `logout` (user asked) \| `idle_timeout` (idle dialog button or its deadline) \| `session_expired` (absolute 12 h cap) \| `cross_tab` (a sibling tab ended it) \| `force_logout` (the server killed the session) |
 
 ### Tenancy
 
@@ -195,14 +198,14 @@ Never import `posthog-js` directly in feature code — use `captureAnalyticsEven
 
 ## Key source files
 
-| File                                           | Role                                  |
-| ---------------------------------------------- | ------------------------------------- |
-| `shared/analytics/analytics.constants.ts`      | Event name catalog                    |
-| `shared/analytics/capture.ts`                  | Capture API + identity/router helpers |
-| `app/analytics/posthog.ts`                     | SDK init + logout reset               |
-| `shared/analytics/capture-consent-decision.ts` | Consent audit event                   |
-| `main.tsx`                                     | Idle bootstrap with router            |
-| `shared/components/ConsentBanner/`             | Consent gate                          |
+| File                                          | Role                                  |
+| --------------------------------------------- | ------------------------------------- |
+| `shared/analytics/analytics.constants.ts`     | Event name catalog                    |
+| `shared/analytics/capture.ts`                 | Capture API + identity/router helpers |
+| `app/analytics/posthog.ts`                    | SDK init + logout reset               |
+| `shared/analytics/record-consent-decision.ts` | Consent event + the account's receipt |
+| `main.tsx`                                    | Idle bootstrap with router            |
+| `shared/components/ConsentBanner/`            | Consent gate; saves the answer        |
 
 ---
 

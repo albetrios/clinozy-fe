@@ -278,6 +278,70 @@
   --color-tone-slate-border: oklch(0.83 0.03 255);
   --color-tone-slate-dot: oklch(0.66 0.05 255);
 
+  /* A picked badge's edge (`TONE_CLASSES.selected`, `.ring`): a mid shade of the
+     badge's own colour — its ink mixed into its dot, `--tone-edge-ink` of ink
+     (45% light, 15% dark) — never the near-black (or, dark, near-white) ink
+     itself. Every edge holds 3:1 against the card and its chip, both modes.
+     Declared once here (not inline): each utility then reads one short var().
+     Every scope that re-declares a tone's ink or dot (`.dark`, a base, a
+     preset) sits on <html>, where these resolve. */
+  --color-tone-butter-edge: color-mix(
+    in oklab,
+    var(--color-tone-butter-foreground) var(--tone-edge-ink),
+    var(--color-tone-butter-dot)
+  );
+  --color-tone-lav-edge: color-mix(
+    in oklab,
+    var(--color-tone-lav-foreground) var(--tone-edge-ink),
+    var(--color-tone-lav-dot)
+  );
+  --color-tone-sky-edge: color-mix(
+    in oklab,
+    var(--color-tone-sky-foreground) var(--tone-edge-ink),
+    var(--color-tone-sky-dot)
+  );
+  --color-tone-sage-edge: color-mix(
+    in oklab,
+    var(--color-tone-sage-foreground) var(--tone-edge-ink),
+    var(--color-tone-sage-dot)
+  );
+  --color-tone-blush-edge: color-mix(
+    in oklab,
+    var(--color-tone-blush-foreground) var(--tone-edge-ink),
+    var(--color-tone-blush-dot)
+  );
+  --color-tone-mint-edge: color-mix(
+    in oklab,
+    var(--color-tone-mint-foreground) var(--tone-edge-ink),
+    var(--color-tone-mint-dot)
+  );
+  --color-tone-peach-edge: color-mix(
+    in oklab,
+    var(--color-tone-peach-foreground) var(--tone-edge-ink),
+    var(--color-tone-peach-dot)
+  );
+  --color-tone-plum-edge: color-mix(
+    in oklab,
+    var(--color-tone-plum-foreground) var(--tone-edge-ink),
+    var(--color-tone-plum-dot)
+  );
+  --color-tone-lime-edge: color-mix(
+    in oklab,
+    var(--color-tone-lime-foreground) var(--tone-edge-ink),
+    var(--color-tone-lime-dot)
+  );
+  --color-tone-slate-edge: color-mix(
+    in oklab,
+    var(--color-tone-slate-foreground) var(--tone-edge-ink),
+    var(--color-tone-slate-dot)
+  );
+  /* Stone has no dot of its own: its neutral ink meets the strong border. */
+  --color-tone-stone-edge: color-mix(
+    in oklab,
+    var(--color-foreground-soft) 55%,
+    var(--color-border-strong)
+  );
+
   /* Breakpoints past Tailwind's `2xl` (96rem) — the big-monitor tier. `2xl`
      stops at a 1536px laptop; a 1920px desktop and a 2560px+ monitor are
      different canvases again, and without a name for them every layout simply
@@ -448,8 +512,15 @@
   --text-display--letter-spacing: -0.02em;
 }
 
+/* The ink share of a picked badge's edge (`--color-tone-<tone>-edge`): 45% in
+   light; `.dark` lowers it so the edge stays the tone's own colour. */
+:root {
+  --tone-edge-ink: 45%;
+}
+
 /* ── Dark mode overrides via .dark class ── */
 .dark {
+  --tone-edge-ink: 15%;
   --color-background: oklch(0.145 0 0);
   --color-foreground: oklch(0.985 0 0);
   --color-card: oklch(0.205 0 0);
@@ -552,143 +623,9 @@
   --color-tone-slate-border: oklch(0.4 0.024 255);
 }
 
-/* ── Base colour (data-base) — tint the neutral surfaces/borders, keeping each
-   token's per-mode lightness so light/dark stay correct. `neutral` = no block. */
-[data-base='stone'] {
-  --color-background: oklch(1 0.004 60);
-  --color-card: oklch(1 0.004 60);
-  --color-popover: oklch(1 0.004 60);
-  --color-muted: oklch(0.97 0.005 60);
-  --color-secondary: oklch(0.97 0.005 60);
-  --color-accent: oklch(0.97 0.005 60);
-  --color-border: oklch(0.922 0.006 60);
-  --color-input: oklch(0.922 0.006 60);
-  --color-sidebar: oklch(0.985 0.004 60);
-  --color-sidebar-accent: oklch(0.97 0.005 60);
-  --color-sidebar-border: oklch(0.922 0.006 60);
-}
-.dark[data-base='stone'] {
-  --color-background: oklch(0.145 0.004 60);
-  --color-card: oklch(0.205 0.005 60);
-  --color-popover: oklch(0.205 0.005 60);
-  --color-muted: oklch(0.269 0.006 60);
-  --color-secondary: oklch(0.269 0.006 60);
-  --color-accent: oklch(0.269 0.006 60);
-  --color-border: oklch(0.269 0.006 60);
-  --color-input: oklch(0.269 0.006 60);
-  --color-sidebar: oklch(0.205 0.005 60);
-  --color-sidebar-accent: oklch(0.269 0.006 60);
-  --color-sidebar-border: oklch(0.269 0.006 60);
-}
-[data-base='slate'] {
-  --color-background: oklch(1 0.005 255);
-  --color-card: oklch(1 0.005 255);
-  --color-popover: oklch(1 0.005 255);
-  --color-muted: oklch(0.97 0.007 255);
-  --color-secondary: oklch(0.97 0.007 255);
-  --color-accent: oklch(0.97 0.007 255);
-  --color-border: oklch(0.922 0.009 255);
-  --color-input: oklch(0.922 0.009 255);
-  --color-sidebar: oklch(0.985 0.005 255);
-  --color-sidebar-accent: oklch(0.97 0.007 255);
-  --color-sidebar-border: oklch(0.922 0.009 255);
-}
-.dark[data-base='slate'] {
-  --color-background: oklch(0.145 0.006 255);
-  --color-card: oklch(0.205 0.008 255);
-  --color-popover: oklch(0.205 0.008 255);
-  --color-muted: oklch(0.269 0.009 255);
-  --color-secondary: oklch(0.269 0.009 255);
-  --color-accent: oklch(0.269 0.009 255);
-  --color-border: oklch(0.269 0.009 255);
-  --color-input: oklch(0.269 0.009 255);
-  --color-sidebar: oklch(0.205 0.008 255);
-  --color-sidebar-accent: oklch(0.269 0.009 255);
-  --color-sidebar-border: oklch(0.269 0.009 255);
-}
-[data-base='olive'] {
-  --color-background: oklch(1 0.008 110);
-  --color-card: oklch(1 0.008 110);
-  --color-popover: oklch(1 0.008 110);
-  --color-muted: oklch(0.97 0.011 110);
-  --color-secondary: oklch(0.97 0.011 110);
-  --color-accent: oklch(0.97 0.011 110);
-  --color-border: oklch(0.922 0.014 110);
-  --color-input: oklch(0.922 0.014 110);
-  --color-sidebar: oklch(0.985 0.008 110);
-  --color-sidebar-accent: oklch(0.97 0.011 110);
-  --color-sidebar-border: oklch(0.922 0.014 110);
-}
-.dark[data-base='olive'] {
-  --color-background: oklch(0.145 0.009 110);
-  --color-card: oklch(0.205 0.011 110);
-  --color-popover: oklch(0.205 0.011 110);
-  --color-muted: oklch(0.269 0.013 110);
-  --color-secondary: oklch(0.269 0.013 110);
-  --color-accent: oklch(0.269 0.013 110);
-  --color-border: oklch(0.269 0.013 110);
-  --color-input: oklch(0.269 0.013 110);
-  --color-sidebar: oklch(0.205 0.011 110);
-  --color-sidebar-accent: oklch(0.269 0.013 110);
-  --color-sidebar-border: oklch(0.269 0.013 110);
-}
-[data-base='zinc'] {
-  --color-background: oklch(1 0.003 286);
-  --color-card: oklch(1 0.003 286);
-  --color-popover: oklch(1 0.003 286);
-  --color-muted: oklch(0.97 0.004 286);
-  --color-secondary: oklch(0.97 0.004 286);
-  --color-accent: oklch(0.97 0.004 286);
-  --color-border: oklch(0.922 0.006 286);
-  --color-input: oklch(0.922 0.006 286);
-  --color-sidebar: oklch(0.985 0.003 286);
-  --color-sidebar-accent: oklch(0.97 0.004 286);
-  --color-sidebar-border: oklch(0.922 0.006 286);
-}
-.dark[data-base='zinc'] {
-  --color-background: oklch(0.145 0.005 286);
-  --color-card: oklch(0.205 0.006 286);
-  --color-popover: oklch(0.205 0.006 286);
-  --color-muted: oklch(0.269 0.007 286);
-  --color-secondary: oklch(0.269 0.007 286);
-  --color-accent: oklch(0.269 0.007 286);
-  --color-border: oklch(0.269 0.007 286);
-  --color-input: oklch(0.269 0.007 286);
-  --color-sidebar: oklch(0.205 0.006 286);
-  --color-sidebar-accent: oklch(0.269 0.007 286);
-  --color-sidebar-border: oklch(0.269 0.007 286);
-}
-[data-base='warm'] {
-  --color-background: oklch(0.995 0.008 75);
-  --color-card: oklch(0.995 0.008 75);
-  --color-popover: oklch(0.995 0.008 75);
-  --color-muted: oklch(0.96 0.012 75);
-  --color-secondary: oklch(0.96 0.012 75);
-  --color-accent: oklch(0.96 0.012 75);
-  --color-border: oklch(0.91 0.016 75);
-  --color-input: oklch(0.91 0.016 75);
-  --color-sidebar: oklch(0.98 0.01 75);
-  --color-sidebar-accent: oklch(0.96 0.012 75);
-  --color-sidebar-border: oklch(0.91 0.016 75);
-}
-.dark[data-base='warm'] {
-  --color-background: oklch(0.16 0.012 75);
-  --color-card: oklch(0.21 0.014 75);
-  --color-popover: oklch(0.21 0.014 75);
-  --color-muted: oklch(0.27 0.016 75);
-  --color-secondary: oklch(0.27 0.016 75);
-  --color-accent: oklch(0.27 0.016 75);
-  --color-border: oklch(0.32 0.018 75);
-  --color-input: oklch(0.32 0.018 75);
-  --color-sidebar: oklch(0.19 0.013 75);
-  --color-sidebar-accent: oklch(0.27 0.016 75);
-  --color-sidebar-border: oklch(0.32 0.018 75);
-}
-
 /* ── The app's one look: Clinozy Zinc Pastel (`clinozy-zinc-pastel`) ──
    `public/theme-init.js` and `applyTheme()` put it on <html>. It sets every
-   surface token, so it sits after the base-colour blocks: a `data-base` does
-   not tint its zinc surfaces. Light here (also what prints), dark below.
+   surface token. Light here (also what prints), dark below.
    Values: the design's preset (`preset.md`, prototype H:11 / H:12) —
    KICKOFF §3.1. */
 [data-theme='clinozy-zinc-pastel'] {
@@ -1301,6 +1238,51 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* The sign-in showcase (AuthShowcase): a wave that lights each journey stop in
+   turn (8.4s, each stop 600ms after the last), the moments' 4px drift, and the
+   sage live dot's breathing halo. Used through arbitrary `animate-[…]` classes,
+   not theme animations, so `cn()`'s registry (first paint) stays as it was;
+   each element also carries `motion-reduce:animate-none`, so reduced motion
+   shows every stop lit.
+   A resting stop is still text (12px), so it dims only as far as WCAG AA allows:
+   at 0.85 its worst tone reads 5.3:1 in light and 7.3:1 in dark; below 0.79 the
+   light tones drop under 4.5:1 (0.4 measured ~2:1, and Lighthouse's
+   color-contrast audit failed every sign-in route). AuthShowcase.test.tsx pins it. */
+@keyframes journey-wave {
+  0%,
+  85%,
+  100% {
+    opacity: 0.85;
+    transform: none;
+  }
+  8% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+  14%,
+  70% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes drift {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(-4px);
+  }
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-tone-sage-dot) 18%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-tone-sage-dot) 32%, transparent);
   }
 }
 

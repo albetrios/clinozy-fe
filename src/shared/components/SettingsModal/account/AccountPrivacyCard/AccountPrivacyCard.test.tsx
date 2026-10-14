@@ -4,7 +4,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { platformConfig } from '@/core/config/env.ts';
-import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
+import {
+  ACCEPT_ALL_CONSENT_PREFERENCES,
+  useConsentStore,
+} from '@/shared/store/useConsentStore/index.ts';
+import {
+  answerConsentForTests,
+  readConsentCookieForTests,
+  resetConsentForTests,
+  setGlobalPrivacyControlForTests,
+} from '@/tests/utils/consent-cookie.ts';
 
 import { AccountPrivacyCard } from './AccountPrivacyCard.tsx';
 
@@ -12,58 +21,75 @@ type MutableConfig = { privacyPolicyUrl: string | undefined };
 const config = platformConfig as unknown as MutableConfig;
 const originalPolicyUrl = config.privacyPolicyUrl;
 
-const capture = vi.hoisted(() => vi.fn(async () => undefined));
-vi.mock('@/shared/analytics/capture-consent-decision.ts', () => ({
-  captureAnalyticsConsentDecision: capture,
+const record = vi.hoisted(() => vi.fn(async () => undefined));
+vi.mock('@/shared/analytics/record-consent-decision.ts', () => ({
+  recordConsentDecision: record,
 }));
 
-describe('AccountPrivacyCard (D161)', () => {
+describe('AccountPrivacyCard — this browser’s cookie settings', () => {
   beforeEach(() => {
-    capture.mockClear();
+    record.mockClear();
     config.privacyPolicyUrl = undefined;
-    useConsentStore.getState().resetAnalyticsConsent();
+    setGlobalPrivacyControlForTests(false);
+    resetConsentForTests();
   });
 
   afterEach(() => {
     config.privacyPolicyUrl = originalPolicyUrl;
+    setGlobalPrivacyControlForTests(false);
   });
 
-  it('reads "Not answered yet" with the switch off until the person answers', () => {
+  it('draws the Customize rows: Necessary required and locked, Analytics off until answered', () => {
     render(<AccountPrivacyCard />);
+    const necessary = screen.getByRole('switch', { name: 'Necessary' });
+    expect(necessary).toBeChecked();
+    expect(necessary).toBeDisabled();
+    expect(screen.getByTestId('account-privacy-necessary')).toHaveTextContent('Required');
+    expect(screen.getByRole('switch', { name: 'Analytics' })).not.toBeChecked();
     expect(screen.getByTestId('account-privacy-status')).toHaveTextContent(
       'Not answered yet',
     );
-    // a11y guard: the switch is named by its label.
-    expect(
-      screen.getByRole('switch', { name: 'Product analytics and session recordings' }),
-    ).not.toBeChecked();
   });
 
-  it('turning it on grants consent from Settings', async () => {
+  it('turning Analytics on saves it in this browser at once and records it from Settings', async () => {
     const user = userEvent.setup();
     render(<AccountPrivacyCard />);
 
-    await user.click(screen.getByTestId('account-privacy-analytics'));
+    await user.click(screen.getByTestId('account-privacy-analytics-switch'));
 
-    expect(useConsentStore.getState().analyticsConsent).toBe('granted');
-    expect(screen.getByTestId('account-privacy-status')).toHaveTextContent(
-      /^Allowed on /,
+    expect(useConsentStore.getState().preferences).toEqual({ analytics: true });
+    expect(readConsentCookieForTests()).toMatchObject({ analytics: true });
+    expect(screen.getByTestId('account-privacy-analytics')).toHaveTextContent('On');
+    expect(screen.getByTestId('account-privacy-status')).toHaveTextContent(/^Saved on /);
+    await waitFor(() =>
+      expect(record).toHaveBeenCalledWith({ analytics: true }, 'settings'),
     );
-    await waitFor(() => expect(capture).toHaveBeenCalledWith('granted', 'settings'));
   });
 
-  it('turning it off withdraws consent as easily as it was given', async () => {
-    useConsentStore.getState().setAnalyticsConsent('granted');
+  it('turning it off withdraws as easily as it was given', async () => {
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
     const user = userEvent.setup();
     render(<AccountPrivacyCard />);
 
-    await user.click(screen.getByTestId('account-privacy-analytics'));
+    await user.click(screen.getByTestId('account-privacy-analytics-switch'));
 
-    expect(useConsentStore.getState().analyticsConsent).toBe('denied');
-    expect(screen.getByTestId('account-privacy-status')).toHaveTextContent(
-      /^Declined on /,
+    expect(useConsentStore.getState().preferences).toEqual({ analytics: false });
+    expect(screen.getByTestId('account-privacy-analytics')).toHaveTextContent('Off');
+    await waitFor(() =>
+      expect(record).toHaveBeenCalledWith({ analytics: false }, 'settings'),
     );
-    await waitFor(() => expect(capture).toHaveBeenCalledWith('denied', 'settings'));
+  });
+
+  it('locks Analytics off under Global Privacy Control and says why', () => {
+    setGlobalPrivacyControlForTests(true);
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
+    render(<AccountPrivacyCard />);
+    const toggle = screen.getByRole('switch', { name: 'Analytics' });
+    expect(toggle).not.toBeChecked();
+    expect(toggle).toBeDisabled();
+    expect(screen.getByTestId('consent-gpc-note')).toHaveTextContent(
+      'Global Privacy Control',
+    );
   });
 
   it('links the privacy policy when one is configured', () => {

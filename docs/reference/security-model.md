@@ -9,7 +9,7 @@ everything — frontend controls are defense-in-depth and UX, never the only gat
 | Threat                           | Control                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Where                                                                                                                                                                                                                                                                                                      |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Token theft via XSS              | Access token in a **module-closure in memory** — never `localStorage`/`sessionStorage`; refresh token is an HttpOnly cookie the JS never reads                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [`shared/auth/token.ts`](../../src/shared/auth/token.ts); test: `tests/security/token-storage.security.test.ts`                                                                                                                                                                                            |
-| Script injection (XSS)           | CSP `script-src 'self'` — no `unsafe-inline`/`unsafe-eval`; the only `dangerouslySetInnerHTML` is the vendored shadcn chart's `<style>` (dev-defined CSS variables, not script, and currently tree-shaken out); `assetsInlineLimit: 0` (no inlined data URIs)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | header CSP + `index.html` meta; test: `tests/security/static-security-config.security.test.ts`                                                                                                                                                                                                             |
+| Script injection (XSS)           | CSP `script-src 'self'` — no `unsafe-inline`/`unsafe-eval`; Zod runs jitless (`src/lib/zod-jitless.ts`, first in the `zod` chunk), so no schema probes `new Function` and the CSP never has an eval to block; the only `dangerouslySetInnerHTML` is `QrCode`'s SVG, generated in the browser by `qrcode` from the MFA enrolment's otpauth URI (never user input); `assetsInlineLimit: 0` (no inlined data URIs)                                                                                                                                                                                                                                                                                                                               | header CSP + `index.html` meta; test: `tests/security/static-security-config.security.test.ts`; `src/lib/zod-jitless.test.ts`                                                                                                                                                                              |
 | CSRF on auth endpoints           | `X-Requested-With: XMLHttpRequest` custom header (can't be set cross-origin without a CORS preflight the backend rejects) + `credentials: 'include'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | [`shared/auth/service.ts`](../../src/shared/auth/service.ts), [`shared/api/auth-api.ts`](../../src/shared/api/auth-api.ts)                                                                                                                                                                                 |
 | Clickjacking                     | `X-Frame-Options: DENY` + `Content-Security-Policy: frame-ancestors 'none'` (header-delivered — meta CSP ignores it)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | [`public/_headers`](../../public/_headers)                                                                                                                                                                                                                                                                 |
 | Open redirect (post-login)       | `isSafeRedirectPath` rejects absolute URLs, protocol-relative `//`, scheme smuggling, backslash normalization, and embedded control/whitespace; `isSafeExternalHttpsUrl` gates the OAuth provider URL                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | [`shared/auth/redirect-safety.ts`](../../src/shared/auth/redirect-safety.ts); test: `tests/security/redirect-safety.security.test.ts`                                                                                                                                                                      |
@@ -33,8 +33,8 @@ everything — frontend controls are defense-in-depth and UX, never the only gat
 Sentry and PostHog run in the same JS context as the in-memory token, so their
 capture settings are part of the threat model — verified:
 
-- **Sentry replay** — **consent-gated** with profiling (D161: added only while the
-  analytics consent stands, stopped at once on a withdrawal; profiling follows the
+- **Sentry replay** — **consent-gated** with profiling (added only while the cookie
+  card's Analytics category is on, stopped at once on a withdrawal; profiling follows the
   answer at page load). `maskAllText: true` + `blockAllMedia: true`; inputs are
   masked by default and **network request headers/bodies are not captured**
   (no `networkDetailAllowUrls`), so the `Authorization: Bearer` header never
@@ -53,20 +53,29 @@ capture settings are part of the threat model — verified:
   `$current_url`-style properties; and
   `posthog.reset()` runs when the session ends so successive users on a shared
   device never chain into one anonymous profile. Accepting the banner emits a
-  single `analytics_consent_decision` event (`shared/analytics/capture-consent-decision.ts`).
+  single `analytics_consent_decision` event (`shared/analytics/record-consent-decision.ts`).
   ([`app/analytics/posthog.ts`](../../src/app/analytics/posthog.ts)) Sentry's error
   reports are **not** gated — no tracking cookies, legitimate interest.
-- **Consent is the person's, not the browser's** (D161, clinozy-be D85) — the answer is
-  stored with its time and the policy version (`CONSENT_POLICY_VERSION`); one older than
-  six months or to an older version counts as not answered, and the card asks again.
-  Closing the card is declining. Signed in, the later of the account's and the
-  browser's answers wins and is kept on both (`PATCH /users/me/settings`; clinozy-be
-  audits each answer as the proof of consent); when the session ends the browser's
-  answer and PostHog's `ph_*` identifiers are removed, so the next person at a shared
-  computer is asked afresh. Tabs follow each other's answer. Settings › Account ›
-  Privacy withdraws it with one switch. `index.html` no longer preconnects to PostHog,
-  so nothing reaches it before a grant.
-  ([`shared/analytics/consent-account-sync.ts`](../../src/shared/analytics/consent-account-sync.ts))
+- **Consent is the browser's, as on claude.com** (iteration
+  `change-cookie-consent-2026-10-13-fmal`) — one first-party cookie,
+  `clinozy-consent-preferences` (`{analytics, version, decidedAt}`, one year, `Path=/`,
+  `SameSite=Lax`, `Secure` on https), holds the answer per category: Necessary is always on,
+  Analytics is the choice. A missing, unreadable or older-policy (`CONSENT_POLICY_VERSION`)
+  cookie counts as not answered and the card asks again. **Signing out never forgets it and
+  signing in never replaces it**, so a shared clinic computer is not asked at every sign-out;
+  PostHog's identity is still reset at sign-out (above). Escape inside the card is Reject all;
+  Global Privacy Control is Reject all and is never asked. Signed in, each new answer is also
+  sent to the account as a **receipt** (`PATCH /users/me/settings` with the policy version;
+  clinozy-be audits it as the proof of consent) — never read back. Refusing Analytics purges
+  PostHog's `ph_*` identifiers. "Privacy choices" on the signed-out frame and Settings ›
+  Account › Privacy change it. `index.html` does not preconnect to PostHog, so nothing reaches
+  it before a grant.
+  ([`shared/store/useConsentStore/useConsentStore.ts`](../../src/shared/store/useConsentStore/useConsentStore.ts)
+  reads it on every first paint;
+  [`shared/components/ConsentBanner/save-consent-preferences.ts`](../../src/shared/components/ConsentBanner/save-consent-preferences.ts)
+  writes it, from the card and Settings only;
+  [`shared/analytics/record-consent-decision.ts`](../../src/shared/analytics/record-consent-decision.ts)
+  sends the event and the receipt)
 - **Service worker** — precaches only static build assets + fonts; **no runtime
   caching of `/api`** or auth responses, so a shared device cannot serve one
   user's data to another from the SW cache. ([`src/sw.ts`](../../src/sw.ts))
@@ -115,11 +124,28 @@ not fail) on a deploy environment that leaves it unset. Steps:
    nonces and fights the component stack. Accepted; revisit only if the styling
    approach changes.
 2. **OAuth `state`/PKCE is not validated in the frontend.** By design the
-   **backend is the OAuth broker** — it performs the provider dance and delivers
-   the session via the HttpOnly refresh cookie, so the frontend never sees the
-   authorization code or `state`. `/callback` only triggers a silent refresh.
-   The CSRF protection for the OAuth flow is the backend's; there is nothing for
-   the frontend to validate. (Confirm this contract holds if the flow changes.)
+   **backend is the OAuth broker**: it mints the `state` (bound to an
+   `oauth_nonce` cookie) and the PKCE verifier when sign-in starts, and the
+   provider sends the browser back to `/callback/<provider>?code=…&state=…`.
+   `CallbackPage` ([`src/pages/callback/`](../../src/pages/callback/CALLBACK.OVERVIEW.md))
+   relays them and checks only their shape — `state` is 64 lowercase hex
+   characters (clinozy-be's own mint), `code` 1–2048 visible ASCII characters,
+   the provider a lowercase slug; a value of any other shape counts as absent. It
+   forwards `code` + `state` to clinozy-be's `GET /auth/oauth/:provider/callback`
+   in an XHR that carries the `oauth_nonce` cookie, and the backend consumes the
+   single-use state, checks the nonce binding and PKCE, exchanges the code, sets
+   the HttpOnly refresh cookie on that response and returns the access token (or
+   the MFA hand-off to `/mfa`). The frontend holds no secret to check a `state`
+   against, so the CSRF protection for the flow is the backend's.
+
+   Without `code` + `state` — a direct visit, a provider denial — the page asks
+   `/auth/refresh` only when this browser holds the session hint
+   (`hasSessionHint()`, the same check the boot makes before its silent
+   refresh). With no hint there is no session to restore, so it fails straight
+   to `/login?error=oauth_failed` without a request; the hint never authorizes —
+   when it is present, the refresh still decides. (Confirm this contract holds if
+   the flow changes.)
+
 3. **`config.js` runtime config injection.** `<script src="/config.js">` loads
    the API base URL written by the deploy. It is same-origin (covered by
    `script-src 'self'`), served over HTTPS with immutable caching. The residual

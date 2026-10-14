@@ -123,7 +123,6 @@
     "loadingNamed": "{{name}} लोड हो रहा है…",
     "loadingPage": "पेज लोड हो रहा है",
     "toggleTheme": "थीम बदलें",
-    "cookieConsent": "कुकी सहमति",
     "rowsPerPage": "प्रति पृष्ठ पंक्तियाँ",
     "goFirstPage": "पहला पृष्ठ",
     "goPreviousPage": "पिछला पृष्ठ",
@@ -188,11 +187,8 @@
     }
   },
   "consent": {
-    "description": "आपकी अनुमति से हम {{productName}} को बेहतर बनाने के लिए PostHog विश्लेषण और Sentry सत्र रिकॉर्डिंग का उपयोग करते हैं। त्रुटि रिपोर्ट सहित बाकी सब इनके बिना काम करता है। बंद करने का अर्थ है ‘नहीं’।",
-    "privacyPolicy": "गोपनीयता नीति",
-    "accept": "स्वीकार करें",
-    "decline": "अस्वीकार करें",
-    "closeAndDecline": "बंद करें (अस्वीकार माना जाएगा)"
+    "title": "कुकी सेटिंग्स",
+    "privacyChoices": "गोपनीयता विकल्प"
   },
   "confirm": {
     "accept": "पुष्टि करें",

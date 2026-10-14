@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2252 src files · ~1145 tests in src/ · 90 E2E specs · 27 shadcn UI primitives
+Stats: ~2262 src files · ~1152 tests in src/ · 90 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -287,6 +287,22 @@ clinozy-fe/
 │   │   └── README.md
 │   └── README.md
 ├── iterations/
+│   ├── change-cookie-consent-2026-10-13-fmal/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── feat-clinic-setup-2026-10-13-sltd/
 │   │   ├── intake-files/
 │   │   │   ├── _index.md
@@ -312,6 +328,12 @@ clinozy-fe/
 │   │   │   ├── tasks.md
 │   │   │   ├── today.md
 │   │   │   └── users.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── fix-upload-storage-cors-2026-10-13-lnab/
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md
@@ -476,7 +498,7 @@ clinozy-fe/
 │   │   │   ├── PageTransition.tsx
 │   │   │   ├── prefers-reduced-motion.ts
 │   │   │   ├── useReplayedAnimation.ts
-│   │   │   └── [2 test files]
+│   │   │   └── [3 test files]
 │   │   ├── billing/
 │   │   │   ├── stripe-return.ts
 │   │   │   └── [1 test file]
@@ -546,7 +568,8 @@ clinozy-fe/
 │   │   ├── signed-in-shell-warmup.ts
 │   │   ├── telemetry-scrub.ts
 │   │   ├── utils.ts
-│   │   └── [28 test files]
+│   │   ├── zod-jitless.ts
+│   │   └── [29 test files]
 │   ├── locales/
 │   │   ├── ar/
 │   │   │   ├── app-stock.json
@@ -554,6 +577,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -575,6 +599,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -596,6 +621,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -617,6 +643,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -638,6 +665,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -659,6 +687,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -680,6 +709,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -701,6 +731,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -722,6 +753,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -743,6 +775,7 @@ clinozy-fe/
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
 │   │   │   ├── common.json
+│   │   │   ├── consent.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
 │   │   │   ├── leads.json
@@ -764,6 +797,7 @@ clinozy-fe/
 │   │       ├── appointments.json
 │   │       ├── auth.json
 │   │       ├── common.json
+│   │       ├── consent.json
 │   │       ├── errors.json
 │   │       ├── layout.json
 │   │       ├── leads.json
@@ -1413,10 +1447,9 @@ clinozy-fe/
 │   ├── shared/
 │   │   ├── analytics/
 │   │   │   ├── analytics.constants.ts
-│   │   │   ├── capture-consent-decision.ts
 │   │   │   ├── capture.ts
-│   │   │   ├── consent-account-sync.ts
-│   │   │   └── [3 test files]
+│   │   │   ├── record-consent-decision.ts
+│   │   │   └── [2 test files]
 │   │   ├── api/
 │   │   │   ├── app/
 │   │   │   │   ├── fixtures/
@@ -1811,10 +1844,16 @@ clinozy-fe/
 │   │   │   │   ├── ReasonConfirm.tsx
 │   │   │   │   └── [4 test files]
 │   │   │   ├── ConsentBanner/
+│   │   │   │   ├── ConsentCategoryRow/
+│   │   │   │   │   ├── ConsentCategoryRow.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── consent-banner.constants.ts
 │   │   │   │   ├── ConsentBanner.tsx
 │   │   │   │   ├── ConsentBannerLazy.tsx
 │   │   │   │   ├── index.ts
-│   │   │   │   └── [3 test files]
+│   │   │   │   ├── save-consent-preferences.ts
+│   │   │   │   └── [4 test files]
 │   │   │   ├── CreateOrganizationDialog/
 │   │   │   │   ├── CreateOrganizationDialog.tsx
 │   │   │   │   ├── index.ts
@@ -2348,8 +2387,9 @@ clinozy-fe/
 │   │   │   │   └── [1 test file]
 │   │   │   ├── ThemeModeToggle/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── ThemeModeMenu.tsx
 │   │   │   │   ├── ThemeModeToggle.tsx
-│   │   │   │   └── [1 test file]
+│   │   │   │   └── [2 test files]
 │   │   │   ├── TotpCodeInput/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── TotpCodeInput.tsx
@@ -2361,6 +2401,10 @@ clinozy-fe/
 │   │   │   │   ├── upload-tray.constants.ts
 │   │   │   │   ├── UploadTray.tsx
 │   │   │   │   └── [2 test files]
+│   │   │   ├── WeightStableLabel/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── WeightStableLabel.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── WidgetErrorBoundary/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── WidgetErrorBoundary.tsx
@@ -2957,6 +3001,12 @@ clinozy-fe/
 │   │   │   │   ├── section-bar-shortcuts.ts
 │   │   │   │   └── [6 test files]
 │   │   │   ├── AuthLayout/
+│   │   │   │   ├── components/
+│   │   │   │   │   └── AuthShowcase/
+│   │   │   │   │       ├── auth-showcase.constants.ts
+│   │   │   │   │       ├── AuthShowcase.tsx
+│   │   │   │   │       ├── index.ts
+│   │   │   │   │       └── [1 test file]
 │   │   │   │   ├── AuthLayout.shared.tsx
 │   │   │   │   ├── AuthLayout.tsx
 │   │   │   │   ├── index.ts
@@ -3045,7 +3095,7 @@ clinozy-fe/
 │   │       ├── layout-width.ts
 │   │       ├── org-brand.ts
 │   │       ├── presets.ts
-│   │       └── [7 test files]
+│   │       └── [8 test files]
 │   ├── App.tsx
 │   ├── index.css
 │   ├── main.tsx
@@ -3054,7 +3104,7 @@ clinozy-fe/
 │   └── [1 test file]
 ├── tests/
 │   ├── ci/
-│   │   └── [39 test files]
+│   │   └── [40 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
@@ -3127,6 +3177,7 @@ clinozy-fe/
 │   │   ├── axe-for-dialog.ts
 │   │   ├── bidi-marks.ts
 │   │   ├── branch-doubles.ts
+│   │   ├── consent-cookie.ts
 │   │   ├── contact-doubles.ts
 │   │   ├── e2e-api-retry.ts
 │   │   ├── e2e-app-config.ts
@@ -3175,7 +3226,7 @@ clinozy-fe/
 │   │   ├── lint-changed-markdown.sh
 │   │   ├── run-size-limit.mjs
 │   │   ├── strip-sourcemaps.mjs
-│   │   └── [6 test files]
+│   │   └── [7 test files]
 │   ├── codegen/
 │   │   ├── api-types.mjs
 │   │   ├── app-schema.mjs

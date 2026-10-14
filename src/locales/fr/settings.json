@@ -230,11 +230,8 @@
       "deleteBody": "Supprimez définitivement votre compte et toutes les données associées.",
       "deleteAction": "Supprimer le compte",
       "privacyTitle": "Confidentialité",
-      "privacyDescription": "Votre choix concernant l’analyse produit et les enregistrements de session, enregistré sur votre compte.",
-      "analyticsLabel": "Analyse produit et enregistrements de session",
-      "analyticsHint": "Analyse PostHog et enregistrements de session Sentry. Les rapports d’erreurs fonctionnent dans tous les cas.",
-      "consentGrantedOn": "Autorisé le {{date}}",
-      "consentDeniedOn": "Refusé le {{date}}",
+      "privacyDescription": "Paramètres des cookies de ce navigateur. Les modifications s’appliquent immédiatement.",
+      "consentSavedOn": "Enregistré le {{date}}",
       "consentUnanswered": "Pas encore répondu",
       "privacyPolicyLink": "Politique de confidentialité"
     },

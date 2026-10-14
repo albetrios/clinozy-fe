@@ -239,11 +239,8 @@
       "deleteBody": "احذف حسابك وجميع البيانات المرتبطة به نهائيًا.",
       "deleteAction": "حذف الحساب",
       "privacyTitle": "الخصوصية",
-      "privacyDescription": "اختيارك بشأن تحليلات المنتج وتسجيلات الجلسات، محفوظ في حسابك.",
-      "analyticsLabel": "تحليلات المنتج وتسجيلات الجلسات",
-      "analyticsHint": "تحليلات PostHog وتسجيلات الجلسات من Sentry. تعمل تقارير الأخطاء في كل الأحوال.",
-      "consentGrantedOn": "مسموح في {{date}}",
-      "consentDeniedOn": "مرفوض في {{date}}",
+      "privacyDescription": "إعدادات ملفات تعريف الارتباط لهذا المتصفح. تُطبَّق التغييرات فورًا.",
+      "consentSavedOn": "حُفظ في {{date}}",
       "consentUnanswered": "لم تتم الإجابة بعد",
       "privacyPolicyLink": "سياسة الخصوصية"
     },

@@ -4,6 +4,7 @@ export const I18N_NAMESPACES = {
   layout: 'layout',
   settings: 'settings',
   errors: 'errors',
+  consent: 'consent',
   onboarding: 'onboarding',
   auth: 'auth',
   today: 'today',

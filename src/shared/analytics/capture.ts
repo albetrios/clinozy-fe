@@ -40,7 +40,7 @@ const POSTHOG_STORAGE_PREFIX = 'ph_';
 
 /**
  * Remove PostHog's stored identifiers from this browser without loading PostHog — what an
- * earlier grant on a shared computer left behind (D161).
+ * earlier grant left behind, once Analytics is refused.
  */
 function forgetStoredAnalyticsIdentifiers(): void {
   try {

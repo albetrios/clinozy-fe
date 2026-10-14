@@ -70,12 +70,12 @@ Cross-browser smoke: `pnpm test:cross-browser` — see [cross-browser-support.md
 
 ## What to measure
 
-| Gate                | Command                                                 | Notes                                                          |
-| ------------------- | ------------------------------------------------------- | -------------------------------------------------------------- |
-| Initial JS budget   | `pnpm size`                                             | Critical path + route chunks (`tooling/ci/run-size-limit.mjs`) |
-| Lighthouse perf     | `npx @lhci/cli autorun` or Chrome DevTools → Lighthouse | Production URL only                                            |
-| PWA precache weight | Inspect `dist/sw.js` or build log                       | Trimmed in `vite.config.ts` / custom SW                        |
-| Unit + security     | `pnpm test`                                             | Regression guard after perf refactors                          |
+| Gate                | Command                                                 | Notes                                                                   |
+| ------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Initial JS budget   | `pnpm size`                                             | Critical path + route chunks (`tooling/ci/run-size-limit.mjs`)          |
+| Lighthouse perf     | `npx @lhci/cli autorun` or Chrome DevTools → Lighthouse | Production URL only; CI's weekly reports: `lighthouse-results` artifact |
+| PWA precache weight | Inspect `dist/sw.js` or build log                       | Trimmed in `vite.config.ts` / custom SW                                 |
+| Unit + security     | `pnpm test`                                             | Regression guard after perf refactors                                   |
 
 Historical Phase A-D notes targeted Lighthouse performance **~85+** on `/login`,
 TBT **&lt; 200ms**, and initial critical JS **~208 kB** gzip. These are not current
@@ -125,7 +125,13 @@ Since the launch splash (KICKOFF §6.1) the exit also has a **design floor**: it
 never starts before the wordmark lands, 2,050ms after first paint (500ms under
 reduced motion), and the cross-fade takes 500ms. "Splash gone" therefore no
 longer drops below ≈2.55s; "Destination in DOM" is unaffected — the app renders
-underneath at opacity 0 and is ready when the splash leaves.
+underneath at opacity 0 and is ready when the splash leaves. Its entering fade
+starts one frame in, never at exactly 0: Chrome records no Largest Contentful
+Paint for a paint at opacity 0, so a fade from 0 left every route with no LCP and
+Lighthouse's performance score empty. LCP lands when the app appears. The
+splash's own mark starts at 2% for the same reason, so First Contentful Paint
+lands on the first paint instead of when the "C" starts drawing — see
+[tests/performance/README.md → Lighthouse CI](../../tests/performance/README.md#lighthouse-ci).
 
 Wall-clock numbers flake, so **CI does not assert them**. It asserts the
 invariants that made the load _feel_ slow (`tests/e2e/boot-splash.e2e.test.ts`):

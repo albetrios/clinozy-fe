@@ -21,7 +21,7 @@ export interface DrawerChipOption<T extends string> {
  * How the chips look: `tone` — the drawers' 24px pills, each in its tone
  * (H:905); `outline` — 24px pills with a dashed edge, picked on `muted` with a
  * solid one (the contact preferences, H:1982); `button` — 32px buttons, plain
- * until picked, then in the tone with its ink edge (the default channel, H:1975).
+ * until picked, then in the tone with its edge (the default channel, H:1975).
  */
 export type DrawerChipsVariant = 'tone' | 'outline' | 'button';
 
@@ -78,7 +78,7 @@ export type DrawerChipsProps<T extends string> =
 
 /**
  * 24px, 10px sides, 12px/500, a 1px edge in the chip's own fill (H:905): picked
- * turns the edge and a 1px ring outside it to the chip's ink, hover the edge only.
+ * draws a 1.5px edge in the chip's own hue with a soft halo, hover the edge only.
  * Each chip carries `data-slot="pill"`: the Sharp shape squares it, and the
  * focus personality draws its keyboard ring.
  */
@@ -89,28 +89,35 @@ const CHIP_CLASS =
 const BUTTON_CLASS =
   'inline-flex h-8 max-w-full min-w-0 shrink-0 items-center gap-1.5 rounded-lg border px-2.75 text-body font-medium whitespace-nowrap transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50';
 
-/** A chip's colours for its variant, picked or not. */
+/**
+ * A chip's colours for its variant, picked or not. Picked is the tone's own
+ * edge and halo (`TONE_CLASSES.selected`), never its ink — an untoned chip
+ * ("Any") takes stone's — and hover previews the edge (iteration
+ * change-shell-polish-and-sign-in, D7).
+ */
 function chipColours(
   variant: DrawerChipsVariant,
   tone: Tone | undefined,
   picked: boolean,
 ) {
+  const paint = TONE_CLASSES[tone ?? 'stone'];
   if (variant === 'outline') {
     return picked
-      ? 'bg-muted text-foreground border-foreground'
+      ? cn('bg-muted text-foreground border-transparent', paint.selected)
       : 'bg-card text-foreground border-dashed border-border-strong hover:bg-muted';
   }
   if (variant === 'button') {
     if (!picked) return 'bg-card text-foreground border-border hover:bg-muted';
-    return tone
-      ? cn(TONE_CLASSES[tone].surface, 'border-current')
-      : 'bg-muted text-foreground border-current';
+    return cn(
+      tone ? paint.surface : 'bg-muted text-foreground',
+      'border-transparent',
+      paint.selected,
+    );
   }
   return cn(
-    tone ? TONE_CLASSES[tone].surface : 'bg-muted text-foreground',
-    picked
-      ? 'border-current ring-1 ring-current'
-      : 'border-transparent hover:border-current',
+    tone ? paint.surface : 'bg-muted text-foreground',
+    'border-transparent',
+    picked ? paint.selected : paint.selectedHover,
   );
 }
 

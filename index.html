@@ -116,6 +116,16 @@
       #app-splash:not(.app-splash-exiting) ~ #root {
         opacity: 0;
       }
+      /* …starting one frame in, so its first frame is ~2% and never 0. Chrome
+         records no Largest Contentful Paint for a paint at opacity 0, and a fade
+         from exactly 0 runs on the compositor without painting the page again:
+         every boot ended with no LCP at all, and Lighthouse's performance score
+         was empty (NO_LCP). A first frame above 0 is painted, so LCP lands when
+         the app appears. Entering only: a fade taken back (`cancelExit` in
+         src/lib/app-splash.ts) runs the transition above from where it is. */
+      #app-splash.app-splash-exiting ~ #root {
+        transition-delay: -16ms;
+      }
       .app-splash-emblem {
         position: relative;
         flex: none;
@@ -268,9 +278,16 @@
         align-items: center;
         gap: 10px;
       }
+      /* The mark starts at 2%, not 0 — the root fade's rule above, for First
+         Contentful Paint: a paint at opacity 0 is not contentful, and the fade
+         runs on the compositor without painting again, so the browser never
+         recorded the mark it was showing — FCP waited for the "C" to start
+         drawing, or for the app. From 2% the first paint counts. Invisible
+         (and the frames' timing is unchanged); it is still the splash, not the
+         app, so LCP stays the page's own content. */
       @keyframes app-splash-mark {
         from {
-          opacity: 0;
+          opacity: 0.02;
           transform: scale(0.6);
         }
         to {

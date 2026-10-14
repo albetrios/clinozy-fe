@@ -88,21 +88,27 @@ fallbacks (the look's own values) and the stylesheet's blocks once it has loaded
 A fresh install starts in **light** mode. Toasts are not part of the look: every toast
 is the design's bar, bottom-centre (`shared/notify/ToastBar.tsx`).
 
-It is **full-surface**: its `[data-theme]` block sets every surface token and sits after
-the base-colour blocks, so a `data-base` tint does not reach it. Dark is `@media screen`
-only — printing always uses the light tokens.
+It is **full-surface**: its `[data-theme]` block sets every surface token. (The retired
+base-colour picker's `data-base` tint blocks left `index.css` on 2026-10-13 — nothing had
+set the attribute since the studio went, and they were ~0.6 kB of every first paint's
+stylesheet.) Dark is `@media screen` only — printing always uses the light tokens.
 Inside it, `[data-surface='light-pinned']` keeps a panel on the light ramp in dark mode
 (the bulk-actions bar, the photo viewer and its captions), with primary one step softer.
 
 Tokens the clinic screens add — all base-level (light values in `@theme`, dark in
 `.dark`; the Clinozy block sets its own neutral steps):
 
-| Group         | Tokens                                                                                                                                                                                         | Use                                                                                                                                                           |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Neutral steps | `canvas`, `muted-strong`, `border-strong`, `disabled`, `muted-foreground-strong`, `foreground-soft`                                                                                            | page tint under cards; skeleton / focus fill; strong border; disabled text; **text on `muted`** (never `muted-foreground` there — 4.40:1); body one step down |
-| Accents       | `brand-mark`, `brand-mark-strong`, `destructive-tint`, `destructive-border`, `highlight`, `assist`, `success-strong`, `now-indicator`, `presence-online`                                       | logo (non-text only); danger wash and border; search match; the AI "Suggest" accent; "Read" / trend up; calendar now-line; online dot                         |
-| Channels      | `channel-whatsapp`, `channel-call`, `channel-note`, `channel-instagram` (+ `-tint`, `-foreground` where the design has them)                                                                   | chat channels; the Instagram values are raised to AA                                                                                                          |
-| Section tones | `tone-<butter · lav · sky · sage · blush · mint · peach · plum · lime · slate>` + `-foreground` (ink), `-border` (line), `-dot`; `-tint` on sage, butter and lav; `tone-stone` is the fallback | one per clinic room: text in ink on the tone; selected = ink fill with `background` text; dots are decorative (always beside a label)                         |
+| Group         | Tokens                                                                                                                                                                                                                           | Use                                                                                                                                                                                                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Neutral steps | `canvas`, `muted-strong`, `border-strong`, `disabled`, `muted-foreground-strong`, `foreground-soft`                                                                                                                              | page tint under cards; skeleton / focus fill; strong border; disabled text; **text on `muted`** (never `muted-foreground` there — 4.40:1); body one step down                                                                                                               |
+| Accents       | `brand-mark`, `brand-mark-strong`, `destructive-tint`, `destructive-border`, `highlight`, `assist`, `success-strong`, `now-indicator`, `presence-online`                                                                         | logo (non-text only); danger wash and border; search match; the AI "Suggest" accent; "Read" / trend up; calendar now-line; online dot                                                                                                                                       |
+| Channels      | `channel-whatsapp`, `channel-call`, `channel-note`, `channel-instagram` (+ `-tint`, `-foreground` where the design has them)                                                                                                     | chat channels; the Instagram values are raised to AA                                                                                                                                                                                                                        |
+| Section tones | `tone-<butter · lav · sky · sage · blush · mint · peach · plum · lime · slate>` + `-foreground` (ink), `-border` (line), `-dot`, `-edge` (ink mixed into the dot); `-tint` on sage, butter and lav; `tone-stone` is the fallback | one per clinic room: text in ink on the tone; selected = ink fill with `background` text; a **picked badge** = a 1.5px `-edge` + a 3px halo of that edge at 24% (`TONE_CLASSES.selected`, `PICKED_HALO`), never an ink outline; dots are decorative (always beside a label) |
+
+`-edge` is declared once in `@theme` — `color-mix(in oklab, <ink> var(--tone-edge-ink), <dot>)`,
+45% ink in light and 15% in `.dark` (stone: `foreground-soft` 55% with `border-strong`) — so
+it follows dark mode and every preset, and holds 3:1 against the card and its chip in both
+(`src/shared/theme/tone-edge-css.test.ts`; iteration `change-shell-polish-and-sign-in`).
 
 In this look `warning` and `info` are **pairs** — a pale fill with an ink
 (`-foreground`). Text or an icon on its own uses the ink or a tone dot, never the fill.

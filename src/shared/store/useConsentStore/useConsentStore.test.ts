@@ -1,99 +1,118 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
+import {
+  answerConsentForTests,
+  resetConsentForTests,
+  setGlobalPrivacyControlForTests,
+  writeConsentCookieForTests,
+} from '@/tests/utils/consent-cookie.ts';
 
 import {
-  CONSENT_MAX_AGE_DAYS,
+  ACCEPT_ALL_CONSENT_PREFERENCES,
   CONSENT_POLICY_VERSION,
-  currentAnalyticsConsent,
   hasAnalyticsConsent,
+  REJECT_ALL_CONSENT_PREFERENCES,
+  selectConsentCardOpen,
+  selectShouldAsk,
+  startConsentFollow,
   useConsentStore,
 } from './useConsentStore.ts';
 
-const DAY_MS = 86_400_000;
-
 describe('useConsentStore', () => {
   beforeEach(() => {
-    useConsentStore.getState().resetAnalyticsConsent();
+    setGlobalPrivacyControlForTests(false);
+    resetConsentForTests();
     localStorage.clear();
   });
 
-  it('starts undecided (banner should show, analytics off)', () => {
-    expect(useConsentStore.getState().analyticsConsent).toBeNull();
-    expect(hasAnalyticsConsent()).toBe(false);
+  afterEach(() => {
+    setGlobalPrivacyControlForTests(false);
   });
 
-  it('grants consent, stamped with the time and the policy version', () => {
-    useConsentStore.getState().setAnalyticsConsent('granted');
+  it('starts undecided: the card asks and analytics stays off', () => {
     const state = useConsentStore.getState();
-    expect(state.analyticsConsent).toBe('granted');
-    expect(state.policyVersion).toBe(CONSENT_POLICY_VERSION);
-    expect(Date.now() - Date.parse(state.decidedAt ?? '')).toBeLessThan(5000);
-    expect(hasAnalyticsConsent()).toBe(true);
-  });
-
-  it('denies consent (stays off)', () => {
-    useConsentStore.getState().setAnalyticsConsent('denied');
+    expect(state.preferences).toBeNull();
+    expect(selectShouldAsk(state)).toBe(true);
     expect(hasAnalyticsConsent()).toBe(false);
   });
 
-  it("takes the account's saved answer with its own time and version", () => {
-    useConsentStore.getState().setAnalyticsConsent('granted', {
-      decidedAt: '2026-09-01T10:00:00.000Z',
-      policyVersion: 1,
+  it('a standing Accept all allows analytics and stops asking', () => {
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
+    expect(hasAnalyticsConsent()).toBe(true);
+    expect(selectShouldAsk(useConsentStore.getState())).toBe(false);
+  });
+
+  it('a standing Reject all keeps analytics off and stops asking', () => {
+    answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
+    expect(hasAnalyticsConsent()).toBe(false);
+    expect(selectShouldAsk(useConsentStore.getState())).toBe(false);
+  });
+
+  it('reads a standing answer back from the cookie (a reload, another tab)', () => {
+    writeConsentCookieForTests({
+      analytics: true,
+      version: CONSENT_POLICY_VERSION,
+      decidedAt: '2026-10-01T09:00:00.000Z',
     });
-    expect(useConsentStore.getState().decidedAt).toBe('2026-09-01T10:00:00.000Z');
-  });
-
-  it('persists the decision to localStorage', () => {
-    useConsentStore.getState().setAnalyticsConsent('granted');
-    expect(localStorage.getItem(`${PRODUCT_NAMESPACE}-consent`)).toContain('granted');
-  });
-
-  it('reset returns to undecided', () => {
-    useConsentStore.getState().setAnalyticsConsent('denied');
-    useConsentStore.getState().resetAnalyticsConsent();
+    useConsentStore.getState().reloadFromCookie();
     expect(useConsentStore.getState()).toMatchObject({
-      analyticsConsent: null,
-      decidedAt: null,
-      policyVersion: null,
+      preferences: { analytics: true },
+      decidedAt: '2026-10-01T09:00:00.000Z',
     });
   });
-});
 
-describe('currentAnalyticsConsent', () => {
-  const now = Date.parse('2026-10-10T12:00:00.000Z');
-  const answered = (
-    daysAgo: number,
-    policyVersion: number | null = CONSENT_POLICY_VERSION,
-  ) => ({
-    analyticsConsent: 'granted' as const,
-    decidedAt: new Date(now - daysAgo * DAY_MS).toISOString(),
-    policyVersion,
+  it('asks again for an answer to another policy version', () => {
+    writeConsentCookieForTests({
+      analytics: true,
+      version: 1,
+      decidedAt: '2026-10-01T09:00:00.000Z',
+    });
+    useConsentStore.getState().reloadFromCookie();
+    expect(useConsentStore.getState().preferences).toBeNull();
+    expect(hasAnalyticsConsent()).toBe(false);
   });
 
-  it('keeps an answer to this policy for six months', () => {
-    expect(currentAnalyticsConsent(answered(CONSENT_MAX_AGE_DAYS - 1), now)).toBe(
-      'granted',
-    );
+  it('asks again when the cookie cannot be read', () => {
+    writeConsentCookieForTests('{not json');
+    useConsentStore.getState().reloadFromCookie();
+    expect(useConsentStore.getState().preferences).toBeNull();
+    writeConsentCookieForTests({
+      analytics: 'yes',
+      version: CONSENT_POLICY_VERSION,
+      decidedAt: 'x',
+    });
+    useConsentStore.getState().reloadFromCookie();
+    expect(useConsentStore.getState().preferences).toBeNull();
   });
 
-  it('asks again once the answer is older than six months', () => {
-    expect(currentAnalyticsConsent(answered(CONSENT_MAX_AGE_DAYS + 1), now)).toBeNull();
+  it('Global Privacy Control turns analytics off and answers for the card', () => {
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
+    setGlobalPrivacyControlForTests(true);
+    expect(hasAnalyticsConsent()).toBe(false);
+    resetConsentForTests();
+    expect(selectShouldAsk(useConsentStore.getState())).toBe(false);
   });
 
-  it('asks again when the policy version moved', () => {
-    expect(
-      currentAnalyticsConsent(answered(1, CONSENT_POLICY_VERSION - 1), now),
-    ).toBeNull();
+  it('Privacy choices reopens the card over a standing answer', () => {
+    answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
+    expect(selectConsentCardOpen(useConsentStore.getState())).toBe(false);
+    useConsentStore.getState().openPreferences();
+    expect(selectConsentCardOpen(useConsentStore.getState())).toBe(true);
   });
 
-  it('treats an answer stored before the time and version were kept as not answered', () => {
-    expect(
-      currentAnalyticsConsent(
-        { analyticsConsent: 'granted', decidedAt: null, policyVersion: null },
-        now,
-      ),
-    ).toBeNull();
+  it('startConsentFollow drops the launch answer and re-reads the cookie when the tab is shown', () => {
+    localStorage.setItem(`${PRODUCT_NAMESPACE}-consent`, '{"state":{}}');
+    const stop = startConsentFollow();
+    expect(localStorage.getItem(`${PRODUCT_NAMESPACE}-consent`)).toBeNull();
+
+    writeConsentCookieForTests({
+      analytics: false,
+      version: CONSENT_POLICY_VERSION,
+      decidedAt: '2026-10-02T09:00:00.000Z',
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(useConsentStore.getState().preferences).toEqual({ analytics: false });
+    stop();
   });
 });

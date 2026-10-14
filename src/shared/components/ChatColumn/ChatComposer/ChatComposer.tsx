@@ -110,20 +110,20 @@ const MODE_PAINT: Readonly<
 /** Send's label per mode: "Send WhatsApp" · "Send Instagram" · "Log call" · "Add note". */
 const SEND_LABELS = keys.send;
 
-/** A smart chip's hover ring and a template row's hover wash, per tone (literal classes). */
+/** A smart chip's hover ring (the tone's edge colour, not its ink) and a template row's hover wash, per tone (literal classes). */
 const TONE_HOVERS: Readonly<Partial<Record<Tone, { chip: string; row: string }>>> = {
   butter: {
-    chip: 'hover:ring-1 hover:ring-tone-butter-foreground',
+    chip: 'hover:ring-1 hover:ring-tone-butter-edge',
     row: 'hover:bg-tone-butter',
   },
-  sky: { chip: 'hover:ring-1 hover:ring-tone-sky-foreground', row: 'hover:bg-tone-sky' },
-  lav: { chip: 'hover:ring-1 hover:ring-tone-lav-foreground', row: 'hover:bg-tone-lav' },
+  sky: { chip: 'hover:ring-1 hover:ring-tone-sky-edge', row: 'hover:bg-tone-sky' },
+  lav: { chip: 'hover:ring-1 hover:ring-tone-lav-edge', row: 'hover:bg-tone-lav' },
   mint: {
-    chip: 'hover:ring-1 hover:ring-tone-mint-foreground',
+    chip: 'hover:ring-1 hover:ring-tone-mint-edge',
     row: 'hover:bg-tone-mint',
   },
   sage: {
-    chip: 'hover:ring-1 hover:ring-tone-sage-foreground',
+    chip: 'hover:ring-1 hover:ring-tone-sage-edge',
     row: 'hover:bg-tone-sage',
   },
 };
@@ -232,7 +232,7 @@ function ComposerNotes({
           data-slot="pill"
           data-testid={ids.mismatch}
           onClick={() => onSwitch(hint.channel)}
-          className="border-tone-blush-border bg-tone-blush text-tone-blush-foreground hover:ring-tone-blush-foreground inline-flex h-6 max-w-full items-center truncate rounded-full border px-2.5 text-xs font-medium whitespace-nowrap hover:ring-1"
+          className="border-tone-blush-border bg-tone-blush text-tone-blush-foreground hover:ring-tone-blush-edge inline-flex h-6 max-w-full items-center truncate rounded-full border px-2.5 text-xs font-medium whitespace-nowrap hover:ring-1"
         >
           {t(keys.mismatch, {
             first: isolateText(first),

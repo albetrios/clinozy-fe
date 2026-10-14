@@ -197,7 +197,7 @@ Categorize each hit:
 2. **Replace custom card shells** with `<Card>` + `<CardContent>` (auth/public layouts, settings lists, dashboard tiles).
 3. **Replace raw `<button>` / `<a>` chrome** with `<Button>` or `data-slot="button"`.
 4. **Replace raw inputs/selects** with shadcn or `data-slot="input"` / `select-trigger"`.
-5. **Add shared helpers** only when repeated 3+ times (e.g. `iconChipClassName`, `themeChoiceButtonClassName`, `focusControlClassName` in `src/lib/icon-surface.ts`).
+5. **Add shared helpers** only when repeated 3+ times (e.g. `themeChoiceButtonClassName`, `focusControlClassName` in `src/lib/icon-surface.ts`).
 6. **Remove className overrides** on `<Skeleton>` that fight the axis (`rounded-lg`, `rounded-xl`).
 
 ### Phase 3 — Verify
@@ -232,7 +232,6 @@ Manual: set the hook across **all its values** on:
 
 | Helper                         | File                                                               | Pair with                                   |
 | ------------------------------ | ------------------------------------------------------------------ | ------------------------------------------- |
-| `iconChipClassName`            | `src/lib/icon-surface.ts`                                          | `data-slot="icon-chip"`                     |
 | `closeControlClassName`        | `src/lib/icon-surface.ts`                                          | `data-slot="button"` (dismiss controls)     |
 | `focusControlClassName`        | `src/lib/icon-surface.ts`                                          | `data-slot="button"` (no hardcoded rings)   |
 | `themeChoiceButtonClassName`   | `src/lib/icon-surface.ts`                                          | `data-slot="button"` (Appearance pickers)   |

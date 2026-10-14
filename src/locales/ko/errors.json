@@ -98,6 +98,12 @@
       "avatarUpdated": "아바타가 업데이트됨.",
       "avatarRemoved": "아바타가 제거됨."
     },
+    "upload": {
+      "storageUnreachable": "파일을 저장소로 보내지 못했습니다. 연결을 확인하고 다시 시도해 주세요. 계속 실패하면 지원팀에 문의해 주세요.",
+      "storageRejected": "저장소가 파일을 거부했습니다. 다시 업로드해 주세요.",
+      "notConfirmed": "업로드 후 파일을 확인하지 못했습니다. 다시 업로드해 주세요.",
+      "invalidFileName": "파일 이름을 바꾼 뒤 다시 시도해 주세요. 이름에 슬래시, “..” 또는 제어 문자를 넣을 수 없습니다."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "패스키를 추가할 수 없습니다",
