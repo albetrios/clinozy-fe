@@ -67,8 +67,9 @@ describe('phone bottom stack (index.css)', () => {
     expect(page).toContain(
       'calc( var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px) + 0.75rem + var(--consent-card-height, 0px) )',
     );
-    expect(declarations('#sentry-feedback').replace(/\s+/g, ' ')).toContain(
-      'calc(var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px))',
+    // The Report a bug trigger (feat-bug-report-2026-10-13-dgnx): 16px above the capsule.
+    expect(declarations("[data-slot='feedback-trigger']").replace(/\s+/g, ' ')).toContain(
+      'calc( 1rem + var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px) )',
     );
   });
 

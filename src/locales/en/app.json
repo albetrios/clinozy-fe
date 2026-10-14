@@ -1388,5 +1388,31 @@
   "appHomeEmpty": {
     "title": "Nothing is switched on here yet",
     "description": "Your clinic's sections appear here as soon as they're switched on for you."
+  },
+  "bugReport": {
+    "trigger": "Report a bug",
+    "panel": {
+      "title": "Report a bug",
+      "subtitle": "What went wrong? Type it — or tap the mic and say it.",
+      "label": "Describe the bug",
+      "placeholder": "What happened, and what did you expect instead?",
+      "signedAs": "Sent as {{name}}, with this page and the app version.",
+      "close": "Close"
+    },
+    "voice": {
+      "start": "Dictate with your voice",
+      "stop": "Stop dictating",
+      "listening": "Listening…",
+      "hearing": "Hearing you…",
+      "denied": "The microphone is blocked. Allow it in your browser to dictate.",
+      "noSpeech": "Didn't catch that — tap the mic and try again.",
+      "unavailable": "Voice input isn't available right now. You can still type."
+    },
+    "send": {
+      "idle": "Send",
+      "sending": "Sending…",
+      "sent": "Thanks — the team has it.",
+      "error": "Couldn't send your report. Your words are still here — try again."
+    }
   }
 }

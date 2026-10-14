@@ -347,11 +347,23 @@ const config = [
      * Every lazy chunk now imports those modules from the entry chunk, which is
      * loaded anyway. ~0.4 kB of headroom.
      *
-     * 238.6 → 239.0 kB: a declared exemption, itemised — the clinic setup
+     * 238.6 → 238.9 kB: a declared exemption, itemised — "Report a bug" with native voice
+     * (iteration feat-bug-report-2026-10-13-dgnx, D20), replacing Sentry's injected widget. The
+     * merges since the lowering (#64, #70, #71) left main at ~238.6 kB; built the same way side by
+     * side, this adds ~0.27 kB to the entry chunk (CI: 238.87 kB):
+     * - the `BugReportLazy` shell the clinic layout mounts (the signed-in check, its error
+     *   boundary and the on-demand loader of the widget and its copy);
+     * - two registry glyphs, `Bug` (the trigger) and `Mic` (the voice button) — every registry
+     *   icon ships in the first-paint chunk, and drawing them outside the registry would break
+     *   the one-file icon-library swap.
+     * Trimmed first: the widget, its voice hook, its copy and its motion stylesheet load on
+     * demand (their own chunk and `BugReport-*.css`); initial CSS is 0.01 kB smaller than main.
+     *
+     * 238.9 → 239.4 kB: a declared exemption, itemised — the clinic setup
      * (iterations/feat-clinic-setup-2026-10-13-sltd, AS-BUILT row 14; for the
-     * owner's review). +0.43 kB, all in the `boot` entry chunk: 238.45 → 238.88 kB,
-     * main (fe32cd0) and the merged branch built the same way on one machine (no
-     * env file, no ambient VITE_ variables; CI measured main at 238.16 kB):
+     * owner's review). +0.46 kB, all in the `boot` entry chunk: 238.85 → 239.31 kB,
+     * main (85b9864) and the merged branch built the same way on one machine (no
+     * env file, no ambient VITE_ variables; main's 238.85 matches its CI 238.87):
      * - The onboarding store's version-1 migration: the wizard lost two steps,
      *   and a half-finished onboarding must resume on the right one. The store
      *   is read at boot.
@@ -364,9 +376,9 @@ const config = [
      *   the create-action guard read the setup.
      * Trimmed first: "Finish setup" draws the registry's `ClipboardList` instead
      * of adding `ListChecks` to the icon set; the drawer, the guide, the starter
-     * list and the PIN directory load on demand. ~0.4 kB of headroom, as before.
+     * list and the PIN directory load on demand. ~0.1 kB of headroom.
      */
-    limit: '239.0 kB',
+    limit: '239.4 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -530,7 +542,7 @@ const config = [
            *
            * 35.7 → 36.0 kB: a declared exemption, itemised — the clinic setup
            * (iterations/feat-clinic-setup-2026-10-13-sltd, AS-BUILT row 14; for
-           * the owner's review). +0.25 kB: 35.58 → 35.83 kB, main (afc5610) and
+           * the owner's review). +0.26 kB: 35.57 → 35.83 kB, main (85b9864) and
            * the merged branch built the same way (no env file), 19 new rules:
            * the avatar's progress ring (its arc, stroke, rotation and
            * reduced-motion transition), the setup drawer's and guide's progress

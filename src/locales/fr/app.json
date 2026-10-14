@@ -1407,5 +1407,31 @@
   "appHomeEmpty": {
     "title": "Rien n’est encore activé ici",
     "description": "Les sections de votre clinique apparaîtront ici dès qu’elles seront activées pour vous."
+  },
+  "bugReport": {
+    "trigger": "Signaler un bug",
+    "panel": {
+      "title": "Signaler un bug",
+      "subtitle": "Qu'est-ce qui ne va pas ? Écrivez-le, ou touchez le micro et dites-le.",
+      "label": "Décrivez le bug",
+      "placeholder": "Que s'est-il passé, et qu'attendiez-vous ?",
+      "signedAs": "Envoyé en tant que {{name}}, avec cette page et la version de l'app.",
+      "close": "Fermer"
+    },
+    "voice": {
+      "start": "Dicter avec votre voix",
+      "stop": "Arrêter la dictée",
+      "listening": "Écoute…",
+      "hearing": "Je vous entends…",
+      "denied": "Le micro est bloqué. Autorisez-le dans le navigateur pour dicter.",
+      "noSpeech": "Je n'ai pas compris — touchez le micro et réessayez.",
+      "unavailable": "La saisie vocale n'est pas disponible pour le moment. Vous pouvez écrire."
+    },
+    "send": {
+      "idle": "Envoyer",
+      "sending": "Envoi…",
+      "sent": "Merci — l'équipe l'a reçu.",
+      "error": "Impossible d'envoyer le signalement. Votre texte est toujours là — réessayez."
+    }
   }
 }

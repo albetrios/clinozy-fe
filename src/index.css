@@ -1497,7 +1497,7 @@
   }
 }
 
-/* ── Floating corner surfaces (consent card, feedback trigger) ──
+/* ── Floating corner surfaces (consent card, Report a bug trigger) ──
    A shell that renders the mobile tab bar publishes its height here, so nothing
    pinned to the bottom edge sits on top of primary navigation. `:has()` keeps it
    declarative: no shell has to know which floating surfaces exist, and a screen
@@ -1628,48 +1628,48 @@
   }
 }
 
-/* The Sentry feedback trigger is third-party and lives in a shadow root, but it
-   positions itself from custom properties on its host — so it can be steered
-   from here. It owns the bottom-END corner; lift it clear of the tab bar too. */
-#sentry-feedback {
-  --inset: auto 0
-    calc(var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px)) auto;
+/* The "Report a bug" trigger (shared/components/BugReport — our own since iteration
+   feat-bug-report-2026-10-13-dgnx, in place of Sentry's feedback widget). It owns the bottom-END
+   corner, 16px in, and lifts clear of the tab bar too. */
+[data-slot='feedback-trigger'] {
+  bottom: calc(
+    1rem + var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px)
+  );
+  inset-inline-end: 1rem;
 }
 /* Below `sm` the consent card spans the full width, so the two would share a
    corner and the trigger lands on top of "Accept". The consent decision is a
    one-off, seconds-long state: the trigger simply waits for it. */
 @media (max-width: 39.9375rem) {
-  :root:has([data-slot='surface'][data-floating]) #sentry-feedback {
+  :root:has([data-slot='surface'][data-floating]) [data-slot='feedback-trigger'] {
     display: none;
   }
 }
 /* A floating "New" owns the same corner on a phone (a primary action beats a
    feedback button), so the trigger steps aside while one is mounted. */
 @media (max-width: 47.9375rem) {
-  :root:has([data-slot='fab']) #sentry-feedback {
+  :root:has([data-slot='fab']) [data-slot='feedback-trigger'] {
     display: none;
   }
 }
-/* The upload tray takes the same corner at every width while files are moving
-   (KICKOFF §3.5). It is a seconds-long state, so the trigger waits for it, as
-   it does for the consent card — otherwise it sits on the tray's last row. */
-:root:has([data-slot='upload-tray']) #sentry-feedback {
-  display: none;
-}
-/* Same rule, the other direction: a MODAL surface owns the screen while it is
-   open, and the feedback trigger is pinned above everything it dims — it sat
-   lit up over Settings, over a confirm, over the invite form. A side drawer is
-   as modal as a centred dialog, so the sheets and the phone sheets count too.
-   Keyed on the OVERLAY rather than the content: that is what marks a surface
-   as modal, so a popover or a menu (no scrim, page stays live) keeps the
-   trigger, which is right — nothing is being interrupted there. */
+/* At every width the trigger also steps aside for:
+   - the upload tray, which takes the same corner while files are moving
+     (KICKOFF §3.5) — a seconds-long state, so the trigger waits for it, as it
+     does for the consent card, instead of sitting on the tray's last row;
+   - a MODAL surface, which owns the screen while it is open — the trigger sat
+     lit up over Settings, over a confirm, over the invite form. A side drawer
+     is as modal as a centred dialog, so the sheets and the phone sheets count
+     too. Keyed on the OVERLAY rather than the content: that is what marks a
+     surface as modal, so a popover or a menu (no scrim, page stays live) keeps
+     the trigger, which is right — nothing is being interrupted there. */
 :root:has(
+    [data-slot='upload-tray'],
     [data-slot='dialog-overlay'],
     [data-slot='alert-dialog-overlay'],
     [data-slot='sheet-overlay'],
     [data-slot='drawer-overlay']
   )
-  #sentry-feedback {
+  [data-slot='feedback-trigger'] {
   display: none;
 }
 

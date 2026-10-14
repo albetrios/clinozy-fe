@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2263 src files · ~1152 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
+Stats: ~2274 src files · ~1158 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -320,6 +320,12 @@ clinozy-fe/
 │   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── feat-bug-report-2026-10-13-dgnx/
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md
@@ -1608,6 +1614,8 @@ clinozy-fe/
 │   │   │   ├── billing-api.ts
 │   │   │   ├── billing-contracts.ts
 │   │   │   ├── billing-query-keys.ts
+│   │   │   ├── bug-report-api.ts
+│   │   │   ├── bug-report-contracts.ts
 │   │   │   ├── fetch-all-pages.ts
 │   │   │   ├── fetch-list-page.ts
 │   │   │   ├── mfa-api.ts
@@ -1627,7 +1635,7 @@ clinozy-fe/
 │   │   │   ├── user-avatar-api.ts
 │   │   │   ├── webhook-contracts.ts
 │   │   │   ├── webhooks-api.ts
-│   │   │   └── [18 test files]
+│   │   │   └── [19 test files]
 │   │   ├── app/
 │   │   │   ├── pin-directory/
 │   │   │   │   ├── data/
@@ -1786,6 +1794,18 @@ clinozy-fe/
 │   │   │   │   ├── BrandLoader.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── BugReport/
+│   │   │   │   ├── VoiceInputButton/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── VoiceInputButton.tsx
+│   │   │   │   │   └── [1 test file]
+│   │   │   │   ├── bug-report-text.ts
+│   │   │   │   ├── bug-report.constants.ts
+│   │   │   │   ├── bug-report.css
+│   │   │   │   ├── BugReport.tsx
+│   │   │   │   ├── BugReportLazy.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── [3 test files]
 │   │   │   ├── Cells/
 │   │   │   │   ├── AvatarStack/
 │   │   │   │   │   ├── AvatarStack.tsx
@@ -2912,6 +2932,10 @@ clinozy-fe/
 │   │   │   ├── useSettingsNav/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSettingsNav.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useSpeechRecognition/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useSpeechRecognition.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useStackedDrawer/
 │   │   │   │   ├── index.ts
