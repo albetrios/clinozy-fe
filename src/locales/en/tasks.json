@@ -453,6 +453,7 @@
   },
   "empty": {
     "queue": "Nothing needs you right now. New tasks appear here as leads write, visits come up and feedback arrives.",
+    "caughtUp": "All caught up",
     "snoozed": "No snoozed tasks",
     "done": "Nothing resolved yet today"
   },

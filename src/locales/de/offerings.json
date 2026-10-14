@@ -69,8 +69,7 @@
     "title": "Noch keine Leistungen",
     "description": "Fügen Sie Behandlungen und Pakete mit Preisen hinzu, damit sie gebucht und abgerechnet werden können.",
     "noMatchTitle": "Keine passende Leistung",
-    "noMatchDescription": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
-    "newOffering": "Neue Leistung"
+    "noMatchDescription": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
   },
   "offers": {
     "columns": {
@@ -111,8 +110,7 @@
     },
     "empty": {
       "title": "Noch keine Angebote",
-      "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
-      "newOffer": "Neues Angebot"
+      "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
     },
     "record": "Angebot"
   },

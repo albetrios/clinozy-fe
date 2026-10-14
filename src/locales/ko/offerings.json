@@ -63,8 +63,7 @@
     "title": "아직 서비스가 없습니다",
     "description": "가격과 함께 시술과 패키지를 추가하면 예약하고 청구할 수 있습니다.",
     "noMatchTitle": "일치하는 서비스가 없습니다",
-    "noMatchDescription": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요.",
-    "newOffering": "새 서비스"
+    "noMatchDescription": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
   },
   "offers": {
     "columns": {
@@ -103,8 +102,7 @@
     },
     "empty": {
       "title": "아직 프로모션이 없습니다",
-      "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요.",
-      "newOffer": "새 할인"
+      "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
     },
     "record": "할인"
   },

@@ -66,8 +66,8 @@
       "status": "Statut"
     },
     "minutes": "{{minutes}} min",
-    "empty": "Aucun rendez-vous ici · ",
-    "bookOne": "en réserver un",
+    "empty": "Aucun rendez-vous ici",
+    "emptyHint": "Les rendez-vous des jours choisis s’affichent ici.",
     "day": {
       "today": "Aujourd’hui",
       "tomorrow": "Demain",

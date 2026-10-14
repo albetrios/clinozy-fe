@@ -20,7 +20,7 @@ export function AppHomeEmpty() {
       className="flex min-h-full items-center justify-center"
     >
       <EmptyState
-        tone="stone"
+        tone="sky"
         icon={<Plug />}
         title={t(APP_HOME_EMPTY_KEYS.title)}
         description={t(APP_HOME_EMPTY_KEYS.description)}

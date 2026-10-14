@@ -98,8 +98,7 @@
   "empty": {
     "ledgerTitle": "No entry matches",
     "pendingTitle": "Nothing pending",
-    "description": "Nothing here yet. Try another tab or search.",
-    "receive": "Receive"
+    "description": "Nothing here yet. Try another tab or search."
   },
   "deleteEntry": {
     "title": "Delete this payment?",

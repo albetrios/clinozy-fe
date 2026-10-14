@@ -22,7 +22,7 @@ import {
   LedgerWhatCell,
   LedgerWhenCell,
 } from '@/shared/components/LedgerCells/index.ts';
-import { ChevronDown, Lock } from '@/shared/icons/index.ts';
+import { ChevronDown, Lock, Receipt } from '@/shared/icons/index.ts';
 
 import {
   DAY_CLOSE_TEST_ID,
@@ -245,10 +245,12 @@ export function DayCloseReview({ entries, onOpen, actionsOf }: DayCloseReviewPro
       </button>
       {open && entries.length === 0 ? (
         <EmptyState
-          variant="inline"
+          variant="compact"
+          tone="peach"
+          icon={<Receipt />}
           title={t(K.empty)}
           testId={`${T}-empty`}
-          className="animate-reveal border-t px-4 py-6 text-center text-sm"
+          className="animate-reveal border-t px-4 py-6"
         />
       ) : null}
       {open && entries.length > 0 ? (

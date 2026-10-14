@@ -102,8 +102,7 @@
   "empty": {
     "ledgerTitle": "Ningún movimiento coincide",
     "pendingTitle": "Nada pendiente",
-    "description": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda.",
-    "receive": "Cobrar"
+    "description": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda."
   },
   "deleteEntry": {
     "title": "¿Eliminar este pago?",

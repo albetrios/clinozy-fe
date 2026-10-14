@@ -66,8 +66,8 @@
       "status": "Estado"
     },
     "minutes": "{{minutes}} min",
-    "empty": "No hay citas aquí · ",
-    "bookOne": "reserva una",
+    "empty": "No hay citas aquí",
+    "emptyHint": "Aquí aparecen las citas de los días que elijas.",
     "day": {
       "today": "Hoy",
       "tomorrow": "Mañana",

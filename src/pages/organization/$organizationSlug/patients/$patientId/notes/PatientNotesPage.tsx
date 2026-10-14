@@ -18,6 +18,7 @@ import {
   useContactActivities,
   useContactActivityAccess,
 } from '@/shared/hooks/useContactActivities/index.ts';
+import { MessageSquare } from '@/shared/icons/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import { type StaffChip, useStaffLookup } from '../shared/hooks/useStaffLookup/index.ts';
@@ -132,7 +133,7 @@ export function PatientNotesPage() {
 
   return (
     <PatientSection section="notes" data-testid={manifest.testId}>
-      <div className="flex max-w-190 flex-col gap-2.5 px-(--table-pad-x) pt-3 pb-5">
+      <div className="flex min-h-full max-w-190 flex-col gap-2.5 px-(--table-pad-x) pt-3 pb-5">
         {access.writes ? <NoteComposer contactId={contactId} /> : null}
         {access.reads ? (
           <>
@@ -161,10 +162,11 @@ export function PatientNotesPage() {
               </Button>
             ) : null}
             {notes.isSuccess && list.length === 0 ? (
+              // The room look in the Team notes lav, centred (change-empty-states R20).
               <EmptyState
-                variant="inline"
+                tone="lav"
+                icon={<MessageSquare />}
                 title={t(NOTES_KEYS.empty)}
-                className="text-body"
               />
             ) : null}
           </>

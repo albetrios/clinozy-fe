@@ -201,7 +201,6 @@ export function PurchasesPage() {
   const search = validateStockSearch(useSearch({ strict: false }));
   const params = purchaseParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useStockAccess();
   const nav = useStockNav();
   const { fields, copy } = usePurchaseFilters();
   const filters = useRoomFilters(fields);
@@ -244,14 +243,6 @@ export function PurchasesPage() {
           filtered={filters.count > 0}
           onClearFilters={() => filters.apply({})}
           emptyTitle={t(STOCK_KEYS.empty.stock)}
-          emptyAction={
-            access.canCreate
-              ? {
-                  label: t(STOCK_KEYS.create.purchase),
-                  onSelect: () => nav.create('purchases'),
-                }
-              : undefined
-          }
           recordsLabel={t(STOCK_KEYS.purchases.records)}
           countLabel={countLabel}
           minWidth={1000}

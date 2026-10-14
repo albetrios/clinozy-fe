@@ -68,10 +68,12 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     (in-page views, panes, modes: `look` track / card / plain, `fill`, `activation`
     automatic, per-tab colours, `disabled` + `hint`). Never a hand-built `role="tablist"`;
     the Settings nav and `ToggleGroup` stay.
-  - Nothing to list → **`EmptyState`** (`tone` the room's illustration, `onClearFilters`
-    the filtered one, `variant="card"` a thread's starter, `variant="inline"` a list's or
-    a card's one-liner sized by `className`; `testId`). Never a hand-rolled muted `<p>`;
-    the Picker's and ⌘K's own one-line empties stay.
+  - Nothing to list → **`EmptyState`** (`tone` + `icon` the list's colourful illustration,
+    centred by `my-auto` in a growing column; `onClearFilters` the filtered one;
+    `variant="compact"` an empty list inside a populated screen; `variant="card"` a
+    thread's starter; `variant="inline"` only for a one-liner that is not an empty list;
+    `testId`). Every section, tab and card list gets a tone and an icon of its own. Never a
+    hand-rolled muted `<p>`; the Picker's and ⌘K's own one-line empties stay.
   - A side drawer (a record, a form, a detail view) → **`RecordDrawer`** (steps, an `aside`
     column with phone `panes`, `headerStart` / `titleEnd` / `band` / `footerStart`,
     `hideFooter`; `dirty` asks before discarding — `useDrawerSave`, `useDrawerSession`;

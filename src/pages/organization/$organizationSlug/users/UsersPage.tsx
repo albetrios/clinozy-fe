@@ -32,7 +32,7 @@ import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { useTeam } from '@/shared/hooks/useTeam/index.ts';
-import { FileIcon, LogOut, PenLine, Shield, Trash } from '@/shared/icons/index.ts';
+import { FileIcon, LogOut, PenLine, Trash, UserCog } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -182,7 +182,7 @@ function TeamEmpty({
   return (
     <EmptyState
       tone="lav"
-      icon={<Shield />}
+      icon={<UserCog />}
       title={t(USERS_KEYS.empty.title)}
       description={t(USERS_KEYS.empty.description)}
     />

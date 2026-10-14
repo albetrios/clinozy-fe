@@ -30,7 +30,7 @@ that fails shows the error in place with Retry (`RetryError`); a later one keeps
 saver (G10), so Updated shows the time alone.
 
 The Offering drawer opens over the list from its two dialog routes (`create/`, `$offeringId/edit/`,
-D24): "New offering" (toolbar, phone pill, empty catalogue), a row click or a row's Edit — the edit route
+D24): "New offering" (toolbar, phone pill), a row click or a row's Edit — the edit route
 carries the offering's public id (`off_…`) and reads it (`GET /app/offerings/:offering_id`). It is two
 steps, or three while an offer that has not ended names the offering; the draft is priced live for
 the header's branch. Money is typed in rupees; GST is one of the API's rates (chips: 0 · 5 · 12 · 18 ·

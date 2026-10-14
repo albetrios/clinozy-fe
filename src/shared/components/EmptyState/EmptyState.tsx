@@ -9,10 +9,14 @@ import { Button } from '@/shared/components/ui/button.tsx';
 import { Plus, Search } from '@/shared/icons/index.ts';
 
 import { EMPTY_STATE_KEYS, EMPTY_STATE_NS } from './empty-state.constants.ts';
+import { EMPTY_STATE_ART_ACCENTS } from './empty-state-art.ts';
 
 /** Props for {@link EmptyState}: copy, icon and action, plus the room tone and filtered state. */
 export interface EmptyStateProps {
-  /** Leading icon: the room icon in the illustrated tile (18px), else ~40px and muted. */
+  /**
+   * Leading icon: the list's own glyph in the illustrated tile (24px in the room
+   * look, 18px compact), else ~40px and muted.
+   */
   icon?: ReactNode;
   /** Defaults to "Nothing here yet". */
   title?: string;
@@ -28,9 +32,11 @@ export interface EmptyStateProps {
   action?: ReactNode;
   className?: string;
   /**
-   * The room's tone. Draws the design's illustration — a 96px dashed ring, the
-   * tinted 68px disc, a 40px card tile holding the icon, a 10px and a 6px dot
-   * (H:695; `_patterns.md:283`). Without it the plain icon look stays.
+   * The list's tone. Draws the colourful illustration (change-empty-states):
+   * a 96px ring dashed in the tone's border, the tinted 68px disc, a 44px tile
+   * filled with the tone's bright dot colour with the icon knocked out, and three dots — the
+   * tone's own and two accents. The room look takes `my-auto`, so a growing
+   * column centres it. Without a tone the plain icon look stays.
    */
   tone?: Tone;
   /**
@@ -44,10 +50,17 @@ export interface EmptyStateProps {
    * in a wrapping, centred row of chips. `inline`: the muted one-liner in
    * place of a list's or a card's rows ("No notes yet", "No snoozed tasks") —
    * 12.5px by default, sized, spaced and aligned to its spec by `className`,
-   * an action (a link, a button) following the line. Without it, the room or
-   * plain look.
+   * an action (a link, a button) following the line — kept for lines that are
+   * not an empty list (search results, notices). `compact`: an empty list inside
+   * a populated screen — the 48px art (needs `tone` and `icon`) over a one-line
+   * title, centred. Without it, the room or plain look.
    */
-  variant?: 'card' | 'inline';
+  variant?: 'card' | 'inline' | 'compact';
+  /**
+   * The empty state sits on its own tone's tint (a Today lane panel): the art's
+   * disc takes the card colour so it still reads against the tint.
+   */
+  tinted?: boolean;
   /** Test id (default `empty-state`). */
   testId?: string;
 }
@@ -88,6 +101,123 @@ export function EmptyStateAction({
   );
 }
 
+/** Which illustration to draw: the room's, the compact one, or the card's (no ring). */
+export type EmptyStateArtSize = 'room' | 'compact' | 'card';
+
+/**
+ * Each size's box, disc, tile and icon (change-empty-states, `preset.md`), all
+ * steps the app already ships, so the art adds no first-paint CSS (the size
+ * budget, KICKOFF §8): the room's 96px ring, 68px disc and 44px tile; the
+ * compact 48px dashed disc and 32px tile; the card's 44px disc and 28px tile.
+ */
+const ART_SIZES: Readonly<
+  Record<EmptyStateArtSize, { box: string; disc: string; tile: string }>
+> = {
+  room: {
+    box: 'mb-1 size-24',
+    disc: 'inset-3.5',
+    tile: 'size-11 rounded-2xl [&_svg]:size-6',
+  },
+  compact: { box: 'size-12', disc: '', tile: 'size-8 rounded-lg [&_svg]:size-4.5' },
+  card: { box: 'size-11', disc: '', tile: 'size-7 rounded-md [&_svg]:size-3.5' },
+};
+
+/**
+ * The decorative illustration in a tone: the ring dashed in its border colour,
+ * the tinted disc, the tile filled with its bright dot colour holding the icon
+ * in the page's background colour, and its dots — the room look scatters three (its own and
+ * two accents), the smaller ones one accent. Exported for an empty state that
+ * is itself a control (the patient overview's "log feedback" card), which draws
+ * the art inside its own button.
+ */
+export function EmptyStateArt({
+  tone,
+  icon,
+  size,
+  tinted = false,
+}: {
+  tone: Tone;
+  icon: ReactNode;
+  size: EmptyStateArtSize;
+  tinted?: boolean;
+}) {
+  const paint = TONE_CLASSES[tone];
+  const [first, second] = EMPTY_STATE_ART_ACCENTS[tone];
+  const box = ART_SIZES[size];
+  const disc = tinted ? 'bg-card' : paint.bg;
+  return (
+    <span
+      aria-hidden="true"
+      data-testid="empty-state-illustration"
+      data-size={size}
+      className={cn('relative flex shrink-0 items-center justify-center', box.box)}
+    >
+      {size === 'room' ? (
+        <>
+          <span
+            data-slot="pill"
+            className={cn(
+              'absolute inset-0 rounded-full border-[1.5px] border-dashed',
+              paint.border,
+            )}
+          />
+          <span
+            data-slot="pill"
+            className={cn('absolute rounded-full', box.disc, disc)}
+          />
+        </>
+      ) : (
+        // The smaller looks fold the ring and the disc into one: the compact
+        // disc keeps the dashed edge, the card's (inside a dashed card) has none.
+        <span
+          data-slot="pill"
+          className={cn(
+            'absolute inset-0 rounded-full',
+            disc,
+            size === 'compact' && cn('border-[1.5px] border-dashed', paint.border),
+          )}
+        />
+      )}
+      <span
+        data-slot="empty-state-tile"
+        className={cn(
+          'text-background relative flex items-center justify-center shadow-xs',
+          box.tile,
+          paint.dot,
+        )}
+      >
+        {icon}
+      </span>
+      {size === 'room' ? (
+        <>
+          <span
+            className={cn('absolute end-2 top-2.5 size-2.5 rounded-full', paint.dot)}
+          />
+          <span
+            className={cn(
+              'absolute start-1.5 bottom-3.5 size-1.75 rounded-full',
+              TONE_CLASSES[first].dot,
+            )}
+          />
+          <span
+            className={cn(
+              'absolute start-4 top-2 size-1.25 rounded-full',
+              TONE_CLASSES[second].dot,
+            )}
+          />
+        </>
+      ) : (
+        <span
+          className={cn(
+            'absolute end-0.5 top-0.5 size-1.75 rounded-full',
+            TONE_CLASSES[first].dot,
+          )}
+        />
+      )}
+    </span>
+  );
+}
+
 /** The dashed card variant: title, line and a centred, wrapping row of chips. */
 function EmptyStateCard({
   title,
@@ -95,7 +225,9 @@ function EmptyStateCard({
   action,
   className,
   testId,
-}: Pick<EmptyStateProps, 'description' | 'action' | 'className'> & {
+  tone,
+  icon,
+}: Pick<EmptyStateProps, 'description' | 'action' | 'className' | 'tone' | 'icon'> & {
   title: string;
   testId: string;
 }) {
@@ -108,6 +240,7 @@ function EmptyStateCard({
         className,
       )}
     >
+      {tone && icon ? <EmptyStateArt tone={tone} icon={icon} size="card" /> : null}
       <h3 className="text-detail text-foreground-soft leading-[1.3] font-semibold">
         {title}
       </h3>
@@ -125,7 +258,7 @@ function EmptyStateCard({
 
 /**
  * The inline variant: one muted line — its action, when it has one, inside
- * the same paragraph, so "No appointments here · book one" reads as one line
+ * the same paragraph, so "No results · clear the search" reads as one line
  * and a column layout (`flex flex-col`) stacks it under the words.
  */
 function EmptyStateInline({
@@ -148,6 +281,50 @@ function EmptyStateInline({
       {description ? <span className="block">{description}</span> : null}
       {action}
     </p>
+  );
+}
+
+/**
+ * The compact variant: an empty list inside a populated screen — the 48px art
+ * in the list's tone over a one-line title (a paragraph, not a heading), an
+ * optional muted line and action, centred in its card (`my-auto` in a growing
+ * column). Without a tone or an icon it falls back to the muted one-liner.
+ */
+function EmptyStateCompact({
+  title,
+  description,
+  action,
+  className,
+  testId,
+  tone,
+  icon,
+}: Pick<EmptyStateProps, 'description' | 'action' | 'className' | 'tone' | 'icon'> & {
+  title: string;
+  testId: string;
+}) {
+  return (
+    <div
+      data-testid={testId}
+      data-variant="compact"
+      data-tone={tone}
+      className={cn(
+        'my-auto flex flex-col items-center gap-2 px-4 py-6 text-center',
+        className,
+      )}
+    >
+      {tone && icon ? <EmptyStateArt tone={tone} icon={icon} size="compact" /> : null}
+      <p className="text-body text-foreground-soft leading-snug font-medium text-pretty">
+        {title}
+      </p>
+      {description ? (
+        <p className="text-muted-foreground max-w-80 text-xs leading-normal text-pretty">
+          {description}
+        </p>
+      ) : null}
+      {action ? (
+        <div className="flex flex-wrap justify-center gap-1.5">{action}</div>
+      ) : null}
+    </div>
   );
 }
 
@@ -197,9 +374,11 @@ function shownContent(
  * Centered empty-state for lists/panels with no data yet (no members, no roles,
  * empty search). Pairs with `Skeleton` (loading) and the route error boundary
  * (error) to make every data surface cover loading / empty / error. With a
- * `tone` it is the clinic rooms' illustrated empty state; with
- * `onClearFilters` it is the filtered one; `variant="card"` is a thread's dashed
- * starter card; `variant="inline"` is a list's or a card's one-liner.
+ * `tone` it is the clinic rooms' colourful illustrated empty state, centred in
+ * a growing column; with `onClearFilters` it is the filtered one;
+ * `variant="compact"` is an empty list inside a populated screen;
+ * `variant="card"` is a thread's dashed starter card; `variant="inline"` is a
+ * one-liner for lines that are not an empty list.
  */
 export function EmptyState({
   icon,
@@ -211,14 +390,28 @@ export function EmptyState({
   tone,
   onClearFilters,
   variant,
+  tinted,
   testId = 'empty-state',
 }: EmptyStateProps) {
   const { t } = useTranslation(EMPTY_STATE_NS);
   const Heading = HEADING_TAGS[headingLevel];
-  if (variant === 'card' || variant === 'inline') {
-    const Variant = variant === 'card' ? EmptyStateCard : EmptyStateInline;
+  if (variant === 'card' || variant === 'compact') {
+    const Variant = variant === 'card' ? EmptyStateCard : EmptyStateCompact;
     return (
       <Variant
+        title={title ?? t(EMPTY_STATE_KEYS.fallbackTitle)}
+        description={description}
+        action={action}
+        className={className}
+        testId={testId}
+        tone={tone}
+        icon={icon}
+      />
+    );
+  }
+  if (variant === 'inline') {
+    return (
+      <EmptyStateInline
         title={title ?? t(EMPTY_STATE_KEYS.fallbackTitle)}
         description={description}
         action={action}
@@ -233,46 +426,16 @@ export function EmptyState({
   );
 
   if (tone) {
-    const toneClasses = TONE_CLASSES[tone];
     return (
       <div
         data-testid={testId}
         data-tone={tone}
         className={cn(
-          'flex flex-col items-center gap-2.5 px-(--table-pad-x) pt-16 pb-18 text-center',
+          'my-auto flex flex-col items-center gap-2.5 px-(--table-pad-x) py-12 text-center',
           className,
         )}
       >
-        <span
-          aria-hidden="true"
-          data-testid="empty-state-illustration"
-          className="relative mb-1.5 flex size-24 items-center justify-center"
-        >
-          <span
-            data-slot="pill"
-            className="border-border absolute inset-0 rounded-full border-[1.5px] border-dashed"
-          />
-          <span
-            data-slot="pill"
-            className={cn('absolute inset-3.5 rounded-full', toneClasses.bg)}
-          />
-          <span
-            data-slot="empty-state-tile"
-            className={cn(
-              'bg-card ring-border relative flex size-10 items-center justify-center rounded-xl shadow-xs ring-1 [&_svg]:size-4.5',
-              toneClasses.ink,
-            )}
-          >
-            {shownIcon}
-          </span>
-          <span
-            className={cn(
-              'absolute end-2 top-2.5 size-2.5 rounded-full',
-              toneClasses.dot,
-            )}
-          />
-          <span className="bg-border absolute start-1.5 bottom-3.5 size-1.5 rounded-full" />
-        </span>
+        <EmptyStateArt tone={tone} icon={shownIcon} size="room" tinted={tinted} />
         <Heading className="text-foreground text-title leading-[1.2] font-semibold">
           {shownTitle}
         </Heading>

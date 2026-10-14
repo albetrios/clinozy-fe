@@ -172,7 +172,6 @@ export function VendorsPage() {
   const search = validateStockSearch(useSearch({ strict: false }));
   const params = vendorParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useStockAccess();
   const nav = useStockNav();
   const { rowActions, confirm } = useVendorActions();
   const { dialog, close } = useStockDialogRoute({
@@ -213,14 +212,6 @@ export function VendorsPage() {
           filtered={false}
           onClearFilters={() => undefined}
           emptyTitle={t(STOCK_KEYS.vendors.empty)}
-          emptyAction={
-            access.canCreate
-              ? {
-                  label: t(STOCK_KEYS.create.vendor),
-                  onSelect: () => nav.create('vendors'),
-                }
-              : undefined
-          }
           recordsLabel={t(STOCK_KEYS.vendors.records)}
           countLabel={countLabel}
           minWidth={640}
