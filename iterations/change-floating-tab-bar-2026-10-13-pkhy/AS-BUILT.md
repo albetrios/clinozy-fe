@@ -10,6 +10,11 @@ reachable in this container (Docker down), so the signed-in app itself was not o
 page was deleted before the commit. The safe-area inset was emulated by serving `index.css` with
 `env(safe-area-inset-bottom)` replaced by `34px`.
 
+`intake-files/` keeps only the file this iteration received, `BRIEF.md` (D17): the 22 carried-forward
+files are byte-identical to the Baseline's, so a citation such as `shell.md:48` reads in
+`iterations/launch-2026-09-30-jxmr/intake-files/`. The README's Intake hash is the full snapshot's,
+taken at intake.
+
 Commits: `98ac7b4` (the bar, first as utilities), `82453d3` (its material moved into `index.css`
 within the CSS budget — D14), and the close.
 
