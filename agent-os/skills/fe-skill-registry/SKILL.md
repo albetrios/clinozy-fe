@@ -740,7 +740,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 **Path:** `agent-os/skills/fe-iteration-planning/SKILL.md`
 
-**Purpose:** Plan a design iteration from its `intake-files/` — **no code**: confirm the iteration and Baseline, pass the intake gate and read the full snapshot, establish the incremental delta by Intake mode, reconcile md ↔ prototype with evidence, gate on blocking questions, write `KICKOFF.md` with its ordered ledger, and stop for approval. The planning half of the iteration workflow.
+**Purpose:** Plan a design iteration from its `intake-files/` — **no code**: confirm the iteration and Baseline, pass the intake gate and read the resolved snapshot, establish the incremental delta by Intake mode, reconcile md ↔ prototype with evidence, gate on blocking questions, write `KICKOFF.md` with its ordered ledger, and stop for approval. The planning half of the iteration workflow.
 
 **Trigger keywords:** "plan iteration <name>", "iteration planning", "plan the next iteration", "make a plan from legacy", "plan from legacy", "review the legacy version"
 
@@ -749,7 +749,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 - Step 0 shows the eligibility table (Status `planning`) and confirms the iteration and its Baseline with AskUserQuestion (`pnpm iteration:baseline`)
 - The intake gate `pnpm iteration:intake <it> --check [--baseline <b>]` runs at Step 0; on failure the skill stops at once (writes nothing, changes no status) and prints the output
 - Every intake file is read in full and proved with a coverage matrix
-- MODE incremental, by Intake mode: full/overlay — `pnpm iteration:diff` of the two `intake-files/` folders reconciled with the designer's "What changed"; brief — `BRIEF.md` is the change list and nothing else may differ. Always the Baseline's Standing deviations; every change classified, omissions raised as findings
+- MODE incremental, by Intake mode: full/overlay — `pnpm iteration:diff` of the two resolved intakes reconciled with the designer's "What changed"; brief — `BRIEF.md` is the change list and nothing else may differ. Always the Baseline's Standing deviations; every change classified, omissions raised as findings
 - Every md ↔ prototype verdict carries file:line or selector evidence; RED questions go to AskUserQuestion and `plans/decisions.md`, never a guess
 - Writes every KICKOFF section (`n/a — reason` allowed, absent not) with the route-ordered ledger (Kind, Depends on, Skill/driver, Acceptance, Assignee, Status), then `iteration:status ready-for-approval` and stops; `approved` on the user's go-ahead
 

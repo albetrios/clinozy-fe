@@ -1,9 +1,9 @@
 /**
- * `pnpm iteration:intake` — the three intake modes (full, overlay, brief) and the full snapshot each
- * builds, the frontend's mandatory set on that snapshot, replacing a snapshot (diff and stop unless
- * --replace, which only works while planning), the lock from `approved`, `--both` into the
- * sibling's same-named iteration on its own Baseline, the README rows it fills, and the gate
- * (`--check`). Any problem stops the intake with nothing written.
+ * `pnpm iteration:intake` — the three intake modes (full, overlay, brief): what each stores and the
+ * snapshot each resolves to, the frontend's mandatory set on that snapshot, replacing a snapshot
+ * (diff and stop unless --replace, which only works while planning), the lock from `approved`,
+ * `--both` into the sibling's same-named iteration on its own Baseline, the README rows it fills,
+ * the gate (`--check`) and `--compact`. Any problem stops the intake with nothing written.
  */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -38,7 +38,12 @@ import {
   renderIntakeNote,
   runIntake,
 } from './intake-iteration.mjs';
-import { intakeHash, parseIterationReadme } from './iterations.mjs';
+import {
+  intakeHash,
+  parseIterationReadme,
+  resolvedIntakeHash,
+  resolveIntakeSnapshot,
+} from './iterations.mjs';
 
 afterEach(cleanScratch);
 
@@ -61,6 +66,16 @@ const readmeText = (repositoryRoot, iteration = NAME) =>
 const readmeFields = (repositoryRoot, iteration = NAME) =>
   parseIterationReadme(readmeText(repositoryRoot, iteration));
 const hasLine = (result, text) => result.lines.some((line) => line.includes(text));
+const setStatus = (repositoryRoot, iteration, status) => {
+  const readme = join(repositoryRoot, 'iterations', iteration, 'README.md');
+  writeFileSync(
+    readme,
+    readFileSync(readme, 'utf-8').replace(
+      /\| Status \| [a-z-]+ \|/,
+      `| Status | ${status} |`,
+    ),
+  );
+};
 
 /** A repository with the iteration under test and a complete drop in a scratch folder. */
 function setup({ status = 'planning', intake } = {}) {
@@ -100,6 +115,7 @@ describe('arguments and paths', () => {
         source: '~/drop',
         mode: 'overlay',
         check: false,
+        compact: false,
         baseline: undefined,
         createInSibling: true,
         siblingPath: '../x-be',
@@ -112,6 +128,24 @@ describe('arguments and paths', () => {
     const check = parseIntakeArguments([NAME, '--check', '--baseline', LAUNCH]);
     assert.equal(check.check, true);
     assert.equal(check.baseline, LAUNCH);
+    const compact = parseIntakeArguments([NAME, '--compact', '--dry-run']);
+    assert.equal(compact.compact, true);
+    assert.equal(compact.dryRun, true);
+  });
+
+  test('--compact takes only the iteration and --dry-run', () => {
+    for (const commandLine of [
+      [NAME, 'drop', '--compact'],
+      [NAME, '--compact', '--check'],
+      [NAME, '--compact', '--mode', 'brief'],
+      [NAME, '--compact', '--replace'],
+      [NAME, '--compact', '--both'],
+    ]) {
+      assert.throws(
+        () => parseIntakeArguments(commandLine),
+        /--(compact|check) takes only/,
+      );
+    }
   });
 
   test('refuses an unknown mode, --check mixed with intake options, and a lone --baseline', () => {
@@ -326,7 +360,7 @@ describe('replacing a snapshot', () => {
 });
 
 describe('overlay mode', () => {
-  test("lays the received files over the Baseline's snapshot", () => {
+  test("stores the received files, resolved over the Baseline's snapshot", () => {
     const repositoryRoot = withBaseline();
     const received = writeDrop(join(scratchFolder(), 'changes'), {
       'alpha.md': '# Screen: Alpha — with a returns badge\n',
@@ -338,22 +372,30 @@ describe('overlay mode', () => {
       today: TODAY,
     });
     assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(
-      intakeNames(repositoryRoot),
-      [...Object.keys(completeDrop()), 'gamma.md'].sort(),
-    );
+    assert.deepEqual(intakeNames(repositoryRoot), ['_index.md', 'alpha.md', 'gamma.md']);
     assert.equal(
       readIntake(repositoryRoot, 'alpha.md'),
       '# Screen: Alpha — with a returns badge\n',
     );
-    assert.equal(readIntake(repositoryRoot, 'beta.md'), '# Screen: Beta\n');
+    const { files } = resolveIntakeSnapshot({ repositoryRoot, iteration: NAME });
+    assert.deepEqual(
+      [...files.keys()].sort(),
+      [...Object.keys(completeDrop()), 'gamma.md'].sort(),
+    );
+    assert.equal(
+      files.get('beta.md'),
+      join(intakePath(repositoryRoot, LAUNCH), 'beta.md'),
+    );
     const fields = readmeFields(repositoryRoot);
     assert.equal(fields.get('Intake mode'), 'overlay');
     assert.equal(
       fields.get('Intake note'),
       `3 received (_index.md, alpha.md, gamma.md) · ${DROP_SIZE - 2} carried forward from ${LAUNCH}`,
     );
-    assert.equal(fields.get('Intake hash'), intakeHash(intakePath(repositoryRoot)));
+    assert.equal(
+      fields.get('Intake hash'),
+      resolvedIntakeHash({ repositoryRoot, iteration: NAME }),
+    );
     assert.equal(fields.get('Schema-routes'), SCHEMA_ROUTES_HASH);
     assert.equal(
       runIntake([NAME, '--check', '--baseline', LAUNCH], { repositoryRoot }).exitCode,
@@ -405,7 +447,7 @@ describe('overlay mode', () => {
 });
 
 describe('brief mode', () => {
-  test("adds BRIEF.md to the Baseline's snapshot — and the diff shows nothing else", () => {
+  test("stores only BRIEF.md, resolves to the Baseline's snapshot plus it — and the diff shows nothing else", () => {
     const repositoryRoot = withBaseline();
     const folder = writeDrop(join(scratchFolder(), 'brief'), {
       'BRIEF.md': brief(),
@@ -416,12 +458,13 @@ describe('brief mode', () => {
       today: TODAY,
     });
     assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(
-      intakeNames(repositoryRoot),
-      [...Object.keys(completeDrop()), 'BRIEF.md'].sort(),
-    );
+    assert.deepEqual(intakeNames(repositoryRoot), ['BRIEF.md']);
     const fields = readmeFields(repositoryRoot);
     assert.equal(fields.get('Intake mode'), 'brief');
+    assert.equal(
+      fields.get('Intake hash'),
+      resolvedIntakeHash({ repositoryRoot, iteration: NAME }),
+    );
     assert.equal(
       fields.get('Intake note'),
       `1 received (BRIEF.md) · ${DROP_SIZE} carried forward from ${LAUNCH}`,
@@ -499,37 +542,64 @@ describe('the gate (--check)', () => {
     const result = gate(repositoryRoot, '--baseline', LAUNCH);
     assert.equal(result.exitCode, 0, result.lines.join('\n'));
     assert.ok(
-      hasLine(result, `✓ iterations/${NAME}/intake-files/ — ${DROP_SIZE + 1} files`),
+      hasLine(
+        result,
+        `✓ iterations/${NAME}/intake-files/ — ${DROP_SIZE + 1} files (1 stored, ${DROP_SIZE} from ${LAUNCH})`,
+      ),
     );
     assert.ok(hasLine(result, `✓ iterations/${LAUNCH}/intake-files/`));
     assert.equal(result.lines.at(-1), 'Gate passed.');
   });
 
   test('a missing mandatory file fails, naming the folder, the file and the fix', () => {
-    const repositoryRoot = briefed();
-    rmSync(join(intakePath(repositoryRoot), 'BRIEF.md'));
+    const repositoryRoot = setup().repositoryRoot;
+    const drop = { ...completeDrop() };
+    delete drop['shell.md'];
+    writeIteration({
+      repositoryRoot,
+      name: NAME,
+      fields: { intakeMode: 'full', intakeHash: 'aaaaaaaaaaaa' },
+      intake: drop,
+    });
     const result = gate(repositoryRoot);
     assert.equal(result.exitCode, 1);
     assert.match(result.lines[0], /^Gate failed — 2 problems\. Stop here/);
     assert.ok(
       result.lines.includes(
-        `✗ iterations/${NAME}/intake-files/: missing mandatory file(s): BRIEF.md`,
+        `✗ iterations/${NAME}/intake-files/: missing mandatory file(s): shell.md`,
       ),
     );
     assert.ok(
       result.lines.includes(
-        `    fix: re-run the intake: pnpm iteration:intake ${NAME} <source> --mode brief --replace`,
+        `    fix: re-run the intake: pnpm iteration:intake ${NAME} <source> --replace`,
       ),
     );
-    assert.ok(hasLine(result, 'Uncommitted: deleted BRIEF.md'));
   });
 
-  test("a file missing from the Baseline's intake fails in the Baseline's folder", () => {
+  test('a brief whose BRIEF.md is removed stores nothing: no intake yet', () => {
+    const repositoryRoot = briefed();
+    rmSync(join(intakePath(repositoryRoot), 'BRIEF.md'));
+    const result = gate(repositoryRoot);
+    assert.equal(result.exitCode, 1);
+    assert.ok(result.lines.includes(`✗ iterations/${NAME}/intake-files/: no intake yet`));
+  });
+
+  test("a file missing from the Baseline's intake fails in the Baseline's folder — and in each iteration resolved through it", () => {
     const repositoryRoot = briefed();
     rmSync(join(intakePath(repositoryRoot, LAUNCH), 'shell.md'));
     const result = gate(repositoryRoot, '--baseline', LAUNCH);
     assert.equal(result.exitCode, 1);
-    assert.ok(hasLine(result, `✓ iterations/${NAME}/intake-files/`));
+    assert.ok(
+      result.lines.includes(
+        `✗ iterations/${NAME}/intake-files/: missing mandatory file(s): shell.md`,
+      ),
+    );
+    assert.ok(
+      hasLine(
+        result,
+        `a change anywhere in the Baseline chain (${LAUNCH}) changes it too: pnpm iteration:intake ${LAUNCH} --check`,
+      ),
+    );
     assert.ok(
       result.lines.includes(
         `✗ iterations/${LAUNCH}/intake-files/: missing mandatory file(s): shell.md`,
@@ -544,17 +614,17 @@ describe('the gate (--check)', () => {
     const repositoryRoot = briefed();
     const recorded = readmeFields(repositoryRoot).get('Intake hash');
     writeFileSync(
-      join(intakePath(repositoryRoot), 'alpha.md'),
-      '# Screen: Alpha — tweaked\n',
+      join(intakePath(repositoryRoot), 'BRIEF.md'),
+      `${brief()}\nA late edit.\n`,
     );
     const uncommitted = gate(repositoryRoot);
     assert.equal(uncommitted.exitCode, 1);
     assert.ok(
       uncommitted.lines.includes(
-        `✗ iterations/${NAME}/intake-files/: changed since the intake — the Intake hash is ${intakeHash(intakePath(repositoryRoot))}, the README records ${recorded}`,
+        `✗ iterations/${NAME}/intake-files/: changed since the intake — the Intake hash is ${resolvedIntakeHash({ repositoryRoot, iteration: NAME })}, the README records ${recorded}`,
       ),
     );
-    assert.ok(uncommitted.lines.includes('    Uncommitted: modified alpha.md'));
+    assert.ok(uncommitted.lines.includes('    Uncommitted: modified BRIEF.md'));
     assert.ok(
       hasLine(uncommitted, 'fix: restore the delivered files (git restore --source=HEAD'),
     );
@@ -600,6 +670,12 @@ describe('the gate (--check)', () => {
     );
     const rebased = gate(repositoryRoot);
     assert.equal(rebased.exitCode, 1);
+    assert.ok(
+      hasLine(
+        rebased,
+        `the brief snapshot cannot be resolved — ${NAME} is a brief intake with Baseline none`,
+      ),
+    );
     assert.ok(
       hasLine(
         rebased,
@@ -679,11 +755,16 @@ describe('--both', () => {
       today: TODAY,
     });
     assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(siblingRoot), [
-      'PRD.md',
-      'design-overview.md',
-      'schema-routes.md',
-    ]);
+    assert.deepEqual(intakeNames(siblingRoot), ['PRD.md', 'schema-routes.md']);
+    assert.deepEqual(
+      [
+        ...resolveIntakeSnapshot({
+          repositoryRoot: siblingRoot,
+          iteration: NAME,
+        }).files.keys(),
+      ].sort(),
+      ['PRD.md', 'design-overview.md', 'schema-routes.md'],
+    );
     assert.equal(readIntake(siblingRoot, 'PRD.md'), '# Demo — PRD, with returns\n');
     assert.equal(
       readmeFields(siblingRoot).get('Intake note'),
@@ -784,6 +865,168 @@ describe('--both', () => {
     assert.equal(refused.exitCode, 1);
     assert.ok(
       hasLine(refused, 'Sibling repository: the intake is locked (Status approved)'),
+    );
+  });
+});
+
+describe('--compact', () => {
+  /**
+   * The iteration under test as every brief used to be placed: committed, with the launch's files
+   * copied into its own `intake-files/` beside `BRIEF.md`, and the README's hash over all of them.
+   */
+  function legacyBrief({ status = 'frozen' } = {}) {
+    const repositoryRoot = withBaseline();
+    const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
+    assert.equal(
+      runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot, today: TODAY })
+        .exitCode,
+      0,
+    );
+    writeDrop(intakePath(repositoryRoot), completeDrop());
+    setStatus(repositoryRoot, NAME, status);
+    commitAll(repositoryRoot, 'legacy brief', 2_000);
+    return repositoryRoot;
+  }
+  const compact = (repositoryRoot, ...options) =>
+    runIntake([NAME, '--compact', ...options], { repositoryRoot });
+
+  test('a legacy full copy hashes the same as what it resolves to', () => {
+    const repositoryRoot = legacyBrief();
+    assert.equal(intakeNames(repositoryRoot).length, DROP_SIZE + 1);
+    assert.equal(
+      intakeHash(intakePath(repositoryRoot)),
+      readmeFields(repositoryRoot).get('Intake hash'),
+    );
+    assert.equal(
+      runIntake([NAME, '--check', '--baseline', LAUNCH], { repositoryRoot }).exitCode,
+      0,
+    );
+  });
+
+  test("removes the copies of the Baseline's files and keeps what was received, even when frozen", () => {
+    const repositoryRoot = legacyBrief();
+    const readmeBefore = readmeText(repositoryRoot);
+    const result = compact(repositoryRoot);
+    assert.equal(result.exitCode, 0, result.lines.join('\n'));
+    assert.deepEqual(intakeNames(repositoryRoot), ['BRIEF.md']);
+    const hash = readmeFields(repositoryRoot).get('Intake hash');
+    assert.match(
+      result.lines[0],
+      new RegExp(
+        `^Compacted iterations/${NAME}/intake-files/: removed ${DROP_SIZE} copies identical to ${LAUNCH} \\(.+\\) · kept BRIEF\\.md · Intake hash ${hash} unchanged$`,
+      ),
+    );
+    assert.equal(readmeText(repositoryRoot), readmeBefore);
+    assert.equal(resolvedIntakeHash({ repositoryRoot, iteration: NAME }), hash);
+    assert.equal(
+      runIntake([NAME, '--check', '--baseline', LAUNCH], { repositoryRoot }).exitCode,
+      0,
+    );
+    const again = compact(repositoryRoot);
+    assert.equal(again.exitCode, 0);
+    assert.match(again.lines[0], /already stores only what arrived — kept BRIEF\.md/);
+  });
+
+  test('--dry-run removes nothing', () => {
+    const repositoryRoot = legacyBrief();
+    const result = compact(repositoryRoot, '--dry-run');
+    assert.equal(result.exitCode, 0);
+    assert.match(result.lines[0], /^Dry run — nothing removed; would remove /);
+    assert.equal(intakeNames(repositoryRoot).length, DROP_SIZE + 1);
+  });
+
+  test('keeps a stored file that differs from the Baseline’s', () => {
+    const repositoryRoot = withBaseline();
+    const received = writeDrop(join(scratchFolder(), 'changes'), {
+      'alpha.md': '# Screen: Alpha — with a returns badge\n',
+    });
+    assert.equal(
+      runIntake([NAME, received, '--mode', 'overlay'], { repositoryRoot }).exitCode,
+      0,
+    );
+    writeDrop(intakePath(repositoryRoot), {
+      'beta.md': completeDrop()['beta.md'],
+      'shell.md': completeDrop()['shell.md'],
+    });
+    commitAll(repositoryRoot, 'legacy overlay', 2_000);
+    const result = compact(repositoryRoot);
+    assert.equal(result.exitCode, 0, result.lines.join('\n'));
+    assert.deepEqual(intakeNames(repositoryRoot), ['alpha.md']);
+    assert.equal(
+      readIntake(repositoryRoot, 'alpha.md'),
+      '# Screen: Alpha — with a returns badge\n',
+    );
+  });
+
+  test('refuses a full intake, and an intake that fails the gate', () => {
+    const repositoryRoot = withBaseline();
+    const launch = runIntake([LAUNCH, '--compact'], { repositoryRoot });
+    assert.equal(launch.exitCode, 1);
+    assert.ok(hasLine(launch, 'is a full intake — it stores the whole drop'));
+    assert.equal(launch.lines.at(-1), 'Nothing removed.');
+
+    const failing = legacyBrief();
+    writeFileSync(join(intakePath(failing), 'BRIEF.md'), `${brief()}\nEdited.\n`);
+    const refused = compact(failing);
+    assert.equal(refused.exitCode, 1);
+    assert.ok(hasLine(refused, 'the gate fails first — changed since the intake'));
+    assert.equal(intakeNames(failing).length, DROP_SIZE + 1);
+  });
+});
+
+describe('resolving a snapshot', () => {
+  test('follows a chain of layered intakes, the nearest file winning', () => {
+    const repositoryRoot = withBaseline();
+    const first = writeDrop(join(scratchFolder(), 'first'), {
+      'alpha.md': '# Screen: Alpha — first\n',
+    });
+    assert.equal(
+      runIntake([NAME, first, '--mode', 'overlay'], { repositoryRoot }).exitCode,
+      0,
+    );
+    setStatus(repositoryRoot, NAME, 'done');
+    const next = 'fix-badge-2026-10-08-wxyz';
+    writeIteration({ repositoryRoot, name: next, fields: { baseline: NAME } });
+    const second = writeDrop(join(scratchFolder(), 'second'), { 'BRIEF.md': brief() });
+    const result = runIntake([next, second, '--mode', 'brief'], { repositoryRoot });
+    assert.equal(result.exitCode, 0, result.lines.join('\n'));
+    assert.deepEqual(intakeNames(repositoryRoot, next), ['BRIEF.md']);
+    const { files, stored, baseline, problem } = resolveIntakeSnapshot({
+      repositoryRoot,
+      iteration: next,
+    });
+    assert.equal(problem, undefined);
+    assert.deepEqual(stored, ['BRIEF.md']);
+    assert.equal(baseline, NAME);
+    assert.equal(files.get('alpha.md'), join(intakePath(repositoryRoot), 'alpha.md'));
+    assert.equal(
+      files.get('beta.md'),
+      join(intakePath(repositoryRoot, LAUNCH), 'beta.md'),
+    );
+    assert.equal(files.size, DROP_SIZE + 1);
+  });
+
+  test('names a Baseline chain that loops or reaches no iteration', () => {
+    const repositoryRoot = createRepository();
+    writeIteration({
+      repositoryRoot,
+      name: NAME,
+      fields: { baseline: 'feat-other-2026-10-01-abcd', intakeMode: 'brief' },
+      intake: { 'BRIEF.md': brief() },
+    });
+    assert.match(
+      resolveIntakeSnapshot({ repositoryRoot, iteration: NAME }).problem,
+      /reaches feat-other-2026-10-01-abcd, which is not an iteration with a README/,
+    );
+    writeIteration({
+      repositoryRoot,
+      name: 'feat-other-2026-10-01-abcd',
+      fields: { baseline: NAME, intakeMode: 'brief' },
+      intake: { 'BRIEF.md': brief() },
+    });
+    assert.match(
+      resolveIntakeSnapshot({ repositoryRoot, iteration: NAME }).problem,
+      new RegExp(`loops: ${NAME} → feat-other-2026-10-01-abcd → ${NAME}`),
     );
   });
 });

@@ -1,6 +1,6 @@
 ---
 name: fe-iteration-planning
-description: Plan a design iteration under iterations/<iteration>/ — NO CODE. Confirm the iteration and its Baseline, pass the intake gate (iteration:intake --check — stop on failure), read the full snapshot (coverage matrix), establish the delta by Intake mode (full/overlay: iteration:diff + the designer's "What changed"; brief: BRIEF.md) and the Baseline's Standing deviations, reconcile md ↔ prototype with file:line evidence, gate on blocking questions, then write KICKOFF.md with an ordered ledger and stop for approval. Use when the user says "plan iteration <name>", "iteration planning", "plan the next iteration", "plan from legacy", or asks to plan the build of a design drop. Next step after approval: fe-kickoff-iteration.
+description: Plan a design iteration under iterations/<iteration>/ — NO CODE. Confirm the iteration and its Baseline, pass the intake gate (iteration:intake --check — stop on failure), read the resolved snapshot (coverage matrix), establish the delta by Intake mode (full/overlay: iteration:diff + the designer's "What changed"; brief: BRIEF.md) and the Baseline's Standing deviations, reconcile md ↔ prototype with file:line evidence, gate on blocking questions, then write KICKOFF.md with an ordered ledger and stop for approval. Use when the user says "plan iteration <name>", "iteration planning", "plan the next iteration", "plan from legacy", or asks to plan the build of a design drop. Next step after approval: fe-kickoff-iteration.
 ---
 
 # Iteration planning (plan from `iterations/<iteration>/intake-files/`)
@@ -22,7 +22,7 @@ The rules: [`iterations/README.md`](../../../iterations/README.md).
 ```text
 iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/
 ├── README.md            ← field table (Status, Baseline, Drop placed, Schema-routes, …) + ## History
-├── intake-files/        ← the FULL snapshot (Intake mode full, overlay or brief), flat; locked from approved
+├── intake-files/        ← what arrived (Intake mode full, overlay or brief), flat; locked from approved
 │   ├── PRD.md · schema-routes.md · _index.md · preset.md · shell.md · <slug>.md per screen
 │   ├── <prototype>.html · the *.js it loads (optional: _patterns.md, _report.md, …)
 │   └── BRIEF.md         ← brief mode only: the written change
@@ -35,13 +35,15 @@ iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/
   repo): everything is new; read everything. Otherwise **MODE incremental**
   against the Baseline the user confirms in Step 0 — the suggestion is the
   latest `done` or `frozen` iteration in this repo.
-- **Intake modes.** `intake-files/` is always a full snapshot. `full` — the drop as received (the
-  launch is always full). `overlay` — only the changed files arrived: the Baseline's snapshot with
-  them laid over it. `brief` — no design files, only a written change such as "implement these
-  kinds of screens": the Baseline's snapshot plus `BRIEF.md`. The README records the Intake mode,
+- **Intake modes.** `intake-files/` stores what arrived; the snapshot is resolved from it. `full` —
+  the drop as received (the launch is always full). `overlay` — only the changed files arrived and
+  are stored: the snapshot is the Baseline's with them laid over it. `brief` — no design files, only
+  a written change such as "implement these kinds of screens": `BRIEF.md` is stored, and the
+  snapshot is the Baseline's plus it. Read a file `intake-files/` does not store in the Baseline's
+  intake (and, when that one is layered too, in its Baseline's) — the gate's ✓ line counts both. The README records the Intake mode,
   an Intake note (received versus carried forward) and an Intake hash.
 - **The delta by mode.** `full` / `overlay`: the designer's "What changed" notes plus
-  `pnpm iteration:diff <baseline> <iteration>`, which compares the two `intake-files/` folders and
+  `pnpm iteration:diff <baseline> <iteration>`, which compares the two resolved intakes and
   nothing else — anything the diff shows that the notes omit is a finding. `brief`: `BRIEF.md` is
   the change list, and the diff must show nothing else changed. Always: the Baseline's Standing
   deviations — where the build differs from the drop, plan against what was actually built.

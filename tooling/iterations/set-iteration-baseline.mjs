@@ -65,7 +65,7 @@ export function planBaselineChange({ repositoryRoot, iteration, baseline, today 
     const missing = missingIntakeFiles({ repositoryRoot, iteration: baseline });
     if (missing.length > 0) {
       throw new Error(
-        `Baseline "${baseline}" has an incomplete intake-files/ (missing: ${missing.join(', ')}) — the incremental delta is a diff of intake-files/ only, so the Baseline's drop is mandatory.`,
+        `Baseline "${baseline}" has an incomplete intake (missing: ${missing.join(', ')}) — the incremental delta is a diff of the two intakes only, so the Baseline's drop is mandatory.`,
       );
     }
   }

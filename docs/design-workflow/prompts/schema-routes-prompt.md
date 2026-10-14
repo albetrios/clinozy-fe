@@ -203,10 +203,10 @@ marked n/a: M. Gaps I could not resolve: <list, or none>.`
    one file, as returned.
 2. Place the drop: `pnpm iteration:intake <iteration> <drop-folder>` — or, when
    only some files changed, `--mode overlay`, which lays them over the
-   Baseline's snapshot. It writes the full snapshot into
+   Baseline's snapshot. It stores what arrived in
    `iterations/<iteration>/intake-files/`, every received file exactly as
-   delivered, and records the file's fingerprint and the Intake hash in the
-   README. When the backend changes
+   delivered, and records the file's fingerprint and the Intake hash of the
+   resolved snapshot in the README. When the backend changes
    too, add `--both`: `PRD.md` and `schema-routes.md` also go, byte-for-byte,
    into the same-named clinozy-be iteration (open it in both with
    `pnpm iteration:new … --both`) — the backend builds its contracts from them.

@@ -314,13 +314,53 @@ describe('the required intake set', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
+      name: 'launch-2026-09-30-jxmr',
+      intake: completeDrop(),
+      fields: { status: 'done' },
+    });
+    writeIteration({
+      repositoryRoot,
       name: 'feat-returns-2026-10-06-kqzx',
       intake: completeDrop(),
-      fields: { intakeMode: 'brief' },
+      fields: { intakeMode: 'brief', baseline: 'launch-2026-09-30-jxmr' },
     });
     assert.deepEqual(
       missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
       ['BRIEF.md'],
+    );
+  });
+
+  test("checks a brief that stores only BRIEF.md on its Baseline's snapshot", () => {
+    const repositoryRoot = createRepository();
+    const { 'shell.md': _shell, ...withoutShell } = completeDrop();
+    writeIteration({
+      repositoryRoot,
+      name: 'launch-2026-09-30-jxmr',
+      intake: withoutShell,
+      fields: { status: 'done' },
+    });
+    writeIteration({
+      repositoryRoot,
+      name: 'feat-returns-2026-10-06-kqzx',
+      intake: { 'BRIEF.md': '# Brief\n' },
+      fields: { intakeMode: 'brief', baseline: 'launch-2026-09-30-jxmr' },
+    });
+    assert.deepEqual(
+      missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
+      ['shell.md'],
+    );
+    writeIteration({
+      repositoryRoot,
+      name: 'feat-returns-2026-10-06-kqzx',
+      intake: { 'BRIEF.md': '# Brief\n' },
+      fields: { intakeMode: 'brief', baseline: 'none' },
+    });
+    assert.match(
+      missingIntakeFiles({
+        repositoryRoot,
+        iteration: 'feat-returns-2026-10-06-kqzx',
+      })[0],
+      /^intake-files\/ \(feat-returns-2026-10-06-kqzx is a brief intake with Baseline none/,
     );
   });
 

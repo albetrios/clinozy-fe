@@ -537,22 +537,20 @@ export function recordedIntakeMode(fields) {
 }
 
 /**
- * The mandatory files an iteration's `intake-files/` is missing, for the Intake mode its README
- * records — empty when the snapshot is complete.
+ * The mandatory files an iteration's resolved snapshot ({@link resolveIntakeSnapshot}) is
+ * missing, for the Intake mode its README records — empty when the snapshot is complete.
  *
  * @param {{ repositoryRoot: string, iteration: string }} location
  * @returns {string[]}
  */
 export function missingIntakeFiles(location) {
-  const folder = intakeFolder(location);
-  if (!existsSync(folder)) return [`${INTAKE_DIRECTORY}/`];
-  const readme = join(iterationFolder(location), 'README.md');
+  if (!existsSync(intakeFolder(location))) return [`${INTAKE_DIRECTORY}/`];
+  const { files, mode, problem } = resolveIntakeSnapshot(location);
+  if (problem !== undefined) return [`${INTAKE_DIRECTORY}/ (${problem})`];
   return checkIntakeSet({
-    names: flatFileNames(folder),
-    readText: (name) => readFileSync(join(folder, name), 'utf-8'),
-    mode: existsSync(readme)
-      ? recordedIntakeMode(parseIterationReadme(readFileSync(readme, 'utf-8')))
-      : DEFAULT_INTAKE_MODE,
+    names: [...files.keys()],
+    readText: (name) => readFileSync(files.get(name), 'utf-8'),
+    mode,
   }).missing;
 }
 
@@ -632,6 +630,109 @@ export function readSnapshot(folder) {
  */
 export function intakeHash(folder) {
   return snapshotFingerprint(readSnapshot(folder));
+}
+
+/**
+ * Intake modes whose `intake-files/` stores only what arrived — the received files of an overlay,
+ * the `BRIEF.md` of a brief — and takes everything else from the Baseline.
+ */
+export const LAYERED_INTAKE_MODES = new Set(['overlay', 'brief']);
+
+/**
+ * Resolves an iteration's snapshot: file name → the path that holds it. A `full` intake is its own
+ * `intake-files/`. An `overlay` or a `brief` stores only what arrived, so its snapshot is its
+ * Baseline's resolved snapshot (up the Baseline chain) with its own files laid over it. An
+ * iteration with no README resolves as `full`, and one that stores nothing resolves to nothing (no
+ * intake yet). Every reader of a snapshot — the gate, the Intake
+ * hash, `iteration:diff`, `iteration:list`, the Baseline checks — goes through here.
+ *
+ * @param {{ repositoryRoot: string, iteration: string }} location
+ * @returns {{ files: Map<string, string>, stored: string[], mode: string, baseline: string | undefined, problem: string | undefined }}
+ *   `stored` are the files in the iteration's own `intake-files/`; `baseline` the iteration the
+ *   rest comes from; `problem` why the snapshot cannot be resolved (then `files` holds only the
+ *   stored files)
+ */
+export function resolveIntakeSnapshot({ repositoryRoot, iteration }) {
+  const visited = [];
+  const layers = [];
+  let current = iteration;
+  let problem;
+  while (current !== undefined) {
+    const folder = intakeFolder({ repositoryRoot, iteration: current });
+    const stored = flatFileNames(folder);
+    const readmePath = join(
+      iterationFolder({ repositoryRoot, iteration: current }),
+      'README.md',
+    );
+    const fields = existsSync(readmePath)
+      ? parseIterationReadme(readFileSync(readmePath, 'utf-8'))
+      : new Map();
+    const mode = recordedIntakeMode(fields);
+    if (visited.length > 0 && stored.length === 0) {
+      problem = `its Baseline chain reaches ${current}, which has no intake`;
+      break;
+    }
+    visited.push(current);
+    layers.push({ folder, stored, mode, baseline: fields.get('Baseline') });
+    if (!LAYERED_INTAKE_MODES.has(mode) || stored.length === 0) break;
+    const baseline = fields.get('Baseline') ?? EMPTY_FIELD;
+    if (baseline === NO_BASELINE || baseline === EMPTY_FIELD) {
+      problem = `${current} is a ${mode} intake with Baseline ${baseline}, so the files it does not store have nowhere to come from`;
+      break;
+    }
+    if (visited.includes(baseline)) {
+      problem = `its Baseline chain loops: ${[...visited, baseline].join(' → ')}`;
+      break;
+    }
+    if (
+      parseIterationName(baseline) === undefined ||
+      !existsSync(
+        join(iterationFolder({ repositoryRoot, iteration: baseline }), 'README.md'),
+      )
+    ) {
+      problem = `its Baseline chain reaches ${baseline}, which is not an iteration with a README`;
+      break;
+    }
+    current = baseline;
+  }
+  const [own] = layers;
+  const files = new Map();
+  for (const layer of problem === undefined ? [...layers].reverse() : [own]) {
+    for (const name of layer.stored) files.set(name, join(layer.folder, name));
+  }
+  return {
+    files,
+    stored: own.stored,
+    mode: own.mode,
+    baseline: LAYERED_INTAKE_MODES.has(own.mode) ? own.baseline : undefined,
+    problem,
+  };
+}
+
+/**
+ * An iteration's resolved snapshot ({@link resolveIntakeSnapshot}) read into memory.
+ *
+ * @param {{ repositoryRoot: string, iteration: string }} location
+ * @returns {Map<string, Buffer>}
+ */
+export function readResolvedSnapshot(location) {
+  return new Map(
+    [...resolveIntakeSnapshot(location).files].map(([name, path]) => [
+      name,
+      readFileSync(path),
+    ]),
+  );
+}
+
+/**
+ * An iteration's Intake hash as it is on disk: the {@link snapshotFingerprint} of its resolved
+ * snapshot, so an overlay or a brief that stores only what arrived hashes the same as one that
+ * holds the whole snapshot.
+ *
+ * @param {{ repositoryRoot: string, iteration: string }} location
+ */
+export function resolvedIntakeHash(location) {
+  return snapshotFingerprint(readResolvedSnapshot(location));
 }
 
 // ── Baseline ─────────────────────────────────────────────────────────────────
