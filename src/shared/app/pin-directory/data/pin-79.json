@@ -1,0 +1,4069 @@
+{
+  "790001": [
+    "West Kameng",
+    "Arunachal Pradesh",
+    ["Bomdila", "Nafra", "Palizi", "Rahung", "Salari", "Thrizino"]
+  ],
+  "790002": ["West Kameng", "Arunachal Pradesh", ["Balemu", "Kalaktang", "Tenzingaon"]],
+  "790003": ["West Kameng", "Arunachal Pradesh", ["Rupa", "Shergaon"]],
+  "790101": [
+    "West Kameng",
+    "Arunachal Pradesh",
+    ["Dirang", "Dirang Basti", "Lish", "Munna Camp", "Sangti", "Senge"]
+  ],
+  "790102": [
+    "East Kameng",
+    "Arunachal Pradesh",
+    [
+      "Bameng",
+      "Bana",
+      "Chyangtajo",
+      "Khenewa",
+      "Lada",
+      "P.Kessang",
+      "Pipu Dipu",
+      "Seppa",
+      "Veo"
+    ]
+  ],
+  "790103": ["Pakke Kessang", "Arunachal Pradesh", ["Seijosa"]],
+  "790104": [
+    "Tawang",
+    "Arunachal Pradesh",
+    ["B.Supply", "Kitpi", "Lhou", "Lumberdung", "Sakpret", "Tawang", "Temple Gompa"]
+  ],
+  "790105": ["Tawang", "Arunachal Pradesh", ["Jang", "Mukto", "Thingbu"]],
+  "790106": ["Tawang", "Arunachal Pradesh", ["Gispu", "Lumla", "Zemithang"]],
+  "790114": ["West Kameng", "Arunachal Pradesh", ["Bhalukpong", "Khellong", "Tippi"]],
+  "790116": [
+    "West Kameng",
+    "Arunachal Pradesh",
+    ["Dahung", "Dedza", "Singchung", "Tenga Market"]
+  ],
+  "791001": [
+    "West Siang",
+    "Arunachal Pradesh",
+    [
+      "Along",
+      "Bagra",
+      "Bene",
+      "Darak",
+      "Darka",
+      "Kambang",
+      "Kaying",
+      "Kombo",
+      "Logum Jining",
+      "Monigong",
+      "Nikte",
+      "Payum",
+      "Pessing",
+      "Rumgong",
+      "Tato",
+      "Vivek Nagar",
+      "Yoji Yora",
+      "Yomcha"
+    ]
+  ],
+  "791002": [
+    "Upper Siang",
+    "Arunachal Pradesh",
+    ["Geku", "Karko", "Mariyang", "Shimong", "Yingkiong"]
+  ],
+  "791003": ["Shi Yomi", "Arunachal Pradesh", ["Mechuka"]],
+  "791101": [
+    "Leparada",
+    "Arunachal Pradesh",
+    ["Bame", "Basar", "Dali", "Daring", "Liromoba", "Tirbin"]
+  ],
+  "791102": [
+    "East Siang",
+    "Arunachal Pradesh",
+    [
+      "Balek",
+      "Bilat",
+      "Debing",
+      "Korang",
+      "Koyu",
+      "Ledum",
+      "Nari",
+      "Oyan",
+      "Pasighat",
+      "Rani",
+      "Ruksin",
+      "Sille",
+      "Yagrung"
+    ]
+  ],
+  "791103": [
+    "Siang",
+    "Arunachal Pradesh",
+    [
+      "Adipassi",
+      "Boleng",
+      "Dalbing",
+      "Damro",
+      "GTC",
+      "Hill Top",
+      "Kebang",
+      "Pangin",
+      "Renging",
+      "Riga"
+    ]
+  ],
+  "791104": [
+    "East Siang",
+    "Arunachal Pradesh",
+    ["Ayeng", "Borguli", "Mebo", "Namsing", "Ngopok", "Silluk", "Sirem"]
+  ],
+  "791105": [
+    "Upper Siang",
+    "Arunachal Pradesh",
+    ["Gelling", "Migging", "Singa", "Tuting"]
+  ],
+  "791109": ["Papum Pare", "Arunachal Pradesh", ["Nirjuli"]],
+  "791110": ["Papum Pare", "Arunachal Pradesh", ["Model Village", "Naharlagun", "Yupia"]],
+  "791111": [
+    "Papum Pare",
+    "Arunachal Pradesh",
+    ["Arunachal Pradesh Secretariat", "Itanagar"]
+  ],
+  "791112": [
+    "Papum Pare",
+    "Arunachal Pradesh",
+    ["Arunachal University", "Doimukh", "Kheel", "Midpu"]
+  ],
+  "791113": [
+    "Papum Pare",
+    "Arunachal Pradesh",
+    [
+      "Chimpu",
+      "Donyi Polo",
+      "Jully",
+      "Ram Krishna Mission",
+      "Suchana Nagar",
+      "Vidya Vihar"
+    ]
+  ],
+  "791114": ["Papum Pare", "Arunachal Pradesh", ["Sagalee"]],
+  "791118": [
+    "Kurung Kumey",
+    "Arunachal Pradesh",
+    [
+      "Chambang",
+      "Damin",
+      "Hiya",
+      "Koloriang",
+      "Nyapin",
+      "Palin",
+      "Sangram",
+      "Sarli",
+      "Tali"
+    ]
+  ],
+  "791119": [
+    "Lower Subansiri",
+    "Arunachal Pradesh",
+    ["Mengio", "Ranga Nadi Project", "Yazali"]
+  ],
+  "791120": [
+    "Lower Subansiri",
+    "Arunachal Pradesh",
+    [
+      "Boasimla",
+      "Deed",
+      "Godak",
+      "Hari",
+      "Hija",
+      "Hong",
+      "Joram",
+      "Old Ziro",
+      "Raga",
+      "Siiro",
+      "Talo",
+      "Yachuli",
+      "Ziro"
+    ]
+  ],
+  "791121": ["Papum Pare", "Arunachal Pradesh", ["Hawa Camp", "Kimin"]],
+  "791122": [
+    "Upper Subansiri",
+    "Arunachal Pradesh",
+    [
+      "Daporijo",
+      "Dumporijo",
+      "Giba",
+      "Lemiking",
+      "Lepajaring",
+      "Maro",
+      "Muri",
+      "Nacho",
+      "Sippi",
+      "Siyum",
+      "Tabarijo",
+      "Taksing",
+      "Taliha"
+    ]
+  ],
+  "791123": [
+    "Papum Pare",
+    "Arunachal Pradesh",
+    ["Balijan", "Banderdewa", "Kokila", "Kolaptukar", "Sonajuli"]
+  ],
+  "791125": ["Lower Siang", "Arunachal Pradesh", ["Garu", "Gensi", "Likabali"]],
+  "792001": [
+    "Lohit",
+    "Arunachal Pradesh",
+    [
+      "Changliang",
+      "Danglat",
+      "Gohaingaon",
+      "Lohitpur",
+      "Loiliang",
+      "Tafragam",
+      "Tezu",
+      "Tezu Govt. College",
+      "Tindolong"
+    ]
+  ],
+  "792055": ["Changlang", "Arunachal Pradesh", ["Gandhigram", "Two Hut", "Vijoynagar"]],
+  "792056": [
+    "Changlang",
+    "Arunachal Pradesh",
+    ["Bordumsa", "Kherem Bisa", "Lallung", "New Mohong", "Rajanagar", "Vijoypur"]
+  ],
+  "792101": ["Dibang Valley", "Arunachal Pradesh", ["Alinye", "Anini", "Etalin"]],
+  "792102": [
+    "Namsai",
+    "Arunachal Pradesh",
+    [
+      "Alubari",
+      "Chakma",
+      "Chowkham",
+      "Kamlang Nagar",
+      "Kherem",
+      "Medo",
+      "Momong",
+      "Wakro"
+    ]
+  ],
+  "792103": [
+    "Namsai",
+    "Arunachal Pradesh",
+    [
+      "Diyun",
+      "Innao",
+      "Jaipur",
+      "Kumsai",
+      "Lathao",
+      "Manmao",
+      "Nampong",
+      "Namsai",
+      "Nanam",
+      "Piyong",
+      "Udaipur",
+      "Wingko"
+    ]
+  ],
+  "792104": [
+    "Anjaw",
+    "Arunachal Pradesh",
+    [
+      "Chaglagam",
+      "Goiliang",
+      "Hawai",
+      "Hayuliang",
+      "Khopa",
+      "Kibitho",
+      "Meteliang",
+      "Wallong",
+      "Yatong"
+    ]
+  ],
+  "792105": ["Namsai", "Arunachal Pradesh", ["Kumari Kachari", "Mahadevpur", "Padumani"]],
+  "792110": [
+    "Lower Dibang Valley",
+    "Arunachal Pradesh",
+    [
+      "Abango",
+      "Anelih",
+      "Anupam",
+      "Bijari",
+      "Bolung",
+      "Bomjir",
+      "Dambuk",
+      "Desali",
+      "Elopa",
+      "Hunli",
+      "Iduli",
+      "Jia",
+      "Koronu",
+      "Kronli",
+      "Meka",
+      "Paglam",
+      "Parbuk",
+      "Roing",
+      "Santipur"
+    ]
+  ],
+  "792111": ["Lohit", "Arunachal Pradesh", ["Sunpura", "Yealing"]],
+  "792120": [
+    "Changlang",
+    "Arunachal Pradesh",
+    [
+      "Bubang",
+      "Changlang",
+      "Khemiyong",
+      "Namdang",
+      "Namtok",
+      "Rangfra Govt.College",
+      "Ranglum",
+      "Yangkang"
+    ]
+  ],
+  "792121": ["Changlang", "Arunachal Pradesh", ["Jairampur", "Manmao"]],
+  "792122": [
+    "Changlang",
+    "Arunachal Pradesh",
+    [
+      "Chopelling",
+      "Deban",
+      "Dharampur",
+      "Kharsang",
+      "Kutum Basti",
+      "Manabhum",
+      "Miao",
+      "Milonpur",
+      "Namchik",
+      "Namphai"
+    ]
+  ],
+  "792123": ["Changlang", "Arunachal Pradesh", ["Nampong"]],
+  "792129": [
+    "Tirap",
+    "Arunachal Pradesh",
+    ["Deomali", "Hukanjuri", "Namsang", "Namsang Mukh", "Narottam Nagar", "Soha"]
+  ],
+  "792130": [
+    "Tirap",
+    "Arunachal Pradesh",
+    [
+      "Borduria",
+      "Dadam",
+      "Kaimai",
+      "Kanubari",
+      "Kapu",
+      "Khela",
+      "Kheti",
+      "Khonsa",
+      "Khonsa Basti",
+      "Lazu",
+      "Thinsa",
+      "Tupi",
+      "Valley View"
+    ]
+  ],
+  "792131": [
+    "Longding",
+    "Arunachal Pradesh",
+    [
+      "K/Nokno",
+      "Kanubari",
+      "Khotnu",
+      "Longding",
+      "Longfong",
+      "Minthong",
+      "Nginu",
+      "Niausa",
+      "Pangchou",
+      "Senewa",
+      "Tissa",
+      "Wakka"
+    ]
+  ],
+  "793001": [
+    "East Khasi Hills",
+    "Meghalaya",
+    ["Meghalaya Secretariat", "Oakland", "Shillong"]
+  ],
+  "793002": ["East Khasi Hills", "Meghalaya", ["Iewduh", "Jaiaw"]],
+  "793003": ["East Khasi Hills", "Meghalaya", ["Laitumkhrah"]],
+  "793004": [
+    "East Khasi Hills",
+    "Meghalaya",
+    ["Bishnupur", "Laban", "Lawsohtun", "Rilbong"]
+  ],
+  "793005": [
+    "East Khasi Hills",
+    "Meghalaya",
+    ["Diengiei", "Nongumlong", "Upper Shillong"]
+  ],
+  "793006": ["East Khasi Hills", "Meghalaya", ["Rynjah", "Umkdait"]],
+  "793007": ["East Khasi Hills", "Meghalaya", ["Happy Valley"]],
+  "793008": ["East Khasi Hills", "Meghalaya", ["Mawroh", "Phudmawri"]],
+  "793009": [
+    "East Khasi Hills",
+    "Meghalaya",
+    ["Mawklot", "Mylliem Syllai U Lar", "Nonglyer"]
+  ],
+  "793010": ["East Khasi Hills", "Meghalaya", ["Laitkor", "Laitkor Peak", "Pomlakrai"]],
+  "793011": ["East Khasi Hills", "Meghalaya", ["Assam Rifles"]],
+  "793012": [
+    "East Khasi Hills",
+    "Meghalaya",
+    ["Diengpasoh", "Mawkhanu", "Mawpat", "Tynring"]
+  ],
+  "793014": ["East Khasi Hills", "Meghalaya", ["Nongthymmai"]],
+  "793015": [
+    "East Khasi Hills",
+    "Meghalaya",
+    [
+      "Jongksha",
+      "Kharang",
+      "Lynshing",
+      "Mawkynrew",
+      "Mawlat",
+      "Mawlong",
+      "Nongkrem",
+      "Ryngibah",
+      "Smit",
+      "Thangsning",
+      "Thynroit",
+      "Umphyrnai",
+      "Umsning"
+    ]
+  ],
+  "793016": ["East Khasi Hills", "Meghalaya", ["Mawiong"]],
+  "793017": ["East Khasi Hills", "Meghalaya", ["Mawlai"]],
+  "793018": [
+    "East Khasi Hills",
+    "Meghalaya",
+    ["Diengpasoh", "Mawkhanu", "Neigrihms", "Tynring"]
+  ],
+  "793019": ["East Khasi Hills", "Meghalaya", ["Nongmynsong"]],
+  "793021": [
+    "East Khasi Hills",
+    "Meghalaya",
+    [
+      "Kynton U Mon",
+      "Madanriting",
+      "Mawlyngngad",
+      "Mawryngkneng",
+      "Pamora",
+      "Puriang",
+      "Sohryngkham"
+    ]
+  ],
+  "793022": ["East Khasi Hills", "Meghalaya", ["Kynton Massar", "Mawtawar", "Nehu"]],
+  "793101": [
+    "Ri Bhoi",
+    "Meghalaya",
+    ["Byrnihat", "Epip Byrnihat", "Jorabat", "Killing Centre", "Tamul Kuchi Gaon"]
+  ],
+  "793102": [
+    "Ri Bhoi",
+    "Meghalaya",
+    [
+      "Hatumling",
+      "Kynjoin Umran",
+      "Lailad",
+      "Marmain",
+      "Marngar",
+      "Mawlong",
+      "Niangbari",
+      "Nongladew",
+      "Nongpoh",
+      "Saiden",
+      "Umden",
+      "Umdihar",
+      "Umrit",
+      "Umsawnongbri",
+      "Umshakhon Mathon"
+    ]
+  ],
+  "793103": [
+    "Ri Bhoi",
+    "Meghalaya",
+    ["Kyrdem", "Mawbri", "Mawlasnai", "Rongmen", "Umiam", "Umktieh", "Umroi"]
+  ],
+  "793104": ["Ri Bhoi", "Meghalaya", ["Barua Basti", "Mawlein Mawkhan", "Sumer"]],
+  "793105": [
+    "Ri Bhoi",
+    "Meghalaya",
+    ["Kyrdem Kulai", "Mawhati", "Mawrong", "Sanidon", "Umran", "Umsning", "Umsohlait"]
+  ],
+  "793106": [
+    "South West Khasi Hills",
+    "Meghalaya",
+    [
+      "Balat",
+      "Borsora",
+      "Dholai",
+      "Gumaghat",
+      "Khonjoy",
+      "Makali",
+      "Mawput",
+      "Munai",
+      "Puksora",
+      "Pyndeng Sohsaw",
+      "Rajapara",
+      "Ranikor",
+      "Rongasora",
+      "Sarin",
+      "Sonatola",
+      "Telsora",
+      "Trongpleng",
+      "Umpung"
+    ]
+  ],
+  "793107": ["East Khasi Hills", "Meghalaya", ["Bholaganj Bazar"]],
+  "793108": [
+    "East Khasi Hills",
+    "Meghalaya",
+    [
+      "Cherrapunjee",
+      "Lad Mawphlang",
+      "Laitduh",
+      "Laitkynsew",
+      "Laitryngew",
+      "Mahadeo",
+      "Mawblang",
+      "Mawkdok",
+      "Mawmluh",
+      "Ramdait",
+      "Sohbarpunjee",
+      "Sohkmie",
+      "Tynrong",
+      "Tyrna",
+      "Wahlong"
+    ]
+  ],
+  "793109": [
+    "West Jaintia Hills",
+    "Meghalaya",
+    [
+      "Amlari",
+      "Darrang",
+      "Dawki",
+      "Lamin",
+      "Muktapur",
+      "Naljuri",
+      "Nongbareh",
+      "Nongtalang",
+      "Padu",
+      "Passadwar",
+      "Rongkhum",
+      "Sohkha",
+      "Syndai",
+      "Umsyiem"
+    ]
+  ],
+  "793110": [
+    "East Khasi Hills",
+    "Meghalaya",
+    [
+      "Iewmawiong",
+      "Laitlyngkot",
+      "Langkyrdem",
+      "Lyngkhat",
+      "Mawbeh",
+      "Myllat",
+      "Nongjri",
+      "Nongkynrih",
+      "Nongtyngur",
+      "Pamshutia",
+      "Pongtung",
+      "Pynursla",
+      "Umniuh Tmar",
+      "Wahkdait",
+      "Wahshiarkhmut"
+    ]
+  ],
+  "793111": ["East Khasi Hills", "Meghalaya", ["Cherrabazar", "Ladmawphlang"]],
+  "793112": [
+    "East Khasi Hills",
+    "Meghalaya",
+    ["Dalia", "Disong", "Ichamati", "Kalatak", "Mawlong", "Shella"]
+  ],
+  "793113": [
+    "East Khasi Hills",
+    "Meghalaya",
+    [
+      "Lawbah",
+      "Mawdongbazar",
+      "Mawhiang",
+      "Mawsynram",
+      "Phlang Mawsyrpat",
+      "Phlangwanbroi",
+      "Rynkubazar",
+      "Syntein",
+      "Thyllaw",
+      "Tynger"
+    ]
+  ],
+  "793114": [
+    "South West Khasi Hills",
+    "Meghalaya",
+    [
+      "Jakrem",
+      "Jashier",
+      "Laitnongrim",
+      "Mawkyrwat",
+      "Mawlyngwir",
+      "Mawsaw",
+      "Mawten",
+      "Mawthapdoh",
+      "Ngunraw",
+      "Nonglang",
+      "Nongnah",
+      "Nongsynrih",
+      "Phlang Kynshi",
+      "Phudjaud",
+      "Pyndemsakwang",
+      "Rangmaw",
+      "Rangthong",
+      "Sngimawlein",
+      "Umjarain"
+    ]
+  ],
+  "793115": [
+    "East Khasi Hills",
+    "Meghalaya",
+    [
+      "Khlieh Lyngkhoi",
+      "Krang",
+      "Lyngkhoi",
+      "Madan Bitaw",
+      "Mawpun",
+      "Nongspung",
+      "Sohiong",
+      "Sohpian"
+    ]
+  ],
+  "793116": [
+    "Ri Bhoi",
+    "Meghalaya",
+    ["Bhoirymbong", "Kyrdem", "Mawbri", "Mawlasnai", "Umroi"]
+  ],
+  "793119": [
+    "West Khasi Hills",
+    "Meghalaya",
+    [
+      "Byrki",
+      "Jaidoh",
+      "Khliehmawlieh",
+      "Laitkseh",
+      "Langdongdai",
+      "Marskuin",
+      "Maweitlyngngam",
+      "Mawkohngei",
+      "Mawlieh",
+      "Mawthengkut",
+      "Mawthungkper",
+      "Myriem",
+      "Nongbah",
+      "Nongkasen",
+      "Nonglang",
+      "Nongpyndeng",
+      "Nongsdad Dkhar",
+      "Nongshyrkon",
+      "Nongstoin",
+      "Nongthynniew",
+      "Pam Briew",
+      "Phlangdiloin",
+      "Pyndengrei",
+      "Rambrai",
+      "Rangblang",
+      "Shallang",
+      "Thangpylleng Pyndemkseh",
+      "Umdohlun",
+      "Umsohpieng",
+      "Umyap",
+      "Wahkaji"
+    ]
+  ],
+  "793120": [
+    "West Khasi Hills",
+    "Meghalaya",
+    [
+      "Dungki Ingdong",
+      "Iewmaroid",
+      "Khlieh Lyngkhoi",
+      "Kynrut",
+      "Kynshi",
+      "Laitdombah",
+      "Langtor",
+      "Lawbyrtun",
+      "Lyngkhoi",
+      "Madanbynther",
+      "Mairang",
+      "Manai",
+      "Mawkarah",
+      "Mawshut",
+      "Myriaw",
+      "Nongkhlaw",
+      "Nongthliew",
+      "Nongum",
+      "Pariong",
+      "Tiehnongbah",
+      "Umkrem",
+      "Umthlong"
+    ]
+  ],
+  "793121": [
+    "East Khasi Hills",
+    "Meghalaya",
+    [
+      "Lyngiong",
+      "Madan Bitaw",
+      "Marbisu",
+      "Mawkriah",
+      "Mawngap",
+      "Mawphlang",
+      "Mawpun",
+      "Mawreng",
+      "Mawtiehbah",
+      "Nongspung",
+      "Pongkung",
+      "Rangshken",
+      "Sohpian",
+      "Tyrsad",
+      "Weiloi"
+    ]
+  ],
+  "793122": ["Ri Bhoi", "Meghalaya", ["Ucc"]],
+  "793123": ["Ri Bhoi", "Meghalaya", ["Umsaw"]],
+  "793126": [
+    "West Khasi Hills",
+    "Meghalaya",
+    ["Langdongdai", "Mawthengkut", "Riangdo Bazar", "Seinduli", "Shallang", "Umsohpieng"]
+  ],
+  "793150": [
+    "West Jaintia Hills",
+    "Meghalaya",
+    [
+      "Barato",
+      "Iawthymmai",
+      "Jarain",
+      "Jowai",
+      "Kyndong Tuber",
+      "Laskein",
+      "Mawkaiaw",
+      "Mawkyndeng",
+      "Mihmyntdu",
+      "Mupyut",
+      "Mustem",
+      "Mynso",
+      "Nongbah",
+      "Nongryngkoh",
+      "Pdengshakap",
+      "Raliang",
+      "Sahsniang",
+      "Shangpung",
+      "Sohmynting",
+      "Thadmuthlong",
+      "Thangrain",
+      "Trangblang",
+      "Yalang",
+      "Yooksi"
+    ]
+  ],
+  "793151": [
+    "West Jaintia Hills",
+    "Meghalaya",
+    [
+      "Khanduli",
+      "Mawbakhon",
+      "Mawdymmai",
+      "Mookynniang",
+      "Mynsngad",
+      "Namdong",
+      "Nartiang",
+      "Nongjngi",
+      "Saitsama",
+      "Thadlaskein",
+      "Umladang",
+      "Ummulong",
+      "Wahiajer"
+    ]
+  ],
+  "793160": [
+    "East Jaintia Hills",
+    "Meghalaya",
+    [
+      "Bataw",
+      "Ladrymbai",
+      "Mukhialong",
+      "Musniang",
+      "Rymbai",
+      "Sham Sham",
+      "Sohkymphor",
+      "Tuber Kmaishnong",
+      "Wapung"
+    ]
+  ],
+  "793161": [
+    "West Jaintia Hills",
+    "Meghalaya",
+    [
+      "Amlarem",
+      "Amlari",
+      "Jarain",
+      "Nongbareh",
+      "Padu",
+      "Pdengshakap",
+      "Thangbuli",
+      "Trangblang"
+    ]
+  ],
+  "793200": [
+    "East Jaintia Hills",
+    "Meghalaya",
+    [
+      "Huroi",
+      "Khliehriat",
+      "Mualsei",
+      "Myndihati",
+      "Pala",
+      "Saipung",
+      "Sheruphie",
+      "Shnongrim",
+      "Sutnga",
+      "Umkiang"
+    ]
+  ],
+  "793210": [
+    "East Jaintia Hills",
+    "Meghalaya",
+    [
+      "Chiruphi",
+      "Huroi",
+      "Khatdum",
+      "Lumshnong",
+      "Rata Cherra",
+      "Ratacherra",
+      "Sonapur",
+      "Umkiang"
+    ]
+  ],
+  "794001": ["West Garo Hills", "Meghalaya", ["Tura"]],
+  "794002": [
+    "West Garo Hills",
+    "Meghalaya",
+    [
+      "Achitchonggiri",
+      "Anugiri",
+      "Bajengdoba",
+      "Bolsong",
+      "Dajongpara",
+      "Edenbari Rongkhon",
+      "Gabil",
+      "Jingjal",
+      "Lower Chandmari",
+      "Matchakgiri",
+      "Mendal",
+      "Raja Apal",
+      "Raribazar",
+      "Rongkhon",
+      "Rongram"
+    ]
+  ],
+  "794003": ["West Garo Hills", "Meghalaya", ["Dadengiri", "Rom Bazar"]],
+  "794005": [
+    "West Garo Hills",
+    "Meghalaya",
+    [
+      "Bolchugre",
+      "Chokpotgiri",
+      "Dekubazar",
+      "Dhopgiri",
+      "Dobasipara",
+      "Gambigre",
+      "Gongrengiri",
+      "Shankinigiri"
+    ]
+  ],
+  "794101": [
+    "West Garo Hills",
+    "Meghalaya",
+    ["Araimile", "Captain Reserve", "Dakopgiri"]
+  ],
+  "794102": [
+    "South Garo Hills",
+    "Meghalaya",
+    [
+      "Baghmara",
+      "Balkhalbazar",
+      "Balsalgiri",
+      "Emangiri",
+      "Mendikgiri",
+      "Nilwalgiri",
+      "Panda",
+      "Siju"
+    ]
+  ],
+  "794103": [
+    "West Garo Hills",
+    "Meghalaya",
+    [
+      "Barengapara",
+      "Chandabhui",
+      "Chati",
+      "Chengapara",
+      "Dimapara",
+      "Gachuapara",
+      "Ganchudari",
+      "Halchati",
+      "Joshipara",
+      "Kapasipara",
+      "Kharapara",
+      "Killapara",
+      "Mihanpara",
+      "Purakhasia",
+      "Rimrangapara",
+      "Sasengpara",
+      "Sibbari",
+      "Silkhigiri"
+    ]
+  ],
+  "794104": [
+    "West Garo Hills",
+    "Meghalaya",
+    [
+      "Batabari",
+      "Bhaitbari",
+      "Bhajamara",
+      "Bholarbhita",
+      "Bikonggre",
+      "Fulbari",
+      "Gatsingbazar",
+      "Gumaijhora",
+      "Haripur",
+      "Holidayganj",
+      "Manlakandi",
+      "Mechanpani",
+      "New Bhaitbari",
+      "Paham",
+      "Rajabala",
+      "Rombazar",
+      "Rongmatchokgiri",
+      "Sabribari",
+      "Shyamnagar"
+    ]
+  ],
+  "794105": [
+    "West Garo Hills",
+    "Meghalaya",
+    [
+      "Damalgiri",
+      "Garobadha",
+      "Garodoba",
+      "Grenggandi Agal",
+      "Haldibari",
+      "Kalchengapara",
+      "Melliam",
+      "Monabari",
+      "Mukhdangra",
+      "Okkapara",
+      "Rongsakhona",
+      "Selsella",
+      "Teporpara",
+      "Zekabari"
+    ]
+  ],
+  "794106": [
+    "South West Garo Hills",
+    "Meghalaya",
+    [
+      "Balurghat",
+      "Chapahati",
+      "Gopinath Killa",
+      "Kalaipara",
+      "Kawahagra",
+      "Mahendraganj",
+      "Majerchar",
+      "Nogorpara"
+    ]
+  ],
+  "794107": ["South Garo Hills", "Meghalaya", ["Jadigitim", "Nangwalbibra"]],
+  "794108": [
+    "North Garo Hills",
+    "Meghalaya",
+    ["Dagal", "Daram", "Haluapara", "Resubelpara", "Rongrong", "Thapa"]
+  ],
+  "794109": [
+    "West Garo Hills",
+    "Meghalaya",
+    [
+      "Belguri",
+      "Bolangitak",
+      "Borjhora",
+      "Halloidanga",
+      "Hatugaon",
+      "Jengrapara",
+      "Pedaldoba",
+      "Photamati",
+      "Raksamgiri",
+      "Tikrikilla"
+    ]
+  ],
+  "794110": [
+    "East Garo Hills",
+    "Meghalaya",
+    [
+      "Dabu",
+      "Dainadubi",
+      "Darugiri",
+      "Dokangsi",
+      "Gairong",
+      "Gambil",
+      "Mangsang",
+      "Nongcharan",
+      "Ronga Agal",
+      "Rongchek Akhong",
+      "Rongjeng",
+      "Rongmil",
+      "Wagachi"
+    ]
+  ],
+  "794111": [
+    "East Garo Hills",
+    "Meghalaya",
+    [
+      "Balkinigiri",
+      "Dawagre",
+      "Rombagiri",
+      "Rongrengiri",
+      "Rongsakgiri",
+      "Sakhadamgiri",
+      "Samanda",
+      "Songsak",
+      "Williamnagar"
+    ]
+  ],
+  "794112": ["West Garo Hills", "Meghalaya", ["Mendipathar"]],
+  "794114": [
+    "South Garo Hills",
+    "Meghalaya",
+    ["Dambuk Agal", "Mahesh Khola", "Rongra", "Warimagiri"]
+  ],
+  "794115": [
+    "South West Garo Hills",
+    "Meghalaya",
+    [
+      "Ampati",
+      "Bandelkona",
+      "Betsing",
+      "Kalaichar",
+      "Katuli",
+      "Salmanpara",
+      "Sulguri",
+      "Zigzak"
+    ]
+  ],
+  "795001": [
+    "Imphal West",
+    "Manipur",
+    [
+      "D.M College",
+      "Imphal",
+      "Imphal Bazar",
+      "Khoyathong",
+      "Manipur High Court",
+      "Soibam Leikai"
+    ]
+  ],
+  "795002": [
+    "Imphal West",
+    "Manipur",
+    [
+      "Ahallup",
+      "Awangpotsangbam",
+      "Heingang",
+      "Karakhul",
+      "Khongampat",
+      "Khurukhul",
+      "Konthakhabam",
+      "Loitang Leikinthabi",
+      "Luwangsangbam",
+      "Mantripukhri",
+      "Tendongyang"
+    ]
+  ],
+  "795003": [
+    "Imphal West",
+    "Manipur",
+    [
+      "Canchipur",
+      "Kunja (P)",
+      "Kyamgei",
+      "Langthabal",
+      "Manipur University",
+      "Mongsangei",
+      "Ningombam"
+    ]
+  ],
+  "795004": [
+    "Imphal West",
+    "Manipur",
+    [
+      "Central Agriculture University",
+      "Iroisemba",
+      "Lamboi Khongngangkhong",
+      "Lamphelpat",
+      "Langol Housing Complex",
+      "Naoremthong Bazar",
+      "Sagolband Thingom Leikai",
+      "Sayang Kuraomakhong",
+      "Tera Bazar"
+    ]
+  ],
+  "795005": [
+    "Imphal East",
+    "Manipur",
+    [
+      "Awang Kongpal",
+      "Khurai Khongnang Makhong",
+      "Kshetribangoon",
+      "Kshetrigao",
+      "Moirang Kampu",
+      "Porompat",
+      "Takhel"
+    ]
+  ],
+  "795006": [
+    "Pherzawl",
+    "Manipur",
+    [
+      "Aibulon",
+      "Bukpi",
+      "Bungmual",
+      "Bungpilon",
+      "Geljang",
+      "Hanship",
+      "Khajang",
+      "Kwanpui",
+      "Leijangphai",
+      "Leisan",
+      "Leison",
+      "Lingshiphai",
+      "Milongmun",
+      "Mission Compound",
+      "Mualkoi",
+      "New Lamka",
+      "Pamjal",
+      "Panglian",
+      "Parbung",
+      "Pearsonmun",
+      "Phaijang",
+      "Pherzawl",
+      "Sawaiphaih (T/C/D)",
+      "Senvon",
+      "Singjawl",
+      "Singzawl",
+      "Taithu",
+      "Takvom",
+      "Thanlon",
+      "Tingsong",
+      "Tipaimukh (P)",
+      "Tuabung"
+    ]
+  ],
+  "795007": [
+    "Senapati",
+    "Manipur",
+    [
+      "Karong",
+      "Lairouching",
+      "Oinam Hills",
+      "Rajamei",
+      "Thingba Khullen",
+      "Thingba Khunou",
+      "Willong",
+      "Yangkhullen"
+    ]
+  ],
+  "795008": [
+    "Imphal East",
+    "Manipur",
+    [
+      "Irilbung",
+      "Keirao Bitra Salam",
+      "Keirao Makting",
+      "Keirao Wangkhem",
+      "Khongangpheidekpi",
+      "Kitnapanung",
+      "Kongba Bazar",
+      "Laiphrak Maring",
+      "Mongkhang Lambi",
+      "Oinam Thingel",
+      "Singjamei",
+      "Uchekon"
+    ]
+  ],
+  "795009": [
+    "Imphal West",
+    "Manipur",
+    [
+      "Bitrarakhong",
+      "Haoreibi",
+      "Hiyangthang",
+      "Irom Meijrao",
+      "Kodompokpi",
+      "Paobitek",
+      "Samurou",
+      "Wangoi"
+    ]
+  ],
+  "795010": [
+    "Imphal East",
+    "Manipur",
+    [
+      "Chingmang",
+      "Heinoumakhong",
+      "Huidrom",
+      "Kameng Kakching",
+      "Laikoiching",
+      "Lamlai",
+      "Lamlong",
+      "Moirang Purel",
+      "Ningthemchakhul",
+      "Nongada",
+      "Nongdam Tangkhul",
+      "Phaknung",
+      "Sawombung",
+      "Tangkhul Hungdung",
+      "Taretkhul",
+      "Yourbung"
+    ]
+  ],
+  "795011": [
+    "Bishnupur",
+    "Manipur",
+    ["Haotak Khullen", "Naransena", "Ningthoukhong", "Phubala", "Potsangbam", "Thinungei"]
+  ],
+  "795101": [
+    "Chandel",
+    "Manipur",
+    [
+      "Aigejang",
+      "Chairen",
+      "Julbalching",
+      "K. Molnam",
+      "Khambathel",
+      "Khongnangpheisabi",
+      "Longja",
+      "M Bongmol",
+      "Mahou Tera",
+      "Sangaikot",
+      "Sehao",
+      "Semol",
+      "Serou",
+      "Shahumphai",
+      "Sugnu",
+      "Zoupi"
+    ]
+  ],
+  "795102": [
+    "Chandel",
+    "Manipur",
+    [
+      "Anal Khullen",
+      "Chakpikarong",
+      "Gobok",
+      "Khengjoi",
+      "Khubung Khullen",
+      "Monbi",
+      "Phiran Machet",
+      "Sajik Tampak",
+      "Thorchom",
+      "Toupokpi"
+    ]
+  ],
+  "795103": [
+    "Kakching",
+    "Manipur",
+    [
+      "Arong Nongmaikhong",
+      "Elangkhangpokpi",
+      "Hiyanglam",
+      "K M College",
+      "Kakching",
+      "Kakching Khunou",
+      "Kakching Lamkhai",
+      "Kalikalok",
+      "Keirak",
+      "Khudei Khunou",
+      "Langmeidong",
+      "Leingangching",
+      "Mairembam",
+      "Mantak",
+      "Pangaltabi",
+      "Purum Pantha",
+      "Sora",
+      "Tokpaching",
+      "Wabagai",
+      "Waikhong",
+      "Wangoo Laipham"
+    ]
+  ],
+  "795104": [
+    "Senapati",
+    "Manipur",
+    [
+      "Chawanamei",
+      "Chingai Khullen",
+      "Kaibi",
+      "Laii",
+      "Liyai",
+      "Liyai Khunou",
+      "Paomata Centre",
+      "Phaibung Khullen",
+      "Saranamei",
+      "Siraffi",
+      "Tadubi",
+      "Tungjoy"
+    ]
+  ],
+  "795105": [
+    "Senapati",
+    "Manipur",
+    [
+      "Khongdei Simphung",
+      "Koide",
+      "Lakhamei",
+      "Maiba",
+      "Makhan Bazar",
+      "Maram",
+      "Ngari Khullen",
+      "Phuba",
+      "Purul"
+    ]
+  ],
+  "795106": ["Senapati", "Manipur", ["Oklong", "Senapati", "Tumuyen Khullen"]],
+  "795107": [
+    "Kangpokpi",
+    "Manipur",
+    [
+      "J Phaijang",
+      "Motbung",
+      "N. Khenjang",
+      "Nurathel",
+      "S.Bolkot",
+      "Saitu",
+      "Sapermeina",
+      "Thingsat"
+    ]
+  ],
+  "795112": [
+    "Kangpokpi",
+    "Manipur",
+    ["Chalwa (P)", "Cheljang", "Ganel", "Irang", "Kolhen", "T Waichong", "Thengjang"]
+  ],
+  "795113": [
+    "Imphal West",
+    "Manipur",
+    [
+      "CRPF Camp Langjing",
+      "Haorang Kairel",
+      "Khamnam Bazar",
+      "Khumbong Bazar",
+      "Kongakhul",
+      "Konthoujam",
+      "Langjing Achouba",
+      "Longa Koireng",
+      "Maklang Bazar",
+      "Natok Kabui",
+      "New Keithelmanbi",
+      "Ngairangbam",
+      "Patsoi Part II",
+      "Sagoltongba Bazar",
+      "Tairenpokpi",
+      "Takyel Khongbal",
+      "Tharoijam",
+      "Yurembam"
+    ]
+  ],
+  "795114": [
+    "Imphal East",
+    "Manipur",
+    [
+      "Dolaithabi",
+      "Haraorou",
+      "Kairang Litan Makhong",
+      "Khongbal Tangkhul",
+      "Khumidok (P)",
+      "Liklikhong Bazar",
+      "Mapao Keithelmanbi",
+      "Pngaei Yangdong",
+      "Pukhao Ahallup",
+      "Sagolmang",
+      "Satang",
+      "Thangal Surung",
+      "Uyumpok",
+      "Waiton",
+      "Wakhen Phai",
+      "Yumnam Khunou"
+    ]
+  ],
+  "795115": [
+    "Jiribam",
+    "Manipur",
+    [
+      "Bidyanagar",
+      "BR Colony",
+      "Gularthol",
+      "Kashimpur",
+      "Keimai",
+      "Lalkhan",
+      "New Keiphundai",
+      "Ngamphabung",
+      "Nungkao"
+    ]
+  ],
+  "795116": [
+    "Jiribam",
+    "Manipur",
+    [
+      "Bongmun",
+      "Borobekra",
+      "Champanagar",
+      "Chingmun",
+      "Chongmun",
+      "Jakurdhar",
+      "Jiribam Bazar",
+      "Kh Jaikhan",
+      "Latingkhal",
+      "Longpi",
+      "Patpuimun",
+      "Phaibok Mullen",
+      "Sonapur",
+      "Suangpuimun",
+      "Tuitengmun"
+    ]
+  ],
+  "795117": [
+    "Churachandpur",
+    "Manipur",
+    ["Khouwpuibung", "Mual Vaiphei", "Saikot", "Tuikham", "Tuining", "Tuitengphai"]
+  ],
+  "795118": [
+    "Kangpokpi",
+    "Manipur",
+    [
+      "Bunglong",
+      "Dolang",
+      "Galam",
+      "Gangpijang",
+      "Ichaigojang",
+      "Jangnoi",
+      "Makeng Ngarolu",
+      "Makokchung",
+      "Molkon",
+      "Mutukhong",
+      "Pangjang",
+      "Phaikon",
+      "Saikul",
+      "Sangpei Khullen",
+      "T. Awkhumbung",
+      "Tingpibung",
+      "Zelengphai"
+    ]
+  ],
+  "795122": [
+    "Kangpokpi",
+    "Manipur",
+    [
+      "Chandraman",
+      "Haipi",
+      "Kalapahar",
+      "Keithelmanbi",
+      "Kheljang",
+      "Persian",
+      "Thanamba",
+      "Tokpa"
+    ]
+  ],
+  "795124": [
+    "Churachandpur",
+    "Manipur",
+    [
+      "Charoi Khullel",
+      "Jiban Nager",
+      "Leimatak",
+      "Loktak Project",
+      "Mayuran",
+      "Sadukhoiroi",
+      "Tokpalamdan"
+    ]
+  ],
+  "795125": [
+    "Tamenglong",
+    "Manipur",
+    [
+      "Atang Khunou",
+      "Chaiton",
+      "Dullen (T/C/D)",
+      "Illong",
+      "Jampii (T/C/D)",
+      "Kadi",
+      "Kasanlong",
+      "Khumphung",
+      "Kuilong",
+      "Lemta",
+      "Lenglong",
+      "Magulong",
+      "New Lamlaba",
+      "Takou",
+      "Tamei",
+      "Upper Selsi (T/C/D)"
+    ]
+  ],
+  "795126": [
+    "Noney",
+    "Manipur",
+    [
+      "Bishnupur",
+      "Dolang",
+      "Dolang Khunou",
+      "Khoijuman",
+      "Khongbung",
+      "Khoupum",
+      "Khunpi Naosem",
+      "Lamdangmei",
+      "Ngaikhong Khullen",
+      "Ngarian",
+      "Nungsai Chiru",
+      "Thangal",
+      "Toubul",
+      "Zouzangtek"
+    ]
+  ],
+  "795127": [
+    "Chandel",
+    "Manipur",
+    ["Chandel", "Duthang", "Larong", "Liwasarai", "Mittong"]
+  ],
+  "795128": [
+    "Churachandpur",
+    "Manipur",
+    [
+      "Aina",
+      "Chehjang",
+      "Chingkonpang",
+      "Chothemunpi",
+      "Churachandpur",
+      "Geljang",
+      "Hamkeilon",
+      "Henglep",
+      "Kamkeilon",
+      "Kangvai Bazar",
+      "Khanpi",
+      "Kolhen",
+      "Kumbipukhri",
+      "Kwanpui",
+      "Lailong",
+      "Lungsai",
+      "Lungshung",
+      "M.Songel",
+      "Mission Compound",
+      "Munpi",
+      "Phaipheng",
+      "Saiden",
+      "Saikhul Village",
+      "Sangphou",
+      "Santing",
+      "Sielmet",
+      "South Kotlein",
+      "Takvom",
+      "Teiyong",
+      "Thangshi",
+      "Thinkew",
+      "Tollen",
+      "Tolphei",
+      "Tuinom",
+      "Tulaphei",
+      "Ukha"
+    ]
+  ],
+  "795129": [
+    "Kangpokpi",
+    "Manipur",
+    [
+      "Henbung",
+      "Kangpokpi",
+      "Kangpokpi Mission",
+      "Maohiing",
+      "Maohing",
+      "Taphou",
+      "Thonglang",
+      "Toribari"
+    ]
+  ],
+  "795130": [
+    "Thoubal",
+    "Manipur",
+    [
+      "Arapti",
+      "Chajing Pt. 1",
+      "Haoreibi Mayai Leikai",
+      "Heinoumakhong",
+      "Lairabokhong",
+      "Lilong",
+      "Nungei",
+      "Phunalmaring",
+      "Thiyamkonjil",
+      "Turelahnabi",
+      "Urup"
+    ]
+  ],
+  "795131": [
+    "Tengnoupal",
+    "Manipur",
+    [
+      "Bongajang",
+      "Bongjang",
+      "Changpol",
+      "Gamphajal",
+      "Khenjoi",
+      "Khudengthabi",
+      "Maojam",
+      "Molcham",
+      "Moreh",
+      "New Somtal",
+      "T Bongmun",
+      "T Minou",
+      "Tengnoupal",
+      "Yangoulen"
+    ]
+  ],
+  "795132": [
+    "Imphal West",
+    "Manipur",
+    [
+      "Arong",
+      "Bengoon Maning Leikai",
+      "Chabung Company",
+      "Chirai Muslim",
+      "Hayel Hangoon",
+      "Heibong Makhong",
+      "Irong Chessaba",
+      "Irong Umang Khunou",
+      "Khelakhong Khongjil",
+      "Komlakhong",
+      "Laphupat",
+      "Loukok Mayai Leikai",
+      "Maibam Konjil",
+      "Mayang Impahl Bengoon",
+      "Mayang Imphal",
+      "Mutum Phibou",
+      "Phoubakchao",
+      "Santhel",
+      "Sekmaijin",
+      "Sekmaijin Khunou Konuma",
+      "Sekmaijin Khunou Litan Makhong",
+      "Tera Khoidum Mayai Leikai",
+      "Uchiwa",
+      "Uchiwa Wangban"
+    ]
+  ],
+  "795133": [
+    "Bishnupur",
+    "Manipur",
+    [
+      "Boroyangbi",
+      "Bunglon",
+      "Dopkon",
+      "Ethai Bazar",
+      "Gelman (G.Gothal)",
+      "Haotakphailen",
+      "Kangathel",
+      "Khathinungei",
+      "Khoirentak",
+      "Khordak Ichin",
+      "Khousabung",
+      "Kumbi (P)",
+      "Kwakta",
+      "Moirang",
+      "Molphei Tampak",
+      "Nabil (P)",
+      "Ngangkha Louwai",
+      "Nungthangtampak",
+      "Phousabung",
+      "Sagang",
+      "Saiton",
+      "Terakhongshangbi",
+      "Thanga (P)",
+      "Thanga Karang",
+      "Thumkhonglok",
+      "Torbung",
+      "Tronglaobi",
+      "Tuisang Gothal",
+      "Wangoo",
+      "Wangoo Tera"
+    ]
+  ],
+  "795134": [
+    "Bishnupur",
+    "Manipur",
+    [
+      "Awangjiri",
+      "Bungte Chiru",
+      "Heikrujam",
+      "Irengbam",
+      "Isok",
+      "Kabowakching",
+      "Kangmong",
+      "Keinou",
+      "Khabi",
+      "Langpok",
+      "Leimapokpam",
+      "Leimaram",
+      "Maibam",
+      "Manamayang",
+      "Nambol",
+      "Naorem",
+      "Oinam",
+      "Pukhrambam",
+      "Thingkai Khullen",
+      "Utlou",
+      "Yarou Bomdiar"
+    ]
+  ],
+  "795135": [
+    "Tengnoupal",
+    "Manipur",
+    [
+      "Aimol Kodamphai",
+      "Angbrashu",
+      "Bongli",
+      "Chatong",
+      "Chelhep",
+      "Kambang Khunou",
+      "Khangbarol",
+      "Kharou Khullen",
+      "Khoibu",
+      "Khousat (T/C/D)",
+      "Khudei Khullen",
+      "Khunbi",
+      "Laiching Tangsang",
+      "Lamkang Khunou",
+      "Lamlong Khullen",
+      "Lamlong Khunou",
+      "Leibi",
+      "Liwachangning",
+      "Machi",
+      "Minou Khunjao",
+      "Molhang",
+      "Moltek",
+      "Narum",
+      "Pallel",
+      "Saibhom",
+      "Sita",
+      "Songjang",
+      "Thamnapokpi"
+    ]
+  ],
+  "795136": [
+    "Imphal West",
+    "Manipur",
+    [
+      "Awang Leikinthabi",
+      "Ch. Khongnangpokpi",
+      "Kanglatombi",
+      "Luwangsangol",
+      "Makhan",
+      "Potsangbam Khoiru",
+      "Sekmai"
+    ]
+  ],
+  "795138": [
+    "Thoubal",
+    "Manipur",
+    [
+      "Athokpam",
+      "Athokpam Khunou",
+      "Charangpat",
+      "Haokha",
+      "Irong Thokchom (T/C/D)",
+      "Keibung Mamang",
+      "Khangabok",
+      "Khekman",
+      "Kiyam Siphai",
+      "Kshetri Leikai",
+      "Moijing",
+      "Okram Wangmataba",
+      "Phoudel",
+      "Poirou Kongjil",
+      "Sabaltongba",
+      "Thoubal",
+      "Thoubal Block (T/C/D)",
+      "Thoubal Khunou",
+      "Thoubal Leisangthem",
+      "Thoubal Ningombam",
+      "Wangbal"
+    ]
+  ],
+  "795139": [
+    "Churachandpur",
+    "Manipur",
+    [
+      "Behiang",
+      "Hengtam",
+      "Kangkap",
+      "Lama Camp",
+      "Lungchin",
+      "Lungthul (L.Daijang)",
+      "Mualmun",
+      "Siabu",
+      "Singhat",
+      "Songtal",
+      "Suangdoh",
+      "Vokbual"
+    ]
+  ],
+  "795140": [
+    "Imphal West",
+    "Manipur",
+    ["Laiphrakom", "Sangaiprou", "Tulihal", "Yarou Mitram"]
+  ],
+  "795141": [
+    "Tamenglong",
+    "Manipur",
+    [
+      "Akhui",
+      "Atengba",
+      "Bhalok",
+      "Bongoijang",
+      "Dailong",
+      "Farmland",
+      "Kahulong",
+      "Keikao",
+      "Khongjaron",
+      "Khongjaron Khunthak",
+      "Longpram",
+      "Namtiram",
+      "New Pallong",
+      "Songpram",
+      "Tamenglong",
+      "Tamenglong Khunjao",
+      "Tharon",
+      "Thuilon",
+      "Tousem",
+      "Wairengba"
+    ]
+  ],
+  "795142": [
+    "Ukhrul",
+    "Manipur",
+    [
+      "Chamu",
+      "Chingai (P)",
+      "Chingjaroi (P)",
+      "Chither (P)",
+      "Huining",
+      "Hundung",
+      "Jessami",
+      "Kagai",
+      "Khamasom",
+      "Kharasom",
+      "Khayang",
+      "Lamlang Gate",
+      "Mapum",
+      "Ngaimu",
+      "Nungbi Khunou",
+      "Nungshang",
+      "Paorei",
+      "Paoyii",
+      "Phungcham",
+      "Poii",
+      "Pushing",
+      "Rajai Khunou",
+      "Sirarakhong",
+      "Siroi",
+      "Soraphung",
+      "T.C.Compound",
+      "Tolloi",
+      "Tuinem",
+      "Tungou",
+      "Tushem",
+      "Ukhrul"
+    ]
+  ],
+  "795144": ["Ukhrul", "Manipur", ["Huime", "Kachai", "Phadang", "Somdal", "Thiwa"]],
+  "795145": [
+    "Kamjong",
+    "Manipur",
+    [
+      "Aishi",
+      "Chadong",
+      "Chassad",
+      "Grihang",
+      "Kongpat Khunou",
+      "L Tangkhul",
+      "Lambui",
+      "Leiting",
+      "Litan",
+      "Lungphu",
+      "Maku",
+      "Maokot",
+      "Phungyar",
+      "Sanakeithel",
+      "Semol",
+      "Shangsak",
+      "Siyamongjang",
+      "Sorde",
+      "Thawai",
+      "Yaingangpokpi"
+    ]
+  ],
+  "795146": [
+    "Imphal West",
+    "Manipur",
+    [
+      "Christian Centre Haochong",
+      "Heibongpokpi",
+      "Ijairong",
+      "Irengnaga",
+      "Kangchup Chiru",
+      "Kangchup Hill (P)",
+      "Kangchup Makhong",
+      "Karam Vaiphei",
+      "Khungdong Khungkhaiba",
+      "Lairen Sajik",
+      "Lamdeng",
+      "Lamsang",
+      "Mayang Langjing",
+      "Oktan",
+      "Phayeng",
+      "Ponlian"
+    ]
+  ],
+  "795147": [
+    "Noney",
+    "Manipur",
+    ["Kambiron", "Khongsang", "Mukti Khullen", "Nungba", "Rengpang", "Sibilong"]
+  ],
+  "795148": [
+    "Thoubal",
+    "Manipur",
+    [
+      "Cherapur",
+      "Heirok Part 2",
+      "Herok Part 1",
+      "Karongthel",
+      "Khongjom",
+      "Langathel",
+      "Phundrei",
+      "Puleipokpi",
+      "Salungpham",
+      "Samaram",
+      "Sangaiyumpham",
+      "Sapam Salai",
+      "Tekcham",
+      "Tentha",
+      "Tollen",
+      "Wangjing"
+    ]
+  ],
+  "795149": [
+    "Kangpokpi",
+    "Manipur",
+    [
+      "Andro",
+      "Angtha",
+      "Bongbal Khullen",
+      "Changamdabi",
+      "Haokhongching",
+      "Heinganglok",
+      "Huikap",
+      "Irong Tangkhul",
+      "Kamu Tampak",
+      "Kamu Tongnom",
+      "Kamuching",
+      "Kasom Khullen",
+      "Khoirom",
+      "Khonglou Vaiphei (T/C/D)",
+      "Lembakhul",
+      "Lourembam",
+      "Lungthar",
+      "Mollen (T/C/D)",
+      "Nambasi",
+      "Ningthounai",
+      "Nongpok Sekmai",
+      "Phouoibi",
+      "Saram Patong",
+      "Soichang",
+      "Theiyong",
+      "Top Chingtha",
+      "Yairipok",
+      "Yairipok Tulihal",
+      "Yambem Laxmi Bazar"
+    ]
+  ],
+  "795150": ["Senapati", "Manipur", ["Mao", "Pfukhro", "Phunanamei", "Pudunamei"]],
+  "795159": [
+    "Noney",
+    "Manipur",
+    [
+      "Awangkhul",
+      "Charoi Tupul",
+      "Haochong",
+      "Karuangmuan (Nungtek)",
+      "Lukhambi",
+      "Nagaching",
+      "New Kabui Khullen",
+      "None",
+      "Nungnang",
+      "Thingra"
+    ]
+  ],
+  "796001": ["Aizawl", "Mizoram", ["Aizawl", "Dawrpui"]],
+  "796004": ["Aizawl", "Mizoram", ["Mizoram University"]],
+  "796005": [
+    "Aizawl",
+    "Mizoram",
+    [
+      "Bungkawn",
+      "College Veng",
+      "Hualngohmun",
+      "Kelsih",
+      "Khawchhete",
+      "Kulikawn",
+      "Maubawk",
+      "Missionvengthlang",
+      "Muallungthu",
+      "Mualmawi",
+      "Mualpui",
+      "N.Lungleng",
+      "New Secretariat Complex",
+      "Republic Veng",
+      "S,Hlimen",
+      "Sabualkawn",
+      "Thakthingbazar",
+      "Thingdawlmelriat"
+    ]
+  ],
+  "796007": [
+    "Aizawl",
+    "Mizoram",
+    [
+      "Armed Veng",
+      "Bethlehem",
+      "Chandmary",
+      "Edenthar",
+      "Electric Veng",
+      "Ramthar",
+      "Tuithiang"
+    ]
+  ],
+  "796008": ["Aizawl", "Mizoram", ["Armed Veng"]],
+  "796009": [
+    "Aizawl",
+    "Mizoram",
+    [
+      "Chawlhhmun",
+      "Dinthar",
+      "Govt. Complex",
+      "Luangmual",
+      "Rangvamual",
+      "Sakawrtuichhun",
+      "Tanhril",
+      "Vaivakawn"
+    ]
+  ],
+  "796012": ["Aizawl", "Mizoram", ["Chaltlang", "Ramhlun"]],
+  "796014": ["Aizawl", "Mizoram", ["Bawngkawn", "Durtlang", "Sihphir"]],
+  "796015": [
+    "Aizawl",
+    "Mizoram",
+    ["Durtlang", "Lungdai", "Muthi", "Selesih", "Tlangnuam", "Zanlawn"]
+  ],
+  "796017": [
+    "Aizawl",
+    "Mizoram",
+    [
+      "Cti Sesawng",
+      "Kepran",
+      "Khanpui",
+      "Khawruhlian",
+      "Phaileng 'E'",
+      "Putlungasih",
+      "Sawleng",
+      "Sesawng",
+      "Tuirial Airfield",
+      "Zemabawk",
+      "Zuangtui"
+    ]
+  ],
+  "796036": ["Aizawl", "Mizoram", ["Sihphir"]],
+  "796070": [
+    "Kolasib",
+    "Mizoram",
+    [
+      "Bualpui",
+      "Bukpui",
+      "Hortoki",
+      "Kawnpui",
+      "Lungmuat",
+      "Mualvum",
+      "N.Chaltlang",
+      "N.Hlimen",
+      "Nisapui",
+      "Serkhan",
+      "Thingthelh"
+    ]
+  ],
+  "796075": ["Kolasib", "Mizoram", ["Thingdawl"]],
+  "796081": [
+    "Kolasib",
+    "Mizoram",
+    [
+      "Bairabi",
+      "Builum",
+      "Chuhvel",
+      "Diakkawn",
+      "Kolasib",
+      "Saikhawthlir",
+      "Suarhliap",
+      "Thingdawl",
+      "Vengthar"
+    ]
+  ],
+  "796091": [
+    "Kolasib",
+    "Mizoram",
+    [
+      "Bilkhawthlir",
+      "Buhchang",
+      "N.Chawnpui",
+      "Phaisen",
+      "Saiphai",
+      "Saipum",
+      "Tuirial H.E.P"
+    ]
+  ],
+  "796101": ["Kolasib", "Mizoram", ["Phainuam", "Vairengte"]],
+  "796111": [
+    "Aizawl",
+    "Mizoram",
+    [
+      "Darlawn",
+      "Khawpuar",
+      "Lungsum",
+      "Mauchar",
+      "N.Serzawl",
+      "N.Tinghmun",
+      "New Vervek",
+      "Palsang",
+      "Ratu",
+      "Sailutar",
+      "Sakawrdai",
+      "Thingsat",
+      "Vaitin",
+      "Vervek",
+      "Zohmun"
+    ]
+  ],
+  "796161": [
+    "Serchhip",
+    "Mizoram",
+    [
+      "Baktawng",
+      "Chhingchhip",
+      "Hmuntha",
+      "Hualtu",
+      "Khawbel",
+      "Khumtung",
+      "Seling",
+      "Thentlang",
+      "Thingsulthliah",
+      "Tlungvel"
+    ]
+  ],
+  "796181": [
+    "Serchhip",
+    "Mizoram",
+    [
+      "Bungtlang 'N'",
+      "Chekawn",
+      "Chhiahtlang",
+      "Chhipphir",
+      "Kanghmun 'S'",
+      "Keitum",
+      "Khawlailung",
+      "Lungpho",
+      "New Serchhip",
+      "Serchhip",
+      "Sialhau",
+      "Thinglian",
+      "Zote 'S'"
+    ]
+  ],
+  "796184": [
+    "Serchhip",
+    "Mizoram",
+    ["Lungchhuan", "Lungkawlh", "N. Vanlaiphai", "Sialsir"]
+  ],
+  "796186": [
+    "Serchhip",
+    "Mizoram",
+    ["Chhipphir", "Kanghmun 'S'", "Ramlaitui", "Thenzawl", "Zote South"]
+  ],
+  "796190": [
+    "Aizawl",
+    "Mizoram",
+    [
+      "Aibawk",
+      "Hmuifang",
+      "Lamchhip",
+      "Maubuang",
+      "Phulpui",
+      "Sailam",
+      "Samlukhai",
+      "Sateek",
+      "Sialsuk",
+      "Sumsuih",
+      "Tachhip",
+      "Thiak"
+    ]
+  ],
+  "796230": ["Aizawl", "Mizoram", ["Sialsuk"]],
+  "796261": [
+    "Saitual",
+    "Mizoram",
+    [
+      "Aiduzawl",
+      "Buhban",
+      "Changzawl",
+      "Keifang",
+      "Khawlian",
+      "Luangpawn",
+      "Lungpher 'N'",
+      "Maite",
+      "Mualpheng",
+      "N.E.Bualpui",
+      "N.Khawlek",
+      "Pawlrang",
+      "Phuaibuang",
+      "Phullen",
+      "Ruallung",
+      "Saichal",
+      "Saitual",
+      "Sihfa",
+      "Suangpuilawn",
+      "Tualbung",
+      "Vanbawng",
+      "Zawngin"
+    ]
+  ],
+  "796290": [
+    "Saitual",
+    "Mizoram",
+    [
+      "Hrianghmun",
+      "Kawlbem",
+      "Khawkawn",
+      "Lamzawl",
+      "Mimbung",
+      "Ne Khawdungsei",
+      "Ngopa",
+      "Selam",
+      "Teikhang"
+    ]
+  ],
+  "796310": [
+    "Khawzawl",
+    "Mizoram",
+    [
+      "Chalrang",
+      "Chawngtlai",
+      "Chhawrtui",
+      "Dulte",
+      "Kawlkulh",
+      "Khawhai",
+      "Khawzawl",
+      "Lungtan",
+      "N.Chalrang",
+      "Neihdawn",
+      "Ngaizawl",
+      "Puilo",
+      "Riangtlei",
+      "Rullam",
+      "Tualpui",
+      "Tualte",
+      "Vanchengpui",
+      "Vangtlang"
+    ]
+  ],
+  "796320": [
+    "Champhai",
+    "Mizoram",
+    [
+      "Bungzung",
+      "Dungtlang",
+      "Farkawn",
+      "Khuangthing",
+      "Leithum",
+      "Muallung",
+      "S.Khawbung",
+      "Samthang",
+      "Sazep",
+      "Vangchhia",
+      "Vanzau",
+      "Vaphai"
+    ]
+  ],
+  "796321": [
+    "Champhai",
+    "Mizoram",
+    [
+      "Bethel",
+      "Champhai",
+      "Chhawkhlei",
+      "Dilkawn",
+      "Hmunhmeltha",
+      "Hnahlan",
+      "Hruaikawn",
+      "Kelkang",
+      "Khawnuam",
+      "Khuangleng",
+      "Khuangphah",
+      "Leisenzo",
+      "Lungphunlian",
+      "Maulkawi",
+      "Murlen",
+      "N.Khawbung",
+      "Ngur",
+      "Ruantlang",
+      "Sesih",
+      "Tlangsam",
+      "Tualcheng",
+      "Vaikhawtlang",
+      "Vapar",
+      "Vengthlang",
+      "Zokhawthar",
+      "Zote 'e'"
+    ]
+  ],
+  "796370": [
+    "Serchhip",
+    "Mizoram",
+    ["Biate", "Leng", "Lungdar", "Mualcheng", "Sailulak", "Sialhawk", "Tlangpui"]
+  ],
+  "796410": [
+    "Aizawl",
+    "Mizoram",
+    ["Dapchhuah", "Lengpui", "Mualkhang", "Ptc Lungverh", "Rawpuichhip", "Sairang"]
+  ],
+  "796421": ["Aizawl", "Mizoram", ["Hmunpui", "Lengpui Airport"]],
+  "796431": [
+    "Mamit",
+    "Mizoram",
+    [
+      "Damparengpui",
+      "Hnahva",
+      "Khawhnai",
+      "Lallen",
+      "Marpara",
+      "N.Chhippui",
+      "Parvatui",
+      "Phaileng",
+      "Phuldungsei",
+      "Pukzing",
+      "Saithah",
+      "Silsury",
+      "Tuipuibari",
+      "Tuipuibari II"
+    ]
+  ],
+  "796441": [
+    "Mamit",
+    "Mizoram",
+    [
+      "Dampui",
+      "Darlak",
+      "Kawrtethawveng",
+      "Mamit",
+      "N.Sabual",
+      "Serhmun",
+      "Tlangkhang",
+      "Tuidam"
+    ]
+  ],
+  "796470": [
+    "Mamit",
+    "Mizoram",
+    [
+      "Boraibazar",
+      "Hriphaw",
+      "Kanhmunbazar",
+      "Kawrthah",
+      "Lushaicherra",
+      "Momcherra",
+      "Rengdil",
+      "Zamuang",
+      "Zawlnuam"
+    ]
+  ],
+  "796471": ["Mamit", "Mizoram", ["Zawlnuam"]],
+  "796501": [
+    "Mamit",
+    "Mizoram",
+    [
+      "Ailawng",
+      "Darlung",
+      "Kanghmun",
+      "Khawrihnim",
+      "Lungdar 'W'",
+      "Reiek",
+      "Rulpuihlim",
+      "S.Sabual"
+    ]
+  ],
+  "796571": [
+    "Hnahthial",
+    "Mizoram",
+    [
+      "Aithur",
+      "Bualpui H",
+      "Chawngtui",
+      "Cherhlun",
+      "Darzo",
+      "Hnahthial",
+      "Leite",
+      "Lungleng 's'",
+      "Muallianpui",
+      "Pangzawl",
+      "Rawpui",
+      "S.Vanlaiphai",
+      "Tarpho",
+      "Thiltlang",
+      "Thingsai",
+      "Tuipui 'D'"
+    ]
+  ],
+  "796581": ["Hnahthial", "Mizoram", ["Bualpui H", "Thingsai"]],
+  "796691": [
+    "Lunglei",
+    "Mizoram",
+    [
+      "Haulawng",
+      "Hnahchang",
+      "Mualthuam 'N'",
+      "Pukpui",
+      "Ralvawng",
+      "Ramlaitui",
+      "Serkawn",
+      "Zohnuai",
+      "Zotlang"
+    ]
+  ],
+  "796701": [
+    "Lunglei",
+    "Mizoram",
+    [
+      "Belthei",
+      "Bualte",
+      "Buarpui",
+      "Bunghmun",
+      "Chandmary",
+      "Changpui",
+      "Darngawn 'W'",
+      "Hauruang",
+      "Hrangchalkawn",
+      "Kawnpui 'W'",
+      "Kikawn",
+      "Lungchem",
+      "Lunglawn",
+      "Lunglei",
+      "Lungrang 'S'",
+      "Lungsen",
+      "Mualcheng 'S'",
+      "Phairuangkai",
+      "Rangte",
+      "Rualalung",
+      "Sachan",
+      "Sazaikawn",
+      "Sertlangpui",
+      "Sesawm",
+      "Tawipui 'N'",
+      "Tawipui 'S'",
+      "Theiriat",
+      "Thenhlum",
+      "Thingfal",
+      "Thualthu",
+      "Thuampui",
+      "Vaisam",
+      "Vanhne",
+      "Zawlpui",
+      "Zobawk"
+    ]
+  ],
+  "796710": [
+    "Lunglei",
+    "Mizoram",
+    ["Bunghmun", "Darngawn 'W'", "Kawnpui 'W'", "Laisawral", "Sachan", "Sesawm"]
+  ],
+  "796751": [
+    "Lunglei",
+    "Mizoram",
+    [
+      "Diblibagh",
+      "Kajoisury",
+      "Nunsury",
+      "Puankhai",
+      "S.Chawilung",
+      "Tiperaghat",
+      "Tlabung",
+      "Tuichawng",
+      "Tuikawi",
+      "Zodin"
+    ]
+  ],
+  "796770": [
+    "Lunglei",
+    "Mizoram",
+    [
+      "Ajasora",
+      "Borapansury",
+      "Chawngte",
+      "Jarulsury",
+      "Kamalanagar",
+      "Lawngtl",
+      "Saizawh",
+      "Sumsilui",
+      "Udaisury",
+      "Udalthana"
+    ]
+  ],
+  "796772": ["Lawngtlai", "Mizoram", ["Kamalanagar"]],
+  "796810": ["Lawngtlai", "Mizoram", ["Sangau"]],
+  "796891": [
+    "Lawngtlai",
+    "Mizoram",
+    [
+      "Balhlakawn",
+      "Bungtlang 'S'",
+      "Chamdur",
+      "Diltlang",
+      "Karlui",
+      "Kawlchaw 'W'",
+      "Lawngtlai",
+      "Mampui",
+      "Mualbukawn",
+      "New Jagnasury",
+      "Ngengpuikai",
+      "Paithar",
+      "Parva",
+      "Rulkual",
+      "Sabualtlang",
+      "Tuisentlang",
+      "Tuithumhnar",
+      "Vaseitlang",
+      "Vathuampui"
+    ]
+  ],
+  "796901": [
+    "Saiha",
+    "Mizoram",
+    [
+      "Bualpui 'ng'",
+      "Chakhang",
+      "Chapui",
+      "Cheural",
+      "Chhuarlung",
+      "Fungkah",
+      "Khopai",
+      "Laki",
+      "Latawh",
+      "Lawngban",
+      "Lungbun",
+      "Lungpher 'S'",
+      "Lungtian",
+      "New Maubawk",
+      "Niawhtlang",
+      "Pangkhua",
+      "Phura",
+      "Rawmibawk",
+      "Saiha",
+      "Sangau",
+      "Serkawr",
+      "Siata",
+      "Theiva",
+      "Tongkolong",
+      "Tuipang",
+      "Tuipuiferry",
+      "Tuisih",
+      "Vahai",
+      "Vawmbuk",
+      "Zawngling"
+    ]
+  ],
+  "797001": ["Kohima", "Nagaland", ["Kohima"]],
+  "797002": [
+    "Kohima",
+    "Nagaland",
+    ["Jotsoma", "Khonoma", "Kohima Science College", "Mezoma", "Poilwa"]
+  ],
+  "797003": [
+    "Kohima",
+    "Nagaland",
+    ["Chakhabama", "Chedema", "Ciesema", "Dihoma", "Kizocha", "Kohima Village", "Rusoma"]
+  ],
+  "797004": ["Kohima", "Nagaland", ["Meriema", "New Sectt Complex", "Thizama"]],
+  "797006": [
+    "Kohima",
+    "Nagaland",
+    ["Jakhama", "Khuzama", "Kidima", "Kigwema", "Mima", "Viswema"]
+  ],
+  "797099": ["Wokha", "Nagaland", ["Bhandari"]],
+  "797101": ["Peren", "Nagaland", ["Mbaulwa", "N.Song", "Nchongram", "Peren", "Tening"]],
+  "797103": [
+    "Dimapur",
+    "Nagaland",
+    [
+      "Chumukedima",
+      "Khopoanaula",
+      "Mhaikam",
+      "Nihekhu",
+      "P C College",
+      "Pimla",
+      "Tenyiphe"
+    ]
+  ],
+  "797104": [
+    "Phek",
+    "Nagaland",
+    [
+      "Chetheba",
+      "Chozuba",
+      "Dzulhami",
+      "Kilomi",
+      "Phugwu",
+      "Runguzumi",
+      "Thevopesumi",
+      "Yoribami"
+    ]
+  ],
+  "797105": [
+    "Kohima",
+    "Nagaland",
+    ["Botsa", "Chiechama", "Chiephobozou", "Mishilimi", "Tuophema", "Zhadima"]
+  ],
+  "797106": [
+    "Dimapur",
+    "Nagaland",
+    [
+      "Agri College",
+      "Jharnapani",
+      "Khaibung",
+      "Maova",
+      "Medziphema",
+      "Molvom",
+      "Pherima",
+      "Piphima",
+      "Punglwa",
+      "Razaphema",
+      "Sirhima"
+    ]
+  ],
+  "797107": [
+    "Phek",
+    "Nagaland",
+    [
+      "Chizami Town",
+      "Chizami Village",
+      "Khezhakeno",
+      "Kikruma",
+      "Mesolumi",
+      "Pfutsero",
+      "Phesachuduma",
+      "Porba",
+      "Sakraba",
+      "Tekhouba",
+      "Thechulumi",
+      "Thipuzumi",
+      "Zhamai",
+      "Zhavame",
+      "Zuketsa"
+    ]
+  ],
+  "797108": [
+    "Phek",
+    "Nagaland",
+    ["Ketsapo", "Khuzami", "Losami", "Lozaphema", "Middle Khomi", "Old Phek", "Phek"]
+  ],
+  "797109": [
+    "Kohima",
+    "Nagaland",
+    [
+      "Asukika",
+      "Chatashi",
+      "Ehunnu",
+      "Ghathashi",
+      "Kandinu",
+      "Lazami",
+      "Nisenyu",
+      "Phenshunyu",
+      "Phenwhenyu",
+      "Pughoboto",
+      "Sendenyu",
+      "Tesophenyu",
+      "Tseminyu",
+      "Tseminyu Old Town",
+      "Tsosesunyu",
+      "Zephenyu"
+    ]
+  ],
+  "797110": [
+    "Peren",
+    "Nagaland",
+    [
+      "Athibung",
+      "Bongkholong",
+      "Gaili",
+      "Jalukie 'B'",
+      "Khelma",
+      "Lilen",
+      "Mhainamtsi",
+      "New Jalukie",
+      "Samjiuram",
+      "Zalukie"
+    ]
+  ],
+  "797111": [
+    "Wokha",
+    "Nagaland",
+    [
+      "Aitepyong",
+      "Baghty",
+      "Bhandari",
+      "Chukitong",
+      "Doyang",
+      "Elumnyu",
+      "Englan",
+      "Humtsu",
+      "Longtsung",
+      "Lotsu",
+      "Mekhukla",
+      "Moilan",
+      "N. Longidong",
+      "Nyiro",
+      "Pangti",
+      "Pongitong",
+      "Sanis",
+      "Sungro",
+      "Tsungtsutong",
+      "Wokha",
+      "Wokha Village",
+      "Wozhru",
+      "Yamhon",
+      "Yikhum"
+    ]
+  ],
+  "797112": [
+    "Dimapur",
+    "Nagaland",
+    [
+      "Dimapur",
+      "Doyapur",
+      "Hening Kunglwa",
+      "Jalukiekam",
+      "Khermahal",
+      "Kuda",
+      "Nuiland",
+      "Phaipijan",
+      "Ralan",
+      "Seluophe",
+      "Singrijan",
+      "Yampha"
+    ]
+  ],
+  "797113": [
+    "Dimapur",
+    "Nagaland",
+    [
+      "D.C Complex",
+      "Duncan Basti",
+      "Industrial Estate",
+      "Lengrijan",
+      "New Nepaligaon",
+      "Nst Colony"
+    ]
+  ],
+  "797114": [
+    "Phek",
+    "Nagaland",
+    ["Akhegwo", "Hutsu", "Lephori", "Meluri", "Pungkhuri", "Wazhiho"]
+  ],
+  "797115": [
+    "Dimapur",
+    "Nagaland",
+    [
+      "Aoyimti",
+      "Artc",
+      "Daroga Pathar",
+      "Diphupar",
+      "Eralibill",
+      "Ikishe",
+      "Showba Old",
+      "Sugar Mill Project",
+      "Sukhovi"
+    ]
+  ],
+  "797116": [
+    "Dimapur",
+    "Nagaland",
+    ["Dimapur Bazar", "Khehekhu", "Kuhuboto", "Kushiabill", "Padampukhuri", "Vihokhu"]
+  ],
+  "797117": [
+    "Dimapur",
+    "Nagaland",
+    ["Circular Road", "Pwd Colony", "Singal Village", "Zeliangrong"]
+  ],
+  "797118": ["Dimapur", "Nagaland", ["Rangapahar", "Signal Village", "Thahekhu"]],
+  "797120": ["Kohima", "Nagaland", ["Lalmati", "P.R.Hill", "Phesama", "Zubza"]],
+  "797121": ["Kohima", "Nagaland", ["High School Junction"]],
+  "798601": [
+    "Mokokchung",
+    "Nagaland",
+    [
+      "Aolijen",
+      "Arree Old",
+      "Changki",
+      "Chare",
+      "Chungtia",
+      "Fazl Ali College",
+      "Khensa",
+      "Kubza",
+      "Longkhum",
+      "Longmisa",
+      "Longsa",
+      "Mangmentong",
+      "Mokokchung",
+      "Nst Colony",
+      "Ongpangkong",
+      "S. E. Colony",
+      "Tronger",
+      "Ungma",
+      "V. K. Town"
+    ]
+  ],
+  "798602": ["Mon", "Nagaland", ["Namsa", "Tizit", "Yannu", "Zaboka", "Zangkham"]],
+  "798603": [
+    "Mon",
+    "Nagaland",
+    [
+      "Angphang",
+      "Champang",
+      "Chenloisho",
+      "Chenwetnyu",
+      "Chingkao",
+      "Chinglong",
+      "Jakpang",
+      "Longching",
+      "Monyakshu",
+      "Pessao",
+      "Tobu",
+      "Ukha"
+    ]
+  ],
+  "798604": [
+    "Mokokchung",
+    "Nagaland",
+    [
+      "Alungkima",
+      "Alungtaki",
+      "Chungtia Yimsen",
+      "Khari",
+      "Longchem",
+      "Longnak",
+      "Mongchen",
+      "Mongkholemba",
+      "Waromung"
+    ]
+  ],
+  "798607": ["Mokokchung", "Nagaland", ["Alichen"]],
+  "798611": [
+    "Kiphire",
+    "Nagaland",
+    [
+      "Amahatore",
+      "Anatongere",
+      "Kiphire",
+      "Kisethong",
+      "Longmatra",
+      "Moya",
+      "Phalonger",
+      "Phisami",
+      "Pokhpur",
+      "Pungro",
+      "Seyochang",
+      "Sikur",
+      "Singrup",
+      "Sitimi"
+    ]
+  ],
+  "798612": [
+    "Tuensang",
+    "Nagaland",
+    [
+      "Chessore",
+      "Chingmei",
+      "Choklangan",
+      "Huker",
+      "Kuthur",
+      "Nokhu",
+      "Noklak",
+      "Noksen",
+      "Pangsha",
+      "Panso",
+      "Pessu",
+      "Sanglao",
+      "Sangsanyu",
+      "Saramati",
+      "Shamator",
+      "Shampur",
+      "Shiponger",
+      "Sotokur",
+      "Thonokhunyu",
+      "Tuensang",
+      "Tuensang Village",
+      "Yangpi"
+    ]
+  ],
+  "798613": ["Mokokchung", "Nagaland", ["Chantongia", "Yaongyimsen"]],
+  "798614": [
+    "Mokokchung",
+    "Nagaland",
+    [
+      "Chuchuyimlang",
+      "Longkong",
+      "Mongsenyimti",
+      "Phangsang",
+      "Salulamang",
+      "Ungar",
+      "Yisemyong"
+    ]
+  ],
+  "798615": ["Mokokchung", "Nagaland", ["Impur", "Kubulong", "Longchang", "Sungratsu"]],
+  "798616": [
+    "Tuensang",
+    "Nagaland",
+    ["Angangba", "Chimonger", "Chungtore", "Longkhim", "Yangli"]
+  ],
+  "798618": [
+    "Mokokchung",
+    "Nagaland",
+    [
+      "Asangma",
+      "Barakangtsung",
+      "Luyang Valley",
+      "Merangkong",
+      "Molungkhimong",
+      "Molungyimsen",
+      "Tamlu",
+      "Tuli",
+      "Wamaken"
+    ]
+  ],
+  "798620": [
+    "Zunheboto",
+    "Nagaland",
+    [
+      "Aghunato",
+      "Akuhaito",
+      "Asukhomi",
+      "Asukuto",
+      "Asuto",
+      "Atoizu",
+      "Hosephu",
+      "Kichilimi",
+      "Saghemi",
+      "Satakha",
+      "Satami",
+      "Satoi",
+      "Suruhuto",
+      "Surumi",
+      "Tokiye",
+      "Zunheboto"
+    ]
+  ],
+  "798621": [
+    "Mon",
+    "Nagaland",
+    [
+      "Chui",
+      "Longpong Senghe",
+      "Longwa",
+      "Mon",
+      "Pongkong",
+      "Singha Chingnyu",
+      "Tang",
+      "Totak",
+      "Wakching",
+      "Waunching"
+    ]
+  ],
+  "798622": ["Mon", "Nagaland", ["Baranamsang", "Kongon", "Naginimora"]],
+  "798623": ["Mokokchung", "Nagaland", ["Paper Nagar"]],
+  "798625": [
+    "Longleng",
+    "Nagaland",
+    ["Bhumnyu", "Hukpang", "Longleng", "Nian", "Phomching", "Sakchi", "Yachem", "Yongyah"]
+  ],
+  "798627": ["Zunheboto", "Nagaland", ["Aizuto", "Akuluto", "Lumami"]],
+  "799001": [
+    "West Tripura",
+    "Tripura",
+    ["Agartala", "Agartala Bazar", "Agartala Court", "Jaganath Bari Road"]
+  ],
+  "799002": [
+    "West Tripura",
+    "Tripura",
+    [
+      "AgartalaGuard Post",
+      "Barjala",
+      "Bhati Abhoynagar",
+      "Border Rampur",
+      "Krishnanagar",
+      "Paschim Bhubanban",
+      "Ramnagar",
+      "Town Rampur"
+    ]
+  ],
+  "799003": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Arundhutinagar",
+      "Badharghat",
+      "Bardowali",
+      "Bhattapukur",
+      "Charipara",
+      "Ishanchandranagar",
+      "Madhuban",
+      "Ranirkhamar",
+      "S.D.Mission Colony",
+      "Siddhi Ashram"
+    ]
+  ],
+  "799004": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Agartala College",
+      "Anandanagar",
+      "Aralia",
+      "Dhupcherra",
+      "Gabordi",
+      "Jarul Bachai",
+      "Jogendranagar",
+      "Nagicherra",
+      "Purba Pratapgarh",
+      "Renters Colony",
+      "Srinagar Kacharipara",
+      "Town Pratapgarh"
+    ]
+  ],
+  "799005": ["West Tripura", "Tripura", ["Abhoynagar"]],
+  "799006": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Bankumari E/SB",
+      "G.B.Hospital",
+      "Indranagar",
+      "Kathalbagan",
+      "Kunjaban",
+      "Kunjabon Road",
+      "Nandannagar",
+      "Noagaon Krishnagar"
+    ]
+  ],
+  "799007": ["West Tripura", "Tripura", ["Banamalipur", "Dhaleswar"]],
+  "799008": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Khasnoagaon",
+      "Khayerpur",
+      "Mariamnagar",
+      "Neepco",
+      "Old Agartala",
+      "Paschim Champamur",
+      "Paschim Noabadi",
+      "Ramachandranagar",
+      "Reshambagan"
+    ]
+  ],
+  "799009": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Agartala Aerodrome",
+      "Agartala Airport Building",
+      "Durjaynagar",
+      "Lankamura",
+      "Narayanpur",
+      "Nutannagar"
+    ]
+  ],
+  "799010": ["West Tripura", "Tripura", ["Agartala Secretariat"]],
+  "799011": [
+    "Sepahijala",
+    "Tripura",
+    [
+      "Jampuijala",
+      "Jampuijala Colony",
+      "Kanakraipara",
+      "Kendraicherra",
+      "Sankumabari",
+      "Takarjala",
+      "Ujan Ghaniamara"
+    ]
+  ],
+  "799012": ["West Tripura", "Tripura", ["Gandhigram", "Salbagan"]],
+  "799013": [
+    "Gomati",
+    "Tripura",
+    [
+      "Abani Reangpara",
+      "Dakshin Chandrapur",
+      "Dakshin Maharani",
+      "Fulkumari",
+      "Holakhet",
+      "Jamjuri",
+      "Joalikhamar",
+      "Lakshipati",
+      "Maharani",
+      "Matabari",
+      "Murapara"
+    ]
+  ],
+  "799014": ["West Tripura", "Tripura", ["Agartala ONGC"]],
+  "799015": ["West Tripura", "Tripura", ["Narayanpur Bazar", "Tebaria"]],
+  "799022": ["West Tripura", "Tripura", ["Tripura University"]],
+  "799035": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Burakha Landless Colony",
+      "Dinabandhupara",
+      "Durganagar",
+      "Majlishpur",
+      "Meghlipara",
+      "Purba Noagaon",
+      "Ranirbazar",
+      "Sonamani Sepaipara",
+      "Wakinagar"
+    ]
+  ],
+  "799045": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Ashigarh",
+      "Belbari",
+      "Birendranagar",
+      "Bisrambari",
+      "Brigudaspara",
+      "Champaknagar",
+      "Gurudas Colony",
+      "Janmejoynagar",
+      "Mandainagar",
+      "Mdhabbari",
+      "Noabadi",
+      "Radhamohanpur",
+      "Sanchindranagar Colony",
+      "Shantinagar",
+      "Tripura Engineering College"
+    ]
+  ],
+  "799046": ["West Tripura", "Tripura", ["NIT Agartala"]],
+  "799101": [
+    "Gomati",
+    "Tripura",
+    [
+      "Amarpur",
+      "Ampinagar",
+      "Bampur",
+      "Chechuajamatiabari",
+      "Chellagong",
+      "Dakshin Taidu",
+      "Debbari",
+      "Dhanlekha",
+      "Gamakubari",
+      "Kurma",
+      "Mahuamillan",
+      "Malbassa",
+      "Nagrai",
+      "Paharpur",
+      "Palku",
+      "Rangamati",
+      "Rangkhang",
+      "Sarbong",
+      "Taidubari"
+    ]
+  ],
+  "799102": [
+    "Sepahijala",
+    "Tripura",
+    [
+      "Bishalgarh",
+      "Boxonagar",
+      "Brajapur",
+      "Dhajanagar",
+      "Gazaria",
+      "Golaghati",
+      "Harishnagar T.E.",
+      "Jampuijala",
+      "Jampuijala Colony",
+      "Kaiyadhepa",
+      "Kalamcherra",
+      "Kalasimura",
+      "Kalkalia",
+      "Kamalasagar",
+      "Kanakraipara",
+      "Kendraicherra",
+      "Konabon",
+      "Krishnakishorenagar",
+      "Lalsingmura",
+      "Madhupur",
+      "Nabasantiganj Bazar",
+      "Nabinagar",
+      "No.2 Chandranagar",
+      "Purathalrajnagar",
+      "Purba Gokulnagar",
+      "Purba Laxmi Bill",
+      "Putia",
+      "Rohimpur",
+      "Rokhia G.T Project",
+      "Sankumabari",
+      "Sepahijala",
+      "South Nehalchandranagar",
+      "Sutarmura",
+      "Takarjala",
+      "Ujan Ghaniamara",
+      "Veluarchar",
+      "West Laxmibill"
+    ]
+  ],
+  "799103": [
+    "Sepahijala",
+    "Tripura",
+    [
+      "Amarendranagar",
+      "Bagmara",
+      "Barjala",
+      "Bishramganj",
+      "Charilam",
+      "Chechrimile",
+      "Goliraibari",
+      "Latiacherra",
+      "Padmanagar",
+      "Pathaliaghat",
+      "Promodenagar",
+      "Ramnagar Bazar",
+      "Rangamala Bazar",
+      "South Charilam",
+      "Tekshapara"
+    ]
+  ],
+  "799104": [
+    "Gomati",
+    "Tripura",
+    [
+      "Barbil",
+      "Boalkhali",
+      "Dumburnagar",
+      "Ghorakappa",
+      "Jalaya",
+      "Jatanbari",
+      "Karbook",
+      "Lebacherra",
+      "Paticherri",
+      "Purba Manikya Dewan",
+      "Raima",
+      "Silacharri",
+      "Suknacherri",
+      "Tirthamukh",
+      "Tuichama",
+      "Uttar Chellagonj"
+    ]
+  ],
+  "799105": [
+    "Gomati",
+    "Tripura",
+    [
+      "Bazar Amtali",
+      "Chandul",
+      "Dhuptali",
+      "East Mirza",
+      "Hadra",
+      "Ichacherra",
+      "Jitendranagar",
+      "Kakraban",
+      "Kamrangatali",
+      "Kishoreganj",
+      "Kusumara",
+      "Mogpuskarini",
+      "Mohanbhog",
+      "Palatana",
+      "Paschim Mogpuskarini",
+      "Rani",
+      "Samukcherra",
+      "Silghati",
+      "Taibandal",
+      "Upendranagar"
+    ]
+  ],
+  "799113": [
+    "Gomati",
+    "Tripura",
+    ["Bagma", "Bagma ED", "East Bagabassa", "Garjanmura", "Kupilong", "Tepania"]
+  ],
+  "799114": [
+    "Gomati",
+    "Tripura",
+    [
+      "Gakulpur",
+      "Khilpara",
+      "Killarbazar",
+      "Manikya",
+      "Pitra Bazar",
+      "Raiyabari",
+      "Rajarbag",
+      "Rajnagar Colony",
+      "Salgarah",
+      "Thelakum",
+      "Uttar Brojendranagar"
+    ]
+  ],
+  "799115": [
+    "Sepahijala",
+    "Tripura",
+    [
+      "Bagabassa",
+      "Bardwal",
+      "Battali",
+      "Chandigarh",
+      "Chowmouhani",
+      "Durlavnarayan",
+      "Jumerdhepa",
+      "Kemtali",
+      "Khas Chowmouhani",
+      "Lakshmandhepa",
+      "Melaghar",
+      "Nalchar",
+      "Rudijala",
+      "Telkajla",
+      "Urmai",
+      "West Nalchar"
+    ]
+  ],
+  "799120": ["Gomati", "Tripura", ["Radhakishorepur"]],
+  "799125": [
+    "Gomati",
+    "Tripura",
+    [
+      "Gangacherra",
+      "Garjee",
+      "Kalabon",
+      "Paikhola",
+      "Paschim Paticherri Colony",
+      "Rajapur",
+      "Tainani",
+      "Takmacherra"
+    ]
+  ],
+  "799130": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Amtali",
+      "Champamura Bazar",
+      "Kanchanmala",
+      "Pandavpur",
+      "Paschim Gokulnagar",
+      "Pravapur",
+      "Rayermura",
+      "Sekerkote",
+      "Surjamaninagar",
+      "Viveknagar"
+    ]
+  ],
+  "799131": [
+    "Sepahijala",
+    "Tripura",
+    [
+      "Bejimara",
+      "Dhanirampur",
+      "Dhanpur",
+      "Durgapur",
+      "Induria",
+      "Kamalnagar",
+      "Kathalia",
+      "Khedabari",
+      "Kulubari",
+      "Matinagar",
+      "Nidaya",
+      "Rabindranagar Colony",
+      "Sonamura"
+    ]
+  ],
+  "799132": [
+    "Sepahijala",
+    "Tripura",
+    [
+      "Bhabanipur",
+      "Jatrapur",
+      "Kalikrishnagar",
+      "Kathalia",
+      "Maheshpur",
+      "Manaipathar",
+      "Nirvoypur"
+    ]
+  ],
+  "799141": [
+    "South Tripura",
+    "Tripura",
+    [
+      "Dakshin Hichacherri",
+      "Debdaru Bazar",
+      "Jolaibari",
+      "Kalashi Bazar",
+      "Kwaifung",
+      "Madhya Pillak",
+      "Paschim Pillak",
+      "Sakbari",
+      "Thakurcherra"
+    ]
+  ],
+  "799142": ["South Tripura", "Tripura", ["Charakbai", "Muhuri Ratanpur", "Muhuripur"]],
+  "799143": [
+    "South Tripura",
+    "Tripura",
+    [
+      "Amlighat",
+      "Bhuratali",
+      "Bishnupur",
+      "Dakshin Fulcherri",
+      "Dakshin Manubankul",
+      "Guachand",
+      "Magurcherra",
+      "Manubazar",
+      "Poangbari",
+      "Satchand",
+      "Sindukpathar",
+      "Srinagar"
+    ]
+  ],
+  "799144": [
+    "South Tripura",
+    "Tripura",
+    [
+      "Bagafa",
+      "Baikhora",
+      "Betaga",
+      "East Bagafa",
+      "Kanchannagar",
+      "Kathaliacherra",
+      "Laxmicherra",
+      "Lowgang",
+      "Manpather",
+      "Purba Manu",
+      "Radhakishoreganj",
+      "Santirbazar",
+      "Urrat Takmacherra",
+      "Uttar Debipur"
+    ]
+  ],
+  "799145": [
+    "South Tripura",
+    "Tripura",
+    [
+      "Baishnabpur",
+      "Bijoynagar",
+      "Chalitacherra",
+      "Doulbari",
+      "Harbatali",
+      "Harina Bazar",
+      "Jalefa Bazar",
+      "Kathalcherri",
+      "Ludhua",
+      "Ludhua Tea Estate",
+      "Rupaicherri",
+      "Sabroom",
+      "Sonaicherri"
+    ]
+  ],
+  "799150": ["South Tripura", "Tripura", ["Kasari", "Rajnagar"]],
+  "799153": ["South Tripura", "Tripura", ["Radhanagar", "Rangamura"]],
+  "799155": [
+    "South Tripura",
+    "Tripura",
+    [
+      "Abhoyganj Bazar",
+      "Barpathari",
+      "Baspadua",
+      "Belonia Aerodrome",
+      "Beloniya",
+      "Chittamara",
+      "Dakshin Sonaicharri",
+      "Debipur",
+      "Matai",
+      "Paschim Pipariakhola",
+      "Sarasima",
+      "South Bharat Ch.Nagar",
+      "Subashnagar",
+      "Uttar Bharat Ch Nagar",
+      "Uttar Sonaicherri"
+    ]
+  ],
+  "799156": [
+    "South Tripura",
+    "Tripura",
+    ["Hrishyamukh", "Madhabnagar", "Nalua", "Samarendraganj", "South Krishnagar"]
+  ],
+  "799157": [
+    "South Tripura",
+    "Tripura",
+    [
+      "Anandapur",
+      "Chottakhola",
+      "Dimatali",
+      "Gabtali",
+      "Gouranga Bazar",
+      "Puran Rajbari",
+      "Siddhinagar",
+      "South Srirampur"
+    ]
+  ],
+  "799201": [
+    "Khowai",
+    "Tripura",
+    [
+      "Agagartilla",
+      "Asharambari",
+      "Bachaibari",
+      "Banbazar",
+      "Behalabari",
+      "Belcherra",
+      "Champahaor",
+      "East Bachaibari",
+      "Gakulbari",
+      "Ganki",
+      "Karingicherra",
+      "Khowai",
+      "Khowai T. E",
+      "Paharmora",
+      "Paschim Belcherra",
+      "Paschim Laxmicherra",
+      "Ratanpurbazar",
+      "Samatal Padmabil",
+      "Singicherra",
+      "Subashpark"
+    ]
+  ],
+  "799202": ["Khowai", "Tripura", ["Khowai Court"]],
+  "799203": [
+    "Khowai",
+    "Tripura",
+    [
+      "Barmaidan Bazar",
+      "Dakshin Promode L. L.Colony",
+      "Durgapur",
+      "Dwarikapur",
+      "Ghilatali",
+      "Kalyanpur",
+      "Kalyanpur T. E",
+      "Moharcherra",
+      "Paschim Kalyanpur",
+      "Paschim Kunjaban",
+      "Paschim Santinagar",
+      "Ramdayal Lendless Colony",
+      "Ratia",
+      "Tablabari",
+      "Uttat Pulinpur"
+    ]
+  ],
+  "799204": ["Dhalai", "Tripura", ["Balarambazar", "Kulaibazar", "Nalicherra"]],
+  "799205": [
+    "Khowai",
+    "Tripura",
+    [
+      "Ataromura",
+      "Barmura Project",
+      "Brahmacherra",
+      "Chakmaghat",
+      "Golabari",
+      "Hadrai",
+      "Howaibari",
+      "Kalitilla",
+      "Karailong",
+      "Khasiamangal",
+      "Maharanipur",
+      "Maigonga",
+      "Mongtukupara",
+      "Nabakumar Rankhal Para",
+      "Netajinagar",
+      "Nunacherra",
+      "Rupacherra",
+      "Teliamura",
+      "Uttar Gakulnagar"
+    ]
+  ],
+  "799207": [
+    "Khowai",
+    "Tripura",
+    [
+      "Baijalbari",
+      "Bharatsardarbari",
+      "Chankhala",
+      "Chebri",
+      "Gouranga Tilla",
+      "Paglabari",
+      "Rajnagar Khowai",
+      "Ramchandraghat",
+      "Sonatala",
+      "Uttarchebri"
+    ]
+  ],
+  "799210": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Bodhjungnagar",
+      "Chechuria",
+      "Fatikchhera",
+      "Harendranagar T.",
+      "Kalibazar",
+      "Kamalghat",
+      "Laifunga",
+      "Lembucherra"
+    ]
+  ],
+  "799211": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Baikunthapur",
+      "Bamutia",
+      "Barkathalia",
+      "Bijoynagar Bazar",
+      "Chachubazar",
+      "Dighalia Bazar",
+      "Kalacherra T.E.",
+      "Kalkalia T.E.",
+      "Madhuchoudhurypara",
+      "Mohanpur",
+      "Patnipara",
+      "Subalsing",
+      "Taranagar",
+      "Tarapur",
+      "Thamakari",
+      "Uttar Debendranagar"
+    ]
+  ],
+  "799212": [
+    "West Tripura",
+    "Tripura",
+    [
+      "Balubon",
+      "Darogamura",
+      "Ishanpur",
+      "Sidhai",
+      "Simna",
+      "Simna Colony",
+      "Sonaram Bazar",
+      "Sundartilla",
+      "Uttar Dasgharia"
+    ]
+  ],
+  "799250": ["North Tripura", "Tripura", ["Dharmanagar"]],
+  "799251": [
+    "North Tripura",
+    "Tripura",
+    [
+      "Bakbaki",
+      "Baruakandi",
+      "Bhagyapur",
+      "Chandrapur",
+      "Dighalbak",
+      "Gobindapur",
+      "Huruah",
+      "Ichailalcherra",
+      "Ichaisonapur",
+      "Kalacherra",
+      "Nayapara",
+      "Paschimchandrapur",
+      "Pratyekroy",
+      "Raghna",
+      "Sakaibari",
+      "Sonarurbassa",
+      "Thana Road"
+    ]
+  ],
+  "799253": [
+    "North Tripura",
+    "Tripura",
+    [
+      "Algapur",
+      "Bagbassa",
+      "Dharmanagar Bazar",
+      "Dharmanagar College",
+      "Dhupirbond",
+      "East Huruah",
+      "East Kamesawar",
+      "Kakrirpar",
+      "Kameswargaon",
+      "Krishnapur",
+      "Lalcherra Colony",
+      "Padmapur",
+      "Radhapur",
+      "Rajbari",
+      "South Ganganagar",
+      "Tripura Ganganagar",
+      "Zaithang"
+    ]
+  ],
+  "799254": [
+    "North Tripura",
+    "Tripura",
+    [
+      "Baithangbari",
+      "Balidhum",
+      "Dewanpassa",
+      "Halflongcherra",
+      "Jubarajnagar",
+      "Paschim Radhapur",
+      "Rajnagar Laxmipur"
+    ]
+  ],
+  "799256": [
+    "North Tripura",
+    "Tripura",
+    ["Kacharicherra", "Khedacherra", "Narendranagar", "Piplacherra", "Tripura Damcherra"]
+  ],
+  "799260": [
+    "North Tripura",
+    "Tripura",
+    [
+      "Agnipassa",
+      "Bilthai",
+      "Deocherra",
+      "Indurail",
+      "Jalabazar",
+      "Jalebassa",
+      "Janata College",
+      "Juri R.F",
+      "Noagang",
+      "North Padmabil",
+      "Padmabil",
+      "Panisagar",
+      "Pekucherr",
+      "Rahumcherra",
+      "Rowabazar",
+      "Tilthai",
+      "Tilthai Nutanbazar",
+      "Ujan Sailenbari",
+      "Uptakhali",
+      "West Panisagar"
+    ]
+  ],
+  "799261": [
+    "North Tripura",
+    "Tripura",
+    [
+      "Amtilla",
+      "Brajendranagar",
+      "Kadamtala",
+      "Kalagangar Par",
+      "Kurit",
+      "Pearacherra",
+      "Premtala",
+      "Rakhalgang",
+      "Ranibari",
+      "Sarala",
+      "Tarakpur"
+    ]
+  ],
+  "799262": [
+    "North Tripura",
+    "Tripura",
+    ["Balicherra", "Churaibari", "Fulbari", "Kheranjuri", "Sanicherra"]
+  ],
+  "799263": [
+    "Unakoti",
+    "Tripura",
+    [
+      "Andharcherra",
+      "Dhanicherra",
+      "Govidabari",
+      "Karaicherra",
+      "Krishnatilla",
+      "Machmara",
+      "Nabincherra",
+      "Nalkata",
+      "Pecharthal",
+      "Ramgunapara",
+      "Ugalcherra"
+    ]
+  ],
+  "799264": [
+    "Unakoti",
+    "Tripura",
+    [
+      "Bhatisonaimuri",
+      "Darchai",
+      "East Kanchanbari",
+      "Kumarghat",
+      "Notting Chedrra",
+      "Pabiacherra",
+      "Sayedabari",
+      "South Unokoti"
+    ]
+  ],
+  "799266": [
+    "Dhalai",
+    "Tripura",
+    ["Betcherra", "Kanchancherra", "Karamcherra", "Purba Betcherra", "West Nalkata"]
+  ],
+  "799269": [
+    "North Tripura",
+    "Tripura",
+    [
+      "Belianchief",
+      "Hmungchuan",
+      "Hmunpui",
+      "Jampui",
+      "Kalagong",
+      "Kangrai",
+      "Phuldengsai",
+      "Sabual",
+      "Sailo",
+      "Tlangsang"
+    ]
+  ],
+  "799270": [
+    "North Tripura",
+    "Tripura",
+    ["Joyasree", "Kanchanpur", "Laljuri", "Satnala", "Sibnagar", "Suknacherra"]
+  ],
+  "799271": [
+    "North Tripura",
+    "Tripura",
+    [
+      "Anandabazar",
+      "Barhaldi",
+      "Dasdabazar",
+      "Garchirampara",
+      "Kalapania",
+      "Sakhan Serhmun",
+      "Tuichama"
+    ]
+  ],
+  "799273": [
+    "Dhalai",
+    "Tripura",
+    [
+      "Bindulal Karbaripara",
+      "Chailengta",
+      "Chawmanu",
+      "Durgacherra",
+      "Laldingabari",
+      "Manikpur",
+      "Natinmanu"
+    ]
+  ],
+  "799275": [
+    "Dhalai",
+    "Tripura",
+    [
+      "Demchedrra Colony",
+      "Dhumacherra",
+      "East Masli",
+      "Jamircherra",
+      "Karatichesdrra",
+      "Longtharai",
+      "Mainerma",
+      "Manughat",
+      "Maslicherra",
+      "Sindhukumarpara"
+    ]
+  ],
+  "799277": [
+    "Unakoti",
+    "Tripura",
+    [
+      "Bhadrapally",
+      "Chandipur",
+      "Gulakpur T.E",
+      "Ichabpur",
+      "Jamtolibari",
+      "Kailashahar",
+      "Kalishahan",
+      "Manuvelly",
+      "Noorpur",
+      "Panichowkibazar",
+      "Rangrung",
+      "Sadhanasram",
+      "Samrurpar",
+      "Sreerampur",
+      "Tapaspalli"
+    ]
+  ],
+  "799278": [
+    "Dhalai",
+    "Tripura",
+    [
+      "Kachucherra",
+      "Maharani Bus Stop",
+      "Mechuria",
+      "Mendihaor",
+      "Paschim Dalucherra",
+      "Salema"
+    ]
+  ],
+  "799279": [
+    "Unakoti",
+    "Tripura",
+    [
+      "Bhagabannagar",
+      "Chantail",
+      "Chinibagan",
+      "Deora Cherra",
+      "Goldharpur",
+      "Gournagar",
+      "Kailashahar Air Port",
+      "Kirtantali",
+      "Paiturbazar",
+      "Zarultali"
+    ]
+  ],
+  "799280": [
+    "Unakoti",
+    "Tripura",
+    [
+      "Balehar",
+      "Birchandranagar",
+      "Dalugaon",
+      "Dhanbilash",
+      "Fultali",
+      "Jagannathpur",
+      "Pechardahar",
+      "Sonamukhi"
+    ]
+  ],
+  "799281": [
+    "Unakoti",
+    "Tripura",
+    ["Baburbazar", "Hiracherra", "Irani", "Latiapur", "Rangauti", "Tripura Tillabazar"]
+  ],
+  "799282": ["Unakoti", "Tripura", ["Bhagabannagar", "Chinibagan", "Gournagar"]],
+  "799284": [
+    "Dhalai",
+    "Tripura",
+    [
+      "Bhagirathpara",
+      "Bullongbassa",
+      "Dalapatipara",
+      "Jagabandhu Para",
+      "Laxmipur",
+      "Ranipukur",
+      "Sarma"
+    ]
+  ],
+  "799285": [
+    "Dhalai",
+    "Tripura",
+    [
+      "Bagaicherri",
+      "Baligaon",
+      "Chotosarma",
+      "Fulcherri",
+      "Garodtilla",
+      "Kamalpur",
+      "Kamalpur Bazar",
+      "Maracherra",
+      "Noagoan",
+      "Ramdurlavpur",
+      "Singibill"
+    ]
+  ],
+  "799286": [
+    "Dhalai",
+    "Tripura",
+    [
+      "Abhanga",
+      "Apareshkar",
+      "Baralutma",
+      "Chengkap",
+      "Durga Chowmuhani",
+      "Halahali",
+      "Jamthing",
+      "Katalutma",
+      "Mahavir T.E."
+    ]
+  ],
+  "799287": [
+    "Dhalai",
+    "Tripura",
+    [
+      "Kamalpur Aerodrome",
+      "Kuchainala",
+      "Manikbhander",
+      "Nagbangshi",
+      "Srirampur Lambucherra"
+    ]
+  ],
+  "799288": [
+    "Unakoti",
+    "Tripura",
+    [
+      "Dengdung",
+      "Dudhpur",
+      "Kanchanbari",
+      "Laljuri East",
+      "Masauli",
+      "Nepaltilla",
+      "Taraninagar",
+      "Ujan Dodhpur"
+    ]
+  ],
+  "799289": [
+    "Dhalai",
+    "Tripura",
+    [
+      "Ambassa",
+      "Chandraipara",
+      "Ganganagar Tribalcolony",
+      "Harincherra",
+      "Kamalacherra",
+      "Kanchanpur Colony",
+      "Karnamunipara",
+      "Lakraichowdhuripara",
+      "Sikaribari"
+    ]
+  ],
+  "799290": [
+    "Unakoti",
+    "Tripura",
+    [
+      "Emrapassa",
+      "Fatikcherra",
+      "Fatikroy",
+      "Gakulnagar",
+      "Ganganagar",
+      "Noagaon Bazar",
+      "Paschimratacherra",
+      "Rajkandi",
+      "Ratacherra",
+      "Saidarpar",
+      "Tarapur",
+      "Teghari",
+      "Uttar Radhanagar"
+    ]
+  ]
+}

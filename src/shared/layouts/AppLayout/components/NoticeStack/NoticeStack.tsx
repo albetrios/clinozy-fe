@@ -8,7 +8,9 @@ import { EmailVerificationBanner } from '@/shared/components/EmailVerificationBa
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useAppRoles/index.ts';
-import { Eye } from '@/shared/icons/index.ts';
+import { useBranches } from '@/shared/hooks/useBranches/index.ts';
+import { useAccessResolved, useCan } from '@/shared/hooks/useCan/index.ts';
+import { Eye, Info } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
@@ -65,6 +67,33 @@ function ViewAsPill() {
 }
 
 /**
+ * "Your clinic is still being set up — bookings open once it's ready." (feat-clinic-setup KICKOFF
+ * §3; BRIEF.md:117–121): for a member of a team clinic who cannot manage it, while the clinic has
+ * no open branch. Managers get the setup drawer and the ring instead.
+ */
+function SetupMemberNotice() {
+  const { t } = useTranslation(LAYOUT_NS);
+  const isResolved = useAccessResolved();
+  const isTeam = useCan({ teamOrganizationOnly: true });
+  const canManage = useCan({ permission: 'organization:update' });
+  const { openBranches, isPending } = useBranches();
+  if (!isResolved || !isTeam || canManage || isPending || openBranches.length > 0)
+    return null;
+  return (
+    <output
+      data-slot="notice-pill"
+      data-testid="setup-member-notice"
+      className="bg-primary text-primary-foreground animate-dropdown-up pointer-events-auto flex h-11 max-w-full items-center gap-2.5 rounded-full px-3.5 shadow-(--elevation-menu)"
+    >
+      <Info className="size-3.5 flex-none opacity-70" aria-hidden />
+      <span className="text-body min-w-0 truncate font-semibold">
+        {t(LAYOUT_KEYS.app.setup.memberNotice)}
+      </span>
+    </output>
+  );
+}
+
+/**
  * The section bar's bottom-centre notices (`shell.md:63`; H:554): the email
  * verification notice and, under it, the View-as pill. 72px up on desktop and
  * tablet; on a phone 14px above the tab bar, each pill publishing its height
@@ -81,6 +110,7 @@ export function NoticeStack() {
       >
         <EmailVerificationBanner />
       </SectionErrorBoundary>
+      <SetupMemberNotice />
       <ViewAsPill />
     </div>
   );

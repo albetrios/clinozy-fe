@@ -102,6 +102,13 @@
       "dark": "डार्क",
       "system": "सिस्टम"
     },
+    "setup": {
+      "finishSetup": "सेटअप पूरा करें · {{total}} में से {{done}}",
+      "clinicSettings": "क्लिनिक की सेटिंग",
+      "ringLabel": "सेटअप: {{total}} में से {{done}} पूरे",
+      "memberNotice": "आपका क्लिनिक अभी सेट अप हो रहा है — तैयार होते ही बुकिंग खुल जाएगी।",
+      "drawerName": "क्लिनिक सेटअप"
+    },
     "sectionBar": {
       "nav": "अनुभाग",
       "allSections": "सभी अनुभाग",

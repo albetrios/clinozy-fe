@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2239 src files · ~1135 tests in src/ · 90 E2E specs · 27 shadcn UI primitives
+Stats: ~2277 src files · ~1158 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -347,6 +347,14 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── feat-clinic-setup-2026-10-13-sltd/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── fix-empty-state-actions-2026-10-14-iazm/
 │   │   ├── intake-files/
 │   │   │   ├── _index.md
@@ -635,6 +643,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -656,6 +665,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -677,6 +687,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -698,6 +709,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -719,6 +731,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -740,6 +753,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -761,6 +775,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -782,6 +797,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -803,6 +819,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -824,6 +841,7 @@ clinozy-fe/
 │   │   │   ├── payments.json
 │   │   │   ├── print.json
 │   │   │   ├── settings.json
+│   │   │   ├── setup.json
 │   │   │   ├── tasks.json
 │   │   │   ├── today.json
 │   │   │   └── users.json
@@ -845,6 +863,7 @@ clinozy-fe/
 │   │       ├── payments.json
 │   │       ├── print.json
 │   │       ├── settings.json
+│   │       ├── setup.json
 │   │       ├── tasks.json
 │   │       ├── today.json
 │   │       └── users.json
@@ -890,18 +909,9 @@ clinozy-fe/
 │   │   │   │   │   ├── DoneStep.tsx
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── [1 test file]
-│   │   │   │   ├── InviteStep/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── InviteStep.tsx
-│   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── ProfileStep/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── ProfileStep.tsx
-│   │   │   │   │   └── [1 test file]
-│   │   │   │   ├── QuestionsStep/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── QuestionsStep.constants.ts
-│   │   │   │   │   ├── QuestionsStep.tsx
 │   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── StepIndicator/
 │   │   │   │   │   ├── index.ts
@@ -1533,9 +1543,12 @@ clinozy-fe/
 │   │   │   │   ├── appointments-api.ts
 │   │   │   │   ├── appointments-contracts.ts
 │   │   │   │   ├── appointments-fixture-contracts.ts
+│   │   │   │   ├── branch-places-api.ts
+│   │   │   │   ├── branch-places-contracts.ts
 │   │   │   │   ├── branches-api.ts
 │   │   │   │   ├── branches-contracts.ts
 │   │   │   │   ├── branches-manage-api.ts
+│   │   │   │   ├── clinic-api.ts
 │   │   │   │   ├── clinical-notes-api.ts
 │   │   │   │   ├── clinical-notes-contracts.ts
 │   │   │   │   ├── command-search-api.ts
@@ -1568,6 +1581,8 @@ clinozy-fe/
 │   │   │   │   ├── offerings-contracts.ts
 │   │   │   │   ├── offerings-fixture-contracts.ts
 │   │   │   │   ├── offerings-pricing.ts
+│   │   │   │   ├── onboarding-setup-api.ts
+│   │   │   │   ├── onboarding-setup-contracts.ts
 │   │   │   │   ├── patient-file-api.ts
 │   │   │   │   ├── patient-file-contracts.ts
 │   │   │   │   ├── patient-images-api.ts
@@ -1602,7 +1617,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [59 test files]
+│   │   │   │   └── [63 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -1632,6 +1647,83 @@ clinozy-fe/
 │   │   │   ├── webhooks-api.ts
 │   │   │   └── [19 test files]
 │   │   ├── app/
+│   │   │   ├── pin-directory/
+│   │   │   │   ├── data/
+│   │   │   │   │   ├── pin-11.json
+│   │   │   │   │   ├── pin-12.json
+│   │   │   │   │   ├── pin-13.json
+│   │   │   │   │   ├── pin-14.json
+│   │   │   │   │   ├── pin-15.json
+│   │   │   │   │   ├── pin-16.json
+│   │   │   │   │   ├── pin-17.json
+│   │   │   │   │   ├── pin-18.json
+│   │   │   │   │   ├── pin-19.json
+│   │   │   │   │   ├── pin-20.json
+│   │   │   │   │   ├── pin-21.json
+│   │   │   │   │   ├── pin-22.json
+│   │   │   │   │   ├── pin-23.json
+│   │   │   │   │   ├── pin-24.json
+│   │   │   │   │   ├── pin-25.json
+│   │   │   │   │   ├── pin-26.json
+│   │   │   │   │   ├── pin-27.json
+│   │   │   │   │   ├── pin-28.json
+│   │   │   │   │   ├── pin-30.json
+│   │   │   │   │   ├── pin-31.json
+│   │   │   │   │   ├── pin-32.json
+│   │   │   │   │   ├── pin-33.json
+│   │   │   │   │   ├── pin-34.json
+│   │   │   │   │   ├── pin-36.json
+│   │   │   │   │   ├── pin-37.json
+│   │   │   │   │   ├── pin-38.json
+│   │   │   │   │   ├── pin-39.json
+│   │   │   │   │   ├── pin-40.json
+│   │   │   │   │   ├── pin-41.json
+│   │   │   │   │   ├── pin-42.json
+│   │   │   │   │   ├── pin-43.json
+│   │   │   │   │   ├── pin-44.json
+│   │   │   │   │   ├── pin-45.json
+│   │   │   │   │   ├── pin-46.json
+│   │   │   │   │   ├── pin-47.json
+│   │   │   │   │   ├── pin-48.json
+│   │   │   │   │   ├── pin-49.json
+│   │   │   │   │   ├── pin-50.json
+│   │   │   │   │   ├── pin-51.json
+│   │   │   │   │   ├── pin-52.json
+│   │   │   │   │   ├── pin-53.json
+│   │   │   │   │   ├── pin-56.json
+│   │   │   │   │   ├── pin-57.json
+│   │   │   │   │   ├── pin-58.json
+│   │   │   │   │   ├── pin-59.json
+│   │   │   │   │   ├── pin-60.json
+│   │   │   │   │   ├── pin-61.json
+│   │   │   │   │   ├── pin-62.json
+│   │   │   │   │   ├── pin-63.json
+│   │   │   │   │   ├── pin-64.json
+│   │   │   │   │   ├── pin-67.json
+│   │   │   │   │   ├── pin-68.json
+│   │   │   │   │   ├── pin-69.json
+│   │   │   │   │   ├── pin-70.json
+│   │   │   │   │   ├── pin-71.json
+│   │   │   │   │   ├── pin-72.json
+│   │   │   │   │   ├── pin-73.json
+│   │   │   │   │   ├── pin-74.json
+│   │   │   │   │   ├── pin-75.json
+│   │   │   │   │   ├── pin-76.json
+│   │   │   │   │   ├── pin-77.json
+│   │   │   │   │   ├── pin-78.json
+│   │   │   │   │   ├── pin-79.json
+│   │   │   │   │   ├── pin-80.json
+│   │   │   │   │   ├── pin-81.json
+│   │   │   │   │   ├── pin-82.json
+│   │   │   │   │   ├── pin-83.json
+│   │   │   │   │   ├── pin-84.json
+│   │   │   │   │   ├── pin-85.json
+│   │   │   │   │   ├── pin-90.json
+│   │   │   │   │   └── pin-99.json
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── pin-directory.ts
+│   │   │   │   ├── PIN_DIRECTORY.OVERVIEW.md
+│   │   │   │   └── [1 test file]
 │   │   │   ├── app-branch.ts
 │   │   │   ├── app-command-targets.ts
 │   │   │   ├── app-greeting.ts
@@ -1642,6 +1734,7 @@ clinozy-fe/
 │   │   │   ├── app-referrer.ts
 │   │   │   ├── app-section-icons.ts
 │   │   │   ├── app-sections.ts
+│   │   │   ├── app-starter-services.ts
 │   │   │   ├── app-tone-label.ts
 │   │   │   ├── app-tones.ts
 │   │   │   ├── app.constants.ts
@@ -1652,7 +1745,7 @@ clinozy-fe/
 │   │   │   ├── task-rules.constants.ts
 │   │   │   ├── task-targets.ts
 │   │   │   ├── visit-redirect.ts
-│   │   │   └── [17 test files]
+│   │   │   └── [18 test files]
 │   │   ├── auth/
 │   │   │   ├── captcha/
 │   │   │   │   ├── useCaptchaIntent/
@@ -2298,7 +2391,9 @@ clinozy-fe/
 │   │   │   │   │   └── [6 test files]
 │   │   │   │   ├── organization/
 │   │   │   │   │   ├── ApiKeyCreateDialog.tsx
+│   │   │   │   │   ├── clinic-settings-form.ts
 │   │   │   │   │   ├── org-list-sort.ts
+│   │   │   │   │   ├── OrganizationClinicPanel.tsx
 │   │   │   │   │   ├── OrganizationGeneralPanel.tsx
 │   │   │   │   │   ├── OrganizationIntegrationsPanel.tsx
 │   │   │   │   │   ├── OrganizationMembersPanel.tsx
@@ -2308,7 +2403,7 @@ clinozy-fe/
 │   │   │   │   │   ├── UsersRoomLink.tsx
 │   │   │   │   │   ├── WebhookDeliveryAttemptsDialog.tsx
 │   │   │   │   │   ├── WebhookFormDialog.tsx
-│   │   │   │   │   └── [11 test files]
+│   │   │   │   │   └── [13 test files]
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── settings-dirty.tsx
 │   │   │   │   ├── settings-hash-grammar.ts
@@ -2332,6 +2427,27 @@ clinozy-fe/
 │   │   │   │   ├── settle-credit.ts
 │   │   │   │   ├── SettleCreditDrawer.tsx
 │   │   │   │   └── [2 test files]
+│   │   │   ├── SetupDrawer/
+│   │   │   │   ├── go-live.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── setup-analytics.ts
+│   │   │   │   ├── setup-drawer.constants.ts
+│   │   │   │   ├── setup-hash-grammar.ts
+│   │   │   │   ├── setup-heard-about.ts
+│   │   │   │   ├── setup-location-form.ts
+│   │   │   │   ├── setup-place.ts
+│   │   │   │   ├── setup-step-props.ts
+│   │   │   │   ├── SetupClinicTypeStep.tsx
+│   │   │   │   ├── SetupDrawer.tsx
+│   │   │   │   ├── SetupDrawerLazy.tsx
+│   │   │   │   ├── SetupGuide.tsx
+│   │   │   │   ├── SetupLive.tsx
+│   │   │   │   ├── SetupLocationStep.tsx
+│   │   │   │   ├── SetupStarterList.tsx
+│   │   │   │   ├── SetupStepsDrawer.tsx
+│   │   │   │   ├── SetupYouStep.tsx
+│   │   │   │   ├── use-consultation-name.ts
+│   │   │   │   └── [10 test files]
 │   │   │   ├── SkeletonRows/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── skeleton-sheen.css
@@ -2535,6 +2651,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useClinicalNotes.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useClinicProfile/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useClinicProfile.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useCommandSearch/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useCommandSearch.ts
@@ -2628,6 +2748,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useHiddenColumns.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useHoursFormat/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useHoursFormat.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useInvitations/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useInvitations.ts
@@ -2709,6 +2833,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useOffers.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useOnboardingSetup/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useOnboardingSetup.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useOne/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useOne.ts
@@ -2784,6 +2912,10 @@ clinozy-fe/
 │   │   │   ├── useRBAC/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useRBAC.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useRequireOpenBranch/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useRequireOpenBranch.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useRoles/
 │   │   │   │   ├── index.ts
@@ -2912,7 +3044,7 @@ clinozy-fe/
 │   │   │   │   │   ├── AccountMenu/
 │   │   │   │   │   │   ├── AccountMenu.tsx
 │   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   └── [1 test file]
+│   │   │   │   │   │   └── [2 test files]
 │   │   │   │   │   ├── AllSections/
 │   │   │   │   │   │   ├── AllSections.tsx
 │   │   │   │   │   │   ├── index.ts
@@ -2924,7 +3056,7 @@ clinozy-fe/
 │   │   │   │   │   ├── NoticeStack/
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   ├── NoticeStack.tsx
-│   │   │   │   │   │   └── [1 test file]
+│   │   │   │   │   │   └── [2 test files]
 │   │   │   │   │   ├── PinnedTabs/
 │   │   │   │   │   │   ├── fit-pinned-tabs.ts
 │   │   │   │   │   │   ├── index.ts
@@ -3099,7 +3231,7 @@ clinozy-fe/
 │   │   │   ├── today-chromium-darwin.png
 │   │   │   └── today-chromium-linux.png
 │   │   ├── global-setup.ts
-│   │   └── [42 test files]
+│   │   └── [43 test files]
 │   ├── factories/
 │   │   └── README.md
 │   ├── fixtures/
@@ -3125,6 +3257,7 @@ clinozy-fe/
 │   │   ├── e2e-app.ts
 │   │   ├── e2e-auth.ts
 │   │   ├── e2e-captcha.ts
+│   │   ├── e2e-clinic-setup.ts
 │   │   ├── e2e-deployment-mode.ts
 │   │   ├── e2e-faker.ts
 │   │   ├── e2e-hybrid.ts
@@ -3171,6 +3304,9 @@ clinozy-fe/
 │   ├── codegen/
 │   │   ├── api-types.mjs
 │   │   ├── app-schema.mjs
+│   │   └── [1 test file]
+│   ├── data/
+│   │   ├── build-pin-directory.mjs
 │   │   └── [1 test file]
 │   ├── dev/
 │   │   ├── chrome-devtools-mcp.mjs

@@ -6,7 +6,7 @@ import { queryClient } from '@/core/http/queryClient.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-import type { DeleteReason } from './app-schema.ts';
+import type { DeleteReason, OfferingSpecialty } from './app-schema.ts';
 import {
   clinicSpecialtiesWire,
   type LowestPriceAccess,
@@ -143,18 +143,21 @@ async function clinicSpecialty() {
 }
 
 /**
- * A new offering, in the clinic's specialty (Q-O6). The lowest price goes only from a member
- * who may set it. `409 offering_name_taken` when another offering has the name (any case).
+ * A new offering, in the clinic's specialty (Q-O6) unless `specialty` names one — setup's "<Specialty>
+ * consultation" (feat-clinic-setup D18). The lowest price goes only from a member who may set it.
+ * `409 offering_name_taken` when another offering has the name (any case).
  */
 export async function createOffering({
   fields,
   canSetLowestPrice,
   idempotencyKey,
+  specialty: chosenSpecialty,
 }: LowestPriceAccess & {
   fields: OfferingFields;
   idempotencyKey: string;
+  specialty?: OfferingSpecialty;
 }): Promise<OfferingRecord> {
-  const specialty = await clinicSpecialty();
+  const specialty = chosenSpecialty ?? (await clinicSpecialty());
   const response = await api.post('/app/offerings', {
     body: offeringCreateBodyOf(fields, { canSetLowestPrice, specialty }),
     idempotencyKey,

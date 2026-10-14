@@ -102,6 +102,13 @@
       "dark": "داكن",
       "system": "النظام"
     },
+    "setup": {
+      "finishSetup": "أكمل الإعداد · {{done}} من {{total}}",
+      "clinicSettings": "إعدادات العيادة",
+      "ringLabel": "الإعداد: اكتمل {{done}} من {{total}}",
+      "memberNotice": "لا يزال إعداد عيادتك جاريًا — تُفتح الحجوزات عندما تصبح جاهزة.",
+      "drawerName": "إعداد العيادة"
+    },
     "sectionBar": {
       "nav": "الأقسام",
       "allSections": "كل الأقسام",

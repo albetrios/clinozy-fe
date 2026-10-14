@@ -15,12 +15,12 @@ import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
+import { useHoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 import { useResendInvitation } from '@/shared/hooks/useInvitations/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { useHoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import {
   type RoleDirectory,
   useRoleDirectory,

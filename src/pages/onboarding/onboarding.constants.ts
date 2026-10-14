@@ -10,15 +10,10 @@ export const ONBOARDING_KEYS = {
   steps: {
     welcome: { title: 'steps.welcome.title', description: 'steps.welcome.description' },
     profile: { title: 'steps.profile.title', description: 'steps.profile.description' },
-    questions: {
-      title: 'steps.questions.title',
-      description: 'steps.questions.description',
-    },
     workspace: {
       title: 'steps.workspace.title',
       description: 'steps.workspace.description',
     },
-    invite: { title: 'steps.invite.title', description: 'steps.invite.description' },
     done: { title: 'steps.done.title', description: 'steps.done.description' },
   },
   welcome: { body: 'welcome.body', bodyPersonal: 'welcome.bodyPersonal' },
@@ -37,20 +32,10 @@ export const ONBOARDING_KEYS = {
     slugFallback: 'workspace.slugFallback',
     slugInvalid: 'workspace.slugInvalid',
   },
-  invite: {
-    emailLabel: 'invite.emailLabel',
-    emailPlaceholder: 'invite.emailPlaceholder',
-    addButton: 'invite.addButton',
-    invalidEmail: 'invite.invalidEmail',
-    duplicateEmail: 'invite.duplicateEmail',
-    removeAriaLabel: 'invite.removeAriaLabel',
-  },
   done: {
     nameLabel: 'done.nameLabel',
     organizationLabel: 'done.organizationLabel',
-    invitesLabel: 'done.invitesLabel',
     emptyValue: 'done.emptyValue',
-    invitesPending: 'done.invitesPending',
   },
   actions: {
     back: 'actions.back',
@@ -60,14 +45,10 @@ export const ONBOARDING_KEYS = {
   },
   defaults: {
     organizationName: 'defaults.organizationName',
-    memberRoleName: 'defaults.memberRoleName',
-    memberRoleDescription: 'defaults.memberRoleDescription',
   },
   toast: {
     finishSuccess: 'toast.finishSuccess',
-    finishSuccessWithInvites: 'toast.finishSuccessWithInvites',
     finishError: 'toast.finishError',
-    invitePartialFailure: 'toast.invitePartialFailure',
     profileSaveFailed: 'toast.profileSaveFailed',
   },
   session: {
@@ -117,21 +98,4 @@ export const ONBOARDING_TEST_IDS = {
   organizationSlug: 'onboarding-organization-slug',
   slugError: 'onboarding-slug-error',
   urlPreview: 'onboarding-url-preview',
-  inviteEmail: 'onboarding-invite-email',
-  inviteAdd: 'onboarding-invite-add',
-  inviteError: 'onboarding-invite-error',
-  inviteList: 'onboarding-invite-list',
 } as const;
-
-// ── API / non-copy defaults ──────────────────────────────────────────────────
-
-/**
- * Permission set for the default "Member" role the finish step provisions when
- * a freshly created org has no assignable (non-Owner) role yet — a safe,
- * read-only baseline (see the org can be viewed; its members can be listed).
- * API contract, not UI copy.
- */
-export const ONBOARDING_DEFAULT_MEMBER_PERMISSIONS = [
-  'organization:read',
-  'membership:read',
-] as const;

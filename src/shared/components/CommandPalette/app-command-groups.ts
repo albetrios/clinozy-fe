@@ -1,4 +1,4 @@
-import { useRouter } from '@tanstack/react-router';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
@@ -7,6 +7,7 @@ import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type { Section } from '@/shared/api/app/app-schema.ts';
 import { isCommandSearchQuery } from '@/shared/api/app/command-search-api.ts';
 import type { CommandSearchPerson } from '@/shared/api/app/command-search-contracts.ts';
+import { setupProgress } from '@/shared/api/app/onboarding-setup-contracts.ts';
 import { APP_KEYS } from '@/shared/app/app.constants.ts';
 import {
   type AppCommandNavigation,
@@ -14,11 +15,17 @@ import {
 } from '@/shared/app/app-command-targets.ts';
 import { referrerFromPath } from '@/shared/app/app-referrer.ts';
 import { APP_SECTION_ICONS } from '@/shared/app/app-section-icons.ts';
+import { setupHash } from '@/shared/components/SetupDrawer/setup-hash-grammar.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';
 import { useCommandSearch } from '@/shared/hooks/useCommandSearch/index.ts';
+import {
+  useOnboardingSetup,
+  useSetupUnfinished,
+} from '@/shared/hooks/useOnboardingSetup/index.ts';
+import { useRequireOpenBranch } from '@/shared/hooks/useRequireOpenBranch/index.ts';
 import { readViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import { UserPlus, Users } from '@/shared/icons/index.ts';
+import { ClipboardList, UserPlus, Users } from '@/shared/icons/index.ts';
 
 import {
   COMMAND_MENU_KEYS,
@@ -31,7 +38,8 @@ import {
   matchesCommandQuery,
 } from './command-palette-model.ts';
 
-type ActionKey = keyof typeof COMMAND_MENU_KEYS.actions;
+/** The room actions — "Finish setup" is the clinic setup's own row, not a room's. */
+type ActionKey = Exclude<keyof typeof COMMAND_MENU_KEYS.actions, 'finishSetup'>;
 
 /**
  * The Actions group (H:4600), in the design's order: each is shown when the
@@ -76,6 +84,13 @@ const APP_ACTIONS: readonly {
   },
 ];
 
+/** The actions that need an open branch — a manager lands on setup's step 2 without one (§6.3). */
+const NEEDS_BRANCH: ReadonlySet<ActionKey> = new Set([
+  'newAppointment',
+  'newPatient',
+  'newReceipt',
+]);
+
 /** The design's "Go to" lists every room but Today (H:4602). */
 const NOT_A_GO_TO: Section = 'today';
 
@@ -111,19 +126,26 @@ const lastDigits = (phone: string) => phone.replace(/\D/g, '').slice(-4);
  *
  * @param navEntries The primary nav (`useAppNav`) — the rooms the access in force can reach.
  * @param go Closes the menu and navigates.
+ * @param run Closes the menu and runs a command (the clinic setup's rows); runs it at once when absent.
  */
 export function useAppCommandGroups({
   query,
   organizationSlug,
   navEntries,
   go,
+  run = (command) => command(),
 }: {
   query: string;
   organizationSlug: string;
   navEntries: readonly AppNavEntry[];
   go: (navigation: AppCommandNavigation) => void;
+  run?: (command: () => void) => void;
 }): AppCommandGroups {
   const { t } = useTranslation(COMMAND_MENU_NS);
+  const navigate = useNavigate();
+  const requireOpenBranch = useRequireOpenBranch();
+  const { data: setup } = useOnboardingSetup();
+  const setupUnfinished = useSetupUnfinished();
   // Read at the pick, not subscribed: only the page the menu opened over
   // matters, and only to the drawers that keep it behind them (`from`).
   const router = useRouter({ warn: false });
@@ -150,11 +172,32 @@ export function useAppCommandGroups({
       sub: t(APP_KEYS.sections[section].label),
       icon: APP_SECTION_ICONS[section],
       testId,
-      onSelect: () =>
-        go(appCommandNavigation(key, { organizationSlug, referrer: fromHere() })),
+      onSelect: () => {
+        const open = () =>
+          go(appCommandNavigation(key, { organizationSlug, referrer: fromHere() }));
+        if (NEEDS_BRANCH.has(key)) run(() => requireOpenBranch(open));
+        else open();
+      },
     }))
     .filter((row) => matchesCommandQuery(row.label, undefined, typed))
     .slice(0, COMMAND_MENU_LIMITS.actions);
+  // "Finish setup" while the clinic setup is unfinished (feat-clinic-setup KICKOFF §3), first.
+  if (setup && setupUnfinished) {
+    const setupRow: CommandRow = {
+      value: 'action:finishSetup',
+      label: t(COMMAND_MENU_KEYS.actions.finishSetup),
+      sub: t(COMMAND_MENU_KEYS.setupSub, setupProgress(setup)),
+      icon: ClipboardList,
+      testId: 'command-palette-action-finish-setup',
+      onSelect: () =>
+        run(
+          () =>
+            void navigate({ to: '.', hash: setupHash(), search: (previous) => previous }),
+        ),
+    };
+    if (matchesCommandQuery(setupRow.label, undefined, typed))
+      actionRows.unshift(setupRow);
+  }
 
   const goToRows: CommandRow[] = typed
     ? navEntries

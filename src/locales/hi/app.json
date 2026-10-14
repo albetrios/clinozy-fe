@@ -560,14 +560,16 @@
       "newAppointment": "नया अपॉइंटमेंट",
       "newPatient": "नया मरीज़",
       "newReceipt": "नई रसीद",
-      "openTasks": "कार्य खोलें"
+      "openTasks": "कार्य खोलें",
+      "finishSetup": "सेटअप पूरा करें"
     },
     "screen": "स्क्रीन",
     "move": "चलें",
     "open": "खोलें",
     "hint": "लोगों को खोजने के लिए 3+ अक्षर या 4+ अंक लिखें",
     "empty": "कोई मिलान नहीं। नाम, फ़ोन या C-नंबर आज़माएँ।",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{total}} में से {{done}}"
   },
   "lists": {
     "loadError": "यह सूची लोड नहीं हो सकी · कनेक्शन टूट गया। आख़िरी कॉपी दिखाई जा रही है।",

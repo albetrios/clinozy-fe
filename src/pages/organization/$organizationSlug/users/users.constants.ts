@@ -57,16 +57,6 @@ export const USERS_KEYS = {
     expires: 'status.expires',
     expired: 'status.expired',
   },
-  /** Working hours (`usRange`, H:3608): "Mon–Sat · 09:30–19:30". */
-  hours: {
-    everyDay: 'hours.everyDay',
-    /** "Mon–Sat". */
-    run: 'hours.run',
-    /** "Mon, Wed, Fri". */
-    list: 'hours.list',
-    /** "<days> · <from>–<to>". */
-    line: 'hours.line',
-  },
   filters: {
     roles: 'filters.roles',
     all: 'filters.all',
@@ -384,6 +374,8 @@ export const USERS_KEYS = {
         place: 'branches.drawer.steps.place',
         contact: 'branches.drawer.steps.contact',
         people: 'branches.drawer.steps.people',
+        /** "Places & days" — the fourth step, an existing branch only (D23). */
+        places: 'branches.drawer.steps.places',
       },
       groups: {
         branch: 'branches.drawer.groups.branch',
@@ -464,6 +456,88 @@ export const USERS_KEYS = {
       /** "Vesu branch added" / "Vesu saved". */
       added: 'branches.drawer.added',
       saved: 'branches.drawer.saved',
+      /**
+       * "Places & days" (KICKOFF §6.6, D23): the rooms, machines and holidays of an existing
+       * branch, each row saved on its own. Keyed by list — `room`, `machine`, `holiday`.
+       */
+      places: {
+        /** "Rooms" · "Machines" · "Holidays" — each list's heading and its peek tile. */
+        sections: {
+          room: 'branches.drawer.places.sections.room',
+          machine: 'branches.drawer.places.sections.machine',
+          holiday: 'branches.drawer.places.sections.holiday',
+        },
+        hints: {
+          room: 'branches.drawer.places.hints.room',
+          machine: 'branches.drawer.places.hints.machine',
+          holiday: 'branches.drawer.places.hints.holiday',
+        },
+        /** "2 rooms" · "1 machine" · "3 holidays" — the step's head line, joined by " · ". */
+        counts: {
+          room: 'branches.drawer.places.counts.room',
+          machine: 'branches.drawer.places.counts.machine',
+          holiday: 'branches.drawer.places.counts.holiday',
+        },
+        /** The head line with nothing in any list. */
+        nothingYet: 'branches.drawer.places.nothingYet',
+        empty: {
+          room: 'branches.drawer.places.empty.room',
+          machine: 'branches.drawer.places.empty.machine',
+          holiday: 'branches.drawer.places.empty.holiday',
+        },
+        /** "New room" · "New machine" · "New holiday" — the add row's name. */
+        newLabel: {
+          room: 'branches.drawer.places.newLabel.room',
+          machine: 'branches.drawer.places.newLabel.machine',
+          holiday: 'branches.drawer.places.newLabel.holiday',
+        },
+        placeholders: {
+          room: 'branches.drawer.places.placeholders.room',
+          machine: 'branches.drawer.places.placeholders.machine',
+          holiday: 'branches.drawer.places.placeholders.holiday',
+        },
+        fields: {
+          name: 'branches.drawer.places.fields.name',
+          date: 'branches.drawer.places.fields.date',
+          label: 'branches.drawer.places.fields.label',
+        },
+        add: 'branches.drawer.places.add',
+        rename: 'branches.drawer.places.rename',
+        save: 'branches.drawer.places.save',
+        cancel: 'branches.drawer.places.cancel',
+        remove: 'branches.drawer.places.remove',
+        /** The row's switch: "In use" / "Switched off", named "<name> in use". */
+        toggle: {
+          on: 'branches.drawer.places.toggle.on',
+          off: 'branches.drawer.places.toggle.off',
+          label: 'branches.drawer.places.toggle.label',
+        },
+        /** "Remove this room?" — the reason confirm's title. */
+        removeTitle: {
+          room: 'branches.drawer.places.removeTitle.room',
+          machine: 'branches.drawer.places.removeTitle.machine',
+          holiday: 'branches.drawer.places.removeTitle.holiday',
+        },
+        /** "A room called Room 2 already exists" · "Sun 8 Nov is already a holiday" (409). */
+        duplicate: {
+          room: 'branches.drawer.places.duplicate.room',
+          machine: 'branches.drawer.places.duplicate.machine',
+          holiday: 'branches.drawer.places.duplicate.holiday',
+        },
+        nameMissing: 'branches.drawer.places.nameMissing',
+        nameTooLong: 'branches.drawer.places.nameTooLong',
+        dateMissing: 'branches.drawer.places.dateMissing',
+        labelMissing: 'branches.drawer.places.labelMissing',
+        labelTooLong: 'branches.drawer.places.labelTooLong',
+        /** "Room 3 added" · "Laser room renamed" · "Room 2 switched off" · "Diwali removed". */
+        added: 'branches.drawer.places.added',
+        renamed: 'branches.drawer.places.renamed',
+        switchedOn: 'branches.drawer.places.switchedOn',
+        switchedOff: 'branches.drawer.places.switchedOff',
+        removed: 'branches.drawer.places.removed',
+        /** The step's one read failure, over its retry. */
+        loadFailed: 'branches.drawer.places.loadFailed',
+      },
     },
   },
 } as const;

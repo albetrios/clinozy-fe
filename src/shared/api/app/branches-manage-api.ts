@@ -134,12 +134,19 @@ export async function replaceBranchMembers(
   });
 }
 
+/** Whether a branch's team differs from the one read. */
+function membersChanged(after: readonly string[], before: readonly string[]): boolean {
+  const known = new Set(before);
+  return after.length !== known.size || after.some((id) => !known.has(id));
+}
+
 /**
  * Save a branch (`users.md:179–198`; H:5220–5222). A new one is one `POST` (`branch:create`) with
- * its team; an edit writes its team first when it changed — a default must work at the branch,
- * and clinozy-be clears a default who no longer does — then its fields (`PATCH`, `branch:update`,
- * with `expected_updated_at`: `409 record_changed` when someone saved first). A name another
- * branch has is a 409 (`branchNameExists`); a broken rule a 400 naming its field.
+ * its team (none named → its creator, D13); an edit writes its team first when it changed — a
+ * default must work at the branch, and clinozy-be clears a default who no longer does — then its
+ * fields (`PATCH`, `branch:update`, with `expected_updated_at`: `409 record_changed` when someone
+ * saved first). A name another branch has is a 409 (`branchNameExists`); a broken rule a 400
+ * naming its field.
  */
 export async function saveBranch({
   save: { branch, input, memberIds, memberIdsBefore },
@@ -150,15 +157,17 @@ export async function saveBranch({
 }): Promise<AppBranch> {
   if (!branch) {
     const response = await api.post('/app/branches', {
-      body: { ...branchBody(input), membership_ids: [...memberIds] },
+      body: {
+        ...branchBody(input),
+        ...(memberIds ? { membership_ids: [...memberIds] } : {}),
+      },
       idempotencyKey,
     });
     return toAppBranch(branchWire.parse(response.data));
   }
-  const before = new Set(memberIdsBefore ?? []);
-  const changed =
-    memberIds.length !== before.size || memberIds.some((id) => !before.has(id));
-  if (changed) await replaceBranchMembers(branch.id, memberIds);
+  if (memberIds && membersChanged(memberIds, memberIdsBefore ?? [])) {
+    await replaceBranchMembers(branch.id, memberIds);
+  }
   const response = await api.patch('/app/branches/{branch_id}', {
     params: { branch_id: branch.id },
     body: { ...branchBody(input), expected_updated_at: branch.updatedAt },

@@ -7,6 +7,13 @@ import { ONBOARDING_STEPS } from '@/shared/store/useOnboardingStore/index.ts';
 import { StepIndicator } from './StepIndicator.tsx';
 
 describe('StepIndicator', () => {
+  it('counts the four steps: Welcome, Your name, Clinic name, Done', () => {
+    render(<StepIndicator current={0} steps={ONBOARDING_STEPS} />);
+    const circles = screen.getAllByRole('listitem');
+    expect(circles).toHaveLength(4);
+    expect(circles.map((item) => item.textContent)).toEqual(['1', '2', '3', '4']);
+  });
+
   it('marks the current step with aria-current', () => {
     render(<StepIndicator current={1} steps={ONBOARDING_STEPS} />);
     const current = screen

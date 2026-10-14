@@ -1,10 +1,12 @@
 import { useNavigate } from '@tanstack/react-router';
+import type { TFunction } from 'i18next';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Presence } from '@/shared/api/app/app-schema.ts';
+import { setupProgress } from '@/shared/api/app/onboarding-setup-contracts.ts';
 import { logout } from '@/shared/auth/service.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import {
@@ -15,6 +17,7 @@ import { OrganizationSwitcher } from '@/shared/components/OrganizationSwitcher/i
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
 import { isSettingsModuleEnabled } from '@/shared/components/SettingsModal/settings-modules.ts';
 import type { AccountSettingsSection } from '@/shared/components/SettingsModal/settings-sections.ts';
+import { setupHash } from '@/shared/components/SetupDrawer/setup-hash-grammar.ts';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,11 +32,18 @@ import {
 import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useAppRoles/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useUnreadCount } from '@/shared/hooks/useNotifications/index.ts';
+import {
+  useOnboardingSetup,
+  useSetupAccess,
+  useSetupUnfinished,
+} from '@/shared/hooks/useOnboardingSetup/index.ts';
 import { usePresence } from '@/shared/hooks/usePresence/index.ts';
 import {
   type AppIcon,
   Bell,
+  Building,
   ChevronLeft,
+  ClipboardList,
   CreditCard,
   Keyboard,
   Monitor,
@@ -267,6 +277,94 @@ function AppearancePills() {
   );
 }
 
+/** The setup's "n of 3" while it still asks for attention, else null (BRIEF.md:85–88). */
+function useSetupCount(): { done: number; total: number } | null {
+  const { data } = useOnboardingSetup();
+  const unfinished = useSetupUnfinished();
+  return data && unfinished ? setupProgress(data) : null;
+}
+
+/**
+ * The clinic setup's rows (feat-clinic-setup KICKOFF §3; BRIEF.md:82–92): "Finish setup · n of 3"
+ * while setup is unfinished (it opens the drawer — the steps while not live, the guide after), and
+ * "Clinic settings" for a manager of a team clinic, always.
+ */
+function SetupRows() {
+  const { t } = useTranslation(LAYOUT_NS);
+  const navigate = useNavigate();
+  const count = useSetupCount();
+  // Managers of a team clinic, access known, never in a View-as preview — as the drawer.
+  const { canManageSetup } = useSetupAccess();
+  if (!canManageSetup) return null;
+  return (
+    <>
+      <DropdownMenuGroup className="flex flex-col p-1.5">
+        {count ? (
+          <MenuRow
+            icon={ClipboardList}
+            label={t(LAYOUT_KEYS.app.setup.finishSetup, count)}
+            testId="account-menu-finish-setup"
+            onSelect={() =>
+              void navigate({
+                to: '.',
+                hash: setupHash(),
+                search: (previous) => previous,
+              })
+            }
+          />
+        ) : null}
+        <MenuRow
+          icon={Building}
+          label={t(LAYOUT_KEYS.app.setup.clinicSettings)}
+          testId="account-menu-clinic-settings"
+          onSelect={() =>
+            void navigate({
+              to: '.',
+              hash: settingsHash('organization', 'clinic'),
+              search: (previous) => previous,
+            })
+          }
+        />
+      </DropdownMenuGroup>
+      <DropdownMenuSeparator className="m-0" />
+    </>
+  );
+}
+
+/** The avatar's progress ring while setup is unfinished — the arc is the share done (D23). */
+function SetupRing({ done, total }: { done: number; total: number }) {
+  const radius = 17;
+  const circumference = 2 * Math.PI * radius;
+  return (
+    <svg
+      aria-hidden="true"
+      data-testid="user-menu-setup-ring"
+      viewBox="0 0 38 38"
+      className="pointer-events-none absolute -inset-1 size-[calc(100%+0.5rem)] -rotate-90"
+    >
+      <circle
+        cx="19"
+        cy="19"
+        r={radius}
+        fill="none"
+        strokeWidth="2"
+        className="stroke-success/20"
+      />
+      <circle
+        cx="19"
+        cy="19"
+        r={radius}
+        fill="none"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={circumference * (1 - done / total)}
+        className="stroke-success transition-[stroke-dashoffset] duration-200 ease-in-out motion-reduce:duration-1"
+      />
+    </svg>
+  );
+}
+
 /** The platform rows relocated into the menu (KICKOFF §3.2 relocation table). */
 function PlatformRows({ onOpenNotifications }: { onOpenNotifications: () => void }) {
   const { t } = useTranslation(LAYOUT_NS);
@@ -306,6 +404,33 @@ function PlatformRows({ onOpenNotifications }: { onOpenNotifications: () => void
 }
 
 /**
+ * The avatar's name for assistive tech: who and their status, then any pending invitations and
+ * the clinic setup's "n of 3" — each only when there is one.
+ */
+function triggerLabel({
+  t,
+  name,
+  presence,
+  invitationCount,
+  setupCount,
+}: {
+  t: TFunction;
+  name: string;
+  presence: Presence;
+  invitationCount: number;
+  setupCount: { done: number; total: number } | null;
+}): string {
+  const parts = [t(keys.avatarLabel, { name, status: t(keys.presence[presence]) })];
+  if (invitationCount > 0) {
+    parts.push(
+      t(LAYOUT_KEYS.app.orgSwitcher.invitationCount, { count: invitationCount }),
+    );
+  }
+  if (setupCount) parts.push(t(LAYOUT_KEYS.app.setup.ringLabel, setupCount));
+  return parts.join(' · ');
+}
+
+/**
  * Header slot 10 and the Account menu (`shell.md:27, 56–62`; H:545–551,
  * H:4151): the avatar with its presence dot, then — identity (opens the
  * profile), "Switch clinic", Status, Appearance (the mode pills, and the
@@ -326,6 +451,8 @@ export function AccountMenu({
   // Pending invitations to other clinics (D84): a count on the avatar, so they are seen without
   // opening the menu; "Switch clinic" lists them.
   const invitationCount = useMyInvitations().data?.length ?? 0;
+  // The clinic setup's ring and its "n of 3" (feat-clinic-setup D28), managers only.
+  const setupCount = useSetupCount();
   const [open, setOpen] = useState(false);
   // The inbox opens as this menu closes; the menu must not hand focus back to
   // the avatar then, or the inbox would read that as a click outside.
@@ -347,14 +474,7 @@ export function AccountMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={[
-            t(keys.avatarLabel, { name, status: t(keys.presence[presence]) }),
-            invitationCount > 0
-              ? t(LAYOUT_KEYS.app.orgSwitcher.invitationCount, { count: invitationCount })
-              : null,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
+          aria-label={triggerLabel({ t, name, presence, invitationCount, setupCount })}
           data-testid="user-menu-trigger"
           data-slot="pill"
           className={cn(
@@ -365,6 +485,9 @@ export function AccountMenu({
           )}
         >
           {avatar('cell')}
+          {setupCount ? (
+            <SetupRing done={setupCount.done} total={setupCount.total} />
+          ) : null}
           {invitationCount > 0 ? (
             <CountBadge
               count={invitationCount}
@@ -391,6 +514,7 @@ export function AccountMenu({
           }
         }}
       >
+        <SetupRows />
         <IdentityBlock
           name={name}
           email={user?.email}

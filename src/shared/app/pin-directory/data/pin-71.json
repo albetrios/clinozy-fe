@@ -1,0 +1,2145 @@
+{
+  "711101": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Howrah",
+      "Howrah RS",
+      "Kadamtala",
+      "Khurut Rd",
+      "Pachalbazar",
+      "Panchanantala Road",
+      "Ramkrishnapur",
+      "Ross Road"
+    ]
+  ],
+  "711102": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Baisnabpara Bazar",
+      "Cows Ghat Rd",
+      "Dinabandhu Instt",
+      "Keorapara",
+      "Sibpur",
+      "Sibpur Bazar",
+      "TMG Lane"
+    ]
+  ],
+  "711103": ["Howrah", "West Bengal", ["Andul Road", "Bataitala", "BGarden", "DGRoad"]],
+  "711104": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Chakraberia",
+      "Chatterjee Hat",
+      "Circular Rd",
+      "Dharsa",
+      "Ichapur Rd",
+      "Olabibitala",
+      "Ramrajatala",
+      "Santragachi",
+      "Sarat Chatterjee Rd"
+    ]
+  ],
+  "711105": ["Howrah", "West Bengal", ["Belgachia Mansatala", "Dasnagar"]],
+  "711106": [
+    "Howrah",
+    "West Bengal",
+    [
+      "ARoadBamungachi",
+      "Bamungachi",
+      "Bhairab Dutta Lane",
+      "Dharmatala Rd",
+      "Hooghly Dock",
+      "Howrah Loco Depot",
+      "Jagriti",
+      "Qumaresh",
+      "Salkia"
+    ]
+  ],
+  "711107": ["Howrah", "West Bengal", ["Ghusuri", "Howrah VicCotMill"]],
+  "711108": ["Howrah", "West Bengal", ["Netajigarh"]],
+  "711109": [
+    "Howrah",
+    "West Bengal",
+    ["Bakultala", "Danesh SkLane", "Goaberia", "Podra"]
+  ],
+  "711110": ["Howrah", "West Bengal", ["Baksara"]],
+  "711111": ["Howrah", "West Bengal", ["Jagacha"]],
+  "711112": ["Howrah", "West Bengal", ["Gip Colony", "Old Jagacha"]],
+  "711113": ["Howrah", "West Bengal", ["Balitikuri"]],
+  "711114": ["Howrah", "West Bengal", ["Chamrail", "Kona", "Lakshmanpur"]],
+  "711115": ["Howrah", "West Bengal", ["Jagadishpurhat"]],
+  "711201": ["Howrah", "West Bengal", ["Bally", "Bally Goswami Rd", "MBRoad"]],
+  "711202": ["Howrah", "West Bengal", ["Belur Bazar", "Belur Math"]],
+  "711203": ["Howrah", "West Bengal", ["Bhattanagar"]],
+  "711204": [
+    "Howrah",
+    "West Bengal",
+    ["AGuha Road", "Chakpara", "Liluah", "Shibtala Liluah"]
+  ],
+  "711205": [
+    "Howrah",
+    "West Bengal",
+    ["Abhoynagar", "Daws Temple Rd", "Durgapur", "Joypur Bill", "Samabaypalli"]
+  ],
+  "711206": ["Howrah", "West Bengal", ["Sapuipara"]],
+  "711225": ["Howrah", "West Bengal", ["Pancharul"]],
+  "711226": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Bairakurchi",
+      "Gaza",
+      "Harali",
+      "Joka",
+      "Rampur",
+      "Singti Sibpur",
+      "Sonagachi",
+      "Udaynarayanpur"
+    ]
+  ],
+  "711227": ["Howrah", "West Bengal", ["Anandanagar", "Ghoshpara"]],
+  "711301": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Anantapur",
+      "Dakhin Durgapur",
+      "Deoly",
+      "Dihimandal Ghat",
+      "Jhumjhumi",
+      "Kotra",
+      "Radhapur"
+    ]
+  ],
+  "711302": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Andul Mouri",
+      "Argori",
+      "Dhulagori",
+      "Duillya",
+      "Gangadharpur",
+      "Gondalpara",
+      "Jhorehat",
+      "Joynagar",
+      "Jujursa",
+      "Kendua",
+      "Kuldanga",
+      "Mashila",
+      "New Kolora",
+      "Prasastha",
+      "Subhararah",
+      "Unsani"
+    ]
+  ],
+  "711303": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Agunshi",
+      "Bagnan",
+      "Bainan",
+      "Bakshi",
+      "Bangalpur",
+      "Bankura BoHowrah",
+      "Barunda",
+      "Bhatora",
+      "Birampur",
+      "Chakur",
+      "Chitnan",
+      "Deul Gram",
+      "Deulti",
+      "Harop",
+      "Haturia",
+      "Joargori",
+      "Kalyanpur",
+      "Kantapukur",
+      "Kasmali",
+      "Khadinan",
+      "Khajutti",
+      "Mahishrekha",
+      "Mankur",
+      "Mellock",
+      "Nawpala",
+      "Olanpara",
+      "Orphuli",
+      "Panitras",
+      "Pirpur",
+      "Ramchandrapur",
+      "Samta",
+      "Subsit",
+      "Sumda",
+      "Uttar Batora"
+    ]
+  ],
+  "711304": ["Howrah", "West Bengal", ["Banipur"]],
+  "711305": ["Howrah", "West Bengal", ["Bauria"]],
+  "711306": ["Howrah", "West Bengal", ["Kulgachia"]],
+  "711307": ["Howrah", "West Bengal", ["Chackasi", "Dasbhaga", "Khalisani"]],
+  "711308": ["Howrah", "West Bengal", ["Chengail"]],
+  "711309": ["Howrah", "West Bengal", ["Delta Mil", "Sarenga"]],
+  "711310": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Burikhali",
+      "Fortgloster",
+      "Hirapur",
+      "Nalpur",
+      "Radhanagar",
+      "Raghudebbati",
+      "Rameswarnagar",
+      "Sahapur",
+      "Santoshpur",
+      "Ula"
+    ]
+  ],
+  "711312": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Ajodhyahat",
+      "Amardah",
+      "Antila",
+      "Bachhri",
+      "Baidyanathpur",
+      "Bantul",
+      "Bargarchumuk",
+      "Bargram",
+      "Benapur Chandanapara",
+      "Dakshin Radhanagar",
+      "Ganeshpur",
+      "Hallyan",
+      "Kulitapara",
+      "Kultikari",
+      "Mugkalyan",
+      "Nakol",
+      "Naul",
+      "Rabibhag",
+      "Ramnagar",
+      "Rupasgori",
+      "Sasati",
+      "Uttar Durgapur"
+    ]
+  ],
+  "711313": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Bharat Cooperative",
+      "Chaturbhujkati",
+      "Ramchandrapur",
+      "Sankrail",
+      "Sankrail Dakshinpara"
+    ]
+  ],
+  "711314": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Dakshin Shibpur",
+      "Dingakhola",
+      "Gobindapur",
+      "Gurepole",
+      "Guzarpur",
+      "Jallabaj",
+      "Kalidaha",
+      "Kharuberia",
+      "Mollahat",
+      "Pichaldaha",
+      "Shibganj",
+      "Shyampur"
+    ]
+  ],
+  "711315": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Alipur",
+      "Baganda",
+      "Balichaturi",
+      "Belari",
+      "Bhekutal",
+      "Dakshin Hirapur",
+      "Dakshin Ramchandrapur",
+      "Dhulasimla",
+      "Gohalberia",
+      "Gutinagari",
+      "Jagadishpur",
+      "Kanjiakhali",
+      "Kashmul",
+      "Khurigachi",
+      "Madhabpur",
+      "Nabagram Sikipur",
+      "Uluberia"
+    ]
+  ],
+  "711316": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Bahira",
+      "Baniban",
+      "Banitala",
+      "Basudebpur",
+      "Birshibpur",
+      "Brindabanpur",
+      "Dulopur",
+      "Fuleswar",
+      "Hatgacha",
+      "Jaduberia",
+      "Kaijuri",
+      "Kantaberia",
+      "Karatberia",
+      "Khariamoynapur",
+      "Kushberia",
+      "Latibpur",
+      "Rajkhola",
+      "Samruk",
+      "Sijberia",
+      "Sundarpur",
+      "Uluberia RS"
+    ]
+  ],
+  "711317": ["Howrah", "West Bengal", ["Radhadasi"]],
+  "711322": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Banharishpur",
+      "Beldubi",
+      "Belkulai",
+      "Bikihakola",
+      "Dhamsia",
+      "Dhunki",
+      "Gabberia",
+      "Gobardhanbati",
+      "Jalabiswanathpur",
+      "Nabghara",
+      "Nayachak",
+      "Panchla",
+      "Raghudevpur",
+      "Tehatta"
+    ]
+  ],
+  "711331": ["Howrah", "West Bengal", ["Paniara"]],
+  "711401": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Amaragori",
+      "Amta",
+      "Anulia",
+      "Bagua",
+      "Baramahara",
+      "Barda",
+      "Betai",
+      "Bhandargacha",
+      "Chandrapur",
+      "Deora",
+      "Ghoshpur",
+      "Islampur",
+      "Jhamtia",
+      "Jhinkra",
+      "Joypur",
+      "Joypur Fakirdas",
+      "Kankrol",
+      "Khasmahal Balichak",
+      "Khorop",
+      "Khosalpur",
+      "Kumarchak",
+      "Nowpara",
+      "Panpur",
+      "Rashpur",
+      "Saltighat Gujarpur",
+      "Santoshnagar",
+      "Sonamui",
+      "Thalia",
+      "Tulsiberia",
+      "Udang"
+    ]
+  ],
+  "711403": ["Howrah", "West Bengal", ["Bankra", "Munshidanga"]],
+  "711404": [
+    "Howrah",
+    "West Bengal",
+    ["Bargachia", "Dakshin Santoshpur", "Hantal Anantabati", "Mansinghpur", "Nijbalia"]
+  ],
+  "711405": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Baluhati",
+      "Dafarpur",
+      "Dakshin Jhapardaha",
+      "Domjur",
+      "Narna",
+      "Nonakundu",
+      "Parbatipur",
+      "South Joychanditala",
+      "Uttar Jharpardah"
+    ]
+  ],
+  "711408": ["Howrah", "West Bengal", ["Jagatballavpur", "Mato"]],
+  "711409": ["Howrah", "West Bengal", ["Makardaha", "Nibra", "Salap", "Tentulkuli"]],
+  "711410": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Debandi",
+      "Dhurkhali",
+      "Garbalia",
+      "Gourangachak",
+      "Harishpur",
+      "Kanpur",
+      "Khila",
+      "Manikura",
+      "Mansuka",
+      "Munshirhat",
+      "Paikpara",
+      "Pantihal",
+      "Penro",
+      "Sealdanga",
+      "Sibnarayanchak"
+    ]
+  ],
+  "711411": [
+    "Howrah",
+    "West Bengal",
+    [
+      "Begri",
+      "Bhandardaha",
+      "Biprannapara",
+      "Deulpur",
+      "Jalalshi",
+      "Keshabpur",
+      "Khantora",
+      "Khasmora",
+      "Kolora",
+      "Rudrapur",
+      "Wadipur"
+    ]
+  ],
+  "711412": [
+    "Howrah",
+    "West Bengal",
+    ["Chitrasenpur", "Kanupat Majhpara", "Raichak", "Sonatala", "Uttar Mansri"]
+  ],
+  "711413": [
+    "Howrah",
+    "West Bengal",
+    ["Gazipur", "Khalna", "Kushberia", "Narit", "Sarda", "Sauria", "Tajpur"]
+  ],
+  "711414": [
+    "Howrah",
+    "West Bengal",
+    ["Gobindapur Shibtala", "Maju", "Naskarpur", "Polgustia", "Siddheswar"]
+  ],
+  "712101": [
+    "Hooghly",
+    "West Bengal",
+    ["Chinsurah", "Chinsurah Bazar", "Chinsurah Court", "Pratappur", "Sandeswartala JC"]
+  ],
+  "712102": [
+    "Hooghly",
+    "West Bengal",
+    ["Chinsurah RS", "Kamdebpur", "Katsara", "Sogandha"]
+  ],
+  "712103": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Bikramnagore Bali",
+      "Hooghly",
+      "Kapasdanga Roybazarcolony",
+      "Pipulpati",
+      "Rabindranagar",
+      "Tamlipara"
+    ]
+  ],
+  "712104": ["Hooghly", "West Bengal", ["Keotalatbagan", "Sahaganj"]],
+  "712105": [
+    "Hooghly",
+    "West Bengal",
+    ["Buroshibtala", "Dharampur", "Kamarparabazar", "Kanakshally"]
+  ],
+  "712121": ["Hooghly", "West Bengal", ["Addconagar"]],
+  "712122": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Badanganj",
+      "Fului",
+      "Jharia",
+      "Kadra",
+      "Pandugram",
+      "Santipur",
+      "Selampur",
+      "Shyambazar",
+      "Tilari"
+    ]
+  ],
+  "712123": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Bandel Junction",
+      "Debanandapur",
+      "Ektarpur",
+      "Inchura Bazar",
+      "Manaspur",
+      "Naldanga",
+      "Rajhat",
+      "Somra"
+    ]
+  ],
+  "712124": [
+    "Hooghly",
+    "West Bengal",
+    ["Bhadreswar", "Bighati", "K G R S Path", "Nanda", "Saradapally"]
+  ],
+  "712125": ["Hooghly", "West Bengal", ["Rajabazar", "Telinipara"]],
+  "712134": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Balindar",
+      "Barul",
+      "Berela",
+      "Bhonpur",
+      "Bilsara",
+      "Boinchi",
+      "Hanraldaspur",
+      "Hatni",
+      "Insura",
+      "Raijamna",
+      "Talbona"
+    ]
+  ],
+  "712135": ["Hooghly", "West Bengal", ["Ballaldighi", "Boinchigram", "Simlagarh"]],
+  "712136": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Boraichanditala",
+      "Chandannagar",
+      "Chandannagar Barasat",
+      "Chandannagar RS",
+      "Kundughat"
+    ]
+  ],
+  "712137": ["Hooghly", "West Bengal", ["Gondalpara"]],
+  "712138": ["Hooghly", "West Bengal", ["Jarura", "Khalisani", "Noapara", "Palpara"]],
+  "712139": ["Hooghly", "West Bengal", ["Mankundu", "Mankundu GovtColony"]],
+  "712146": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Arjuna",
+      "Baharkuli",
+      "Brindabanpur",
+      "Gajinadaspur",
+      "Gram Kulti",
+      "Gramchagram",
+      "Ilsobamondalai",
+      "Jamgram",
+      "Mohipalpur",
+      "Pindira"
+    ]
+  ],
+  "712147": [
+    "Hooghly",
+    "West Bengal",
+    ["Chatosarsa", "Haridaspur", "Hoera", "Itachuna", "Khanyan", "Radhanagar"]
+  ],
+  "712148": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Akna",
+      "Barunanpara",
+      "Digsui",
+      "Magra",
+      "Pakri",
+      "Patna",
+      "Polba",
+      "Ramnathpur",
+      "Sultangacha",
+      "Talandu"
+    ]
+  ],
+  "712149": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Amra",
+      "Aymanawabpur",
+      "Beloon",
+      "Bhitasin",
+      "Dwarbasini",
+      "Hanral",
+      "Khajurdaha",
+      "Magura",
+      "Megshar",
+      "Mohanad",
+      "Panchgora",
+      "Pandua",
+      "Ranagarh",
+      "Rosna",
+      "Sarai",
+      "Satithan",
+      "Tinna"
+    ]
+  ],
+  "712152": [
+    "Hooghly",
+    "West Bengal",
+    ["Chandpur", "Dabra", "Jayer", "Melki", "Rameswarpur"]
+  ],
+  "712201": [
+    "Hooghly",
+    "West Bengal",
+    ["Kalbazar", "Manicktala Bazar", "Serampore", "Serampore Court"]
+  ],
+  "712202": ["Hooghly", "West Bengal", ["Mahesh 1", "Masjid Lane"]],
+  "712203": ["Hooghly", "West Bengal", ["Bahirserampore", "Mallickpara", "Simla"]],
+  "712204": ["Hooghly", "West Bengal", ["Chatra"]],
+  "712221": ["Hooghly", "West Bengal", ["Angus"]],
+  "712222": ["Hooghly", "West Bengal", ["Baidyabati", "Champdani"]],
+  "712223": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Antisara",
+      "Belumilki",
+      "Chandanpur",
+      "Chinamore",
+      "Dearah",
+      "Kumarpara",
+      "Mohistikri",
+      "Mollasimla",
+      "Nasibpur",
+      "Pahalampur",
+      "Sheoraphuli"
+    ]
+  ],
+  "712232": ["Hooghly", "West Bengal", ["Bhadrakali"]],
+  "712233": ["Hooghly", "West Bengal", ["Hindmotor"]],
+  "712234": ["Hooghly", "West Bengal", ["Kanaipur"]],
+  "712235": ["Hooghly", "West Bengal", ["Criper Road", "Konnagar"]],
+  "712245": ["Hooghly", "West Bengal", ["Makhla", "Raghunathpur", "Rajendra Avenue"]],
+  "712246": ["Hooghly", "West Bengal", ["Barabahera", "Nabagram"]],
+  "712248": [
+    "Hooghly",
+    "West Bengal",
+    ["Bangurpark", "Gandhisarak", "Mahesh 2", "Rishra"]
+  ],
+  "712249": ["Hooghly", "West Bengal", ["Nutangram", "Prabasnagar"]],
+  "712250": ["Hooghly", "West Bengal", ["Bamunari", "Mollerberh", "Morepukur"]],
+  "712258": ["Hooghly", "West Bengal", ["Uttarpara", "Uttarpara Bazar"]],
+  "712301": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Alipur Nayanagar",
+      "Bagnan Chaitanyabati",
+      "Bhandarhati",
+      "Dakshin Basudebpur",
+      "Kanui Banka",
+      "Mandra",
+      "New Chandpur"
+    ]
+  ],
+  "712302": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Belmuri",
+      "Boso",
+      "Dedhara",
+      "Dhaniakhali",
+      "Hazipur",
+      "Kananadi",
+      "Kankrakuli",
+      "Lokabati",
+      "Mazinan",
+      "Rudrani"
+    ]
+  ],
+  "712303": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Balidaha",
+      "Bhastara",
+      "Cheragram",
+      "Ghosla",
+      "Gurap",
+      "Jolekul",
+      "Palasi",
+      "Sankarpur"
+    ]
+  ],
+  "712304": [
+    "Hooghly",
+    "West Bengal",
+    ["Baksha", "Chikranda", "Janai", "Kharsarai", "Monirampur"]
+  ],
+  "712305": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Alipur",
+      "Ati",
+      "Babnan",
+      "Danrpur",
+      "Gobarara",
+      "Goswamimalipara",
+      "Harit",
+      "Makalpur",
+      "Nagbal",
+      "Pawnan",
+      "Porabazar",
+      "Puinan",
+      "Sinhet"
+    ]
+  ],
+  "712306": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Baratajpur",
+      "Baruipara",
+      "Begampur",
+      "Bora",
+      "Borai",
+      "Gangadharpur Bazar",
+      "Panchgharabazar"
+    ]
+  ],
+  "712308": [
+    "Hooghly",
+    "West Bengal",
+    ["Chopa", "Gurbari", "Khanpur", "Kharua", "Siptai"]
+  ],
+  "712310": ["Hooghly", "West Bengal", ["Chakundi", "Dankuni Coal Complex"]],
+  "712311": [
+    "Hooghly",
+    "West Bengal",
+    ["Dankuni", "Dankuni Housing Complex", "Garalgacha", "Mrigala"]
+  ],
+  "712401": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Aimapaharpur",
+      "Ankriserampore",
+      "Astara",
+      "Balipur",
+      "Binagram",
+      "Champadanga",
+      "Chiladangi",
+      "Gholdigrui",
+      "Ghole",
+      "Jangalpara",
+      "Moktarpur",
+      "Parshyampur",
+      "Pursurah",
+      "Ramnarayanpur"
+    ]
+  ],
+  "712402": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Chenchua",
+      "Dasghara",
+      "Gopinagar",
+      "Mohisgoria",
+      "Nimdanga",
+      "Routhpur",
+      "Sahabazar"
+    ]
+  ],
+  "712403": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Basuri",
+      "Dalapatipur",
+      "Dwarhatta",
+      "Haripal",
+      "Hawakhana",
+      "Jagalgori",
+      "Mora",
+      "Paschimgopinathpur"
+    ]
+  ],
+  "712404": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Baganda",
+      "Dilakash",
+      "Dingalhati",
+      "Jangipara",
+      "Krishnanagar",
+      "Kulakash",
+      "Lakshmanpur",
+      "Mundalika",
+      "Prasadpur",
+      "Satghara"
+    ]
+  ],
+  "712405": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Bahirkhand",
+      "Bajitpur",
+      "Brahmanpara",
+      "Jejur",
+      "Kaikala",
+      "Kalachara",
+      "Khamarchandi",
+      "Malia",
+      "Musapur",
+      "Paniseola"
+    ]
+  ],
+  "712406": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Hirapur",
+      "Kedarpur",
+      "Khanakul",
+      "Mainan",
+      "Nangulpara",
+      "Patul",
+      "Pole",
+      "Routhkhana",
+      "Sonatikri",
+      "Udaypur"
+    ]
+  ],
+  "712407": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Bajemalia",
+      "Bandipur",
+      "Beraberi",
+      "Chitrasali",
+      "Haripur Chak",
+      "Kamarkundu",
+      "Kinkarbati",
+      "Nalikul",
+      "Pargopalnagar"
+    ]
+  ],
+  "712408": [
+    "Hooghly",
+    "West Bengal",
+    ["Antpur", "Dihibhursut", "Guti", "Poshpur", "Rahimpur", "Rajbalhat", "Rashidpur"]
+  ],
+  "712409": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Anandanagar",
+      "Balarambati",
+      "Basubati",
+      "Dewanbheri",
+      "Dihiratanpur",
+      "Ganderpukur",
+      "Gopalnagar Harharia",
+      "Harishnagar",
+      "Jagatnagar",
+      "Jalaghata",
+      "Karicharbheri",
+      "Mirjapur Bankipur",
+      "Paltagarh",
+      "Singherbheri",
+      "Singur"
+    ]
+  ],
+  "712410": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Amarpur",
+      "Baidyapur Shibtala",
+      "Baligori",
+      "Bhangamora",
+      "Bhata",
+      "Bishnupur",
+      "Chaulpatty",
+      "Duttapur",
+      "Gotan",
+      "Jamdara",
+      "Kashipur",
+      "Keshabchak",
+      "Ketera",
+      "Kumrul",
+      "Madpur",
+      "Muidipur",
+      "Ramnagar",
+      "Rasulpur",
+      "Sainta",
+      "Samserpur",
+      "Shyampur",
+      "Soaluk",
+      "Talpur",
+      "Tarakeswar",
+      "Tarakeswar Math",
+      "Teghari"
+    ]
+  ],
+  "712412": [
+    "Hooghly",
+    "West Bengal",
+    ["Baradigrui", "Chandraban", "Helan", "Hiatpur", "Kaiba", "Narayanpur", "Tantisal"]
+  ],
+  "712413": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Arandi",
+      "Bachhanari",
+      "Bairakanpur",
+      "Balundi",
+      "Chunait",
+      "Dakshin Rasulpur",
+      "Daminya Kabikankan",
+      "Dihiboira",
+      "Hatbasantapur",
+      "Keshabpur",
+      "Madhabpur",
+      "Madhurpur",
+      "Mayapur",
+      "Parabagnan"
+    ]
+  ],
+  "712414": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Alati",
+      "Baikunthapur",
+      "Deulpara",
+      "Ghargohal",
+      "Kulbatpur",
+      "Nachipur",
+      "Nimdangi"
+    ]
+  ],
+  "712415": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Bhuerah",
+      "Harinkhola",
+      "Hati",
+      "Jasar",
+      "Pratapnagar",
+      "Purba Krishnapur",
+      "Ragpur",
+      "Saidpur"
+    ]
+  ],
+  "712416": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Balaichak",
+      "Balpai",
+      "Chakhayatpur",
+      "Chingra",
+      "Dharasimul",
+      "Harishchak",
+      "Mostafapur",
+      "Natibpur",
+      "Palaspai",
+      "Ranjitbati"
+    ]
+  ],
+  "712417": [
+    "Hooghly",
+    "West Bengal",
+    ["Bonhijli", "Jagatpur", "Mar0Khana", "Nandanpur", "Rajhati Bandar", "Sabalsingpur"]
+  ],
+  "712501": [
+    "Hooghly",
+    "West Bengal",
+    ["Balagarh", "Basna", "Jirat", "Milangarh", "Panchpara", "Patuligram"]
+  ],
+  "712502": [
+    "Hooghly",
+    "West Bengal",
+    ["Bansberia", "Bansberia Bazar", "Chawk Bansberia", "Shibpur Bansberia"]
+  ],
+  "712503": ["Hooghly", "West Bengal", ["Btps", "Tribeni"]],
+  "712504": ["Hooghly", "West Bengal", ["Chandrahati"]],
+  "712512": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Aidakismat",
+      "Bakuliagram",
+      "Dhobapara",
+      "Digra",
+      "Guptipara",
+      "Krishanbatichar",
+      "Purba Satgachia"
+    ]
+  ],
+  "712513": ["Hooghly", "West Bengal", ["Gopalpur", "Nayasarai"]],
+  "712514": ["Hooghly", "West Bengal", ["Sripur Bazar"]],
+  "712515": ["Hooghly", "West Bengal", ["Baneswarpur", "Dumurdaha", "Khamargachi"]],
+  "712601": [
+    "Hooghly",
+    "West Bengal",
+    ["Arambagh", "Arambagh Court", "Krishnapur", "Natunbazar", "Netaji Mahavidyalaya"]
+  ],
+  "712602": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Bajua",
+      "Bhadur",
+      "Chandur",
+      "Gobindapur",
+      "Maigram",
+      "Mriga Chatra",
+      "Naisarai",
+      "Santoshpur",
+      "Tirol"
+    ]
+  ],
+  "712611": [
+    "Hooghly",
+    "West Bengal",
+    ["Asudkhola", "Bengai", "Bhurkunda", "Khatul", "Salikona", "Senai"]
+  ],
+  "712612": [
+    "Hooghly",
+    "West Bengal",
+    ["Kamarpukur", "Mandaran", "Paschimpara", "Satberia", "Sripur", "Tarahat"]
+  ],
+  "712613": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Beniajole",
+      "Dihi Bagnan",
+      "Duadanda",
+      "Ghoshpur",
+      "Gourhati",
+      "Kupsit",
+      "Pilkhan",
+      "Thakuranichak"
+    ]
+  ],
+  "712614": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Debkhanda",
+      "Goghat",
+      "Kantali",
+      "Laluka",
+      "Nakunda",
+      "Paba",
+      "Raghubati",
+      "Ratanpur",
+      "Singrapur",
+      "Sunia"
+    ]
+  ],
+  "712615": [
+    "Hooghly",
+    "West Bengal",
+    ["Batanal", "Bhalia", "Golta", "Karui", "Moloypur"]
+  ],
+  "712616": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Aslahari",
+      "Balidewanganj",
+      "Dahia Kanda",
+      "Damodarpur",
+      "Dhulepur",
+      "Kumursha",
+      "Muktarpur Belekusma",
+      "Radhaballavpur",
+      "Ramnagar Mobarakpur",
+      "Salepur",
+      "Saora"
+    ]
+  ],
+  "712617": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Baradangal",
+      "Chuadanga",
+      "Daharkunda",
+      "Gujrat",
+      "Kishorepur",
+      "Mahisgot",
+      "Manikpat",
+      "Mayalbandipur"
+    ]
+  ],
+  "712701": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Akuni",
+      "Bandhpur",
+      "Bhagabatipur",
+      "Haripur",
+      "Jangalpara Bazar",
+      "Masat",
+      "Nawabpur"
+    ]
+  ],
+  "712702": [
+    "Hooghly",
+    "West Bengal",
+    ["Chanditala", "Kalachara", "Kristorampur", "Kumirmorah", "Naity"]
+  ],
+  "712706": [
+    "Hooghly",
+    "West Bengal",
+    [
+      "Aniya",
+      "Charpur",
+      "Dakshindihi",
+      "Furfura",
+      "Ilahipur",
+      "Paschimtajpur",
+      "Seakhala"
+    ]
+  ],
+  "713101": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Agriculture Farm",
+      "Bahirsarbamangala",
+      "Bajepratappur NDDF",
+      "Burdwan",
+      "Burdwan Bar Library",
+      "Burdwan District School Board",
+      "Burdwan Rs",
+      "Nutanpalli",
+      "Ranisayar",
+      "Sadhanpur",
+      "Sarbamangala Bari"
+    ]
+  ],
+  "713102": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Belkas",
+      "Bhita",
+      "Chandrahati",
+      "Chotobelun",
+      "Jamar",
+      "Kaligram",
+      "Kamalakanta Kalibari",
+      "Kanchannagar",
+      "Karjanachati",
+      "Korar",
+      "Kotalhat",
+      "Kshetia",
+      "Kubajpur",
+      "Kurmun",
+      "Lakurdi",
+      "Mahachanda",
+      "Mirjapur",
+      "Nutanganj",
+      "Rajganj Asthal"
+    ]
+  ],
+  "713103": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Bolpur",
+      "Bontir",
+      "Chotonilpur",
+      "Ghordourchati",
+      "Hijalna",
+      "Ichlabad",
+      "Kamalpur",
+      "Machkanda",
+      "Sadarghat",
+      "Saloon",
+      "Sankharipukur",
+      "Sripalli"
+    ]
+  ],
+  "713104": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Baikunthapur",
+      "Burdwan Medical College",
+      "Burdwan Rajbati",
+      "Burdwan University",
+      "Fagupur",
+      "Golapbag",
+      "Harisava",
+      "Joteram",
+      "Rayan"
+    ]
+  ],
+  "713121": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Aogram", "Aruar", "Debpur", "Muratipur", "Ratanpur", "Sahebganj", "Sanchalida"]
+  ],
+  "713122": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Akalpoush", "Anukhal", "Badla", "Baidyapur", "Goda Annada", "Singerkone", "Tehatta"]
+  ],
+  "713123": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Agardanga",
+      "Baharan",
+      "Banwaribad Raj",
+      "Dakshinkhanda",
+      "Gangatikuri",
+      "Kachutia",
+      "Keuguri",
+      "Mougram",
+      "Murgram",
+      "Pachundi",
+      "Sankai",
+      "Shimulia",
+      "Sitahati"
+    ]
+  ],
+  "713124": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Barsul Unnayani",
+      "Belna",
+      "Boro Balaram",
+      "Chakshanjadi",
+      "Deriapur",
+      "Kalanabagram",
+      "Natumohanpur"
+    ]
+  ],
+  "713125": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Amarun",
+      "Amarun Bazar",
+      "Barabelun",
+      "Basuda",
+      "Bhatar",
+      "Chandipur Kanpur",
+      "Fulgram",
+      "Hargram",
+      "Hossainpur",
+      "Kherur",
+      "Nasigram",
+      "Pachim Kharampur",
+      "Palar",
+      "Shyamnabagram",
+      "Sunur"
+    ]
+  ],
+  "713126": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Berenda", "Bhedia", "Goligram", "Kurumba", "Nrisinghapur", "Saha Basantapur"]
+  ],
+  "713127": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Bonpas", "Gramdighi", "Khurul", "Mandarbati", "Mohanpur", "Narayanpur"]
+  ],
+  "713128": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Deasa Aligram",
+      "Deoradanga",
+      "Digha",
+      "Dignagar",
+      "Genna Deriapur",
+      "Gonpur",
+      "Gushkara",
+      "Gushkara New Town",
+      "Hatkirtinagar",
+      "Jadabganj",
+      "Jaypur",
+      "Keleti",
+      "Mahata",
+      "Orgram",
+      "Paligram",
+      "Pichkuri",
+      "Rairamchandrapur",
+      "Sarulia",
+      "Shar",
+      "Shibda",
+      "Somaipur",
+      "Uniatatarpur"
+    ]
+  ],
+  "713129": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Amgoria",
+      "Ankhona",
+      "Bamundi",
+      "Brahmanigram",
+      "Chakta",
+      "Ehiapur",
+      "Hatkalua",
+      "Kandara",
+      "Kantadihi",
+      "Khanji",
+      "Khatundi",
+      "Komarpur",
+      "Masundi",
+      "Rajoor",
+      "Sadipur Berugram",
+      "Srigopalpur",
+      "Srigram"
+    ]
+  ],
+  "713130": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Atuhatpara", "Katwa", "Katwa Bazar", "Katwa College", "Katwa Station Bazar"]
+  ],
+  "713131": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Bamunara", "Chanak", "Gatistha", "Kalanpur", "Kasemnagar", "Lakhuria"]
+  ],
+  "713132": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Barashyambazar",
+      "Bhalgram",
+      "Boinchee",
+      "Chakulia",
+      "Kowarpur",
+      "Kulai",
+      "Majigram",
+      "Mathrun",
+      "Palita",
+      "Pindira Boura"
+    ]
+  ],
+  "713140": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Barapurulia",
+      "Gurpara",
+      "Ketugram",
+      "Nabagram",
+      "Nirol",
+      "Roundi Srirampur",
+      "Shibloon"
+    ]
+  ],
+  "713141": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Amar",
+      "Bara Balgona",
+      "Barakashiara",
+      "Belari",
+      "Belgram",
+      "Bhada",
+      "Bhaghar",
+      "Bhota",
+      "Chandul",
+      "Khana Jn",
+      "Khano",
+      "Pachkula",
+      "Sanko",
+      "Satinandi",
+      "Shyamsundarpur",
+      "Simdal",
+      "Takipur",
+      "Talit"
+    ]
+  ],
+  "713142": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Bijpur",
+      "Chandipur Berugram",
+      "Khandaghosh",
+      "Nishchintapur",
+      "Oari",
+      "Rupsa",
+      "Sasanga",
+      "Somsar",
+      "Ukhrid"
+    ]
+  ],
+  "713143": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Auria",
+      "Bazar Bankapashi",
+      "Gandhpur",
+      "Gidhgram",
+      "Gobordhanpur",
+      "Jabagram",
+      "Jamra",
+      "Jogeswardihi",
+      "Kaithan",
+      "Karui",
+      "Khirgram",
+      "Koychor",
+      "Kuara",
+      "Nigun",
+      "Palsona",
+      "Panjua",
+      "Puini",
+      "Purba Gopalpur",
+      "Saragram",
+      "Shimulia Danga",
+      "Thangapara"
+    ]
+  ],
+  "713144": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Abhirampur",
+      "Amrargarh",
+      "Bhalki",
+      "Eral",
+      "Khandaridanga",
+      "Kolkol",
+      "Mankar",
+      "Maro",
+      "Pratappur",
+      "Samantapara",
+      "Suata"
+    ]
+  ],
+  "713145": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Asanpur",
+      "Bhojpur",
+      "Chandrapur",
+      "Denur",
+      "Golatun",
+      "Kaigram",
+      "Kalui",
+      "Kasa",
+      "Lohar",
+      "Maldanga",
+      "Monteswar",
+      "Purbakhanpur Bamunpara",
+      "Putsuri",
+      "Singhali",
+      "Tarasusunia"
+    ]
+  ],
+  "713146": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Bagila",
+      "Bahabpur",
+      "Bamunpara",
+      "Bara Mahesh",
+      "Baror",
+      "Biruha",
+      "Chotkhanda",
+      "Debipur",
+      "Debipur RS",
+      "Ghosh",
+      "Gontar",
+      "Hatsridharpur",
+      "Jabui",
+      "Kalibele",
+      "Memari",
+      "Memari Bazar",
+      "Nimo",
+      "Paharhati",
+      "Radhakantapur",
+      "Sasinara",
+      "Sultanpur"
+    ]
+  ],
+  "713147": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Athghara",
+      "Jhilu",
+      "Khurtuba",
+      "Kunda",
+      "Mongalkote",
+      "Nutanhat",
+      "Palishgram",
+      "Purbo Noaapara"
+    ]
+  ],
+  "713148": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Aduria",
+      "Bankati",
+      "Bharatpur",
+      "Birudiha",
+      "Chotoramchandrapur",
+      "Debsala",
+      "Kanksa",
+      "Kota",
+      "Panagar Bazara",
+      "Shilampur",
+      "Sonai",
+      "Trilokchandrapur"
+    ]
+  ],
+  "713149": ["Purba Bardhaman", "West Bengal", ["Bhaita", "Khagrakaranda", "Saktigarh"]],
+  "713150": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Alampur",
+      "Bandhmura",
+      "Berampur",
+      "Bileswar",
+      "Churpuni",
+      "Khajurdihi",
+      "Kosigram",
+      "Mustafapur",
+      "Srikhanda",
+      "Sudpur"
+    ]
+  ],
+  "713151": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Chanchai", "Maheshdanga", "Palla", "Palla RS", "Rasulpur"]
+  ],
+  "713152": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Ausgram",
+      "Bannabagram",
+      "Bhuera",
+      "Chhorahattala",
+      "Genrai",
+      "Hedogora",
+      "Karotia",
+      "Panduk",
+      "Uttarramnagar"
+    ]
+  ],
+  "713153": ["Purba Bardhaman", "West Bengal", ["Bhatkunda", "Kuldiha", "Parisha"]],
+  "713154": ["Purba Bardhaman", "West Bengal", ["Amadpur"]],
+  "713166": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Abujhati",
+      "Dhuluk",
+      "Ilsara",
+      "Jaugram",
+      "Keotara",
+      "Kulingram",
+      "Nabagram",
+      "Reora Gopalpur"
+    ]
+  ],
+  "713201": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Durgapur", "Durgapur Rabindra Pally", "Durgapur RS"]
+  ],
+  "713202": ["Paschim Bardhaman", "West Bengal", ["Durgapur Coke Oven Colony"]],
+  "713203": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Amrai", "Bhiringi", "Durgapur DSP SB", "Durgapur Steel Project"]
+  ],
+  "713204": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Benachity Market", "Durgapur Steel Town West", "Kamalpur", "Pratappur"]
+  ],
+  "713205": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Dhabani", "Durgapur Sepco Township", "Durgapur Steel Town East"]
+  ],
+  "713206": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Durgapur Abl Township", "Fuljhore", "Jemua"]
+  ],
+  "713207": ["Paschim Bardhaman", "West Bengal", ["Durgapur Thermal Power Station"]],
+  "713208": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Durgapur Alloy Steel Project", "Durgapur ASP SB"]
+  ],
+  "713209": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Durgapur Mg Avenue", "Durgapur Re College"]
+  ],
+  "713210": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Durgapur Heavy Engg Plant", "V K Nagar"]
+  ],
+  "713211": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Durgapur Sagarbhanga Colony", "Gopinathpur", "Nadiha"]
+  ],
+  "713212": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    [
+      "Amlajora",
+      "Bamunara",
+      "Bidhannagar",
+      "Burdwan Arrah",
+      "Durgapur Bidhannagar Postal Colony",
+      "Gopalpur",
+      "Kuldiha",
+      "Malandighi",
+      "Rajbandh",
+      "Rakshitpur",
+      "Shibpur"
+    ]
+  ],
+  "713213": ["Paschim Bardhaman", "West Bengal", ["Benachity"]],
+  "713214": ["Paschim Bardhaman", "West Bengal", ["Amrabati", "Durgapur CRPF Camp"]],
+  "713215": ["Paschim Bardhaman", "West Bengal", ["Angadpur", "Durgapur Brick Field"]],
+  "713216": ["Paschim Bardhaman", "West Bengal", ["City Centre"]],
+  "713217": ["Paschim Bardhaman", "West Bengal", ["Oyaria"]],
+  "713301": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Asansol", "Hutton Road", "SBGorai Road"]
+  ],
+  "713302": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Dakhin Dhadka", "Jhingri Mohallah", "Palashbagan", "Railpar"]
+  ],
+  "713303": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["BBCollege", "Mohishila Colony", "Rambandhutalaw", "SDHospital", "Ushagram"]
+  ],
+  "713304": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Asansol Court", "Hill View", "Kumarpur", "U C Danga"]
+  ],
+  "713305": ["Paschim Bardhaman", "West Bengal", ["Ramkrishna Mission"]],
+  "713315": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Jamgram", "Kapista", "Panuria", "Roshna"]
+  ],
+  "713321": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    [
+      "Andal",
+      "Andal South Bazar",
+      "Andalgram",
+      "Baktarnagar",
+      "Dakhin Khanda",
+      "Madanpur",
+      "Moira Colliery",
+      "Srirampur"
+    ]
+  ],
+  "713322": ["Paschim Bardhaman", "West Bengal", ["Bahula", "Siduli"]],
+  "713323": ["Paschim Bardhaman", "West Bengal", ["Ballavpur", "Egara", "Nupur"]],
+  "713324": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Baltoria", "Barakar", "Begunia Bazar", "Ramnagar"]
+  ],
+  "713325": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    [
+      "Burnpur",
+      "Burnpur Mkt",
+      "Dharampur",
+      "Hirapur",
+      "Kalajhoria",
+      "Narsinghbandh",
+      "Radhanagar",
+      "Rahmatdanga",
+      "Rambandh",
+      "Santa",
+      "Santinagar"
+    ]
+  ],
+  "713326": ["Paschim Bardhaman", "West Bengal", ["Chotodighari"]],
+  "713330": ["Paschim Bardhaman", "West Bengal", ["Charanpur", "Majhiara", "Shivpur"]],
+  "713331": ["Paschim Bardhaman", "West Bengal", ["Amladahi", "Chittaranjan", "Simjuri"]],
+  "713332": ["Paschim Bardhaman", "West Bengal", ["Bogra", "Devchandnagar"]],
+  "713333": ["Paschim Bardhaman", "West Bengal", ["Disergarh", "Gangutia", "Sitalpur"]],
+  "713334": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Baraboni", "Bhanora", "Birkulti", "Churulia", "Domahani Bazar", "Kelejora"]
+  ],
+  "713335": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Achra", "Basudevpur Jemari", "Hindustan Cables", "Seakulberia"]
+  ],
+  "713336": ["Paschim Bardhaman", "West Bengal", ["Jamuriahat", "Mandalpur", "Taltore"]],
+  "713337": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Benali", "Bidhanbag", "Jemahari", "Satgram"]
+  ],
+  "713338": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Kajoragram", "Madhusudhanpur", "Parascole"]
+  ],
+  "713339": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Chelod", "Damra", "Kalipahari", "Mohishila", "Rotibati"]
+  ],
+  "713340": ["Paschim Bardhaman", "West Bengal", ["Kalla Central Hospital"]],
+  "713341": ["Paschim Bardhaman", "West Bengal", ["Kanyapur", "Nuni"]],
+  "713342": ["Paschim Bardhaman", "West Bengal", ["Kenda"]],
+  "713343": ["Paschim Bardhaman", "West Bengal", ["Kendua", "Kulti", "Lalbazar"]],
+  "713344": ["Paschim Bardhaman", "West Bengal", ["Nandi"]],
+  "713346": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Kendra", "Pandaveshwar", "Ramnagar Gram", "Semallya"]
+  ],
+  "713347": ["Paschim Bardhaman", "West Bengal", ["Kharsuli Bazar", "Raniganj"]],
+  "713357": ["Paschim Bardhaman", "West Bengal", ["Salanpur"]],
+  "713358": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Amritnagar", "Bansra", "Bijpur", "Nimcha", "Searsole Rajbari"]
+  ],
+  "713359": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    [
+      "Aldihi",
+      "Baradhemo",
+      "Bejdih",
+      "Ethora",
+      "Lalganj",
+      "Neamatpur",
+      "Old Sitarampur",
+      "Raghunathchak",
+      "Samdi",
+      "Sitarampur"
+    ]
+  ],
+  "713360": ["Paschim Bardhaman", "West Bengal", ["Asanboni", "Chinakuri", "Sunderchak"]],
+  "713361": ["Paschim Bardhaman", "West Bengal", ["Suryanagar"]],
+  "713362": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Bahadurpur", "Hijalgora", "Ikrah", "Jote Janki", "Toposi"]
+  ],
+  "713363": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    [
+      "Ichapur",
+      "Khandra",
+      "Kumardihi",
+      "Nabagram",
+      "Patsora",
+      "Sankarpur",
+      "Sarpi",
+      "Ukhra",
+      "Ukhra Puratanhattala"
+    ]
+  ],
+  "713365": ["Paschim Bardhaman", "West Bengal", ["Chittaranjan TS"]],
+  "713369": ["Paschim Bardhaman", "West Bengal", ["Kalyaneshwari"]],
+  "713370": ["Paschim Bardhaman", "West Bengal", ["Ningha"]],
+  "713371": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Bidyanandapur", "Mithani", "Patmohana"]
+  ],
+  "713372": ["Paschim Bardhaman", "West Bengal", ["Radhanagar Rly Colony"]],
+  "713373": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Kankhaya", "Nischinta", "Pariharpur", "Sripur", "Sripur Bazar"]
+  ],
+  "713376": ["Paschim Bardhaman", "West Bengal", ["Dhandadihi"]],
+  "713378": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Bhuri", "Bilpahari", "Chinchuria", "Haripur", "Khottadihi", "Sonepur"]
+  ],
+  "713381": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Amdahi", "Gogla", "Gourbazar", "Nutandanga"]
+  ],
+  "713384": ["Paschim Bardhaman", "West Bengal", ["Parasea"]],
+  "713385": [
+    "Paschim Bardhaman",
+    "West Bengal",
+    ["Balijuri", "Jamgora", "Jhanjra", "Laudoha", "Nakrakonda"]
+  ],
+  "713386": ["Paschim Bardhaman", "West Bengal", ["Rupnarayanpur Bazar"]],
+  "713401": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Ajhapur", "Habaspur", "Kenna", "Masagram", "Panchra", "Sanchra"]
+  ],
+  "713403": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Budbud", "Dwarnari", "Jharul", "Kasba", "Nurkona", "Paraj", "Ramgopalpur"]
+  ],
+  "713404": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Bishnubati", "Chakdighi", "Jaragram", "Runkini Mahalla", "Sonargaria"]
+  ],
+  "713405": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Astogoria",
+      "Dhatrigram",
+      "Krishnadebpur",
+      "Medgachi",
+      "Nandai",
+      "Nibhujibazar",
+      "Sahajpur",
+      "Simlon"
+    ]
+  ],
+  "713406": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Bahirghanna",
+      "Bhuri",
+      "Chakmuria",
+      "Galsi",
+      "Goligrammathurapur",
+      "Joykrishnapur",
+      "Monoharsujapur",
+      "Pursa",
+      "Pursura",
+      "Uchhagram",
+      "Ura"
+    ]
+  ],
+  "713407": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Balgona",
+      "Begut",
+      "Bonogram",
+      "Hatgobindapur",
+      "Kashiara",
+      "Kuchut",
+      "Nabastha",
+      "Sodda",
+      "Sonapalashi",
+      "Suhari",
+      "Sukur"
+    ]
+  ],
+  "713408": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Anguna",
+      "Bahadurpur",
+      "Berugram",
+      "Jamalpur",
+      "Jotsriram",
+      "Kamargoria",
+      "Paratal",
+      "Parbatpur",
+      "Sadipur",
+      "Sah Hossainpur",
+      "Sanktia",
+      "Surekanla"
+    ]
+  ],
+  "713409": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Bagnapara",
+      "Baramitrapara",
+      "Bhaduripara",
+      "Deara Radhanagar",
+      "Hatbele",
+      "Kalna",
+      "Kalna Court"
+    ]
+  ],
+  "713420": ["Purba Bardhaman", "West Bengal", ["Panagar", "Rondia"]],
+  "713421": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Barabainan", "Kamarhati", "Pasanda", "Raina", "Saknara", "Tajpur"]
+  ],
+  "713422": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Begpur",
+      "Bhagra",
+      "Bijur",
+      "Bitra",
+      "Bohar",
+      "Dewania",
+      "Ibrahambadsonadanga",
+      "Jamna",
+      "Jhikra",
+      "Kanpur",
+      "Karanda",
+      "Katshihi",
+      "Khalishpur",
+      "Khandraparulia",
+      "Kuley",
+      "Kulut",
+      "Kusumgram",
+      "Madhyagram",
+      "Mamudpur",
+      "Mangalpur",
+      "Piplon",
+      "Purguna",
+      "Raigram",
+      "Satgachia",
+      "Sontla"
+    ]
+  ],
+  "713423": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Amila",
+      "Bowai",
+      "Bujrukhdighi",
+      "Chagram",
+      "Chotobainan",
+      "Guir",
+      "Kaiti",
+      "Keshabpur",
+      "Keunta",
+      "Konakrishnapur",
+      "Koyar",
+      "Saranga",
+      "Sehara",
+      "Torkona"
+    ]
+  ],
+  "713424": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Burar",
+      "Golgram",
+      "Huria",
+      "Jubila",
+      "Madabdihi",
+      "Madanagar",
+      "Meral",
+      "Narugram",
+      "Nole",
+      "Palashan",
+      "Rambati",
+      "Sagrai",
+      "Sahajpur Hattala",
+      "Sankari",
+      "Shyamdasbati",
+      "Shyamsundar",
+      "Teandul",
+      "Telua"
+    ]
+  ],
+  "713426": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Barapalashan",
+      "Bhandardihi",
+      "Faridpur",
+      "Kamarkita",
+      "Kasthakurumba",
+      "Malamba",
+      "Mandalgram",
+      "Ramchandrapur",
+      "Samanti",
+      "Susunia",
+      "Untia"
+    ]
+  ],
+  "713427": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Bajekumarpur",
+      "Belar Bhurkunda",
+      "Eklakhi",
+      "Gopalbera",
+      "Kendur",
+      "Kumarganj",
+      "Pahalanpur",
+      "Painta",
+      "Sherpur",
+      "Uchalan"
+    ]
+  ],
+  "713428": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Adrahati",
+      "Bakta",
+      "Belan",
+      "Gohagram",
+      "Irkona",
+      "Masidpur",
+      "Mohara",
+      "Mollasarul",
+      "Purangaon",
+      "Serorai"
+    ]
+  ],
+  "713502": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Agradwip RS",
+      "Ankra",
+      "Ballavpara",
+      "Bera",
+      "Bhagyabantapur",
+      "Chanduli",
+      "Dainhat",
+      "Deasin",
+      "Islampur",
+      "Kalikapur",
+      "Karajgram",
+      "Musthuli",
+      "Panuhat"
+    ]
+  ],
+  "713512": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Agradwip",
+      "Belerhat",
+      "Chatni",
+      "Hapania",
+      "Jhaudanga",
+      "Lakshmipur",
+      "Majida",
+      "Narayanapur",
+      "Patuli",
+      "Patuli Station Bazar",
+      "Tamaghata",
+      "Ukhra Sarangpur"
+    ]
+  ],
+  "713513": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Biswaramba",
+      "Chakbamongaria",
+      "Chupi",
+      "Haldinawapara",
+      "Jahannagar",
+      "Kasthashali",
+      "Mertala",
+      "Minapur",
+      "Moail",
+      "Mukshinpara",
+      "Parulia",
+      "Purbasthali",
+      "Raidogachia",
+      "Sutra"
+    ]
+  ],
+  "713514": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Amul", "Gourdanga", "Kurchi", "Multikrishnanagar", "Okarsa", "Singhi", "Sribati"]
+  ],
+  "713515": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Akabpur", "Dirghapara", "Nadanghat", "Nowapara"]
+  ],
+  "713519": [
+    "Purba Bardhaman",
+    "West Bengal",
+    ["Charmaniknagar", "Dupsa", "Kutirpara", "Nasaratpur", "Raipur", "Samudragarh"]
+  ],
+  "713520": [
+    "Purba Bardhaman",
+    "West Bengal",
+    [
+      "Balgona Tulshidanga",
+      "Bamsore",
+      "Bhatakul",
+      "Dhenria",
+      "Kalapahari",
+      "Nityanandapur",
+      "Poshla"
+    ]
+  ]
+}

@@ -314,7 +314,8 @@
       "steps": {
         "place": "拠点と住所",
         "contact": "連絡先と営業時間",
-        "people": "担当者"
+        "people": "担当者",
+        "places": "場所と休業日"
       },
       "groups": {
         "branch": "拠点",
@@ -390,7 +391,76 @@
       "added": "拠点 {{name}} を追加しました",
       "saved": "{{name}} を保存しました",
       "contactMissing": "電話番号とメールを入力してください",
-      "pinInvalid": "PINコードは6桁です"
+      "pinInvalid": "PINコードは6桁です",
+      "places": {
+        "sections": {
+          "room": "診察室",
+          "machine": "機器",
+          "holiday": "休業日"
+        },
+        "hints": {
+          "room": "患者さんを診る場所",
+          "machine": "施術と一緒に予約",
+          "holiday": "終日休業 · 予約不可"
+        },
+        "counts": {
+          "room_other": "{{count}} 室",
+          "machine_other": "{{count}} 台",
+          "holiday_other": "{{count}} 日"
+        },
+        "nothingYet": "診察室・機器・休業日はまだありません",
+        "empty": {
+          "room": "診察室はまだありません",
+          "machine": "機器はまだありません",
+          "holiday": "今後の休業日はありません"
+        },
+        "newLabel": {
+          "room": "新しい診察室",
+          "machine": "新しい機器",
+          "holiday": "新しい休業日"
+        },
+        "placeholders": {
+          "room": "例：診察室 1",
+          "machine": "例：レーザー機器",
+          "holiday": "例：ディワリ"
+        },
+        "fields": {
+          "name": "名前",
+          "date": "日付",
+          "label": "休業日"
+        },
+        "add": "追加",
+        "rename": "名前を変更",
+        "save": "保存",
+        "cancel": "キャンセル",
+        "remove": "削除",
+        "toggle": {
+          "on": "使用中",
+          "off": "停止中",
+          "label": "{{name}} 使用中"
+        },
+        "removeTitle": {
+          "room": "この診察室を削除しますか？",
+          "machine": "この機器を削除しますか？",
+          "holiday": "この休業日を削除しますか？"
+        },
+        "duplicate": {
+          "room": "{{name}} という診察室はすでにあります",
+          "machine": "{{name}} という機器はすでにあります",
+          "holiday": "{{date}} はすでに休業日です"
+        },
+        "nameMissing": "名前を入力してください",
+        "nameTooLong": "60 文字以内",
+        "dateMissing": "日付を選んでください",
+        "labelMissing": "休業日の名前を入力してください",
+        "labelTooLong": "60 文字以内",
+        "added": "{{name}} を追加しました",
+        "renamed": "{{name}} に名前を変更しました",
+        "switchedOn": "{{name}} を使用中にしました",
+        "switchedOff": "{{name}} を停止しました",
+        "removed": "{{name}} を削除しました",
+        "loadFailed": "診察室・機器・休業日を読み込めませんでした"
+      }
     }
   }
 }

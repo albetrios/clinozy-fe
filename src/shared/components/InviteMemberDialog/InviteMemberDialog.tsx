@@ -5,7 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { translateFormMessage } from '@/lib/i18n/translate-form-message.ts';
-import { isInvitableRole } from '@/shared/api/organization-contracts.ts';
+import {
+  isInvitableRole,
+  type MemberInvite,
+} from '@/shared/api/organization-contracts.ts';
 import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
@@ -30,6 +33,28 @@ type InviteInput = z.infer<typeof inviteSchema>;
 /** Email and role: the light 560px drawer (`_patterns.md:28`). */
 const INVITE_FORM_PROFILE = { fieldCount: 2 } as const;
 
+/** Props of {@link InviteMemberDialog} — all optional; without them it is Settings › Members' own. */
+export interface InviteMemberDialogProps {
+  /**
+   * Controlled: the caller opens it (the setup guide's "Invite", feat-clinic-setup KICKOFF §6.2)
+   * and there is no "Invite member" button of its own.
+   */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** The role picked when it opens — "Invite your doctor" picks Doctor. */
+  defaultRoleId?: string;
+  /**
+   * What every invitation sent from here also carries — setup's are the main branch and its days
+   * and hours as the member's working hours (D16).
+   */
+  memberDefaults?: Pick<
+    MemberInvite,
+    'branchIds' | 'workingDays' | 'workStartsAt' | 'workEndsAt'
+  >;
+  /** After an invitation is sent. */
+  onInvited?: () => void;
+}
+
 /**
  * Drawer + form for inviting a new member to the active organization — a child
  * drawer stacked on Settings › Members (L-65), whose Back returns there. Roles
@@ -38,9 +63,21 @@ const INVITE_FORM_PROFILE = { fieldCount: 2 } as const;
  * "create a role first" hint instead of an unusable form. Gated by the caller
  * (render only when the user holds `membership:create` and `role:read`).
  */
-export function InviteMemberDialog() {
+export function InviteMemberDialog({
+  open: controlledOpen,
+  onOpenChange,
+  defaultRoleId = '',
+  memberDefaults,
+  onInvited,
+}: InviteMemberDialogProps = {}) {
   const { t } = useTranslation(SETTINGS_NS);
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = controlledOpen ?? ownOpen;
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setOwnOpen(next);
+    onOpenChange?.(next);
+  };
   // The email takes focus on open, as it did when this was a dialog.
   const emailRef = useRef<HTMLInputElement | null>(null);
   /** The form the footer's Send submits — Enter in the email sends too. */
@@ -52,7 +89,7 @@ export function InviteMemberDialog() {
 
   const form = useForm<InviteInput>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { email: '', roleId: '' },
+    defaultValues: { email: '', roleId: defaultRoleId },
   });
   const {
     register,
@@ -63,9 +100,14 @@ export function InviteMemberDialog() {
   const { ref: registerEmailRef, ...emailField } = register('email');
 
   const onSubmit = async (data: InviteInput) => {
-    await invite.mutateAsync({ email: data.email, roleIds: [data.roleId] });
-    resetFormInPlace(form, { email: '', roleId: '' });
+    await invite.mutateAsync({
+      email: data.email,
+      roleIds: [data.roleId],
+      ...memberDefaults,
+    });
+    resetFormInPlace(form, { email: '', roleId: defaultRoleId });
     setOpen(false);
+    onInvited?.();
   };
 
   const showForm = !roles.isPending && hasRoles;
@@ -167,10 +209,12 @@ export function InviteMemberDialog() {
   // (loading, a failed read, no role to assign) offers only Back.
   return (
     <>
-      <Button size="sm" onClick={() => setOpen(true)} data-testid="invite-member-open">
-        <UserPlus className="size-4" />
-        Invite member
-      </Button>
+      {isControlled ? null : (
+        <Button size="sm" onClick={() => setOpen(true)} data-testid="invite-member-open">
+          <UserPlus className="size-4" />
+          Invite member
+        </Button>
+      )}
       <RecordDrawer
         open={open}
         onClose={() => setOpen(false)}

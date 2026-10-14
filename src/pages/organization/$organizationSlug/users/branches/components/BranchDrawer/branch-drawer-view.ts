@@ -4,8 +4,8 @@ import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { formatAppPhoneDigits } from '@/shared/app/app-phone-field.ts';
 import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
+import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 
-import type { HoursFormat } from '../../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import { BRANCH_DEFAULT_ROLES, teamMemberById } from '../../hooks/useBranchRows/index.ts';
 import {

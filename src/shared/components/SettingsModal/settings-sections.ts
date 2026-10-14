@@ -7,6 +7,7 @@ import {
   Plug,
   Shield,
   ShieldCheck,
+  Stethoscope,
   User,
   UserCog,
   Users,
@@ -37,7 +38,11 @@ export type AccountSettingsSection =
   | 'billing'
   | 'integrations';
 
-export type OrganizationSettingsSection = 'general' | 'members' | 'roles';
+/**
+ * A section of the Organization settings scope — TEAM workspaces only. `clinic` is the clinic's
+ * deeper setup (feat-clinic-setup KICKOFF §6.6): its specialties, timezone and operating values.
+ */
+export type OrganizationSettingsSection = 'general' | 'clinic' | 'members' | 'roles';
 
 export type SettingsSection = AccountSettingsSection | OrganizationSettingsSection;
 
@@ -57,7 +62,7 @@ export const SECTIONS_BY_SCOPE: Record<SettingsScope, readonly SettingsSection[]
     'billing',
     'integrations',
   ],
-  organization: ['general', 'members', 'roles'],
+  organization: ['general', 'clinic', 'members', 'roles'],
 };
 
 export const DEFAULT_SETTINGS: SettingsSectionRef = {
@@ -84,7 +89,7 @@ export const DEFAULT_SETTINGS: SettingsSectionRef = {
 export function sectionsForOrgType(
   type: OrganizationType,
 ): readonly OrganizationSettingsSection[] {
-  return type === 'TEAM' ? ['general', 'members', 'roles'] : [];
+  return type === 'TEAM' ? ['general', 'clinic', 'members', 'roles'] : [];
 }
 
 /** One openable destination in the Settings nav (and in the command palette). */
@@ -187,6 +192,22 @@ export const SETTINGS_NAV: readonly SettingsNavGroup[] = [
         labelKey: SETTINGS_SECTION_LABEL_KEYS.general,
         icon: Building,
         keywords: ['organization', 'name', 'slug', 'general'],
+      },
+      {
+        scope: 'organization',
+        section: 'clinic',
+        labelKey: SETTINGS_SECTION_LABEL_KEYS.clinic,
+        icon: Stethoscope,
+        keywords: [
+          'clinic',
+          'specialties',
+          'timezone',
+          'reminder',
+          'lead',
+          'retarget',
+          'setup',
+          'guide',
+        ],
       },
       {
         scope: 'organization',

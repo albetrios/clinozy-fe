@@ -1,0 +1,174 @@
+{
+  "drawer": {
+    "title": "Set up {{clinic}}",
+    "sub": "About a minute · Step {{step}} of {{total}}",
+    "progressLabel": "Setup progress",
+    "stepAnnounce": "Step {{step}} of {{total}}",
+    "exploreFirst": "Explore first",
+    "next": "Next: {{step}}",
+    "goLive": "Go live",
+    "goingLive": "Going live…",
+    "saving": "Saving…",
+    "notSaved": "Not saved · your changes are kept",
+    "lockedHint": "After “{{step}}”",
+    "lockedToast": "Finish “{{step}}” first",
+    "saveFailed": "Couldn't save this step. Your answers are kept — try again.",
+    "loadFailed": "Couldn't load your clinic's setup."
+  },
+  "steps": {
+    "clinicType": {
+      "title": "What kind of clinic is it?",
+      "why": "Your services and bills start from it.",
+      "label": "Specialties",
+      "hint": "Pick one or more",
+      "required": "Pick at least one specialty."
+    },
+    "location": {
+      "title": "Where is your clinic?",
+      "why": "Bookings and bills need a place.",
+      "pin": "PIN code",
+      "pinHint": "Fills in the area, city and state",
+      "pinUnknown": "We don't know this PIN — type the area, city and state.",
+      "areaPick": "Pick your area",
+      "area": "Area",
+      "city": "City",
+      "state": "State",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "branchName": "Branch name",
+      "hours": "Open {{days}} · {{opens}}–{{closes}}",
+      "change": "Change",
+      "done": "Done",
+      "days": "Working days",
+      "opens": "Opens",
+      "closes": "Closes",
+      "closesAfterOpens": "Closing time must be after opening time.",
+      "requiredField": "{{field}} is required.",
+      "pinInvalid": "Enter the six-digit PIN code.",
+      "emailInvalid": "Enter a valid email.",
+      "phoneInvalid": "Enter a valid phone number.",
+      "mainExists": "Your clinic already has a main branch — setup uses it."
+    },
+    "you": {
+      "title": "Do you see patients yourself?",
+      "why": "So patients can be booked with you from day one.",
+      "label": "Do you see patients yourself?",
+      "doctor": "Yes, as a doctor",
+      "therapist": "Yes, as a therapist",
+      "no": "No",
+      "noHint": "You can invite your doctor next.",
+      "required": "Pick one."
+    }
+  },
+  "peek": {
+    "specialties": "Specialties",
+    "branch": "Branch",
+    "hours": "Hours",
+    "seesPatients": "Sees patients"
+  },
+  "checks": {
+    "clinic_type": "what kind of clinic",
+    "main_branch": "where it is",
+    "services": "a service"
+  },
+  "goLiveRefused": "Can't go live yet — still missing: {{missing}}.",
+  "live": {
+    "title": "You're live",
+    "sub": "{{clinic}} can book and bill now.",
+    "setUp": "We set up:",
+    "branch": "{{branch}} branch",
+    "consultation": "{{name}} {{price}}",
+    "youAsDoctor": "you as doctor",
+    "youAsTherapist": "you as therapist",
+    "book": "Book your first appointment",
+    "done": "Done",
+    "heardAbout": {
+      "label": "How did you hear about us?",
+      "options": {
+        "search": "Search",
+        "socialMedia": "Social media",
+        "friendOrColleague": "Friend or colleague",
+        "blogOrArticle": "Blog or article",
+        "other": "Other"
+      },
+      "thanks": "Thanks — that helps us."
+    }
+  },
+  "guide": {
+    "title": "Finish setting up {{clinic}}",
+    "count": "{{done}} of {{total}} done",
+    "consultationAdded": "Consultation added",
+    "items": {
+      "treatments": {
+        "title": "Add your treatments",
+        "sub": "Pick from the starter list",
+        "action": "Add"
+      },
+      "inviteTeam": {
+        "title": "Invite your team",
+        "sub": "Doctors, front desk",
+        "action": "Invite"
+      },
+      "inviteDoctor": {
+        "title": "Invite your doctor",
+        "sub": "Nobody can be booked yet",
+        "action": "Invite"
+      },
+      "firstAppointment": {
+        "title": "Book your first appointment",
+        "action": "Book"
+      }
+    },
+    "skip": "Skip",
+    "undoSkip": "Undo skip",
+    "skipped": "Skipped",
+    "done": "Done",
+    "hide": "Hide this guide",
+    "hidden": "Guide hidden — reopen it from Clinic settings.",
+    "ready": {
+      "title": "Your clinic is ready",
+      "sub": "Everything else — hours, rooms, reminders — lives in Clinic settings.",
+      "settings": "Clinic settings"
+    }
+  },
+  "starter": {
+    "title": "Add your treatments",
+    "sub": "Tick what you offer; edit the name, minutes, price and GST before adding.",
+    "back": "Back to the guide",
+    "name": "Name",
+    "minutes": "Minutes",
+    "price": "Price",
+    "gst": "GST",
+    "rowLabel": "Add {{name}}",
+    "exists": "Added",
+    "add_one": "Add {{count}} treatment",
+    "add_other": "Add {{count}} treatments",
+    "adding": "Adding…",
+    "added_one": "{{count}} treatment added",
+    "added_other": "{{count}} treatments added",
+    "addOwn": "Add your own",
+    "nothingTicked": "Tick at least one treatment.",
+    "consultationNamed": "{{specialty}} consultation",
+    "names": {
+      "consultation": "Consultation",
+      "chemicalPeel": "Chemical peel",
+      "hydrafacial": "Hydrafacial",
+      "laserHairRemovalFullFace": "LHR full face (session)",
+      "acneScarTreatment": "Acne scar treatment",
+      "prpSession": "PRP session",
+      "prpPack": "PRP pack",
+      "scalpTreatment": "Scalp treatment",
+      "scalingPolishing": "Scaling & polishing",
+      "toothFilling": "Tooth filling",
+      "rootCanal": "Root canal",
+      "teethWhitening": "Teeth whitening",
+      "papSmear": "Pap smear",
+      "pelvicUltrasound": "Pelvic ultrasound",
+      "physioSession": "Physio session",
+      "physioPack": "Physio pack",
+      "followUpVisit": "Follow-up visit",
+      "dressing": "Dressing"
+    }
+  }
+}

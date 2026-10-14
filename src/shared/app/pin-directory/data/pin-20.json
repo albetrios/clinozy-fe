@@ -1,0 +1,4086 @@
+{
+  "201001": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    ["Ashok Nagar", "Ghaziabad", "Nehru Nagar", "Ramte Ram Road"]
+  ],
+  "201002": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    [
+      "Ingrahm Institute",
+      "Kamla Nehru Nagar",
+      "Kavi Nagar",
+      "New Raj Nagar",
+      "Police Line Harsaon",
+      "Raispur",
+      "Rajapur",
+      "Raknpa",
+      "Sadarpur",
+      "Shahpur Bamheta",
+      "Shastri Nagar",
+      "Vivekanand Nagar"
+    ]
+  ],
+  "201003": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    [
+      "Atore Nangla",
+      "Aurangabad Ristal",
+      "BubKheri",
+      "Farrukh Ng",
+      "Meerut Road",
+      "Morta",
+      "Nistauli"
+    ]
+  ],
+  "201004": ["Ghaziabad", "Uttar Pradesh", ["Hindon Air Field"]],
+  "201005": ["Ghaziabad", "Uttar Pradesh", ["Pasonda", "Sahibabad"]],
+  "201006": ["Ghaziabad", "Uttar Pradesh", ["Bhopura", "Chikamberpur"]],
+  "201007": ["Ghaziabad", "Uttar Pradesh", ["Mohan Nagar"]],
+  "201008": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Bisara", "Piaoli", "Salarpur Kalan", "Vidyut Nagar"]
+  ],
+  "201009": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    [
+      "Arya Nagar",
+      "Chhapraula",
+      "Chipiana",
+      "Dasna Gate",
+      "Dundaheda",
+      "Ghaziabad City",
+      "Kaila",
+      "Nasratpura",
+      "Roja Yakoobpur",
+      "Vijay Nagar"
+    ]
+  ],
+  "201010": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    ["Bharat Nagar", "Hasanpur Bhowapur", "IESahibabad", "Kaushambi"]
+  ],
+  "201011": ["Ghaziabad", "Uttar Pradesh", ["Chandra Nagar"]],
+  "201012": ["Ghaziabad", "Uttar Pradesh", ["Vasundhra"]],
+  "201013": ["Ghaziabad", "Uttar Pradesh", ["Govindpuram"]],
+  "201014": ["Ghaziabad", "Uttar Pradesh", ["Shipra Sun City"]],
+  "201015": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    [
+      "Adhyatmik Nagar",
+      "Dasna",
+      "Dasna RS",
+      "Galand",
+      "Hasanpur",
+      "Hindon Nagar",
+      "Jindal Nagar",
+      "Kushlia",
+      "Nahal",
+      "Udai Rampur Nangla"
+    ]
+  ],
+  "201016": ["Ghaziabad", "Uttar Pradesh", ["Crossings Republik"]],
+  "201017": ["Ghaziabad", "Uttar Pradesh", ["Raj Nagar Extension"]],
+  "201018": ["Ghaziabad", "Uttar Pradesh", ["Model Town"]],
+  "201019": ["Ghaziabad", "Uttar Pradesh", ["Vaishali"]],
+  "201020": ["Ghaziabad", "Uttar Pradesh", ["Khora"]],
+  "201021": ["Ghaziabad", "Uttar Pradesh", ["Abhay Khand 03"]],
+  "201102": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    [
+      "Badshahpur Siroli",
+      "Behta Hazipur",
+      "Chirori",
+      "Jaoli",
+      "Loni",
+      "Mandola",
+      "Teela Shahbazpur"
+    ]
+  ],
+  "201103": ["Ghaziabad", "Uttar Pradesh", ["Meerpur Hindu", "Tronica City"]],
+  "201201": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    ["Churiyala", "Govindpuri", "Harmukhpuri", "Rori", "Saidpur", "Sara", "Talheta"]
+  ],
+  "201204": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    [
+      "Begmabad",
+      "Gyaspur",
+      "Khanjarpur",
+      "Khindora",
+      "Modi Nagar",
+      "Nagla Akhu",
+      "Niwari",
+      "Painga",
+      "Patla",
+      "Saunda",
+      "Shahjahanpur",
+      "Sikri Kalan",
+      "Sikri Khurd",
+      "Tibra"
+    ]
+  ],
+  "201206": [
+    "Ghaziabad",
+    "Uttar Pradesh",
+    [
+      "Abupur",
+      "Basantpur Sainthli",
+      "Bhadauli",
+      "Bhikanpur",
+      "Didauli",
+      "Dosa Banjarpur",
+      "Duhai",
+      "Jalalabad",
+      "Jalalpur Dhindhar",
+      "Kakra",
+      "Kanauja",
+      "Khimawti",
+      "Kumhera",
+      "Murad Nagar",
+      "Murad Nagar Bazar",
+      "Murad Nagar Town",
+      "Nekpur",
+      "Noorpur",
+      "Raoli Kalan",
+      "Shahpur",
+      "Sultanpur",
+      "Surana"
+    ]
+  ],
+  "201301": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Noida", "Sec 16 Noida", "Sec 27 Noida"]
+  ],
+  "201302": ["Gautam Buddha Nagar", "Uttar Pradesh", []],
+  "201303": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Sec37 Noida", "Sec41 Noida", "Sec45 Noida", "Sector 30 Noida"]
+  ],
+  "201304": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Baraula", "Chhaprauli Bengar", "Gejha", "Maharshi Nagar"]
+  ],
+  "201305": ["Gautam Buddha Nagar", "Uttar Pradesh", ["Nagla Charandas", "Nepz"]],
+  "201306": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["CRPF Greater Noida", "IA Surajpur", "Kulesra"]
+  ],
+  "201307": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Sarfabad", "Sec 12 Noida", "Sec34 Noida"]
+  ],
+  "201309": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Chhajarsi", "Sec55 Noida", "Sec62 Noida"]
+  ],
+  "201310": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Alpha Greater Noida", "Ghori", "Knowledge ParkI", "Sakipur"]
+  ],
+  "201311": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Container Depot", "Kheri Bhanota", "Pali", "Tilapta Karanwas"]
+  ],
+  "201312": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Gautam Budh University", "Kasna", "Maicha"]
+  ],
+  "201313": ["Gautam Buddha Nagar", "Uttar Pradesh", ["Amity University"]],
+  "201314": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    [
+      "Behrampur",
+      "Chainsa",
+      "Chholas",
+      "Chithera",
+      "Khandera",
+      "Kot",
+      "Luharli",
+      "Sainthli",
+      "Shiv Nadar University"
+    ]
+  ],
+  "201315": ["Gautam Buddha Nagar", "Uttar Pradesh", ["Gurjinder Vihar"]],
+  "201316": ["Gautam Buddha Nagar", "Uttar Pradesh", ["Sec 122 Noida"]],
+  "201317": ["Gautam Buddha Nagar", "Uttar Pradesh", ["Sec 128 Noida"]],
+  "201318": ["Gautam Buddha Nagar", "Uttar Pradesh", ["Sec 01 Greater Noida"]],
+  "202001": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Aligarh",
+      "Aligarh City",
+      "Bannadevi",
+      "Civil Court",
+      "D S College",
+      "Delhi Gate",
+      "Dodhpur",
+      "Form Press",
+      "Gandhi Eye Hospital",
+      "I T I Road",
+      "Industrial Area Aligarh",
+      "Jaiganj",
+      "Kutchery",
+      "Madar Darwaja",
+      "Mahavir Ganj",
+      "Manik Chowk",
+      "Naurangabad",
+      "Ramghat Road",
+      "Rasal Ganj",
+      "Sarai Khirni",
+      "Sarai Kutub",
+      "Sarai Labaria",
+      "Sasni Gate",
+      "Subhash Road",
+      "T R M M Aligarh",
+      "Upperkot",
+      "Vishnupuri"
+    ]
+  ],
+  "202002": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Adaun",
+      "Ahmedpur",
+      "Aisi",
+      "Aligarh Muslim University",
+      "Allahdadpur",
+      "Beethna",
+      "Bhadesi",
+      "Bhankri Niranjankot",
+      "Bhemti",
+      "Bidirka",
+      "Dhanipur",
+      "Digsi",
+      "Govindpur Fagoi",
+      "Jallupur Sehore",
+      "Kalwa",
+      "Kamalpur",
+      "Konchhor",
+      "Mahua",
+      "Medical College",
+      "Mehrawal",
+      "Mukandpur",
+      "Nagla Devi",
+      "Naglamandir",
+      "Pala Aisi",
+      "Panethi",
+      "Quarsi",
+      "Sarsol",
+      "Shahpur Kutub"
+    ]
+  ],
+  "202121": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Akrabad",
+      "Dabha",
+      "Jiroli Hira Singh",
+      "Khera Narain Singh",
+      "Khurrampur",
+      "Ladhaua",
+      "Manai",
+      "Mandanpur",
+      "PilAkhna",
+      "Suhawali",
+      "Tuamai"
+    ]
+  ],
+  "202122": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Aligarh Dairy Farm",
+      "Amrauli",
+      "Bahadurpur Kota",
+      "Chherat",
+      "Pala Kastali",
+      "Sikandarpur Kota",
+      "Siya Khas"
+    ]
+  ],
+  "202123": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Digsari",
+      "Gonda",
+      "Kemthal",
+      "Manti Basai",
+      "Nagla Birkhu",
+      "Nagla Jagdeo",
+      "Nagla Jhujhar",
+      "Pachawari",
+      "Paindapur",
+      "Rajawal",
+      "Sehri Madangarhi",
+      "Talesara"
+    ]
+  ],
+  "202124": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Bhaiyan",
+      "Chhaichhau",
+      "Gahlau",
+      "Gidauli",
+      "Gursena",
+      "Harautha",
+      "Hastpur Chandfari",
+      "Iglas",
+      "Kajrauth",
+      "Kalua Bhilet",
+      "Matroi",
+      "Mohreni",
+      "Sahara Khurd",
+      "Salempur",
+      "Simardhari"
+    ]
+  ],
+  "202125": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Barotha",
+      "Bhavigarh",
+      "Budhansi",
+      "Chhadawali",
+      "Gurushikharan",
+      "Harduaganj",
+      "Kalai",
+      "Khan Alampur",
+      "Narona Akapur",
+      "Sadhu Ashram",
+      "Ukhlana"
+    ]
+  ],
+  "202126": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Baraula",
+      "Barauli",
+      "Daheli",
+      "Daupur",
+      "Debthala",
+      "Jawan",
+      "Pilona",
+      "Songra",
+      "Sumera"
+    ]
+  ],
+  "202127": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Chhalesar",
+      "Godha",
+      "Kasimpur",
+      "Khera Bujurg",
+      "N C Kasimpur",
+      "Parki",
+      "Satha",
+      "Sikharna",
+      "Sunamai",
+      "Talib Nagar"
+    ]
+  ],
+  "202128": [
+    "Aligarh",
+    "Uttar Pradesh",
+    ["Baranadi", "Changeri", "Jalali", "Rehsupur", "Sheikhupur"]
+  ],
+  "202129": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Alampur Rani",
+      "Barla",
+      "Bhilet Ramnagar",
+      "Hasona Jagmohanpur",
+      "Kauriyaganj",
+      "Kutubour Amarpur",
+      "Pahari Pur",
+      "Phusauli",
+      "Pipoli",
+      "Shahagarh",
+      "Utra"
+    ]
+  ],
+  "202130": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Bain Kalan",
+      "Bhamora Kalan",
+      "Bhikampur",
+      "Chharra",
+      "Dhansari",
+      "Habibganj",
+      "Siroli",
+      "Sunpahar"
+    ]
+  ],
+  "202131": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Badesara",
+      "Bijauli",
+      "Chandaua Goverdhanapur",
+      "Dudhma",
+      "Gehtoli Nirmal",
+      "Nahal",
+      "Pali Mukimpur",
+      "Panehra",
+      "Pipari",
+      "Rajatau"
+    ]
+  ],
+  "202132": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Amritpur",
+      "Bhagatpur",
+      "Bharpur",
+      "Chandaus",
+      "Kaseru",
+      "Nagla Padam",
+      "Ogipur",
+      "Sudeshpur"
+    ]
+  ],
+  "202133": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Abhaipur Behlolpur",
+      "Alampur Fatehpur",
+      "Bonai",
+      "Dadon",
+      "Dinapur",
+      "Haranpur Kalan",
+      "Hardoi",
+      "Harnaut",
+      "Jirauli",
+      "Kaser",
+      "Khandua",
+      "Lehra",
+      "Mandpur",
+      "Nah",
+      "Narupura",
+      "Paitra Nawabpur",
+      "Rajmau",
+      "Rajpur Khas",
+      "Ramnagar",
+      "Rampur Chandyana",
+      "Sahjahanpur Baijna",
+      "Sankra",
+      "Zafar Manzil"
+    ]
+  ],
+  "202134": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Badhari Bujurg",
+      "Bilona Chitsari",
+      "Budha Gaon",
+      "Gangiri",
+      "Kanobi",
+      "Majhola",
+      "Manena Ummedpur",
+      "Naugawan",
+      "Rukhala"
+    ]
+  ],
+  "202135": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Ahraula",
+      "Aidalpur",
+      "Bankner",
+      "Fatehgarhi",
+      "Gomat",
+      "Kasison",
+      "Khera Sattu",
+      "Madanpur",
+      "Shiwala"
+    ]
+  ],
+  "202136": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Gabhana",
+      "Kandauli",
+      "Kanoi",
+      "Korah Rustampur",
+      "Mohrena",
+      "Parai",
+      "Pothi",
+      "Tamkoli"
+    ]
+  ],
+  "202137": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Bajauta",
+      "Hetalpur",
+      "Jalalpur",
+      "Jatrauli",
+      "Jattari",
+      "Khandeha",
+      "Maur",
+      "Palsera",
+      "Pempur",
+      "Shadipur"
+    ]
+  ],
+  "202138": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Achna",
+      "Arrana",
+      "Bamani",
+      "Bamoti",
+      "Bisara",
+      "Jarara",
+      "Khair",
+      "Khair Mandi",
+      "Pala Chand",
+      "Sawai Raghunathpur",
+      "Usram",
+      "Utwara"
+    ]
+  ],
+  "202139": [
+    "Hathras",
+    "Uttar Pradesh",
+    ["Chandaiya", "K G W Sasni", "Komari", "Lutsan", "Sikur"]
+  ],
+  "202140": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Akrawat",
+      "Andla",
+      "Badon",
+      "Beharipur",
+      "Bhanauli",
+      "Dunai",
+      "Ismailpur",
+      "Jiroli Dor",
+      "Kesopur Jofari",
+      "Kiratpur Nimana",
+      "Lodha",
+      "Majupur",
+      "Rait",
+      "Shikharan"
+    ]
+  ],
+  "202141": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Bharatpur",
+      "Dayal Nagar",
+      "Dewa Hamidpur",
+      "Jamonka",
+      "Karanpur",
+      "Kilpur",
+      "Narainpur",
+      "Rajpur",
+      "Ranjeet Garhi",
+      "Resari",
+      "Sahajpura",
+      "Salpur",
+      "Takipur"
+    ]
+  ],
+  "202142": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Bhimpur",
+      "Birpura",
+      "Chilawati",
+      "Hinsel",
+      "Karanpur",
+      "Nagla Sarua",
+      "Rampur Shahpur",
+      "Udaipur"
+    ]
+  ],
+  "202143": [
+    "Aligarh",
+    "Uttar Pradesh",
+    ["Balwant Nagaria", "Deopur", "Deorau", "Madhaula", "Pahawati", "Somna"]
+  ],
+  "202145": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Beswan",
+      "Bhangra",
+      "Gorai",
+      "Jamaun",
+      "Jatwar",
+      "Khirsauli",
+      "Maisubhasgram",
+      "Mohkampur Garia",
+      "Sathini",
+      "Sudama Ka Bas",
+      "Tamotia"
+    ]
+  ],
+  "202146": ["Aligarh", "Uttar Pradesh", ["Mangalayatan University"]],
+  "202150": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Basai Kazi",
+      "Bhankri Ahiwasi",
+      "Dedamai",
+      "Gadrana",
+      "Madrak",
+      "Malikpura",
+      "Musepur Jalal",
+      "Palirajapur",
+      "Shahabajpur",
+      "Shahpur Madrak",
+      "Tatarpur"
+    ]
+  ],
+  "202155": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Deta Khurd",
+      "Jalalpur",
+      "Jalokhari",
+      "Madha Habibpur",
+      "Mehgora",
+      "Mirpur Khas",
+      "Pisawah",
+      "Sabalpur"
+    ]
+  ],
+  "202165": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Bena",
+      "Gharbara",
+      "Gorola",
+      "Jaidpura",
+      "Malav",
+      "Siarol",
+      "Simrauthi",
+      "Tappal",
+      "Utasani"
+    ]
+  ],
+  "202170": [
+    "Aligarh",
+    "Uttar Pradesh",
+    ["Bijaigarh", "Bistauli", "Chhonk", "Gangrol", "Kathera"]
+  ],
+  "202280": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Atrauli",
+      "Behrabad",
+      "Chhabilpur",
+      "Ganiyabali",
+      "Ghazipur",
+      "Izzatpur",
+      "Jhijharka",
+      "Madholi",
+      "Orani Dalpatpur",
+      "Pureni",
+      "Teothu"
+    ]
+  ],
+  "202281": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Bembirpur",
+      "Bhojpur Nuri",
+      "Chakathal",
+      "J D Singh",
+      "Kakethal",
+      "Kalayanpur Bhagirathpur",
+      "Kalyanpur Rani",
+      "Lohgarh"
+    ]
+  ],
+  "202282": [
+    "Aligarh",
+    "Uttar Pradesh",
+    [
+      "Atrauli Ro RS",
+      "Badholi",
+      "Jamuna",
+      "Kazimabad",
+      "Klyanpur",
+      "Malviya Nagar",
+      "Sahnaul",
+      "Salarpur"
+    ]
+  ],
+  "203001": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Akabarpur",
+      "Aulina",
+      "Bhoor",
+      "Bulandshahr",
+      "Bulandshahr Kutchery",
+      "Bulandshahr Tehsil",
+      "Chanderu",
+      "Chitson",
+      "Dariyapur",
+      "Dav College Bulandshahr",
+      "Deputy Ganj Bulandshahr",
+      "Dhamera Keerat",
+      "Dhatori",
+      "Ghunghraoli Banwaripur",
+      "Guthaoli",
+      "Hattmabad",
+      "Ipdc Bulandshahr",
+      "Jauli Garh",
+      "Kahira",
+      "Krishananagar",
+      "Lalkuan",
+      "Luharaly Ludhiyana",
+      "Malagarh",
+      "Mirjapur",
+      "Mukeempur",
+      "Naya Gaon",
+      "Panni Nagar",
+      "Rangpur",
+      "Salempur",
+      "Sarai Ghashi",
+      "Surjawaly"
+    ]
+  ],
+  "203002": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    ["AgSchool", "Dhamraoli", "Jhal Khera", "Naithala Hasanpur", "Shikhera"]
+  ],
+  "203129": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Aterna",
+      "Badshahpur Pachgain",
+      "Devrala",
+      "Farkana Gangagarhi",
+      "Gangawaly",
+      "Gwarauly",
+      "Karora",
+      "Nagliya Udaibhan",
+      "Raipur Palda",
+      "Rampur Manpur",
+      "Sabitgarh"
+    ]
+  ],
+  "203131": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Agaura Hameerpur",
+      "Arniya",
+      "Bada Gaon",
+      "Bagrai Khurd",
+      "Bhatwara",
+      "Bichoula",
+      "Dashhera Kherli",
+      "Dharpa Chuhar Pur",
+      "Dinoul",
+      "Gt Road Khurja",
+      "Jarara",
+      "Jawal",
+      "Kalena",
+      "Kehroula",
+      "Khurja",
+      "Khurja Chowk",
+      "Kirra",
+      "Meerpur",
+      "Munda Khera",
+      "Muni",
+      "Nagla Mahiuddinpur",
+      "Raniaoli",
+      "Roop Wash Pachgain",
+      "Seekri",
+      "Senda Faridpur",
+      "Shahbaz Pur",
+      "Subhash Road Khurja",
+      "Surjawaly"
+    ]
+  ],
+  "203132": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Asgarpur",
+      "Bhadaura Kamalpur",
+      "Dabar",
+      "Khurja Jn RS",
+      "Samashpur",
+      "Sarangpur",
+      "Sonda Habibpur"
+    ]
+  ],
+  "203135": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    [
+      "Dayanatpur",
+      "Faleda",
+      "Jewar",
+      "Kanigarhi",
+      "Kureb",
+      "Mangrauli",
+      "Sabota Zafrabad"
+    ]
+  ],
+  "203141": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    [
+      "Bhaipur",
+      "Bhunna Jattan",
+      "Chhapana",
+      "Chingrawly",
+      "Firoujpur",
+      "Gotheny",
+      "Hasanpur",
+      "Jahangirpur",
+      "Jawan",
+      "Lodana",
+      "Narmohamadpur",
+      "Ram Garhi",
+      "Shahpur Kala"
+    ]
+  ],
+  "203150": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Ajnara",
+      "Ashwari",
+      "Bhudhana",
+      "Jugsana Kalan",
+      "Manglore",
+      "Pondhery",
+      "Raura",
+      "Rehamapur Siyawali",
+      "Ronda",
+      "Shahkarinagar",
+      "Shiwaly"
+    ]
+  ],
+  "203155": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    [
+      "Ahamedpur Chauroli",
+      "Bankapur",
+      "Chanchali",
+      "Kishore Pur",
+      "Manchad",
+      "Neemka",
+      "Runhera",
+      "Thora"
+    ]
+  ],
+  "203201": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Dankaur", "Dhanouri Kalan", "Mirzapur Niloni", "Nawada", "Parsol"]
+  ],
+  "203202": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    [
+      "Astauly",
+      "Baroda",
+      "Bilaspur",
+      "Chiti",
+      "Deota",
+      "Gurukul Sikandrabad",
+      "Rasool Pur Rithaury",
+      "Salempur Gujar",
+      "Wair"
+    ]
+  ],
+  "203203": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    [
+      "Banchaoli",
+      "Bichhat Sujanpur",
+      "Biraundi Tajpur",
+      "Chola",
+      "Dhanaura",
+      "Jhajhar",
+      "Kakore",
+      "Khabra Khanpur",
+      "Mahmoodpur Jadon",
+      "Salempur Jat",
+      "Sunpera",
+      "Wailana"
+    ]
+  ],
+  "203205": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Aurangabad Aheer",
+      "Bharana",
+      "Bilsoory",
+      "Gajipur",
+      "Geshupur",
+      "Ishmail Pur",
+      "Kanwra",
+      "Kayasthwara Sikandrabad",
+      "Mahepa",
+      "Prangarh",
+      "Sanota",
+      "Sikandrabad"
+    ]
+  ],
+  "203206": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    ["Industrial Estate Sikandrabad", "Til BegumPur"]
+  ],
+  "203207": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    [
+      "Achheja",
+      "Bambawar",
+      "Bedpura",
+      "Dadri",
+      "Dhoom",
+      "Dujana",
+      "Jarcha",
+      "Kachera Versabad",
+      "Kalaunda",
+      "Khatana"
+    ]
+  ],
+  "203209": [
+    "Gautam Buddha Nagar",
+    "Uttar Pradesh",
+    ["Bhaipur Brahmanan", "Karauli Banger", "Rabupura", "Ronija", "Tirthaly"]
+  ],
+  "203389": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    ["Belon", "Napp", "Narora", "Rampur", "Vijay Nagliya"]
+  ],
+  "203390": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Anupshahr",
+      "Bagsara",
+      "Bhargava Pharmecy",
+      "Bhopatpur",
+      "Bibiyana",
+      "Birauli",
+      "Jirauli",
+      "Malakpur",
+      "Parly",
+      "Roopwas",
+      "Siraura Bangar",
+      "Surajpur Makhena"
+    ]
+  ],
+  "203391": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Andhiyar",
+      "Bhaipur",
+      "Katiyawali",
+      "Khelia Kalyanpur",
+      "KSC Mill Anupshahr",
+      "Riwada"
+    ]
+  ],
+  "203392": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Ahmadgarh",
+      "Bhikampur",
+      "Chehla",
+      "Choundhera",
+      "Dangarh",
+      "Danpur",
+      "DaoulatpurKhurd",
+      "Donka",
+      "Indoure Khera",
+      "Keeratpur",
+      "Khakhunda",
+      "Muradpur",
+      "Poothery Kalan",
+      "Runsi",
+      "Satwara",
+      "Shekhpur"
+    ]
+  ],
+  "203393": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Asadpur Gher",
+      "Daurau",
+      "Debai",
+      "Debai Bazar",
+      "Dharmpur",
+      "Dogawan",
+      "Karanbash",
+      "Kaser Kalan",
+      "Kaser Khurd",
+      "Kharikbari",
+      "Khushalabad",
+      "Pilkhana",
+      "Rahim Kot",
+      "Raj Ghat",
+      "Satoha",
+      "Talwar",
+      "Uamrara"
+    ]
+  ],
+  "203394": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Bansuri",
+      "Chandauk",
+      "Charora",
+      "Darora",
+      "Dhalana",
+      "Guraoli",
+      "Jahangirabad",
+      "Jahangirabad Mandi",
+      "Jakheta",
+      "JaleelPur",
+      "Jatpura",
+      "Kakrai",
+      "Khadana",
+      "Khalor",
+      "Khanauda",
+      "Navi Nagar",
+      "Sankhani",
+      "Tauli",
+      "Titauta Veer"
+    ]
+  ],
+  "203395": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Anchrookalan",
+      "Bohich",
+      "Daduwa Mutafabad",
+      "Kailawan",
+      "Sarawa",
+      "Shikarpur",
+      "Utrawaly"
+    ]
+  ],
+  "203396": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    ["Banel", "Dighi", "Fazalpur", "GangaGarhi", "Kunwarpur", "Lalner", "Pahasu", "Soi"]
+  ],
+  "203397": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Behlolpur",
+      "Biroura",
+      "Chhatary",
+      "Kamona",
+      "Narau",
+      "Pindrawal",
+      "Sahar",
+      "Tyore Buzurg"
+    ]
+  ],
+  "203398": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Ahar",
+      "Amargarh",
+      "Auranga Bad Taherpur",
+      "Barhpura",
+      "Darawer",
+      "Doulatpur Kala",
+      "Ghungharwaly",
+      "Khandoi",
+      "Mauwa Khera",
+      "Mawai",
+      "Mohersha",
+      "Narsena",
+      "Shikoi",
+      "Thana Gajraula",
+      "Uncha Gaon"
+    ]
+  ],
+  "203399": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    ["Chiroury", "Dharakpur", "Jargawan", "Ramghat"]
+  ],
+  "203401": ["Bulandshahr", "Uttar Pradesh", ["Aurangabad", "Paswasara", "Visundhara"]],
+  "203402": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Banhpur",
+      "Bb Nagar",
+      "Benipur",
+      "Bihta",
+      "Chitsona Ali Pur",
+      "Hingwara",
+      "Kuchesar",
+      "Lad Pur",
+      "Madona Jafara Bad",
+      "Sathala"
+    ]
+  ],
+  "203403": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Barhana",
+      "Bharkau",
+      "Bugrasi",
+      "Buklana",
+      "Chandiyana",
+      "Dhaniya Wali",
+      "Gesupur Barwala",
+      "Hazipur",
+      "Jalalpur",
+      "Kisola",
+      "Mankari"
+    ]
+  ],
+  "203405": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Amarpur",
+      "Chathera",
+      "Ginaura Nangali",
+      "Giraura",
+      "Kamalpur",
+      "Kanauna",
+      "Khanpur",
+      "Pali Partapur",
+      "Raghunathpur",
+      "Sonjhana Jhaya"
+    ]
+  ],
+  "203407": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Bihra",
+      "Lakhaoti",
+      "Mundi Bakapur",
+      "Nimchana",
+      "Parwana",
+      "Sega Jagatpur",
+      "Shekhpur Gadwa"
+    ]
+  ],
+  "203408": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Asawar",
+      "Asfabad Chandpura",
+      "Baghwala",
+      "Banboai",
+      "Baral",
+      "Bhatauna",
+      "Chaprawat",
+      "Garhiya Manpur",
+      "Ginora Shekh",
+      "Gulaothi",
+      "Harchana",
+      "Isapur",
+      "Khushhalpur",
+      "Kisauli",
+      "Kota",
+      "Kurli",
+      "Mohana",
+      "Obs Gulaothi",
+      "Oledha",
+      "Pitubash",
+      "Senta"
+    ]
+  ],
+  "203409": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    ["Balka", "Birouli", "Jadoul", "Maithna Jagatpur", "Sarai Chhabila", "Utrouly"]
+  ],
+  "203411": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Agauta",
+      "Ahmadanagar",
+      "AkapurTiyana",
+      "Barkatpur",
+      "Bhainsakhur",
+      "Bhainsrauli",
+      "Nisurkha",
+      "Partapur",
+      "Saidpur",
+      "Sehra",
+      "Sihi",
+      "Tajpur"
+    ]
+  ],
+  "203412": [
+    "Bulandshahr",
+    "Uttar Pradesh",
+    [
+      "Baddha Bazidpur",
+      "Barouli Basdev Pur",
+      "Bhainsaura",
+      "Bigraou",
+      "Khad Mohan Nagar",
+      "Mahav",
+      "Siyana",
+      "Waira Firozpur"
+    ]
+  ],
+  "204101": [
+    "Hathras",
+    "Uttar Pradesh",
+    [
+      "Ahabaranpur",
+      "Ahen",
+      "Allehpur",
+      "Arjunpur",
+      "Bisana",
+      "Gangcholi",
+      "Garhi Balna",
+      "Hathras",
+      "Hathras City",
+      "Hatisa Bhagwantpur",
+      "I A Hathras",
+      "Jogia",
+      "Karas",
+      "Koka",
+      "Kunwarpur",
+      "L C Hathras",
+      "Ladpur",
+      "Lakhnu",
+      "Luheta Khurd",
+      "M M Hathras",
+      "Meetai",
+      "Nayaganj Hathras",
+      "Parsara",
+      "Ruheri",
+      "Sokhana",
+      "Tehra",
+      "Tochhigarh",
+      "Tuksan",
+      "Veernagar"
+    ]
+  ],
+  "204102": [
+    "Hathras",
+    "Uttar Pradesh",
+    [
+      "Akhaipur",
+      "Baghraya",
+      "Dhatroi",
+      "Hathras Jn RS",
+      "Kailora",
+      "Khera Tikari",
+      "Mendu",
+      "Punner",
+      "Thulai"
+    ]
+  ],
+  "204211": [
+    "Hathras",
+    "Uttar Pradesh",
+    [
+      "Agrana",
+      "Agsauli",
+      "Bartar Khas",
+      "Bhatikara",
+      "Bhisi Mirjapur",
+      "Dandesari",
+      "Ganthri Shahpur",
+      "Garhi Hirasingh",
+      "Kachaura",
+      "Northa Isepur",
+      "Pachaun",
+      "Pipalgaon",
+      "Sujawalpur",
+      "Tikari Kalan"
+    ]
+  ],
+  "204212": [
+    "Hathras",
+    "Uttar Pradesh",
+    [
+      "Band Abdulhamipur",
+      "Bapandai",
+      "Bonai Mohabbatpur",
+      "Bwarwana",
+      "Gadola",
+      "Gangapur",
+      "Guarau Kalan",
+      "Hasayan",
+      "Kanau",
+      "Maho",
+      "Nagla Danda",
+      "Rati Ka Nagla",
+      "Shankerpur",
+      "Siktara",
+      "Srinagar"
+    ]
+  ],
+  "204213": [
+    "Hathras",
+    "Uttar Pradesh",
+    [
+      "Asroi",
+      "Bardwari",
+      "Jatoi",
+      "Jawar",
+      "Kota",
+      "Mursan",
+      "Pata Khas",
+      "Pateni",
+      "Penth Gaon"
+    ]
+  ],
+  "204214": [
+    "Hathras",
+    "Uttar Pradesh",
+    [
+      "Barsauli",
+      "Bhenkuri",
+      "Bhuraka",
+      "Jansoi",
+      "Mendamai",
+      "Nagaria Patti",
+      "Nagla Veer Sahai",
+      "Pora",
+      "Purdilpur"
+    ]
+  ],
+  "204215": [
+    "Hathras",
+    "Uttar Pradesh",
+    [
+      "Ama Madapur",
+      "Arnot",
+      "Bamnoi",
+      "Barai Shahpur",
+      "Basai Babas",
+      "Bastoi",
+      "Chandpur Mirza",
+      "Ginoli Kishanpur",
+      "Gopi",
+      "Gudmai Misripur",
+      "Jiroli Kalan",
+      "Kapasiya",
+      "Mau Chirayal",
+      "Naj Mandi S Rao",
+      "Ratanpur Hussainpur",
+      "Sikandra Rao",
+      "Tati Dadia"
+    ]
+  ],
+  "204216": [
+    "Hathras",
+    "Uttar Pradesh",
+    [
+      "Basgoi",
+      "Chhonda",
+      "Dwarikapur",
+      "G C Sasni",
+      "Jiroli",
+      "Kanya Gurukul",
+      "Mohariya",
+      "Parhil",
+      "Rudayan",
+      "Sasni",
+      "Susayat Kalan",
+      "Tilothi"
+    ]
+  ],
+  "205001": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Ahirwa",
+      "Anjani",
+      "Auden Mandan",
+      "Auden Padaria",
+      "Awadh Nagar",
+      "Beonti Khurd",
+      "Civil Court",
+      "Daulatpur",
+      "Dharau",
+      "Ghitauli",
+      "Gola Bazar",
+      "JIC Nauner",
+      "Kakan",
+      "Kapoorpur",
+      "Karhal Gate Mainpuri",
+      "Karimganj",
+      "Kharpari",
+      "Lalupur",
+      "Mainpuri",
+      "Mainpuri City",
+      "Mainpuri R S",
+      "Manchhana",
+      "Nagla Jula",
+      "Nauner",
+      "Ninauli",
+      "Raja Ki Bajria",
+      "Ratibhanpur",
+      "Sagauni",
+      "Sikandarpur",
+      "Zilla Parishad"
+    ]
+  ],
+  "205119": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    ["Darwah", "Gangsi", "Halpura", "Jabapur", "Kosma", "Kuchela", "Tindauli"]
+  ],
+  "205121": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Azmabad Araon",
+      "Badshahpur",
+      "Baijua Khas",
+      "Bajhera Bujurg",
+      "Bharaul",
+      "Ghiror",
+      "Johari Nagar",
+      "Kalhor",
+      "Musayatpur Kheriya",
+      "Pachawer",
+      "Shahjahanpur"
+    ]
+  ],
+  "205247": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Agautha",
+      "Ajitganj",
+      "Allau",
+      "Bhawat",
+      "Dharmangadpur",
+      "Hathpau",
+      "Jagir",
+      "Pundari",
+      "Ratanpur Bara",
+      "Sugaon"
+    ]
+  ],
+  "205261": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Banigon",
+      "Baranahal",
+      "Chandikara",
+      "Dalupur",
+      "Dihuli",
+      "Hazipur Nera",
+      "Lakhanmau",
+      "Nawa Terha",
+      "Sarakh",
+      "Sukurullapur",
+      "Talibpur"
+    ]
+  ],
+  "205262": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Aghar",
+      "Alipur Kherha",
+      "Aramsarai",
+      "Aung",
+      "Bhaisrauli",
+      "Bhongaon",
+      "Chhachha",
+      "Garhia Govindepur",
+      "Himaunpur",
+      "Jamaura",
+      "Maujepur Havelia",
+      "Mota",
+      "Naya Bazar Bhongaon",
+      "Rajwana",
+      "Rakari",
+      "Rui Sinaura",
+      "Town Hall",
+      "Vinodpur"
+    ]
+  ],
+  "205263": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Achalpur",
+      "Aunchha",
+      "Chetai",
+      "Isai Gopalpur",
+      "Jeonti",
+      "Madhan",
+      "Manauna",
+      "Paronkh",
+      "Thorwa",
+      "Ujhaiya Fakirpur"
+    ]
+  ],
+  "205264": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Andani",
+      "Atirajpur",
+      "Bamtapur",
+      "Bhidaura",
+      "Chandpura",
+      "Grhiya",
+      "Karhal",
+      "Kirthua",
+      "Nagla Dik",
+      "Nakau",
+      "Pairar Shahpur",
+      "Shjhajipur",
+      "Urthan"
+    ]
+  ],
+  "205265": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Alupura",
+      "Belahar",
+      "Galla Mandi Kurawali",
+      "Jakhaua",
+      "Kuraoli",
+      "Lahara",
+      "Lakhaura",
+      "Nanamau",
+      "Naugaon",
+      "Salempur",
+      "Sharifpur",
+      "Sonai"
+    ]
+  ],
+  "205267": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Aurandh",
+      "Balarpur",
+      "Bichhawan",
+      "Dalippur Kailai",
+      "Jagatpur B",
+      "Kinhawar",
+      "Nagla Semar",
+      "Sahara",
+      "Simarai",
+      "Sultanganj",
+      "Tisauli"
+    ]
+  ],
+  "205268": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Aunha",
+      "Kurra",
+      "Mohabbatpur",
+      "Patara",
+      "Ranipur",
+      "Sahan",
+      "Sauj",
+      "Takharau",
+      "Vinayakpur"
+    ]
+  ],
+  "205301": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Bajhera",
+      "Bewar",
+      "Bewar Bazar",
+      "Garhia Chhinkaura",
+      "Joga",
+      "Kaua Tanda",
+      "Madhupuri",
+      "Mahmudia",
+      "Manpur Hari",
+      "Mudai",
+      "Nabiganj",
+      "Nagla Painth",
+      "Paronkha"
+    ]
+  ],
+  "205303": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Basait",
+      "Chauraipur",
+      "Chitayan",
+      "Farenzi",
+      "Kishni",
+      "Kutukpur",
+      "Maholi Shamserganj",
+      "Naigwan Kheria",
+      "Ratheh",
+      "Saman"
+    ]
+  ],
+  "205304": [
+    "Mainpuri",
+    "Uttar Pradesh",
+    [
+      "Ahimalpur",
+      "Arsara",
+      "Elabans",
+      "Kumhaul",
+      "Kurhi",
+      "Kusmara",
+      "Madhukarpur",
+      "Manigaon",
+      "Mudausi",
+      "Ramnagar",
+      "Sakra",
+      "Uncha Islamabad"
+    ]
+  ],
+  "206001": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Ashok Nagar",
+      "Bajaria",
+      "Distt Board Etawah",
+      "Etawah",
+      "Etawah City",
+      "Etawah Kutchery",
+      "Etawah New City",
+      "K K D C Etawah",
+      "Lalpura Etawah",
+      "Satyawadi Etawah"
+    ]
+  ],
+  "206002": [
+    "Etawah",
+    "Uttar Pradesh",
+    ["Adhiyapur", "Datawali", "I T I Etawah", "Pratapner", "Sarangpura", "Vaidpura"]
+  ],
+  "206003": [
+    "Etawah",
+    "Uttar Pradesh",
+    ["Chitbhawan", "Manikpur Bissu", "Musaoli", "Pilkhar", "Ram Lila Road"]
+  ],
+  "206120": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Aheripur",
+      "Bhadsan",
+      "Bojha",
+      "Darbatpur",
+      "Indrawakhi",
+      "Niwarikalan",
+      "Pilkhana",
+      "Sekhupur Adhar Singh",
+      "Ureng"
+    ]
+  ],
+  "206121": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Ajitmal",
+      "Amavata",
+      "Atsoo",
+      "Babain",
+      "Babarpur",
+      "Badera",
+      "Ballapur",
+      "Bhareh",
+      "Bhurepurkalan",
+      "Bilawan",
+      "Garha Kasda",
+      "Gauhani Kalan",
+      "Janishnagar",
+      "Juhikha",
+      "Kariyawali",
+      "Khetupur",
+      "Sanphar",
+      "Senganpur",
+      "Sohari Garhia"
+    ]
+  ],
+  "206122": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Auraiya",
+      "Badharipur",
+      "Bamuripur",
+      "Bharsen",
+      "Bhaupur",
+      "Burhadana",
+      "Chirhuli",
+      "Daulatpur",
+      "Ikaurapur",
+      "Jaitapur",
+      "Kakhawatoo",
+      "Keontra",
+      "Khanpur",
+      "Kharka",
+      "Luhiapur",
+      "Narainpur",
+      "Panhar",
+      "Sahabda",
+      "Sherpur Saraiya",
+      "Tilak Nagar"
+    ]
+  ],
+  "206123": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Bakauli",
+      "Baralokpur",
+      "Beena",
+      "Chaubia",
+      "Kadampur",
+      "Karri",
+      "Kauwa",
+      "Kharagpur Saraiya",
+      "Moonj",
+      "Parasana",
+      "Punja",
+      "Purela",
+      "Sarsai Helu",
+      "Sarsai Nawar",
+      "Usrahar"
+    ]
+  ],
+  "206124": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Bakewar",
+      "Bijauli",
+      "Fatehpura",
+      "Ghughsina",
+      "Gulabpura",
+      "Ingurri",
+      "Kunetha",
+      "Ludhiani",
+      "Prithvirampur",
+      "Sherpur"
+    ]
+  ],
+  "206125": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Bachheri",
+      "Bansari",
+      "Barechha",
+      "Bidauri",
+      "Bindwa Kalan",
+      "Bindwa Khurd",
+      "Bithauli",
+      "Chakar Nagar",
+      "Chaurela",
+      "Gauhani",
+      "Jagtauli",
+      "Kandheshi Ghar",
+      "Piprauli Gadhia",
+      "Rajpur",
+      "Sahson",
+      "Sindaus",
+      "Titawali"
+    ]
+  ],
+  "206126": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Baisolighat",
+      "Birari",
+      "Chandanpur",
+      "Dadora",
+      "Ekdil",
+      "Karwa Bujurg",
+      "Maniamau",
+      "Mugalpur Naraini",
+      "Prithvipur",
+      "Ritaur"
+    ]
+  ],
+  "206127": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Bahadurpurghar",
+      "Bidhipura",
+      "Chandpura",
+      "Chindauli",
+      "Durgapura",
+      "Ekari",
+      "Eknaur",
+      "Lakhana",
+      "Lavedi",
+      "Nandgawan",
+      "Paharpur",
+      "Takrupur"
+    ]
+  ],
+  "206128": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Anantram Sonasi",
+      "Andawa",
+      "Jagannathpur",
+      "Mandir Mahewa",
+      "Phoolpur",
+      "Puraoli",
+      "Ujhiani"
+    ]
+  ],
+  "206129": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Ayana",
+      "Bakhariya",
+      "Bhason",
+      "Bhikhepur",
+      "Birhuni",
+      "Chapta",
+      "Haidarpur",
+      "Karampur",
+      "Mahmoodpur",
+      "Muradganj",
+      "Nigra",
+      "Phariha",
+      "Roshangpur",
+      "Sikharna",
+      "Uncha"
+    ]
+  ],
+  "206130": [
+    "Etawah",
+    "Uttar Pradesh",
+    ["Ginja", "Heonra", "Kuiya", "Larkhaur", "Saifai"]
+  ],
+  "206131": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Ajabpur",
+      "Bahuri",
+      "Barauli Jamunapar",
+      "Barhpura",
+      "Garhaita",
+      "Gati",
+      "Jaitpura Par",
+      "Jarhauli",
+      "Kamet",
+      "Murong",
+      "Pachhayagaon",
+      "Udi"
+    ]
+  ],
+  "206241": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Achhalda",
+      "Baghaipur",
+      "Bansi",
+      "Bhainsol",
+      "Chhachhund",
+      "Dashera",
+      "Ghasara",
+      "Gwari",
+      "Itailly",
+      "Mohammdabad",
+      "Nagaria",
+      "Nevilganj",
+      "Pata RS"
+    ]
+  ],
+  "206242": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Baharpur",
+      "Ber",
+      "Bharthana",
+      "Birondhi",
+      "College Road Bharthana",
+      "Garhwana",
+      "Girdharipura",
+      "Kakrahi",
+      "Kandheshi Pachar",
+      "Kudrail",
+      "Kunwara",
+      "Kushna",
+      "Malhausi",
+      "Maman",
+      "Merhi Dudhi",
+      "Nagaria Yadwan",
+      "Pali Khurd",
+      "Purana Bharthana",
+      "Ramain",
+      "Sainfi",
+      "Samhon",
+      "Samthar",
+      "Sarai Chauri",
+      "Sarawa",
+      "Takha",
+      "Umarsenda"
+    ]
+  ],
+  "206243": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Alipur",
+      "Asjana",
+      "Bandhmau",
+      "Banthara",
+      "Bhaipur",
+      "Bhikhara",
+      "Bidhuna",
+      "Dondapur",
+      "Goora",
+      "Indapamau",
+      "Kaithawa",
+      "Pusauli",
+      "Rathgaon",
+      "Sabhad",
+      "Tilakpur Farm"
+    ]
+  ],
+  "206244": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Aghara",
+      "Bijhai",
+      "Dakhlipur",
+      "Dhupkari",
+      "Dibiapur",
+      "Dibiapur Mandi",
+      "Gulariha",
+      "Kakor Buzurg",
+      "N T P C Dibiapur",
+      "Nauli",
+      "Piparpur",
+      "Purakalan",
+      "Sahayal",
+      "Seengpurva Mana",
+      "Sehud",
+      "Sondhemau",
+      "Umri"
+    ]
+  ],
+  "206245": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Balrai",
+      "Bauth",
+      "Bibamau",
+      "Dhanua",
+      "Dharwar",
+      "Garhi Ram Dhan",
+      "Jagsora",
+      "Jasohan",
+      "Jaswant Nagar",
+      "Jaswant Nagar Bazar",
+      "Jhabrapura",
+      "Kaisth",
+      "Kokawali",
+      "Kursena",
+      "Malajani",
+      "Nagla Ram Sunder",
+      "Nagla Taur",
+      "Niloi",
+      "Sirhaul",
+      "Sishat",
+      "Vijaypura"
+    ]
+  ],
+  "206246": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Belhupur",
+      "Binpurapur",
+      "Dahgaon",
+      "Kanchausi",
+      "Kanchausi Bazar",
+      "Lahrapur",
+      "Madhwapur",
+      "Naugawan"
+    ]
+  ],
+  "206247": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Adhasi",
+      "Ata",
+      "Bhagya Nagar",
+      "Fatehpur Beni",
+      "Jua",
+      "Murhi",
+      "Phaphund",
+      "Salhapur"
+    ]
+  ],
+  "206248": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Gapchariapur",
+      "Harbanspur",
+      "Kursi",
+      "Madokmeet",
+      "Narainpur",
+      "Purwa Bhikha",
+      "Purwa Jain",
+      "Sahar",
+      "Shivganj"
+    ]
+  ],
+  "206249": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Ailly",
+      "Barahar",
+      "Kalabhoj",
+      "Kudarkot",
+      "Masoodpur",
+      "Pasuwa",
+      "Ruruganj",
+      "Rurukalan",
+      "Sarai Sheesgram"
+    ]
+  ],
+  "206250": [
+    "Auraiya",
+    "Uttar Pradesh",
+    ["Deoraon", "Harchandpur", "Kamara", "Rajuamau", "Saraipukhta"]
+  ],
+  "206251": ["Auraiya", "Uttar Pradesh", ["Bela", "Gailly", "Hardu", "Mahu"]],
+  "206252": [
+    "Auraiya",
+    "Uttar Pradesh",
+    [
+      "Airwa Katra",
+      "Badhin",
+      "Barauna Kalan",
+      "Bhedpur",
+      "Patna Airwa",
+      "Samayan",
+      "Surendha",
+      "Umrain"
+    ]
+  ],
+  "206253": [
+    "Etawah",
+    "Uttar Pradesh",
+    [
+      "Abhinaypur Pathakpur",
+      "Baroli Khurd",
+      "Basrehar",
+      "Chakwa Bujurg",
+      "Hardoi",
+      "Kathua",
+      "Kharduli",
+      "Kharkauli",
+      "Kheda Helu",
+      "Kumahwar",
+      "Rahin",
+      "Santoshpur Ghat",
+      "Sirsa"
+    ]
+  ],
+  "206255": [
+    "Auraiya",
+    "Uttar Pradesh",
+    ["Jalalpur", "Malhosi", "Marhadaspur", "Piprauli Shiv", "Yakubpur"]
+  ],
+  "207001": [
+    "Etah",
+    "Uttar Pradesh",
+    ["Collectorate Compound", "Etah", "Gandhi Market", "Patiali Gate"]
+  ],
+  "207002": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Ahamdabad",
+      "Ahemadpur Nagla Dhanu",
+      "Aruna Nagar",
+      "Babsa",
+      "Begaur",
+      "Bijauri",
+      "Chhoti Nidhaoli",
+      "Datai",
+      "Girora",
+      "Jirsimi",
+      "Kakrawali",
+      "Lalgarhi",
+      "Loya Badshapur",
+      "Marthara Bhagwandas",
+      "Milawali",
+      "Nagla Galu",
+      "Nagla Khilli",
+      "Nagla Pawal",
+      "Neorai",
+      "Phaphoto",
+      "Rajpur",
+      "Rarpatti",
+      "Rijor",
+      "Rustamgarh",
+      "Sarnau",
+      "Sarvodaya Ashram"
+    ]
+  ],
+  "207003": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Barauli",
+      "Bhagwala",
+      "Brahm Sajiwan",
+      "Chhachena",
+      "Garhi",
+      "Garia Sheelam",
+      "Hirondi",
+      "Jamlapur",
+      "Jeskhpur",
+      "Kangrol",
+      "Kansuri",
+      "Kartala",
+      "Kashon",
+      "Khaddua",
+      "Mahua Khaira",
+      "Malwan",
+      "Manikpur",
+      "Nigoh Hasanpur",
+      "Pamas",
+      "Parson",
+      "Puraon",
+      "Sheetal Pur",
+      "Sonhar"
+    ]
+  ],
+  "207120": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Barai",
+      "Barigawan",
+      "Bhadwas",
+      "Jitauli",
+      "Jogamai Kalan",
+      "Muiddinpur",
+      "Pilua",
+      "Songra"
+    ]
+  ],
+  "207121": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Ambarpur Rejor",
+      "Angadpur",
+      "Bhartoli",
+      "Chaprai Sikandarpur",
+      "Ishara Purbi",
+      "Kawar",
+      "Lothra",
+      "Nandpur Bailamay",
+      "Peepal Khairia",
+      "Saina Kalan",
+      "Sakeet"
+    ]
+  ],
+  "207122": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Dalshahpur",
+      "Dholeswar",
+      "Gahaitoo",
+      "Jhinwar",
+      "Magrauli",
+      "Manora",
+      "Margayan",
+      "Mitraul",
+      "Nidholi Kalan"
+    ]
+  ],
+  "207123": [
+    "Kasganj",
+    "Uttar Pradesh",
+    [
+      "Barahdwari",
+      "Behta",
+      "Gorha",
+      "Kasganj",
+      "Kasganj RS",
+      "Kayampur Baheria",
+      "Mahdava",
+      "Mihari",
+      "Nadrai",
+      "Nagla Katila",
+      "Nawab Ganj",
+      "Pathreki",
+      "Rekhpur",
+      "Salai",
+      "Tilsai",
+      "Wazirpur"
+    ]
+  ],
+  "207124": [
+    "Kasganj",
+    "Uttar Pradesh",
+    [
+      "Bilram",
+      "Dholna",
+      "Harsena",
+      "Jakhera",
+      "Kinawa",
+      "Kisarauli",
+      "Kudhar",
+      "Kumraua",
+      "Mahawar",
+      "Mubarik Pur Mafi",
+      "Nameni",
+      "Pachgain"
+    ]
+  ],
+  "207125": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Achalpur",
+      "Banthal Kutukpur",
+      "Burhenabad",
+      "Dhiramai",
+      "Gobra",
+      "Lodhamai",
+      "Mirehachi",
+      "Naya Bans",
+      "Sheorai",
+      "Sirsa Tippu"
+    ]
+  ],
+  "207241": [
+    "Kasganj",
+    "Uttar Pradesh",
+    [
+      "Abhaipura",
+      "Amanpur",
+      "Arjunpur Nauabad",
+      "Karsana",
+      "Nadarmai",
+      "Partappur",
+      "Samaspur Dengri",
+      "Sarsai Narau",
+      "Sujrai",
+      "Tharachithara"
+    ]
+  ],
+  "207242": [
+    "Kasganj",
+    "Uttar Pradesh",
+    [
+      "Bahrojpur",
+      "Bastarmau",
+      "Chirola",
+      "Garka",
+      "Gunjdundwara",
+      "Kadarganj",
+      "Karampur",
+      "Midhola Bujurg",
+      "Mohanpur",
+      "Nagla Bhimsen",
+      "Samaspur",
+      "Sikehara",
+      "Singpur",
+      "Sunngarhi"
+    ]
+  ],
+  "207243": [
+    "Kasganj",
+    "Uttar Pradesh",
+    [
+      "Ashokpur",
+      "Aurangabad",
+      "Bahdola",
+      "Bahora",
+      "Ballia",
+      "Hathodaban",
+      "Jagpura",
+      "Khaduya",
+      "Myau",
+      "Nardoli",
+      "Narthar",
+      "Patiali",
+      "Raja Rijola",
+      "Rajepur Kurra",
+      "Sahori",
+      "Sanauri Khas",
+      "Thana Darioganj"
+    ]
+  ],
+  "207244": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Alliyapur",
+      "Bhargain",
+      "Bijora",
+      "Bilsad",
+      "Gariya Jagannath",
+      "Luhari Kherra",
+      "Majhola",
+      "Mokampur",
+      "Nagla Pohpi",
+      "Raja Ka Rampur",
+      "Shahpur Tehla"
+    ]
+  ],
+  "207245": [
+    "Kasganj",
+    "Uttar Pradesh",
+    [
+      "Amirasa",
+      "Faroli",
+      "Jahangirpur",
+      "Kachhela",
+      "Khojpur",
+      "Myasur",
+      "Sahawar",
+      "Yakootganj"
+    ]
+  ],
+  "207246": [
+    "Kasganj",
+    "Uttar Pradesh",
+    [
+      "Aun",
+      "Bhensrasi",
+      "Bhujpura",
+      "Dhansinghpur",
+      "Dhondhara",
+      "Fatehpur",
+      "Kamalpur",
+      "Khiriya Patti",
+      "Magthara",
+      "Naugaon",
+      "Pilkhuni",
+      "Pithanpur",
+      "Sirhpura",
+      "Sultanpur"
+    ]
+  ],
+  "207247": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Akbarpurkot",
+      "Aliganj",
+      "Amraulirattanpur",
+      "Angriya",
+      "Daheliyapooth",
+      "Datingara",
+      "Gahi",
+      "Jasrathpur",
+      "Junedpur",
+      "Kaila",
+      "Kakora",
+      "Mohammadnagar Bajhera",
+      "Nadrala",
+      "Nagla Gajpat",
+      "Pardanapur",
+      "Sarauth",
+      "Sarutiya",
+      "Ubhai Asadnagar"
+    ]
+  ],
+  "207248": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Baroliya",
+      "Datauli",
+      "Dhumri",
+      "Fagnaul",
+      "Jalalpur Santhal",
+      "Jasmai",
+      "Kasela",
+      "Rupdhani",
+      "Sarawal",
+      "Shekhpura",
+      "Udaipura"
+    ]
+  ],
+  "207249": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Barahpur",
+      "Barna",
+      "Bhalol",
+      "Bhaupura",
+      "Daheliya",
+      "Dharoli",
+      "Jaithra",
+      "Jiroliya",
+      "Khirya Nagar Shah",
+      "Meidupura",
+      "Nagla Leeladhar",
+      "Parauli Suhagpur",
+      "Pinjari",
+      "Sahadat Nagar",
+      "Targawan"
+    ]
+  ],
+  "207250": [
+    "Etah",
+    "Uttar Pradesh",
+    ["Alipur", "Kalua Teel Pur", "Kharsulia", "Sarai Aghat"]
+  ],
+  "207301": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Awagarh",
+      "Barabhodela",
+      "Baraikalyanpur",
+      "Basundhara",
+      "Borakalan",
+      "Gahrana",
+      "Jalukhera",
+      "Jarani Kalan",
+      "Khatout",
+      "Narura",
+      "Pipehra",
+      "Pondari",
+      "Rohina Mirjapur",
+      "Tikathar"
+    ]
+  ],
+  "207302": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Badhawali",
+      "Berni",
+      "Chirgawan",
+      "Ganehspur",
+      "Gudaun",
+      "Isauli",
+      "Jainpura",
+      "Jalesar",
+      "Jamon",
+      "Maksud Pur",
+      "Misauli",
+      "Nagla Anni",
+      "Narau",
+      "Naukhera",
+      "Neem Khera",
+      "Pilkhatra",
+      "Punhera",
+      "Rejua",
+      "Sarai Neem",
+      "Shahnagar Timarua",
+      "Shakrauli",
+      "Simrau",
+      "Takhawan"
+    ]
+  ],
+  "207401": [
+    "Etah",
+    "Uttar Pradesh",
+    [
+      "Bahadurpur",
+      "Beri",
+      "Kanar Kheraa",
+      "Kantore",
+      "Kutukpur Kaseri",
+      "Marehara",
+      "Mehni Sora",
+      "Mohani Mamoorganj",
+      "Mohanpura",
+      "Pidora",
+      "Piwari",
+      "Salempur Pironda",
+      "Tirlokpur"
+    ]
+  ],
+  "207402": [
+    "Kasganj",
+    "Uttar Pradesh",
+    ["Baznagar", "Gaupura", "Neoli", "Roshan Nagar"]
+  ],
+  "207403": [
+    "Kasganj",
+    "Uttar Pradesh",
+    [
+      "Badria",
+      "Devri Prahlad Pur",
+      "Ganga Garh",
+      "Goyati",
+      "Kadarwadi",
+      "Khairpur",
+      "Malikpur",
+      "Mehmood Pur Pukhata",
+      "Salempur Bebe",
+      "Sirawali",
+      "Soron",
+      "Virahampuri"
+    ]
+  ],
+  "208001": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "B N Shukla Sons",
+      "Birhana Raod",
+      "Colonelganj",
+      "Cotton Mill",
+      "Dhankutti",
+      "Elgin Mills",
+      "Fahimabad",
+      "Farrashkhana",
+      "Gwaltoli",
+      "Hatia",
+      "K M Street",
+      "Kanpur",
+      "Kanpur Court",
+      "Kanpur West",
+      "Maholi",
+      "Naveen Market",
+      "Nayaganj",
+      "Oe Factory",
+      "Philkhana"
+    ]
+  ],
+  "208002": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Agriculture College",
+      "Arya Nagar",
+      "Employeement Exchange",
+      "Gsvm Medical College",
+      "Hbti",
+      "Motijheel",
+      "N C Line",
+      "Nawabganj",
+      "Purana Kanpur",
+      "Swarup Nagar"
+    ]
+  ],
+  "208003": ["Kanpur Nagar", "Uttar Pradesh", ["Anwarganj", "Chauki Jarib"]],
+  "208004": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Kanpur Cantt",
+      "Khapra Mohal",
+      "Meerpur Cantt",
+      "Napier Road",
+      "Narona Exchange",
+      "Railganj"
+    ]
+  ],
+  "208005": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    ["Hns Nagar", "Sarvodaya Nagar", "Shivaji Nagar", "Vijai Nagar"]
+  ],
+  "208006": ["Kanpur Nagar", "Uttar Pradesh", ["Govind Nagar", "Govind Nagar West"]],
+  "208007": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    ["Cambridge Road", "Gandhi Grame", "Hal Colony", "Harjinder Nagar", "Krishna Nagar"]
+  ],
+  "208008": ["Kanpur Nagar", "Uttar Pradesh", ["Cat", "Chakeri Aerodrum"]],
+  "208009": ["Kanpur Nagar", "Uttar Pradesh", ["Armapore", "Armapore Estate"]],
+  "208010": ["Kanpur Nagar", "Uttar Pradesh", ["J K Puri", "Shiwans Tanney"]],
+  "208011": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    ["Anand Nagar", "Kidwai Nagar", "RBI Colony", "Yashoda Nagar"]
+  ],
+  "208012": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "D O Oil Mill",
+      "Industrial Estate",
+      "Jawahar Nagar",
+      "Kaushalpuri",
+      "R K Nagar",
+      "Rambagh",
+      "Sisamau"
+    ]
+  ],
+  "208013": ["Kanpur Nagar", "Uttar Pradesh", ["Cod", "Dmsrde", "Shyam Nagar"]],
+  "208014": ["Kanpur Nagar", "Uttar Pradesh", ["Juhi Colony", "Nirala Nagar"]],
+  "208015": ["Kanpur Nagar", "Uttar Pradesh", ["New Pac Lines"]],
+  "208016": ["Kanpur Nagar", "Uttar Pradesh", ["Iit"]],
+  "208017": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Avas Vikas Yojna No 3",
+      "Bairi Akbarpur",
+      "Kalyanpur",
+      "Keshav Puram",
+      "Kheora",
+      "Nsi"
+    ]
+  ],
+  "208019": ["Kanpur Nagar", "Uttar Pradesh", ["Rawatpur", "Syyed Nagar Post Office"]],
+  "208020": ["Kanpur Nagar", "Uttar Pradesh", ["Panki", "Panki Ganga Ganj"]],
+  "208021": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Kasigaon",
+      "Kathongar",
+      "N H Road",
+      "Naubasta",
+      "Pipergaon",
+      "Sanigawan",
+      "Taudhakpur"
+    ]
+  ],
+  "208022": ["Kanpur Nagar", "Uttar Pradesh", ["Ratan Lal Nagar", "Udyog Nagar"]],
+  "208023": ["Kanpur Nagar", "Uttar Pradesh", ["Munshipurwa", "T P Nagar"]],
+  "208024": ["Kanpur Nagar", "Uttar Pradesh", ["Bima Vihar", "K P University"]],
+  "208025": ["Kanpur Nagar", "Uttar Pradesh", ["Naveen Nagar", "Saketpuri"]],
+  "208026": ["Kanpur Nagar", "Uttar Pradesh", ["Indira Nagar"]],
+  "208027": ["Kanpur Nagar", "Uttar Pradesh", ["Barra", "Barra Vishwa Bank SectorA"]],
+  "209101": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Akbarpur",
+      "Badhapur",
+      "Bewain",
+      "Bewan",
+      "Bhuganiyapur",
+      "Gauriyapur",
+      "Gujraai",
+      "Jhindaura",
+      "Karosa",
+      "Korwakhurd",
+      "Kumbhi",
+      "Lalpur II",
+      "Lalpur RS",
+      "Rurwahar",
+      "Sariyapur"
+    ]
+  ],
+  "209111": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Akodhi",
+      "Bhognipur",
+      "Chak Chalpur",
+      "Hansemau",
+      "Haramau",
+      "Kachhigaon",
+      "Pukhrayan",
+      "Saray"
+    ]
+  ],
+  "209112": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Amraudha",
+      "Bilhapur",
+      "Debair",
+      "Devrahut",
+      "Gaur",
+      "Mancha",
+      "Nonapur",
+      "Paniyamau",
+      "Selhoopur",
+      "Shekhpur"
+    ]
+  ],
+  "209115": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Anwa",
+      "Auderi",
+      "Bhal",
+      "Budhauli",
+      "Damanpur",
+      "Doharapur",
+      "Gaurikaran",
+      "Kamalpur",
+      "Kandhi",
+      "Madiyapur",
+      "Mubarakpur",
+      "Rajpur",
+      "Ramau",
+      "Rasdhan",
+      "Rurgaon",
+      "Satti",
+      "Shahjahanpur",
+      "Silhara",
+      "Vaina"
+    ]
+  ],
+  "209121": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Bharatpur Piyasi",
+      "Durooli",
+      "Duwari",
+      "Gajner",
+      "Gangruli",
+      "Hathai",
+      "Jithrauli",
+      "Juniya",
+      "Karsa",
+      "Kathethi EUP7895",
+      "Kausum",
+      "Lohari",
+      "Manethu",
+      "Mangta",
+      "Ninaya",
+      "Pama RS",
+      "Rasulpur GogumauEUP7906",
+      "Sairua",
+      "Saitha",
+      "Sarwankhera",
+      "Sultanur Perajore"
+    ]
+  ],
+  "209125": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Arsun Bangar",
+      "Dharampur",
+      "Gardhiya",
+      "Gurdahi Bujurg",
+      "Kasolar",
+      "Khawajaphool",
+      "Manpur",
+      "Mirgaon",
+      "Palhnapur",
+      "Pindarthu",
+      "Sandelpur",
+      "Sikandra",
+      "Umarpur"
+    ]
+  ],
+  "209202": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Aakeen",
+      "Anaie",
+      "Anta",
+      "Araul",
+      "Aurangpur Gahdeva",
+      "Aurotahar Pur",
+      "Bachhna",
+      "Bakothi",
+      "Baranda",
+      "Bedi Alipur",
+      "Bilhaur",
+      "Devha",
+      "Gajna",
+      "Kakwan",
+      "Kamsaan",
+      "Khera Kurshi",
+      "Makanpur",
+      "Maujampur",
+      "Nanamau",
+      "Nashirapur",
+      "Oriya",
+      "Pihani Majbootnagar",
+      "Rahimpur Bisdhan",
+      "Tisti",
+      "Uttha"
+    ]
+  ],
+  "209203": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Chaubepur",
+      "Gabdaha",
+      "Gauri Bhagwantpur",
+      "Ghanshyampur",
+      "Malon",
+      "Rautapur Kalan",
+      "Sarai Gadewa",
+      "Tari Pathakpur"
+    ]
+  ],
+  "209204": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Aonaha",
+      "Bairi Sawai",
+      "Bannapur",
+      "Barra Tharra",
+      "Bhiwan",
+      "Biroha",
+      "Dalipnagar",
+      "Kahijari",
+      "Kanjeti",
+      "Mawaiya",
+      "Nigoha",
+      "Sakhrez",
+      "Sakrawa",
+      "Sheoli"
+    ]
+  ],
+  "209205": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    ["Bhaisau", "Bhausana", "Chhatarpur", "Kakoopur", "Sambhalpur", "Sheorajpur"]
+  ],
+  "209206": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Akbarpur Birbal",
+      "Anupur",
+      "Asdhna",
+      "Bara Daulatpur",
+      "Bari Mahtaen",
+      "Baripal",
+      "Bhadras",
+      "Bhadwara",
+      "Bibipur",
+      "Chanwar",
+      "Dhamna Bujurg",
+      "Dharmangadpur",
+      "Ghatampur",
+      "Gujela",
+      "Harbansh Pur",
+      "Itrra",
+      "Jajpur",
+      "Kaitha",
+      "Kohara",
+      "Korea",
+      "Kotra Makrandpur",
+      "Kuwankhera",
+      "Nauranga",
+      "Parachand",
+      "Patrsa",
+      "Pras",
+      "Rar",
+      "Ratanpur",
+      "Rawaipur",
+      "Revna",
+      "Roop Nagar",
+      "Sadar Bazar Ghatampur",
+      "Sajeti",
+      "Shambuhi",
+      "Srinagar"
+    ]
+  ],
+  "209208": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Bamhrauli",
+      "Bamhrauli Ghat",
+      "Daheli",
+      "Gadatha",
+      "Katri",
+      "Makhauli",
+      "Musa Nagar",
+      "Rathgaon",
+      "Singrasipur"
+    ]
+  ],
+  "209209": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Bauhar",
+      "BBGaon",
+      "Behta Bujurg",
+      "Birhar",
+      "Pahewa",
+      "Pasikhera",
+      "Rawatpur Chaudhriyan",
+      "Umri",
+      "Virsinghpur"
+    ]
+  ],
+  "209210": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Beeramau",
+      "Dudwa",
+      "Nadiha",
+      "Radhan EUP5857",
+      "Saibasu",
+      "Sugarardeva EUP 9346",
+      "Uttaripura"
+    ]
+  ],
+  "209214": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Bharu",
+      "Bidhnoo",
+      "Chaurai",
+      "Chhatarpur",
+      "Dehli Ujagar",
+      "Deosarh",
+      "Gayatri Seedh Peeth Khadeshar",
+      "Hardauli",
+      "Jamu",
+      "Kadari Champatpur",
+      "Kaindha",
+      "Kathara",
+      "Katherua",
+      "Majhawan",
+      "Ramaipur",
+      "Sapai",
+      "Sirhi Itra",
+      "Udaipur"
+    ]
+  ],
+  "209217": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Baikunthpur",
+      "Bithoor",
+      "Itra",
+      "Mandhana",
+      "Naramau",
+      "Pachor",
+      "Pem",
+      "Tatya Ganj",
+      "Tikra"
+    ]
+  ],
+  "209301": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Angadpur",
+      "Aslanapur",
+      "Baalai Bujurg",
+      "Badagaon Bhikhi",
+      "Bijhara",
+      "Derapur",
+      "Galuapur",
+      "Hathuma",
+      "Mungisapur",
+      "Reri",
+      "Ursaan"
+    ]
+  ],
+  "209302": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Akaru",
+      "Ban",
+      "Chhatrsa",
+      "Dilauliya",
+      "Injuarampur",
+      "Jalihapur",
+      "Jhinjhak",
+      "Khamhaila",
+      "Kishaura",
+      "Laxmanpur Pilakh",
+      "Sithmara",
+      "Sunderpur Gajan"
+    ]
+  ],
+  "209303": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Banipara",
+      "Chilaauli",
+      "Devipur",
+      "Gahlo Zarbi",
+      "Indrarukh",
+      "Jaganpur",
+      "Kari Kalwari",
+      "Kashipur",
+      "MAdauli",
+      "Pur EUP3155",
+      "Roshanmau EUP6054",
+      "Rura",
+      "Sargaon Bujurg",
+      "Shahi EUP6127",
+      "Tigaei"
+    ]
+  ],
+  "209304": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Binour",
+      "Bisayakpur",
+      "Fatehpur Roshnai",
+      "Jugrajpur",
+      "Parsauli",
+      "Raipur Kukhat",
+      "Rania",
+      "Sachendi"
+    ]
+  ],
+  "209305": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Bhairampur",
+      "Bhauti Pratappur",
+      "Bhimsen",
+      "Chakarpur",
+      "Mardanpur",
+      "Senpara Paschim"
+    ]
+  ],
+  "209306": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Asalatganj",
+      "BhaisayanEUP7098",
+      "Bharamau",
+      "Birhuan",
+      "Jot",
+      "Laloo",
+      "Mahera",
+      "Makrandpur",
+      "Nahuwa Nogaon",
+      "Naila",
+      "Narkhurd",
+      "Puran Purwa",
+      "Rasulabad",
+      "Ratanpur",
+      "Shisahi",
+      "SujanpurEUP9348",
+      "Usri"
+    ]
+  ],
+  "209307": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Baghpur",
+      "Bhaupur",
+      "Bhool",
+      "Dharmangadpur",
+      "Hathika",
+      "Kodwa",
+      "Lalpur SheorajPur",
+      "Maitha",
+      "Maitha RS",
+      "Naubasta",
+      "Pratappur",
+      "Raipalpur",
+      "Rasatpur",
+      "Surar"
+    ]
+  ],
+  "209308": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Barnaow",
+      "Jahangirabad",
+      "Padari Lalpur",
+      "Patara",
+      "Raipur",
+      "Shambhuaa",
+      "Targaonw",
+      "Tejpur",
+      "Tilsada"
+    ]
+  ],
+  "209310": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Asvi",
+      "Aurangabad",
+      "Bhandemau",
+      "Jasapur",
+      "Khanpur",
+      "Mahua Mahoi",
+      "Mangalpur",
+      "Nonari",
+      "Paraukh"
+    ]
+  ],
+  "209311": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    ["Bara", "Girsi", "Jainpur I A", "MAti KishunPur", "Mohana EUP 7305", "Patra"]
+  ],
+  "209312": [
+    "Kanpur Dehat",
+    "Uttar Pradesh",
+    [
+      "Arhariyamau",
+      "Baraur",
+      "Girdau",
+      "Gurugaon",
+      "Jalalpur",
+      "Kailai",
+      "Malasa",
+      "Meenapur",
+      "Mohammedpur",
+      "Sithrabujurg"
+    ]
+  ],
+  "209401": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Amour",
+      "Aranjhami",
+      "Baraigarh",
+      "Bausar",
+      "Behta Gambhirpur",
+      "Gazipur",
+      "Gopalpur",
+      "Harchandkhera",
+      "Kudani",
+      "Narwal",
+      "Nasra",
+      "Palhepur",
+      "Pali Bhogipur",
+      "Rasulpur Umra",
+      "Sarh",
+      "Sawaijpur",
+      "Semarjhal"
+    ]
+  ],
+  "209402": [
+    "Kanpur Nagar",
+    "Uttar Pradesh",
+    [
+      "Bhadrsa",
+      "Bheoli",
+      "Hathigaon",
+      "Jarkala",
+      "Kamalpur",
+      "Karbigvan",
+      "Kulgaon",
+      "Maharajpur",
+      "Maholi",
+      "Mahua Gaon",
+      "Parasadepur",
+      "Phuphuwar",
+      "Prempur Badagaon",
+      "Purwameer",
+      "Rooma",
+      "Salempur",
+      "Sarsaul",
+      "Subhauli",
+      "Tilsahari"
+    ]
+  ],
+  "209501": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Babna",
+      "Kanasi",
+      "Khalwara",
+      "Kurar",
+      "Nawabganj",
+      "Pilkhana",
+      "Puthari",
+      "Sirmaura Banger",
+      "Ukhra"
+    ]
+  ],
+  "209502": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Ahmadganj",
+      "Ataipur",
+      "Bara Biku",
+      "Barjhala",
+      "Barkhera",
+      "Behta Ballu",
+      "Bhatasa",
+      "College Rd Kaimganj",
+      "Ganga Darwaja Kmj",
+      "K K W",
+      "Kaimganj",
+      "Lahra",
+      "Lakhanpur",
+      "Mau Rashidabad",
+      "Narainamau",
+      "Paithan",
+      "Pitaura",
+      "Raipur",
+      "Rashidabad Tiwariyan",
+      "Rly Road Kaimganj",
+      "Rutaul",
+      "Silsanda"
+    ]
+  ],
+  "209503": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    ["Kisrauli", "Kuiyan Khera", "Shamsabad", "Ugarpur"]
+  ],
+  "209504": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    ["Harsinghpur Goa", "Khinmini", "Manjhana", "Rasidpur Mai", "Shukrullapur"]
+  ],
+  "209505": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Bilsari",
+      "Kampil",
+      "Mistni Bahbalpur",
+      "Raukari",
+      "Rudain",
+      "Sikanderpur Khas",
+      "Siwara Khas"
+    ]
+  ],
+  "209601": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Barhpur",
+      "Bazaza Bazar",
+      "Bharka",
+      "Bholeypur",
+      "Civil Lines",
+      "Distt Jail",
+      "Fatehgarh",
+      "Fatehgarh RS",
+      "Ghatiaghat",
+      "JNVRoad",
+      "Kotwali Road Ftg",
+      "Kutchery Fatehgarh",
+      "Maseni",
+      "RRC Fatehgarh",
+      "Sarah"
+    ]
+  ],
+  "209602": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Bhopat Patti",
+      "Central Jail",
+      "Gaisinghpur",
+      "Jaitpur",
+      "Kanjhiana",
+      "Runi",
+      "Singanpur"
+    ]
+  ],
+  "209621": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    ["Aligarh", "Gandhi", "Jainpur Maheshpur", "Kankapur", "Khandauli", "Sabalpur"]
+  ],
+  "209622": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Amratpur",
+      "Chapra",
+      "Hariharpur",
+      "Harsinghpur",
+      "Karanpur Dutt",
+      "Kumhraur",
+      "Pithnapur"
+    ]
+  ],
+  "209625": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Avas Vikas Colony",
+      "Awajpur",
+      "Baraun",
+      "Bazaria Farrukhabad",
+      "Bibiganj",
+      "Farrukhabad",
+      "Farrukhabad R S",
+      "Gutasi",
+      "Ite",
+      "K P Ghat",
+      "Kila",
+      "Lal Sarai",
+      "Lindsayganj",
+      "Mathia Devi",
+      "Nehru Road",
+      "Nitganja",
+      "Pachpukhra",
+      "Panda Bagh",
+      "Pipergaon"
+    ]
+  ],
+  "209651": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Barakeshav",
+      "Gosarpur",
+      "Maudha",
+      "Mohamdabad",
+      "Rohila",
+      "Sakwai",
+      "Sirauli",
+      "Tajpur"
+    ]
+  ],
+  "209652": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Arjunpur",
+      "Barkhiriya",
+      "Bihar",
+      "Guthina",
+      "Merapur",
+      "Nadaura",
+      "Nagla Bagh Rathaura",
+      "Nagla Kel Champat",
+      "Neebkarori",
+      "Pakhna",
+      "Rajendra Nagar",
+      "Roop Nagar",
+      "Sankisa"
+    ]
+  ],
+  "209720": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Asaltabad",
+      "Bhadehi",
+      "Bhaunrajpur",
+      "Bishungarh",
+      "Hariharpur",
+      "Jasmai",
+      "Jot",
+      "Kaitholi",
+      "Lokpur",
+      "Todarpur"
+    ]
+  ],
+  "209721": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Akbarpur",
+      "Bahbalpur",
+      "Bazaria Chhibramau",
+      "Chhibramau",
+      "Galla Mandi CBR",
+      "Hathin",
+      "Jafrabad",
+      "K P Banwari",
+      "Kasawa",
+      "Khojipur",
+      "Khubariapur",
+      "Merapur Garhiya",
+      "Mighauli",
+      "Nandlalpur",
+      "Naugai",
+      "Nigoh",
+      "Prempur"
+    ]
+  ],
+  "209722": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Dundwabuzurg",
+      "Gurusahaiganj",
+      "Ismailpur",
+      "Majhpurwa",
+      "Mohanpur Ratanpur",
+      "Samdhan",
+      "Tera Rabbu",
+      "Uncha"
+    ]
+  ],
+  "209723": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Agaus",
+      "Bahosi",
+      "Belamau Saraiya",
+      "Bhagwantpur",
+      "Indergarh",
+      "Kalsan",
+      "Lakh",
+      "Madhpura",
+      "Parsaramau Majhretha",
+      "Pura Rai"
+    ]
+  ],
+  "209724": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Bhainsiapur",
+      "Chiyasar",
+      "Gadanpur Deorajpur",
+      "Kadhar",
+      "Kamalganj",
+      "Katrauli Patti",
+      "Khudaganj",
+      "Rajipur",
+      "Rampur Majhgaon",
+      "Singhirampur"
+    ]
+  ],
+  "209725": [
+    "Kannauj",
+    "Uttar Pradesh",
+    ["Chhipatti", "Hari Nagar", "Kannauj", "Kannauj Samachar"]
+  ],
+  "209726": ["Kannauj", "Uttar Pradesh", ["Makrand Nagar"]],
+  "209727": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Barauli",
+      "Gangemau",
+      "Godhani",
+      "Ibrahimpur Zagir",
+      "Jalalpur Panwara",
+      "Jaspura Pur",
+      "Kushum Khor",
+      "Malikapur",
+      "Mitra Senpur",
+      "Miyaganj",
+      "Muraiya Buzurg",
+      "Nazrapur Patti",
+      "Nera",
+      "Painda Bad",
+      "Saraimira",
+      "Teramallu",
+      "Tidiyapur"
+    ]
+  ],
+  "209728": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Aruha",
+      "Bahadurpur Majhgaon",
+      "Bangawan Kharg",
+      "Behta Rampur",
+      "Chapunna",
+      "Gulariyapur",
+      "Gyaspur",
+      "Haseran",
+      "Ishampur",
+      "Khadini",
+      "Kisai Jagdishpur",
+      "Murra",
+      "Nademau",
+      "Nizampur",
+      "Sakatpur",
+      "Sarai Theku",
+      "Saurikh"
+    ]
+  ],
+  "209729": [
+    "Kannauj",
+    "Uttar Pradesh",
+    ["Aseha", "Bibia Jalalpur", "Chanderpur", "Nauli", "Sikanderpur"]
+  ],
+  "209731": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Amolar",
+      "Bamrauli",
+      "Jeramau Alampur",
+      "Madhonagar",
+      "Salempur",
+      "Sataura",
+      "Tahpur",
+      "Talgram"
+    ]
+  ],
+  "209732": [
+    "Kannauj",
+    "Uttar Pradesh",
+    ["Balanpur", "Basta", "Behrin", "Lohamarh", "Mahteypurwa", "Tirwa", "Tirwa Ganj"]
+  ],
+  "209733": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Anaugi",
+      "Fatehpur",
+      "Gugrapur",
+      "Jalalabad",
+      "Jewan",
+      "Kiratpur",
+      "Kulhapur",
+      "Matauli",
+      "Mirgawan Ki Garhi",
+      "Saunsarapur"
+    ]
+  ],
+  "209734": [
+    "Kannauj",
+    "Uttar Pradesh",
+    ["Bhadausi", "Bhunna", "Khama", "Patti", "Rura", "Sursi", "Thathia"]
+  ],
+  "209735": ["Kannauj", "Uttar Pradesh", ["Rohili", "Sarai Prayag", "Tera Jaket"]],
+  "209736": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Auser",
+      "Binaura Rampur",
+      "Hamirpur",
+      "Haraipur",
+      "Jankhat",
+      "Khairnagar",
+      "Simaria",
+      "Umrain"
+    ]
+  ],
+  "209738": [
+    "Kannauj",
+    "Uttar Pradesh",
+    [
+      "Deodha",
+      "Ferozpur",
+      "Khanpur",
+      "Kudhina",
+      "Mawai Bilwari",
+      "Miruan Marha",
+      "Rampur Majhila",
+      "Umarda"
+    ]
+  ],
+  "209739": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Danmandi",
+      "Daraura",
+      "Gadanpur Turra",
+      "Jahanganj",
+      "Jarari",
+      "Jhasi",
+      "Kandhrapur",
+      "Musakhiria",
+      "Rajeypur Tappa Mandal"
+    ]
+  ],
+  "209743": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    [
+      "Dhirpur",
+      "Jyonta",
+      "Kanheypur",
+      "Khimseypur",
+      "Madanpur",
+      "Mahoi",
+      "Sahaspur",
+      "Ugrapur Sultan Patti"
+    ]
+  ],
+  "209745": [
+    "Farrukhabad",
+    "Uttar Pradesh",
+    ["Amlaiya Ashanand", "Barai", "Chilsara", "Nagla Nan", "Roshnabad"]
+  ],
+  "209747": [
+    "Kannauj",
+    "Uttar Pradesh",
+    ["Birpur", "Dadauna", "Majhupur", "Paraur", "Sakrawa", "Salempur", "Sarifabad"]
+  ],
+  "209749": ["Farrukhabad", "Uttar Pradesh", ["Bhojpur", "Sitauli", "Yaqutganj"]],
+  "209801": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Aterdhani",
+      "Collectorate Unnao",
+      "Csa Colony",
+      "Deeh",
+      "Dipwal",
+      "Gauraiya Kalan",
+      "Jamuka",
+      "Jawaher Nager",
+      "Kanta Guljarpur",
+      "Karowan",
+      "Kesar Ganj",
+      "Kursath",
+      "Makhi",
+      "Patari",
+      "Patiyara",
+      "Pidna",
+      "Poora N Pansari",
+      "Qila",
+      "Raukarna",
+      "Rupau",
+      "Sainta",
+      "Sarosi",
+      "Shadipur",
+      "Sikandarpur Sihura",
+      "Singrosi",
+      "SNC",
+      "Takia Nigohi Unnao",
+      "Thana",
+      "Tikargadi",
+      "Tikra",
+      "Ugoo",
+      "Unnao"
+    ]
+  ],
+  "209821": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Ahesa",
+      "Akohari",
+      "Bisara",
+      "Drehata",
+      "Gujouly",
+      "Gulriha",
+      "Hilauli",
+      "Kanchanpur",
+      "Kardaha",
+      "Lotna",
+      "Lowa Singhan Khera",
+      "Maurawan",
+      "Mawai",
+      "Mouddinpur",
+      "Muktemau",
+      "Musandi",
+      "Para",
+      "Sagoli",
+      "Samadha",
+      "Sandana",
+      "Sarwan"
+    ]
+  ],
+  "209825": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Badaurra",
+      "Baigaon",
+      "Banigaon",
+      "Bhadnag",
+      "Bhopatpur",
+      "Bichhiya",
+      "Chetra",
+      "Dela",
+      "Devmai",
+      "Dhannipur",
+      "Jargaon",
+      "Madarpur Narainpur",
+      "Majhgawa Sadku",
+      "Mirzapur Sumbhari",
+      "Mohmmedpur",
+      "Nathikhera",
+      "Nevarna",
+      "Orhar",
+      "Padri Kalan",
+      "Padri Khurd",
+      "Purwa",
+      "Targaon",
+      "Taura",
+      "Tripurarpur"
+    ]
+  ],
+  "209827": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Aon",
+      "Chamiyani",
+      "Dubeypur",
+      "Magraiyar",
+      "Mehramau",
+      "Pasakhera",
+      "Unchgaon Sani"
+    ]
+  ],
+  "209831": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Ajgain",
+      "Atesuwa",
+      "Bhauli",
+      "Chamrauli",
+      "Chandpur Jhalaei",
+      "Jaitipur",
+      "Kodara Sandana",
+      "Makoor",
+      "Nawai",
+      "Parenda",
+      "Rainapur",
+      "Raipur Garhi",
+      "Sonik"
+    ]
+  ],
+  "209841": [
+    "Unnao",
+    "Uttar Pradesh",
+    ["Chharihara", "Hasanganj", "Maula Bankipur", "Neotani"]
+  ],
+  "209859": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Arjunamau",
+      "Asawar",
+      "Asha Khera",
+      "Asoha",
+      "Chaupai",
+      "Darehata",
+      "Kantha",
+      "Katehru",
+      "Kusumbhi",
+      "Mirrikalan",
+      "Nawabganj",
+      "Sahrawa",
+      "Sohramau"
+    ]
+  ],
+  "209860": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Achalganj",
+      "Aderuwa",
+      "Badarka",
+      "Band Hamirpur",
+      "Bether",
+      "Bhadohi",
+      "Hadha",
+      "Itauli",
+      "Korari Kalan",
+      "Manjra Bhikhna",
+      "Nibai",
+      "Pansariya EUP9189",
+      "Ranipur",
+      "Rawal Kalan",
+      "Rithnai",
+      "Sikandarpur Karan",
+      "Wsaina"
+    ]
+  ],
+  "209861": [
+    "Unnao",
+    "Uttar Pradesh",
+    ["Devra Kalan", "Ganga Ghat", "Majra Piper Khera", "Shankerpur Sarai"]
+  ],
+  "209862": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Akrampur",
+      "Banther",
+      "Kanjaura",
+      "Magarwara",
+      "Maswasi",
+      "Sahjani",
+      "Shekh Pur Nari"
+    ]
+  ],
+  "209863": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Alipur",
+      "Bara",
+      "Baxer",
+      "Chandan Pur",
+      "Daundiya Khera",
+      "Dhanikhera",
+      "Dhankoli",
+      "Dundpur Jothra",
+      "Jagatpur",
+      "Kodra Bakhat Khera",
+      "Majhgawa",
+      "Narain Das Khera",
+      "Raipur",
+      "Sagwar",
+      "Terha"
+    ]
+  ],
+  "209864": [
+    "Unnao",
+    "Uttar Pradesh",
+    ["Bhagwant Nagar", "Mahesh Khera", "Panai Kalan", "Sawain"]
+  ],
+  "209865": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Behta Bhawani",
+      "Bighapur",
+      "Bisen Mau",
+      "Garha Kola",
+      "Ghatampur",
+      "Kharoli",
+      "Kulaha Bagha",
+      "Osia",
+      "Pali",
+      "Raithana",
+      "Rujhai"
+    ]
+  ],
+  "209866": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Aakampur",
+      "Bihar",
+      "Chainpur",
+      "Gaura",
+      "Kundenpur",
+      "Malona",
+      "Mankapur",
+      "Pakrakhurd",
+      "Pokhri",
+      "Sumerpur",
+      "Zamipur"
+    ]
+  ],
+  "209867": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Akbarpur",
+      "Akwabad",
+      "Bardaha",
+      "Dhamni Khera",
+      "Indemau",
+      "Majhgawan Sevak",
+      "Panhan",
+      "Parsanda",
+      "Patan",
+      "Shukla Khera",
+      "Sijni",
+      "Wazidpur"
+    ]
+  ],
+  "209868": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Argoopur",
+      "Ashayash",
+      "Atwabaik",
+      "Bangermau",
+      "Bhikharipur Patsiya",
+      "Faridpur Katter",
+      "Hafizabad",
+      "Jagatnagar",
+      "Jogi Kot",
+      "Khambhauli",
+      "Madhapur",
+      "Rajepur",
+      "Ruri Sadikpur",
+      "Sainpur Sagaura",
+      "Sursaini",
+      "Utmaanpur"
+    ]
+  ],
+  "209869": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Ballapur",
+      "Ganj Jalalabad",
+      "Ganj Moradabad",
+      "Hariyapur",
+      "Kalwari",
+      "Raghurampur",
+      "Vyoli Islamabad"
+    ]
+  ],
+  "209870": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Anikhurd",
+      "Asiwan",
+      "Auras",
+      "Bachhauli",
+      "Baghwa Kola",
+      "Barithana",
+      "Birsinghpur",
+      "Hydrabad",
+      "Kanigaon",
+      "Kodra",
+      "Laglesra",
+      "Mawai Dhamiyan",
+      "Mirzapur Ajgaon",
+      "Mirzapur Kalan",
+      "Miyanganj",
+      "Mustafabad",
+      "Purthiyawa",
+      "Rampur Gadewa",
+      "Rasulabad",
+      "Saray Malkaadim",
+      "Sorauli Khanpur",
+      "Tiyar"
+    ]
+  ],
+  "209871": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Atwa",
+      "Bamhna",
+      "Bandakhera",
+      "Bhadsar Nausahra",
+      "Dabauli",
+      "Daldalha",
+      "Darauli",
+      "Devgaon",
+      "Fatehpur Chaurasi",
+      "Gangadas Pur",
+      "Jajamau",
+      "Jamuniya Kachh",
+      "Kanjaura",
+      "Korari Khurd",
+      "Lawani Kalan",
+      "Mraunda Majhwara",
+      "Mudha",
+      "Munda",
+      "Mustafabad Pakhrora",
+      "Osiya",
+      "Pariyar",
+      "Safipur",
+      "Sarai Sakhan",
+      "Udshah",
+      "Unnwa"
+    ]
+  ],
+  "209881": [
+    "Unnao",
+    "Uttar Pradesh",
+    [
+      "Dhaura",
+      "Mohan",
+      "Nevalganj",
+      "Rasulpur Bakiya",
+      "Samadpur Hardas",
+      "Shahpur Tonda"
+    ]
+  ]
+}

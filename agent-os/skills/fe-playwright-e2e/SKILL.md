@@ -69,6 +69,12 @@ them, and "Switch clinic" (`openOrganizationSwitcher`). A room spec starts from
 `openNewClinic(page)` (`tests/utils/e2e-app.ts`): a new owner of a new clinic on their role home,
 signed in through `page.request` so a cold `page.goto` (a deep link) restores the session.
 
+**The clinic setup drawer** opens by itself over a new clinic's first room. Every spec meets the
+clinic as an owner who chose "Explore first": `gotoApp` and `establishSessionInPage` call
+`exploreClinicSetupFirst(page)` (`tests/utils/e2e-clinic-setup.ts`), which answers the page's setup
+reads as deferred — nothing is written. A spec about the setup itself calls
+`letClinicSetupOpen(page)` first (`tests/e2e/clinic-setup.e2e.test.ts`).
+
 ## When to use which
 
 - **Always testid** for: page roots, form wrappers, fields, submit, nav items, dialogs, tables (see `fe-e2e-testids` skill).

@@ -314,7 +314,8 @@
       "steps": {
         "place": "分院与地址",
         "contact": "联系方式与营业时间",
-        "people": "人员"
+        "people": "人员",
+        "places": "地点与休息日"
       },
       "groups": {
         "branch": "分院",
@@ -390,7 +391,76 @@
       "added": "已添加 {{name}} 分院",
       "saved": "已保存 {{name}}",
       "contactMissing": "请填写电话和邮箱",
-      "pinInvalid": "PIN 码需为 6 位数字"
+      "pinInvalid": "PIN 码需为 6 位数字",
+      "places": {
+        "sections": {
+          "room": "诊室",
+          "machine": "设备",
+          "holiday": "休息日"
+        },
+        "hints": {
+          "room": "接诊的地方",
+          "machine": "随疗程预约",
+          "holiday": "全天关闭 · 不接受预约"
+        },
+        "counts": {
+          "room_other": "{{count}} 间诊室",
+          "machine_other": "{{count}} 台设备",
+          "holiday_other": "{{count}} 个休息日"
+        },
+        "nothingYet": "还没有诊室、设备或休息日",
+        "empty": {
+          "room": "还没有诊室",
+          "machine": "还没有设备",
+          "holiday": "近期没有休息日"
+        },
+        "newLabel": {
+          "room": "新诊室",
+          "machine": "新设备",
+          "holiday": "新休息日"
+        },
+        "placeholders": {
+          "room": "例如：1 号诊室",
+          "machine": "例如：激光设备",
+          "holiday": "例如：排灯节"
+        },
+        "fields": {
+          "name": "名称",
+          "date": "日期",
+          "label": "休息日"
+        },
+        "add": "添加",
+        "rename": "重命名",
+        "save": "保存",
+        "cancel": "取消",
+        "remove": "移除",
+        "toggle": {
+          "on": "使用中",
+          "off": "已停用",
+          "label": "{{name}} 使用中"
+        },
+        "removeTitle": {
+          "room": "移除此诊室？",
+          "machine": "移除此设备？",
+          "holiday": "移除此休息日？"
+        },
+        "duplicate": {
+          "room": "已存在名为 {{name}} 的诊室",
+          "machine": "已存在名为 {{name}} 的设备",
+          "holiday": "{{date}} 已是休息日"
+        },
+        "nameMissing": "请填写名称",
+        "nameTooLong": "最多 60 个字符",
+        "dateMissing": "请选择日期",
+        "labelMissing": "请为休息日命名",
+        "labelTooLong": "最多 60 个字符",
+        "added": "已添加 {{name}}",
+        "renamed": "已重命名为 {{name}}",
+        "switchedOn": "已启用 {{name}}",
+        "switchedOff": "已停用 {{name}}",
+        "removed": "已移除 {{name}}",
+        "loadFailed": "无法加载诊室、设备和休息日"
+      }
     }
   }
 }

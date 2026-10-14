@@ -1,0 +1,176 @@
+{
+  "drawer": {
+    "title": "Configurer {{clinic}}",
+    "sub": "Environ une minute · Étape {{step}} sur {{total}}",
+    "progressLabel": "Progression de la configuration",
+    "stepAnnounce": "Étape {{step}} sur {{total}}",
+    "exploreFirst": "Explorer d’abord",
+    "next": "Suivant : {{step}}",
+    "goLive": "Démarrer",
+    "goingLive": "Démarrage…",
+    "saving": "Enregistrement…",
+    "notSaved": "Non enregistré · vos modifications sont conservées",
+    "lockedHint": "Après « {{step}} »",
+    "lockedToast": "Terminez d’abord « {{step}} »",
+    "saveFailed": "Impossible d’enregistrer cette étape. Vos réponses sont conservées — réessayez.",
+    "loadFailed": "Impossible de charger la configuration de votre clinique."
+  },
+  "steps": {
+    "clinicType": {
+      "title": "Quel type de clinique est-ce ?",
+      "why": "Vos prestations et vos factures en découlent.",
+      "label": "Spécialités",
+      "hint": "Choisissez-en une ou plusieurs",
+      "required": "Choisissez au moins une spécialité."
+    },
+    "location": {
+      "title": "Où se trouve votre clinique ?",
+      "why": "Les réservations et les factures ont besoin d’un lieu.",
+      "pin": "Code postal",
+      "pinHint": "Remplit le quartier, la ville et l’État",
+      "pinUnknown": "Code postal inconnu — saisissez le quartier, la ville et l’État.",
+      "areaPick": "Choisissez votre quartier",
+      "area": "Quartier",
+      "city": "Ville",
+      "state": "État",
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "branchName": "Nom de l’établissement",
+      "hours": "Ouvert {{days}} · {{opens}}–{{closes}}",
+      "change": "Modifier",
+      "done": "Terminé",
+      "days": "Jours d’ouverture",
+      "opens": "Ouvre",
+      "closes": "Ferme",
+      "closesAfterOpens": "L’heure de fermeture doit être après l’heure d’ouverture.",
+      "requiredField": "Le champ {{field}} est obligatoire.",
+      "pinInvalid": "Saisissez le code postal à six chiffres.",
+      "emailInvalid": "Saisissez un e-mail valide.",
+      "phoneInvalid": "Saisissez un numéro de téléphone valide.",
+      "mainExists": "Votre clinique a déjà un établissement principal — la configuration l’utilise."
+    },
+    "you": {
+      "title": "Recevez-vous vous-même des patients ?",
+      "why": "Pour qu’on puisse prendre rendez-vous avec vous dès le premier jour.",
+      "label": "Recevez-vous vous-même des patients ?",
+      "doctor": "Oui, en tant que médecin",
+      "therapist": "Oui, en tant que thérapeute",
+      "no": "Non",
+      "noHint": "Vous pourrez inviter votre médecin ensuite.",
+      "required": "Choisissez une réponse."
+    }
+  },
+  "peek": {
+    "specialties": "Spécialités",
+    "branch": "Établissement",
+    "hours": "Horaires",
+    "seesPatients": "Reçoit des patients"
+  },
+  "checks": {
+    "clinic_type": "le type de clinique",
+    "main_branch": "son emplacement",
+    "services": "une prestation"
+  },
+  "goLiveRefused": "Impossible de démarrer pour l’instant — il manque encore : {{missing}}.",
+  "live": {
+    "title": "C’est parti !",
+    "sub": "{{clinic}} peut désormais prendre des rendez-vous et facturer.",
+    "setUp": "Nous avons configuré :",
+    "branch": "Établissement {{branch}}",
+    "consultation": "{{name}} {{price}}",
+    "youAsDoctor": "vous comme médecin",
+    "youAsTherapist": "vous comme thérapeute",
+    "book": "Prendre votre premier rendez-vous",
+    "done": "Terminé",
+    "heardAbout": {
+      "label": "Comment avez-vous entendu parler de nous ?",
+      "options": {
+        "search": "Recherche",
+        "socialMedia": "Réseaux sociaux",
+        "friendOrColleague": "Ami ou collègue",
+        "blogOrArticle": "Blog ou article",
+        "other": "Autre"
+      },
+      "thanks": "Merci — cela nous aide."
+    }
+  },
+  "guide": {
+    "title": "Terminez la configuration de {{clinic}}",
+    "count": "{{done}} sur {{total}} terminés",
+    "consultationAdded": "Consultation ajoutée",
+    "items": {
+      "treatments": {
+        "title": "Ajoutez vos soins",
+        "sub": "Choisissez dans la liste de départ",
+        "action": "Ajouter"
+      },
+      "inviteTeam": {
+        "title": "Invitez votre équipe",
+        "sub": "Médecins, accueil",
+        "action": "Inviter"
+      },
+      "inviteDoctor": {
+        "title": "Invitez votre médecin",
+        "sub": "Personne n’est encore réservable",
+        "action": "Inviter"
+      },
+      "firstAppointment": {
+        "title": "Prenez votre premier rendez-vous",
+        "action": "Réserver"
+      }
+    },
+    "skip": "Passer",
+    "undoSkip": "Ne plus passer",
+    "skipped": "Passé",
+    "done": "Terminé",
+    "hide": "Masquer ce guide",
+    "hidden": "Guide masqué — rouvrez-le depuis Paramètres de la clinique.",
+    "ready": {
+      "title": "Votre clinique est prête",
+      "sub": "Tout le reste — horaires, salles, rappels — se trouve dans Paramètres de la clinique.",
+      "settings": "Paramètres de la clinique"
+    }
+  },
+  "starter": {
+    "title": "Ajoutez vos soins",
+    "sub": "Cochez ce que vous proposez ; modifiez le nom, les minutes, le prix et la GST avant d’ajouter.",
+    "back": "Retour au guide",
+    "name": "Nom",
+    "minutes": "Minutes",
+    "price": "Prix",
+    "gst": "GST",
+    "rowLabel": "Ajouter {{name}}",
+    "exists": "Ajouté",
+    "add_one": "Ajouter {{count}} soin",
+    "add_many": "Ajouter {{count}} de soins",
+    "add_other": "Ajouter {{count}} soins",
+    "adding": "Ajout…",
+    "added_one": "{{count}} soin ajouté",
+    "added_many": "{{count}} de soins ajoutés",
+    "added_other": "{{count}} soins ajoutés",
+    "addOwn": "Ajouter le vôtre",
+    "nothingTicked": "Cochez au moins un soin.",
+    "consultationNamed": "Consultation {{specialty}}",
+    "names": {
+      "consultation": "Consultation",
+      "chemicalPeel": "Peeling chimique",
+      "hydrafacial": "Hydrafacial",
+      "laserHairRemovalFullFace": "LHR visage complet (séance)",
+      "acneScarTreatment": "Traitement des cicatrices d’acné",
+      "prpSession": "Séance PRP",
+      "prpPack": "Forfait PRP",
+      "scalpTreatment": "Soin du cuir chevelu",
+      "scalingPolishing": "Détartrage et polissage",
+      "toothFilling": "Obturation dentaire",
+      "rootCanal": "Dévitalisation",
+      "teethWhitening": "Blanchiment des dents",
+      "papSmear": "Frottis cervical",
+      "pelvicUltrasound": "Échographie pelvienne",
+      "physioSession": "Séance de kiné",
+      "physioPack": "Forfait kiné",
+      "followUpVisit": "Visite de suivi",
+      "dressing": "Pansement"
+    }
+  }
+}

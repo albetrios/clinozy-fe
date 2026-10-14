@@ -51,16 +51,20 @@ function csvTextOf(value: unknown): string {
 /**
  * Who may do what on Branches — by the `branch:*` codes: create, edit (closing one included —
  * a branch is never deleted) and export what the tab already shows (clinozy-be has no export
- * code for branches).
+ * code for branches). The same codes gate a branch's rooms, machines and holidays in the
+ * drawer's "Places & days": add on `branch:create`, rename or switch off on `branch:update`,
+ * remove on `branch:delete`.
  */
 function useBranchAccess() {
   const access = useAppAccess();
-  const holds = (code: 'branch:read' | 'branch:create' | 'branch:update') =>
-    access.isResolved && access.canCode(code);
+  const holds = (
+    code: 'branch:read' | 'branch:create' | 'branch:update' | 'branch:delete',
+  ) => access.isResolved && access.canCode(code);
   return {
     isResolved: access.isResolved,
     canCreate: holds('branch:create'),
     canEdit: holds('branch:update'),
+    canDelete: holds('branch:delete'),
     canExport: holds('branch:read'),
   };
 }
@@ -229,7 +233,15 @@ export function BranchesPage() {
         mode="edit"
         open={dialog.kind === 'edit'}
         row={dialog.kind === 'edit' ? dialog.row : undefined}
-        access={{ resolved: access.isResolved, canWrite: access.canEdit }}
+        access={{
+          resolved: access.isResolved,
+          canWrite: access.canEdit,
+          places: {
+            canAdd: access.canCreate,
+            canEdit: access.canEdit,
+            canRemove: access.canDelete,
+          },
+        }}
         rows={list.rows}
         members={list.members}
         ready={!list.isPending}

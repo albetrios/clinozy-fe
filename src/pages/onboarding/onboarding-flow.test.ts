@@ -22,50 +22,56 @@ const ORGS_WITH_PERSONAL = [
 const ORGS_EMPTY: typeof ORGS_WITH_PERSONAL = [];
 
 describe('deriveOnboardingSteps', () => {
-  it('skips workspace and invite in personal-only mode', () => {
+  it('skips the clinic name in personal-only mode', () => {
     expect(deriveOnboardingSteps(PERSONAL_ONLY, ORGS_WITH_PERSONAL)).toEqual([
       'welcome',
       'profile',
-      'questions',
       'done',
     ]);
   });
 
-  it('requires workspace in team-only mode', () => {
+  // Clinic setup (D4): Welcome → Your name → Clinic name → Done — no questions,
+  // no invitations.
+  it('asks four steps in team-only mode: welcome, name, clinic name, done', () => {
     expect(deriveOnboardingSteps(TEAM_ONLY, ORGS_EMPTY)).toEqual([
       'welcome',
       'profile',
-      'questions',
       'workspace',
-      'invite',
       'done',
     ]);
   });
 
-  it('asks only for the profile in team-only mode when the person already joined a clinic (D84)', () => {
+  it('asks only for the name in team-only mode when the person already joined a clinic (D84)', () => {
     expect(
       deriveOnboardingSteps(TEAM_ONLY, [
         { id: 'org_team', type: 'TEAM' as const, slug: 'acme' },
       ]),
-    ).toEqual(['welcome', 'profile', 'questions', 'done']);
+    ).toEqual(['welcome', 'profile', 'done']);
   });
 
-  it('skips workspace and invite in both mode when personal org already exists', () => {
+  it('skips the clinic name in both mode when a personal org already exists', () => {
     expect(deriveOnboardingSteps(BOTH_FLAGS, ORGS_WITH_PERSONAL)).toEqual([
       'welcome',
       'profile',
-      'questions',
       'done',
     ]);
   });
 
-  it('includes invite in both mode only when a team org exists', () => {
+  it('never asks for invitations — not even in both mode with a team org', () => {
     expect(
       deriveOnboardingSteps(BOTH_FLAGS, [
         ...ORGS_WITH_PERSONAL,
         { id: 'org_team', type: 'TEAM' as const, slug: 'acme' },
       ]),
-    ).toEqual(['welcome', 'profile', 'questions', 'invite', 'done']);
+    ).toEqual(['welcome', 'profile', 'done']);
+  });
+
+  it('never runs past four steps in any mode', () => {
+    for (const flags of [BOTH_FLAGS, PERSONAL_ONLY, TEAM_ONLY]) {
+      for (const organizations of [ORGS_EMPTY, ORGS_WITH_PERSONAL]) {
+        expect(deriveOnboardingSteps(flags, organizations).length).toBeLessThanOrEqual(4);
+      }
+    }
   });
 });
 

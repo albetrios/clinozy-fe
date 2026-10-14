@@ -102,6 +102,13 @@
       "dark": "다크",
       "system": "시스템"
     },
+    "setup": {
+      "finishSetup": "설정 마무리 · {{total}}개 중 {{done}}개",
+      "clinicSettings": "클리닉 설정",
+      "ringLabel": "설정 {{total}}개 중 {{done}}개 완료",
+      "memberNotice": "클리닉을 아직 설정하는 중입니다 — 준비가 끝나면 예약이 열립니다.",
+      "drawerName": "클리닉 초기 설정"
+    },
     "sectionBar": {
       "nav": "섹션",
       "allSections": "모든 섹션",

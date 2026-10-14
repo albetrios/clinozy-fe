@@ -48,6 +48,13 @@ vi.mock('@/core/http/fetch-client.ts', () => ({
 
 Playwright specs use **`data-testid` for actions** and **`getByRole` / `getByLabel` for a11y guards**. See `agent-os/skills/fe-playwright-e2e/SKILL.md`.
 
+### `e2e-clinic-setup.ts`
+
+A new clinic opens its setup drawer by itself over the first room. `exploreClinicSetupFirst(page)` —
+called by `gotoApp` and `establishSessionInPage`, so every spec gets it — answers the page's setup
+reads as deferred ("Explore first"), writing nothing; `letClinicSetupOpen(page)` lets a spec about
+the setup meet the drawer as a new owner does.
+
 ### `e2e-faker.ts`
 
 Faker-backed disposable data for Playwright/API E2E (emails stay on `@acme.test` for mail_outbox).

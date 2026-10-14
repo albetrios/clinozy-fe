@@ -1,0 +1,5456 @@
+{
+  "530001": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Fortward", "Kurupam Market", "Visakhapatnam"]
+  ],
+  "530002": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["D.C. Buildings", "KGH", "Maharanipeta", "Turners Choultry"]
+  ],
+  "530003": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "A U Engg College",
+      "Andhra University",
+      "Chinawaltair",
+      "Ghandhi Place",
+      "Pithapuram Colony",
+      "Vidya Bhavan"
+    ]
+  ],
+  "530004": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Gnanapuram", "LIC Building", "Waltair R S"]
+  ],
+  "530005": ["Visakhapatanam", "Andhra Pradesh", ["Gandhigram", "Nausenabagh", "Yarada"]],
+  "530007": ["Visakhapatanam", "Andhra Pradesh", ["Industrial Estate", "Muralinagar"]],
+  "530008": ["Visakhapatanam", "Andhra Pradesh", ["IRSD Area", "Kancharapalem"]],
+  "530009": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Marripalem Vuda Colony", "N A D", "Visakhapatnam Airport"]
+  ],
+  "530011": ["Visakhapatanam", "Andhra Pradesh", ["Malkapuram"]],
+  "530012": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Autonagar",
+      "B H P V",
+      "Jaggayyapalem",
+      "Mindi",
+      "Sheelanagar",
+      "Tunglam",
+      "Visweswarayanagar"
+    ]
+  ],
+  "530013": ["Visakhapatanam", "Andhra Pradesh", ["P and T Colony (VM)"]],
+  "530014": ["Visakhapatanam", "Andhra Pradesh", ["Naval Base", "Naval Dock Yard"]],
+  "530015": ["Visakhapatanam", "Andhra Pradesh", ["Zinc Smelter P"]],
+  "530016": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Akkayyapalem", "Dwarakanagar", "New Colony"]
+  ],
+  "530017": ["Visakhapatanam", "Andhra Pradesh", ["L B Colony", "M.V.P.Colony"]],
+  "530018": ["Visakhapatanam", "Andhra Pradesh", ["Marripalem"]],
+  "530020": ["Visakhapatanam", "Andhra Pradesh", ["Dabagardens", "VM Bus Station"]],
+  "530022": ["Visakhapatanam", "Andhra Pradesh", ["H B Colony", "Isakathota"]],
+  "530024": ["Visakhapatanam", "Andhra Pradesh", ["Salagramapuram"]],
+  "530026": ["Visakhapatanam", "Andhra Pradesh", ["Gajuwaka"]],
+  "530027": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Gopalapatnam", "Narava", "NSTL", "Prahladapuram", "Yellapuvanipalem"]
+  ],
+  "530028": ["Visakhapatanam", "Andhra Pradesh", ["Simhachalam", "Simhachalam Hills"]],
+  "530029": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Durganagar", "R R V Puram", "Venkatapuram"]
+  ],
+  "530031": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Devada", "Islampeta", "Visakhapatnam Steel Project"]
+  ],
+  "530032": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Ukkunagaram", "VM Steel Projrct Town Ship"]
+  ],
+  "530040": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Arilova", "Govt Dairy Farm", "Pedagadili", "Sri Krishnapuram"]
+  ],
+  "530041": ["Visakhapatanam", "Andhra Pradesh", ["Pothinamallayapalem"]],
+  "530043": ["Visakhapatanam", "Andhra Pradesh", ["Dayalnagar", "Visalakshinagar"]],
+  "530044": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Balacheruvu", "Dibbapalem", "Gangavaram", "Nadupuru", "Pedagantyada"]
+  ],
+  "530045": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Gitam Engg. College", "Sagar Nagar", "Yendada"]
+  ],
+  "530046": ["Visakhapatanam", "Andhra Pradesh", ["Vadlapudi"]],
+  "530047": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Chintalaagaraharam", "Porlupalem", "Vepagunta"]
+  ],
+  "530048": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Gayatri Engg College", "Kommadi", "Madhurawada", "Marikavalasa", "Ratnagiri Colony"]
+  ],
+  "530049": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Duvvada", "Pakeertekya", "Special Economic Zone P.O", "Vedullanarava"]
+  ],
+  "530051": ["Visakhapatanam", "Andhra Pradesh", ["Chinamushidiwada", "Sujatha Nagar"]],
+  "530052": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Anandapuram", "Palavalasa", "Tarluvada", "Vemulavalasa"]
+  ],
+  "530053": ["Visakhapatanam", "Andhra Pradesh", ["Aganampudi", "Pedamadaka"]],
+  "531001": ["Visakhapatanam", "Andhra Pradesh", ["Anakapalle", "Gandhinagaram"]],
+  "531002": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Amal College",
+      "Ammulapalem",
+      "Batlapudi",
+      "Gopalapuram",
+      "Koduru",
+      "Kondupalem",
+      "Nagulapalli",
+      "Nidanam Doddi",
+      "Rebaka",
+      "Thotada"
+    ]
+  ],
+  "531011": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Atchutapuram",
+      "Chodapalle",
+      "Dibbapalem SEZ R.H Colony",
+      "Dosuru",
+      "Dupputuru",
+      "Janguluru",
+      "Lalamkoduru",
+      "Maduthuru",
+      "Pudimadaka",
+      "Tanthadi"
+    ]
+  ],
+  "531019": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Jawaharlalnehru Pharmacity",
+      "Lankelapalem",
+      "Maredupudi",
+      "Narsingaraopeta",
+      "Pedamushidivada",
+      "Thadi",
+      "Valluru"
+    ]
+  ],
+  "531020": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Cheepurupalli",
+      "Dalaipalim",
+      "Ntpc Simhadri",
+      "Nunaparthi",
+      "Ravada",
+      "Venkatapathipalem"
+    ]
+  ],
+  "531021": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Bharnikam",
+      "Desapatrunipalem",
+      "Dopperla",
+      "Kalapaka",
+      "Paravada",
+      "Payakarao Bonangi",
+      "Thanam",
+      "Vennalapalem"
+    ]
+  ],
+  "531022": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "A Koduru",
+      "A Kothapalle",
+      "Anandapuram",
+      "Gavarapalem",
+      "K.J.Puram",
+      "Koruvada",
+      "Mushidipalli",
+      "Rama Yogi Agraharam",
+      "Varada"
+    ]
+  ],
+  "531023": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Bhogapuram", "Duddupalem", "Govada", "Juttada", "Muddurthi", "Rayapurajupeta"]
+  ],
+  "531024": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Chintalaveedhi",
+      "Dokuluru",
+      "Gondeli",
+      "Iradapalle",
+      "Kinchuru",
+      "Kindangi",
+      "Legisipalli",
+      "Minimuluru",
+      "Modapalli",
+      "Paderoo",
+      "Salugu",
+      "Thumpada",
+      "Vantlamamidi",
+      "Vanugupalli"
+    ]
+  ],
+  "531025": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Chinapachila",
+      "Gompa",
+      "Gudivada Veeravalli",
+      "Gunnempudi",
+      "Marupaka",
+      "Medivada",
+      "Ravikamatham",
+      "Seethayyapeta",
+      "Tattabanda",
+      "Thotakurapalem"
+    ]
+  ],
+  "531026": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Butchiyyapeta",
+      "China Appannapalem",
+      "Chinamadina",
+      "Chittayyapalem",
+      "D Suravaram",
+      "Dibbapalem",
+      "Dibbidi",
+      "Kondempudi",
+      "Kondupalem Agraharam",
+      "Lopudi",
+      "Mangalapuram",
+      "Mukundapuram",
+      "P Bhimavaram",
+      "Polipalli",
+      "Pottidorapalem",
+      "Turakalapudi",
+      "Vaddadi",
+      "Veeravalli Agraharam",
+      "Vijayaramarajupeta"
+    ]
+  ],
+  "531027": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "A Veeranarayanam",
+      "D Gottivada",
+      "Devapuram",
+      "Gadirai",
+      "Jalampalli",
+      "Jammadevipeta",
+      "Jampena",
+      "Kavagunta",
+      "Kinthalli",
+      "L Ponnavolu",
+      "M Koduru",
+      "Madugula",
+      "Pongalipaka",
+      "Sagaram",
+      "Sankaram",
+      "Satyavaram",
+      "Tatiparthi",
+      "Vommali Jagannadhapuram"
+    ]
+  ],
+  "531028": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Appalrajupuram",
+      "Bylapudi",
+      "Cheedikada",
+      "Chintaluru",
+      "Gotivada Agraharam",
+      "Jaithavaram",
+      "Kandivaram",
+      "Kj Puram",
+      "Konam",
+      "M Kotapadu",
+      "Manchala",
+      "Sirijam",
+      "V B Peta",
+      "Veeranarayanam"
+    ]
+  ],
+  "531029": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Bandaveedhi",
+      "Beeram",
+      "Bongaram",
+      "Bonthilli",
+      "G Madugula",
+      "Gaduthuru",
+      "Gammili",
+      "Gomangi",
+      "Gulleli",
+      "Killamkota",
+      "Kokkirapalle",
+      "Kuntharla",
+      "Lingeti",
+      "Luvvasingi",
+      "Nurmathi",
+      "Pedalochali",
+      "Singarbha",
+      "Sulabham",
+      "Vanthala"
+    ]
+  ],
+  "531030": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Alamanda",
+      "Chinanadipalli",
+      "Chintalapudi",
+      "Devarapalli",
+      "Garisingi",
+      "Kasipuram",
+      "Kiverla",
+      "Marepalli",
+      "Nagayyapeta",
+      "Pedakota",
+      "Pedanandipalle Agraharam",
+      "Raivada",
+      "Tamarabba",
+      "Tenugupudi",
+      "Valabu",
+      "Zeenabadu"
+    ]
+  ],
+  "531031": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Atcherla",
+      "Bayyavaram",
+      "Kannurupalem",
+      "Kasimkota",
+      "Sampathipuram",
+      "Tallapalem",
+      "Theeda",
+      "Ugginapalem",
+      "Veduruparthi",
+      "Vetazangalapalem"
+    ]
+  ],
+  "531032": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Bowluwada",
+      "Chn Agraharam",
+      "Gandhavaram",
+      "Kundram",
+      "Kuntsangi",
+      "Makavaram",
+      "Mamidipalem",
+      "Maruturu",
+      "Mettapalem",
+      "Papayya Santhapalem",
+      "R Bheemavaram",
+      "T S Nagaram",
+      "Thummapala",
+      "Uderoo",
+      "Venkupalem"
+    ]
+  ],
+  "531033": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Khazeepalem",
+      "Kondakarla",
+      "Munagapaka",
+      "Nagavaram",
+      "Pallapu Anandapuram",
+      "Patipalle",
+      "Thimmarajupeta",
+      "Vadrapalle",
+      "Yerravaram"
+    ]
+  ],
+  "531034": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Arle",
+      "Chowduvada",
+      "Gondupalem",
+      "Gullepalle",
+      "K Kotapadu",
+      "K Santhaplem",
+      "Kinthada",
+      "Kothapenta",
+      "Medicherla",
+      "Pydampeta",
+      "Rongalinaidupalem",
+      "Singannadorapalem"
+    ]
+  ],
+  "531035": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Adduru",
+      "Amruthpuram.",
+      "Anthakapalle",
+      "Aripaka",
+      "Asakapalle",
+      "Bangarammapalem",
+      "Boduvalasa",
+      "Chintagatla",
+      "Gollalapalem",
+      "Gullepalli",
+      "Mallunaidupalem",
+      "Subbavaram",
+      "Tekkalipalem"
+    ]
+  ],
+  "531036": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Adavi Agraharam",
+      "Arjunagiri",
+      "Bennavolu",
+      "Chakipalle",
+      "Chettupalle",
+      "Chodavaram",
+      "Chukkapalle",
+      "Damunapalle",
+      "Gogada Kothapalle",
+      "Gowripatnam",
+      "Jannavaram",
+      "Kandepalli",
+      "Kandipudi",
+      "Kannampalem",
+      "Laxmipuram",
+      "Mallam",
+      "Neelakantapuram",
+      "Pakeersahebpeta",
+      "Pedagogada",
+      "R Sivarampuram",
+      "Rajam",
+      "Timmannapalem",
+      "Turuvolu",
+      "Varahapuram"
+    ]
+  ],
+  "531040": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Aduguluputtu",
+      "Aradakota",
+      "Babusala",
+      "Barada",
+      "Basiputtu",
+      "Bondapalli",
+      "Bungaput",
+      "Darela",
+      "Dodiput",
+      "Ginnelakota",
+      "Injari",
+      "Jamiguda",
+      "Jarjula",
+      "Jarrela",
+      "Jolaput",
+      "Karimukhput",
+      "Kilagada",
+      "Koravangi",
+      "Kumada",
+      "Laxmipeta",
+      "Laxmipuram",
+      "Makavaram",
+      "Munchingput",
+      "Panasaput",
+      "Parreda",
+      "Pedabayalu",
+      "Pedaguda",
+      "Poipalli",
+      "Rngabayalu",
+      "Rudakota",
+      "Seekari",
+      "Sujanakota",
+      "Vanabhangi",
+      "Vanabhasingi",
+      "Vanagumma"
+    ]
+  ],
+  "531055": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Ameena Sahebpeta",
+      "Cherlopalem",
+      "Enugutuni",
+      "Ganaparthi",
+      "Jagannadhapuram.",
+      "Janguluru",
+      "Kokkirapalle",
+      "Melupaka",
+      "Narasingabilli",
+      "Pedapalli",
+      "Penugollu",
+      "Petasudipuram",
+      "Pulaparthi",
+      "Purushothapuram",
+      "Regupalem",
+      "Somalingapalem",
+      "Somavaram",
+      "Tsuchikonda",
+      "Turangalapalem",
+      "Vemagiri",
+      "Yellamanchili"
+    ]
+  ],
+  "531060": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Lingarajupalem",
+      "S Rayavaram",
+      "Sarvasiddi",
+      "Vakapadu",
+      "Venkatapuram",
+      "Vommavaram"
+    ]
+  ],
+  "531061": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Dharapalem",
+      "Dimili",
+      "Gokivada",
+      "Gorapudi",
+      "Govindapalem",
+      "Haripuram",
+      "Kalavalapalle",
+      "Kothuru",
+      "Murakada",
+      "Raja Koduru",
+      "Rambilli"
+    ]
+  ],
+  "531075": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Boyila Kinthada",
+      "Gavaravaram",
+      "Kaligotla",
+      "Lakkavaram",
+      "Mamidipalli",
+      "Mulakapalli",
+      "Taruva Agraharam",
+      "Timiram",
+      "Vadrapalem",
+      "Vakapalle",
+      "Vechalam"
+    ]
+  ],
+  "531077": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Addumanda",
+      "Andiba",
+      "Bakuru",
+      "Boddaput",
+      "Chekumaddila",
+      "Durgam",
+      "Galaganda",
+      "Gamparai",
+      "Ganneruputtu",
+      "Guda",
+      "Guttulaputtu",
+      "Hukumpeta",
+      "Jarrakonda",
+      "Kamayyapeta",
+      "Kimudupalle",
+      "Konthili",
+      "Kotnapalle",
+      "Mattam",
+      "Matyapuram",
+      "Mettujoru",
+      "Olda",
+      "Pathakota",
+      "Pedagaruvu",
+      "Pedakodapalli",
+      "Rapa",
+      "Santhari",
+      "Sobhakota",
+      "Sukuru",
+      "Tadigiri"
+    ]
+  ],
+  "531081": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Bodugullam Agraharam",
+      "Ch Laxmipuram",
+      "Chandanada",
+      "Chinadoddigallu",
+      "D L Puram",
+      "Kagitha",
+      "Nakkapalle",
+      "Nellipudi",
+      "Peda Doddigallu",
+      "Pedateenarla",
+      "Rajayyapeta",
+      "Upamaka Agraharam",
+      "Vedullapalem",
+      "Vempadu"
+    ]
+  ],
+  "531082": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Bhimavaram", "Darlapudi", "Etikoppaka"]
+  ],
+  "531083": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Chinnagummuluru",
+      "Geddapalem",
+      "Gudivada",
+      "Koruprolu",
+      "Pedagummuluru",
+      "Pedauppalam",
+      "Revupolavaram",
+      "Timmapuram"
+    ]
+  ],
+  "531084": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Antada",
+      "Bangarampeta",
+      "Chittempadu",
+      "Chodyam.",
+      "Gadampalem",
+      "Golugonda",
+      "Jogempeta",
+      "K Mallampeta",
+      "Kantaram",
+      "Kd Peta",
+      "Kinaparthi",
+      "Kommika",
+      "Konkasingi",
+      "Nadimpalem",
+      "Nallagonda",
+      "Old K D Peta",
+      "Pappusettipalem",
+      "Pathamallmpeta",
+      "Pedamakavaram",
+      "Sarabhannapalem",
+      "Thotaluru"
+    ]
+  ],
+  "531085": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Bapiraju Kothapalli",
+      "Kailasapatnam",
+      "Kodavatipudi",
+      "Kotauratla",
+      "Lingapuram",
+      "Panduru",
+      "Rajupeta",
+      "Sunkapur",
+      "Venkatapuram"
+    ]
+  ],
+  "531087": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Budarallu",
+      "Cheedipalem",
+      "Chintalapudi",
+      "Gangavaram",
+      "Kakarapadu",
+      "Koyyuru",
+      "M Makavaram",
+      "Mampa",
+      "Marrivada",
+      "Revallu"
+    ]
+  ],
+  "531105": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    ["Darakonda", "Duppulavada", "Sileru Project"]
+  ],
+  "531111": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Annavaram",
+      "Bennavaram",
+      "Bylakinchangi",
+      "Chintapalli",
+      "Chowdupalli",
+      "Damanapalli",
+      "Jerrala",
+      "Kommangi",
+      "Korukonda",
+      "Kothapalem",
+      "Kudumusari",
+      "Lothugedda",
+      "Luthugedda Jn.",
+      "Mondigedda",
+      "Thammingula",
+      "Vanchula",
+      "Vangasara",
+      "Yerrabommalu"
+    ]
+  ],
+  "531113": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Bheemaboinapalem",
+      "Burugupalem",
+      "Giduturu",
+      "Koduru",
+      "Kondala Agraharam",
+      "Makavarapalem",
+      "Mallavaram",
+      "P P Agraharam",
+      "Pydipala",
+      "Rachapalli",
+      "Tutipala",
+      "Vajragada"
+    ]
+  ],
+  "531114": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Addasaram",
+      "Dondapudi",
+      "Jaggampeta",
+      "Kalayanapulova",
+      "Kanchugummala",
+      "Kannampeta",
+      "Komaruvolu",
+      "Konthalam",
+      "Kothakota",
+      "Kothapatnam",
+      "Kovvuru",
+      "Rolugunta",
+      "Tamaracherla",
+      "V Sarabhavaram"
+    ]
+  ],
+  "531115": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Adakula",
+      "Chammachinta",
+      "Dharagangavaram",
+      "E D Peta",
+      "Golugondapeta",
+      "Gummadigonda",
+      "Gunupudi",
+      "M B Patnam",
+      "Manyapuratla",
+      "Marripalem",
+      "Nathavaram",
+      "P Kotha Gudem",
+      "Pedajaggampeta",
+      "Sarugudu",
+      "Srungavaram",
+      "T R Project",
+      "Vedurupalle",
+      "Y B Agraharam"
+    ]
+  ],
+  "531116": ["Visakhapatanam", "Andhra Pradesh", ["Narsipatnam"]],
+  "531117": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Amalapuram",
+      "Bodapalem",
+      "Cherlopalem",
+      "Jilledupudi",
+      "M Bennavaram",
+      "P Kothapalle",
+      "Pamulavaka",
+      "Vemulapudi",
+      "Yerakannapalem"
+    ]
+  ],
+  "531118": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Annavaram",
+      "Balighattam",
+      "Bennabhupalapatnam",
+      "Butchampeta",
+      "Cheedigummala",
+      "Chettupalle",
+      "Dharnasagaram",
+      "Downuru",
+      "Gabbada",
+      "Gondipakalau",
+      "Gundupala",
+      "Gurandarapalem",
+      "J P Agraharam",
+      "K Yellavaram",
+      "Kitumula",
+      "Krishna Bazar (Narsipatnam)",
+      "Kusarlapudi",
+      "Lammasingi",
+      "M K Patnam",
+      "Nindugonda",
+      "Pakalapadu",
+      "Pedda Boddepalli",
+      "Rajupakalu",
+      "Sanivaram",
+      "Tajangi",
+      "Vaddipa",
+      "Y G Peta"
+    ]
+  ],
+  "531126": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Donkada",
+      "Dosalapadu",
+      "G J Puram",
+      "Godicherla",
+      "Gullipadu",
+      "Guntapalle",
+      "Mangavaram",
+      "Namavaram",
+      "Payakaraopeta",
+      "Rebaka",
+      "Uddandapuram"
+    ]
+  ],
+  "531127": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Gopalapatnam",
+      "Idatam",
+      "Kandipudi",
+      "Kumarapuram",
+      "Pedaramabhadrapuram",
+      "Pentakota",
+      "Satyavaram",
+      "Srirampuram",
+      "Venkatanagaram"
+    ]
+  ],
+  "531133": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Devarapalli",
+      "Galikonda",
+      "Gudem",
+      "Lakkavarapupeta",
+      "Pedavalasa",
+      "R V Nagar",
+      "Rintada",
+      "Sankada",
+      "Saparla"
+    ]
+  ],
+  "531149": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Araku Colony",
+      "Baski",
+      "Bondam",
+      "Bosubeda",
+      "Burja",
+      "Chinalabudu",
+      "Chompi",
+      "Gannela",
+      "Iragi",
+      "Iti Araku",
+      "Kothaballuguda",
+      "Lother",
+      "Machapur",
+      "Madagada",
+      "Madala",
+      "Pedabaludu",
+      "Siragam",
+      "Sunkarimetta"
+    ]
+  ],
+  "531151": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Araku",
+      "Araku Rs",
+      "Arma",
+      "Dumbriguda",
+      "Gasaba",
+      "Gattum",
+      "Gorapur",
+      "Guntagannela",
+      "Guntaseema",
+      "Kandrum",
+      "Kinchumanda",
+      "Kithalangi",
+      "Kollaput",
+      "Korra",
+      "Korrai",
+      "Layaganda",
+      "Pattam",
+      "Pynampadu",
+      "Rangaseela",
+      "Rangelisingi",
+      "Sagara",
+      "Sovva",
+      "Tutangi",
+      "Yangada"
+    ]
+  ],
+  "531162": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Amanam",
+      "Annavaram",
+      "Bodamettapalem",
+      "Boni",
+      "Chippada",
+      "Chittivalasa",
+      "Dakamarri",
+      "Gudivada",
+      "Korada",
+      "Majjivalasa",
+      "Modavalasa",
+      "Mulakuddu",
+      "Nagamayyapalem",
+      "Nagarajupalem",
+      "Pandranki",
+      "Polipalli",
+      "Ravada",
+      "Revidi",
+      "Sangivalasa",
+      "Singannabanda",
+      "Tallavalasa",
+      "Tatituru"
+    ]
+  ],
+  "531163": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Bheemunipatnam",
+      "Boddapalem",
+      "Boyapalem",
+      "Chepaluppada",
+      "INS Kalinga",
+      "J.V.Agraharam",
+      "Kapuluppada",
+      "Kothaparadesipalem",
+      "Nerellavalasa",
+      "Peddipalem",
+      "Rayapalem",
+      "Vellanki"
+    ]
+  ],
+  "531173": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Chintalapalem",
+      "Desapatrunipalem",
+      "Gandigundam",
+      "Gidijala",
+      "Gorapalle",
+      "Gudilova",
+      "Gurrampalem",
+      "Kanamam",
+      "Mudapaka",
+      "Mutcherla",
+      "Pedagadi",
+      "Pendurthy",
+      "Pinagadi",
+      "Ramavaram",
+      "Rampuram",
+      "Saripalli",
+      "Sontyam",
+      "Sowbhagya Rayapuram",
+      "V. Juttada"
+    ]
+  ],
+  "531219": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Ananthavaram",
+      "Bhandevupuram",
+      "Chinnapuram",
+      "Gandhavaram",
+      "Gottupalli",
+      "Kovvada",
+      "Kusuluwada",
+      "Maddi",
+      "Padmanabham",
+      "Penta",
+      "Potnuru",
+      "R P Agraharam",
+      "Sirlapalem",
+      "T.V.Agraharam"
+    ]
+  ],
+  "532001": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Srikakulam",
+      "Srikakulam Collectorate",
+      "Srikakulam District Court",
+      "Srikakulam Market",
+      "Srikakulam New Colony",
+      "Srikakulam Official Colony",
+      "Srikakulam Town",
+      "Srikakulam Zilla Parishad"
+    ]
+  ],
+  "532005": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Gujarathipeta", "Kothapeta", "Muddada", "Thotapalem"]
+  ],
+  "532122": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Ambada",
+      "Arasada",
+      "Bhagempeta",
+      "Galavilli",
+      "Kandisa",
+      "Kodisa",
+      "Madduvalasa",
+      "Nayaralavalasa",
+      "Neelayyavalasa",
+      "Parampeta",
+      "Pedasirlam",
+      "Sarasanapalli",
+      "Sundarada",
+      "Tunivada",
+      "Uddavolu",
+      "Venkampeta",
+      "Vunukuru"
+    ]
+  ],
+  "532123": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Ambakhandi",
+      "Govindapuram",
+      "Kondagudem",
+      "KR Puram",
+      "Lingalavalasa",
+      "Mamidipalli",
+      "Mamidivalasa",
+      "Mandarada",
+      "S.R.Puram",
+      "Santhakaviti",
+      "Talada",
+      "Talatampara",
+      "Vasudevapatnam",
+      "Vavilavalasa",
+      "Vungarada"
+    ]
+  ],
+  "532127": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Aguru",
+      "Agurukancharam",
+      "Anthakapalli",
+      "Bodduru",
+      "Bomminaiduvalasa",
+      "Dasariraminaiduvalasa",
+      "G.M.R.Nagar",
+      "Gadimudidam",
+      "Gopalapuram",
+      "Guravam",
+      "Kagam",
+      "Korallavalasa",
+      "Maredubaka",
+      "Marrivalasa",
+      "Nagulavalasa",
+      "Penubaka",
+      "Perumali",
+      "Rachagumadam",
+      "Rajam",
+      "Sathamvalasa",
+      "Vommi"
+    ]
+  ],
+  "532148": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Boddam",
+      "Chandraiahpeta",
+      "Chettupodilam",
+      "Gedda Kancharam",
+      "Gobburu",
+      "Jada",
+      "Nandabalaga",
+      "Niddam",
+      "Pogiri",
+      "Ramachandrapuram Agraharam",
+      "Sigadam",
+      "Yenduva"
+    ]
+  ],
+  "532168": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Anandapuram",
+      "Banam",
+      "Buridikancharam",
+      "Chittarupuram",
+      "Devaravalasa",
+      "Dhavalapeta",
+      "Gokarnapalli",
+      "Gorinta",
+      "Honjaram",
+      "Laidam",
+      "Lolugu",
+      "Mandavakuriti",
+      "Manthina",
+      "Mettavalasa",
+      "Mirtivalasa",
+      "Palakhandyam",
+      "Pathakumkam",
+      "Ponduru",
+      "Rapaka",
+      "Santhavuriti",
+      "Siripuram",
+      "Suravam",
+      "Tamaram",
+      "Tankaladuggivalasa",
+      "Thandyam",
+      "Thungapeta",
+      "Walteru"
+    ]
+  ],
+  "532185": ["Srikakulam", "Andhra Pradesh", ["Amadalavalasa"]],
+  "532186": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Akkulapeta",
+      "Alikam",
+      "B.S.Puram",
+      "Cheemalavalasa",
+      "Chinthada",
+      "Chittivalasa",
+      "Kalaparthi",
+      "Kanugulavalasa",
+      "Kasimivalasa",
+      "Kistappapeta",
+      "Korlakota",
+      "Naira",
+      "Opivada Venkampeta",
+      "Ponnam",
+      "Silagam Singuvalasa",
+      "Tandemvalasa",
+      "Turakapeta",
+      "Uppinivalasa",
+      "Vengala Rao Colony"
+    ]
+  ],
+  "532187": ["Srikakulam", "Andhra Pradesh", ["Bairisingupuram"]],
+  "532190": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Alamajipeta",
+      "Chiguruvalasa",
+      "Kondavalasa",
+      "P.S.Puram",
+      "Rottavalasa",
+      "Shalantri"
+    ]
+  ],
+  "532195": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Borubhadra",
+      "Danta",
+      "Elamanchili",
+      "Gangaram",
+      "Jarjangi",
+      "Kakarapalli",
+      "Kamalanabhapuram",
+      "Kistupuram",
+      "Kotabomma R.S.",
+      "Kotabommali",
+      "Kurudu",
+      "Pattupuram",
+      "Santhabommali",
+      "T.Lingalapadu"
+    ]
+  ],
+  "532201": ["Srikakulam", "Andhra Pradesh", ["Tekkali"]],
+  "532203": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Aitam Engg.College",
+      "Ayodhyapuram",
+      "Baddumarri",
+      "Bhagavanpuram",
+      "Chakipalli",
+      "Dimidijola",
+      "Gudem",
+      "Kommusariapalli",
+      "Kottapalli",
+      "Lingalavalasa",
+      "Nandigam",
+      "Narasingupalli",
+      "Narsipuram",
+      "Nowgam",
+      "Parasurampuram",
+      "Pedalavunipalli",
+      "Polavaram",
+      "Sasanam",
+      "Seethapuram",
+      "Temburu",
+      "Venkateswara Colony",
+      "Venugopalapuram"
+    ]
+  ],
+  "532211": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Akasalakkavaram",
+      "Devanaltada",
+      "Hanumanthunaidupeta",
+      "Kothalingudu",
+      "Lakkivalasa",
+      "Marripadu",
+      "Meghavaram",
+      "Mulapeta",
+      "Naupada"
+    ]
+  ],
+  "532212": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Buragam",
+      "Dandugopalapuram",
+      "Dimilada",
+      "Jandapeta",
+      "Naupada RS",
+      "Ravivalasa",
+      "Sailada",
+      "Talagam"
+    ]
+  ],
+  "532213": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Labara",
+      "Pathapatnam",
+      "Peddalogidi",
+      "Peddamallipuram",
+      "R.L.Puram",
+      "Sarali",
+      "Seetarampalli",
+      "Tiddimi"
+    ]
+  ],
+  "532214": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Borubhadra",
+      "Chinakittalapadu",
+      "Dhanupuram",
+      "Dharmalaxmipuram",
+      "Kallata",
+      "Kommanapalli",
+      "Korasavada",
+      "Pedalamba",
+      "Peddaseedhi",
+      "Romadala"
+    ]
+  ],
+  "532215": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Deenabhandupuram",
+      "Kerasingi",
+      "Marripadu",
+      "Meliaputti",
+      "Pedapadmapuram",
+      "Siriakhandi",
+      "Vasundhara",
+      "Venkatapuram"
+    ]
+  ],
+  "532216": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Banapuram", "Chapara", "Jhadupalli", "Pedalaxmipuram", "Sekharapuram"]
+  ],
+  "532218": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Amalapadu",
+      "Borubhadra",
+      "Haridasupuram",
+      "Kambalarayudupeta",
+      "Kanitivooru",
+      "Komaraltada",
+      "Kondavooru",
+      "Kurmanadhapuram",
+      "Pathatekkali",
+      "Pedamuraharipuram",
+      "Pundi R S",
+      "Reyyipadu",
+      "Singuru",
+      "UG Puram"
+    ]
+  ],
+  "532219": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Akkupalli", "Bathupuram", "Metturu", "Vonkuluru"]
+  ],
+  "532220": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Amalakudiya",
+      "Bantukotturu",
+      "Bendi",
+      "Brahmanatarla",
+      "Garudakhandi",
+      "Kavitaagraharam",
+      "Kothagraharam",
+      "Parasurampuram",
+      "Pedanarayanapuram",
+      "Tekkalipatnam",
+      "Venkatapuram"
+    ]
+  ],
+  "532221": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Bharanikota",
+      "Goppili",
+      "Karajada",
+      "Kedaripuram",
+      "Lotturu",
+      "Palasa",
+      "Rentikota",
+      "Tarlakota"
+    ]
+  ],
+  "532222": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Anthrakudda",
+      "Boddapadu",
+      "Chinabadam",
+      "Dokulapadu",
+      "Garudabhadra",
+      "Kasibugga",
+      "Laxmidevipeta",
+      "Nagarampalli",
+      "Pallisaradhi",
+      "Vajrapukotturu"
+    ]
+  ],
+  "532242": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Cheepi",
+      "Gudarurajamanipuram",
+      "Killoyicolony",
+      "Kothapalli",
+      "Mandasa",
+      "Sondipudi"
+    ]
+  ],
+  "532243": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Ganguvada",
+      "Haripuram",
+      "Kondalogam",
+      "Loharibanda",
+      "Neelavathi",
+      "Rangoi",
+      "Suvarnapuram",
+      "Tallabhadra"
+    ]
+  ],
+  "532263": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Baruva", "Gollagandi", "Nadumuru", "Uppalam", "Yerramukkam"]
+  ],
+  "532264": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Badupuram",
+      "Baruva R S",
+      "Bhogapuram",
+      "Budarisingi",
+      "Chowkipeta",
+      "Mamidipalli",
+      "Palavalasa",
+      "Potrakonda",
+      "Turakasasanam"
+    ]
+  ],
+  "532284": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Bhogabeni",
+      "Brc Puram",
+      "Buragam",
+      "Jalantrakota",
+      "Jinkibhadra",
+      "Palasapuram",
+      "Sasanam",
+      "Sompeta"
+    ]
+  ],
+  "532290": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Belagam",
+      "Gorlapadu",
+      "Jhadupudi",
+      "Kanchili",
+      "Khajuru",
+      "Makarampuram",
+      "Pedasrirampuram",
+      "Peddakojjiria",
+      "Sahalalaputtuga"
+    ]
+  ],
+  "532291": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Dolagovindapuram", "Kesaripada", "Ms Palli", "Mundala", "Poleru"]
+  ],
+  "532292": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Borivanka",
+      "Gonapaputtuga",
+      "Isakalapalem",
+      "Kusumapuram",
+      "Manikyapuram",
+      "Rushikudda",
+      "Talatampara"
+    ]
+  ],
+  "532312": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Arakabhadra",
+      "Bhirlangi",
+      "Burjapadu",
+      "Deppilugonapaputtuga",
+      "Dharmapuram",
+      "Edupuram",
+      "Haripuram",
+      "Ichchapuram",
+      "Ichchapuram Bus Stand",
+      "Karapadu",
+      "Kesupuram",
+      "Koligam",
+      "Loddaputti",
+      "Mandapalli",
+      "Muchindra",
+      "Purushothapur (IPR)",
+      "Rattakanna"
+    ]
+  ],
+  "532322": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Beejiputti", "Jagathi", "Kapaskudda", "Kaviti", "Rajapuram", "Silagam"]
+  ],
+  "532401": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Arasavilli",
+      "Ippili",
+      "Mofusbandar",
+      "Patrunivalasa",
+      "Peddapadu",
+      "Sanivada",
+      "Vadada"
+    ]
+  ],
+  "532402": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Dallavalasa",
+      "Dharmapuram",
+      "Kanimetta",
+      "Kinthali",
+      "Kotipalli",
+      "S.M.Puram",
+      "Tholapi"
+    ]
+  ],
+  "532403": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Adapaka",
+      "Ajjaram",
+      "Allinagaram",
+      "Bejjipuram",
+      "Budatavalasa",
+      "Budumuru",
+      "Kesavadasupuram",
+      "Kesavarayunipalem",
+      "Kuppili",
+      "Lakshmipuram",
+      "Mahanthipalem",
+      "Murapaka",
+      "Tamavada"
+    ]
+  ],
+  "532404": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Ampolu", "Chinavatsavalasa", "Lingalavalasa", "Srikurmam", "Vatsavalasa"]
+  ],
+  "532405": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Bhairi", "Buravilli", "Gara", "Korlam", "Salihundam", "Sathivada", "Tulugu"]
+  ],
+  "532406": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Bandaruvanipeta", "Calingapatnam", "Tonangi", "Vommaravilli"]
+  ],
+  "532407": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Allivalasa",
+      "Bantupalle",
+      "Gollalapalem",
+      "Gumadam",
+      "J.R.Puram",
+      "Jeerupalem",
+      "Kotapalem",
+      "Kovvadamachilesam",
+      "Laveru",
+      "Patharlapalli",
+      "Ranasthalam",
+      "Ravada",
+      "Tallavalasa",
+      "Teppalavalasa",
+      "Venkatapuram"
+    ]
+  ],
+  "532408": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Bontalakoduru", "D. Matchilesam", "Dharmavaram", "Koyyam", "Ponnada"]
+  ],
+  "532409": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Arjunavalasa",
+      "Derasam",
+      "Devunipalavalasa",
+      "Maruvada",
+      "Naruva",
+      "Pathivadapalem",
+      "Pydibheemavaram",
+      "Rajam",
+      "Sancham",
+      "Varisam"
+    ]
+  ],
+  "532410": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Etcherla", "Fareedpeta", "Tamminaidupeta"]
+  ],
+  "532421": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Devadi",
+      "Idulavalasa",
+      "Jaduru",
+      "Kambakaya",
+      "Karagam",
+      "Komarti",
+      "Mabagam",
+      "Madapam",
+      "Makivalasa",
+      "Narasannapeta",
+      "Narasannapeta Market",
+      "Piruvada",
+      "Satyavaram"
+    ]
+  ],
+  "532425": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Allada",
+      "Andhavaram",
+      "Badam",
+      "Chikkalavalasa",
+      "Chodavaram",
+      "Kameswaripeta",
+      "Lukulam",
+      "Makivalasa",
+      "Nadagam",
+      "Paraselli",
+      "Parlam",
+      "Urlam"
+    ]
+  ],
+  "532426": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Aludu",
+      "Annupuram",
+      "Burujuvada",
+      "Jamachakram",
+      "Kodaddapanasa",
+      "Saravakota",
+      "Savaraddapanasa"
+    ]
+  ],
+  "532427": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Bhadri", "Budithi", "Kommanapalli", "Timadam", "Togiri", "Yalamanchili"]
+  ],
+  "532428": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Karakavalasa", "Kittalapadu", "Mukhalingam", "Nagarikatakam"]
+  ],
+  "532429": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Amapalam",
+      "Challayyavalasa",
+      "Deerghasi",
+      "Dola",
+      "Gollalavalasa",
+      "Polaki",
+      "Talasamudram",
+      "Urjam"
+    ]
+  ],
+  "532430": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Belamara",
+      "Dandulaxmipuram",
+      "Gathalavalasa",
+      "Harischandrapuram",
+      "Jagannadhapuram",
+      "Koduru",
+      "Malagam",
+      "Nimmada",
+      "Priyagraharam",
+      "Rahimanpuram",
+      "Runku Hanumanthapuram",
+      "Umilada"
+    ]
+  ],
+  "532432": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Challavanipeta", "Chennaivalasa", "Gotivada", "Jalumuru", "Karavanja", "Regulapadu"]
+  ],
+  "532440": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Adavaram",
+      "Aradali",
+      "Bhasuru",
+      "Bukkuru",
+      "Devudala",
+      "Gottamangalapuram",
+      "Komiri",
+      "Kondapuram",
+      "Palakonda",
+      "Pedakotipalli",
+      "Purli",
+      "Regidi",
+      "Sankili",
+      "Tampatapalli",
+      "Vatapagu",
+      "Voni"
+    ]
+  ],
+  "532443": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Gondi",
+      "Kodisa",
+      "Kuddapalli",
+      "Kusimi",
+      "Manda",
+      "Pedarama",
+      "Pedduru",
+      "Sambham",
+      "Seethampeta"
+    ]
+  ],
+  "532445": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Allena",
+      "Annampeta",
+      "Burja",
+      "Guttavilli",
+      "Javam",
+      "Khandyam",
+      "Labham",
+      "Lakkupuram",
+      "Mamidivalasa",
+      "Neelampeta",
+      "Peddapeta",
+      "Thotavada"
+    ]
+  ],
+  "532455": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Baleru",
+      "Chinnabagga",
+      "Ghanasara",
+      "Gunabhadra",
+      "Haddubangi",
+      "Keesara",
+      "Korama",
+      "Kotturu",
+      "Marripadu",
+      "Parapuram",
+      "Peddadimili",
+      "Puliputti",
+      "Putikavalasa",
+      "Sirusuvada",
+      "Somagandi"
+    ]
+  ],
+  "532456": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Battili", "Bhamini", "Gurandi", "Loharijola", "Maniga", "Manumakonda", "Singidi"]
+  ],
+  "532457": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Balada", "Dimili", "Kadumu", "Kurigam", "Nivagam", "Ponnuturu"]
+  ],
+  "532458": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Chintalabadavanja",
+      "Dabbapadu",
+      "Gonepadu",
+      "Kadagandi",
+      "L.N.Peta",
+      "Mulasavalapuram",
+      "Pedasavalapuram",
+      "Peddakota",
+      "Pusam",
+      "Sarubujjili",
+      "Siddhantham",
+      "Telikipenta",
+      "Vondrajola",
+      "Yeragam"
+    ]
+  ],
+  "532459": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Akulatampara",
+      "Bhagiradhipuram",
+      "Gulumuru",
+      "Gurandi",
+      "Hiramandalam",
+      "Irapadu",
+      "Kommuvalasa",
+      "Kondaragolu",
+      "Labba",
+      "Neradi",
+      "Padali",
+      "Pedasankili",
+      "Somarajapuram",
+      "Tulagam",
+      "Tungatampara"
+    ]
+  ],
+  "532460": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Chidimi",
+      "Chittapudivalasa",
+      "Donubai",
+      "Gadagamma",
+      "Gumada",
+      "Hussainpuram",
+      "Kadakella",
+      "Kambara",
+      "Kathulakaviti",
+      "Killada",
+      "Mokhasarajapuram",
+      "Narsipuram",
+      "Pedapolla",
+      "Pubbada",
+      "Regulapadu",
+      "Samarelli",
+      "Titukupai",
+      "Tudi",
+      "Vanduva",
+      "Veeraghattam"
+    ]
+  ],
+  "532461": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Kottisa",
+      "Rajulagumada",
+      "Rushingi",
+      "Seetharampuram Inam",
+      "Sivvam",
+      "Talagam",
+      "Vangara"
+    ]
+  ],
+  "532462": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Avalangi",
+      "Bitiwada",
+      "Jamparakota",
+      "Navagam",
+      "Neelanagaram",
+      "Potli",
+      "Sangam",
+      "Singupuram",
+      "Talavaram",
+      "Tettangi"
+    ]
+  ],
+  "532474": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    ["Chinabammidi", "Peddabammidi", "Rana", "Tilaru", "Tilaru RS", "Yetturallapadu"]
+  ],
+  "532484": [
+    "Srikakulam",
+    "Andhra Pradesh",
+    [
+      "Belamam",
+      "Dusi Rs",
+      "Gudem",
+      "Lankam",
+      "Modallavalasa",
+      "Ragolu",
+      "Tadivalasa",
+      "Thogaram",
+      "Thotada",
+      "Vanjangi"
+    ]
+  ],
+  "533001": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Govt.Gen Hospital", "Kakinada", "Kakinada Bazar", "KD Collectorate", "Suryaraopeta"]
+  ],
+  "533002": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Church Square", "Jagannaickpur", "M S N Charties"]
+  ],
+  "533003": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Bhaskarnagar", "Engg.College", "Mehernagar", "Sriramnagar"]
+  ],
+  "533004": ["East Godavari", "Andhra Pradesh", ["Gandhinagar (KKD)", "Ramaraopet"]],
+  "533005": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Apiic",
+      "APSP Camp",
+      "Atchampeta",
+      "Madhavapatnam",
+      "Nemam",
+      "Panasapadu",
+      "Panduru",
+      "Ramanayyapeta",
+      "Sarpavaram",
+      "Thammavaram",
+      "Thimmaparam",
+      "Valasapakala"
+    ]
+  ],
+  "533006": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Atchutapuratriam",
+      "Ganganapalli",
+      "Indrapalem",
+      "Kaikavolu",
+      "Karakuduru",
+      "Pedapudi",
+      "Repuru"
+    ]
+  ],
+  "533007": ["East Godavari", "Andhra Pradesh", ["Dairy Farm Center"]],
+  "533016": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Aratlakatta", "Gurazanapalli", "Kovvuru", "Nadakuduru", "Penuguduru", "Turangi"]
+  ],
+  "533101": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Alcot Gardens",
+      "Fort Gate",
+      "Rajahmundry",
+      "Ramakrishna Nagar",
+      "Syamalamba Temple",
+      "Vullithota"
+    ]
+  ],
+  "533102": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Gadala",
+      "Kolamuru",
+      "Konthamuru",
+      "Madhurapudi",
+      "Nidigatla",
+      "Palacherla",
+      "Ramadasupeta",
+      "Visranthipuram"
+    ]
+  ],
+  "533103": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Danavaipeta", "Rtc Bus Complex Centre", "Syamalanagar"]
+  ],
+  "533104": ["East Godavari", "Andhra Pradesh", ["Aryapuram"]],
+  "533105": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Government College",
+      "Kateru",
+      "Sarangadarametta",
+      "Sriramnagar",
+      "Trunk Road Junction",
+      "Venkatanagaram",
+      "Weavers Colony"
+    ]
+  ],
+  "533106": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["APHB Colony", "Prakasamnagar", "Spinning Mills Centre"]
+  ],
+  "533107": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Hukumpeta", "Pidimgoyya", "Punyakshetram", "Satellite City"]
+  ],
+  "533124": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Bommuru", "Industrial Estate", "Kondagunturu", "Rajavolu"]
+  ],
+  "533125": ["East Godavari", "Andhra Pradesh", ["Dowlaiswaram", "Vemagiri"]],
+  "533126": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Baduguvanilanka",
+      "Burrilanka",
+      "Jegurupadu",
+      "Kadiyam",
+      "Kadiyapulanka",
+      "Madhavarayudupalem",
+      "Madiki",
+      "Muramanda",
+      "Pottilanka",
+      "Veeravaram"
+    ]
+  ],
+  "533201": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Amalapuram",
+      "Amalapuram Bus Complex",
+      "Gandhi Bazar",
+      "Moberlypeta",
+      "New Colony",
+      "Rdo's Office Road",
+      "Vidyanagaram"
+    ]
+  ],
+  "533210": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Bendamurlanka", "Komaragiripatnam", "Mogallamori", "Tummalapalli", "Vodalarevu"]
+  ],
+  "533211": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Ainavalli",
+      "Ainavillilanka",
+      "Kondukuduru",
+      "Moolapolam",
+      "Mukteswaram",
+      "Sanapallilanka",
+      "Tottaramudi",
+      "Veeravallipelem",
+      "Velavalapalli"
+    ]
+  ],
+  "533212": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Balusutippa",
+      "Battucheruvu",
+      "Bojjavaripeta",
+      "Dontikurru",
+      "Geddanapalli",
+      "Kandikuppa",
+      "Katrenikona",
+      "Koppigunta",
+      "Mokkalitippa",
+      "Nadavapalli",
+      "Pallam",
+      "Pallamkurru",
+      "Uppudi"
+    ]
+  ],
+  "533213": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Challapalli",
+      "Gopavaram",
+      "Kamanagaruvu",
+      "Kunavaram",
+      "Samanasa",
+      "Saripalli",
+      "Surasani Yanam",
+      "Tandavapalli",
+      "Vannechintalapudi",
+      "Vilasavilli"
+    ]
+  ],
+  "533214": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Ambajipeta",
+      "Isukapudi",
+      "Machavaram",
+      "Munganda",
+      "Munjavarapukottu",
+      "Nandampudi",
+      "Pothavaram"
+    ]
+  ],
+  "533215": ["East Godavari", "Andhra Pradesh", ["Bodasakurru"]],
+  "533216": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Ainapuram",
+      "Annampalli",
+      "Chinakothalanka",
+      "Gadilanka",
+      "Gedillanka",
+      "Kamini",
+      "Komanapalli",
+      "Kothalanka",
+      "Krapa",
+      "Krapa Chintalapudi",
+      "Mummidivaram",
+      "Somidevarapalem",
+      "Thanelanka"
+    ]
+  ],
+  "533217": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Allavaram",
+      "Devaguptam",
+      "Godi",
+      "Godilanka",
+      "Goditippa",
+      "Guthulavaripalem",
+      "Samanthakurru",
+      "Turupulanka"
+    ]
+  ],
+  "533218": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Gudala", "Immidivarappadu", "Kodurupadu", "Peruru", "Rollapalem", "Tadikona"]
+  ],
+  "533220": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "I.Polavaram",
+      "Kesanakurru",
+      "Kesanakurrupalem",
+      "Komaragiri",
+      "Muramalla",
+      "Pasuvullanka",
+      "Serilanka",
+      "T.Kothapalli",
+      "Tillakuppa"
+    ]
+  ],
+  "533221": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Bandarlanka",
+      "Gangalakurru",
+      "Gangalakurru Agraharam",
+      "Indupalli",
+      "Nadipudi",
+      "Sakurru",
+      "Tondavaram"
+    ]
+  ],
+  "533222": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Anatavaram",
+      "Bhatnavilli",
+      "Bheemanapalli",
+      "Cheyyuru",
+      "Gollavilli",
+      "Gunnepalli",
+      "N.Kothapalli",
+      "Pedagadavilli",
+      "Penumalla",
+      "Sannavilli",
+      "Uppalaguptam"
+    ]
+  ],
+  "533223": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Devarapalli", "Kedarlanka", "Kothapeta", "Vadapalem", "Yenugulamahal"]
+  ],
+  "533228": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Billakurru", "Madupalli", "Pasupalli", "Vanapalli"]
+  ],
+  "533229": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Avidi", "Chirata Pudi", "Modekurru", "Narendrapuram", "Palivela"]
+  ],
+  "533232": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chintaluru",
+      "Gummileru",
+      "Modukuru",
+      "Narsipudi",
+      "Pedapalla",
+      "Penikeru",
+      "Pinapalla",
+      "Sandhipudi",
+      "Suryaraopeta"
+    ]
+  ],
+  "533233": ["East Godavari", "Andhra Pradesh", ["Alamuru", "Jonnada", "Mulastanam"]],
+  "533234": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Choppella", "Dulla", "Seethanagaram", "Yeditha"]
+  ],
+  "533235": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Atreyapuram",
+      "Bobbarlanka",
+      "Kattunga",
+      "Peravaram",
+      "Pulidindi",
+      "Rajavaram",
+      "Vaddiparru",
+      "Vasanthavada",
+      "Velicheru",
+      "Vutchili"
+    ]
+  ],
+  "533236": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Ankampalem", "Laxmi Polavaram", "Narkedmilli", "Podagatapalli", "Ryali"]
+  ],
+  "533237": ["East Godavari", "Andhra Pradesh", ["Lolla", "Vadapalli", "Vubalanka"]],
+  "533238": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Ithakota",
+      "Ketharajuupalli",
+      "Komarajulanka",
+      "Ravulapadu",
+      "Ravulapalem",
+      "Vedureswaram"
+    ]
+  ],
+  "533239": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Irusumanda", "K.Pedapudi", "Mosalapalli", "Pulletikurru"]
+  ],
+  "533240": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["D.Gannavaram", "L.Gannavaram", "Mondepulanka", "Yenugupalli"]
+  ],
+  "533241": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Kamujuvarilanka", "Mukkamala", "Nallacheruvu", "Nedunuru", "Vakkalanka"]
+  ],
+  "533242": ["East Godavari", "Andhra Pradesh", ["Razole"]],
+  "533244": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chintalapalli",
+      "Eastpalem",
+      "Gudapalli",
+      "Kesanapalli",
+      "Kunavaram",
+      "Mattaparru",
+      "Medicherlapalem",
+      "Sivakodu"
+    ]
+  ],
+  "533247": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Adurru",
+      "Appanapalli",
+      "B.Doddavaram",
+      "Badava",
+      "Idarada",
+      "Lutukurru",
+      "Mamidikuduru",
+      "Nagaram",
+      "Pasarlapudi",
+      "Pasarlapudilanka",
+      "Pedapatnam Lanka"
+    ]
+  ],
+  "533248": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Aravapalem",
+      "Gogannamatham",
+      "Kadali",
+      "Karavaka",
+      "Katrenipadu",
+      "Magatapalli",
+      "Mulikipalli",
+      "Ponnamanda",
+      "Vegivaripalem"
+    ]
+  ],
+  "533249": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Jaggannapeta",
+      "Manepalli",
+      "Mogalikuduru",
+      "Nagullanka",
+      "Palagummi",
+      "Pedapatnam",
+      "Podalada",
+      "Tatipaka",
+      "Tatipaka Bazar",
+      "Vadrevupalli"
+    ]
+  ],
+  "533250": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Chintalamori", "Mori", "Padamatipalem", "Sankaraguptam", "Srungavarappadu"]
+  ],
+  "533251": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Gondi",
+      "Gudimula",
+      "Rameswaram",
+      "Sakhinetipalli",
+      "Sakhinetipalli Lanka",
+      "Sakhinetipallipalem",
+      "Srirampuram"
+    ]
+  ],
+  "533252": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Addalapalem",
+      "Antarvedi",
+      "Antarvedi Devastanam",
+      "Antarvedipalem",
+      "Appanaramunilanka",
+      "Kesavadasupalem",
+      "Rambagh"
+    ]
+  ],
+  "533253": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Gudimellanka", "Kantevaripadu", "Malikipuram", "Ramarajulanka"]
+  ],
+  "533254": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Irusumanda", "Kathimanda", "Lakkavaram", "Visweswarayapuram"]
+  ],
+  "533255": ["East Godavari", "Andhra Pradesh", ["Ramachandrapuram"]],
+  "533256": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Arikarevula",
+      "Chodavaram",
+      "Kothuru",
+      "Kurmapuram",
+      "Muchimilli",
+      "Narasapurapupeta",
+      "Ramachandrapuram Old Town",
+      "Tallapolam",
+      "Vella",
+      "Venturu"
+    ]
+  ],
+  "533260": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Kurada", "Siripuram", "Velangi", "Yanamadala"]
+  ],
+  "533261": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Chelluru", "Matsavaram", "Pasalapudi", "Pulagurtha", "Someswaram"]
+  ],
+  "533262": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Addampalli",
+      "Draksharamam",
+      "Hasanbada",
+      "Ithapudi",
+      "Jagannadhagiri",
+      "Jagannaiyakulapalem",
+      "Kapavaram",
+      "Kunduru",
+      "Nelaparthipadu",
+      "Penumalla",
+      "Sivala",
+      "Vegayampeta",
+      "Velampalem",
+      "Venkatayapalem"
+    ]
+  ],
+  "533263": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Balantram",
+      "Bhatlapalika",
+      "Dangeru",
+      "Duggudurru",
+      "Kudupuru",
+      "Kuyyeru",
+      "Masakapalli",
+      "Pekeru"
+    ]
+  ],
+  "533264": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Kutukuluru", "Pedaparthi", "Ramavaram"]
+  ],
+  "533274": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "G.Pedapudi",
+      "Ganti",
+      "Gopalapuram",
+      "Mummidivarappadu",
+      "North Gopalapuram",
+      "Vudimudi"
+    ]
+  ],
+  "533284": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Amudalabanda",
+      "B.Velamakota",
+      "Doramamidi",
+      "Gangavaram",
+      "Goragummi",
+      "Kothada",
+      "Lakkonda",
+      "Utla"
+    ]
+  ],
+  "533285": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Bayyanapalli",
+      "Bhupatipalem",
+      "Foulkspeta",
+      "Jaggampalem",
+      "Kamarajupeta",
+      "Kothapalli",
+      "Mallavaram",
+      "Molleru",
+      "Narasapuram",
+      "Nellipudi",
+      "Pidathamamidi",
+      "Soorampalem"
+    ]
+  ],
+  "533286": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chinabhimpalli",
+      "Devaram",
+      "Gadelapalem",
+      "Gangampalem",
+      "Gokaram",
+      "Indukuru",
+      "Indukurupeta",
+      "Krishunipalem",
+      "Rampayerrampalem",
+      "Sarabhavaram",
+      "Tantikonda",
+      "Tirumalayapalem"
+    ]
+  ],
+  "533287": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chinakondepudi",
+      "Muggulla",
+      "Purushottapatnam",
+      "Raghudevapuram",
+      "Ramachandrapuram",
+      "Sithanagaram",
+      "Vangalapudi"
+    ]
+  ],
+  "533288": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Akuru",
+      "Bandapalli",
+      "Beerampalli",
+      "Bolagonda",
+      "Busigudem",
+      "D.Velamakota",
+      "Dorachintalapalem",
+      "Geddada",
+      "Ginnepalli",
+      "I.Polavaram",
+      "Madicherla",
+      "Marriwada",
+      "Musurumilli",
+      "Palem",
+      "Pamugandi",
+      "Rampa",
+      "Rampachodavaram",
+      "Seethapalli",
+      "Sunnampadu",
+      "Tadepalle",
+      "Tamarapalli",
+      "Tatiwada",
+      "Tunnuru",
+      "Vadapalli",
+      "Vemulukonda"
+    ]
+  ],
+  "533289": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Atchutapuram",
+      "Gadarada",
+      "Gummalladoddi",
+      "Jambupatnam",
+      "Kanupuru",
+      "Korukonda",
+      "Kunavaram",
+      "Munagala",
+      "Narasimhapuram",
+      "Srirangapatnam",
+      "Vedurupaka"
+    ]
+  ],
+  "533290": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Bolleddupalem",
+      "Itikayalapalli",
+      "Koti",
+      "Kotikesavaram",
+      "Nagampalli",
+      "Raghavapuram"
+    ]
+  ],
+  "533291": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Doddigunta", "Mukundavaram", "Pedarayavaram", "Rangampeta", "Subhadrampeta"]
+  ],
+  "533292": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Burugupudi", "Butchampeta", "Dosakayapalli", "Nandarada"]
+  ],
+  "533293": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Katavaram", "Mirthipadu", "Mulakallanka", "Munikodali", "Torredu"]
+  ],
+  "533294": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "East Gonagudem",
+      "G.Donthamuru",
+      "Ilakolanu",
+      "Narendrapuram",
+      "Pallakadiyam",
+      "Rajanagaram",
+      "Ramaswamipeta",
+      "Vadisaleru",
+      "Veerampalem",
+      "Velugubanda"
+    ]
+  ],
+  "533295": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chatlawada",
+      "Chavadikota",
+      "Chintalapudi",
+      "Gujjumamidivalasa",
+      "Kundada",
+      "Kutrawada",
+      "Maredumilli",
+      "Pullangi",
+      "Vetukuru"
+    ]
+  ],
+  "533296": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Adikavi Nannayya University Campus",
+      "Chakradwarabandham",
+      "Dewancheruvu",
+      "GSL Medical College",
+      "Kanavaram",
+      "Mallampudi",
+      "Srikrishnapatnam",
+      "Srirampuram",
+      "Tokada"
+    ]
+  ],
+  "533297": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Gandepalli",
+      "K.Gopalapuram",
+      "Kalavacherala",
+      "Murari",
+      "N.T.Rajapuram",
+      "Seetharampuram",
+      "Singarampalem"
+    ]
+  ],
+  "533305": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Amjuru",
+      "Gangavaram",
+      "Kulla",
+      "Pamarru",
+      "Panangipalli",
+      "Satyavada",
+      "Tamarapalli",
+      "Vakatippa",
+      "Yandagandi"
+    ]
+  ],
+  "533306": ["East Godavari", "Andhra Pradesh", ["Kota", "Kotipalli", "Sundarapalli"]],
+  "533307": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Angara", "Atchutapuram", "Nalluru", "Teki", "Vedurumudi"]
+  ],
+  "533308": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Mandapeta", "Mandapeta Bazar", "Maredubaka", "Nelaturu", "Valluru"]
+  ],
+  "533309": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Kapileswarapuram", "Korumilli", "Machara", "Tatapudi"]
+  ],
+  "533339": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chinaramanayyapeta",
+      "Choppakonda",
+      "Devipatnam",
+      "Manturu",
+      "Pudipalli",
+      "V.Ramannapalem"
+    ]
+  ],
+  "533340": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Arthamuru", "Ippanapadu", "Palathodu", "Peketipakalu", "Tapeswaram", "Velagathodu"]
+  ],
+  "533341": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Dwarapudi",
+      "G.Yerrampalem",
+      "Kesavaram",
+      "Pathatungapadu",
+      "Radheyapalem",
+      "Z.Medapadu"
+    ]
+  ],
+  "533342": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Anaparthy",
+      "Duppalapudi",
+      "Kapavaram",
+      "Laxminarasapuram",
+      "Mahendrawada",
+      "Mukkinada",
+      "Peraramachandrapuram",
+      "Polamuru"
+    ]
+  ],
+  "533343": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Balabhadrapuram", "Bikkavolu", "Rangapuram", "Singampalli", "Vulapalli"]
+  ],
+  "533344": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chintaplli",
+      "G.Mamidada",
+      "Gandredu",
+      "Kumarapriyam",
+      "Peddada",
+      "Pyna",
+      "Rajupalem",
+      "Sampara",
+      "Vendra"
+    ]
+  ],
+  "533345": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Konkuduru", "Pandalapaka", "Vedurupaka"]
+  ],
+  "533346": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Komaripalem", "Koppavaram", "Lolla", "Rayavaram", "Vedurupakasavaram"]
+  ],
+  "533347": ["East Godavari", "Andhra Pradesh", ["Chintur", "Mothugudem", "Pulluru Phc"]],
+  "533348": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Donkarayi", "Forebey Dam Camp", "Mangampadu"]
+  ],
+  "533349": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chintaregupalli",
+      "Jeediguppa",
+      "Pedamittapalli",
+      "Rakapalli",
+      "Sriramgiri",
+      "Tummileru",
+      "Ummadivaram",
+      "V.R. Puram",
+      "Vaddigudem"
+    ]
+  ],
+  "533350": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Abhicherla",
+      "Chuchirevulagudem",
+      "Jaggavaram",
+      "Kondrajupeta",
+      "Kunavaram",
+      "Kuturu",
+      "Lingapuram",
+      "Marrigudem",
+      "Pedarkur"
+    ]
+  ],
+  "533351": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Gannavaram",
+      "Gannerugoyyapadu",
+      "Kachavaram",
+      "Karakagudem",
+      "Murumuru",
+      "Nallakunta",
+      "Nandigama",
+      "Tekubaka",
+      "Thotapalli",
+      "Vissapuram"
+    ]
+  ],
+  "533352": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chadalavada",
+      "Chatti",
+      "Chidumuru",
+      "Chintalagudem",
+      "Chodavaram",
+      "Choppalli",
+      "Edurallapalli",
+      "G.Kothagudem",
+      "Godlagudem",
+      "Gogubaka",
+      "Gundala",
+      "Kannaigudem",
+      "Kolturu",
+      "Kommuru",
+      "Laxmipuram",
+      "Mukunuru",
+      "Nellipaka",
+      "Pitchukulapadu",
+      "Purushottapatnam",
+      "Ramagopalapuram",
+      "Ramavaram",
+      "Rayanipeta",
+      "Regulapadu",
+      "Tummala",
+      "Vegithota",
+      "Venkatareddipeta",
+      "Yatapaka"
+    ]
+  ],
+  "533353": ["East Godavari", "Andhra Pradesh", ["Dewancheruvu"]],
+  "533354": ["East Godavari", "Andhra Pradesh", ["Indukurupeta"]],
+  "533355": ["East Godavari", "Andhra Pradesh", ["Gangavaram"]],
+  "533401": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Addaripeta",
+      "Ammajipeta",
+      "Boddavaram",
+      "Chamavaram",
+      "D Polavaram",
+      "Hamsavaram",
+      "K Mallavaram",
+      "Kummarilova",
+      "Nadigatla Vari Savaram",
+      "Nandivampu",
+      "Paltheru",
+      "Pydi Konda",
+      "Rekhavanipalem",
+      "S Annavaram",
+      "Talluru",
+      "Tuni",
+      "Tuni Old Bazar",
+      "Velamakothuru",
+      "Vemavaram"
+    ]
+  ],
+  "533406": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Annavaram",
+      "Annavaram Devasthanam",
+      "Bendapudi",
+      "Koduru",
+      "Latchireddipalem",
+      "Mandapam",
+      "N Narendrapatnam",
+      "P.E.Chinayapalem",
+      "Ravikampadu",
+      "Srungadhara Agraharam",
+      "Tetagunta",
+      "Thimmapuram"
+    ]
+  ],
+  "533407": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Allipudi",
+      "Bhimavarapukota",
+      "Billananduru",
+      "Indugupalli",
+      "K E Chinnayyapalem",
+      "Kamatam Mallavaram",
+      "Kotananduru",
+      "Kothakottam",
+      "Rajavaram",
+      "Surapurajupeta"
+    ]
+  ],
+  "533408": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "A Kothapalli",
+      "Kodada",
+      "Krishnapuram",
+      "Srungavruksham",
+      "Thondangi",
+      "Vontimamidi",
+      "Yellayyapeta"
+    ]
+  ],
+  "533428": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Addatigala",
+      "Bhimavaram",
+      "Bodlanka",
+      "Cheedipalem",
+      "Dhanyampalem",
+      "Doramamidi",
+      "Gondolu",
+      "Jaderu",
+      "K Yerragonda",
+      "Kinaparthi",
+      "Konalova",
+      "Kota",
+      "Marripalem",
+      "Marriveedu",
+      "Matlapadu",
+      "Mohanapuram",
+      "Pandraprolu",
+      "Pinjarakonda",
+      "Somannapalem",
+      "Thimmapuram",
+      "Thungamadugula",
+      "Vetamamidi",
+      "Yellavaram",
+      "Yendapalli",
+      "Yerramreddypalem"
+    ]
+  ],
+  "533429": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Bhadravaram",
+      "Gontuvanipalem",
+      "J Annavaram",
+      "Kimmuru",
+      "Lingamparthi",
+      "Maredubaka",
+      "Peravaram",
+      "Puligogulapadu",
+      "Ramanayyapeta",
+      "Tirumali",
+      "Vanchangi",
+      "Yeleswaram"
+    ]
+  ],
+  "533430": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Dharamavaram",
+      "Gokavaram",
+      "Lampakalova",
+      "Pothuluru",
+      "Rachapalli",
+      "Sarabhavaram",
+      "Uttarakanchi",
+      "Vommangi"
+    ]
+  ],
+  "533431": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "B Kothuru",
+      "Chillangi",
+      "Geddanapalli",
+      "Jagapathinagaram",
+      "Kirlampudi",
+      "Mukkullu",
+      "Peddanapalli",
+      "Rajupalem",
+      "S Thimmapuram",
+      "Veeravaram"
+    ]
+  ],
+  "533432": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Chinasankaralapudi", "Pedasankarlapudi", "Prathipadu", "Siripuram", "Yeluru"]
+  ],
+  "533433": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Chadalada", "Divili", "Gorinta", "Jalluru", "Mallam", "Pulimeru"]
+  ],
+  "533434": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Hussain Puram",
+      "Medapadu",
+      "P Vemavaram",
+      "Pedabrahmadevam",
+      "Unduru",
+      "V K Rayapuram",
+      "Vetlapalem"
+    ]
+  ],
+  "533435": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Govindapuram",
+      "Gurrampalem",
+      "Irripaka",
+      "J Burugupudi",
+      "Jaggampeta",
+      "Koturu",
+      "Mallepalli",
+      "Mallisala",
+      "Narendrapatnam",
+      "Rajapudi",
+      "Ramavaram",
+      "Somavaram",
+      "Talluru",
+      "Yerravaram",
+      "Z Ragampeta"
+    ]
+  ],
+  "533436": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Aminabad",
+      "Ammirekula",
+      "Ananthagiri",
+      "Badadanampalli",
+      "Cherukumpalem",
+      "Chikilintha",
+      "Donelapalem",
+      "Godi O Kurthi",
+      "Jaddangi",
+      "Kindra",
+      "Kirrabu",
+      "Kondapalli",
+      "Labbarthi",
+      "Lagarayi",
+      "Lododdi",
+      "Rajavommangi",
+      "Sarabhavaram",
+      "Thantikonda",
+      "Urlakulapadu",
+      "Vathangi",
+      "Vattigadda"
+    ]
+  ],
+  "533437": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Anuru",
+      "G Ragampeta",
+      "Goneda",
+      "Gudivada",
+      "Kandrakota",
+      "Katravulapalli",
+      "Kattamuru",
+      "Marlova",
+      "Marripudi",
+      "Nayakampalli",
+      "Peddapuram",
+      "Peddapuram Town",
+      "Ramesampeta",
+      "Rayabhupalapatnam",
+      "Surampalem",
+      "Tamarada",
+      "Vadlamuru"
+    ]
+  ],
+  "533440": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Samalkot",
+      "Samalkot Agrl Farm B",
+      "Samalkot Pen Lines",
+      "Samalkot R S",
+      "Satyanarayanapuram"
+    ]
+  ],
+  "533444": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Chendurti", "Kathipudi", "Kodavali", "Vazrakutam"]
+  ],
+  "533445": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Bhogapuram", "Gollaprolu", "P.Donthamuru", "Raparthi", "Rayavaram", "Tatiparthi"]
+  ],
+  "533446": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chintaluru",
+      "G Kothapalli",
+      "Konthangi",
+      "Meraka Chamavaram",
+      "Mulagapudi",
+      "Nellipudi",
+      "Pedamallapuram",
+      "Raghavapatnam",
+      "Routhulapudi",
+      "Sankhavaram",
+      "Santhapydipala",
+      "Santhiashram"
+    ]
+  ],
+  "533447": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Kothapalli (U)", "Nagulapalli", "Ramanakkapeta", "Yendapalli"]
+  ],
+  "533448": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Amaravalli", "Mulapeta", "Ponnada", "Uppada"]
+  ],
+  "533449": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "A Mallavaram",
+      "A V Nagaram",
+      "Chebrolu",
+      "Durgada",
+      "Kommanapalli",
+      "Kothaperumallapuram"
+    ]
+  ],
+  "533450": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chandanampalem",
+      "Chitrada",
+      "F K Palem",
+      "Gokivada",
+      "Gorsa",
+      "Isukapalli",
+      "Kolanka",
+      "Komaragiri",
+      "Kondevaram",
+      "Kothapeta (PTP)",
+      "Lakshminarasapuram",
+      "Navara",
+      "Pavara",
+      "Pithapuram",
+      "Pithapuram Town",
+      "Virava",
+      "Viravada"
+    ]
+  ],
+  "533451": ["East Godavari", "Andhra Pradesh", ["Tatiparthi"]],
+  "533461": ["East Godavari", "Andhra Pradesh", ["Chollangipeta", "Coringa", "Patavala"]],
+  "533462": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Kandregula", "Karapa", "Sahapuram", "Vakada", "Vemulavada", "Z.Bhavaram"]
+  ],
+  "533463": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["Gadimoga", "Kesavapuram", "P.Mallavaram", "Pathigondi", "Silalanka", "Tallarevu"]
+  ],
+  "533464": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "G.Moolapalem",
+      "Georgepeta",
+      "Gogullanka",
+      "Guthenadeevi",
+      "Injaram",
+      "Kapulapalem",
+      "Kolanka",
+      "Neelapalli",
+      "Pallipalem",
+      "Pillanka",
+      "Uppangala",
+      "Yanam",
+      "Yedurulanka"
+    ]
+  ],
+  "533468": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Aryavatam",
+      "Bandanapudi",
+      "Gollapalem",
+      "Gorripudi",
+      "Kajuluru",
+      "Manjeru",
+      "Peddapurappadu",
+      "Seela",
+      "Selapaka",
+      "Tarlampudi",
+      "Vijayarayudupalem",
+      "Yandamuru"
+    ]
+  ],
+  "533483": [
+    "East Godavari",
+    "Andhra Pradesh",
+    [
+      "Chamagadda",
+      "Chavitidibbalu",
+      "D. Ramavaram",
+      "Dakodu",
+      "Dalipadu",
+      "Durcherthi",
+      "Gurthedu",
+      "P Yerragonda",
+      "Panasalapalem",
+      "Pedavadisakarra",
+      "Rayapalli",
+      "Veeravaram",
+      "Y .Ramavaram"
+    ]
+  ],
+  "533577": [
+    "East Godavari",
+    "Andhra Pradesh",
+    ["A.Vemavaram", "Janupalli", "K.Jagannadhapuram", "Magam", "Pothukurru", "Vilasa"]
+  ],
+  "534001": ["West Godavari", "Andhra Pradesh", ["Benerjipeta", "Eluru", "Eluru Bazar"]],
+  "534002": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Ashok Nagar",
+      "Chodimella",
+      "Kothuru",
+      "Malkapuram",
+      "Mupparu",
+      "Ponangi",
+      "Power Peta",
+      "Vangayagudem",
+      "Vanguru",
+      "Venkata Rao Peta"
+    ]
+  ],
+  "534003": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Ankannagudem",
+      "Koppaka",
+      "Pedakadimi",
+      "Pinakadimi",
+      "Sanivarapu Peta",
+      "Westren Street"
+    ]
+  ],
+  "534004": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Chataparru",
+      "Gudivakalanka",
+      "Jalipudi",
+      "Komadavole",
+      "Prathikollanka",
+      "Sriparru"
+    ]
+  ],
+  "534005": ["West Godavari", "Andhra Pradesh", ["Eluru R.S", "Tangellamudi"]],
+  "534006": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Eluru Bus Station",
+      "Eluru Collectorate",
+      "Narasimharao Peta",
+      "Ramachandra Rao Peta"
+    ]
+  ],
+  "534007": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Bhogapuram",
+      "Gandhinagaram",
+      "Industrial Estate",
+      "Kalaparru",
+      "Kokkiripadu",
+      "P&T Colony",
+      "Sb Colony"
+    ]
+  ],
+  "534101": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Aphb Colony", "Subbaraopeta", "Tadepalligudem", "Tadepalligudem Town"]
+  ],
+  "534102": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Jaggannapeta",
+      "Juvvalapalem",
+      "Kadakatla",
+      "Kadiyedda",
+      "Kommugudem",
+      "Kondruprolu",
+      "Kunchinapalli",
+      "Padala",
+      "Ramannagudem",
+      "Tadepalli",
+      "Tadepalligudem Bazar",
+      "Veerampalem",
+      "Venkatramannagudem"
+    ]
+  ],
+  "534111": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Ananthapallli", "Atchannapalem", "Gundepalli", "Telikecharla"]
+  ],
+  "534112": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Avapadu",
+      "Dubacharla",
+      "Gantavarigudem",
+      "Marellamudi",
+      "Nallajerla",
+      "Prakasaraopalem",
+      "Pullalapadu",
+      "Singarajupalem"
+    ]
+  ],
+  "534122": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Jagannadhapuram", "Maruteru", "Pandithavilluru", "Satyavaram"]
+  ],
+  "534123": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Atchanta", "Deva", "Mulaparru", "Penumanchili"]
+  ],
+  "534124": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Juttiga", "Mallipudi", "Nattarameswaram", "Penumantra", "Velagalavariplalem"]
+  ],
+  "534126": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Alamuru",
+      "Bhatlamaguturu",
+      "Kanteru",
+      "Kathavapadu",
+      "Nelamuru",
+      "Podalada",
+      "Voduru"
+    ]
+  ],
+  "534134": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Attili",
+      "Eduru",
+      "K.Samudrapugattu",
+      "Komarru",
+      "Kommara",
+      "Manchili",
+      "Minavilluru",
+      "Moyyeru",
+      "Mupparthipadu",
+      "Paluru",
+      "Seethalm Kondepadu",
+      "Uradallapalem LWE"
+    ]
+  ],
+  "534145": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Apparaopeta",
+      "Dandagarra",
+      "Jagannadhapuram",
+      "Madhavaram",
+      "Moduggunta",
+      "Pullayagudem"
+    ]
+  ],
+  "534146": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Allampuram",
+      "Arugolanu",
+      "Konala",
+      "Kothuru",
+      "Krishnayampalemi",
+      "Marampalli",
+      "Muddapuram",
+      "Nandamuru",
+      "Navabpalem",
+      "Prattipadu"
+    ]
+  ],
+  "534156": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["B.Kondepadu", "Duvva", "Korumilli", "Pasalapudi", "Ravipadu", "Surya Rao Palem"]
+  ],
+  "534165": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Kakarlamudi", "Mounjipadu", "West Vipparru"]
+  ],
+  "534166": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Darisaparru",
+      "Jetlapalem",
+      "K.Pentapadu",
+      "Parimalla",
+      "Pentapadu",
+      "Racharla",
+      "Yanalapalli"
+    ]
+  ],
+  "534176": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Cheepurugudem", "Kavuluru", "Nabipeta", "Pothavaram", "Pothineedipalem"]
+  ],
+  "534186": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Appannapeta",
+      "Garagaparru",
+      "Jallikakinada",
+      "Kesavaram",
+      "Mypa",
+      "Vundurru",
+      "Yandagandi"
+    ]
+  ],
+  "534195": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["D.Gopavaram", "Mandalaparru", "Nidamarru", "P.N.Kolanu"]
+  ],
+  "534196": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Akuteegapadu",
+      "Bodapadu",
+      "Ch.Agraharam",
+      "Chintapalli Agraharam",
+      "Kasipadu",
+      "Kommara",
+      "Mudunuru",
+      "Vakapalli"
+    ]
+  ],
+  "534197": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["A.Gopavaram", "Ardhavaram", "Muggalla", "Pippara", "Valluru"]
+  ],
+  "534198": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Adavikolanu",
+      "Aredu",
+      "Bavaipalem",
+      "Bhuvanapalli",
+      "Chanamilli",
+      "Ganapavaram",
+      "Kaligotla",
+      "Kothapalli",
+      "Krovvidi",
+      "Panduvva",
+      "Saripalli",
+      "Velagapalli",
+      "Yenikepalli"
+    ]
+  ],
+  "534199": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Arthamuru",
+      "Cherukuwada",
+      "Chilukuru",
+      "Kalisipudi",
+      "Kolamuru",
+      "Mahadevapatnam",
+      "N.R.P. Agraharam",
+      "Pamulaparru",
+      "Pedapulleru",
+      "Undi",
+      "Uppuluru"
+    ]
+  ],
+  "534201": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Bhimavaram", "Bhimavaram Railway Colony", "Someswaralayam"]
+  ],
+  "534202": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Annavaram",
+      "Bhimavaram Bazar",
+      "D.N.R.College",
+      "Gollalakoderu",
+      "Sivaraopeta",
+      "Sreeramapuram",
+      "Taderu"
+    ]
+  ],
+  "534204": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["China Amiram", "Peda Amiram", "S.R.K.R .Engg.College"]
+  ],
+  "534206": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Bondada", "Jakkaram", "Kopalle", "Lakshminarasimhapuram", "Vandram", "Vempadu"]
+  ],
+  "534207": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Bethapudi", "Matsyapuri", "Pedagaruvu", "Tundurru", "Vempa"]
+  ],
+  "534208": ["West Godavari", "Andhra Pradesh", ["Ankoderu", "Komarada", "Rayalam"]],
+  "534209": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Korukollu", "Lakshminarayanapuram", "Mogallu"]
+  ],
+  "534210": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Kondepudi", "Kumudavalli", "Palakoderu", "Vendra"]
+  ],
+  "534211": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Hanumantharaopeta", "Sajjapuram", "Tanuku", "Tanuku Bazar", "Tanuku Old Town"]
+  ],
+  "534215": ["West Godavari", "Andhra Pradesh", ["Venkatrayapuram"]],
+  "534216": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Chilakapadu", "Chivatam", "Palangi", "Vundrajavaram"]
+  ],
+  "534217": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Arjunudupalem",
+      "Goteru",
+      "Iragavaram",
+      "K.Illindalaparru",
+      "Kothapadu",
+      "Yeraih Cheruvu"
+    ]
+  ],
+  "534218": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Mandapaka", "Satyawada", "Tetali", "Vadluru"]
+  ],
+  "534222": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Kavalipuram", "Komaravaram", "Veerabhadrapuram", "Velpur"]
+  ],
+  "534225": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Ballipadu",
+      "Gavarlapalem",
+      "Gummampadu",
+      "Pali Gds",
+      "Relangi",
+      "S.Illindalaparru",
+      "Tirupathipuram",
+      "Varighedu"
+    ]
+  ],
+  "534227": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Dammennu", "Mortha", "Tadiparru", "Velagaduuru"]
+  ],
+  "534230": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Aravalli", "Kanchumarru", "Skinnerapuram", "Unikili"]
+  ],
+  "534235": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Aibhimavaram",
+      "Akividu",
+      "Apparaopeta",
+      "Cherukumilli",
+      "Chinakapavaram",
+      "Chinamallipadu",
+      "Dumpagadapa",
+      "Gummuluru",
+      "Kollaparru",
+      "Pedakapavaram",
+      "Sidhapuram"
+    ]
+  ],
+  "534236": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Juvvalapalem", "Kalavapudi", "Military Colony", "Prathalameraka", "Yelurupadu"]
+  ],
+  "534237": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Doddanapudi", "Kalla", "Kallakuru", "Kolanapalli", "Kuppanapudi", "Sisali"]
+  ],
+  "534238": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Andaluru", "Mamuduru", "Navuduru", "Polamuru"]
+  ],
+  "534239": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Deyyalatippa",
+      "Dirusumarru",
+      "Enamadurru",
+      "Gollavanitippa",
+      "Losari Gutlapadu",
+      "Tokatippa"
+    ]
+  ],
+  "534240": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Jonnalapalem", "Konithiwada", "Madugupolavaram", "Nelapogula"]
+  ],
+  "534243": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Dusanapudi", "Nandamurugaruvu", "Pennada", "Perkipalem", "Srungavruksham"]
+  ],
+  "534244": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Goraganamudi", "Vankayalapalem", "Vissakoderu"]
+  ],
+  "534245": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Sivadevunichikkala", "Tillapudi", "Viravasaram"]
+  ],
+  "534247": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Panjavemavaram", "Rayakuduru", "Tokalapudi", "Toleru"]
+  ],
+  "534250": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Agarru",
+      "Agarthipalem",
+      "Aratlakatta",
+      "Bhaggeswaram",
+      "Chintaparru",
+      "Dagguluru",
+      "Kapavaram",
+      "Lankalakoderu",
+      "Poolapalli",
+      "Velivela",
+      "Venkata Puram"
+    ]
+  ],
+  "534260": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Lajapathiroya Peta", "Palakol", "Palakol Bazar"]
+  ],
+  "534265": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Jinnuru",
+      "Mattaparru",
+      "Ullamparru",
+      "Vadlavani Palem",
+      "Varidhanam",
+      "Vedangi",
+      "Vedangi Palem"
+    ]
+  ],
+  "534266": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Abbiraju Palem",
+      "Ayodhya Lanka",
+      "Bhimala Puram",
+      "Burugupalli",
+      "Doddipatla",
+      "Gumparru",
+      "Ilapakurru",
+      "Matla Palem",
+      "Narinameraka"
+    ]
+  ],
+  "534267": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["A.Vemavaram", "Appanna Cheruvu", "Gummaluru", "Penumadam", "Ravipadu", "Vaddiparru"]
+  ],
+  "534268": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Adavipalem",
+      "Chinchinada",
+      "Ellamanchili",
+      "Ellamanchili Lanka",
+      "Kalagam Pudi",
+      "Kaza",
+      "Konteru",
+      "Medapadu",
+      "Neredumilli",
+      "Penumarru",
+      "Siragala Palli"
+    ]
+  ],
+  "534269": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Chinamallam", "Karugorumilli", "Kodamanchili", "Koderu", "Pedamallam", "Valluru"]
+  ],
+  "534275": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Chittavaram",
+      "Darabharevu",
+      "Digamarru",
+      "Kopparru",
+      "Lakshmaneswaram",
+      "Linganaboyinacherla",
+      "Mallavaram",
+      "Narsapur",
+      "Narsapur Bazar",
+      "Roypeta",
+      "Rustumbada",
+      "Saripalli",
+      "Vemuladeevi",
+      "Yenuguvanilanka"
+    ]
+  ],
+  "534280": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Akanivarithota",
+      "Kummarapurugupalem",
+      "Mylavanilanka",
+      "Pasaladeevi",
+      "Ramannapalem",
+      "Sitaramapuram",
+      "Turputallu"
+    ]
+  ],
+  "534281": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Chinagolla Palem",
+      "Kalipatnam",
+      "Mogalturu",
+      "Mutyalapalli",
+      "Perupalem",
+      "Serepalem"
+    ]
+  ],
+  "534301": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Basivireddipeta",
+      "Brahmanagudem",
+      "Daravaram",
+      "Kalavalapalli",
+      "Kamsalipalem",
+      "Markondapadu",
+      "Nidadavole",
+      "Nidadavole O.T.",
+      "Ravimetla",
+      "Settipeta",
+      "Singavaram",
+      "Tallapalem",
+      "Timmarajupalem"
+    ]
+  ],
+  "534302": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Atlapadu",
+      "D.Muppavaram",
+      "Gopavaram",
+      "Jeedigunta",
+      "Madduru",
+      "Maddurulanka",
+      "Pandalaparru",
+      "Purushottapalli",
+      "Samisragudem",
+      "Thogummi",
+      "Vadapalli",
+      "Vemuluru",
+      "Vijjeswaram"
+    ]
+  ],
+  "534305": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Chikkala", "Katakoteswaram", "Korumamidi", "Kurukuru", "Tadimalla", "Tyajampudi"]
+  ],
+  "534311": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Kamaiahkunta",
+      "Kandrikagudem",
+      "Kannapuram",
+      "Kopalli",
+      "Kotaramachandrapuram",
+      "Koyarajahmundry",
+      "Merakagudem",
+      "Puliramannagudem",
+      "Rajanagaram",
+      "Ramannapalem"
+    ]
+  ],
+  "534312": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Atchuthapuram",
+      "Bayyanagudem",
+      "Bodigudem",
+      "Dippakayalapadu",
+      "Gavaravaram",
+      "Jagannadhapuram",
+      "Karicherlagudem",
+      "Kethavaram",
+      "Koyyalagudem",
+      "Narasannapalem",
+      "Ponguturu",
+      "Rajavaram",
+      "Ramanujapuram",
+      "Saripalli",
+      "Seethampeta",
+      "Tirumalapuram",
+      "Vedanthapuram",
+      "Yerrampeta"
+    ]
+  ],
+  "534313": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Bandapuram",
+      "Devarapalli",
+      "Duddukuru",
+      "Gowripatnam",
+      "Krishnampalem",
+      "Lakshmipuram",
+      "Pallantla",
+      "Ramannapalem",
+      "Sangayagudem",
+      "Yarnagudem"
+    ]
+  ],
+  "534315": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Bangarampeta",
+      "Bodigudem",
+      "Itikalakota",
+      "Kondamodalu",
+      "Kondrukota",
+      "Mamidigondi",
+      "Paidipaka",
+      "Pattiseema",
+      "Polavaram",
+      "Ramayyapeta",
+      "Sivagiri",
+      "Talluru",
+      "Tutigunta",
+      "Vk.Reddigudem"
+    ]
+  ],
+  "534316": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Cherukumilli",
+      "Chinnayagudem",
+      "Chityala",
+      "Gopalapuram",
+      "Guddigudem",
+      "Komatikunta",
+      "Nandigudem",
+      "Sanjeevapuram",
+      "V.Ch.Gudem",
+      "Vadalagunta",
+      "Venkatayapalem",
+      "Yadavole"
+    ]
+  ],
+  "534318": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Dondapudi",
+      "Gangole",
+      "Gopavaram",
+      "Gunjavaram",
+      "Hukumpeta",
+      "Karagapadu",
+      "Kovvurupadu",
+      "Kunkala",
+      "Lnd Peta",
+      "Pragadapalli",
+      "Rampalem",
+      "Reddinagampalem"
+    ]
+  ],
+  "534320": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Ainaparru",
+      "Eletipadu",
+      "Kakileru",
+      "Kothalaparru",
+      "Koyyetipadu",
+      "Pekeru",
+      "Penugonda",
+      "Penugonda Bazar",
+      "Rapaka"
+    ]
+  ],
+  "534324": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Munamarru",
+      "Pittalavemavarm",
+      "Ramannapalem",
+      "Tamarada",
+      "Vadali",
+      "Venkatramapuram"
+    ]
+  ],
+  "534326": ["West Godavari", "Andhra Pradesh", ["Ilaparru", "Nadipudi", "Sidhantam"]],
+  "534327": ["West Godavari", "Andhra Pradesh", ["Miniminchilipadu", "Poduru"]],
+  "534328": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "East Vipparru",
+      "Kannai Kumudavalli",
+      "Kapavaram",
+      "Kothapalli Agraharam",
+      "Peravali",
+      "Surampudi"
+    ]
+  ],
+  "534329": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "K.Agraharam",
+      "Kaldhari",
+      "Kanuru",
+      "Munipalli",
+      "Pendyala",
+      "Usulumarru",
+      "Velivennu"
+    ]
+  ],
+  "534330": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Annavarappadu",
+      "Dongaravipalem",
+      "Khandavalli",
+      "Malleswaram",
+      "Mukkamala",
+      "Mutyalavaripalem"
+    ]
+  ],
+  "534331": ["West Godavari", "Andhra Pradesh", ["Ajjaram", "Kakaraparru", "Teeparru"]],
+  "534338": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Kavitam", "Kommuchikkala", "Pemmaraju Polavaram"]
+  ],
+  "534340": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Arikirevula",
+      "Ballipadu",
+      "Chidipi",
+      "Dharmavaram",
+      "Kumaradevam",
+      "Malakapalli",
+      "Peddavam",
+      "Penkanametta",
+      "Tirugudumetta",
+      "Vegeswarapuram"
+    ]
+  ],
+  "534341": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Annadevarapeta",
+      "Bhimole",
+      "Gajjaram",
+      "Gutala",
+      "Pochavaram",
+      "Tadipudi",
+      "Tallapudi"
+    ]
+  ],
+  "534342": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Chagallu",
+      "Chandravaram",
+      "Dommeru",
+      "I.Pangidi",
+      "Kapavaram",
+      "Mallavaram",
+      "Nandigampadu",
+      "Pasivedala",
+      "Unagatla"
+    ]
+  ],
+  "534350": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Gowtaminagar", "Kovvur", "RTC Bustand"]
+  ],
+  "534401": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Amberpeta", "Kurellagudem", "M.M.Puram", "P.Kannapuram", "Pulla"]
+  ],
+  "534406": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Chebrole",
+      "Chinanindrakolanu",
+      "Gollagudem",
+      "Narayanapuram",
+      "Rachuru",
+      "Ravulaparru",
+      "Thokalapally"
+    ]
+  ],
+  "534411": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Badampudi",
+      "Bommidi",
+      "Kagupadu",
+      "Nachugunta",
+      "Uppakapadu",
+      "Vellamilli",
+      "Vunguturu",
+      "Yerramalla"
+    ]
+  ],
+  "534416": ["West Godavari", "Andhra Pradesh", ["A.Gokavaram", "Kaikaram"]],
+  "534425": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Bhimadole",
+      "Challachintalapudi",
+      "Gopalapuram",
+      "Gunnampally",
+      "M.Nagulapally",
+      "Polasanipally",
+      "R.Pangidigudem",
+      "Surappagudem"
+    ]
+  ],
+  "534426": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Apmc",
+      "Dorasanipadu",
+      "Dwaraka Tirumala",
+      "East Yedavally",
+      "Rallakunta",
+      "Ramannagudem",
+      "Tadicherla",
+      "Timmapuram",
+      "Tirumalampalem",
+      "Venkatakrishnapuram"
+    ]
+  ],
+  "534427": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Agadalalanka", "Bhogapuram", "Chettunnapadu", "Gundugolanu", "Krothagudem"]
+  ],
+  "534432": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Denduluru", "Medinaraopalem", "Satynarayanapuram", "Sriramvaram"]
+  ],
+  "534435": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Koppulavarigudem", "Kuchimpudi", "Pedavegi", "Ramasingavaram"]
+  ],
+  "534437": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Gogunta",
+      "Gudipadu",
+      "Koniki",
+      "Naidugudem",
+      "Pedapadu",
+      "Punikollu",
+      "Raju Peta",
+      "Satyavole",
+      "Vadddigudem",
+      "Vasanthavada",
+      "Veerammakunta"
+    ]
+  ],
+  "534442": ["West Godavari", "Andhra Pradesh", ["Dosapadu", "Kovvali", "Pothunuru"]],
+  "534444": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Amaravram",
+      "Dachavaram",
+      "Damacherla",
+      "Ganapavaram",
+      "Katkuru",
+      "Koida",
+      "Kukunoor",
+      "Madhavaram",
+      "Ravigudem",
+      "Repakagommu",
+      "Rudramkota",
+      "Seetharamanagar",
+      "Sridharvelair",
+      "Tatkuragommu",
+      "Tondipaka",
+      "Upperu",
+      "Velairpadu",
+      "Vinjaram"
+    ]
+  ],
+  "534447": ["West Godavari", "Andhra Pradesh", ["Jangareddygudem"]],
+  "534448": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Alivery",
+      "Antervedigudem",
+      "Buttayagudem",
+      "Doramamidi",
+      "Kommugudem",
+      "Korasavarigudem",
+      "Mangaiahpalem",
+      "Mettagudem",
+      "Muppinavarigudem",
+      "Nimmalagudem",
+      "Rachuru",
+      "Ramannagudem",
+      "Regulakunta",
+      "Vippalapadu"
+    ]
+  ],
+  "534449": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Adamilli", "Ankalampadu", "Jeelakarragudem", "Kamavarapukota", "Uppalapadu"]
+  ],
+  "534450": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Galayagudem",
+      "Gangannagudem",
+      "Gopannapalem",
+      "Jogannapalem",
+      "Munduru",
+      "Somavarappadu",
+      "Vidyanagar"
+    ]
+  ],
+  "534451": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Borrampalem",
+      "Ch.Pothepalli",
+      "Devulapalli",
+      "G.Kothapalli",
+      "I.S.Jagannadhapuram",
+      "I.S.Raghavapuram",
+      "Lakkavaram",
+      "Ravikampadu"
+    ]
+  ],
+  "534452": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Kallacheruvu", "Sagipadu", "T.Gokavaram", "Tadikalapudi", "Vegivada", "Vemulapally"]
+  ],
+  "534455": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Akkampeta",
+      "Challavarigudem",
+      "Chinnavarigudem",
+      "G.Pangidigudem",
+      "Ganapavaram",
+      "Gowrisankara Puram",
+      "Guravaigudem",
+      "Jonnavarigudem",
+      "Maisannagudem",
+      "Marlagudem",
+      "Mulagalampally",
+      "Pattenapalem",
+      "Perampeta",
+      "Srinivaspuram",
+      "Swarnavarigudem",
+      "Taduvai",
+      "Veerannapalem",
+      "Vegavaram"
+    ]
+  ],
+  "534456": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "A.Polavaram",
+      "Ankannagudem",
+      "Appalarajugudem",
+      "Bandivarigudem",
+      "Darbhagudem",
+      "Jeelugumilli",
+      "Kamaiahpalem",
+      "Makkinavarigudem",
+      "P.Ankampalem",
+      "P.Rajavaram",
+      "Puchikapadu",
+      "Ratsannagudem",
+      "Tatiyakulagudem",
+      "Vankavarigudem"
+    ]
+  ],
+  "534460": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Balavarigudem",
+      "Chintalapudi",
+      "Chintalapudi Cutchery",
+      "Kanthampalem",
+      "Lingagudem",
+      "Mallayagudem",
+      "Pothunuru",
+      "Raghavapuram",
+      "Recherla",
+      "Utasamudram",
+      "Venkatapuram",
+      "Yendapalli",
+      "Yerraguntapally"
+    ]
+  ],
+  "534461": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Edavally",
+      "Nagireddigudem",
+      "Pragadavaram",
+      "Sankuchakrapuram",
+      "Tedlam",
+      "Velagapally",
+      "Yerrampally"
+    ]
+  ],
+  "534462": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Bhogole",
+      "Dharmajigudem",
+      "K.Gokavaram",
+      "Kalarayanagudem",
+      "Kothapally",
+      "Lingapalem",
+      "Mattamagudem",
+      "Rangapuram",
+      "Tch Rayudupalem"
+    ]
+  ],
+  "534467": [
+    "West Godavari",
+    "Andhra Pradesh",
+    ["Bandamcherla", "Epigunta", "Jaggavaram", "T.Narasapuram", "Tirumaladevipeta"]
+  ],
+  "534475": [
+    "West Godavari",
+    "Andhra Pradesh",
+    [
+      "Bapirajugudem",
+      "Jagannadhapuram",
+      "Janampeta",
+      "Kavvagunta",
+      "Nadipally",
+      "Rayannapalem",
+      "Vijayarai"
+    ]
+  ],
+  "535001": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    ["Vizianagaram City", "Vizianagaram Market"]
+  ],
+  "535002": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    ["Dasannapeta", "Khadarnagar", "Kothapeta", "Vizianagaram"]
+  ],
+  "535003": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Ambativalasa",
+      "Ayyannapeta",
+      "Duppada",
+      "Dwarapudi",
+      "Gajularega",
+      "Gokapeta",
+      "Gotlam",
+      "Gunkalam",
+      "Kanapaka",
+      "Karatam",
+      "Kondakarakam",
+      "Nelivada",
+      "Tekkali",
+      "Thotapalem",
+      "Vendram",
+      "Vizianagaram Collectorate",
+      "Vizianagaram Contonment",
+      "Vzm R.S"
+    ]
+  ],
+  "535004": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Dharmapuri",
+      "Industrial Estate",
+      "Jonnavalasa",
+      "Pinavemali",
+      "Rakodu",
+      "Sarika",
+      "Vizianagaram Court Complex"
+    ]
+  ],
+  "535005": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Ainada",
+      "Apsp Quarters",
+      "B.Tallavalasa",
+      "Cheluvuru",
+      "Chintalavalasa",
+      "D Tallavalasa",
+      "Jonnada",
+      "Malicherala",
+      "Mopada",
+      "Raghumanda",
+      "Vedullavalasa"
+    ]
+  ],
+  "535006": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    ["Denkada", "Gunupur", "Jammu", "Munginapalli", "Pedathadivada", "Pinathadivada"]
+  ],
+  "535101": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Arthamuru",
+      "Chinabantupalli",
+      "Devada",
+      "Devunikanapaka",
+      "Dummeda",
+      "Garividi",
+      "Geddapuvalasa",
+      "Ippalavalasa",
+      "Konuru",
+      "Lavidam Agraharam",
+      "Pedabantupalli",
+      "Penubarthi",
+      "Shreeramnagar",
+      "Shreeramnagar Ind.Colony",
+      "Thondrangi"
+    ]
+  ],
+  "535102": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Bhupalarajapuram",
+      "Bhyripuram",
+      "Budarayavalasa",
+      "Gadelamarrivalasa",
+      "Garbham",
+      "Gottipalli",
+      "Merakamudidam",
+      "Mokhasa Lingalavalasa",
+      "Vootapalli"
+    ]
+  ],
+  "535124": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Akulakatta",
+      "Gangannapadu",
+      "Kunayavalasa",
+      "Kusumuru",
+      "Mudidam Ravivalasa",
+      "Nandigam",
+      "Rajeru",
+      "Uttaravalli",
+      "Vadada"
+    ]
+  ],
+  "535125": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Batuva",
+      "Devarapodilam",
+      "Gollala Mulagam",
+      "Karlam",
+      "Mettapalli",
+      "Nimmalavalasa",
+      "Palavalasa",
+      "Perapi",
+      "Ramalingapuram"
+    ]
+  ],
+  "535126": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    ["Amiti", "Goluguvalasa", "Koratam", "Locherla", "Nemalam", "Therlam", "Velagavalasa"]
+  ],
+  "535128": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Billalavalasa",
+      "Bondapalli",
+      "Chipurupalle",
+      "Dalemrajuvalasa",
+      "Garraju Chipurupalle",
+      "Garugubilli",
+      "Gotnandi",
+      "Gulivinda Agraharam",
+      "Kapusambham",
+      "Kumaram",
+      "Mokhasa Duggivalasa",
+      "Routhupeta",
+      "Sivaram",
+      "Vedullavalasa",
+      "Yadika"
+    ]
+  ],
+  "535145": [
+    "Visakhapatanam",
+    "Andhra Pradesh",
+    [
+      "Ananthagiri",
+      "B G Valasa",
+      "Bheempolu",
+      "Boddam",
+      "Gumma",
+      "K G Budi",
+      "Kasipatnam",
+      "Konapuram",
+      "Kondiba",
+      "Kothuru",
+      "Longuparthi",
+      "Mallipudi",
+      "Muliaguda",
+      "Pedabidda",
+      "Pedakandepalli",
+      "S G Peta",
+      "S Kota",
+      "Seethampeta",
+      "T B Vara",
+      "Timidi",
+      "Tokuru",
+      "Tyda",
+      "Valasi",
+      "Veeranaraynam",
+      "Y S R Puram"
+    ]
+  ],
+  "535148": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Dharmavaram",
+      "Gopalapalli",
+      "Kottam",
+      "Krishnapuram",
+      "Madhupada",
+      "Talari",
+      "Vemulapalli"
+    ]
+  ],
+  "535160": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Bonangi",
+      "Madanapuram",
+      "Ramabhadrapuram",
+      "Regubilli",
+      "Revallapalem",
+      "Seetharamapuram",
+      "Tatipudi",
+      "Vasadi"
+    ]
+  ],
+  "535161": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Athava",
+      "Dasulapalem",
+      "Golzam",
+      "Jammadevipeta",
+      "Kallempudi",
+      "Khasapeta",
+      "L Kota",
+      "Lingampeta",
+      "Malliveedu",
+      "R G Peta",
+      "Rangarayapuram",
+      "Seetharampuram",
+      "Singarai",
+      "Sompuram Agraharam",
+      "T Sanduluru"
+    ]
+  ],
+  "535183": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Bhaligattam",
+      "Cheedivalasa",
+      "Cheepuruvalasa",
+      "Denderu",
+      "Devada",
+      "Gangubudi",
+      "K R Peta",
+      "Kallepalli",
+      "Kothavalasa",
+      "Kummapalli",
+      "Mangalapalem",
+      "Pathavalasa",
+      "Pindrangi",
+      "Pothampeta",
+      "Relli",
+      "Tangudubilli",
+      "Tummukapalli",
+      "Uttarapalli",
+      "V B Puram",
+      "Viyyammapeta"
+    ]
+  ],
+  "535204": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Alladapalem",
+      "Challavanithota",
+      "Chintapalli",
+      "Chodamma Agraharam",
+      "Chollangipeta",
+      "Govindapuram",
+      "Gumpam Agraharam",
+      "Kandivalasa",
+      "Kanimella",
+      "Kg Pathasala",
+      "Kovvada Agraharam",
+      "Krishnapuram",
+      "Kumili",
+      "Lankapillipalem",
+      "Perapuram",
+      "Pusapatirega",
+      "Rellivalasa",
+      "Vempadam"
+    ]
+  ],
+  "535213": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    ["Konada", "Kopperla", "Pasupam", "Pathivada", "Singavaram", "Velduru"]
+  ],
+  "535214": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    ["B S Factory", "Korukonda", "M Kothasvalasa", "Ss Korukonda"]
+  ],
+  "535215": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Budathanapalli",
+      "Gantyada",
+      "Korlam",
+      "Kotarupalli",
+      "Lakkidam",
+      "Narava",
+      "Neelavathi",
+      "Ompalli",
+      "P.S.R Puram",
+      "Pedavemali",
+      "Penasam",
+      "Ramavaram",
+      "Siripuram",
+      "Vasantha"
+    ]
+  ],
+  "535216": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Akkivaram",
+      "Amatamravivalasa",
+      "Bantupalli",
+      "Bhogapuram",
+      "Chakivalasa",
+      "Gantlam",
+      "Gudepuvalasa",
+      "Kancheru",
+      "Mukkam",
+      "Munjeru",
+      "Nandigam",
+      "Savaravilli"
+    ]
+  ],
+  "535217": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Atchutapuram",
+      "Chodavaram",
+      "Damarasingi",
+      "Garida",
+      "Gujjangivalasa",
+      "Gurla",
+      "Jammu",
+      "Jarajapupeta",
+      "Kella",
+      "Kondavelagada",
+      "Manyapuripeta",
+      "Nagallavalasa",
+      "Nellimarla",
+      "S S R Peta",
+      "Tummalapeta",
+      "Vallapuram"
+    ]
+  ],
+  "535218": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "A T Agraharam",
+      "Alugolu",
+      "Boppadam",
+      "Gushini",
+      "Kothapeta",
+      "M J R Peta",
+      "Malayada",
+      "Ragolu",
+      "Ramathirtam",
+      "Saripalli",
+      "Sativada",
+      "Tangudubilli",
+      "Tatipudi",
+      "Valluru"
+    ]
+  ],
+  "535220": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Garikavalasa",
+      "Gudem",
+      "Kondagandredu",
+      "Kotagandredu",
+      "Pakirkitthali",
+      "Palavalasa",
+      "Palli Gandredu",
+      "Tatavari Kittali",
+      "Tettangi"
+    ]
+  ],
+  "535221": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Ginjeru",
+      "Godiyada",
+      "J Gumadam",
+      "Kirthubarthi",
+      "Kothapalem",
+      "Kothavalasa",
+      "Pedamajjipalem",
+      "Veduruvada"
+    ]
+  ],
+  "535240": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Alamanda R S",
+      "Alamanda Sandy",
+      "Bheemali",
+      "Ganivada",
+      "Gedalavani Palem",
+      "Kalagada",
+      "Kantakapalli",
+      "Katakapalli",
+      "Kotyada",
+      "Nidigattu"
+    ]
+  ],
+  "535250": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Alugubilli",
+      "Annamurajupeta",
+      "Bhandevpuram",
+      "Bheemasinghi",
+      "Chinatada",
+      "Jaddetivalasa",
+      "Jagaram",
+      "Jami",
+      "Pavada",
+      "R B Puram",
+      "Sasanapalli",
+      "Tanavaram",
+      "V B Peta",
+      "V R Palem",
+      "Vizinigiri"
+    ]
+  ],
+  "535260": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "B.Rajeru",
+      "Bondapalli",
+      "Devupalli",
+      "Garudabilli",
+      "Kanimeraka",
+      "Kondakindram",
+      "Rachakindam",
+      "Raindram",
+      "Tamatada"
+    ]
+  ],
+  "535270": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Bhudevipeta",
+      "G Ch Penta",
+      "Gajapathinagaram",
+      "Gollupalem",
+      "Jinnam Agrharam",
+      "Kenguva",
+      "Konisa",
+      "Lingalavalasa",
+      "Logisa",
+      "M Gumudam",
+      "M Kothavalasa",
+      "Madhupada",
+      "Marupalli",
+      "Mutcherla",
+      "P P Agraharam",
+      "Pathabaggam",
+      "Pedakada",
+      "S R R Puram",
+      "Tummikapalli",
+      "Vemali"
+    ]
+  ],
+  "535273": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Andra",
+      "G T Peta",
+      "Garugubilli",
+      "Gummakota",
+      "Lothugedda",
+      "Melia Kancheru",
+      "Mentada",
+      "Pedaraba",
+      "Pittada",
+      "Rompalli",
+      "Salipeta"
+    ]
+  ],
+  "535280": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Anandapuram",
+      "Buradapeta",
+      "Chintalapeta",
+      "Kondagumpam",
+      "Moida",
+      "Mudduru",
+      "Nadupuru",
+      "Parasam"
+    ]
+  ],
+  "535281": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "A S Peta",
+      "Banadi",
+      "Dabbirajupeta",
+      "Gudivada",
+      "N K R Puram",
+      "Nallaballi",
+      "Vavilapadu",
+      "Veeluparthi",
+      "Vepada"
+    ]
+  ],
+  "535463": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Buradavenkatapuram",
+      "Chinagudaba",
+      "Dalaivalasa",
+      "Garugubilli",
+      "Gottivalasa",
+      "Kothapalli",
+      "Kotturu",
+      "Marupenta",
+      "Ravipalli",
+      "Sanyasirajupeta",
+      "Sivvam",
+      "Uddavolu",
+      "Vallarigudaba",
+      "Vullibhadra"
+    ]
+  ],
+  "535501": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    ["Jagannadhapuram", "Kothavalasa", "Parvatipuram", "Parvatipuram Town"]
+  ],
+  "535502": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Addapuseela",
+      "Balagudaba",
+      "Duggi",
+      "Krishnapalli",
+      "Parvatipuram Bus Stand",
+      "Pedamariki",
+      "Philipnagar",
+      "Seetharampuram",
+      "Vikrampuram"
+    ]
+  ],
+  "535521": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Antivalasa",
+      "Babbidi",
+      "Chinageesada",
+      "Chollapadam",
+      "Gangareguvalasa",
+      "Goipaka",
+      "Gumada",
+      "Janjhavathi Colony",
+      "Jarna",
+      "Kallikota",
+      "Kemiseela",
+      "Komarada",
+      "Kotipam",
+      "Kottu",
+      "Kuneru",
+      "Lakshminaiduvalasa",
+      "Madalangi",
+      "Palem",
+      "Pedasakha",
+      "Rajyalakshmipuram",
+      "Thodumu",
+      "Tulasivalasa"
+    ]
+  ],
+  "535522": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Kavitibhadra",
+      "Lakshminarayanapuram",
+      "Mrutyunjayarayanagaram",
+      "Mulaga",
+      "Narsipuram",
+      "Sangamvalasa"
+    ]
+  ],
+  "535523": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Amiti",
+      "Chemuduguda",
+      "Dummangi",
+      "Elwinpeta",
+      "Gumma",
+      "Gummalakshmipuram",
+      "Iridi",
+      "Karivalasa",
+      "Kedaripuram",
+      "Kondavada",
+      "Kukkidi",
+      "Lakkaguda",
+      "Pedakharja",
+      "Podi",
+      "Puttajammu",
+      "Rastakuntubai",
+      "Rella",
+      "Tadikonda",
+      "Vangara",
+      "Voppangi",
+      "Yegulavada"
+    ]
+  ],
+  "535524": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Buddemkharja",
+      "Chaparayabinnidi",
+      "Dalaipeta",
+      "Duddukhallu",
+      "Gotivada",
+      "Kitchada",
+      "Kurupam",
+      "Rayagadajammu",
+      "Regidi",
+      "Sivannapeta"
+    ]
+  ],
+  "535525": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Ankavaram",
+      "Basangi",
+      "Chilakam",
+      "Gijaba",
+      "Gunanupuram",
+      "Kudama",
+      "Lakhanapuram",
+      "Markondaputti",
+      "Naguru",
+      "Pedabuddidi",
+      "Ravivalasa",
+      "Santhoshapuram",
+      "Sunki Agraharam",
+      "Thotapalli",
+      "Turakanaiduvalasa"
+    ]
+  ],
+  "535526": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Chintalabelagam",
+      "Gavarampeta",
+      "Kannapudoravalasa",
+      "Merangi",
+      "Parajapadu",
+      "Pedamerangi",
+      "Pippalabhadra",
+      "Tumbali"
+    ]
+  ],
+  "535527": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Bandaluppi",
+      "Buduruwada",
+      "Dabbagedda",
+      "Dokiseela",
+      "Donkala Kothapatnam",
+      "Gochekka",
+      "Jamadala",
+      "Pedabondapalli",
+      "Puligummi",
+      "Putturu",
+      "Sirlam",
+      "Sudigam",
+      "Surampeta",
+      "Tallaburidi"
+    ]
+  ],
+  "535534": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Dharmalakshmipuram",
+      "Gorjipadu",
+      "Gujjuvai",
+      "Jumbiri",
+      "Kondabaridi",
+      "Maripalli",
+      "Mondemkhallu",
+      "Neelakanthapuram",
+      "Pedagottili",
+      "Sivada",
+      "Tittiri",
+      "Udayapuram",
+      "Valasaballeru",
+      "Vobbangi",
+      "Zarada"
+    ]
+  ],
+  "535546": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Ajjada",
+      "Appayyapeta",
+      "Burja",
+      "Chakarapalli",
+      "Geddaluppi",
+      "Gutchimi",
+      "Khasapeta",
+      "Koyyannapeta",
+      "Krishnarayapuram",
+      "Lakshmipuram Agraharam",
+      "Maripivalasa",
+      "Nidagallu",
+      "Pedankalam",
+      "Ramavaram",
+      "Seethanagaram",
+      "Tamarakhandi",
+      "Venkatabhyripuram"
+    ]
+  ],
+  "535547": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "A.Venkampeta",
+      "Bangaruvalasa",
+      "Chappabutchampeta",
+      "Chemudu",
+      "Duggeru",
+      "Kasipatnam",
+      "Kaviripalli",
+      "Lakshmipuram",
+      "Makkuva",
+      "Markondaputti",
+      "Saraivalasa",
+      "Thunda",
+      "Thurumamidi"
+    ]
+  ],
+  "535557": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Ampavalli",
+      "Arasada",
+      "Balijipeta",
+      "Chilakalapalli",
+      "Gangada",
+      "Iruwada",
+      "Kinjangi",
+      "Koppara",
+      "Maruwada",
+      "Narayanapuram",
+      "Palagara",
+      "Pedapenki",
+      "Tumarada",
+      "Vantharam",
+      "Vengapuram Agraharam"
+    ]
+  ],
+  "535558": ["Vizianagaram", "Andhra Pradesh", ["Bobbili"]],
+  "535559": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Barli",
+      "Bobbili Govt.Hospital Road",
+      "Bobbili R.S",
+      "Chintada",
+      "Gadelavalasa",
+      "Gorle Seetharampuram",
+      "Janumallavalasa",
+      "Kalavarai Agraharam",
+      "Komatipalli",
+      "Kotaseetharampuram",
+      "Mettavalasa",
+      "Mirthivalasa",
+      "Pakki",
+      "Ramuduvalasa",
+      "Subhadra Agraharam"
+    ]
+  ],
+  "535568": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    ["Karada", "Kondadevupalli", "Nandabalaga", "Pinapenki", "Piridi", "Sivadavalasa"]
+  ],
+  "535573": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Alajangi",
+      "Bobbili Bazar",
+      "Chitrakota Boddavalasa",
+      "Church Road Ndt",
+      "Dibbaguddivalasa",
+      "Gollapalli",
+      "Kannampeta",
+      "Latchayyapeta",
+      "Patha Bobbili",
+      "Penta",
+      "Rajupeta",
+      "Rangarayapuram"
+    ]
+  ],
+  "535578": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Badangi",
+      "Bhimavaram",
+      "Donkinavalasa",
+      "Gajarayanavalasa",
+      "Golladi Agraharam",
+      "Koduru",
+      "Mallampeta",
+      "Mugada",
+      "Naidu Valasa",
+      "Paltheru",
+      "Pappala Lingalavalasa",
+      "Shikarganj"
+    ]
+  ],
+  "535579": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Arikathota",
+      "Burjavalasa",
+      "Busayavalasa",
+      "Chowdantivalasa",
+      "Duppalapudi",
+      "Itlamamidipalli",
+      "Jannivalasa",
+      "Kondakenguva",
+      "Korapukothavalasa",
+      "Kota Sirlam",
+      "Mamidivalasa",
+      "Pachalavalasa",
+      "Patharega",
+      "Ramabhadrapuram",
+      "Rompalli",
+      "Sompuram",
+      "Tarapuram"
+    ]
+  ],
+  "535580": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Chinakada",
+      "Datti",
+      "Datti Rajeru",
+      "Gadasam",
+      "Gobhyam",
+      "Gutchimi",
+      "Ingilapalli Agraharam",
+      "Komatipalli Agraharam",
+      "Kompangi",
+      "Kuntinivalasa",
+      "Maradam",
+      "Pedachamalapalli",
+      "Pedamanapuram",
+      "Pedamedapalli",
+      "Poram",
+      "S Chintalavalasa",
+      "Sarayyavalasa",
+      "Vangara",
+      "Vijayaramapuram",
+      "Vindhyavasi"
+    ]
+  ],
+  "535581": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Badevalasa",
+      "Challapeta",
+      "Ippalavalasa",
+      "Jakkuva",
+      "Jayathi",
+      "Konda.Lingalavalasa",
+      "Kuneru",
+      "Uddangi"
+    ]
+  ],
+  "535582": ["Vizianagaram", "Andhra Pradesh", ["Dattirajeru"]],
+  "535591": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Bangarampeta",
+      "Guruvunaidupeta",
+      "Kharasavalasa",
+      "Kothavalasa",
+      "Matumuru",
+      "Mosuru",
+      "Narlavalasa",
+      "Nelliparthi",
+      "Panchali",
+      "Panukuvalasa",
+      "Parannavalasa",
+      "Pedaborabanda",
+      "Pedapadam",
+      "Purohitunivalasa",
+      "Salur",
+      "Salur Fort",
+      "Sivarampuram",
+      "Taduru",
+      "Viswanadhapuram"
+    ]
+  ],
+  "535592": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Gadivalasa",
+      "Karrivalasa",
+      "Kesali",
+      "Pachipenta",
+      "Padmapuram",
+      "Panasapeddikonavalasa"
+    ]
+  ],
+  "535593": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Antivalasa",
+      "Dandigam",
+      "Kandulapadam",
+      "Kottuparuva",
+      "Kurukutti",
+      "Mamidipalle",
+      "Maripalli",
+      "Mavudi",
+      "Pandiri Mamidivalasa",
+      "Sambara",
+      "Sariki",
+      "Sivili Peddavalasa",
+      "Thonam"
+    ]
+  ],
+  "535594": [
+    "Vizianagaram",
+    "Andhra Pradesh",
+    [
+      "Bommika Jagannadhapuram",
+      "Dangabhadra",
+      "Jiyyammavalsa",
+      "Joguladumma",
+      "Ramabhadrapuram",
+      "Sikhabadi",
+      "Tamarakhandi Jammu"
+    ]
+  ]
+}

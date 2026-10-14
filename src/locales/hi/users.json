@@ -316,7 +316,8 @@
       "steps": {
         "place": "शाखा और पता",
         "contact": "संपर्क और खुलने का समय",
-        "people": "लोग"
+        "people": "लोग",
+        "places": "जगहें और दिन"
       },
       "groups": {
         "branch": "शाखा",
@@ -392,7 +393,79 @@
       "added": "{{name}} शाखा जोड़ी गई",
       "saved": "{{name}} सहेजी गई",
       "contactMissing": "फ़ोन और ईमेल जोड़ें",
-      "pinInvalid": "PIN कोड में 6 अंक चाहिए"
+      "pinInvalid": "PIN कोड में 6 अंक चाहिए",
+      "places": {
+        "sections": {
+          "room": "कमरे",
+          "machine": "मशीनें",
+          "holiday": "छुट्टियाँ"
+        },
+        "hints": {
+          "room": "जहाँ मरीज़ देखे जाते हैं",
+          "machine": "ट्रीटमेंट के साथ बुक होती हैं",
+          "holiday": "पूरे दिन बंद · कोई बुकिंग नहीं"
+        },
+        "counts": {
+          "room_one": "{{count}} कमरा",
+          "room_other": "{{count}} कमरे",
+          "machine_one": "{{count}} मशीन",
+          "machine_other": "{{count}} मशीनें",
+          "holiday_one": "{{count}} छुट्टी",
+          "holiday_other": "{{count}} छुट्टियाँ"
+        },
+        "nothingYet": "अभी कोई कमरा, मशीन या छुट्टी नहीं",
+        "empty": {
+          "room": "अभी कोई कमरा नहीं",
+          "machine": "अभी कोई मशीन नहीं",
+          "holiday": "आगे कोई छुट्टी नहीं"
+        },
+        "newLabel": {
+          "room": "नया कमरा",
+          "machine": "नई मशीन",
+          "holiday": "नई छुट्टी"
+        },
+        "placeholders": {
+          "room": "जैसे कमरा 1",
+          "machine": "जैसे लेज़र मशीन",
+          "holiday": "जैसे दिवाली"
+        },
+        "fields": {
+          "name": "नाम",
+          "date": "तारीख",
+          "label": "छुट्टी"
+        },
+        "add": "जोड़ें",
+        "rename": "नाम बदलें",
+        "save": "सहेजें",
+        "cancel": "रद्द करें",
+        "remove": "हटाएँ",
+        "toggle": {
+          "on": "इस्तेमाल में",
+          "off": "बंद",
+          "label": "{{name}} इस्तेमाल में"
+        },
+        "removeTitle": {
+          "room": "यह कमरा हटाएँ?",
+          "machine": "यह मशीन हटाएँ?",
+          "holiday": "यह छुट्टी हटाएँ?"
+        },
+        "duplicate": {
+          "room": "{{name}} नाम का कमरा पहले से मौजूद है",
+          "machine": "{{name}} नाम की मशीन पहले से मौजूद है",
+          "holiday": "{{date}} पहले से छुट्टी है"
+        },
+        "nameMissing": "नाम जोड़ें",
+        "nameTooLong": "ज़्यादा से ज़्यादा 60 अक्षर",
+        "dateMissing": "तारीख चुनें",
+        "labelMissing": "छुट्टी का नाम लिखें",
+        "labelTooLong": "ज़्यादा से ज़्यादा 60 अक्षर",
+        "added": "{{name}} जोड़ा गया",
+        "renamed": "नाम बदलकर {{name}} किया गया",
+        "switchedOn": "{{name}} चालू किया गया",
+        "switchedOff": "{{name}} बंद किया गया",
+        "removed": "{{name}} हटाया गया",
+        "loadFailed": "कमरे, मशीनें और छुट्टियाँ लोड नहीं हो सकीं"
+      }
     }
   }
 }

@@ -10,9 +10,9 @@ import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { formatAppPhoneDigits } from '@/shared/app/app-phone-field.ts';
 import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
+import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-import type { HoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import type { TeamPill } from '../TeamCells/index.ts';
 import { missingUserFields, type UserFormValues } from './user-form.ts';

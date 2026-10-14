@@ -73,7 +73,8 @@ describe('filterNav', () => {
 describe('sectionsForOrgType', () => {
   it('gives a team the organization management set', () => {
     const team = sectionsForOrgType('TEAM');
-    expect(team).toEqual(['general', 'members', 'roles']);
+    // Clinic (feat-clinic-setup §6.6) sits beside General: the clinic's own values.
+    expect(team).toEqual(['general', 'clinic', 'members', 'roles']);
     // Billing and Integrations are ACCOUNT sections — neither belongs to an org type.
     expect(team).not.toContain('billing');
     expect(team).not.toContain('integrations');

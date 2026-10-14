@@ -314,7 +314,8 @@
       "steps": {
         "place": "지점 및 주소",
         "contact": "연락처 및 운영 시간",
-        "people": "담당자"
+        "people": "담당자",
+        "places": "장소와 휴무일"
       },
       "groups": {
         "branch": "지점",
@@ -390,7 +391,76 @@
       "added": "{{name}} 지점을 추가했습니다",
       "saved": "{{name}}을(를) 저장했습니다",
       "contactMissing": "전화번호와 이메일을 입력하세요",
-      "pinInvalid": "PIN 코드는 6자리여야 합니다"
+      "pinInvalid": "PIN 코드는 6자리여야 합니다",
+      "places": {
+        "sections": {
+          "room": "진료실",
+          "machine": "장비",
+          "holiday": "휴무일"
+        },
+        "hints": {
+          "room": "환자를 보는 곳",
+          "machine": "시술과 함께 예약",
+          "holiday": "종일 휴무 · 예약 불가"
+        },
+        "counts": {
+          "room_other": "진료실 {{count}}개",
+          "machine_other": "장비 {{count}}대",
+          "holiday_other": "휴무일 {{count}}일"
+        },
+        "nothingYet": "아직 진료실, 장비, 휴무일이 없습니다",
+        "empty": {
+          "room": "아직 진료실이 없습니다",
+          "machine": "아직 장비가 없습니다",
+          "holiday": "예정된 휴무일이 없습니다"
+        },
+        "newLabel": {
+          "room": "새 진료실",
+          "machine": "새 장비",
+          "holiday": "새 휴무일"
+        },
+        "placeholders": {
+          "room": "예: 진료실 1",
+          "machine": "예: 레이저 장비",
+          "holiday": "예: 디왈리"
+        },
+        "fields": {
+          "name": "이름",
+          "date": "날짜",
+          "label": "휴무일"
+        },
+        "add": "추가",
+        "rename": "이름 변경",
+        "save": "저장",
+        "cancel": "취소",
+        "remove": "삭제",
+        "toggle": {
+          "on": "사용 중",
+          "off": "사용 중지",
+          "label": "{{name}} 사용 중"
+        },
+        "removeTitle": {
+          "room": "이 진료실을 삭제할까요?",
+          "machine": "이 장비를 삭제할까요?",
+          "holiday": "이 휴무일을 삭제할까요?"
+        },
+        "duplicate": {
+          "room": "{{name}} 진료실이 이미 있습니다",
+          "machine": "{{name}} 장비가 이미 있습니다",
+          "holiday": "{{date}}은(는) 이미 휴무일입니다"
+        },
+        "nameMissing": "이름을 입력하세요",
+        "nameTooLong": "최대 60자",
+        "dateMissing": "날짜를 선택하세요",
+        "labelMissing": "휴무일 이름을 입력하세요",
+        "labelTooLong": "최대 60자",
+        "added": "{{name}}을(를) 추가했습니다",
+        "renamed": "이름을 {{name}}(으)로 변경했습니다",
+        "switchedOn": "{{name}}을(를) 사용으로 전환했습니다",
+        "switchedOff": "{{name}}을(를) 사용 중지했습니다",
+        "removed": "{{name}}을(를) 삭제했습니다",
+        "loadFailed": "진료실, 장비, 휴무일을 불러오지 못했습니다"
+      }
     }
   }
 }
