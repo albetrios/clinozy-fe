@@ -331,9 +331,11 @@ const config = [
      * bindings; in one chunk the minifier also inlines and mangles across them.
      * Every lazy chunk now imports those modules from the entry chunk, which is
      * loaded anyway. ~0.4 kB of headroom.
-     * "Report a bug" (iteration feat-bug-report-2026-10-13-dgnx) spends 0.08 kB of it: two
-     * registry glyphs, `Bug` (the trigger) and `Mic` (the voice button), in the first-paint
-     * `icons` chunk. The widget, its voice hook and its motion stylesheet load on demand.
+     * "Report a bug" (iteration feat-bug-report-2026-10-13-dgnx) spends ~0.25 kB of it,
+     * measured against main built the same way: the `BugReportLazy` shell the clinic layout
+     * mounts, and two registry glyphs — `Bug` (the trigger) and `Mic` (the voice button) — both
+     * now in the entry chunk with the `boot` group. The widget, its voice hook, its copy and its
+     * motion stylesheet load on demand. ~0.2 kB of headroom left.
      */
     limit: '238.6 kB',
     gzip: true,
