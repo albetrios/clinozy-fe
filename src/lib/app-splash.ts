@@ -5,13 +5,26 @@
  * the mark plays before any JS. This module owns when it LEAVES — never before
  * the wordmark lands, never while a loader holds it, never while the device was
  * offline at mount — and gives the React slot (`AppSplashSlot`) the splash's
- * clock and the node it renders the greeting block into.
+ * clock and the node it renders the greeting block into. One load skips it: the
+ * one right after a sign-out ({@link APP_SPLASH_SKIP}).
  */
 
 const SPLASH_ID = 'app-splash';
 const EXIT_CLASS = 'app-splash-exiting';
 const SLOT_CLASS = 'app-splash-slot';
 const DISMISS_EVENT = 'app-splash-dismissed';
+
+/**
+ * The load right after a sign-out skips the splash: the class `public/splash-init.js`
+ * puts on `<html>` before the first paint, for index.html's CSS and for this module,
+ * when it finds this sessionStorage key — which `forceLogout()` writes
+ * (`skipSplashOnNextLoad` in `shared/auth/service.ts`). On that load the splash is hidden and `#root` shown, and
+ * nothing paints until the login screen has rendered — so browsers keep the page
+ * being left on screen until then. The splash node stays (hidden), so the loaders'
+ * holds still keep React's own full-page loader away. Pinned across the files by
+ * `app-splash.test.ts` and `service.test.ts`.
+ */
+export const APP_SPLASH_SKIP = 'app-splash-skip';
 
 /**
  * The `#app-splash` opacity/visibility transition in index.html (500ms ease,
@@ -172,8 +185,17 @@ export function appSplashElapsedMs(): number {
   return Number.isFinite(start) ? now - start : now;
 }
 
-/** How long until the exit may start: the wordmark (or, reduced, 500ms) has to land first. */
+/** This load skips the splash (`public/splash-init.js` read the key). */
+function isAppSplashSkipped(): boolean {
+  return document.documentElement.classList.contains(APP_SPLASH_SKIP);
+}
+
+/**
+ * How long until the exit may start: the wordmark (or, reduced, 500ms) has to
+ * land first — unless this load skips the splash, which then has no frames to wait for.
+ */
 function framesRemainingMs(): number {
+  if (isAppSplashSkipped()) return 0;
   const floor = prefersReducedMotion() ? SPLASH_REDUCED_FRAMES_MS : SPLASH_FRAMES_MS;
   return Math.max(0, floor - appSplashElapsedMs());
 }
@@ -208,9 +230,12 @@ function runExit(): void {
 
   exitFinish = finish;
   splash.addEventListener('transitionend', finish, { once: true });
+  // A skipped splash fades nothing anyone can see, so it goes as fast as a reduced one.
   exitTimer = window.setTimeout(
     finish,
-    prefersReducedMotion() ? REDUCED_EXIT_FALLBACK_MS : EXIT_FALLBACK_MS,
+    prefersReducedMotion() || isAppSplashSkipped()
+      ? REDUCED_EXIT_FALLBACK_MS
+      : EXIT_FALLBACK_MS,
   );
 }
 
