@@ -1,0 +1,8 @@
+/* The switch's thumb travels on the strong ease-out (change-motion-polish):
+   200ms instead of the utility's default curve. Plain CSS outside a layer, so
+   it times the thumb's `transition-transform`. Ships with the switch's lazy
+   chunk; the reduced-motion rule (`src/index.css`, end) lands it at once. */
+[data-slot='switch-thumb'] {
+  transition-duration: 200ms;
+  transition-timing-function: var(--ease-out-strong);
+}

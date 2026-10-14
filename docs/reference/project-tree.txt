@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2277 src files · ~1158 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
+Stats: ~2282 src files · ~1165 tests in src/ · 91 E2E specs · 30 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -333,6 +333,14 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── change-motion-polish-2026-10-14-uvgh/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
@@ -567,8 +575,9 @@ clinozy-fe/
 │   │   │   ├── index.ts
 │   │   │   ├── PageTransition.tsx
 │   │   │   ├── prefers-reduced-motion.ts
+│   │   │   ├── useRefreshSettle.ts
 │   │   │   ├── useReplayedAnimation.ts
-│   │   │   └── [3 test files]
+│   │   │   └── [5 test files]
 │   │   ├── billing/
 │   │   │   ├── stripe-return.ts
 │   │   │   └── [1 test file]
@@ -2315,6 +2324,11 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RetryError.tsx
 │   │   │   │   └── [1 test file]
+│   │   │   ├── RollingNumber/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── rolling-number.css
+│   │   │   │   ├── RollingNumber.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── RoomTable/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── RoomTable.tsx
@@ -2370,6 +2384,11 @@ clinozy-fe/
 │   │   │   ├── SecurityOverviewCard/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── SecurityOverviewCard.tsx
+│   │   │   │   └── [1 test file]
+│   │   │   ├── SelectionGlide/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── selection-glide.css
+│   │   │   │   ├── SelectionGlide.tsx
 │   │   │   │   └── [1 test file]
 │   │   │   ├── SessionTimeoutDialog/
 │   │   │   │   ├── index.ts

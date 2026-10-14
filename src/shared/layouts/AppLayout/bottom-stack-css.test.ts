@@ -101,7 +101,8 @@ describe('phone bottom stack (index.css)', () => {
     const lens = declarations('[data-lens]');
     expect(lens).toContain('width: calc(20% - 0.1rem)');
     expect(lens).toContain('translate: calc(var(--lens, 0) * 100%)');
-    expect(lens).toContain('transition: 320ms cubic-bezier(0.32, 0.72, 0, 1)');
+    // The sheet curve, by its name (change-motion-polish D6).
+    expect(lens).toContain('transition: 320ms var(--ease-sheet)');
     expect(declarations("[dir='rtl'] [data-lens]")).toContain(
       'translate: calc(var(--lens, 0) * -100%)',
     );

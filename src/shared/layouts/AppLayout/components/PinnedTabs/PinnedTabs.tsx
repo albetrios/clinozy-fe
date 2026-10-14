@@ -6,6 +6,7 @@ import { measureTextWidth } from '@/lib/fit-tabs.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
+import { SelectionGlide } from '@/shared/components/SelectionGlide/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { WeightStableLabel } from '@/shared/components/WeightStableLabel/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
@@ -76,6 +77,10 @@ function PinnedTab({
  * and — once the measured space runs out — "More", the folded pins as a Picker
  * menu (each room's icon tile in its tone; picking one opens it).
  * `available` is the measured tab space (null until measured: nothing folds).
+ * The current tab's tint is one lens (change-motion-polish D7): it glides to
+ * the room opened and crossfades into its tone, as the phone tab bar's lens
+ * does; a current room outside the tabs fades it out. The nav it sits in is
+ * `relative isolate` (`AppLayoutSectionBar`).
  */
 export function PinnedTabs({
   nav,
@@ -108,6 +113,13 @@ export function PinnedTabs({
 
   return (
     <>
+      <SelectionGlide
+        selected='[data-slot="nav-item"][aria-current="page"]'
+        className={cn(
+          'rounded-lg',
+          nav.current ? TONE_CLASSES[nav.current.tone].bg : null,
+        )}
+      />
       {fit.visible.map((index) => {
         const entry = nav.pinned[index];
         return entry ? (

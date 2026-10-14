@@ -1,0 +1,54 @@
+/* The selection glide (`SelectionGlide`, change-motion-polish D7): one thumb
+   behind a row's items, under the selected one. Its box comes from the
+   component as four properties; it is anchored at the row's inline start, so
+   right-to-left rows are measured from their right edge. Behind the items:
+   the row is `relative isolate`, so -1 still paints above the row's own fill.
+
+   Shipped with the lazy chunks that render a glide, never the first paint
+   (the initial stylesheet is a ratchet, `pnpm size`). Plain CSS outside a
+   layer: the covered item's own fill and shadow step aside over its utilities.
+
+   Modes (`data-glide`): none yet — hidden; `still` — placed at once; `glide`
+   — slides there on the sheet curve, its size with it; `appear` — fades in
+   where it lands; `gone` — fades out. Its colour crossfades in every mode.
+   The reduced-motion rule (`src/index.css`, end) lands every one at once. */
+[data-slot='selection-glide'] {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: -1;
+  width: var(--glide-w, 0);
+  height: var(--glide-h, 0);
+  translate: var(--glide-x, 0) var(--glide-y, 0);
+  opacity: 0;
+  /* Its colour always crossfades: a row's tone may change a render before
+     its selection moves (the section bar's room, then the link). */
+  transition: background-color 280ms var(--ease-sheet);
+}
+[data-slot='selection-glide'][data-glide] {
+  opacity: 1;
+}
+[data-slot='selection-glide'][data-glide='glide'] {
+  transition:
+    translate 280ms var(--ease-sheet),
+    width 280ms var(--ease-sheet),
+    height 280ms var(--ease-sheet),
+    background-color 280ms var(--ease-sheet);
+}
+[data-slot='selection-glide'][data-glide='appear'] {
+  transition:
+    opacity 200ms var(--ease-out-strong),
+    background-color 280ms var(--ease-sheet);
+}
+[data-slot='selection-glide'][data-glide='gone'] {
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out-strong);
+}
+/* The covered item's own fill and shadow step aside — never a focus ring,
+   which stock shadcn draws as a box-shadow too. */
+[data-glide-covered] {
+  background-color: transparent;
+}
+[data-glide-covered]:not(:focus-visible) {
+  box-shadow: none;
+}

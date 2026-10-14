@@ -184,6 +184,36 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   dot's `pulse-dot` (2.4s) is global. Under reduced motion the dial stands still with
   every stop named. Motion never takes text below WCAG AA: a stop lifts (scale) and
   is never dimmed, pinned in `AuthShowcase.test.tsx`.
+- **Two curves.** Every new motion uses one of two named curves on `:root`
+  (`index.css`): **`--ease-sheet`** (`cubic-bezier(0.32, 0.72, 0, 1)` — drawers,
+  sheets, the bulk bar and every selection that glides) and **`--ease-out-strong`**
+  (`cubic-bezier(0.23, 1, 0.32, 1)` — what answers a press or arrives). Each element
+  stays under 300ms, and only `translate` / `scale`, opacity, a short blur and
+  colours animate — plus the width of the one glide thumb, which moves no layout.
+  Pinned by `src/lib/animations/motion-stylesheets.test.ts`.
+- **Selections glide.** A segmented track's selected card (`RoomTabs`, `RoomViewTabs`
+  `look="track"`), the section bar's pinned-tab tint and Today's Mine · Everyone are
+  one **`SelectionGlide`** thumb each: measured under the selected item (logical, so
+  right-to-left too) and gliding to the next one on the sheet curve (280ms), its
+  colour crossfading with it — as the phone tab bar's lens already slid. A row whose
+  tabs paint their own selected colours (the composer's channels, the patient file
+  bar) keeps its look. The item keeps its own selected classes; the thumb only covers
+  them once it has a real size, so a row without layout looks exactly as before.
+- **Numbers say which way they moved.** A live count (Today's lane tiles) is a
+  **`RollingNumber`**: a change rolls up when it grew and down when it shrank (280ms,
+  a 2px blur); a first load lands without rolling (`still`).
+- **Refreshes settle.** When the in-place skeleton (`data-refreshing`) leaves a
+  subtree, `useRefreshSettle` (mounted once by the app shell) brings it up from half
+  opacity over 220ms — the places that set the attribute change nothing.
+- **Presses answer.** A held button (every variant but `link`) sinks to 97%; a
+  checkbox's tick pops in from 65% (160ms); the switch's thumb travels on the strong
+  ease-out. Menus grow from their trigger (Radix's transform origin), never a fixed
+  corner.
+- **Where motion stays out.** Nothing moves on a keyboard shortcut, the command
+  palette's open or a hover; the drawers keep no exit motion. These rules ship in
+  co-located stylesheets with the lazy chunks that use them (`selection-glide.css`,
+  `rolling-number.css`, `lane-panel.css`, `checkbox.css`, `switch.css`), never in
+  `index.css` (iteration `change-motion-polish-2026-10-14-uvgh`).
 - **Tabs keep their place.** A tab drawn bolder when current keeps its bold width
   (`WeightStableLabel`), so switching tabs never moves its neighbours.
 - **Product motion.** Prefer **Anime.js** for intentional numeric or timeline

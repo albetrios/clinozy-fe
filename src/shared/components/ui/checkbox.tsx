@@ -1,9 +1,16 @@
+import './checkbox.css';
+
 import { CheckIcon, MinusIcon } from 'lucide-react';
 import { Checkbox as CheckboxPrimitive } from 'radix-ui';
 import type * as React from 'react';
 
 import { cn } from '@/lib/utils.ts';
 
+/**
+ * Local change to the shadcn checkbox (re-apply after a shadcn refresh): the
+ * tick pops in when it is checked (`checkbox.css`, change-motion-polish) —
+ * 160ms from 65% on the strong ease-out; unchecking takes it away at once.
+ */
 function Checkbox({
   className,
   ...props

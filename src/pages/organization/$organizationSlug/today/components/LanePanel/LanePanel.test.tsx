@@ -5,7 +5,10 @@ import { axe } from 'vitest-axe';
 
 import i18n from '@/lib/i18n/i18n.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
-import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+import {
+  renderWithProviders,
+  renderWithQueryClient,
+} from '@/tests/utils/renderWithProviders.tsx';
 
 import {
   enquiry,
@@ -87,6 +90,34 @@ beforeEach(() => {
   vi.mocked(useCheckoutDues).mockClear();
 });
 afterEach(() => useLocaleStore.setState({ hourCycle: initialHourCycle }));
+
+describe('LanePanel — following the tile (change-motion-polish)', () => {
+  it('cascades its cards in, again when the lane changes, not when it refreshes', async () => {
+    const panel = (lane: 'waiting' | 'checkout', cards = LANES[lane]) => (
+      <LanePanel
+        lane={lane}
+        cards={cards}
+        now={NOW}
+        today="2026-10-03"
+        actionOf={() => vi.fn()}
+        onOpen={vi.fn()}
+      />
+    );
+    // No router: rerendering keeps the panel mounted, as Today does.
+    const { rerender } = renderWithQueryClient(panel('waiting'));
+    const region = await screen.findByRole('region', { name: 'Waiting' });
+    expect(region).toHaveAttribute('data-slot', 'lane-panel');
+    const grid = within(region).getByTestId('today-card').parentElement;
+    if (!grid) throw new Error('no card grid');
+    expect(grid).toHaveClass('lane-cascade');
+
+    const replay = vi.spyOn(grid.classList, 'add');
+    rerender(panel('waiting', [...LANES.waiting]));
+    expect(replay).not.toHaveBeenCalled();
+    rerender(panel('checkout'));
+    expect(replay).toHaveBeenCalledWith('lane-cascade');
+  });
+});
 
 describe('LanePanel (KICKOFF §6.2 Selected lane panel, Visit cards)', () => {
   it('names the lane and its people, and draws each card', async () => {

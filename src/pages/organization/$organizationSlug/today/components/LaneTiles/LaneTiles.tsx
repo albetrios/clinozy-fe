@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import { TODAY_LANES, type TodayLane } from '@/shared/api/app/today-contracts.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { RollingNumber } from '@/shared/components/RollingNumber/index.ts';
 import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
@@ -27,6 +28,8 @@ export interface LaneTilesProps {
   visible?: readonly TodayLane[];
   /** The clinic day, for wording each hint's time. */
   today: string;
+  /** The floor's first load: its counts arrive, they do not change — none rolls. */
+  loading?: boolean;
   onSelect: (lane: TodayLane) => void;
 }
 
@@ -59,7 +62,8 @@ const DIMMED_TILE_INK = {
  * 1440 eight 128px tracks. The time itself never breaks (`useAppClock`
  * keeps it one token). Below `md` one snap strip of 128px tiles that bleeds to
  * the screen edges. Each tile: the label in the lane's ink, the
- * count, up to four faces then "+N", and the hint. Lanes outside the member's
+ * count (a {@link RollingNumber}: a check-in rolls Arriving down and Waiting
+ * up — change-motion-polish), up to four faces then "+N", and the hint. Lanes outside the member's
  * focus recede ({@link DIMMED_TILE_INK}); hover inks the border at once (no
  * transition).
  */
@@ -69,6 +73,7 @@ export function LaneTiles({
   focus,
   visible = TODAY_LANES,
   today,
+  loading = false,
   onSelect,
 }: LaneTilesProps) {
   const { t } = useTranslation(TODAY_NS);
@@ -128,7 +133,12 @@ export function LaneTiles({
                   dimmed && DIMMED_TILE_INK.count,
                 )}
               >
-                {formatNumber(cards.length)}
+                {/* A count that changes while Today is open rolls to it (D10). */}
+                <RollingNumber
+                  value={cards.length}
+                  format={formatNumber}
+                  still={loading}
+                />
               </span>
               <span aria-hidden="true" className="flex min-h-5.5 items-center">
                 {faces.faces.map((face) => (

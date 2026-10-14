@@ -66,6 +66,40 @@ function renderTabs(available: number | null = 260) {
   );
 }
 
+describe('PinnedTabs — the lens (change-motion-polish)', () => {
+  function renderCurrent(current: SectionBarEntry | null) {
+    return renderWithProviders(
+      <nav aria-label="Pinned rooms" className="relative isolate">
+        <PinnedTabs
+          nav={{ ...NAV, current }}
+          organizationSlug="acme"
+          available={null}
+          fontFamily="sans-serif"
+        />
+      </nav>,
+    );
+  }
+
+  it('lays one lens in the current room’s tone before the tabs', async () => {
+    renderCurrent(PINS[1] ?? null);
+    const leads = await screen.findByTestId('nav-leads');
+    expect(leads).toHaveAttribute('aria-current', 'page');
+    const lens = leads.parentElement?.firstElementChild;
+    expect(lens).toHaveAttribute('data-slot', 'selection-glide');
+    expect(lens).toHaveClass('rounded-lg', 'bg-tone-lav');
+    // No layout in jsdom: the tab keeps its own tint.
+    expect(leads).toHaveClass('bg-tone-lav');
+  });
+
+  it('keeps an untinted lens when no pinned room is current', async () => {
+    renderCurrent(null);
+    const appointments = await screen.findByTestId('nav-appointments');
+    const lens = appointments.parentElement?.firstElementChild;
+    expect(lens).toHaveAttribute('data-slot', 'selection-glide');
+    expect(lens?.className).not.toMatch(/\bbg-tone-/);
+  });
+});
+
 describe('PinnedTabs', () => {
   it('shows every pin as a tab until the space is measured', async () => {
     const { container } = renderTabs(null);

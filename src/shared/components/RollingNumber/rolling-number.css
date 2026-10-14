@@ -1,0 +1,47 @@
+/* A number that rolls to its next value (`RollingNumber`, change-motion-polish
+   D10): the old and the new value share one grid cell, clipped to the line;
+   the new one arrives from below when the number grew (`data-roll="up"`) and
+   from above when it shrank, the old one (drawn from `data-value`) leaving
+   the other way — 280ms on the strong ease-out, through a 2px blur. Only
+   translate, opacity and the blur move. Shipped with the lazy chunks that
+   roll a number, never the first paint; the reduced-motion rule
+   (`src/index.css`, end) lands it at once. */
+[data-slot='rolling-number'] {
+  display: inline-grid;
+  overflow: hidden;
+}
+[data-slot='rolling-number'] > * {
+  grid-area: 1 / 1;
+}
+[data-slot='rolling-number'][data-roll='up'] {
+  --roll-from: 0.7em;
+  --roll-to: -0.7em;
+}
+[data-slot='rolling-number'][data-roll='down'] {
+  --roll-from: -0.7em;
+  --roll-to: 0.7em;
+}
+[data-roll-layer='in'] {
+  animation: rolling-number-in 280ms var(--ease-out-strong) both;
+}
+[data-roll-layer='out'] {
+  animation: rolling-number-out 280ms var(--ease-out-strong) both;
+}
+/* The leaving value is drawn, not written: the number's text stays its value. */
+[data-roll-layer='out']::before {
+  content: attr(data-value);
+}
+@keyframes rolling-number-in {
+  from {
+    translate: 0 var(--roll-from);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+@keyframes rolling-number-out {
+  to {
+    translate: 0 var(--roll-to);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}

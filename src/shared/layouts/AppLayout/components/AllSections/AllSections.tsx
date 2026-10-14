@@ -183,7 +183,7 @@ export function AllSectionsPopover({
         data-testid="all-sections"
         // The bar's own surface: G closes it from inside (section-bar-shortcuts.ts).
         data-sections-surface
-        className="data-[state=open]:animate-dropdown-in max-h-[calc(100vh-5.625rem)] w-[min(17.5rem,calc(100vw-2rem))] origin-top-left overflow-auto rounded-xl p-2"
+        className="data-[state=open]:animate-dropdown-in max-h-[calc(100vh-5.625rem)] w-[min(17.5rem,calc(100vw-2rem))] overflow-auto rounded-xl p-2"
       >
         <AllSectionsList
           nav={nav}
