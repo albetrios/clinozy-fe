@@ -305,29 +305,9 @@ clinozy-fe/
 │   │   └── README.md
 │   ├── feat-clinic-setup-2026-10-13-sltd/
 │   │   ├── intake-files/
-│   │   │   ├── _index.md
-│   │   │   ├── _patterns.md
-│   │   │   ├── _report.md
-│   │   │   ├── appointments.md
 │   │   │   ├── BRIEF.md
-│   │   │   ├── clinic-stock.md
-│   │   │   ├── Clinozy.dc.html
-│   │   │   ├── design-brief-preset.md
-│   │   │   ├── leads.md
-│   │   │   ├── medical.md
-│   │   │   ├── offerings.md
-│   │   │   ├── patient-file.md
-│   │   │   ├── patients.md
-│   │   │   ├── payments.md
 │   │   │   ├── PRD.md
-│   │   │   ├── preset.md
-│   │   │   ├── schema-routes.md
-│   │   │   ├── shell.md
-│   │   │   ├── splash.md
-│   │   │   ├── support.js
-│   │   │   ├── tasks.md
-│   │   │   ├── today.md
-│   │   │   └── users.md
+│   │   │   └── schema-routes.md
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md
