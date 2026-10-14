@@ -1535,5 +1535,55 @@
       "sent": "شكرًا — وصل البلاغ إلى الفريق.",
       "error": "تعذّر إرسال البلاغ. نصك ما زال هنا — حاول مرة أخرى."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "الترقية إلى {{name}}",
+    "plan": {
+      "perMonth": "/ شهريًا",
+      "billedYearlyTotal": "فوترة سنوية · {{price}} سنويًا",
+      "monthlyOnly": "فوترة شهرية — لا يتوفر خيار سنوي",
+      "freeForever": "مجاني دائمًا",
+      "save": "وفّر {{percent}}٪",
+      "saveUpTo": "وفّر حتى {{percent}}٪",
+      "includes": "يتضمن:",
+      "everythingInPlus": "كل ما في {{name}}، بالإضافة إلى:",
+      "everythingIn": "كل ما في {{name}}",
+      "audienceSolo": "لممارس واحد",
+      "audienceTeam": "للفرق حتى {{seats}}",
+      "audienceAny": "للفرق من أي حجم",
+      "seatsOne": "مقعد واحد",
+      "seatsUpTo": "حتى {{seats}} مقعدًا",
+      "seatsUnlimited": "مقاعد غير محدودة"
+    },
+    "compare": {
+      "toggle": "قارن كل الميزات",
+      "caption": "كل الخطط جنبًا إلى جنب",
+      "current": "الحالية",
+      "included": "مشمول",
+      "notIncluded": "غير مشمول",
+      "notOffered": "غير متاح",
+      "unlimited": "غير محدود",
+      "groups": {
+        "pricing": "الأسعار",
+        "team": "الفريق",
+        "features": "الميزات"
+      },
+      "rows": {
+        "monthly": "السعر الشهري",
+        "monthlyHint": "يُفوتر كل شهر.",
+        "yearly": "السعر السنوي",
+        "yearlyHint": "يُفوتر مرة واحدة في السنة.",
+        "seats": "المقاعد المشمولة",
+        "seatsHint": "الأشخاص الذين يمكنهم تسجيل الدخول إلى مساحة العمل هذه."
+      }
+    },
+    "features": {
+      "auditLog": "سجل التدقيق",
+      "auditLogHint": "اعرف من غيّر ماذا، ومتى.",
+      "sso": "تسجيل الدخول الموحّد (SSO)",
+      "ssoHint": "يسجّل فريقك الدخول عبر مزوّد الهوية في شركتك.",
+      "prioritySupport": "دعم ذو أولوية",
+      "prioritySupportHint": "يُرد على طلباتك أولًا."
+    }
   }
 }

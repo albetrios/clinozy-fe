@@ -1430,5 +1430,55 @@
       "sent": "감사합니다. 팀에 전달됐어요.",
       "error": "신고를 보내지 못했습니다. 작성한 내용은 그대로 있어요. 다시 시도해 주세요."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "{{name}}(으)로 업그레이드",
+    "plan": {
+      "perMonth": "/ 월",
+      "billedYearlyTotal": "연간 청구 · 연 {{price}}",
+      "monthlyOnly": "월간 청구만 가능 — 연간 옵션 없음",
+      "freeForever": "평생 무료",
+      "save": "{{percent}}% 절약",
+      "saveUpTo": "최대 {{percent}}% 절약",
+      "includes": "포함 항목:",
+      "everythingInPlus": "{{name}}의 모든 기능, 추가로:",
+      "everythingIn": "{{name}}의 모든 기능",
+      "audienceSolo": "1인 진료자용",
+      "audienceTeam": "최대 {{seats}}명 팀용",
+      "audienceAny": "모든 규모의 팀용",
+      "seatsOne": "1석",
+      "seatsUpTo": "최대 {{seats}}석",
+      "seatsUnlimited": "무제한 좌석"
+    },
+    "compare": {
+      "toggle": "모든 기능 비교",
+      "caption": "모든 요금제를 나란히 비교",
+      "current": "현재",
+      "included": "포함",
+      "notIncluded": "미포함",
+      "notOffered": "제공 안 함",
+      "unlimited": "무제한",
+      "groups": {
+        "pricing": "가격",
+        "team": "팀",
+        "features": "기능"
+      },
+      "rows": {
+        "monthly": "월간 가격",
+        "monthlyHint": "매월 청구됩니다.",
+        "yearly": "연간 가격",
+        "yearlyHint": "1년에 한 번 청구됩니다.",
+        "seats": "포함 좌석",
+        "seatsHint": "이 워크스페이스에 로그인할 수 있는 사람 수."
+      }
+    },
+    "features": {
+      "auditLog": "감사 로그",
+      "auditLogHint": "누가 무엇을 언제 변경했는지 확인하세요.",
+      "sso": "싱글 사인온(SSO)",
+      "ssoHint": "팀이 회사의 ID 공급자로 로그인합니다.",
+      "prioritySupport": "우선 지원",
+      "prioritySupportHint": "문의에 가장 먼저 답변합니다."
+    }
   }
 }

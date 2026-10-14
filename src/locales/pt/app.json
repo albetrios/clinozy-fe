@@ -1472,5 +1472,55 @@
       "sent": "Obrigado — a equipe já recebeu.",
       "error": "Não foi possível enviar o relato. Seu texto continua aqui — tente de novo."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "Fazer upgrade para {{name}}",
+    "plan": {
+      "perMonth": "/ mês",
+      "billedYearlyTotal": "Cobrança anual · {{price}} por ano",
+      "monthlyOnly": "Cobrança mensal — sem opção anual",
+      "freeForever": "Grátis para sempre",
+      "save": "Economize {{percent}}%",
+      "saveUpTo": "Economize até {{percent}}%",
+      "includes": "Inclui:",
+      "everythingInPlus": "Tudo do {{name}}, e mais:",
+      "everythingIn": "Tudo do {{name}}",
+      "audienceSolo": "Para um profissional sozinho",
+      "audienceTeam": "Para equipes de até {{seats}}",
+      "audienceAny": "Para equipes de qualquer tamanho",
+      "seatsOne": "1 assento",
+      "seatsUpTo": "Até {{seats}} assentos",
+      "seatsUnlimited": "Assentos ilimitados"
+    },
+    "compare": {
+      "toggle": "Comparar todos os recursos",
+      "caption": "Todos os planos, lado a lado",
+      "current": "Atual",
+      "included": "Incluído",
+      "notIncluded": "Não incluído",
+      "notOffered": "Não oferecido",
+      "unlimited": "Ilimitados",
+      "groups": {
+        "pricing": "Preços",
+        "team": "Equipe",
+        "features": "Recursos"
+      },
+      "rows": {
+        "monthly": "Preço mensal",
+        "monthlyHint": "Cobrado todo mês.",
+        "yearly": "Preço anual",
+        "yearlyHint": "Cobrado uma vez por ano.",
+        "seats": "Assentos incluídos",
+        "seatsHint": "Pessoas que podem entrar neste espaço de trabalho."
+      }
+    },
+    "features": {
+      "auditLog": "Registro de auditoria",
+      "auditLogHint": "Veja quem mudou o quê, e quando.",
+      "sso": "Login único (SSO)",
+      "ssoHint": "Sua equipe entra com o provedor de identidade da sua empresa.",
+      "prioritySupport": "Suporte prioritário",
+      "prioritySupportHint": "Suas solicitações são atendidas primeiro."
+    }
   }
 }

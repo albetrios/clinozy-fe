@@ -1472,5 +1472,55 @@
       "sent": "Gracias, el equipo ya lo tiene.",
       "error": "No se pudo enviar el informe. Tu texto sigue aquí; inténtalo de nuevo."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "Mejorar a {{name}}",
+    "plan": {
+      "perMonth": "/ mes",
+      "billedYearlyTotal": "Facturación anual · {{price}} al año",
+      "monthlyOnly": "Facturación mensual — sin opción anual",
+      "freeForever": "Gratis para siempre",
+      "save": "Ahorra un {{percent}} %",
+      "saveUpTo": "Ahorra hasta un {{percent}} %",
+      "includes": "Incluye:",
+      "everythingInPlus": "Todo lo de {{name}}, y además:",
+      "everythingIn": "Todo lo de {{name}}",
+      "audienceSolo": "Para un solo profesional",
+      "audienceTeam": "Para equipos de hasta {{seats}}",
+      "audienceAny": "Para equipos de cualquier tamaño",
+      "seatsOne": "1 asiento",
+      "seatsUpTo": "Hasta {{seats}} asientos",
+      "seatsUnlimited": "Asientos ilimitados"
+    },
+    "compare": {
+      "toggle": "Comparar todas las funciones",
+      "caption": "Todos los planes, uno al lado del otro",
+      "current": "Actual",
+      "included": "Incluido",
+      "notIncluded": "No incluido",
+      "notOffered": "No disponible",
+      "unlimited": "Ilimitados",
+      "groups": {
+        "pricing": "Precios",
+        "team": "Equipo",
+        "features": "Funciones"
+      },
+      "rows": {
+        "monthly": "Precio mensual",
+        "monthlyHint": "Se factura cada mes.",
+        "yearly": "Precio anual",
+        "yearlyHint": "Se factura una vez al año.",
+        "seats": "Asientos incluidos",
+        "seatsHint": "Personas que pueden iniciar sesión en este espacio de trabajo."
+      }
+    },
+    "features": {
+      "auditLog": "Registro de auditoría",
+      "auditLogHint": "Consulta quién cambió qué y cuándo.",
+      "sso": "Inicio de sesión único (SSO)",
+      "ssoHint": "Tu equipo inicia sesión con el proveedor de identidad de tu empresa.",
+      "prioritySupport": "Soporte prioritario",
+      "prioritySupportHint": "Tus solicitudes se atienden primero."
+    }
   }
 }

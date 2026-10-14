@@ -1451,5 +1451,55 @@
       "sent": "Thanks — the team has it.",
       "error": "Couldn't send your report. Your words are still here — try again."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "Upgrade to {{name}}",
+    "plan": {
+      "perMonth": "/ month",
+      "billedYearlyTotal": "Billed yearly · {{price}} a year",
+      "monthlyOnly": "Billed monthly — no yearly option",
+      "freeForever": "Free for ever",
+      "save": "Save {{percent}}%",
+      "saveUpTo": "Save up to {{percent}}%",
+      "includes": "Includes:",
+      "everythingInPlus": "Everything in {{name}}, plus:",
+      "everythingIn": "Everything in {{name}}",
+      "audienceSolo": "For one practitioner",
+      "audienceTeam": "For teams of up to {{seats}}",
+      "audienceAny": "For teams of any size",
+      "seatsOne": "1 seat",
+      "seatsUpTo": "Up to {{seats}} seats",
+      "seatsUnlimited": "Unlimited seats"
+    },
+    "compare": {
+      "toggle": "Compare all features",
+      "caption": "Every plan, side by side",
+      "current": "Current",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "notOffered": "Not offered",
+      "unlimited": "Unlimited",
+      "groups": {
+        "pricing": "Pricing",
+        "team": "Team",
+        "features": "Features"
+      },
+      "rows": {
+        "monthly": "Monthly price",
+        "monthlyHint": "Billed every month.",
+        "yearly": "Yearly price",
+        "yearlyHint": "Billed once a year.",
+        "seats": "Seats included",
+        "seatsHint": "People who can sign in to this workspace."
+      }
+    },
+    "features": {
+      "auditLog": "Audit log",
+      "auditLogHint": "See who changed what, and when.",
+      "sso": "Single sign-on (SSO)",
+      "ssoHint": "Your team signs in with your company's identity provider.",
+      "prioritySupport": "Priority support",
+      "prioritySupportHint": "Your requests are answered first."
+    }
   }
 }

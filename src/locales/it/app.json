@@ -1472,5 +1472,55 @@
       "sent": "Grazie, il team l'ha ricevuto.",
       "error": "Impossibile inviare la segnalazione. Il tuo testo è ancora qui: riprova."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "Passa a {{name}}",
+    "plan": {
+      "perMonth": "/ mese",
+      "billedYearlyTotal": "Fatturazione annuale · {{price}} all’anno",
+      "monthlyOnly": "Fatturazione mensile — nessuna opzione annuale",
+      "freeForever": "Gratis per sempre",
+      "save": "Risparmi il {{percent}}%",
+      "saveUpTo": "Risparmi fino al {{percent}}%",
+      "includes": "Include:",
+      "everythingInPlus": "Tutto di {{name}}, più:",
+      "everythingIn": "Tutto di {{name}}",
+      "audienceSolo": "Per un singolo professionista",
+      "audienceTeam": "Per team fino a {{seats}}",
+      "audienceAny": "Per team di ogni dimensione",
+      "seatsOne": "1 postazione",
+      "seatsUpTo": "Fino a {{seats}} postazioni",
+      "seatsUnlimited": "Postazioni illimitate"
+    },
+    "compare": {
+      "toggle": "Confronta tutte le funzioni",
+      "caption": "Tutti i piani, fianco a fianco",
+      "current": "Attuale",
+      "included": "Incluso",
+      "notIncluded": "Non incluso",
+      "notOffered": "Non disponibile",
+      "unlimited": "Illimitate",
+      "groups": {
+        "pricing": "Prezzi",
+        "team": "Team",
+        "features": "Funzioni"
+      },
+      "rows": {
+        "monthly": "Prezzo mensile",
+        "monthlyHint": "Fatturato ogni mese.",
+        "yearly": "Prezzo annuale",
+        "yearlyHint": "Fatturato una volta all’anno.",
+        "seats": "Postazioni incluse",
+        "seatsHint": "Le persone che possono accedere a questo spazio di lavoro."
+      }
+    },
+    "features": {
+      "auditLog": "Registro attività",
+      "auditLogHint": "Scopri chi ha cambiato cosa, e quando.",
+      "sso": "Single sign-on (SSO)",
+      "ssoHint": "Il tuo team accede con il provider di identità della tua azienda.",
+      "prioritySupport": "Assistenza prioritaria",
+      "prioritySupportHint": "Le tue richieste hanno la precedenza."
+    }
   }
 }

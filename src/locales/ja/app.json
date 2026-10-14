@@ -1430,5 +1430,55 @@
       "sent": "ありがとうございます。チームに届きました。",
       "error": "報告を送信できませんでした。入力内容は残っています。もう一度お試しください。"
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "{{name}} にアップグレード",
+    "plan": {
+      "perMonth": "/ 月",
+      "billedYearlyTotal": "年払い · 年額 {{price}}",
+      "monthlyOnly": "月払いのみ — 年払いはありません",
+      "freeForever": "ずっと無料",
+      "save": "{{percent}}% お得",
+      "saveUpTo": "最大 {{percent}}% お得",
+      "includes": "含まれるもの:",
+      "everythingInPlus": "{{name}} のすべてに加えて:",
+      "everythingIn": "{{name}} のすべて",
+      "audienceSolo": "個人の施術者向け",
+      "audienceTeam": "最大 {{seats}} 人のチーム向け",
+      "audienceAny": "あらゆる規模のチーム向け",
+      "seatsOne": "1 席",
+      "seatsUpTo": "最大 {{seats}} 席",
+      "seatsUnlimited": "席数無制限"
+    },
+    "compare": {
+      "toggle": "すべての機能を比較",
+      "caption": "すべてのプランを並べて比較",
+      "current": "現在",
+      "included": "含まれる",
+      "notIncluded": "含まれない",
+      "notOffered": "提供なし",
+      "unlimited": "無制限",
+      "groups": {
+        "pricing": "料金",
+        "team": "チーム",
+        "features": "機能"
+      },
+      "rows": {
+        "monthly": "月額料金",
+        "monthlyHint": "毎月請求されます。",
+        "yearly": "年額料金",
+        "yearlyHint": "年に一度請求されます。",
+        "seats": "含まれる席数",
+        "seatsHint": "このワークスペースにサインインできる人数。"
+      }
+    },
+    "features": {
+      "auditLog": "監査ログ",
+      "auditLogHint": "誰が・何を・いつ変更したかを確認できます。",
+      "sso": "シングルサインオン (SSO)",
+      "ssoHint": "チームは会社の ID プロバイダーでサインインします。",
+      "prioritySupport": "優先サポート",
+      "prioritySupportHint": "お問い合わせに優先して対応します。"
+    }
   }
 }

@@ -1472,5 +1472,55 @@
       "sent": "Merci — l'équipe l'a reçu.",
       "error": "Impossible d'envoyer le signalement. Votre texte est toujours là — réessayez."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "Passer à {{name}}",
+    "plan": {
+      "perMonth": "/ mois",
+      "billedYearlyTotal": "Facturation annuelle · {{price}} par an",
+      "monthlyOnly": "Facturation mensuelle — pas d’option annuelle",
+      "freeForever": "Gratuit pour toujours",
+      "save": "Économisez {{percent}} %",
+      "saveUpTo": "Jusqu’à {{percent}} % d’économie",
+      "includes": "Comprend :",
+      "everythingInPlus": "Tout {{name}}, plus :",
+      "everythingIn": "Tout {{name}}",
+      "audienceSolo": "Pour un praticien seul",
+      "audienceTeam": "Pour les équipes jusqu’à {{seats}}",
+      "audienceAny": "Pour les équipes de toute taille",
+      "seatsOne": "1 siège",
+      "seatsUpTo": "Jusqu’à {{seats}} sièges",
+      "seatsUnlimited": "Sièges illimités"
+    },
+    "compare": {
+      "toggle": "Comparer toutes les fonctionnalités",
+      "caption": "Toutes les offres, côte à côte",
+      "current": "Actuelle",
+      "included": "Inclus",
+      "notIncluded": "Non inclus",
+      "notOffered": "Non proposé",
+      "unlimited": "Illimité",
+      "groups": {
+        "pricing": "Tarifs",
+        "team": "Équipe",
+        "features": "Fonctionnalités"
+      },
+      "rows": {
+        "monthly": "Prix mensuel",
+        "monthlyHint": "Facturé chaque mois.",
+        "yearly": "Prix annuel",
+        "yearlyHint": "Facturé une fois par an.",
+        "seats": "Sièges inclus",
+        "seatsHint": "Les personnes qui peuvent se connecter à cet espace de travail."
+      }
+    },
+    "features": {
+      "auditLog": "Journal d’audit",
+      "auditLogHint": "Voyez qui a modifié quoi, et quand.",
+      "sso": "Authentification unique (SSO)",
+      "ssoHint": "Votre équipe se connecte avec le fournisseur d’identité de votre entreprise.",
+      "prioritySupport": "Assistance prioritaire",
+      "prioritySupportHint": "Vos demandes sont traitées en premier."
+    }
   }
 }

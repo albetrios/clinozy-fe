@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2277 src files · ~1158 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
+Stats: ~2283 src files · ~1162 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -326,6 +326,14 @@ clinozy-fe/
 │   │   ├── KICKOFF.md
 │   │   └── README.md
 │   ├── change-floating-tab-bar-2026-10-13-pkhy/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── change-plan-comparison-2026-10-14-hhus/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
 │   │   ├── plans/
@@ -2398,6 +2406,14 @@ clinozy-fe/
 │   │   │   │   │   │   ├── BillingPaymentMethods.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── [1 test file]
+│   │   │   │   │   ├── BillingPlanComparison/
+│   │   │   │   │   │   ├── billing-plan.constants.ts
+│   │   │   │   │   │   ├── BillingPlanCard.tsx
+│   │   │   │   │   │   ├── BillingPlanComparison.tsx
+│   │   │   │   │   │   ├── BillingPlanTable.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── plan-comparison.ts
+│   │   │   │   │   │   └── [4 test files]
 │   │   │   │   │   ├── AccountBillingPanel.tsx
 │   │   │   │   │   ├── AccountNotificationsPanel.tsx
 │   │   │   │   │   ├── AccountPanel.tsx

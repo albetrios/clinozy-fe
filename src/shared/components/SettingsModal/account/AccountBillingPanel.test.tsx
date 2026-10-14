@@ -110,7 +110,8 @@ const PLANS = [
     priceYearly: 0,
     currency: 'usd',
     isActive: true,
-    seatLimit: null,
+    seatLimit: 1,
+    features: { audit_log: false },
   },
   {
     id: 'pln_pro',
@@ -121,6 +122,7 @@ const PLANS = [
     currency: 'usd',
     isActive: true,
     seatLimit: null,
+    features: { audit_log: true },
   },
 ];
 
@@ -252,7 +254,7 @@ describe('AccountBillingPanel', () => {
     });
   });
 
-  it('marks the subscribed plan as current and offers a switch off it', () => {
+  it('marks the subscribed plan as current and offers an upgrade off it', () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -263,11 +265,27 @@ describe('AccountBillingPanel', () => {
     renderPanel();
 
     // The plan the subscription names is identified in two places at once: the
-    // summary heading and a badge on its own card, which has no button.
+    // summary heading and its own card, whose button is a disabled "Current plan".
     expect(screen.getByText('Free plan')).toBeInTheDocument();
-    expect(screen.getByText('Current plan')).toBeInTheDocument();
+    expect(screen.getByTestId('plan-current')).toHaveTextContent('Current plan');
+    expect(screen.getByTestId('plan-current')).toBeDisabled();
     expect(screen.queryByTestId('plan-pln_free')).not.toBeInTheDocument();
-    expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Switch to Pro');
+    // Pro costs more than Free: the button says it is an upgrade.
+    expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Upgrade to Pro');
+  });
+
+  it('offers a switch, not an upgrade, to a cheaper plan', () => {
+    useSubscriptionMock.mockReturnValue({
+      data: { ...SUB, planId: 'pln_pro' },
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+
+    expect(screen.getByTestId('plan-pln_free')).toHaveTextContent('Switch to Free');
+    expect(screen.queryByTestId('plan-pln_pro')).not.toBeInTheDocument();
   });
 
   it('draws the current plan with the ink edge', () => {
@@ -309,7 +327,14 @@ describe('AccountBillingPanel', () => {
       'aria-pressed',
       'false',
     );
-    expect(screen.getByTestId('plan-options')).toHaveTextContent('/ yr');
+    // Yearly says what it saves, and every card still reads per month.
+    expect(screen.getByTestId('billing-cycle-savings')).toHaveTextContent(
+      'Save up to 17%',
+    );
+    expect(screen.getByTestId('plan-options')).toHaveTextContent('$82.50/ month');
+    expect(screen.getByTestId('plan-options')).toHaveTextContent(
+      'Billed yearly · $990 a year',
+    );
   });
 
   /*
@@ -333,8 +358,12 @@ describe('AccountBillingPanel', () => {
 
       expect(screen.queryByTestId('billing-cycle-toggle')).not.toBeInTheDocument();
       expect(screen.getByText('Billed yearly')).toBeInTheDocument();
-      expect(screen.getByTestId('plan-options')).toHaveTextContent('/ yr');
-      expect(screen.getByTestId('plan-options')).not.toHaveTextContent('/ mo');
+      expect(screen.getByTestId('plan-options')).toHaveTextContent(
+        'Billed yearly · $990 a year',
+      );
+      expect(screen.getByTestId('plan-options')).not.toHaveTextContent(
+        /Billed monthly(?! — no yearly option)/,
+      );
     });
 
     it('switches plan on the subscription cycle', async () => {

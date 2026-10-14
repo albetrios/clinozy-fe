@@ -1,7 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import type { TFunction } from 'i18next';
-import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,12 +25,17 @@ import { BillingCancellationSection } from '@/shared/components/SettingsModal/ac
 import { BillingInvoicesTable } from '@/shared/components/SettingsModal/account/BillingInvoicesTable/index.ts';
 import { BillingPaymentMethods } from '@/shared/components/SettingsModal/account/BillingPaymentMethods/index.ts';
 import {
+  bestYearlySavingsPercent,
+  BILLING_PLAN_KEYS,
+  BILLING_PLAN_NS,
+  BillingPlanComparison,
+} from '@/shared/components/SettingsModal/account/BillingPlanComparison/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { StripePaymentForm } from '@/shared/components/StripePaymentForm/index.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useCan } from '@/shared/hooks/useCan/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -44,32 +47,6 @@ import {
 import { notify } from '@/shared/notify/index.ts';
 
 const BILLING_KEYS = SETTINGS_KEYS.panels.billing;
-
-function planPriceLabel(
-  plan: BillingPlan,
-  billingCycle: BillingCycle,
-  formatCurrency: (cents: number, currency: string) => string,
-  t: TFunction,
-) {
-  // A plan without annual billing keeps its monthly price in the yearly view.
-  const yearlyCents = billingCycle === 'yearly' ? plan.priceYearly : null;
-  const yearly = yearlyCents !== null;
-  const cents = yearlyCents ?? plan.priceMonthly;
-  // A free plan still gets formatted in the viewer's locale — a hardcoded "$0"
-  // was both untranslated and wrong for every non-USD workspace.
-  const price = formatCurrency(cents, plan.currency);
-  return t(yearly ? BILLING_KEYS.pricePerYear : BILLING_KEYS.pricePerMonth, { price });
-}
-
-function planActionLabel(
-  name: string,
-  hasSubscription: boolean,
-  busy: boolean,
-  t: TFunction,
-) {
-  if (busy) return t(BILLING_KEYS.switching);
-  return t(hasSubscription ? BILLING_KEYS.switchTo : BILLING_KEYS.choose, { name });
-}
 
 /** A subscription status's pill tone: running sage, payment trouble blush, else plain. */
 function statusTone(status: BillingSubscription['status']): PillTone {
@@ -110,102 +87,29 @@ async function loadPaymentSetup(subscriptionId: string): Promise<string | null> 
   return null;
 }
 
-interface PlanCardProps {
-  plan: BillingPlan;
-  current: boolean;
-  canManage: boolean;
-  hasSubscription: boolean;
-  billingCycle: BillingCycle;
-  /** The plan whose switch is in flight, if any — at most one at a time. */
-  pendingPlanId: string | null;
-  onSelect: (planId: string) => Promise<void>;
-  formatCurrency: (cents: number, currency: string) => string;
-}
-
-/**
- * One plan in the comparison grid, with its own busy state — a tile in the
- * settings card's frame: the name 13.5px/600, the price in the 15px title step
- * (tabular), the description muted; the current plan carries the ink edge, as a
- * picked chip does (`preset.md:64`).
- */
-function PlanCard({
-  plan,
-  current,
-  canManage,
-  hasSubscription,
-  billingCycle,
-  pendingPlanId,
-  onSelect,
-  formatCurrency,
-}: PlanCardProps) {
-  const { t } = useTranslation(SETTINGS_NS);
-  const busy = pendingPlanId === plan.id;
-  let action: ReactNode = null;
-  if (current) {
-    action = (
-      <TonePill tone="neutral" size="sm">
-        {t(BILLING_KEYS.currentPlan)}
-      </TonePill>
-    );
-  } else if (canManage) {
-    action = (
-      <Button
-        size="sm"
-        className="w-full"
-        // Only the pressed plan spins; the rest are merely disabled, because
-        // one of them is already being switched to (SET-13).
-        isLoading={busy}
-        disabled={pendingPlanId !== null}
-        onClick={() => void onSelect(plan.id)}
-        data-testid={`plan-${plan.id}`}
-      >
-        {planActionLabel(plan.name, hasSubscription, busy, t)}
-      </Button>
-    );
-  }
-
-  return (
-    <div
-      data-slot="card"
-      data-current={current || undefined}
-      className={cn(
-        'bg-card text-card-foreground flex flex-col gap-1.5 rounded-xl border p-(--step-pad)',
-        current && 'border-foreground ring-foreground ring-1',
-      )}
-    >
-      <h4 dir="auto" className="text-field leading-[1.3] font-semibold">
-        {plan.name}
-      </h4>
-      <p className="text-title leading-[1.3] font-semibold tabular-nums">
-        {planPriceLabel(plan, billingCycle, formatCurrency, t)}
-      </p>
-      <p className="text-muted-foreground text-xs leading-[1.45] text-pretty">
-        {plan.description ?? t(BILLING_KEYS.planFallbackDescription)}
-      </p>
-      {action ? <div className="mt-auto pt-2">{action}</div> : null}
-    </div>
-  );
-}
-
 /** The segmented track's classes (the room tabs', H:1086): a 36px `muted` track of 28px segments. */
 const CYCLE_TRACK =
-  'bg-muted border-muted inline-flex h-9 items-center gap-0.5 rounded-lg border p-0.75';
+  'bg-muted border-muted inline-flex h-9 items-center gap-0.5 self-start rounded-lg border p-0.75';
 const CYCLE_SEGMENT =
-  'text-detail h-7 rounded-md px-3 font-medium whitespace-nowrap transition-[background-color,color,box-shadow] duration-150';
+  'text-detail inline-flex h-7 items-center rounded-md px-3 font-medium whitespace-nowrap transition-[background-color,color,box-shadow] duration-150';
 
 /**
  * Monthly · Yearly, on the room tabs' segmented track: the picked segment is the
  * card with its 1px ring, the other the strong muted ink. Each segment states
- * whether it is the one in force (`aria-pressed`).
+ * whether it is the one in force (`aria-pressed`). Yearly says what it saves —
+ * "Save up to N%", the best saving any plan offers — as Claude's switch does.
  */
 function BillingCycleSwitch({
   value,
+  savingsPercent,
   onChange,
 }: {
   value: BillingCycle;
+  savingsPercent: number | null;
   onChange: (cycle: BillingCycle) => void;
 }) {
   const { t } = useTranslation(SETTINGS_NS);
+  const { t: tPlan } = useTranslation(BILLING_PLAN_NS);
   return (
     <fieldset className={CYCLE_TRACK} data-testid="billing-cycle-toggle">
       <legend className="sr-only">{t(BILLING_KEYS.cycleLegend)}</legend>
@@ -224,9 +128,83 @@ function BillingCycleSwitch({
           )}
         >
           {t(cycle === 'monthly' ? BILLING_KEYS.monthly : BILLING_KEYS.yearly)}
+          {cycle === 'yearly' && savingsPercent !== null ? (
+            <TonePill
+              tone="sage"
+              size="xs"
+              className="ms-1.5"
+              data-testid="billing-cycle-savings"
+            >
+              {tPlan(BILLING_PLAN_KEYS.plan.saveUpTo, { percent: savingsPercent })}
+            </TonePill>
+          ) : null}
         </button>
       ))}
     </fieldset>
+  );
+}
+
+interface ChangePlanCardProps {
+  sub: BillingSubscription | null;
+  plans: BillingPlan[];
+  canManage: boolean;
+  /** The cycle every card is priced on — the subscription's own once there is one. */
+  billingCycle: BillingCycle;
+  /** The cycle picked on the switch, before there is a subscription. */
+  chosenCycle: BillingCycle;
+  onChooseCycle: (cycle: BillingCycle) => void;
+  /** The plan whose switch is in flight, if any — at most one at a time. */
+  pendingPlanId: string | null;
+  onSelect: (planId: string) => Promise<void>;
+}
+
+/**
+ * The Change plan card: the Monthly · Yearly switch (managers, before there is a
+ * subscription) over the plan comparison.
+ */
+function ChangePlanCard({
+  sub,
+  plans,
+  canManage,
+  billingCycle,
+  chosenCycle,
+  onChooseCycle,
+  pendingPlanId,
+  onSelect,
+}: ChangePlanCardProps) {
+  const { t } = useTranslation(SETTINGS_NS);
+  return (
+    <SettingsCard
+      title={t(BILLING_KEYS.changePlanTitle)}
+      description={t(BILLING_KEYS.changePlanDescription)}
+    >
+      {/* Above the cards, not in the card head: with its saving it needs the
+          room a phone's head row does not have (Claude centres it there too). */}
+      {canManage && !sub ? (
+        <BillingCycleSwitch
+          value={chosenCycle}
+          savingsPercent={bestYearlySavingsPercent(plans)}
+          onChange={onChooseCycle}
+        />
+      ) : null}
+      <BillingPlanComparison
+        plans={plans}
+        currentPlanId={sub?.planId ?? null}
+        // `Boolean`, not `!== null`: this was the one check in the file that
+        // told `undefined` apart from `null`, and it decides whether the
+        // buttons read "Choose Free" or "Switch to Free". An `undefined` here
+        // therefore put "Switch to …" on every card of a workspace whose own
+        // summary says "No active subscription yet. Choose a plan below." —
+        // the card telling the user they are on a plan while the heading above
+        // it says they are not. Every other read of `sub` in this component
+        // (`sub ?`, `!sub`, `Boolean(sub)`) already treats the two alike.
+        hasSubscription={Boolean(sub)}
+        canManage={canManage}
+        billingCycle={billingCycle}
+        pendingPlanId={pendingPlanId}
+        onSelect={onSelect}
+      />
+    </SettingsCard>
   );
 }
 
@@ -239,7 +217,7 @@ function BillingContent({ sub, plans }: BillingContentProps) {
   const { t } = useTranslation(SETTINGS_NS);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { formatCurrency, formatDate } = useLocaleFormat();
+  const { formatDate } = useLocaleFormat();
   const canManage = useCan({
     permission: 'subscription:manage',
     teamOrganizationOnly: true,
@@ -400,40 +378,16 @@ function BillingContent({ sub, plans }: BillingContentProps) {
 
       <BillingInvoicesTable enabled={showBillingExtras} />
 
-      <SettingsCard
-        title={t(BILLING_KEYS.changePlanTitle)}
-        description={t(BILLING_KEYS.changePlanDescription)}
-        action={
-          canManage && !sub ? (
-            <BillingCycleSwitch value={chosenCycle} onChange={setChosenCycle} />
-          ) : undefined
-        }
-      >
-        <div className="grid gap-3 sm:grid-cols-3" data-testid="plan-options">
-          {plans.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              current={sub?.planId === plan.id}
-              canManage={canManage}
-              // `Boolean`, not `!== null`: this was the one check in the file
-              // that told `undefined` apart from `null`, and it decides whether
-              // the buttons read "Choose Free" or "Switch to Free". An
-              // `undefined` here therefore put "Switch to …" on every card of a
-              // workspace whose own summary says "No active subscription yet.
-              // Choose a plan below." — the card telling the user they are on a
-              // plan while the heading above it says they are not. Every other
-              // read of `sub` in this component (`sub ?`, `!sub`,
-              // `Boolean(sub)`) already treats the two alike.
-              hasSubscription={Boolean(sub)}
-              billingCycle={billingCycle}
-              pendingPlanId={pendingPlanId}
-              onSelect={handlePlanSelect}
-              formatCurrency={formatCurrency}
-            />
-          ))}
-        </div>
-      </SettingsCard>
+      <ChangePlanCard
+        sub={sub}
+        plans={plans}
+        canManage={canManage}
+        billingCycle={billingCycle}
+        chosenCycle={chosenCycle}
+        onChooseCycle={setChosenCycle}
+        pendingPlanId={pendingPlanId}
+        onSelect={handlePlanSelect}
+      />
 
       {sub ? (
         // Ending a subscription is its own failure domain: a throw here must not

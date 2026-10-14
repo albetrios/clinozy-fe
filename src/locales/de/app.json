@@ -1451,5 +1451,55 @@
       "sent": "Danke – das Team hat es.",
       "error": "Die Meldung konnte nicht gesendet werden. Ihr Text ist noch da – versuchen Sie es erneut."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "Auf {{name}} upgraden",
+    "plan": {
+      "perMonth": "/ Monat",
+      "billedYearlyTotal": "Jährliche Abrechnung · {{price}} pro Jahr",
+      "monthlyOnly": "Monatliche Abrechnung — keine jährliche Option",
+      "freeForever": "Für immer kostenlos",
+      "save": "{{percent}} % sparen",
+      "saveUpTo": "Bis zu {{percent}} % sparen",
+      "includes": "Enthält:",
+      "everythingInPlus": "Alles aus {{name}}, plus:",
+      "everythingIn": "Alles aus {{name}}",
+      "audienceSolo": "Für eine einzelne Fachkraft",
+      "audienceTeam": "Für Teams bis {{seats}}",
+      "audienceAny": "Für Teams jeder Größe",
+      "seatsOne": "1 Platz",
+      "seatsUpTo": "Bis zu {{seats}} Plätze",
+      "seatsUnlimited": "Unbegrenzte Plätze"
+    },
+    "compare": {
+      "toggle": "Alle Funktionen vergleichen",
+      "caption": "Alle Tarife im Vergleich",
+      "current": "Aktuell",
+      "included": "Enthalten",
+      "notIncluded": "Nicht enthalten",
+      "notOffered": "Nicht angeboten",
+      "unlimited": "Unbegrenzt",
+      "groups": {
+        "pricing": "Preise",
+        "team": "Team",
+        "features": "Funktionen"
+      },
+      "rows": {
+        "monthly": "Monatspreis",
+        "monthlyHint": "Monatlich abgerechnet.",
+        "yearly": "Jahrespreis",
+        "yearlyHint": "Einmal im Jahr abgerechnet.",
+        "seats": "Enthaltene Plätze",
+        "seatsHint": "Personen, die sich in diesem Arbeitsbereich anmelden können."
+      }
+    },
+    "features": {
+      "auditLog": "Audit-Protokoll",
+      "auditLogHint": "Sehen Sie, wer was wann geändert hat.",
+      "sso": "Single Sign-on (SSO)",
+      "ssoHint": "Ihr Team meldet sich über den Identitätsanbieter Ihres Unternehmens an.",
+      "prioritySupport": "Bevorzugter Support",
+      "prioritySupportHint": "Ihre Anfragen werden zuerst beantwortet."
+    }
   }
 }

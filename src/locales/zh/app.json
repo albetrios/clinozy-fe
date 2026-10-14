@@ -1430,5 +1430,55 @@
       "sent": "谢谢，团队已收到。",
       "error": "无法发送报告。你写的内容还在，请重试。"
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "升级到 {{name}}",
+    "plan": {
+      "perMonth": "/ 月",
+      "billedYearlyTotal": "按年计费 · 每年 {{price}}",
+      "monthlyOnly": "仅按月计费 — 无年付选项",
+      "freeForever": "永久免费",
+      "save": "节省 {{percent}}%",
+      "saveUpTo": "最多节省 {{percent}}%",
+      "includes": "包含：",
+      "everythingInPlus": "{{name}} 的全部功能，另加：",
+      "everythingIn": "{{name}} 的全部功能",
+      "audienceSolo": "适合单人执业",
+      "audienceTeam": "适合最多 {{seats}} 人的团队",
+      "audienceAny": "适合任意规模的团队",
+      "seatsOne": "1 个席位",
+      "seatsUpTo": "最多 {{seats}} 个席位",
+      "seatsUnlimited": "不限席位"
+    },
+    "compare": {
+      "toggle": "比较全部功能",
+      "caption": "所有套餐并排比较",
+      "current": "当前",
+      "included": "包含",
+      "notIncluded": "不包含",
+      "notOffered": "不提供",
+      "unlimited": "不限",
+      "groups": {
+        "pricing": "价格",
+        "team": "团队",
+        "features": "功能"
+      },
+      "rows": {
+        "monthly": "月付价格",
+        "monthlyHint": "每月计费。",
+        "yearly": "年付价格",
+        "yearlyHint": "每年计费一次。",
+        "seats": "包含席位",
+        "seatsHint": "可以登录此工作区的人数。"
+      }
+    },
+    "features": {
+      "auditLog": "审计日志",
+      "auditLogHint": "查看谁在何时改了什么。",
+      "sso": "单点登录 (SSO)",
+      "ssoHint": "团队通过公司的身份提供商登录。",
+      "prioritySupport": "优先支持",
+      "prioritySupportHint": "您的请求会被优先处理。"
+    }
   }
 }
