@@ -5,4 +5,6 @@ export {
   type PublicCardProps,
   PublicFrame,
   type PublicFrameProps,
+  PublicPrivacyChoices,
+  PublicSkipLink,
 } from './PublicFrame.tsx';

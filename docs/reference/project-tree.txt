@@ -2945,9 +2945,11 @@ clinozy-fe/
 │   │   │   │   ├── components/
 │   │   │   │   │   └── AuthShowcase/
 │   │   │   │   │       ├── auth-showcase.constants.ts
+│   │   │   │   │       ├── auth-showcase.css
 │   │   │   │   │       ├── AuthShowcase.tsx
 │   │   │   │   │       ├── index.ts
 │   │   │   │   │       └── [1 test file]
+│   │   │   │   ├── auth-layout.css
 │   │   │   │   ├── AuthLayout.shared.tsx
 │   │   │   │   ├── AuthLayout.tsx
 │   │   │   │   ├── index.ts

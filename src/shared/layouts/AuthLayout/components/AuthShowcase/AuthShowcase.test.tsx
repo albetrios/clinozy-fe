@@ -8,13 +8,43 @@ import { axe } from 'vitest-axe';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { JOURNEY_STOPS } from './auth-showcase.constants.ts';
+import { JOURNEY_STOPS, SHOWCASE_MOMENTS } from './auth-showcase.constants.ts';
 import {
-  AuthShowcaseBoard,
-  AuthShowcaseCanvas,
+  AuthShowcaseBackdrop,
+  AuthShowcaseDial,
   AuthShowcaseHero,
   AuthShowcasePrivacy,
+  AuthShowcaseValues,
 } from './AuthShowcase.tsx';
+
+/** The dial's own stylesheet — it loads with the lazy chunk, not with `index.css`. */
+const CSS = readFileSync(
+  join(
+    process.cwd(),
+    'src/shared/layouts/AuthLayout/components/AuthShowcase/auth-showcase.css',
+  ),
+  'utf8',
+);
+
+/** A rule's body: everything between `selector {` and its closing brace. */
+function ruleBody(selector: string): string {
+  const start = CSS.indexOf(`${selector} {`);
+  expect(start, selector).toBeGreaterThan(-1);
+  return CSS.slice(start, CSS.indexOf('}', start));
+}
+
+/** A keyframe block, from its name to the next `@keyframes`. */
+function keyframes(name: string): string {
+  const start = CSS.indexOf(`@keyframes ${name} `);
+  expect(start, name).toBeGreaterThan(-1);
+  return CSS.slice(start, CSS.indexOf('@keyframes', start + 1));
+}
+
+/** The `--stop` a rule gives, or NaN. */
+function stopIndexOf(body: string): number {
+  const match = /--stop:\s*(\d+);/.exec(body);
+  return match ? Number(match[1]) : Number.NaN;
+}
 
 describe('AuthShowcase', () => {
   it('says who the product is for, the promise, and what it replaces', async () => {
@@ -33,12 +63,13 @@ describe('AuthShowcase', () => {
     expect(within(hero.parentElement ?? hero).getByRole('region')).toBe(hero);
   });
 
-  it('walks one patient through the seven rooms, each stop in its room’s tone', async () => {
-    const { findByRole } = renderWithProviders(<AuthShowcaseBoard />);
+  it('draws one patient’s journey as a dial: seven stops, each in its room’s tone', async () => {
+    const { findByRole } = renderWithProviders(<AuthShowcaseDial />);
     const journey = await findByRole('list', {
       name: `A patient’s journey through ${PRODUCT_NAME}`,
     });
     const stops = within(journey).getAllByRole('listitem');
+    // Every stop is named on the dial — the centre label is decoration on top.
     expect(stops.map((stop) => stop.textContent)).toEqual([
       'Enquiry',
       'Booked',
@@ -49,43 +80,77 @@ describe('AuthShowcase', () => {
       'Follow-up',
     ]);
     stops.forEach((stop, index) => {
+      expect(stop).toHaveAttribute('data-stop', JOURNEY_STOPS[index]?.id);
+      expect(stop).toHaveClass('auth-dial-stop');
       const pill = stop.querySelector('[data-slot="pill"]');
       expect(pill).toHaveAttribute('data-tone', JOURNEY_STOPS[index]?.tone);
-      // The wave lights them in turn — and stands still under reduced motion.
-      expect(pill).toHaveClass(
-        'animate-[journey-wave_8400ms_ease-in-out_infinite_both]',
-        'motion-reduce:animate-none',
-      );
-      expect(pill).toHaveClass(JOURNEY_STOPS[index]?.delay ?? '');
+      // It lifts as the thread arrives (`auth-dial-node`).
+      expect(pill).toHaveClass('auth-dial-node');
     });
   });
 
-  it('dims a resting stop only as far as its text keeps WCAG AA contrast', () => {
-    // A resting stop is 12px text over its tone: below 0.79 opacity the light
-    // tones fall under 4.5:1 (0.4 measured ~2:1 and failed Lighthouse's
-    // color-contrast audit on every sign-in route).
-    const css = readFileSync(join(process.cwd(), 'src/index.css'), 'utf8');
-    const start = css.indexOf('@keyframes journey-wave');
-    expect(start).toBeGreaterThan(-1);
-    const block = css.slice(start, css.indexOf('@keyframes', start + 1));
-    const opacities = [...block.matchAll(/opacity:\s*([\d.]+)/g)].map((match) =>
-      Number(match[1]),
-    );
-    expect(opacities.length).toBeGreaterThan(0);
-    expect(Math.min(...opacities)).toBeGreaterThanOrEqual(0.79);
-  });
-
-  it('shows three anonymous moments and three reasons, with no numbers or names', async () => {
-    const { findByRole, getByRole } = renderWithProviders(<AuthShowcaseBoard />);
-    const moments = await findByRole('list', { name: 'Moments from a clinic day' });
-    expect(within(moments).getAllByRole('listitem')).toHaveLength(3);
-    for (const moment of within(moments).getAllByRole('listitem')) {
-      expect(moment).toHaveClass(
-        'animate-[drift_6000ms_ease-in-out_infinite_alternate_both]',
-        'motion-reduce:animate-none',
+  it('keeps the dial in step: each stop starts a seventh of a turn after the last', () => {
+    // The CSS places and times each stop by its index in JOURNEY_STOPS.
+    JOURNEY_STOPS.forEach((stop, index) => {
+      expect(stopIndexOf(ruleBody(`.auth-dial [data-stop='${stop.id}']`))).toBe(index);
+    });
+    // A stop is a seventh of a turn: 15.4s round, 2.2s a stop.
+    const dial = ruleBody('.auth-dial');
+    expect(dial).toContain('--dial-turn: 15400ms;');
+    expect(dial).toContain(`--dial-step: ${15_400 / JOURNEY_STOPS.length}ms;`);
+    // Every synced motion starts `--stop` steps in.
+    for (const selector of [
+      '.auth-dial-node',
+      '.auth-dial-halo',
+      '.auth-dial-now > *',
+      '.auth-moment',
+      '.auth-moment::after',
+    ]) {
+      expect(ruleBody(selector), selector).toContain(
+        'animation-delay: calc(var(--stop) * var(--dial-step));',
       );
     }
-    const values = getByRole('list', { name: `Why clinics choose ${PRODUCT_NAME}` });
+    // The thread holds on each stop: seven holds, 360° / 7 apart.
+    const holds = [
+      ...keyframes('auth-dial-thread').matchAll(/rotate\(([\d.]+)deg\)/g),
+    ].map((match) => Number(match[1]));
+    expect(holds).toHaveLength(8);
+    holds.forEach((degrees, index) => {
+      expect(degrees).toBeCloseTo((360 / JOURNEY_STOPS.length) * index, 2);
+    });
+  });
+
+  it('never dims a stop: its lift is scale only, its label always full strength', () => {
+    // The stops' labels are text (12–13px). The launch's wave dimmed them, and
+    // dimming text costs WCAG AA contrast; the dial lifts a stop instead.
+    expect(keyframes('auth-dial-lift-stop')).not.toMatch(/opacity/);
+    expect(ruleBody('.auth-dial-label')).not.toMatch(/opacity/);
+  });
+
+  it('lifts each moment as the thread reaches its stop', async () => {
+    const { findByRole } = renderWithProviders(<AuthShowcaseDial />);
+    const moments = await findByRole('list', { name: 'Moments from a clinic day' });
+    const items = within(moments).getAllByRole('listitem');
+    expect(items).toHaveLength(3);
+    for (const moment of SHOWCASE_MOMENTS) {
+      // Each card takes its stop's place in the turn.
+      const stopIndex = JOURNEY_STOPS.findIndex((stop) => stop.id === moment.stop);
+      expect(stopIndexOf(ruleBody(`.auth-moments [data-moment='${moment.id}']`))).toBe(
+        stopIndex,
+      );
+    }
+    for (const item of items) {
+      expect(item.querySelector('[data-slot="card"]')).toHaveClass('auth-moment');
+    }
+    // No numbers or names: anonymous moments (D11) — "Tuesday" is not a number.
+    expect(moments.textContent).not.toMatch(/\d/);
+  });
+
+  it('names three reasons, with no numbers or names', async () => {
+    const { findByRole } = renderWithProviders(<AuthShowcaseValues />);
+    const values = await findByRole('list', {
+      name: `Why clinics choose ${PRODUCT_NAME}`,
+    });
     expect(
       within(values)
         .getAllByRole('listitem')
@@ -94,11 +159,19 @@ describe('AuthShowcase', () => {
     expect(values.textContent).not.toMatch(/\d/);
   });
 
-  it('draws its washed panel from lg only, as decoration', () => {
-    const { container } = render(<AuthShowcaseCanvas />);
-    const canvas = container.firstElementChild;
-    expect(canvas).toHaveAttribute('aria-hidden', 'true');
-    expect(canvas).toHaveClass('hidden', 'lg:block');
+  it('paints its backdrop as decoration only', () => {
+    const { container } = render(<AuthShowcaseBackdrop />);
+    const backdrop = container.firstElementChild;
+    expect(backdrop).toHaveAttribute('aria-hidden', 'true');
+    expect(backdrop).toHaveClass('auth-backdrop', 'pointer-events-none', '-z-10');
+  });
+
+  it('stands the dial still under reduced motion, every stop still named', () => {
+    const reduced = CSS.slice(CSS.indexOf('@media (prefers-reduced-motion: reduce)'));
+    expect(reduced).toMatch(/\.auth-dial \*[\s\S]*animation: none;/);
+    expect(reduced).toMatch(
+      /\.auth-dial-thread,\s*\.auth-dial-halo,\s*\.auth-dial-now \{\s*display: none;/,
+    );
   });
 
   it('has no accessibility violations', async () => {
@@ -106,7 +179,8 @@ describe('AuthShowcase', () => {
       <main>
         <AuthShowcaseHero />
         <AuthShowcasePrivacy />
-        <AuthShowcaseBoard />
+        <AuthShowcaseDial />
+        <AuthShowcaseValues />
       </main>,
     );
     await findByTestId('auth-showcase');

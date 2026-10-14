@@ -154,4 +154,11 @@ describe('PublicCardHeader', () => {
     const { container } = render(<PublicCardHeader title="Session expired" />);
     expect(container.querySelector('p')).toBeNull();
   });
+
+  it('draws the sign-in screen’s larger heading at display size', () => {
+    render(<PublicCardHeader title="Welcome back" size="display" />);
+    const heading = screen.getByRole('heading', { level: 1, name: 'Welcome back' });
+    expect(heading).toHaveClass('text-2xl', 'xl:text-3xl', 'font-semibold');
+    expect(heading).not.toHaveClass('text-lg');
+  });
 });

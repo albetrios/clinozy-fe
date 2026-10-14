@@ -1239,41 +1239,11 @@
   }
 }
 
-/* The sign-in showcase (AuthShowcase): a wave that lights each journey stop in
-   turn (8.4s, each stop 600ms after the last), the moments' 4px drift, and the
-   sage live dot's breathing halo. Used through arbitrary `animate-[…]` classes,
-   not theme animations, so `cn()`'s registry (first paint) stays as it was;
-   each element also carries `motion-reduce:animate-none`, so reduced motion
-   shows every stop lit.
-   A resting stop is still text (12px), so it dims only as far as WCAG AA allows:
-   at 0.85 its worst tone reads 5.3:1 in light and 7.3:1 in dark; below 0.79 the
-   light tones drop under 4.5:1 (0.4 measured ~2:1, and Lighthouse's
-   color-contrast audit failed every sign-in route). AuthShowcase.test.tsx pins it. */
-@keyframes journey-wave {
-  0%,
-  85%,
-  100% {
-    opacity: 0.85;
-    transform: none;
-  }
-  8% {
-    opacity: 1;
-    transform: translateY(-2px);
-  }
-  14%,
-  70% {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes drift {
-  from {
-    transform: none;
-  }
-  to {
-    transform: translateY(-4px);
-  }
-}
+/* The sign-in showcase's live dot (AuthShowcase): the sage dot's breathing
+   halo. Used through an arbitrary `animate-[…]` class, not a theme animation,
+   so `cn()`'s registry (first paint) stays as it was; the dot also carries
+   `motion-reduce:animate-none`. The rest of the showcase's motion — the journey
+   dial — ships with its lazy chunk (`AuthShowcase/auth-showcase.css`). */
 @keyframes pulse-dot {
   0%,
   100% {

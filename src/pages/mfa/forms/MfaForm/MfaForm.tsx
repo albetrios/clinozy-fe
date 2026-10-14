@@ -151,6 +151,7 @@ export function MfaForm() {
     return (
       <div className="flex flex-col gap-5" data-testid={MFA_TEST_IDS.form}>
         <PublicCardHeader
+          size="display"
           title={t(AUTH_KEYS.mfa.sessionExpiredHeading)}
           description={t(AUTH_KEYS.mfa.sessionExpiredSubheading)}
         />
@@ -164,6 +165,7 @@ export function MfaForm() {
   return (
     <div className="flex flex-col gap-5" data-testid={MFA_TEST_IDS.form}>
       <PublicCardHeader
+        size="display"
         title={t(AUTH_KEYS.mfa.heading)}
         description={
           useRecovery ? t(AUTH_KEYS.mfa.recoveryHint) : t(AUTH_KEYS.mfa.authenticatorHint)

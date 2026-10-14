@@ -1,0 +1,470 @@
+/* The sign-in showcase — the journey dial and its page-load choreography.
+   Loaded with the lazy auth layout chunk, never on the first paint (the
+   initial-CSS budget): the same split as `bug-report.css`.
+
+   One turn of the dial is 15.4s. The thread (the logo's green dot with its
+   tail) steps round the seven stops, holding on each for 1.54s (10% of a turn)
+   and moving for 0.66s on a strong ease-in-out. Everything that answers it — a
+   stop's lift and halo, the centre label, a moment card's lift and glow — runs
+   the same 15.4s, started `--stop × 2.2s` in, so the dial never drifts out of
+   step. `--stop` is the stop's place in the journey (0–6, clockwise from the
+   top, as `JOURNEY_STOPS` lists them; AuthShowcase.test.tsx pins the two
+   together). Only transform, opacity and a short blur animate; no stop label is
+   ever dimmed (they are text). Logical insets throughout, so under RTL the
+   journey runs the other way round, as the reading order does — the thread and
+   the aura are mirrored to match. Reduced motion: the dial stands still with
+   every stop named; the thread, the halos and the centre label leave. */
+
+.auth-dial {
+  --dial-turn: 15400ms;
+  --dial-step: 2200ms;
+  --dial-move: cubic-bezier(0.77, 0, 0.175, 1);
+  --dial-out: cubic-bezier(0.23, 1, 0.32, 1);
+  animation: auth-dial-enter 1100ms var(--dial-out) 120ms both;
+}
+
+/* Each stop's place: its index and its centre, 35% out from the middle, a
+   seventh of a turn apart, starting at the top. */
+.auth-dial [data-stop='enquiry'] {
+  --stop: 0;
+  --x: 50%;
+  --y: 15%;
+}
+.auth-dial [data-stop='booked'] {
+  --stop: 1;
+  --x: 77.4%;
+  --y: 28.2%;
+}
+.auth-dial [data-stop='waiting'] {
+  --stop: 2;
+  --x: 84.1%;
+  --y: 57.8%;
+}
+.auth-dial [data-stop='withDoctor'] {
+  --stop: 3;
+  --x: 65.2%;
+  --y: 81.5%;
+}
+.auth-dial [data-stop='treatment'] {
+  --stop: 4;
+  --x: 34.8%;
+  --y: 81.5%;
+}
+.auth-dial [data-stop='checkout'] {
+  --stop: 5;
+  --x: 15.9%;
+  --y: 57.8%;
+}
+.auth-dial [data-stop='followUp'] {
+  --stop: 6;
+  --x: 22.6%;
+  --y: 28.2%;
+}
+
+/* The seven stops' dots swept round a circle in journey order, blurred
+   behind the ring — breathing, slowly. */
+.auth-dial-aura {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--color-tone-lav-dot),
+    var(--color-tone-sky-dot),
+    var(--color-tone-butter-dot),
+    var(--color-tone-blush-dot),
+    var(--color-tone-sage-dot),
+    var(--color-tone-peach-dot),
+    var(--color-tone-plum-dot),
+    var(--color-tone-lav-dot)
+  );
+  filter: blur(48px);
+  opacity: 0.4;
+  animation: auth-dial-breathe 7s ease-in-out infinite alternate both;
+}
+.dark .auth-dial-aura {
+  opacity: 0.25;
+}
+
+/* The thread: a tail a seventh of a turn long, brightening to the head. */
+.auth-dial-thread {
+  position: absolute;
+  inset: 15%;
+  animation: auth-dial-thread var(--dial-turn) linear infinite;
+}
+.auth-dial-thread::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(transparent 0deg 308deg, var(--color-brand-mark) 360deg);
+  mask-image: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 3px),
+    black calc(100% - 2.5px)
+  );
+}
+.auth-dial-thread::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: var(--color-brand-mark);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-brand-mark) 22%, transparent);
+}
+[dir='rtl'] :is(.auth-dial-thread, .auth-dial-aura) {
+  scale: -1 1;
+}
+
+/* A stop: centred on its point, popping in a beat after the one before. */
+.auth-dial-stop {
+  position: absolute;
+  inset-inline-start: var(--x);
+  top: var(--y);
+  translate: -50% -50%;
+  animation: auth-dial-pop 520ms var(--dial-out) both;
+  animation-delay: calc(420ms + var(--stop) * 60ms);
+}
+[dir='rtl'] .auth-dial-stop {
+  translate: 50% -50%;
+}
+.auth-dial-node {
+  animation: auth-dial-lift-stop var(--dial-turn) var(--dial-out) infinite;
+  animation-delay: calc(var(--stop) * var(--dial-step));
+}
+.auth-dial-halo {
+  position: absolute;
+  inset: -0.5rem;
+  border-radius: 50%;
+  filter: blur(12px);
+  opacity: 0;
+  animation: auth-dial-halo var(--dial-turn) ease-out infinite;
+  animation-delay: calc(var(--stop) * var(--dial-step));
+}
+.auth-dial-label {
+  position: absolute;
+  inset-inline-start: 50%;
+  top: 100%;
+  margin-top: 0.375rem;
+  translate: -50% 0;
+  white-space: nowrap;
+}
+[dir='rtl'] .auth-dial-label {
+  translate: 50% 0;
+}
+
+/* The centre: the stop the thread is on, each label rising in as it arrives. */
+.auth-dial-now {
+  display: grid;
+  place-items: center;
+}
+.auth-dial-now > * {
+  grid-area: 1 / 1;
+  opacity: 0;
+  animation: auth-dial-label var(--dial-turn) ease-out infinite;
+  animation-delay: calc(var(--stop) * var(--dial-step));
+}
+
+/* The moments: each lifts and glows in its tone as the thread reaches its stop. */
+.auth-moments [data-moment='checkIn'] {
+  --stop: 2;
+  --moment-tone: var(--color-tone-sky-dot);
+}
+.auth-moments [data-moment='followUp'] {
+  --stop: 6;
+  --moment-tone: var(--color-tone-plum-dot);
+}
+.auth-moments [data-moment='invoice'] {
+  --stop: 5;
+  --moment-tone: var(--color-tone-peach-dot);
+}
+.auth-moments > li {
+  animation: auth-rise 700ms var(--dial-out) both;
+}
+.auth-moments > li:nth-child(1) {
+  animation-delay: 900ms;
+}
+.auth-moments > li:nth-child(2) {
+  animation-delay: 1000ms;
+}
+.auth-moments > li:nth-child(3) {
+  animation-delay: 1100ms;
+}
+.auth-moment {
+  animation: auth-dial-lift var(--dial-turn) var(--dial-out) infinite;
+  animation-delay: calc(var(--stop) * var(--dial-step));
+}
+.auth-moment::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--moment-tone) 50%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: auth-dial-glow var(--dial-turn) ease-out infinite;
+  animation-delay: calc(var(--stop) * var(--dial-step));
+}
+/* From `sm` the cards float by the dial (below it they stack under it). */
+@media (min-width: 40rem) {
+  .auth-moments {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .auth-moments > li {
+    position: absolute;
+  }
+  .auth-moments > [data-moment='checkIn'] {
+    inset-inline-end: -8%;
+    top: -4%;
+  }
+  .auth-moments > [data-moment='followUp'] {
+    inset-inline-start: -10%;
+    top: -4%;
+  }
+  .auth-moments > [data-moment='invoice'] {
+    inset-inline-start: -6%;
+    bottom: -15%;
+  }
+}
+/* From `xl` the dial is smaller than its column: the top pair rise clear of it. */
+@media (min-width: 80rem) {
+  .auth-moments > :is([data-moment='checkIn'], [data-moment='followUp']) {
+    top: -14%;
+  }
+}
+
+/* The page load: the hero's lines, then the values, rise in turn. */
+.auth-rise > * {
+  animation: auth-rise 700ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.auth-rise > :nth-child(2) {
+  animation-delay: 80ms;
+}
+.auth-rise > :nth-child(3) {
+  animation-delay: 160ms;
+}
+.auth-values > li {
+  animation: auth-rise 700ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.auth-values > li:nth-child(1) {
+  animation-delay: 240ms;
+}
+.auth-values > li:nth-child(2) {
+  animation-delay: 300ms;
+}
+.auth-values > li:nth-child(3) {
+  animation-delay: 360ms;
+}
+
+/* The stage's atmosphere: a fine dot grid fading out from the dial, and two of
+   the rooms' tones washed in from the corners. */
+.auth-backdrop::before,
+.auth-backdrop::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+}
+.auth-backdrop::before {
+  inset-block-start: -10rem;
+  inset-inline-start: -10rem;
+  width: 36rem;
+  height: 36rem;
+  background: var(--color-tone-lav);
+  opacity: 0.7;
+}
+.auth-backdrop::after {
+  inset-block-end: -12rem;
+  inset-inline-start: 45%;
+  width: 30rem;
+  height: 30rem;
+  background: var(--color-tone-peach);
+  opacity: 0.5;
+}
+.dark .auth-backdrop::before {
+  opacity: 0.4;
+}
+.dark .auth-backdrop::after {
+  opacity: 0.3;
+}
+.auth-backdrop-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--color-border-strong) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 60% 55% at 62% 50%, black, transparent 75%);
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-dial,
+  .auth-dial *,
+  .auth-moments > li,
+  .auth-moment,
+  .auth-moment::after,
+  .auth-rise > *,
+  .auth-values > li {
+    animation: none;
+  }
+  .auth-dial-thread,
+  .auth-dial-halo,
+  .auth-dial-now {
+    display: none;
+  }
+}
+
+@keyframes auth-dial-thread {
+  0%,
+  10% {
+    transform: rotate(0deg);
+    animation-timing-function: var(--dial-move);
+  }
+  14.2857%,
+  24.2857% {
+    transform: rotate(51.4286deg);
+    animation-timing-function: var(--dial-move);
+  }
+  28.5714%,
+  38.5714% {
+    transform: rotate(102.857deg);
+    animation-timing-function: var(--dial-move);
+  }
+  42.8571%,
+  52.8571% {
+    transform: rotate(154.286deg);
+    animation-timing-function: var(--dial-move);
+  }
+  57.1429%,
+  67.1429% {
+    transform: rotate(205.714deg);
+    animation-timing-function: var(--dial-move);
+  }
+  71.4286%,
+  81.4286% {
+    transform: rotate(257.143deg);
+    animation-timing-function: var(--dial-move);
+  }
+  85.7143%,
+  95.7143% {
+    transform: rotate(308.571deg);
+    animation-timing-function: var(--dial-move);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* A stop as the thread reaches it: lifts 16% and holds while the thread rests. */
+@keyframes auth-dial-lift-stop {
+  0%,
+  13%,
+  100% {
+    transform: none;
+  }
+  2.5%,
+  9.5% {
+    transform: scale(1.16);
+  }
+}
+/* Its halo swells in with the lift and out after. */
+@keyframes auth-dial-halo {
+  0%,
+  13%,
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  2.5%,
+  9.5% {
+    opacity: 0.5;
+    transform: none;
+  }
+}
+/* The centre label rises in, sharpens, holds, then rises out. */
+@keyframes auth-dial-label {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(4px);
+  }
+  2.5%,
+  9.5% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  13%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+    filter: blur(4px);
+  }
+}
+/* A moment card: a 5px lift, held, and its tone's ring. */
+@keyframes auth-dial-lift {
+  0%,
+  14%,
+  100% {
+    transform: none;
+  }
+  3%,
+  10% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes auth-dial-glow {
+  0%,
+  14%,
+  100% {
+    opacity: 0;
+  }
+  3%,
+  10% {
+    opacity: 1;
+  }
+}
+/* The page load: the dial turns in from a blur, each stop pops into place. */
+@keyframes auth-dial-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.94) rotate(-12deg);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes auth-dial-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes auth-dial-breathe {
+  from {
+    transform: scale(0.94);
+  }
+  to {
+    transform: scale(1.04);
+  }
+}
+@keyframes auth-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

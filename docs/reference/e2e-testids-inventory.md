@@ -22,14 +22,15 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `auth-email` / `auth-email-submit` / `auth-email-code` / `auth-email-verify` | Email OTP flow                                           | AuthEmailPanel                                       |
 | `auth-email-resend` / `auth-email-resend-countdown` / `auth-email-change`    | Resend link, timer, change email                         | AuthEmailPanel                                       |
 | `mfa-form` / `mfa-code` / `mfa-submit`                                       | MFA                                                      | `MfaForm.tsx`                                        |
-| `public-frame-controls`                                                      | Signed-out canvas header: the controls (language, theme) | `shared/components/PublicFrame/`                     |
-| `auth-showcase-hero` / `auth-showcase` / `auth-showcase-privacy`             | Sign-in showcase: hero, board, privacy line              | `shared/layouts/AuthLayout/components/AuthShowcase/` |
-| `auth-showcase-journey` / `auth-showcase-moments` / `auth-showcase-values`   | Showcase board: journey, moments, reasons                | AuthShowcase                                         |
+| `public-frame-controls`                                                      | Signed-out canvas header: the controls (language, theme) | `shared/layouts/AuthLayout/AuthLayout.tsx`           |
+| `auth-showcase-hero` / `auth-showcase` / `auth-showcase-privacy`             | Sign-in showcase: hero, journey dial, privacy line       | `shared/layouts/AuthLayout/components/AuthShowcase/` |
+| `auth-showcase-journey` / `auth-showcase-moments` / `auth-showcase-values`   | The dial's stops, its moment cards, the reasons          | AuthShowcase                                         |
 
-The auth shell (`AuthLayout.tsx`) is the signed-out canvas (`PublicFrame`): it keeps
-`auth-layout` and `auth-form-container`, and its logo is `brand-logo`; the card sits beside
-the sign-in showcase (`auth-showcase*`). `PublicLayout`, the organization picker and the 404
-draw the same frame without the showcase.
+The auth shell (`AuthLayout.tsx`) is the signed-out canvas — built from `PublicFrame`'s parts
+(`PublicSkipLink`, `PublicPrivacyChoices`) as a split screen from `xl`: it keeps `auth-layout`,
+`public-frame-controls` and `auth-form-container`, and its logo is `brand-logo`; the form docks
+in its own panel beside the sign-in showcase (`auth-showcase*`). `PublicLayout`, the
+organization picker and the 404 draw `PublicFrame` itself, without the showcase.
 
 **Hybrid helpers:** `tests/utils/e2e-hybrid.ts` — `expectAuthScreenReady`, `expectLoginFormReady`, `fillTestId`, `clickTestId`, label constants.
 

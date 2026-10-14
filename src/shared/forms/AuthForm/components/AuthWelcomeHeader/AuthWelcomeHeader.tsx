@@ -12,8 +12,9 @@ type AuthWelcomeHeaderProps = {
 };
 
 /**
- * Welcome copy for the unified auth entry — the sign-in card's heading in the
- * drawer title's anatomy (`PublicCardHeader`): 18px/600 over a 13px muted line.
+ * Welcome copy for the unified auth entry — the sign-in screen's heading
+ * (`PublicCardHeader` at `display` size): 24px/600, 30px from `xl`, over a
+ * 13px muted line.
  */
 export function AuthWelcomeHeader({
   className,
@@ -26,6 +27,7 @@ export function AuthWelcomeHeader({
     return (
       <PublicCardHeader
         className={className}
+        size="display"
         title={t(AUTH_KEYS.auth.verify.heading)}
         description={
           email ? (
@@ -48,6 +50,7 @@ export function AuthWelcomeHeader({
   return (
     <PublicCardHeader
       className={className}
+      size="display"
       title={t(AUTH_KEYS.auth.heading)}
       description={t(AUTH_KEYS.auth.subheading)}
     />

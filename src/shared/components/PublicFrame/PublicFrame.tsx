@@ -41,20 +41,12 @@ export function PublicFrame({
   testId,
   className,
 }: PublicFrameProps) {
-  const { t } = useTranslation(LAYOUT_NS);
-  const { t: tCommon } = useTranslation(LOCALE_NS);
-  const openPreferences = useConsentStore((s) => s.openPreferences);
   return (
     <div
       data-testid={testId}
       className="bg-canvas text-foreground flex min-h-dvh flex-col"
     >
-      <a
-        href={`#${mainId}`}
-        className="focus:bg-background focus:text-foreground sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:underline"
-      >
-        {t(LAYOUT_KEYS.a11y.skipToMain)}
-      </a>
+      <PublicSkipLink mainId={mainId} />
       <header className="flex min-h-13 flex-none items-center justify-between gap-3 px-(--room-header-pad-x) md:min-h-15">
         <BrandLogo wordmark="always" />
         {controls ? (
@@ -76,17 +68,45 @@ export function PublicFrame({
         {children}
       </main>
       <footer className="flex min-h-13 flex-none items-center justify-center px-(--room-header-pad-x) md:min-h-15">
-        <Button
-          variant="link"
-          size="xs"
-          onClick={openPreferences}
-          className="text-muted-foreground hover:text-foreground text-xs font-normal"
-          data-testid="privacy-choices"
-        >
-          {tCommon(LOCALE_KEYS.consentPrivacyChoices)}
-        </Button>
+        <PublicPrivacyChoices />
       </footer>
     </div>
+  );
+}
+
+/**
+ * The signed-out frame's skip link — hidden until focused, then the first
+ * thing on the page — to the `<main>` whose id it is given.
+ */
+export function PublicSkipLink({ mainId = 'main-content' }: { mainId?: string }) {
+  const { t } = useTranslation(LAYOUT_NS);
+  return (
+    <a
+      href={`#${mainId}`}
+      className="focus:bg-background focus:text-foreground sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:underline"
+    >
+      {t(LAYOUT_KEYS.a11y.skipToMain)}
+    </a>
+  );
+}
+
+/**
+ * claude.com's "Privacy choices" link in the signed-out frame's footer: it
+ * reopens the cookie card, so a signed-out visitor can change their answer (D12).
+ */
+export function PublicPrivacyChoices() {
+  const { t } = useTranslation(LOCALE_NS);
+  const openPreferences = useConsentStore((s) => s.openPreferences);
+  return (
+    <Button
+      variant="link"
+      size="xs"
+      onClick={openPreferences}
+      className="text-muted-foreground hover:text-foreground text-xs font-normal"
+      data-testid="privacy-choices"
+    >
+      {t(LOCALE_KEYS.consentPrivacyChoices)}
+    </Button>
   );
 }
 
@@ -124,31 +144,45 @@ export function PublicCard({ width = 'auth', className, ...props }: PublicCardPr
   );
 }
 
+/**
+ * The heading sizes: `card` is the drawer title's 18px/600; `display` is the
+ * sign-in screen's — 24px, 30px from `xl`, where the form owns a whole panel.
+ */
+const CARD_HEADER_SIZES = {
+  card: 'text-lg leading-[1.2] tracking-[-0.01em]',
+  display: 'text-2xl leading-[1.15] tracking-[-0.025em] xl:text-3xl',
+} as const;
+
 /** Props for {@link PublicCardHeader}. */
 export interface PublicCardHeaderProps {
   title: ReactNode;
   description?: ReactNode;
   /** Test id on the heading itself. */
   titleTestId?: string;
+  /** `card` (default) or `display` — the sign-in screen's larger heading. */
+  size?: keyof typeof CARD_HEADER_SIZES;
   className?: string;
 }
 
 /**
  * A public card's heading — the page's `h1` — in the drawer title's anatomy
  * (18px/600, −0.01em, line height 1.2) with the 13px muted sub line under it
- * (`preset.md` Typography).
+ * (`preset.md` Typography). The sign-in screens draw it at `display` size.
  */
 export function PublicCardHeader({
   title,
   description,
   titleTestId,
+  size = 'card',
   className,
 }: PublicCardHeaderProps) {
   return (
-    <header className={cn('flex flex-col gap-1.5', className)}>
+    <header
+      className={cn('flex flex-col gap-1.5', size === 'display' && 'gap-2', className)}
+    >
       <h1
         data-testid={titleTestId}
-        className="text-lg leading-[1.2] font-semibold tracking-[-0.01em] text-balance"
+        className={cn('font-semibold text-balance', CARD_HEADER_SIZES[size])}
       >
         {title}
       </h1>

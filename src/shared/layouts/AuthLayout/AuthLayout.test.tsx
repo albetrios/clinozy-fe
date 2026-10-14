@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { act, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -45,7 +48,7 @@ describe('AuthLayout', () => {
     expect(getByText('Form content')).toBeInTheDocument();
   });
 
-  it('is the launch canvas: the logo, the controls and one 360px card', async () => {
+  it('is the signed-out canvas: the logo, the controls, and the form in a 360px card that docks from xl', async () => {
     const { findByTestId, getByTestId } = renderWithProviders(
       <AuthLayout>
         <span>child</span>
@@ -59,18 +62,40 @@ describe('AuthLayout', () => {
       'data-testid',
       'brand-logo',
     );
-    // Theme toggle and language picker sit at the header's end.
-    expect(
-      within(getByTestId('public-frame-controls')).getByTestId('theme-toggle'),
-    ).toBeInTheDocument();
-    // The form sits in the "Signed out" card (H:515): 360px, the card slot.
+    // Theme toggle and language picker sit at the header's end — from xl, at
+    // the top of the form's panel.
+    const controls = getByTestId('public-frame-controls');
+    expect(within(controls).getByTestId('theme-toggle')).toBeInTheDocument();
+    expect(controls).toHaveClass('auth-layout-controls');
+    // The form sits in a 360px card below xl; from xl the panel is its surface
+    // (`auth-layout-card` drops the card's own chrome there).
     const card = (await findByTestId('auth-form-container')).parentElement;
-    expect(card).toHaveAttribute('data-slot', 'card');
-    expect(card).toHaveClass('max-w-90', 'rounded-xl');
+    expect(card).toHaveAttribute('data-slot', 'surface');
+    expect(card).toHaveClass('auth-layout-card', 'max-w-90', 'rounded-2xl');
     expect(within(layout).getByRole('main')).toHaveAttribute('id', 'main-content');
+    // "Privacy choices" stays in the footer, under the panel from xl.
+    expect(getByTestId('privacy-choices').closest('footer')).toHaveClass(
+      'auth-layout-footer',
+    );
   });
 
-  it('frames the card with the showcase, in the order hero → card → showcase', async () => {
+  it('docks the form in a full-height panel from xl only', () => {
+    // auth-layout.css rides the lazy chunk: the panel and the split grid exist
+    // only from xl (80rem), and the card drops its chrome there.
+    const css = readFileSync(
+      join(process.cwd(), 'src/shared/layouts/AuthLayout/auth-layout.css'),
+      'utf8',
+    );
+    expect(css).toMatch(/^\.auth-layout-panel \{\s*display: none;/m);
+    const fromXl = css.slice(css.indexOf('@media (min-width: 80rem)'));
+    expect(fromXl).toMatch(/\.auth-layout-panel \{\s*display: block;/);
+    expect(fromXl).toMatch(
+      /grid-template-columns: minmax\(0, 1fr\) auto var\(--auth-panel\);/,
+    );
+    expect(fromXl).toMatch(/\.auth-layout-card \{[^}]*box-shadow: none;/);
+  });
+
+  it('frames the card with the showcase, in the order hero → card → dial → values', async () => {
     const { findByTestId, getByTestId } = renderWithProviders(
       <AuthLayout>
         <span>child</span>
@@ -79,11 +104,13 @@ describe('AuthLayout', () => {
     const card = (await findByTestId('auth-form-container')).parentElement;
     const hero = getByTestId('auth-showcase-hero');
     const board = getByTestId('auth-showcase');
+    const values = getByTestId('auth-showcase-values');
     const follows = (first: Node, second: Node) =>
       Boolean(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING);
     // The tab order reaches the email field before anything in the showcase.
     expect(card && follows(hero, card)).toBe(true);
     expect(card && follows(card, board)).toBe(true);
+    expect(follows(board, values)).toBe(true);
     // The card stays the page's `h1`; the hero's headline is an `h2`.
     expect(within(hero).getByRole('heading', { level: 2 })).toHaveTextContent(
       'Your whole clinic, calm in one place.',
