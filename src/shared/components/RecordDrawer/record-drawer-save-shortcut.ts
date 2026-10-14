@@ -1,16 +1,22 @@
 import type { KeyboardEvent } from 'react';
 
+import { isApplePlatform } from '@/lib/apple-platform.ts';
+
 /** Marks a drawer's footer primary — the button ⌘ / Ctrl Enter presses. */
 export const DRAWER_PRIMARY_ATTRIBUTE = 'data-drawer-primary';
 
-/** The keys as `aria-keyshortcuts` names them, per platform. */
-export function saveShortcutAria(apple: boolean): string {
-  return apple ? 'Meta+Enter' : 'Control+Enter';
+/** The save keys as the primary's hint draws them and as `aria-keyshortcuts` names them. */
+export interface SaveShortcutKeys {
+  label: string;
+  aria: string;
 }
 
-/** The keys as the primary's hint draws them: "⌘ ↵" on Apple devices, "Ctrl ↵" elsewhere. */
-export function saveShortcutLabel(apple: boolean): string {
-  return apple ? '⌘ ↵' : 'Ctrl ↵';
+const APPLE_SAVE_KEYS: SaveShortcutKeys = { label: '⌘ ↵', aria: 'Meta+Enter' };
+const OTHER_SAVE_KEYS: SaveShortcutKeys = { label: 'Ctrl ↵', aria: 'Control+Enter' };
+
+/** This device's save keys: "⌘ ↵" (`Meta+Enter`) on Apple devices, "Ctrl ↵" (`Control+Enter`) elsewhere. */
+export function saveShortcutKeys(): SaveShortcutKeys {
+  return isApplePlatform() ? APPLE_SAVE_KEYS : OTHER_SAVE_KEYS;
 }
 
 /** ⌘ Enter or Ctrl Enter alone — not mid-composition, not already taken by a field inside. */

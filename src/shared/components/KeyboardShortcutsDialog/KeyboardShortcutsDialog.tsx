@@ -5,7 +5,7 @@ import {
   type DrawerContentProfile,
   RecordDrawer,
 } from '@/shared/components/RecordDrawer/index.ts';
-import { saveShortcutLabel } from '@/shared/components/RecordDrawer/record-drawer-save-shortcut.ts';
+import { saveShortcutKeys } from '@/shared/components/RecordDrawer/record-drawer-save-shortcut.ts';
 import { SettingsList, SettingsListRow } from '@/shared/components/SettingsCard/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
@@ -41,7 +41,7 @@ export function KeyboardShortcutsDialog() {
     { labelKey: sk.jumpToSection, keys: '1–9 · 0' },
     { labelKey: sk.listSearch, keys: '/' },
     { labelKey: sk.leadRows, keys: 'j · k' },
-    { labelKey: sk.saveForm, keys: saveShortcutLabel(mac) },
+    { labelKey: sk.saveForm, keys: saveShortcutKeys().label },
     { labelKey: sk.closeDialog, keys: 'Esc' },
   ];
 

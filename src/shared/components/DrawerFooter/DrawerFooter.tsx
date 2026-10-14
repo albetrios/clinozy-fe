@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isApplePlatform } from '@/lib/apple-platform.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -9,8 +8,7 @@ import {
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import {
   DRAWER_PRIMARY_ATTRIBUTE,
-  saveShortcutAria,
-  saveShortcutLabel,
+  saveShortcutKeys,
 } from '@/shared/components/RecordDrawer/record-drawer-save-shortcut.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -124,7 +122,7 @@ function PrimaryAction({
   | 'testId'
 > & { className: string }) {
   const { t } = useTranslation(RECORD_DRAWER_NS);
-  const apple = isApplePlatform();
+  const keys = saveShortcutKeys();
   const saving = saveState === 'saving';
   let label = saveLabel ?? t(RECORD_DRAWER_KEYS.save);
   if (saving) label = savingLabel ?? t(RECORD_DRAWER_KEYS.saving);
@@ -143,7 +141,7 @@ function PrimaryAction({
       data-testid={saveTestId ?? `${testId}-save`}
       // ⌘ / Ctrl Enter anywhere in the drawer presses this button (feat-write-less, D8).
       {...{ [DRAWER_PRIMARY_ATTRIBUTE]: '' }}
-      aria-keyshortcuts={saveShortcutAria(apple)}
+      aria-keyshortcuts={keys.aria}
       className={cn(className, 'px-4', saveIncomplete && 'opacity-50')}
     >
       {label}
@@ -154,7 +152,7 @@ function PrimaryAction({
         data-testid={`${testId}-save-keys`}
         className="border-primary-foreground/25 text-primary-foreground/70 ms-0.5 hidden h-4.5 items-center rounded-xs border px-1 font-sans text-[0.625rem] leading-none font-medium tracking-wide md:pointer-fine:inline-flex"
       >
-        {saveShortcutLabel(apple)}
+        {keys.label}
       </span>
     </Button>
   );
