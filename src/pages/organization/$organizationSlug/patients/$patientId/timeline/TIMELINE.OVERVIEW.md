@@ -7,8 +7,8 @@ with no header (H:4943; its title stays for screen readers). The default section
 L-46: on the canvas, the patient's records on clinozy-be in **fixed rows**, every card in a row one
 height (change-patient-overview-photos D9; container variants on the scrolling column, its
 padding inside) — Clinical the full width; **Care** (Visits · Treatments · Packages ·
-Prescriptions) one column, two from 560px of the content column, four from 1180px; Photos (two
-thirds) and Reports (one third) from 900px; Billing and Team notes side by side from 640px; a row
+Prescriptions) one column, two from 640px of the content column, four from 1180px; Photos and
+Reports, then Billing and Team notes, side by side from 640px (breakpoints the app already uses); a row
 closes up around the cards the member reads — then the **activity timeline**, the person's own
 activity. The
 **visit flow** takes its place on `?visit=open` while the patient has an open visit (L-49, D18).

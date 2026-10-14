@@ -30,7 +30,7 @@ describe('PhotoUploadZone', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('shows the touch-only Take photo through a coarse-pointer class', () => {
+  it('offers Take photo below md only — a phone or a tablet held upright', () => {
     render(
       <PhotoUploadZone
         variant="strip"
@@ -39,9 +39,7 @@ describe('PhotoUploadZone', () => {
         onCamera={vi.fn()}
       />,
     );
-    expect(screen.getByTestId('patient-photos-take').className).toContain(
-      '[@media(pointer:coarse)]:inline-flex',
-    );
+    expect(screen.getByTestId('patient-photos-take').className).toContain('md:hidden');
   });
 
   it('turns the empty album into the drop zone', async () => {

@@ -45,7 +45,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
   album only (G4).
 - **Grid** (`components/PhotoGrid/`): a group per day, named by the rooms' one time rule
   (`useAppClock().day`: "Today", "Yesterday", "Mon", "24 Sep") with its visit's service, square
-  tiles at 110 / 160 / 230px with the body-part and stage pills, a check circle at the top end
+  tiles at 112 / 160 / 224px with the body-part and stage pills, a check circle at the top end
   and the caption bar (always shown; Edit and Delete at M and L). The groups flow side by side
   and wrap, each only as wide as its photos, so single-photo visits share a row
   (change-patient-overview-photos). The design's "3 photos · …" per day goes (a day can run across
@@ -55,7 +55,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 - **Paging:** a page of 12, then "Load more · 4 left" reads the next page.
 - **Upload** (change-patient-overview-photos): for a member who uploads, the strip above the
   grid (`components/PhotoUploadZone/`) — "Drop photos here", "or paste a copied image · JPG or PNG
-  up to 10 MB · Adds to General", "Choose photos" and, on a touch device, "Take photo" (the
+  up to 10 MB · Adds to General", "Choose photos" and, below `md` (a phone, a tablet held upright), "Take photo" (the
   camera input, `capture="environment"`). Files dropped on the section (the dashed outline 8px
   inside and the veil "Drop to add to General", `../shared/hooks/usePhotoDrop/`), an image pasted
   on it outside a field and a dialog (`../shared/hooks/usePhotoPaste/`), "Upload images" and the

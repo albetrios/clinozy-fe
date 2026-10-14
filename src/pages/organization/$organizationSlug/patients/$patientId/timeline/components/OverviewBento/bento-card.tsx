@@ -244,7 +244,7 @@ function BentoEmpty({
     </>
   );
   const look =
-    'border-border-strong flex min-h-24 flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-5 text-center';
+    'border-border-strong flex min-h-16 flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-4 text-center';
   if (!action) {
     return (
       <div data-testid={testId} data-slot="bento-empty" className={look}>

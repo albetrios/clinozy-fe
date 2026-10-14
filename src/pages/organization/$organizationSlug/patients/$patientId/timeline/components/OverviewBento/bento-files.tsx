@@ -76,7 +76,7 @@ function PhotosDropZone({ onClick, testId }: { onClick: () => void; testId: stri
       type="button"
       onClick={onClick}
       data-testid={testId}
-      className="border-border-strong hover:border-muted-foreground hover:bg-canvas flex min-h-32 flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-6 text-center transition-colors"
+      className="border-border-strong hover:border-muted-foreground hover:bg-canvas flex min-h-30 flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-6 text-center transition-colors"
     >
       <span
         aria-hidden="true"
@@ -135,8 +135,8 @@ export function PhotosBentoCard({
       {...drop.handlers}
       data-dropping={drop.over || undefined}
       className={cn(
-        'h-full min-w-0 rounded-xl outline-2 -outline-offset-2 transition-[outline-color]',
-        drop.over ? 'outline-primary outline-dashed' : 'outline-transparent',
+        'h-full min-w-0 rounded-xl transition-shadow',
+        drop.over && 'ring-primary ring-2',
         className,
       )}
     >

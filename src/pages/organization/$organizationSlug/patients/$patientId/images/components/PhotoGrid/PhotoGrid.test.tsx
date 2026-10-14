@@ -118,7 +118,11 @@ describe('PhotoGrid', () => {
     const { onOpen } = renderGrid({
       selection: { active: false, ids: new Set(), full: false, onToggle },
     });
-    await user.click(screen.getByRole('button', { name: 'Select IMG_5100' }));
+    const [check] = screen.getAllByTestId('patient-photo-check');
+    // The pointer's shortcut: no second "Select …" for the keyboard or a screen reader.
+    expect(check).toHaveAttribute('aria-hidden', 'true');
+    expect(check).toHaveAttribute('tabindex', '-1');
+    await user.click(check!);
     expect(onToggle).toHaveBeenCalledWith(expect.objectContaining({ id: 'pimg_a' }));
     await user.click(screen.getByRole('button', { name: 'Open IMG_5100' }));
     expect(onOpen).toHaveBeenCalled();

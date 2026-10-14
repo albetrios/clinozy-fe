@@ -26,7 +26,7 @@ export interface PhotoUploadZoneProps {
   onCamera: () => void;
 }
 
-/** "Take photo" (a coarse pointer only) and "Choose photos". */
+/** "Take photo" (below `md` — a phone, a tablet held upright) and "Choose photos". */
 function ZoneButtons({
   onChoose,
   onCamera,
@@ -44,7 +44,7 @@ function ZoneButtons({
         variant="outline"
         onClick={onCamera}
         data-testid={PHOTO_UPLOAD_ZONE_TEST_IDS.camera}
-        className="bg-card hidden gap-1.5 shadow-none [@media(pointer:coarse)]:inline-flex"
+        className="bg-card gap-1.5 shadow-none md:hidden"
       >
         <Camera aria-hidden="true" className="size-4" />
         {t(K.dropzone.camera)}
@@ -67,7 +67,7 @@ function ZoneButtons({
  * The Photos section's upload, always in view for a member who uploads
  * (change-patient-overview-photos `BRIEF.md:23–29`): the **strip** above the
  * grid — the blush tile, "Drop photos here", "or paste a copied image · JPG or
- * PNG up to 10 MB · Adds to General", "Take photo" on a touch device and
+ * PNG up to 10 MB · Adds to General", "Take photo" below `md` and
  * "Choose photos" — and, for an empty album, the **empty** zone: the Photos art,
  * "No photos in General yet", the same line and the buttons, centred in a dashed
  * frame. The section itself takes the drop and the paste; this says so.
@@ -85,13 +85,13 @@ export function PhotoUploadZone({
       <section
         aria-label={t(K.empty.title, { album })}
         data-testid={PHOTO_UPLOAD_ZONE_TEST_IDS.empty}
-        className="border-border-strong flex min-h-80 flex-1 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center"
+        className="border-border-strong flex min-h-[50vh] flex-1 flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-12 text-center"
       >
         <EmptyStateArt tone="blush" icon={<Camera />} size="room" />
         <h3 className="text-foreground text-base font-semibold text-balance">
           {t(K.empty.title, { album })}
         </h3>
-        <p className="text-muted-foreground max-w-96 text-sm text-pretty">
+        <p className="text-muted-foreground max-w-90 text-sm text-pretty">
           {t(K.dropzone.title)} · {line}
         </p>
         <ZoneButtons onChoose={onChoose} onCamera={onCamera} primary />
@@ -114,7 +114,7 @@ export function PhotoUploadZone({
       >
         <ImagePlus className="size-4.5" />
       </span>
-      <span className="flex min-w-0 flex-1 basis-48 flex-col gap-0.5">
+      <span className="flex min-w-40 flex-1 flex-col gap-0.5">
         <span className="text-body font-semibold">{t(K.dropzone.title)}</span>
         <span className="text-muted-foreground text-xs text-pretty">{line}</span>
       </span>

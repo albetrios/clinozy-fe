@@ -45,9 +45,9 @@ import { useSmartNote } from './use-smart-note.ts';
  */
 const CARE_ROW: Readonly<Record<number, string>> = {
   1: 'grid-cols-1',
-  2: 'grid-cols-1 @min-[560px]:grid-cols-2',
-  3: 'grid-cols-1 @min-[760px]:grid-cols-3',
-  4: 'grid-cols-1 @min-[560px]:grid-cols-2 @min-[1180px]:grid-cols-4',
+  2: 'grid-cols-1 @min-[640px]:grid-cols-2',
+  3: 'grid-cols-1 @min-[1100px]:grid-cols-3',
+  4: 'grid-cols-1 @min-[640px]:grid-cols-2 @min-[1180px]:grid-cols-4',
 };
 const PAIR_ROW: Readonly<Record<number, string>> = {
   1: 'grid-cols-1',
@@ -165,9 +165,8 @@ function CareRow({ links }: { links: BentoLinks }) {
   );
 }
 
-/** Photos (two thirds) and Reports (one third) from 900px. */
+/** Photos and Reports side by side from 640px. */
 function FilesRow({ links }: { links: BentoLinks }) {
-  const reports = links.shows('reports');
   const cells = [
     links.shows('images') ? (
       <PhotosBentoCard
@@ -175,10 +174,9 @@ function FilesRow({ links }: { links: BentoLinks }) {
         onOpen={links.open('images')}
         onUpload={links.run('photo')}
         onAlbum={links.openAlbum}
-        className={reports ? '@min-[900px]:col-span-2' : undefined}
       />
     ) : null,
-    reports ? (
+    links.shows('reports') ? (
       <ReportsBentoCard
         key="reports"
         onOpen={links.open('reports')}
@@ -187,13 +185,7 @@ function FilesRow({ links }: { links: BentoLinks }) {
     ) : null,
   ].filter(Boolean);
   return (
-    <OverviewRow
-      name="files"
-      cells={cells}
-      className={
-        cells.length === 2 ? 'grid-cols-1 @min-[900px]:grid-cols-3' : 'grid-cols-1'
-      }
-    />
+    <OverviewRow name="files" cells={cells} className={PAIR_ROW[cells.length] ?? ''} />
   );
 }
 
@@ -224,9 +216,9 @@ function MoneyRow({ links }: { links: BentoLinks }) {
  * in fixed rows (change-patient-overview-photos D9) — every card in a row one
  * height, so nothing leaves a hole: Clinical (with the smart note) the full
  * width; Care — Visits, Treatments, Packages, Prescriptions — one column, two
- * from 560px of the content column, four from 1180px; Photos (two thirds) and
- * Reports (one third) from 900px; Billing and Team notes side by side from
- * 640px. A card shows only for a member whose codes read it (its section's —
+ * from 640px of the content column, four from 1180px; Photos and Reports, then
+ * Billing and Team notes, side by side from 640px. The breakpoints are ones the
+ * app already uses, so the rows add almost nothing to the first-paint CSS. A card shows only for a member whose codes read it (its section's —
  * billing view for Billing — `contact_activity:read` for Team notes), so no
  * read is refused, and a row closes up around the cards it has; each opens its
  * section and adds its record through the file's Add-to-record items, for the

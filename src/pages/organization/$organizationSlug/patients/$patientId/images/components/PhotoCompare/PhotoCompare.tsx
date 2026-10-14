@@ -147,7 +147,7 @@ function ComparePanel({
     <figure
       data-testid={PHOTO_COMPARE_TEST_IDS.panel}
       data-photo={photo.id}
-      className="bg-overlay border-canvas/12 @container relative m-0 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border"
+      className="bg-overlay/94 border-canvas/20 @container relative m-0 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border"
     >
       <div
         {...zoom.stage}
@@ -178,11 +178,11 @@ function ComparePanel({
         </div>
         <span
           data-slot="pill"
-          className="bg-overlay/70 text-canvas pointer-events-none absolute start-2 top-2 flex h-6 items-center gap-1.5 rounded-full ps-1 pe-2.5 text-xs font-semibold backdrop-blur-sm"
+          className="bg-overlay/60 text-canvas pointer-events-none absolute start-2 top-2 flex h-6 items-center gap-1.5 rounded-full ps-1 pe-2.5 text-xs font-semibold backdrop-blur-sm"
         >
           <span
             data-slot="pill"
-            className="bg-canvas text-foreground flex size-4.5 items-center justify-center rounded-full text-[0.6875rem] tabular-nums"
+            className="bg-canvas text-foreground text-tiny flex size-4.5 items-center justify-center rounded-full tabular-nums"
           >
             {index + 1}
           </span>
@@ -196,13 +196,13 @@ function ComparePanel({
             title={t(K.compare.remove, { name })}
             data-testid={PHOTO_COMPARE_TEST_IDS.remove}
             data-slot="pill"
-            className="bg-overlay/70 text-canvas hover:bg-destructive absolute end-2 top-2 flex size-7 items-center justify-center rounded-full backdrop-blur-sm transition-colors"
+            className="bg-overlay/60 text-canvas hover:bg-destructive absolute end-2 top-2 flex size-7 items-center justify-center rounded-full backdrop-blur-sm transition-colors"
           >
             <X aria-hidden="true" className="size-3.5" />
           </button>
         ) : null}
       </div>
-      <figcaption className="border-canvas/12 flex min-w-0 items-center gap-1.5 border-t px-3 py-2">
+      <figcaption className="border-canvas/20 flex min-w-0 items-center gap-1.5 border-t px-3 py-2">
         <span className="min-w-0 flex-1 truncate text-sm font-semibold" title={name}>
           {name}
         </span>
@@ -218,7 +218,7 @@ function ComparePanel({
         ) : null}
         <span
           data-testid={PHOTO_COMPARE_TEST_IDS.since}
-          className="text-canvas/75 flex-none text-xs font-semibold whitespace-nowrap tabular-nums"
+          className="text-canvas/80 flex-none text-xs font-semibold whitespace-nowrap tabular-nums"
         >
           {index === 0 ? t(K.compare.start) : t(K.compare.since, { count: days })}
         </span>
@@ -300,7 +300,7 @@ export function PhotoCompare({ ids, dayLabel, onRemove, onClose }: PhotoCompareP
           }}
           onPointerDownOutside={(event) => event.preventDefault()}
           onKeyDown={onKeyDown}
-          className="bg-overlay/98 text-canvas animate-fade fixed inset-0 z-[96] grid grid-rows-[3.5rem_minmax(0,1fr)] outline-none md:grid-rows-[3.5rem_minmax(0,1fr)_3rem]"
+          className="bg-overlay/94 text-canvas animate-fade fixed inset-0 z-[96] grid grid-rows-[3.5rem_minmax(0,1fr)] outline-none md:grid-rows-[3.5rem_minmax(0,1fr)_3rem]"
         >
           <div className="bg-overlay/60 flex min-w-0 items-center gap-3 px-4">
             <span className="flex min-w-0 flex-col gap-0.5">
@@ -334,7 +334,7 @@ export function PhotoCompare({ ids, dayLabel, onRemove, onClose }: PhotoCompareP
               <X aria-hidden="true" className="size-5" />
             </PhotoRoundButton>
           </div>
-          <div className="min-h-0 p-2 md:p-4">
+          <div className="min-h-0 p-3">
             <div
               data-testid={PHOTO_COMPARE_TEST_IDS.stage}
               data-columns={columns}

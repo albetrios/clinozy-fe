@@ -142,11 +142,12 @@ function TileBar({
 }
 
 /**
- * A tile's check circle at the top end (24px): it picks the photo. Over a photo
- * it shows on hover and focus where hover exists, and always while selecting —
- * filled with the primary and a tick once picked. While selecting the tile
- * itself picks, so the circle is only its mark for the pointer: out of the tab
- * order and hidden from assistive tech, never a second "Select …".
+ * A tile's check circle at the top end (24px): it picks the photo with one
+ * tap. Where hover exists it shows on hover, and always while selecting or on
+ * a touch screen — filled with the primary and a tick once picked. It is the
+ * pointer's shortcut only: out of the tab order and hidden from assistive
+ * tech, so a keyboard and a screen reader pick through "Select" and the tile
+ * itself — never a second "Select …".
  */
 function TileCheck({
   photo,
@@ -155,29 +156,27 @@ function TileCheck({
   photo: PatientPhoto;
   selection: PhotoGridSelection;
 }) {
-  const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const picked = selection.ids.has(photo.id);
   return (
     <button
       type="button"
       onClick={() => selection.onToggle(photo)}
-      aria-label={t(K.select.toggle, { name: photoName(photo) })}
-      aria-pressed={picked}
-      aria-hidden={selection.active || undefined}
-      tabIndex={selection.active ? -1 : undefined}
+      aria-hidden="true"
+      tabIndex={-1}
+      data-picked={picked || undefined}
       data-testid={PHOTO_GRID_TEST_IDS.check}
       data-slot="pill"
       className={cn(
         'absolute end-1.5 top-1.5 z-1 flex size-6 items-center justify-center rounded-full border-2 transition-[opacity,background-color,border-color]',
         picked
           ? 'bg-primary border-primary text-primary-foreground'
-          : 'border-canvas bg-overlay/25 hover:bg-overlay/45 text-transparent',
+          : 'border-canvas bg-overlay/35',
         !picked && selection.full && 'opacity-50',
         !selection.active &&
-          '[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within/tile:opacity-100 [@media(hover:hover)]:group-hover/tile:opacity-100 [@media(hover:none)]:hidden',
+          '[@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/tile:opacity-100',
       )}
     >
-      <Check aria-hidden="true" className="size-3.5" strokeWidth={3} />
+      {picked ? <Check className="size-3.5" strokeWidth={3} /> : null}
     </button>
   );
 }
@@ -187,7 +186,7 @@ function TilePills({ photo }: { photo: PatientPhoto }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   if (photo.bodyPart === null && photo.stage === null) return null;
   return (
-    <span className="pointer-events-none absolute start-1.5 end-9 top-1.5 flex flex-wrap gap-1">
+    <span className="pointer-events-none absolute start-1.5 end-8 top-1.5 flex flex-wrap gap-1">
       {photo.bodyPart ? (
         <TilePill tone={PHOTO_BODY_PART_TONES[photo.bodyPart]}>
           {t(K.bodyParts[photo.bodyPart])}
@@ -242,12 +241,9 @@ function PhotoTile({
         }
         aria-label={selecting ? t(K.select.toggle, { name }) : t(K.tile.open, { name })}
         aria-pressed={selecting ? picked : undefined}
-        className={cn(
-          'absolute inset-0 size-full transition-transform duration-150',
-          picked && 'scale-[0.94]',
-        )}
+        className="absolute inset-0 size-full"
       >
-        <PhotoThumb src={photo.fileUrl} className={cn(picked && 'rounded-md')} />
+        <PhotoThumb src={photo.fileUrl} />
       </button>
       <TilePills photo={photo} />
       {selection ? <TileCheck photo={photo} selection={selection} /> : null}
@@ -290,7 +286,7 @@ export function PhotoGrid({
   return (
     <div
       data-selecting={selection?.active || undefined}
-      className="flex flex-wrap items-start gap-x-6 gap-y-4"
+      className="flex flex-wrap items-start gap-x-4 gap-y-3"
     >
       {days.map((day) => {
         const date = dayLabel(day.date);

@@ -247,11 +247,11 @@ function DropVeil({ album }: { album: string }) {
     <div
       aria-hidden="true"
       data-testid={IDS.veil}
-      className="bg-canvas/80 pointer-events-none absolute inset-2 z-20 flex justify-center rounded-xl backdrop-blur-[2px]"
+      className="bg-overlay/35 pointer-events-none absolute inset-0 z-10 flex justify-center backdrop-blur-sm"
     >
       <span
         data-slot="pill"
-        className="bg-primary text-primary-foreground sticky top-[40%] mt-[20vh] flex h-11 items-center gap-2 self-start rounded-full px-5 text-sm font-semibold shadow-(--elevation-fab)"
+        className="bg-primary text-primary-foreground sticky top-1/2 mt-10 flex h-11 items-center gap-2 self-start rounded-full px-5 text-sm font-semibold shadow-(--elevation-fab)"
       >
         <ImagePlus className="size-4.5" />
         {t(K.dropzone.veil, { album })}

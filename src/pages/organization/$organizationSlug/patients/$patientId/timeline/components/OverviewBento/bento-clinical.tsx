@@ -28,13 +28,13 @@ const SMART_NOTE_MAX = 300;
 /**
  * The four lists as panels (change-patient-overview-photos D9): each its dot,
  * its name and its count over its chips — a chip wraps to two lines rather
- * than being cut to one — or "Nothing added yet". One column, two from 480px
- * of the content column, four from 860px.
+ * than being cut to one — or "Nothing added yet". One column, two from 640px
+ * of the content column, four from 1180px.
  */
 function ClinicalGroups({ lists }: { lists: ClinicalLists }) {
   const { t } = useTranslation(TIMELINE_NS);
   return (
-    <div className="grid grid-cols-1 gap-2 @min-[480px]:grid-cols-2 @min-[860px]:grid-cols-4">
+    <div className="grid grid-cols-1 gap-2 @min-[640px]:grid-cols-2 @min-[1180px]:grid-cols-4">
       {CLINICAL_LISTS.map(({ field, tone }) => {
         const items = lists.items(field);
         return (

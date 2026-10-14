@@ -149,7 +149,7 @@ export const ChevronsRight: AppIcon = LuChevronsRight;
 export const ChevronsUpDown: AppIcon = LuChevronsUpDown;
 /** Lucide `clipboard-list`: reports, stock checks and the clinic setup ("Finish setup"). */
 export const ClipboardList: AppIcon = LuClipboardList;
-/** Lucide `columns-3`: side by side — the photo comparison and its one-row layout. */
+/** Lucide `columns` (three of them): side by side — the photo comparison and its one-row layout. */
 export const Columns: AppIcon = LuColumns;
 /** Lucide `clock`: planned and time-bound items. */
 export const Clock: AppIcon = LuClock;
