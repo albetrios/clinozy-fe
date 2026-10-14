@@ -723,7 +723,9 @@
     "updated": "経過確認を更新しました",
     "record": "経過確認",
     "noScore": "患者さん自身の評価を選んでください",
-    "offeringsPlanned": "提案に追加済み"
+    "offeringsPlanned": "提案に追加済み",
+    "useAdvised": "前回のアドバイスを使う",
+    "samePlan": "前回と同じプラン"
   },
   "review": {
     "title": "レビューを記録",

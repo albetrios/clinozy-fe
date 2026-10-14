@@ -757,7 +757,9 @@
     "updated": "Seguimiento actualizado",
     "record": "Seguimiento",
     "noScore": "Elige la puntuación del paciente",
-    "offeringsPlanned": "Añadido a las sugerencias"
+    "offeringsPlanned": "Añadido a las sugerencias",
+    "useAdvised": "Usar el plan recomendado",
+    "samePlan": "Mismo plan que la última vez"
   },
   "review": {
     "title": "Registrar una reseña",

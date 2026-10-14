@@ -1472,5 +1472,10 @@
     "denied": "El micrófono está bloqueado. Permítelo en el navegador para dictar.",
     "noSpeech": "No te he entendido: toca el micrófono e inténtalo de nuevo.",
     "unavailable": "La entrada por voz no está disponible ahora. Puedes escribir."
+  },
+  "pinPlace": {
+    "hint": "Rellena la zona, la ciudad y el estado",
+    "unknown": "No conocemos este código postal — escribe la zona, la ciudad y el estado.",
+    "areaPick": "Elige tu zona"
   }
 }

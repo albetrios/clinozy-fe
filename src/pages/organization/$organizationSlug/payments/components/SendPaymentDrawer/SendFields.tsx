@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { EXPENSE_CATEGORY_VALUES } from '@/shared/api/app/app-schema.ts';
 import {
   EXPENSE_MODE_VALUES,
+  type LedgerListParams,
   type OpenSupplierBill,
   supplierBillKey,
 } from '@/shared/api/app/payments-contracts.ts';
@@ -24,6 +25,7 @@ import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useLedgerList } from '@/shared/hooks/usePayments/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
@@ -31,7 +33,7 @@ import {
   ageTone,
   AMOUNT_QUICK,
   amountText,
-  PAID_TO_QUICK,
+  paidToQuick,
   type SendFormValues,
 } from './send-form.ts';
 import { useBillAge, useBillLabel } from './send-wording.ts';
@@ -43,6 +45,9 @@ const LIMITS = { payee: 120, note: 280, money: 9 } as const;
 
 /** The key "Other spend" holds in the bill picker. */
 const OTHER_SPEND = 'other';
+
+/** The ledger read "Paid to" learns its payees from: the clinic's expenses, newest first. */
+const RECENT_EXPENSES: LedgerListParams = { kind: ['expense'] };
 
 /** Everything the step bodies read. */
 export interface SendFieldsProps {
@@ -235,7 +240,10 @@ export function SendExpenseFields({
   const field = useDrawerFieldIds(form, idPrefix);
   const payee = field('payeeName');
   const note = field('note');
-  const quick = [...PAID_TO_QUICK, t(K.electricity)];
+  // The clinic's own recent payees (its expenses' first page), quietly — a failed read leaves
+  // "Electricity" alone (feat-write-less, D14).
+  const recent = useLedgerList(RECENT_EXPENSES, !readOnly);
+  const quick = paidToQuick(recent.rows, t(K.electricity));
   return (
     <DrawerFieldGrid>
       {values.bill ? (

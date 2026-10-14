@@ -251,12 +251,12 @@ function TextSuggestionChips({
           key={suggestion.id}
           type="button"
           title={suggestion.text}
-          data-slot="pill"
           data-testid={testId ? `${testId}-suggestion-${suggestion.id}` : undefined}
           onClick={() => {
             onPick(suggestion.text);
             setUsed((current) => new Set(current).add(suggestion.id));
           }}
+          data-slot="pill"
           className="text-foreground hover:bg-muted bg-background inline-flex h-6 max-w-full min-w-0 items-center gap-1 rounded-full border border-dashed px-2.5 text-xs font-medium transition-colors"
         >
           <Zap aria-hidden="true" className="size-3 flex-none" />

@@ -1472,5 +1472,10 @@
     "denied": "Le micro est bloqué. Autorisez-le dans le navigateur pour dicter.",
     "noSpeech": "Je n'ai pas compris — touchez le micro et réessayez.",
     "unavailable": "La saisie vocale n'est pas disponible pour le moment. Vous pouvez écrire."
+  },
+  "pinPlace": {
+    "hint": "Remplit le quartier, la ville et l’État",
+    "unknown": "Code postal inconnu — saisissez le quartier, la ville et l’État.",
+    "areaPick": "Choisissez votre quartier"
   }
 }

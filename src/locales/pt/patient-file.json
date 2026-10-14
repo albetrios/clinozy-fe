@@ -757,7 +757,9 @@
     "updated": "Acompanhamento atualizado",
     "record": "Acompanhamento",
     "noScore": "Escolha a nota do paciente",
-    "offeringsPlanned": "Adicionado às sugestões"
+    "offeringsPlanned": "Adicionado às sugestões",
+    "useAdvised": "Usar o plano recomendado",
+    "samePlan": "Mesmo plano da última vez"
   },
   "review": {
     "title": "Registrar uma avaliação",

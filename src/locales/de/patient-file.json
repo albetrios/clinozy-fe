@@ -740,7 +740,9 @@
     "updated": "Check-in aktualisiert",
     "record": "Check-in",
     "noScore": "Wählen Sie die Bewertung des Patienten",
-    "offeringsPlanned": "Zu den Angebotsvorschlägen hinzugefügt"
+    "offeringsPlanned": "Zu den Angebotsvorschlägen hinzugefügt",
+    "useAdvised": "Empfohlenen Plan übernehmen",
+    "samePlan": "Gleicher Plan wie beim letzten Mal"
   },
   "review": {
     "title": "Bewertung erfassen",

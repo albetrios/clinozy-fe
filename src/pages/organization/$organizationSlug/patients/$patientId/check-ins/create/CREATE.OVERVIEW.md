@@ -6,7 +6,9 @@ names none, as the schema has it — taken from the file's sections module
 (`../../patient-id.sections.ts`) through `../../shared/hooks/usePatientFileDialog/`, and the
 family-shared check-in drawer over it (`../../shared/components/CheckInDrawer/`): an aftercare
 check-in when `?treatment=` names the treatment it follows, tied to the visit `?appointment=`
-names. Saving or closing goes back to that section. The params are parsed by
+names. When the patient's previous check-in advised a plan, "Details" offers "Use the advised plan"
+and "Next plan" offers "Same plan as last time" — chips that write it in (`DrawerTextarea`
+`suggestions`, feat-write-less, D12). Saving or closing goes back to that section. The params are parsed by
 `validatePatientFeedbackSearch` in `../../patient-id.dialog-search.ts`.
 
 Data: clinozy-be — the drawer saves with `POST /app/patients/{patient_id}/check-ins`

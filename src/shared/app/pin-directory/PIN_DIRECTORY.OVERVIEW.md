@@ -5,7 +5,10 @@ the areas its post offices serve. The clinic setup's "Where is your clinic?" ste
 city and state from it the moment the sixth digit is typed (iteration
 `feat-clinic-setup-2026-10-13-sltd`, decision D27, KICKOFF §6.4) — no outside service, no cost,
 offline once loaded. An unknown PIN fills nothing and blocks nothing; every filled field stays
-editable.
+editable. Since `feat-write-less-2026-10-14-oixr` (D13) Users › Branches fills a branch's place the
+same way: both screens look the PIN up through `usePinPlace` (`src/shared/hooks/usePinPlace/` — a
+slower answer for an earlier PIN never overwrites a later one) and draw the unknown-PIN line and the
+area chips with `PinAreaChips` (`src/shared/components/PinAreaChips/`, copy in `app` › `pinPlace`).
 
 ## Files
 

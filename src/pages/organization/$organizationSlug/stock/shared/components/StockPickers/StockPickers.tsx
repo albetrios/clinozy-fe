@@ -17,6 +17,11 @@ import { fromMilli } from '../../stock-units.ts';
 
 const K = STOCK_DRAWER_KEYS.pickers;
 
+/** The vendor picker's Recent picks on the member's preferences (feat-write-less, D11). */
+const STOCK_VENDOR_RECENT_KEY = 'stock:vendor';
+
+/** The item picker's Recent picks on the member's preferences (feat-write-less, D11). */
+const STOCK_ITEM_RECENT_KEY = 'stock:item';
 /** The catalogue's rows, then what was just created that it does not list yet. */
 function withAdded<T extends { id: string }>(rows: readonly T[], added: readonly T[]) {
   const known = new Set(rows.map((row) => row.id));
@@ -77,6 +82,7 @@ export function StockVendorPicker({
       placeholder={t(K.searchVendors)}
       searchPlaceholder={t(K.searchVendors)}
       searchable
+      recentKey={STOCK_VENDOR_RECENT_KEY}
       size={size}
       onCreateFull={
         openChild
@@ -140,6 +146,7 @@ export function StockItemPicker({
       onChange={(id) => onChange(id)}
       placeholder={t(K.selectItem)}
       searchable
+      recentKey={STOCK_ITEM_RECENT_KEY}
       size={size}
       onCreateFull={
         openChild

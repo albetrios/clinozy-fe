@@ -1451,5 +1451,10 @@
     "denied": "The microphone is blocked. Allow it in your browser to dictate.",
     "noSpeech": "Didn't catch that — tap the mic and try again.",
     "unavailable": "Voice input isn't available right now. You can still type."
+  },
+  "pinPlace": {
+    "hint": "Fills in the area, city and state",
+    "unknown": "We don't know this PIN — type the area, city and state.",
+    "areaPick": "Pick your area"
   }
 }

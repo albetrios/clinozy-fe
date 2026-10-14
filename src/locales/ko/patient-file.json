@@ -723,7 +723,9 @@
     "updated": "체크인을 업데이트했습니다",
     "record": "체크인",
     "noScore": "환자 본인 점수를 선택하세요",
-    "offeringsPlanned": "제안에 추가됨"
+    "offeringsPlanned": "제안에 추가됨",
+    "useAdvised": "지난번 권장 계획 사용",
+    "samePlan": "지난번과 같은 계획"
   },
   "review": {
     "title": "리뷰 기록",

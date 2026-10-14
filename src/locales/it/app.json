@@ -1472,5 +1472,10 @@
     "denied": "Il microfono è bloccato. Consentilo nel browser per dettare.",
     "noSpeech": "Non ho capito: tocca il microfono e riprova.",
     "unavailable": "L'input vocale non è disponibile ora. Puoi comunque scrivere."
+  },
+  "pinPlace": {
+    "hint": "Compila zona, città e stato",
+    "unknown": "Non conosciamo questo CAP — inserisci zona, città e stato.",
+    "areaPick": "Scegli la tua zona"
   }
 }

@@ -757,7 +757,9 @@
     "updated": "Controllo aggiornato",
     "record": "Controllo",
     "noScore": "Scegli il voto del paziente",
-    "offeringsPlanned": "Aggiunto ai suggerimenti"
+    "offeringsPlanned": "Aggiunto ai suggerimenti",
+    "useAdvised": "Usa il piano consigliato",
+    "samePlan": "Stesso piano dell'ultima volta"
   },
   "review": {
     "title": "Registra una recensione",

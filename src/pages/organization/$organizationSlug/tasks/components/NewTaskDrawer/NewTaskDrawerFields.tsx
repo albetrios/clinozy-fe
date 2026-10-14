@@ -181,6 +181,8 @@ export function NewTaskWhenFields({
             if (key) setField(form, 'owner', key);
           }}
           searchable
+          // Who the member assigns to most opens the list (feat-write-less, D11).
+          recentKey="tasks:owner"
           invalid={Boolean(ownerField.error)}
           testId={IDS.owner}
         />

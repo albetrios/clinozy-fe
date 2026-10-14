@@ -740,7 +740,9 @@
     "updated": "Check-in updated",
     "record": "Check-in",
     "noScore": "Pick the patient’s score",
-    "offeringsPlanned": "Added to offering suggestions"
+    "offeringsPlanned": "Added to offering suggestions",
+    "useAdvised": "Use the advised plan",
+    "samePlan": "Same plan as last time"
   },
   "review": {
     "title": "Log a review",

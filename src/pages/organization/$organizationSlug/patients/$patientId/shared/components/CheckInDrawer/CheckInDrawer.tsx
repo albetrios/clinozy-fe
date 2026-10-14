@@ -159,6 +159,7 @@ export function CheckInDrawer({
         <CheckInNextFields
           form={form}
           values={values}
+          previous={context.previous}
           options={options}
           editing={record !== null}
         />

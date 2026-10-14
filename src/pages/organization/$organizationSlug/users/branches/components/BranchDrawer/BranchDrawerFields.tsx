@@ -18,7 +18,13 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { nextTimeSlot, TimePicker } from '@/shared/components/Picker/TimePicker/index.ts';
+import {
+  PIN_PLACE_KEYS,
+  PIN_PLACE_NS,
+  PinAreaChips,
+} from '@/shared/components/PinAreaChips/index.ts';
 import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
+import { usePinPlace } from '@/shared/hooks/usePinPlace/index.ts';
 
 import type { RoleDirectory } from '../../../shared/hooks/useRoleDirectory/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -113,8 +119,20 @@ export function BranchPlaceFields({
   readOnly,
 }: BranchFieldsProps) {
   const { t } = useTranslation(USERS_NS);
+  const { t: tPin } = useTranslation(PIN_PLACE_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const pin = field('pin');
+  const { place, lookUp } = usePinPlace();
+
+  /** The sixth digit fills City and State — and Area when the PIN has one (feat-write-less, D13). */
+  const fillFromPin = async (typed: string) => {
+    const found = await lookUp(typed);
+    if (!found) return;
+    form.setValue('city', found.district, { shouldDirty: true });
+    form.setValue('state', found.state, { shouldDirty: true });
+    if (found.areas.length === 1)
+      form.setValue('area', found.areas[0] ?? '', { shouldDirty: true });
+  };
 
   return (
     <DrawerStepBody readOnly={readOnly}>
@@ -210,6 +228,7 @@ export function BranchPlaceFields({
         <DrawerField
           span="third"
           label={t(K.fields.pin)}
+          hint={tPin(PIN_PLACE_KEYS.hint)}
           htmlFor={pin.id}
           required
           error={pin.error}
@@ -221,11 +240,13 @@ export function BranchPlaceFields({
               <DrawerInput
                 {...pin.control}
                 value={control.value}
-                onChange={(event) =>
-                  control.onChange(
-                    event.target.value.replace(/\D/g, '').slice(0, BRANCH_LIMITS.pin),
-                  )
-                }
+                onChange={(event) => {
+                  const typed = event.target.value
+                    .replace(/\D/g, '')
+                    .slice(0, BRANCH_LIMITS.pin);
+                  control.onChange(typed);
+                  void fillFromPin(typed);
+                }}
                 onBlur={control.onBlur}
                 inputMode="numeric"
                 aria-required="true"
@@ -248,6 +269,12 @@ export function BranchPlaceFields({
           testId={`${testId}-state`}
         />
       </DrawerFieldGrid>
+      <PinAreaChips
+        place={place}
+        area={values.area}
+        onAreaChange={(area) => form.setValue('area', area, { shouldDirty: true })}
+        testId={testId}
+      />
     </DrawerStepBody>
   );
 }

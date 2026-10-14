@@ -424,6 +424,38 @@ describe('the branch drawer — New branch (users.md:176–198)', () => {
     expect(server.branches).toHaveLength(3);
   });
 
+  it('fills City, State and a single Area from the PIN, from the bundled directory (feat-write-less)', async () => {
+    const user = userEvent.setup();
+    renderBranches('/organization/acme/users/branches/create');
+    const panel = await drawer();
+    expect(within(panel).getByTestId('branch-drawer-city')).toHaveValue('Surat');
+    // 390011 is Manjalpur, Vadodara — one area.
+    await user.type(within(panel).getByTestId('branch-drawer-pin'), '390011');
+    await waitFor(() =>
+      expect(within(panel).getByTestId('branch-drawer-city')).toHaveValue('Vadodara'),
+    );
+    expect(within(panel).getByTestId('branch-drawer-state')).toHaveValue('Gujarat');
+    expect(within(panel).getByTestId('branch-drawer-area')).toHaveValue('Manjalpur');
+    expect(within(panel).queryByTestId('branch-drawer-area-pick')).toBeNull();
+  });
+
+  it('offers a PIN’s areas as chips, and says so for a PIN it does not know', async () => {
+    const user = userEvent.setup();
+    renderBranches('/organization/acme/users/branches/create');
+    const panel = await drawer();
+    const pin = within(panel).getByTestId('branch-drawer-pin');
+    await user.type(pin, '395007');
+    await within(panel).findByTestId('branch-drawer-area-pick');
+    await user.click(within(panel).getByTestId('branch-drawer-area-pick-Piplod'));
+    expect(within(panel).getByTestId('branch-drawer-area')).toHaveValue('Piplod');
+
+    await user.clear(pin);
+    await user.type(pin, '395999');
+    expect(
+      await within(panel).findByTestId('branch-drawer-pin-unknown'),
+    ).toHaveTextContent("We don't know this PIN");
+  });
+
   it('checks a PIN code of six digits, a phone of ten and an email that reads as one', async () => {
     const user = userEvent.setup();
     renderBranches('/organization/acme/users/branches/create');

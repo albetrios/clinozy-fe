@@ -156,6 +156,22 @@ describe('Visit / Aftercare check-in (KICKOFF §6.6; S:44–45)', () => {
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
+  it('writes last time’s plan into Details and Next plan in one tap (feat-write-less)', async () => {
+    const { user, drawer } = await open();
+    await user.click(within(drawer).getByTestId(`${D}-step-followed-trigger`));
+    await user.click(
+      await within(drawer).findByTestId(`${D}-details-suggestion-advised`),
+    );
+    expect(within(drawer).getByTestId(`${D}-details`)).toHaveValue('Sunscreen every day');
+    expect(within(drawer).queryByTestId(`${D}-details-suggestion-advised`)).toBeNull();
+
+    await user.click(within(drawer).getByTestId(`${D}-step-next-trigger`));
+    const same = await within(drawer).findByTestId(`${D}-plan-suggestion-same`);
+    expect(same).toHaveTextContent('Same plan as last time');
+    await user.click(same);
+    expect(within(drawer).getByTestId(`${D}-plan`)).toHaveValue('Sunscreen every day');
+  });
+
   it('is an aftercare check-in named after the session it follows', async () => {
     const { drawer } = await open({ treatmentId: LHR });
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent(

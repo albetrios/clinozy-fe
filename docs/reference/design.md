@@ -301,6 +301,12 @@ organization" note.
 - Verify every change in **both** light and dark, at AA contrast.
 - Respect reduced-motion; keep motion fast and few.
 - Compose from shadcn/ui primitives; extend via `cn()` + `cva` variants.
+- Let the field do the work before the person types (feat-write-less-2026-10-14-oixr): build forms
+  from the shared drawer pieces, which already take speech (`DrawerTextarea`'s microphone), save on
+  ⌘ / Ctrl Enter (`RecordDrawer`), work sums out (`DrawerNumberInput`: `1500+300`, `1.5k`, `2L`),
+  read date shorthand (`DatePicker`: `2w`, `fri`), step on the arrow keys (`DrawerStepper`) and
+  remember the last picks (`Picker` `recentKey`) — and offer known text as a chip (`suggestions`)
+  instead of a placeholder the person must retype.
 
 **Don't**
 
