@@ -346,8 +346,27 @@ const config = [
      * bindings; in one chunk the minifier also inlines and mangles across them.
      * Every lazy chunk now imports those modules from the entry chunk, which is
      * loaded anyway. ~0.4 kB of headroom.
+     *
+     * 238.6 → 239.0 kB: a declared exemption, itemised — the clinic setup
+     * (iterations/feat-clinic-setup-2026-10-13-sltd, AS-BUILT row 14; for the
+     * owner's review). +0.43 kB, all in the `boot` entry chunk: 238.45 → 238.88 kB,
+     * main (fe32cd0) and the merged branch built the same way on one machine (no
+     * env file, no ambient VITE_ variables; CI measured main at 238.16 kB):
+     * - The onboarding store's version-1 migration: the wizard lost two steps,
+     *   and a half-finished onboarding must resume on the right one. The store
+     *   is read at boot.
+     * - The `setup` namespace's loader and the shell's setup keys
+     *   (`layout` › `app.setup.*`, Settings › Clinic).
+     * - The setup's eight event names in the analytics catalog — the catalog is
+     *   the one source of event names.
+     * - The route preload map naming the setup's shared chunks
+     *   (`setup-hash-grammar`, `useOnboardingSetup`): the account menu, ⌘K and
+     *   the create-action guard read the setup.
+     * Trimmed first: "Finish setup" draws the registry's `ClipboardList` instead
+     * of adding `ListChecks` to the icon set; the drawer, the guide, the starter
+     * list and the PIN directory load on demand. ~0.4 kB of headroom, as before.
      */
-    limit: '238.6 kB',
+    limit: '239.0 kB',
     gzip: true,
   },
   ...(cssPaths.length
