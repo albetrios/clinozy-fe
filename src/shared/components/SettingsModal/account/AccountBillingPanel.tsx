@@ -30,7 +30,7 @@ import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { StripePaymentForm } from '@/shared/components/StripePaymentForm/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
@@ -460,10 +460,7 @@ export function AccountBillingPanel() {
 
   return (
     <section className="flex flex-col gap-4" data-testid="settings-account-billing">
-      <SectionHeader
-        title={t(BILLING_KEYS.title)}
-        description={t(BILLING_KEYS.description)}
-      />
+      <SettingsSectionHeader section="billing" />
       {/*
         Plans on the OUTSIDE, subscription within — and the subscription boundary
         carries an `idle` fallback.
