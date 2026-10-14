@@ -30,6 +30,11 @@ Where a bare `/` lands, decided from the JWT-backed session context.
      org, a PERSONAL active org, a `personal-only` deployment — → `/organization`
      (the picker): personal workspaces have no clinic (D44), and the picker's list
      and "Create organization" lead into one.
+   - **Which org is active after a sign-in** is decided by clinozy-be, not here: the login
+     token names the clinic the person last switched to (each `/auth/switch-to-organization`
+     remembers it), else their newest clinic, and the personal workspace only when they have
+     no clinic. So a returning member's `/` goes straight to their clinic's home; nothing is
+     stored in the browser (`feat-default-clinic-at-login`).
 3. Resolver returns the redirect. The retired `/dashboard` URL redirects to `/`, so
    it resolves the same way.
 
