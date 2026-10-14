@@ -3,14 +3,72 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('../shared/medical-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listMedicalSales: vi.fn(),
+  medicalListSummary: vi.fn(),
+  fetchMedicalSale: vi.fn(),
+  listSaleReminders: vi.fn(),
+  listPrescriptionsToFill: vi.fn(),
+}));
+vi.mock('../shared/medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  collectSale: vi.fn(),
+}));
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchInvoice: vi.fn(),
+}));
+vi.mock('@/shared/api/app/medicines-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllMedicines: vi.fn(),
+}));
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchTeamDirectory: vi.fn(),
+}));
+vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  findMyMembershipId: vi.fn(),
+}));
+
+import * as branchesApi from '@/shared/api/app/branches-api.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
+import { fetchInvoice } from '@/shared/api/app/invoices-api.ts';
+import { fetchAllMedicines } from '@/shared/api/app/medicines-api.ts';
+import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import {
+  INVOICE_TEST_BRANCHES,
+  INVOICE_TEST_TEAM,
+  invoiceDetail,
+} from '@/tests/utils/invoice-doubles.ts';
+import {
+  medicalPage,
+  medicineRow,
+  paidSaleRow,
+  prescriptionToFill,
+  saleRow,
+  TEST_BUYER_CONTACT_ID,
+  TEST_BUYER_PATIENT_ID,
+  TEST_MEDICAL_AUTHOR_ID,
+  TEST_PRESCRIPTION_ID,
+  TEST_SALE_ID,
+} from '@/tests/utils/medical-doubles.ts';
+import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
 
 import {
   renderMedicalRoutes,
   resetMedicalRoutes,
 } from '../__tests__/integration/medical-test-router.tsx';
-import { fetchMedicalSale } from '../shared/medical-api.ts';
+import {
+  fetchMedicalSale,
+  listMedicalSales,
+  listPrescriptionsToFill,
+  listSaleReminders,
+  medicalListSummary,
+} from '../shared/medical-api.ts';
+import { collectSale } from '../shared/medical-records-api.ts';
 import { SalesPage } from './SalesPage.tsx';
 
 const { printMock } = vi.hoisted(() => ({ printMock: vi.fn() }));
@@ -19,22 +77,93 @@ vi.mock('@/shared/components/PrintTemplate/index.ts', async (importOriginal) => 
   printDocument: printMock,
 }));
 
-/** 10:00 on 3 Oct, clinic time. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+/** 10:00 on 10 Oct, clinic time. */
+const NOW = new Date('2026-10-10T04:30:00Z');
 const ROOM = '/organization/acme/medical/sales';
+const PAID_ID = 'msal_sale98300000000000000';
+const RETURNED_ID = 'msal_sale97100000000000000';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+
+/** #978 to Priya Shah, unpaid; #983 to Rhea Shah, paid in full; #971 to Meera Joshi, partly returned. */
+const UNPAID = saleRow();
+const PAID = paidSaleRow({
+  id: PAID_ID,
+  seq: 983,
+  customer: {
+    id: 'con_rhea00000000000000000',
+    name: 'Rhea Shah',
+    phone: '+919825044120',
+    patientId: 'pat_rhea00000000000000000',
+  },
+});
+const RETURNED = paidSaleRow({
+  id: RETURNED_ID,
+  seq: 971,
+  status: 'returned',
+  returned: 650,
+  customer: {
+    id: 'con_meera0000000000000000',
+    name: 'Meera Joshi',
+    phone: null,
+    patientId: null,
+  },
+});
+const SALES = [PAID, UNPAID, RETURNED];
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   printMock.mockReset();
-  resetAppFixtures();
+  signInTestMember();
+  vi.mocked(listMedicalSales).mockResolvedValue(medicalPage(SALES));
+  vi.mocked(medicalListSummary).mockResolvedValue({ total: 3, payable: 0 });
+  vi.mocked(fetchMedicalSale).mockImplementation(async (id) => {
+    const sale = SALES.find((row) => row.id === id);
+    if (!sale) throw new Error(`no sale ${id}`);
+    return sale;
+  });
+  vi.mocked(listPrescriptionsToFill).mockResolvedValue([prescriptionToFill()]);
+  vi.mocked(listSaleReminders).mockResolvedValue({
+    clinicName: 'Cresence Skin',
+    customers: [
+      {
+        customer: {
+          id: TEST_BUYER_CONTACT_ID,
+          name: 'Priya Shah',
+          phone: '+919900011122',
+          patientId: TEST_BUYER_PATIENT_ID,
+        },
+        due: 1300,
+        sales: [{ id: TEST_SALE_ID, seq: 978, due: 1300, soldAt: UNPAID.soldAt }],
+      },
+    ],
+  });
+  vi.mocked(collectSale).mockResolvedValue(ledgerRow({ amount: 1300 }));
+  vi.mocked(fetchInvoice).mockResolvedValue(invoiceDetail());
+  vi.mocked(fetchAllMedicines).mockResolvedValue([medicineRow()]);
+  vi.mocked(fetchTeamDirectory).mockResolvedValue(INVOICE_TEST_TEAM);
+  vi.mocked(findMyMembershipId).mockResolvedValue(TEST_MEDICAL_AUTHOR_ID);
+  vi.spyOn(branchesApi, 'fetchActiveBranches').mockResolvedValue(INVOICE_TEST_BRANCHES);
 });
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
   resetMedicalRoutes();
-  resetAppFixtures();
+  for (const fn of [
+    listMedicalSales,
+    medicalListSummary,
+    fetchMedicalSale,
+    listPrescriptionsToFill,
+    listSaleReminders,
+    collectSale,
+    fetchInvoice,
+    fetchAllMedicines,
+    fetchTeamDirectory,
+    findMyMembershipId,
+  ]) {
+    vi.mocked(fn).mockReset();
+  }
 });
 
 /** The Sales tab at `url`, its rows loaded. */
@@ -45,6 +174,15 @@ async function renderSales(url = ROOM, role?: 'admin' | 'pharmacist' | 'accounta
   );
   return view;
 }
+
+/** The row of the sale to `name`. */
+const rowOf = (name: string) => {
+  const row = screen
+    .getAllByTestId('medical-sales-table-row')
+    .find((candidate) => candidate.textContent?.includes(name));
+  if (!row) throw new Error(`no row for ${name}`);
+  return within(row);
+};
 
 describe('SalesPage', () => {
   it('lists the tab under the Medical toolbar, ending with "All sales loaded"', async () => {
@@ -57,24 +195,28 @@ describe('SalesPage', () => {
       'data-testid',
       'medical-sales-tab-sales',
     );
+    expect(listMedicalSales).toHaveBeenCalledWith({}, undefined);
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('offers Collect, Return and Void on the unpaid sale; Collect records its due', async () => {
+  it('offers Collect and Void on the unpaid sale, Return on those paid in full; Collect records its due', async () => {
     const user = setup();
     await renderSales();
     const collect = screen.getByTestId('medical-sales-row-action-collect');
-    expect(collect).toHaveAccessibleName('Collect ₹563');
-    expect(screen.getAllByTestId('medical-sales-row-action-return')).toHaveLength(3);
+    expect(collect).toHaveAccessibleName('Collect ₹1,300');
+    expect(screen.getAllByTestId('medical-sales-row-action-return')).toHaveLength(2);
+    expect(
+      rowOf('Priya Shah').queryByTestId('medical-sales-row-action-return'),
+    ).toBeNull();
     expect(screen.getAllByTestId('medical-sales-row-action-void')).toHaveLength(1);
     await user.click(collect);
-    await waitFor(async () =>
-      expect((await fetchMedicalSale(ref.medicalSale(978))).status).toBe('paid'),
+    await waitFor(() =>
+      expect(collectSale).toHaveBeenCalledWith(
+        expect.objectContaining({ sale: UNPAID, mode: 'upi' }),
+      ),
     );
 
-    await user.click(
-      screen.getAllByTestId('medical-sales-row-action-return')[0] as HTMLElement,
-    );
+    await user.click(rowOf('Rhea Shah').getByTestId('medical-sales-row-action-return'));
     expect(await screen.findByTestId('sale-return-drawer')).toBeInTheDocument();
   });
 
@@ -84,43 +226,40 @@ describe('SalesPage', () => {
     await user.click(screen.getByTestId('medical-sales-row-action-void'));
     const dialog = await screen.findByRole('alertdialog');
     expect(within(dialog).getByText('Void this sale?')).toBeInTheDocument();
-    expect(dialog).toHaveTextContent('Dharti Galani');
+    expect(dialog).toHaveTextContent('Priya Shah');
   });
 
-  it('a Pharmacist collects and returns but never voids; an Accountant only looks', async () => {
+  it('a Pharmacist collects but never returns or voids; an Accountant collects and returns (MD23)', async () => {
     const first = await renderSales(ROOM, 'pharmacist');
     expect(screen.getByTestId('medical-sales-row-action-collect')).toBeInTheDocument();
-    expect(screen.queryByTestId('medical-sales-row-action-void')).not.toBeInTheDocument();
-    first.unmount();
-    await renderSales(ROOM, 'accountant');
-    expect(
-      screen.queryByTestId('medical-sales-row-action-collect'),
-    ).not.toBeInTheDocument();
     expect(
       screen.queryByTestId('medical-sales-row-action-return'),
     ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('medical-sales-row-action-void')).not.toBeInTheDocument();
+    first.unmount();
+    await renderSales(ROOM, 'accountant');
+    expect(screen.getByTestId('medical-sales-row-action-collect')).toBeInTheDocument();
+    expect(screen.getAllByTestId('medical-sales-row-action-return')).toHaveLength(2);
+    expect(screen.queryByTestId('medical-sales-row-action-void')).not.toBeInTheDocument();
   });
 
   it('opens the Sale over the list from a row, and Return from patient from its URL', async () => {
     const user = setup();
     const { router } = await renderSales();
-    const rows = screen.getAllByTestId('medical-sales-table-row');
-    await user.click(rows[0] as HTMLElement);
+    await user.click(rowOf('Rhea Shah').getByText('Rhea Shah'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`${ROOM}/${ref.medicalSale(983)}`),
+      expect(router.state.location.pathname).toBe(`${ROOM}/${PAID_ID}`),
     );
     const drawer = await screen.findByTestId('sale-drawer');
     expect(drawer).toHaveTextContent('Rhea Shah');
     await user.click(within(drawer).getByTestId('sale-drawer-save'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        `${ROOM}/${ref.medicalSale(983)}/return`,
-      ),
+      expect(router.state.location.pathname).toBe(`${ROOM}/${PAID_ID}/return`),
     );
     expect(await screen.findByTestId('sale-return-drawer')).toBeInTheDocument();
   });
 
-  it('"Prescriptions to fill" opens New sale on the one picked', async () => {
+  it('"Prescriptions to fill" opens New sale on the one picked — its patient’s contact and the prescription', async () => {
     const user = setup();
     const { router } = await renderSales();
     await user.click(
@@ -131,17 +270,22 @@ describe('SalesPage', () => {
     await user.click(newest as HTMLElement);
     await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/create`));
     expect(router.state.location.search).toMatchObject({
-      prescription: ref.prescription(501),
+      prescription: TEST_PRESCRIPTION_ID,
+      customer: TEST_BUYER_CONTACT_ID,
     });
   });
 
-  it('shows no "Prescriptions to fill" with a Status set', async () => {
-    renderMedicalRoutes(`${ROOM}?status=unpaid`, { sales: SalesPage });
+  it('filters by Status — Paid among them — and shows no "Prescriptions to fill" with one set', async () => {
+    renderMedicalRoutes(`${ROOM}?status=paid`, { sales: SalesPage });
     await waitFor(() =>
-      expect(screen.getAllByTestId('medical-sales-table-row')).toHaveLength(1),
+      expect(listMedicalSales).toHaveBeenCalledWith({ status: 'paid' }, undefined),
     );
+    expect(await screen.findByTestId('medical-sales-page')).toBeInTheDocument();
     expect(
       screen.queryByTestId('medical-sales-view-action-prescriptions'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('medical-sales-view-action-reminders'),
     ).not.toBeInTheDocument();
   });
 
@@ -151,8 +295,9 @@ describe('SalesPage', () => {
     await user.click(await screen.findByTestId('medical-sales-view-action-reminders'));
     const panel = await screen.findByTestId('payment-reminders');
     const [row] = within(panel).getAllByTestId('payment-reminders-row');
-    expect(row).toHaveTextContent('Dharti Galani');
-    expect(row).toHaveTextContent(/₹563 due · Sale #978/);
+    expect(row).toHaveTextContent('Priya Shah');
+    expect(row).toHaveTextContent(/₹1,300 due · Sale #978/);
+    expect(listSaleReminders).toHaveBeenCalledWith({ status: 'unpaid' });
     view.unmount();
 
     // Returned has no view action.

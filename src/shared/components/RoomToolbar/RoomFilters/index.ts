@@ -3,6 +3,7 @@ export {
   type AutomaticSectionValue,
   type RoomFilterSection,
   roomFiltersOf,
+  singlePickSection,
 } from './room-filter-sections.ts';
 export {
   type RoomDateFilterKind,

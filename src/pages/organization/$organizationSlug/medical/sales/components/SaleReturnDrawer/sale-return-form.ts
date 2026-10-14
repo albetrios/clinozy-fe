@@ -1,23 +1,27 @@
+import { paiseOfRupees } from '@/lib/number-text.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 
-import type { SaleRow } from '../../../shared/medical-contracts.ts';
 import type {
   RefundMode,
-  SaleReturnInput,
   SaleReturnReason,
-} from '../../../shared/medical-flows-contracts.ts';
+  SaleRow,
+} from '../../../shared/medical-contracts.ts';
+import type { SaleReturnInput } from '../../../shared/medical-records-contracts.ts';
 
 /*
  * Return from patient's form (`medical.md:283–295`) — pure, so the drawer, its
- * steps' heads, its Save label and its check read one set of rules.
+ * steps' heads, its Save label and its check read one set of rules. Its money
+ * is paise, as every form's (W0): a line's price per unit is the API's line
+ * amount over its quantity; the server works out the return's own figures.
  */
 
-/** One sold line that can come back: what is left of it and its price per unit. */
+/** One sold line that can come back: what is still out of it and its price per unit. */
 export interface ReturnLineValues {
-  medicineId: string;
-  batchNo: string;
+  /** The sale's invoice line (`iitm_…`) — what the return names. */
+  invoiceItemId: string;
   name: string;
-  /** Units still with the patient: sold less what came back before. */
+  batchNo: string | null;
+  /** Units still with the customer: sold less what the server counts as back already. */
   sold: number;
   /** The line's net price per unit, paise. */
   unit: number;
@@ -36,38 +40,27 @@ export interface SaleReturnFormValues {
 export const RETURN_REASON_TONES: Readonly<Record<SaleReturnReason, Tone>> = {
   unused: 'sage',
   reaction: 'blush',
-  rx_changed: 'sky',
+  doctor_changed: 'sky',
   wrong_item: 'butter',
   damaged: 'lav',
 };
 
-/** How many of a sold line came back already. */
-function returnedOf(sale: Pick<SaleRow, 'returns'>, medicineId: string, batchNo: string) {
-  return sale.returns
-    .flatMap((back) => back.items)
-    .filter((item) => item.medicineId === medicineId && item.batchNo === batchNo)
-    .reduce((sum, item) => sum + item.qty, 0);
-}
-
 /**
- * The form a sale opens with: every sold line with a medicine and a batch, with
- * what is still out — nothing coming back yet — the reason "Unused" and the
- * refund in Cash (`medical.md:288–290`).
+ * The form a sale opens with: every sold line with something still out — the
+ * server's `returned_quantity` taken off — nothing coming back yet, the reason
+ * "Unused" and the refund in Cash (`medical.md:288–290`).
  */
-export function saleReturnFormOf(
-  sale: Pick<SaleRow, 'lines' | 'returns'>,
-): SaleReturnFormValues {
+export function saleReturnFormOf(sale: Pick<SaleRow, 'lines'>): SaleReturnFormValues {
   const lines = sale.lines.flatMap((line) => {
-    if (!(line.medicineId && line.batchNo) || line.qty <= 0) return [];
-    const sold = line.qty - returnedOf(sale, line.medicineId, line.batchNo);
+    const sold = line.qty - line.returnedQty;
     if (sold <= 0) return [];
     return [
       {
-        medicineId: line.medicineId,
-        batchNo: line.batchNo,
+        invoiceItemId: line.invoiceItemId,
         name: line.name,
+        batchNo: line.batchNo,
         sold,
-        unit: line.amount / line.qty,
+        unit: paiseOfRupees(line.amount) / line.qty,
         qty: 0,
       },
     ];
@@ -79,7 +72,7 @@ export function saleReturnFormOf(
 export const lineRefund = (line: Pick<ReturnLineValues, 'unit' | 'qty'>) =>
   Math.round(line.unit * line.qty);
 
-/** What the return is worth: Σ each line's refund, paise. */
+/** What the return is worth: Σ each line's refund, paise — the server's figure replaces it. */
 export const returnAmount = (lines: readonly ReturnLineValues[]) =>
   lines.reduce((sum, line) => sum + lineRefund(line), 0);
 
@@ -91,15 +84,15 @@ export const linesBack = (lines: readonly ReturnLineValues[]) =>
 export const everythingBack = (lines: readonly ReturnLineValues[]) =>
   lines.map((line) => ({ ...line, qty: line.sold }));
 
-/** The contract's fields for a form; untouched lines are left out. */
+/** The return as `useReturnSale` takes it: the lines coming back by their invoice line, no note. */
 export function saleReturnInputOf(values: SaleReturnFormValues): SaleReturnInput {
   return {
     lines: linesBack(values.lines).map((line) => ({
-      medicineId: line.medicineId,
-      batchNo: line.batchNo,
+      invoiceItemId: line.invoiceItemId,
       qty: line.qty,
     })),
     reason: values.reason,
     mode: values.mode,
+    note: null,
   };
 }

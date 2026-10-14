@@ -23,7 +23,7 @@ import type { DrawerPreview, InvoicePreviewLine } from './use-invoice-preview.ts
 import { belowLowestMessage } from './use-invoice-save.ts';
 
 /*
- * The drawer's figures and each row's: a Medical sale's from the fixture world's own sums, an
+ * The drawer's figures and each row's: a Medical sale's from the drawer's own sums at MRP, an
  * invoice's from the server's preview — or, when the invoice cannot change here, as it was saved.
  * A typed Final turns into the line's discount (a preview of what the member types — the server's
  * figure replaces it).
@@ -33,7 +33,7 @@ import { belowLowestMessage } from './use-invoice-save.ts';
 interface DrawerFiguresInput {
   form: UseFormReturn<InvoiceFormValues>;
   values: InvoiceFormValues;
-  /** A Medical sale (the fixture world's). */
+  /** A Medical sale: the drawer's own sums (the server prices it on save). */
   sale: boolean;
   /** The saved invoice an edit opened on. */
   invoice: InvoiceRecord | null;
@@ -92,7 +92,7 @@ function discountForTypedFinal(line: InvoicePreviewLine, final: number): number 
   return Math.round((1 - wanted / full) * 10_000) / 100;
 }
 
-/** A sale's row as the fixture world sums it. */
+/** A sale's row as the drawer sums it, at MRP. */
 function saleRow(row: InvoiceLineForm): InvoiceRowFigures {
   const named = row.name.trim() !== '';
   return {

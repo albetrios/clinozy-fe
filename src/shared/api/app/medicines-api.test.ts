@@ -1,144 +1,321 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
-
-import { ref } from './fixtures/refs.fixtures.ts';
-import { resetAppFixtures } from './fixtures/world.fixtures.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+import { api } from '@/core/http/api.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
+  medicineRow,
+  medicineWire,
+  TEST_BATCH_ID,
+  TEST_MAKER_ID,
+  TEST_MEDICINE_ID,
+  TEST_SUPPLIER_ID,
+} from '@/tests/utils/medical-doubles.ts';
+
+import { appInstant } from './app-time.ts';
+import {
+  activeMedicalOrganizationId,
   createMedicine,
   deleteMedicine,
   fetchAllMedicines,
   fetchMedicine,
   listMedicines,
+  medicineListQuery,
+  medicineQueryKeys,
   quickCreateMedicine,
   restoreMedicine,
   setNearExpiryDiscount,
+  setNearExpiryDiscountWithin,
   updateMedicine,
 } from './medicines-api.ts';
 import type { MedicineInput } from './medicines-contracts.ts';
 
-afterEach(() => resetAppFixtures());
+/** The clinic's day every range here is read on. */
+const TODAY = '2026-10-10';
 
-const GLYCOLAC = ref.medicine(456);
+/** A list page as the API answers it. */
+const page = (data: unknown[], next: string | null = null) => ({
+  data,
+  meta: {
+    request_id: 'req',
+    pagination: {
+      per_page: 50,
+      next,
+      has_more: next !== null,
+      estimated_total: data.length,
+    },
+  },
+});
 
-/** The 422 a write was refused with: its detail and fields. */
-async function refusal(write: Promise<unknown>) {
-  try {
-    await write;
-  } catch (error) {
-    if (isHttpError(error)) {
-      const body = error.data as { error: { detail: string; fields?: object } };
-      return { status: error.status, ...body.error };
-    }
-    throw error;
-  }
-  throw new Error('the write went through');
-}
-
+/** The drawer's fields for Azelaic gel as saved. */
 const input = (fields: Partial<MedicineInput> = {}): MedicineInput => ({
-  name: 'Azelan Gel',
-  composition: null,
-  manufacturerId: ref.manufacturer(1),
+  name: 'Azelaic gel 15g',
+  composition: 'Azelaic acid 15%',
+  manufacturerId: TEST_MAKER_ID,
   prescriptionOnly: false,
-  mrp: 30_000,
+  mrp: 650,
   gstPct: 12,
   minStock: 2,
-  maxStock: 10,
-  batches: [],
-  supplierRates: [{ supplierId: ref.supplier(61), rate: 20_000, free: 0, leadDays: 2 }],
+  maxStock: 20,
+  batches: [
+    {
+      id: TEST_BATCH_ID,
+      batchNo: '026-312',
+      expiry: '12/27',
+      qty: 12,
+      purchaseRate: 420,
+      supplierId: TEST_SUPPLIER_ID,
+    },
+  ],
+  supplierRates: [{ supplierId: TEST_SUPPLIER_ID, rate: 420, free: 0, leadDays: 2 }],
   ...fields,
 });
 
-describe('listMedicines (`S:1660`)', () => {
-  it('reads every medicine by name with its stock, maker, nearest batch and best rate', async () => {
-    const page = await listMedicines();
-    expect(page.items).toHaveLength(9);
-    expect(page.items.map((row) => row.name)[0]).toBe('Admosh UV Sunscreen 60g');
-    const uncap = page.items.find((row) => row.seq === 458);
-    expect(uncap).toMatchObject({
-      stock: 8,
-      manufacturer: { name: 'ALVI', tone: 'lav' },
-      nearest: { batchNo: 'CSH26044' },
-      bestRate: { supplierName: 'K R Medical Agency', rate: 44_000 },
-      margin: 32,
-    });
-  });
+beforeEach(() => {
+  vi.resetAllMocks();
+  signInTestMember();
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date(appInstant(TODAY, '10:00')));
+});
+afterEach(() => {
+  vi.useRealTimers();
+  useOrganizationStore.getState().clearOrganization();
+});
 
-  it('searches name, composition, maker, supplier and "#458"', async () => {
-    const names = async (q: string) =>
-      (await listMedicines({ q })).items.map((row) => row.name);
-    expect(await names('azelaic')).toEqual(['Azelan 20% Cream', 'Beyolaic Cream']);
-    expect(await names('#458')).toEqual(['Uncap Smooth Anti Acne PM Gel']);
-    expect(await names('nh pharma')).toContain('Trichospire Hair Kit');
-  });
-
-  it('filters low stock, near expiry and makers, and sorts on request', async () => {
-    const low = await listMedicines({ stock: 'low' });
-    expect(low.items.every((row) => row.stock <= row.minStock)).toBe(true);
-    expect(low.items.map((row) => row.seq).sort()).toEqual([451, 454, 457]);
-    const soon = await listMedicines({ expiry: '90' });
-    expect(soon.items.every((row) => (row.nearest?.daysLeft ?? 999) <= 90)).toBe(true);
-    const alvi = await listMedicines({ manufacturer: [ref.manufacturer(1)] });
-    expect(alvi.items.map((row) => row.seq)).toEqual([458]);
-    const byMrp = await listMedicines({ sort: 'mrp', order: 'desc' });
-    expect(byMrp.items[0]?.mrp).toBe(117_500);
+describe('the keys', () => {
+  it('carry the organization, every list under one prefix', () => {
+    expect(activeMedicalOrganizationId()).toBe('org_test');
+    expect(medicineQueryKeys.list('org_test', { q: 'azel' })).toEqual([
+      'app',
+      'medicines',
+      'org_test',
+      'list',
+      { q: 'azel' },
+    ]);
+    expect(medicineQueryKeys.detail('org_test', TEST_MEDICINE_ID)).toEqual([
+      'app',
+      'medicines',
+      'org_test',
+      'detail',
+      TEST_MEDICINE_ID,
+    ]);
   });
 });
 
-describe('medicine writes', () => {
-  it('refuses a missing name, MRP or supplier rate with the design’s words', async () => {
-    expect(await refusal(createMedicine(input({ name: ' ' })))).toMatchObject({
-      status: 422,
-      detail: 'Add a name',
+describe('medicineListQuery (`medical.md:41–47`)', () => {
+  it('reads 50 by name unless sorted; Low stock is low and out; a window and makers', () => {
+    expect(medicineListQuery({}, TODAY)).toEqual({
+      limit: 50,
+      q: undefined,
+      stock_level: undefined,
+      expiring_within_days: undefined,
+      manufacturer_id: undefined,
+      created_from: undefined,
+      created_to: undefined,
+      sort: undefined,
+      order: undefined,
     });
-    expect(await refusal(createMedicine(input({ mrp: 0 })))).toMatchObject({
-      detail: 'Enter the MRP',
+    expect(
+      medicineListQuery(
+        {
+          q: ' azel ',
+          stock: 'low',
+          expiry: '60',
+          manufacturer: [TEST_MAKER_ID, 'mfr_other00000000000000000'],
+          created: 'today',
+          sort: 'margin',
+          order: 'desc',
+        },
+        TODAY,
+      ),
+    ).toEqual({
+      limit: 50,
+      q: 'azel',
+      stock_level: 'low,out',
+      expiring_within_days: '60',
+      manufacturer_id: `${TEST_MAKER_ID},mfr_other00000000000000000`,
+      created_from: appInstant(TODAY, '00:00'),
+      created_to: appInstant('2026-10-11', '00:00'),
+      sort: 'margin_percent',
+      order: 'desc',
     });
-    const noRate = input({
-      supplierRates: [{ supplierId: ref.supplier(61), rate: 0, free: 0, leadDays: 2 }],
+    expect(
+      medicineListQuery({ sort: 'manufacturer', order: 'asc' }, TODAY),
+    ).toMatchObject({
+      sort: 'manufacturer_name',
     });
-    expect(await refusal(createMedicine(noRate))).toMatchObject({
-      detail: 'Enter a rate for every supplier price',
+  });
+});
+
+describe('the reads', () => {
+  it('a page maps each medicine to its row — rupees, "MM/YY", the days left', async () => {
+    vi.mocked(api.get).mockResolvedValue(page([medicineWire()], 'cursor_b') as never);
+    const result = await listMedicines({ stock: 'low' }, 'cursor_a');
+    expect(vi.mocked(api.get).mock.calls[0]?.[1]).toMatchObject({
+      query: { stock_level: 'low,out', after: 'cursor_a' },
+    });
+    expect(result.next).toBe('cursor_b');
+    expect(result.rows[0]).toMatchObject({
+      id: TEST_MEDICINE_ID,
+      seq: 458,
+      mrp: 650,
+      manufacturer: { id: TEST_MAKER_ID, name: 'SUN PHARMA', tone: 'sky' },
+      nearest: { batchNo: '026-312', expiry: '12/27' },
+      bestRate: { supplierId: TEST_SUPPLIER_ID, rate: 420 },
+      batches: [{ id: TEST_BATCH_ID, expiry: '12/27', purchaseRate: 420 }],
+      nearExpiryDiscountPct: 0,
+    });
+    expect(result.rows[0]?.nearest?.daysLeft).toBeGreaterThan(400);
+  });
+
+  it('the catalogue reads every page, 100 at a time, by name', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(page([medicineWire()], 'cursor_b') as never)
+      .mockResolvedValueOnce(
+        page([
+          medicineWire({ id: 'med_second0000000000000000', name: 'Benzac' }),
+        ]) as never,
+      );
+    const rows = await fetchAllMedicines();
+    expect(rows.map((row) => row.name)).toEqual(['Azelaic gel 15g', 'Benzac']);
+    expect(vi.mocked(api.get).mock.calls[1]?.[1]).toMatchObject({
+      query: { limit: 100, after: 'cursor_b', sort: 'name' },
     });
   });
 
-  it('creates a full medicine, numbered after the last', async () => {
-    const created = await createMedicine(input());
-    expect(created).toMatchObject({ seq: 459, isQuick: false });
-    expect((await fetchMedicine(created.id)).bestRate?.supplierName).toBe(
-      'K R Medical Agency',
-    );
-  });
-
-  it('creates a quick medicine at MRP ₹0 on the order’s supplier; a full save drops the flag', async () => {
-    const quick = await quickCreateMedicine({
-      name: 'Azel cream',
-      supplierId: ref.supplier(58),
-    });
-    expect(quick).toMatchObject({ isQuick: true, mrp: 0 });
-    expect(quick.supplierRates).toEqual([
-      { supplierId: ref.supplier(58), rate: 0, free: 0, leadDays: 2 },
+  it('one medicine by its id', async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: medicineWire() } as never);
+    expect((await fetchMedicine(TEST_MEDICINE_ID)).name).toBe('Azelaic gel 15g');
+    expect(vi.mocked(api.get).mock.calls[0]).toEqual([
+      '/app/medicines/{medicine_id}',
+      { params: { medicine_id: TEST_MEDICINE_ID } },
     ]);
-    const saved = await updateMedicine(quick.id, {
-      mrp: 20_000,
-      supplierRates: [
-        { supplierId: ref.supplier(58), rate: 12_000, free: 0, leadDays: 2 },
-      ],
+  });
+});
+
+describe('the writes', () => {
+  it('a new medicine is a full record, the expiry month as the API takes it', async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: medicineWire() } as never);
+    await createMedicine(
+      input({ batches: [{ ...input().batches[0]!, id: undefined }] }),
+      'key',
+    );
+    expect(vi.mocked(api.post).mock.calls[0]).toEqual([
+      '/app/medicines',
+      {
+        body: {
+          name: 'Azelaic gel 15g',
+          composition: 'Azelaic acid 15%',
+          manufacturer_id: TEST_MAKER_ID,
+          is_prescription_only: false,
+          mrp: 650,
+          gst_percent: 12,
+          min_stock: 2,
+          max_stock: 20,
+          batches: [
+            {
+              batch_number: '026-312',
+              expiry_month: '2027-12',
+              quantity: 12,
+              purchase_rate: 420,
+              supplier_id: TEST_SUPPLIER_ID,
+            },
+          ],
+          supplier_prices: [
+            { supplier_id: TEST_SUPPLIER_ID, rate: 420, free_quantity: 0, lead_days: 2 },
+          ],
+          is_quick: false,
+        },
+        idempotencyKey: 'key',
+      },
+    ]);
+  });
+
+  it('a save sends only what changed, with the read’s updated_at', async () => {
+    vi.mocked(api.patch).mockResolvedValue({ data: medicineWire({ mrp: 700 }) } as never);
+    const saved = await updateMedicine(medicineRow(), input({ mrp: 700 }), 'key');
+    expect(saved.mrp).toBe(700);
+    expect(vi.mocked(api.patch).mock.calls[0]).toEqual([
+      '/app/medicines/{medicine_id}',
+      {
+        params: { medicine_id: TEST_MEDICINE_ID },
+        body: { mrp: 700, expected_updated_at: medicineRow().updatedAt },
+        idempotencyKey: 'key',
+      },
+    ]);
+  });
+
+  it('a save of nothing changed writes nothing; a quick record saved as it is turns full', async () => {
+    expect(await updateMedicine(medicineRow(), input(), 'key')).toEqual(medicineRow());
+    expect(api.patch).not.toHaveBeenCalled();
+    vi.mocked(api.patch).mockResolvedValue({ data: medicineWire() } as never);
+    await updateMedicine(medicineRow({ isQuick: true }), input(), 'key');
+    expect(vi.mocked(api.patch).mock.calls[0]?.[1]).toMatchObject({
+      body: { name: 'Azelaic gel 15g' },
     });
-    expect(saved.isQuick).toBe(false);
   });
 
-  it('sets and removes the near-expiry discount', async () => {
-    await setNearExpiryDiscount([GLYCOLAC], 20);
-    expect((await fetchMedicine(GLYCOLAC)).nearExpiryDiscountPct).toBe(20);
-    await setNearExpiryDiscount([GLYCOLAC], 0);
-    expect((await fetchMedicine(GLYCOLAC)).nearExpiryDiscountPct).toBe(0);
+  it('a quick medicine is the typed name under its maker', async () => {
+    vi.mocked(api.post).mockResolvedValue({
+      data: medicineWire({ is_quick: true }),
+    } as never);
+    await quickCreateMedicine(
+      { name: ' Azel cream ', manufacturerId: TEST_MAKER_ID },
+      'key',
+    );
+    expect(vi.mocked(api.post).mock.calls[0]?.[1]).toEqual({
+      body: { name: 'Azel cream', is_quick: true, manufacturer_id: TEST_MAKER_ID },
+      idempotencyKey: 'key',
+    });
   });
 
-  it('soft-deletes with a reason and restores', async () => {
-    await deleteMedicine(GLYCOLAC, 'duplicate', null);
-    expect((await fetchAllMedicines()).map((row) => row.id)).not.toContain(GLYCOLAC);
-    await restoreMedicine(GLYCOLAC);
-    expect((await fetchAllMedicines()).map((row) => row.id)).toContain(GLYCOLAC);
+  it('the row’s near-expiry discount changes each medicine; 0 removes it', async () => {
+    vi.mocked(api.patch).mockResolvedValue({ data: medicineWire() } as never);
+    await setNearExpiryDiscount([medicineRow()], 20, 'key');
+    await setNearExpiryDiscount([medicineRow()], 0, 'undo');
+    expect(vi.mocked(api.patch).mock.calls.map((call) => call[1])).toEqual([
+      {
+        params: { medicine_id: TEST_MEDICINE_ID },
+        body: { near_expiry_discount_percent: 20 },
+        idempotencyKey: 'key:0',
+      },
+      {
+        params: { medicine_id: TEST_MEDICINE_ID },
+        body: { near_expiry_discount_percent: null },
+        idempotencyKey: 'undo:0',
+      },
+    ]);
+  });
+
+  it('"Sell all at 20% off" is one write over the window, answering how many', async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: { updated_count: 3 } } as never);
+    expect(await setNearExpiryDiscountWithin(30, 20, 'key')).toBe(3);
+    expect(vi.mocked(api.post).mock.calls[0]).toEqual([
+      '/app/medicines/near-expiry-discount',
+      { body: { expiring_within_days: 30, discount_percent: 20 }, idempotencyKey: 'key' },
+    ]);
+  });
+
+  it('a delete carries its reason and note; the restore its key', async () => {
+    vi.mocked(api.delete).mockResolvedValue({} as never);
+    vi.mocked(api.post).mockResolvedValue({ data: medicineWire() } as never);
+    await deleteMedicine(TEST_MEDICINE_ID, 'other', 'Discontinued');
+    await deleteMedicine(TEST_MEDICINE_ID, 'duplicate', null);
+    await restoreMedicine(TEST_MEDICINE_ID, 'key');
+    expect(vi.mocked(api.delete).mock.calls.map((call) => call[1])).toEqual([
+      {
+        params: { medicine_id: TEST_MEDICINE_ID },
+        reason: 'other',
+        note: 'Discontinued',
+      },
+      { params: { medicine_id: TEST_MEDICINE_ID }, reason: 'duplicate' },
+    ]);
+    expect(vi.mocked(api.post).mock.calls[0]).toEqual([
+      '/app/medicines/{medicine_id}/restore',
+      { params: { medicine_id: TEST_MEDICINE_ID }, idempotencyKey: 'key' },
+    ]);
   });
 });

@@ -41,8 +41,9 @@ export interface InvoiceCatalog {
  * The Invoice drawer's catalogue (KICKOFF §6.9 Items): a clinic or consultation invoice lists
  * its type's offerings at the branch from clinozy-be's one offerings catalogue (`useOfferings`,
  * the Offerings room's cache entry), each at its "Billed today" with its live offer named
- * (`useOffers`); a Medical sale the fixture world's medicines at MRP with their stock
- * (`useMedicineCatalogue`, the Medical room's cache entry).
+ * (`useOffers`) — never a medicine, which clinozy-be refuses on an invoice (MD28); a Medical
+ * sale clinozy-be's medicines at MRP with their stock (`useMedicineCatalogue`, the Medical
+ * room's cache entry), read for a sale only.
  */
 export function useInvoiceCatalog(
   type: InvoiceType,
@@ -53,7 +54,7 @@ export function useInvoiceCatalog(
   const medical = type === 'medical';
   const offerings = useOfferings({ enabled: !medical, staleTime: CATALOGUE_STALE_MS });
   const offers = useOffers();
-  const medicines = useMedicineCatalogue();
+  const medicines = useMedicineCatalogue({ enabled: medical });
 
   const items = useMemo(() => {
     if (medical) return (medicines.data ?? []).map(medicineCatalogItem);

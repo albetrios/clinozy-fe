@@ -181,6 +181,7 @@ describe('PatientPrescriptionsPage', () => {
     );
     expect(shownLocation(router).search).toEqual({
       prescription: APPROVED.id,
+      customer: APPROVED.patientId,
       from: `patients/${TEST_PATIENT_ID}/prescriptions`,
     });
   });

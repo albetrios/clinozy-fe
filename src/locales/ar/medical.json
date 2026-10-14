@@ -11,6 +11,7 @@
     "manufacturers": "الشركات المصنّعة",
     "mrs": "المندوبون",
     "payments": "المدفوعات",
+    "credits": "الأرصدة",
     "groups": {
       "selling": "البيع",
       "stock": "المخزون",
@@ -53,7 +54,9 @@
     "manufacturer": "الشركة المصنّعة",
     "manufacturers": "الشركات المصنّعة",
     "suppliers": "الموردون",
-    "mrs": "المندوبون"
+    "mrs": "المندوبون",
+    "payable": "المستحق",
+    "owed": "لهم مبلغ مستحق"
   },
   "table": {
     "percent": "{{value}}٪",
@@ -211,6 +214,7 @@
     "ageing_few": "{{count}} أيام",
     "ageing_many": "{{count}} يومًا",
     "ageing_other": "{{count}} يوم",
+    "paidUp": "لا يوجد مبلغ مستحق لـ {{name}} الآن",
     "rowActions": {
       "pay": "ادفع {{amount}}",
       "newOrder": "أمر شراء جديد",
@@ -269,7 +273,83 @@
   },
   "payments": {
     "records": "مدفوعات الصيدلية",
-    "empty": "لا توجد مدفوعات للصيدلية بعد"
+    "empty": "لا توجد مدفوعات للصيدلية بعد",
+    "export": "تصدير",
+    "exportTitle": "تصدير هذه المدفوعات بصيغة CSV",
+    "exported": "تم تصدير المدفوعات بصيغة CSV",
+    "exportTruncated": "تم تصدير أول 10,000 دفعة — ضيّق عوامل التصفية للباقي"
+  },
+  "credits": {
+    "records": "أرصدة الصيدلية",
+    "count_few": "{{count}} أرصدة",
+    "count_many": "{{count}} رصيدًا",
+    "count_one": "رصيد واحد",
+    "count_other": "{{count}} رصيد",
+    "count_two": "رصيدان",
+    "count_zero": "لا أرصدة",
+    "sides": {
+      "label": "أرصدة من",
+      "suppliers": "من الموردين",
+      "customers": "مع العملاء"
+    },
+    "columns": {
+      "credit": "الرصيد",
+      "supplier": "المورد",
+      "packs": "العبوات",
+      "amount": "المبلغ",
+      "applied": "المسوّى",
+      "state": "الحالة",
+      "since": "منذ",
+      "who": "من",
+      "way": "الاتجاه",
+      "left": "المتبقي"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_zero": "{{count}} عبوة",
+    "packs_one": "عبوة واحدة",
+    "packs_two": "عبوتان",
+    "packs_few": "{{count}} عبوات",
+    "packs_many": "{{count}} عبوة",
+    "packs_other": "{{count}} عبوة",
+    "states": {
+      "open": "مفتوح",
+      "adjusted": "مسوّى"
+    },
+    "customerStates": {
+      "open": "مفتوح",
+      "given_back": "تمت الإعادة",
+      "got_back": "تم الاسترداد",
+      "used": "مستخدم"
+    },
+    "ways": {
+      "give": "نعيده نحن",
+      "take": "يُعاد إلينا"
+    },
+    "rowActions": {
+      "void": "إلغاء الرصيد",
+      "giveBack": "إعادة",
+      "gotBack": "تم الاسترداد",
+      "open": "فتح في المعلّقة"
+    },
+    "empty": {
+      "suppliers": "لا توجد أرصدة موردين بعد — أعد المخزون القريب من الانتهاء من الأدوية",
+      "customers": "لا توجد أرصدة عملاء بعد"
+    },
+    "addCredit": "إضافة رصيد",
+    "void": {
+      "title": "إلغاء هذا الرصيد؟",
+      "effect": "تعود عبواته إلى المخزون ويصبح المورد مستحقًا من جديد.",
+      "voided": "تم إلغاء الرصيد · {{batch}}",
+      "reasons": {
+        "mistake": "أُضيف بالخطأ",
+        "wrongQuantity": "كمية خاطئة",
+        "supplierRefused": "رفض المورد"
+      }
+    },
+    "filters": {
+      "state": "الحالة",
+      "way": "الاتجاه"
+    }
   },
   "drawers": {
     "records": {
@@ -307,8 +387,7 @@
     "quick": {
       "manufacturer": "تمت إضافة الشركة المصنّعة {{name}}",
       "supplier": "تمت إضافة المورد {{name}} · أضف الهاتف وGST لاحقًا",
-      "mr": "تمت إضافة المندوب {{name}}",
-      "medicine": "تمت إضافة {{name}} · حدّد السعر الأقصى لاحقًا في المخزون"
+      "mr": "تمت إضافة المندوب {{name}}"
     },
     "deleteConfirm": {
       "medicine": "حذف هذا الدواء؟",
@@ -634,6 +713,7 @@
       "payable": "مستحق {{amount}}",
       "paid": "مدفوع {{amount}}",
       "paidOf": "مدفوع {{paid}} من {{total}}",
+      "paidWithCredits": "مدفوع {{paid}} + {{credited}} من أرصدة المورد",
       "pay": "ادفع {{amount}}",
       "print": "طباعة"
     },
@@ -665,7 +745,7 @@
     },
     "saleReturn": {
       "title": "إرجاع من المريض",
-      "sub": "{{customer}} · يعود المخزون المُرتجع إلى تشغيلته",
+      "sub": "{{customer}} · تعود العبوات المُرتجعة إلى تشغيلتها، وتُشطب التالفة أو التي سببت تفاعلًا",
       "steps": {
         "back": "ما الذي يُرجَع",
         "reason": "السبب والاسترداد"
@@ -690,8 +770,11 @@
       "nothing": "أدخل ما يتم إرجاعه",
       "refunded": "تم استرداد {{amount}} · أُعيد المخزون",
       "refundedWrittenOff": "تم استرداد {{amount}} · شُطب المخزون",
-      "lowered": "تم إرجاع {{amount}} · أُعيد المخزون",
-      "loweredWrittenOff": "تم إرجاع {{amount}} · شُطب المخزون"
+      "storeCredit": "رصيد المتجر",
+      "saveCredit": "احتفظ بـ {{amount}} كرصيد في المتجر",
+      "credited": "احتُفظ بـ {{amount}} كرصيد في المتجر · أُعيد المخزون",
+      "creditedWrittenOff": "احتُفظ بـ {{amount}} كرصيد في المتجر · شُطب المخزون",
+      "notPaid": "حصّل الفاتورة كاملة أولاً · لا يُقبل الإرجاع إلا على بيع مدفوع بالكامل"
     },
     "expiring": {
       "title": "إرجاع المخزون القريب من الانتهاء",

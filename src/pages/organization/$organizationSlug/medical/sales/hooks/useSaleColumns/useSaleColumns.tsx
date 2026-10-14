@@ -16,12 +16,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
 import { useMedicalDates } from '../../../shared/components/MedicalCells/index.ts';
 import type { SaleRow } from '../../../shared/medical-contracts.ts';
 import { SALE_STATUS_TONES } from '../../../shared/medical-tones.ts';
+import { salePaymentOf } from '../useSaleActions/index.ts';
 
 const rowOf = (original: unknown) => original as SaleRow;
 
@@ -30,11 +31,13 @@ const rowOf = (original: unknown) => original as SaleRow;
  * Customer · Medicines · Bill · Margin (hidden) · Status · When — tracks
  * `80px minmax(200px,1.3fr) minmax(220px,1.6fr) 100px 100px 100px 128px`. On a
  * phone the Customer leads, the Bill is the key and the meta line reads
- * Medicines, Status, When and "#983". The column ids are the URL's sort keys.
+ * Medicines, Status, When and "#983". The column ids are the URL's sort keys
+ * (Sale, Customer, Bill — the API's). Money is the API's rupees; the margin,
+ * its percent, the due and what came back are the server's, never summed here.
  */
 export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
   const { t } = useTranslation(MEDICAL_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const dates = useMedicalDates();
   const keys = MEDICAL_KEYS.sales;
 
@@ -44,8 +47,6 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
     const numbers = sale.lines.flatMap((line) => (line.batchNo ? [line.batchNo] : []));
     return numbers.length > 0 ? t(keys.batches, { batches: numbers.join(', ') }) : '';
   };
-  const margin = (sale: SaleRow) => sale.bill - sale.cost;
-
   return [
     {
       id: 'seq',
@@ -67,7 +68,7 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
       cell: ({ row }) => {
         const customer = row.original.customer;
         if (!customer) return null;
-        const patient = customer.kind === 'patient';
+        const patient = customer.patientId !== null;
         return (
           <PersonChip
             name={customer.name}
@@ -97,10 +98,10 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
         <TextCell
           align="end"
           weight="semibold"
-          text={<MoneyCell paise={row.original.bill} />}
+          text={<MoneyCell rupees={row.original.bill} />}
           sub={
             row.original.returned > 0
-              ? t(keys.returned, { amount: formatPaise(row.original.returned) })
+              ? t(keys.returned, { amount: formatRupees(row.original.returned) })
               : undefined
           }
           subTone="lav"
@@ -109,12 +110,12 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
       meta: {
         track: '100px',
         align: 'end',
-        foldValue: (original) => formatPaise(rowOf(original).bill),
+        foldValue: (original) => formatRupees(rowOf(original).bill),
       },
     },
     {
       id: 'margin',
-      accessorFn: (sale) => margin(sale),
+      accessorKey: 'margin',
       header: t(keys.columns.margin),
       enableSorting: false,
       cell: ({ row }) => {
@@ -122,13 +123,11 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
         return (
           <TextCell
             align="end"
-            text={<MoneyCell paise={margin(sale)} />}
+            text={<MoneyCell rupees={sale.margin} />}
             sub={
-              sale.bill > 0
-                ? t(MEDICAL_KEYS.table.percent, {
-                    value: Math.round((margin(sale) / sale.bill) * 100),
-                  })
-                : undefined
+              sale.marginPct === null
+                ? undefined
+                : t(MEDICAL_KEYS.table.percent, { value: Math.round(sale.marginPct) })
             }
             subTone="sage"
           />
@@ -138,7 +137,7 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
         track: '100px',
         align: 'end',
         defaultHidden: true,
-        foldValue: (original) => formatPaise(margin(rowOf(original))),
+        foldValue: (original) => formatRupees(rowOf(original).margin),
       },
     },
     {
@@ -146,9 +145,11 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
       accessorKey: 'status',
       header: t(keys.columns.status),
       enableSorting: false,
-      // "Returned" (lav, its refund in the tooltip) before Paid / Unpaid (`medical.md:29`).
+      // "Returned" (lav, its refund in the tooltip) before Paid / Unpaid (`medical.md:29`): the
+      // server's status reads "returned" once anything came back; Paid / Unpaid is its due.
       cell: ({ row }) => {
         const sale = row.original;
+        const payment = salePaymentOf(sale);
         return (
           <span className="flex min-w-0 flex-wrap gap-1">
             {sale.returns.length > 0 ? (
@@ -160,13 +161,13 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
                     </TonePill>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {t(keys.refunded, { amount: formatPaise(sale.returned) })}
+                    {t(keys.refunded, { amount: formatRupees(sale.returned) })}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             ) : null}
-            <TonePill tone={SALE_STATUS_TONES[sale.status]} dot>
-              {t(keys.statuses[sale.status])}
+            <TonePill tone={SALE_STATUS_TONES[payment]} dot>
+              {t(keys.statuses[payment])}
             </TonePill>
           </span>
         );
@@ -176,10 +177,11 @@ export function useSaleColumns(): ColumnDef<DataTableFeatures, SaleRow>[] {
         kind: 'badges',
         foldValue: (original) => {
           const sale = rowOf(original);
-          const tone = SALE_STATUS_TONES[sale.status];
+          const payment = salePaymentOf(sale);
+          const tone = SALE_STATUS_TONES[payment];
           const labels = [
             ...(sale.returns.length > 0 ? [t(keys.statuses.returned)] : []),
-            t(keys.statuses[sale.status]),
+            t(keys.statuses[payment]),
           ];
           return { value: labels.join(', '), dotClassName: TONE_CLASSES[tone].fill };
         },

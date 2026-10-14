@@ -11,6 +11,7 @@
     "manufacturers": "제조사",
     "mrs": "MR",
     "payments": "결제",
+    "credits": "크레딧",
     "groups": {
       "selling": "판매",
       "stock": "재고",
@@ -53,7 +54,9 @@
     "manufacturer": "제조사",
     "manufacturers": "제조사",
     "suppliers": "공급업체",
-    "mrs": "MR"
+    "mrs": "MR",
+    "payable": "미지급",
+    "owed": "미지급 있음"
   },
   "table": {
     "percent": "{{value}}%",
@@ -176,6 +179,7 @@
     "orders_other": "주문 {{count}}건",
     "noOrders": "주문 없음",
     "ageing_other": "{{count}}일",
+    "paidUp": "이제 {{name}}에게 지불할 금액이 없습니다",
     "rowActions": {
       "pay": "{{amount}} 지불",
       "newOrder": "새 구매 주문",
@@ -219,7 +223,73 @@
   },
   "payments": {
     "records": "약국 결제",
-    "empty": "아직 약국 결제가 없습니다"
+    "empty": "아직 약국 결제가 없습니다",
+    "export": "내보내기",
+    "exportTitle": "이 결제를 CSV로 내보내기",
+    "exported": "결제를 CSV로 내보냈습니다",
+    "exportTruncated": "처음 10,000건의 결제를 내보냈습니다 — 나머지는 필터를 좁혀 주세요"
+  },
+  "credits": {
+    "records": "약국 크레딧",
+    "count_other": "크레딧 {{count}}건",
+    "sides": {
+      "label": "크레딧 상대",
+      "suppliers": "공급업체에서",
+      "customers": "고객과"
+    },
+    "columns": {
+      "credit": "크레딧",
+      "supplier": "공급업체",
+      "packs": "팩",
+      "amount": "금액",
+      "applied": "상계됨",
+      "state": "상태",
+      "since": "등록일",
+      "who": "상대",
+      "way": "방향",
+      "left": "잔액"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_other": "{{count}}팩",
+    "states": {
+      "open": "미상계",
+      "adjusted": "상계됨"
+    },
+    "customerStates": {
+      "open": "미정산",
+      "given_back": "돌려줌",
+      "got_back": "돌려받음",
+      "used": "사용됨"
+    },
+    "ways": {
+      "give": "우리가 돌려줌",
+      "take": "우리가 돌려받음"
+    },
+    "rowActions": {
+      "void": "크레딧 취소",
+      "giveBack": "돌려주기",
+      "gotBack": "돌려받음",
+      "open": "보류에서 열기"
+    },
+    "empty": {
+      "suppliers": "아직 공급업체 크레딧이 없습니다 — 의약품에서 만료 임박 재고를 반품하세요",
+      "customers": "아직 고객 크레딧이 없습니다"
+    },
+    "addCredit": "크레딧 추가",
+    "void": {
+      "title": "이 크레딧을 취소할까요?",
+      "effect": "팩은 재고로 돌아가고 공급업체에 다시 지급할 금액이 생깁니다.",
+      "voided": "크레딧 · {{batch}} 취소됨",
+      "reasons": {
+        "mistake": "실수로 추가",
+        "wrongQuantity": "수량 오류",
+        "supplierRefused": "공급업체가 거절"
+      }
+    },
+    "filters": {
+      "state": "상태",
+      "way": "방향"
+    }
   },
   "drawers": {
     "records": {
@@ -252,8 +322,7 @@
     "quick": {
       "manufacturer": "제조사 {{name}} 추가됨",
       "supplier": "공급업체 {{name}} 추가됨 · 전화와 GST는 나중에 추가",
-      "mr": "MR {{name}} 추가됨",
-      "medicine": "{{name}} 추가됨 · 최대 소매가는 나중에 재고에서 설정"
+      "mr": "MR {{name}} 추가됨"
     },
     "deleteConfirm": {
       "medicine": "이 의약품을 삭제할까요?",
@@ -544,6 +613,7 @@
       "payable": "미지급 {{amount}}",
       "paid": "지급 {{amount}}",
       "paidOf": "{{total}} 중 {{paid}} 지급",
+      "paidWithCredits": "{{paid}} 지급 + 공급업체 크레딧 {{credited}}",
       "pay": "{{amount}} 지불",
       "print": "인쇄"
     },
@@ -570,7 +640,7 @@
     },
     "saleReturn": {
       "title": "환자 반품",
-      "sub": "{{customer}} · 반품된 재고는 원래 배치로 돌아갑니다",
+      "sub": "{{customer}} · 반품된 팩은 원래 배치로 돌아갑니다. 파손되었거나 부작용으로 반품된 팩은 폐기 처리됩니다",
       "steps": {
         "back": "반품되는 품목",
         "reason": "사유 및 환불"
@@ -595,8 +665,11 @@
       "nothing": "반품할 품목을 입력하세요",
       "refunded": "{{amount}} 환불됨 · 재고 복원",
       "refundedWrittenOff": "{{amount}} 환불됨 · 재고 폐기",
-      "lowered": "{{amount}} 반품됨 · 재고 복원",
-      "loweredWrittenOff": "{{amount}} 반품됨 · 재고 폐기"
+      "storeCredit": "매장 크레딧",
+      "saveCredit": "{{amount}} 매장 크레딧으로 보관",
+      "credited": "{{amount}} 매장 크레딧으로 보관됨 · 재고 복원",
+      "creditedWrittenOff": "{{amount}} 매장 크레딧으로 보관됨 · 재고 폐기",
+      "notPaid": "먼저 전액을 수금하세요 · 전액 결제된 판매만 반품할 수 있습니다"
     },
     "expiring": {
       "title": "유효기간 임박 재고 반품",

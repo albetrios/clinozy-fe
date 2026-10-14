@@ -1,494 +1,507 @@
-import { appDateOf, createdFilterMatches } from '@/shared/api/app/app-filter-match.ts';
-import {
-  appHttpError,
-  compareText,
-  type CursorPage,
-  cursorPageOf,
-  directedCompare,
-  searchMatches,
-} from '@/shared/api/app/app-fixture-store.ts';
-import {
-  invoiceBalance,
-  invoiceLineAmounts,
-  purchaseOrderDue,
-  purchaseOrderTotal,
-} from '@/shared/api/app/app-money.ts';
-import type {
-  Invoice,
-  MedicalPurchaseOrder,
-  MedicalSale,
-} from '@/shared/api/app/app-schema.ts';
-import { appToday, civilDayOffset } from '@/shared/api/app/app-time.ts';
-import { cheapestRate } from '@/shared/api/app/medicine-stock.ts';
+import { z } from 'zod';
+
+import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
+import { createdRangeOf } from '@/shared/api/app/app-filter-ranges.ts';
+import type { CreatedFilter } from '@/shared/api/app/app-list-filters.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { invoiceSheetOrganizationWire } from '@/shared/api/app/invoices-contracts.ts';
 import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/app/medicines-api.ts';
-import type { MedicineMaker } from '@/shared/api/app/medicines-contracts.ts';
-import { patientName } from '@/shared/api/app/patients-fixture-contracts.ts';
+import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import {
   type ManufacturerListParams,
   type ManufacturerRow,
+  manufacturerWire,
   type MedicalListSummary,
+  medicalRepVisitWire,
+  medicalRepWire,
   type MrListParams,
   type MrRow,
-  PURCHASE_STAGE_ORDER,
+  type MrVisitRow,
+  type PrescriptionToFill,
+  prescriptionToFillWire,
   type PurchaseOrderListParams,
   type PurchaseOrderRow,
   type PurchaseOrderSheet,
-  type SaleCustomer,
+  purchaseOrderWire,
+  saleDueWire,
   type SaleListParams,
-  type SaleReminder,
   type SaleReminders,
   type SaleRow,
+  saleWire,
+  type SupplierAccountRow,
+  type SupplierCreditListParams,
+  type SupplierCreditRow,
+  supplierCreditWire,
+  supplierListMetaWire,
   type SupplierListParams,
   type SupplierRow,
+  supplierWire,
+  toManufacturerRow,
+  toMrRow,
+  toMrVisitRow,
+  toPrescriptionToFill,
+  toPurchaseOrderRow,
+  toSaleReminder,
+  toSaleRow,
+  toSupplierCreditRow,
+  toSupplierRow,
 } from './medical-contracts.ts';
-import type { SupplierAccountRow } from './medical-partners-contracts.ts';
-import { type SupplierCredit, supplierCreditStore } from './medical-supplier-credits.ts';
 
 /*
- * The Medical family's reads and writes (`S:1655–1677`), on the fixture world
- * until clinozy-be serves them — every call is REPLACE_WITH_API (D6). The
- * world is imported on demand, so its seed data never lands in a route chunk.
- * Each list row carries what the server derives (Appendix F); medicines are
- * the shared `medicines-api.ts`.
+ * The Medical store's reads on clinozy-be (api-integration §5.5): each tab in cursor pages of 50,
+ * one record of each, the whole manufacturer, supplier and MR lists the pickers and the Filters'
+ * sections read (every page, 100 at a time), a supplier's Account, an MR's visits, "Send payment
+ * reminders", a purchase order's print sheet and the footer figures — one read of a single row.
+ * Every key carries the organization. Medicines are the shared `medicines-api.ts`; the store's
+ * payments and customer credits are the shared ledger's and Pending's slices.
  */
 
-/** TanStack Query keys for the Medical family — all under `['app', 'medical']`. */
+/** TanStack Query keys for the Medical store — all under `['app', 'medical']`, each carrying the organization. */
 export const medicalQueryKeys = {
   all: MEDICAL_ROOM_QUERY_KEY,
-  sales: (params: SaleListParams) => [...medicalQueryKeys.all, 'sales', params] as const,
-  sale: (id: string) => [...medicalQueryKeys.all, 'sale', id] as const,
-  /** "Send payment reminders": who the unpaid sales the list matches name. */
-  saleReminders: (params: SaleListParams) =>
-    [...medicalQueryKeys.all, 'sale-reminders', params] as const,
-  purchaseOrders: (params: PurchaseOrderListParams) =>
-    [...medicalQueryKeys.all, 'purchase-orders', params] as const,
-  purchaseOrder: (id: string) => [...medicalQueryKeys.all, 'purchase-order', id] as const,
+  /** Every read of one organization. */
+  organization: (organizationId: string | null) =>
+    [...medicalQueryKeys.all, organizationId] as const,
+  sales: (organizationId: string | null, params: SaleListParams) =>
+    [...medicalQueryKeys.organization(organizationId), 'sales', params] as const,
+  sale: (organizationId: string | null, id: string) =>
+    [...medicalQueryKeys.organization(organizationId), 'sale', id] as const,
+  /** "Send payment reminders": who owes on the sales the list's search and Created match. */
+  saleReminders: (organizationId: string | null, params: SaleListParams) =>
+    [...medicalQueryKeys.organization(organizationId), 'sale-reminders', params] as const,
+  purchaseOrders: (organizationId: string | null, params: PurchaseOrderListParams) =>
+    [
+      ...medicalQueryKeys.organization(organizationId),
+      'purchase-orders',
+      params,
+    ] as const,
+  purchaseOrder: (organizationId: string | null, id: string) =>
+    [...medicalQueryKeys.organization(organizationId), 'purchase-order', id] as const,
   /** What an order's A4 sheet prints beyond the order. */
-  purchaseOrderSheet: (id: string) =>
-    [...medicalQueryKeys.all, 'purchase-order-sheet', id] as const,
-  suppliers: (params: SupplierListParams) =>
-    [...medicalQueryKeys.all, 'suppliers', params] as const,
-  supplier: (id: string) => [...medicalQueryKeys.all, 'supplier', id] as const,
-  supplierAccount: (id: string) =>
-    [...medicalQueryKeys.all, 'supplier-account', id] as const,
-  manufacturers: (params: ManufacturerListParams) =>
-    [...medicalQueryKeys.all, 'manufacturers', params] as const,
-  manufacturer: (id: string) => [...medicalQueryKeys.all, 'manufacturer', id] as const,
-  mrs: (params: MrListParams) => [...medicalQueryKeys.all, 'mrs', params] as const,
-  mr: (id: string) => [...medicalQueryKeys.all, 'mr', id] as const,
+  purchaseOrderSheet: (organizationId: string | null, id: string) =>
+    [
+      ...medicalQueryKeys.organization(organizationId),
+      'purchase-order-sheet',
+      id,
+    ] as const,
+  suppliers: (organizationId: string | null, params: SupplierListParams) =>
+    [...medicalQueryKeys.organization(organizationId), 'suppliers', params] as const,
+  supplier: (organizationId: string | null, id: string) =>
+    [...medicalQueryKeys.organization(organizationId), 'supplier', id] as const,
+  supplierAccount: (organizationId: string | null, id: string) =>
+    [...medicalQueryKeys.organization(organizationId), 'supplier-account', id] as const,
+  supplierCredits: (organizationId: string | null, params: SupplierCreditListParams) =>
+    [
+      ...medicalQueryKeys.organization(organizationId),
+      'supplier-credits',
+      params,
+    ] as const,
+  manufacturers: (organizationId: string | null, params: ManufacturerListParams) =>
+    [...medicalQueryKeys.organization(organizationId), 'manufacturers', params] as const,
+  manufacturer: (organizationId: string | null, id: string) =>
+    [...medicalQueryKeys.organization(organizationId), 'manufacturer', id] as const,
+  mrs: (organizationId: string | null, params: MrListParams) =>
+    [...medicalQueryKeys.organization(organizationId), 'mrs', params] as const,
+  mr: (organizationId: string | null, id: string) =>
+    [...medicalQueryKeys.organization(organizationId), 'mr', id] as const,
+  /** An MR's logged visits. */
+  mrVisits: (organizationId: string | null, id: string) =>
+    [...medicalQueryKeys.organization(organizationId), 'medical-rep-visits', id] as const,
+  /** "Prescriptions to fill" — the pharmacy queue. */
+  prescriptionsToFill: (organizationId: string | null) =>
+    [...medicalQueryKeys.organization(organizationId), 'prescriptions-to-fill'] as const,
   /** A list's footer figures, by tab and params. */
-  summary: (tab: string, params: object) =>
-    [...medicalQueryKeys.all, 'summary', tab, params] as const,
-  /** A whole list the Filters' automatic sections and the pickers read. */
-  catalogue: (kind: 'manufacturers' | 'suppliers' | 'mrs') =>
-    [...medicalQueryKeys.all, 'catalogue', kind] as const,
+  summary: (organizationId: string | null, tab: MedicalSummaryTab, params: object) =>
+    [...medicalQueryKeys.organization(organizationId), 'summary', tab, params] as const,
+  /** A whole list the Filters' sections and the pickers read. */
+  catalogue: (
+    organizationId: string | null,
+    kind: 'manufacturers' | 'suppliers' | 'mrs',
+  ) => [...medicalQueryKeys.organization(organizationId), 'catalogue', kind] as const,
 };
 
-const fixtureWorld = () => import('@/shared/api/app/fixtures/world.fixtures.ts');
+/** One page of a tab — the design's 50. */
+const PAGE_SIZE = 50;
 
-type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['appFixtures'];
+/** One page of a whole list — the API's most. */
+const CATALOGUE_PAGE_SIZE = 100;
 
-/** The credits suppliers gave for returned expiring stock (fixture state beside the world). */
-async function supplierCredits(): Promise<readonly SupplierCredit[]> {
-  const { onAppFixturesReset } = await fixtureWorld();
-  return supplierCreditStore(onAppFixturesReset).list();
+/** How many customers "Send payment reminders" lists — the dues read's most. */
+const REMINDERS_LIMIT = 100;
+
+/** A page of rows with the cursor of the next and the API's estimated total. */
+export interface MedicalPage<T> {
+  rows: T[];
+  next: string | null;
+  total: number | null;
 }
 
-/** Whether `createdAt` passes the Created filter (none set passes). */
-function createdOk(
-  createdAt: string,
-  created: SaleListParams['created'],
-  today: string,
-): boolean {
-  return !created || createdFilterMatches(createdAt, created, today);
+/** The Created filter as the API's range, on the clinic's `today`. */
+function createdQuery(created: CreatedFilter | undefined, today: string) {
+  const range = created ? createdRangeOf(created, today) : {};
+  return { created_from: range.from, created_to: range.to };
 }
 
-/** Every manufacturer as a row names it. */
-function makersOf(world: FixtureWorld): Map<string, MedicineMaker> {
-  return new Map(
-    world.manufacturers
-      .snapshot()
-      .map((maker) => [maker.id, { id: maker.id, name: maker.name, tone: maker.tone }]),
-  );
-}
-
-const makersFor = (ids: readonly string[], makers: Map<string, MedicineMaker>) =>
-  ids.flatMap((id) => {
-    const maker = makers.get(id);
-    return maker ? [maker] : [];
-  });
+/** A search as the API takes it — none when blank. */
+const searchOf = (q: string | undefined) => (q?.trim() ? q.trim() : undefined);
 
 // ── Sales ──
 
-/** The sale's buyer: the patient, else the Medical contact. */
-function customerOf(sale: MedicalSale, world: FixtureWorld): SaleCustomer | null {
-  if (sale.patientId) {
-    const [patient] = world.patients.snapshot((row) => row.id === sale.patientId);
-    if (patient) {
-      return {
-        kind: 'patient',
-        id: patient.id,
-        name: patientName(patient),
-        phone: patient.phone,
-      };
-    }
-  }
-  if (sale.medicalContactId) {
-    const [contact] = world.medicalContacts.snapshot(
-      (row) => row.id === sale.medicalContactId,
-    );
-    if (contact) {
-      return {
-        kind: 'contact',
-        id: contact.id,
-        name: contact.name,
-        phone: contact.phone,
-      };
-    }
-  }
-  return null;
-}
+/** The Sales sorts as the API names them; none is the sale time, the latest first. */
+const SALE_SORTS = {
+  seq: 'sale_number',
+  customer: 'contact_name',
+  bill: 'total',
+} as const;
 
-/**
- * A sale as its row: its invoice's lines and bill, what came back, the cost at
- * today's best buy rates, and the due — the bill less returns and what was
- * paid net of refunds, so a refunded return leaves a paid sale Paid.
- */
-function toSaleRow(
-  sale: MedicalSale,
-  world: FixtureWorld,
-  invoices: Map<string, Invoice>,
-): SaleRow {
-  const invoice = invoices.get(sale.invoiceId);
-  const payments = world.payments.snapshot();
-  const balance = invoice
-    ? invoiceBalance(invoice, payments)
-    : { bill: 0, paid: 0, due: 0, status: 'unpaid' as const };
-  const medicines = new Map(world.medicines.snapshot().map((row) => [row.id, row]));
-  const lines = (invoice?.items ?? []).map((item) => ({
-    medicineId: item.medicineId,
-    name: item.name,
-    qty: item.qty,
-    batchNo: item.batchNo,
-    amount: invoiceLineAmounts(item).net,
-  }));
-  const cost = (invoice?.items ?? []).reduce((sum, item) => {
-    const medicine = item.medicineId ? medicines.get(item.medicineId) : undefined;
-    const best = medicine ? cheapestRate(medicine.supplierRates) : null;
-    return sum + item.qty * (best?.rate ?? 0);
-  }, 0);
-  const returned = sale.returns.reduce((sum, back) => sum + back.amount, 0);
-  const due = Math.max(0, balance.bill - returned - balance.paid);
+/** The Sales filters as the API takes them, on the clinic's `today`. */
+function saleFilterQuery(
+  params: Pick<SaleListParams, 'q' | 'status' | 'created'>,
+  today: string,
+) {
   return {
-    ...sale,
-    invoiceSeq: invoice?.seq ?? null,
-    customer: customerOf(sale, world),
-    lines,
-    bill: balance.bill,
-    returned,
-    cost,
-    paid: balance.paid,
-    due,
-    status: due === 0 ? 'paid' : 'unpaid',
+    q: searchOf(params.q),
+    status: params.status,
+    ...createdQuery(params.created, today),
   };
 }
 
-/** Every live, unvoided sale as its row. */
-function saleRows(world: FixtureWorld): SaleRow[] {
-  const invoices = new Map(
-    world.invoices.snapshot().map((invoice) => [invoice.id, invoice]),
-  );
-  return world.medicalSales
-    .snapshot((sale) => sale.voidedAt === null)
-    .map((sale) => toSaleRow(sale, world, invoices));
+/** The Sales read's query for the URL's params, on the clinic's `today`. */
+export function saleListQuery(params: SaleListParams, today: string = appToday()) {
+  return {
+    limit: PAGE_SIZE,
+    ...saleFilterQuery(params, today),
+    sort: params.sort ? SALE_SORTS[params.sort] : undefined,
+    order: params.sort ? params.order : undefined,
+  };
 }
 
-const SALE_ORDER = {
-  seq: (a: SaleRow, b: SaleRow) => a.seq - b.seq,
-  customer: (a: SaleRow, b: SaleRow) =>
-    (a.customer?.name ?? '').localeCompare(b.customer?.name ?? ''),
-  bill: (a: SaleRow, b: SaleRow) => a.bill - b.bill,
-};
-
-/** The sales a list read matches, in its order. */
-async function salesFor(params: SaleListParams): Promise<SaleRow[]> {
-  const { appFixtures } = await fixtureWorld();
-  const today = appToday();
-  const rows = saleRows(appFixtures).filter(
-    (row) =>
-      searchMatches(params.q, [row.customer?.name ?? '', `#${row.seq}`]) &&
-      (params.status !== 'unpaid' || row.status === 'unpaid') &&
-      (params.status !== 'returned' || row.returns.length > 0) &&
-      createdOk(row.createdAt, params.created, today),
-  );
-  // The contract's default is the newest sale first (`S:1657`).
-  return rows.sort(
-    params.sort
-      ? (a, b) => directedCompare(SALE_ORDER[params.sort ?? 'seq'], params.order)(a, b)
-      : (a, b) => compareText(b.soldAt, a.soldAt),
-  );
-}
-
-/** One cursor page of sales (`listSales`, `S:1657`; REPLACE_WITH_API). */
+/** One page of sales; `after` is the cursor. */
 export async function listMedicalSales(
   params: SaleListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<SaleRow>> {
-  return cursorPageOf(await salesFor(params), cursor);
+  after?: string,
+): Promise<MedicalPage<SaleRow>> {
+  const response = await api.get('/app/medical-sales', {
+    query: { ...saleListQuery(params), after },
+  });
+  return {
+    rows: z
+      .array(saleWire)
+      .parse(response.data ?? [])
+      .map(toSaleRow),
+    ...pageOf(response.meta?.pagination),
+  };
+}
+
+/** One sale as its row — a voided one too (its void and Undo read it); a 404 when unknown. */
+export async function fetchMedicalSale(id: string): Promise<SaleRow> {
+  const response = await api.get('/app/medical-sales/{medical_sale_id}', {
+    params: { medical_sale_id: id },
+  });
+  return toSaleRow(saleWire.parse(response.data));
+}
+
+/** The clinic's name — what a reminder is from. */
+async function clinicName(): Promise<string> {
+  const response = await api.get('/tenancy/organization');
+  return z.object({ name: z.string() }).parse(response.data).name;
 }
 
 /**
- * Who "Send payment reminders" lists (`medical.md:17`; the prototype only
- * toasts, H:5441; REPLACE_WITH_API): each customer the unpaid sales name —
- * the list's search and Created applied — with what they owe across them and
- * their sale numbers, the largest due first; a sale with no customer on
- * record has no one to remind. The clinic's name comes with them, for the
- * message.
+ * Who "Send payment reminders" lists (`GET /app/medical-sales/dues`, MD25): each customer with
+ * unpaid sales the list's search and Created match, what they owe and those sales, the largest due
+ * first; a sale with no buyer on record has no one to remind. The clinic's name comes with them,
+ * for the message. Nothing is sent by the app (D167).
  */
 export async function listSaleReminders(
   params: SaleListParams = {},
+  today: string = appToday(),
 ): Promise<SaleReminders> {
-  const { clinicOrganization } = await fixtureWorld();
-  const rows = await salesFor({ q: params.q, created: params.created, status: 'unpaid' });
-  const byCustomer = new Map<string, SaleReminder>();
-  for (const row of [...rows].sort((a, b) => a.seq - b.seq)) {
-    if (!row.customer || row.due <= 0) continue;
-    const key = `${row.customer.kind}:${row.customer.id}`;
-    const known = byCustomer.get(key);
-    if (known) {
-      known.due += row.due;
-      known.saleSeqs.push(row.seq);
-    } else {
-      byCustomer.set(key, { customer: row.customer, due: row.due, saleSeqs: [row.seq] });
-    }
-  }
+  const [response, name] = await Promise.all([
+    api.get('/app/medical-sales/dues', {
+      query: {
+        limit: REMINDERS_LIMIT,
+        q: searchOf(params.q),
+        ...createdQuery(params.created, today),
+      },
+    }),
+    clinicName(),
+  ]);
   return {
-    clinicName: clinicOrganization().name,
-    customers: [...byCustomer.values()].sort(
-      (a, b) => b.due - a.due || a.customer.name.localeCompare(b.customer.name),
-    ),
+    clinicName: name,
+    customers: z
+      .array(saleDueWire)
+      .parse(response.data ?? [])
+      .flatMap((row) => {
+        const reminder = toSaleReminder(row);
+        return reminder ? [reminder] : [];
+      }),
   };
 }
 
-/** One sale as its row — a 404 when it is unknown, deleted or voided. */
-export async function fetchMedicalSale(id: string): Promise<SaleRow> {
-  const { appFixtures } = await fixtureWorld();
-  const sale = await appFixtures.medicalSales.get(id);
-  if (sale.voidedAt) throw appHttpError(404, 'not_found', 'Sale not found');
-  const invoices = new Map(
-    appFixtures.invoices.snapshot().map((invoice) => [invoice.id, invoice]),
-  );
-  return toSaleRow(sale, appFixtures, invoices);
+/** How many prescriptions "Prescriptions to fill" lists. */
+const TO_FILL_LIMIT = 20;
+
+/**
+ * "Prescriptions to fill" — the approved prescriptions no live sale has filled yet, the latest
+ * first, at most 20 (`GET /app/patient-prescriptions?status=approved&is_filled=false`), each with
+ * its patient (MD29).
+ */
+export async function listPrescriptionsToFill(): Promise<PrescriptionToFill[]> {
+  const response = await api.get('/app/patient-prescriptions', {
+    query: {
+      limit: TO_FILL_LIMIT,
+      status: 'approved',
+      is_filled: 'false',
+      sort: 'prescription_date',
+      order: 'desc',
+    },
+  });
+  return z
+    .array(prescriptionToFillWire)
+    .parse(response.data ?? [])
+    .flatMap((row) => {
+      const prescription = toPrescriptionToFill(row);
+      return prescription ? [prescription] : [];
+    });
 }
 
 // ── Purchase orders ──
 
-/** An order as its row: its supplier, medicine names, free units, total and due. */
-function toPurchaseOrderRow(
-  order: MedicalPurchaseOrder,
-  suppliers: Map<string, string>,
-  medicines: Map<string, string>,
-): PurchaseOrderRow {
+/** The Purchases sorts as the API names them; none is the order date, the latest first. */
+const PURCHASE_SORTS = {
+  seq: 'purchase_order_number',
+  date: 'order_date',
+  total: 'total',
+} as const;
+
+/** The Stage filter as the API's: Paid is a received order paid in full. */
+function stageQuery(stage: PurchaseOrderListParams['stage']) {
+  if (stage === 'ordered') return { stage: 'ordered' };
+  if (stage === 'received')
+    return { stage: 'received', payment_status: 'unpaid,partial' };
+  if (stage === 'paid') return { stage: 'received', payment_status: 'paid' };
+  return {};
+}
+
+/** The Purchases filters as the API takes them, on the clinic's `today`. */
+function purchaseFilterQuery(
+  params: Pick<PurchaseOrderListParams, 'q' | 'stage' | 'created'>,
+  today: string,
+) {
   return {
-    ...order,
-    supplierName: suppliers.get(order.supplierId) ?? '',
-    itemNames: order.items.map((item) => medicines.get(item.medicineId) ?? ''),
-    freeCount: order.items.reduce((sum, item) => sum + item.free, 0),
-    total: purchaseOrderTotal(order.items),
-    due: purchaseOrderDue(order),
+    q: searchOf(params.q),
+    ...stageQuery(params.stage),
+    ...createdQuery(params.created, today),
   };
 }
 
-/** Every live order as its row — cancelled orders leave the list (H:5351). */
-function purchaseOrderRows(world: FixtureWorld): PurchaseOrderRow[] {
-  const suppliers = new Map(world.suppliers.snapshot().map((row) => [row.id, row.name]));
-  const medicines = new Map(world.medicines.snapshot().map((row) => [row.id, row.name]));
-  return world.purchaseOrders
-    .snapshot((order) => order.stage !== 'cancelled')
-    .map((order) => toPurchaseOrderRow(order, suppliers, medicines));
-}
-
-const stageRank = (row: PurchaseOrderRow) =>
-  PURCHASE_STAGE_ORDER.indexOf(row.stage as (typeof PURCHASE_STAGE_ORDER)[number]);
-
-const PURCHASE_ORDER_ORDER = {
-  seq: (a: PurchaseOrderRow, b: PurchaseOrderRow) => a.seq - b.seq,
-  supplier: (a: PurchaseOrderRow, b: PurchaseOrderRow) =>
-    a.supplierName.localeCompare(b.supplierName),
-  total: (a: PurchaseOrderRow, b: PurchaseOrderRow) => a.total - b.total,
-  stage: (a: PurchaseOrderRow, b: PurchaseOrderRow) => stageRank(a) - stageRank(b),
-};
-
-/** The orders a list read matches, in its order. */
-async function purchaseOrdersFor(
+/** The Purchases read's query for the URL's params, on the clinic's `today`. */
+export function purchaseOrderListQuery(
   params: PurchaseOrderListParams,
-): Promise<PurchaseOrderRow[]> {
-  const { appFixtures } = await fixtureWorld();
-  const today = appToday();
-  const rows = purchaseOrderRows(appFixtures).filter(
-    (row) =>
-      searchMatches(params.q, [
-        `#${row.seq}`,
-        row.supplierBillNo ?? '',
-        row.supplierName,
-      ]) &&
-      (!params.stage || row.stage === params.stage) &&
-      createdOk(row.createdAt, params.created, today),
-  );
-  // The contract's default is the latest order date first (`S:1661`).
-  return rows.sort((a, b) =>
-    params.sort
-      ? directedCompare(PURCHASE_ORDER_ORDER[params.sort], params.order)(a, b) ||
-        b.seq - a.seq
-      : compareText(b.date, a.date) || b.seq - a.seq,
-  );
+  today: string = appToday(),
+) {
+  return {
+    limit: PAGE_SIZE,
+    ...purchaseFilterQuery(params, today),
+    sort: params.sort ? PURCHASE_SORTS[params.sort] : undefined,
+    order: params.sort ? params.order : undefined,
+  };
 }
 
-/** One cursor page of purchase orders (`listPurchaseOrders`, `S:1661`; REPLACE_WITH_API). */
+/** One page of purchase orders; `after` is the cursor. */
 export async function listPurchaseOrders(
   params: PurchaseOrderListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<PurchaseOrderRow>> {
-  return cursorPageOf(await purchaseOrdersFor(params), cursor);
+  after?: string,
+): Promise<MedicalPage<PurchaseOrderRow>> {
+  const response = await api.get('/app/medical-purchase-orders', {
+    query: { ...purchaseOrderListQuery(params), after },
+  });
+  return {
+    rows: z
+      .array(purchaseOrderWire)
+      .parse(response.data ?? [])
+      .map(toPurchaseOrderRow),
+    ...pageOf(response.meta?.pagination),
+  };
 }
 
-/** One purchase order as its row — a 404 when it is unknown or deleted. */
+/** One purchase order as its row — a 404 when it is unknown or cancelled. */
 export async function fetchPurchaseOrder(id: string): Promise<PurchaseOrderRow> {
-  const { appFixtures } = await fixtureWorld();
-  const order = await appFixtures.purchaseOrders.get(id);
-  const suppliers = new Map(
-    appFixtures.suppliers.snapshot().map((row) => [row.id, row.name]),
+  const response = await api.get(
+    '/app/medical-purchase-orders/{medical_purchase_order_id}',
+    { params: { medical_purchase_order_id: id } },
   );
-  const medicines = new Map(
-    appFixtures.medicines.snapshot().map((row) => [row.id, row.name]),
-  );
-  return toPurchaseOrderRow(order, suppliers, medicines);
+  return toPurchaseOrderRow(purchaseOrderWire.parse(response.data));
 }
 
 /**
- * A purchase order and what its A4 sheet prints with it (Q-M7;
- * REPLACE_WITH_API): its supplier — read even if since removed — and the
- * clinic with its main branch's phone and GSTIN, as an order names no branch.
+ * A supplier's oldest received order still due — what "Pay ₹X" opens Send payment on, as Clinic
+ * stock's Vendors do; none once they are paid up.
+ */
+export async function fetchOldestOpenPurchaseOrder(
+  supplierId: string,
+): Promise<PurchaseOrderRow | null> {
+  const response = await api.get('/app/medical-purchase-orders', {
+    query: {
+      supplier_id: supplierId,
+      stage: 'received',
+      payment_status: 'unpaid,partial',
+      sort: 'order_date',
+      order: 'asc',
+      limit: 1,
+    },
+  });
+  const [oldest] = z.array(purchaseOrderWire).parse(response.data ?? []);
+  return oldest ? toPurchaseOrderRow(oldest) : null;
+}
+
+/**
+ * A purchase order and what its A4 sheet prints with it (Q-M7, N21): the clinic, and its main
+ * branch's phone and GSTIN (`GET /app/branches/my` — any member), as an order names no branch. The
+ * supplier's phone and GSTIN come on the order, a deleted supplier's too.
  */
 export async function fetchPurchaseOrderSheet(id: string): Promise<PurchaseOrderSheet> {
-  const { appFixtures, clinicOrganization } = await fixtureWorld();
-  const order = await fetchPurchaseOrder(id);
-  const supplier = await appFixtures.suppliers.get(order.supplierId, {
-    includeDeleted: true,
-  });
-  const branches = appFixtures.branches.snapshot();
-  const branch = branches.find((row) => row.isMain) ?? branches[0];
-  const organization = clinicOrganization();
+  const [order, organization, branches] = await Promise.all([
+    fetchPurchaseOrder(id),
+    api.get('/tenancy/organization'),
+    api.get('/app/branches/my'),
+  ]);
+  const clinic = invoiceSheetOrganizationWire.parse(organization.data);
+  const mine = z
+    .array(
+      z.object({
+        is_main: z.boolean(),
+        phone: z.string(),
+        gst_number: z.string().nullable(),
+      }),
+    )
+    .parse(branches.data ?? []);
+  const branch = mine.find((row) => row.is_main) ?? mine[0];
   return {
     order,
-    supplier: {
-      name: supplier.name,
-      phone: supplier.phone,
-      gstNumber: supplier.gstNumber,
-    },
-    organization: {
-      name: organization.name,
-      specialties: organization.specialties,
-      currency: organization.currency,
-    },
-    branch: { phone: branch?.phone ?? '', gstNumber: branch?.gstNumber ?? null },
+    organization: clinic,
+    branch: { phone: branch?.phone ?? '', gstNumber: branch?.gst_number ?? null },
   };
 }
 
 // ── Suppliers ──
 
-/**
- * Every live supplier as its row: the makers it distributes, its live orders,
- * what it is owed on received orders — less the credit it gave for returned
- * stock (`medical.md:309`) — and since when (`S:830`, "N days pending → today
- * − date while due > 0").
- */
-function supplierRows(
-  world: FixtureWorld,
-  credits: readonly SupplierCredit[],
-): SupplierRow[] {
-  const today = appToday();
-  const makers = makersOf(world);
-  const orders = purchaseOrderRows(world);
-  return world.suppliers.snapshot().map((supplier) => {
-    const own = orders.filter((order) => order.supplierId === supplier.id);
-    const open = own
-      .filter((order) => order.due > 0)
-      .sort((a, b) => compareText(a.date, b.date) || a.seq - b.seq);
-    const [oldest] = open;
-    return {
-      ...supplier,
-      manufacturers: makersFor(supplier.manufacturerIds, makers),
-      orderCount: own.length,
-      orderTotal: own.reduce((sum, order) => sum + order.total, 0),
-      payable: Math.max(
-        0,
-        open.reduce((sum, order) => sum + order.due, 0) -
-          credits
-            .filter((credit) => credit.supplierId === supplier.id)
-            .reduce((sum, credit) => sum + credit.amount, 0),
-      ),
-      ageingDays: oldest ? Math.max(0, civilDayOffset(oldest.date, today)) : null,
-      hasOpenOrder: own.some((order) => order.stage !== 'paid'),
-      oldestOpenBill: oldest ? { id: oldest.id, seq: oldest.seq, due: oldest.due } : null,
-    };
-  });
+/** The Suppliers filters as the API takes them, on the clinic's `today`. */
+function supplierFilterQuery(params: SupplierListParams, today: string) {
+  return {
+    q: searchOf(params.q),
+    manufacturer_id: params.manufacturer,
+    has_payable: params.hasPayable ? ('true' as const) : undefined,
+    ...createdQuery(params.created, today),
+  };
 }
 
-const SUPPLIER_ORDER = {
-  name: (a: SupplierRow, b: SupplierRow) => a.name.localeCompare(b.name),
-  payable: (a: SupplierRow, b: SupplierRow) => a.payable - b.payable,
-};
-
-/** The suppliers a list read matches, in its order (name, A to Z, by default). */
-async function suppliersFor(params: SupplierListParams): Promise<SupplierRow[]> {
-  const { appFixtures } = await fixtureWorld();
-  const today = appToday();
-  return supplierRows(appFixtures, await supplierCredits())
-    .filter(
-      (row) =>
-        searchMatches(params.q, [row.name]) &&
-        (!params.manufacturer?.length ||
-          row.manufacturerIds.some((id) => params.manufacturer?.includes(id))) &&
-        createdOk(row.createdAt, params.created, today),
-    )
-    .sort(directedCompare(SUPPLIER_ORDER[params.sort ?? 'name'], params.order));
-}
-
-/** One cursor page of suppliers (`listSuppliers`, `S:1662`; REPLACE_WITH_API). */
+/** One page of suppliers; `after` is the cursor. */
 export async function listSuppliers(
   params: SupplierListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<SupplierRow>> {
-  return cursorPageOf(await suppliersFor(params), cursor);
+  after?: string,
+): Promise<MedicalPage<SupplierRow>> {
+  const response = await api.get('/app/suppliers', {
+    query: {
+      limit: PAGE_SIZE,
+      ...supplierFilterQuery(params, appToday()),
+      sort: params.sort,
+      order: params.sort ? params.order : undefined,
+      after,
+    },
+  });
+  return {
+    rows: z
+      .array(supplierWire)
+      .parse(response.data ?? [])
+      .map(toSupplierRow),
+    ...pageOf(response.meta?.pagination),
+  };
 }
 
-/** Every live supplier as its row — the pickers' list. */
-export function fetchAllSuppliers(params: SupplierListParams = {}) {
-  return suppliersFor(params);
+/** Every live supplier as its row, by name — the pickers' and the Filters' list. */
+export function fetchAllSuppliers(): Promise<SupplierRow[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/suppliers', {
+      query: { limit: CATALOGUE_PAGE_SIZE, after: after ?? undefined, sort: 'name' },
+    });
+    return {
+      rows: z
+        .array(supplierWire)
+        .parse(response.data ?? [])
+        .map(toSupplierRow),
+      next: pageOf(response.meta?.pagination).next,
+    };
+  }, 'suppliers');
 }
 
 /** One supplier as its row — a 404 when it is unknown or deleted. */
 export async function fetchSupplier(id: string): Promise<SupplierRow> {
-  const { appFixtures } = await fixtureWorld();
-  const [row] = supplierRows(appFixtures, await supplierCredits()).filter(
-    (supplier) => supplier.id === id,
-  );
-  if (!row) throw appHttpError(404, 'not_found', 'Supplier not found');
-  return row;
+  const response = await api.get('/app/suppliers/{supplier_id}', {
+    params: { supplier_id: id },
+  });
+  return toSupplierRow(supplierWire.parse(response.data));
+}
+
+/** Every credit of one supplier, newest first (`GET /app/suppliers/:supplier_id/credits`, MD34). */
+function fetchAllSupplierCredits(supplierId: string): Promise<SupplierCreditRow[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/suppliers/{supplier_id}/credits', {
+      params: { supplier_id: supplierId },
+      query: { limit: CATALOGUE_PAGE_SIZE, after: after ?? undefined },
+    });
+    return {
+      rows: z
+        .array(supplierCreditWire)
+        .parse(response.data ?? [])
+        .map(toSupplierCreditRow),
+      next: pageOf(response.meta?.pagination).next,
+    };
+  }, 'supplier-credits');
+}
+
+/** Every live order of one supplier, the latest first. */
+function fetchAllSupplierOrders(supplierId: string): Promise<PurchaseOrderRow[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/medical-purchase-orders', {
+      query: {
+        limit: CATALOGUE_PAGE_SIZE,
+        after: after ?? undefined,
+        supplier_id: supplierId,
+      },
+    });
+    return {
+      rows: z
+        .array(purchaseOrderWire)
+        .parse(response.data ?? [])
+        .map(toPurchaseOrderRow),
+      next: pageOf(response.meta?.pagination).next,
+    };
+  }, 'supplier-orders');
 }
 
 /**
- * A supplier's Account (`medical.md:200`): every live order — its stage, total
- * and what is still owed on it — and every credit it gave for returned stock
- * ("Credit · 026-312"), latest first (REPLACE_WITH_API).
+ * A supplier's Account (`medical.md:200`): every live order — its stage, total and what is still
+ * owed on it — and every credit it gave for returned stock ("Credit · 026-312"), latest first.
  */
 export async function fetchSupplierAccount(id: string): Promise<SupplierAccountRow[]> {
-  const { appFixtures } = await fixtureWorld();
-  const orders: SupplierAccountRow[] = purchaseOrderRows(appFixtures)
-    .filter((order) => order.supplierId === id)
-    .map((order) => ({
+  const [orders, credits] = await Promise.all([
+    fetchAllSupplierOrders(id),
+    fetchAllSupplierCredits(id),
+  ]);
+  const rows: SupplierAccountRow[] = [
+    ...credits.map((credit) => ({
+      kind: 'credit' as const,
+      id: credit.id,
+      batchNo: credit.batchNo,
+      // The clinic's day of the instant — its UTC date is the day before until 05:30 IST.
+      date: appToday(new Date(credit.createdAt)),
+      amount: credit.amount,
+    })),
+    ...orders.map((order) => ({
       kind: 'order' as const,
       id: order.id,
       seq: order.seq,
@@ -497,156 +510,243 @@ export async function fetchSupplierAccount(id: string): Promise<SupplierAccountR
       stage: order.stage,
       amount: order.total,
       due: order.due,
-    }));
-  const credits: SupplierAccountRow[] = (await supplierCredits())
-    .filter((credit) => credit.supplierId === id)
-    .map((credit) => ({
-      kind: 'credit' as const,
-      id: credit.id,
-      batchNo: credit.batchNo,
-      date: appDateOf(credit.at),
-      amount: credit.amount,
-    }));
-  return [...credits, ...orders].sort((a, b) => compareText(b.date, a.date));
+    })),
+  ];
+  return rows.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+// ── Supplier credits ──
+
+/**
+ * One page of supplier credits, newest first — every supplier's (`GET /app/supplier-credits`, the
+ * Credits tab) or one supplier's (`GET /app/suppliers/:supplier_id/credits`); `after` is the cursor.
+ */
+export async function listSupplierCredits(
+  params: SupplierCreditListParams = {},
+  after?: string,
+): Promise<MedicalPage<SupplierCreditRow>> {
+  const query = { limit: PAGE_SIZE, status: params.status, after };
+  const response = params.supplier
+    ? await api.get('/app/suppliers/{supplier_id}/credits', {
+        params: { supplier_id: params.supplier },
+        query,
+      })
+    : await api.get('/app/supplier-credits', { query });
+  return {
+    rows: z
+      .array(supplierCreditWire)
+      .parse(response.data ?? [])
+      .map(toSupplierCreditRow),
+    ...pageOf(response.meta?.pagination),
+  };
 }
 
 // ── Manufacturers ──
 
-/** Every live manufacturer as its row: its medicines, suppliers and MRs. */
-function manufacturerRows(world: FixtureWorld): ManufacturerRow[] {
-  const medicines = world.medicines.snapshot();
-  const suppliers = world.suppliers.snapshot();
-  const reps = world.medicalReps.snapshot();
-  return world.manufacturers.snapshot().map((maker) => ({
-    ...maker,
-    medicineCount: medicines.filter((row) => row.manufacturerId === maker.id).length,
-    suppliers: suppliers
-      .filter((row) => row.manufacturerIds.includes(maker.id))
-      .map((row) => ({ id: row.id, name: row.name })),
-    mrs: reps
-      .filter((row) => row.manufacturerIds.includes(maker.id))
-      .map((row) => ({ id: row.id, name: row.name })),
-  }));
+/** The Manufacturers filters as the API takes them, on the clinic's `today`. */
+function manufacturerFilterQuery(params: ManufacturerListParams, today: string) {
+  return {
+    q: searchOf(params.q),
+    supplier_id: params.supplier,
+    medical_rep_id: params.mr,
+    ...createdQuery(params.created, today),
+  };
 }
 
-/** The manufacturers a list read matches, by name. */
-async function manufacturersFor(
-  params: ManufacturerListParams,
-): Promise<ManufacturerRow[]> {
-  const { appFixtures } = await fixtureWorld();
-  const today = appToday();
-  return manufacturerRows(appFixtures)
-    .filter(
-      (row) =>
-        searchMatches(params.q, [row.name]) &&
-        (!params.suppliers?.length ||
-          row.suppliers.some((supplier) => params.suppliers?.includes(supplier.id))) &&
-        (!params.mrs?.length || row.mrs.some((mr) => params.mrs?.includes(mr.id))) &&
-        createdOk(row.createdAt, params.created, today),
-    )
-    .sort(directedCompare((a, b) => a.name.localeCompare(b.name), params.order));
-}
-
-/** One cursor page of manufacturers (`listManufacturers`, `S:1662`; REPLACE_WITH_API). */
+/** One page of manufacturers, by name; `after` is the cursor. */
 export async function listManufacturers(
   params: ManufacturerListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<ManufacturerRow>> {
-  return cursorPageOf(await manufacturersFor(params), cursor);
+  after?: string,
+): Promise<MedicalPage<ManufacturerRow>> {
+  const response = await api.get('/app/manufacturers', {
+    query: {
+      limit: PAGE_SIZE,
+      ...manufacturerFilterQuery(params, appToday()),
+      sort: 'name',
+      order: params.order,
+      after,
+    },
+  });
+  return {
+    rows: z
+      .array(manufacturerWire)
+      .parse(response.data ?? [])
+      .map(toManufacturerRow),
+    ...pageOf(response.meta?.pagination),
+  };
 }
 
-/** Every live manufacturer as its row — the pickers' list. */
-export function fetchAllManufacturers(params: ManufacturerListParams = {}) {
-  return manufacturersFor(params);
+/** Every live manufacturer as its row, by name — the pickers' and the Filters' list. */
+export function fetchAllManufacturers(): Promise<ManufacturerRow[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/manufacturers', {
+      query: { limit: CATALOGUE_PAGE_SIZE, after: after ?? undefined, sort: 'name' },
+    });
+    return {
+      rows: z
+        .array(manufacturerWire)
+        .parse(response.data ?? [])
+        .map(toManufacturerRow),
+      next: pageOf(response.meta?.pagination).next,
+    };
+  }, 'manufacturers');
 }
 
 /** One manufacturer as its row — a 404 when it is unknown or deleted. */
 export async function fetchManufacturer(id: string): Promise<ManufacturerRow> {
-  const { appFixtures } = await fixtureWorld();
-  const [row] = manufacturerRows(appFixtures).filter((maker) => maker.id === id);
-  if (!row) throw appHttpError(404, 'not_found', 'Manufacturer not found');
-  return row;
+  const response = await api.get('/app/manufacturers/{manufacturer_id}', {
+    params: { manufacturer_id: id },
+  });
+  return toManufacturerRow(manufacturerWire.parse(response.data));
 }
 
 // ── MRs ──
 
-/** Every live MR as their row: the makers they represent and their last visit. */
-function mrRows(world: FixtureWorld): MrRow[] {
-  const makers = makersOf(world);
-  const visits = world.mrVisits
-    .snapshot()
-    .sort((a, b) => compareText(b.date, a.date) || compareText(b.createdAt, a.createdAt));
-  return world.medicalReps.snapshot().map((rep) => {
-    const last = visits.find((visit) => visit.mrId === rep.id);
-    return {
-      ...rep,
-      manufacturers: makersFor(rep.manufacturerIds, makers),
-      lastVisitOn: last?.date ?? null,
-      samples: last?.samples ?? null,
-    };
-  });
-}
-
-/** The MRs a list read matches, by name. */
-async function mrsFor(params: MrListParams): Promise<MrRow[]> {
-  const { appFixtures } = await fixtureWorld();
-  const today = appToday();
-  return mrRows(appFixtures)
-    .filter(
-      (row) =>
-        searchMatches(params.q, [row.name]) &&
-        createdOk(row.createdAt, params.created, today),
-    )
-    .sort(directedCompare((a, b) => a.name.localeCompare(b.name), params.order));
-}
-
-/** One cursor page of MRs (`listMRs`, `S:1662`; REPLACE_WITH_API). */
+/** One page of MRs, by name; `after` is the cursor. */
 export async function listMedicalReps(
   params: MrListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<MrRow>> {
-  return cursorPageOf(await mrsFor(params), cursor);
+  after?: string,
+): Promise<MedicalPage<MrRow>> {
+  const response = await api.get('/app/medical-reps', {
+    query: {
+      limit: PAGE_SIZE,
+      q: searchOf(params.q),
+      ...createdQuery(params.created, appToday()),
+      sort: 'name',
+      order: params.order,
+      after,
+    },
+  });
+  return {
+    rows: z
+      .array(medicalRepWire)
+      .parse(response.data ?? [])
+      .map(toMrRow),
+    ...pageOf(response.meta?.pagination),
+  };
 }
 
-/** Every live MR as their row — the pickers' list. */
-export function fetchAllMedicalReps(params: MrListParams = {}) {
-  return mrsFor(params);
+/** Every live MR as their row, by name — the pickers' list. */
+export function fetchAllMedicalReps(): Promise<MrRow[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/medical-reps', {
+      query: { limit: CATALOGUE_PAGE_SIZE, after: after ?? undefined, sort: 'name' },
+    });
+    return {
+      rows: z
+        .array(medicalRepWire)
+        .parse(response.data ?? [])
+        .map(toMrRow),
+      next: pageOf(response.meta?.pagination).next,
+    };
+  }, 'medical-reps');
 }
 
 /** One MR as their row — a 404 when they are unknown or deleted. */
 export async function fetchMedicalRep(id: string): Promise<MrRow> {
-  const { appFixtures } = await fixtureWorld();
-  const [row] = mrRows(appFixtures).filter((rep) => rep.id === id);
-  if (!row) throw appHttpError(404, 'not_found', 'MR not found');
-  return row;
+  const response = await api.get('/app/medical-reps/{medical_rep_id}', {
+    params: { medical_rep_id: id },
+  });
+  return toMrRow(medicalRepWire.parse(response.data));
+}
+
+/** An MR's logged visits, the latest first. */
+export function fetchMrVisits(mrId: string): Promise<MrVisitRow[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/medical-reps/{medical_rep_id}/visits', {
+      params: { medical_rep_id: mrId },
+      query: {
+        limit: CATALOGUE_PAGE_SIZE,
+        after: after ?? undefined,
+        sort: 'visit_date',
+        order: 'desc',
+      },
+    });
+    return {
+      rows: z
+        .array(medicalRepVisitWire)
+        .parse(response.data ?? [])
+        .map(toMrVisitRow),
+      next: pageOf(response.meta?.pagination).next,
+    };
+  }, 'medical-rep-visits');
 }
 
 // ── Footer figures ──
 
+/** The tabs with a footer. */
+export type MedicalSummaryTab =
+  'sales' | 'purchases' | 'suppliers' | 'manufacturers' | 'mrs' | 'supplierCredits';
+
+/** A footer read: how many rows match, read with one. */
+const countOf = (response: { meta?: { pagination?: object } }): MedicalListSummary => ({
+  total: pageOf(response.meta?.pagination).total ?? 0,
+  payable: 0,
+});
+
+/** Each tab's footer read for its list's own filters, on the clinic's `today`. */
+const SUMMARY_READS: Readonly<
+  Record<
+    MedicalSummaryTab,
+    (params: object, today: string) => Promise<MedicalListSummary>
+  >
+> = {
+  sales: async (params, today) =>
+    countOf(
+      await api.get('/app/medical-sales', {
+        query: { ...saleFilterQuery(params as SaleListParams, today), limit: 1 },
+      }),
+    ),
+  purchases: async (params, today) =>
+    countOf(
+      await api.get('/app/medical-purchase-orders', {
+        query: {
+          ...purchaseFilterQuery(params as PurchaseOrderListParams, today),
+          limit: 1,
+        },
+      }),
+    ),
+  suppliers: async (params, today) => {
+    const response = await api.get('/app/suppliers', {
+      query: { ...supplierFilterQuery(params as SupplierListParams, today), limit: 1 },
+    });
+    const meta = supplierListMetaWire.safeParse(response.meta);
+    return { ...countOf(response), payable: meta.success ? meta.data.payable_total : 0 };
+  },
+  manufacturers: async (params, today) =>
+    countOf(
+      await api.get('/app/manufacturers', {
+        query: {
+          ...manufacturerFilterQuery(params as ManufacturerListParams, today),
+          limit: 1,
+        },
+      }),
+    ),
+  mrs: async (params, today) => {
+    const mrs = params as MrListParams;
+    return countOf(
+      await api.get('/app/medical-reps', {
+        query: { q: searchOf(mrs.q), ...createdQuery(mrs.created, today), limit: 1 },
+      }),
+    );
+  },
+  supplierCredits: async (params) =>
+    countOf(
+      await api.get('/app/supplier-credits', {
+        query: { status: (params as SupplierCreditListParams).status, limit: 1 },
+      }),
+    ),
+};
+
 /**
- * A list's footer figures (`medical.md:19`): how many rows the read matches
- * and, on Suppliers, what they are owed — a fixture `total` until the list
- * contract carries one (C31, Appendix F; REPLACE_WITH_API).
+ * A list's footer figures (`medical.md:19`): how many rows the read matches and, on Suppliers,
+ * what they are owed (`meta.payable_total`, over every page) — each one read of a single row, for
+ * the list's own filters.
  */
-export async function medicalListSummary(
-  tab: 'sales' | 'purchases' | 'suppliers' | 'manufacturers' | 'mrs',
+export function medicalListSummary(
+  tab: MedicalSummaryTab,
   params: object,
+  today: string = appToday(),
 ): Promise<MedicalListSummary> {
-  switch (tab) {
-    case 'sales':
-      return { total: (await salesFor(params)).length, payable: 0 };
-    case 'purchases':
-      return { total: (await purchaseOrdersFor(params)).length, payable: 0 };
-    case 'suppliers': {
-      const rows = await suppliersFor(params);
-      return {
-        total: rows.length,
-        payable: rows.reduce((sum, row) => sum + row.payable, 0),
-      };
-    }
-    case 'manufacturers':
-      return { total: (await manufacturersFor(params)).length, payable: 0 };
-    default:
-      return { total: (await mrsFor(params)).length, payable: 0 };
-  }
+  return SUMMARY_READS[tab](params, today);
 }

@@ -1,12 +1,17 @@
-import { purchaseOrderTotal } from '@/shared/api/app/app-money.ts';
+import { paiseOfRupees } from '@/lib/number-text.ts';
 import { expiryMonthSchema } from '@/shared/api/app/app-schema.ts';
 
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
-import type { ReceiveInput } from '../../../shared/medical-flows-contracts.ts';
+import type { ReceiveInput } from '../../../shared/medical-records-contracts.ts';
+import {
+  orderLineInputOf,
+  typedMedicineName,
+} from '../PurchaseOrderDrawer/purchase-order-form.ts';
 
 /*
  * Receive goods' form (`medical.md:269–279`) — pure, so the drawer and its
- * check read one set of rules.
+ * check read one set of rules. An unexpected line's rate is paise, the money
+ * cell's unit, sent as the API's rupees; an ordered line is sent by its id.
  */
 
 /**
@@ -15,7 +20,9 @@ import type { ReceiveInput } from '../../../shared/medical-flows-contracts.ts';
  * counts and rate are typed here.
  */
 export interface ReceiveLineValues {
-  /** The ordered line's medicine; an unexpected line's once picked. */
+  /** The ordered line's id (`mpoi_…`); none on an unexpected one. */
+  lineId: string | null;
+  /** The ordered line's medicine; an unexpected line's once picked — or a typed one's key. */
   medicineId: string | null;
   name: string;
   qty: number;
@@ -38,12 +45,13 @@ export interface ReceiveFormValues {
 /** Every line of the order, ticked as arrived, with no batch or expiry yet. */
 export function receiveFormOf(order: PurchaseOrderRow): ReceiveFormValues {
   return {
-    lines: order.items.map((item, index) => ({
-      medicineId: item.medicineId,
-      name: order.itemNames[index] ?? '',
-      qty: item.qty,
-      free: item.free,
-      rate: item.rate,
+    lines: order.lines.map((line) => ({
+      lineId: line.id,
+      medicineId: line.medicineId,
+      name: line.medicineName,
+      qty: line.qty,
+      free: line.free,
+      rate: paiseOfRupees(line.rate),
       arrived: true,
       batchNo: '',
       expiry: '',
@@ -54,6 +62,7 @@ export function receiveFormOf(order: PurchaseOrderRow): ReceiveFormValues {
 
 /** "+ Add unexpected item": a line with no medicine yet, one unit, arrived. */
 export const emptyUnexpectedLine = (): ReceiveLineValues => ({
+  lineId: null,
   medicineId: null,
   name: '',
   qty: 1,
@@ -116,22 +125,35 @@ export const receiveLineCount = (lines: readonly ReceiveLineValues[]) =>
   lines.filter((line) => !line.unexpected || comesIn(line)).length;
 
 /**
- * The bill once received (the summary, `medical.md:277`): the order's total
- * and each unexpected line coming in, qty × rate — free units cost nothing.
+ * The bill once received (the summary, `medical.md:277`), paise: the order's
+ * total and each unexpected line coming in, qty × rate — free units cost
+ * nothing. A preview: the server bills the receipt.
  */
 export function receiveTotal(
   order: Pick<PurchaseOrderRow, 'total'>,
   lines: readonly ReceiveLineValues[],
 ): number {
-  return (
-    order.total +
-    purchaseOrderTotal(lines.filter((line) => line.unexpected && comesIn(line)))
-  );
+  return lines
+    .filter((line) => line.unexpected && comesIn(line))
+    .reduce(
+      (sum, line) => sum + Math.round(line.qty * line.rate),
+      paiseOfRupees(order.total),
+    );
+}
+
+/** A line's medicine as the checks name it: its name, or a typed one's. */
+export function receiveLineName(
+  line: Pick<ReceiveLineValues, 'name' | 'medicineId'>,
+): string | undefined {
+  if (line.name) return line.name;
+  return typedMedicineName(line.medicineId) ?? undefined;
 }
 
 /**
- * The contract's fields: every ordered line in the order's order — an empty
- * batch is the server's "NEW-<seq>" — and each unexpected line coming in.
+ * The contract's fields: every ordered line by its id — an empty batch is the
+ * server's "NEW-<seq>" — and each unexpected line coming in as `extras`, sent
+ * without an id (MD26): its medicine, or a typed one's name for the server to
+ * add, and its rate in rupees.
  */
 export function receiveInputOf(values: ReceiveFormValues): ReceiveInput {
   const trimmed = (text: string) => text.trim() || null;
@@ -139,6 +161,7 @@ export function receiveInputOf(values: ReceiveFormValues): ReceiveInput {
     lines: values.lines
       .filter((line) => !line.unexpected)
       .map((line) => ({
+        id: line.lineId ?? '',
         arrived: line.arrived,
         batchNo: line.arrived ? trimmed(line.batchNo) : null,
         expiry: line.arrived ? trimmed(line.expiry) : null,
@@ -146,10 +169,7 @@ export function receiveInputOf(values: ReceiveFormValues): ReceiveInput {
     extras: values.lines
       .filter((line) => line.unexpected && comesIn(line))
       .map((line) => ({
-        medicineId: line.medicineId ?? '',
-        qty: line.qty,
-        free: line.free,
-        rate: line.rate,
+        ...orderLineInputOf(line),
         batchNo: trimmed(line.batchNo),
         expiry: trimmed(line.expiry),
       })),

@@ -3,12 +3,11 @@ import { z } from 'zod';
 import { type TaskKind, taskSchema } from './app-schema.ts';
 
 /**
- * The fixture world's task record — what `world.tasks` holds for the rooms still on fixtures: the
- * fixture chat history (`messages-api.ts`), the fixture contact threads
- * (`fixtures/contact-threads.fixtures.ts`) and the invoices' "Payment due" task
- * (`fixtures/invoices-server.fixtures.ts`). The Tasks room and Today's work queue read clinozy-be
+ * The fixture world's task record — what `world.tasks` holds for the chat column's fixture path:
+ * the fixture chat history (`messages-api.ts`) and the fixture contact threads
+ * (`fixtures/contact-threads.fixtures.ts`). The Tasks room and Today's work queue read clinozy-be
  * (`tasks-contracts.ts`, D155) — no fixture server or rule job runs on these any more; this goes
- * with the last fixture room that reads `world.tasks`.
+ * with the chat's fixture path.
  */
 
 /**

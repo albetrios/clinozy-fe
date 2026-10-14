@@ -26,6 +26,7 @@ import {
   Package,
   Pill,
   Receipt,
+  RefreshCw,
   Users,
   Wallet,
 } from '@/shared/icons/index.ts';
@@ -40,7 +41,10 @@ import { type MedicalCreateTab, useMedicalNav } from '../../hooks/useMedicalNav/
 /** A tab's group in "More" and the Create menu (H:5433). */
 type MedicalGroup = keyof typeof MEDICAL_KEYS.tabs.groups;
 
-/** The seven tabs in the prototype's order (H:5433), each with its icon and group. */
+/**
+ * The tabs in the prototype's order (H:5433), each with its icon and group — and Credits, the
+ * store's credits beside its Payments in "Money" (clinozy-be D90; a standing deviation).
+ */
 const MEDICAL_TABS: readonly { id: MedicalTab; icon: AppIcon; group: MedicalGroup }[] = [
   { id: 'sales', icon: Receipt, group: 'selling' },
   { id: 'medicines', icon: Pill, group: 'stock' },
@@ -49,6 +53,7 @@ const MEDICAL_TABS: readonly { id: MedicalTab; icon: AppIcon; group: MedicalGrou
   { id: 'manufacturers', icon: Package, group: 'buying' },
   { id: 'mrs', icon: Users, group: 'buying' },
   { id: 'payments', icon: Wallet, group: 'money' },
+  { id: 'credits', icon: RefreshCw, group: 'money' },
 ];
 
 /** One create action: the tab whose create route it opens. */
@@ -78,7 +83,7 @@ const MEDICAL_CREATES: readonly MedicalCreate[] = [
   { id: 'manufacturer', tab: 'manufacturers', icon: Package, group: 'buying' },
 ];
 
-/** The split primary per tab (H:5431); Payments' is "New sale". */
+/** The split primary per tab (H:5431); Payments' and Credits' is "New sale". */
 const PRIMARY_CREATE: Readonly<Record<MedicalTab, MedicalCreate['id']>> = {
   sales: 'sale',
   medicines: 'medicine',
@@ -87,6 +92,7 @@ const PRIMARY_CREATE: Readonly<Record<MedicalTab, MedicalCreate['id']>> = {
   manufacturers: 'manufacturer',
   mrs: 'mr',
   payments: 'sale',
+  credits: 'sale',
 };
 
 /** Props of {@link MedicalToolbar}. */
@@ -99,11 +105,13 @@ export interface MedicalToolbarProps<TRow extends RowData> {
   filters?: RoomToolbarFilters;
   /** The tab's view action for its filter state (`RoomViewAction`), if any. */
   viewAction?: ReactNode;
+  /** The search field; off for a list the API cannot search (Credits' "From suppliers"). */
+  searchable?: boolean;
 }
 
 /**
  * The Medical toolbar (KICKOFF §6.7 Toolbar; `medical.md:17`) on the shared
- * room toolbar: h1 "Medical" · the seven tabs folding into "More ⌄" when the
+ * room toolbar: h1 "Medical" · the eight tabs folding into "More ⌄" when the
  * measured space runs out (on a phone the current tab alone) · search ·
  * saved views · Filters · Columns · the tab's view action · the split
  * "+ New <thing>" with its "⌄" Create menu (every other create, grouped
@@ -115,6 +123,7 @@ export function MedicalToolbar<TRow extends RowData>({
   table,
   filters,
   viewAction,
+  searchable = true,
 }: MedicalToolbarProps<TRow>) {
   const { t } = useTranslation(MEDICAL_NS);
   const phone = useViewportTier() === 'phone';
@@ -155,10 +164,14 @@ export function MedicalToolbar<TRow extends RowData>({
           {phone ? viewAction : null}
         </div>
       }
-      search={{
-        placeholder: t(MEDICAL_KEYS.search.placeholder),
-        label: t(MEDICAL_KEYS.search.label),
-      }}
+      search={
+        searchable
+          ? {
+              placeholder: t(MEDICAL_KEYS.search.placeholder),
+              label: t(MEDICAL_KEYS.search.label),
+            }
+          : undefined
+      }
       filters={filters}
       columns={
         table ? <DataTableColumnChooser table={table} tableId={tableId} /> : undefined

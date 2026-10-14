@@ -1,9 +1,10 @@
-import type { Manufacturer, MedicalRep, Supplier } from '@/shared/api/app/app-schema.ts';
-import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
+import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 import {
   type StackedRequests,
   useStackedRequest,
 } from '@/shared/hooks/useStackedDrawer/index.ts';
+
+import type { ManufacturerRow, MrRow, SupplierRow } from '../../medical-contracts.ts';
 
 /**
  * A parent's "New <thing> · “q”" + "full details" (`medical.md:319, 343–355`):
@@ -11,22 +12,22 @@ import {
  * the field its save selects the new record in.
  */
 export type MedicalStackRequest =
-  | { kind: 'manufacturer'; query: string; onCreated: (record: Manufacturer) => void }
+  | { kind: 'manufacturer'; query: string; onCreated: (record: ManufacturerRow) => void }
   | {
       kind: 'supplier';
       query: string;
       /** The makers it distributes from the start (the medicine's own). */
       manufacturerIds?: readonly string[];
-      onCreated: (record: Supplier) => void;
+      onCreated: (record: SupplierRow) => void;
     }
-  | { kind: 'mr'; query: string; onCreated: (record: MedicalRep) => void }
-  | { kind: 'medicine'; query: string; onCreated: (record: MedicineRecord) => void };
+  | { kind: 'mr'; query: string; onCreated: (record: MrRow) => void }
+  | { kind: 'medicine'; query: string; onCreated: (record: MedicineRow) => void };
 
 /** The records a Medical drawer can open on top of itself. */
 export type MedicalStackKind = MedicalStackRequest['kind'];
 
 /** What a stacked child saves. */
-export type MedicalStackRecord = Manufacturer | Supplier | MedicalRep | MedicineRecord;
+export type MedicalStackRecord = ManufacturerRow | SupplierRow | MrRow | MedicineRow;
 
 /** How a record drawer asks for a stacked child; without it the pickers offer no "full details". */
 export type OpenMedicalChild = (request: MedicalStackRequest) => void;

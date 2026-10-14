@@ -56,10 +56,12 @@ import { validateInvoiceSearch } from '@/pages/organization/$organizationSlug/in
 import type { LeadCreateSearch } from '@/pages/organization/$organizationSlug/leads/leads.dialog-search.ts';
 import { manifest as leadsManifest } from '@/pages/organization/$organizationSlug/leads/leads.manifest.ts';
 import { validateLeadsSearch } from '@/pages/organization/$organizationSlug/leads/leads.search.ts';
+import { manifest as medicalCreditsManifest } from '@/pages/organization/$organizationSlug/medical/credits/credits.manifest.ts';
 import { manifest as medicalManufacturersManifest } from '@/pages/organization/$organizationSlug/medical/manufacturers/manufacturers.manifest.ts';
 import type { MedicalCreateSearch } from '@/pages/organization/$organizationSlug/medical/medical.dialog-search.ts';
 import { manifest as medicalManifest } from '@/pages/organization/$organizationSlug/medical/medical.manifest.ts';
 import {
+  validateMedicalCreditsSearch,
   validateMedicalPaymentsSearch,
   validateMedicalSearch,
 } from '@/pages/organization/$organizationSlug/medical/medical.search.ts';
@@ -361,6 +363,7 @@ const MedicalSuppliersPage = roomRoute('MedicalSuppliersPage');
 const MedicalManufacturersPage = roomRoute('MedicalManufacturersPage');
 const MedicalMrsPage = roomRoute('MedicalMrsPage');
 const MedicalPaymentsPage = roomRoute('MedicalPaymentsPage');
+const MedicalCreditsPage = roomRoute('MedicalCreditsPage');
 const StockLayout = roomRoute('StockLayout');
 const StockItemsPage = roomRoute('StockItemsPage');
 const StockPurchasesPage = roomRoute('StockPurchasesPage');
@@ -1440,6 +1443,16 @@ const organizationMedicalPaymentsRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
+const organizationMedicalCreditsRoute = createRoute({
+  getParentRoute: () => organizationMedicalRoute,
+  path: 'credits',
+  head: manifestHead(medicalCreditsManifest),
+  validateSearch: validateMedicalCreditsSearch,
+  beforeLoad: roomLeafGate(medicalCreditsManifest),
+  component: MedicalCreditsPage,
+  errorComponent: RouteErrorBoundary,
+});
+
 // URL-driven dialogs over the Medical tabs (D24, S:50–70): each renders
 // nothing; the tab page reads the URL and opens the drawer over itself.
 const organizationSaleCreateRoute = createRoute({
@@ -1776,6 +1789,7 @@ const routeTree = rootRoute.addChildren([
         organizationMrVisitCreateRoute,
       ]),
       organizationMedicalPaymentsRoute,
+      organizationMedicalCreditsRoute,
     ]),
     organizationStockRoute.addChildren([
       organizationStockIndexRoute,

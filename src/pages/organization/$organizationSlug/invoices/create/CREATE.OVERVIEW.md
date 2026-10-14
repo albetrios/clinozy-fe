@@ -2,7 +2,9 @@
 
 Route: `/organization/$organizationSlug/invoices/create` (`S:92`) — a URL-driven dialog over its
 referrer (KICKOFF §4, D24). The route renders nothing: the invoices island reads the URL and
-opens the shared Invoice drawer. `?type=clinic|medical|consultation&patient=` prefill it,
+opens the shared Invoice drawer. `?type=clinic|consultation&patient=` prefill it — never
+`medical`: a medical bill is the Medical room's New sale and clinozy-be refuses one on
+`/app/invoices` (MD28), so `?type=medical` is dropped and the drawer opens on Clinic —
 `?appointment=` (the visit flow's "Create invoice from visit", D156) fills its lines with the
 visit's sessions still to bill (`GET /app/patients/:patient_id/treatments?appointment_id=
 &is_billed=false`, one line per offering carrying them), `?copyOf=` starts it as a copy, and

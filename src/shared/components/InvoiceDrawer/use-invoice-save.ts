@@ -6,18 +6,19 @@ import type {
   InvoiceRecord,
   InvoiceSaveResult,
 } from '@/shared/api/app/invoices-contracts.ts';
-import type { InvoiceSaveResult as SaleSaveResult } from '@/shared/api/app/invoices-fixture-contracts.ts';
+import { PATIENT_DRAWER_KEYS } from '@/shared/components/PatientDrawer/patient-drawer.constants.ts';
 import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
+import {
+  contactFieldsOf,
+  emptyContactValue,
+} from '@/shared/forms/ContactEditor/index.ts';
+import { useCreateContact } from '@/shared/hooks/useContacts/index.ts';
 import {
   type DrawerSaveProblem,
   useDrawerSave,
 } from '@/shared/hooks/useDrawerSave/index.ts';
-import {
-  useCreateInvoice,
-  useCreateSale,
-  useUpdateInvoice,
-} from '@/shared/hooks/useInvoices/index.ts';
+import { useCreateInvoice, useUpdateInvoice } from '@/shared/hooks/useInvoices/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -32,7 +33,11 @@ import {
   namedLines,
   sentLines,
 } from './invoice-form.ts';
-import { saleInputOf } from './sale-form.ts';
+import {
+  type InvoiceSaleWrite,
+  saleDraftOf,
+  type SaleDraftOutcome,
+} from './sale-form.ts';
 import type { InvoiceCatalog } from './use-invoice-catalog.ts';
 import type { InvoiceDrawerOutcome } from './use-invoice-drawer.ts';
 
@@ -45,13 +50,13 @@ function stepOfField(field: string): InvoiceStepId {
   return 'payment';
 }
 
-/** The contract's names the form spells differently — a sale's fixture names among them. */
+/** The contract's names the form spells differently — a sale's among them. */
 const SERVER_FIELDS: Readonly<Record<string, FieldPath<InvoiceFormValues>>> = {
   contactId: 'party',
   patientId: 'party',
-  medicalContactId: 'party',
-  leadId: 'party',
+  patientPrescriptionId: 'party',
   memberIds: 'teamIds',
+  phones: 'party',
   invoiceDate: 'date',
   payment: 'paidNow',
   'payment.splits': 'paidNow',
@@ -109,13 +114,26 @@ const CONFLICTS: ReadonlyMap<
   ['invoice_of_sale', { key: K.refusals.ofSale }],
 ]);
 
+/**
+ * What a party with no contact yet still lacks, as a message key: an invoice's patient still
+ * being read — or a sale's new customer, whose contact the save writes once it has a mobile.
+ */
+function partyProblem(party: InvoiceFormValues['party'], sale: boolean): string | null {
+  if (party?.contactId !== null) return null;
+  if (!sale) return K.errors.pickPatient;
+  if (party.kind !== 'contact') return K.errors.pickCustomer;
+  return party.phone ? null : PATIENT_DRAWER_KEYS.mobileInvalid;
+}
+
 /** Options of {@link useInvoiceSave}. */
 export interface UseInvoiceSaveOptions {
   form: UseFormReturn<InvoiceFormValues>;
   /** The saved invoice an edit changes, as last read; a new one has none. */
   invoice: InvoiceRecord | null;
-  /** A Medical sale (the fixture world's), not an invoice. */
+  /** A Medical sale, not an invoice. */
   sale: boolean;
+  /** The Medical room's write for a sale (`POST /app/medical-sales`); none outside New sale. */
+  saleWrite: InvoiceSaleWrite | null;
   /** The branch a new invoice files under when the form has none. */
   fallbackBranchId: string;
   catalog: InvoiceCatalog;
@@ -131,8 +149,16 @@ export interface UseInvoiceSaveOptions {
   onDone: (outcome: InvoiceDrawerOutcome) => void;
 }
 
+/** A written sale as the drawer's outcome: its invoice, numbered as the sale. */
+const saleOutcomeOf = (sale: SaleDraftOutcome): InvoiceDrawerOutcome => ({
+  invoiceId: sale.invoiceId,
+  seq: sale.seq,
+  type: 'medical',
+  planLinked: 0,
+});
+
 /** A save's answer as the drawer's outcome. */
-function outcomeOf(result: InvoiceSaveResult | SaleSaveResult): InvoiceDrawerOutcome {
+function outcomeOf(result: InvoiceSaveResult): InvoiceDrawerOutcome {
   const { invoice } = result.detail;
   return {
     invoiceId: invoice.id,
@@ -192,17 +218,20 @@ export function belowLowestMessage({
 /**
  * The Invoice drawer's save (KICKOFF §6.9 Save; H:5064–5065) on the shared drawer save. A
  * missing patient opens its step first (the drawer's steps); then "Add at least one item" (the
- * Items step opens), "Paid ₹X is more than the bill ₹Y" (an invoice's bill is the server's
- * preview), a new sale's stock — "Only 3 of Glycolac Cream in stock" — and a line the preview
- * found under its lowest price. Then `POST /app/invoices` (with "Paid now"), `PATCH
- * /app/invoices/:id` (what changed, with the read's `updated_at`) or the fixture sale; a refusal
- * keeps the draft: a field the server names goes on its field (`items/<n>` on its row), a `409`
- * reason is said in the screen's words, a stale save offers "Reload".
+ * Items step opens), a new customer's mobile, "Paid ₹X is more than the bill ₹Y" (an invoice's
+ * bill is the server's preview), a new sale's stock — "Only 3 of Glycolac Cream in stock" — and
+ * a line the preview found under its lowest price. Then `POST /app/invoices` (with "Paid now"),
+ * `PATCH /app/invoices/:id` (what changed, with the read's `updated_at`) or the Medical room's
+ * sale write (a new customer's contact saved first, `POST /app/contacts`); a refusal keeps the
+ * draft: a field the server names goes on its field (`items/<n>` on its row), a `409` reason is
+ * said in the screen's words — or the server's (`not_enough_stock`, `prescription_filled`) — a
+ * stale save offers "Reload".
  */
 export function useInvoiceSave({
   form,
   invoice,
   sale,
+  saleWrite,
   fallbackBranchId,
   catalog,
   figures,
@@ -217,7 +246,7 @@ export function useInvoiceSave({
   const formatRupees = useRupeeFormat();
   const create = useCreateInvoice({ notifyOnError: false });
   const update = useUpdateInvoice({ notifyOnError: false });
-  const createSale = useCreateSale({ notifyOnError: false });
+  const createContact = useCreateContact({ notifyOnError: false });
   const rows = form.getValues('items');
 
   const check = (
@@ -225,9 +254,8 @@ export function useInvoiceSave({
   ): DrawerSaveProblem<InvoiceFormValues> | null => {
     const billed = sale ? namedLines(values.items) : sentLines(values.items);
     if (billed.length === 0) return { fields: ['items'], message: t(K.errors.addItem) };
-    if (!sale && values.party?.contactId === null) {
-      return { fields: ['party'], message: t(K.errors.pickPatient) };
-    }
+    const party = partyProblem(values.party, sale);
+    if (party) return { fields: ['party'], message: t(party) };
     const paid = figures.paidBefore + figures.paidNow;
     if (figures.status === 'ready' && figures.paidNow > figures.dueBefore) {
       return {
@@ -268,12 +296,30 @@ export function useInvoiceSave({
     notify.error(message);
   };
 
+  /** The buyer's contact — a new customer's saved first, and kept on the form for a retry. */
+  const buyerContactOf = async (values: InvoiceFormValues): Promise<string> => {
+    const party = values.party;
+    if (party?.contactId) return party.contactId;
+    if (party?.kind !== 'contact')
+      throw new Error('invoice drawer: a sale needs its buyer');
+    const contact = await createContact.mutateAsync(
+      contactFieldsOf(emptyContactValue(party.name, party.phone)),
+    );
+    form.setValue('party', { ...party, id: contact.id, contactId: contact.id });
+    return contact.id;
+  };
+
   const write = async (): Promise<InvoiceDrawerOutcome> => {
     const values = form.getValues();
-    if (sale)
-      return outcomeOf(
-        await createSale.mutateAsync(saleInputOf(values, fallbackBranchId)),
+    if (sale) {
+      // Outside New sale (no room's write) a Medical invoice has nowhere to go (MD28).
+      if (!saleWrite)
+        throw new Error('invoice drawer: a sale needs the Medical room’s write');
+      const contactId = await buyerContactOf(values);
+      return saleOutcomeOf(
+        await saleWrite.create(saleDraftOf(values, { contactId, fallbackBranchId })),
       );
+    }
     const input = invoiceInputOf(values, fallbackBranchId);
     const result = invoice
       ? await update.mutateAsync({ invoice, input })

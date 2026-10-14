@@ -1,331 +1,275 @@
-import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
+import { z } from 'zod';
 
-import { createdFilterMatches } from './app-filter-match.ts';
-import {
-  appHttpError,
-  type CursorPage,
-  cursorPageOf,
-  definedFields,
-  refuseUnknownIds,
-  validateAppInput,
-} from './app-fixture-store.ts';
+import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
+import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+
+import { createdRangeOf } from './app-filter-ranges.ts';
 import type { DeleteReason } from './app-schema.ts';
 import { appToday } from './app-time.ts';
 import {
-  cheapestRate,
-  marginPercent,
-  medicineStock,
-  nearestExpiry,
-} from './medicine-stock.ts';
-import {
+  medicineChangeOf,
+  medicineCreateBodyOf,
   type MedicineInput,
-  medicineInputSchema,
   type MedicineListParams,
-  type MedicineMaker,
-  type MedicineRecord,
   type MedicineRow,
   type MedicineSortKey,
+  medicineWire,
+  quickMedicineBodyOf,
   type QuickMedicineInput,
+  toMedicineRow,
 } from './medicines-contracts.ts';
 
 /*
- * The Medical store's medicines (`S:1660–1671`), on the fixture world until
- * clinozy-be serves them — every call is REPLACE_WITH_API (D6). The world is
- * imported on demand, so its seed data never lands in a route chunk. A row
- * carries what the list derives (stock, nearest expiry, best rate, margin) —
- * a backend request (Appendix F).
+ * The Medical store's medicines on clinozy-be (`/app/medicines`, api-integration §5.5): the
+ * Medicines tab in cursor pages of 50, the whole list every picker reads (every page, 100 at a
+ * time), one medicine, and the writes — create, an edit that sends what changed with its read's
+ * `updated_at`, a quick medicine from a picker, the near-expiry discount, delete with its reason
+ * and restore. Every write carries its action's idempotency key; every key carries the
+ * organization.
  */
 
 /**
- * The prefix of the Medical room's own reads (sales, orders, suppliers,
- * manufacturers, MRs — `medicalQueryKeys`): a medicine write refreshes them
- * too, since they join medicine names, rates and counts.
+ * The prefix of the Medical room's own reads (sales, orders, suppliers, manufacturers, MRs — the
+ * room's `medicalQueryKeys`): a medicine write refreshes them too, since they show medicine names,
+ * rates and counts.
  */
 export const MEDICAL_ROOM_QUERY_KEY = ['app', 'medical'] as const;
 
-/** TanStack Query keys for the medicines — all under `['app', 'medicines']`. */
+/** TanStack Query keys for the medicines — all under `['app', 'medicines']`, each carrying the organization. */
 export const medicineQueryKeys = {
   all: ['app', 'medicines'] as const,
-  /** Every list variant — a write invalidates them all. */
-  lists: () => [...medicineQueryKeys.all, 'list'] as const,
-  list: (params: MedicineListParams) => [...medicineQueryKeys.lists(), params] as const,
+  /** Every list variant of one organization — a write invalidates them all. */
+  lists: (organizationId: string | null) =>
+    [...medicineQueryKeys.all, organizationId, 'list'] as const,
+  list: (organizationId: string | null, params: MedicineListParams) =>
+    [...medicineQueryKeys.lists(organizationId), params] as const,
   /** Every live medicine — the pickers' catalogue. */
-  catalogue: () => [...medicineQueryKeys.all, 'catalogue'] as const,
-  detail: (id: string) => [...medicineQueryKeys.all, 'detail', id] as const,
+  catalogue: (organizationId: string | null) =>
+    [...medicineQueryKeys.all, organizationId, 'catalogue'] as const,
+  detail: (organizationId: string | null, id: string) =>
+    [...medicineQueryKeys.all, organizationId, 'detail', id] as const,
 };
 
-const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
+/** The organization the cached reads belong to. */
+export const activeMedicalOrganizationId = () =>
+  useOrganizationStore.getState().organizationId;
 
-type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['appFixtures'];
+/** One page of the Medicines tab — the design's 50. */
+const PAGE_SIZE = 50;
 
-/** The quick record's defaults (H:5316): MRP ₹0, 12% GST, reorder at 2, fill up to 10. */
-const QUICK_DEFAULTS = { mrp: 0, gstPct: 12, minStock: 2, maxStock: 10 } as const;
+/** One page of a whole list — the API's most. */
+const CATALOGUE_PAGE_SIZE = 100;
 
-/** A quick record's supplier price: the order's supplier, its rate still to come (H:5316). */
-const QUICK_LEAD_DAYS = 2;
-
-// ── Joins (the fixture server's) ──
-
-interface ReadContext {
-  today: string;
-  makers: Map<string, MedicineMaker>;
-  suppliers: Map<string, string>;
-}
-
-function readContext(world: FixtureWorld): ReadContext {
-  return {
-    today: appToday(),
-    makers: new Map(
-      world.manufacturers
-        .snapshot()
-        .map((maker) => [maker.id, { id: maker.id, name: maker.name, tone: maker.tone }]),
-    ),
-    suppliers: new Map(
-      world.suppliers.snapshot().map((supplier) => [supplier.id, supplier.name]),
-    ),
-  };
-}
-
-/** A medicine as its list row: the stock, its maker, the batch first to expire, the best price. */
-function toMedicineRow(
-  medicine: MedicineRecord,
-  context: {
-    today: string;
-    makers: ReadonlyMap<string, MedicineMaker>;
-    suppliers: ReadonlyMap<string, string>;
-  },
-): MedicineRow {
-  const nearest = nearestExpiry(medicine.batches, context.today);
-  const best = cheapestRate(medicine.supplierRates);
-  return {
-    ...medicine,
-    stock: medicineStock(medicine.batches),
-    manufacturer: context.makers.get(medicine.manufacturerId) ?? null,
-    nearest: nearest
-      ? {
-          batchNo: nearest.batch.batchNo,
-          expiry: nearest.batch.expiry,
-          daysLeft: nearest.daysLeft,
-        }
-      : null,
-    bestRate: best
-      ? {
-          supplierId: best.supplierId,
-          supplierName: context.suppliers.get(best.supplierId) ?? '',
-          rate: best.rate,
-        }
-      : null,
-    margin: marginPercent(medicine.mrp, best?.rate),
-  };
-}
-
-// ── Search, filters and order (the fixture server's) ──
-
-/** Whether a row matches `q`: name, composition, manufacturer, a supplier or "#458" (H:5329). */
-function matchesSearch(row: MedicineRow, query: string, context: ReadContext): boolean {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return true;
-  const suppliers = row.supplierRates.map(
-    (rate) => context.suppliers.get(rate.supplierId) ?? '',
-  );
-  return [
-    row.name,
-    row.composition ?? '',
-    row.manufacturer?.name ?? '',
-    ...suppliers,
-    `#${row.seq}`,
-  ]
-    .join(' ')
-    .toLowerCase()
-    .includes(needle);
-}
-
-/** Whether a row passes the Stock, Nearest expiry, Manufacturer and Created filters. */
-function passesFilters(row: MedicineRow, params: MedicineListParams, today: string) {
-  if (params.stock === 'low' && row.stock > row.minStock) return false;
-  if (params.expiry && !(row.nearest && row.nearest.daysLeft <= Number(params.expiry))) {
-    return false;
-  }
-  if (params.manufacturer?.length && !params.manufacturer.includes(row.manufacturerId)) {
-    return false;
-  }
-  return !params.created || createdFilterMatches(row.createdAt, params.created, today);
-}
-
-const ORDER: Readonly<
-  Record<MedicineSortKey, (a: MedicineRow, b: MedicineRow) => number>
+/** The Medicines sorts as the API names them; none is the name, A to Z. */
+const MEDICINE_SORTS: Readonly<
+  Record<
+    MedicineSortKey,
+    | 'medicine_number'
+    | 'name'
+    | 'manufacturer_name'
+    | 'quantity'
+    | 'mrp'
+    | 'margin_percent'
+  >
 > = {
-  seq: (a, b) => a.seq - b.seq,
-  name: (a, b) => a.name.localeCompare(b.name),
-  manufacturer: (a, b) =>
-    (a.manufacturer?.name ?? '').localeCompare(b.manufacturer?.name ?? ''),
-  stock: (a, b) => a.stock - b.stock,
-  mrp: (a, b) => a.mrp - b.mrp,
-  margin: (a, b) => (a.margin ?? -1) - (b.margin ?? -1),
+  seq: 'medicine_number',
+  name: 'name',
+  manufacturer: 'manufacturer_name',
+  stock: 'quantity',
+  mrp: 'mrp',
+  margin: 'margin_percent',
 };
 
-// ── Reads ──
+/** A search as the API takes it — none when blank. */
+const searchOf = (q: string | undefined) => (q?.trim() ? q.trim() : undefined);
 
-/**
- * One cursor page of live medicines (`listMedicines`, `S:1660`;
- * REPLACE_WITH_API): searched, filtered, by name unless a column sort is
- * asked for.
- */
+/** The Medicines read's query for the URL's params, on the clinic's `today`. */
+export function medicineListQuery(
+  params: MedicineListParams,
+  today: string = appToday(),
+) {
+  const created = params.created ? createdRangeOf(params.created, today) : {};
+  return {
+    limit: PAGE_SIZE,
+    q: searchOf(params.q),
+    // Low stock is everything at or below its reorder level — the empty shelves too.
+    stock_level: params.stock === 'low' ? 'low,out' : undefined,
+    expiring_within_days: params.expiry,
+    manufacturer_id: params.manufacturer?.length
+      ? params.manufacturer.join(',')
+      : undefined,
+    created_from: created.from,
+    created_to: created.to,
+    sort: params.sort ? MEDICINE_SORTS[params.sort] : undefined,
+    order: params.sort ? params.order : undefined,
+  };
+}
+
+/** A page of rows with the cursor of the next and the API's estimated total. */
+export interface MedicinePage {
+  rows: MedicineRow[];
+  next: string | null;
+  total: number | null;
+}
+
+/** One page of medicines; `after` is the cursor. */
 export async function listMedicines(
   params: MedicineListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<MedicineRow>> {
-  const { appFixtures } = await fixtureWorld();
-  const context = readContext(appFixtures);
-  const rows = appFixtures.medicines
-    .snapshot()
-    .map((medicine) => toMedicineRow(medicine, context))
-    .filter(
-      (row) =>
-        matchesSearch(row, params.q ?? '', context) &&
-        passesFilters(row, params, context.today),
-    );
-  // The contract's default is the name, A to Z (`S:1660`); an asked-for sort runs either way.
-  const key = params.sort ?? 'name';
-  const direction = params.order === 'desc' ? -1 : 1;
-  rows.sort((a, b) => direction * ORDER[key](a, b) || b.seq - a.seq);
-  return cursorPageOf(rows, cursor);
+  after?: string,
+): Promise<MedicinePage> {
+  const today = appToday();
+  const response = await api.get('/app/medicines', {
+    query: { ...medicineListQuery(params, today), after },
+  });
+  return {
+    rows: z
+      .array(medicineWire)
+      .parse(response.data ?? [])
+      .map((wire) => toMedicineRow(wire, today)),
+    ...pageOf(response.meta?.pagination),
+  };
 }
 
-/** Every live medicine matching `params` — each cursor page in turn (the pickers' catalogue). */
-export function fetchAllMedicines(
-  params: MedicineListParams = {},
-): Promise<MedicineRow[]> {
-  return collectAllPages(async (cursor) => {
-    const page = await listMedicines(params, cursor);
-    return { rows: page.items, next: page.nextCursor };
+/** Every live medicine as its row, by name (`GET /app/medicines`, every page) — the pickers' catalogue. */
+export async function fetchAllMedicines(): Promise<MedicineRow[]> {
+  const today = appToday();
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/medicines', {
+      query: { limit: CATALOGUE_PAGE_SIZE, after: after ?? undefined, sort: 'name' },
+    });
+    return {
+      rows: z
+        .array(medicineWire)
+        .parse(response.data ?? [])
+        .map((wire) => toMedicineRow(wire, today)),
+      next: pageOf(response.meta?.pagination).next,
+    };
   }, 'medicines');
 }
 
-/** One medicine as its row (REPLACE_WITH_API) — a 404 when it is unknown or deleted. */
+/** One medicine as its row — a 404 when it is unknown or deleted. */
 export async function fetchMedicine(id: string): Promise<MedicineRow> {
-  const { appFixtures } = await fixtureWorld();
-  const medicine = await appFixtures.medicines.get(id);
-  return toMedicineRow(medicine, readContext(appFixtures));
+  const response = await api.get('/app/medicines/{medicine_id}', {
+    params: { medicine_id: id },
+  });
+  return toMedicineRow(medicineWire.parse(response.data));
 }
 
 // ── Writes ──
 
-/** Refuse what the contract's server refuses: an unknown manufacturer or supplier. */
-async function checkMedicine(fields: MedicineInput): Promise<void> {
-  const { appFixtures } = await fixtureWorld();
-  refuseUnknownIds(
-    'manufacturerId',
-    [fields.manufacturerId],
-    appFixtures.manufacturers.snapshot(),
-    'Pick a manufacturer',
-  );
-  refuseUnknownIds(
-    'supplierRates',
-    fields.supplierRates.map((rate) => rate.supplierId),
-    appFixtures.suppliers.snapshot(),
-    'Pick suppliers the store buys from',
-  );
-}
+/** A medicine's answer as its row. */
+const medicineOf = (data: unknown) => toMedicineRow(medicineWire.parse(data));
 
-/**
- * Create a medicine (`createMedicine`, `S:1669`; REPLACE_WITH_API) — a full
- * record, never a quick one. A 422 names the broken rule ("Add a name",
- * "Enter the MRP", "Enter a rate for every supplier price").
- */
-export async function createMedicine(input: MedicineInput): Promise<MedicineRecord> {
-  const { appFixtures } = await fixtureWorld();
-  const fields = validateAppInput(medicineInputSchema, input);
-  await checkMedicine(fields);
-  return appFixtures.medicines.create({
-    ...fields,
-    isQuick: false,
-    nearExpiryDiscountPct: 0,
+/** Create a medicine from its drawer — a full record; a 400 names the field it refuses. */
+export async function createMedicine(
+  input: MedicineInput,
+  idempotencyKey: string,
+): Promise<MedicineRow> {
+  const response = await api.post('/app/medicines', {
+    body: medicineCreateBodyOf(input),
+    idempotencyKey,
   });
+  return medicineOf(response.data);
 }
 
 /**
- * Save a medicine (`updateMedicine`, `S:1669`; REPLACE_WITH_API): the patch
- * merged into the saved record and the whole checked again. A full save
- * drops the quick record's "Needs MRP and composition" flag (`medical.md:187`).
+ * Save a medicine: only what changed, with the read's `updated_at` — a 409 when someone saved it
+ * meanwhile. Nothing changed answers the record as it was, with no write.
  */
 export async function updateMedicine(
-  id: string,
-  patch: Partial<MedicineInput>,
-): Promise<MedicineRecord> {
-  const { appFixtures } = await fixtureWorld();
-  const saved = await appFixtures.medicines.get(id);
-  const fields = validateAppInput(medicineInputSchema, {
-    ...saved,
-    ...definedFields(patch),
+  record: MedicineRow,
+  input: MedicineInput,
+  idempotencyKey: string,
+): Promise<MedicineRow> {
+  const change = medicineChangeOf(record, input);
+  if (change === null) return record;
+  const response = await api.patch('/app/medicines/{medicine_id}', {
+    params: { medicine_id: record.id },
+    body: change,
+    idempotencyKey,
   });
-  await checkMedicine(fields);
-  return appFixtures.medicines.update(id, { ...fields, isQuick: false });
+  return medicineOf(response.data);
 }
 
 /**
- * A quick medicine from a picker (`quickCreateMedicine`, `S:1670`;
- * REPLACE_WITH_API): the typed name at MRP ₹0, the first manufacturer unless
- * one is given, and a supplier price on the order's supplier — "Needs MRP and
- * composition" until a full save.
+ * A quick medicine from a picker ("Add medicine “Azel cream”"): the typed name at MRP ₹0 —
+ * "Needs MRP and composition" until a full save.
  */
 export async function quickCreateMedicine(
   input: QuickMedicineInput,
-): Promise<MedicineRecord> {
-  const { appFixtures } = await fixtureWorld();
-  const name = input.name.trim();
-  if (!name) {
-    throw appHttpError(422, 'validation', 'Add a name', { name: ['Add a name'] });
-  }
-  const makers = appFixtures.manufacturers.snapshot();
-  const manufacturerId = input.manufacturerId ?? makers[0]?.id;
-  if (!manufacturerId) {
-    throw appHttpError(422, 'validation', 'Add a manufacturer first', {
-      manufacturerId: ['Add a manufacturer first'],
-    });
-  }
-  return appFixtures.medicines.create({
-    name,
-    composition: null,
-    manufacturerId,
-    ...QUICK_DEFAULTS,
-    batches: [],
-    supplierRates: input.supplierId
-      ? [{ supplierId: input.supplierId, rate: 0, free: 0, leadDays: QUICK_LEAD_DAYS }]
-      : [],
-    isQuick: true,
-    prescriptionOnly: false,
-    nearExpiryDiscountPct: 0,
+  idempotencyKey: string,
+): Promise<MedicineRow> {
+  const response = await api.post('/app/medicines', {
+    body: quickMedicineBodyOf(input),
+    idempotencyKey,
   });
+  return medicineOf(response.data);
 }
 
 /**
- * Turn the near-expiry discount on or off for these medicines — the row's
- * "Sell at 20% off (near expiry)" and the toolbar's "Sell all at 20% off"
- * (Q-M3; a plan field, Appendix F; REPLACE_WITH_API).
+ * Turn the near-expiry discount on or off for these medicines — the row's "Sell at 20% off (near
+ * expiry)" and its Undo: a change of `near_expiry_discount_percent` on each (null removes it).
  */
 export async function setNearExpiryDiscount(
-  ids: readonly string[],
+  medicines: readonly Pick<MedicineRow, 'id' | 'updatedAt'>[],
   pct: number,
-): Promise<MedicineRecord[]> {
-  const { appFixtures } = await fixtureWorld();
+  idempotencyKey: string,
+): Promise<MedicineRow[]> {
   return Promise.all(
-    ids.map((id) => appFixtures.medicines.update(id, { nearExpiryDiscountPct: pct })),
+    medicines.map(async (medicine, index) => {
+      const response = await api.patch('/app/medicines/{medicine_id}', {
+        params: { medicine_id: medicine.id },
+        body: { near_expiry_discount_percent: pct > 0 ? pct : null },
+        idempotencyKey: `${idempotencyKey}:${index}`,
+      });
+      return medicineOf(response.data);
+    }),
   );
 }
 
-/** Soft-delete a medicine with the Reason confirm's choice (`S:1546`; REPLACE_WITH_API). */
+/**
+ * "Sell all at 20% off" — every medicine with stock expiring within the window, in one write
+ * (`POST /app/medicines/near-expiry-discount`; null removes the discount). Answers how many
+ * medicines changed.
+ */
+export async function setNearExpiryDiscountWithin(
+  expiringWithinDays: 30 | 60 | 90,
+  pct: number,
+  idempotencyKey: string,
+): Promise<number> {
+  const response = await api.post('/app/medicines/near-expiry-discount', {
+    body: {
+      expiring_within_days: expiringWithinDays,
+      discount_percent: pct > 0 ? pct : null,
+    },
+    idempotencyKey,
+  });
+  return z.object({ updated_count: z.number().int() }).parse(response.data).updated_count;
+}
+
+/** Soft-delete a medicine with the Reason confirm's choice. */
 export async function deleteMedicine(
   id: string,
   reason: DeleteReason,
   note: string | null,
-): Promise<MedicineRecord> {
-  const { appFixtures } = await fixtureWorld();
-  return appFixtures.medicines.remove(id, reason, note);
+): Promise<void> {
+  await api.delete('/app/medicines/{medicine_id}', {
+    params: { medicine_id: id },
+    reason,
+    ...(note ? { note } : {}),
+  });
 }
 
-/** Restore a deleted medicine — the Undo of its "deleted" toast (`POST …/restore`, D32). */
-export async function restoreMedicine(id: string): Promise<MedicineRecord> {
-  const { appFixtures } = await fixtureWorld();
-  return appFixtures.medicines.restore(id);
+/** Restore a deleted medicine — the Undo of its "deleted" toast. */
+export async function restoreMedicine(
+  id: string,
+  idempotencyKey: string,
+): Promise<MedicineRow> {
+  const response = await api.post('/app/medicines/{medicine_id}/restore', {
+    params: { medicine_id: id },
+    idempotencyKey,
+  });
+  return medicineOf(response.data);
 }

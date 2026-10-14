@@ -26,6 +26,7 @@ export {
   type RoomFiltersTriggerProps,
   type RoomFilterValues,
   showsAutomaticSection,
+  singlePickSection,
   useRoomFilters,
 } from './RoomFilters/index.ts';
 export {

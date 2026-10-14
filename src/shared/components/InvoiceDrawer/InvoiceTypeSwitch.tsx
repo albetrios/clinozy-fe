@@ -2,7 +2,7 @@ import { type KeyboardEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
+import type { ClinicInvoiceType } from '@/shared/api/app/invoices-contracts.ts';
 import { APP_KEYS } from '@/shared/app/app.constants.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 
@@ -16,22 +16,24 @@ import {
 
 /** Props of {@link InvoiceTypeSwitch}. */
 export interface InvoiceTypeSwitchProps {
-  value: InvoiceType;
-  onChange: (type: InvoiceType) => void;
+  value: ClinicInvoiceType;
+  onChange: (type: ClinicInvoiceType) => void;
   disabled?: boolean;
 }
 
 /**
  * The Invoice drawer's type switch (H:1024; `payments.md:134`): Clinic (sky
- * dot) · Medical (sage) · Consultation (lav) as one full-width segmented group
- * — as the prototype renders it, the room tabs' look: a 3px-padded `muted`
- * track, 30px segments, the picked one on `card` with the control shadow and
- * ring, each dot in its tone's ink. One radio group: ← / → move the pick
- * (mirrored under RTL). Switching clears the items (the drawer's to do).
+ * dot) · Consultation (lav) as one full-width segmented group — as the
+ * prototype renders it, the room tabs' look: a 3px-padded `muted` track, 30px
+ * segments, the picked one on `card` with the control shadow and ring, each
+ * dot in its tone's ink. The design's Medical (sage) segment is not offered:
+ * a medical bill is the Medical room's New sale (MD28). One radio group: ← / →
+ * move the pick (mirrored under RTL). Switching clears the items (the drawer's
+ * to do).
  */
 export function InvoiceTypeSwitch({ value, onChange, disabled }: InvoiceTypeSwitchProps) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
-  const buttons = useRef(new Map<InvoiceType, HTMLButtonElement>());
+  const buttons = useRef(new Map<ClinicInvoiceType, HTMLButtonElement>());
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;

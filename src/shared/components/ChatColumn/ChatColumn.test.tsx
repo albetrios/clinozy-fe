@@ -180,7 +180,7 @@ describe('the conversation', () => {
     expect(
       within(screen.getByTestId(ids.header)).getByTestId('patient-badge'),
     ).toBeVisible();
-    await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(13));
+    await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(12));
     // The parts are isolated and a time's own space is unbreakable (U+00A0):
     // read the words and their order.
     const chips = screen
@@ -204,7 +204,7 @@ describe('the conversation', () => {
 
   it('masks every ₹ behind the patient file’s privacy', async () => {
     renderChat({ person: DHARTI, contact: DHARTI_CONTACT, maskMoney: true });
-    await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(13));
+    await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(12));
     const chips = screen
       .getAllByTestId(ids.history)
       .map((chip) => withoutBidiMarks(chip.textContent).replace(/\u00a0/gu, ' '));

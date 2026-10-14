@@ -1195,6 +1195,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/app/medical-payments/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export the medical store's payments */
+        get: operations["getAppMedicalPaymentsExports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/app/medical-pending-credits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the medical store's customer credits */
+        get: operations["getAppMedicalPendingCredits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/app/medical-purchase-orders": {
         parameters: {
             query?: never;
@@ -1454,6 +1488,23 @@ export interface paths {
         put?: never;
         /** Return from patient */
         post: operations["postAppMedicalSalesBymedical_sale_idReturns"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/app/medical-sales/dues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List who owes on medical sales */
+        get: operations["getAppMedicalSalesDues"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3065,24 +3116,6 @@ export interface paths {
         /** List supplier credits */
         get: operations["getAppSupplierCredits"];
         put?: never;
-        /** Return stock to a supplier */
-        post: operations["postAppSupplierCredits"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/app/supplier-credits/{supplier_credit_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a supplier credit */
-        get: operations["getAppSupplierCreditsBysupplier_credit_id"];
-        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -3125,6 +3158,59 @@ export interface paths {
         head?: never;
         /** Change a supplier */
         patch: operations["patchAppSuppliersBysupplier_id"];
+        trace?: never;
+    };
+    "/api/v1/app/suppliers/{supplier_id}/credits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List a supplier's credits */
+        get: operations["getAppSuppliersBysupplier_idCredits"];
+        put?: never;
+        /** Return stock to a supplier */
+        post: operations["postAppSuppliersBysupplier_idCredits"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/app/suppliers/{supplier_id}/credits/{supplier_credit_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a supplier credit */
+        get: operations["getAppSuppliersBysupplier_idCreditsBysupplier_credit_id"];
+        put?: never;
+        post?: never;
+        /** Void a supplier credit */
+        delete: operations["deleteAppSuppliersBysupplier_idCreditsBysupplier_credit_id"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/app/suppliers/{supplier_id}/credits/{supplier_credit_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo a supplier credit void */
+        post: operations["postAppSuppliersBysupplier_idCreditsBysupplier_credit_idRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/app/suppliers/{supplier_id}/payments": {
@@ -10488,6 +10574,7 @@ export interface operations {
                             patient_prescription_id?: string | null;
                             /** @enum {string} */
                             payment_status?: "paid" | "partial" | "unpaid";
+                            refunded_amount?: number;
                             remark?: string | null;
                             subtotal?: number;
                             taxable_total?: number;
@@ -10620,6 +10707,7 @@ export interface operations {
                             patient_prescription_id?: string | null;
                             /** @enum {string} */
                             payment_status?: "paid" | "partial" | "unpaid";
+                            refunded_amount?: number;
                             remark?: string | null;
                             subtotal?: number;
                             taxable_total?: number;
@@ -10713,6 +10801,7 @@ export interface operations {
                             patient_prescription_id?: string | null;
                             /** @enum {string} */
                             payment_status?: "paid" | "partial" | "unpaid";
+                            refunded_amount?: number;
                             remark?: string | null;
                             subtotal?: number;
                             taxable_total?: number;
@@ -10861,6 +10950,7 @@ export interface operations {
                             patient_prescription_id?: string | null;
                             /** @enum {string} */
                             payment_status?: "paid" | "partial" | "unpaid";
+                            refunded_amount?: number;
                             remark?: string | null;
                             subtotal?: number;
                             taxable_total?: number;
@@ -11124,6 +11214,7 @@ export interface operations {
                             }[];
                             overall_discount?: number;
                             paid_amount?: number;
+                            refunded_amount?: number;
                             subtotal?: number;
                             taxable_total?: number;
                             total?: number;
@@ -11217,6 +11308,7 @@ export interface operations {
                             patient_prescription_id?: string | null;
                             /** @enum {string} */
                             payment_status?: "paid" | "partial" | "unpaid";
+                            refunded_amount?: number;
                             remark?: string | null;
                             subtotal?: number;
                             taxable_total?: number;
@@ -11369,6 +11461,7 @@ export interface operations {
                             }[];
                             overall_discount?: number;
                             paid_amount?: number;
+                            refunded_amount?: number;
                             subtotal?: number;
                             taxable_total?: number;
                             total?: number;
@@ -12611,6 +12704,144 @@ export interface operations {
             500: components["responses"]["ApiError"];
         };
     };
+    getAppMedicalPaymentsExports: {
+        parameters: {
+            query?: {
+                after?: string;
+                branch_id?: string;
+                contact_id?: string;
+                created_from?: string;
+                created_to?: string;
+                direction?: "received" | "paid";
+                expense_category?: string;
+                invoice_id?: string;
+                is_settled?: "true" | "false";
+                kind?: string;
+                limit?: number;
+                medical_purchase_order_id?: string;
+                mode?: string;
+                order?: "asc" | "desc";
+                paid_date_from?: string;
+                paid_date_to?: string;
+                patient_id?: string;
+                pending_credit_id?: string;
+                q?: string;
+                sort?: "paid_at" | "created_at" | "amount";
+                stock_purchase_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            content?: string;
+                            /** @enum {string} */
+                            content_type?: "text/csv";
+                            file_name?: string;
+                            is_truncated?: boolean;
+                            row_count?: number;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    getAppMedicalPendingCredits: {
+        parameters: {
+            query?: {
+                after?: string;
+                contact_id?: string;
+                created_from?: string;
+                created_to?: string;
+                direction?: "give" | "take";
+                invoice_id?: string;
+                limit?: number;
+                order?: "asc" | "desc";
+                q?: string;
+                settle_by_from?: string;
+                settle_by_to?: string;
+                sort?: "created_at" | "settle_by";
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            amount?: number;
+                            contact?: {
+                                id?: string;
+                                name?: string;
+                                primary_phone?: string;
+                            } | null;
+                            /** Format: date-time */
+                            created_at?: string;
+                            created_by_membership_id?: string | null;
+                            /** @enum {string} */
+                            direction?: "give" | "take";
+                            id?: string;
+                            invoice_id?: string | null;
+                            left_amount?: number;
+                            note?: string | null;
+                            party_name?: string | null;
+                            patient_id?: string | null;
+                            payment_ids?: string[];
+                            pending_credit_number?: number;
+                            reason?: string;
+                            /** Format: date */
+                            settle_by?: string | null;
+                            settled_amount?: number;
+                            source_payment_id?: string | null;
+                            /** @enum {string} */
+                            status?: "open" | "given_back" | "got_back" | "used";
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                        meta?: {
+                            pagination: {
+                                estimated_total?: number;
+                                has_more?: boolean;
+                                next?: string | null;
+                                per_page?: number;
+                            };
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
     getAppMedicalPurchaseOrders: {
         parameters: {
             query?: {
@@ -12676,8 +12907,10 @@ export interface operations {
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
+                                gst_number?: string | null;
                                 id?: string;
                                 name?: string;
+                                phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
                             total?: number;
@@ -12775,8 +13008,10 @@ export interface operations {
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
+                                gst_number?: string | null;
                                 id?: string;
                                 name?: string;
+                                phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
                             total?: number;
@@ -12855,8 +13090,10 @@ export interface operations {
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
+                                gst_number?: string | null;
                                 id?: string;
                                 name?: string;
+                                phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
                             total?: number;
@@ -12984,8 +13221,10 @@ export interface operations {
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
+                                gst_number?: string | null;
                                 id?: string;
                                 name?: string;
+                                phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
                             total?: number;
@@ -13024,12 +13263,20 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    items?: {
+                    items?: ({
                         batch_number?: string;
                         expiry_month?: string;
                         id: string;
                         is_received?: boolean;
-                    }[];
+                    } | {
+                        batch_number?: string;
+                        expiry_month?: string;
+                        free_quantity?: number;
+                        medicine_id?: string;
+                        new_medicine_name?: string;
+                        quantity: number;
+                        rate: number;
+                    })[];
                     supplier_bill_number?: string;
                 };
             };
@@ -13079,8 +13326,10 @@ export interface operations {
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
+                                gst_number?: string | null;
                                 id?: string;
                                 name?: string;
+                                phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
                             total?: number;
@@ -13162,8 +13411,10 @@ export interface operations {
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
+                                gst_number?: string | null;
                                 id?: string;
                                 name?: string;
+                                phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
                             total?: number;
@@ -13838,12 +14089,14 @@ export interface operations {
                 after?: string;
                 branch_id?: string;
                 contact_id?: string;
+                created_from?: string;
+                created_to?: string;
                 limit?: number;
                 medicine_id?: string;
                 order?: "asc" | "desc";
                 patient_prescription_id?: string;
                 q?: string;
-                sort?: "sold_at" | "sale_number" | "total";
+                sort?: "sold_at" | "sale_number" | "total" | "contact_name";
                 status?: string;
             };
             header?: never;
@@ -13914,10 +14167,11 @@ export interface operations {
                                     quantity?: number;
                                 }[];
                                 note?: string | null;
+                                pending_credit_id?: string | null;
                                 /** @enum {string} */
                                 reason?: "unused" | "reaction" | "doctor_changed" | "wrong_item" | "damaged";
                                 /** @enum {string} */
-                                refund_mode?: "cash" | "upi" | "card";
+                                refund_mode?: "cash" | "upi" | "card" | "credit";
                                 returned_by_membership_id?: string | null;
                             }[];
                             sale_number?: number;
@@ -14048,10 +14302,11 @@ export interface operations {
                                     quantity?: number;
                                 }[];
                                 note?: string | null;
+                                pending_credit_id?: string | null;
                                 /** @enum {string} */
                                 reason?: "unused" | "reaction" | "doctor_changed" | "wrong_item" | "damaged";
                                 /** @enum {string} */
-                                refund_mode?: "cash" | "upi" | "card";
+                                refund_mode?: "cash" | "upi" | "card" | "credit";
                                 returned_by_membership_id?: string | null;
                             }[];
                             sale_number?: number;
@@ -14153,10 +14408,11 @@ export interface operations {
                                     quantity?: number;
                                 }[];
                                 note?: string | null;
+                                pending_credit_id?: string | null;
                                 /** @enum {string} */
                                 reason?: "unused" | "reaction" | "doctor_changed" | "wrong_item" | "damaged";
                                 /** @enum {string} */
-                                refund_mode?: "cash" | "upi" | "card";
+                                refund_mode?: "cash" | "upi" | "card" | "credit";
                                 returned_by_membership_id?: string | null;
                             }[];
                             sale_number?: number;
@@ -14289,10 +14545,11 @@ export interface operations {
                                     quantity?: number;
                                 }[];
                                 note?: string | null;
+                                pending_credit_id?: string | null;
                                 /** @enum {string} */
                                 reason?: "unused" | "reaction" | "doctor_changed" | "wrong_item" | "damaged";
                                 /** @enum {string} */
-                                refund_mode?: "cash" | "upi" | "card";
+                                refund_mode?: "cash" | "upi" | "card" | "credit";
                                 returned_by_membership_id?: string | null;
                             }[];
                             sale_number?: number;
@@ -14343,7 +14600,7 @@ export interface operations {
                     /** @enum {string} */
                     reason: "unused" | "reaction" | "doctor_changed" | "wrong_item" | "damaged";
                     /** @enum {string} */
-                    refund_mode: "cash" | "upi" | "card";
+                    refund_mode: "cash" | "upi" | "card" | "credit";
                 };
             };
         };
@@ -14411,10 +14668,11 @@ export interface operations {
                                     quantity?: number;
                                 }[];
                                 note?: string | null;
+                                pending_credit_id?: string | null;
                                 /** @enum {string} */
                                 reason?: "unused" | "reaction" | "doctor_changed" | "wrong_item" | "damaged";
                                 /** @enum {string} */
-                                refund_mode?: "cash" | "upi" | "card";
+                                refund_mode?: "cash" | "upi" | "card" | "credit";
                                 returned_by_membership_id?: string | null;
                             }[];
                             sale_number?: number;
@@ -14443,18 +14701,74 @@ export interface operations {
             500: components["responses"]["ApiError"];
         };
     };
+    getAppMedicalSalesDues: {
+        parameters: {
+            query?: {
+                branch_id?: string;
+                created_from?: string;
+                created_to?: string;
+                limit?: number;
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            contact?: {
+                                id?: string;
+                                name?: string;
+                                primary_phone?: string;
+                            } | null;
+                            due_total?: number;
+                            /** Format: date-time */
+                            oldest_sold_at?: string;
+                            patient_id?: string | null;
+                            sale_count?: number;
+                            sales?: {
+                                due_amount?: number;
+                                id?: string;
+                                sale_number?: number;
+                                /** Format: date-time */
+                                sold_at?: string;
+                            }[];
+                        }[];
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
     getAppMedicalSalesExports: {
         parameters: {
             query?: {
                 after?: string;
                 branch_id?: string;
                 contact_id?: string;
+                created_from?: string;
+                created_to?: string;
                 limit?: number;
                 medicine_id?: string;
                 order?: "asc" | "desc";
                 patient_prescription_id?: string;
                 q?: string;
-                sort?: "sold_at" | "sale_number" | "total";
+                sort?: "sold_at" | "sale_number" | "total" | "contact_name";
                 status?: string;
             };
             header?: never;
@@ -14503,7 +14817,7 @@ export interface operations {
                 manufacturer_id?: string;
                 order?: "asc" | "desc";
                 q?: string;
-                sort?: "name" | "medicine_number" | "quantity" | "mrp" | "nearest_expiry" | "created_at";
+                sort?: "name" | "medicine_number" | "quantity" | "mrp" | "nearest_expiry" | "manufacturer_name" | "margin_percent" | "created_at";
                 stock_level?: string;
                 supplier_id?: string;
             };
@@ -15062,7 +15376,7 @@ export interface operations {
                 manufacturer_id?: string;
                 order?: "asc" | "desc";
                 q?: string;
-                sort?: "name" | "medicine_number" | "quantity" | "mrp" | "nearest_expiry" | "created_at";
+                sort?: "name" | "medicine_number" | "quantity" | "mrp" | "nearest_expiry" | "manufacturer_name" | "margin_percent" | "created_at";
                 stock_level?: string;
                 supplier_id?: string;
             };
@@ -17029,6 +17343,12 @@ export interface operations {
                                 timing_text?: string | null;
                             }[];
                             lab_report?: string | null;
+                            patient?: {
+                                contact_id?: string;
+                                id?: string;
+                                name?: string;
+                                patient_number?: number;
+                            } | null;
                             patient_id?: string;
                             /** Format: date */
                             prescription_date?: string;
@@ -19317,6 +19637,12 @@ export interface operations {
                                 timing_text?: string | null;
                             }[];
                             lab_report?: string | null;
+                            patient?: {
+                                contact_id?: string;
+                                id?: string;
+                                name?: string;
+                                patient_number?: number;
+                            } | null;
                             patient_id?: string;
                             /** Format: date */
                             prescription_date?: string;
@@ -19432,6 +19758,12 @@ export interface operations {
                                 timing_text?: string | null;
                             }[];
                             lab_report?: string | null;
+                            patient?: {
+                                contact_id?: string;
+                                id?: string;
+                                name?: string;
+                                patient_number?: number;
+                            } | null;
                             patient_id?: string;
                             /** Format: date */
                             prescription_date?: string;
@@ -19509,6 +19841,12 @@ export interface operations {
                                 timing_text?: string | null;
                             }[];
                             lab_report?: string | null;
+                            patient?: {
+                                contact_id?: string;
+                                id?: string;
+                                name?: string;
+                                patient_number?: number;
+                            } | null;
                             patient_id?: string;
                             /** Format: date */
                             prescription_date?: string;
@@ -19654,6 +19992,12 @@ export interface operations {
                                 timing_text?: string | null;
                             }[];
                             lab_report?: string | null;
+                            patient?: {
+                                contact_id?: string;
+                                id?: string;
+                                name?: string;
+                                patient_number?: number;
+                            } | null;
                             patient_id?: string;
                             /** Format: date */
                             prescription_date?: string;
@@ -19734,6 +20078,12 @@ export interface operations {
                                 timing_text?: string | null;
                             }[];
                             lab_report?: string | null;
+                            patient?: {
+                                contact_id?: string;
+                                id?: string;
+                                name?: string;
+                                patient_number?: number;
+                            } | null;
                             patient_id?: string;
                             /** Format: date */
                             prescription_date?: string;
@@ -19814,6 +20164,12 @@ export interface operations {
                                 timing_text?: string | null;
                             }[];
                             lab_report?: string | null;
+                            patient?: {
+                                contact_id?: string;
+                                id?: string;
+                                name?: string;
+                                patient_number?: number;
+                            } | null;
                             patient_id?: string;
                             /** Format: date */
                             prescription_date?: string;
@@ -25100,6 +25456,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                created_from?: string;
+                created_to?: string;
                 limit?: number;
                 medicine_id?: string;
                 order?: "asc" | "desc";
@@ -25157,117 +25515,6 @@ export interface operations {
             500: components["responses"]["ApiError"];
         };
     };
-    postAppSupplierCredits: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-Idempotency-Key": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    medicine_batch_id: string;
-                    quantity: number;
-                    supplier_id: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    "X-Idempotency-Replay"?: "true";
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data?: {
-                            amount?: number;
-                            applied_amount?: number;
-                            batch_number?: string;
-                            /** Format: date-time */
-                            created_at?: string;
-                            created_by_membership_id?: string | null;
-                            id?: string;
-                            medicine_batch_id?: string;
-                            medicine_id?: string;
-                            medicine_name?: string;
-                            quantity?: number;
-                            rate?: number;
-                            /** @enum {string} */
-                            status?: "open" | "adjusted";
-                            supplier_id?: string;
-                            supplier_name?: string;
-                        };
-                        meta?: {
-                            request_id: string;
-                        };
-                    };
-                };
-            };
-            400: components["responses"]["ApiError"];
-            401: components["responses"]["ApiError"];
-            403: components["responses"]["ApiError"];
-            404: components["responses"]["ApiError"];
-            409: components["responses"]["ApiError"];
-            413: components["responses"]["ApiError"];
-            415: components["responses"]["ApiError"];
-            422: components["responses"]["ApiError"];
-            429: components["responses"]["ApiError"];
-            500: components["responses"]["ApiError"];
-        };
-    };
-    getAppSupplierCreditsBysupplier_credit_id: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                supplier_credit_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data?: {
-                            amount?: number;
-                            applied_amount?: number;
-                            batch_number?: string;
-                            /** Format: date-time */
-                            created_at?: string;
-                            created_by_membership_id?: string | null;
-                            id?: string;
-                            medicine_batch_id?: string;
-                            medicine_id?: string;
-                            medicine_name?: string;
-                            quantity?: number;
-                            rate?: number;
-                            /** @enum {string} */
-                            status?: "open" | "adjusted";
-                            supplier_id?: string;
-                            supplier_name?: string;
-                        };
-                        meta?: {
-                            request_id: string;
-                        };
-                    };
-                };
-            };
-            400: components["responses"]["ApiError"];
-            401: components["responses"]["ApiError"];
-            403: components["responses"]["ApiError"];
-            404: components["responses"]["ApiError"];
-            429: components["responses"]["ApiError"];
-            500: components["responses"]["ApiError"];
-        };
-    };
     getAppSuppliers: {
         parameters: {
             query?: {
@@ -25308,6 +25555,7 @@ export interface operations {
                             }[];
                             name?: string;
                             order_count?: number;
+                            order_total?: number;
                             payable?: number;
                             phone?: string | null;
                             /** Format: date-time */
@@ -25320,6 +25568,7 @@ export interface operations {
                                 next?: string | null;
                                 per_page?: number;
                             };
+                            payable_total?: number;
                             request_id: string;
                         };
                     };
@@ -25376,6 +25625,7 @@ export interface operations {
                             }[];
                             name?: string;
                             order_count?: number;
+                            order_total?: number;
                             payable?: number;
                             phone?: string | null;
                             /** Format: date-time */
@@ -25431,6 +25681,7 @@ export interface operations {
                             }[];
                             name?: string;
                             order_count?: number;
+                            order_total?: number;
                             payable?: number;
                             phone?: string | null;
                             /** Format: date-time */
@@ -25528,10 +25779,278 @@ export interface operations {
                             }[];
                             name?: string;
                             order_count?: number;
+                            order_total?: number;
                             payable?: number;
                             phone?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            413: components["responses"]["ApiError"];
+            415: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    getAppSuppliersBysupplier_idCredits: {
+        parameters: {
+            query?: {
+                after?: string;
+                created_from?: string;
+                created_to?: string;
+                limit?: number;
+                medicine_id?: string;
+                order?: "asc" | "desc";
+                sort?: "created_at";
+                status?: "open" | "adjusted";
+            };
+            header?: never;
+            path: {
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            amount?: number;
+                            applied_amount?: number;
+                            batch_number?: string;
+                            /** Format: date-time */
+                            created_at?: string;
+                            created_by_membership_id?: string | null;
+                            id?: string;
+                            medicine_batch_id?: string;
+                            medicine_id?: string;
+                            medicine_name?: string;
+                            quantity?: number;
+                            rate?: number;
+                            /** @enum {string} */
+                            status?: "open" | "adjusted";
+                            supplier_id?: string;
+                            supplier_name?: string;
+                        }[];
+                        meta?: {
+                            pagination: {
+                                estimated_total?: number;
+                                has_more?: boolean;
+                                next?: string | null;
+                                per_page?: number;
+                            };
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    postAppSuppliersBysupplier_idCredits: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Idempotency-Key": string;
+            };
+            path: {
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    medicine_batch_id: string;
+                    quantity: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    "X-Idempotency-Replay"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            amount?: number;
+                            applied_amount?: number;
+                            batch_number?: string;
+                            /** Format: date-time */
+                            created_at?: string;
+                            created_by_membership_id?: string | null;
+                            id?: string;
+                            medicine_batch_id?: string;
+                            medicine_id?: string;
+                            medicine_name?: string;
+                            quantity?: number;
+                            rate?: number;
+                            /** @enum {string} */
+                            status?: "open" | "adjusted";
+                            supplier_id?: string;
+                            supplier_name?: string;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            413: components["responses"]["ApiError"];
+            415: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    getAppSuppliersBysupplier_idCreditsBysupplier_credit_id: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                supplier_credit_id: string;
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            amount?: number;
+                            applied_amount?: number;
+                            batch_number?: string;
+                            /** Format: date-time */
+                            created_at?: string;
+                            created_by_membership_id?: string | null;
+                            id?: string;
+                            medicine_batch_id?: string;
+                            medicine_id?: string;
+                            medicine_name?: string;
+                            quantity?: number;
+                            rate?: number;
+                            /** @enum {string} */
+                            status?: "open" | "adjusted";
+                            supplier_id?: string;
+                            supplier_name?: string;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    deleteAppSuppliersBysupplier_idCreditsBysupplier_credit_id: {
+        parameters: {
+            query: {
+                note?: string;
+                reason: "mistake" | "wrong_quantity" | "supplier_refused" | "other";
+            };
+            header?: {
+                "X-Idempotency-Key"?: string;
+            };
+            path: {
+                supplier_credit_id: string;
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    postAppSuppliersBysupplier_idCreditsBysupplier_credit_idRestore: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Idempotency-Key": string;
+            };
+            path: {
+                supplier_credit_id: string;
+                supplier_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "X-Idempotency-Replay"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            amount?: number;
+                            applied_amount?: number;
+                            batch_number?: string;
+                            /** Format: date-time */
+                            created_at?: string;
+                            created_by_membership_id?: string | null;
+                            id?: string;
+                            medicine_batch_id?: string;
+                            medicine_id?: string;
+                            medicine_name?: string;
+                            quantity?: number;
+                            rate?: number;
+                            /** @enum {string} */
+                            status?: "open" | "adjusted";
+                            supplier_id?: string;
+                            supplier_name?: string;
                         };
                         meta?: {
                             request_id: string;
@@ -25601,6 +26120,7 @@ export interface operations {
                             }[];
                             name?: string;
                             order_count?: number;
+                            order_total?: number;
                             payable?: number;
                             phone?: string | null;
                             /** Format: date-time */
@@ -25659,6 +26179,7 @@ export interface operations {
                             }[];
                             name?: string;
                             order_count?: number;
+                            order_total?: number;
                             payable?: number;
                             phone?: string | null;
                             /** Format: date-time */

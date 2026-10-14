@@ -31,6 +31,7 @@ import {
   creditListQuery,
   deleteCredit,
   fetchCredit,
+  fetchStoreCreditCount,
   listPendingCredits,
   restoreCredit,
   searchCreditParties,
@@ -169,6 +170,17 @@ describe('the Pending reads', () => {
       total: 1,
     });
     expect(await fetchCredit(TEST_CREDIT_ID)).toEqual(creditRow());
+  });
+
+  it('counts the medical store’s customer credits for its filters, read with one row', async () => {
+    answer({
+      '/app/medical-pending-credits': () => page([creditWire()], { estimated_total: 3 }),
+    });
+    expect(await fetchStoreCreditCount({ status: ['open'] })).toBe(3);
+    expect(queryOf('/app/medical-pending-credits')).toMatchObject({
+      status: 'open',
+      limit: 1,
+    });
   });
 
   it('reads a supplier’s credit by name, an "Other" reason as its text, a settled one’s day', async () => {

@@ -515,6 +515,7 @@
       "treatment": "施術を開く",
       "patient": "患者を開く",
       "invoice": "請求書を開く",
+      "medicalRep": "MR を開く",
       "checkIn": "チェックインを開く",
       "review": "レビューを開く"
     },

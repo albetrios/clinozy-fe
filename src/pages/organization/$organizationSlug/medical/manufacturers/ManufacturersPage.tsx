@@ -2,10 +2,13 @@ import { Outlet, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   automaticSection,
   roomFiltersOf,
+  singlePickSection,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
@@ -37,31 +40,50 @@ import { fetchManufacturer, medicalQueryKeys } from '../shared/medical-api.ts';
 import type { ManufacturerRow } from '../shared/medical-contracts.ts';
 import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
 import { useManufacturerColumns } from './hooks/useManufacturerColumns/index.ts';
-import { manufacturerFilterKey, manufacturerParamsOf } from './manufacturers.params.ts';
+import {
+  manufacturerFilterKey,
+  manufacturerParamsOf,
+  manufacturerSummaryParamsOf,
+} from './manufacturers.params.ts';
 
 const TABLE_ID = MEDICAL_TABLE_IDS.manufacturers;
 
 /**
- * Medical › Manufacturers (KICKOFF §6.7; `medical.md:89–103`): the Medical
- * toolbar over the brands on the pack — each with its medicines, who
- * distributes it (grey) and who represents it (mint). A row opens Edit
- * manufacturer; Delete, only while no medicine names it, asks for a reason;
- * the row edge is the maker's own tone. This page opens the Manufacturer
- * drawer for the `create/` and `$manufacturerId/edit/` routes.
+ * The Manufacturers Filters (`medical.md:103`): the automatic Suppliers and
+ * MRs sections — one of each at a time, as the API filters by one — and
+ * Created.
+ */
+function useManufacturerFilters() {
+  const { t } = useTranslation(MEDICAL_NS);
+  const suppliers = useSupplierCatalogue().data ?? [];
+  const mrs = useMrCatalogue().data ?? [];
+  return roomFiltersOf({
+    suppliers: singlePickSection(
+      automaticSection(t(MEDICAL_KEYS.filters.suppliers), suppliers),
+    ),
+    mrs: singlePickSection(automaticSection(t(MEDICAL_KEYS.filters.mrs), mrs)),
+  });
+}
+
+/**
+ * Medical › Manufacturers (KICKOFF §6.7; `medical.md:89–103`) on clinozy-be
+ * (`GET /app/manufacturers`): the Medical toolbar over the brands on the pack
+ * — each with its medicines, who distributes it (grey) and who represents it
+ * (mint), as the server links them. A row opens Edit manufacturer; Delete,
+ * only while no medicine names it, asks for a reason; the row edge is the
+ * maker's own tone. This page opens the Manufacturer drawer for the `create/`
+ * and `$manufacturerId/edit/` routes. A first read that fails shows in place
+ * with Retry.
  */
 export function ManufacturersPage() {
   const { t } = useTranslation(MEDICAL_NS);
+  const { t: tErrors } = useTranslation(ERRORS_NS);
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = manufacturerParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
   const access = useAppAccess();
   const nav = useMedicalNav();
-  const suppliers = useSupplierCatalogue().data ?? [];
-  const mrs = useMrCatalogue().data ?? [];
-  const { fields, copy } = roomFiltersOf({
-    suppliers: automaticSection(t(MEDICAL_KEYS.filters.suppliers), suppliers),
-    mrs: automaticSection(t(MEDICAL_KEYS.filters.mrs), mrs),
-  });
+  const { fields, copy } = useManufacturerFilters();
   const filters = useRoomFilters(fields);
   const stack = useMedicalStack();
   const [deleting, setDeleting] = useState<MedicalDeleteTarget | null>(null);
@@ -75,7 +97,10 @@ export function ManufacturersPage() {
 
   const list = useManufacturerList(params);
   const { rows, loading } = useRoomList(list, TABLE_ID, manufacturerFilterKey(params));
-  const summary = useMedicalSummary('manufacturers', params).data;
+  const summary = useMedicalSummary(
+    'manufacturers',
+    manufacturerSummaryParamsOf(params),
+  ).data;
   const table = useRoomTable({
     tableId: TABLE_ID,
     columns: useManufacturerColumns(),
@@ -83,6 +108,7 @@ export function ManufacturersPage() {
     sort: search.sort,
     onSortChange: (sort) => patchSearch({ sort }),
   });
+  const failed = list.isError && rows.length === 0 && !loading;
 
   const canDelete = access.isResolved && access.can('medical', 'delete');
   const keys = MEDICAL_KEYS.manufacturers;
@@ -115,22 +141,29 @@ export function ManufacturersPage() {
       className="flex min-h-0 flex-1 flex-col"
     >
       <MedicalToolbar tab="manufacturers" table={table} filters={{ fields, copy }} />
-      <MedicalTable
-        tab="manufacturers"
-        table={table}
-        list={list}
-        loading={loading}
-        filtered={filters.count > 0}
-        onClearFilters={() => filters.apply({})}
-        emptyTitle={t(keys.empty)}
-        recordsLabel={t(keys.records)}
-        countLabel={summary ? t(keys.count, { count: summary.total }) : undefined}
-        minWidth={930}
-        onRowClick={(maker) => nav.manufacturerEdit(maker.id)}
-        rowTone={(maker) => maker.tone}
-        rowActions={rowActions}
-        exportName="manufacturers.csv"
-      />
+      {failed ? (
+        <RetryError
+          message={tErrors(ERRORS_KEYS.frontend.query.loadFailed)}
+          onRetry={list.refetch}
+        />
+      ) : (
+        <MedicalTable
+          tab="manufacturers"
+          table={table}
+          list={list}
+          loading={loading}
+          filtered={filters.count > 0}
+          onClearFilters={() => filters.apply({})}
+          emptyTitle={t(keys.empty)}
+          recordsLabel={t(keys.records)}
+          countLabel={summary ? t(keys.count, { count: summary.total }) : undefined}
+          minWidth={930}
+          onRowClick={(maker) => nav.manufacturerEdit(maker.id)}
+          rowTone={(maker) => maker.tone}
+          rowActions={rowActions}
+          exportName="manufacturers.csv"
+        />
+      )}
       <ManufacturerDrawer
         {...(dialog.kind === 'record'
           ? { mode: 'edit' as const, manufacturer: dialog.record }

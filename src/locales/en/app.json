@@ -1287,8 +1287,6 @@
     "items": {
       "quickLine": "Type offering, qty, discount · e.g. lhr face 1 10%",
       "quickLineMedical": "Type medicine and qty · e.g. sun 2",
-      "hint": "2 = qty · 10% = discount · @500 = rate",
-      "oftenBilled": "Often billed",
       "browse": {
         "all": "All",
         "oral": "Oral",
@@ -1391,7 +1389,6 @@
       "saved": "Invoice #{{seq}} saved",
       "savedPlan": "Invoice #{{seq}} saved · offering suggestions updated",
       "promo": "{{offer}} applied to {{offering}}",
-      "contactSaved": "{{name}} saved as a Medical contact · add a mobile below",
       "rxUnmatched": "{{name}} not in the medicine list · add from the quick line",
       "deleted": "Invoice #{{seq}} deleted"
     },

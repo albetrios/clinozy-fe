@@ -117,6 +117,7 @@
     "free": "무상",
     "rate": "단가",
     "paid": "결제액:",
+    "credited": "공급업체 크레딧:",
     "issuedBy": "{{clinic}}의 구매 주문"
   }
 }

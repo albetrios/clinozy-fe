@@ -3,7 +3,7 @@
 Route: `/organization/$organizationSlug/medical/purchases` (KICKOFF §6.7, L-50). Same gates as
 the Medical room.
 
-Every purchase order but the cancelled (`medical.md:57–71`): PO (and the supplier's bill number) · Supplier · Items (and the free units) · Date · Total · Stage (Ordered sky · Received butter · Paid sage, with what a part-paid order has paid). The sequence follows the stage: an Ordered order opens for editing with "Receive goods" and — for an Admin — "Cancel order"; a Received one opens its read-only view with "Pay ₹2,980"; a Paid one its view with "Print" — its A4 purchase order (L-64, Q-M7). Receive goods' "+ Add unexpected item" takes in what came that was not ordered: its medicine, counts, rate, batch and expiry go into stock and onto the bill. Every payment goes through Payments › Send payment on `?bill=md:<poId>` (Q-M1): the row's and the view's "Pay ₹X", and the view action "Pay all received · ₹X" with Stage Received (the oldest open bill first). Filters: Stage · Created; the footer counts the orders.
+Every purchase order but the cancelled, on clinozy-be (`GET /app/medical-purchase-orders`, api-integration §5.5; `medical.md:57–71`): PO (and the supplier's bill number) · Supplier · Items (and the free units) · Date · Total · Stage (Ordered sky · Received butter · Paid sage — a received order paid in full, `payment_status` — with what a part-paid order has paid). Money is the API's rupees; the total, due and stage are the server's. The sequence follows the stage: an Ordered order opens for editing with "Receive goods" and — for an Admin — "Cancel order" (its toast's Undo restores it); a Received one opens its read-only view with "Pay ₹2,980"; a Paid one its view with "Print" — its A4 purchase order (L-64, Q-M7). A medicine typed on a line rides it by name, and the save has the server add it as a quick medicine (MD26). Receive goods' "+ Add unexpected item" takes in what came that was not ordered: its medicine, counts, rate, batch and expiry are sent without a line id, into stock and onto the bill. The row's and the view's "Pay ₹X" open Payments › Send payment on the order's bill (Q-M1, `usePayBill`); the view action "Pay all received · ₹X" with Stage Received — what the suppliers owed something are owed — opens Suppliers filtered `payable=owed`, where each row pays (route 13). Filters: Stage · Created; PO, Date and Total sort on the server (Supplier and Stage do not); the footer counts the orders.
 
 The search, filters and sort live in the URL (the room reads them in `../medical.search.ts`); the list read follows them —
 a sort keeps the rows until the new page arrives, a search or "Apply filter" shows the skeleton.
@@ -26,6 +26,9 @@ list (D24).
 | `components/PurchaseOrderDrawer/` | New / Edit purchase order: Order → Items with the quick line ("azel 20 +2 @180"), its Low stock chips and its Browse. |
 | `components/ReceiveGoodsDrawer/`  | Receive goods: "Tick what arrived", its form's rules (`components/ReceiveGoodsDrawer/receive-form.ts`).               |
 | `components/PurchaseOrderView/`   | A received or paid order, locked, with "Pay ₹X" — or, once paid, "Print": the A4 purchase order.                      |
+
+Tests mock `../shared/medical-api.ts`, `../shared/medical-records-api.ts` and
+`@/shared/api/app/medicines-api.ts` with the doubles of `tests/utils/medical-doubles.ts`.
 
 ## Test ids
 

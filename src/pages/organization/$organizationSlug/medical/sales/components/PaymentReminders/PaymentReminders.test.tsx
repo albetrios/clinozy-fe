@@ -5,15 +5,20 @@ import { axe } from 'vitest-axe';
 
 import i18n from '@/lib/i18n/i18n.ts';
 import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import {
+  TEST_BUYER_CONTACT_ID,
+  TEST_BUYER_PATIENT_ID,
+} from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
-import type { SaleReminders } from '../../../shared/medical-contracts.ts';
+import { listSaleReminders } from '../../../shared/medical-api.ts';
+import type { SaleReminder } from '../../../shared/medical-contracts.ts';
 import { PaymentReminders } from './PaymentReminders.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -37,11 +42,9 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5200, error: 9000, undo: 10_000 },
 }));
 
-/** What the reminders read answers in a test — `undefined` while it loads. */
-const answer = vi.hoisted(() => ({ current: undefined as SaleReminders | undefined }));
-vi.mock('../../../shared/hooks/useMedicalLists/index.ts', async (importOriginal) => ({
+vi.mock('../../../shared/medical-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  useSaleReminders: () => ({ data: answer.current }),
+  listSaleReminders: vi.fn(),
 }));
 
 const TRIGGER = 'medical-sales-view-action-reminders';
@@ -49,25 +52,33 @@ const PANEL = 'payment-reminders';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-const DHARTI = {
+/** A sale a reminder names. */
+const sale = (seq: number, due: number) => ({
+  id: `msal_sale${seq}0000000000000000`,
+  seq,
+  due,
+  soldAt: '2026-10-01T05:30:00.000Z',
+});
+
+const DHARTI: SaleReminder = {
   customer: {
-    kind: 'patient' as const,
-    id: 'patient-dharti',
+    id: TEST_BUYER_CONTACT_ID,
     name: 'Dharti Galani',
     phone: '+919825044120',
+    patientId: TEST_BUYER_PATIENT_ID,
   },
-  due: 56_300,
-  saleSeqs: [978],
+  due: 563,
+  sales: [sale(978, 563)],
 };
-const WALK_IN = {
+const WALK_IN: SaleReminder = {
   customer: {
-    kind: 'contact' as const,
-    id: 'contact-1',
+    id: 'con_meera0000000000000000',
     name: 'Meera Joshi',
     phone: null,
+    patientId: null,
   },
-  due: 122_600,
-  saleSeqs: [971, 975],
+  due: 1226,
+  sales: [sale(971, 600), sale(975, 626)],
 };
 
 /** The panel, opened from its view action. */
@@ -81,20 +92,20 @@ async function openPanel() {
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  answer.current = {
+  signInTestMember();
+  vi.mocked(listSaleReminders).mockResolvedValue({
     clinicName: 'Cresence Skin',
     customers: [WALK_IN, DHARTI],
-  };
-  resetAppFixtures();
+  });
 });
 afterEach(async () => {
   resetMedicalRoutes();
-  resetAppFixtures();
+  vi.mocked(listSaleReminders).mockReset();
   await i18n.changeLanguage('en');
 });
 
 describe('PaymentReminders (medical.md:17, Q-M6)', () => {
-  it('lists who owes the store: the total, each due and its sales', async () => {
+  it('lists who owes the store: the total, each due and its sales (the server’s dues)', async () => {
     const user = setup();
     const { container } = renderMedicalDrawer(<PaymentReminders params={{}} />);
     const trigger = await screen.findByTestId(TRIGGER);
@@ -114,6 +125,7 @@ describe('PaymentReminders (medical.md:17, Q-M6)', () => {
     expect(dharti).toHaveTextContent('Dharti Galani');
     expect(dharti).toHaveTextContent('₹563 due · Sale #978');
     expect(await axeForDialog(panel)).toHaveNoViolations();
+    expect(listSaleReminders).toHaveBeenCalledWith({});
   });
 
   it('opens WhatsApp with the reminder typed and rings the customer — nothing is sent from here', async () => {
@@ -166,11 +178,15 @@ describe('PaymentReminders (medical.md:17, Q-M6)', () => {
   });
 
   it('hides while no one can be reminded, and while the read is out', async () => {
-    answer.current = { clinicName: 'Cresence Skin', customers: [] };
+    vi.mocked(listSaleReminders).mockResolvedValue({
+      clinicName: 'Cresence Skin',
+      customers: [],
+    });
     const view = renderMedicalDrawer(<PaymentReminders params={{}} />);
+    await waitFor(() => expect(listSaleReminders).toHaveBeenCalled());
     await waitFor(() => expect(screen.queryByTestId(TRIGGER)).not.toBeInTheDocument());
     view.unmount();
-    answer.current = undefined;
+    vi.mocked(listSaleReminders).mockReturnValue(new Promise(() => undefined));
     renderMedicalDrawer(<PaymentReminders params={{}} />);
     await waitFor(() => expect(screen.queryByTestId(TRIGGER)).not.toBeInTheDocument());
   });

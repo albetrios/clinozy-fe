@@ -521,6 +521,7 @@
       "treatment": "Behandlung öffnen",
       "patient": "Patient öffnen",
       "invoice": "Rechnung öffnen",
+      "medicalRep": "Pharmareferent öffnen",
       "checkIn": "Check-in öffnen",
       "review": "Bewertung öffnen"
     },

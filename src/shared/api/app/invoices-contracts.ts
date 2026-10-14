@@ -113,6 +113,9 @@ export interface InvoiceRecord {
   /** What the invoice bills. */
   total: number;
   paid: number;
+  /** What its refunds gave back — moved out of `paid`, so `due` (total − paid − refunded) never
+   *  rises with a refund (clinozy-be D93). */
+  refunded: number;
   due: number;
   status: InvoicePaymentStatus;
   /** Its day is closed — read-only. */
@@ -190,6 +193,7 @@ const invoiceFieldsWire = {
   gst_total: z.number(),
   total: z.number(),
   paid_amount: z.number(),
+  refunded_amount: z.number(),
   due_amount: z.number(),
   payment_status: z.enum(INVOICE_PAYMENT_STATUS_VALUES),
   is_settled: z.boolean(),
@@ -258,6 +262,7 @@ export function toInvoiceRecord(row: InvoiceWire): InvoiceRecord {
     gstTotal: row.gst_total,
     total: row.total,
     paid: row.paid_amount,
+    refunded: row.refunded_amount,
     due: row.due_amount,
     status: row.payment_status,
     isSettled: row.is_settled,
@@ -299,6 +304,7 @@ export interface InvoicePreview {
   gstTotal: number;
   total: number;
   paid: number;
+  refunded: number;
   due: number;
 }
 
@@ -322,6 +328,7 @@ export const invoicePreviewWire = wireSchema<ApiInvoicePreview>()(
     gst_total: z.number(),
     total: z.number(),
     paid_amount: z.number(),
+    refunded_amount: z.number(),
     due_amount: z.number(),
   }),
 );
@@ -361,6 +368,7 @@ export function toInvoicePreview(
     gstTotal: row.gst_total,
     total: row.total,
     paid: row.paid_amount,
+    refunded: row.refunded_amount,
     due: row.due_amount,
   };
 }
@@ -449,16 +457,15 @@ export interface InvoiceParty {
 
 /**
  * One invoice with what reads beside it: who it bills, the ledger entries against it (receipts,
- * refunds with their credit notes, newest first) and the sheet's clinic and branch. `sale` is the
- * fixture Medical room's sale an invoice belongs to (its print reads "S-983"); clinozy-be's
- * invoices carry none.
+ * refunds with their credit notes, newest first) and the sheet's clinic and branch.
  */
 export interface InvoiceDetail {
   invoice: InvoiceRecord;
   party: InvoiceParty | null;
-  sale: { id: string; seq: number } | null;
   payments: LedgerRow[];
   sheet: InvoiceSheet;
+  /** The Medical sale the invoice belongs to, when the reader knows it — the sale print's "S-983". */
+  sale?: { seq: number } | null;
 }
 
 /** What a save answers: the invoice as read back, and how many of its lines bill plan rows. */

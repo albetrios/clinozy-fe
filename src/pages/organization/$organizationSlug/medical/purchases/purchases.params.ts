@@ -14,7 +14,9 @@ export function purchaseOrderParamsOf(search: MedicalSearch): PurchaseOrderListP
     q: search.q,
     stage: search.stage,
     created: search.created,
-    ...sortParamsOf(search.sort, ['seq', 'supplier', 'total', 'stage'] as const),
+    // The API sorts by number, order date and total (`sort=purchase_order_number`,
+    // `order_date`, `total`); the Supplier and Stage columns are not sortable.
+    ...sortParamsOf(search.sort, ['seq', 'date', 'total'] as const),
   };
 }
 

@@ -2,7 +2,6 @@ import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { MedicalPurchaseOrder } from '@/shared/api/app/app-schema.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
@@ -44,11 +43,13 @@ import {
   newOrderForm,
   orderFormOf,
   orderInputOf,
+  orderServerFields,
   orderTotal,
   pickedLines,
   type PurchaseOrderFormValues,
   reorderLines,
   reorderSupplier,
+  typedMedicineName,
 } from './purchase-order-form.ts';
 import {
   ItemsFields,
@@ -161,9 +162,10 @@ function useOrderSave({
     notifyOnError: false,
     successMessage: t(K.saved),
   });
-  return useDrawerSave<PurchaseOrderFormValues, MedicalPurchaseOrder>({
+  return useDrawerSave<PurchaseOrderFormValues, PurchaseOrderRow>({
     form,
     fieldOrder: ['supplierId', 'billNo', 'date', 'lines'],
+    serverFields: orderServerFields(form.getValues('lines')),
     toastId: 'purchase-order-save-failed',
     check: (current) => {
       form.clearErrors('lines');
@@ -176,17 +178,21 @@ function useOrderSave({
         });
       }
       setOpenStep('items');
-      const names = missing.map(
-        (index) =>
-          medicines.find((row) => row.id === current.lines[index]?.medicineId)?.name,
-      );
+      const names = missing.map((index) => {
+        const medicineId = current.lines[index]?.medicineId ?? null;
+        return (
+          medicines.find((row) => row.id === medicineId)?.name ??
+          typedMedicineName(medicineId) ??
+          undefined
+        );
+      });
       return { fields: [], message: rateMessage(names, t) };
     },
     onField: (field) => setOpenStep(stepOfField(field)),
     write: () => {
       const input = orderInputOf(form.getValues());
       return order
-        ? update.mutateAsync({ id: order.id, input })
+        ? update.mutateAsync({ record: order, input })
         : create.mutateAsync(input);
     },
     onDone: () => onClose(),

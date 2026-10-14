@@ -54,6 +54,9 @@ export const paymentQueryKeys = {
     [...paymentQueryKeys.all, organizationId, 'list'] as const,
   list: (organizationId: string | null, params: LedgerListParams) =>
     [...paymentQueryKeys.lists(organizationId), params] as const,
+  /** The medical store's slice of the ledger (`/app/medical-payments`) — under `lists`, so every write refreshes it. */
+  store: (organizationId: string | null, params: LedgerListParams) =>
+    [...paymentQueryKeys.lists(organizationId), 'store', params] as const,
   /** The ledger's count for its params — under `lists`, so every write refreshes it. */
   count: (organizationId: string | null, params: LedgerListParams) =>
     [...paymentQueryKeys.lists(organizationId), 'count', params] as const,
@@ -152,11 +155,10 @@ const KIND_QUERY: Readonly<Record<LedgerKindFilter, string>> = {
   money_back: 'money_back',
 };
 
-/** The ledger read's query for the URL's params, on the clinic's `today` — newest first. */
-export function ledgerListQuery(params: LedgerListParams, today: string = appToday()) {
+/** The ledger's filters as the API takes them, on the clinic's `today`. */
+function ledgerFilterQuery(params: LedgerListParams, today: string) {
   const created = params.created ? createdRangeOf(params.created, today) : {};
   return {
-    limit: PAGE_SIZE,
     direction: params.direction,
     kind: params.kind?.length
       ? params.kind.map((kind) => KIND_QUERY[kind]).join(',')
@@ -169,6 +171,11 @@ export function ledgerListQuery(params: LedgerListParams, today: string = appTod
     created_from: created.from,
     created_to: created.to,
   };
+}
+
+/** The ledger read's query for the URL's params, on the clinic's `today` — newest first. */
+export function ledgerListQuery(params: LedgerListParams, today: string = appToday()) {
+  return { limit: PAGE_SIZE, ...ledgerFilterQuery(params, today) };
 }
 
 /** A page of ledger rows with the cursor of the next and the API's estimated total. */
@@ -193,6 +200,45 @@ export async function listLedger(
   return {
     rows: await ledgerRowsOf(records),
     ...pageOf(response.meta?.pagination),
+  };
+}
+
+/**
+ * One page of the medical store's slice of the ledger (`GET /app/medical-payments`, MD31) —
+ * receipts and refunds on its sales, supplier bills of its orders, `medicines` expenses and their
+ * reversals — with the ledger's filters, each row with its author; `after` is the cursor.
+ */
+export async function listStoreLedger(
+  params: LedgerListParams,
+  after?: string,
+): Promise<LedgerPage> {
+  const response = await api.get('/app/medical-payments', {
+    query: { ...ledgerListQuery(params), after },
+  });
+  const records = z
+    .array(paymentRowWire)
+    .parse(response.data ?? [])
+    .map(toPaymentRecord);
+  return {
+    rows: await ledgerRowsOf(records),
+    ...pageOf(response.meta?.pagination),
+  };
+}
+
+/** The store's payments as the server's CSV for the same filters (`medicine:export`, MD31). */
+export async function exportStoreLedger(
+  params: LedgerListParams,
+): Promise<{ fileName: string; content: string; truncated: boolean }> {
+  const response = await api.get('/app/medical-payments/exports', {
+    query: ledgerFilterQuery(params, appToday()),
+  });
+  const file = z
+    .object({ file_name: z.string(), content: z.string(), is_truncated: z.boolean() })
+    .parse(response.data);
+  return {
+    fileName: file.file_name,
+    content: file.content,
+    truncated: file.is_truncated,
   };
 }
 

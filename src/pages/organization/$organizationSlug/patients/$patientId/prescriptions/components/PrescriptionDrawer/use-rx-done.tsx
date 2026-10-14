@@ -80,11 +80,12 @@ export function useRxDone({
       onClose();
       return;
     }
+    // New sale reads the prescription among its patient's: the patient rides along (`customer`).
     void navigate(
       appCommandNavigation('newSale', {
         organizationSlug,
         referrer: sellFrom,
-        search: { prescription: saved.id },
+        search: { prescription: saved.id, customer: saved.patientId },
       }),
     );
   };

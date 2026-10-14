@@ -9,14 +9,14 @@ import {
   ItemsField,
   ItemsReadCell,
 } from '@/shared/forms/ItemsField/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
+import type { SupplierAccountRow } from '../../medical-contracts.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWERS_NS,
 } from '../../medical-drawers.constants.ts';
-import type { SupplierAccountRow } from '../../medical-partners-contracts.ts';
 import { PURCHASE_STAGE_TONES } from '../../medical-tones.ts';
 import { useMedicalDates } from '../MedicalCells/medical-dates.ts';
 
@@ -31,7 +31,7 @@ interface AccountForm {
 function useColumns(): ItemsColumn<AccountForm, 'rows'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const { t: tRoom } = useTranslation(MEDICAL_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const dates = useMedicalDates();
   return [
     {
@@ -80,8 +80,8 @@ function useColumns(): ItemsColumn<AccountForm, 'rows'>[] {
       cell: ({ row }) => (
         <ItemsReadCell strong>
           {row.kind === 'order'
-            ? formatPaise(row.amount)
-            : `− ${formatPaise(row.amount)}`}
+            ? formatRupees(row.amount)
+            : `− ${formatRupees(row.amount)}`}
         </ItemsReadCell>
       ),
     },
@@ -96,7 +96,7 @@ function useColumns(): ItemsColumn<AccountForm, 'rows'>[] {
         if (row.due > 0) {
           return (
             <ItemsReadCell className={TONE_CLASSES.blush.ink}>
-              {t(K.due, { amount: formatPaise(row.due) })}
+              {t(K.due, { amount: formatRupees(row.due) })}
             </ItemsReadCell>
           );
         }

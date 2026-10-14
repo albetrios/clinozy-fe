@@ -117,6 +117,7 @@
     "free": "赠品",
     "rate": "单价",
     "paid": "已付：",
+    "credited": "供应商抵扣：",
     "issuedBy": "{{clinic}} 采购单"
   }
 }

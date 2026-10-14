@@ -1,16 +1,23 @@
-import type {
-  DeleteReason,
-  Manufacturer,
-  MedicalRep,
-  MRVisit,
-  Supplier,
-} from '@/shared/api/app/app-schema.ts';
+import type { QueryKey } from '@tanstack/react-query';
+
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { MEDICINE_WRITE_KEYS } from '@/shared/hooks/useMedicines/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
-import { fetchSupplierAccount, medicalQueryKeys } from '../../medical-api.ts';
+import {
+  fetchMrVisits,
+  fetchSupplierAccount,
+  medicalQueryKeys,
+} from '../../medical-api.ts';
+import type {
+  ManufacturerRow,
+  MrRow,
+  MrVisitRow,
+  SupplierRow,
+} from '../../medical-contracts.ts';
 import {
   createManufacturer,
   createMedicalRep,
@@ -28,24 +35,25 @@ import {
   updateManufacturer,
   updateMedicalRep,
   updateSupplier,
-} from '../../medical-partners-api.ts';
+} from '../../medical-records-api.ts';
 import type {
   ManufacturerInput,
   MedicalRepInput,
   MrVisitInput,
   SupplierInput,
-} from '../../medical-partners-contracts.ts';
+} from '../../medical-records-contracts.ts';
 
 /*
- * The Medical store's partner reads and writes for the drawers (KICKOFF §6.7):
- * every write refreshes the room — its lists join supplier, maker and MR names
- * — and the medicines, whose rows name their maker and best supplier.
+ * The Medical store's partner reads and writes for the drawers, each write carrying its action's
+ * idempotency key: suppliers, manufacturers, MRs and their visits. Every write refreshes the room —
+ * its rows name suppliers, makers and MRs — and the medicines, whose rows name their maker and best
+ * supplier.
  */
 
-/** A partner save: the record and its patch. */
-export interface PartnerUpdateVars<TInput> {
-  id: string;
-  patch: TInput;
+/** A partner save: the record as read — its `updated_at` guards the save — and the drawer's fields. */
+export interface PartnerUpdateVars<TRecord, TInput> {
+  record: TRecord;
+  input: TInput;
 }
 
 /** A partner delete: the record and the reason confirm's choice. */
@@ -61,153 +69,216 @@ export interface QuickSupplierVars {
   manufacturerIds?: readonly string[];
 }
 
-/** One write of the room, refreshing what it joins. */
-function useMedicalWrite<TData, TVars>(
-  mutationFn: (vars: TVars) => Promise<TData>,
-  options: CrudMutationOptions<TData, TVars>,
-) {
-  return useAppMutation<TData, TVars>({
-    mutationFn,
-    invalidateKeys: [...MEDICINE_WRITE_KEYS],
-    ...options,
+/** What a partner write refreshes: the room and its medicines. */
+const PARTNER_KEYS: readonly QueryKey[] = MEDICINE_WRITE_KEYS;
+
+/** A supplier's Account rows — its orders and credits (`medical.md:200`); idle without an id. */
+export function useSupplierAccount(id: string | null) {
+  const organizationId = useOrganizationId();
+  return useAppQuery({
+    queryKey: medicalQueryKeys.supplierAccount(organizationId, id ?? ''),
+    queryFn: () => fetchSupplierAccount(id ?? ''),
+    enabled: Boolean(id) && organizationId !== null,
+    notifyOnError: false,
   });
 }
 
-/** A supplier's Account rows (`medical.md:200`); idle without an id. */
-export function useSupplierAccount(id: string | null) {
+/** An MR's logged visits, the latest first; idle without an id. */
+export function useMrVisits(id: string | null) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: medicalQueryKeys.supplierAccount(id ?? ''),
-    queryFn: () => fetchSupplierAccount(id ?? ''),
-    enabled: Boolean(id),
+    queryKey: medicalQueryKeys.mrVisits(organizationId, id ?? ''),
+    queryFn: () => fetchMrVisits(id ?? ''),
+    enabled: Boolean(id) && organizationId !== null,
     notifyOnError: false,
   });
 }
 
 // ── Suppliers ──
 
-/** New supplier (`S:1675`). */
+/** New supplier. */
 export function useCreateSupplier(
-  options: CrudMutationOptions<Supplier, SupplierInput> = {},
+  options: CrudMutationOptions<SupplierRow, SupplierInput> = {},
 ) {
-  return useMedicalWrite(createSupplier, options);
+  return useAppMutation<SupplierRow, SupplierInput>({
+    mutationFn: (input, action) => createSupplier({ input, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
-/** Edit supplier (`S:1675`). */
+/** Edit supplier — refused when someone saved it since (`409 record_changed`). */
 export function useUpdateSupplier(
-  options: CrudMutationOptions<Supplier, PartnerUpdateVars<Partial<SupplierInput>>> = {},
+  options: CrudMutationOptions<
+    SupplierRow,
+    PartnerUpdateVars<SupplierRow, SupplierInput>
+  > = {},
 ) {
-  return useMedicalWrite(({ id, patch }) => updateSupplier(id, patch), options);
+  return useAppMutation<SupplierRow, PartnerUpdateVars<SupplierRow, SupplierInput>>({
+    mutationFn: (vars, action) => updateSupplier({ ...vars, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
 /** "Add supplier “Om Pharma”" from a picker. */
 export function useQuickCreateSupplier(
-  options: CrudMutationOptions<Supplier, QuickSupplierVars> = {},
+  options: CrudMutationOptions<SupplierRow, QuickSupplierVars> = {},
 ) {
-  return useMedicalWrite(
-    ({ name, manufacturerIds }) => quickCreateSupplier(name, manufacturerIds),
-    options,
-  );
+  return useAppMutation<SupplierRow, QuickSupplierVars>({
+    mutationFn: (vars, action) => quickCreateSupplier({ ...vars, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
-/** Delete a supplier with the reason confirm's choice (`S:1546`). */
+/** Delete a supplier with the reason confirm's choice — `409 supplier_has_dues` while owed. */
 export function useDeleteSupplier(
-  options: CrudMutationOptions<Supplier, PartnerDeleteVars> = {},
+  options: CrudMutationOptions<void, PartnerDeleteVars> = {},
 ) {
-  return useMedicalWrite(
-    ({ id, reason, note }) => deleteSupplier(id, reason, note),
-    options,
-  );
+  return useAppMutation<void, PartnerDeleteVars>({
+    mutationFn: ({ id, reason, note }) => deleteSupplier(id, reason, note),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
 /** Undo a supplier's delete (D32). */
-export function useRestoreSupplier(options: CrudMutationOptions<Supplier, string> = {}) {
-  return useMedicalWrite(restoreSupplier, options);
+export function useRestoreSupplier(
+  options: CrudMutationOptions<SupplierRow, string> = {},
+) {
+  return useAppMutation<SupplierRow, string>({
+    mutationFn: (id, action) => restoreSupplier(id, action.idempotencyKey),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
 // ── Manufacturers ──
 
-/** New manufacturer and its connections (`S:1675`). */
+/** New manufacturer and its connections. */
 export function useCreateManufacturer(
-  options: CrudMutationOptions<Manufacturer, ManufacturerInput> = {},
+  options: CrudMutationOptions<ManufacturerRow, ManufacturerInput> = {},
 ) {
-  return useMedicalWrite(createManufacturer, options);
+  return useAppMutation<ManufacturerRow, ManufacturerInput>({
+    mutationFn: (input, action) => createManufacturer({ input, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
-/** Edit manufacturer and its connections (`S:1675`). */
+/** Edit manufacturer and its connections — refused when someone saved it since. */
 export function useUpdateManufacturer(
-  options: CrudMutationOptions<Manufacturer, PartnerUpdateVars<ManufacturerInput>> = {},
+  options: CrudMutationOptions<
+    ManufacturerRow,
+    PartnerUpdateVars<ManufacturerRow, ManufacturerInput>
+  > = {},
 ) {
-  return useMedicalWrite(({ id, patch }) => updateManufacturer(id, patch), options);
+  return useAppMutation<
+    ManufacturerRow,
+    PartnerUpdateVars<ManufacturerRow, ManufacturerInput>
+  >({
+    mutationFn: (vars, action) => updateManufacturer({ ...vars, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
-/** "Add manufacturer “acme”" from a picker. */
+/** "Add manufacturer “ACME”" from a picker. */
 export function useQuickCreateManufacturer(
-  options: CrudMutationOptions<Manufacturer, string> = {},
+  options: CrudMutationOptions<ManufacturerRow, string> = {},
 ) {
-  return useMedicalWrite(quickCreateManufacturer, options);
+  return useAppMutation<ManufacturerRow, string>({
+    mutationFn: (name, action) => quickCreateManufacturer({ name, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
-/** Delete a manufacturer with the reason confirm's choice (`S:1546`). */
+/** Delete a manufacturer with the reason confirm's choice — refused while a medicine names it. */
 export function useDeleteManufacturer(
-  options: CrudMutationOptions<Manufacturer, PartnerDeleteVars> = {},
+  options: CrudMutationOptions<void, PartnerDeleteVars> = {},
 ) {
-  return useMedicalWrite(
-    ({ id, reason, note }) => deleteManufacturer(id, reason, note),
-    options,
-  );
+  return useAppMutation<void, PartnerDeleteVars>({
+    mutationFn: ({ id, reason, note }) => deleteManufacturer(id, reason, note),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
 /** Undo a manufacturer's delete (D32). */
 export function useRestoreManufacturer(
-  options: CrudMutationOptions<Manufacturer, string> = {},
+  options: CrudMutationOptions<ManufacturerRow, string> = {},
 ) {
-  return useMedicalWrite(restoreManufacturer, options);
+  return useAppMutation<ManufacturerRow, string>({
+    mutationFn: (id, action) => restoreManufacturer(id, action.idempotencyKey),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
 // ── MRs ──
 
-/** New MR (`S:1675`). */
+/** New MR. */
 export function useCreateMedicalRep(
-  options: CrudMutationOptions<MedicalRep, MedicalRepInput> = {},
+  options: CrudMutationOptions<MrRow, MedicalRepInput> = {},
 ) {
-  return useMedicalWrite(createMedicalRep, options);
+  return useAppMutation<MrRow, MedicalRepInput>({
+    mutationFn: (input, action) => createMedicalRep({ input, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
-/** Edit MR (`S:1675`). */
+/** Edit MR — refused when someone saved them since. */
 export function useUpdateMedicalRep(
-  options: CrudMutationOptions<
-    MedicalRep,
-    PartnerUpdateVars<Partial<MedicalRepInput>>
-  > = {},
+  options: CrudMutationOptions<MrRow, PartnerUpdateVars<MrRow, MedicalRepInput>> = {},
 ) {
-  return useMedicalWrite(({ id, patch }) => updateMedicalRep(id, patch), options);
+  return useAppMutation<MrRow, PartnerUpdateVars<MrRow, MedicalRepInput>>({
+    mutationFn: (vars, action) => updateMedicalRep({ ...vars, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
 /** "Add MR “Ravi”" from a picker. */
 export function useQuickCreateMedicalRep(
-  options: CrudMutationOptions<MedicalRep, string> = {},
+  options: CrudMutationOptions<MrRow, string> = {},
 ) {
-  return useMedicalWrite(quickCreateMedicalRep, options);
+  return useAppMutation<MrRow, string>({
+    mutationFn: (name, action) => quickCreateMedicalRep({ name, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
-/** Delete an MR with the reason confirm's choice (`S:1546`). */
+/** Delete an MR with the reason confirm's choice. */
 export function useDeleteMedicalRep(
-  options: CrudMutationOptions<MedicalRep, PartnerDeleteVars> = {},
+  options: CrudMutationOptions<void, PartnerDeleteVars> = {},
 ) {
-  return useMedicalWrite(
-    ({ id, reason, note }) => deleteMedicalRep(id, reason, note),
-    options,
-  );
+  return useAppMutation<void, PartnerDeleteVars>({
+    mutationFn: ({ id, reason, note }) => deleteMedicalRep(id, reason, note),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
 /** Undo an MR's delete (D32). */
-export function useRestoreMedicalRep(
-  options: CrudMutationOptions<MedicalRep, string> = {},
-) {
-  return useMedicalWrite(restoreMedicalRep, options);
+export function useRestoreMedicalRep(options: CrudMutationOptions<MrRow, string> = {}) {
+  return useAppMutation<MrRow, string>({
+    mutationFn: (id, action) => restoreMedicalRep(id, action.idempotencyKey),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }
 
-/** Log MR visit (`logMRVisit`, `S:1676`). */
-export function useLogMrVisit(options: CrudMutationOptions<MRVisit, MrVisitInput> = {}) {
-  return useMedicalWrite(logMrVisit, options);
+/** Log MR visit — sets the MR's next visit when one is given. */
+export function useLogMrVisit(
+  options: CrudMutationOptions<MrVisitRow, MrVisitInput> = {},
+) {
+  return useAppMutation<MrVisitRow, MrVisitInput>({
+    mutationFn: (input, action) => logMrVisit({ input, ...action }),
+    invalidateKeys: [...PARTNER_KEYS],
+    ...options,
+  });
 }

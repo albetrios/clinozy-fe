@@ -11,6 +11,7 @@
     "manufacturers": "Hersteller",
     "mrs": "Pharmareferenten",
     "payments": "Zahlungen",
+    "credits": "Gutschriften",
     "groups": {
       "selling": "Verkauf",
       "stock": "Bestand",
@@ -53,7 +54,9 @@
     "manufacturer": "Hersteller",
     "manufacturers": "Hersteller",
     "suppliers": "Lieferanten",
-    "mrs": "Pharmareferenten"
+    "mrs": "Pharmareferenten",
+    "payable": "Offen",
+    "owed": "Mit offenem Betrag"
   },
   "table": {
     "percent": "{{value}} %",
@@ -183,6 +186,7 @@
     "noOrders": "Keine Bestellungen",
     "ageing_one": "{{count}} Tag",
     "ageing_other": "{{count}} Tage",
+    "paidUp": "An {{name}} ist jetzt nichts mehr offen",
     "rowActions": {
       "pay": "{{amount}} zahlen",
       "newOrder": "Neue Bestellung",
@@ -229,7 +233,75 @@
   },
   "payments": {
     "records": "Apothekenzahlungen",
-    "empty": "Noch keine Apothekenzahlungen"
+    "empty": "Noch keine Apothekenzahlungen",
+    "export": "Exportieren",
+    "exportTitle": "Diese Zahlungen als CSV exportieren",
+    "exported": "Zahlungen als CSV exportiert",
+    "exportTruncated": "Die ersten 10.000 Zahlungen exportiert — grenze die Filter für den Rest ein"
+  },
+  "credits": {
+    "records": "Apothekengutschriften",
+    "count_one": "{{count}} Gutschrift",
+    "count_other": "{{count}} Gutschriften",
+    "sides": {
+      "label": "Wessen Gutschriften",
+      "suppliers": "Von Lieferanten",
+      "customers": "Bei Kunden"
+    },
+    "columns": {
+      "credit": "Gutschrift",
+      "supplier": "Lieferant",
+      "packs": "Packungen",
+      "amount": "Betrag",
+      "applied": "Verrechnet",
+      "state": "Status",
+      "since": "Seit",
+      "who": "Wer",
+      "way": "Richtung",
+      "left": "Offen"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_one": "{{count}} Packung",
+    "packs_other": "{{count}} Packungen",
+    "states": {
+      "open": "Offen",
+      "adjusted": "Verrechnet"
+    },
+    "customerStates": {
+      "open": "Offen",
+      "given_back": "Zurückgegeben",
+      "got_back": "Zurückerhalten",
+      "used": "Verwendet"
+    },
+    "ways": {
+      "give": "Wir zahlen zurück",
+      "take": "Wir bekommen zurück"
+    },
+    "rowActions": {
+      "void": "Gutschrift stornieren",
+      "giveBack": "Zurückgeben",
+      "gotBack": "Zurückerhalten",
+      "open": "In Ausstehend öffnen"
+    },
+    "empty": {
+      "suppliers": "Noch keine Lieferantengutschriften — gib ablaufende Ware unter Medikamente zurück",
+      "customers": "Noch keine Kundengutschriften"
+    },
+    "addCredit": "Gutschrift hinzufügen",
+    "void": {
+      "title": "Diese Gutschrift stornieren?",
+      "effect": "Die Packungen kommen zurück in den Bestand, und der Lieferant ist wieder offen.",
+      "voided": "Gutschrift · {{batch}} storniert",
+      "reasons": {
+        "mistake": "Versehentlich angelegt",
+        "wrongQuantity": "Falsche Menge",
+        "supplierRefused": "Lieferant hat abgelehnt"
+      }
+    },
+    "filters": {
+      "state": "Status",
+      "way": "Richtung"
+    }
   },
   "drawers": {
     "records": {
@@ -263,8 +335,7 @@
     "quick": {
       "manufacturer": "Hersteller {{name}} hinzugefügt",
       "supplier": "Lieferant {{name}} hinzugefügt · Telefon und GST später ergänzen",
-      "mr": "Pharmareferent {{name}} hinzugefügt",
-      "medicine": "{{name}} hinzugefügt · UVP später unter Bestand setzen"
+      "mr": "Pharmareferent {{name}} hinzugefügt"
     },
     "deleteConfirm": {
       "medicine": "Dieses Arzneimittel löschen?",
@@ -562,6 +633,7 @@
       "payable": "Offen {{amount}}",
       "paid": "Bezahlt {{amount}}",
       "paidOf": "{{paid}} von {{total}} bezahlt",
+      "paidWithCredits": "{{paid}} bezahlt + {{credited}} Lieferantengutschriften",
       "pay": "{{amount}} zahlen",
       "print": "Drucken"
     },
@@ -589,7 +661,7 @@
     },
     "saleReturn": {
       "title": "Rückgabe vom Patienten",
-      "sub": "{{customer}} · zurückgegebener Bestand geht in seine Charge zurück",
+      "sub": "{{customer}} · zurückgegebene Packungen gehen in ihre Charge zurück; beschädigte oder nach einer Reaktion zurückgegebene werden ausgebucht",
       "steps": {
         "back": "Was zurückkommt",
         "reason": "Grund & Erstattung"
@@ -614,8 +686,11 @@
       "nothing": "Geben Sie ein, was zurückgegeben wird",
       "refunded": "{{amount}} erstattet · Bestand wieder hinzugefügt",
       "refundedWrittenOff": "{{amount}} erstattet · Bestand abgeschrieben",
-      "lowered": "{{amount}} zurückgegeben · Bestand wieder hinzugefügt",
-      "loweredWrittenOff": "{{amount}} zurückgegeben · Bestand abgeschrieben"
+      "storeCredit": "Guthaben",
+      "saveCredit": "{{amount}} als Guthaben behalten",
+      "credited": "{{amount}} als Guthaben behalten · Bestand wieder hinzugefügt",
+      "creditedWrittenOff": "{{amount}} als Guthaben behalten · Bestand abgeschrieben",
+      "notPaid": "Zuerst die ganze Rechnung kassieren · nur ein voll bezahlter Verkauf nimmt eine Rückgabe an"
     },
     "expiring": {
       "title": "Ablaufenden Bestand zurückgeben",

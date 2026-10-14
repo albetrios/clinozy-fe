@@ -1,21 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { addCivilDays, appToday } from '@/shared/api/app/app-time.ts';
+import { mrRow } from '@/tests/utils/medical-doubles.ts';
 
 import type { MrRow } from '../../../shared/medical-contracts.ts';
 import { mrInitials, useMrColumns } from './useMrColumns.tsx';
-
-const rep = (nextVisitOn: string | null) =>
-  ({
-    id: 'r1',
-    name: 'Alvio Pharma · Rakesh',
-    phone: null,
-    manufacturers: [],
-    nextVisitOn,
-    lastVisitOn: null,
-    samples: null,
-  }) as unknown as MrRow;
 
 describe('useMrColumns', () => {
   it('lays out the MRs columns with Samples hidden', () => {
@@ -30,17 +19,25 @@ describe('useMrColumns', () => {
     expect(result.current.at(-1)?.meta).toMatchObject({ defaultHidden: true });
   });
 
-  it('tones the next visit blush once it is past, against today', () => {
+  it('tones the next visit blush once the server marks it overdue, sky ahead', () => {
     const { result } = renderHook(() => useMrColumns());
     const fold = (row: MrRow) =>
       result.current.find((column) => column.id === 'nextVisit')?.meta?.foldValue?.(row);
-    expect(fold(rep(addCivilDays(appToday(), -1)))).toMatchObject({
+    expect(fold(mrRow({ nextVisitOn: '2026-10-01', visitOverdue: true }))).toMatchObject({
       dotClassName: 'bg-tone-blush-foreground text-background',
     });
-    expect(fold(rep(addCivilDays(appToday(), 3)))).toMatchObject({
+    expect(fold(mrRow({ visitOverdue: false }))).toMatchObject({
       dotClassName: 'bg-tone-sky-foreground text-background',
     });
-    expect(fold(rep(null))).toBeNull();
+    expect(fold(mrRow({ nextVisitOn: null }))).toBeNull();
+  });
+
+  it('folds the last visit, or nothing before the first', () => {
+    const { result } = renderHook(() => useMrColumns());
+    const fold = (row: MrRow) =>
+      result.current.find((column) => column.id === 'lastVisit')?.meta?.foldValue?.(row);
+    expect(fold(mrRow())).toEqual(expect.any(String));
+    expect(fold(mrRow({ lastVisitOn: null }))).toBeNull();
   });
 
   it('takes the rep’s initials from their own name', () => {

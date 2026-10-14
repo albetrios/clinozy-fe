@@ -9,9 +9,9 @@ import {
 } from '@/shared/components/RoomToolbar/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { Printer, RefreshCw, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
@@ -24,19 +24,22 @@ import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
 import { useMedicalSummary, useSaleList } from '../shared/hooks/useMedicalLists/index.ts';
 import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
-import type { SaleListParams, SaleRow } from '../shared/medical-contracts.ts';
-import type { PrescriptionToFill } from '../shared/medical-flows-contracts.ts';
+import type {
+  PrescriptionToFill,
+  SaleListParams,
+  SaleRow,
+} from '../shared/medical-contracts.ts';
 import { SALE_STATUS_TONES } from '../shared/medical-tones.ts';
 import { PaymentReminders } from './components/PaymentReminders/index.ts';
 import { PrescriptionsToFill } from './components/PrescriptionsToFill/index.ts';
 import { SaleDrawers } from './components/SaleDrawers/index.ts';
-import { useSaleActions } from './hooks/useSaleActions/index.ts';
+import { salePaymentOf, useSaleActions } from './hooks/useSaleActions/index.ts';
 import { useSaleColumns } from './hooks/useSaleColumns/index.ts';
 import { saleFilterKey, saleParamsOf } from './sales.params.ts';
 
 const TABLE_ID = MEDICAL_TABLE_IDS.sales;
 
-/** The Sales Filters (`medical.md:39`): Status (All · Unpaid · Returned) · Created. */
+/** The Sales Filters (`medical.md:39`): Status (All · Unpaid · Paid · Returned) · Created. */
 const SALE_FILTER_FIELDS = {
   status: { kind: 'options', values: SALE_STATUSES, single: true },
   created: { kind: 'date', presets: 'created' },
@@ -45,7 +48,7 @@ const SALE_FILTER_FIELDS = {
 /**
  * The Sales view action for the Status filter (`medical.md:17`): All →
  * "Prescriptions to fill" (for members who create sales), Unpaid → "Send
- * payment reminders" (Q-M6); Returned → none, and no actions slot.
+ * payment reminders" (Q-M6); Paid and Returned → none, and no actions slot.
  */
 function salesViewAction({
   status,
@@ -64,10 +67,12 @@ function salesViewAction({
 }
 
 /**
- * Medical › Sales (KICKOFF §6.7; `medical.md:25–39`), the room's first tab: the
- * Medical toolbar — "Prescriptions to fill" with Status All, "Send payment
- * reminders" with Unpaid — over the sales table. A row opens the read-only Sale; "Collect ₹563" records the due on
- * the ledger (Q-M1), "Return medicines" opens Return from patient, "Print"
+ * Medical › Sales (KICKOFF §6.7; `medical.md:25–39`), the room's first tab on
+ * clinozy-be (`GET /app/medical-sales`): the Medical toolbar — "Prescriptions
+ * to fill" with Status All, "Send payment reminders" with Unpaid — over the
+ * sales table. A row opens the read-only Sale; "Collect ₹563" records the due
+ * on the ledger (Q-M1, `payment:create`), "Return medicines" — a sale paid in
+ * full, `payment:delete` (MD23, MD24) — opens Return from patient, "Print"
  * prints the sale's invoice on the A4 sheet, and an unpaid sale with nothing
  * paid or returned can be voided (Q-M2). New sale is the shared Invoice
  * drawer, Medical locked. The search, Status, Created and the sort live in the
@@ -76,7 +81,7 @@ function salesViewAction({
  */
 export function SalesPage() {
   const { t } = useTranslation(MEDICAL_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = saleParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
@@ -106,12 +111,12 @@ export function SalesPage() {
     if (actions.canCollect(sale)) {
       offered.push({
         id: 'collect',
-        label: t(keys.collect, { amount: formatPaise(sale.due) }),
+        label: t(keys.collect, { amount: formatRupees(sale.due) }),
         icon: Wallet,
         onSelect: () => actions.collect(sale),
       });
     }
-    if (actions.canReturn) {
+    if (actions.canReturn(sale)) {
       offered.push({
         id: 'return',
         label: t(keys.return),
@@ -119,12 +124,15 @@ export function SalesPage() {
         onSelect: () => nav.saleReturn(sale.id),
       });
     }
-    offered.push({
-      id: 'print',
-      label: t(keys.print),
-      icon: Printer,
-      onSelect: () => actions.print(sale),
-    });
+    // A voided sale has no invoice left to print.
+    if (sale.invoice) {
+      offered.push({
+        id: 'print',
+        label: t(keys.print),
+        icon: Printer,
+        onSelect: () => actions.print(sale),
+      });
+    }
     if (actions.canVoid(sale)) {
       offered.push({
         id: 'void',
@@ -156,6 +164,7 @@ export function SalesPage() {
               anyLabel: t(MEDICAL_KEYS.filters.all),
               options: {
                 unpaid: { label: t(statuses.unpaid), tone: 'blush' },
+                paid: { label: t(statuses.paid), tone: 'sage' },
                 returned: { label: t(statuses.returned), tone: 'lav' },
               },
             },
@@ -166,7 +175,7 @@ export function SalesPage() {
           params,
           canCreate,
           onPickPrescription: (rx) =>
-            nav.create('sales', { prescription: rx.id, customer: rx.patientId }),
+            nav.create('sales', { prescription: rx.id, customer: rx.contactId }),
         })}
       />
       <MedicalTable
@@ -183,7 +192,7 @@ export function SalesPage() {
         }
         minWidth={1100}
         onRowClick={(sale) => nav.sale(sale.id)}
-        rowTone={(sale) => SALE_STATUS_TONES[sale.status]}
+        rowTone={(sale) => SALE_STATUS_TONES[salePaymentOf(sale)]}
         rowActions={rowActions}
         exportName="sales.csv"
         exportValue={(columnId, sale) =>

@@ -20,11 +20,17 @@ describe('purchaseOrderParamsOf — the Purchases read from the URL', () => {
     });
   });
 
-  it('sends no sort for a column it lacks', () => {
-    expect(purchaseOrderParamsOf({ sort: 'margin:asc' })).toEqual({
-      q: undefined,
-      stage: undefined,
-      created: undefined,
+  it('sends no sort for a column it lacks — the API sorts no supplier or stage', () => {
+    for (const sort of ['margin:asc', 'supplier:asc', 'stage:desc'] as const) {
+      expect(purchaseOrderParamsOf({ sort })).toEqual({
+        q: undefined,
+        stage: undefined,
+        created: undefined,
+      });
+    }
+    expect(purchaseOrderParamsOf({ sort: 'date:asc' })).toMatchObject({
+      sort: 'date',
+      order: 'asc',
     });
   });
 

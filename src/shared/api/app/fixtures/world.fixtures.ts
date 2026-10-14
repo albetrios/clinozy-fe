@@ -2,17 +2,9 @@ import { createFixtureCollection } from '@/shared/api/app/app-fixture-store.ts';
 import type {
   Branch,
   CheckIn,
-  CreditNote,
   FeedbackAction,
   Invoice,
   LeadMessage,
-  Manufacturer,
-  MedicalContact,
-  MedicalPurchaseOrder,
-  MedicalRep,
-  MedicalSale,
-  MRVisit,
-  OfferingSuggestion,
   Organization,
   PatientImage,
   PatientNote,
@@ -20,55 +12,24 @@ import type {
   PatientReport,
   Prescription,
   Review,
-  StockCount,
-  StockItem,
-  StockMovement,
-  StockPurchase,
-  StockVendor,
-  Supplier,
   Treatment,
 } from '@/shared/api/app/app-schema.ts';
 import type { AppointmentRecord } from '@/shared/api/app/appointments-fixture-contracts.ts';
 import type { LeadRecord } from '@/shared/api/app/leads-fixture-contracts.ts';
-import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
-import type {
-  OfferingRecord,
-  OfferRecord,
-} from '@/shared/api/app/offerings-fixture-contracts.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-fixture-contracts.ts';
 import type { PatientRecord } from '@/shared/api/app/patients-fixture-contracts.ts';
-import type {
-  DayCloseRecord,
-  PaymentRecord,
-  PendingCreditRecord,
-} from '@/shared/api/app/payments-fixture-contracts.ts';
+import type { PaymentRecord } from '@/shared/api/app/payments-fixture-contracts.ts';
 import type { StaffProfile } from '@/shared/api/app/staff-fixture-contracts.ts';
 import type { TaskRecord } from '@/shared/api/app/tasks-fixture-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
 import { leadMessageSeed, leadSeed } from './leads.fixtures.ts';
-import {
-  manufacturerSeed,
-  medicalContactSeed,
-  medicalRepSeed,
-  medicalSaleSeed,
-  medicineSeed,
-  mrVisitSeed,
-  purchaseOrderSeed,
-  supplierSeed,
-} from './medical.fixtures.ts';
-import {
-  creditNoteSeed,
-  dayCloseSeed,
-  invoiceSeed,
-  paymentSeed,
-  pendingCreditSeed,
-} from './money.fixtures.ts';
-import { offeringSeed, offerSeed } from './offerings.fixtures.ts';
+import { invoiceSeed, paymentSeed } from './money.fixtures.ts';
+import { offeringSeed } from './offerings.fixtures.ts';
 import { branchSeed, organizationSeed } from './organization.fixtures.ts';
 import {
   checkInSeed,
   feedbackActionSeed,
-  offeringSuggestionSeed,
   patientImageSeed,
   patientNoteSeed,
   patientPackageSeed,
@@ -79,21 +40,16 @@ import {
 } from './patient-records.fixtures.ts';
 import { patientSeed } from './patients.fixtures.ts';
 import { staffSeed } from './staff.fixtures.ts';
-import {
-  stockCountSeed,
-  stockItemSeed,
-  stockMovementSeed,
-  stockPurchaseSeed,
-  stockVendorSeed,
-} from './stock.fixtures.ts';
 import { taskSeed } from './tasks.fixtures.ts';
 
 /**
  * The clinic fixture world (D6, D37 — REPLACE_WITH_API): one in-memory
- * collection per contract entity, seeded from the prototype the first time a
- * room reads it, on the real clinic clock — the prototype's seed day is today.
- * The records cross-link by id like one database. Room api modules read and
- * write these; when an entity's API lands its collection is deleted.
+ * collection per contract entity, seeded from the prototype the first time it
+ * is read, on the real clinic clock — the prototype's seed day is today. The
+ * records cross-link by id like one database. Every room reads clinozy-be now
+ * (Medical last, D168); what is left is what the chat column's lead and patient
+ * threads read (`messages-api.ts`, `contact-threads-api.ts`) and the records
+ * those point at. When an entity's API lands its collection is deleted.
  */
 export const appFixtures = {
   branches: createFixtureCollection<Branch>({
@@ -154,10 +110,6 @@ export const appFixtures = {
     resource: 'Note',
     seed: () => patientNoteSeed(),
   }),
-  offeringSuggestions: createFixtureCollection<OfferingSuggestion>({
-    resource: 'Offering suggestion',
-    seed: () => offeringSuggestionSeed(),
-  }),
   checkIns: createFixtureCollection<CheckIn>({
     resource: 'Check-in',
     seed: () => checkInSeed(),
@@ -176,11 +128,6 @@ export const appFixtures = {
     resource: 'Offering',
     seed: () => offeringSeed(),
   }),
-  offers: createFixtureCollection<OfferRecord>({
-    resource: 'Offer',
-    seed: () => offerSeed(),
-    sequenced: false,
-  }),
   invoices: createFixtureCollection<Invoice>({
     resource: 'Invoice',
     seed: () => invoiceSeed(),
@@ -190,77 +137,9 @@ export const appFixtures = {
     resource: 'Payment',
     seed: () => paymentSeed(),
   }),
-  creditNotes: createFixtureCollection<CreditNote>({
-    resource: 'Credit note',
-    seed: () => creditNoteSeed(),
-  }),
-  // Credits carry the plan's reason chip, note, invoice and settle-by day — see payments-fixture-contracts.ts.
-  pendingCredits: createFixtureCollection<PendingCreditRecord>({
-    resource: 'Pending credit',
-    seed: () => pendingCreditSeed(),
-  }),
-  // Closes carry the plan's recount, acceptor and review ticks — see payments-fixture-contracts.ts.
-  dayCloses: createFixtureCollection<DayCloseRecord>({
-    resource: 'Day close',
-    seed: () => dayCloseSeed(),
-  }),
   tasks: createFixtureCollection<TaskRecord>({
     resource: 'Task',
     seed: () => taskSeed(),
-  }),
-  manufacturers: createFixtureCollection<Manufacturer>({
-    resource: 'Manufacturer',
-    seed: () => manufacturerSeed(),
-  }),
-  suppliers: createFixtureCollection<Supplier>({
-    resource: 'Supplier',
-    seed: () => supplierSeed(),
-  }),
-  medicalReps: createFixtureCollection<MedicalRep>({
-    resource: 'MR',
-    seed: () => medicalRepSeed(),
-  }),
-  mrVisits: createFixtureCollection<MRVisit>({
-    resource: 'MR visit',
-    seed: () => mrVisitSeed(),
-  }),
-  // Medicines carry the plan's "Sold with" and near-expiry discount — see medicines-contracts.ts.
-  medicines: createFixtureCollection<MedicineRecord>({
-    resource: 'Medicine',
-    seed: () => medicineSeed(),
-  }),
-  purchaseOrders: createFixtureCollection<MedicalPurchaseOrder>({
-    resource: 'Purchase order',
-    seed: () => purchaseOrderSeed(),
-  }),
-  medicalContacts: createFixtureCollection<MedicalContact>({
-    resource: 'Contact',
-    seed: () => medicalContactSeed(),
-  }),
-  medicalSales: createFixtureCollection<MedicalSale>({
-    resource: 'Sale',
-    seed: () => medicalSaleSeed(),
-  }),
-  stockVendors: createFixtureCollection<StockVendor>({
-    resource: 'Vendor',
-    seed: () => stockVendorSeed(),
-  }),
-  stockItems: createFixtureCollection<StockItem>({
-    resource: 'Item',
-    seed: () => stockItemSeed(),
-  }),
-  stockPurchases: createFixtureCollection<StockPurchase>({
-    resource: 'Purchase',
-    seed: () => stockPurchaseSeed(),
-  }),
-  stockMovements: createFixtureCollection<StockMovement>({
-    resource: 'Movement',
-    seed: () => stockMovementSeed(),
-  }),
-  stockCounts: createFixtureCollection<StockCount>({
-    resource: 'Stock check',
-    seed: () => stockCountSeed(),
-    sequenced: false,
   }),
 };
 

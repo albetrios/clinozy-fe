@@ -118,6 +118,19 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     expect(probe.actions?.actionOf(cardIn('enquiries'))).toBeNull();
   });
 
+  it('dispenses on New sale with the Rx and its patient, Today the way back', async () => {
+    const { router } = await actionsFor('pharmacist');
+    await waitFor(() =>
+      expect(probe.actions?.actionOf(cardIn('pharmacy'))).toBeTypeOf('function'),
+    );
+    act(() => probe.actions?.actionOf(cardIn('pharmacy'))?.());
+    // New sale opens over Today — the URL bar on the sale (A-P1).
+    const sale = `medical/sales/create?prescription=${publicId('rx', 50)}&customer=${publicId('pat', 2)}&from=today`;
+    await waitFor(() =>
+      expect(router.history.location.href).toBe(`/organization/acme/${sale}`),
+    );
+  });
+
   it('checks in through the booking’s check-in route with Today’s own words, and its Undo undoes it', async () => {
     await actionsFor('front_desk');
     await waitFor(() =>

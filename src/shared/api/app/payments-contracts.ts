@@ -32,7 +32,7 @@ import { appClockTime, appInstant, appToday } from './app-time.ts';
 // ── Records ──
 
 /** One split of an entry: a mode and its amount, in rupees. */
-export interface LedgerSplit {
+interface LedgerSplit {
   mode: PaymentMode;
   amount: number;
 }
@@ -47,7 +47,7 @@ interface LedgerContact {
 }
 
 /** The invoice an entry settles: its numbers, its type and what it still owes now (rupees). */
-export interface LedgerInvoice {
+interface LedgerInvoice {
   /** "#5". */
   seq: number;
   /** The statutory number, "2026-27/0005". */

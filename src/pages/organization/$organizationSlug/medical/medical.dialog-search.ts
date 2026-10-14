@@ -7,7 +7,7 @@
  * (`dialogSearch` in `routeTree.tsx`); the page that opens the drawer parses it,
  * and this module loads with the room.
  */
-import { oneOf, RECORD_ID, textOf } from '@/lib/routes/search-params.ts';
+import { matchOf, oneOf, PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
 
 /**
  * The dialog routes' prefills: New medicine's `?name=`, New purchase order's
@@ -32,15 +32,12 @@ export interface MedicalCreateSearch {
   from?: string;
 }
 
-/** Parse a Medical dialog route's prefill. */
+/** Parse a Medical dialog route's prefill — its record ids are clinozy-be public ids (`sup_…`, `rx_…`, `con_…`). */
 export function validateMedicalCreateSearch(
   search: Record<string, unknown>,
 ): MedicalCreateSearch {
   const name = textOf(search.name);
-  const one = (value: unknown) => {
-    const text = textOf(value);
-    return RECORD_ID.test(text) ? text : undefined;
-  };
+  const one = (value: unknown) => matchOf(PUBLIC_ID, value);
   return {
     name: name && name.length <= 120 ? name : undefined,
     supplier: one(search.supplier),

@@ -45,11 +45,14 @@ type PrintFormat = ReturnType<typeof usePrintFormat>;
 
 /** What the purchase order sheet prints from. */
 export interface PurchaseOrderPrintProps {
-  /** The order: its number and date, its stage, the supplier's bill number, its lines and what is paid. */
+  /**
+   * The order: its number and date, its stage, the supplier's bill number, its lines, what is
+   * paid and what the supplier's credits set off (paise; none when left out).
+   */
   order: Pick<
     MedicalPurchaseOrder,
     'seq' | 'date' | 'stage' | 'supplierBillNo' | 'items' | 'paid'
-  >;
+  > & { credited?: number };
   /** Each line's medicine name, in the order's order. */
   itemNames: readonly string[];
   /** Who the order is to: the supplier's name, phone and GSTIN. */
@@ -262,7 +265,10 @@ function PurchaseItemsTable({
   );
 }
 
-/** Total, what is paid and what is still due — a received order's bill (`S:830`). */
+/**
+ * Total, what is paid, what the supplier's credits set off and what is still due — a received
+ * order's bill (`S:830`, MD11).
+ */
 function PurchaseSummary({
   order,
   format,
@@ -271,6 +277,7 @@ function PurchaseSummary({
   format: PrintFormat;
 }) {
   const { t } = usePrintTranslation();
+  const credited = order.credited ?? 0;
   return (
     <PrintBox
       title={t(words.paymentSummary)}
@@ -287,11 +294,19 @@ function PurchaseSummary({
             <dt>{t(keys.paid)}</dt>
             <dd className="font-bold">{format.money(order.paid)}</dd>
           </div>
+          {credited > 0 ? (
+            <div className="flex justify-between">
+              <dt>{t(keys.credited)}</dt>
+              <dd className="font-bold">{format.money(credited)}</dd>
+            </div>
+          ) : null}
         </dl>
         <dl className="flex flex-col leading-[4.7mm] font-bold">
           <div className="mt-[2.6mm] flex justify-between text-[3.6mm]">
             <dt>{t(words.balanceDue)}</dt>
-            <dd>{format.money(purchaseOrderDue(order))}</dd>
+            <dd>
+              {format.money(purchaseOrderDue({ ...order, paid: order.paid + credited }))}
+            </dd>
           </div>
         </dl>
       </div>

@@ -16,6 +16,8 @@ import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
+import type { HttpError } from '@/shared/errors/HttpError.ts';
 import {
   type ItemsColumn,
   ItemsField,
@@ -26,20 +28,23 @@ import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 
 import { useReturnSale } from '../../../shared/hooks/useMedicalFlows/index.ts';
-import type { SaleRow } from '../../../shared/medical-contracts.ts';
-import { useMedicalDrawerAccess } from '../../../shared/medical-drawer-form.ts';
+import {
+  REFUND_MODES,
+  type RefundMode,
+  SALE_RETURN_REASONS,
+  type SaleReturnReason,
+  type SaleRow,
+} from '../../../shared/medical-contracts.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWER_TEST_IDS,
   MEDICAL_DRAWERS_NS,
 } from '../../../shared/medical-drawers.constants.ts';
-import {
-  REFUND_MODES,
-  SALE_RETURN_REASONS,
-  type SaleReturnResult,
-} from '../../../shared/medical-flows-contracts.ts';
 import {
   everythingBack,
   lineRefund,
@@ -52,6 +57,15 @@ import {
 } from './sale-return-form.ts';
 
 const K = MEDICAL_DRAWER_KEYS.saleReturn;
+
+/** Each reason's chip label — "Doctor changed Rx" is the API's `doctor_changed` (MD21). */
+const REASON_KEYS: Readonly<Record<SaleReturnReason, string>> = {
+  unused: K.reasons.unused,
+  reaction: K.reasons.reaction,
+  doctor_changed: K.reasons.rx_changed,
+  wrong_item: K.reasons.wrong_item,
+  damaged: K.reasons.damaged,
+};
 
 /** The lines table: 840px, as every drawer holding item rows (H:3850). */
 const CONTENT_PROFILE = { fieldCount: 3, hasItems: true } as const;
@@ -90,7 +104,7 @@ function useLineColumns({
       id: 'batch',
       header: t(K.batch),
       track: '110px',
-      cell: ({ row }) => <ItemsReadCell>{row.batchNo}</ItemsReadCell>,
+      cell: ({ row }) => <ItemsReadCell>{row.batchNo ?? '—'}</ItemsReadCell>,
     },
     {
       id: 'sold',
@@ -141,7 +155,11 @@ function LinesStep(props: BodyProps) {
   );
 }
 
-/** REASON & REFUND: Reason (default Unused) · Refund by (default Cash) (`medical.md:289–290`). */
+/**
+ * REASON & REFUND: Reason (default Unused) · Refund by (default Cash) — Cash ·
+ * UPI · Card, or Store credit: the money stays as the customer's credit (MD33)
+ * (`medical.md:289–290`).
+ */
 function ReasonStep({ form, readOnly, testId }: BodyProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const { t: tApp } = useTranslation(APP_NS);
@@ -157,7 +175,7 @@ function ReasonStep({ form, readOnly, testId }: BodyProps) {
                 label={t(K.reason)}
                 options={SALE_RETURN_REASONS.map((reason) => ({
                   value: reason,
-                  label: t(K.reasons[reason]),
+                  label: t(REASON_KEYS[reason]),
                   tone: RETURN_REASON_TONES[reason],
                 }))}
                 value={field.value}
@@ -179,7 +197,10 @@ function ReasonStep({ form, readOnly, testId }: BodyProps) {
                 label={t(K.refundBy)}
                 options={REFUND_MODES.map((mode) => ({
                   value: mode,
-                  label: tApp(APP_KEYS.paymentModes[mode]),
+                  label:
+                    mode === 'credit'
+                      ? t(K.storeCredit)
+                      : tApp(APP_KEYS.paymentModes[mode]),
                   tone: PAYMENT_MODE_TONES[mode],
                 }))}
                 value={field.value}
@@ -228,13 +249,16 @@ function useSteps(body: BodyProps, values: SaleReturnFormValues): DrawerStep[] {
         {
           kind: 'value',
           label: t(K.reason),
-          value: t(K.reasons[values.reason]),
+          value: t(REASON_KEYS[values.reason]),
           tone: RETURN_REASON_TONES[values.reason],
         },
         {
           kind: 'value',
           label: t(K.refundBy),
-          value: tApp(APP_KEYS.paymentModes[values.mode]),
+          value:
+            values.mode === 'credit'
+              ? t(K.storeCredit)
+              : tApp(APP_KEYS.paymentModes[values.mode]),
           tone: PAYMENT_MODE_TONES[values.mode],
         },
       ],
@@ -243,21 +267,35 @@ function useSteps(body: BodyProps, values: SaleReturnFormValues): DrawerStep[] {
   ];
 }
 
-/** The toast a saved return raises: refunded, or only off the bill; restocked or written off. */
-function savedMessage(
-  result: SaleReturnResult,
-  t: ReturnType<typeof useTranslation>['t'],
-  formatPaise: (paise: number) => string,
-): string {
-  if (result.refunded > 0) {
-    return t(result.restocked ? K.refunded : K.refundedWrittenOff, {
-      amount: formatPaise(result.refunded),
-    });
-  }
-  return t(result.restocked ? K.lowered : K.loweredWrittenOff, {
-    amount: formatPaise(result.amount),
-  });
+/** The newest return on the sale the server answered — the one just written. */
+function newestReturn(sale: SaleRow) {
+  return sale.returns.reduce<SaleRow['returns'][number] | undefined>(
+    (newest, entry) => (!newest || entry.at > newest.at ? entry : newest),
+    undefined,
+  );
 }
+
+/**
+ * The toast a saved return raises, from the return as the server wrote it: refunded, or kept
+ * as store credit (MD33); its packs back in their batch, or written off.
+ */
+function savedMessage(
+  sale: SaleRow,
+  t: ReturnType<typeof useTranslation>['t'],
+  formatRupees: (rupees: number) => string,
+): string {
+  const written = newestReturn(sale);
+  if (!written) return t(K.refunded, { amount: formatRupees(sale.returned) });
+  const restocked = written.items.some((item) => item.restocked);
+  const amount = formatRupees(written.amount);
+  if (written.refundMode === 'credit') {
+    return t(restocked ? K.credited : K.creditedWrittenOff, { amount });
+  }
+  return t(restocked ? K.refunded : K.refundedWrittenOff, { amount });
+}
+
+/** The Save's words: "Refund ₹550", or "Keep ₹550 as store credit". */
+const saveKey = (mode: RefundMode) => (mode === 'credit' ? K.saveCredit : K.save);
 
 /** One opening of the drawer on a read sale. */
 function ReturnSession({
@@ -268,19 +306,29 @@ function ReturnSession({
 }: Omit<SaleReturnDrawerProps, 'sale' | 'testId'> & { sale: SaleRow; testId: string }) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
-  const { readOnly } = useMedicalDrawerAccess(true);
+  const formatRupees = useRupeeFormat();
+  const payments = usePaymentAccess();
+  // Money given back is `payment:delete`'s (MD23): without it the drawer reads only.
+  const readOnly = payments.resolved && !payments.canDelete;
   const form = useForm<SaleReturnFormValues>({ defaultValues: saleReturnFormOf(sale) });
   const values = useFormValues(form);
   const [openStep, setOpenStep] = useState('back');
   const returnSale = useReturnSale({
     notifyOnError: false,
-    successMessage: (result) => savedMessage(result, t, formatPaise),
+    successMessage: (result) => savedMessage(result, t, formatRupees),
   });
 
-  const { saveState, save } = useDrawerSave<SaleReturnFormValues, SaleReturnResult>({
+  const onConflict = (error: HttpError) => {
+    // A sale owing anything takes no return (MD24): collect first.
+    if (apiErrorReason(error) === 'sale_not_paid') notify.error(t(K.notPaid));
+    else notifyError(error);
+  };
+
+  const { saveState, save } = useDrawerSave<SaleReturnFormValues, SaleRow>({
     form,
     fieldOrder: ['lines', 'reason', 'mode'],
     toastId: 'sale-return-save-failed',
+    onConflict,
     check: (current) => {
       if (linesBack(current.lines).length > 0) return null;
       setOpenStep('back');
@@ -322,9 +370,9 @@ function ReturnSession({
       steps={useSteps({ form, readOnly, testId }, values)}
       openStep={openStep}
       onOpenStepChange={setOpenStep}
-      summary={t(K.summary, { reason: t(K.reasons[values.reason]), amount })}
+      summary={t(K.summary, { reason: t(REASON_KEYS[values.reason]), amount })}
       readOnly={readOnly}
-      saveLabel={t(K.save, { amount })}
+      saveLabel={t(saveKey(values.mode), { amount })}
       onSave={() => void save()}
       saveState={saveState}
       testId={testId}
@@ -337,12 +385,14 @@ function ReturnSession({
  * 840px in two steps: "What is coming back" — each sold line with what is
  * still out and how many return, its refund beside it — then "Reason &
  * refund": Unused · Reaction · Doctor changed Rx · Wrong item · Damaged, paid
- * back by Cash · UPI · Card. "⚡ Return everything" fills every line. "Refund
- * ₹550" writes the return: stock back into its batch — written off for a
- * reaction or damage — and, when the sale was paid, a credit note and the
- * refund on the ledger. An unpaid sale's return lowers what is due instead
- * (AMBER: the "Refund" wording stays). Nothing coming back: "Enter what is
- * being returned".
+ * back by Cash · UPI · Card or kept as Store credit (MD33). "⚡ Return
+ * everything" fills every line. "Refund ₹550" writes the return
+ * (`POST /app/medical-sales/:id/returns`): stock back into its batch —
+ * written off for a reaction or damage — a credit note and the refund on the
+ * ledger, or the customer's credit. Only a sale paid in full takes a return
+ * (MD24 — `409 sale_not_paid`: collect first), and only a member who gives
+ * money back (`payment:delete`, MD23); anyone else reads it only. Nothing
+ * coming back: "Enter what is being returned".
  */
 export function SaleReturnDrawer({ testId: id, ...props }: SaleReturnDrawerProps) {
   const { session } = useDrawerSession(props.open);

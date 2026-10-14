@@ -4,6 +4,7 @@ import type { MedicalTab } from '@/lib/routes/medical-builders.ts';
 import { RoomTable, type RoomTableProps } from '@/shared/components/RoomTable/index.ts';
 import {
   type AppIcon,
+  Clock,
   Factory,
   Pill,
   Receipt,
@@ -31,6 +32,8 @@ const MEDICAL_EMPTY_ICONS: Readonly<Record<MedicalTab, AppIcon>> = {
   manufacturers: Factory,
   mrs: User,
   payments: Wallet,
+  // The store's credits — the clock of Payments › Pending's credits (clinozy-be D90).
+  credits: Clock,
 };
 
 /** Props of {@link MedicalTable}: the shared room table's, named by the tab. */

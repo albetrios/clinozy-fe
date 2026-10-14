@@ -119,6 +119,7 @@
     "free": "Bônus",
     "rate": "Preço",
     "paid": "Pago:",
+    "credited": "Créditos do fornecedor:",
     "issuedBy": "Pedido de compra de {{clinic}}"
   }
 }

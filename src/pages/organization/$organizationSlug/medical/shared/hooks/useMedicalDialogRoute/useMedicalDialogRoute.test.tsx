@@ -1,8 +1,14 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('../../medical-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchSupplier: vi.fn(),
+}));
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import { supplierRow, TEST_SUPPLIER_ID } from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalRoutes,
@@ -46,16 +52,18 @@ function Probe() {
 }
 
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
+  vi.mocked(fetchSupplier).mockResolvedValue(supplierRow());
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetAppFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('useMedicalDialogRoute (KICKOFF §4, S:115)', () => {
-  it('reads nothing on the list, a create with its prefill, and a record route', async () => {
+  it('reads nothing on the list, a create with its prefill, and a record route by its id', async () => {
     const list = renderMedicalRoutes(`${ROOM}/suppliers`, { suppliers: Probe });
     expect(await screen.findByTestId('dialog')).toHaveTextContent('none');
     list.unmount();
@@ -66,18 +74,26 @@ describe('useMedicalDialogRoute (KICKOFF §4, S:115)', () => {
     expect(await screen.findByTestId('dialog')).toHaveTextContent('create Om Pharma');
     create.unmount();
 
-    renderMedicalRoutes(`${ROOM}/suppliers/${ref.supplier(52)}/edit`, {
+    const record = renderMedicalRoutes(`${ROOM}/suppliers/${TEST_SUPPLIER_ID}/edit`, {
       suppliers: Probe,
     });
     await waitFor(() =>
-      expect(screen.getByTestId('dialog')).toHaveTextContent(
-        'record edit Akshar Medicines',
-      ),
+      expect(screen.getByTestId('dialog')).toHaveTextContent('record edit Ankur Pharma'),
     );
+    expect(fetchSupplier).toHaveBeenCalledWith(TEST_SUPPLIER_ID);
+    // The record is cached under the active organization.
+    expect(
+      record.queryClient.getQueryData(
+        medicalQueryKeys.supplier('org_test', TEST_SUPPLIER_ID),
+      ),
+    ).toMatchObject({ name: 'Ankur Pharma' });
   });
 
   it('goes back to the list with "Supplier not found" for an unknown id', async () => {
-    const unknown = '0b9c7a3e-2f6d-4f8a-9c1e-5d4b3a2f1e0d';
+    const unknown = 'sup_gone00000000000000000';
+    vi.mocked(fetchSupplier).mockRejectedValue(
+      new HttpError('Not found', 404, `/app/suppliers/${unknown}`, 'GET', {}),
+    );
     const { router } = renderMedicalRoutes(`${ROOM}/suppliers/${unknown}/edit?q=ak`, {
       suppliers: Probe,
     });

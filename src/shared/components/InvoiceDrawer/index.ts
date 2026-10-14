@@ -15,4 +15,5 @@ export {
   type InvoiceDrawerProps,
   type InvoiceEditDrawerProps,
 } from './InvoiceDrawer.tsx';
+export type { InvoiceSaleWrite, SaleDraft, SaleDraftOutcome } from './sale-form.ts';
 export type { InvoiceDrawerOutcome } from './use-invoice-drawer.ts';

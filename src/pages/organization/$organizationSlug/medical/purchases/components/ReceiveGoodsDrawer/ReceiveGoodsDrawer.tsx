@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
-import type { MedicalPurchaseOrder } from '@/shared/api/app/app-schema.ts';
 import { SECTION_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { DrawerFieldGrid } from '@/shared/components/DrawerField/index.ts';
 import {
@@ -50,6 +49,7 @@ import {
   type ReceiveFormValues,
   receiveInputOf,
   receiveLineCount,
+  receiveLineName,
   receiveTotal,
   unexpectedProblems,
 } from './receive-form.ts';
@@ -161,7 +161,7 @@ function useColumns({
 }: ColumnsContext): ItemsColumn<ReceiveFormValues, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
-  const options = useMedicineOptions(order.supplierId, order.supplierName);
+  const options = useMedicineOptions(order.supplier.id, order.supplier.name);
   // A line that did not come takes no batch, expiry or figures.
   const locked = (row: LineContext) => readOnly || !row.row.arrived;
   const count = (key: 'qty' | 'free') => (row: LineContext) =>
@@ -221,7 +221,7 @@ function useColumns({
           <OrderMedicineCell<ReceiveFormValues>
             binding={row.bind('medicineId')}
             options={options}
-            supplierId={order.supplierId}
+            supplierId={order.supplier.id}
             openChild={openChild}
             disabled={locked(row)}
             onMedicine={(medicine) => {
@@ -284,7 +284,7 @@ function useReceiveSave(
     notifyOnError: false,
     successMessage: t(K.saved),
   });
-  return useDrawerSave<ReceiveFormValues, MedicalPurchaseOrder>({
+  return useDrawerSave<ReceiveFormValues, PurchaseOrderRow>({
     form,
     fieldOrder: ['lines'],
     toastId: 'receive-goods-save-failed',
@@ -307,7 +307,10 @@ function useReceiveSave(
       if (first) return { fields: [], message: expiryMessage(first.problem) };
       if (unexpected.qty.length) return { fields: [], message: t(K.enterQuantity) };
       if (unexpected.rate.length) {
-        const names = unexpected.rate.map((index) => current.lines[index]?.name);
+        const names = unexpected.rate.map((index) => {
+          const line = current.lines[index];
+          return line ? receiveLineName(line) : undefined;
+        });
         return { fields: [], message: rateMessage(names, t) };
       }
       return null;
@@ -347,7 +350,7 @@ function ReceiveSession({
   const total = formatPaise(receiveTotal(order, lines));
   // The supplier, the lines and their bill, which follow the unexpected ones (H:5394).
   const badges: DrawerBadge[] = [
-    { id: 'supplier', label: order.supplierName, tone: 'sky' },
+    { id: 'supplier', label: order.supplier.name, tone: 'sky' },
     {
       id: 'items',
       label: t(MEDICAL_KEYS.purchases.items, { count: receiveLineCount(lines) }),
@@ -360,7 +363,7 @@ function ReceiveSession({
       onClose={onClose}
       title={t(K.title)}
       tag={`#${order.seq}`}
-      sub={t(K.sub, { supplier: isolateText(order.supplierName) })}
+      sub={t(K.sub, { supplier: isolateText(order.supplier.name) })}
       badges={badges}
       content={CONTENT_PROFILE}
       tone={SECTION_TONES.medical}
@@ -398,7 +401,8 @@ function ReceiveSession({
  * but was not ordered — its medicine, counts, rate, batch and expiry; × drops
  * it (the prototype's button adds nothing, H:5388). "Mark received" adds every
  * arrived line to stock — qty + free into its batch ("NEW-430" when none is
- * typed) — and the order becomes a bill to pay, the unexpected lines on it:
+ * typed) — and the order becomes a bill to pay, the unexpected lines on it
+ * (sent without an id, MD26; a typed medicine is added by the server):
  * "Goods received · stock and free quantity added". The summary is that bill.
  */
 export function ReceiveGoodsDrawer({ testId: id, ...props }: ReceiveGoodsDrawerProps) {

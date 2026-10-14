@@ -155,6 +155,8 @@ export const PRINT_TEMPLATE_KEYS = {
     free: 'purchaseOrder.free',
     rate: 'purchaseOrder.rate',
     paid: 'purchaseOrder.paid',
+    /** The supplier's credits set off against the order (MD11). */
+    credited: 'purchaseOrder.credited',
     /** The footer's first line: the clinic the order is from. */
     issuedBy: 'purchaseOrder.issuedBy',
   },

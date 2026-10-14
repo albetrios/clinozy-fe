@@ -1,22 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
 import type { InvoicePresets } from '@/shared/api/app/invoices-contracts.ts';
-import type { InvoiceRxPreset } from '@/shared/api/app/invoices-fixture-contracts.ts';
 import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
-import { patientName } from '@/shared/api/app/patients-fixture-contracts.ts';
-import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
-import { useFixtureMyStaff } from '@/shared/hooks/useFixtureStaff/index.ts';
-import {
-  useInvoicePresets,
-  usePrescriptionPreset,
-  useSalePresets,
-} from '@/shared/hooks/useInvoices/index.ts';
+import { useContact } from '@/shared/hooks/useContacts/index.ts';
+import { useInvoicePresets } from '@/shared/hooks/useInvoices/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { useOffers } from '@/shared/hooks/useOffers/index.ts';
 import { usePatient } from '@/shared/hooks/usePatients/index.ts';
+import { usePatientPrescriptions } from '@/shared/hooks/usePrescriptions/index.ts';
 import { useStackedDrawer } from '@/shared/hooks/useStackedDrawer/index.ts';
 import { useVisitTreatmentsToBill } from '@/shared/hooks/useTreatments/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -29,12 +23,13 @@ import {
   offeringCatalogItem,
 } from './invoice-lines.ts';
 import { rxLines, visitLines } from './invoice-presets.ts';
+import { type SalePrescription, salePrescriptionOf } from './sale-form.ts';
 
 /*
  * The Invoice drawer's form-level behaviour beside its fields (KICKOFF §6.9): what arrives after
  * it opens (the prefilled patient's name and contact, a prescription's medicines, the branch, the
- * team), the stacked "New offering", and the save's toasts. An invoice reads clinozy-be; a
- * Medical sale the fixture world (D153 seam).
+ * team), the stacked "New offering", and the save's toasts — all clinozy-be's, a Medical sale's
+ * too.
  */
 
 const K = INVOICE_DRAWER_KEYS;
@@ -45,16 +40,33 @@ type InvoiceForm = UseFormReturn<InvoiceFormValues>;
 const unnamedPatient = (party: InvoicePartyForm | null) =>
   party?.kind === 'patient' && party.name === '' ? party.id : undefined;
 
+/** A prefilled buyer's contact while its name is still to read; undefined otherwise. */
+const unnamedContact = (party: InvoicePartyForm | null) =>
+  party?.kind === 'contact' && party.name === '' && party.contactId
+    ? party.contactId
+    : undefined;
+
 /**
- * A prefilled patient (`?patient=`) arrives as an id: their name, mobile — and, on an invoice,
- * the contact it bills — follow once read (clinozy-be's patient file; a sale's fixture patient).
+ * A prefilled patient (`?patient=`, a sale's `?customer=pat_…`) or a sale's buyer
+ * (`?customer=con_…`) arrives as an id: their name, mobile and the contact the invoice or the
+ * sale bills — and a buyer's patient file — follow once read (clinozy-be's).
  */
 export function usePrefillPatientName(form: InvoiceForm): void {
   const party = form.getValues('party');
-  const sale = form.getValues('type') === 'medical';
-  const unnamed = unnamedPatient(party);
-  const patient = usePatient(sale ? undefined : unnamed);
-  const salePatient = useFixturePatient(sale ? unnamed : undefined);
+  const patient = usePatient(unnamedPatient(party));
+  const contact = useContact(unnamedContact(party));
+  useEffect(() => {
+    const current = form.getValues('party');
+    const buyer = contact.data;
+    if (!buyer || current?.contactId !== buyer.id || current.name) return;
+    form.setValue('party', {
+      kind: buyer.patientId ? 'patient' : 'contact',
+      id: buyer.patientId ?? buyer.id,
+      contactId: buyer.id,
+      name: buyer.name,
+      phone: buyer.primaryPhone || null,
+    });
+  }, [form, contact.data]);
   useEffect(() => {
     const current = form.getValues('party');
     if (!patient.data || current?.id !== patient.data.id || current.name) return;
@@ -66,46 +78,56 @@ export function usePrefillPatientName(form: InvoiceForm): void {
       phone: patient.data.phone,
     });
   }, [form, patient.data]);
-  useEffect(() => {
-    const current = form.getValues('party');
-    if (!salePatient.data || current?.id !== salePatient.data.id || current.name) return;
-    form.setValue('party', {
-      kind: 'patient',
-      id: salePatient.data.id,
-      contactId: null,
-      name: patientName(salePatient.data),
-      phone: salePatient.data.phone,
-    });
-  }, [form, salePatient.data]);
 }
 
 /**
- * A sale from a prescription (`?prescription=`, `S:50`; `medical.md:401`): once the medicines
- * are known, its patient, its medicines in stock and the Remark "From Rx #500"; a name the store
- * lacks is named in a toast ("Flubolt 400 not in the medicine list · add from the quick line").
+ * A sale's patient's approved prescriptions, newest first, as a sale fills them — clinozy-be's
+ * (`GET /app/patients/:patient_id/prescriptions`); idle outside a sale or without a patient.
+ */
+function useSalePrescriptions(
+  patientId: string | null,
+  sale: boolean,
+): SalePrescription[] {
+  const read = usePatientPrescriptions(patientId ?? '', {
+    enabled: sale && patientId !== null,
+    notifyOnError: false,
+  });
+  return useMemo(
+    () =>
+      (read.data ?? [])
+        .filter((record) => record.status === 'approved')
+        .map(salePrescriptionOf),
+    [read.data],
+  );
+}
+
+/**
+ * A sale from a prescription (`?prescription=&customer=`, `S:50`; `medical.md:401`): once the
+ * patient's prescriptions and the medicines are known, the prescription's medicines in stock and
+ * the Remark "From Rx #500"; a name the store lacks is named in a toast ("Flubolt 400 not in the
+ * medicine list · add from the quick line"). The prescription is read among its patient's — a
+ * prescription alone, with no patient, prefills nothing.
  */
 export function usePrescriptionPrefill(
   form: InvoiceForm,
-  prescriptionId: string | null,
-  catalog: readonly InvoiceCatalogItem[],
+  {
+    prescriptionId,
+    patientId,
+    catalog,
+  }: {
+    prescriptionId: string | null;
+    patientId: string | null;
+    catalog: readonly InvoiceCatalogItem[];
+  },
 ): void {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
-  const rx = usePrescriptionPreset(prescriptionId);
+  const prescriptions = useSalePrescriptions(patientId, prescriptionId !== null);
   const filledRef = useRef(false);
-  const preset: InvoiceRxPreset | undefined = rx.data;
+  const preset = prescriptions.find((rx) => rx.id === prescriptionId);
   useEffect(() => {
     if (!preset || filledRef.current || catalog.length === 0) return;
     filledRef.current = true;
     const { lines, unmatched } = rxLines(preset, catalog);
-    if (!form.getValues('party')) {
-      form.setValue('party', {
-        kind: 'patient',
-        id: preset.patientId,
-        contactId: null,
-        name: '',
-        phone: null,
-      });
-    }
     if (lines.length > 0) form.setValue('items', lines);
     form.setValue('remark', t(K.presets.rx, { seq: preset.seq }));
     for (const name of unmatched) notify.info(t(K.toasts.rxUnmatched, { name }));
@@ -151,17 +173,17 @@ export function useBranchPrefill(form: InvoiceForm, branchId: string | null): vo
 export interface TeamPrefill {
   /** An invoice's patient's packages and last invoices (clinozy-be). */
   presets: InvoicePresets | null;
-  /** A sale's patient's latest prescription (the fixture world). */
-  latestRx: InvoiceRxPreset | null;
+  /** A sale's patient's latest approved prescription — "⚡ From Rx #500". */
+  latestRx: SalePrescription | null;
   /** The member changed the team: no prefill replaces it any more. */
   touch: () => void;
 }
 
 /**
  * The team a new invoice starts with (`payments.md:139`): the patient's last invoice's team,
- * else the member themself — until the member changes it. An invoice with a team of its own
- * keeps it (`ownTeam`): an edit, a copy. An invoice names memberships (`mem_…`, clinozy-be's
- * team); a Medical sale the fixture world's staff.
+ * else the member themself — until the member changes it; a Medical sale's "Prescribed by" the
+ * member themself. An invoice with a team of its own keeps it (`ownTeam`): an edit, a copy.
+ * Both name memberships (`mem_…`, clinozy-be's team).
  */
 export function useTeamPrefill({
   form,
@@ -175,13 +197,13 @@ export function useTeamPrefill({
   sale: boolean;
 }): TeamPrefill {
   const presets = useInvoicePresets(sale ? null : patientId);
-  const salePresets = useSalePresets(sale ? patientId : null);
+  const [latestRx] = useSalePrescriptions(patientId, sale);
   const myMembershipId = useMyMembershipId();
-  const myStaff = useFixtureMyStaff();
   const touchedRef = useRef(ownTeam);
-  const recent = (sale ? salePresets.data : presets.data)?.recentTeamIds ?? [];
-  const me = sale ? myStaff.data?.id : myMembershipId;
-  const key = (recent.length > 0 ? recent : [me ?? '']).filter(Boolean).join();
+  const recent = presets.data?.recentTeamIds ?? [];
+  const key = (recent.length > 0 ? recent : [myMembershipId ?? ''])
+    .filter(Boolean)
+    .join();
   useEffect(() => {
     if (touchedRef.current || key === '') return;
     if (form.getValues('teamIds').join() === key) return;
@@ -189,7 +211,7 @@ export function useTeamPrefill({
   }, [form, key]);
   return {
     presets: presets.data ?? null,
-    latestRx: salePresets.data?.latestRx ?? null,
+    latestRx: latestRx ?? null,
     touch: () => {
       touchedRef.current = true;
     },

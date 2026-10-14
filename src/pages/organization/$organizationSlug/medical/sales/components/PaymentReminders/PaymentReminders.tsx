@@ -8,7 +8,7 @@ import { PickerSheet } from '@/shared/components/Picker/index.ts';
 import { RoomViewAction } from '@/shared/components/RoomToolbar/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useMessageTranslator } from '@/shared/hooks/useMessageTranslator/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { MessageSquare } from '@/shared/icons/index.ts';
 
 import {
@@ -41,17 +41,17 @@ export interface PaymentRemindersProps {
 function ReminderRow({ reminder, clinic }: { reminder: SaleReminder; clinic: string }) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const tm = useMessageTranslator(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
-  const { customer, due, saleSeqs } = reminder;
+  const formatRupees = useRupeeFormat();
+  const { customer, due, sales } = reminder;
   const name = firstNameOf(customer.name) || customer.name;
-  const amount = formatPaise(due);
+  const amount = formatRupees(due);
   const message = tm(K.message, { name, clinic, amount });
-  const [seq] = saleSeqs;
+  const [first] = sales;
   const owed =
-    saleSeqs.length === 1
-      ? t(K.dueOne, { amount, seq })
-      : t(K.dueMany, { amount, count: saleSeqs.length });
-  const patient = customer.kind === 'patient';
+    sales.length === 1
+      ? t(K.dueOne, { amount, seq: first?.seq })
+      : t(K.dueMany, { amount, count: sales.length });
+  const patient = customer.patientId !== null;
   return (
     <li data-testid={`${TEST_ID}-row`}>
       <ReachRow
@@ -93,7 +93,8 @@ function ReminderRow({ reminder, clinic }: { reminder: SaleReminder; clinic: str
  * "Send payment reminders" (KICKOFF §6.7; `medical.md:17`; Q-M6): Sales'
  * view action with Status Unpaid — a 400px panel under the button (the 82%
  * bottom sheet on a phone) listing each customer the unpaid sales name, the
- * largest due first. Messaging is not built, so nothing is sent from here and
+ * largest due first, as the server sums them (`GET /app/medical-sales/dues`,
+ * MD25, N20) over the list's search and Created. Messaging is not built, so nothing is sent from here and
  * nothing claims it was (the prototype toasts "WhatsApp reminders sent for
  * unpaid sales", H:5441): WhatsApp opens the customer's chat with the
  * reminder typed, ready to send — in the message language (Q-X2) — Call
@@ -103,7 +104,7 @@ function ReminderRow({ reminder, clinic }: { reminder: SaleReminder; clinic: str
 export function PaymentReminders({ params }: PaymentRemindersProps) {
   const { t } = useTranslation(MEDICAL_NS);
   const { t: tPanel } = useTranslation(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const [open, setOpen] = useState(false);
   const reminders = useSaleReminders(params).data;
   if (!reminders || reminders.customers.length === 0) return null;
@@ -137,7 +138,7 @@ export function PaymentReminders({ params }: PaymentRemindersProps) {
             data-testid={`${TEST_ID}-summary`}
             className="text-muted-foreground text-xs leading-[normal]"
           >
-            {tPanel(K.summary, { count: customers.length, amount: formatPaise(total) })}
+            {tPanel(K.summary, { count: customers.length, amount: formatRupees(total) })}
           </span>
           <span className="text-caption text-muted-foreground-strong pt-1 leading-[normal] text-pretty">
             {tPanel(K.hint)}
@@ -147,7 +148,7 @@ export function PaymentReminders({ params }: PaymentRemindersProps) {
           <ul className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-auto p-2">
             {customers.map((reminder) => (
               <ReminderRow
-                key={`${reminder.customer.kind}-${reminder.customer.id}`}
+                key={reminder.customer.id}
                 reminder={reminder}
                 clinic={clinicName}
               />

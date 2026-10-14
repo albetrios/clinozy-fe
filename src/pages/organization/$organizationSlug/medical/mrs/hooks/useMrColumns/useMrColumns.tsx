@@ -1,7 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { appToday } from '@/shared/api/app/app-time.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
@@ -27,13 +26,13 @@ export function mrInitials(name: string): string {
  * The MRs columns (KICKOFF §6.7 Tables; `medical.md:109–116`): MR · Represents
  * · Last visit · Next visit · Samples (hidden) — tracks `minmax(220px,1.4fr)
  * minmax(180px,1.2fr) 110px 120px 120px`. The next visit is sky ahead and
- * blush once past — against today, not the prototype's fixed "24 Sep". On a
- * phone the MR leads, Represents is the key, the meta line reads the visits.
+ * blush once the server marks it overdue (`is_visit_overdue`), not against
+ * the prototype's fixed "24 Sep". On a phone the MR leads, Represents is the
+ * key, the meta line reads the visits.
  */
 export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
   const { t } = useTranslation(MEDICAL_NS);
   const dates = useMedicalDates();
-  const today = appToday();
   const keys = MEDICAL_KEYS.mrs;
   const noValue = t(MEDICAL_KEYS.table.noValue);
 
@@ -92,7 +91,7 @@ export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
         const next = row.original.nextVisitOn;
         if (!next) return null;
         return (
-          <TonePill tone={nextVisitTone(next, today)}>
+          <TonePill tone={nextVisitTone(row.original)}>
             <span className="whitespace-nowrap tabular-nums">{dates.visit(next)}</span>
           </TonePill>
         );
@@ -101,11 +100,11 @@ export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
         track: '120px',
         kind: 'badges',
         foldValue: (original) => {
-          const next = rowOf(original).nextVisitOn;
-          if (!next) return null;
+          const mr = rowOf(original);
+          if (!mr.nextVisitOn) return null;
           return {
-            value: dates.visit(next),
-            dotClassName: TONE_CLASSES[nextVisitTone(next, today)].fill,
+            value: dates.visit(mr.nextVisitOn),
+            dotClassName: TONE_CLASSES[nextVisitTone(mr)].fill,
           };
         },
       },

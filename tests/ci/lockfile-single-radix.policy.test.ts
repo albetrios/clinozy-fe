@@ -65,7 +65,7 @@ function resolvedVersions(lockfile: string): Map<string, Set<string>> {
     const key = /^ {2}'?((?:@[^/\s']+\/)?[^@\s']+)@([^'\s():]+)'?:\s*$/.exec(line);
     const name = key?.[1];
     const version = key?.[2];
-    if (!name || !version) continue;
+    if (!(name && version)) continue;
     const known = versions.get(name) ?? new Set<string>();
     known.add(version);
     versions.set(name, known);

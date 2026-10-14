@@ -20,7 +20,7 @@ import {
   ItemsReadCell,
 } from '@/shared/forms/ItemsField/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { useMedicalDates } from '../../../shared/components/MedicalCells/medical-dates.ts';
 import {
@@ -33,7 +33,7 @@ import {
   MEDICAL_DRAWER_TEST_IDS,
   MEDICAL_DRAWERS_NS,
 } from '../../../shared/medical-drawers.constants.ts';
-import { useSaleActions } from '../../hooks/useSaleActions/index.ts';
+import { salePaymentOf, useSaleActions } from '../../hooks/useSaleActions/index.ts';
 
 const K = MEDICAL_DRAWER_KEYS.sale;
 
@@ -56,10 +56,10 @@ interface LinesForm {
   lines: SaleLine[];
 }
 
-/** Medicine · Batch · Qty · Amount (H:5423). */
+/** Medicine · Batch · Qty · Amount (H:5423) — the batches the server drew, its amounts. */
 function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   return [
     {
       id: 'medicine',
@@ -85,7 +85,7 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       header: t(K.amount),
       track: '100px',
       align: 'end',
-      cell: ({ row }) => <ItemsReadCell strong>{formatPaise(row.amount)}</ItemsReadCell>,
+      cell: ({ row }) => <ItemsReadCell strong>{formatRupees(row.amount)}</ItemsReadCell>,
     },
   ];
 }
@@ -108,34 +108,34 @@ function SaleLines({ lines, testId }: { lines: readonly SaleLine[]; testId: stri
 }
 
 /**
- * The header's badges (`medical.md:333`): Paid / Unpaid, "Returned ₹239", the
- * invoice when the buyer is a patient ("Invoice #785 · in patient file") and
- * the bill.
+ * The header's badges (`medical.md:333`): Paid / Unpaid (the server's due),
+ * "Returned ₹239", the invoice when the buyer is a patient ("Invoice
+ * #2026-27/0412 · in patient file" — the API's invoice number) and the bill.
  */
 function badgesOf(
   sale: SaleRow,
-  formatPaise: (paise: number) => string,
+  formatRupees: (rupees: number) => string,
   t: TFunction,
 ): DrawerBadge[] {
   const badges: DrawerBadge[] = [
-    sale.status === 'paid'
+    salePaymentOf(sale) === 'paid'
       ? { id: 'status', label: t(K.badges.paid), tone: 'sage' }
       : { id: 'status', label: t(K.badges.unpaid), tone: 'blush' },
   ];
   if (sale.returned > 0) {
     badges.push({
       id: 'returned',
-      label: t(K.badges.returned, { amount: formatPaise(sale.returned) }),
+      label: t(K.badges.returned, { amount: formatRupees(sale.returned) }),
       tone: 'lav',
     });
   }
-  if (sale.customer?.kind === 'patient' && sale.invoiceSeq !== null) {
+  if (sale.customer?.patientId && sale.invoice) {
     badges.push({
       id: 'invoice',
-      label: t(K.badges.invoice, { seq: sale.invoiceSeq }),
+      label: t(K.badges.invoice, { seq: sale.invoice.number }),
     });
   }
-  badges.push({ id: 'bill', label: formatPaise(sale.bill) });
+  badges.push({ id: 'bill', label: formatRupees(sale.bill) });
   return badges;
 }
 
@@ -149,22 +149,22 @@ function SaleSession({
 }: Omit<SaleDrawerProps, 'sale' | 'testId'> & { sale: SaleRow; testId: string }) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const dates = useMedicalDates();
   const actions = useSaleActions();
   const [voiding, setVoiding] = useState<MedicalFlowTarget | null>(null);
 
   const summary = t(K.summary, {
     count: sale.lines.length,
-    amount: formatPaise(sale.bill),
+    amount: formatRupees(sale.bill),
   });
   let primary: { label: string; run: () => void } | null = null;
   if (actions.canCollect(sale)) {
     primary = {
-      label: t(K.collect, { amount: formatPaise(sale.due) }),
+      label: t(K.collect, { amount: formatRupees(sale.due) }),
       run: () => actions.collect(sale),
     };
-  } else if (sale.status === 'paid' && actions.canReturn) {
+  } else if (actions.canReturn(sale)) {
     primary = { label: t(K.returnMedicines), run: () => onReturn(sale) };
   }
 
@@ -182,7 +182,7 @@ function SaleSession({
             when: dates.when(sale.soldAt),
           }),
         )}
-        badges={badgesOf(sale, formatPaise, t)}
+        badges={badgesOf(sale, formatRupees, t)}
         content={CONTENT_PROFILE}
         tone={SECTION_TONES.medical}
         summary={summary}
@@ -219,10 +219,11 @@ function SaleSession({
  * Sale (KICKOFF §6.7 Drawers; `medical.md:333–338`; H:5422–5426): the read-only
  * sale, 840px — "Rhea Shah · Today 10:12 · a sale is changed by a return, not
  * edited", the Paid / Unpaid, returned, invoice and bill badges, and its
- * medicines with their batches. An unpaid sale offers "Collect ₹563" (one
- * receipt on the ledger, Q-M1) and, with nothing paid or returned, the red
- * "Void sale" (Admin with the void ability, Q-M2); a paid one "Return
- * medicines". Sales are never edited.
+ * medicines with the batches the server drew. A sale still owing offers
+ * "Collect ₹563" (one receipt on the ledger, Q-M1, `payment:create`) and, with
+ * nothing paid or returned, the red "Void sale" (Medical Delete, Q-M2); one
+ * paid in full "Return medicines" (`payment:delete`, MD23, MD24). Sales are
+ * never edited (MD19).
  */
 export function SaleDrawer({ testId: id, ...props }: SaleDrawerProps) {
   const { session } = useDrawerSession(props.open);

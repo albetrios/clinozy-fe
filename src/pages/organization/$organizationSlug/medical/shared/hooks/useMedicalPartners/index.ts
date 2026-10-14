@@ -9,6 +9,7 @@ export {
   useDeleteMedicalRep,
   useDeleteSupplier,
   useLogMrVisit,
+  useMrVisits,
   useQuickCreateManufacturer,
   useQuickCreateMedicalRep,
   useQuickCreateSupplier,

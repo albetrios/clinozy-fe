@@ -14,10 +14,9 @@ import {
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { useReturnExpiringStock } from '../../../shared/hooks/useMedicalFlows/index.ts';
-import { useSupplierCatalogue } from '../../../shared/hooks/useMedicalLists/index.ts';
 import { useMedicalDrawerAccess } from '../../../shared/medical-drawer-form.ts';
 import {
   MEDICAL_DRAWER_KEYS,
@@ -43,27 +42,39 @@ function expiringBatch(medicine: MedicineRow) {
   return batch ? { ...batch, daysLeft: nearest.daysLeft } : null;
 }
 
-/** This medicine's suppliers, cheapest first, each "Bought at ₹123" (`medical.md:301`). */
+/**
+ * This medicine's suppliers, cheapest first, each "Bought at ₹123"
+ * (`medical.md:301`) — its supplier prices, which name their suppliers.
+ */
 function useSupplierOptions(medicine: MedicineRow): PickerOption[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
-  const names = new Map(
-    (useSupplierCatalogue().data ?? []).map((row) => [row.id, row.name]),
-  );
+  const formatRupees = useRupeeFormat();
   return [...medicine.supplierRates]
     .sort((a, b) => a.rate - b.rate)
-    .flatMap((rate) => {
-      const name = names.get(rate.supplierId);
-      if (!name) return [];
-      return [
-        {
-          key: rate.supplierId,
-          label: name,
-          sub: t(K.boughtAt, { amount: formatPaise(rate.rate) }),
-          leading: { kind: 'none' as const },
-        },
-      ];
-    });
+    .map((rate) => ({
+      key: rate.supplierId,
+      label: rate.supplierName,
+      sub: t(K.boughtAt, { amount: formatRupees(rate.rate) }),
+      leading: { kind: 'none' as const },
+    }));
+}
+
+/**
+ * The credit a return previews, rupees: the packs × the batch's purchase rate,
+ * else the picked supplier's price for a batch bought without one. The server
+ * works out the credit it records.
+ */
+function creditOf(
+  medicine: MedicineRow,
+  batch: { purchaseRate: number | null },
+  supplierId: string | null,
+  qty: number,
+): number {
+  const rate =
+    batch.purchaseRate ??
+    medicine.supplierRates.find((price) => price.supplierId === supplierId)?.rate ??
+    0;
+  return Math.round(qty * rate * 100) / 100;
 }
 
 /** One opening of the drawer on an expiring batch. */
@@ -77,7 +88,7 @@ function ExpiringSession({
   testId: string;
 }) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const { readOnly } = useMedicalDrawerAccess(true);
   const options = useSupplierOptions(medicine);
   const supplierFieldId = useId();
@@ -91,13 +102,13 @@ function ExpiringSession({
     successMessage: (result) =>
       t(K.saved, {
         count: result.qty,
-        amount: formatPaise(result.credit),
+        amount: formatRupees(result.amount),
         supplier: result.supplierName,
       }),
   });
   if (!batch) return null;
   const supplierName = options.find((option) => option.key === supplierId)?.label ?? '';
-  const credit = qty * batch.purchaseRate;
+  const credit = creditOf(medicine, batch, supplierId, qty);
   return (
     <RecordDrawer
       open
@@ -114,7 +125,7 @@ function ExpiringSession({
       badges={[
         {
           id: 'credit',
-          label: t(K.badges.credit, { amount: formatPaise(credit) }),
+          label: t(K.badges.credit, { amount: formatRupees(credit) }),
           tone: 'sage',
         },
         {
@@ -130,7 +141,7 @@ function ExpiringSession({
       onSave={() => {
         if (!supplierId || qty <= 0) return;
         returnStock.mutate(
-          { medicineId: medicine.id, batchNo: batch.batchNo, supplierId, qty },
+          { supplierId, batchId: batch.id, qty },
           { onSuccess: onClose },
         );
       }}
@@ -167,7 +178,7 @@ function ExpiringSession({
           />
         </DrawerField>
         <DrawerField span="half" label={t(K.creditNote)}>
-          <DrawerInfo testId={`${testId}-credit`}>{formatPaise(credit)}</DrawerInfo>
+          <DrawerInfo testId={`${testId}-credit`}>{formatRupees(credit)}</DrawerInfo>
         </DrawerField>
       </DrawerFieldGrid>
     </RecordDrawer>
@@ -181,9 +192,10 @@ function ExpiringSession({
  * one section "Return to supplier": the medicine's expiring batch goes back to
  * one of its suppliers (the cheapest by default, "Bought at ₹123"), as many
  * packs as the batch holds or fewer, for a credit of qty × the batch's rate.
- * "Return & take credit" lowers the batch and what the room owes that
- * supplier, and adds a credit row to its Account: "3 returned · ₹369 credit
- * from Akshar Medicines".
+ * "Return & take credit" records a supplier credit (`POST
+ * /app/suppliers/:supplier_id/credits`, MD34): the server lowers the batch and
+ * sets the credit against what the room owes that supplier, and its Account
+ * lists it — "3 returned · ₹369 credit from Akshar Medicines".
  */
 export function ExpiringReturnDrawer({
   medicine,

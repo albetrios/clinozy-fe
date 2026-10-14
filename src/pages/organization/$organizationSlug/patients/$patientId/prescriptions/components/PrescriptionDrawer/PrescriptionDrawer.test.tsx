@@ -209,6 +209,7 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37; Q19)', () => {
     expect(written()?.status).toBe('approved');
     expect(shownLocation(router).search).toEqual({
       prescription: written()?.id,
+      customer: TEST_PATIENT_ID,
       from: `patients/${TEST_PATIENT_ID}/prescriptions`,
     });
   });

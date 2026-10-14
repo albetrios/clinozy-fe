@@ -3,12 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
-import { deletePayment } from '@/shared/api/app/payments-api.ts';
+import { deletePayment, restorePayment } from '@/shared/api/app/payments-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -32,26 +27,31 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   deletePayment: vi.fn(),
+  restorePayment: vi.fn(),
 }));
 
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
+/** 10:00 on 3 Oct, clinic time. */
 const NOW = new Date('2026-10-03T04:30:00Z');
 
-/** Rhea's ₹600 UPI against Sale #785 (₹700 still due) — the parked Medical room's fixture ledger. */
+/** The receipt's and the expense's public ids. */
+const RECEIPT_ID = 'pay_receipt5512000000000';
+const EXPENSE_ID = 'pay_expense0310000000000';
+
+/** Rhea's ₹600 UPI against Invoice #785 (₹700 still due). */
 const RECEIPT: PaymentDeleteTarget = {
   entry: {
-    id: ref.payment(5512),
+    id: RECEIPT_ID,
     seq: 5512,
     kind: 'receipt',
     amount: 600,
-    invoice: { seq: 785, number: '2026-27/0785', type: 'medical', due: 700 },
+    invoice: { seq: 785, number: '2026-27/0785', type: 'clinic', due: 700 },
   },
   dueAfter: 1300,
 };
 /** "Tea & snacks", ₹260 cash. */
 const EXPENSE: PaymentDeleteTarget = {
   entry: {
-    id: ref.payment(310),
+    id: EXPENSE_ID,
     seq: 310,
     kind: 'expense',
     amount: 260,
@@ -65,33 +65,26 @@ const conflict = (reason: string, detail: string) =>
     error: { type: 'request_error', code: 'conflict', reason, detail },
   });
 
-const isLive = (id: string) =>
-  appFixtures.payments.snapshot((payment) => payment.id === id).length === 1;
-
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: true });
   vi.setSystemTime(NOW);
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  vi.mocked(deletePayment).mockReset();
+  vi.mocked(restorePayment).mockReset();
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetAppFixtures();
 });
 
 describe('PaymentDeleteConfirm (payments.md:34)', () => {
   it('asks about the entry with the invoice it reopens, and removes it with a reason', async () => {
+    vi.mocked(deletePayment).mockResolvedValue();
     const user = userEvent.setup();
     const onClose = vi.fn();
     const onDeleted = vi.fn();
     renderWithProviders(
-      <PaymentDeleteConfirm
-        target={RECEIPT}
-        onClose={onClose}
-        onDeleted={onDeleted}
-        fixture
-      />,
+      <PaymentDeleteConfirm target={RECEIPT} onClose={onClose} onDeleted={onDeleted} />,
     );
     const dialog = await screen.findByTestId('confirm-dialog');
     expect(within(dialog).getByText('Delete this payment?')).toBeInTheDocument();
@@ -113,12 +106,12 @@ describe('PaymentDeleteConfirm (payments.md:34)', () => {
     await user.click(within(dialog).getByTestId('confirm-accept'));
     await waitFor(() => expect(onDeleted).toHaveBeenCalledTimes(1));
     expect(onClose).toHaveBeenCalled();
-    expect(isLive(ref.payment(5512))).toBe(false);
     // A reason the schema lacks travels as "other", its label in the note (D32).
-    const removed = await appFixtures.payments.get(ref.payment(5512), {
-      includeDeleted: true,
+    expect(deletePayment).toHaveBeenCalledWith({
+      paymentId: RECEIPT_ID,
+      reason: 'other',
+      note: 'Wrong amount',
     });
-    expect(removed).toMatchObject({ deleteReason: 'other', deleteNote: 'Wrong amount' });
     expect(notifyMock.undo).toHaveBeenCalledWith(
       'PAY-5512 removed · invoice balance restored',
       { onUndo: expect.any(Function) },
@@ -126,10 +119,9 @@ describe('PaymentDeleteConfirm (payments.md:34)', () => {
   });
 
   it('says only the audit sentence for an expense, and Undo puts it back', async () => {
+    vi.mocked(deletePayment).mockResolvedValue();
     const user = userEvent.setup();
-    renderWithProviders(
-      <PaymentDeleteConfirm target={EXPENSE} onClose={vi.fn()} fixture />,
-    );
+    renderWithProviders(<PaymentDeleteConfirm target={EXPENSE} onClose={vi.fn()} />);
     const dialog = await screen.findByTestId('confirm-dialog');
     expect(
       within(dialog).getByText(
@@ -142,32 +134,19 @@ describe('PaymentDeleteConfirm (payments.md:34)', () => {
     expect(notifyMock.undo).toHaveBeenCalledWith('PAY-310 removed', {
       onUndo: expect.any(Function),
     });
-    expect(isLive(ref.payment(310))).toBe(false);
+    expect(deletePayment).toHaveBeenCalledWith({
+      paymentId: EXPENSE_ID,
+      reason: 'duplicate',
+      note: null,
+    });
     const [, { onUndo }] = notifyMock.undo.mock.calls[0] as [
       string,
       { onUndo: () => void },
     ];
     onUndo();
-    await waitFor(() => expect(isLive(ref.payment(310))).toBe(true));
-  });
-
-  it('deletes a Payments entry on clinozy-be, not on the fixture ledger', async () => {
-    vi.mocked(deletePayment).mockResolvedValue();
-    const user = userEvent.setup();
-    const onDeleted = vi.fn();
-    renderWithProviders(
-      <PaymentDeleteConfirm target={EXPENSE} onClose={vi.fn()} onDeleted={onDeleted} />,
+    await waitFor(() =>
+      expect(restorePayment).toHaveBeenCalledWith(EXPENSE_ID, expect.any(String)),
     );
-    const dialog = await screen.findByTestId('confirm-dialog');
-    await user.click(within(dialog).getByTestId('confirm-reason-duplicate'));
-    await user.click(within(dialog).getByTestId('confirm-accept'));
-    await waitFor(() => expect(onDeleted).toHaveBeenCalledTimes(1));
-    expect(deletePayment).toHaveBeenCalledWith({
-      paymentId: ref.payment(310),
-      reason: 'duplicate',
-      note: null,
-    });
-    expect(isLive(ref.payment(310))).toBe(true);
   });
 
   it.each([
@@ -214,12 +193,10 @@ describe('PaymentDeleteConfirm (payments.md:34)', () => {
   it('keeps the entry on "Keep it"', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
-    renderWithProviders(
-      <PaymentDeleteConfirm target={EXPENSE} onClose={onClose} fixture />,
-    );
+    renderWithProviders(<PaymentDeleteConfirm target={EXPENSE} onClose={onClose} />);
     await user.click(await screen.findByTestId('confirm-cancel'));
     expect(onClose).toHaveBeenCalled();
-    expect(isLive(ref.payment(310))).toBe(true);
+    expect(deletePayment).not.toHaveBeenCalled();
   });
 
   it('is closed while no entry is set', async () => {

@@ -51,11 +51,11 @@ import type { InvoiceCatalog } from './use-invoice-catalog.ts';
 
 const K = INVOICE_DRAWER_KEYS.items;
 
-/** What a sale's line reads (`payments.md:140`): "2 = qty · 10% = discount · @500 = rate". */
-const SALE_LINE_TERMS: readonly QuickLineTerm[] = ['qty', 'discount', 'rate'];
-
-/** What an invoice's line reads: "2 = qty · 10% = discount" — the server sets the rate (B9). */
-const INVOICE_LINE_TERMS: readonly QuickLineTerm[] = ['qty', 'discount'];
+/**
+ * What a line reads: "2 = qty · 10% = discount" — the server sets the rate (B9), a sale's too
+ * (MD19: no typed rate; the design's "@500 = rate", `payments.md:140`, goes).
+ */
+const LINE_TERMS: readonly QuickLineTerm[] = ['qty', 'discount'];
 
 /** What a row's read-only cells show — in paise, null while not known — and why it is refused. */
 export interface InvoiceRowFigures {
@@ -79,13 +79,11 @@ export interface InvoiceItemsFieldProps {
   catalog: InvoiceCatalog;
   /**
    * A row's Rate, GST and Final — an invoice's from the server's preview, a sale's from the
-   * fixture world's own sums.
+   * drawer's own sums at MRP (the server prices the sale).
    */
   rowFigures: (row: InvoiceLineForm, index: number) => InvoiceRowFigures;
   /** A Final typed on a row: the discount that brings the line to it (paise). */
   onFinal: (index: number, final: number) => void;
-  /** "Often billed" (H:5058), as catalogue entries. */
-  oftenBilled: readonly InvoiceCatalogItem[];
   /** The bill the table's footer shows (H:5059). */
   total: number;
   readOnly: boolean;
@@ -108,12 +106,11 @@ function quickItemOf(
   return { key: item.key, label: item.label, ...catalog.words(item), data: item };
 }
 
-/** The Browse groups (H:5058): All, Often billed, then the catalogue's own groups in order. */
-function useBrowseGroups(
-  catalog: InvoiceCatalog,
-  oftenBilled: readonly InvoiceCatalogItem[],
-  medical: boolean,
-) {
+/**
+ * The Browse groups (H:5058): All, then the catalogue's own groups in order — the design's
+ * "Often billed" has no clinozy-be read (G-P6) and is not drawn.
+ */
+function useBrowseGroups(catalog: InvoiceCatalog, medical: boolean) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const present = [...new Set(catalog.items.map((item) => item.group))];
   const groupLabel = (group: string) => {
@@ -123,7 +120,6 @@ function useBrowseGroups(
   const order = medical ? ['oral', 'topical'] : present;
   return [
     { id: 'all', label: t(K.browse.all) },
-    ...(oftenBilled.length > 0 ? [{ id: 'often', label: t(K.oftenBilled) }] : []),
     ...order
       .filter((group) => present.includes(group as InvoiceCatalogItem['group']))
       .map((group) => ({ id: group, label: groupLabel(group) })),
@@ -194,10 +190,7 @@ function ItemPickerCellOf({
 }
 
 /** What the table's columns read. */
-type ItemColumnsProps = Omit<
-  InvoiceItemsFieldProps,
-  'oftenBilled' | 'total' | 'canAddMedicine'
->;
+type ItemColumnsProps = Omit<InvoiceItemsFieldProps, 'total' | 'canAddMedicine'>;
 
 /** A figure the row does not know yet: "—". */
 const NO_FIGURE = '—';
@@ -360,8 +353,8 @@ function useMedicineDraft(
 
 /**
  * The Items step (`payments.md:142`; H:5058–5059): the quick line —
- * "lhr face 1 10%" (the shared shorthand, `useQuickLineTerms`), its matches,
- * "Often billed" and Browse, where on a Medical invoice a medicine the store
+ * "lhr face 1 10%" (the shared shorthand, `useQuickLineTerms`), its matches
+ * and Browse, where on a Medical sale a medicine the store
  * lacks becomes a quick draft (`useMedicineDraft`, Q-M4) — over the item
  * rows: the offering (or medicine) picker with "New offering · “q”"
  * stacking the offering form, the Qty
@@ -377,7 +370,6 @@ export function InvoiceItemsField({
   catalog,
   rowFigures,
   onFinal,
-  oftenBilled,
   total,
   readOnly,
   locked,
@@ -398,10 +390,10 @@ export function InvoiceItemsField({
     locked,
     onNewOffering,
   });
-  const groups = useBrowseGroups(catalog, oftenBilled, medical);
+  const groups = useBrowseGroups(catalog, medical);
   const parse = useQuickLineTerms({
     numbers: nameNumbers(catalog.items.map((item) => item.label)),
-    terms: medical ? SALE_LINE_TERMS : INVOICE_LINE_TERMS,
+    terms: LINE_TERMS,
     max: INVOICE_QTY_MAX,
   });
   const setRows = (next: InvoiceLineForm[]) =>
@@ -421,11 +413,7 @@ export function InvoiceItemsField({
     groups,
     tiles: (group, words) =>
       catalog.items
-        .filter((item) => {
-          if (group === 'all') return true;
-          if (group === 'often') return oftenBilled.includes(item);
-          return item.group === group;
-        })
+        .filter((item) => group === 'all' || item.group === group)
         .filter((item) => quickLineBrowseMatches(item, words))
         .map((item) => quickItemOf(item, catalog)),
     count: countOf,
@@ -453,10 +441,10 @@ export function InvoiceItemsField({
         editable ? (
           <QuickLine<InvoiceCatalogItem, QuickLineTermValues>
             placeholder={t(medical ? K.quickLineMedical : K.quickLine)}
-            hint={t(medical ? K.hint : K.hintInvoice)}
+            hint={t(K.hintInvoice)}
             parse={parse}
             matches={(words) =>
-              quickLineMatches(catalog.items, words, oftenBilled).map((item) =>
+              quickLineMatches(catalog.items, words).map((item) =>
                 quickItemOf(item, catalog),
               )
             }
@@ -467,10 +455,6 @@ export function InvoiceItemsField({
                 : undefined
             }
             onCreate={addMedicine}
-            frequent={{
-              label: t(K.oftenBilled),
-              items: oftenBilled.map((item) => quickItemOf(item, catalog)),
-            }}
             browse={{
               ...browse,
               newItem: addMedicine

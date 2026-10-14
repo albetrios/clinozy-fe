@@ -1,24 +1,26 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import {
-  branchRef,
-  MAIN_BRANCH,
-} from '@/shared/api/app/fixtures/organization.fixtures.ts';
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
-import {
-  listFixtureLedger,
-  payFixtureExpense,
-} from '@/shared/api/app/payments-fixture-api.ts';
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listStoreLedger: vi.fn(),
+  exportStoreLedger: vi.fn(),
+}));
+vi.mock('@/lib/csv.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  downloadCsv: vi.fn(),
+}));
+
+import { downloadCsv } from '@/lib/csv.ts';
+import { exportStoreLedger, listStoreLedger } from '@/shared/api/app/payments-api.ts';
+import { ledgerRow, TEST_PAYMENT_ID } from '@/tests/utils/payments-doubles.ts';
 
 import {
   renderMedicalRoutes,
   resetMedicalRoutes,
 } from '../__tests__/integration/medical-test-router.tsx';
-import { collectSale } from '../shared/medical-flows-api.ts';
 import { MedicalPaymentsPage } from './MedicalPaymentsPage.tsx';
 
 const { notifyMock } = vi.hoisted(() => ({
@@ -36,101 +38,141 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5200, error: 9000, undo: 10_000 },
 }));
 
-/** 10:00 on 3 Oct, clinic time. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+/** 10:00 on 10 Oct, clinic time. */
+const NOW = new Date('2026-10-10T04:30:00Z');
 const ROOM = '/organization/acme/medical/payments';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+
+/** The store's receipt on sale #978's invoice, an open day's. */
+const receipt = ledgerRow({ partyName: 'Priya Shah' });
+/** A Medicines expense on a closed day. */
+const settled = ledgerRow({
+  id: 'pay_settled0000000000000',
+  seq: 6,
+  direction: 'paid',
+  kind: 'expense',
+  partyName: 'Ankur Pharma',
+  payeeName: 'Ankur Pharma',
+  expenseCategory: 'medicines',
+  invoiceId: null,
+  invoice: null,
+  isSettled: true,
+  editCount: 0,
+  lastEdit: null,
+});
+
+const rows = () => screen.getAllByTestId('medical-payments-table-row');
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  vi.mocked(listStoreLedger).mockReset();
+  vi.mocked(listStoreLedger).mockResolvedValue({
+    rows: [receipt, settled],
+    next: null,
+    total: 2,
+  });
+  vi.mocked(exportStoreLedger).mockReset();
+  vi.mocked(downloadCsv).mockReset();
 });
 afterEach(() => {
   vi.useRealTimers();
   resetMedicalRoutes();
-  resetAppFixtures();
 });
 
 describe('MedicalPaymentsPage', () => {
-  it('is the ledger limited to Medical under the Medical toolbar, its New sale primary', async () => {
-    const medical = (await listFixtureLedger({ scope: 'medical' })).items;
+  it('is the store’s slice of the ledger under the Medical toolbar, its New sale primary', async () => {
     const { container } = renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage });
     expect(await screen.findByTestId('medical-payments-new')).toHaveTextContent(
       'New sale',
     );
     expect(screen.getByRole('link', { current: 'page' })).toHaveTextContent('Payments');
-    await waitFor(() =>
-      expect(screen.getAllByTestId('medical-payments-table-row')).toHaveLength(
-        medical.length,
-      ),
-    );
+    await waitFor(() => expect(rows()).toHaveLength(2));
     expect(screen.getByTestId('medical-payments-table-end')).toHaveTextContent(
       'All Medical payments loaded',
     );
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('a Collect lands here, and opens in Payments while its day is open', async () => {
+  it('reads the ledger with the URL’s filters and search', async () => {
+    renderMedicalRoutes(`${ROOM}?kind=expense&mode=upi&q=Ankur`, {
+      payments: MedicalPaymentsPage,
+    });
+    await waitFor(() => expect(listStoreLedger).toHaveBeenCalled());
+    expect(vi.mocked(listStoreLedger).mock.calls[0]?.[0]).toMatchObject({
+      kind: ['expense'],
+      mode: ['upi'],
+      q: 'Ankur',
+    });
+  });
+
+  it('an open day’s entry opens in Payments', async () => {
     const user = setup();
-    const receipt = await collectSale(ref.medicalSale(978));
     const { router } = renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage });
-    await waitFor(() => expect(screen.getByText('Sale · Invoice #788')).toBeVisible());
-    const row = screen
-      .getAllByTestId('medical-payments-table-row')
-      .find((entry) => entry.textContent?.includes('Sale · Invoice #788'));
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    const row = rows().find((entry) => entry.textContent?.includes('Priya Shah'));
     await user.click(row as HTMLElement);
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/payments/${receipt.id}/edit`,
+        `/organization/acme/payments/${TEST_PAYMENT_ID}/edit`,
       ),
     );
   });
 
   it('a closed day’s entry answers with its lock', async () => {
     const user = setup();
-    const locked = (await listFixtureLedger({ scope: 'medical' })).items.find(
-      (row) => row.isSettled,
-    );
-    if (!locked) throw new Error('expected a closed day’s Medical entry in the seed');
     renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage });
-    await waitFor(() =>
-      expect(screen.getAllByTestId('medical-payments-table-row').length).toBeGreaterThan(
-        0,
-      ),
-    );
-    const row = screen
-      .getAllByTestId('medical-payments-table-row')
-      .find((entry) => entry.textContent?.includes(`PAY-${locked.seq}`));
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    const row = rows().find((entry) => entry.textContent?.includes('PAY-6'));
     await user.click(row as HTMLElement);
-    expect(notifyMock.info).toHaveBeenCalledWith(`PAY-${locked.seq} · Day closed`);
+    expect(notifyMock.info).toHaveBeenCalledWith('PAY-6 · Day closed');
   });
 
-  it('the What filter narrows the list to money out: a Medical PO paid through Send payment', async () => {
-    await payFixtureExpense({
-      branchId: branchRef(MAIN_BRANCH),
-      billRef: { kind: 'medical_po', purchaseId: ref.purchaseOrder(431), billNo: '1631' },
-      payeeName: 'Shree Ramdev Medical Agency',
-      expenseCategory: 'medicines',
-      amount: 298_000,
-      mode: 'upi',
-      paidOn: '2026-10-03',
-      note: null,
+  it('Export saves the server’s CSV of the filtered payments', async () => {
+    const user = setup();
+    vi.mocked(exportStoreLedger).mockResolvedValue({
+      fileName: 'medical-payments-2026-10-10.csv',
+      content: 'Ref,Amount\nPAY-5,150\n',
+      truncated: false,
     });
-    renderMedicalRoutes(`${ROOM}?kind=expense`, { payments: MedicalPaymentsPage });
+    renderMedicalRoutes(`${ROOM}?kind=receipt`, { payments: MedicalPaymentsPage });
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    await user.click(screen.getByTestId('medical-payments-view-action-export'));
     await waitFor(() =>
-      expect(screen.getAllByTestId('medical-payments-table-row').length).toBeGreaterThan(
-        0,
+      expect(downloadCsv).toHaveBeenCalledWith(
+        'medical-payments-2026-10-10.csv',
+        'Ref,Amount\nPAY-5,150\n',
       ),
     );
-    for (const row of screen.getAllByTestId('medical-payments-table-row')) {
-      expect(within(row).getByText('Paid')).toBeInTheDocument();
-    }
+    expect(vi.mocked(exportStoreLedger).mock.calls[0]?.[0]).toMatchObject({
+      kind: ['receipt'],
+    });
+    expect(notifyMock.success).toHaveBeenCalledWith('Payments exported as CSV');
   });
 
-  it('shows the empty state with nothing in the Medical scope', async () => {
+  it('Export says when the server cut the file short', async () => {
+    const user = setup();
+    vi.mocked(exportStoreLedger).mockResolvedValue({
+      fileName: 'medical-payments.csv',
+      content: 'Ref\n',
+      truncated: true,
+    });
+    renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage });
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    await user.click(screen.getByTestId('medical-payments-view-action-export'));
+    await waitFor(() => expect(notifyMock.warning).toHaveBeenCalled());
+  });
+
+  it('offers no Export without medicine:export', async () => {
+    renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage }, { role: 'pharmacist' });
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    expect(screen.queryByTestId('medical-payments-view-action-export')).toBeNull();
+  });
+
+  it('shows the filtered empty state when nothing matches', async () => {
+    vi.mocked(listStoreLedger).mockResolvedValue({ rows: [], next: null, total: 0 });
     renderMedicalRoutes(`${ROOM}?kind=money_back`, { payments: MedicalPaymentsPage });
     expect(await screen.findByText('No matches')).toBeVisible();
   });

@@ -249,7 +249,6 @@ describe('fetchInvoice', () => {
       name: 'Kavya Mehta',
       phone: '+919825005865',
     });
-    expect(detail.sale).toBeNull();
     expect(detail.payments.map((row) => row.seq)).toEqual([5]);
     expect(queriesOf('/app/payments')[0]).toMatchObject({ invoice_id: TEST_INVOICE_ID });
     expect(detail.sheet).toEqual({
@@ -354,6 +353,7 @@ const previewWire = {
   gst_total: 630,
   total: 4130,
   paid_amount: 0,
+  refunded_amount: 0,
   due_amount: 4130,
 };
 

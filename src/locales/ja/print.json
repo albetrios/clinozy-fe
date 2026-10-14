@@ -117,6 +117,7 @@
     "free": "無償",
     "rate": "単価",
     "paid": "支払額：",
+    "credited": "仕入先クレジット：",
     "issuedBy": "{{clinic}} からの発注書"
   }
 }

@@ -1,10 +1,9 @@
 import { paiseOfRupees } from '@/lib/number-text.ts';
 import type { InvoiceType, OfferingCategory, Tone } from '@/shared/api/app/app-schema.ts';
-import { medicineStock } from '@/shared/api/app/medicine-stock.ts';
 import {
   type MedicineForm,
   medicineForm,
-  type MedicineRecord,
+  type MedicineRow,
 } from '@/shared/api/app/medicines-contracts.ts';
 import type {
   OfferingRecord,
@@ -19,8 +18,9 @@ import type { InvoiceLineForm } from './invoice-form.ts';
  * What the Invoice drawer can bill (KICKOFF §6.9 Items): a clinic or consultation invoice the
  * clinic's offerings of its type — active and sold at its branch, Consultation's alone for a
  * consultation invoice — each listed at the price the Offerings room shows as "Billed today"
- * (the line itself is priced by the server); a Medical sale the fixture world's medicines at MRP
- * with GST included (D45) and the near-expiry discount (Q-M3). Each entry knows the line a pick
+ * (the line itself is priced by the server); a Medical sale clinozy-be's medicines at MRP with
+ * GST included (D45), their stock and the near-expiry discount (Q-M3) — a guide: the server
+ * prices the sale from the batches it draws. Each entry knows the line a pick
  * fills, its Browse group and its sessions.
  */
 
@@ -104,9 +104,12 @@ export function offeringCatalogItem(
   };
 }
 
-/** One medicine as a sale bills it (D45, Q-M3): its MRP, GST 0%, the near-expiry discount. */
-export function medicineCatalogItem(medicine: MedicineRecord): InvoiceCatalogItem {
-  const stock = medicineStock(medicine.batches);
+/**
+ * One medicine as a sale bills it (D45, Q-M3): its MRP (the API's rupees, in paise here), GST
+ * 0% on top, the near-expiry discount, and the stock the server counts.
+ */
+export function medicineCatalogItem(medicine: MedicineRow): InvoiceCatalogItem {
+  const mrp = paiseOfRupees(medicine.mrp);
   return {
     key: medicine.id,
     kind: 'medicine',
@@ -117,13 +120,13 @@ export function medicineCatalogItem(medicine: MedicineRecord): InvoiceCatalogIte
       offeringId: null,
       medicineId: medicine.id,
       name: medicine.name,
-      rate: medicine.mrp,
+      rate: mrp,
       gstPct: 0,
       discountPct: medicine.nearExpiryDiscountPct,
     },
-    price: medicine.mrp,
+    price: mrp,
     sessions: 1,
-    stock,
+    stock: medicine.stock,
     promo: null,
     detail: medicine.composition,
     tone: null,
@@ -160,23 +163,4 @@ export function coveredSessions(
     const sessions = line.sessionsTotal ?? 0;
     return sessions > line.qty ? sum + sessions : sum;
   }, 0);
-}
-
-/** How many entries "Often billed" offers (H:5058). */
-const OFTEN_BILLED_LIMIT = 5;
-
-/**
- * "Often billed" (H:5058): the ranked names as catalogue entries — the first the name is, or
- * starts, in catalogue order — those the catalogue lacks skipped, five kept.
- */
-export function oftenBilledItems(
-  names: readonly string[],
-  catalog: readonly InvoiceCatalogItem[],
-): InvoiceCatalogItem[] {
-  return names
-    .map((name) =>
-      catalog.find((item) => item.label === name || item.label.startsWith(name)),
-    )
-    .filter((item): item is InvoiceCatalogItem => item !== undefined)
-    .slice(0, OFTEN_BILLED_LIMIT);
 }

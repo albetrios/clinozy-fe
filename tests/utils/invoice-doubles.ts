@@ -186,6 +186,7 @@ export function invoicePreview(
     gstTotal: sum((line) => line.gstAmount),
     total,
     paid: 0,
+    refunded: 0,
     due: total,
     ...overrides,
   };
@@ -204,7 +205,6 @@ export function invoiceDetail(invoice: InvoiceRecord = invoiceRecord()): Invoice
       name: invoice.contact?.name ?? 'Kavya Mehta',
       phone: invoice.contact?.phone ?? '+919825005865',
     },
-    sale: null,
     payments: [],
     sheet: {
       organization: { name: 'Demo Organization', specialties: ['skin'], currency: 'INR' },
