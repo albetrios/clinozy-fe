@@ -154,14 +154,6 @@ export function SuppliersPage() {
         filtered={filters.count > 0}
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(keys.empty)}
-        emptyAction={
-          canCreate
-            ? {
-                label: t(MEDICAL_KEYS.create.supplier),
-                onSelect: () => nav.create('suppliers'),
-              }
-            : undefined
-        }
         recordsLabel={t(keys.records)}
         countLabel={
           summary

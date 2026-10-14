@@ -84,7 +84,6 @@ export function ManufacturersPage() {
     onSortChange: (sort) => patchSearch({ sort }),
   });
 
-  const canCreate = access.isResolved && access.can('medical', 'create');
   const canDelete = access.isResolved && access.can('medical', 'delete');
   const keys = MEDICAL_KEYS.manufacturers;
 
@@ -124,14 +123,6 @@ export function ManufacturersPage() {
         filtered={filters.count > 0}
         onClearFilters={() => filters.apply({})}
         emptyTitle={t(keys.empty)}
-        emptyAction={
-          canCreate
-            ? {
-                label: t(MEDICAL_KEYS.create.manufacturer),
-                onSelect: () => nav.create('manufacturers'),
-              }
-            : undefined
-        }
         recordsLabel={t(keys.records)}
         countLabel={summary ? t(keys.count, { count: summary.total }) : undefined}
         minWidth={930}

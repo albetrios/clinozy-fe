@@ -66,8 +66,8 @@
       "status": "Stato"
     },
     "minutes": "{{minutes}} min",
-    "empty": "Nessun appuntamento qui · ",
-    "bookOne": "prenotane uno",
+    "empty": "Nessun appuntamento qui",
+    "emptyHint": "Qui compaiono gli appuntamenti dei giorni che scegli.",
     "day": {
       "today": "Oggi",
       "tomorrow": "Domani",

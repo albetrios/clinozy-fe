@@ -40,7 +40,7 @@ describe('EmptyState', () => {
   });
 
   describe('with a room tone (the clinic illustration)', () => {
-    it('draws the dashed ring, the tinted disc, the tile and the dots in the tone', () => {
+    it('draws the ring and the dots in colour, and the icon knocked out of a bright tile', () => {
       render(
         <EmptyState
           tone="sage"
@@ -51,22 +51,32 @@ describe('EmptyState', () => {
       );
       const root = screen.getByTestId('empty-state');
       expect(root).toHaveAttribute('data-tone', 'sage');
+      // Centred in a growing column (the table body, a tab's view).
+      expect(root).toHaveClass('my-auto', 'py-12');
 
       const art = screen.getByTestId('empty-state-illustration');
       expect(art).toHaveAttribute('aria-hidden', 'true');
+      expect(art).toHaveAttribute('data-size', 'room');
       expect(art).toHaveClass('size-24');
-      const [ring, disc, tile, dot, smallDot] = Array.from(art.children);
-      expect(ring).toHaveClass('border-dashed', 'rounded-full', 'inset-0');
+      const [ring, disc, tile, dot, firstAccent, secondAccent] = Array.from(art.children);
+      expect(ring).toHaveClass(
+        'border-dashed',
+        'rounded-full',
+        'inset-0',
+        'border-tone-sage-border',
+      );
       expect(disc).toHaveClass('bg-tone-sage', 'inset-3.5');
       expect(tile).toHaveClass(
-        'bg-card',
-        'size-10',
-        'rounded-xl',
-        'text-tone-sage-foreground',
+        'size-11',
+        'rounded-2xl',
+        'bg-tone-sage-dot',
+        'text-background',
       );
       expect(tile).toContainElement(screen.getByTestId('room-icon'));
       expect(dot).toHaveClass('bg-tone-sage-dot', 'size-2.5');
-      expect(smallDot).toHaveClass('bg-border', 'size-1.5');
+      // Sage's accents: lime and sky — three colours in every illustration.
+      expect(firstAccent).toHaveClass('bg-tone-lime-dot', 'size-1.75');
+      expect(secondAccent).toHaveClass('bg-tone-sky-dot', 'size-1.25');
 
       expect(screen.getByRole('heading', { name: 'No patients match' })).toHaveClass(
         'text-title',
@@ -133,6 +143,22 @@ describe('EmptyState', () => {
       expect(screen.queryByTestId('empty-state-illustration')).not.toBeInTheDocument();
     });
 
+    it('carries the small art above its title when given a tone and an icon', () => {
+      render(
+        <EmptyState
+          variant="card"
+          tone="sky"
+          icon={<Users data-testid="card-icon" />}
+          title="No conversation yet"
+        />,
+      );
+      const art = screen.getByTestId('empty-state-illustration');
+      expect(art).toHaveAttribute('data-size', 'card');
+      // No dashed ring: the card itself is dashed.
+      expect(art.querySelector('.border-dashed')).toBeNull();
+      expect(art).toContainElement(screen.getByTestId('card-icon'));
+    });
+
     it('has no accessibility violations', async () => {
       const { container } = render(
         <EmptyState
@@ -140,6 +166,73 @@ describe('EmptyState', () => {
           title="No conversation yet"
           action={<button type="button">Say hello</button>}
         />,
+      );
+      expect(await axe(container)).toHaveNoViolations();
+    });
+  });
+
+  describe('compact (an empty list inside a populated screen)', () => {
+    it('draws the 48px art in the tone over a one-line title, centred', () => {
+      render(
+        <EmptyState
+          variant="compact"
+          tone="plum"
+          icon={<Users data-testid="compact-icon" />}
+          title="Nothing needs you right now."
+          testId="queue-empty"
+        />,
+      );
+      const root = screen.getByTestId('queue-empty');
+      expect(root).toHaveAttribute('data-variant', 'compact');
+      expect(root).toHaveAttribute('data-tone', 'plum');
+      expect(root).toHaveClass('my-auto', 'items-center', 'text-center');
+      const art = screen.getByTestId('empty-state-illustration');
+      expect(art).toHaveAttribute('data-size', 'compact');
+      expect(art).toHaveClass('size-12');
+      const [disc, tile, accent] = Array.from(art.children);
+      expect(disc).toHaveClass(
+        'bg-tone-plum',
+        'border-dashed',
+        'border-tone-plum-border',
+      );
+      expect(tile).toHaveClass('size-8', 'bg-tone-plum-dot', 'text-background');
+      expect(tile).toContainElement(screen.getByTestId('compact-icon'));
+      expect(accent).toHaveClass('bg-tone-lav-dot');
+      // A paragraph, not a heading: it sits inside a card that has its own.
+      expect(screen.queryByRole('heading')).toBeNull();
+      expect(screen.getByText('Nothing needs you right now.').tagName).toBe('P');
+    });
+
+    it('keeps its line and action', async () => {
+      const onAdd = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <EmptyState
+          variant="compact"
+          tone="peach"
+          icon={<Users />}
+          title="No entries"
+          description="Payments taken today show up here."
+          action={<EmptyStateAction onClick={onAdd}>Receive</EmptyStateAction>}
+        />,
+      );
+      expect(screen.getByText('Payments taken today show up here.')).toHaveClass(
+        'text-xs',
+        'text-muted-foreground',
+      );
+      await user.click(screen.getByRole('button', { name: 'Receive' }));
+      expect(onAdd).toHaveBeenCalledOnce();
+    });
+
+    it('draws no art without a tone and an icon', () => {
+      render(<EmptyState variant="compact" title="No entries" />);
+      expect(screen.queryByTestId('empty-state-illustration')).toBeNull();
+      expect(screen.getByText('No entries')).toBeInTheDocument();
+    });
+
+    it('has no accessibility violations', async () => {
+      const { container } = render(
+        <EmptyState variant="compact" tone="lav" icon={<Users />} title="No passkeys" />,
       );
       expect(await axe(container)).toHaveNoViolations();
     });
@@ -251,24 +344,24 @@ describe('EmptyState — inline (a list’s or a card’s one-liner)', () => {
     expect(line).not.toHaveClass('text-detail');
   });
 
-  it('keeps its action in the same line — "No appointments here · book one"', async () => {
+  it('keeps its action in the same line — "No results · clear the search"', async () => {
     const onBook = vi.fn();
     const user = userEvent.setup();
     render(
       <EmptyState
         variant="inline"
-        title="No appointments here · "
+        title="No results · "
         action={
           <button type="button" onClick={onBook}>
-            book one
+            clear the search
           </button>
         }
       />,
     );
     expect(screen.getByTestId('empty-state')).toHaveTextContent(
-      'No appointments here · book one',
+      'No results · clear the search',
     );
-    await user.click(screen.getByRole('button', { name: 'book one' }));
+    await user.click(screen.getByRole('button', { name: 'clear the search' }));
     expect(onBook).toHaveBeenCalledOnce();
   });
 

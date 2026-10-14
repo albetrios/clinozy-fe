@@ -35,6 +35,8 @@
       "updated": "更新"
     },
     "empty": "一致するリードはありません",
+    "emptyTitle": "リードはまだありません",
+    "emptyHint": "電話、WhatsApp、来店からの問い合わせがここに届きます。",
     "clearFilters": "フィルターをクリア",
     "moreInterests_other": "他 {{count}} 件: {{list}}"
   },

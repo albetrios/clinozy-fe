@@ -152,6 +152,7 @@ export function VisitsBentoCard({
         empty={rows.length === 0 && !next}
         label={title}
         emptyTitle={t(TIMELINE_KEYS.visits.empty)}
+        section="visits"
         testId={testId}
       />
     </BentoCard>
@@ -229,6 +230,7 @@ export function PackagesBentoCard({ onOpen }: CardLinks) {
         empty={rows.length === 0}
         label={title}
         emptyTitle={t(TIMELINE_KEYS.packages.empty)}
+        section="packages"
         testId={TIMELINE_TEST_IDS.card('packages')}
       />
     </BentoCard>
@@ -291,6 +293,7 @@ export function PrescriptionsBentoCard({ onOpen, onNew }: NewCardLinks) {
         empty={rows.length === 0}
         label={title}
         emptyTitle={t(TIMELINE_KEYS.prescriptions.empty)}
+        section="prescriptions"
         testId={testId}
       />
     </BentoCard>
@@ -346,6 +349,7 @@ export function TreatmentsBentoCard({
         empty={rows.length === 0}
         label={title}
         emptyTitle={t(TIMELINE_KEYS.treatments.empty)}
+        section="treatments"
         testId={testId}
       />
     </BentoCard>

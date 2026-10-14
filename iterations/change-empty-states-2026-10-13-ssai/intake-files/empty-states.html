@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empty states</title>
+<style>
+  :root {
+    --bg: oklch(0.985 0.002 90); --card: #fff; --fg: oklch(0.24 0.01 260); --fg-soft: oklch(0.38 0.01 260);
+    --muted: oklch(0.52 0.01 260); --border: oklch(0.91 0.004 260); --border-strong: oklch(0.84 0.006 260);
+    --primary: oklch(0.24 0.01 260); --on-primary: #fff;
+    --butter: oklch(0.935 0.06 85); --butter-ink: oklch(0.38 0.085 65); --butter-border: oklch(0.85 0.08 80); --butter-dot: oklch(0.74 0.11 75);
+    --lav: oklch(0.925 0.045 295); --lav-ink: oklch(0.37 0.09 295); --lav-border: oklch(0.83 0.06 295); --lav-dot: oklch(0.68 0.1 295);
+    --sky: oklch(0.925 0.04 235); --sky-ink: oklch(0.37 0.08 235); --sky-border: oklch(0.83 0.055 235); --sky-dot: oklch(0.68 0.09 235);
+    --sage: oklch(0.925 0.045 150); --sage-ink: oklch(0.37 0.08 150); --sage-border: oklch(0.83 0.06 150); --sage-dot: oklch(0.66 0.1 150);
+    --blush: oklch(0.925 0.04 20); --blush-ink: oklch(0.38 0.1 20); --blush-border: oklch(0.83 0.06 20); --blush-dot: oklch(0.68 0.1 20);
+    --mint: oklch(0.93 0.04 190); --mint-ink: oklch(0.37 0.07 195); --mint-border: oklch(0.83 0.055 190); --mint-dot: oklch(0.68 0.08 190);
+    --peach: oklch(0.93 0.045 55); --peach-ink: oklch(0.4 0.1 50); --peach-border: oklch(0.84 0.07 55); --peach-dot: oklch(0.72 0.12 55);
+    --plum: oklch(0.925 0.04 330); --plum-ink: oklch(0.38 0.1 330); --plum-border: oklch(0.83 0.06 330); --plum-dot: oklch(0.68 0.1 330);
+    --lime: oklch(0.935 0.055 120); --lime-ink: oklch(0.38 0.08 125); --lime-border: oklch(0.85 0.07 120); --lime-dot: oklch(0.72 0.11 120);
+  }
+  [data-theme="dark"] {
+    --bg: oklch(0.17 0.006 260); --card: oklch(0.21 0.006 260); --fg: oklch(0.95 0.004 260); --fg-soft: oklch(0.85 0.006 260);
+    --muted: oklch(0.7 0.008 260); --border: oklch(0.3 0.006 260); --border-strong: oklch(0.38 0.008 260);
+    --primary: oklch(0.95 0.004 260); --on-primary: oklch(0.17 0.006 260);
+    --butter: oklch(0.28 0.04 85); --butter-ink: oklch(0.88 0.08 85); --butter-border: oklch(0.42 0.06 85); --butter-dot: oklch(0.78 0.12 80);
+    --lav: oklch(0.265 0.035 295); --lav-ink: oklch(0.86 0.07 295); --lav-border: oklch(0.4 0.05 295); --lav-dot: oklch(0.74 0.1 295);
+    --sky: oklch(0.265 0.032 235); --sky-ink: oklch(0.86 0.06 235); --sky-border: oklch(0.4 0.048 235); --sky-dot: oklch(0.74 0.09 235);
+    --sage: oklch(0.265 0.032 150); --sage-ink: oklch(0.86 0.06 150); --sage-border: oklch(0.4 0.048 150); --sage-dot: oklch(0.72 0.1 150);
+    --blush: oklch(0.265 0.032 20); --blush-ink: oklch(0.86 0.06 20); --blush-border: oklch(0.4 0.048 20); --blush-dot: oklch(0.74 0.1 20);
+    --mint: oklch(0.265 0.03 190); --mint-ink: oklch(0.86 0.05 190); --mint-border: oklch(0.4 0.045 190); --mint-dot: oklch(0.74 0.08 190);
+    --peach: oklch(0.27 0.035 55); --peach-ink: oklch(0.87 0.07 55); --peach-border: oklch(0.42 0.05 55); --peach-dot: oklch(0.77 0.12 55);
+    --plum: oklch(0.265 0.032 330); --plum-ink: oklch(0.86 0.06 330); --plum-border: oklch(0.4 0.048 330); --plum-dot: oklch(0.74 0.1 330);
+    --lime: oklch(0.28 0.04 120); --lime-ink: oklch(0.88 0.07 120); --lime-border: oklch(0.42 0.05 120); --lime-dot: oklch(0.78 0.11 120);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 13px/1.45 system-ui, sans-serif; padding: 24px 16px 48px; }
+  h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 32px 0 12px; }
+  .lede { color: var(--muted); margin: 0 0 16px; max-width: 720px; }
+  .toggle { position: fixed; top: 16px; right: 16px; border: 1px solid var(--border); background: var(--card); color: var(--fg); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; min-height: 360px; overflow: hidden; }
+  .card-head { display: flex; gap: 16px; padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 12px; }
+  .card-body { flex: 1; display: flex; flex-direction: column; }
+  .tag { font-size: 11px; color: var(--muted); padding: 6px 14px; border-top: 1px solid var(--border); }
+
+  /* The room look — 112px art, centered in the body (my-auto). */
+  .empty { margin: auto 0; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 48px 16px; text-align: center; }
+  .art { position: relative; width: 112px; height: 112px; margin-bottom: 4px; }
+  .ring { position: absolute; inset: 0; border-radius: 50%; border: 1.5px dashed var(--t-border); }
+  .disc { position: absolute; inset: 14px; border-radius: 50%; background: var(--t); }
+  .tile { position: absolute; inset: 32px; border-radius: 16px; display: grid; place-items: center; color: var(--bg);
+          background: linear-gradient(135deg, var(--t-dot), var(--t-ink)); box-shadow: 0 2px 6px -2px color-mix(in oklch, var(--t-ink) 45%, transparent); }
+  .tile svg { width: 22px; height: 22px; }
+  .dot { position: absolute; border-radius: 50%; }
+  .d1 { width: 10px; height: 10px; top: 12px; right: 10px; background: var(--t-dot); }
+  .d2 { width: 7px; height: 7px; bottom: 16px; left: 8px; background: var(--a1); }
+  .d3 { width: 5px; height: 5px; top: 8px; left: 18px; background: var(--a2); }
+  .title { font-size: 16px; font-weight: 600; margin: 0; }
+  .line { color: var(--muted); margin: 0; max-width: 320px; }
+  .btn { margin-top: 6px; height: 36px; padding: 0 14px; border-radius: 8px; border: 0; background: var(--primary); color: var(--on-primary); font: 600 13px system-ui; display: inline-flex; gap: 6px; align-items: center; }
+
+  /* The compact look — 56px art. */
+  .compact { margin: auto 0; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 16px; text-align: center; }
+  .compact .art { width: 56px; height: 56px; margin: 0; }
+  .compact .disc { inset: 6px; }
+  .compact .tile { inset: 12px; border-radius: 8px; }
+  .compact .tile svg { width: 16px; height: 16px; }
+  .compact .d1 { width: 7px; height: 7px; top: 2px; right: 2px; background: var(--a1); }
+  .compact p { margin: 0; color: var(--fg-soft); font-weight: 500; }
+  .mini { min-height: 180px; }
+
+  /* The old looks, for comparison. */
+  .old-line { padding: 40px; text-align: center; color: var(--muted); }
+  .old-line u { color: var(--fg); }
+
+  .butter { --t: var(--butter); --t-ink: var(--butter-ink); --t-border: var(--butter-border); --t-dot: var(--butter-dot); --a1: var(--peach-dot); --a2: var(--sky-dot); }
+  .lav { --t: var(--lav); --t-ink: var(--lav-ink); --t-border: var(--lav-border); --t-dot: var(--lav-dot); --a1: var(--plum-dot); --a2: var(--sky-dot); }
+  .sky { --t: var(--sky); --t-ink: var(--sky-ink); --t-border: var(--sky-border); --t-dot: var(--sky-dot); --a1: var(--mint-dot); --a2: var(--lav-dot); }
+  .sage { --t: var(--sage); --t-ink: var(--sage-ink); --t-border: var(--sage-border); --t-dot: var(--sage-dot); --a1: var(--lime-dot); --a2: var(--sky-dot); }
+  .blush { --t: var(--blush); --t-ink: var(--blush-ink); --t-border: var(--blush-border); --t-dot: var(--blush-dot); --a1: var(--peach-dot); --a2: var(--lav-dot); }
+  .mint { --t: var(--mint); --t-ink: var(--mint-ink); --t-border: var(--mint-border); --t-dot: var(--mint-dot); --a1: var(--sky-dot); --a2: var(--lime-dot); }
+  .peach { --t: var(--peach); --t-ink: var(--peach-ink); --t-border: var(--peach-border); --t-dot: var(--peach-dot); --a1: var(--butter-dot); --a2: var(--blush-dot); }
+  .plum { --t: var(--plum); --t-ink: var(--plum-ink); --t-border: var(--plum-border); --t-dot: var(--plum-dot); --a1: var(--lav-dot); --a2: var(--blush-dot); }
+  .lime { --t: var(--lime); --t-ink: var(--lime-ink); --t-border: var(--lime-border); --t-dot: var(--lime-dot); --a1: var(--sage-dot); --a2: var(--butter-dot); }
+  .lane { background: var(--t); border-color: var(--t-border); }
+  svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+<button class="toggle" type="button" id="theme">Dark</button>
+<h1>Empty states — every section and tab</h1>
+<p class="lede">The room look (112px) centered in the list's space, and the compact look (56px) for
+empties inside a populated screen. The art takes the list's tone: a dashed ring in its border color, a
+disc in its fill, a tile in a gradient from its dot to its ink with the icon knocked out, and three
+dots — its own and two accents. See <code>empty-states.md</code> for the full inventory.</p>
+
+<h2>Before → after (Appointments › Agenda, R10)</h2>
+<div class="grid">
+  <section class="card"><div class="card-head"><span>Time</span><span>Contact</span><span>Service</span></div>
+    <div class="card-body"><p class="old-line">No appointments here · <u>book one</u></p></div><div class="tag">Before — a grey line under the header</div></section>
+  <section class="card sky"><div class="card-head"><span>Time</span><span>Contact</span><span>Service</span></div>
+    <div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span>
+      <h3 class="title">No appointments here</h3><p class="line">Bookings for the days you pick show up here.</p><button class="btn" type="button">+ New appointment</button></div></div><div class="tag">After — centered, sky, Calendar</div></section>
+</div>
+
+<h2>The room look, by section</h2>
+<div class="grid">
+  <section class="card sage"><div class="card-head"><span>Patient</span><span>Type</span></div><div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span><h3 class="title">No patients yet</h3><p class="line">Patients appear here once they are registered.</p></div></div><div class="tag">R11 Patients — sage, Users</div></section>
+  <section class="card lav"><div class="card-head"><span>Lead</span><span>Status</span></div><div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span><h3 class="title">No leads yet</h3><p class="line">Enquiries from calls, WhatsApp and walk-ins land here.</p><button class="btn" type="button">+ New lead</button></div></div><div class="tag">R8 Leads — lav, UserPlus</div></section>
+  <section class="card blush"><div class="card-head"><span>Supplier</span><span>Payable</span></div><div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span><h3 class="title">No supplier matches</h3><p class="line">Nothing here yet. Try another tab or search.</p><button class="btn" type="button">+ New supplier</button></div></div><div class="tag">R24 Medical › Suppliers — blush, Truck</div></section>
+  <section class="card mint"><div class="card-head"><span>Item</span><span>Change</span></div><div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><path d="M8 3 4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span><h3 class="title">No stock items here</h3><p class="line">Nothing here yet. Try another tab or search.</p></div></div><div class="tag">R30 Clinic stock › Movements — mint, ArrowLeftRight</div></section>
+  <section class="card butter"><div class="card-head"><span>Payment</span><span>Mode</span></div><div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span><h3 class="title">No payments yet</h3><p class="line">Payments you receive show up here.</p><button class="btn" type="button">+ Receive payment</button></div></div><div class="tag">R32 Payments — butter, Wallet</div></section>
+  <section class="card plum"><div class="card-head"><span>Task</span><span>Due</span></div><div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span><h3 class="title">All caught up</h3><p class="line">Nothing needs you right now. New tasks appear here as leads write, visits come up and feedback arrives.</p><button class="btn" type="button">+ New task</button></div></div><div class="tag">R34 Tasks › To do — plum, SquareCheck</div></section>
+  <section class="card lane sky"><div class="card-head"><span>Arriving</span><span>0 people</span></div><div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span><h3 class="title">No one here right now.</h3></div></div><div class="tag">R2 Today › Arriving lane — on the lane's own tint</div></section>
+  <section class="card lav"><div class="card-head"><span>Lead</span><span>Status</span></div><div class="card-body"><div class="empty"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></span><h3 class="title">No leads match</h3><button class="btn" type="button">Clear filters</button></div></div><div class="tag">R9 Filtered — the list's tone, Search</div></section>
+</div>
+
+<h2>The compact look</h2>
+<div class="grid">
+  <section class="card mini blush"><div class="card-head"><span>Complaints</span></div><div class="card-body"><div class="compact"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="dot d1"></span></span><p>Nothing added yet</p></div></div><div class="tag">C2 Patient overview — blush, MessageSquare</div></section>
+  <section class="card mini plum"><div class="card-head"><span>Work queue</span></div><div class="card-body"><div class="compact"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg></span><span class="dot d1"></span></span><p>Nothing needs you right now.</p></div></div><div class="tag">C1 Today › work queue — plum, SquareCheck</div></section>
+  <section class="card mini peach"><div class="card-head"><span>Day close</span></div><div class="card-body"><div class="compact"><span class="art" aria-hidden="true"><span class="ring"></span><span class="disc"></span><span class="tile"><svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 17.5v-11"/></svg></span><span class="dot d1"></span></span><p>No entries for this day</p></div></div><div class="tag">C10 Payments › Day close — peach, Receipt</div></section>
+</div>
+
+<script>
+  document.getElementById('theme').addEventListener('click', (event) => {
+    const dark = document.documentElement.dataset.theme !== 'dark';
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    event.currentTarget.textContent = dark ? 'Light' : 'Dark';
+  });
+</script>
+</body>
+</html>

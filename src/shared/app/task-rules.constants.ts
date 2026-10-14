@@ -455,6 +455,8 @@ export const TASK_QUEUE_KEYS = {
   anyone: 'row.anyone',
   /** To do's empty line — Today's work queue shows it too (its design has none; AMBER). */
   empty: 'empty.queue',
+  /** The empty state's title over {@link TASK_QUEUE_KEYS.empty} (change-empty-states R34, C1). */
+  caughtUp: 'empty.caughtUp',
   /**
    * An outcome on a task someone — or the rules — closed first (`409 transition_not_allowed`):
    * the task drawer's and Today's card's words.

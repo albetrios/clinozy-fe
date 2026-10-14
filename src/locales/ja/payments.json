@@ -94,8 +94,7 @@
   "empty": {
     "ledgerTitle": "該当する記録はありません",
     "pendingTitle": "保留中の項目はありません",
-    "description": "まだ何もありません。別のタブや検索をお試しください。",
-    "receive": "受け取る"
+    "description": "まだ何もありません。別のタブや検索をお試しください。"
   },
   "deleteEntry": {
     "title": "この支払いを削除しますか?",

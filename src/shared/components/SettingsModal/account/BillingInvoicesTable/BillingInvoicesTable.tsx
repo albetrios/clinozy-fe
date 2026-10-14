@@ -9,6 +9,7 @@ import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
@@ -18,6 +19,7 @@ import {
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useBillingInvoices } from '@/shared/hooks/useBillingInvoices/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { Receipt } from '@/shared/icons/index.ts';
 
 const INVOICE_KEYS = SETTINGS_KEYS.panels.billing.invoices;
 
@@ -93,7 +95,15 @@ function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
       {/* The design's table card, kept edged on a phone inside the settings card. */}
       <DataTable
         table={table}
-        emptyMessage={t(INVOICE_KEYS.empty)}
+        empty={
+          <EmptyState
+            variant="compact"
+            tone="peach"
+            icon={<Receipt />}
+            title={t(INVOICE_KEYS.empty)}
+            className="py-8"
+          />
+        }
         className="max-md:rounded-xl max-md:border-x"
       />
     </div>

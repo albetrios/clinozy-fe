@@ -234,19 +234,11 @@ describe('the Offerings tab on clinozy-be (KICKOFF §6.11)', () => {
     expect(router.state.location.search).not.toHaveProperty('status');
   });
 
-  it('greets an empty catalogue with "New offering", which opens the drawer', async () => {
-    const user = userEvent.setup();
+  it('greets an empty catalogue with no button — the toolbar adds', async () => {
     world.offerings = [];
-    const { router } = renderOfferingsRoutes(OFFERINGS_URL);
+    renderOfferingsRoutes(OFFERINGS_URL);
     expect(await screen.findByText('No offerings yet')).toBeInTheDocument();
-    await user.click(await screen.findByTestId('empty-state-action'));
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`${OFFERINGS_URL}/create`),
-    );
-    expect(await screen.findByTestId('offering-drawer')).toHaveAttribute(
-      'data-mode',
-      'create',
-    );
+    expect(within(screen.getByTestId('empty-state')).queryByRole('button')).toBeNull();
   });
 
   it('opens an offering’s drawer by its public id from a row and from a link', async () => {

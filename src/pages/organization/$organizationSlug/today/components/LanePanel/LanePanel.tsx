@@ -10,6 +10,16 @@ import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
+import {
+  type AppIcon,
+  Calendar,
+  Clock,
+  Pill,
+  Receipt,
+  Sparkles,
+  Stethoscope,
+  UserPlus,
+} from '@/shared/icons/index.ts';
 
 import { useCheckoutDues } from '../../hooks/useCheckoutDues/index.ts';
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
@@ -154,6 +164,17 @@ function VisitCard({
   );
 }
 
+/** Each lane's empty-state glyph (change-empty-states R1–R7), in the lane's tone. */
+const LANE_EMPTY_ICONS: Readonly<Record<TodayLane, AppIcon>> = {
+  enquiries: UserPlus,
+  arriving: Calendar,
+  waiting: Clock,
+  with_doctor: Stethoscope,
+  treatment: Sparkles,
+  checkout: Receipt,
+  pharmacy: Pill,
+};
+
 /** How many skeleton cards the first load shows (the prototype's placeholder count, H:603). */
 const SKELETON_CARDS = ['first', 'second', 'third'] as const;
 
@@ -221,6 +242,7 @@ export function LanePanel({
     today,
   });
   const paint = TONE_CLASSES[TODAY_LANE_META[lane].tone];
+  const EmptyIcon = LANE_EMPTY_ICONS[lane];
   return (
     <section
       ref={panel}
@@ -247,29 +269,36 @@ export function LanePanel({
           {t(TODAY_KEYS.lanes.count, { count: cards.length })}
         </span>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] content-start gap-2 md:min-h-0 md:flex-1 md:overflow-y-auto">
-        {loading
-          ? SKELETON_CARDS.map((key) => <VisitCardSkeleton key={key} />)
-          : cards.map((card) => (
-              <VisitCard
-                key={card.id}
-                card={card}
-                now={now}
-                today={today}
-                dues={dues}
-                action={actionOf(card)}
-                onOpen={onOpen}
-              />
-            ))}
-        {!loading && cards.length === 0 ? (
+      {!loading && cards.length === 0 ? (
+        // The lane's room look on its own tint, centred in the panel
+        // (change-empty-states R1–R7).
+        <div className="flex flex-col md:min-h-0 md:flex-1">
           <EmptyState
-            variant="inline"
+            tone={TODAY_LANE_META[lane].tone}
+            tinted
+            icon={<EmptyIcon />}
             title={t(TODAY_KEYS.lanes.empty)}
             testId={TODAY_TEST_IDS.empty}
-            className="text-muted-foreground-strong"
+            className="py-6"
           />
-        ) : null}
-      </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] content-start gap-2 md:min-h-0 md:flex-1 md:overflow-y-auto">
+          {loading
+            ? SKELETON_CARDS.map((key) => <VisitCardSkeleton key={key} />)
+            : cards.map((card) => (
+                <VisitCard
+                  key={card.id}
+                  card={card}
+                  now={now}
+                  today={today}
+                  dues={dues}
+                  action={actionOf(card)}
+                  onOpen={onOpen}
+                />
+              ))}
+        </div>
+      )}
     </section>
   );
 }

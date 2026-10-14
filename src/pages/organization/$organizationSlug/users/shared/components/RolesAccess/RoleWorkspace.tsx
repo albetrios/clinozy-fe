@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { useAssignablePermissions } from '@/shared/hooks/useAssignablePermissions/index.ts';
+import { ShieldCheck } from '@/shared/icons/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import { APP_PERMISSION_CODES } from './roles-matrix.ts';
@@ -39,7 +40,14 @@ export function RoleWorkspace({
   }
   const rows = assignable.rows.filter((entry) => !APP_PERMISSION_CODES.has(entry.code));
   if (rows.length === 0) {
-    return <EmptyState variant="inline" title={t(USERS_KEYS.roles.workspace.none)} />;
+    return (
+      <EmptyState
+        variant="compact"
+        tone="lav"
+        icon={<ShieldCheck />}
+        title={t(USERS_KEYS.roles.workspace.none)}
+      />
+    );
   }
   return (
     <div
