@@ -1,20 +1,25 @@
+import { type Ref, type RefObject, useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import type {
   RxCatalog,
   RxCatalogMedicine,
 } from '@/shared/api/app/prescriptions-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { QuickLine } from '@/shared/components/QuickLine/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import {
   type ItemsColumn,
   ItemsField,
   ItemsPickerCell,
   ItemsQtyCell,
 } from '@/shared/forms/ItemsField/index.ts';
+import { ClipboardList } from '@/shared/icons/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 
-import { RX_KEYS, RX_NS } from '../../prescriptions.constants.ts';
+import { RX_KEYS, RX_NS, RX_TEST_IDS } from '../../prescriptions.constants.ts';
 import {
   emptyRxLine,
   RX_PLACES,
@@ -25,9 +30,25 @@ import {
   typedValue,
 } from './rx-form.ts';
 import { RxDoseCell, RxWhenCell } from './rx-item-cells.tsx';
+import { type ReadableRxPadLine, withRxPadLines } from './rx-pad.ts';
+import { RxPadPanel } from './rx-pad-panel.tsx';
 import { useRxQuickLine } from './use-rx-quick-line.ts';
 
 const K = RX_KEYS;
+
+/** The Rx Pad's state, held by the drawer (its Esc closes the Pad first). */
+export interface RxPadState {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+/** The Rx Pad's elements, held by the drawer. */
+export interface RxPadRefs {
+  /** The open Pad's root. */
+  panelRef: RefObject<HTMLElement | null>;
+  /** The toggle beside Browse — the focus goes back to it when the Pad closes. */
+  toggleRef: RefObject<HTMLButtonElement | null>;
+}
 
 /** Props of {@link RxMedicinesField}. */
 export interface RxMedicinesFieldProps {
@@ -36,6 +57,49 @@ export interface RxMedicinesFieldProps {
   items: RxFormValues['items'];
   catalog: RxCatalog | undefined;
   readOnly: boolean;
+  /** The Rx Pad beside Browse (feat-prescription-composer §6.4); none without it. */
+  pad?: RxPadState;
+  /** The Pad's root and its toggle (with `pad`). */
+  padPanelRef?: Ref<HTMLElement>;
+  padToggleRef?: RefObject<HTMLButtonElement | null>;
+  /** The patient's allergies — the Pad marks a line that matches one. */
+  allergies?: readonly string[] | null;
+  /** The quick line's input — a new prescription's drawer focuses it on open. */
+  quickLineRef?: Ref<HTMLInputElement>;
+  /** The drawer focuses the line on open: that focus keeps its suggestions closed. */
+  focusOnOpen?: boolean;
+}
+
+/** "Pad" beside Browse: opens and closes the Rx Pad under the quick line. */
+function RxPadToggle({
+  pad,
+  controls,
+  toggleRef,
+}: {
+  pad: RxPadState;
+  controls: string;
+  toggleRef: Ref<HTMLButtonElement> | undefined;
+}) {
+  const { t } = useTranslation(RX_NS);
+  return (
+    <Button
+      ref={toggleRef}
+      type="button"
+      variant={pad.open ? 'default' : 'outline'}
+      aria-pressed={pad.open}
+      aria-controls={pad.open ? controls : undefined}
+      title={t(K.pad.toggleHint)}
+      onClick={() => pad.onOpenChange(!pad.open)}
+      data-testid={`${RX_TEST_IDS.pad}-toggle`}
+      className={cn(
+        'h-11 gap-1.5 shadow-none',
+        pad.open ? 'border-primary border' : 'text-foreground-soft hover:border-disabled',
+      )}
+    >
+      <ClipboardList aria-hidden="true" className="size-3.75" />
+      <span className="max-sm:sr-only">{t(K.pad.toggle)}</span>
+    </Button>
+  );
 }
 
 /**
@@ -203,10 +267,52 @@ export function RxMedicinesField({
   items,
   catalog,
   readOnly,
+  pad,
+  padPanelRef,
+  padToggleRef,
+  allergies = null,
+  quickLineRef,
+  focusOnOpen = false,
 }: RxMedicinesFieldProps) {
   const { t } = useTranslation(RX_NS);
   const quickLine = useRxQuickLine(form, catalog, items);
   const { columns, recompute } = useRxColumns({ form, catalog, readOnly });
+  const padId = useId();
+  // The Pad adds its lines as the quick line adds one: a blank row first, the last dosage.
+  const addPadLines = (lines: readonly ReadableRxPadLine[]) => {
+    const daysNote = (days: number) => t(K.daysNote, { count: days });
+    form.setValue('items', withRxPadLines(form.getValues('items'), lines, daysNote), {
+      shouldDirty: true,
+    });
+    notify.success(t(K.pad.added, { count: lines.length }));
+  };
+  const toolbar = readOnly ? undefined : (
+    <div className="flex flex-col gap-2.5">
+      <QuickLine
+        {...quickLine}
+        inputRef={quickLineRef}
+        quietFirstFocus={focusOnOpen}
+        trailing={
+          pad ? (
+            <RxPadToggle pad={pad} controls={padId} toggleRef={padToggleRef} />
+          ) : undefined
+        }
+      />
+      {pad?.open ? (
+        <RxPadPanel
+          id={padId}
+          catalog={catalog?.medicines ?? []}
+          allergies={allergies}
+          onAdd={addPadLines}
+          onClose={() => {
+            pad.onOpenChange(false);
+            padToggleRef?.current?.focus();
+          }}
+          panelRef={padPanelRef}
+        />
+      ) : null}
+    </div>
+  );
 
   return (
     <ItemsField<RxFormValues, 'items'>
@@ -224,7 +330,7 @@ export function RxMedicinesField({
         maxLength: 200,
         onChange: (value, row) => recompute(row.name, row.row.dose, value),
       }}
-      toolbar={readOnly ? undefined : <QuickLine {...quickLine} />}
+      toolbar={toolbar}
       testId="rx-items"
     />
   );

@@ -561,7 +561,8 @@
       "newPatient": "Neuer Patient",
       "newReceipt": "Neuer Zahlungseingang",
       "openTasks": "Aufgaben öffnen",
-      "finishSetup": "Einrichtung abschließen"
+      "finishSetup": "Einrichtung abschließen",
+      "writePrescription": "Rezept schreiben"
     },
     "screen": "Seite",
     "move": "navigieren",
@@ -569,7 +570,16 @@
     "hint": "Geben Sie 3+ Buchstaben oder 4+ Ziffern ein, um Personen zu suchen",
     "empty": "Keine Treffer. Versuchen Sie einen Namen, eine Telefonnummer oder eine C-Nummer.",
     "personSub": "{{id}} · •••• {{lastDigits}}",
-    "setupSub": "{{done}} von {{total}}"
+    "setupSub": "{{done}} von {{total}}",
+    "prescribe": {
+      "chip": "Rezept schreiben",
+      "leave": "Zurück zu allen Befehlen",
+      "placeholder": "Welche Person? Name oder Telefon eingeben",
+      "thisPatient": "Diese Person",
+      "patients": "Patienten",
+      "hint": "3+ Buchstaben oder 4+ Ziffern eingeben, um eine Person zu finden",
+      "empty": "Keine Person gefunden. Versuche einen Namen, eine Telefonnummer oder eine Patientennummer."
+    }
   },
   "lists": {
     "loadError": "Diese Liste konnte nicht geladen werden · Verbindung unterbrochen. Die letzte Version wird angezeigt.",

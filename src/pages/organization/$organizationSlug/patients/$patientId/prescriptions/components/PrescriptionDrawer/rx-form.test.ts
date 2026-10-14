@@ -6,6 +6,7 @@ import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contract
 import { prescriptionRecord } from '../../__tests__/integration/prescription-doubles.ts';
 import {
   emptyRxLine,
+  firstRxStep,
   initialRxForm,
   namedRxLines,
   newRxForm,
@@ -271,5 +272,12 @@ describe('adding a medicine', () => {
     expect(steppedRxLines([emptyRxLine()], flubolt, -1, daysNote)).toEqual([
       emptyRxLine(),
     ]);
+  });
+});
+
+describe('firstRxStep — where the drawer opens (feat-prescription-composer D9)', () => {
+  it('opens on Medicines with a doctor, on step 1 without one', () => {
+    expect(firstRxStep('mem_nisha0000000000000000')).toBe('medicines');
+    expect(firstRxStep(null)).toBe('prescription');
   });
 });

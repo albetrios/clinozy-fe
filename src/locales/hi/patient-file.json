@@ -374,7 +374,77 @@
       "draft": "ड्राफ़्ट",
       "approved": "स्वीकृत"
     },
-    "approvedNote": "स्वीकृत · स्वीकृत पर्चा बदला नहीं जा सकता"
+    "approvedNote": "स्वीकृत · स्वीकृत पर्चा बदला नहीं जा सकता",
+    "pad": {
+      "toggle": "पैड",
+      "toggleHint": "एक साथ कई दवाएँ लिखें या पेस्ट करें",
+      "label": "Rx पैड",
+      "hint": "हर पंक्ति में एक दवा · पूरा पर्चा पेस्ट करें",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "सूची में मिली",
+      "typed": "सूची में नहीं · जैसा लिखा वैसा जोड़ा",
+      "unreadable": "कोई दवा नहीं · छोड़ी गई",
+      "lines_one": "{{count}} पंक्ति",
+      "lines_other": "{{count}} पंक्तियाँ",
+      "foundCount": "{{value}} मिलीं",
+      "typedCount": "{{value}} नई",
+      "skippedCount": "{{value}} छोड़ी गईं",
+      "overflow": "केवल पहली {{max}} पंक्तियाँ पढ़ी जाती हैं",
+      "add_one": "{{count}} दवा जोड़ें",
+      "add_other": "{{count}} दवाएँ जोड़ें",
+      "clear": "साफ़ करें",
+      "close": "पैड बंद करें",
+      "empty": "हर पंक्ति पढ़ते ही यहाँ दिखती है",
+      "added_one": "{{count}} दवा जोड़ी गई",
+      "added_other": "{{count}} दवाएँ जोड़ी गईं"
+    },
+    "sidekick": {
+      "label": "Rx जाँच",
+      "allergies": "एलर्जी",
+      "noAllergies": "कोई एलर्जी दर्ज नहीं",
+      "matches": "{{medicine}} {{allergies}} से मेल खाती है",
+      "since": "पर्चा {{number}} के बाद से · {{date}}",
+      "first": "इस मरीज़ का पहला पर्चा",
+      "kinds": {
+        "new": "नई",
+        "changed": "बदली",
+        "unchanged": "वही",
+        "stopped": "बंद"
+      },
+      "unchangedCount": "{{value}} वही",
+      "continue": "जारी रखें",
+      "continueLabel": "{{name}} पिछले पर्चे की तरह जारी रखें",
+      "continued": "{{name}} जारी रखी गई",
+      "reads": "मरीज़ क्या पढ़ेगा",
+      "readsEmpty": "दवाएँ जोड़ते ही यहाँ आसान शब्दों में दिखेंगी",
+      "summary": {
+        "allergy_one": "{{count}} एलर्जी मेल",
+        "allergy_other": "{{count}} एलर्जी मेल",
+        "changes_one": "पर्चा {{number}} के बाद {{count}} बदलाव",
+        "changes_other": "पर्चा {{number}} के बाद {{count}} बदलाव",
+        "noChanges": "पर्चा {{number}} जैसा ही",
+        "first": "पहला पर्चा"
+      },
+      "show": "दिखाएँ",
+      "hide": "छिपाएँ"
+    },
+    "allergyBand": {
+      "label": "एलर्जी"
+    },
+    "plain": {
+      "morning": "सुबह {{value}}",
+      "afternoon": "दोपहर {{value}}",
+      "night": "रात {{value}}",
+      "sos": "केवल ज़रूरत पर",
+      "total": "कुल {{value}}"
+    },
+    "allergyConfirm": {
+      "title": "एलर्जी के बावजूद दवा लिखें?",
+      "body_one": "यह दवा मरीज़ की एलर्जी से मेल खाती है:",
+      "body_other": "ये दवाएँ मरीज़ की एलर्जी से मेल खाती हैं:",
+      "back": "वापस जाएँ",
+      "confirm": "फिर भी सहेजें"
+    }
   },
   "treatment": {
     "record": "उपचार",

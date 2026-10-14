@@ -557,7 +557,8 @@
       "newPatient": "新規患者",
       "newReceipt": "新規入金",
       "openTasks": "タスクを開く",
-      "finishSetup": "設定を完了"
+      "finishSetup": "設定を完了",
+      "writePrescription": "処方箋を書く"
     },
     "screen": "画面",
     "move": "移動",
@@ -565,7 +566,16 @@
     "hint": "人物を検索するには3文字以上または4桁以上を入力してください",
     "empty": "一致するものがありません。名前、電話番号、または C 番号でお試しください。",
     "personSub": "{{id}} · •••• {{lastDigits}}",
-    "setupSub": "{{total}} 件中 {{done}} 件"
+    "setupSub": "{{total}} 件中 {{done}} 件",
+    "prescribe": {
+      "chip": "処方箋を書く",
+      "leave": "すべてのコマンドに戻る",
+      "placeholder": "どの患者？ 名前か電話番号を入力",
+      "thisPatient": "この患者",
+      "patients": "患者",
+      "hint": "患者を探すには3文字以上か4桁以上を入力",
+      "empty": "該当する患者がいません。名前、電話番号、患者番号で試してください。"
+    }
   },
   "lists": {
     "loadError": "このリストを読み込めませんでした · 接続が切れました。最後のコピーを表示しています。",

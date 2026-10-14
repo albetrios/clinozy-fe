@@ -561,7 +561,8 @@
       "newPatient": "New patient",
       "newReceipt": "New receipt",
       "openTasks": "Open tasks",
-      "finishSetup": "Finish setup"
+      "finishSetup": "Finish setup",
+      "writePrescription": "Write prescription"
     },
     "screen": "Screen",
     "move": "move",
@@ -569,7 +570,16 @@
     "hint": "Type 3+ letters or 4+ digits to search people",
     "empty": "No matches. Try a name, phone or C-number.",
     "personSub": "{{id}} · •••• {{lastDigits}}",
-    "setupSub": "{{done}} of {{total}}"
+    "setupSub": "{{done}} of {{total}}",
+    "prescribe": {
+      "chip": "Write prescription",
+      "leave": "Back to all commands",
+      "placeholder": "Which patient? Type a name or phone",
+      "thisPatient": "This patient",
+      "patients": "Patients",
+      "hint": "Type 3+ letters or 4+ digits to find a patient",
+      "empty": "No patient matches. Try a name, phone or patient number."
+    }
   },
   "lists": {
     "loadError": "Couldn’t load this list · connection dropped. Showing the last copy.",

@@ -34,7 +34,8 @@
   "rowActions": {
     "edit": "संपादित करें",
     "delete": "हटाएँ",
-    "newInvoice": "नया इनवॉइस"
+    "newInvoice": "नया इनवॉइस",
+    "writePrescription": "पर्चा लिखें"
   },
   "bulk": {
     "export": "एक्सपोर्ट करें",

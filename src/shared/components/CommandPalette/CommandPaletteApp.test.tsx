@@ -104,6 +104,24 @@ vi.mock('@/shared/tenancy/my-organization-summaries.ts', async (importOriginal) 
   useMyOrganizationSummaries: () => ({ data: [], isPending: false }),
 }));
 
+// The patient file the menu may open over (`patients/$patientId`): Dharti's, already read.
+vi.mock('@/shared/hooks/usePatientFile/index.ts', () => ({
+  usePatientFile: (patientId?: string) => ({
+    data:
+      patientId === 'pat_dharti0000000000000000'
+        ? {
+            patient: {
+              id: 'pat_dharti0000000000000000',
+              firstName: 'Dharti',
+              lastName: 'Galani',
+              seq: 3508,
+              phone: '+919825043212',
+            },
+          }
+        : undefined,
+  }),
+}));
+
 const ORG = '/organization/$organizationSlug';
 
 function roomRoute(
@@ -144,8 +162,13 @@ async function renderMenu(path = '/organization/acme/today') {
   const rooms = APP_SECTION_ORDER.map((section) =>
     roomRoute(() => organization, section),
   );
+  const patientFile = createRoute({
+    getParentRoute: () => organization,
+    path: 'patients/$patientId',
+    component: () => null,
+  });
   const router = createRouter({
-    routeTree: root.addChildren([organization.addChildren(rooms)]),
+    routeTree: root.addChildren([organization.addChildren([...rooms, patientFile])]),
     history: createMemoryHistory({ initialEntries: [path] }),
   });
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -199,21 +222,36 @@ const ALL_ACTIONS = [
   'new-receipt',
   'open-tasks',
 ];
+/** A prescriber's actions: "Write prescription" after New patient (feat-prescription-composer). */
+const PRESCRIBER_ACTIONS = [
+  'new-lead',
+  'new-appointment',
+  'new-patient',
+  'write-prescription',
+  'new-receipt',
+  'open-tasks',
+];
 
 /** What each preset is offered by its codes (`PRESET_CODES`; KICKOFF §3.7). */
 const BY_ROLE: Record<Role, { actions: string[]; goTo: string[]; people: string[] }> = {
   owner: {
-    actions: ALL_ACTIONS,
+    actions: PRESCRIBER_ACTIONS,
     goTo: ['leads', 'appointments', 'patients', 'stock'],
     people: [DHARTI.id, RAVI.id],
   },
   admin: {
-    actions: ALL_ACTIONS,
+    actions: PRESCRIBER_ACTIONS,
     goTo: ['leads', 'appointments', 'patients', 'stock'],
     people: [DHARTI.id, RAVI.id],
   },
   doctor: {
-    actions: ['new-lead', 'new-appointment', 'new-patient', 'open-tasks'],
+    actions: [
+      'new-lead',
+      'new-appointment',
+      'new-patient',
+      'write-prescription',
+      'open-tasks',
+    ],
     goTo: ['leads', 'appointments', 'patients', 'payments'],
     people: [DHARTI.id, RAVI.id],
   },
@@ -321,6 +359,7 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
       'New leadLeads',
       'New appointmentAppointments',
       'New patientPatients',
+      'Write prescriptionPatients',
       'New receiptPayments',
       'Open tasksTasks',
     ]);
@@ -580,6 +619,84 @@ describe('the command menu — accessibility', () => {
       timeout: 3000,
     });
 
+    expect(await axeForDialog(baseElement)).toHaveNoViolations();
+  });
+});
+
+describe('"Write prescription" — the patient finder (feat-prescription-composer §6.1)', () => {
+  const RX_CREATE = `/organization/acme/patients/${DHARTI.patientId}/prescriptions/create`;
+
+  it('is found by "rx", keeps the menu open as a finder of patients, and opens the drawer', async () => {
+    const { user, router } = await renderMenu();
+    await screen.findByTestId('command-palette-group-actions');
+    await user.type(search(), 'rx');
+    expect(rowIds('actions', 'command-palette-action-')).toEqual(['write-prescription']);
+
+    await user.keyboard('{Enter}');
+
+    expect(await screen.findByTestId('command-palette-mode')).toHaveTextContent(
+      'Write prescription',
+    );
+    expect(search()).toHaveValue('');
+    expect(search()).toHaveAttribute(
+      'placeholder',
+      'Which patient? Type a name or phone',
+    );
+    expect(search()).toHaveFocus();
+    expect(screen.getByTestId('command-palette-hint')).toHaveTextContent(
+      'Type 3+ letters or 4+ digits to find a patient',
+    );
+    expect(group('actions')).toBeNull();
+
+    // Patients only: Ravi has an open lead and no file, Neha neither.
+    await user.type(search(), 'gal');
+    await waitFor(() =>
+      expect(rowIds('patients', 'command-palette-prescribe-')).toEqual([DHARTI.id]),
+    );
+    expect(screen.queryByText('Log out')).toBeNull();
+
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(router.state.location.pathname).toBe(RX_CREATE));
+    expect(useUIStore.getState().commandPaletteOpen).toBe(false);
+  });
+
+  it('offers the patient file under the menu first, and Backspace leaves the finder', async () => {
+    const { user, router } = await renderMenu(
+      `/organization/acme/patients/${DHARTI.patientId}`,
+    );
+    await user.click(
+      await screen.findByTestId('command-palette-action-write-prescription'),
+    );
+
+    const here = await screen.findByTestId('command-palette-prescribe-this-patient');
+    expect(
+      within(group('this-patient') as HTMLElement).getByText('This patient'),
+    ).toBeVisible();
+    expect(withoutBidiMarks(here.textContent ?? '')).toBe(
+      'Dharti Galani#3508 · •••• 3212',
+    );
+    expect(activeRow()).toBe(here);
+
+    await user.keyboard('{Backspace}');
+    expect(screen.queryByTestId('command-palette-mode')).toBeNull();
+    expect(await screen.findByTestId('command-palette-group-actions')).toBeVisible();
+
+    await user.click(screen.getByTestId('command-palette-action-write-prescription'));
+    await user.click(await screen.findByTestId('command-palette-mode-leave'));
+    expect(screen.queryByTestId('command-palette-mode')).toBeNull();
+
+    await user.click(screen.getByTestId('command-palette-action-write-prescription'));
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(router.state.location.pathname).toBe(RX_CREATE));
+  });
+
+  it('has no axe violations in the finder', async () => {
+    const { user, baseElement } = await renderMenu();
+    await user.click(
+      await screen.findByTestId('command-palette-action-write-prescription'),
+    );
+    await user.type(search(), 'gal');
+    await screen.findByTestId(`command-palette-prescribe-${DHARTI.id}`);
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 });

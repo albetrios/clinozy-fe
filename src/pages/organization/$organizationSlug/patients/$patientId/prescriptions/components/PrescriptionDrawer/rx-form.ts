@@ -265,6 +265,14 @@ export function namedRxLines(items: readonly RxFormLine[]): RxFormLine[] {
 
 // ── The form ──
 
+/**
+ * The step the drawer opens on (feat-prescription-composer D9): Medicines — Date and Doctor are
+ * already right — unless no doctor could be chosen, which step 1 asks for.
+ */
+export function firstRxStep(doctorId: string | null): 'medicines' | 'prescription' {
+  return doctorId ? 'medicines' : 'prescription';
+}
+
 /** A new prescription's form: today, the doctor, one blank line, no notes. */
 export function newRxForm(date: string, doctorId: string | null): RxFormValues {
   return {

@@ -385,7 +385,83 @@
       "draft": "Rascunho",
       "approved": "Aprovada"
     },
-    "approvedNote": "Aprovada · uma receita aprovada não pode ser alterada"
+    "approvedNote": "Aprovada · uma receita aprovada não pode ser alterada",
+    "pad": {
+      "toggle": "Bloco",
+      "toggleHint": "Escreva ou cole vários medicamentos de uma vez",
+      "label": "Bloco Rx",
+      "hint": "Um medicamento por linha · cole uma receita inteira",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "Encontrado na lista",
+      "typed": "Fora da lista · adicionado como digitado",
+      "unreadable": "Sem medicamento · ignorada",
+      "lines_one": "{{count}} linha",
+      "lines_many": "{{count}} linhas",
+      "lines_other": "{{count}} linhas",
+      "foundCount": "{{value}} encontrados",
+      "typedCount": "{{value}} novos",
+      "skippedCount": "{{value}} ignoradas",
+      "overflow": "Só as primeiras {{max}} linhas são lidas",
+      "add_one": "Adicionar {{count}} medicamento",
+      "add_many": "Adicionar {{count}} medicamentos",
+      "add_other": "Adicionar {{count}} medicamentos",
+      "clear": "Limpar",
+      "close": "Fechar o bloco",
+      "empty": "Cada linha aparece aqui assim que é lida",
+      "added_one": "{{count}} medicamento adicionado",
+      "added_many": "{{count}} medicamentos adicionados",
+      "added_other": "{{count}} medicamentos adicionados"
+    },
+    "sidekick": {
+      "label": "Verificação Rx",
+      "allergies": "Alergias",
+      "noAllergies": "Nenhuma alergia registrada",
+      "matches": "{{medicine}} corresponde a {{allergies}}",
+      "since": "Desde a receita {{number}} · {{date}}",
+      "first": "Primeira receita deste paciente",
+      "kinds": {
+        "new": "Novo",
+        "changed": "Alterado",
+        "unchanged": "Sem alteração",
+        "stopped": "Suspenso"
+      },
+      "unchangedCount": "{{value}} sem alteração",
+      "continue": "Continuar",
+      "continueLabel": "Continuar {{name}} como na última receita",
+      "continued": "{{name}} continuado",
+      "reads": "O que o paciente lê",
+      "readsEmpty": "Os medicamentos aparecem aqui em palavras simples ao adicioná-los",
+      "summary": {
+        "allergy_one": "{{count}} correspondência de alergia",
+        "allergy_many": "{{count}} correspondências de alergia",
+        "allergy_other": "{{count}} correspondências de alergia",
+        "changes_one": "{{count}} alteração desde a receita {{number}}",
+        "changes_many": "{{count}} alterações desde a receita {{number}}",
+        "changes_other": "{{count}} alterações desde a receita {{number}}",
+        "noChanges": "Igual à receita {{number}}",
+        "first": "Primeira receita"
+      },
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "allergyBand": {
+      "label": "Alergias"
+    },
+    "plain": {
+      "morning": "{{value}} de manhã",
+      "afternoon": "{{value}} à tarde",
+      "night": "{{value}} à noite",
+      "sos": "Só se necessário",
+      "total": "{{value}} no total"
+    },
+    "allergyConfirm": {
+      "title": "Prescrever apesar da alergia?",
+      "body_one": "Este medicamento corresponde às alergias do paciente:",
+      "body_many": "Estes medicamentos correspondem às alergias do paciente:",
+      "body_other": "Estes medicamentos correspondem às alergias do paciente:",
+      "back": "Voltar",
+      "confirm": "Salvar mesmo assim"
+    }
   },
   "treatment": {
     "record": "Tratamento",

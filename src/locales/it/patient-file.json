@@ -385,7 +385,83 @@
       "draft": "Bozza",
       "approved": "Approvata"
     },
-    "approvedNote": "Approvata · una prescrizione approvata non può essere modificata"
+    "approvedNote": "Approvata · una prescrizione approvata non può essere modificata",
+    "pad": {
+      "toggle": "Blocco",
+      "toggleHint": "Scrivi o incolla più farmaci insieme",
+      "label": "Blocco Rx",
+      "hint": "Un farmaco per riga · incolla un’intera ricetta",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "Trovato nell’elenco",
+      "typed": "Non in elenco · aggiunto così com’è",
+      "unreadable": "Nessun farmaco · saltato",
+      "lines_one": "{{count}} riga",
+      "lines_many": "{{count}} righe",
+      "lines_other": "{{count}} righe",
+      "foundCount": "{{value}} trovati",
+      "typedCount": "{{value}} nuovi",
+      "skippedCount": "{{value}} saltati",
+      "overflow": "Vengono lette solo le prime {{max}} righe",
+      "add_one": "Aggiungi {{count}} farmaco",
+      "add_many": "Aggiungi {{count}} farmaci",
+      "add_other": "Aggiungi {{count}} farmaci",
+      "clear": "Cancella",
+      "close": "Chiudi il blocco",
+      "empty": "Ogni riga appare qui appena letta",
+      "added_one": "{{count}} farmaco aggiunto",
+      "added_many": "{{count}} farmaci aggiunti",
+      "added_other": "{{count}} farmaci aggiunti"
+    },
+    "sidekick": {
+      "label": "Controllo Rx",
+      "allergies": "Allergie",
+      "noAllergies": "Nessuna allergia registrata",
+      "matches": "{{medicine}} corrisponde a {{allergies}}",
+      "since": "Dalla ricetta {{number}} · {{date}}",
+      "first": "Prima ricetta di questo paziente",
+      "kinds": {
+        "new": "Nuovo",
+        "changed": "Modificato",
+        "unchanged": "Invariato",
+        "stopped": "Sospeso"
+      },
+      "unchangedCount": "{{value}} invariati",
+      "continue": "Continua",
+      "continueLabel": "Continua {{name}} come nell’ultima ricetta",
+      "continued": "{{name}} continuato",
+      "reads": "Cosa legge il paziente",
+      "readsEmpty": "I farmaci appaiono qui in parole semplici man mano che li aggiungi",
+      "summary": {
+        "allergy_one": "{{count}} corrispondenza con allergie",
+        "allergy_many": "{{count}} corrispondenze con allergie",
+        "allergy_other": "{{count}} corrispondenze con allergie",
+        "changes_one": "{{count}} modifica dalla ricetta {{number}}",
+        "changes_many": "{{count}} modifiche dalla ricetta {{number}}",
+        "changes_other": "{{count}} modifiche dalla ricetta {{number}}",
+        "noChanges": "Uguale alla ricetta {{number}}",
+        "first": "Prima ricetta"
+      },
+      "show": "Mostra",
+      "hide": "Nascondi"
+    },
+    "allergyBand": {
+      "label": "Allergie"
+    },
+    "plain": {
+      "morning": "{{value}} al mattino",
+      "afternoon": "{{value}} al pomeriggio",
+      "night": "{{value}} alla sera",
+      "sos": "Solo al bisogno",
+      "total": "{{value}} in totale"
+    },
+    "allergyConfirm": {
+      "title": "Prescrivere nonostante l’allergia?",
+      "body_one": "Questo farmaco corrisponde alle allergie del paziente:",
+      "body_many": "Questi farmaci corrispondono alle allergie del paziente:",
+      "body_other": "Questi farmaci corrispondono alle allergie del paziente:",
+      "back": "Torna indietro",
+      "confirm": "Salva comunque"
+    }
   },
   "treatment": {
     "record": "Trattamento",

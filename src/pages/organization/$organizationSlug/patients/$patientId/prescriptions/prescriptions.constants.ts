@@ -145,6 +145,84 @@ export const RX_KEYS = {
   delete: { title: 'rx.delete.title', deleted: 'rx.delete.deleted' },
   /** "Prescription #500" — the shared print preview's title. */
   preview: 'rx.preview',
+  /** The Rx Pad (feat-prescription-composer §6.4): many shorthand lines at once. */
+  pad: {
+    toggle: 'rx.pad.toggle',
+    toggleHint: 'rx.pad.toggleHint',
+    label: 'rx.pad.label',
+    hint: 'rx.pad.hint',
+    placeholder: 'rx.pad.placeholder',
+    /** A preview line's state, read out beside its mark. */
+    found: 'rx.pad.found',
+    typed: 'rx.pad.typed',
+    unreadable: 'rx.pad.unreadable',
+    /** "3 lines" (plural) · "2 found" · "1 new" · "1 skipped". */
+    lines: 'rx.pad.lines',
+    foundCount: 'rx.pad.foundCount',
+    typedCount: 'rx.pad.typedCount',
+    skippedCount: 'rx.pad.skippedCount',
+    /** "Only the first 30 lines are read". */
+    overflow: 'rx.pad.overflow',
+    /** "Add 3 medicines" (plural). */
+    add: 'rx.pad.add',
+    clear: 'rx.pad.clear',
+    close: 'rx.pad.close',
+    empty: 'rx.pad.empty',
+    /** "3 medicines added" (plural) — the toast. */
+    added: 'rx.pad.added',
+  },
+  /** The Rx sidekick (§6.5): the allergies, since last Rx, the plain words. */
+  sidekick: {
+    label: 'rx.sidekick.label',
+    allergies: 'rx.sidekick.allergies',
+    noAllergies: 'rx.sidekick.noAllergies',
+    /** "Septran DS matches Sulfa drugs". */
+    matches: 'rx.sidekick.matches',
+    /** "Since Rx #12 · 30 Sep". */
+    since: 'rx.sidekick.since',
+    first: 'rx.sidekick.first',
+    kinds: {
+      new: 'rx.sidekick.kinds.new',
+      changed: 'rx.sidekick.kinds.changed',
+      unchanged: 'rx.sidekick.kinds.unchanged',
+      stopped: 'rx.sidekick.kinds.stopped',
+    },
+    /** "2 unchanged". */
+    unchangedCount: 'rx.sidekick.unchangedCount',
+    continue: 'rx.sidekick.continue',
+    continueLabel: 'rx.sidekick.continueLabel',
+    /** "Cetirizine 10 continued" — the toast. */
+    continued: 'rx.sidekick.continued',
+    reads: 'rx.sidekick.reads',
+    readsEmpty: 'rx.sidekick.readsEmpty',
+    /** The folded card's line (plurals): "1 allergy match · 3 changes since Rx #12". */
+    summary: {
+      allergy: 'rx.sidekick.summary.allergy',
+      changes: 'rx.sidekick.summary.changes',
+      noChanges: 'rx.sidekick.summary.noChanges',
+      first: 'rx.sidekick.summary.first',
+    },
+    show: 'rx.sidekick.show',
+    hide: 'rx.sidekick.hide',
+  },
+  /** The band under the header: "Allergies". */
+  allergyBand: { label: 'rx.allergyBand.label' },
+  /** A line in plain words: "1 in the morning + 1 at night · … · 20 in all". */
+  plain: {
+    morning: 'rx.plain.morning',
+    afternoon: 'rx.plain.afternoon',
+    night: 'rx.plain.night',
+    sos: 'rx.plain.sos',
+    total: 'rx.plain.total',
+  },
+  /** The save's confirm when a line matches an allergy (D8). */
+  allergyConfirm: {
+    title: 'rx.allergyConfirm.title',
+    /** "These medicines match the patient's allergies:" (plural). */
+    body: 'rx.allergyConfirm.body',
+    back: 'rx.allergyConfirm.back',
+    confirm: 'rx.allergyConfirm.confirm',
+  },
 } as const;
 
 /** A prescription's status pill: a draft waits (butter), an approved one is final (sage). */
@@ -160,4 +238,12 @@ export const RX_KIT_TONES: readonly Tone[] = ['lav', 'blush', 'butter', 'mint'];
 export const RX_TEST_IDS = {
   drawer: 'rx-drawer',
   preview: 'rx-print-preview',
+  /** The Rx Pad and its toggle beside Browse (`rx-pad-…`). */
+  pad: 'rx-pad',
+  /** The Rx sidekick — the drawer's column, or the folded card below `xl` (`rx-sidekick-…`). */
+  sidekick: 'rx-sidekick',
+  /** The allergy band under the drawer's header. */
+  allergyBand: 'rx-drawer-allergy-band',
+  /** The save's allergy confirm (`-cancel`, `-accept`). */
+  allergyConfirm: 'rx-allergy-confirm',
 } as const;

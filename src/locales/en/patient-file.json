@@ -374,7 +374,77 @@
       "draft": "Draft",
       "approved": "Approved"
     },
-    "approvedNote": "Approved · an approved prescription can’t be changed"
+    "approvedNote": "Approved · an approved prescription can’t be changed",
+    "pad": {
+      "toggle": "Pad",
+      "toggleHint": "Write or paste many medicines at once",
+      "label": "Rx Pad",
+      "hint": "One medicine a line · paste a whole prescription",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "Found in the list",
+      "typed": "Not in the list · added as typed",
+      "unreadable": "No medicine named · skipped",
+      "lines_one": "{{count}} line",
+      "lines_other": "{{count}} lines",
+      "foundCount": "{{value}} found",
+      "typedCount": "{{value}} new",
+      "skippedCount": "{{value}} skipped",
+      "overflow": "Only the first {{max}} lines are read",
+      "add_one": "Add {{count}} medicine",
+      "add_other": "Add {{count}} medicines",
+      "clear": "Clear",
+      "close": "Close the pad",
+      "empty": "Each line shows here as it is read",
+      "added_one": "{{count}} medicine added",
+      "added_other": "{{count}} medicines added"
+    },
+    "sidekick": {
+      "label": "Rx check",
+      "allergies": "Allergies",
+      "noAllergies": "No allergies recorded",
+      "matches": "{{medicine}} matches {{allergies}}",
+      "since": "Since Rx {{number}} · {{date}}",
+      "first": "First prescription for this patient",
+      "kinds": {
+        "new": "New",
+        "changed": "Changed",
+        "unchanged": "Unchanged",
+        "stopped": "Stopped"
+      },
+      "unchangedCount": "{{value}} unchanged",
+      "continue": "Continue",
+      "continueLabel": "Continue {{name}} as last prescribed",
+      "continued": "{{name}} continued",
+      "reads": "What the patient reads",
+      "readsEmpty": "Medicines show here in plain words as you add them",
+      "summary": {
+        "allergy_one": "{{count}} allergy match",
+        "allergy_other": "{{count}} allergy matches",
+        "changes_one": "{{count}} change since Rx {{number}}",
+        "changes_other": "{{count}} changes since Rx {{number}}",
+        "noChanges": "Same as Rx {{number}}",
+        "first": "First prescription"
+      },
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "allergyBand": {
+      "label": "Allergies"
+    },
+    "plain": {
+      "morning": "{{value}} in the morning",
+      "afternoon": "{{value}} in the afternoon",
+      "night": "{{value}} at night",
+      "sos": "Only when needed",
+      "total": "{{value}} in all"
+    },
+    "allergyConfirm": {
+      "title": "Prescribe despite the allergy?",
+      "body_one": "This medicine matches the patient’s allergies:",
+      "body_other": "These medicines match the patient’s allergies:",
+      "back": "Go back",
+      "confirm": "Save anyway"
+    }
   },
   "treatment": {
     "record": "Treatment",

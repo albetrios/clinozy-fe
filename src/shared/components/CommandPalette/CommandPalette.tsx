@@ -1,9 +1,11 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import { isCommandSearchQuery } from '@/shared/api/app/command-search-api.ts';
 import type { AppCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import {
   Command,
@@ -15,13 +17,14 @@ import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
-import { Search } from '@/shared/icons/index.ts';
+import { Pill, Search, X } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import {
   type AppCommandGroups,
   NO_APP_COMMANDS,
+  type PrescribeMode,
   useAppCommandGroups,
 } from './app-command-groups.ts';
 import { COMMAND_MENU_KEYS, COMMAND_MENU_NS } from './command-palette.constants.ts';
@@ -93,23 +96,70 @@ function usePaletteCommands() {
 }
 
 function OrganizationCommandMenu({ organizationSlug }: { organizationSlug: string }) {
-  const { query } = useCommandPaletteSearch();
+  const { query, setQuery } = useCommandPaletteSearch();
   // The same entries as the shell's nav: manifest-driven, and narrowed by the
   // member's clinic access and any View-as preview.
   const { entries } = useAppNav();
   const { go, runCommand } = usePaletteCommands();
+  // "Write prescription" turns the menu into a patient finder until it is left
+  // (feat-prescription-composer §6.1); every opening starts on the full menu.
+  const [prescribing, setPrescribing] = useState(false);
   const appCommands = useAppCommandGroups({
     query,
     organizationSlug,
     navEntries: entries,
     go,
     run: runCommand,
+    prescribing,
+    onPrescribe: () => {
+      setQuery('');
+      setPrescribing(true);
+    },
   });
-  return <CommandMenu organizationSlug={organizationSlug} appCommands={appCommands} />;
+  return (
+    <CommandMenu
+      organizationSlug={organizationSlug}
+      appCommands={appCommands}
+      onLeaveMode={() => {
+        setQuery('');
+        setPrescribing(false);
+      }}
+    />
+  );
 }
 
 function PersonalCommandMenu() {
   return <CommandMenu organizationSlug="" appCommands={NO_APP_COMMANDS} />;
+}
+
+/**
+ * What the menu shows around its rows. The design's empty query shows Actions alone (H:4600);
+ * the platform rows join once typing — or at once, when the clinic has nothing to offer — and
+ * the patient finder lists patients alone. The clinic's empty line names what it searches, and
+ * waits for the search to answer: "No matches" never flashes ahead of the rows.
+ */
+function useMenuLines(appCommands: AppCommandGroups, typed: string) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const { t: tMenu } = useTranslation(COMMAND_MENU_NS);
+  const { prescribe } = appCommands;
+  if (prescribe) {
+    return {
+      showPlatform: false,
+      empty: typed && !appCommands.isSearching ? prescribe.empty : null,
+      hint: isCommandSearchQuery(typed) ? null : prescribe.hint,
+    };
+  }
+  const searching = appCommands.searchable;
+  let empty: string | null = t(LAYOUT_KEYS.app.commandPalette.empty);
+  if (searching) {
+    empty = typed && !appCommands.isSearching ? tMenu(COMMAND_MENU_KEYS.empty) : null;
+  }
+  return {
+    showPlatform: typed !== '' || appCommands.groups.length === 0,
+    empty,
+    hint:
+      searching && !isCommandSearchQuery(typed) ? tMenu(COMMAND_MENU_KEYS.hint) : null,
+  };
 }
 
 /**
@@ -122,9 +172,12 @@ function PersonalCommandMenu() {
 function CommandMenu({
   organizationSlug,
   appCommands,
+  onLeaveMode,
 }: {
   organizationSlug: string;
   appCommands: AppCommandGroups;
+  /** Leaves the patient finder for the full menu. */
+  onLeaveMode?: () => void;
 }) {
   const { t } = useTranslation(LAYOUT_NS);
   const { t: tMenu } = useTranslation(COMMAND_MENU_NS);
@@ -136,26 +189,19 @@ function CommandMenu({
   const { runCommand } = usePaletteCommands();
   const inOrganization = organizationSlug !== '';
   const platform = usePlatformCommandGroups({ query, runCommand });
-  const selection = useCommandSelection(query, appCommands.groups[0]?.rows[0]?.value);
+  // The finder is a new list: its first row leads, whatever was hovered before it opened.
+  const selection = useCommandSelection(
+    appCommands.prescribe ? `prescribe:${query}` : query,
+    appCommands.groups[0]?.rows[0]?.value,
+  );
   const closePalette = useCallback(() => {
     setOpen(false);
   }, [setOpen]);
 
   const cp = LAYOUT_KEYS.app.commandPalette;
   const typed = query.trim();
-  // The design's empty query shows Actions alone (H:4600); the platform rows
-  // join once typing — or at once, when the clinic has nothing to offer.
-  const showPlatform = typed !== '' || appCommands.groups.length === 0;
-  // The clinic's empty line names what it searches, and waits for the search
-  // to answer — "No matches" never flashes ahead of the rows.
-  let empty: string | null = t(cp.empty);
-  if (appCommands.searchable) {
-    empty = typed && !appCommands.isSearching ? tMenu(COMMAND_MENU_KEYS.empty) : null;
-  }
-  const hint =
-    appCommands.searchable && !isCommandSearchQuery(typed)
-      ? tMenu(COMMAND_MENU_KEYS.hint)
-      : null;
+  const { prescribe } = appCommands;
+  const { showPlatform, empty, hint } = useMenuLines(appCommands, typed);
 
   return (
     <Command
@@ -172,7 +218,12 @@ function CommandMenu({
       }}
       className="flex min-h-0 flex-1 flex-col rounded-none bg-transparent"
     >
-      <CommandPaletteInput searching={appCommands.isSearching} />
+      <CommandPaletteInput
+        searching={appCommands.isSearching}
+        mode={
+          prescribe && onLeaveMode ? { ...prescribe, onLeave: onLeaveMode } : undefined
+        }
+      />
 
       <CommandList
         label={inOrganization ? tMenu(COMMAND_MENU_KEYS.results) : undefined}
@@ -217,12 +268,55 @@ function CommandMenu({
   );
 }
 
-/** The 52px input row (H:2672): search mark · input ("Search or jump to…") · "esc". */
-function CommandPaletteInput({ searching }: { searching: boolean }) {
+/** The patient finder's chip before the line: "Write prescription" and its × back to every command. */
+function ModeChip({ mode }: { mode: PrescribeMode & { onLeave: () => void } }) {
+  return (
+    <span
+      data-slot="pill"
+      data-testid="command-palette-mode"
+      className={cn(
+        TONE_CLASSES.sage.surface,
+        'inline-flex h-6.5 flex-none items-center gap-1 rounded-full ps-2 pe-0.5 text-xs font-medium whitespace-nowrap',
+      )}
+    >
+      <Pill aria-hidden="true" className="size-3" />
+      {mode.chip}
+      <button
+        type="button"
+        aria-label={mode.leave}
+        title={mode.leave}
+        onClick={mode.onLeave}
+        data-testid="command-palette-mode-leave"
+        data-slot="pill"
+        className="hover:bg-background/60 grid size-5.5 place-items-center rounded-full"
+      >
+        <X aria-hidden="true" className="size-3" />
+      </button>
+    </span>
+  );
+}
+
+/**
+ * The 52px input row (H:2672): search mark · input ("Search or jump to…") · "esc" — with the
+ * patient finder's chip and placeholder while "Write prescription" holds the menu, where
+ * Backspace on an empty line leaves it.
+ */
+function CommandPaletteInput({
+  searching,
+  mode,
+}: {
+  searching: boolean;
+  mode?: PrescribeMode & { onLeave: () => void };
+}) {
   const { t } = useTranslation(LAYOUT_NS);
   const { t: tPicker } = useTranslation(PICKER_NS);
   const { query, setQuery, searchFocus, rememberFocus } = useCommandPaletteSearch();
   const inputRef = useRef<HTMLInputElement>(null);
+  const inMode = mode !== undefined;
+  // Entering or leaving the finder keeps the cursor in the line (a row's click may have taken it).
+  useEffect(() => {
+    if (inMode) inputRef.current?.focus();
+  }, [inMode]);
   useLayoutEffect(() => {
     const input = inputRef.current;
     if (searchFocus.current.focused && input) {
@@ -236,7 +330,12 @@ function CommandPaletteInput({ searching }: { searching: boolean }) {
   return (
     <CommandInput
       wrapperClassName={COMMAND_SEARCH_ROW_CLASS}
-      icon={<Search aria-hidden="true" className={COMMAND_SEARCH_ICON_CLASS} />}
+      icon={
+        <>
+          <Search aria-hidden="true" className={COMMAND_SEARCH_ICON_CLASS} />
+          {mode ? <ModeChip mode={mode} /> : null}
+        </>
+      }
       trailing={
         <>
           {searching ? (
@@ -252,12 +351,18 @@ function CommandPaletteInput({ searching }: { searching: boolean }) {
       }
       data-slot="input"
       data-testid="command-palette-search"
-      placeholder={t(LAYOUT_KEYS.app.commandPalette.placeholder)}
+      placeholder={mode?.placeholder ?? t(LAYOUT_KEYS.app.commandPalette.placeholder)}
       maxLength={COMMAND_SEARCH_MAX_LENGTH}
       className={COMMAND_SEARCH_CLASS}
       ref={inputRef}
       value={query}
       onValueChange={setQuery}
+      onKeyDown={(event) => {
+        if (mode && event.key === 'Backspace' && query === '') {
+          event.preventDefault();
+          mode.onLeave();
+        }
+      }}
       onFocus={() => {
         rememberFocus(true);
       }}

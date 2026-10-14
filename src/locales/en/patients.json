@@ -34,7 +34,8 @@
   "rowActions": {
     "edit": "Edit",
     "delete": "Delete",
-    "newInvoice": "New invoice"
+    "newInvoice": "New invoice",
+    "writePrescription": "Write prescription"
   },
   "bulk": {
     "export": "Export",

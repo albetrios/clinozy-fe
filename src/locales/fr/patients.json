@@ -35,7 +35,8 @@
   "rowActions": {
     "edit": "Modifier",
     "delete": "Supprimer",
-    "newInvoice": "Nouvelle facture"
+    "newInvoice": "Nouvelle facture",
+    "writePrescription": "Rédiger une ordonnance"
   },
   "bulk": {
     "export": "Exporter",

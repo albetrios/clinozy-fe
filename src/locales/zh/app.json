@@ -557,7 +557,8 @@
       "newPatient": "新建患者",
       "newReceipt": "新建收款",
       "openTasks": "打开任务",
-      "finishSetup": "完成设置"
+      "finishSetup": "完成设置",
+      "writePrescription": "开处方"
     },
     "screen": "页面",
     "move": "移动",
@@ -565,7 +566,16 @@
     "hint": "输入 3 个以上字母或 4 位以上数字以搜索人员",
     "empty": "没有匹配项。请尝试姓名、电话或 C 编号。",
     "personSub": "{{id}} · •••• {{lastDigits}}",
-    "setupSub": "{{done}}/{{total}}"
+    "setupSub": "{{done}}/{{total}}",
+    "prescribe": {
+      "chip": "开处方",
+      "leave": "返回所有命令",
+      "placeholder": "哪位患者？输入姓名或电话",
+      "thisPatient": "该患者",
+      "patients": "患者",
+      "hint": "输入 3 个以上字母或 4 位以上数字来查找患者",
+      "empty": "没有匹配的患者。试试姓名、电话或患者编号。"
+    }
   },
   "lists": {
     "loadError": "无法加载此列表 · 连接已断开。正在显示最近一次的副本。",

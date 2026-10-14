@@ -52,8 +52,8 @@ const typedMedicine = (name: string): RxCatalogMedicine => ({
   last: null,
 });
 
-/** The pills a typed line shows, in the drawer's words. */
-function useLineTags() {
+/** The pills a typed line shows, in the drawer's words — the quick line's and the Pad's. */
+export function useRxLineTags() {
   const { t } = useTranslation(RX_NS);
   const labels = useRxLabels();
   return (values: RxLineValues) => {
@@ -89,7 +89,7 @@ export function useRxQuickLine(
 ): QuickLineProps<RxCatalogMedicine, RxLineValues> {
   const { t } = useTranslation(RX_NS);
   const labels = useRxLabels();
-  const tags = useLineTags();
+  const tags = useRxLineTags();
   const medicines = useMemo(() => catalog?.medicines ?? [], [catalog]);
   const numbers = useMemo(
     () => nameNumbers(medicines.map((medicine) => medicine.name)),

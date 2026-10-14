@@ -33,7 +33,8 @@
   "rowActions": {
     "edit": "编辑",
     "delete": "删除",
-    "newInvoice": "新建发票"
+    "newInvoice": "新建发票",
+    "writePrescription": "开处方"
   },
   "bulk": {
     "export": "导出",

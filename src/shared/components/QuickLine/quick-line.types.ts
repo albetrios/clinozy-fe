@@ -1,3 +1,5 @@
+import type { ReactNode, Ref } from 'react';
+
 /** One thing the quick line can add: a match, a frequent chip or a Browse tile. */
 export interface QuickLineItem<TItem> {
   /** Stable, unique key — the React key and the option id. */
@@ -60,6 +62,15 @@ export interface QuickLineProps<TItem, TValues> {
   /** The Browse button and its panel; none without it. */
   browse?: QuickLineBrowseConfig<TItem>;
   disabled?: boolean;
+  /** The line's input — a host that focuses it on open (the Rx drawer's new prescription). */
+  inputRef?: Ref<HTMLInputElement>;
+  /**
+   * The host focuses the line itself on open: that first focus keeps the suggestions closed
+   * (they would cover the form before anything is typed); typing, or a later focus, opens them.
+   */
+  quietFirstFocus?: boolean;
+  /** A control after Browse on the line's row — the Rx drawer's Pad toggle. */
+  trailing?: ReactNode;
   /** Root test id; the parts derive theirs (`<testId>-input` …). */
   testId: string;
 }

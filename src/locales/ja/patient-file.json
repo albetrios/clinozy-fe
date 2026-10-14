@@ -363,7 +363,71 @@
       "draft": "下書き",
       "approved": "承認済み"
     },
-    "approvedNote": "承認済み · 承認済みの処方箋は変更できません"
+    "approvedNote": "承認済み · 承認済みの処方箋は変更できません",
+    "pad": {
+      "toggle": "パッド",
+      "toggleHint": "複数の薬をまとめて入力・貼り付け",
+      "label": "Rx パッド",
+      "hint": "1行に1つの薬 · 処方箋をまるごと貼り付け",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "リストにあり",
+      "typed": "リストにない · 入力どおり追加",
+      "unreadable": "薬名なし · スキップ",
+      "lines_other": "{{count}}行",
+      "foundCount": "{{value}}件一致",
+      "typedCount": "{{value}}件新規",
+      "skippedCount": "{{value}}件スキップ",
+      "overflow": "最初の{{max}}行のみ読み取ります",
+      "add_other": "薬{{count}}件を追加",
+      "clear": "クリア",
+      "close": "パッドを閉じる",
+      "empty": "各行は読み取られるとここに表示されます",
+      "added_other": "薬{{count}}件を追加しました"
+    },
+    "sidekick": {
+      "label": "Rx チェック",
+      "allergies": "アレルギー",
+      "noAllergies": "アレルギーの記録なし",
+      "matches": "{{medicine}} は {{allergies}} に該当",
+      "since": "処方箋 {{number}} 以降 · {{date}}",
+      "first": "この患者の最初の処方箋",
+      "kinds": {
+        "new": "新規",
+        "changed": "変更",
+        "unchanged": "変更なし",
+        "stopped": "中止"
+      },
+      "unchangedCount": "{{value}}件変更なし",
+      "continue": "継続",
+      "continueLabel": "{{name}} を前回どおり継続",
+      "continued": "{{name}} を継続しました",
+      "reads": "患者が読む内容",
+      "readsEmpty": "薬を追加すると、わかりやすい言葉でここに表示されます",
+      "summary": {
+        "allergy_other": "アレルギー該当{{count}}件",
+        "changes_other": "処方箋 {{number}} から{{count}}件の変更",
+        "noChanges": "処方箋 {{number}} と同じ",
+        "first": "最初の処方箋"
+      },
+      "show": "表示",
+      "hide": "隠す"
+    },
+    "allergyBand": {
+      "label": "アレルギー"
+    },
+    "plain": {
+      "morning": "朝 {{value}}",
+      "afternoon": "昼 {{value}}",
+      "night": "夜 {{value}}",
+      "sos": "必要時のみ",
+      "total": "合計 {{value}}"
+    },
+    "allergyConfirm": {
+      "title": "アレルギーがありますが処方しますか？",
+      "body_other": "次の薬が患者のアレルギーに該当します:",
+      "back": "戻る",
+      "confirm": "このまま保存"
+    }
   },
   "treatment": {
     "record": "施術",

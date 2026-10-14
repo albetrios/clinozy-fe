@@ -557,7 +557,8 @@
       "newPatient": "새 환자",
       "newReceipt": "새 수납",
       "openTasks": "작업 열기",
-      "finishSetup": "설정 마무리"
+      "finishSetup": "설정 마무리",
+      "writePrescription": "처방전 쓰기"
     },
     "screen": "화면",
     "move": "이동",
@@ -565,7 +566,16 @@
     "hint": "사람을 검색하려면 3자 이상 또는 숫자 4자리 이상을 입력하세요",
     "empty": "일치하는 항목이 없습니다. 이름, 전화번호 또는 C 번호로 시도해 보세요.",
     "personSub": "{{id}} · •••• {{lastDigits}}",
-    "setupSub": "{{total}}개 중 {{done}}개"
+    "setupSub": "{{total}}개 중 {{done}}개",
+    "prescribe": {
+      "chip": "처방전 쓰기",
+      "leave": "모든 명령으로 돌아가기",
+      "placeholder": "어느 환자인가요? 이름이나 전화번호 입력",
+      "thisPatient": "이 환자",
+      "patients": "환자",
+      "hint": "환자를 찾으려면 3자 이상 또는 4자리 이상 입력",
+      "empty": "일치하는 환자가 없습니다. 이름, 전화번호 또는 환자 번호로 시도하세요."
+    }
   },
   "lists": {
     "loadError": "이 목록을 불러오지 못했습니다 · 연결이 끊겼습니다. 마지막 사본을 표시합니다.",

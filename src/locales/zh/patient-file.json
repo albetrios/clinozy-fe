@@ -363,7 +363,71 @@
       "draft": "草稿",
       "approved": "已批准"
     },
-    "approvedNote": "已批准 · 已批准的处方无法更改"
+    "approvedNote": "已批准 · 已批准的处方无法更改",
+    "pad": {
+      "toggle": "便签",
+      "toggleHint": "一次写入或粘贴多种药物",
+      "label": "Rx 便签",
+      "hint": "每行一种药物 · 可粘贴整张处方",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "在列表中找到",
+      "typed": "不在列表中 · 按输入添加",
+      "unreadable": "未写药名 · 已跳过",
+      "lines_other": "{{count}} 行",
+      "foundCount": "找到 {{value}} 个",
+      "typedCount": "新增 {{value}} 个",
+      "skippedCount": "跳过 {{value}} 个",
+      "overflow": "只读取前 {{max}} 行",
+      "add_other": "添加 {{count}} 种药物",
+      "clear": "清除",
+      "close": "关闭便签",
+      "empty": "每一行读取后显示在这里",
+      "added_other": "已添加 {{count}} 种药物"
+    },
+    "sidekick": {
+      "label": "Rx 核对",
+      "allergies": "过敏",
+      "noAllergies": "未记录过敏",
+      "matches": "{{medicine}} 与 {{allergies}} 相符",
+      "since": "自处方 {{number}} 起 · {{date}}",
+      "first": "该患者的第一张处方",
+      "kinds": {
+        "new": "新增",
+        "changed": "已更改",
+        "unchanged": "未变",
+        "stopped": "已停用"
+      },
+      "unchangedCount": "{{value}} 个未变",
+      "continue": "继续",
+      "continueLabel": "按上次处方继续 {{name}}",
+      "continued": "已继续 {{name}}",
+      "reads": "患者看到的内容",
+      "readsEmpty": "添加药物后，这里会用简单的话显示",
+      "summary": {
+        "allergy_other": "{{count}} 项过敏相符",
+        "changes_other": "自处方 {{number}} 起 {{count}} 处变化",
+        "noChanges": "与处方 {{number}} 相同",
+        "first": "第一张处方"
+      },
+      "show": "显示",
+      "hide": "隐藏"
+    },
+    "allergyBand": {
+      "label": "过敏"
+    },
+    "plain": {
+      "morning": "早上 {{value}}",
+      "afternoon": "中午 {{value}}",
+      "night": "晚上 {{value}}",
+      "sos": "仅在需要时",
+      "total": "共 {{value}}"
+    },
+    "allergyConfirm": {
+      "title": "仍要在过敏情况下开药吗？",
+      "body_other": "以下药物与患者的过敏相符：",
+      "back": "返回",
+      "confirm": "仍然保存"
+    }
   },
   "treatment": {
     "record": "治疗",

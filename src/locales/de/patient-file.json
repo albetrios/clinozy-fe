@@ -374,7 +374,77 @@
       "draft": "Entwurf",
       "approved": "Freigegeben"
     },
-    "approvedNote": "Freigegeben · ein freigegebenes Rezept kann nicht geändert werden"
+    "approvedNote": "Freigegeben · ein freigegebenes Rezept kann nicht geändert werden",
+    "pad": {
+      "toggle": "Block",
+      "toggleHint": "Mehrere Medikamente auf einmal schreiben oder einfügen",
+      "label": "Rx-Block",
+      "hint": "Ein Medikament pro Zeile · ganzes Rezept einfügen",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "In der Liste gefunden",
+      "typed": "Nicht in der Liste · wie eingegeben hinzugefügt",
+      "unreadable": "Kein Medikament · übersprungen",
+      "lines_one": "{{count}} Zeile",
+      "lines_other": "{{count}} Zeilen",
+      "foundCount": "{{value}} gefunden",
+      "typedCount": "{{value}} neu",
+      "skippedCount": "{{value}} übersprungen",
+      "overflow": "Nur die ersten {{max}} Zeilen werden gelesen",
+      "add_one": "{{count}} Medikament hinzufügen",
+      "add_other": "{{count}} Medikamente hinzufügen",
+      "clear": "Leeren",
+      "close": "Block schließen",
+      "empty": "Jede Zeile erscheint hier, sobald sie gelesen ist",
+      "added_one": "{{count}} Medikament hinzugefügt",
+      "added_other": "{{count}} Medikamente hinzugefügt"
+    },
+    "sidekick": {
+      "label": "Rx-Prüfung",
+      "allergies": "Allergien",
+      "noAllergies": "Keine Allergien erfasst",
+      "matches": "{{medicine}} passt zu {{allergies}}",
+      "since": "Seit Rezept {{number}} · {{date}}",
+      "first": "Erstes Rezept für diese Person",
+      "kinds": {
+        "new": "Neu",
+        "changed": "Geändert",
+        "unchanged": "Unverändert",
+        "stopped": "Abgesetzt"
+      },
+      "unchangedCount": "{{value}} unverändert",
+      "continue": "Fortsetzen",
+      "continueLabel": "{{name}} wie zuletzt verordnet fortsetzen",
+      "continued": "{{name}} fortgesetzt",
+      "reads": "Was die Person liest",
+      "readsEmpty": "Medikamente erscheinen hier in einfachen Worten, sobald du sie hinzufügst",
+      "summary": {
+        "allergy_one": "{{count}} Allergie-Treffer",
+        "allergy_other": "{{count}} Allergie-Treffer",
+        "changes_one": "{{count}} Änderung seit Rezept {{number}}",
+        "changes_other": "{{count}} Änderungen seit Rezept {{number}}",
+        "noChanges": "Wie Rezept {{number}}",
+        "first": "Erstes Rezept"
+      },
+      "show": "Anzeigen",
+      "hide": "Ausblenden"
+    },
+    "allergyBand": {
+      "label": "Allergien"
+    },
+    "plain": {
+      "morning": "{{value}} morgens",
+      "afternoon": "{{value}} mittags",
+      "night": "{{value}} abends",
+      "sos": "Nur bei Bedarf",
+      "total": "{{value}} insgesamt"
+    },
+    "allergyConfirm": {
+      "title": "Trotz Allergie verordnen?",
+      "body_one": "Dieses Medikament passt zu den Allergien der Person:",
+      "body_other": "Diese Medikamente passen zu den Allergien der Person:",
+      "back": "Zurück",
+      "confirm": "Trotzdem speichern"
+    }
   },
   "treatment": {
     "record": "Behandlung",

@@ -385,7 +385,83 @@
       "draft": "Borrador",
       "approved": "Aprobada"
     },
-    "approvedNote": "Aprobada · una receta aprobada no se puede cambiar"
+    "approvedNote": "Aprobada · una receta aprobada no se puede cambiar",
+    "pad": {
+      "toggle": "Bloc",
+      "toggleHint": "Escribe o pega varios medicamentos a la vez",
+      "label": "Bloc Rx",
+      "hint": "Un medicamento por línea · pega una receta entera",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "Encontrado en la lista",
+      "typed": "No está en la lista · se añade tal cual",
+      "unreadable": "Sin medicamento · se omite",
+      "lines_one": "{{count}} línea",
+      "lines_many": "{{count}} líneas",
+      "lines_other": "{{count}} líneas",
+      "foundCount": "{{value}} encontrados",
+      "typedCount": "{{value}} nuevos",
+      "skippedCount": "{{value}} omitidos",
+      "overflow": "Solo se leen las primeras {{max}} líneas",
+      "add_one": "Añadir {{count}} medicamento",
+      "add_many": "Añadir {{count}} medicamentos",
+      "add_other": "Añadir {{count}} medicamentos",
+      "clear": "Borrar",
+      "close": "Cerrar el bloc",
+      "empty": "Cada línea aparece aquí al leerse",
+      "added_one": "{{count}} medicamento añadido",
+      "added_many": "{{count}} medicamentos añadidos",
+      "added_other": "{{count}} medicamentos añadidos"
+    },
+    "sidekick": {
+      "label": "Revisión Rx",
+      "allergies": "Alergias",
+      "noAllergies": "Sin alergias registradas",
+      "matches": "{{medicine}} coincide con {{allergies}}",
+      "since": "Desde la Rx {{number}} · {{date}}",
+      "first": "Primera receta de este paciente",
+      "kinds": {
+        "new": "Nuevo",
+        "changed": "Cambiado",
+        "unchanged": "Sin cambios",
+        "stopped": "Suspendido"
+      },
+      "unchangedCount": "{{value}} sin cambios",
+      "continue": "Continuar",
+      "continueLabel": "Continuar {{name}} como en la última receta",
+      "continued": "{{name}} continuado",
+      "reads": "Lo que lee el paciente",
+      "readsEmpty": "Los medicamentos aparecen aquí en palabras sencillas al añadirlos",
+      "summary": {
+        "allergy_one": "{{count}} coincidencia de alergia",
+        "allergy_many": "{{count}} coincidencias de alergia",
+        "allergy_other": "{{count}} coincidencias de alergia",
+        "changes_one": "{{count}} cambio desde la Rx {{number}}",
+        "changes_many": "{{count}} cambios desde la Rx {{number}}",
+        "changes_other": "{{count}} cambios desde la Rx {{number}}",
+        "noChanges": "Igual que la Rx {{number}}",
+        "first": "Primera receta"
+      },
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "allergyBand": {
+      "label": "Alergias"
+    },
+    "plain": {
+      "morning": "{{value}} por la mañana",
+      "afternoon": "{{value}} por la tarde",
+      "night": "{{value}} por la noche",
+      "sos": "Solo si es necesario",
+      "total": "{{value}} en total"
+    },
+    "allergyConfirm": {
+      "title": "¿Recetar pese a la alergia?",
+      "body_one": "Este medicamento coincide con las alergias del paciente:",
+      "body_many": "Estos medicamentos coinciden con las alergias del paciente:",
+      "body_other": "Estos medicamentos coinciden con las alergias del paciente:",
+      "back": "Volver",
+      "confirm": "Guardar igualmente"
+    }
   },
   "treatment": {
     "record": "Tratamiento",

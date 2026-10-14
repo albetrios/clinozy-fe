@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { isMacPlatform } from '@/lib/mac-platform.ts';
 import {
   type DrawerContentProfile,
   RecordDrawer,
@@ -16,12 +17,6 @@ const KEYBOARD_SHORTCUTS_TEST_ID = 'keyboard-shortcuts-dialog';
  * 560px from `md`.
  */
 const SHORTCUTS_DRAWER_CONTENT: DrawerContentProfile = { fieldCount: 0 };
-
-function isMacPlatform(): boolean {
-  if (typeof navigator === 'undefined') return true;
-  const uaData = (navigator as { userAgentData?: { platform?: string } }).userAgentData;
-  return /Mac|iPhone|iPad|iPod/i.test(uaData?.platform ?? navigator.userAgent);
-}
 
 /**
  * Keyboard shortcuts reference — opened via `?` or Cmd/Ctrl+/ from anywhere in

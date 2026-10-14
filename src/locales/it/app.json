@@ -565,7 +565,8 @@
       "newPatient": "Nuovo paziente",
       "newReceipt": "Nuovo incasso",
       "openTasks": "Apri attività",
-      "finishSetup": "Completa la configurazione"
+      "finishSetup": "Completa la configurazione",
+      "writePrescription": "Scrivi ricetta"
     },
     "screen": "Schermata",
     "move": "spostarsi",
@@ -573,7 +574,16 @@
     "hint": "Digita 3+ lettere o 4+ cifre per cercare persone",
     "empty": "Nessun risultato. Prova un nome, un telefono o un numero C.",
     "personSub": "{{id}} · •••• {{lastDigits}}",
-    "setupSub": "{{done}} di {{total}}"
+    "setupSub": "{{done}} di {{total}}",
+    "prescribe": {
+      "chip": "Scrivi ricetta",
+      "leave": "Torna a tutti i comandi",
+      "placeholder": "Quale paziente? Scrivi un nome o un telefono",
+      "thisPatient": "Questo paziente",
+      "patients": "Pazienti",
+      "hint": "Scrivi 3+ lettere o 4+ cifre per trovare un paziente",
+      "empty": "Nessun paziente trovato. Prova un nome, un telefono o un numero paziente."
+    }
   },
   "lists": {
     "loadError": "Impossibile caricare questo elenco · connessione persa. Viene mostrata l’ultima copia.",

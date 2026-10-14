@@ -9,6 +9,7 @@ import { organizationMedicalCreate } from '@/lib/routes/medical-builders.ts';
 import {
   organizationPatient,
   organizationPatientEdit,
+  organizationPrescriptionCreate,
 } from '@/lib/routes/patient-file-builders.ts';
 import { organizationPatientCreate } from '@/lib/routes/patients-builders.ts';
 import {
@@ -32,7 +33,8 @@ export type AppCommandTarget =
   | 'lead'
   | 'invoice'
   | 'invoiceEdit'
-  | 'newSale';
+  | 'newSale'
+  | 'newPrescription';
 
 /**
  * Where ⌘K's clinic rows go (KICKOFF §6.0 Command menu; D24, D19 / D26) — and
@@ -59,6 +61,7 @@ export type AppCommandTarget =
  * | `invoice`        | `/invoices/$invoiceId`         | live (L-40; the preview)       |
  * | `invoiceEdit`    | `/invoices/$invoiceId/edit`    | live (L-40; the file's Invoices) |
  * | `newSale`        | `/medical/sales/create`        | live (L-50c; Invoice drawer)   |
+ * | `newPrescription`| `/patients/$patientId/prescriptions/create` | live (feat-prescription-composer; the Rx drawer) |
  *
  * Plain strings on purpose: a literal no registered route has yet would not
  * type-check as a `to`. When a row adds a route's builder, it swaps its
@@ -79,6 +82,7 @@ export const APP_COMMAND_TARGETS: Readonly<Record<AppCommandTarget, string>> = {
   invoice: organizationInvoice('', '').to,
   invoiceEdit: organizationInvoiceEdit('', '').to,
   newSale: organizationMedicalCreate('', 'sales').to,
+  newPrescription: organizationPrescriptionCreate('', '').to,
 };
 
 /** The record param of a record target's route. */
@@ -89,6 +93,7 @@ const RECORD_PARAM: Readonly<Partial<Record<AppCommandTarget, string>>> = {
   invoice: 'invoiceId',
   invoiceEdit: 'invoiceId',
   paymentEdit: 'paymentId',
+  newPrescription: 'patientId',
 };
 
 /**

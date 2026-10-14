@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -221,6 +221,54 @@ describe('QuickLine', () => {
     const panel = await screen.findByTestId('rx-line-browse-panel');
     expect(within(panel).getAllByTestId('rx-line-browse-tile')).toHaveLength(60);
     expect(panel).toHaveTextContent('Showing 60 of 64 · type to narrow');
+  });
+
+  it("hands its input to the host's ref and shows the host's control after Browse", () => {
+    const inputRef = createRef<HTMLInputElement>();
+    render(
+      <QuickLine<string, Values>
+        placeholder="Type medicine"
+        parse={parse}
+        matches={matches}
+        onPick={vi.fn()}
+        browse={{
+          groups: [{ id: 'all', label: 'All' }],
+          tiles: () => CATALOG,
+          count: () => 0,
+          added: 0,
+          onStep: vi.fn(),
+        }}
+        inputRef={inputRef}
+        trailing={<button type="button">Pad</button>}
+        testId="rx-line"
+      />,
+    );
+    expect(inputRef.current).toBe(screen.getByRole('combobox'));
+    const browse = screen.getByRole('button', { name: 'Browse all' });
+    const pad = screen.getByRole('button', { name: 'Pad' });
+    // The host's control follows Browse on the line's row.
+    expect(
+      browse.compareDocumentPosition(pad) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('keeps the suggestions closed on the host’s first focus, and opens them after', async () => {
+    const user = userEvent.setup();
+    render(
+      <QuickLine<string, Values>
+        placeholder="Type medicine"
+        parse={parse}
+        matches={matches}
+        onPick={vi.fn()}
+        quietFirstFocus
+        testId="rx-line"
+      />,
+    );
+    const line = screen.getByRole('combobox');
+    line.focus();
+    expect(screen.queryByTestId('rx-line-matches')).not.toBeInTheDocument();
+    await user.type(line, 'flu');
+    expect(await screen.findByTestId('rx-line-matches')).toBeInTheDocument();
   });
 
   it('has no axe violations, open or closed', async () => {

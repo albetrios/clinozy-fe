@@ -27,10 +27,11 @@ import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
+import { usePrescriptionAccess } from '@/shared/hooks/usePrescriptions/index.ts';
 import { useRequireOpenBranch } from '@/shared/hooks/useRequireOpenBranch/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import { FileIcon, PenLine, Receipt, Trash, Users } from '@/shared/icons/index.ts';
+import { FileIcon, PenLine, Pill, Receipt, Trash, Users } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PatientsToolbar } from './components/PatientsToolbar/index.ts';
@@ -93,6 +94,7 @@ export function PatientsPage() {
   const go = (navigation: AppCommandNavigation) => void navigate(navigation);
   const can = (action: 'create' | 'edit' | 'delete') =>
     access.isResolved && access.can('patients', action);
+  const prescribes = usePrescriptionAccess().writes;
   const openFile = (patient: PatientRow) =>
     go(
       appCommandNavigation('patient', {
@@ -162,6 +164,22 @@ export function PatientsPage() {
                 search: { type: 'clinic', patient: patient.id },
               }),
             ),
+          ),
+      });
+    }
+    // Write prescription opens the patient's New prescription drawer (feat-prescription-composer
+    // §6.2) — for a member who passes the file's create gate (View-as aware).
+    if (prescribes) {
+      actions.push({
+        id: 'write-prescription',
+        label: t(PATIENTS_KEYS.rowActions.writePrescription),
+        icon: Pill,
+        onSelect: () =>
+          go(
+            appCommandNavigation('newPrescription', {
+              organizationSlug,
+              recordId: patient.id,
+            }),
           ),
       });
     }

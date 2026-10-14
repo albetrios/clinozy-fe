@@ -385,7 +385,83 @@
       "draft": "Brouillon",
       "approved": "Validée"
     },
-    "approvedNote": "Validée · une ordonnance validée ne peut pas être modifiée"
+    "approvedNote": "Validée · une ordonnance validée ne peut pas être modifiée",
+    "pad": {
+      "toggle": "Bloc",
+      "toggleHint": "Saisir ou coller plusieurs médicaments à la fois",
+      "label": "Bloc Rx",
+      "hint": "Un médicament par ligne · collez une ordonnance entière",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "Trouvé dans la liste",
+      "typed": "Absent de la liste · ajouté tel quel",
+      "unreadable": "Aucun médicament · ignoré",
+      "lines_one": "{{count}} ligne",
+      "lines_many": "{{count}} lignes",
+      "lines_other": "{{count}} lignes",
+      "foundCount": "{{value}} trouvés",
+      "typedCount": "{{value}} nouveaux",
+      "skippedCount": "{{value}} ignorés",
+      "overflow": "Seules les {{max}} premières lignes sont lues",
+      "add_one": "Ajouter {{count}} médicament",
+      "add_many": "Ajouter {{count}} médicaments",
+      "add_other": "Ajouter {{count}} médicaments",
+      "clear": "Effacer",
+      "close": "Fermer le bloc",
+      "empty": "Chaque ligne s’affiche ici dès qu’elle est lue",
+      "added_one": "{{count}} médicament ajouté",
+      "added_many": "{{count}} médicaments ajoutés",
+      "added_other": "{{count}} médicaments ajoutés"
+    },
+    "sidekick": {
+      "label": "Contrôle Rx",
+      "allergies": "Allergies",
+      "noAllergies": "Aucune allergie enregistrée",
+      "matches": "{{medicine}} correspond à {{allergies}}",
+      "since": "Depuis l’ordonnance {{number}} · {{date}}",
+      "first": "Première ordonnance de ce patient",
+      "kinds": {
+        "new": "Nouveau",
+        "changed": "Modifié",
+        "unchanged": "Inchangé",
+        "stopped": "Arrêté"
+      },
+      "unchangedCount": "{{value}} inchangés",
+      "continue": "Poursuivre",
+      "continueLabel": "Poursuivre {{name}} comme la dernière fois",
+      "continued": "{{name}} poursuivi",
+      "reads": "Ce que lit le patient",
+      "readsEmpty": "Les médicaments s’affichent ici en mots simples dès leur ajout",
+      "summary": {
+        "allergy_one": "{{count}} allergie concernée",
+        "allergy_many": "{{count}} allergies concernées",
+        "allergy_other": "{{count}} allergies concernées",
+        "changes_one": "{{count}} changement depuis l’ordonnance {{number}}",
+        "changes_many": "{{count}} changements depuis l’ordonnance {{number}}",
+        "changes_other": "{{count}} changements depuis l’ordonnance {{number}}",
+        "noChanges": "Identique à l’ordonnance {{number}}",
+        "first": "Première ordonnance"
+      },
+      "show": "Afficher",
+      "hide": "Masquer"
+    },
+    "allergyBand": {
+      "label": "Allergies"
+    },
+    "plain": {
+      "morning": "{{value}} le matin",
+      "afternoon": "{{value}} l’après-midi",
+      "night": "{{value}} le soir",
+      "sos": "Seulement si besoin",
+      "total": "{{value}} au total"
+    },
+    "allergyConfirm": {
+      "title": "Prescrire malgré l’allergie ?",
+      "body_one": "Ce médicament correspond aux allergies du patient :",
+      "body_many": "Ces médicaments correspondent aux allergies du patient :",
+      "body_other": "Ces médicaments correspondent aux allergies du patient :",
+      "back": "Revenir",
+      "confirm": "Enregistrer quand même"
+    }
   },
   "treatment": {
     "record": "Soin",
