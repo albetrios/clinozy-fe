@@ -71,8 +71,6 @@ export const APPOINTMENT_FORM_KEYS = {
   },
   details: {
     title: 'appointmentForm.details.title',
-    notFilled: 'appointmentForm.details.notFilled',
-    open: 'appointmentForm.details.open',
     type: 'appointmentForm.details.type',
     typeGroup: 'appointmentForm.details.typeGroup',
     types: TYPE_KEYS('appointmentForm.details.types'),
@@ -110,6 +108,8 @@ export const APPOINTMENT_FORM_KEYS = {
     step: 'appointmentForm.slot.step',
     /** "<n> min". */
     stepOption: 'appointmentForm.slot.stepOption',
+    /** The collapsed card's "Date" (its pair with "Time"). */
+    date: 'appointmentForm.slot.date',
     time: 'appointmentForm.slot.time',
     pickDate: 'appointmentForm.slot.pickDate',
     /** An open day with no free start left. */
@@ -182,6 +182,8 @@ export const APPOINTMENT_FORM_TEST_IDS = {
   cancelVisit: 'appointment-form-cancel-visit',
   details: 'appointment-form-details',
   detailsToggle: 'appointment-form-details-toggle',
+  /** Step 1's "Next: Date & time →". */
+  detailsNext: 'appointment-form-details-next',
   type: 'appointment-form-type',
   treatment: 'appointment-form-treatment',
   doctor: 'appointment-form-doctor',

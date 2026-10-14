@@ -11,7 +11,6 @@ import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { emptyDraft, whoOfContact } from './appointment-form-model.ts';
 import {
   cancelReasonText,
-  detailsSummaryText,
   footerSummary,
   formTitle,
   rescheduledText,
@@ -64,18 +63,6 @@ describe('the form’s words', () => {
     );
     expect(saveLabelText(t, 'move', slot)).toBe(
       `appointmentForm.footer.move{"day":"${fsi('Mon 5 Oct')}","time":"${fsi('10:15 am')}"}`,
-    );
-  });
-
-  it('sums step 1 up with the reason quoted, cut at 40 characters', () => {
-    const draft = { ...emptyDraft(null), reason: ` ${'r'.repeat(50)} ` };
-    expect(detailsSummaryText(t, draft, DOCTOR_NISHA)).toBe(
-      [
-        fsi('Consultation'),
-        fsi('Nisha Shah'),
-        fsi('appointmentForm.footer.minutes{"minutes":20}'),
-        fsi(`“${'r'.repeat(40)}”`),
-      ].join(' · '),
     );
   });
 

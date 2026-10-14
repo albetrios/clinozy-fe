@@ -1,4 +1,12 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { ContactChannel } from '@/shared/api/app/contacts-contracts.ts';
+import {
+  type AppIcon,
+  InstagramMark,
+  Phone,
+  WhatsAppMark,
+} from '@/shared/icons/index.ts';
 
 import type { ContactPreferencePreset } from './contact-editor-value.ts';
 
@@ -80,3 +88,15 @@ export const CONTACT_EDITOR_KEYS = {
 
 /** The editor's root test id; its parts derive theirs (`contact-editor-done` …). */
 export const CONTACT_EDITOR_TEST_ID = 'contact-editor';
+
+/**
+ * The default channel chips (`CHS`, H:3362): WhatsApp sage · Call sky · Instagram blush — the
+ * design's SMS has no channel on clinozy-be (route map §4 #8).
+ */
+export const CONTACT_CHANNEL_STYLES: Readonly<
+  Record<ContactChannel, { tone: Tone; icon: AppIcon }>
+> = {
+  whatsapp: { tone: 'sage', icon: WhatsAppMark },
+  call: { tone: 'sky', icon: Phone },
+  instagram: { tone: 'blush', icon: InstagramMark },
+};

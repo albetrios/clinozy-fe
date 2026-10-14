@@ -49,8 +49,12 @@ function withUnit(value: string | undefined, unit: string): string | undefined {
   return value && Number(value) > 0 ? `${value} ${unit}` : undefined;
 }
 
-/** Each template's tiles, in the order its fields show. */
-function templateTiles(
+/**
+ * Step 2's peek (H:3832–3834): each template's fields as tiles, in the order
+ * its fields show — a chip's label, the areas as pills, no value where nothing
+ * is set.
+ */
+export function treatmentDetailsPeek(
   values: TreatmentFormValues,
   t: TFunction,
   formatDay: (civilDate: string) => string,
@@ -143,24 +147,4 @@ function templateTiles(
         value(t(K.general.parameters), p.parameters),
       ];
   }
-}
-
-/**
- * Step 2's peek and head line (H:3832–3840): the template's fields as tiles —
- * a chip's label, the areas as pills, "Empty" where nothing is set — and the
- * first four filled values for the open card's sub line.
- */
-export function treatmentDetailsView(
-  values: TreatmentFormValues,
-  t: TFunction,
-  formatDay: (civilDate: string) => string,
-): { peek: DrawerPeekItem[]; filled: string[] } {
-  const peek = templateTiles(values, t, formatDay);
-  const filled = peek.flatMap((tile) => {
-    if (tile.kind === 'multi')
-      return tile.values.length ? [tile.values.map((pill) => pill.label).join(', ')] : [];
-    if (tile.kind === 'value' && tile.value) return [tile.value];
-    return [];
-  });
-  return { peek, filled };
 }

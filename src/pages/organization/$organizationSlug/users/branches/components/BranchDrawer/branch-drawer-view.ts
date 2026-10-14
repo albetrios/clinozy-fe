@@ -2,15 +2,8 @@ import { useTranslation } from 'react-i18next';
 
 import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { formatAppPhoneDigits } from '@/shared/app/app-phone-field.ts';
-import {
-  type DrawerPeekItem,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -30,15 +23,15 @@ export interface BranchDrawerView {
   badges: DrawerBadge[];
   /** "New branch · Surat · 1 person" / "Vesu · Surat · 6 people". */
   summary: string;
-  place: { peek: DrawerPeekItem[]; summary: string; missing: string[] };
-  contact: { peek: DrawerPeekItem[]; summary: string; missing: string[] };
-  people: { peek: DrawerPeekItem[]; summary: string };
+  place: { peek: DrawerPeekItem[]; missing: string[] };
+  contact: { peek: DrawerPeekItem[]; missing: string[] };
+  people: { peek: DrawerPeekItem[] };
 }
 
 /**
  * The branch drawer's read-outs (`users.md:226–236`; H:5223–5230): the badge
  * strip, the footer summary — a plural count, never "1 people" (§7.3) — and
- * each step's peek grid, head line and missing fields.
+ * each step's peek grid and missing fields.
  */
 export function useBranchDrawerView({
   values,
@@ -50,9 +43,8 @@ export function useBranchDrawerView({
   members: readonly TeamMember[];
   format: HoursFormat;
 }): BranchDrawerView {
-  const { t } = useTranslation([USERS_NS, RECORD_DRAWER_NS]);
+  const { t } = useTranslation(USERS_NS);
   const name = values.name.trim();
-  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled, { ns: RECORD_DRAWER_NS });
   const nobody = t(K.nobody);
   const memberOf = teamMemberById(members);
   const fieldLabel: Readonly<Record<RequiredBranchField, string>> = {
@@ -105,21 +97,6 @@ export function useBranchDrawerView({
         { kind: 'value', label: t(K.fields.city), value: values.city.trim() },
         { kind: 'value', label: t(K.fields.pin), value: values.pin },
       ],
-      // The first four filled values in the fields' order (H:5225).
-      summary: drawerStepSummary(
-        [
-          name,
-          mainLabel,
-          statusLabel,
-          values.addressLine1.trim(),
-          values.addressLine2.trim(),
-          values.area.trim(),
-          values.city.trim(),
-          values.pin,
-          values.state.trim(),
-        ],
-        notFilled,
-      ),
       missing: missingPlaceFields(values).map((field) => fieldLabel[field]),
     },
     contact: {
@@ -139,17 +116,6 @@ export function useBranchDrawerView({
         { kind: 'value', label: t(K.fields.opens), value: values.opensAt },
         { kind: 'value', label: t(K.fields.closes), value: values.closesAt },
       ],
-      summary: drawerStepSummary(
-        [
-          phone,
-          values.email.trim(),
-          values.gstNumber.trim().toUpperCase(),
-          format.days(values.workingDays),
-          values.opensAt,
-          values.closesAt,
-        ],
-        notFilled,
-      ),
       missing: missingContactFields(values).map((field) => fieldLabel[field]),
     },
     people: {
@@ -165,14 +131,6 @@ export function useBranchDrawerView({
           value: defaultName(role) ?? nobody,
         })),
       ],
-      // The team, then each default or "Nobody" (H:5229).
-      summary: drawerStepSummary(
-        [
-          team.map((member) => member.name).join(', '),
-          ...BRANCH_DEFAULT_ROLES.map((role) => defaultName(role) ?? nobody),
-        ],
-        notFilled,
-      ),
     },
   };
 }

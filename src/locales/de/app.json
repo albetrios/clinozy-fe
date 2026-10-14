@@ -360,13 +360,22 @@
       "edit": "Bearbeiten",
       "open": "Öffnen",
       "missing": "Fehlt: {{fields, list(type: unit)}}",
-      "notFilled": "Noch nicht ausgefüllt"
+      "notFilled": "Noch nicht ausgefüllt",
+      "position": "Schritt {{number}} von {{total}}",
+      "state": {
+        "open": "In Bearbeitung",
+        "done": "Vollständig",
+        "missing": "Braucht Aufmerksamkeit",
+        "later": "Nicht begonnen",
+        "locked": "Gesperrt"
+      }
     },
     "peek": {
-      "empty": "Leer",
-      "added_one": "{{count}} hinzugefügt",
-      "added_other": "{{count}} hinzugefügt",
-      "noneYet": "Noch keine"
+      "more_one": "+{{count}} weiteres",
+      "more_other": "+{{count}} weitere",
+      "notFilled": "Nicht ausgefüllt: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} nicht ausgefüllt",
+      "notFilledCount_other": "{{count}} nicht ausgefüllt"
     },
     "stepper": {
       "decrease": "Verringern",
@@ -1027,8 +1036,6 @@
     },
     "details": {
       "title": "Termin",
-      "notFilled": "Noch nicht ausgefüllt",
-      "open": "Öffnen",
       "type": "Art",
       "typeGroup": "Terminart",
       "types": {
@@ -1074,6 +1081,7 @@
       "nextMonth": "Nächster Monat",
       "step": "Zeitraster",
       "stepOption": "{{minutes}} Min.",
+      "date": "Datum",
       "time": "Uhrzeit",
       "pickDate": "Wählen Sie ein Datum, um Zeiten zu sehen",
       "none": "An diesem Tag sind keine Zeiten buchbar · wählen Sie ein anderes Datum",

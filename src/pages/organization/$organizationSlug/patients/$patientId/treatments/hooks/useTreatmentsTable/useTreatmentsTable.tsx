@@ -29,7 +29,7 @@ import {
 } from '../../../shared/hooks/useStaffLookup/index.ts';
 import {
   teethOf,
-  treatmentDetailsView,
+  treatmentDetailsPeek,
   treatmentFormOf,
 } from '../../components/TreatmentDrawer/index.ts';
 import { TREATMENT_KEYS } from '../../treatments.constants.ts';
@@ -100,9 +100,7 @@ function useTreatmentParts() {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const day = useTableDay();
   return (treatment: TreatmentRecord) => {
-    const { peek } = treatmentDetailsView(treatmentFormOf(treatment), t, (date) =>
-      day(date),
-    );
+    const peek = treatmentDetailsPeek(treatmentFormOf(treatment), t, (date) => day(date));
     const teethLabel = t(TREATMENT_KEYS.dental.teeth);
     const areas =
       treatment.template === 'dental'

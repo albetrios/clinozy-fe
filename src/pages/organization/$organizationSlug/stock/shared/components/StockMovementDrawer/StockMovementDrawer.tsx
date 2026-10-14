@@ -16,10 +16,6 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -305,7 +301,6 @@ function MovementSession({
   testId: string;
 }) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const words = useStockWords();
   const idPrefix = `stock-movement-${useId().replace(/:/g, '')}`;
   const form = useForm<MovementFormValues>({ defaultValues: formFor(item, type) });
@@ -378,12 +373,10 @@ function MovementSession({
   });
 
   const body = { form, item, idPrefix, testId };
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const treatment = TREATMENTS.find((entry) => entry.name === values.usedFor);
   const details: DrawerStep = {
     id: 'details',
     title: t(K.steps.details),
-    summary: treatment ? t(STOCK_DRAWER_KEYS.treatments[treatment.key]) : notFilled,
     peek: [
       {
         kind: 'value',
@@ -401,7 +394,6 @@ function MovementSession({
     {
       id: 'movement',
       title: t(K.steps.movement),
-      summary: [typeLabel.label, typed].join(' · '),
       peek: [
         {
           kind: 'value',
@@ -426,7 +418,6 @@ function MovementSession({
     {
       id: 'notes',
       title: t(K.steps.notes),
-      summary: values.note.trim() || notFilled,
       peek: [{ kind: 'value', label: t(K.fields.remark), value: values.note.trim() }],
       content: (
         <DrawerStepBody readOnly={false}>

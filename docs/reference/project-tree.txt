@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2274 src files · ~1158 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
+Stats: ~2276 src files · ~1158 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -288,6 +288,14 @@ clinozy-fe/
 │   └── README.md
 ├── iterations/
 │   ├── change-cookie-consent-2026-10-13-fmal/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── change-drawer-steps-2026-10-13-ltet/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
 │   │   ├── plans/
@@ -1975,6 +1983,8 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── DrawerSteps/
+│   │   │   │   ├── drawer-step-head.tsx
+│   │   │   │   ├── drawer-step-peek.tsx
 │   │   │   │   ├── drawer-step-status.ts
 │   │   │   │   ├── drawer-step-summary.ts
 │   │   │   │   ├── DrawerSteps.tsx

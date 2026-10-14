@@ -148,8 +148,10 @@ describe('SendPaymentDrawer — new (payments.md:112–130)', () => {
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByText('Send payment')).toBeInTheDocument();
     expect(part('step-bill')).toBeInTheDocument();
-    expect(part('step-expense')).toHaveTextContent('Missing: Paid to');
-    expect(part('step-payment')).toHaveTextContent('Missing: Amount');
+    // Steps not reached yet are never flagged: their grey numbers, "Open".
+    expect(part('step-expense')).toHaveAttribute('data-status', 'later');
+    expect(part('step-expense')).not.toHaveTextContent('Missing:');
+    expect(part('step-payment')).toHaveAttribute('data-status', 'later');
     // The oldest bills, oldest first, their dues in rupees.
     const oldest = within(part('oldest')).getAllByRole('button');
     expect(oldest.map((chip) => chip.textContent)).toEqual([

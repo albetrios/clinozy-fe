@@ -14,10 +14,6 @@ import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useEditingRecord } from '@/shared/hooks/useEditingRecord/index.ts';
@@ -99,10 +95,8 @@ function useSteps(
   readOnly: boolean,
 ): DrawerStep[] {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const words = useStockWords();
   const vendors = useStockVendorCatalogue().data ?? [];
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
   const category = words.category(values.category);
   const unit = words.unit(values.unit);
@@ -120,7 +114,6 @@ function useSteps(
     {
       id: 'item',
       title: t(K.steps.item),
-      summary: [name, category.label, unit].filter(Boolean).join(' · ') || notFilled,
       peek: [
         { kind: 'value', label: t(K.fields.name), value: name },
         {
@@ -150,9 +143,6 @@ function useSteps(
     {
       id: 'levels',
       title: t(K.steps.levels),
-      summary:
-        [inStock, `${values.minQty}–${values.maxQty}`].filter(Boolean).join(' · ') ||
-        notFilled,
       peek: [
         { kind: 'value', label: t(K.fields.inStock), value: inStock },
         { kind: 'value', label: t(K.fields.usage), value: usage },
@@ -174,7 +164,6 @@ function useSteps(
     {
       id: 'vendor',
       title: t(K.steps.vendor),
-      summary: vendor?.name ?? notFilled,
       peek: [{ kind: 'value', label: t(K.fields.vendor), value: vendor?.name ?? '' }],
       content: (
         <DrawerStepBody readOnly={readOnly}>

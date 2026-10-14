@@ -48,7 +48,7 @@ export function placesSummary(lists: BranchPlacesLists, t: TFunction): string {
   return parts.length > 0 ? parts.join(' · ') : t(K.nothingYet);
 }
 
-/** The collapsed step's peek: each list as one items tile ("Rooms · 2 added", the names). */
+/** The collapsed step's peek: each list as an items field — its names as chips, an empty list "not filled". */
 function placesPeek(
   lists: BranchPlacesLists,
   t: TFunction,

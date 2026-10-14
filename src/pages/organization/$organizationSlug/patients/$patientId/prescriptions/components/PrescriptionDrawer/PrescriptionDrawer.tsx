@@ -18,19 +18,12 @@ import type {
   RxCatalog,
 } from '@/shared/api/app/prescriptions-contracts.ts';
 import { visitFlowReferrer } from '@/shared/app/app-referrer.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import {
   type DrawerBadge,
   RecordDrawer,
 } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import {
   resetFormInPlace,
   useEditingRecord,
@@ -88,20 +81,16 @@ function useRxSteps({
   readOnly: boolean;
 }): DrawerStep[] {
   const { t } = useTranslation(RX_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const { formatDate } = useLocaleFormat();
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const date = formatDate(
     localDateOf(values.date),
     { day: 'numeric', month: 'short', year: 'numeric' },
     { civilDay: true },
   );
-  const named = namedRxLines(values.items).length;
   return [
     {
       id: 'prescription',
       title: t(K.steps.prescription),
-      summary: drawerStepSummary([date, doctorName], notFilled),
       peek: [
         { kind: 'value', label: t(K.date), value: date },
         {
@@ -123,10 +112,6 @@ function useRxSteps({
     {
       id: 'medicines',
       title: t(K.steps.medicines),
-      summary: drawerStepSummary(
-        [named ? t(K.medicines, { count: named }) : ''],
-        notFilled,
-      ),
       peek: [
         {
           kind: 'items',
@@ -146,10 +131,6 @@ function useRxSteps({
     {
       id: 'notes',
       title: t(K.steps.notes),
-      summary: drawerStepSummary(
-        RX_NOTES.map((note) => values[note.field].trim()),
-        notFilled,
-      ),
       peek: RX_NOTES.map((note) => ({
         kind: 'value' as const,
         label: t(K.notes[note.label]),

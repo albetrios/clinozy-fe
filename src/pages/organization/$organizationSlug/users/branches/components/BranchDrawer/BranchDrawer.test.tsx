@@ -580,13 +580,15 @@ describe('the branch drawer — Places & days (KICKOFF §6.6, D23)', () => {
     const panel = await drawer();
     const step = within(panel).getByTestId('branch-drawer-step-places');
     expect(within(step).getByText('Places & days')).toBeInTheDocument();
+    // The shared step pattern: each list's names as chips, an empty list counted as not filled;
+    // a step with a peek shows no sub line.
     await waitFor(() =>
       expect(
         within(step).getByTestId('branch-drawer-step-places-peek'),
-      ).toHaveTextContent('Rooms · 2 added'),
+      ).toHaveTextContent('Rooms: Room 1Room 2'),
     );
     expect(within(step).getByTestId('branch-drawer-step-places-peek')).toHaveTextContent(
-      'Machines · None yet',
+      'Not filled: Machines, Holidays',
     );
     expect(placesApi.fetchBranchPlaces).toHaveBeenCalledWith({
       kind: 'room',
@@ -617,8 +619,6 @@ describe('the branch drawer — Places & days (KICKOFF §6.6, D23)', () => {
     expect(within(panel).getByTestId('branch-drawer-holidays-empty')).toHaveTextContent(
       'No holidays coming up',
     );
-    // The step's own head line, once it is open.
-    expect(within(panel).getByText('2 rooms')).toBeInTheDocument();
     expect(await axeForDialog(panel)).toHaveNoViolations();
   });
 

@@ -5,11 +5,7 @@ import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { copyText } from '@/lib/sensitive-clipboard.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/app/app-schema.ts';
-import {
-  CONTACT_CHANNELS,
-  type ContactChannel,
-} from '@/shared/api/app/contacts-contracts.ts';
+import { CONTACT_CHANNELS } from '@/shared/api/app/contacts-contracts.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { formatAppPhone, toAppPhone } from '@/shared/app/app-phone.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
@@ -25,17 +21,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
-import {
-  type AppIcon,
-  Copy,
-  InstagramMark,
-  Phone,
-  WhatsAppMark,
-  X,
-} from '@/shared/icons/index.ts';
+import { Copy, InstagramMark, WhatsAppMark, X } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { CONTACT_EDITOR_KEYS, CONTACT_EDITOR_NS } from './contact-editor.constants.ts';
+import {
+  CONTACT_CHANNEL_STYLES,
+  CONTACT_EDITOR_KEYS,
+  CONTACT_EDITOR_NS,
+} from './contact-editor.constants.ts';
 import {
   CONTACT_HANDLE_MAX,
   CONTACT_NAME_MAX,
@@ -50,16 +43,6 @@ import {
 } from './contact-editor-value.ts';
 
 const K = CONTACT_EDITOR_KEYS;
-
-/**
- * The default channel chips (`CHS`, H:3362): WhatsApp sage · Call sky · Instagram blush — the
- * design's SMS has no channel on clinozy-be (route map §4 #8).
- */
-const CHANNELS: Readonly<Record<ContactChannel, { tone: Tone; icon: AppIcon }>> = {
-  whatsapp: { tone: 'sage', icon: WhatsAppMark },
-  call: { tone: 'sky', icon: Phone },
-  instagram: { tone: 'blush', icon: InstagramMark },
-};
 
 /** A 32px dashed "add" button (H:1973, H:1978): the outline `Button` at 13px/400. */
 const ADD_BUTTON =
@@ -433,8 +416,8 @@ export function ContactIdentityFields({
             options={CONTACT_CHANNELS.map((channel) => ({
               value: channel,
               label: tApp(APP_KEYS.channels[channel]),
-              tone: CHANNELS[channel].tone,
-              icon: CHANNELS[channel].icon,
+              tone: CONTACT_CHANNEL_STYLES[channel].tone,
+              icon: CONTACT_CHANNEL_STYLES[channel].icon,
             }))}
             value={value.defaultChannel}
             onChange={(channel) => {

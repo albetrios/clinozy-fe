@@ -684,12 +684,6 @@
         "damaged": "تالف"
       },
       "refundBy": "الاسترداد عبر",
-      "peek_zero": "{{count}} أدوية · {{amount}}",
-      "peek_one": "{{count}} دواء · {{amount}}",
-      "peek_two": "{{count}} دواءان · {{amount}}",
-      "peek_few": "{{count}} أدوية · {{amount}}",
-      "peek_many": "{{count}} دواءً · {{amount}}",
-      "peek_other": "{{count}} دواء · {{amount}}",
       "quickFill": "إرجاع الكل",
       "save": "استرداد {{amount}}",
       "summary": "{{reason}} · {{amount}}",

@@ -35,11 +35,24 @@ export const RECORD_DRAWER_KEYS = {
     missing: 'recordDrawer.step.missing',
     /** A step head's sub line before any of its fields is filled. */
     notFilled: 'recordDrawer.step.notFilled',
+    /** Read out with the head: "Step 2 of 3". */
+    position: 'recordDrawer.step.position',
+    /** Read out with the head: what its circle shows in colour. */
+    state: {
+      open: 'recordDrawer.step.state.open',
+      done: 'recordDrawer.step.state.done',
+      missing: 'recordDrawer.step.state.missing',
+      later: 'recordDrawer.step.state.later',
+      locked: 'recordDrawer.step.state.locked',
+    },
   },
   peek: {
-    empty: 'recordDrawer.peek.empty',
-    added: 'recordDrawer.peek.added',
-    noneYet: 'recordDrawer.peek.noneYet',
+    /** Filled fields past the six a collapsed step shows: "+2 more". */
+    more: 'recordDrawer.peek.more',
+    /** A collapsed step's empty fields, read out and on hover: "Not filled: Email, GSTIN". */
+    notFilled: 'recordDrawer.peek.notFilled',
+    /** How many fields of a collapsed step are empty: "2 not filled". */
+    notFilledCount: 'recordDrawer.peek.notFilledCount',
   },
   /** The clinic currency's sign before a typed amount — a money field's "₹" tile. */
   currency: 'recordDrawer.currency',

@@ -31,7 +31,6 @@ import {
   type DrawerBadge,
   RecordDrawer,
 } from '@/shared/components/RecordDrawer/index.ts';
-import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
@@ -188,7 +187,7 @@ function useExpensePeek(values: SendFormValues): DrawerStep['peek'] {
   ];
 }
 
-/** The step cards: each step's heads (peek, summary, what is missing) and its body. */
+/** The step cards: each step's heads (peek, what is missing) and its body. */
 function useSteps({
   values,
   bills,
@@ -206,15 +205,13 @@ function useSteps({
   const dayLabel = useDayLabel();
   const missing = sendMissing(values);
   const amount = sendAmount(values);
-  const billSummary = values.bill ? billLabel(values.bill) : t(K.otherSpend);
-  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled, { ns: APP_NS });
+  const billText = values.bill ? billLabel(values.bill) : t(K.otherSpend);
   const steps: DrawerStep[] = [];
   if (bills.bills || bills.retry) {
     steps.push({
       id: 'bill',
       title: t(K.steps.bill),
-      summary: billSummary,
-      peek: [{ kind: 'value', label: t(K.bill), value: billSummary }],
+      peek: [{ kind: 'value', label: t(K.bill), value: billText }],
       content: bodies.bill,
     });
   }
@@ -224,7 +221,6 @@ function useSteps({
       title: t(K.steps.expense),
       missing: missing.includes('payeeName') ? [t(K.paidTo)] : [],
       peek: expensePeek,
-      summary: values.payeeName.trim() || notFilled,
       content: bodies.expense,
     },
     {
@@ -245,7 +241,6 @@ function useSteps({
           tone: PAYMENT_MODE_TONES[values.mode],
         },
       ],
-      summary: amount > 0 ? formatPaise(amount) : notFilled,
       content: bodies.payment,
     },
   );

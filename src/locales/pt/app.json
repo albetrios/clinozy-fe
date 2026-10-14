@@ -361,14 +361,24 @@
       "edit": "Editar",
       "open": "Abrir",
       "missing": "Faltando: {{fields, list(type: unit)}}",
-      "notFilled": "Ainda não preenchido"
+      "notFilled": "Ainda não preenchido",
+      "position": "Passo {{number}} de {{total}}",
+      "state": {
+        "open": "Em andamento",
+        "done": "Concluído",
+        "missing": "Precisa de atenção",
+        "later": "Não iniciado",
+        "locked": "Bloqueado"
+      }
     },
     "peek": {
-      "empty": "Vazio",
-      "added_one": "{{count}} adicionado",
-      "added_many": "{{count}} adicionados",
-      "added_other": "{{count}} adicionados",
-      "noneYet": "Nenhum ainda"
+      "more_one": "+{{count}} mais",
+      "more_many": "+{{count}} mais",
+      "more_other": "+{{count}} mais",
+      "notFilled": "Não preenchido: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} não preenchido",
+      "notFilledCount_many": "{{count}} não preenchidos",
+      "notFilledCount_other": "{{count}} não preenchidos"
     },
     "stepper": {
       "decrease": "Diminuir",
@@ -1041,8 +1051,6 @@
     },
     "details": {
       "title": "Consulta",
-      "notFilled": "Ainda não preenchido",
-      "open": "Abrir",
       "type": "Tipo",
       "typeGroup": "Tipo de consulta",
       "types": {
@@ -1088,6 +1096,7 @@
       "nextMonth": "Próximo mês",
       "step": "Intervalo",
       "stepOption": "{{minutes}} min",
+      "date": "Data",
       "time": "Horário",
       "pickDate": "Escolha uma data para ver os horários",
       "none": "Não há horários para agendar neste dia · escolha outra data",

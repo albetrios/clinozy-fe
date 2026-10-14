@@ -175,6 +175,11 @@ export interface RecordDrawerProps {
   steps?: readonly DrawerStep[];
   /** Controlled open step ('' collapses every card). */
   openStep?: string;
+  /**
+   * The open step can be folded away (the default); New lead's stays open, so
+   * its head shows no chevron.
+   */
+  stepsCollapsible?: boolean;
   /** The step open at first when uncontrolled; the first step by default. */
   defaultOpenStep?: string;
   onOpenStepChange?: (stepId: string) => void;
@@ -410,6 +415,10 @@ function useDrawerActions(
   selectStep: (stepId: string) => void,
 ) {
   const saving = props.saveState === 'saving';
+  // A save tried with a required field empty flags every step that lacks one,
+  // reached or not; a closed drawer forgets it.
+  const [attempted, setAttempted] = useState(false);
+  if (!props.open && attempted) setAttempted(false);
   const { guardDialog, confirmDiscard } = useUnsavedChangesGuard({
     when: props.open && Boolean(props.dirty) && !props.readOnly && !saving,
   });
@@ -427,6 +436,7 @@ function useDrawerActions(
         action();
         return;
       }
+      setAttempted(true);
       selectStep(blocked.id);
       props.onMissing?.(blocked.id, blocked.missing ?? []);
     };
@@ -435,6 +445,7 @@ function useDrawerActions(
   return {
     guardDialog,
     requestClose,
+    attempted,
     onSave: guardSave(props.onSave),
     onSaveAndAdd: guardSave(props.onSaveAndAdd),
   };
@@ -541,6 +552,7 @@ function DrawerForm({
   testId,
   step,
   onStepChange,
+  revealMissing,
   markItems,
   onDismiss,
   onSave,
@@ -550,6 +562,7 @@ function DrawerForm({
   testId: string;
   step: string;
   onStepChange: (stepId: string) => void;
+  revealMissing: boolean;
   markItems: () => void;
   onDismiss: () => void;
   onSave?: () => void;
@@ -582,6 +595,8 @@ function DrawerForm({
             value={step}
             onValueChange={onStepChange}
             tone={props.tone}
+            revealMissing={revealMissing}
+            collapsible={props.stepsCollapsible}
             testId={testId}
           />
         </DrawerItemsContext.Provider>
@@ -663,7 +678,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
   );
   const [currentStep, selectStep] = useOpenStep(props);
   const [itemsMounted, markItems] = useMountedItems(props.open);
-  const { guardDialog, requestClose, onSave, onSaveAndAdd } = useDrawerActions(
+  const { guardDialog, requestClose, attempted, onSave, onSaveAndAdd } = useDrawerActions(
     props,
     selectStep,
   );
@@ -698,6 +713,7 @@ export function RecordDrawer(props: RecordDrawerProps) {
       testId={testId}
       step={currentStep}
       onStepChange={selectStep}
+      revealMissing={attempted}
       markItems={markItems}
       onDismiss={requestClose}
       onSave={onSave}

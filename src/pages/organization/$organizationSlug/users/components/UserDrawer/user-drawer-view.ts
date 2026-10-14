@@ -8,15 +8,8 @@ import { getRolePermissions } from '@/shared/api/organization-api.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { formatAppPhoneDigits } from '@/shared/app/app-phone-field.ts';
-import {
-  type DrawerPeekItem,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -36,8 +29,8 @@ export interface UserDrawerView {
   badges: DrawerBadge[];
   /** "New user · Front desk · Adajan" / "<name> · <roles joined ' + '> · <branches>". */
   summary: string;
-  profile: { peek: DrawerPeekItem[]; summary: string; missing: string[] };
-  hours: { peek: DrawerPeekItem[]; summary: string };
+  profile: { peek: DrawerPeekItem[]; missing: string[] };
+  hours: { peek: DrawerPeekItem[] };
 }
 
 /**
@@ -78,8 +71,8 @@ function userAccessLine(
 
 /**
  * The user drawer's read-outs (`users.md:169–170, 276`; H:5163–5177): the
- * badge strip, the footer summary, each step's peek grid and head line, and
- * Step 1's missing fields.
+ * badge strip, the footer summary, each step's peek grid, and Step 1's
+ * missing fields.
  */
 export function useUserDrawerView({
   values,
@@ -105,7 +98,6 @@ export function useUserDrawerView({
     : t(USERS_KEYS.status.inactive);
   const name = values.name.trim();
   const branchNames = multiBranch ? picked.map((branch) => branch.name) : [];
-  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled, { ns: RECORD_DRAWER_NS });
 
   const profilePeek: DrawerPeekItem[] = [
     { kind: 'value', label: t(K.fields.name), value: name },
@@ -167,22 +159,8 @@ export function useUserDrawerView({
       .join(' · '),
     profile: {
       peek: profilePeek,
-      summary: drawerStepSummary(
-        [roles.map((role) => role.label).join(' · '), access, branchNames.join(' · ')],
-        notFilled,
-      ),
       missing: missingUserFields(values).map(() => t(K.fields.email)),
     },
-    hours: {
-      peek: hoursPeek,
-      summary: drawerStepSummary(
-        [
-          hours,
-          t(USERS_KEYS.table.commission, { value: values.commissionPct }),
-          statusLabel,
-        ],
-        notFilled,
-      ),
-    },
+    hours: { peek: hoursPeek },
   };
 }
