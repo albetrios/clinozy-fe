@@ -7,7 +7,7 @@ import type { SaleDraftFigures } from './sale-form.ts';
  * The figures the drawer shows — the badges, the totals above the footer, "Paid now" and its
  * presets — in one shape for both modes, in paise like the form's money fields. An invoice's
  * are the server's preview of the save (D81 Q2), never worked out here; a Medical sale's are
- * the fixture world's own.
+ * the drawer's own sums at MRP — a guide: the server prices the sale when it saves it.
  */
 
 /**
@@ -36,7 +36,7 @@ export interface InvoiceFigures {
   due: number;
 }
 
-/** A Medical sale's figures, from the fixture world's own sums. */
+/** A Medical sale's figures, from the drawer's own sums at MRP. */
 export function saleFigures(figures: SaleDraftFigures): InvoiceFigures {
   const { totals, balance } = figures;
   return {

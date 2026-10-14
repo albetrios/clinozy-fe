@@ -5,7 +5,7 @@ import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { MoneyCell, PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
 import { MakerPills } from '../../../shared/components/MedicalCells/index.ts';
@@ -16,14 +16,15 @@ const rowOf = (original: unknown) => original as SupplierRow;
 
 /**
  * The Suppliers columns (KICKOFF §6.7 Tables; `medical.md:77–84`): Supplier ·
- * Manufacturers · Orders · Payable · Ageing — tracks `minmax(220px,1.4fr)
+ * Manufacturers · Orders · Payable · Ageing — the server's figures, money in
+ * rupees — tracks `minmax(220px,1.4fr)
  * minmax(180px,1.2fr) 100px 110px 120px`. On a phone the Supplier leads, the
  * Payable is the key and the meta line reads Manufacturers, Orders, Ageing.
  * The column ids are the URL's sort keys.
  */
 export function useSupplierColumns(): ColumnDef<DataTableFeatures, SupplierRow>[] {
   const { t } = useTranslation(MEDICAL_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const keys = MEDICAL_KEYS.suppliers;
   const noValue = t(MEDICAL_KEYS.table.noValue);
   const orders = (supplier: SupplierRow) =>
@@ -77,7 +78,7 @@ export function useSupplierColumns(): ColumnDef<DataTableFeatures, SupplierRow>[
       cell: ({ row }) =>
         row.original.payable > 0 ? (
           <MoneyCell
-            paise={row.original.payable}
+            rupees={row.original.payable}
             className="text-tone-blush-foreground font-semibold"
           />
         ) : (
@@ -88,7 +89,7 @@ export function useSupplierColumns(): ColumnDef<DataTableFeatures, SupplierRow>[
         align: 'end',
         foldValue: (original) => {
           const payable = rowOf(original).payable;
-          return payable > 0 ? formatPaise(payable) : noValue;
+          return payable > 0 ? formatRupees(payable) : noValue;
         },
       },
     },

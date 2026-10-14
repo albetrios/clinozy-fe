@@ -46,21 +46,25 @@ describe('APP_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
       appCommandNavigation('newSale', {
         organizationSlug: 'acme',
         referrer: 'today',
-        search: { prescription: PATIENT },
+        search: { prescription: 'rx_1', customer: PATIENT },
       }),
     ).toEqual({
       to: `${ORG}/medical/sales/create`,
       params: { organizationSlug: 'acme' },
-      search: { prescription: PATIENT, from: 'today' },
+      search: { prescription: 'rx_1', customer: PATIENT, from: 'today' },
     });
     // The Rx drawer's "Save & sell" (L-45) keeps the prescriptions section behind it.
     expect(
       appCommandNavigation('newSale', {
         organizationSlug: 'acme',
         referrer: `patients/${PATIENT}/prescriptions`,
-        search: { prescription: 'rx-1' },
+        search: { prescription: 'rx_1', customer: PATIENT },
       }).search,
-    ).toEqual({ prescription: 'rx-1', from: `patients/${PATIENT}/prescriptions` });
+    ).toEqual({
+      prescription: 'rx_1',
+      customer: PATIENT,
+      from: `patients/${PATIENT}/prescriptions`,
+    });
   });
 
   it('takes the Patients row actions to the other rooms’ drawers (§6.5)', () => {

@@ -123,6 +123,12 @@ describe('taskTargetNavigation', () => {
       taskTargetNavigation({ kind: 'invoice', invoiceId: INVOICE }, 'acme', 'tasks')
         .search,
     ).toEqual({ from: 'tasks' });
+    expect(
+      taskTargetNavigation({ kind: 'medicalRep', mrId: 'mrep_a' }, 'acme', 'tasks'),
+    ).toEqual({
+      to: '/organization/$organizationSlug/medical/mrs/$mrId/edit',
+      params: { organizationSlug: 'acme', mrId: 'mrep_a' },
+    });
   });
 
   it('opens a new check-in or review over the patient file with its visit or treatment', () => {

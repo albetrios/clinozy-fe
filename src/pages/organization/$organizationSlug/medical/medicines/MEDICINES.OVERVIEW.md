@@ -3,7 +3,7 @@
 Route: `/organization/$organizationSlug/medical/medicines` (KICKOFF §6.7, L-50). Same gates as
 the Medical room.
 
-Every medicine (`medical.md:41–55`): ID · Medicine (its composition, or "Needs MRP and composition" on a quick record) · Manufacturer · Stock (the line and a bar to the fill-up level) · Nearest expiry (≤ 30 days blush, ≤ 90 butter) · MRP (and the near-expiry discount) · Best rate (hidden) · Margin. The row edge is the stock level. Filters: Stock (All · Low stock) · Nearest expiry · the automatic Manufacturer section · Created. The view action is "Reorder low stock" with Low stock on (a new purchase order with `?reorder=low`) and "Sell all at 20% off" / "Remove near-expiry discount" with a Nearest expiry window; a batch expiring within 90 days adds "Return expiring stock to supplier" (its drawer, no URL — the batch goes back for a credit of qty × its rate, lowering the supplier's payable) and the row's discount toggle. A row opens Edit medicine.
+Every medicine on clinozy-be (`GET /app/medicines`, api-integration §5.5; `medical.md:41–55`): ID · Medicine (its composition, or "Needs MRP and composition" while the server flags it) · Manufacturer · Stock (the line and a bar to the fill-up level) · Nearest expiry (≤ 30 days blush, ≤ 90 butter) · MRP (and the near-expiry discount) · Best rate (hidden) · Margin — money in the API's rupees; the stock level, nearest expiry, best rate and margin are the server's. The row edge is the stock level. Filters: Stock (All · Low stock) · Nearest expiry · the automatic Manufacturer section · Created; every column but Nearest expiry and Best rate sorts on the server. The view action is "Reorder low stock" with Low stock on (a new purchase order with `?reorder=low`) and "Sell all at 20% off" / "Remove near-expiry discount" with a Nearest expiry window — one write over every medicine in the window (`POST /app/medicines/near-expiry-discount`), its Undo the opposite write; a batch expiring within 90 days adds "Return expiring stock to supplier" (its drawer, no URL — a supplier credit, `POST /app/suppliers/:supplier_id/credits`, which the server sets against the supplier's dues) and the row's discount toggle, its Undo putting the old percent back. A row opens Edit medicine.
 
 The search, filters and sort live in the URL (the room reads them in `../medical.search.ts`); the list read follows them —
 a sort keeps the rows until the new page arrives, a search or "Apply filter" shows the skeleton.
@@ -24,6 +24,9 @@ list (D24): the Medicine drawer (`../shared/components/MedicineDrawer/`), New wi
 | `MedicinesPage.tsx`                | The tab: the Medical toolbar, the table, its row actions and states; hosts the dialog routes' `Outlet`. |
 | `hooks/useMedicineColumns/`        | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.            |
 | `components/ExpiringReturnDrawer/` | Return expiring stock: the supplier (cheapest first), the quantity (capped at the batch), the credit.   |
+
+Tests mock `@/shared/api/app/medicines-api.ts` and `../shared/medical-api.ts` with the doubles of
+`tests/utils/medical-doubles.ts`.
 
 ## Test ids
 

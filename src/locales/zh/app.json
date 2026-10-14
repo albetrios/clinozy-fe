@@ -1272,8 +1272,6 @@
     "items": {
       "quickLine": "输入项目、数量、折扣 · 例如 lhr face 1 10%",
       "quickLineMedical": "输入药品和数量 · 例如 sun 2",
-      "hint": "2 = 数量 · 10% = 折扣 · @500 = 单价",
-      "oftenBilled": "常开项目",
       "browse": {
         "all": "全部",
         "oral": "口服",
@@ -1372,7 +1370,6 @@
       "saved": "发票 #{{seq}} 已保存",
       "savedPlan": "发票 #{{seq}} 已保存 · 建议已更新",
       "promo": "已对 {{offering}} 应用 {{offer}}",
-      "contactSaved": "已将 {{name}} 保存为药房联系人 · 请在下方添加手机号",
       "rxUnmatched": "{{name}} 不在药品列表中 · 请通过快速添加加入",
       "deleted": "发票 #{{seq}} 已删除"
     },

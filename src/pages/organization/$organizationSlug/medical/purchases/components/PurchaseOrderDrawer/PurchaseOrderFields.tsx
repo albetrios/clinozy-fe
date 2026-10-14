@@ -202,8 +202,8 @@ function useLineColumns(
 /**
  * ITEMS (`medical.md:261`): the quick line — "azel 20 +2 @180", the Low stock
  * chips and Browse (`useOrderQuickLine`) — over the order's rows: a medicine
- * (grouped by the supplier's price list; "Add medicine “q”" makes a quick one
- * linked to the supplier, "New medicine · “q”" opens it in full on top), its
+ * (grouped by the supplier's price list; "Add medicine “q”" keeps the typed
+ * name for the save to add, "New medicine · “q”" opens it in full on top), its
  * quantity, the free units, the purchase rate (required once a medicine is
  * picked) and the amount — "+ Add medicine" and the total.
  */

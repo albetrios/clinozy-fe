@@ -3,7 +3,14 @@ import type { TaskTarget } from '@/shared/app/task-targets.ts';
 
 /** The source button's kind: the record it opens. */
 type TaskSourceKind =
-  'appointment' | 'lead' | 'treatment' | 'checkIn' | 'review' | 'patient' | 'invoice';
+  | 'appointment'
+  | 'lead'
+  | 'treatment'
+  | 'checkIn'
+  | 'review'
+  | 'patient'
+  | 'invoice'
+  | 'medicalRep';
 
 /** The source button: the record's kind (its words) and where it goes. */
 interface TaskSource {
@@ -62,17 +69,21 @@ const LINKED: Readonly<
     target: { kind: 'invoice', invoiceId },
     code: 'payment:read',
   }),
-  // A credit (Payments) and a medical rep (Medical, parked) are named by kind only.
+  medicalRep: (mrId) => ({
+    kind: 'medicalRep',
+    target: { kind: 'medicalRep', mrId },
+    code: 'medicine:read',
+  }),
+  // A credit (Payments) is named by kind only.
   pendingCredit: () => null,
-  medicalRep: () => null,
 };
 
 /**
  * The source button (`tasks.md` › Task drawer › 1): "Open appointment" → the
  * booking · "Open lead" → the lead drawer · "Open treatment" → the file's
  * Treatments · "Open check-in" / "Open review" → that record over the file ·
- * "Open invoice" — and for a task that points at nothing, the person's patient
- * file ("Open patient", its Timeline). None for a credit or a medical rep, for
+ * "Open invoice" · "Open MR" → the rep in Medical › MRs — and for a task that points at
+ * nothing, the person's patient file ("Open patient", its Timeline). None for a credit, for
  * a record on a file the person does not have, or for a chat-only contact.
  * The read code each needs comes with it; the follow-on screens and every
  * target's navigation are shared with Today (`@/shared/app/task-targets.ts`).

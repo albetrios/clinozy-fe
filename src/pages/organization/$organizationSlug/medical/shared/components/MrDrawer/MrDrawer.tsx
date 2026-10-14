@@ -2,7 +2,6 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { MedicalRep } from '@/shared/api/app/app-schema.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
@@ -50,7 +49,7 @@ import {
   MEDICAL_DRAWER_TEST_IDS,
   MEDICAL_DRAWERS_NS,
 } from '../../medical-drawers.constants.ts';
-import type { MedicalRepInput } from '../../medical-partners-contracts.ts';
+import type { MedicalRepInput } from '../../medical-records-contracts.ts';
 import { useMedicalDates } from '../MedicalCells/medical-dates.ts';
 import { MedicalDeleteConfirm } from '../MedicalDeleteConfirm/index.ts';
 import { MedicalPartnerPicker } from '../MedicalPartnerPicker/index.ts';
@@ -81,7 +80,7 @@ interface MrDrawerBaseProps {
   /** Stacked on another drawer: "Back", "Add MR", no "full details" of its own. */
   stacked?: boolean;
   /** The saved record — a stacked child hands it to the field that asked. */
-  onSaved?: (rep: MedicalRep) => void;
+  onSaved?: (rep: MrRow) => void;
   /** Opens a manufacturer on top for "full details"; a stacked drawer passes none. */
   openChild?: OpenMedicalChild;
   testId?: string;
@@ -350,7 +349,7 @@ function MrSession({
     notifyOnError: false,
     successMessage: t(K.saved),
   });
-  const { saveState, save } = useDrawerSave<MrFormValues, MedicalRep>({
+  const { saveState, save } = useDrawerSave<MrFormValues, MrRow>({
     form,
     fieldOrder: ['name', 'phone', 'nextVisitOn', 'manufacturerIds'],
     toastId: 'rep-save-failed',
@@ -361,9 +360,7 @@ function MrSession({
     onField: (field) => setOpenStep(field === 'manufacturerIds' ? 'represents' : 'mr'),
     write: () => {
       const input = inputOf(form.getValues());
-      return mr
-        ? update.mutateAsync({ id: mr.id, patch: input })
-        : create.mutateAsync(input);
+      return mr ? update.mutateAsync({ record: mr, input }) : create.mutateAsync(input);
     },
     onDone: (record) => (onSaved ? onSaved(record) : onClose()),
   });

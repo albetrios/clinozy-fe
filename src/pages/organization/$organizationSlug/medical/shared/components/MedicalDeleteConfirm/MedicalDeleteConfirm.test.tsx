@@ -2,17 +2,48 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('@/shared/api/app/medicines-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  deleteMedicine: vi.fn(),
+  restoreMedicine: vi.fn(),
+}));
+vi.mock('../../medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  deleteSupplier: vi.fn(),
+  restoreSupplier: vi.fn(),
+  deleteManufacturer: vi.fn(),
+  restoreManufacturer: vi.fn(),
+  deleteMedicalRep: vi.fn(),
+  restoreMedicalRep: vi.fn(),
+}));
+import { deleteMedicine, restoreMedicine } from '@/shared/api/app/medicines-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import {
+  manufacturerRow,
+  medicineRow,
+  mrRow,
+  supplierRow,
+  TEST_MAKER_ID,
+  TEST_MEDICINE_ID,
+  TEST_MR_ID,
+  TEST_SUPPLIER_ID,
+} from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
+import {
+  deleteManufacturer,
+  deleteMedicalRep,
+  deleteSupplier,
+  restoreManufacturer,
+  restoreMedicalRep,
+  restoreSupplier,
+} from '../../medical-records-api.ts';
 import {
   MedicalDeleteConfirm,
   type MedicalDeleteTarget,
@@ -43,15 +74,16 @@ const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetAppFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
-/** Confirm `target` with its first reason; resolve once the confirm has closed. */
+/** Confirm `target` with "Created by mistake"; resolve once the delete is done. */
 async function confirm(target: MedicalDeleteTarget, title: string) {
   const user = setup();
   const onClose = vi.fn();
@@ -68,57 +100,84 @@ async function confirm(target: MedicalDeleteTarget, title: string) {
   return { onClose };
 }
 
+/** Press the Undo the delete's toast offers. */
+function pressUndo(message: string) {
+  expect(notifyMock.undo).toHaveBeenCalledWith(
+    message,
+    expect.objectContaining({ onUndo: expect.any(Function) }),
+  );
+  const [, options] = notifyMock.undo.mock.calls[0] as [string, { onUndo: () => void }];
+  options.onUndo();
+}
+
 describe('MedicalDeleteConfirm (medical.md:357–368)', () => {
   it('deletes a medicine with its reason and offers Undo, which restores it', async () => {
-    const id = ref.medicine(456);
+    vi.mocked(deleteMedicine).mockResolvedValue(undefined);
+    vi.mocked(restoreMedicine).mockResolvedValue(medicineRow());
     await confirm(
-      { kind: 'medicine', id, name: 'Glycolac Cream' },
+      { kind: 'medicine', id: TEST_MEDICINE_ID, name: 'Azelaic gel' },
       'Delete this medicine?',
     );
-    expect(appFixtures.medicines.snapshot((row) => row.id === id)).toHaveLength(0);
-    expect(notifyMock.undo).toHaveBeenCalledWith(
-      'Glycolac Cream deleted',
-      expect.objectContaining({ onUndo: expect.any(Function) }),
-    );
-    const [, options] = notifyMock.undo.mock.calls[0] as [string, { onUndo: () => void }];
-    options.onUndo();
+    expect(deleteMedicine).toHaveBeenCalledWith(TEST_MEDICINE_ID, 'mistake', null);
+    pressUndo('Azelaic gel deleted');
     await waitFor(() =>
-      expect(appFixtures.medicines.snapshot((row) => row.id === id)).toHaveLength(1),
+      expect(restoreMedicine).toHaveBeenCalledWith(TEST_MEDICINE_ID, expect.any(String)),
     );
   });
 
-  it('names each record kind in its title', async () => {
-    await confirm(
-      { kind: 'mr', id: ref.medicalRep(3), name: 'Avriva Skintech · Jay' },
-      'Delete this MR?',
+  it('names each record kind in its title, and Undo restores an MR', async () => {
+    vi.mocked(deleteMedicalRep).mockResolvedValue(undefined);
+    vi.mocked(restoreMedicalRep).mockResolvedValue(mrRow());
+    await confirm({ kind: 'mr', id: TEST_MR_ID, name: 'Rahul Mehta' }, 'Delete this MR?');
+    expect(deleteMedicalRep).toHaveBeenCalledWith(TEST_MR_ID, 'mistake', null);
+    pressUndo('Rahul Mehta deleted');
+    await waitFor(() =>
+      expect(restoreMedicalRep).toHaveBeenCalledWith(TEST_MR_ID, expect.any(String)),
     );
-    expect(
-      appFixtures.medicalReps.snapshot((rep) => rep.id === ref.medicalRep(3)),
-    ).toHaveLength(0);
   });
 
-  it('deletes a manufacturer no medicine names', async () => {
-    const maker = await appFixtures.manufacturers.create({
-      name: 'ZEN',
-      tone: 'lav',
-      isQuick: true,
-    });
+  it('deletes a manufacturer, the drawer’s summary in the pill', async () => {
+    vi.mocked(deleteManufacturer).mockResolvedValue(undefined);
+    vi.mocked(restoreManufacturer).mockResolvedValue(manufacturerRow());
     await confirm(
-      { kind: 'manufacturer', id: maker.id, name: 'ZEN', record: 'ZEN · 0 suppliers' },
+      {
+        kind: 'manufacturer',
+        id: TEST_MAKER_ID,
+        name: 'SUN PHARMA',
+        record: 'SUN PHARMA · 0 suppliers',
+      },
       'Delete this manufacturer?',
     );
-    expect(appFixtures.manufacturers.snapshot((row) => row.id === maker.id)).toHaveLength(
-      0,
-    );
+    expect(deleteManufacturer).toHaveBeenCalledWith(TEST_MAKER_ID, 'mistake', null);
   });
 
-  it('deletes a supplier with nothing to settle', async () => {
-    await confirm(
-      { kind: 'supplier', id: ref.supplier(52), name: 'Akshar Medicines' },
-      'Delete this supplier?',
+  it('deletes a supplier with nothing owed; a refusal keeps the confirm open and says why', async () => {
+    const user = setup();
+    vi.mocked(deleteSupplier).mockRejectedValueOnce(
+      new HttpError('Has dues', 409, '/app/suppliers', 'DELETE', {
+        error: { type: 'request_error', code: 'conflict', reason: 'supplier_has_dues' },
+      }),
     );
-    expect(
-      appFixtures.suppliers.snapshot((row) => row.id === ref.supplier(52)),
-    ).toHaveLength(0);
+    vi.mocked(restoreSupplier).mockResolvedValue(supplierRow());
+    const onDeleted = vi.fn();
+    renderMedicalDrawer(
+      <MedicalDeleteConfirm
+        target={{ kind: 'supplier', id: TEST_SUPPLIER_ID, name: 'Ankur Pharma' }}
+        onClose={vi.fn()}
+        onDeleted={onDeleted}
+      />,
+    );
+    const dialog = await screen.findByRole('alertdialog');
+    expect(within(dialog).getByText('Delete this supplier?')).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('radio', { name: 'Created by mistake' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalledTimes(1));
+    expect(onDeleted).not.toHaveBeenCalled();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+
+    vi.mocked(deleteSupplier).mockResolvedValueOnce(undefined);
+    await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(onDeleted).toHaveBeenCalled());
+    expect(deleteSupplier).toHaveBeenLastCalledWith(TEST_SUPPLIER_ID, 'mistake', null);
   });
 });

@@ -4,12 +4,28 @@ import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('../../medical-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllManufacturers: vi.fn(),
+  fetchAllSuppliers: vi.fn(),
+  fetchAllMedicalReps: vi.fn(),
+}));
+vi.mock('../../medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  quickCreateManufacturer: vi.fn(),
+  quickCreateSupplier: vi.fn(),
+  quickCreateMedicalRep: vi.fn(),
+}));
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import {
+  manufacturerRow,
+  mrRow,
+  supplierRow,
+  TEST_MAKER_ID,
+  TEST_MR_ID,
+} from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
@@ -17,6 +33,16 @@ import {
 } from '../../../__tests__/integration/medical-test-router.tsx';
 import { useMedicalPickers } from '../../hooks/useMedicalPickers/index.ts';
 import type { OpenMedicalChild } from '../../hooks/useMedicalStack/index.ts';
+import {
+  fetchAllManufacturers,
+  fetchAllMedicalReps,
+  fetchAllSuppliers,
+} from '../../medical-api.ts';
+import {
+  quickCreateManufacturer,
+  quickCreateMedicalRep,
+  quickCreateSupplier,
+} from '../../medical-records-api.ts';
 import {
   type MedicalPartnerKind,
   MedicalPartnerPicker,
@@ -45,6 +71,11 @@ vi.mock('@/shared/notify/index.ts', () => ({
 
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+
+const ALVI_ID = 'mfr_alvi00000000000000000';
+const ACME_ID = 'mfr_acme00000000000000000';
+const OM_ID = 'sup_ompharma00000000000000';
+const RAVI_ID = 'mrep_ravi00000000000000000';
 
 /** A one-pick field over `kind`, its pick shown beside it. */
 function Single({
@@ -96,12 +127,31 @@ function Multiple({ kind }: { kind: MedicalPartnerKind }) {
 }
 
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
+  // SUN PHARMA (14 medicines) and ALVI (one); Ankur Pharma distributes SUN PHARMA, NH Pharma nothing.
+  vi.mocked(fetchAllManufacturers).mockResolvedValue([
+    manufacturerRow(),
+    manufacturerRow({ id: ALVI_ID, name: 'ALVI', tone: 'lav', medicineCount: 1 }),
+  ]);
+  vi.mocked(fetchAllSuppliers).mockResolvedValue([
+    supplierRow(),
+    supplierRow({
+      id: 'sup_nhpharma00000000000000',
+      name: 'NH Pharma',
+      manufacturers: [],
+      manufacturerIds: [],
+    }),
+  ]);
+  vi.mocked(fetchAllMedicalReps).mockResolvedValue([
+    mrRow(),
+    mrRow({ id: 'mrep_rakesh000000000000000', name: 'Alvio Pharma · Rakesh' }),
+  ]);
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetAppFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('MedicalPartnerPicker (medical.md:311–325)', () => {
@@ -110,15 +160,18 @@ describe('MedicalPartnerPicker (medical.md:311–325)', () => {
     const { container } = renderMedicalDrawer(<Single kind="manufacturer" />);
     await user.click(await screen.findByTestId('partner'));
     expect(await screen.findByRole('option', { name: /ALVI/ })).toHaveTextContent(
-      ' medicine',
+      '1 medicine',
     );
-    await user.click(screen.getByRole('option', { name: /AVRI/ }));
-    expect(screen.getByTestId('picked')).toHaveTextContent(ref.manufacturer(3));
+    await user.click(screen.getByRole('option', { name: /SUN PHARMA/ }));
+    expect(screen.getByTestId('picked')).toHaveTextContent(TEST_MAKER_ID);
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('quick-adds a maker from the create row: "ACME" in the next colour, toasted and picked', async () => {
+  it('quick-adds a maker from the create row: toasted, listed and picked', async () => {
     const user = setup();
+    vi.mocked(quickCreateManufacturer).mockResolvedValue(
+      manufacturerRow({ id: ACME_ID, name: 'ACME', isQuick: true, medicineCount: 0 }),
+    );
     renderMedicalDrawer(<Single kind="manufacturer" />);
     await user.click(await screen.findByTestId('partner'));
     await user.type(await screen.findByRole('combobox'), 'acme');
@@ -128,18 +181,21 @@ describe('MedicalPartnerPicker (medical.md:311–325)', () => {
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Manufacturer ACME added'),
     );
-    const [acme] = appFixtures.manufacturers.snapshot((row) => row.name === 'ACME');
-    expect(acme?.isQuick).toBe(true);
-    await waitFor(() =>
-      expect(screen.getByTestId('picked')).toHaveTextContent(acme?.id ?? '—'),
-    );
+    expect(quickCreateManufacturer).toHaveBeenCalledWith({
+      name: 'acme',
+      idempotencyKey: expect.any(String),
+    });
+    await waitFor(() => expect(screen.getByTestId('picked')).toHaveTextContent(ACME_ID));
   });
 
   it('groups suppliers by the maker they distribute and quick-adds one linked to it', async () => {
     const user = setup();
-    renderMedicalDrawer(<Single kind="supplier" makerId={ref.manufacturer(6)} />);
+    vi.mocked(quickCreateSupplier).mockResolvedValue(
+      supplierRow({ id: OM_ID, name: 'Om Pharma', phone: null, isQuick: true }),
+    );
+    renderMedicalDrawer(<Single kind="supplier" makerId={TEST_MAKER_ID} />);
     await user.click(await screen.findByTestId('partner'));
-    expect(await screen.findByText('Distributes BLA')).toBeInTheDocument();
+    expect(await screen.findByText('Distributes SUN PHARMA')).toBeInTheDocument();
     expect(screen.getByText('Other suppliers')).toBeInTheDocument();
     await user.type(screen.getByRole('combobox'), 'Om Pharma');
     await user.click(
@@ -150,8 +206,12 @@ describe('MedicalPartnerPicker (medical.md:311–325)', () => {
         'Supplier Om Pharma added · add phone and GST later',
       ),
     );
-    const [om] = appFixtures.suppliers.snapshot((row) => row.name === 'Om Pharma');
-    expect(om?.manufacturerIds).toEqual([ref.manufacturer(6)]);
+    expect(quickCreateSupplier).toHaveBeenCalledWith({
+      name: 'Om Pharma',
+      manufacturerIds: [TEST_MAKER_ID],
+      idempotencyKey: expect.any(String),
+    });
+    await waitFor(() => expect(screen.getByTestId('picked')).toHaveTextContent(OM_ID));
   });
 
   it('opens the record in full on top, and picks what it saves', async () => {
@@ -166,31 +226,27 @@ describe('MedicalPartnerPicker (medical.md:311–325)', () => {
     );
     const [request] = openChild.mock.calls[0] ?? [];
     if (request?.kind !== 'mr') throw new Error('expected an MR request');
-    const rep = await appFixtures.medicalReps.create({
-      name: 'Ravi',
-      phone: null,
-      nextVisitOn: null,
-      manufacturerIds: [],
-    });
-    request.onCreated(rep);
-    await waitFor(() => expect(screen.getByTestId('picked')).toHaveTextContent(rep.id));
+    request.onCreated(mrRow({ id: RAVI_ID, name: 'Ravi', manufacturers: [] }));
+    await waitFor(() => expect(screen.getByTestId('picked')).toHaveTextContent(RAVI_ID));
   });
 
   it('adds picks to a pick-any field, a quick MR among them', async () => {
     const user = setup();
+    vi.mocked(quickCreateMedicalRep).mockResolvedValue(
+      mrRow({ id: RAVI_ID, name: 'Ravi', phone: null, manufacturers: [] }),
+    );
     renderMedicalDrawer(<Multiple kind="mr" />);
     await user.click(await screen.findByTestId('partners'));
-    await user.click(
-      await screen.findByRole('option', { name: /Alvio Pharma · Rakesh/ }),
-    );
+    await user.click(await screen.findByRole('option', { name: /Rahul Mehta/ }));
     await user.type(screen.getByRole('combobox'), 'Ravi');
     await user.click(await screen.findByRole('option', { name: /Add MR “Ravi”/ }));
     await waitFor(() => expect(notifyMock.success).toHaveBeenCalledWith('MR Ravi added'));
-    const [ravi] = appFixtures.medicalReps.snapshot((rep) => rep.name === 'Ravi');
+    expect(quickCreateMedicalRep).toHaveBeenCalledWith({
+      name: 'Ravi',
+      idempotencyKey: expect.any(String),
+    });
     await waitFor(() =>
-      expect(screen.getByTestId('picked')).toHaveTextContent(
-        `${ref.medicalRep(1)},${ravi?.id ?? '—'}`,
-      ),
+      expect(screen.getByTestId('picked')).toHaveTextContent(`${TEST_MR_ID},${RAVI_ID}`),
     );
   });
 });

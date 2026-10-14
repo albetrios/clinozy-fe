@@ -1,16 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import {
-  fetchSaleInvoice,
-  fixtureInvoiceQueryKeys,
-} from '@/shared/api/app/invoices-fixture-api.ts';
+import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
 import { printInvoice } from '@/shared/components/InvoiceDrawer/index.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
-import { useFixtureDeletePayment } from '@/shared/hooks/useFixtureLedger/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
+import { useDeletePayment } from '@/shared/hooks/usePayments/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { useCollectSale } from '../../../shared/hooks/useMedicalFlows/index.ts';
 import type { SaleRow } from '../../../shared/medical-contracts.ts';
@@ -19,83 +18,103 @@ import {
   MEDICAL_DRAWERS_NS,
 } from '../../../shared/medical-drawers.constants.ts';
 
-/** A sale as its actions read it. */
-type SaleState = Pick<SaleRow, 'id' | 'status' | 'paid' | 'due' | 'returns'>;
+/** Paid or Unpaid, as the sale's pill and row edge show it: what the server still has due. */
+export type SalePayment = 'paid' | 'unpaid';
 
-/** A sale as Print reads it: the invoice it prints. */
-type SaleInvoice = Pick<SaleRow, 'invoiceId'>;
+/** Whether the sale still owes, by the server's due (`medical.md:29`). */
+export const salePaymentOf = (sale: Pick<SaleRow, 'due'>): SalePayment =>
+  sale.due > 0 ? 'unpaid' : 'paid';
+
+/** Whether any sold line is still with the customer — the server's `returned_quantity` read. */
+const hasLinesOut = (sale: Pick<SaleRow, 'lines'>) =>
+  sale.lines.some((line) => line.qty - line.returnedQty > 0);
 
 /** What {@link useSaleActions} hands the Sales tab and the Sale drawer. */
 export interface SaleActions {
-  /** "Collect ₹563": an unpaid sale, for members who edit Medical. */
-  canCollect: (sale: SaleState) => boolean;
-  /** "Return medicines": members who edit Medical. */
-  canReturn: boolean;
+  /** "Collect ₹563": a live sale still owing, for members who take money (`payment:create`). */
+  canCollect: (sale: SaleRow) => boolean;
   /**
-   * "Void sale": an unpaid sale nothing was paid on or returned from, for
-   * members with Medical Delete (`medicine:delete`, Q-M2; the `void` ability retired on codes).
+   * "Return medicines": a sale paid in full with something still out (MD24 — collect first),
+   * for members who give money back (`payment:delete`, MD23).
    */
-  canVoid: (sale: SaleState) => boolean;
+  canReturn: (sale: SaleRow) => boolean;
+  /**
+   * "Void sale": an unpaid sale nothing was paid on or returned from, for members with Medical
+   * Delete (`medicine:delete`, Q-M2; the `void` ability retired on codes).
+   */
+  canVoid: (sale: SaleRow) => boolean;
   /** Record the sale's full due as one receipt; `onDone` runs once it is on the ledger. */
-  collect: (sale: SaleState, onDone?: () => void) => void;
+  collect: (sale: SaleRow, onDone?: () => void) => void;
   /** The receipt is being written. */
   collecting: boolean;
   /**
-   * "Print": the sale's invoice on the A4 sheet in its Medical form, the
-   * browser's dialog 260ms after it renders (`medical.md:137–146`).
+   * "Print": the sale's invoice on the A4 sheet in its Medical form under the sale's own number
+   * ("S-983"), the browser's dialog 260ms after it renders (`medical.md:137–146`).
    */
-  print: (sale: SaleInvoice) => void;
+  print: (sale: Pick<SaleRow, 'invoice' | 'seq'>) => void;
 }
 
 /**
  * What a sale offers (`medical.md:29, 338`) — the same on its row and in its
  * drawer — and Collect itself (KICKOFF §6.7 Money actions, Q-M1): the sale's
- * full due as one UPI receipt on the ledger against its invoice, the Receive
- * drawer's "Full · ₹X" preset in one tap, so it reaches Day close. "₹563
- * received" offers Undo, which deletes the receipt while its day is open; a
- * closed day or a settled sale answers with the server's message. Print reads
- * the sale's invoice — cached when the drawer read it — and prints it.
+ * full due as one UPI receipt on the ledger against its invoice
+ * (`POST /app/payments`), so it reaches Day close. "₹563 received" offers
+ * Undo to a member who may delete a payment — it deletes the receipt while its
+ * day is open; a closed day or a settled sale answers with the server's
+ * message. Print reads the sale's invoice (`GET /app/invoices/:id`) — cached
+ * once read — and prints it.
  */
 export function useSaleActions(): SaleActions {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const queryClient = useQueryClient();
-  const formatPaise = usePaiseFormat();
+  const organizationId = useOrganizationId();
+  const formatRupees = useRupeeFormat();
   const access = useAppAccess();
+  const payments = usePaymentAccess();
   const collectSale = useCollectSale();
-  const removeReceipt = useFixtureDeletePayment();
-  const can = (action: 'edit' | 'delete') =>
-    access.isResolved && access.can('medical', action);
+  const removeReceipt = useDeletePayment();
+  const live = (sale: SaleRow) => sale.status !== 'voided' && sale.invoice !== null;
   return {
-    canCollect: (sale) => sale.status === 'unpaid' && can('edit'),
-    canReturn: can('edit'),
+    canCollect: (sale) =>
+      live(sale) && sale.due > 0 && sale.customer !== null && payments.canCreate,
+    canReturn: (sale) =>
+      live(sale) && sale.due <= 0 && hasLinesOut(sale) && payments.canDelete,
     canVoid: (sale) =>
       sale.status === 'unpaid' &&
       sale.paid === 0 &&
       sale.returns.length === 0 &&
-      can('delete'),
+      access.isResolved &&
+      access.can('medical', 'delete'),
     collecting: collectSale.isPending,
-    print: (sale) =>
+    print: ({ invoice, seq }) => {
+      if (!invoice) return;
       void queryClient
         .query({
-          queryKey: fixtureInvoiceQueryKeys.sale(sale.invoiceId),
-          queryFn: () => fetchSaleInvoice(sale.invoiceId),
+          queryKey: invoiceQueryKeys.detail(organizationId, invoice.id),
+          queryFn: () => fetchInvoice(invoice.id),
         })
-        .then(printInvoice)
-        .catch((error: unknown) => notifyError(error)),
+        .then((detail) => printInvoice({ ...detail, sale: { seq } }))
+        .catch((error: unknown) => notifyError(error));
+    },
     collect: (sale, onDone) =>
-      collectSale.mutate(sale.id, {
-        onSuccess: (receipt) => {
-          notify.undo(
-            t(MEDICAL_DRAWER_KEYS.sale.collected, {
-              amount: formatPaise(receipt.amount),
-            }),
-            {
-              onUndo: () =>
-                removeReceipt.mutate({ id: receipt.id, reason: 'mistake', note: null }),
-            },
-          );
-          onDone?.();
+      collectSale.mutate(
+        { sale, mode: 'upi' },
+        {
+          onSuccess: (receipt) => {
+            const message = t(MEDICAL_DRAWER_KEYS.sale.collected, {
+              amount: formatRupees(receipt.amount),
+            });
+            if (payments.canDelete) {
+              notify.undo(message, {
+                onUndo: () =>
+                  removeReceipt.mutate({ id: receipt.id, reason: 'mistake', note: null }),
+              });
+            } else {
+              notify.success(message);
+            }
+            onDone?.();
+          },
         },
-      }),
+      ),
   };
 }

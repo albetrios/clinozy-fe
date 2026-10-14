@@ -3,7 +3,6 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { Supplier } from '@/shared/api/app/app-schema.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
   phoneDigitsOf,
@@ -33,7 +32,7 @@ import {
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -53,7 +52,7 @@ import {
   MEDICAL_DRAWER_TEST_IDS,
   MEDICAL_DRAWERS_NS,
 } from '../../medical-drawers.constants.ts';
-import type { SupplierInput } from '../../medical-partners-contracts.ts';
+import type { SupplierInput } from '../../medical-records-contracts.ts';
 import { MedicalDeleteConfirm } from '../MedicalDeleteConfirm/index.ts';
 import { MedicalPartnerPicker } from '../MedicalPartnerPicker/index.ts';
 import { SupplierAccountRows } from './SupplierAccountRows.tsx';
@@ -90,14 +89,14 @@ interface SupplierDrawerBaseProps {
   /** Stacked on another drawer: "Back", "Add supplier", no "full details" of its own. */
   stacked?: boolean;
   /** The saved record — a stacked child hands it to the field that asked. */
-  onSaved?: (supplier: Supplier) => void;
+  onSaved?: (supplier: SupplierRow) => void;
   /** Opens a manufacturer on top for "full details"; a stacked drawer passes none. */
   openChild?: OpenMedicalChild;
   /** Quick fill's "New purchase order" (edit): a new order for this supplier. */
   onNewOrder?: (supplierId: string) => void;
   /**
    * Quick fill's "Pay ₹827" (edit, while something is due; Q-M1): Send payment
-   * on the supplier's oldest open bill. Passed only to members who may pay.
+   * on the supplier's oldest open order. Passed only to members who may pay.
    */
   onPay?: (supplier: SupplierRow) => void;
   testId?: string;
@@ -247,13 +246,13 @@ function DistributesFields({ form, idPrefix, testId, pickers, openChild }: BodyP
 /** "₹827 · 5 days" / "Nothing due", "1 order · ₹4,236" / "No orders yet". */
 function useAccountWords(supplier: SupplierRow | null) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   if (!supplier) return null;
   return {
     payable:
       supplier.payable > 0
         ? t(K.fields.payableValue, {
-            amount: formatPaise(supplier.payable),
+            amount: formatRupees(supplier.payable),
             count: supplier.ageingDays ?? 0,
           })
         : t(K.fields.nothingDue),
@@ -261,7 +260,7 @@ function useAccountWords(supplier: SupplierRow | null) {
       supplier.orderCount > 0
         ? t(K.fields.ordersValue, {
             count: supplier.orderCount,
-            amount: formatPaise(supplier.orderTotal),
+            amount: formatRupees(supplier.orderTotal),
           })
         : t(K.fields.noOrders),
   };
@@ -359,13 +358,13 @@ const stepOfField = (field: string) =>
 /**
  * The header's Quick fill (edit; `medical.md:203`): "⚡ New purchase order"
  * (sky) and, while the supplier is owed money, "⚡ Pay ₹827" (sage) — Send
- * payment on its oldest open bill (Q-M1).
+ * payment on its oldest open order (Q-M1).
  */
 function quickFillOf(
   supplier: SupplierRow | null,
   actions: Pick<SupplierDrawerBaseProps, 'onNewOrder' | 'onPay'>,
   t: TFunction,
-  formatPaise: (paise: number) => string,
+  formatRupees: (rupees: number) => string,
 ): QuickFillItem[] | undefined {
   if (!supplier) return undefined;
   const { onNewOrder, onPay } = actions;
@@ -378,10 +377,10 @@ function quickFillOf(
       onSelect: () => onNewOrder(supplier.id),
     });
   }
-  if (onPay && supplier.payable > 0 && supplier.oldestOpenBill) {
+  if (onPay && supplier.payable > 0) {
     items.push({
       id: 'pay',
-      label: t(K.quickFill.pay, { amount: formatPaise(supplier.payable) }),
+      label: t(K.quickFill.pay, { amount: formatRupees(supplier.payable) }),
       tone: 'sage',
       onSelect: () => onPay(supplier),
     });
@@ -408,7 +407,7 @@ function SupplierSession({
 }) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const { t: tPatient } = useTranslation(PATIENT_DRAWER_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const idPrefix = `supplier-${useId().replace(/:/g, '')}`;
   const { readOnly, canDelete } = useMedicalDrawerAccess(supplier !== null);
   const pickers = useMedicalPickers();
@@ -422,7 +421,7 @@ function SupplierSession({
 
   const create = useCreateSupplier({ notifyOnError: false, successMessage: t(K.saved) });
   const update = useUpdateSupplier({ notifyOnError: false, successMessage: t(K.saved) });
-  const { saveState, save } = useDrawerSave<SupplierFormValues, Supplier>({
+  const { saveState, save } = useDrawerSave<SupplierFormValues, SupplierRow>({
     form,
     fieldOrder: ['name', 'phone', 'gstNumber', 'manufacturerIds'],
     toastId: 'supplier-save-failed',
@@ -434,7 +433,7 @@ function SupplierSession({
     write: () => {
       const input = inputOf(form.getValues());
       return supplier
-        ? update.mutateAsync({ id: supplier.id, patch: input })
+        ? update.mutateAsync({ record: supplier, input })
         : create.mutateAsync(input);
     },
     onDone: (record) => (onSaved ? onSaved(record) : onClose()),
@@ -447,12 +446,8 @@ function SupplierSession({
     readOnly,
   );
   const summary = values.name.trim();
-  const deletable =
-    canDelete &&
-    !stacked &&
-    supplier !== null &&
-    supplier.payable === 0 &&
-    !supplier.hasOpenOrder;
+  // Nothing payable; an open credit or an order still to receive is the server's refusal.
+  const deletable = canDelete && !stacked && supplier !== null && supplier.payable === 0;
 
   return (
     <>
@@ -464,7 +459,7 @@ function SupplierSession({
         quickFill={
           stacked
             ? undefined
-            : quickFillOf(supplier, { onNewOrder, onPay }, t, formatPaise)
+            : quickFillOf(supplier, { onNewOrder, onPay }, t, formatRupees)
         }
         content={supplier ? EDIT_PROFILE : CREATE_PROFILE}
         tone={SECTION_TONES.medical}

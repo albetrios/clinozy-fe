@@ -2,17 +2,13 @@ import { seedCommon } from '@/shared/api/app/app-fixture-seed.ts';
 import type {
   OfferingCategory,
   OfferingSpecialty,
-  OfferKind,
   Tone,
 } from '@/shared/api/app/app-schema.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
-import type {
-  OfferingRecord,
-  OfferRecord,
-} from '@/shared/api/app/offerings-fixture-contracts.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-fixture-contracts.ts';
 
 import { type BranchName, branchRef } from './organization.fixtures.ts';
-import { must, paise, ref, seedAt, seedDay } from './refs.fixtures.ts';
+import { must, paise, ref, seedAt } from './refs.fixtures.ts';
 import { type StaffKey, staffRef } from './staff.fixtures.ts';
 
 const CATEGORIES: Record<string, OfferingCategory> = {
@@ -29,13 +25,6 @@ const SPECIALTIES: Record<string, OfferingSpecialty> = {
   Gynac: 'gynac',
   Physio: 'physio',
   General: 'general',
-};
-/** `OFX_KINDS` (H:3580). */
-const OFFER_KINDS: Record<string, OfferKind> = {
-  pct: 'percent',
-  amt: 'amount',
-  fixed: 'fixed',
-  extra: 'extra',
 };
 
 interface OfferingRow {
@@ -281,118 +270,4 @@ export function offeringSeed(today: string = appToday()): OfferingRecord[] {
     description: null,
     updatedById: staffRef(row.by),
   }));
-}
-
-interface OfferRow {
-  key: number;
-  name: string;
-  code: string;
-  kind: string;
-  /** Percent, rupees or sessions, by kind. */
-  value: number;
-  offerings: readonly number[];
-  /** Empty = every branch. */
-  branches: readonly BranchName[];
-  from: string;
-  to: string;
-  tone: Tone;
-  paused: boolean;
-  note: string;
-  by: StaffKey;
-  updated: string;
-}
-
-/** `OFX_SEED` (H:3583–3587), verbatim. */
-const OFFER_ROWS: readonly OfferRow[] = [
-  {
-    key: 31,
-    name: 'Navratri glow',
-    code: 'GLOW20',
-    kind: 'pct',
-    value: 20,
-    offerings: [274, 271, 272],
-    branches: ['Adajan', 'Vesu'],
-    from: '22 Sep 2026',
-    to: '2 Oct 2026',
-    tone: 'blush',
-    paused: false,
-    note: 'Festival offer on peels and facials',
-    by: 'RS',
-    updated: 'Sep 21 · 18:10',
-  },
-  {
-    key: 30,
-    name: 'LHR launch · Vesu',
-    code: '',
-    kind: 'fixed',
-    value: 3999,
-    offerings: [268],
-    branches: ['Vesu'],
-    from: '1 Sep 2026',
-    to: '31 Oct 2026',
-    tone: 'lav',
-    paused: false,
-    note: 'Opening price for the new laser room',
-    by: 'DD',
-    updated: 'Aug 30 · 12:02',
-  },
-  {
-    key: 29,
-    name: 'Peel pack + 1 free',
-    code: '',
-    kind: 'extra',
-    value: 1,
-    offerings: [273],
-    branches: [],
-    from: '1 Oct 2026',
-    to: '31 Oct 2026',
-    tone: 'sage',
-    paused: false,
-    note: '',
-    by: 'RS',
-    updated: 'Sep 26 · 10:40',
-  },
-  {
-    key: 28,
-    name: 'Monsoon ₹500 off',
-    code: 'RAIN500',
-    kind: 'amt',
-    value: 500,
-    offerings: [271, 264],
-    branches: [],
-    from: '1 Jul 2026',
-    to: '31 Aug 2026',
-    tone: 'sky',
-    paused: false,
-    note: '',
-    by: 'DN',
-    updated: 'Jun 28 · 16:22',
-  },
-];
-
-/**
- * The offers; money values (₹ off, fixed price) in paise, percent and extra
- * sessions as-is. No branches stays no branches — every branch, shown "All
- * branches" — as the plan keeps it (Appendix F; the contract stores them all).
- */
-export function offerSeed(today: string = appToday()): OfferRecord[] {
-  return OFFER_ROWS.map((row) => {
-    const kind = must(OFFER_KINDS[row.kind], `offer kind ${row.kind}`);
-    return {
-      ...seedCommon(seedAt(row.updated, '10:00', today), staffRef(row.by)),
-      id: ref.offer(row.key),
-      name: row.name,
-      code: row.code || null,
-      kind,
-      value: kind === 'amount' || kind === 'fixed' ? paise(row.value) : row.value,
-      offeringIds: row.offerings.map((seq) => ref.offering(seq)),
-      branchIds: row.branches.map(branchRef),
-      startsOn: seedDay(row.from, today),
-      endsOn: seedDay(row.to, today),
-      paused: row.paused,
-      tone: row.tone,
-      note: row.note || null,
-      updatedById: staffRef(row.by),
-    };
-  });
 }

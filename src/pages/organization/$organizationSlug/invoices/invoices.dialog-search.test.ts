@@ -13,8 +13,10 @@ const VISIT = 'appt_priya0000000000000000';
 const OLD_UUID = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
 
 describe('the contract’s values, declared for the link reader', () => {
-  it('name every invoice type, in the switch’s order', () => {
-    expect([...INVOICE_TYPE_PARAMS].sort()).toEqual([...INVOICE_TYPE_VALUES].sort());
+  it('name every invoice type but Medical — a sale is the Medical room’s (MD28)', () => {
+    expect([...INVOICE_TYPE_PARAMS].sort()).toEqual(
+      INVOICE_TYPE_VALUES.filter((type) => type !== 'medical').sort(),
+    );
   });
 });
 
@@ -22,14 +24,14 @@ describe('validateInvoiceCreateSearch (S:92)', () => {
   it('keeps the type, the patient, the invoice copied, the visit billed and the room to go back to', () => {
     expect(
       validateInvoiceCreateSearch({
-        type: 'medical',
+        type: 'consultation',
         patient: PATIENT,
         copyOf: INVOICE,
         appointment: VISIT,
         from: ' patients/x/invoices ',
       }),
     ).toEqual({
-      type: 'medical',
+      type: 'consultation',
       patient: PATIENT,
       copyOf: INVOICE,
       appointment: VISIT,
@@ -57,6 +59,8 @@ describe('validateInvoiceCreateSearch (S:92)', () => {
     expect(
       validateInvoiceCreateSearch({ type: 'pharmacy', patient: '3508', from: '' }),
     ).toEqual({ type: undefined, patient: undefined, from: undefined });
+    // A medical bill is never started here (MD28): New invoice opens on Clinic.
+    expect(validateInvoiceCreateSearch({ type: 'medical' }).type).toBeUndefined();
     expect(validateInvoiceCreateSearch({})).toEqual({
       type: undefined,
       patient: undefined,

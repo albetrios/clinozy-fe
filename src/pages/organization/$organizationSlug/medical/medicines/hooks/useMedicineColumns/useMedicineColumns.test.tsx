@@ -1,13 +1,9 @@
 import { renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
-import { fetchMedicine } from '@/shared/api/app/medicines-api.ts';
+import { medicineRow } from '@/tests/utils/medical-doubles.ts';
 
 import { useMedicineColumns } from './useMedicineColumns.tsx';
-
-afterEach(() => resetAppFixtures());
 
 describe('useMedicineColumns', () => {
   it('lays out the Medicines columns, Best rate hidden, the ids the URL sorts by', () => {
@@ -37,15 +33,20 @@ describe('useMedicineColumns', () => {
     );
   });
 
-  it('folds a row into the meta line the phone reads', async () => {
-    const row = await fetchMedicine(ref.medicine(458));
+  it('folds a row into the meta line the phone reads — the API’s rupees and stock level', () => {
+    const row = medicineRow();
     const { result } = renderHook(() => useMedicineColumns());
-    const fold = (id: string) =>
-      result.current.find((column) => column.id === id)?.meta?.foldValue?.(row);
+    const fold = (id: string, original: unknown = row) =>
+      result.current.find((column) => column.id === id)?.meta?.foldValue?.(original);
     // A bar cell folds as plain words, without a dot (H:4116).
-    expect(fold('stock')).toBe('8 in stock · OK');
-    expect(fold('expiry')).toMatchObject({ value: expect.stringContaining('CSH26044') });
-    expect(fold('margin')).toBe('32%');
+    expect(fold('stock')).toBe('12 in stock · OK');
+    expect(fold('stock', medicineRow({ stock: 2, stockLevel: 'low' }))).toBe(
+      '2 in stock · Low',
+    );
+    expect(fold('expiry')).toMatchObject({ value: expect.stringContaining('026-312') });
+    expect(fold('margin')).toBe('35%');
     expect(fold('mrp')).toBe('₹650');
+    expect(fold('bestRate')).toBe('₹420');
+    expect(fold('expiry', medicineRow({ nearest: null }))).toBe('No stock');
   });
 });

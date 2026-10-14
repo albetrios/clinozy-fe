@@ -32,6 +32,11 @@ describe('taskSourceTarget (tasks.md › Task drawer › 1)', () => {
       target: { kind: 'invoice', invoiceId: 'inv_a' },
       code: 'payment:read',
     });
+    expect(taskSourceTarget(task({ kind: 'medicalRep', id: 'mrep_a' }))).toEqual({
+      kind: 'medicalRep',
+      target: { kind: 'medicalRep', mrId: 'mrep_a' },
+      code: 'medicine:read',
+    });
   });
 
   it('opens a treatment on the file’s Treatments, a check-in or review over the file', () => {
@@ -60,9 +65,8 @@ describe('taskSourceTarget (tasks.md › Task drawer › 1)', () => {
     });
   });
 
-  it('has none for a credit, a medical rep, a record without a file, or nobody', () => {
+  it('has none for a credit, a record without a file, or nobody', () => {
     expect(taskSourceTarget(task({ kind: 'pendingCredit', id: 'pcr_a' }))).toBeNull();
-    expect(taskSourceTarget(task({ kind: 'medicalRep', id: 'mrp_a' }))).toBeNull();
     const noFile = { patientId: null, patientNumber: null };
     expect(taskSourceTarget(task({ kind: 'treatment', id: 'ptr_a' }, noFile))).toBeNull();
     expect(taskSourceTarget(task({ kind: 'checkIn', id: 'chk_a' }, noFile))).toBeNull();

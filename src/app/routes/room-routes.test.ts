@@ -41,6 +41,7 @@ const ROOM_MODULES: Record<RoomName, string> = {
   MedicalManufacturersPage: `${ORG}/medical/manufacturers/manufacturers.route.tsx`,
   MedicalMrsPage: `${ORG}/medical/mrs/mrs.route.tsx`,
   MedicalPaymentsPage: `${ORG}/medical/payments/payments.route.tsx`,
+  MedicalCreditsPage: `${ORG}/medical/credits/credits.route.tsx`,
   StockLayout: `${ORG}/stock/stock.route.tsx`,
   StockItemsPage: `${ORG}/stock/items/items.route.tsx`,
   StockPurchasesPage: `${ORG}/stock/purchases/purchases.route.tsx`,

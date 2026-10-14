@@ -183,6 +183,15 @@ export const ROOM_ROUTES = {
     ),
     'Component',
   ),
+  MedicalCreditsPage: lazyRouteComponent(
+    localizedRoute(
+      // Pending's words are the Payments room's (`PAYMENTS_NS`).
+      [I18N_NAMESPACES.medical, I18N_NAMESPACES.payments],
+      () =>
+        import('@/pages/organization/$organizationSlug/medical/credits/credits.route.tsx'),
+    ),
+    'Component',
+  ),
   StockLayout: lazyRouteComponent(
     localizedRoute(
       [I18N_NAMESPACES.appStock],

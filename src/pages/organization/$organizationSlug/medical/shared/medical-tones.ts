@@ -20,7 +20,7 @@ export function supplierAgeingTone(days: number): Tone {
   return days >= 7 ? 'butter' : 'sage';
 }
 
-/** An MR's next visit (`medical.md:109`): sky ahead, blush once it is past. */
-export function nextVisitTone(nextVisitOn: string, today: string): Tone {
-  return nextVisitOn < today ? 'blush' : 'sky';
+/** An MR's next visit (`medical.md:109`): sky ahead, blush once the server marks it overdue. */
+export function nextVisitTone(mr: { visitOverdue: boolean }): Tone {
+  return mr.visitOverdue ? 'blush' : 'sky';
 }

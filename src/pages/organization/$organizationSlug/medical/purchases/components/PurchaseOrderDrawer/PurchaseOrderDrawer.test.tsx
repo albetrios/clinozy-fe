@@ -2,19 +2,46 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('@/shared/api/app/medicines-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllMedicines: vi.fn(),
+}));
+vi.mock('../../../shared/medical-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllManufacturers: vi.fn(),
+  fetchAllSuppliers: vi.fn(),
+  fetchAllMedicalReps: vi.fn(),
+}));
+vi.mock('../../../shared/medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  createPurchaseOrder: vi.fn(),
+  updatePurchaseOrder: vi.fn(),
+}));
+import { fetchAllMedicines } from '@/shared/api/app/medicines-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import {
+  manufacturerRow,
+  medicineRow,
+  purchaseOrderRow,
+  supplierRow,
+  TEST_MEDICINE_ID,
+} from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
-import { fetchPurchaseOrder } from '../../../shared/medical-api.ts';
+import {
+  fetchAllManufacturers,
+  fetchAllMedicalReps,
+  fetchAllSuppliers,
+} from '../../../shared/medical-api.ts';
+import {
+  createPurchaseOrder,
+  updatePurchaseOrder,
+} from '../../../shared/medical-records-api.ts';
 import { PurchaseOrderDrawer } from './PurchaseOrderDrawer.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -39,17 +66,111 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const D = 'purchase-order-drawer';
+const AKSHAR_ID = 'sup_akshar000000000000000';
+const KR_ID = 'sup_krmedical000000000000';
+
+const akshar = (rate: number) => ({
+  supplierId: AKSHAR_ID,
+  supplierName: 'Akshar Medicines',
+  rate,
+  free: 0,
+  leadDays: 2,
+});
+const kr = (rate: number) => ({
+  supplierId: KR_ID,
+  supplierName: 'K R Medical Agency',
+  rate,
+  free: 0,
+  leadDays: 1,
+});
+
+/**
+ * The store's medicines: Epriva Tab and Azelan (Akshar Medicines' price list) in stock; Arganlif
+ * and Admosh low (2 of 10) and Trichospire out — the three "Low stock" chips, most of them bought
+ * from K R Medical Agency.
+ */
+const CATALOGUE = [
+  medicineRow({ id: TEST_MEDICINE_ID, name: 'Epriva Tab', supplierRates: [akshar(212)] }),
+  medicineRow({
+    id: 'med_azelan000000000000000',
+    name: 'Azelan 20% Cream',
+    supplierRates: [akshar(190)],
+    bestRate: { supplierId: AKSHAR_ID, supplierName: 'Akshar Medicines', rate: 190 },
+  }),
+  medicineRow({
+    id: 'med_arganlif0000000000000',
+    name: 'Arganlif Hair Serum 50 ml',
+    stock: 2,
+    maxStock: 10,
+    stockLevel: 'low',
+    supplierRates: [kr(677)],
+    bestRate: { supplierId: KR_ID, supplierName: 'K R Medical Agency', rate: 677 },
+  }),
+  medicineRow({
+    id: 'med_admosh000000000000000',
+    name: 'Admosh Lotion',
+    stock: 2,
+    maxStock: 10,
+    stockLevel: 'low',
+    supplierRates: [kr(240)],
+    bestRate: { supplierId: KR_ID, supplierName: 'K R Medical Agency', rate: 240 },
+  }),
+  medicineRow({
+    id: 'med_trichospire0000000000',
+    name: 'Trichospire',
+    stock: 0,
+    maxStock: 10,
+    stockLevel: 'out',
+    supplierRates: [kr(310), akshar(320)],
+    bestRate: { supplierId: KR_ID, supplierName: 'K R Medical Agency', rate: 310 },
+  }),
+];
+
+/** PO #430, Ordered: ten Epriva Tab and one free at ₹423.60 — ₹4,236. */
+const ORDERED = purchaseOrderRow({
+  seq: 430,
+  stage: 'ordered',
+  apiStage: 'ordered',
+  receivedAt: null,
+  supplier: { id: AKSHAR_ID, name: 'Akshar Medicines', phone: null, gstNumber: null },
+  lines: [
+    {
+      id: 'mpoi_line00000000000000000',
+      lineNo: 1,
+      medicineId: TEST_MEDICINE_ID,
+      medicineName: 'Epriva Tab',
+      qty: 10,
+      free: 1,
+      rate: 423.6,
+      amount: 4236,
+      received: null,
+      batchNo: null,
+      expiry: null,
+    },
+  ],
+  paid: 0,
+  due: 0,
+  paymentStatus: 'unpaid',
+});
+
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
+  vi.mocked(fetchAllMedicines).mockResolvedValue(CATALOGUE);
+  vi.mocked(fetchAllSuppliers).mockResolvedValue([
+    supplierRow({ id: AKSHAR_ID, name: 'Akshar Medicines' }),
+    supplierRow({ id: KR_ID, name: 'K R Medical Agency' }),
+  ]);
+  vi.mocked(fetchAllManufacturers).mockResolvedValue([manufacturerRow()]);
+  vi.mocked(fetchAllMedicalReps).mockResolvedValue([]);
+  vi.mocked(createPurchaseOrder).mockResolvedValue(ORDERED);
+  vi.mocked(updatePurchaseOrder).mockResolvedValue(ORDERED);
 });
-afterEach(() => {
-  resetMedicalRoutes();
-  resetAppFixtures();
-});
+afterEach(() => resetMedicalRoutes());
 
 describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
   it('opens on the first supplier; "Reorder low stock" fills the lines; a missing rate names its medicine', async () => {
@@ -79,26 +200,35 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() =>
       expect(notifyMock.warning).toHaveBeenCalledWith(
-        expect.stringMatching(/^Enter the rate for /),
+        'Enter the rate for Arganlif Hair Serum 50 ml',
       ),
     );
-    expect(onClose).not.toHaveBeenCalled();
+    expect(createPurchaseOrder).not.toHaveBeenCalled();
 
     await user.type(firstRate, '700');
     await user.tab();
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(notifyMock.success).toHaveBeenCalledWith('Purchase order saved');
-    expect(
-      appFixtures.purchaseOrders.snapshot(
-        (order) => order.stage === 'ordered' && order.supplierId === ref.supplier(52),
-      ),
-    ).toHaveLength(1);
+    // The lines in rupees, filled up to their fill-up level (10 − 2, 10 − 0).
+    expect(createPurchaseOrder).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          supplierId: AKSHAR_ID,
+          items: [
+            { medicineId: 'med_arganlif0000000000000', qty: 8, free: 0, rate: 700 },
+            { medicineId: 'med_admosh000000000000000', qty: 8, free: 0, rate: 240 },
+            { medicineId: 'med_trichospire0000000000', qty: 10, free: 0, rate: 320 },
+          ],
+        }),
+      }),
+    );
   });
 
   it('fills the items from the quick line — "azel 20 +2 @180" — the Low stock chips and Browse', async () => {
     const user = setup();
-    renderMedicalDrawer(<PurchaseOrderDrawer mode="create" open onClose={vi.fn()} />);
+    const onClose = vi.fn();
+    renderMedicalDrawer(<PurchaseOrderDrawer mode="create" open onClose={onClose} />);
     await waitFor(() =>
       expect(screen.getByTestId(`${D}-supplier`)).toHaveTextContent('Akshar Medicines'),
     );
@@ -149,26 +279,45 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
     expect(panel).toHaveTextContent('2 added');
     expect(await axeForDialog(drawer)).toHaveNoViolations();
 
-    // "New medicine name": a quick medicine on the supplier, at MRP ₹0.
+    // "New medicine name": the typed name rides its line — nothing is written yet.
     await user.type(
       within(panel).getByTestId(`${D}-quick-line-browse-new`),
       'Azel cream{Enter}',
     );
     await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith(
-        'Azel cream added · set MRP later in Stock',
-      ),
-    );
-    await waitFor(() =>
       expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(3),
     );
-    const [quick] = appFixtures.medicines.snapshot(
-      (medicine) => medicine.name === 'Azel cream',
+    expect(within(drawer).getAllByTestId(`${D}-lines-medicine`)[2]).toHaveTextContent(
+      'Azel cream',
     );
-    expect(quick).toMatchObject({ isQuick: true, mrp: 0 });
-    expect(quick?.supplierRates.map((rate) => rate.supplierId)).toEqual([
-      ref.supplier(52),
-    ]);
+
+    // It needs its rate like any line; the save sends its name for the server to add (MD26).
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() =>
+      expect(notifyMock.warning).toHaveBeenCalledWith('Enter the rate for Azel cream'),
+    );
+    const rate = within(drawer).getAllByTestId(`${D}-lines-rate`)[2] as HTMLElement;
+    await user.type(rate, '150');
+    await user.tab();
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createPurchaseOrder).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          items: [
+            { medicineId: 'med_azelan000000000000000', qty: 20, free: 2, rate: 180 },
+            { medicineId: 'med_arganlif0000000000000', qty: 8, free: 0, rate: 677 },
+            {
+              medicineId: null,
+              newMedicineName: 'Azel cream',
+              qty: 1,
+              free: 0,
+              rate: 150,
+            },
+          ],
+        }),
+      }),
+    );
   });
 
   it('`?supplier=` names the supplier; `?reorder=low` opens on Items at the supplier most of them use', async () => {
@@ -176,12 +325,12 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
       <PurchaseOrderDrawer
         mode="create"
         open
-        prefill={{ supplierId: ref.supplier(59) }}
+        prefill={{ supplierId: KR_ID }}
         onClose={vi.fn()}
       />,
     );
     await waitFor(() =>
-      expect(screen.getByTestId(`${D}-supplier`)).toHaveTextContent('NH Pharma'),
+      expect(screen.getByTestId(`${D}-supplier`)).toHaveTextContent('K R Medical Agency'),
     );
     first.unmount();
 
@@ -194,14 +343,17 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
       />,
     );
     await waitFor(() => expect(screen.getAllByTestId(`${D}-lines-row`)).toHaveLength(3));
-    expect(screen.getByTestId(`${D}-summary`)).toHaveTextContent(/₹/);
+    // The Order step, folded, names the supplier.
+    expect(screen.getByTestId(D)).toHaveTextContent('K R Medical Agency');
+    // 8 × ₹677 + 8 × ₹240 + 10 × ₹310.
+    expect(screen.getByTestId(`${D}-summary`)).toHaveTextContent('₹10,436');
   });
 
-  it('edits an Ordered order, with the red "Cancel order" for an Admin', async () => {
+  it('edits an Ordered order — only what changed, with its read — and has the red "Cancel order" for an Admin', async () => {
     const user = setup();
-    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
+    const onClose = vi.fn();
     renderMedicalDrawer(
-      <PurchaseOrderDrawer mode="edit" order={order} open onClose={vi.fn()} />,
+      <PurchaseOrderDrawer mode="edit" order={ORDERED} open onClose={onClose} />,
     );
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent(
@@ -213,12 +365,27 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
     const dialog = await screen.findByRole('alertdialog');
     expect(within(dialog).getByText('Cancel this purchase order?')).toBeInTheDocument();
     expect(dialog).toHaveTextContent('₹4,236');
+    await user.click(within(dialog).getByRole('button', { name: 'Keep it' }));
+
+    const billNo = within(drawer).getByTestId(`${D}-bill-no`);
+    await user.clear(billNo);
+    await user.type(billNo, 'T-90000');
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(updatePurchaseOrder).toHaveBeenCalledWith(
+      expect.objectContaining({
+        record: ORDERED,
+        input: expect.objectContaining({
+          supplierBillNo: 'T-90000',
+          items: [{ medicineId: TEST_MEDICINE_ID, qty: 10, free: 1, rate: 423.6 }],
+        }),
+      }),
+    );
   });
 
   it('a Pharmacist edits but cannot cancel; the drawer shimmers until the order is read', async () => {
-    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
     const view = renderMedicalDrawer(
-      <PurchaseOrderDrawer mode="edit" order={order} open onClose={vi.fn()} />,
+      <PurchaseOrderDrawer mode="edit" order={ORDERED} open onClose={vi.fn()} />,
       { role: 'pharmacist' },
     );
     const drawer = await screen.findByTestId(D);

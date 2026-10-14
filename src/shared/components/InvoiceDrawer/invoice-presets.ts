@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { rupeesOfPaise } from '@/lib/number-text.ts';
 import type { InvoicePresets } from '@/shared/api/app/invoices-contracts.ts';
-import type { InvoiceRxPreset } from '@/shared/api/app/invoices-fixture-contracts.ts';
 import type { PlanSuggestionRow } from '@/shared/api/app/plan-contracts.ts';
 import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
@@ -19,6 +18,7 @@ import {
   namedLines,
 } from './invoice-form.ts';
 import { type InvoiceCatalogItem, lineFromCatalog } from './invoice-lines.ts';
+import type { SalePrescription } from './sale-form.ts';
 import type { InvoiceCatalog } from './use-invoice-catalog.ts';
 
 const K = INVOICE_DRAWER_KEYS.presets;
@@ -30,8 +30,8 @@ export interface InvoiceQuickFillInput {
   catalog: InvoiceCatalog;
   /** An invoice's patient: their packages and last invoices; null before a patient. */
   presets: InvoicePresets | null;
-  /** A sale's patient's latest prescription; null otherwise. */
-  latestRx: InvoiceRxPreset | null;
+  /** A sale's patient's latest approved prescription; null otherwise. */
+  latestRx: SalePrescription | null;
   /** The patient's plan rows; empty before a patient (and on a sale). */
   plan: readonly PlanSuggestionRow[];
   /** The saved invoice's id on an edit — it never repeats itself. */
@@ -165,7 +165,7 @@ function consultationPreset(
 
 /** A prescription's medicines as lines — matched by id, else by name; the rest named in a toast. */
 export function rxLines(
-  rx: InvoiceRxPreset,
+  rx: SalePrescription,
   catalog: readonly InvoiceCatalogItem[],
 ): { lines: InvoiceLineForm[]; unmatched: string[] } {
   const lines: InvoiceLineForm[] = [];

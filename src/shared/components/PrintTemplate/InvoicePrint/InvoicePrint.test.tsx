@@ -55,7 +55,6 @@ function propsFor(invoice: InvoiceRecord = peelInvoice()): InvoicePrintProps {
   const detail = invoiceDetail(invoice);
   return {
     invoice: detail.invoice,
-    sale: detail.sale,
     party: detail.party,
     organization: detail.sheet.organization,
     branch: detail.sheet.branch,
@@ -165,6 +164,22 @@ describe('InvoicePrint', () => {
     expect(screen.getByTestId(PRINT_TEMPLATE_TEST_IDS.footer)).toHaveTextContent(
       'Thank you for choosing Demo Organization for your medicine needs',
     );
+  });
+
+  it('a Medical invoice printed without its sale names the invoice number as one', () => {
+    render(
+      <InvoicePrint
+        {...propsFor(
+          peelInvoice({
+            type: 'medical',
+            items: [{ ...PEEL_LINE, name: 'Admosh UV Sunscreen 60g', offeringId: null }],
+          }),
+        )}
+      />,
+    );
+    expect(screen.getByText('Sale Details')).toBeInTheDocument();
+    expect(field('Invoice #:')).toHaveTextContent('2026-27/0005');
+    expect(screen.queryByText('Sale #:')).not.toBeInTheDocument();
   });
 
   it('prints a line’s own pack size, else the one in its name', () => {

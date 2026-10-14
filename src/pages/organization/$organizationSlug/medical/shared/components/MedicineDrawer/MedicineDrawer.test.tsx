@@ -2,20 +2,37 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
-import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
+vi.mock('@/shared/api/app/medicines-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  createMedicine: vi.fn(),
+  updateMedicine: vi.fn(),
+}));
+vi.mock('../../medical-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllManufacturers: vi.fn(),
+  fetchAllSuppliers: vi.fn(),
+  fetchAllMedicalReps: vi.fn(),
+}));
+import { createMedicine, updateMedicine } from '@/shared/api/app/medicines-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import {
+  manufacturerRow,
+  medicineRow,
+  supplierRow,
+} from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
+import {
+  fetchAllManufacturers,
+  fetchAllMedicalReps,
+  fetchAllSuppliers,
+} from '../../medical-api.ts';
 import { MedicineDrawer } from './MedicineDrawer.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -42,18 +59,68 @@ vi.mock('@/shared/notify/index.ts', () => ({
 const D = 'medicine-drawer';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
-const glycolac = () =>
-  appFixtures.medicines.get(ref.medicine(456)) as Promise<MedicineRecord>;
+const ALVI_ID = 'mfr_alvi00000000000000000';
+const AVRI_ID = 'mfr_avri00000000000000000';
+const AKSHAR_ID = 'sup_akshar000000000000000';
+
+/** Glycolac Cream by AVRI: ₹162.50, 3 in batch 026-312, ₹123 from Akshar Medicines. */
+const GLYCOLAC = medicineRow({
+  id: 'med_glyco0000000000000000',
+  seq: 456,
+  name: 'Glycolac Cream',
+  composition: 'Glycolic acid 6%',
+  manufacturer: { id: AVRI_ID, name: 'AVRI', tone: 'lav' },
+  mrp: 162.5,
+  minStock: 2,
+  maxStock: 10,
+  stock: 3,
+  batches: [
+    {
+      id: 'mbt_glyco0260000000000000',
+      batchNo: '026-312',
+      expiry: '11/26',
+      qty: 3,
+      purchaseRate: 123,
+      supplierId: AKSHAR_ID,
+      expired: false,
+    },
+  ],
+  supplierRates: [
+    {
+      supplierId: AKSHAR_ID,
+      supplierName: 'Akshar Medicines',
+      rate: 123,
+      free: 0,
+      leadDays: 2,
+    },
+  ],
+  bestRate: { supplierId: AKSHAR_ID, supplierName: 'Akshar Medicines', rate: 123 },
+});
+
+/** What a save answers: the record as the API returns it. */
+const saved = (name: string) => medicineRow({ id: 'med_azelcream000000000000', name });
 
 beforeEach(() => {
+  vi.resetAllMocks();
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
+  // ALVI first: a new medicine starts on it.
+  vi.mocked(fetchAllManufacturers).mockResolvedValue([
+    manufacturerRow({ id: ALVI_ID, name: 'ALVI', tone: 'sky' }),
+    manufacturerRow({ id: AVRI_ID, name: 'AVRI', tone: 'lav' }),
+  ]);
+  vi.mocked(fetchAllSuppliers).mockResolvedValue([
+    supplierRow({ id: AKSHAR_ID, name: 'Akshar Medicines', manufacturerIds: [AVRI_ID] }),
+  ]);
+  vi.mocked(fetchAllMedicalReps).mockResolvedValue([]);
+  vi.mocked(createMedicine).mockImplementation(async (input) => saved(input.name));
+  vi.mocked(updateMedicine).mockImplementation(async (record, input) => ({
+    ...record,
+    composition: input.composition,
+  }));
 });
-afterEach(() => {
-  resetMedicalRoutes();
-  resetAppFixtures();
-});
+afterEach(() => resetMedicalRoutes());
 
 describe('MedicineDrawer — New medicine (medical.md:170–188)', () => {
   it('opens on the typed name and the first maker; Save without an MRP opens its step', async () => {
@@ -80,10 +147,9 @@ describe('MedicineDrawer — New medicine (medical.md:170–188)', () => {
       'Order 10 to fill up to 10. Shows under Stock › Low stock.',
     );
 
-    const before = appFixtures.medicines.snapshot().length;
     await user.click(within(drawer).getByTestId(`${D}-save`));
     expect(notifyMock.warning).toHaveBeenCalledWith('Enter the MRP');
-    expect(appFixtures.medicines.snapshot()).toHaveLength(before);
+    expect(createMedicine).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
     expect(await axeForDialog(drawer)).toHaveNoViolations();
   });
@@ -117,9 +183,19 @@ describe('MedicineDrawer — New medicine (medical.md:170–188)', () => {
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(notifyMock.success).toHaveBeenCalledWith('Added Azel cream');
-    const added = appFixtures.medicines.snapshot((row) => row.name === 'Azel cream');
-    expect(added).toHaveLength(1);
-    expect(added[0]).toMatchObject({ mrp: 65_000, gstPct: 18, prescriptionOnly: true });
+    // A full record, rupees: `POST /app/medicines` with `is_quick: false`.
+    expect(createMedicine).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Azel cream',
+        manufacturerId: ALVI_ID,
+        mrp: 650,
+        gstPct: 18,
+        prescriptionOnly: true,
+        batches: [],
+        supplierRates: [],
+      }),
+      expect.any(String),
+    );
   });
 
   it('turns a picked supplier without a rate red, with its own words, and saves nothing', async () => {
@@ -147,6 +223,7 @@ describe('MedicineDrawer — New medicine (medical.md:170–188)', () => {
     const rate = within(drawer).getByRole('textbox', { name: 'Rate' });
     await waitFor(() => expect(rate).toHaveAttribute('aria-invalid', 'true'));
     expect(within(drawer).getByText('Enter this supplier’s rate')).toBeInTheDocument();
+    expect(createMedicine).not.toHaveBeenCalled();
   });
 });
 
@@ -154,7 +231,7 @@ describe('MedicineDrawer — Edit medicine', () => {
   it('shows the saved medicine: tag, sub line, badges, price split, stock and its rows', async () => {
     const user = setup();
     renderMedicalDrawer(
-      <MedicineDrawer mode="edit" medicine={await glycolac()} open onClose={vi.fn()} />,
+      <MedicineDrawer mode="edit" medicine={GLYCOLAC} open onClose={vi.fn()} />,
     );
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-tag`)).toHaveTextContent('#456');
@@ -184,7 +261,7 @@ describe('MedicineDrawer — Edit medicine', () => {
   it('keeps the reorder level at or below the fill-up level', async () => {
     const user = setup();
     renderMedicalDrawer(
-      <MedicineDrawer mode="edit" medicine={await glycolac()} open onClose={vi.fn()} />,
+      <MedicineDrawer mode="edit" medicine={GLYCOLAC} open onClose={vi.fn()} />,
     );
     const drawer = await screen.findByTestId(D);
     const fill = within(drawer).getByRole('button', { name: 'Decrease fill level' });
@@ -195,11 +272,11 @@ describe('MedicineDrawer — Edit medicine', () => {
     ).toBeDisabled();
   });
 
-  it('saves the edit: "Saved …", the record updated', async () => {
+  it('saves the edit: "Saved …" — the record as read, and the drawer’s fields', async () => {
     const user = setup();
     const onClose = vi.fn();
     renderMedicalDrawer(
-      <MedicineDrawer mode="edit" medicine={await glycolac()} open onClose={onClose} />,
+      <MedicineDrawer mode="edit" medicine={GLYCOLAC} open onClose={onClose} />,
     );
     const drawer = await screen.findByTestId(D);
     const composition = within(drawer).getByTestId(`${D}-composition`);
@@ -209,11 +286,28 @@ describe('MedicineDrawer — Edit medicine', () => {
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(notifyMock.success).toHaveBeenCalledWith('Saved Glycolac Cream');
-    expect((await glycolac()).composition).toBe('Glycolic acid 8%');
+    // Its `updated_at` guards the save; the batch goes back with its id.
+    expect(updateMedicine).toHaveBeenCalledWith(
+      GLYCOLAC,
+      expect.objectContaining({
+        composition: 'Glycolic acid 8%',
+        batches: [
+          {
+            id: 'mbt_glyco0260000000000000',
+            batchNo: '026-312',
+            expiry: '11/26',
+            qty: 3,
+            purchaseRate: 123,
+            supplierId: AKSHAR_ID,
+          },
+        ],
+      }),
+      expect.any(String),
+    );
   });
 
   it('opens view only for a role without Edit, and without Delete for one without Delete', async () => {
-    const medicine = await glycolac();
+    const medicine = GLYCOLAC;
     const viewer = renderMedicalDrawer(
       <MedicineDrawer mode="edit" medicine={medicine} open onClose={vi.fn()} />,
       { role: 'accountant' },

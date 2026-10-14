@@ -79,16 +79,19 @@ export function useFloorActions(organizationSlug: string): FloorActions {
   const openLead = (leadId: string) =>
     go(taskTargetNavigation({ kind: 'lead', leadId }, organizationSlug, REFERRER));
 
-  /** "Dispense": the sale drawer, prefilled from the Rx. */
+  /**
+   * "Dispense": the sale drawer on the Rx's patient (`customer`, their file) — New sale reads the
+   * prescription among the patient's, so the two travel together — prefilled from the Rx.
+   */
   const dispense = (row: TodayFloorRow) => {
-    const prescription = row.prescription?.id;
+    const { prescription } = row;
     if (!(prescription && access.can('medical', 'create'))) return null;
     return () =>
       go(
         appCommandNavigation('newSale', {
           organizationSlug,
           referrer: REFERRER,
-          search: { prescription },
+          search: { prescription: prescription.id, customer: prescription.patientId },
         }),
       );
   };

@@ -1,10 +1,7 @@
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type {
-  MedicineRecord,
-  MedicineRow,
-} from '@/shared/api/app/medicines-contracts.ts';
+import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import {
   nameNumbers,
@@ -22,7 +19,6 @@ import {
   withSteppedQuickLineRow,
 } from '@/shared/components/QuickLine/index.ts';
 import { ITEMS_QTY_MAX } from '@/shared/forms/ItemsField/index.ts';
-import { useQuickCreateMedicine } from '@/shared/hooks/useMedicines/index.ts';
 
 import { MEDICAL_KEYS } from '../../../medical.constants.ts';
 import {
@@ -37,6 +33,7 @@ import {
   type OrderLineValues,
   pricedBy,
   type PurchaseOrderFormValues,
+  typedMedicineKey,
 } from './purchase-order-form.ts';
 
 const K = MEDICAL_DRAWER_KEYS.purchaseOrder.fields;
@@ -49,23 +46,6 @@ const LOW_STOCK_CHIPS = 6;
 
 /** A medicine as the line lists it: its picker option's words, searched with its maker's name. */
 type OrderEntry = QuickLineItem<MedicineRow> & QuickLineSearchable;
-
-/**
- * "Add medicine “q”" — the picker's create row and the quick line's typed
- * name alike (`medical.md:261`): a quick medicine at MRP ₹0 linked to the
- * order's supplier, "Azel cream added · set MRP later in Stock". Resolves the
- * new record, or null when the write failed (its toast said so).
- */
-export function useOrderMedicineCreate(
-  supplierId: string | null,
-): (name: string) => Promise<MedicineRecord | null> {
-  const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const quickMedicine = useQuickCreateMedicine({
-    successMessage: (medicine) =>
-      t(MEDICAL_DRAWER_KEYS.quick.medicine, { name: medicine.name }),
-  });
-  return (name) => quickMedicine.mutateAsync({ name, supplierId }).catch(() => null);
-}
 
 /** The medicine picker's options as the line's entries — the same words, the record behind. */
 function entriesOf(options: readonly PickerOption<MedicineRow>[]): OrderEntry[] {
@@ -105,7 +85,8 @@ export interface OrderQuickLineInput {
  * pick without a quantity orders what fills the medicine up to its fill-up
  * level, at the supplier's rate. "Low stock" chips ("Arganlif Hair Serum 50
  * ml · 2 left") for the low medicines the order lacks; a typed name the list
- * lacks becomes a quick medicine. Browse: All · Low stock · "From <supplier>"
+ * lacks rides its line as typed, and the save adds it as a quick medicine
+ * (MD26). Browse: All · Low stock · "From <supplier>"
  * · Other medicines, a tile's [− n +], and "New medicine name".
  */
 export function useOrderQuickLine({
@@ -117,7 +98,6 @@ export function useOrderQuickLine({
   testId,
 }: OrderQuickLineInput): QuickLineProps<MedicineRow, QuickLineTermValues> {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const createMedicine = useOrderMedicineCreate(supplierId);
   const entries = entriesOf(options);
   const low = lowStockMedicines(entries.map((entry) => entry.data)).map((row) => row.id);
   const isLow = (entry: OrderEntry) => low.includes(entry.key);
@@ -131,17 +111,15 @@ export function useOrderQuickLine({
     form.setValue('lines', next, { shouldDirty: true });
   const addLine = (line: OrderLineValues) =>
     setLines(withQuickLineRow(form.getValues('lines'), line, isBlankOrderLine));
-  const create = (name: string, values: QuickLineTermValues) => {
-    void createMedicine(name).then((medicine) => {
-      if (!medicine) return;
-      addLine({
-        medicineId: medicine.id,
-        qty: values.qty ?? 1,
-        free: values.free ?? 0,
-        rate: values.rate ?? 0,
-      });
+  // A typed name the list lacks rides the line as typed; the save sends it and
+  // the server adds the quick medicine (MD26).
+  const create = (name: string, values: QuickLineTermValues) =>
+    addLine({
+      medicineId: typedMedicineKey(name),
+      qty: values.qty ?? 1,
+      free: values.free ?? 0,
+      rate: values.rate ?? 0,
     });
-  };
   const countOf = (item: QuickLineItem<MedicineRow>) =>
     quickLineCount(lines, (line) => line.medicineId === item.key);
 

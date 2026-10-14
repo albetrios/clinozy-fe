@@ -1,13 +1,9 @@
 import { renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { purchaseOrderRow } from '@/tests/utils/medical-doubles.ts';
 
-import { fetchPurchaseOrder } from '../../../shared/medical-api.ts';
 import { usePurchaseOrderColumns } from './usePurchaseOrderColumns.tsx';
-
-afterEach(() => resetAppFixtures());
 
 describe('usePurchaseOrderColumns', () => {
   it('lays out the Purchases columns, the Total the phone key and the PO first in the meta', () => {
@@ -23,15 +19,26 @@ describe('usePurchaseOrderColumns', () => {
     const meta = (id: string) => result.current.find((column) => column.id === id)?.meta;
     expect(meta('total')).toMatchObject({ priority: 1, align: 'end' });
     expect(meta('seq')).toMatchObject({ priority: 5 });
+    // The API sorts by PO, Date and Total only.
+    const sortable = result.current.filter((column) => column.enableSorting !== false);
+    expect(sortable.map((column) => column.id)).toEqual(['seq', 'date', 'total']);
   });
 
-  it('folds an order into "#431, 1631" and its stage', async () => {
-    const order = await fetchPurchaseOrder(ref.purchaseOrder(431));
+  it('folds an order into "#431, T-82370" and its stage — the API’s rupees', () => {
+    const order = purchaseOrderRow();
     const { result } = renderHook(() => usePurchaseOrderColumns());
     const fold = (id: string) =>
       result.current.find((column) => column.id === id)?.meta?.foldValue?.(order);
-    expect(fold('seq')).toBe('#431, 1631');
-    expect(fold('total')).toBe('₹2,980');
+    expect(fold('seq')).toBe('#431, T-82370');
+    expect(fold('total')).toBe('₹4,236');
     expect(fold('stage')).toMatchObject({ value: 'Received' });
+  });
+
+  it('folds an order without a supplier bill into its number alone, no dash', () => {
+    const order = purchaseOrderRow({ seq: 4, supplierBillNo: null });
+    const { result } = renderHook(() => usePurchaseOrderColumns());
+    expect(
+      result.current.find((column) => column.id === 'seq')?.meta?.foldValue?.(order),
+    ).toBe('#4');
   });
 });

@@ -118,6 +118,7 @@
     "free": "Gratis",
     "rate": "Preis",
     "paid": "Bezahlt:",
+    "credited": "Lieferantengutschriften:",
     "issuedBy": "Bestellung von {{clinic}}"
   }
 }

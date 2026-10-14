@@ -8,20 +8,23 @@
  * loads with the room.
  */
 import { matchOf, oneOf, PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
-import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
+import type { ClinicInvoiceType } from '@/shared/api/app/invoices-contracts.ts';
 
 import type { InvoiceSearch } from './invoices.search.ts';
 
-/** The invoice types a create link may name (`S:92`), in the switch's order. */
+/**
+ * The invoice types a create link may name (`S:92`), in the switch's order — not Medical: a
+ * medical bill is the Medical room's New sale, and clinozy-be refuses one here (MD28), so
+ * `?type=medical` is dropped and New invoice opens on Clinic.
+ */
 export const INVOICE_TYPE_PARAMS = [
   'clinic',
-  'medical',
   'consultation',
-] as const satisfies readonly InvoiceType[];
+] as const satisfies readonly ClinicInvoiceType[];
 
 /** `/invoices/create` (`S:92`): the type and patient to start with, and the room to go back to. */
 export interface InvoiceCreateSearch extends InvoiceSearch {
-  type?: InvoiceType;
+  type?: ClinicInvoiceType;
   patient?: string;
   /** The patient file's "Copy invoice": the saved invoice a new one starts as. */
   copyOf?: string;

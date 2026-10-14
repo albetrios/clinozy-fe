@@ -11,10 +11,6 @@ import {
 import { REASON_CONFIRM_KEYS } from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
 import { LEDGER_KEYS, LEDGER_NS } from '@/shared/components/LedgerCells/index.ts';
 import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
-import {
-  useFixtureDeletePayment,
-  useFixtureRestorePayment,
-} from '@/shared/hooks/useFixtureLedger/index.ts';
 import { useDeletePayment, useRestorePayment } from '@/shared/hooks/usePayments/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -56,21 +52,6 @@ export interface PaymentDeleteConfirmProps {
   onClose: () => void;
   /** Runs once the entry is removed (a drawer closes itself). */
   onDeleted?: () => void;
-  /** The parked Medical room's entry: deleted and restored on the fixture ledger (D153 seam). */
-  fixture?: boolean;
-}
-
-/** The delete and its Undo — on clinozy-be, or on the fixture ledger for the parked Medical room. */
-function useEntryWrites(fixture: boolean) {
-  const live = {
-    remove: useDeletePayment({ notifyOnError: false }),
-    restore: useRestorePayment(),
-  };
-  const parked = {
-    remove: useFixtureDeletePayment({ notifyOnError: false }),
-    restore: useFixtureRestorePayment(),
-  };
-  return fixture ? parked : live;
 }
 
 /**
@@ -89,11 +70,11 @@ export function PaymentDeleteConfirm({
   target,
   onClose,
   onDeleted,
-  fixture = false,
 }: PaymentDeleteConfirmProps) {
   const { t } = useTranslation(LEDGER_NS);
   const formatRupees = useRupeeFormat();
-  const { remove, restore } = useEntryWrites(fixture);
+  const remove = useDeletePayment({ notifyOnError: false });
+  const restore = useRestorePayment();
   const queryClient = useQueryClient();
   const entry = target?.entry;
   const ref = entry ? displayId.payment(entry.seq) : '';

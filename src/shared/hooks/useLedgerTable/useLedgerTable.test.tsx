@@ -1,11 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
-import { listFixtureLedger } from '@/shared/api/app/payments-fixture-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
+import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
 
 import { ledgerRowTone, useLedgerTable } from './useLedgerTable.tsx';
 
@@ -15,22 +14,49 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   readViewportTier: () => viewport.tier,
 }));
 
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
+/** 10:00 on 3 Oct, clinic time. */
 const NOW = new Date('2026-10-03T04:30:00Z');
 
-let rows: LedgerRow[] = [];
+/** Rhea's ₹600 UPI receipt (a patient's) and "Tea & snacks", ₹260 cash at 11:05 today (a payee's). */
+const rows: LedgerRow[] = [
+  ledgerRow({
+    id: 'pay_receipt5512000000000',
+    seq: 5512,
+    amount: 600,
+    splits: [{ mode: 'upi', amount: 600 }],
+    partyName: 'Rhea Shah',
+  }),
+  ledgerRow({
+    id: 'pay_expense0310000000000',
+    seq: 310,
+    direction: 'paid',
+    kind: 'expense',
+    amount: 260,
+    splits: [{ mode: 'cash', amount: 260 }],
+    paidAt: '2026-10-03T05:35:00.000Z',
+    contactId: null,
+    contact: null,
+    partyName: 'Tea & snacks',
+    patientId: null,
+    invoiceId: null,
+    invoice: null,
+    payeeName: 'Tea & snacks',
+    expenseCategory: 'misc',
+    reference: null,
+    note: null,
+    editCount: 0,
+    lastEdit: null,
+  }),
+];
 
-beforeEach(async () => {
+beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   viewport.tier = 'desktop';
-  resetAppFixtures();
   useDevicePrefsStore.setState({ hiddenColumns: {} });
-  rows = [...(await listFixtureLedger({})).items];
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetAppFixtures();
 });
 
 describe('useLedgerTable (payments.md:29–30)', () => {

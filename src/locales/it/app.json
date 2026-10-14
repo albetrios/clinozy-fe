@@ -1306,8 +1306,6 @@
     "items": {
       "quickLine": "Scrivi servizio, quantità, sconto · es. lhr face 1 10%",
       "quickLineMedical": "Scrivi farmaco e quantità · es. sun 2",
-      "hint": "2 = quantità · 10% = sconto · @500 = prezzo",
-      "oftenBilled": "Fatturati spesso",
       "browse": {
         "all": "Tutti",
         "oral": "Orale",
@@ -1414,7 +1412,6 @@
       "saved": "Fattura #{{seq}} salvata",
       "savedPlan": "Fattura #{{seq}} salvata · suggerimenti aggiornati",
       "promo": "{{offer}} applicato a {{offering}}",
-      "contactSaved": "{{name}} salvato come contatto medico · aggiungi un cellulare qui sotto",
       "rxUnmatched": "{{name}} non è nell’elenco dei farmaci · aggiungilo dall’aggiunta rapida",
       "deleted": "Fattura #{{seq}} eliminata"
     },

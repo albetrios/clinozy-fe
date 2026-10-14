@@ -191,6 +191,14 @@ describe('InvoicesLayout — the invoice routes over the ledger (KICKOFF §4, §
     expect(await axeForDialog(drawer)).toHaveNoViolations();
   });
 
+  it('never starts a medical bill — `?type=medical` opens on Clinic, and the switch has no Medical (MD28)', async () => {
+    renderInvoicesRoutes(`${BASE}/create?type=medical&patient=${KAVYA}`);
+    const drawer = await screen.findByTestId('invoice-drawer');
+    expect(within(drawer).getByRole('radio', { name: 'Clinic' })).toBeChecked();
+    expect(within(drawer).queryByRole('radio', { name: 'Medical' })).toBeNull();
+    expect(within(drawer).getAllByRole('radio')).toHaveLength(2);
+  });
+
   it('opens a copy of an invoice once it is read: its lines and party, nothing paid (Copy invoice)', async () => {
     renderInvoicesRoutes(
       `${BASE}/create?type=consultation&patient=${KAVYA}&copyOf=${TEST_INVOICE_ID}`,

@@ -2,20 +2,27 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('@/shared/api/app/medicines-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllMedicines: vi.fn(),
+}));
+vi.mock('../../../shared/medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  receivePurchaseOrder: vi.fn(),
+}));
+import { fetchAllMedicines } from '@/shared/api/app/medicines-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { medicineRow, purchaseOrderRow } from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
-import { fetchPurchaseOrder } from '../../../shared/medical-api.ts';
+import { receivePurchaseOrder } from '../../../shared/medical-records-api.ts';
+import { typedMedicineKey } from '../PurchaseOrderDrawer/purchase-order-form.ts';
 import {
   emptyUnexpectedLine,
   expiryProblems,
@@ -51,19 +58,90 @@ const D = 'receive-goods-drawer';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-beforeEach(() => {
-  viewport.tier = 'desktop';
-  for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
-});
-afterEach(() => {
-  resetMedicalRoutes();
-  resetAppFixtures();
+const KR_ID = 'sup_krmedical000000000000';
+const EPRIVA_ID = 'med_epriva000000000000000';
+const GLYCOLAC_ID = 'med_glyco0000000000000000';
+const AZELAN_ID = 'med_azelan000000000000000';
+const EPRIVA_LINE_ID = 'mpoi_epriva00000000000000';
+const GLYCOLAC_LINE_ID = 'mpoi_glyco000000000000000';
+
+/** PO #430 from K R Medical Agency, Ordered: Epriva Tab 10 + 2 at ₹212, Glycolac Cream 4 at ₹529. */
+const ORDER = purchaseOrderRow({
+  seq: 430,
+  stage: 'ordered',
+  apiStage: 'ordered',
+  receivedAt: null,
+  supplier: { id: KR_ID, name: 'K R Medical Agency', phone: null, gstNumber: null },
+  lines: [
+    {
+      id: EPRIVA_LINE_ID,
+      lineNo: 1,
+      medicineId: EPRIVA_ID,
+      medicineName: 'Epriva Tab',
+      qty: 10,
+      free: 2,
+      rate: 212,
+      amount: 2120,
+      received: null,
+      batchNo: null,
+      expiry: null,
+    },
+    {
+      id: GLYCOLAC_LINE_ID,
+      lineNo: 2,
+      medicineId: GLYCOLAC_ID,
+      medicineName: 'Glycolac Cream',
+      qty: 4,
+      free: 0,
+      rate: 529,
+      amount: 2116,
+      received: null,
+      batchNo: null,
+      expiry: null,
+    },
+  ],
+  itemCount: 2,
+  freeCount: 2,
+  total: 4236,
+  paid: 0,
+  due: 0,
+  paymentStatus: 'unpaid',
 });
 
-/** An ordered line of #430 — Epriva Tab, 10 + 2 free at ₹212. */
+/** The store's medicines: Azelan on K R Medical Agency's price list at ₹190. */
+const CATALOGUE = [
+  medicineRow({
+    id: AZELAN_ID,
+    name: 'Azelan 20% Cream',
+    supplierRates: [
+      {
+        supplierId: KR_ID,
+        supplierName: 'K R Medical Agency',
+        rate: 190,
+        free: 0,
+        leadDays: 1,
+      },
+    ],
+  }),
+  medicineRow({ id: EPRIVA_ID, name: 'Epriva Tab' }),
+];
+
+beforeEach(() => {
+  vi.resetAllMocks();
+  viewport.tier = 'desktop';
+  for (const fn of Object.values(notifyMock)) fn.mockReset();
+  signInTestMember();
+  vi.mocked(fetchAllMedicines).mockResolvedValue(CATALOGUE);
+  vi.mocked(receivePurchaseOrder).mockResolvedValue(
+    purchaseOrderRow({ ...ORDER, stage: 'received', apiStage: 'received' }),
+  );
+});
+afterEach(() => resetMedicalRoutes());
+
+/** An ordered line of #430 — Epriva Tab, 10 + 2 free at ₹212 (paise in the form). */
 const ORDERED: ReceiveLineValues = {
-  medicineId: ref.medicine(455),
+  lineId: EPRIVA_LINE_ID,
+  medicineId: EPRIVA_ID,
   name: 'Epriva Tab',
   qty: 10,
   free: 2,
@@ -77,7 +155,7 @@ const ORDERED: ReceiveLineValues = {
 /** An unexpected line with Azelan picked: 2 at ₹190, batch AZ900. */
 const AZELAN: ReceiveLineValues = {
   ...emptyUnexpectedLine(),
-  medicineId: ref.medicine(450),
+  medicineId: AZELAN_ID,
   name: 'Azelan 20% Cream',
   qty: 2,
   rate: 19_000,
@@ -86,7 +164,7 @@ const AZELAN: ReceiveLineValues = {
 };
 
 describe('receive-form (medical.md:269–279)', () => {
-  it('needs an arrived line’s expiry as "MM/YY"; a line that did not arrive sends nothing', () => {
+  it('needs an arrived line’s expiry as "MM/YY"; each ordered line goes by its id, one that did not arrive with nothing', () => {
     const line = ORDERED;
     expect(
       expiryProblems([
@@ -108,30 +186,41 @@ describe('receive-form (medical.md:269–279)', () => {
       }),
     ).toEqual({
       lines: [
-        { arrived: true, batchNo: null, expiry: '12/27' },
-        { arrived: false, batchNo: null, expiry: null },
+        { id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27' },
+        { id: EPRIVA_LINE_ID, arrived: false, batchNo: null, expiry: null },
       ],
       extras: [],
     });
   });
 
-  it('sends an unexpected line once its medicine is picked; a blank one is left out (H:5388)', () => {
+  it('sends an unexpected line once its medicine is picked, without an id, in rupees; a blank one is left out (H:5388, MD26)', () => {
     const blank = emptyUnexpectedLine();
     expect(blank).toMatchObject({
+      lineId: null,
       medicineId: null,
       qty: 1,
       arrived: true,
       unexpected: true,
     });
-    const lines = [{ ...ORDERED, expiry: '12/27' }, AZELAN, blank];
+    const typed = { ...AZELAN, medicineId: typedMedicineKey('Azel cream'), name: '' };
+    const lines = [{ ...ORDERED, expiry: '12/27' }, AZELAN, typed, blank];
     expect(receiveInputOf({ lines })).toEqual({
-      lines: [{ arrived: true, batchNo: null, expiry: '12/27' }],
+      lines: [{ id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27' }],
       extras: [
         {
-          medicineId: ref.medicine(450),
+          medicineId: AZELAN_ID,
           qty: 2,
           free: 0,
-          rate: 19_000,
+          rate: 190,
+          batchNo: 'AZ900',
+          expiry: '06/28',
+        },
+        {
+          medicineId: null,
+          newMedicineName: 'Azel cream',
+          qty: 2,
+          free: 0,
+          rate: 190,
           batchNo: 'AZ900',
           expiry: '06/28',
         },
@@ -153,13 +242,11 @@ describe('receive-form (medical.md:269–279)', () => {
       emptyUnexpectedLine(),
     ];
     expect(unexpectedProblems(lines)).toEqual({ qty: [1], rate: [2] });
-    // #430's ₹4,236 and 2 × ₹190; free units cost nothing, a blank line nothing.
-    expect(receiveTotal({ total: 423_600 }, [ORDERED, { ...AZELAN, free: 3 }])).toBe(
+    // #430's ₹4,236 (the API's rupees) and 2 × ₹190, in paise; free units cost nothing.
+    expect(receiveTotal({ total: 4236 }, [ORDERED, { ...AZELAN, free: 3 }])).toBe(
       423_600 + 38_000,
     );
-    expect(receiveTotal({ total: 423_600 }, [{ ...AZELAN, arrived: false }])).toBe(
-      423_600,
-    );
+    expect(receiveTotal({ total: 4236 }, [{ ...AZELAN, arrived: false }])).toBe(423_600);
   });
 });
 
@@ -167,8 +254,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
   it('ticks every line, needs each arrived expiry, and marks the order received', async () => {
     const user = setup();
     const onClose = vi.fn();
-    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
-    renderMedicalDrawer(<ReceiveGoodsDrawer open order={order} onClose={onClose} />);
+    renderMedicalDrawer(<ReceiveGoodsDrawer open order={ORDER} onClose={onClose} />);
     const drawer = await screen.findByTestId(D);
     expect(drawer).toHaveTextContent(
       `${fsi('K R Medical Agency')} · tick each item and enter batch & expiry`,
@@ -214,18 +300,24 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     expect(notifyMock.success).toHaveBeenCalledWith(
       'Goods received · stock and free quantity added',
     );
-    const saved = await appFixtures.purchaseOrders.get(ref.purchaseOrder(430));
-    expect(saved.stage).toBe('received');
-    expect(saved.items.map((item) => [item.received, item.batchNo])).toEqual([
-      [true, 'NEW-430'],
-      [false, null],
-    ]);
+    // Each ordered line by its id; an empty batch is the server's "NEW-430".
+    expect(receivePurchaseOrder).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: ORDER.id,
+        input: {
+          lines: [
+            { id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27' },
+            { id: GLYCOLAC_LINE_ID, arrived: false, batchNo: null, expiry: null },
+          ],
+          extras: [],
+        },
+      }),
+    );
   });
 
   it('asks for something that arrived, and names an expiry not "MM/YY"', async () => {
     const user = setup();
-    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
-    renderMedicalDrawer(<ReceiveGoodsDrawer open order={order} onClose={vi.fn()} />);
+    renderMedicalDrawer(<ReceiveGoodsDrawer open order={ORDER} onClose={vi.fn()} />);
     const drawer = await screen.findByTestId(D);
     const [expiry] = within(drawer).getAllByTestId(`${D}-lines-expiry`);
     if (!expiry) throw new Error('expected an expiry cell');
@@ -243,9 +335,8 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
   it('adds an unexpected item — medicine, count, rate, batch, expiry — into stock and onto the bill', async () => {
     const user = setup();
     const onClose = vi.fn();
-    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
     renderMedicalDrawer(
-      <ReceiveGoodsDrawer open order={order} onClose={onClose} openChild={vi.fn()} />,
+      <ReceiveGoodsDrawer open order={ORDER} onClose={onClose} openChild={vi.fn()} />,
     );
     const drawer = await screen.findByTestId(D);
     const table = within(drawer).getByTestId(`${D}-lines-table`);
@@ -264,7 +355,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     // Azelan from K R Medical Agency's price list: its ₹190 fills the rate.
     await user.click(within(drawer).getByTestId(`${D}-lines-medicine`));
     await user.click(
-      await screen.findByTestId(`${D}-lines-medicine-option-${ref.medicine(450)}`),
+      await screen.findByTestId(`${D}-lines-medicine-option-${AZELAN_ID}`),
     );
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,426');
     const qty = within(drawer).getByTestId(`${D}-lines-qty`);
@@ -289,31 +380,34 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
 
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    const saved = await appFixtures.purchaseOrders.get(ref.purchaseOrder(430));
-    expect(saved.stage).toBe('received');
-    expect(saved.items[2]).toEqual({
-      medicineId: ref.medicine(450),
-      qty: 2,
-      free: 0,
-      rate: 19_000,
-      batchNo: 'AZ900',
-      expiry: '06/28',
-      received: true,
-    });
-    const azelan = await appFixtures.medicines.get(ref.medicine(450));
-    expect(azelan.batches.find((batch) => batch.batchNo === 'AZ900')?.qty).toBe(2);
+    // The unexpected line goes as an extra, without an id (MD26) — rupees.
+    expect(receivePurchaseOrder).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          extras: [
+            {
+              medicineId: AZELAN_ID,
+              qty: 2,
+              free: 0,
+              rate: 190,
+              batchNo: 'AZ900',
+              expiry: '06/28',
+            },
+          ],
+        }),
+      }),
+    );
   });
 
   it('asks for an unexpected line’s count and rate, and drops it with its ×', async () => {
     const user = setup();
     const onClose = vi.fn();
-    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
-    renderMedicalDrawer(<ReceiveGoodsDrawer open order={order} onClose={onClose} />);
+    renderMedicalDrawer(<ReceiveGoodsDrawer open order={ORDER} onClose={onClose} />);
     const drawer = await screen.findByTestId(D);
     await user.click(within(drawer).getByTestId(`${D}-lines-add`));
     await user.click(within(drawer).getByTestId(`${D}-lines-medicine`));
     await user.click(
-      await screen.findByTestId(`${D}-lines-medicine-option-${ref.medicine(450)}`),
+      await screen.findByTestId(`${D}-lines-medicine-option-${AZELAN_ID}`),
     );
     for (const expiry of within(drawer).getAllByTestId(`${D}-lines-expiry`)) {
       await user.type(expiry, '12/27');
@@ -341,15 +435,15 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     ).toBeNull();
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    const saved = await appFixtures.purchaseOrders.get(ref.purchaseOrder(430));
-    expect(saved.items).toHaveLength(2);
+    expect(receivePurchaseOrder).toHaveBeenCalledWith(
+      expect.objectContaining({ input: expect.objectContaining({ extras: [] }) }),
+    );
   });
 
   it('names an unexpected line’s figures on a phone, where the header row is gone', async () => {
     viewport.tier = 'phone';
     const user = setup();
-    const order = await fetchPurchaseOrder(ref.purchaseOrder(430));
-    renderMedicalDrawer(<ReceiveGoodsDrawer open order={order} onClose={vi.fn()} />);
+    renderMedicalDrawer(<ReceiveGoodsDrawer open order={ORDER} onClose={vi.fn()} />);
     const drawer = await screen.findByTestId(D);
     await user.click(within(drawer).getByTestId(`${D}-lines-add`));
     const [, , added] = within(drawer).getAllByTestId(`${D}-lines-row`);

@@ -46,9 +46,8 @@ writes: the person (`PATCH /app/contacts/:contact_id`) and the file
 
 The data is the shared patients domain on clinozy-be: `@/shared/api/app/patients-api.ts`
 (`/app/patients`, each list page joined with its people through `GET /app/contacts?ids=`),
-its contracts beside it, and the hooks in `@/shared/hooks/usePatients/`. The rooms still on
-fixtures (Payments, Medical, Tasks) read `@/shared/api/app/patients-fixture-api.ts` through
-`@/shared/hooks/useFixturePatients/`. The delete confirm (a reason, Undo = restore) is
+its contracts beside it, and the hooks in `@/shared/hooks/usePatients/` — every room reads
+them. The delete confirm (a reason, Undo = restore) is
 `@/shared/components/PatientDeleteConfirm/`.
 
 ## Files

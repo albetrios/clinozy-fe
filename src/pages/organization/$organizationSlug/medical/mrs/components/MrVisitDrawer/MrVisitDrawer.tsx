@@ -2,7 +2,6 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { MRVisit } from '@/shared/api/app/app-schema.ts';
 import { addCivilDays, addCivilMonths, appToday } from '@/shared/api/app/app-time.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
@@ -26,7 +25,7 @@ import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 
 import { useMedicalDates } from '../../../shared/components/MedicalCells/medical-dates.ts';
 import { useLogMrVisit } from '../../../shared/hooks/useMedicalPartners/index.ts';
-import type { MrRow } from '../../../shared/medical-contracts.ts';
+import type { MrRow, MrVisitRow } from '../../../shared/medical-contracts.ts';
 import { textOrNull } from '../../../shared/medical-drawer-form.ts';
 import {
   MEDICAL_DRAWER_KEYS,
@@ -263,7 +262,7 @@ function VisitSession({
         ? t(K.saved, { date: dates.day(input.nextVisitOn) })
         : t(K.savedNoReminder),
   });
-  const { saveState, save } = useDrawerSave<VisitFormValues, MRVisit>({
+  const { saveState, save } = useDrawerSave<VisitFormValues, MrVisitRow>({
     form,
     fieldOrder: ['date', 'nextVisitOn', 'samples', 'notes'],
     toastId: 'rep-visit-save-failed',

@@ -26,7 +26,7 @@ import {
   percentOf,
   sentLines,
 } from './invoice-form.ts';
-import { draftFigures, saleInputOf } from './sale-form.ts';
+import { draftFigures, saleDraftOf } from './sale-form.ts';
 
 const VESU = 'brn_thsaog1i8bv6m9rd9ucoy';
 
@@ -178,10 +178,10 @@ describe('the Invoice drawer’s form (KICKOFF §6.9)', () => {
     ]);
   });
 
-  it('copies a Medical sale’s invoice as a fresh sale — Medical sells from its own stock', () => {
+  it('copies a Medical sale’s invoice as a blank clinic invoice — the Invoices room bills no medicine (MD28)', () => {
     const detail = invoiceDetail(invoiceRecord({ type: 'medical' }));
     expect(copiedInvoiceForm(detail, '2026-10-11', VESU)).toMatchObject({
-      type: 'medical',
+      type: 'clinic',
       branchId: VESU,
       items: [blankLine()],
       party: null,
@@ -189,15 +189,15 @@ describe('the Invoice drawer’s form (KICKOFF §6.9)', () => {
   });
 });
 
-describe('a Medical sale’s form (the fixture world, D153)', () => {
-  const corn = {
+describe('a Medical sale’s form (MD19: the server draws and prices it)', () => {
+  const azel = {
     ...blankLine(),
-    offeringId: 'corn',
-    name: 'Corn Removal',
+    medicineId: 'med_azel00000000000000000',
+    name: 'Azelaic gel 15g',
     rate: 100_000,
   };
   const sale = (overrides: Partial<InvoiceFormValues> = {}): InvoiceFormValues => ({
-    ...values({ items: [{ ...corn, qty: 2 }, blankLine()] }),
+    ...values({ type: 'medical', items: [{ ...azel, qty: 2 }, blankLine()] }),
     ...overrides,
   });
 
@@ -215,61 +215,54 @@ describe('a Medical sale’s form (the fixture world, D153)', () => {
     });
   });
 
-  it('writes the fixture sale’s input: the named lines, the party, the discount in paise', () => {
-    const input = saleInputOf(
-      sale({ overallDiscountPct: '5', remark: '  Second sitting  ' }),
-      'fallback',
+  it('hands the room’s write its sale: the buyer’s contact, the medicines, the discount and "Paid now" in rupees', () => {
+    const draft = saleDraftOf(
+      sale({
+        overallDiscountPct: '5',
+        remark: '  Second sitting  ',
+        teamIds: [TEST_DOCTOR_ID],
+        prescriptionId: 'rx_rx5800000000000000000',
+        paidNow: [
+          { mode: 'cash', amount: 50_000 },
+          { mode: 'upi', amount: 0 },
+        ],
+      }),
+      { contactId: TEST_MONEY_CONTACT_ID, fallbackBranchId: 'fallback' },
     );
-    expect(input).toMatchObject({
+    expect(draft).toEqual({
       branchId: TEST_MONEY_BRANCH_ID,
-      patientId: TEST_MONEY_PATIENT_ID,
-      medicalContactId: null,
-      leadId: null,
-      overallDiscount: 10_000,
+      contactId: TEST_MONEY_CONTACT_ID,
+      // No rate, no name, no free line: the server prices each medicine (MD19).
+      items: [{ medicineId: 'med_azel00000000000000000', qty: 2, discountPct: 0 }],
+      overallDiscount: 100,
+      memberIds: [TEST_DOCTOR_ID],
+      prescriptionId: 'rx_rx5800000000000000000',
       remark: 'Second sitting',
-      paidNow: [],
+      payment: { splits: [{ mode: 'cash', amount: 500 }] },
     });
-    expect(input.items).toEqual([
-      {
-        offeringId: 'corn',
-        medicineId: null,
-        name: 'Corn Removal',
-        packSize: null,
-        qty: 2,
-        rate: 100_000,
-        discountPct: 0,
-        gstPct: 0,
-      },
+  });
+
+  it('sends each medicine once — its rows’ packs added up, their discount weighted by packs', () => {
+    const draft = saleDraftOf(
+      sale({
+        items: [
+          { ...azel, qty: 2, discountPct: 10 },
+          { ...azel, qty: 1, discountPct: 0 },
+          blankLine(),
+        ],
+      }),
+      { contactId: TEST_MONEY_CONTACT_ID, fallbackBranchId: 'fallback' },
+    );
+    expect(draft.items).toEqual([
+      { medicineId: 'med_azel00000000000000000', qty: 3, discountPct: 6.67 },
     ]);
   });
 
-  it('sends a Medical customer as a contact or a lead, and the fallback branch when none is set', () => {
-    const contact = saleInputOf(
-      sale({
-        type: 'medical',
-        branchId: null,
-        party: {
-          kind: 'contact',
-          id: 'c-1',
-          contactId: null,
-          name: 'Viral Sheth',
-          phone: null,
-        },
-      }),
-      TEST_MONEY_BRANCH_ID,
-    );
-    expect(contact).toMatchObject({
-      branchId: TEST_MONEY_BRANCH_ID,
-      patientId: null,
-      medicalContactId: 'c-1',
-      leadId: null,
+  it('files under the fallback branch when none is set, and sends no payment when nothing is paid now', () => {
+    const draft = saleDraftOf(sale({ branchId: null, remark: '' }), {
+      contactId: TEST_MONEY_CONTACT_ID,
+      fallbackBranchId: VESU,
     });
-    const lead = saleInputOf(
-      sale({
-        party: { kind: 'lead', id: 'l-1', contactId: null, name: 'Kabir', phone: null },
-      }),
-      TEST_MONEY_BRANCH_ID,
-    );
-    expect(lead).toMatchObject({ leadId: 'l-1', medicalContactId: null });
+    expect(draft).toMatchObject({ branchId: VESU, remark: null, payment: null });
   });
 });

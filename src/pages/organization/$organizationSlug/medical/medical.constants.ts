@@ -19,6 +19,7 @@ export const MEDICAL_KEYS = {
     manufacturers: 'tabs.manufacturers',
     mrs: 'tabs.mrs',
     payments: 'tabs.payments',
+    credits: 'tabs.credits',
     /** "More"'s and the Create menu's group headings (H:5433). */
     groups: {
       selling: 'tabs.groups.selling',
@@ -63,6 +64,9 @@ export const MEDICAL_KEYS = {
     manufacturers: 'filters.manufacturers',
     suppliers: 'filters.suppliers',
     mrs: 'filters.mrs',
+    /** Suppliers' Payable section: All · Owed something. */
+    payable: 'filters.payable',
+    owed: 'filters.owed',
   },
   table: {
     /** "49%". */
@@ -190,6 +194,8 @@ export const MEDICAL_KEYS = {
     noOrders: 'suppliers.noOrders',
     /** "5 days" (plural). */
     ageing: 'suppliers.ageing',
+    /** "Pay ₹X" on a supplier paid up since the list was read: "Nothing is owed to Ankur Pharma now". */
+    paidUp: 'suppliers.paidUp',
     rowActions: {
       pay: 'suppliers.rowActions.pay',
       newOrder: 'suppliers.rowActions.newOrder',
@@ -237,6 +243,77 @@ export const MEDICAL_KEYS = {
   payments: {
     records: 'payments.records',
     empty: 'payments.empty',
+    /** The view action: the server's CSV of the filtered payments (`medicine:export`, MD31). */
+    export: 'payments.export',
+    exportTitle: 'payments.exportTitle',
+    exported: 'payments.exported',
+    exportTruncated: 'payments.exportTruncated',
+  },
+  /** Medical › Credits (clinozy-be D90): from suppliers and with customers. */
+  credits: {
+    records: 'credits.records',
+    /** The footer: "2 credits". */
+    count: 'credits.count',
+    sides: {
+      label: 'credits.sides.label',
+      suppliers: 'credits.sides.suppliers',
+      customers: 'credits.sides.customers',
+    },
+    columns: {
+      credit: 'credits.columns.credit',
+      supplier: 'credits.columns.supplier',
+      packs: 'credits.columns.packs',
+      amount: 'credits.columns.amount',
+      applied: 'credits.columns.applied',
+      state: 'credits.columns.state',
+      since: 'credits.columns.since',
+      who: 'credits.columns.who',
+      way: 'credits.columns.way',
+      left: 'credits.columns.left',
+    },
+    /** "Azelaic gel 15g · 026-312". */
+    creditRef: 'credits.creditRef',
+    /** "2 packs". */
+    packs: 'credits.packs',
+    states: {
+      open: 'credits.states.open',
+      adjusted: 'credits.states.adjusted',
+    },
+    customerStates: {
+      open: 'credits.customerStates.open',
+      given_back: 'credits.customerStates.given_back',
+      got_back: 'credits.customerStates.got_back',
+      used: 'credits.customerStates.used',
+    },
+    ways: {
+      give: 'credits.ways.give',
+      take: 'credits.ways.take',
+    },
+    rowActions: {
+      void: 'credits.rowActions.void',
+      giveBack: 'credits.rowActions.giveBack',
+      gotBack: 'credits.rowActions.gotBack',
+      open: 'credits.rowActions.open',
+    },
+    empty: {
+      suppliers: 'credits.empty.suppliers',
+      customers: 'credits.empty.customers',
+    },
+    addCredit: 'credits.addCredit',
+    void: {
+      title: 'credits.void.title',
+      effect: 'credits.void.effect',
+      voided: 'credits.void.voided',
+      reasons: {
+        mistake: 'credits.void.reasons.mistake',
+        wrongQuantity: 'credits.void.reasons.wrongQuantity',
+        supplierRefused: 'credits.void.reasons.supplierRefused',
+      },
+    },
+    filters: {
+      state: 'credits.filters.state',
+      way: 'credits.filters.way',
+    },
   },
 } as const;
 
@@ -249,4 +326,5 @@ export const MEDICAL_TABLE_IDS = {
   manufacturers: 'medical-manufacturers',
   mrs: 'medical-mrs',
   payments: 'medical-payments',
+  credits: 'medical-credits',
 } as const;

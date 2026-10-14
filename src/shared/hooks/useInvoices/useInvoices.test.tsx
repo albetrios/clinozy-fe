@@ -16,11 +16,6 @@ vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   deleteInvoice: vi.fn(),
   restoreInvoice: vi.fn(),
 }));
-vi.mock('@/shared/api/app/invoices-fixture-api.ts', async (importOriginal) => ({
-  ...(await importOriginal<object>()),
-  createSale: vi.fn(),
-  fetchPrescriptionPreset: vi.fn(),
-}));
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
@@ -43,13 +38,7 @@ import type {
   InvoiceInput,
   InvoicePreview,
 } from '@/shared/api/app/invoices-contracts.ts';
-import {
-  createSale,
-  fetchPrescriptionPreset,
-  fixtureInvoiceQueryKeys,
-} from '@/shared/api/app/invoices-fixture-api.ts';
 import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
-import { fixtureLedgerQueryKeys } from '@/shared/api/app/payments-fixture-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
@@ -63,14 +52,12 @@ import {
 import {
   INVOICE_WRITE_KEYS,
   useCreateInvoice,
-  useCreateSale,
   useDeleteInvoice,
   useInvoice,
   useInvoiceList,
   useInvoicePresets,
   useInvoicePreview,
   useInvoiceTotals,
-  usePrescriptionPreset,
   useRestoreInvoice,
   useUpdateInvoice,
 } from './useInvoices.ts';
@@ -100,7 +87,6 @@ const INPUT: InvoiceInput = {
 const DETAIL: InvoiceDetail = {
   invoice: invoiceRecord(),
   party: null,
-  sale: null,
   payments: [],
   sheet: {
     organization: { name: 'Glow', specialties: [], currency: 'INR' },
@@ -119,6 +105,7 @@ const PREVIEW: InvoicePreview = {
   gstTotal: 0,
   total: 500,
   paid: 0,
+  refunded: 0,
   due: 500,
 };
 
@@ -140,7 +127,7 @@ afterEach(() => {
 });
 
 describe('INVOICE_WRITE_KEYS', () => {
-  it('refreshes every money read, the appointments and the tasks — never the fixture ledger', () => {
+  it('refreshes every money read, the appointments and the tasks', () => {
     expect(INVOICE_WRITE_KEYS).toEqual(
       expect.arrayContaining([
         paymentQueryKeys.all,
@@ -148,7 +135,6 @@ describe('INVOICE_WRITE_KEYS', () => {
         appointmentQueryKeys.all,
       ]),
     );
-    expect(INVOICE_WRITE_KEYS).not.toContainEqual(fixtureLedgerQueryKeys.all);
   });
 });
 
@@ -279,32 +265,5 @@ describe('the writes', () => {
     expect(
       invoiceQueryKeys.preview('org_x', null, {}).slice(0, invoiceQueryKeys.all.length),
     ).not.toEqual([...invoiceQueryKeys.all]);
-  });
-});
-
-describe('a Medical sale (the fixture world)', () => {
-  it('sells on the fixture server and reads its prescription there', async () => {
-    vi.mocked(createSale).mockResolvedValue({} as never);
-    vi.mocked(fetchPrescriptionPreset).mockResolvedValue({
-      id: 'rx',
-      seq: 500,
-      patientId: 'p',
-      medicines: [],
-    });
-    const invalidate = vi.spyOn(client, 'invalidateQueries');
-    const { result } = renderHook(
-      () => ({ sell: useCreateSale(), preset: usePrescriptionPreset('rx') }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.preset.data?.seq).toBe(500));
-    await act(() => result.current.sell.mutateAsync({} as never));
-    expect(createSale).toHaveBeenCalled();
-    expect(invalidate).toHaveBeenCalledWith(
-      expect.objectContaining({ queryKey: fixtureLedgerQueryKeys.all }),
-    );
-    expect(invalidate).toHaveBeenCalledWith(
-      expect.objectContaining({ queryKey: fixtureInvoiceQueryKeys.all }),
-    );
   });
 });

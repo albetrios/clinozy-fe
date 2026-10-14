@@ -6,17 +6,9 @@ import { invoiceBalance, invoiceTotals } from '@/shared/api/app/app-money.ts';
 import {
   branchSchema,
   checkInSchema,
-  creditNoteSchema,
   feedbackActionSchema,
   invoiceSchema,
   leadMessageSchema,
-  manufacturerSchema,
-  medicalContactSchema,
-  medicalPurchaseOrderSchema,
-  medicalRepSchema,
-  medicalSaleSchema,
-  mrVisitSchema,
-  offeringSuggestionSchema,
   organizationSchema,
   patientImageSchema,
   patientNoteSchema,
@@ -24,28 +16,14 @@ import {
   patientReportSchema,
   prescriptionSchema,
   reviewSchema,
-  stockCountSchema,
-  stockItemSchema,
-  stockMovementSchema,
-  stockPurchaseSchema,
-  stockVendorSchema,
-  supplierSchema,
   treatmentSchema,
 } from '@/shared/api/app/app-schema.ts';
 import { addCivilDays, appClockTime, appToday } from '@/shared/api/app/app-time.ts';
 import { appointmentRecordSchema } from '@/shared/api/app/appointments-fixture-contracts.ts';
 import { leadRecordSchema } from '@/shared/api/app/leads-fixture-contracts.ts';
-import { medicineRecordSchema } from '@/shared/api/app/medicines-contracts.ts';
-import {
-  offeringRecordSchema,
-  offerRecordSchema,
-} from '@/shared/api/app/offerings-fixture-contracts.ts';
+import { offeringRecordSchema } from '@/shared/api/app/offerings-fixture-contracts.ts';
 import { patientRecordSchema } from '@/shared/api/app/patients-fixture-contracts.ts';
-import {
-  dayCloseRecordSchema,
-  paymentRecordSchema,
-  pendingCreditRecordSchema,
-} from '@/shared/api/app/payments-fixture-contracts.ts';
+import { paymentRecordSchema } from '@/shared/api/app/payments-fixture-contracts.ts';
 import { staffProfileSchema } from '@/shared/api/app/staff-fixture-contracts.ts';
 import { taskRecordSchema } from '@/shared/api/app/tasks-fixture-contracts.ts';
 
@@ -55,14 +33,14 @@ const patientPackageRecordSchema = patientPackageSchema.extend({
 });
 
 import { patientRef } from './patients.fixtures.ts';
-import { readSeedLabel, seedExpiry, seedMobile } from './refs.fixtures.ts';
+import { readSeedLabel, seedMobile } from './refs.fixtures.ts';
 import { appFixtures, clinicOrganization, resetAppFixtures } from './world.fixtures.ts';
 
 type CollectionKey = keyof typeof appFixtures;
 
 const SCHEMAS = {
   branches: branchSchema,
-  // A fixture staff profile: a user with its membership link (Medical sales, fixture leads).
+  // A fixture staff profile: a user with its membership link (fixture leads, the chat's authors).
   staff: staffProfileSchema,
   patients: patientRecordSchema,
   // Leads carry the plan's hold, unread and custom-interest fields (Appendix F).
@@ -78,35 +56,16 @@ const SCHEMAS = {
   // A package may be added before its invoice (A-F6, Appendix F).
   patientPackages: patientPackageRecordSchema,
   patientNotes: patientNoteSchema,
-  offeringSuggestions: offeringSuggestionSchema,
   checkIns: checkInSchema,
   reviews: reviewSchema,
   feedbackActions: feedbackActionSchema,
   // The offerings domain carries the plan's fields (Appendix F).
   offerings: offeringRecordSchema,
-  offers: offerRecordSchema,
   invoices: invoiceSchema,
-  // Entries and credits carry the plan's fields (Appendix F).
+  // Entries carry the plan's fields (Appendix F).
   payments: paymentRecordSchema,
-  creditNotes: creditNoteSchema,
-  pendingCredits: pendingCreditRecordSchema,
-  dayCloses: dayCloseRecordSchema,
   // The contract's Task plus the plan's fields at rest (Appendix F, REPLACE_WITH_API).
   tasks: taskRecordSchema,
-  manufacturers: manufacturerSchema,
-  suppliers: supplierSchema,
-  medicalReps: medicalRepSchema,
-  mrVisits: mrVisitSchema,
-  // The contract's Medicine plus the plan's "Sold with" and near-expiry discount (Appendix F).
-  medicines: medicineRecordSchema,
-  purchaseOrders: medicalPurchaseOrderSchema,
-  medicalContacts: medicalContactSchema,
-  medicalSales: medicalSaleSchema,
-  stockVendors: stockVendorSchema,
-  stockItems: stockItemSchema,
-  stockPurchases: stockPurchaseSchema,
-  stockMovements: stockMovementSchema,
-  stockCounts: stockCountSchema,
 } satisfies Record<CollectionKey, z.ZodObject>;
 
 /** The prototype seeds each collection converts (the H: references live in each file). */
@@ -123,31 +82,13 @@ const COUNTS: Record<CollectionKey, number> = {
   patientReports: 3,
   patientPackages: 4,
   patientNotes: 2,
-  offeringSuggestions: 2,
   checkIns: 2,
   reviews: 3,
   feedbackActions: 0,
   offerings: 11,
-  offers: 4,
-  invoices: 14,
-  payments: 16,
-  creditNotes: 0,
-  pendingCredits: 2,
-  dayCloses: 3,
+  invoices: 9,
+  payments: 12,
   tasks: 8,
-  manufacturers: 6,
-  suppliers: 4,
-  medicalReps: 3,
-  mrVisits: 3,
-  medicines: 9,
-  purchaseOrders: 3,
-  medicalContacts: 1,
-  medicalSales: 3,
-  stockVendors: 5,
-  stockItems: 10,
-  stockPurchases: 4,
-  stockMovements: 4,
-  stockCounts: 0,
 };
 
 const KEYS = Object.keys(SCHEMAS) as CollectionKey[];
@@ -214,7 +155,6 @@ const LINKS: { [K in CollectionKey]: (row: RowOf<K>) => Targets } = {
     ['patients', [r.patientId]],
     ['appointments', [r.appointmentId]],
     ['staff', [r.doctorId]],
-    ['medicines', r.items.map((item) => item.medicineId)],
   ],
   treatments: (r) => [
     ['patients', [r.patientId]],
@@ -234,13 +174,6 @@ const LINKS: { [K in CollectionKey]: (row: RowOf<K>) => Targets } = {
     ['invoices', [r.invoiceId]],
   ],
   patientNotes: (r) => [['patients', [r.patientId]]],
-  offeringSuggestions: (r) => [
-    ['patients', [r.patientId]],
-    ['offerings', [r.offeringId]],
-    ['appointments', [r.appointmentId]],
-    ['staff', [r.suggestedById]],
-    ['invoices', r.invoiceLinks.map((link) => link.invoiceId)],
-  ],
   checkIns: (r) => [
     ['patients', [r.patientId]],
     ['appointments', [r.appointmentId]],
@@ -259,40 +192,17 @@ const LINKS: { [K in CollectionKey]: (row: RowOf<K>) => Targets } = {
     ['staff', [r.byId]],
   ],
   offerings: (r) => [['branches', r.branchIds]],
-  offers: (r) => [
-    ['offerings', r.offeringIds],
-    ['branches', r.branchIds],
-  ],
   invoices: (r) => [
     ['branches', [r.branchId]],
     ['patients', [r.patientId]],
-    ['medicalContacts', [r.medicalContactId]],
     ['staff', r.teamIds],
     ['offerings', r.items.map((item) => item.offeringId)],
-    ['medicines', r.items.map((item) => item.medicineId)],
     ['prescriptions', [r.prescriptionId]],
-    ['medicalSales', [r.saleId]],
   ],
   payments: (r) => [
     ['branches', [r.branchId]],
     ['patients', [r.patientId]],
     ['invoices', [r.invoiceId]],
-    ['creditNotes', [r.creditNoteId]],
-    ['pendingCredits', [r.pendingCreditId]],
-    ['dayCloses', [r.dayCloseId]],
-    [
-      r.billRef?.kind === 'stock_po' ? 'stockPurchases' : 'purchaseOrders',
-      [r.billRef?.purchaseId ?? null],
-    ],
-  ],
-  creditNotes: (r) => [['invoices', [r.invoiceId]]],
-  pendingCredits: (r) => [
-    ['patients', [r.patientId]],
-    ['payments', [r.sourcePaymentId, r.settledPaymentId]],
-  ],
-  dayCloses: (r) => [
-    ['branches', [r.branchId]],
-    ['staff', [r.closedById]],
   ],
   tasks: (r) => [
     ['staff', [r.ownerId, r.resolvedById, ...r.previousOwnerIds]],
@@ -300,40 +210,6 @@ const LINKS: { [K in CollectionKey]: (row: RowOf<K>) => Targets } = {
     ['leads', [r.leadId]],
     [TASK_SOURCES[r.sourceType ?? 'lead'], [r.sourceId]],
   ],
-  manufacturers: () => [],
-  suppliers: (r) => [['manufacturers', r.manufacturerIds]],
-  medicalReps: (r) => [['manufacturers', r.manufacturerIds]],
-  mrVisits: (r) => [['medicalReps', [r.mrId]]],
-  medicines: (r) => [
-    ['manufacturers', [r.manufacturerId]],
-    ['suppliers', r.supplierRates.map((rate) => rate.supplierId)],
-  ],
-  purchaseOrders: (r) => [
-    ['suppliers', [r.supplierId]],
-    ['medicines', r.items.map((item) => item.medicineId)],
-  ],
-  medicalContacts: () => [],
-  medicalSales: (r) => [
-    ['invoices', [r.invoiceId]],
-    ['patients', [r.patientId]],
-    ['medicalContacts', [r.medicalContactId]],
-    ['prescriptions', [r.prescriptionId]],
-    ['medicines', r.returns.flatMap((back) => back.items.map((item) => item.medicineId))],
-  ],
-  stockVendors: () => [],
-  stockItems: (r) => [['stockVendors', [r.vendorId]]],
-  stockPurchases: (r) => [
-    ['stockVendors', [r.vendorId]],
-    ['stockItems', r.lines.map((line) => line.itemId)],
-  ],
-  stockMovements: (r) => [
-    ['stockItems', [r.itemId]],
-    ['patients', [r.patientId]],
-    ['stockPurchases', [r.purchaseId]],
-    ['stockCounts', [r.stockCountId]],
-    ['stockMovements', [r.revertsId, r.revertedById]],
-  ],
-  stockCounts: (r) => [['stockItems', r.lines.map((line) => line.itemId)]],
 };
 
 interface Link {
@@ -469,9 +345,9 @@ describe('the clinic fixture world', () => {
           0,
         );
     };
-    // PY_INV `paid`, ₹ × 100.
-    expect([787, 786, 785, 784, 783, 781, 779, 772].map(paidOn)).toEqual([
-      0, 0, 60000, 0, 0, 765000, 153400, 40000,
+    // PY_INV `paid`, ₹ × 100 — its Medical rows (#785, #779) are the Medical room's sales.
+    expect([787, 786, 784, 783, 781, 772].map(paidOn)).toEqual([
+      0, 0, 0, 0, 765000, 40000,
     ]);
     const bill = (seq: number) =>
       invoiceTotals({
@@ -480,8 +356,8 @@ describe('the clinic fixture world', () => {
       }).bill;
     expect(bill(781)).toBe(765000);
     expect(bill(791)).toBe(371700);
-    // The receipts added for the package and sale invoices settle them exactly.
-    for (const seq of [780, 782, 789, 790]) {
+    // The receipts added for the package invoices settle them exactly.
+    for (const seq of [780, 782]) {
       const invoice = invoices.find((row) => row.seq === seq);
       expect(invoice && invoiceBalance(invoice, payments).status, `#${seq}`).toBe('paid');
     }
@@ -492,7 +368,7 @@ describe('the clinic fixture world', () => {
     }
   });
 
-  it("carries OF_SEED's offer prices and availability, and keeps every-branch offers open", () => {
+  it("carries OF_SEED's offer prices and availability", () => {
     const offerings = appFixtures.offerings.snapshot();
     const bySeq = (seq: number) => offerings.find((row) => row.seq === seq);
     // H:3562 `offer` (₹ × 100); any other offering bills its list price.
@@ -511,20 +387,12 @@ describe('the clinic fixture world', () => {
     expect(soldAt(268)).toEqual(['Vesu']);
     expect(soldAt(267)).toEqual(['Adajan', 'Vesu']);
     expect(soldAt(274)).toEqual([]);
-    expect(
-      appFixtures.offers
-        .snapshot((offer) => offer.branchIds.length === 0)
-        .map((offer) => offer.name),
-    ).toEqual(['Peel pack + 1 free', 'Monsoon ₹500 off']);
   });
 
-  it('pairs every Medical sale with its own invoice', () => {
+  it('seeds no medical bill — a sale is the Medical room’s, on clinozy-be (MD28)', () => {
     const invoices = appFixtures.invoices.snapshot();
-    for (const sale of appFixtures.medicalSales.snapshot()) {
-      const invoice = invoices.find((row) => row.id === sale.invoiceId);
-      expect(invoice?.saleId).toBe(sale.id);
-      expect(invoice?.type).toBe('medical');
-    }
+    expect(invoices.filter((invoice) => invoice.type === 'medical')).toEqual([]);
+    expect(invoices.every((invoice) => invoice.saleId === null)).toBe(true);
   });
 });
 
@@ -565,13 +433,12 @@ describe('the fixture world on the clinic clock', () => {
   );
 
   it('moves every date and instant in the world by the same span', () => {
-    // Batch expiries move by whole months (see the seed readers below).
     const worldOn = (now: string) => {
       floorOn(now);
       // A task's rule key names the visit slot it was derived for — an
       // identity the rule job compares, not a calendar value.
       return leaves(Object.fromEntries(KEYS.map((key) => [key, rowsOf(key)]))).filter(
-        ([path]) => !(path.endsWith('.expiry') || path.endsWith('.ruleKey')),
+        ([path]) => !path.endsWith('.ruleKey'),
       );
     };
     const first = worldOn('2026-10-03T04:30:00Z');
@@ -616,10 +483,8 @@ describe('seed readers', () => {
     expect(() => patientRef('Nobody Known')).toThrow(/unknown patient Nobody Known/);
   });
 
-  it('turns the prototype placeholders into valid mobiles and moves expiries', () => {
+  it('turns the prototype placeholders into valid mobiles', () => {
     expect(seedMobile('+91 33333 33333')).toBe('+919333333333');
     expect(seedMobile('98250 44120')).toBe('+919825044120');
-    expect(seedExpiry('11/26', '2026-09-27')).toBe('11/26');
-    expect(seedExpiry('11/26', '2026-11-26')).toBe('01/27');
   });
 });

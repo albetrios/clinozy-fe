@@ -168,6 +168,7 @@ export const TASKS_KEYS = {
       review: 'drawer.source.review',
       patient: 'drawer.source.patient',
       invoice: 'drawer.source.invoice',
+      medicalRep: 'drawer.source.medicalRep',
     },
     tiles: {
       visit: 'drawer.tiles.visit',

@@ -15,9 +15,11 @@ import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { validateMedicalCreateSearch } from '../../medical.dialog-search.ts';
 import {
+  validateMedicalCreditsSearch,
   validateMedicalPaymentsSearch,
   validateMedicalSearch,
 } from '../../medical.search.ts';
@@ -36,36 +38,61 @@ const TAB_DIALOGS = {
   manufacturers: ['create', '$manufacturerId/edit'],
   mrs: ['create', '$mrId/edit', '$mrId/visits/create'],
   payments: [],
+  credits: [],
 } as const;
 
 /** A Medical tab. */
 export type MedicalTestTab = keyof typeof TAB_DIALOGS;
 
+/** The eight tabs in the tab row's order. */
+export const MEDICAL_TEST_TABS = Object.keys(TAB_DIALOGS) as MedicalTestTab[];
+
+/** Each tab's search schema, as `routeTree.tsx` has it. */
+const TAB_SEARCH: Partial<
+  Record<MedicalTestTab, (search: Record<string, unknown>) => object>
+> = {
+  payments: validateMedicalPaymentsSearch,
+  credits: validateMedicalCreditsSearch,
+};
+
+/** A member of `acme` holding the `role` preset's codes — the room's live reads need the organization. */
+function signInAs(role: Role) {
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions([...PRESET_CODES[role]]);
+}
+
 /**
  * The Medical family as `routeTree.tsx` registers it — every tab with the
  * room's search schema and its dialog routes, which render nothing — with
- * `pages[tab]` as each tab's component, opened at `url`, for a member holding
- * the `role` preset's codes. Every other path lands on a catch-all.
+ * `pages[tab]` as each tab's component, opened at `url`, for a member of
+ * `acme` holding the `role` preset's codes, under the tooltips the app's shell
+ * provides (a drawer's buttons carry them). Every other path lands on a
+ * catch-all.
  */
 export function renderMedicalRoutes(
   url: string,
   pages: Partial<Record<MedicalTestTab, () => ReactNode>>,
   { role = 'admin' }: { role?: Role } = {},
 ) {
-  useOrganizationStore.getState().setPermissions([...PRESET_CODES[role]]);
+  signInAs(role);
 
-  const root = createRootRoute({ component: () => <Outlet /> });
+  const root = createRootRoute({
+    component: () => (
+      <TooltipProvider>
+        <Outlet />
+      </TooltipProvider>
+    ),
+  });
   const medical = createRoute({
     getParentRoute: () => root,
     path: '/organization/$organizationSlug/medical',
     component: () => <Outlet />,
   });
-  const tabs = (Object.keys(TAB_DIALOGS) as MedicalTestTab[]).map((tab) => {
+  const tabs = MEDICAL_TEST_TABS.map((tab) => {
     const page = createRoute({
       getParentRoute: () => medical,
       path: tab,
-      validateSearch:
-        tab === 'payments' ? validateMedicalPaymentsSearch : validateMedicalSearch,
+      validateSearch: TAB_SEARCH[tab] ?? validateMedicalSearch,
       component: pages[tab] ?? (() => <p>{tab} tab</p>),
     });
     const dialogs = TAB_DIALOGS[tab].map((path) =>
@@ -106,14 +133,14 @@ const testQueryClient = () =>
 
 /**
  * One Medical drawer (or any part of the room outside a tab's route) for a
- * member holding the `role` preset's codes, with the router, query client and tooltips the
- * room's shell provides — a drawer's dirty guard reads the router.
+ * member of `acme` holding the `role` preset's codes, with the router, query client and
+ * tooltips the room's shell provides — a drawer's dirty guard reads the router.
  */
 export function renderMedicalDrawer(
   ui: ReactNode,
   { role = 'admin' }: { role?: Role } = {},
 ) {
-  useOrganizationStore.getState().setPermissions([...PRESET_CODES[role]]);
+  signInAs(role);
   const queryClient = testQueryClient();
   const root = createRootRoute({
     component: () => <TooltipProvider>{ui}</TooltipProvider>,
@@ -134,4 +161,5 @@ export function renderMedicalDrawer(
 export function resetMedicalRoutes() {
   useUIStore.setState({ previewRole: null });
   useOrganizationStore.getState().clearPermissions();
+  useOrganizationStore.getState().clearOrganization();
 }

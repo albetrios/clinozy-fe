@@ -16,7 +16,7 @@ import {
  * The Invoice drawer's form (KICKOFF §6.9): what each field holds, what a new or an existing
  * invoice starts with, and what an invoice's save sends. One form serves both of the drawer's
  * modes — a clinic or consultation invoice on clinozy-be, priced by the server, and Medical's
- * New sale on the fixture world (`sale-form.ts`). The money fields hold paise, as every form's do
+ * New sale, the room's write on clinozy-be (`sale-form.ts`). The money fields hold paise, as every form's do
  * (W0); the write turns them into the API's rupees.
  */
 
@@ -32,7 +32,7 @@ export type PaidNowMode = (typeof PAID_NOW_MODES)[number];
 /**
  * One item row. An invoice's line is an offering, its quantity and its discount — the server
  * prices it; a kept line carries its saved id, the plan row it bills and the treatments it pays
- * for. A sale's line is a medicine with its rate (paise) and GST, as the fixture world bills it.
+ * for. A sale's line is a medicine at its MRP (paise) — a guide: the server prices the sale.
  */
 export interface InvoiceLineForm {
   /** A saved line's id (`iitm_…`) — an edit keeps the line by it; null for a new one. */
@@ -202,16 +202,15 @@ export function invoiceFormOf(detail: InvoiceDetail): InvoiceFormValues {
  * discounts), overall discount and remark — dated today with nothing paid, filed like any new
  * invoice under the screen's branch. What belonged to the original alone stays with it: its
  * number and status, its payments, its lines' ids, the plan rows and treatments they billed and
- * the prescription. A Medical sale's invoice is the Medical room's: its copy starts a new sale.
+ * the prescription. A Medical sale's invoice is the Medical room's — the Invoices room bills no
+ * medicine (MD28) — so its copy starts a blank clinic invoice.
  */
 export function copiedInvoiceForm(
   detail: InvoiceDetail,
   today: string,
   branchId: string | null,
 ): InvoiceFormValues {
-  if (detail.invoice.type === 'medical') {
-    return emptyInvoiceForm(today, { type: 'medical', branchId });
-  }
+  if (detail.invoice.type === 'medical') return emptyInvoiceForm(today, { branchId });
   const form = invoiceFormOf(detail);
   return {
     ...form,
@@ -286,8 +285,8 @@ function lineInputOf(line: InvoiceLineForm & { offeringId: string }): InvoiceLin
   };
 }
 
-/** "Paid now" as an invoice's create sends it: one split per mode, in rupees. */
-function paidNowMoney(rows: readonly PaidNowRow[]): MoneySplit[] {
+/** "Paid now" as an invoice's or a sale's create sends it: one split per mode, in rupees. */
+export function paidNowMoney(rows: readonly PaidNowRow[]): MoneySplit[] {
   return paidNowSplits(rows).map(({ mode, amount }) => ({
     mode,
     amount: rupeesOfPaise(amount),

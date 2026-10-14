@@ -47,6 +47,12 @@ export const creditQueryKeys = {
     [...creditQueryKeys.all, organizationId, 'list'] as const,
   list: (organizationId: string | null, params: CreditListParams) =>
     [...creditQueryKeys.lists(organizationId), params] as const,
+  /** The medical store's customer credits (`/app/medical-pending-credits`) — under `lists`, so every write refreshes them. */
+  store: (organizationId: string | null, params: CreditListParams) =>
+    [...creditQueryKeys.lists(organizationId), 'store', params] as const,
+  /** How many of the store's customer credits its params match — under `lists`, so every write refreshes it. */
+  storeCount: (organizationId: string | null, params: CreditListParams) =>
+    [...creditQueryKeys.lists(organizationId), 'store', 'count', params] as const,
   detail: (organizationId: string | null, creditId: string) =>
     [...creditQueryKeys.all, organizationId, 'detail', creditId] as const,
   /** Add pending's Who picker — its pages, by the text searched. */
@@ -113,6 +119,41 @@ export async function listPendingCredits(
   after?: string,
 ): Promise<CreditPage> {
   const response = await api.get('/app/pending-credits', {
+    query: { ...creditListQuery(params), after },
+  });
+  const records = z
+    .array(creditRowWire)
+    .parse(response.data ?? [])
+    .map(toPendingCreditRecord);
+  return {
+    rows: await creditRowsOf(records),
+    ...pageOf(response.meta?.pagination),
+  };
+}
+
+/**
+ * How many of the store's customer credits its params match — the API's count of the whole list
+ * (`estimated_total`), read with one row; null when left out. Medical › Credits' footer.
+ */
+export async function fetchStoreCreditCount(
+  params: CreditListParams,
+): Promise<number | null> {
+  const response = await api.get('/app/medical-pending-credits', {
+    query: { ...creditListQuery(params), limit: 1 },
+  });
+  return pageOf(response.meta?.pagination).total;
+}
+
+/**
+ * One page of the medical store's customer credits (`GET /app/medical-pending-credits`, MD32,
+ * D90) — those naming one of its sales, or left by a return kept as store credit — with Pending's
+ * filters, each with who added it; `after` is the cursor.
+ */
+export async function listStoreCredits(
+  params: CreditListParams,
+  after?: string,
+): Promise<CreditPage> {
+  const response = await api.get('/app/medical-pending-credits', {
     query: { ...creditListQuery(params), after },
   });
   const records = z

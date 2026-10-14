@@ -103,7 +103,8 @@ export function usePrescriptionRowActions({
             appCommandNavigation('newSale', {
               organizationSlug,
               referrer: `patients/${patientId}/prescriptions`,
-              search: { prescription: prescription.id },
+              // New sale reads the prescription among its patient's (`customer`).
+              search: { prescription: prescription.id, customer: prescription.patientId },
             }),
           ),
       });

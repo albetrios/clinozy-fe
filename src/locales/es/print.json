@@ -119,6 +119,7 @@
     "free": "Bonif.",
     "rate": "Tarifa",
     "paid": "Pagado:",
+    "credited": "Créditos del proveedor:",
     "issuedBy": "Orden de compra de {{clinic}}"
   }
 }

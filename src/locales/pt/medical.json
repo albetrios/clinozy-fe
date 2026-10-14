@@ -11,6 +11,7 @@
     "manufacturers": "Fabricantes",
     "mrs": "Representantes",
     "payments": "Pagamentos",
+    "credits": "Créditos",
     "groups": {
       "selling": "Venda",
       "stock": "Estoque",
@@ -53,7 +54,9 @@
     "manufacturer": "Fabricante",
     "manufacturers": "Fabricantes",
     "suppliers": "Fornecedores",
-    "mrs": "Representantes"
+    "mrs": "Representantes",
+    "payable": "A pagar",
+    "owed": "Com valor em dívida"
   },
   "table": {
     "percent": "{{value}}%",
@@ -190,6 +193,7 @@
     "ageing_one": "{{count}} dia",
     "ageing_many": "{{count}} dias",
     "ageing_other": "{{count}} dias",
+    "paidUp": "Já não há nada em dívida a {{name}}",
     "rowActions": {
       "pay": "Pagar {{amount}}",
       "newOrder": "Novo pedido de compra",
@@ -239,7 +243,77 @@
   },
   "payments": {
     "records": "pagamentos da farmácia",
-    "empty": "Ainda não há pagamentos da farmácia"
+    "empty": "Ainda não há pagamentos da farmácia",
+    "export": "Exportar",
+    "exportTitle": "Exportar estes pagamentos como CSV",
+    "exported": "Pagamentos exportados como CSV",
+    "exportTruncated": "Os primeiros 10.000 pagamentos foram exportados — restrinja os filtros para o resto"
+  },
+  "credits": {
+    "records": "créditos da farmácia",
+    "count_many": "{{count}} créditos",
+    "count_one": "{{count}} crédito",
+    "count_other": "{{count}} créditos",
+    "sides": {
+      "label": "De quem são os créditos",
+      "suppliers": "De fornecedores",
+      "customers": "Com clientes"
+    },
+    "columns": {
+      "credit": "Crédito",
+      "supplier": "Fornecedor",
+      "packs": "Embalagens",
+      "amount": "Valor",
+      "applied": "Abatido",
+      "state": "Estado",
+      "since": "Desde",
+      "who": "Quem",
+      "way": "Sentido",
+      "left": "Em aberto"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_one": "{{count}} embalagem",
+    "packs_many": "{{count}} embalagens",
+    "packs_other": "{{count}} embalagens",
+    "states": {
+      "open": "Aberto",
+      "adjusted": "Abatido"
+    },
+    "customerStates": {
+      "open": "Aberto",
+      "given_back": "Devolvido",
+      "got_back": "Recebido de volta",
+      "used": "Usado"
+    },
+    "ways": {
+      "give": "Devolvemos",
+      "take": "Nos devolvem"
+    },
+    "rowActions": {
+      "void": "Anular crédito",
+      "giveBack": "Devolver",
+      "gotBack": "Recebido de volta",
+      "open": "Abrir em Pendentes"
+    },
+    "empty": {
+      "suppliers": "Ainda não há créditos de fornecedores — devolva o stock a vencer em Medicamentos",
+      "customers": "Ainda não há créditos de clientes"
+    },
+    "addCredit": "Adicionar crédito",
+    "void": {
+      "title": "Anular este crédito?",
+      "effect": "As embalagens voltam ao stock e o fornecedor volta a ter a receber.",
+      "voided": "Crédito · {{batch}} anulado",
+      "reasons": {
+        "mistake": "Adicionado por engano",
+        "wrongQuantity": "Quantidade errada",
+        "supplierRefused": "O fornecedor recusou"
+      }
+    },
+    "filters": {
+      "state": "Estado",
+      "way": "Sentido"
+    }
   },
   "drawers": {
     "records": {
@@ -274,8 +348,7 @@
     "quick": {
       "manufacturer": "Fabricante {{name}} adicionado",
       "supplier": "Fornecedor {{name}} adicionado · telefone e GST depois",
-      "mr": "Representante {{name}} adicionado",
-      "medicine": "{{name}} adicionado · defina o PMC depois em Estoque"
+      "mr": "Representante {{name}} adicionado"
     },
     "deleteConfirm": {
       "medicine": "Excluir este medicamento?",
@@ -580,6 +653,7 @@
       "payable": "A pagar {{amount}}",
       "paid": "Pago {{amount}}",
       "paidOf": "Pago {{paid}} de {{total}}",
+      "paidWithCredits": "Pago {{paid}} + {{credited}} em créditos do fornecedor",
       "pay": "Pagar {{amount}}",
       "print": "Imprimir"
     },
@@ -608,7 +682,7 @@
     },
     "saleReturn": {
       "title": "Devolução do paciente",
-      "sub": "{{customer}} · o estoque devolvido volta ao seu lote",
+      "sub": "{{customer}} · as embalagens devolvidas voltam ao seu lote; as danificadas ou por reação são baixadas",
       "steps": {
         "back": "O que está voltando",
         "reason": "Motivo e reembolso"
@@ -633,8 +707,11 @@
       "nothing": "Informe o que está sendo devolvido",
       "refunded": "{{amount}} reembolsado · estoque reposto",
       "refundedWrittenOff": "{{amount}} reembolsado · estoque baixado",
-      "lowered": "{{amount}} devolvido · estoque reposto",
-      "loweredWrittenOff": "{{amount}} devolvido · estoque baixado"
+      "storeCredit": "Crédito na loja",
+      "saveCredit": "Manter {{amount}} como crédito na loja",
+      "credited": "{{amount}} mantido como crédito na loja · estoque reposto",
+      "creditedWrittenOff": "{{amount}} mantido como crédito na loja · estoque baixado",
+      "notPaid": "Receba primeiro a conta inteira · só uma venda paga por inteiro aceita devolução"
     },
     "expiring": {
       "title": "Devolver estoque perto do vencimento",

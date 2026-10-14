@@ -7,7 +7,6 @@ import type {
   CheckinFollowed,
   FeedbackAction,
   ImageAlbum,
-  OfferingSuggestion,
   PatientImage,
   PatientNote,
   PatientPackage,
@@ -19,14 +18,13 @@ import type {
   ReviewSource,
   RxMeal,
   RxTiming,
-  SuggestionStatus,
   Treatment,
 } from '@/shared/api/app/app-schema.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
 
 import { offeringBySeq } from './offerings.fixtures.ts';
 import { patientRef } from './patients.fixtures.ts';
-import { must, paise, ref, seedAt, seedDay } from './refs.fixtures.ts';
+import { must, ref, seedAt, seedDay } from './refs.fixtures.ts';
 import { type StaffKey, staffRef } from './staff.fixtures.ts';
 
 /** Where seeded files live: a reserved test host, never fetched for real. */
@@ -528,61 +526,7 @@ export function patientNoteSeed(today: string = appToday()): PatientNote[] {
   }));
 }
 
-// ── Plan and feedback ──
-
-const SUGGESTION_STATUSES: Record<string, SuggestionStatus> = {
-  Planned: 'planned',
-  Accepted: 'accepted',
-  'Next time': 'next_time',
-  Declined: 'declined',
-};
-
-/**
- * `SUG_SEED` (H:3679), verbatim. Neither row carries invoice links in the
- * prototype (`inv`), so neither is "Invoiced".
- */
-export function offeringSuggestionSeed(today: string = appToday()): OfferingSuggestion[] {
-  const rows = [
-    {
-      key: 1,
-      offering: 268,
-      qty: 1,
-      price: 4500,
-      by: 'DD',
-      at: '24 Sep · 15:00',
-      from: 'Appt #2790 · Consultation',
-      visit: 2790,
-      status: 'Accepted',
-      why: 'Unwanted facial hair · wants a package',
-    },
-    {
-      key: 2,
-      offering: 274,
-      qty: 1,
-      price: null,
-      by: 'NK',
-      at: '25 Sep · 12:00',
-      from: 'Counselling call',
-      visit: null,
-      status: 'Planned',
-      why: 'Tanning · pair with the peel series',
-    },
-  ] as const;
-  return rows.map((row) => ({
-    ...seedCommon(seedAt(row.at, '12:00', today), staffRef(row.by)),
-    id: ref.offeringSuggestion(row.key),
-    patientId: patientRef('Dharti Galani'),
-    offeringId: ref.offering(row.offering),
-    qty: row.qty,
-    price: row.price === null ? null : paise(row.price),
-    status: must(SUGGESTION_STATUSES[row.status], `suggestion status ${row.status}`),
-    sourceLabel: row.from,
-    appointmentId: row.visit === null ? null : ref.appointment(row.visit),
-    reason: row.why,
-    suggestedById: staffRef(row.by),
-    invoiceLinks: [],
-  }));
-}
+// ── Feedback ──
 
 const FEELS: Record<string, CheckinFeel> = {
   'Much better': 'much_better',
