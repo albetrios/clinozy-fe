@@ -35,8 +35,10 @@ What was actually built, ledger row by ledger row, against the approved plan in
 - **After done (D5):** the folder keeps only what this fix produced — `intake-files/BRIEF.md`, the
   plan, the decisions and this record; the 22 files copied from the launch are removed, so this
   iteration's intake gate no longer passes by design (as in the two `change-*` iterations).
-- **Follow-ups for the next iteration:** none from this fix. `frozen` goes in the last commit before
-  the merge, once the user confirms the pull request (D12).
+- **Follow-ups for the next iteration:** none from this fix.
+- **Frozen (D13):** on the user's go-ahead the iteration is `frozen` in the last commit before the
+  merge; `fix-upload-storage-cors-2026-10-13-lnab`, merged meanwhile, touches none of this fix's
+  files.
 
 ## Standing deviations
 
