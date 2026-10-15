@@ -65,6 +65,34 @@ export const RX_KEYS = {
     addMedicine: 'rx.items.addMedicine',
     use: 'rx.items.use',
     note: 'rx.items.note',
+    /** The Days cell (change-prescription-writing D6): its header and its search. */
+    days: 'rx.items.days',
+    searchDays: 'rx.items.searchDays',
+    /** The Days list's first row once a course is set. */
+    noDays: 'rx.items.noDays',
+    /** The medicine list's groups (D4). */
+    groups: {
+      store: 'rx.items.groups.store',
+      outside: 'rx.items.groups.outside',
+    },
+    /** An outside name's line in the list: "Written for this patient before". */
+    writtenBefore: 'rx.items.writtenBefore',
+    /** The create row: "Outside medicine “Acnestar”". */
+    addOutside: 'rx.items.addOutside',
+    /** A row's source pill and its spoken words (D4). */
+    source: {
+      /** "24 in your medical store" (plural). */
+      stocked: 'rx.items.source.stocked',
+      store: 'rx.items.source.store',
+      empty: 'rx.items.source.empty',
+      /** The pill's word: "Outside". */
+      outside: 'rx.items.source.outside',
+      outsideHint: 'rx.items.source.outsideHint',
+    },
+    /** The list's footer: switch the picked line store ↔ outside. */
+    toOutside: 'rx.items.toOutside',
+    toOutsideHint: 'rx.items.toOutsideHint',
+    toStore: 'rx.items.toStore',
   },
   dose: {
     group: 'rx.dose.group',
@@ -78,6 +106,22 @@ export const RX_KEYS = {
     off: 'rx.dose.off',
     sos: 'rx.dose.sos',
     sosHint: 'rx.dose.sosHint',
+    /** The ⌄ beside the taps (D5): its name, its two headings, the presets' words. */
+    presets: 'rx.dose.presets',
+    presetsHint: 'rx.dose.presetsHint',
+    presetNames: {
+      morning: 'rx.dose.presetNames.morning',
+      night: 'rx.dose.presetNames.night',
+      twice: 'rx.dose.presetNames.twice',
+      thrice: 'rx.dose.presetNames.thrice',
+      afternoon: 'rx.dose.presetNames.afternoon',
+      sos: 'rx.dose.presetNames.sos',
+    },
+    counts: 'rx.dose.counts',
+    /** "One less · Morning" / "One more · Morning". */
+    less: 'rx.dose.less',
+    more: 'rx.dose.more',
+    clear: 'rx.dose.clear',
   },
   meal: {
     before: 'rx.meal.before',
@@ -195,6 +239,22 @@ export const RX_KEYS = {
     continued: 'rx.sidekick.continued',
     reads: 'rx.sidekick.reads',
     readsEmpty: 'rx.sidekick.readsEmpty',
+    /** Earlier prescriptions (change-prescription-writing D8). */
+    earlier: {
+      title: 'rx.sidekick.earlier.title',
+      none: 'rx.sidekick.earlier.none',
+      /** "2 of 5". */
+      position: 'rx.sidekick.earlier.position',
+      older: 'rx.sidekick.earlier.older',
+      newer: 'rx.sidekick.earlier.newer',
+      inThisRx: 'rx.sidekick.earlier.inThisRx',
+      add: 'rx.sidekick.earlier.add',
+      addLabel: 'rx.sidekick.earlier.addLabel',
+      /** "Add 3 missing" (plural). */
+      addAll: 'rx.sidekick.earlier.addAll',
+      advice: 'rx.sidekick.earlier.advice',
+      noLines: 'rx.sidekick.earlier.noLines',
+    },
     /** The folded card's line (plurals): "1 allergy match · 3 changes since Rx #12". */
     summary: {
       allergy: 'rx.sidekick.summary.allergy',
@@ -215,13 +275,19 @@ export const RX_KEYS = {
     sos: 'rx.plain.sos',
     total: 'rx.plain.total',
   },
-  /** The save's confirm when a line matches an allergy (D8). */
-  allergyConfirm: {
-    title: 'rx.allergyConfirm.title',
-    /** "These medicines match the patient's allergies:" (plural). */
-    body: 'rx.allergyConfirm.body',
-    back: 'rx.allergyConfirm.back',
-    confirm: 'rx.allergyConfirm.confirm',
+  /** The allergy warning under a matching row (change-prescription-writing D7). */
+  rowAllergy: {
+    /** "Allergic to Sulfa drugs". */
+    warning: 'rx.rowAllergy.warning',
+    keep: 'rx.rowAllergy.keep',
+    keepLabel: 'rx.rowAllergy.keepLabel',
+    remove: 'rx.rowAllergy.remove',
+    removeLabel: 'rx.rowAllergy.removeLabel',
+    /** "Kept knowingly despite the Sulfa drugs allergy". */
+    kept: 'rx.rowAllergy.kept',
+    undo: 'rx.rowAllergy.undo',
+    /** The held save's toast: "Septran DS matches an allergy — keep it or remove it". */
+    held: 'rx.rowAllergy.held',
   },
 } as const;
 
@@ -244,6 +310,6 @@ export const RX_TEST_IDS = {
   sidekick: 'rx-sidekick',
   /** The allergy band under the drawer's header. */
   allergyBand: 'rx-drawer-allergy-band',
-  /** The save's allergy confirm (`-cancel`, `-accept`). */
-  allergyConfirm: 'rx-allergy-confirm',
+  /** The allergy warning under a matching row (`-keep`, `-remove`). */
+  rowAllergy: 'rx-items-allergy',
 } as const;

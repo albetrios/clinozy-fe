@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
-import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { PrescriptionItem, Tone } from '@/shared/api/app/app-schema.ts';
 import { localDateOf } from '@/shared/api/app/app-time.ts';
 import {
   fetchPrescription,
@@ -57,8 +57,9 @@ import {
   type RxPadState,
 } from './rx-medicines-field.tsx';
 import { RxNotesFields, RxPrescriptionFields } from './rx-steps.tsx';
-import { useRxComposer } from './use-rx-composer.tsx';
+import { type RxComposer, useRxComposer } from './use-rx-composer.tsx';
 import { rxSaveLabelKey, rxVisitMode, useRxDone } from './use-rx-done.tsx';
+import { useRxLabels } from './use-rx-labels.ts';
 import { useRxSave } from './use-rx-save.ts';
 
 const K = RX_KEYS;
@@ -92,6 +93,8 @@ function useRxSteps({
     padRefs: RxPadRefs;
     allergies: readonly string[] | null;
     quickLineRef: Ref<HTMLInputElement>;
+    /** The allergy warning under a matching row (change-prescription-writing D7). */
+    rowFooter: RxComposer['rowFooter'];
     focusesLine: boolean;
   };
 }): DrawerStep[] {
@@ -146,6 +149,7 @@ function useRxSteps({
           allergies={composer.allergies}
           quickLineRef={composer.quickLineRef}
           focusOnOpen={composer.focusesLine}
+          rowFooter={composer.rowFooter}
         />
       ),
     },
@@ -218,6 +222,7 @@ function quickFillItems({
   last,
   kits,
   print,
+  dayWords,
   t,
 }: {
   form: UseFormReturn<RxFormValues>;
@@ -225,8 +230,12 @@ function quickFillItems({
   last: PrescriptionRecord | undefined;
   kits: readonly PrescriptionKit[];
   print: () => void;
+  /** A copied note's leading days go to the line's Days (change-prescription-writing D3). */
+  dayWords: readonly string[];
   t: TFunction;
 }): QuickFillItem[] {
+  const linesOf = (lines: readonly PrescriptionItem[]) =>
+    lines.map((item) => rxFormLineOf(item, dayWords));
   const fill = (values: Partial<RxFormValues>) =>
     resetFormInPlace(
       form,
@@ -247,8 +256,7 @@ function quickFillItems({
       id: 'repeat',
       label: t(K.quickFill.repeat, { number: displayId.prescription(last.seq) }),
       tone: 'sky',
-      onSelect: () =>
-        fill({ items: last.items.map(rxFormLineOf), advice: last.advice ?? '' }),
+      onSelect: () => fill({ items: linesOf(last.items), advice: last.advice ?? '' }),
     });
   }
   kits.forEach((kit, index) => {
@@ -256,7 +264,7 @@ function quickFillItems({
       id: `kit-${kit.id}`,
       label: kit.name,
       tone: RX_KIT_TONES[index % RX_KIT_TONES.length],
-      onSelect: () => fill({ items: kit.items.map(rxFormLineOf) }),
+      onSelect: () => fill({ items: linesOf(kit.items) }),
     });
   });
   return items;
@@ -344,6 +352,7 @@ function useRxDrawerSave({
   const { t } = useTranslation(RX_NS);
   const { atVisit, appointmentId } = rxVisitMode(visit, record);
   const printRx = useRxPrint();
+  const { daysNote } = useRxLabels();
   const { saveState, save } = useRxSave({
     form,
     prescription: record,
@@ -365,7 +374,7 @@ function useRxDrawerSave({
   });
   // The sheet as the form stands: an approved one's is its read.
   const print = () => {
-    if (record) void printRx({ ...record, ...rxFieldsOf(form.getValues()) });
+    if (record) void printRx({ ...record, ...rxFieldsOf(form.getValues(), daysNote) });
   };
   const saveLabel = t(rxSaveLabelKey({ editing: record !== null, approves, atVisit }));
   return { saveState, save, saveLabel, print };
@@ -398,6 +407,7 @@ export function PrescriptionDrawer({
   onClose,
 }: PrescriptionDrawerProps) {
   const { t } = useTranslation(RX_NS);
+  const { dayWords } = useRxLabels();
   const form = useForm<RxFormValues>({
     defaultValues: initialRxForm({
       prescription,
@@ -405,12 +415,13 @@ export function PrescriptionDrawer({
       doctorId: defaultDoctorId,
       medicines: smartNoteMedicines,
       catalog: catalog?.medicines ?? [],
+      dayWords,
     }),
   });
   const { record, reload } = useEditingRecord({
     record: prescription,
     form,
-    formOf: rxFormOf,
+    formOf: (read) => rxFormOf(read, dayWords),
     read: readPrescription,
   });
   const values = useFormValues(form);
@@ -438,6 +449,7 @@ export function PrescriptionDrawer({
     allergies,
     writable: mode.writable,
     focusLine: record === null && step === 'medicines',
+    openMedicines: () => setStep('medicines'),
     save: (sell) => void save(sell),
   });
   const steps = useRxSteps({
@@ -454,6 +466,7 @@ export function PrescriptionDrawer({
       allergies,
       quickLineRef: composer.quickLineRef,
       focusesLine: composer.focusesLine,
+      rowFooter: composer.rowFooter,
     },
   });
 
@@ -476,6 +489,7 @@ export function PrescriptionDrawer({
           last: history[0],
           kits,
           print,
+          dayWords,
           t,
         })}
         width={1040}
@@ -509,7 +523,6 @@ export function PrescriptionDrawer({
         )}
         {composer.card}
       </RecordDrawer>
-      {composer.confirm}
       {record && mode.deletable ? (
         <RxDeleteConfirm
           prescription={record}

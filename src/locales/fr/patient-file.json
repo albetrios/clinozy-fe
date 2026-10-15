@@ -304,7 +304,28 @@
       "searchMedicine": "Rechercher un médicament",
       "addMedicine": "Ajouter un médicament",
       "use": "Utiliser",
-      "note": "Remarques · p. ex. 10 jours, couche fine, éviter le soleil"
+      "days": "Jours",
+      "searchDays": "Saisir les jours, ex. 12",
+      "noDays": "Sans durée",
+      "groups": {
+        "store": "Dans votre pharmacie",
+        "outside": "Médicaments extérieurs"
+      },
+      "writtenBefore": "Déjà prescrit à ce patient",
+      "addOutside": "Médicament extérieur",
+      "source": {
+        "stocked_one": "{{count}} dans votre pharmacie",
+        "stocked_many": "{{count}} dans votre pharmacie",
+        "stocked_other": "{{count}} dans votre pharmacie",
+        "store": "De votre pharmacie",
+        "empty": "En rupture dans votre pharmacie",
+        "outside": "Extérieur",
+        "outsideHint": "Médicament extérieur — le patient l’achète ailleurs"
+      },
+      "toOutside": "Écrire comme médicament extérieur",
+      "toOutsideHint": "Le patient l’achète ailleurs ; il n’est pas vendu depuis cette ordonnance",
+      "toStore": "Le prendre dans votre pharmacie",
+      "note": "Remarques · p. ex. couche fine, éviter le soleil"
     },
     "dose": {
       "group": "Dose matin · midi · soir",
@@ -313,10 +334,24 @@
         "afternoon": "Midi",
         "night": "Soir"
       },
-      "on": "{{time}} · {{taps}} — cliquez pour changer",
-      "off": "{{time}} · aucune — cliquez pour changer",
       "sos": "SOS",
-      "sosHint": "Seulement si besoin (SOS)"
+      "sosHint": "Seulement si besoin (SOS)",
+      "on": "{{time}} · {{taps}} — touchez pour retirer",
+      "off": "{{time}} — touchez pour 1",
+      "presets": "Doses courantes",
+      "presetsHint": "Doses courantes, SOS ou plus d’un comprimé",
+      "presetNames": {
+        "morning": "Matin",
+        "night": "Soir",
+        "twice": "Deux fois par jour",
+        "thrice": "Trois fois par jour",
+        "afternoon": "Après-midi",
+        "sos": "Si besoin"
+      },
+      "counts": "Comprimés à chaque prise",
+      "less": "Un de moins · {{time}}",
+      "more": "Un de plus · {{time}}",
+      "clear": "Effacer la dose"
     },
     "meal": {
       "before": "Avant",
@@ -442,7 +477,22 @@
         "first": "Première ordonnance"
       },
       "show": "Afficher",
-      "hide": "Masquer"
+      "hide": "Masquer",
+      "earlier": {
+        "title": "Ordonnances précédentes",
+        "none": "Aucune ordonnance précédente",
+        "position": "{{index}} sur {{count}}",
+        "older": "Ordonnance plus ancienne",
+        "newer": "Ordonnance plus récente",
+        "inThisRx": "Dans cette Rx",
+        "add": "Ajouter",
+        "addLabel": "Ajouter {{name}} à cette ordonnance",
+        "addAll_one": "Ajouter {{count}} manquant",
+        "addAll_many": "Ajouter les {{count}} manquants",
+        "addAll_other": "Ajouter les {{count}} manquants",
+        "advice": "Conseil",
+        "noLines": "Aucun médicament"
+      }
     },
     "allergyBand": {
       "label": "Allergies"
@@ -454,13 +504,15 @@
       "sos": "Seulement si besoin",
       "total": "{{value}} au total"
     },
-    "allergyConfirm": {
-      "title": "Prescrire malgré l’allergie ?",
-      "body_one": "Ce médicament correspond aux allergies du patient :",
-      "body_many": "Ces médicaments correspondent aux allergies du patient :",
-      "body_other": "Ces médicaments correspondent aux allergies du patient :",
-      "back": "Revenir",
-      "confirm": "Enregistrer quand même"
+    "rowAllergy": {
+      "warning": "Le patient est allergique à {{allergies}}",
+      "keep": "Garder",
+      "keepLabel": "Garder {{medicine}} — prescrit en connaissance de cause",
+      "remove": "Retirer",
+      "removeLabel": "Retirer {{medicine}}",
+      "kept": "Gardé en connaissance de cause malgré l’allergie à {{allergies}}",
+      "undo": "Annuler",
+      "held": "{{medicine}} correspond à une allergie — gardez-le ou retirez-le d’abord"
     }
   },
   "treatment": {

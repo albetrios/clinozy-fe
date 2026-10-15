@@ -95,11 +95,10 @@ export function useRxQuickLine(
     () => nameNumbers(medicines.map((medicine) => medicine.name)),
     [medicines],
   );
-  const daysNote = (days: number) => t(K.daysNote, { count: days });
-
   const toItem = (medicine: RxCatalogMedicine): QuickLineItem<RxCatalogMedicine> => {
     const dosage = medicine.last
-      ? labels.directions(rxFormLineOf(medicine.last)) || t(K.quick.lastSaved)
+      ? labels.directions(rxFormLineOf(medicine.last, labels.dayWords)) ||
+        t(K.quick.lastSaved)
       : t(K.quick.noDosage);
     let stock: string | undefined;
     if (medicine.stock !== null) {
@@ -119,7 +118,7 @@ export function useRxQuickLine(
   const setItems = (next: RxFormValues['items']) =>
     form.setValue('items', next, { shouldDirty: true });
   const add = (medicine: RxCatalogMedicine, values: RxLineValues) => {
-    setItems(withRxLine(form.getValues('items'), rxLineFor(medicine, values, daysNote)));
+    setItems(withRxLine(form.getValues('items'), rxLineFor(medicine, values)));
     notify.success(t(K.quick.added, { name: medicine.name }));
   };
 
@@ -141,7 +140,7 @@ export function useRxQuickLine(
       count: (item) => rxCountOf(items, item.data.name),
       added: medicines.filter((medicine) => rxCountOf(items, medicine.name) > 0).length,
       onStep: (item, step) =>
-        setItems(steppedRxLines(form.getValues('items'), item.data, step, daysNote)),
+        setItems(steppedRxLines(form.getValues('items'), item.data, step)),
       newItem: {
         placeholder: t(K.quick.newMedicine),
         onAdd: (name) => add(typedMedicine(name), {}),

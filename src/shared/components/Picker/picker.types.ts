@@ -63,6 +63,9 @@ export interface PickerTriggerState<T> {
   open: boolean;
   selected: readonly PickerOption<T>[];
   placeholder: string;
+  /** The picker's `invalid` and `aria-describedby`, for the trigger to carry as the default one does. */
+  invalid?: boolean;
+  describedBy?: string;
 }
 
 /** Props both selection modes share. */

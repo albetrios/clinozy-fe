@@ -291,6 +291,8 @@ export function Picker<T = unknown>(input: PickerProps<T>) {
       open,
       selected: known.selected,
       placeholder: copy.placeholder,
+      invalid: props.invalid,
+      describedBy: props['aria-describedby'],
     }) ??
     defaultTrigger(props, {
       selected: known.selected,

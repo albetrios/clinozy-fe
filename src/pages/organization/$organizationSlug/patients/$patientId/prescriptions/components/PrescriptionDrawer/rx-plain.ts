@@ -1,4 +1,11 @@
-import { rxDaysIn, rxDoseOf, type RxFormLine } from './rx-form.ts';
+import {
+  isNoteSeparator,
+  LEADING_WORD,
+  rxDaysIn,
+  rxDayUnits,
+  rxDoseOf,
+  type RxFormLine,
+} from './rx-form.ts';
 
 /*
  * "What the patient reads" (feat-prescription-composer KICKOFF §6.5): a line
@@ -18,7 +25,7 @@ export interface RxPlainLine {
   when: string;
   /** The row's place value (`scalp`, `text:…`), or ''. */
   where: string;
-  /** The days the note names, or null. */
+  /** The line's days, else the days its note names, or null. */
   days: number | null;
   qty: number;
   /** The note past its days ("10 days, apply thin layer" → "apply thin layer"), or ''. */
@@ -27,18 +34,12 @@ export interface RxPlainLine {
 
 const TIMES: readonly RxPlainTime[] = ['morning', 'afternoon', 'night'];
 
-/** The letters a word starts with ("days," → "days"). */
-const LEADING_WORD = /^[\p{L}\p{M}]+/u;
-
-/** What separates a note's parts: spaces and punctuation. */
-const isSeparator = (character: string) => /[\s,;:.·–—-]/u.test(character);
-
 /** Text without the separators at its ends, its inner spaces single. */
 function trimSeparators(text: string): string {
   let start = 0;
   let end = text.length;
-  while (start < end && isSeparator(text.charAt(start))) start += 1;
-  while (end > start && isSeparator(text.charAt(end - 1))) end -= 1;
+  while (start < end && isNoteSeparator(text.charAt(start))) start += 1;
+  while (end > start && isNoteSeparator(text.charAt(end - 1))) end -= 1;
   return text.slice(start, end).replace(/\s+/g, ' ');
 }
 
@@ -52,9 +53,7 @@ export function rxNoteBeyondDays(
   remarks: string,
   dayWords: readonly string[] = [],
 ): string {
-  const units = new Set(
-    ['d', 'day', 'days', ...dayWords].map((word) => word.trim().toLowerCase()),
-  );
+  const units = rxDayUnits(dayWords);
   // ["Apply for ", "10", " days, gently"]: each number, then what follows it.
   const parts = remarks.split(/(\d+)/);
   let kept = parts[0] ?? '';
@@ -81,7 +80,7 @@ function echoesDoses(when: string, doses: RxPlainLine['doses']): boolean {
 
 /** A row read for the patient: its doses, timing, place, days, quantity and the rest of its note. */
 export function rxPlainLine(
-  line: Pick<RxFormLine, 'dose' | 'when' | 'where' | 'qty' | 'remarks'>,
+  line: Pick<RxFormLine, 'dose' | 'when' | 'where' | 'days' | 'qty' | 'remarks'>,
   dayWords: readonly string[] = [],
 ): RxPlainLine {
   const dose = rxDoseOf(line.dose);
@@ -96,7 +95,7 @@ export function rxPlainLine(
     doses,
     when: echoesDoses(line.when, doses) ? '' : line.when,
     where: line.where,
-    days: rxDaysIn(line.remarks, dayWords),
+    days: line.days ?? rxDaysIn(line.remarks, dayWords),
     qty: line.qty,
     note: rxNoteBeyondDays(line.remarks, dayWords),
   };

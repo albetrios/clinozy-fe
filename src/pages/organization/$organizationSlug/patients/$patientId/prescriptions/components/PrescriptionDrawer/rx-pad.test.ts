@@ -123,19 +123,18 @@ describe('readRxPad — a whole prescription at once', () => {
 });
 
 describe('withRxPadLines — adding the Pad to the form', () => {
-  const daysNote = (days: number) => `${days} days`;
-
   it('fills the blank row first, then appends, as the quick line adds', () => {
     const pad = readRxPad('flu 0-0-1 af 10d\nkojic gel face', CATALOG, NUMBERS);
-    const lines = withRxPadLines([emptyRxLine()], readableRxPadLines(pad), daysNote);
+    const lines = withRxPadLines([emptyRxLine()], readableRxPadLines(pad));
     expect(lines).toHaveLength(2);
     expect(lines[0]).toMatchObject({
       medicineName: 'Flubolt 400',
       medicineId: 'med_11',
       dose: '0-0-1',
       when: 'after',
+      days: 10,
       qty: 10,
-      remarks: '10 days',
+      remarks: '',
     });
     expect(lines[1]).toMatchObject({
       medicineName: 'Kojic Gel',
@@ -165,7 +164,7 @@ describe('withRxPadLines — adding the Pad to the form', () => {
       },
     } as RxCatalogMedicine;
     const pad = readRxPad('flu', [last], NUMBERS);
-    const [line] = withRxPadLines([], readableRxPadLines(pad), daysNote);
+    const [line] = withRxPadLines([], readableRxPadLines(pad));
     expect(line).toMatchObject({ dose: '1-0-1', when: 'after', qty: 6 });
   });
 });

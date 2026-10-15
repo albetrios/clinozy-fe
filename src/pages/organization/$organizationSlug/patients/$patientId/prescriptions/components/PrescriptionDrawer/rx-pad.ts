@@ -156,11 +156,9 @@ export function rxPadMedicine(
 export function withRxPadLines(
   items: readonly RxFormLine[],
   lines: readonly ReadableRxPadLine[],
-  daysNote: (days: number) => string,
 ): RxFormLine[] {
   return lines.reduce<RxFormLine[]>(
-    (current, line) =>
-      withRxLine(current, rxLineFor(rxPadMedicine(line), line.values, daysNote)),
+    (current, line) => withRxLine(current, rxLineFor(rxPadMedicine(line), line.values)),
     [...items],
   );
 }

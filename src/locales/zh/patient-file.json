@@ -284,7 +284,26 @@
       "searchMedicine": "搜索药物",
       "addMedicine": "添加药物",
       "use": "使用",
-      "note": "备注 · 例如 10 天、薄涂一层、避免日晒"
+      "days": "天数",
+      "searchDays": "输入天数，例如 12",
+      "noDays": "不限天数",
+      "groups": {
+        "store": "本院药房",
+        "outside": "院外药品"
+      },
+      "writtenBefore": "以前给此患者开过",
+      "addOutside": "院外药品",
+      "source": {
+        "stocked_other": "本院药房有 {{count}}",
+        "store": "来自本院药房",
+        "empty": "本院药房缺货",
+        "outside": "院外",
+        "outsideHint": "院外药品 — 患者在别处购买"
+      },
+      "toOutside": "改为院外药品",
+      "toOutsideHint": "患者在别处购买；不从此处方销售",
+      "toStore": "改用本院药房的",
+      "note": "备注 · 例如 薄涂一层、避免日晒"
     },
     "dose": {
       "group": "剂量 早 · 中 · 晚",
@@ -293,10 +312,24 @@
         "afternoon": "中午",
         "night": "晚上"
       },
-      "on": "{{time}} · {{taps}} — 点击更改",
-      "off": "{{time}} · 无 — 点击更改",
       "sos": "SOS",
-      "sosHint": "仅在需要时 (SOS)"
+      "sosHint": "仅在需要时 (SOS)",
+      "on": "{{time}} · {{taps}} — 点按取消",
+      "off": "{{time}} — 点按设为 1",
+      "presets": "常用剂量",
+      "presetsHint": "常用剂量、按需服用或多于一片",
+      "presetNames": {
+        "morning": "早上",
+        "night": "晚上",
+        "twice": "每日两次",
+        "thrice": "每日三次",
+        "afternoon": "中午",
+        "sos": "需要时"
+      },
+      "counts": "每次片数",
+      "less": "少一片 · {{time}}",
+      "more": "多一片 · {{time}}",
+      "clear": "清除剂量"
     },
     "meal": {
       "before": "饭前",
@@ -410,7 +443,20 @@
         "first": "第一张处方"
       },
       "show": "显示",
-      "hide": "隐藏"
+      "hide": "隐藏",
+      "earlier": {
+        "title": "以前的处方",
+        "none": "没有以前的处方",
+        "position": "第 {{index}} / {{count}} 张",
+        "older": "更早的处方",
+        "newer": "更新的处方",
+        "inThisRx": "已在本处方",
+        "add": "添加",
+        "addLabel": "将 {{name}} 添加到本处方",
+        "addAll_other": "添加缺少的 {{count}} 种",
+        "advice": "医嘱",
+        "noLines": "没有药品"
+      }
     },
     "allergyBand": {
       "label": "过敏"
@@ -422,11 +468,15 @@
       "sos": "仅在需要时",
       "total": "共 {{value}}"
     },
-    "allergyConfirm": {
-      "title": "仍要在过敏情况下开药吗？",
-      "body_other": "以下药物与患者的过敏相符：",
-      "back": "返回",
-      "confirm": "仍然保存"
+    "rowAllergy": {
+      "warning": "患者对 {{allergies}} 过敏",
+      "keep": "保留",
+      "keepLabel": "保留 {{medicine}} — 知情开具",
+      "remove": "移除",
+      "removeLabel": "移除 {{medicine}}",
+      "kept": "已知情保留，尽管对 {{allergies}} 过敏",
+      "undo": "撤销",
+      "held": "{{medicine}} 与过敏相符 — 请先保留或移除"
     }
   },
   "treatment": {

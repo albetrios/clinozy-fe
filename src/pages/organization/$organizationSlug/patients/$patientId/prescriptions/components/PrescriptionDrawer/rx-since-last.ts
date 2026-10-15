@@ -24,12 +24,13 @@ export interface RxChangesSince {
 
 const keyOf = (name: string) => name.trim().toLowerCase();
 
-/** The parts of a line a doctor changes: directions, quantity and the note. */
+/** The parts of a line a doctor changes: directions, days, quantity and the note. */
 function sameDirections(before: RxFormLine, now: RxFormLine): boolean {
   return (
     before.dose === now.dose &&
     before.when === now.when &&
     before.where === now.where &&
+    before.days === now.days &&
     before.qty === now.qty &&
     before.remarks.trim() === now.remarks.trim()
   );
@@ -60,12 +61,13 @@ export function previousRxOf(
 export function rxChangesSince(
   lines: readonly RxFormLine[],
   previous: PrescriptionRecord | undefined,
+  dayWords: readonly string[] = [],
 ): RxChangesSince | null {
   if (!previous) return null;
   const before = new Map<string, RxFormLine>();
   for (const item of previous.items) {
     const key = keyOf(item.medicineName);
-    if (!before.has(key)) before.set(key, rxFormLineOf(item));
+    if (!before.has(key)) before.set(key, rxFormLineOf(item, dayWords));
   }
   const seen = new Set<string>();
   const changes: RxChange[] = [];

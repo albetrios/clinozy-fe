@@ -455,6 +455,31 @@ describe('ItemsField — the note line (H:924)', () => {
   });
 });
 
+describe('ItemsField — the row footer (change-prescription-writing D7)', () => {
+  it('puts a host’s full-width line under a row that has one, and none under the rest', () => {
+    renderWithClient(
+      <LinesHarness
+        initial={[GLOVES, { ...GLOVES, name: 'Masks' }]}
+        note={{ key: 'note' }}
+        rowFooter={(row) =>
+          row.row.name === 'Masks' ? (
+            <p data-testid="lines-warning">Check {row.row.name}</p>
+          ) : null
+        }
+      />,
+    );
+    const warnings = screen.getAllByTestId('lines-warning');
+    expect(warnings).toHaveLength(1);
+    const cell = warnings[0]?.closest('[role="cell"]');
+    expect(cell).toHaveClass('col-span-full');
+    expect(cell).toHaveAttribute('aria-colspan', '4');
+    const rows = screen.getAllByTestId('lines-row');
+    expect(rows[1]).toContainElement(warnings[0] as HTMLElement);
+    // After the note: the footer is the row's last cell.
+    expect(rows[1]?.lastElementChild).toBe(cell);
+  });
+});
+
 describe('ItemsField — phone (H:95–101)', () => {
   beforeEach(() => {
     viewport.tier = 'phone';

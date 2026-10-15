@@ -23,11 +23,8 @@ export interface RxPlainWords {
 export function useRxPlainWords(): (line: RxFormLine) => RxPlainWords {
   const { t } = useTranslation(RX_NS);
   const labels = useRxLabels();
-  const dayWords = t(K.dayWords)
-    .split(',')
-    .map((word) => word.trim());
   return (line) => {
-    const plain = rxPlainLine(line, dayWords);
+    const plain = rxPlainLine(line, labels.dayWords);
     const doses =
       plain.doses === 'sos'
         ? t(K.plain.sos)
@@ -38,7 +35,7 @@ export function useRxPlainWords(): (line: RxFormLine) => RxPlainWords {
       doses,
       labels.when(plain.when),
       labels.where(plain.where),
-      plain.days ? t(K.daysNote, { count: plain.days }) : '',
+      plain.days ? labels.daysNote(plain.days) : '',
       t(K.plain.total, { value: plain.qty }),
     ]
       .filter(Boolean)

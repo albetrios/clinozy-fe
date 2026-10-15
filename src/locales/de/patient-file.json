@@ -294,7 +294,27 @@
       "searchMedicine": "Medikament suchen",
       "addMedicine": "Medikament hinzufügen",
       "use": "Übernehmen",
-      "note": "Hinweise · z. B. 10 Tage, dünn auftragen, Sonne meiden"
+      "days": "Tage",
+      "searchDays": "Tage eingeben, z. B. 12",
+      "noDays": "Keine Tage",
+      "groups": {
+        "store": "In Ihrer Apotheke",
+        "outside": "Externe Medikamente"
+      },
+      "writtenBefore": "Diesem Patienten schon verschrieben",
+      "addOutside": "Externes Medikament",
+      "source": {
+        "stocked_one": "{{count}} in Ihrer Apotheke",
+        "stocked_other": "{{count}} in Ihrer Apotheke",
+        "store": "Aus Ihrer Apotheke",
+        "empty": "In Ihrer Apotheke nicht vorrätig",
+        "outside": "Extern",
+        "outsideHint": "Externes Medikament — der Patient kauft es anderswo"
+      },
+      "toOutside": "Als externes Medikament schreiben",
+      "toOutsideHint": "Der Patient kauft es anderswo; es wird nicht über dieses Rezept verkauft",
+      "toStore": "Aus Ihrer Apotheke nehmen",
+      "note": "Hinweise · z. B. dünn auftragen, Sonne meiden"
     },
     "dose": {
       "group": "Dosis morgens · mittags · abends",
@@ -303,10 +323,24 @@
         "afternoon": "Mittags",
         "night": "Abends"
       },
-      "on": "{{time}} · {{taps}} — zum Ändern klicken",
-      "off": "{{time}} · keine — zum Ändern klicken",
       "sos": "SOS",
-      "sosHint": "Nur bei Bedarf (SOS)"
+      "sosHint": "Nur bei Bedarf (SOS)",
+      "on": "{{time}} · {{taps}} — tippen zum Entfernen",
+      "off": "{{time}} — tippen für 1",
+      "presets": "Übliche Dosierungen",
+      "presetsHint": "Übliche Dosierungen, SOS oder mehr als eine Tablette",
+      "presetNames": {
+        "morning": "Morgens",
+        "night": "Abends",
+        "twice": "Zweimal täglich",
+        "thrice": "Dreimal täglich",
+        "afternoon": "Mittags",
+        "sos": "Bei Bedarf"
+      },
+      "counts": "Tabletten pro Einnahme",
+      "less": "Eine weniger · {{time}}",
+      "more": "Eine mehr · {{time}}",
+      "clear": "Dosis löschen"
     },
     "meal": {
       "before": "Vorher",
@@ -426,7 +460,21 @@
         "first": "Erstes Rezept"
       },
       "show": "Anzeigen",
-      "hide": "Ausblenden"
+      "hide": "Ausblenden",
+      "earlier": {
+        "title": "Frühere Rezepte",
+        "none": "Keine früheren Rezepte",
+        "position": "{{index}} von {{count}}",
+        "older": "Älteres Rezept",
+        "newer": "Neueres Rezept",
+        "inThisRx": "In diesem Rx",
+        "add": "Hinzufügen",
+        "addLabel": "{{name}} zu diesem Rezept hinzufügen",
+        "addAll_one": "{{count}} fehlendes hinzufügen",
+        "addAll_other": "Alle {{count}} fehlenden hinzufügen",
+        "advice": "Rat",
+        "noLines": "Keine Medikamente"
+      }
     },
     "allergyBand": {
       "label": "Allergien"
@@ -438,12 +486,15 @@
       "sos": "Nur bei Bedarf",
       "total": "{{value}} insgesamt"
     },
-    "allergyConfirm": {
-      "title": "Trotz Allergie verordnen?",
-      "body_one": "Dieses Medikament passt zu den Allergien der Person:",
-      "body_other": "Diese Medikamente passen zu den Allergien der Person:",
-      "back": "Zurück",
-      "confirm": "Trotzdem speichern"
+    "rowAllergy": {
+      "warning": "Der Patient ist allergisch gegen {{allergies}}",
+      "keep": "Behalten",
+      "keepLabel": "{{medicine}} behalten — bewusst verschrieben",
+      "remove": "Entfernen",
+      "removeLabel": "{{medicine}} entfernen",
+      "kept": "Bewusst behalten trotz Allergie gegen {{allergies}}",
+      "undo": "Rückgängig",
+      "held": "{{medicine}} passt zu einer Allergie — erst behalten oder entfernen"
     }
   },
   "treatment": {

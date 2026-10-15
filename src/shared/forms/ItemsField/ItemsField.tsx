@@ -82,6 +82,11 @@ export interface ItemsFieldProps<
   /** The dashed note line under every row. */
   note?: ItemsRowNote<TForm, TName>;
   /**
+   * A full-width line under a row's note — a warning that belongs to that row
+   * (the Rx allergy match). Rendered for a row only when it returns something.
+   */
+  rowFooter?: (row: ItemsRowContext<TForm, TName>) => ReactNode;
+  /**
    * Mode · Amount rows (H:5071): they leave the drawer's automatic width
    * alone. Every other items field widens its drawer to 840px.
    */
@@ -206,6 +211,7 @@ interface ItemsRowProps<TForm extends FieldValues, TName extends FieldArrayPath<
   values: FieldArray<TForm, TName>;
   columns: readonly ItemsColumn<TForm, TName>[];
   note?: ItemsRowNote<TForm, TName>;
+  rowFooter?: (row: ItemsRowContext<TForm, TName>) => ReactNode;
   /** The table has the × column. */
   removable: boolean;
   /** This row has its × (an empty cell holds the column otherwise). */
@@ -225,6 +231,7 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
   values,
   columns,
   note,
+  rowFooter,
   removable,
   canRemove,
   readOnly,
@@ -252,6 +259,7 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
     }),
   });
   const lastColumn = canRemove ? -1 : columns.length - 1;
+  const footer = rowFooter?.(contextFor('', `${testId}-row-footer`));
 
   return (
     <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
@@ -309,6 +317,15 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
           readOnly={readOnly}
           testId={ids.note}
         />
+      ) : null}
+      {footer ? (
+        <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
+          role="cell"
+          aria-colspan={columns.length + Number(removable)}
+          className={phone ? 'basis-full' : 'col-span-full'}
+        >
+          {footer}
+        </div>
       ) : null}
     </div>
   );
@@ -445,7 +462,9 @@ function ItemsFooter({
  *
  * On a phone the header hides and each row wraps (gap 8px 10px, 10px 12px):
  * the first cell takes the first line, the others follow, the last sits at the
- * inline end and the note keeps a line of its own (H:95–101). Inside a
+ * inline end and the note keeps a line of its own (H:95–101). A host's
+ * `rowFooter` adds a full-width line under a row's note — a warning that
+ * belongs to that row. Inside a
  * `RecordDrawer`, a field that is not `compact` widens the drawer to 840px
  * through its width rule.
  */
@@ -526,6 +545,7 @@ export function ItemsField<
                   values={rows[index] ?? row}
                   columns={columns}
                   note={props.note}
+                  rowFooter={props.rowFooter}
                   removable={removable}
                   canRemove={removable && canRemove(index)}
                   readOnly={readOnly}

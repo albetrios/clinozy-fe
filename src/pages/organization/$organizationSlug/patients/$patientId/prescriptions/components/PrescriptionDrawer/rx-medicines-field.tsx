@@ -1,12 +1,9 @@
-import { type Ref, type RefObject, useId } from 'react';
+import { type ReactNode, type Ref, type RefObject, useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type {
-  RxCatalog,
-  RxCatalogMedicine,
-} from '@/shared/api/app/prescriptions-contracts.ts';
+import type { RxCatalog } from '@/shared/api/app/prescriptions-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { QuickLine } from '@/shared/components/QuickLine/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -15,6 +12,7 @@ import {
   ItemsField,
   ItemsPickerCell,
   ItemsQtyCell,
+  type ItemsRowContext,
 } from '@/shared/forms/ItemsField/index.ts';
 import { ClipboardList } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -23,15 +21,18 @@ import { RX_KEYS, RX_NS, RX_TEST_IDS } from '../../prescriptions.constants.ts';
 import {
   emptyRxLine,
   RX_PLACES,
-  rxFormLineOf,
+  rxDaysIn,
+  type RxFormLine,
   type RxFormValues,
   rxQtyFor,
   typedText,
   typedValue,
 } from './rx-form.ts';
-import { RxDoseCell, RxWhenCell } from './rx-item-cells.tsx';
+import { RxDaysCell, RxDoseCell, RxWhenCell } from './rx-item-cells.tsx';
+import { RxMedicineCell } from './rx-medicine-cell.tsx';
 import { type ReadableRxPadLine, withRxPadLines } from './rx-pad.ts';
 import { RxPadPanel } from './rx-pad-panel.tsx';
+import { useRxLabels } from './use-rx-labels.ts';
 import { useRxQuickLine } from './use-rx-quick-line.ts';
 
 const K = RX_KEYS;
@@ -68,6 +69,8 @@ export interface RxMedicinesFieldProps {
   quickLineRef?: Ref<HTMLInputElement>;
   /** The drawer focuses the line on open: that focus keeps its suggestions closed. */
   focusOnOpen?: boolean;
+  /** A line under a row's note: the allergy warning (change-prescription-writing D7). */
+  rowFooter?: (row: ItemsRowContext<RxFormValues, 'items'>) => ReactNode;
 }
 
 /** "Pad" beside Browse: opens and closes the Rx Pad under the quick line. */
@@ -103,8 +106,10 @@ function RxPadToggle({
 }
 
 /**
- * The item rows' columns — Medicine · "Dose · M A N" · Meal · Where · Qty —
- * and the dose → quantity recompute the note line shares with them.
+ * The item rows' columns (change-prescription-writing §6.1) — Medicine (its
+ * source pill) · Dose (one-tap times and the ⌄) · Days · Meal · Where · Qty —
+ * and the quantity recompute: days × doses a day whenever the dose or the
+ * days change (a note's own days count while Days is empty).
  */
 function useRxColumns({
   form,
@@ -112,43 +117,29 @@ function useRxColumns({
   readOnly,
 }: Pick<RxMedicinesFieldProps, 'form' | 'catalog' | 'readOnly'>) {
   const { t } = useTranslation(RX_NS);
-  const dayWords = t(K.dayWords)
-    .split(',')
-    .map((word) => word.trim());
+  const labels = useRxLabels();
   const medicines = catalog?.medicines ?? [];
 
-  const recompute = (rowName: `items.${number}`, dose: string, remarks: string) => {
-    const qty = rxQtyFor(dose, remarks, dayWords);
+  const recompute = (
+    rowName: `items.${number}`,
+    line: Pick<RxFormLine, 'dose' | 'days' | 'remarks'>,
+  ) => {
+    const days = line.days ?? rxDaysIn(line.remarks, labels.dayWords);
+    const qty = rxQtyFor(line.dose, days);
     if (qty !== null) form.setValue(`${rowName}.qty`, qty, { shouldDirty: true });
-  };
-
-  const stockOf = (medicine: RxCatalogMedicine) => {
-    if (medicine.stock === null) return null;
-    return medicine.stock > 0
-      ? t(K.quick.inStock, { count: medicine.stock })
-      : t(K.quick.outOfStock);
-  };
-
-  const medicineOptions = (current: string): PickerOption<RxCatalogMedicine>[] => {
-    const options = medicines.map((medicine) => {
-      const stock = stockOf(medicine);
-      return {
-        key: medicine.name,
-        label: medicine.name,
-        sub: [medicine.composition, stock].filter(Boolean).join(' · ') || undefined,
-        data: medicine,
-      };
-    });
-    return current && !medicines.some((medicine) => medicine.name === current)
-      ? [...options, { key: current, label: current }]
-      : options;
   };
 
   const placeOptions = (current: string): PickerOption[] => {
     const typed = typedText(current);
+    // No tone dot: the place's word keeps the cell's room (1280px, the sidekick beside it).
+    const leading = { kind: 'none' } as const;
     return [
-      ...RX_PLACES.map((place) => ({ key: place.key, label: t(K.places[place.key]) })),
-      ...(typed !== null ? [{ key: current, label: typed }] : []),
+      ...RX_PLACES.map((place) => ({
+        key: place.key,
+        label: t(K.places[place.key]),
+        leading,
+      })),
+      ...(typed !== null ? [{ key: current, label: typed, leading }] : []),
     ];
   };
 
@@ -156,61 +147,39 @@ function useRxColumns({
     {
       id: 'medicine',
       header: t(K.items.medicine),
-      track: 'minmax(160px,1.6fr)',
+      track: 'minmax(176px,1.5fr)',
       cell: (row) => (
-        <ItemsPickerCell<RxFormValues, RxCatalogMedicine>
-          {...row.bind('medicineName')}
-          options={medicineOptions(row.row.medicineName)}
-          placeholder={t(K.items.medicine)}
-          searchPlaceholder={t(K.items.searchMedicine)}
-          createLabel={t(K.items.addMedicine)}
-          autoCreate
-          onCreate={(query) => {
-            const name = query.trim().slice(0, 120);
-            if (!name) return;
-            form.setValue(`${row.name}.medicineName`, name, { shouldDirty: true });
-            form.setValue(`${row.name}.medicineId`, null, { shouldDirty: true });
-          }}
-          onPick={(option) => {
-            const medicine = option?.data;
-            form.setValue(`${row.name}.medicineId`, medicine?.medicineId ?? null, {
-              shouldDirty: true,
-            });
-            // A first pick takes the patient's last directions for it (H:4807).
-            if (medicine?.last && !row.row.dose && !row.row.when) {
-              const last = rxFormLineOf(medicine.last);
-              form.setValue(
-                row.name,
-                {
-                  ...row.row,
-                  ...last,
-                  medicineName: medicine.name,
-                  remarks: row.row.remarks,
-                },
-                { shouldDirty: true },
-              );
-            }
-          }}
-          disabled={readOnly}
-        />
+        <RxMedicineCell form={form} row={row} medicines={medicines} readOnly={readOnly} />
       ),
     },
     {
       id: 'dose',
       header: t(K.items.dose),
-      track: '150px',
+      track: 'minmax(124px,auto)',
       cell: (row) => (
         <RxDoseCell<RxFormValues>
           {...row.bind('dose')}
           readOnly={readOnly}
-          onValue={(dose) => recompute(row.name, dose, row.row.remarks)}
+          onValue={(dose) => recompute(row.name, { ...row.row, dose })}
+        />
+      ),
+    },
+    {
+      id: 'days',
+      header: t(K.items.days),
+      track: '100px',
+      cell: (row) => (
+        <RxDaysCell<RxFormValues>
+          {...row.bind('days')}
+          readOnly={readOnly}
+          onValue={(days) => recompute(row.name, { ...row.row, days })}
         />
       ),
     },
     {
       id: 'meal',
       header: t(K.items.meal),
-      track: 'minmax(150px,1fr)',
+      track: 'minmax(138px,.9fr)',
       cell: (row) => (
         <RxWhenCell<RxFormValues> {...row.bind('when')} readOnly={readOnly} />
       ),
@@ -218,7 +187,7 @@ function useRxColumns({
     {
       id: 'where',
       header: t(K.items.where),
-      track: 'minmax(110px,.8fr)',
+      track: 'minmax(108px,.8fr)',
       cell: (row) => (
         <ItemsPickerCell<RxFormValues>
           {...row.bind('where')}
@@ -239,7 +208,7 @@ function useRxColumns({
     {
       id: 'qty',
       header: t(K.items.qty),
-      track: '96px',
+      track: '92px',
       align: 'end',
       cell: (row) => (
         <ItemsQtyCell<RxFormValues>
@@ -255,12 +224,13 @@ function useRxColumns({
 }
 
 /**
- * Step 2 "Medicines" (H:4806–4807; `patient-file.md:111–112`): the quick line
- * and Browse above the item rows — Medicine (the store's with its composition
- * and stock, or typed: "Add medicine"; no MRP until F10) · "Dose · M A N" ·
- * Meal · Where (14 places, or typed: "Use") ·
- * Qty · × — each with its dashed note line, where "10 days" recomputes the
- * quantity from the dose; "+ Add medicine". The table keeps one row.
+ * Step 2 "Medicines" (H:4806–4807; `patient-file.md:111–112`;
+ * change-prescription-writing §6.1): the quick line, Browse and the Pad above
+ * the item rows — Medicine (the store's with its stock, or an outside name) ·
+ * Dose (one-tap times, the ⌄ for the common doses, SOS and more tablets) ·
+ * Days · Meal · Where (14 places, or typed: "Use") · Qty · × — each with its
+ * dashed note line and, for a line that matches an allergy, its warning;
+ * "+ Add medicine". The table keeps one row.
  */
 export function RxMedicinesField({
   form,
@@ -273,6 +243,7 @@ export function RxMedicinesField({
   allergies = null,
   quickLineRef,
   focusOnOpen = false,
+  rowFooter,
 }: RxMedicinesFieldProps) {
   const { t } = useTranslation(RX_NS);
   const quickLine = useRxQuickLine(form, catalog, items);
@@ -280,8 +251,7 @@ export function RxMedicinesField({
   const padId = useId();
   // The Pad adds its lines as the quick line adds one: a blank row first, the last dosage.
   const addPadLines = (lines: readonly ReadableRxPadLine[]) => {
-    const daysNote = (days: number) => t(K.daysNote, { count: days });
-    form.setValue('items', withRxPadLines(form.getValues('items'), lines, daysNote), {
+    form.setValue('items', withRxPadLines(form.getValues('items'), lines), {
       shouldDirty: true,
     });
     notify.success(t(K.pad.added, { count: lines.length }));
@@ -328,8 +298,10 @@ export function RxMedicinesField({
         key: 'remarks',
         placeholder: t(K.items.note),
         maxLength: 200,
-        onChange: (value, row) => recompute(row.name, row.row.dose, value),
+        // A note's own days count only while Days is empty.
+        onChange: (value, row) => recompute(row.name, { ...row.row, remarks: value }),
       }}
+      rowFooter={rowFooter}
       toolbar={toolbar}
       testId="rx-items"
     />

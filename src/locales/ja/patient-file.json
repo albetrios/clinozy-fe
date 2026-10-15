@@ -284,7 +284,26 @@
       "searchMedicine": "薬を検索",
       "addMedicine": "薬を追加",
       "use": "使用",
-      "note": "メモ · 例: 10日間、薄く塗る、日光を避ける"
+      "days": "日数",
+      "searchDays": "日数を入力 (例: 12)",
+      "noDays": "日数なし",
+      "groups": {
+        "store": "院内の薬局",
+        "outside": "院外の薬"
+      },
+      "writtenBefore": "この患者に以前処方",
+      "addOutside": "院外の薬",
+      "source": {
+        "stocked_other": "院内の薬局に {{count}}",
+        "store": "院内の薬局から",
+        "empty": "院内の薬局で在庫切れ",
+        "outside": "院外",
+        "outsideHint": "院外の薬 — 患者が別の場所で購入します"
+      },
+      "toOutside": "院外の薬として書く",
+      "toOutsideHint": "患者が別の場所で購入します。この処方から販売されません",
+      "toStore": "院内の薬局のものにする",
+      "note": "メモ · 例: 薄く塗る、日光を避ける"
     },
     "dose": {
       "group": "用量 朝 · 昼 · 夜",
@@ -293,10 +312,24 @@
         "afternoon": "昼",
         "night": "夜"
       },
-      "on": "{{time}} · {{taps}} — クリックで変更",
-      "off": "{{time}} · なし — クリックで変更",
       "sos": "SOS",
-      "sosHint": "必要なときのみ (SOS)"
+      "sosHint": "必要なときのみ (SOS)",
+      "on": "{{time}} · {{taps}} — タップで外す",
+      "off": "{{time}} — タップで 1",
+      "presets": "よく使う用量",
+      "presetsHint": "よく使う用量、頓用、または2錠以上",
+      "presetNames": {
+        "morning": "朝",
+        "night": "夜",
+        "twice": "1日2回",
+        "thrice": "1日3回",
+        "afternoon": "昼",
+        "sos": "必要時"
+      },
+      "counts": "1回の錠数",
+      "less": "1つ減らす · {{time}}",
+      "more": "1つ増やす · {{time}}",
+      "clear": "用量を消す"
     },
     "meal": {
       "before": "食前",
@@ -410,7 +443,20 @@
         "first": "最初の処方箋"
       },
       "show": "表示",
-      "hide": "隠す"
+      "hide": "隠す",
+      "earlier": {
+        "title": "以前の処方",
+        "none": "以前の処方はありません",
+        "position": "{{count}} 件中 {{index}}",
+        "older": "古い処方",
+        "newer": "新しい処方",
+        "inThisRx": "この処方にあり",
+        "add": "追加",
+        "addLabel": "{{name}} をこの処方に追加",
+        "addAll_other": "不足の {{count}} 件を追加",
+        "advice": "指導",
+        "noLines": "薬なし"
+      }
     },
     "allergyBand": {
       "label": "アレルギー"
@@ -422,11 +468,15 @@
       "sos": "必要時のみ",
       "total": "合計 {{value}}"
     },
-    "allergyConfirm": {
-      "title": "アレルギーがありますが処方しますか？",
-      "body_other": "次の薬が患者のアレルギーに該当します:",
-      "back": "戻る",
-      "confirm": "このまま保存"
+    "rowAllergy": {
+      "warning": "患者は {{allergies}} にアレルギーがあります",
+      "keep": "残す",
+      "keepLabel": "{{medicine}} を残す — 承知の上で処方",
+      "remove": "削除",
+      "removeLabel": "{{medicine}} を削除",
+      "kept": "{{allergies}} アレルギーを承知の上で残しました",
+      "undo": "元に戻す",
+      "held": "{{medicine}} がアレルギーに該当します — 先に残すか削除してください"
     }
   },
   "treatment": {

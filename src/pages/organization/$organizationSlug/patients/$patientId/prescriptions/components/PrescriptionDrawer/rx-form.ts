@@ -38,8 +38,13 @@ export interface RxFormLine {
   when: string;
   /** Where it is applied: one of the Where list's places, `text:<typed>`, or ''. */
   where: string;
+  /**
+   * For how many days; null when the line names none. The wire keeps them as the first part of
+   * `remarks` ("7 days · apply thin layer", change-prescription-writing D3).
+   */
+  days: number | null;
   qty: number;
-  /** The dashed note line. */
+  /** The dashed note line — what the patient is told beyond the days. */
   remarks: string;
 }
 
@@ -119,6 +124,87 @@ const isMeal = (value: string): value is RxMeal =>
 const isTiming = (value: string): value is RxTiming =>
   (RX_MORE_TIMINGS as readonly string[]).includes(value);
 
+/**
+ * The dose ⌄'s common doses (change-prescription-writing D5), in the order a
+ * doctor reaches for them; SOS last.
+ */
+export const RX_DOSE_PRESETS = [
+  { id: 'morning', value: '1-0-0' },
+  { id: 'night', value: '0-0-1' },
+  { id: 'twice', value: '1-0-1' },
+  { id: 'thrice', value: '1-1-1' },
+  { id: 'afternoon', value: '0-1-0' },
+  { id: 'sos', value: 'sos' },
+] as const;
+
+/** The most of one tap a dose takes from the ⌄'s + (D5). */
+export const RX_MAX_TAP = 4;
+
+/**
+ * A dose after a tap (D5): a time that is off turns on (1); one that is on —
+ * one tablet or more — turns off. A tap on an SOS dose starts the taps over.
+ */
+export function rxToggledDose(value: string, index: number): string {
+  const dose = rxDoseOf(value);
+  const taps = Array.isArray(dose) ? [...dose] : [0, 0, 0];
+  taps[index] = (taps[index] ?? 0) > 0 ? 0 : 1;
+  return taps.some((tap) => tap > 0) ? taps.join('-') : '';
+}
+
+/** A dose after the ⌄'s − or + on one time, kept within 0 and {@link RX_MAX_TAP}. */
+export function rxSteppedDose(value: string, index: number, step: 1 | -1): string {
+  const dose = rxDoseOf(value);
+  const taps = Array.isArray(dose) ? [...dose] : [0, 0, 0];
+  taps[index] = Math.min(RX_MAX_TAP, Math.max(0, (taps[index] ?? 0) + step));
+  return taps.some((tap) => tap > 0) ? taps.join('-') : '';
+}
+
+/** The Days list (D6): the courses a doctor writes most, in days. */
+export const RX_DAY_PRESETS = [3, 5, 7, 10, 14, 21, 30, 45, 60, 90] as const;
+
+/** Days typed into the Days list ("12", "12 days") — 1 to a year — or null. */
+export function rxTypedDays(text: string): number | null {
+  const days = Number(/^\s*(\d{1,3})/.exec(text)?.[1] ?? 0);
+  return days >= 1 && days <= RX_MAX_DAYS ? days : null;
+}
+
+/**
+ * Where a line's medicine comes from (D4): the store's with stock, out of
+ * stock, or no stock read (`store`); `outside` — written as text, bought
+ * elsewhere; `none` for a blank row.
+ */
+export type RxLineSource = 'stocked' | 'empty' | 'store' | 'outside' | 'none';
+
+/** A line's source, with the store's medicine when it is one. */
+export function rxLineSource(
+  line: Pick<RxFormLine, 'medicineId' | 'medicineName'>,
+  medicines: readonly Pick<RxCatalogMedicine, 'medicineId' | 'name' | 'stock'>[],
+): { source: RxLineSource; stock: number | null } {
+  if (line.medicineName.trim() === '') return { source: 'none', stock: null };
+  if (line.medicineId === null) return { source: 'outside', stock: null };
+  const stock =
+    medicines.find((medicine) => medicine.medicineId === line.medicineId)?.stock ?? null;
+  if (stock === null) return { source: 'store', stock };
+  return { source: stock > 0 ? 'stocked' : 'empty', stock };
+}
+
+/** The store's medicine an outside line's name is, when the store carries it (D4). */
+export function rxStoreMedicineFor<
+  T extends Pick<RxCatalogMedicine, 'medicineId' | 'name'>,
+>(
+  line: Pick<RxFormLine, 'medicineId' | 'medicineName'>,
+  medicines: readonly T[],
+): T | undefined {
+  if (line.medicineId !== null) return undefined;
+  const name = line.medicineName.trim().toLowerCase();
+  return name
+    ? medicines.find(
+        (medicine) =>
+          medicine.medicineId !== null && medicine.name.toLowerCase() === name,
+      )
+    : undefined;
+}
+
 /** Step 3's notes, in order (H:4808): each field with its label and placeholder keys. */
 export const RX_NOTES = [
   {
@@ -157,6 +243,7 @@ export function emptyRxLine(): RxFormLine {
     dose: '',
     when: '',
     where: '',
+    days: null,
     qty: 1,
     remarks: '',
   };
@@ -198,19 +285,27 @@ function whenOf(item: Pick<PrescriptionItem, 'meal' | 'timing' | 'timingText'>):
 /** What a new line reads of a medicine: its name, the store's id, this patient's last line. */
 type RxLineMedicine = Pick<RxCatalogMedicine, 'name' | 'medicineId' | 'last'>;
 
-/** A saved line as the row holds it. */
-export function rxFormLineOf(item: PrescriptionItem): RxFormLine {
+/**
+ * A saved line as the row holds it: a note that starts with days ("7 days · apply thin") gives
+ * them to Days and keeps the rest (D3); `dayWords` are the drawer's own ("Tage").
+ */
+export function rxFormLineOf(
+  item: PrescriptionItem,
+  dayWords: readonly string[] = [],
+): RxFormLine {
   const dose: RxDose | undefined = item.sos
     ? 'sos'
     : [item.doseMorning, item.doseAfternoon, item.doseNight];
+  const { days, note } = rxSplitDays(item.remarks ?? '', dayWords);
   return {
     medicineId: item.medicineId,
     medicineName: item.medicineName,
     dose: rxDoseValue(dose),
     when: whenOf(item),
     where: whereOf(item),
+    days,
     qty: item.qty,
-    remarks: item.remarks ?? '',
+    remarks: note,
   };
 }
 
@@ -240,8 +335,21 @@ function timingFields(when: string) {
   return { meal: null, timing: null, timingText: null };
 }
 
-/** A row as the contract holds it. */
-export function rxItemOf(line: RxFormLine): PrescriptionItem {
+/** "7 days · apply thin layer": the days in the drawer's words, then the note (D3). */
+export function rxRemarksOf(
+  line: Pick<RxFormLine, 'days' | 'remarks'>,
+  daysNote: (days: number) => string,
+): string {
+  return [line.days ? daysNote(line.days) : '', line.remarks.trim()]
+    .filter(Boolean)
+    .join(' · ');
+}
+
+/** A row as the contract holds it — the days written first into its remarks. */
+export function rxItemOf(
+  line: RxFormLine,
+  daysNote: (days: number) => string,
+): PrescriptionItem {
   const dose = rxDoseOf(line.dose);
   const taps = Array.isArray(dose) ? dose : [0, 0, 0];
   return {
@@ -254,7 +362,7 @@ export function rxItemOf(line: RxFormLine): PrescriptionItem {
     ...timingFields(line.when),
     ...placeFields(line.where),
     qty: Math.max(1, line.qty),
-    remarks: textOrNull(line.remarks),
+    remarks: textOrNull(rxRemarksOf(line, daysNote)),
   };
 }
 
@@ -286,12 +394,15 @@ export function newRxForm(date: string, doctorId: string | null): RxFormValues {
 }
 
 /** A saved prescription as the edit drawer opens it. */
-export function rxFormOf(prescription: PrescriptionRecord): RxFormValues {
+export function rxFormOf(
+  prescription: PrescriptionRecord,
+  dayWords: readonly string[] = [],
+): RxFormValues {
   return {
     date: prescription.date,
     doctorId: prescription.doctorId,
     items: prescription.items.length
-      ? prescription.items.map(rxFormLineOf)
+      ? prescription.items.map((item) => rxFormLineOf(item, dayWords))
       : [emptyRxLine()],
     advice: prescription.advice ?? '',
     labReport: prescription.labReport ?? '',
@@ -300,11 +411,14 @@ export function rxFormOf(prescription: PrescriptionRecord): RxFormValues {
 }
 
 /** The write a save sends: the named lines and the notes, blanks as null. */
-export function rxFieldsOf(values: RxFormValues): PrescriptionFields {
+export function rxFieldsOf(
+  values: RxFormValues,
+  daysNote: (days: number) => string,
+): PrescriptionFields {
   return {
     doctorId: values.doctorId ?? '',
     date: values.date,
-    items: namedRxLines(values.items).map(rxItemOf),
+    items: namedRxLines(values.items).map((line) => rxItemOf(line, daysNote)),
     advice: textOrNull(values.advice),
     labReport: textOrNull(values.labReport),
     procedureToday: textOrNull(values.procedureToday),
@@ -314,19 +428,55 @@ export function rxFieldsOf(values: RxFormValues): PrescriptionFields {
 // ── Quantities ──
 
 /** The letters a word starts with ("days," → "days"). */
-const LEADING_WORD = /^[\p{L}\p{M}]+/u;
+export const LEADING_WORD = /^[\p{L}\p{M}]+/u;
+
+/** The words a number of days is followed by: "d", "day", "days" and the drawer's own. */
+export function rxDayUnits(dayWords: readonly string[] = []): ReadonlySet<string> {
+  return new Set(
+    ['d', 'day', 'days', ...dayWords].map((word) => word.trim().toLowerCase()),
+  );
+}
+
+/** What separates a note's parts: spaces and punctuation. */
+export const isNoteSeparator = (character: string) => /[\s,;:.·–—-]/u.test(character);
+
+/** The longest a line runs: a year. */
+const RX_MAX_DAYS = 365;
 
 /**
- * The days a note names — "10 days", "5d", or a day word of the drawer's own
- * language ("10 Tage") — or null (H:4807).
+ * A note's leading days and the rest (D3): "10 days, apply thin" → 10 and
+ * "apply thin"; "5d" → 5 and "". A note that does not start with days is kept
+ * whole, with no days.
+ */
+export function rxSplitDays(
+  remarks: string,
+  dayWords: readonly string[] = [],
+): { days: number | null; note: string } {
+  const number = /^\s*(\d{1,3})/.exec(remarks);
+  const after = remarks.slice(number?.[0].length ?? 0).trimStart();
+  const word = LEADING_WORD.exec(after)?.[0];
+  const days = Number(number?.[1] ?? 0);
+  if (!(
+    word &&
+    days >= 1 &&
+    days <= RX_MAX_DAYS &&
+    rxDayUnits(dayWords).has(word.toLowerCase())
+  ))
+    return { days: null, note: remarks };
+  let rest = after.slice(word.length);
+  while (rest !== '' && isNoteSeparator(rest.charAt(0))) rest = rest.slice(1);
+  return { days, note: rest.trimEnd() };
+}
+
+/**
+ * The days a note names anywhere — "10 days", "5d", or a day word of the
+ * drawer's own language ("10 Tage") — or null (H:4807).
  */
 export function rxDaysIn(
   remarks: string,
   dayWords: readonly string[] = [],
 ): number | null {
-  const units = new Set(
-    ['d', 'day', 'days', ...dayWords].map((word) => word.trim().toLowerCase()),
-  );
+  const units = rxDayUnits(dayWords);
   // ["10", " days, apply…"]: each number, then what follows it.
   const parts = remarks.toLowerCase().split(/(\d+)/);
   for (let index = 1; index < parts.length; index += 2) {
@@ -337,15 +487,10 @@ export function rxDaysIn(
 }
 
 /**
- * The quantity a note and a dose call for (H:4807): days × doses a day, when
- * the note names days and the dose is taps; else null — keep the quantity.
+ * The quantity days and a dose call for (H:4807): days × doses a day, when
+ * both are known and the dose is taps; else null — keep the quantity.
  */
-export function rxQtyFor(
-  dose: string,
-  remarks: string,
-  dayWords: readonly string[] = [],
-): number | null {
-  const days = rxDaysIn(remarks, dayWords);
+export function rxQtyFor(dose: string, days: number | null): number | null {
   const perDay = dosesPerDay(rxDoseOf(dose));
   return days && perDay ? Math.min(days * perDay, 999) : null;
 }
@@ -368,16 +513,12 @@ function shorthandFields(values: RxLineValues): Partial<RxFormLine> {
 
 /**
  * The line a picked medicine adds (H:4806 `addM`): what the quick line set,
- * else the patient's last line of it; the quantity the line set, else the
- * last one's, else 1; "10 days" in the note when days were typed.
+ * else the patient's last line of it — its days too (D3); the quantity the
+ * line set, else days × doses a day, else the last one's, else 1.
  */
-export function rxLineFor(
-  medicine: RxLineMedicine,
-  values: RxLineValues,
-  daysNote: (days: number) => string,
-): RxFormLine {
+export function rxLineFor(medicine: RxLineMedicine, values: RxLineValues): RxFormLine {
   const last = medicine.last ? rxFormLineOf(medicine.last) : null;
-  return {
+  const line: RxFormLine = {
     ...emptyRxLine(),
     medicineId: medicine.medicineId,
     medicineName: medicine.name,
@@ -385,9 +526,9 @@ export function rxLineFor(
     when: last?.when ?? '',
     where: last?.where ?? '',
     ...shorthandFields(values),
-    qty: values.qty ?? last?.qty ?? 1,
-    remarks: values.days ? daysNote(values.days) : '',
+    days: values.days ?? last?.days ?? null,
   };
+  return { ...line, qty: values.qty ?? rxQtyFor(line.dose, line.days) ?? last?.qty ?? 1 };
 }
 
 /** A line with no medicine yet: the next add fills it. */
@@ -408,14 +549,17 @@ export function initialRxForm({
   doctorId,
   medicines,
   catalog,
+  dayWords = [],
 }: {
   prescription: PrescriptionRecord | null;
   today: string;
   doctorId: string | null;
   medicines: readonly string[];
   catalog: readonly RxLineMedicine[];
+  /** The drawer's own day words: a saved note's leading days split by them too (D3). */
+  dayWords?: readonly string[];
 }): RxFormValues {
-  if (prescription) return rxFormOf(prescription);
+  if (prescription) return rxFormOf(prescription, dayWords);
   return rxFormWithMedicines(newRxForm(today, doctorId), medicines, catalog);
 }
 
@@ -435,7 +579,7 @@ export function rxFormWithMedicines(
     );
     return withRxLine(
       lines,
-      rxLineFor(known ?? { name, medicineId: null, last: null }, {}, () => ''),
+      rxLineFor(known ?? { name, medicineId: null, last: null }, {}),
     );
   }, form.items);
   return { ...form, items };
@@ -455,12 +599,11 @@ export function steppedRxLines(
   items: readonly RxFormLine[],
   medicine: RxLineMedicine,
   step: 1 | -1,
-  daysNote: (days: number) => string,
 ): RxFormLine[] {
   return withSteppedQuickLineRow(items, step, {
     isBlank: isBlankRxLine,
     holds: (item) => item.medicineName === medicine.name,
-    newRow: () => rxLineFor(medicine, {}, daysNote),
+    newRow: () => rxLineFor(medicine, {}),
     blank: emptyRxLine,
   });
 }

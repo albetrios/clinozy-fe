@@ -10,6 +10,9 @@ import {
   initialRxForm,
   namedRxLines,
   newRxForm,
+  RX_DAY_PRESETS,
+  RX_DOSE_PRESETS,
+  RX_MAX_TAP,
   rxCountOf,
   rxDaysIn,
   rxDoseOf,
@@ -19,7 +22,14 @@ import {
   rxFormWithMedicines,
   rxItemOf,
   rxLineFor,
+  rxLineSource,
   rxQtyFor,
+  rxRemarksOf,
+  rxSplitDays,
+  rxSteppedDose,
+  rxStoreMedicineFor,
+  rxToggledDose,
+  rxTypedDays,
   steppedRxLines,
   typedValue,
   withRxLine,
@@ -56,10 +66,11 @@ describe('a line ↔ the contract’s item', () => {
       dose: '0-0-1',
       when: 'after',
       where: 'scalp',
+      days: null,
       qty: 8,
       remarks: '1 sun, 1 thu',
     });
-    expect(rxItemOf(line)).toEqual(saved);
+    expect(rxItemOf(line, daysNote)).toEqual(saved);
   });
 
   it('keeps SOS, a timing and a place the contract lacks as other + its name', () => {
@@ -70,7 +81,7 @@ describe('a line ↔ the contract’s item', () => {
       when: 'morning_night',
       where: 'neck',
     };
-    expect(rxItemOf(line)).toMatchObject({
+    expect(rxItemOf(line, daysNote)).toMatchObject({
       doseMorning: 0,
       doseNight: 0,
       sos: true,
@@ -79,7 +90,7 @@ describe('a line ↔ the contract’s item', () => {
       bodyPart: 'other',
       bodyPartText: 'Neck',
     });
-    expect(rxFormLineOf(rxItemOf(line))).toMatchObject({
+    expect(rxFormLineOf(rxItemOf(line, daysNote))).toMatchObject({
       dose: 'sos',
       when: 'morning_night',
       where: 'neck',
@@ -93,7 +104,7 @@ describe('a line ↔ the contract’s item', () => {
       when: typedValue('After dinner'),
       where: typedValue('Elbows'),
     };
-    const saved = rxItemOf(line);
+    const saved = rxItemOf(line, daysNote);
     expect(saved).toMatchObject({
       timingText: 'After dinner',
       bodyPart: 'other',
@@ -147,7 +158,7 @@ describe('the form', () => {
       advice: '  ',
       labReport: 'CBC',
     };
-    const input = rxFieldsOf(values);
+    const input = rxFieldsOf(values, daysNote);
     expect(input.items).toHaveLength(1);
     expect(input.items[0]).toMatchObject({
       medicineName: 'Epriva Tab',
@@ -213,10 +224,105 @@ describe('quantities from the note', () => {
   });
 
   it('multiplies days by the doses a day, never for SOS or without days', () => {
-    expect(rxQtyFor('1-0-1', '10 days')).toBe(20);
-    expect(rxQtyFor('sos', '10 days')).toBeNull();
-    expect(rxQtyFor('1-0-1', 'after food')).toBeNull();
-    expect(rxQtyFor('2-2-2', '999 days')).toBe(999);
+    expect(rxQtyFor('1-0-1', 10)).toBe(20);
+    expect(rxQtyFor('sos', 10)).toBeNull();
+    expect(rxQtyFor('1-0-1', null)).toBeNull();
+    expect(rxQtyFor('', 10)).toBeNull();
+    expect(rxQtyFor('2-2-2', 365)).toBe(999);
+  });
+});
+
+describe('a line’s days (change-prescription-writing D3)', () => {
+  it('splits a note’s leading days from the rest — in English and the drawer’s words', () => {
+    expect(rxSplitDays('10 days, apply thin layer')).toEqual({
+      days: 10,
+      note: 'apply thin layer',
+    });
+    expect(rxSplitDays('7 days · avoid sun')).toEqual({ days: 7, note: 'avoid sun' });
+    expect(rxSplitDays('5d')).toEqual({ days: 5, note: '' });
+    expect(rxSplitDays('10 Tage', ['Tag', 'Tage'])).toEqual({ days: 10, note: '' });
+  });
+
+  it('keeps a note that does not start with days whole', () => {
+    expect(rxSplitDays('apply for 5 days')).toEqual({
+      days: null,
+      note: 'apply for 5 days',
+    });
+    expect(rxSplitDays('2 drops')).toEqual({ days: null, note: '2 drops' });
+    expect(rxSplitDays('0 days')).toEqual({ days: null, note: '0 days' });
+    expect(rxSplitDays('')).toEqual({ days: null, note: '' });
+  });
+
+  it('opens a saved note’s days in Days and saves them back first', () => {
+    const line = rxFormLineOf(item({ remarks: '10 days · apply thin layer' }));
+    expect(line).toMatchObject({ days: 10, remarks: 'apply thin layer' });
+    expect(rxItemOf(line, daysNote).remarks).toBe('10 days · apply thin layer');
+    expect(rxRemarksOf({ days: 7, remarks: '' }, daysNote)).toBe('7 days');
+    expect(rxRemarksOf({ days: null, remarks: ' avoid sun ' }, daysNote)).toBe(
+      'avoid sun',
+    );
+    expect(rxItemOf({ ...line, days: null, remarks: '' }, daysNote).remarks).toBeNull();
+  });
+
+  it('reads days typed into the Days list, 1 to a year', () => {
+    expect(rxTypedDays('12')).toBe(12);
+    expect(rxTypedDays(' 12 days')).toBe(12);
+    expect(rxTypedDays('0')).toBeNull();
+    expect(rxTypedDays('400')).toBeNull();
+    expect(rxTypedDays('days')).toBeNull();
+    expect(RX_DAY_PRESETS).toContain(7);
+  });
+});
+
+describe('the dose taps and the ⌄ (change-prescription-writing D5)', () => {
+  it('toggles a time on and off with one tap, from any count or SOS', () => {
+    expect(rxToggledDose('', 0)).toBe('1-0-0');
+    expect(rxToggledDose('1-0-0', 2)).toBe('1-0-1');
+    expect(rxToggledDose('1-0-1', 0)).toBe('0-0-1');
+    expect(rxToggledDose('2-0-0', 0)).toBe('');
+    expect(rxToggledDose('sos', 1)).toBe('0-1-0');
+  });
+
+  it('steps one time’s tablets between none and the most', () => {
+    expect(rxSteppedDose('1-0-1', 0, 1)).toBe('2-0-1');
+    expect(rxSteppedDose('1-0-0', 0, -1)).toBe('');
+    expect(rxSteppedDose('sos', 2, 1)).toBe('0-0-1');
+    expect(rxSteppedDose(`${RX_MAX_TAP}-0-0`, 0, 1)).toBe(`${RX_MAX_TAP}-0-0`);
+    expect(RX_DOSE_PRESETS.map((preset) => preset.value)).toContain('sos');
+  });
+});
+
+describe('a line’s source — store or outside (change-prescription-writing D4)', () => {
+  const medicines = [
+    { name: 'Doxycycline 100', medicineId: 'med_doxy', stock: 24 },
+    { name: 'Septran DS', medicineId: 'med_sep', stock: 0 },
+    { name: 'Kojic Gel', medicineId: 'med_kojic', stock: null },
+    { name: 'Acnestar', medicineId: null, stock: null },
+  ];
+  const line = (medicineName: string, medicineId: string | null) => ({
+    medicineName,
+    medicineId,
+  });
+
+  it('reads the store’s stock, out of stock, no stock read, outside and blank', () => {
+    expect(rxLineSource(line('Doxycycline 100', 'med_doxy'), medicines)).toEqual({
+      source: 'stocked',
+      stock: 24,
+    });
+    expect(rxLineSource(line('Septran DS', 'med_sep'), medicines).source).toBe('empty');
+    expect(rxLineSource(line('Kojic Gel', 'med_kojic'), medicines).source).toBe('store');
+    expect(rxLineSource(line('Acnestar', null), medicines).source).toBe('outside');
+    expect(rxLineSource(line(' ', null), medicines).source).toBe('none');
+  });
+
+  it('finds the store’s medicine an outside line names, never for a store line', () => {
+    expect(
+      rxStoreMedicineFor(line('doxycycline 100 ', null), medicines)?.medicineId,
+    ).toBe('med_doxy');
+    expect(rxStoreMedicineFor(line('Acnestar', null), medicines)).toBeUndefined();
+    expect(
+      rxStoreMedicineFor(line('Doxycycline 100', 'med_doxy'), medicines),
+    ).toBeUndefined();
   });
 });
 
@@ -224,54 +330,58 @@ describe('adding a medicine', () => {
   const flubolt = { name: 'Flubolt 400', medicineId: null, last: item() };
 
   it('takes the patient’s last line, and the shorthand over it', () => {
-    expect(rxLineFor(flubolt, {}, daysNote)).toMatchObject({
+    expect(rxLineFor(flubolt, {})).toMatchObject({
       dose: '0-0-1',
       when: 'after',
+      days: null,
       qty: 8,
       remarks: '',
     });
     expect(
-      rxLineFor(
-        flubolt,
-        {
-          dose: [1, 0, 1],
-          when: { kind: 'timing', timing: 'night' },
-          where: 'face',
-          days: 5,
-          qty: 10,
-        },
-        daysNote,
-      ),
+      rxLineFor(flubolt, {
+        dose: [1, 0, 1],
+        when: { kind: 'timing', timing: 'night' },
+        where: 'face',
+        days: 5,
+        qty: 10,
+      }),
     ).toMatchObject({
       dose: '1-0-1',
       when: 'night',
       where: 'face',
+      days: 5,
       qty: 10,
-      remarks: '5 days',
+      remarks: '',
+    });
+  });
+
+  it('takes the last line’s days, and fills the quantity from days × doses a day', () => {
+    const lastWithDays = { ...flubolt, last: item({ remarks: '10 days', qty: 3 }) };
+    expect(rxLineFor(lastWithDays, {})).toMatchObject({ days: 10, qty: 10, remarks: '' });
+    expect(rxLineFor(flubolt, { dose: [1, 0, 1], days: 7 })).toMatchObject({
+      days: 7,
+      qty: 14,
     });
   });
 
   it('fills the first blank row, or comes last', () => {
-    const line = rxLineFor(flubolt, {}, daysNote);
+    const line = rxLineFor(flubolt, {});
     expect(withRxLine([emptyRxLine()], line)).toEqual([line]);
     expect(withRxLine([line], line)).toHaveLength(2);
   });
 
   it('steps a medicine up and down from Browse, keeping one blank row', () => {
-    const added = steppedRxLines([emptyRxLine()], flubolt, 1, daysNote);
+    const added = steppedRxLines([emptyRxLine()], flubolt, 1);
     expect(rxCountOf(added, 'Flubolt 400')).toBe(8);
-    const more = steppedRxLines(added, flubolt, 1, daysNote);
+    const more = steppedRxLines(added, flubolt, 1);
     expect(rxCountOf(more, 'Flubolt 400')).toBe(9);
     const one = steppedRxLines(
       [{ ...emptyRxLine(), medicineName: 'Flubolt 400' }],
       flubolt,
       -1,
-      daysNote,
     );
     expect(one).toEqual([emptyRxLine()]);
-    expect(steppedRxLines([emptyRxLine()], flubolt, -1, daysNote)).toEqual([
-      emptyRxLine(),
-    ]);
+    expect(steppedRxLines([emptyRxLine()], flubolt, -1)).toEqual([emptyRxLine()]);
   });
 });
 
