@@ -7,7 +7,6 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import type { ContactScope } from '@/shared/api/app/contacts-api.ts';
@@ -33,7 +32,7 @@ import {
   CONTACT_QUICK_PICK_NS,
   CONTACT_QUICK_PICK_TEST_IDS,
 } from './contact-quick-pick.constants.ts';
-import { markMatch, type QuickAddDraft, railName } from './contact-quick-pick-query.ts';
+import { markWords, type QuickAddDraft, railName } from './contact-quick-pick-query.ts';
 import { ContactQuickAdd } from './ContactQuickAdd.tsx';
 import {
   QUICK_PICK_ADD_VALUE,
@@ -73,8 +72,11 @@ const NOTE_CLASS = 'text-detail text-muted-foreground px-3 py-2.5';
 export interface ContactQuickPickRow {
   /** "Patient · C-12345 · +91 98250 11241", or the mobile. */
   line: string;
-  /** "Use contact", "Open lead", "Re-create lead". */
-  action: string;
+  /**
+   * What a pick does when it is more than taking the person — "Open lead", "Re-create lead"; none
+   * when picking only takes them (change-natural-contact-search D8).
+   */
+  action?: string;
   tone: Tone;
 }
 
@@ -82,7 +84,7 @@ export interface ContactQuickPickRow {
 export interface ContactQuickPickTestIds {
   search: string;
   hit: (hit: ContactHit) => string;
-  /** The add row ("New contact" / "Add “…” as a new contact"). */
+  /** The add row ("New contact" and the values it will use). */
   add: string;
   /** "No existing match". */
   noMatch?: string;
@@ -113,6 +115,12 @@ export interface ContactQuickPickProps {
   /** The quick add also needs a 10-digit mobile. */
   requirePhone?: boolean;
   /**
+   * The host keeps an Instagram handle for a new person (default): a typed `@handle` is shown on
+   * the add row and fills the quick add's Instagram field. Off (the appointment form keeps a name
+   * and a mobile only), the handle is left out (change-natural-contact-search D6).
+   */
+  takesInstagram?: boolean;
+  /**
    * Controls between the search and the people (New lead's Quick start chips). ↵ on one of its
    * buttons presses that button, never the highlighted row.
    */
@@ -138,20 +146,25 @@ function keepCaretKeys(event: KeyboardEvent<HTMLInputElement>) {
 
 /** A person's name with the searched part marked (`<mark>`), in its own direction. */
 function MarkedName({ name, typed }: { name: string; typed: string }) {
-  const marked = markMatch(name, typed);
+  const pieces = markWords(name, typed);
   return (
     <span dir="auto" className="text-body truncate [text-align:match-parent] font-medium">
-      {marked ? (
-        <>
-          {marked.before}
-          <mark className="bg-tone-butter text-tone-butter-foreground rounded-xs">
-            {marked.match}
-          </mark>
-          {marked.after}
-        </>
-      ) : (
-        name
-      )}
+      {pieces
+        ? pieces.map((piece, index) =>
+            piece.marked ? (
+              <mark
+                // The pieces of one name never reorder.
+                // biome-ignore lint/suspicious/noArrayIndexKey: a name's pieces, in order
+                key={index}
+                className="bg-tone-butter text-tone-butter-foreground rounded-xs"
+              >
+                {piece.text}
+              </mark>
+            ) : (
+              piece.text
+            ),
+          )
+        : name}
     </span>
   );
 }
@@ -192,9 +205,11 @@ function PersonRow({
         <MarkedName name={hit.name} typed={typed} />
         <span className="text-caption text-muted-foreground truncate">{row.line}</span>
       </span>
-      <span className="text-foreground-soft flex-none text-xs font-medium">
-        {row.action}
-      </span>
+      {row.action ? (
+        <span className="text-foreground-soft flex-none text-xs font-medium">
+          {row.action}
+        </span>
+      ) : null}
       {highlighted ? (
         <span aria-hidden="true" data-slot="kbd" className={ENTER_KEY_CLASS}>
           {t(K.enterKey)}
@@ -276,8 +291,8 @@ function RecentChip({
         {railName(hit.name)}
       </span>
       <span className="sr-only">
-        <span dir="auto">{hit.name}</span> <span>{row.line}</span>{' '}
-        <span>{row.action}</span>
+        <span dir="auto">{hit.name}</span> <span>{row.line}</span>
+        {row.action ? <span> {row.action}</span> : null}
       </span>
     </CommandItem>
   );
@@ -400,25 +415,25 @@ function LoadingRail({ testId }: { testId: string }) {
   );
 }
 
-/** The add row's words: what the search would start the new contact — or patient — with. */
-function useAddLabel(scope: ContactScope) {
-  const { t } = useTranslation(CONTACT_QUICK_PICK_NS);
-  const words = CONTACT_QUICK_PICK_ADD_KEYS[scope];
-  return ({ name, phone }: QuickAddDraft) => {
-    const shown = isolateValues({
-      name,
-      phone: `${APP_PHONE_PREFIX} ${formatAppPhoneDigits(phone)}`,
-    });
-    if (name && phone) return t(words.addNamedPhone, shown);
-    if (name) return t(words.addNamed, shown);
-    if (phone) return t(words.addPhone, shown);
-    return t(words.newPerson);
-  };
+/**
+ * The values a new person would start with, as the add row shows them: the name, the mobile
+ * (`+91 98250 11241`) and the handle — each the field it fills (change-natural-contact-search D7).
+ */
+function draftValues({
+  name,
+  phone,
+  instagram,
+}: QuickAddDraft): { key: string; text: string }[] {
+  return [
+    { key: 'name', text: name },
+    { key: 'phone', text: phone && `${APP_PHONE_PREFIX} ${formatAppPhoneDigits(phone)}` },
+    { key: 'instagram', text: instagram },
+  ].filter((value) => value.text !== '');
 }
 
 /**
- * The add row: "New contact", or what the search would start the new person with — pinned to the
- * list's foot, so a long answer never scrolls it away.
+ * The add row: "New contact" (or "New patient") and a chip per value the search would start them
+ * with — pinned to the list's foot, so a long answer never scrolls it away.
  */
 function AddRow({
   draft,
@@ -435,7 +450,7 @@ function AddRow({
   testId: string;
 }) {
   const { t } = useTranslation(CONTACT_QUICK_PICK_NS);
-  const addLabel = useAddLabel(scope);
+  const words = CONTACT_QUICK_PICK_ADD_KEYS[scope];
   return (
     <CommandGroup className="sticky bottom-0 p-0">
       <CommandItem
@@ -446,8 +461,19 @@ function AddRow({
         className="group bg-canvas hover:bg-muted data-[selected=true]:bg-muted data-[selected=true]:text-foreground text-body flex h-9 cursor-pointer items-center gap-2 rounded-none px-3 text-start font-medium"
       >
         <Plus aria-hidden="true" className="size-3.25 text-current" />
-        <span dir="auto" className="min-w-0 flex-1 truncate [text-align:match-parent]">
-          {addLabel(draft)}
+        <span className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
+          <span className="shrink-0">{t(words.newPerson)}</span>
+          {draftValues(draft).map((value) => (
+            <span
+              key={value.key}
+              dir={value.key === 'name' ? 'auto' : 'ltr'}
+              data-testid={IDS.addValue(testId, value.key)}
+              className="bg-background text-foreground-soft text-caption min-w-0 truncate rounded-sm border px-1.5 py-px font-normal"
+            >
+              {' '}
+              {value.text}
+            </span>
+          ))}
         </span>
         {keyHint ? (
           <span aria-hidden="true" data-slot="kbd" className={ENTER_KEY_CLASS}>
@@ -570,6 +596,7 @@ function PeopleGroup({
 /** The list under the search: Recent or the search's people, the loading rows, notes, the add row. */
 function PickList({
   view,
+  draft,
   scope,
   highlighted,
   label,
@@ -580,6 +607,8 @@ function PickList({
   testIds,
 }: {
   view: QuickPickView;
+  /** What the add row would start the new person with — the kinds the host keeps. */
+  draft: QuickAddDraft;
   scope: ContactScope;
   highlighted: string;
   label: string;
@@ -647,7 +676,7 @@ function PickList({
         />
       ) : null}
       <AddRow
-        draft={view.draft}
+        draft={draft}
         scope={scope}
         keyHint={highlighted === QUICK_PICK_ADD_VALUE && !view.waiting}
         onSelect={onAdd}
@@ -708,6 +737,7 @@ export function ContactQuickPick({
   onQuickAdd,
   onMoreDetails,
   requirePhone = false,
+  takesInstagram = true,
   toolbar,
   inputRef,
   disabled = false,
@@ -717,6 +747,7 @@ export function ContactQuickPick({
 }: ContactQuickPickProps) {
   const pickState = useContactQuickPick({ limit, disabled, scope });
   const { view, setQuery, setAdding } = pickState;
+  const draft = takesInstagram ? view.draft : { ...view.draft, instagram: '' };
   const done = () => {
     setAdding(null);
     setQuery('');
@@ -805,12 +836,13 @@ export function ContactQuickPick({
           {disabled ? null : (
             <PickList
               view={view}
+              draft={draft}
               scope={scope}
               highlighted={pickState.highlighted}
               label={searchLabel}
               describe={describe}
               onPick={pick}
-              onAdd={() => setAdding(view.draft)}
+              onAdd={() => setAdding(draft)}
               testId={testId}
               testIds={testIds}
             />

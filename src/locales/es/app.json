@@ -927,10 +927,6 @@
     "found_many": "{{count}} personas encontradas",
     "found_other": "{{count}} personas encontradas",
     "noMatch": "Ninguna coincidencia",
-    "use": "Usar contacto",
-    "addNamed": "Añadir «{{name}}» como contacto nuevo",
-    "addPhone": "Añadir {{phone}} como contacto nuevo",
-    "addNamedPhone": "Añadir «{{name}}» · {{phone}} como contacto nuevo",
     "enterKey": "↵",
     "clearSearch": "Borrar búsqueda",
     "added": "{{name}} añadido a contactos",
@@ -948,11 +944,7 @@
     },
     "patient": {
       "newPatient": "Paciente nuevo",
-      "addNamed": "Añadir «{{name}}» como paciente nuevo",
-      "addPhone": "Añadir {{phone}} como paciente nuevo",
-      "addNamedPhone": "Añadir «{{name}}» · {{phone}} como paciente nuevo",
       "add": "Añadir paciente",
-      "use": "Usar paciente",
       "added": "{{name}} añadido como paciente",
       "existing": "{{name}} ya es paciente · seleccionado"
     }

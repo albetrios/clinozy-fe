@@ -5,6 +5,7 @@ export {
 } from './contact-editor.constants.ts';
 export type { ContactLinkedNotice } from './contact-editor-fields.tsx';
 export {
+  CONTACT_HANDLE_MAX,
   CONTACT_PREFERENCE_PRESETS,
   type ContactEditorPhone,
   type ContactEditorValue,
