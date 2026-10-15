@@ -33,8 +33,8 @@
 
 ## 4. The route — the ordered ledger
 
-| #   | Work item                                                     | Kind   | Depends on | Skill/driver           | Acceptance      | Assignee | Status  |
-| --- | ------------------------------------------------------------- | ------ | ---------- | ---------------------- | --------------- | -------- | ------- |
-| L-1 | The validator stops reading `compare`; its test; the overview | change | —          | fe-bundle-performance  | §3 rows 2–3     | Claude   | pending |
-| L-2 | Gates, push, CI green                                         | gate   | L-1        | fe-before-commit-guard | §3 row 1        | Claude   | pending |
-| L-3 | Close: `AS-BUILT.md`, Status `done`, then `frozen`            | verify | L-2        | fe-kickoff-iteration   | README `frozen` | Claude   | pending |
+| #   | Work item                                                     | Kind   | Depends on | Skill/driver           | Acceptance      | Assignee | Status |
+| --- | ------------------------------------------------------------- | ------ | ---------- | ---------------------- | --------------- | -------- | ------ |
+| L-1 | The validator stops reading `compare`; its test; the overview | change | —          | fe-bundle-performance  | §3 rows 2–3     | Claude   | done   |
+| L-2 | Gates, push, CI green                                         | gate   | L-1        | fe-before-commit-guard | §3 row 1        | Claude   | done   |
+| L-3 | Close: `AS-BUILT.md`, Status `done`, then `frozen`            | verify | L-2        | fe-kickoff-iteration   | README `frozen` | Claude   | done   |

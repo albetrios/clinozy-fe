@@ -407,6 +407,7 @@ clinozy-fe/
 │   │   │   └── BRIEF.md
 │   │   ├── plans/
 │   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
 │   ├── fix-settings-drawer-header-2026-10-13-kutv/
