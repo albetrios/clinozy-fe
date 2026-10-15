@@ -341,6 +341,13 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── change-photo-compare-zoom-2026-10-15-funk/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
