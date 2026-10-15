@@ -244,10 +244,12 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   desk — and lists their three newest reviews (iteration
   `feat-payment-celebration-2026-10-15-xpkw`).
 - **A room's own header stays still.** Moving between a room's tabs (they are routes) or
-  the patient file's sections is no page change: the link marks the move
-  (`markSamePageNavigation`) and `PageTransition` keeps the rise for real page changes,
-  while the tab track's thumb carries on across the remount (`SelectionGlide`'s
-  `continuity`) and travels as an in-page track does.
+  the patient file's sections is no page change: a room tab marks the click
+  (`markSamePageNavigation`), the patient file's layout route says it is one room
+  (`staticData.room`), and `PageTransition` keeps the page still and rises only the part
+  that changed — the section, or what sits under the room toolbar (`riseChangedPart`, the
+  page rise's own 6px and 280ms). The tab track's thumb carries on across the remount
+  (`SelectionGlide`'s `continuity`) and travels as an in-page track does.
 - **One bottom sheet.** Every vaul sheet — All sections on a phone, a phone confirm, the
   picker sheets — rises 28px and fades in 260ms on the sheet curve with its scrim, and
   leaves at once; set once in `ui/drawer.tsx`, over vaul's own 500ms slide. Custom

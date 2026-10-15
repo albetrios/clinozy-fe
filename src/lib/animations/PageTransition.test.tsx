@@ -312,6 +312,43 @@ describe('PageTransition', () => {
       classes.disconnect();
     });
 
+    it('keeps a room layout still between its pages, unmarked, and rises only its section', () => {
+      const animate = vi.fn(
+        () => ({ finished: Promise.resolve() }) as unknown as Animation,
+      );
+      HTMLElement.prototype.animate = animate;
+      const file = (patient: string, section: string) => [
+        {
+          pathname: `/organization/acme/patients/${patient}`,
+          staticData: { room: true },
+        },
+        { pathname: `/organization/acme/patients/${patient}/${section}`, staticData: {} },
+      ];
+      const page = () => (
+        <PageTransition>
+          <nav data-testid="file-bar" />
+          <div data-slot="patient-file-section" data-testid="section" />
+        </PageTransition>
+      );
+      matchesMock.mockReturnValue(file('pat_a', 'timeline'));
+      const { rerender } = render(page());
+      const wrapper = screen.getByTestId('file-bar').parentElement as HTMLElement;
+      const classes = new MutationObserver(() => undefined);
+      classes.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
+
+      // Another section of the same file: the file stays, the section rises.
+      matchesMock.mockReturnValue(file('pat_a', 'visits'));
+      rerender(page());
+      expect(classes.takeRecords()).toHaveLength(0);
+      expect(animate.mock.contexts).toEqual([screen.getByTestId('section')]);
+
+      // Another patient's file is a new page.
+      matchesMock.mockReturnValue(file('pat_b', 'visits'));
+      rerender(page());
+      expect(classes.takeRecords().length).toBeGreaterThan(0);
+      classes.disconnect();
+    });
+
     it('rises only what sits under the room toolbar on a marked move', () => {
       const animate = vi.fn(
         () => ({ finished: Promise.resolve() }) as unknown as Animation,

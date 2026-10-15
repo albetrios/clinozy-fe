@@ -861,7 +861,8 @@ const organizationPatientFileRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'patients/$patientId',
   head: manifestHead(patientFileManifest),
-  staticData: { manifest: patientFileManifest },
+  // One room: a move between its sections keeps the file still (feat-payment-celebration D13).
+  staticData: { manifest: patientFileManifest, room: true },
   validateSearch: validatePatientFileSearch,
   beforeLoad: roomLeafGate(patientFileManifest),
   component: patientFileComponent('PatientFileLayout'),
@@ -1947,5 +1948,11 @@ declare module '@tanstack/react-router' {
      * still while the dialog opens, switches and closes.
      */
     dialog?: true;
+    /**
+     * A layout whose children are one room (the patient file): a move between them is no page
+     * change — `PageTransition` keeps what stays on screen still and rises only the part that
+     * changed (`feat-payment-celebration` D13).
+     */
+    room?: true;
   }
 }

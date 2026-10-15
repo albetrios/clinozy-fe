@@ -37,6 +37,7 @@ export function riseChangedPart(root: HTMLElement): void {
   root.setAttribute(REPLAYING_ATTRIBUTE, '');
   void Promise.allSettled(running.map((animation) => animation.finished)).then(() => {
     // A page rise that started meanwhile owns the attribute until it settles.
-    if (root.getAnimations().length === 0) root.removeAttribute(REPLAYING_ATTRIBUTE);
+    if ((root.getAnimations?.() ?? []).length === 0)
+      root.removeAttribute(REPLAYING_ATTRIBUTE);
   });
 }
