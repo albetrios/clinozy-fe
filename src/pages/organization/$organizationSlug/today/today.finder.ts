@@ -105,5 +105,6 @@ export function findOnFloor({
     }),
   );
   // A stable sort keeps the lanes' order and each lane's time order within a rank.
-  return ranked.sort((a, b) => a.rank - b.rank).map(({ match }) => match);
+  ranked.sort((a, b) => a.rank - b.rank);
+  return ranked.map(({ match }) => match);
 }
