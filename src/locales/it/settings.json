@@ -219,6 +219,8 @@
       "description": "Dati dell'account e azioni irreversibili.",
       "infoTitle": "Informazioni account",
       "infoDescription": "Dettagli sul tuo account.",
+      "signInClinicTitle": "Clinica all'accesso",
+      "signInClinicDescription": "Scegli quale clinica si apre quando accedi. Vale su tutti i dispositivi.",
       "accountIdLabel": "ID account",
       "emailLabel": "Email",
       "roleLabel": "Ruolo",

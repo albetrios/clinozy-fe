@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { cn } from '@/lib/utils.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -22,6 +23,7 @@ import {
 import { notifyError, reportError } from '@/shared/errors/errorHandler.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
+import { useSignInClinic } from '@/shared/hooks/useSignInClinic/index.ts';
 import { Check, ChevronsUpDown, Plus } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useWorkspaceSwitchStore } from '@/shared/store/useWorkspaceSwitchStore/index.ts';
@@ -93,16 +95,20 @@ function TriggerIdentity({ name }: { name: string }) {
 function OrganizationOption({
   org,
   isActive,
+  isDefault,
   isSwitching,
   isDisabled,
   onChoose,
 }: {
   org: OrganizationSummary;
   isActive: boolean;
+  /** The clinic pinned to open at sign-in (feat-choose-default-clinic D3). */
+  isDefault: boolean;
   isSwitching: boolean;
   isDisabled: boolean;
   onChoose: (org: OrganizationSummary) => void;
 }) {
+  const { t } = useTranslation(LAYOUT_NS);
   return (
     <DropdownMenuItem
       onSelect={(event) => {
@@ -136,8 +142,21 @@ function OrganizationOption({
           <span className="text-muted-foreground block truncate text-xs">{org.slug}</span>
         ) : null}
       </span>
+      {isDefault ? (
+        <TonePill
+          tone="neutral"
+          size="sm"
+          className="ms-auto shrink-0"
+          data-testid={`organization-switcher-option-default-${org.slug ?? 'personal'}`}
+        >
+          {t(LAYOUT_KEYS.app.orgSwitcher.defaultBadge)}
+        </TonePill>
+      ) : null}
       {isActive ? (
-        <Check className="text-primary ms-auto size-4 shrink-0" aria-hidden />
+        <Check
+          className={cn('text-primary size-4 shrink-0', !isDefault && 'ms-auto')}
+          aria-hidden
+        />
       ) : null}
     </DropdownMenuItem>
   );
@@ -455,12 +474,14 @@ function useSwitcherModel(onSwitched: (() => void) | undefined) {
     onSwitched,
   });
   const { switchingId, selectOrg } = switching;
+  const { pinnedId } = useSignInClinic();
 
   const renderOrg = (org: OrganizationSummary) => (
     <OrganizationOption
       key={org.id}
       org={org}
       isActive={org.id === activeId}
+      isDefault={org.id === pinnedId}
       isSwitching={switchingId === org.id}
       isDisabled={switchingId !== null && switchingId !== org.id}
       onChoose={selectOrg}

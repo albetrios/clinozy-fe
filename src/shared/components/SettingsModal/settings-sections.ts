@@ -135,6 +135,10 @@ export const SETTINGS_NAV: readonly SettingsNavGroup[] = [
           'analytics',
           'cookies',
           'consent',
+          'default clinic',
+          'sign in',
+          'sign-in',
+          'start',
         ],
       },
       {

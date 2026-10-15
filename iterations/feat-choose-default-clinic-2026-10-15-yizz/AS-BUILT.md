@@ -1,0 +1,37 @@
+# feat-choose-default-clinic-2026-10-15-yizz — as built
+
+What was actually built, ledger row by ledger row, against the approved plan in
+[`KICKOFF.md`](KICKOFF.md). Started 2026-10-15. Baseline: `none` (D1).
+
+## Rows
+
+| #   | Ledger row | Planned                                | Actually built                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Difference                                                            | Why                                                        | Decision | Commit        |
+| --- | ---------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- | -------- | ------------- |
+| #1  | 1          | API types; contracts + API; hook       | `core/http/openapi-types.d.ts` regenerated (`pnpm api:types` — `default_organization_id` on the settings PATCH body). `shared/api/user-settings-api.ts`: `fetchSignInClinic` / `saveSignInClinic` on the typed `api` client, Zod-parsed (a backend without the field reads as automatic), `userSettingsQueryKeys.signInClinic`; tests 4/4. `shared/hooks/useSignInClinic/`: the clinics (TEAM only), the pin (one not among them reads as automatic), `canChoose` (two or more clinics and the pin known), `choose` — optimistic, a toast naming the result, rollback + reported error on failure; tests 6/6                                                                                                                                                                                        | the contracts live in the API module (one field)                      | one field does not earn a second file                      | D6       | (this commit) |
+| #2  | 2          | Settings › Account card                | `SettingsModal/account/SignInClinicCard/`: "Clinic at sign-in" — a `RadioGroup` of full-width rows ("The clinic I used last" + hint, then each clinic with its slug), saving on select; absent without a choice; mounted in `AccountPanel` above Privacy; the Account section's search keywords gain "default clinic", "sign in", "start". Tests 5/5 (choices, pinned state, pin and back, absent, `vitest-axe`)                                                                                                                                                                                                                                                                                                                                                                                    | the row's focus ring comes from the theme (`data-slot`)               | `validate:theme-axis` refuses a fixed `focus-visible:ring` | D3 – D5  | (this commit) |
+| #3  | 3          | Account menu submenu + "Default" label | `AccountMenu`: "Opens at sign-in ▸" under Switch clinic — the row shows the pinned clinic's name or "Last used"; the submenu (`w-72`) holds the same choices as `DropdownMenuRadioItem`s. `OrganizationSwitcher`: a `TonePill` "Default" on the pinned clinic's row (the check mark moves beside it). Tests: `AccountMenu.sign-in-clinic.test.tsx` 5/5 (row value, pinned state, pin and back by keyboard, absent, `vitest-axe`), `OrganizationSwitcher.test.tsx` +1 (Default on the pinned row only)                                                                                                                                                                                                                                                                                               | none                                                                  | —                                                          | D3, D4   | (this commit) |
+| #4  | 4          | Languages, docs, recordings, gates     | `layout.json` › `app.signInClinic` (6 strings) and `app.orgSwitcher.defaultBadge`, `settings.json` › `panels.account.signInClinicTitle` / `…Description`, in all 11 languages. The menu's and the toasts' strings sit in `layout` — always loaded — so the menu never shows a key before Settings has loaded its own namespace. Docs: `API.OVERVIEW.md`, `e2e-testids-inventory.md` (5 ids), `TENANCY.FLOWS.md`, `routing-and-tenancy.md`. Recorded on the local stack (video + screenshots, in the review artifact): sign in → Ojas; account menu › Opens at sign-in › Demo Organization (toast); Switch clinic shows "Default"; sign out/in → Demo Organization; switch to Ojas, sign out/in → still Demo Organization; Settings › Account › "The clinic I used last" (toast); sign out/in → Ojas | the shared strings moved from `settings` to `layout` during the build | the account menu renders before `settings` is loaded       | D7, D8   | (this commit) |
+
+**Verified:** `pnpm type-check` ✓ · ESLint and Prettier on every touched file ✓ · `pnpm biome:check`
+(touched files) ✓ · `validate:structure` / `validate:testids` / `validate:tokens` /
+`validate:theme-axis` ✓ · `sync:check` ✓ · the related Vitest files 17/17 (170 tests) ✓ · `pnpm build`
+✓ · `pnpm build:check` ✓. `pnpm size` reads 251 kB initial JS against 239.4 kB on this machine's
+build, which reads the local `.env.local` (dev tooling on); the new code ships in the lazy
+`AccountPanel` and `OrganizationShell` chunks and its own `useSignInClinic` chunk — none of them in
+`index.html`'s initial set (`index`, `query`, `rolldown-runtime`, `vendor`, `zod`). CI measures with no
+env file.
+
+## Revisions to upcoming rows
+
+None.
+
+## Summary
+
+- **Built:** two places to choose the clinic that opens at sign-in — Settings › Account and the
+  account menu — and a "Default" label in Switch clinic, over one shared hook (D3 – D6).
+- **Verified:** F-1 – F-5 ✓ (F-4 in the real app, recorded).
+- **Planned, not built:** none. **Built, not planned:** none.
+
+## Standing deviations
+
+None. This iteration has no design input.

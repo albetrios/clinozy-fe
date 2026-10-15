@@ -54,8 +54,9 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
   role home — Today for most roles), else the `/organization` picker. Personal workspaces
   have no clinic (D44), so a PERSONAL active org lands on the picker too: its list and
   "Create organization" lead into one. Which org is active after a sign-in is clinozy-be's
-  login default: the clinic the person last switched to (every `/auth/switch-to-organization`
-  remembers it), else their newest clinic, and the personal workspace only when they have no
+  login default: the clinic the person pinned (Settings › Account, or the account menu's
+  "Opens at sign-in" — `feat-choose-default-clinic`), else the clinic they last switched to
+  (every `/auth/switch-to-organization` remembers it), else their newest clinic, and the personal workspace only when they have no
   clinic — so a returning member lands in their clinic, not on the picker
   (`feat-default-clinic-at-login`). `/` keeps no UI, and the retired `/dashboard`
   redirects to it (L-63).

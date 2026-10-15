@@ -215,6 +215,8 @@
       "description": "アカウント情報と取り消せない操作。",
       "infoTitle": "アカウント情報",
       "infoDescription": "アカウントの詳細。",
+      "signInClinicTitle": "サインイン時のクリニック",
+      "signInClinicDescription": "サインイン時に開くクリニックを選びます。すべての端末に適用されます。",
       "accountIdLabel": "アカウント ID",
       "emailLabel": "メールアドレス",
       "roleLabel": "ロール",

@@ -219,6 +219,8 @@
       "description": "Metadatos de la cuenta y acciones irreversibles.",
       "infoTitle": "Información de la cuenta",
       "infoDescription": "Detalles sobre tu cuenta.",
+      "signInClinicTitle": "Clínica al iniciar sesión",
+      "signInClinicDescription": "Elige qué clínica se abre al iniciar sesión. Se aplica en todos tus dispositivos.",
       "accountIdLabel": "ID de cuenta",
       "emailLabel": "Correo",
       "roleLabel": "Rol",
