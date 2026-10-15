@@ -346,6 +346,7 @@ clinozy-fe/
 │   │   │   └── BRIEF.md
 │   │   ├── plans/
 │   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
 │   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/

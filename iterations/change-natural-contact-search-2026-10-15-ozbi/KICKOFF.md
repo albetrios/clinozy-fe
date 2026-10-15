@@ -72,9 +72,9 @@ The BRIEF acceptance criteria in the running app (clinozy-be with its sibling ch
 
 | #   | Work item                                                      | Kind       | Depends on | Skill/driver                                    | Acceptance                           | Assignee | Status |
 | --- | -------------------------------------------------------------- | ---------- | ---------- | ----------------------------------------------- | ------------------------------------ | -------- | ------ |
-| L-1 | Parsing: handle, email out, `markWords`                        | foundation | —          | fe-test-generation                              | unit tests for each kind             | Claude   | open   |
-| L-2 | The add row's chips; the quick add's Instagram field           | structural | L-1        | shadcn, frontend-design                         | BRIEF criteria 1–3                   | Claude   | open   |
-| L-3 | Hosts carry the handle; `takesInstagram`; row words removed    | structural | L-2        | fe-code-structure                               | BRIEF criteria 1, 4; host suites     | Claude   | open   |
-| L-4 | Copy across 11 locales; docs (design.md, testids inventory)    | copy       | L-2, L-3   | fe-i18n-constants, fe-documentation-maintenance | `validate:i18n-parity`, `sync:check` | Claude   | open   |
-| L-5 | Verify with the clinozy-be sibling: before / after, 375 / 1440 | verify     | L-1–L-4    | fe-kickoff-iteration                            | BRIEF criteria 1–5, recordings       | Claude   | open   |
-| L-6 | Gates, `AS-BUILT.md`, Status `done`, commit, push              | gate       | L-5        | fe-before-commit-guard                          | §8 green; no pull request            | Claude   | open   |
+| L-1 | Parsing: handle, email out, `markWords`                        | foundation | —          | fe-test-generation                              | unit tests for each kind             | Claude   | done   |
+| L-2 | The add row's chips; the quick add's Instagram field           | structural | L-1        | shadcn, frontend-design                         | BRIEF criteria 1–3                   | Claude   | done   |
+| L-3 | Hosts carry the handle; `takesInstagram`; row words removed    | structural | L-2        | fe-code-structure                               | BRIEF criteria 1, 4; host suites     | Claude   | done   |
+| L-4 | Copy across 11 locales; docs (design.md, testids inventory)    | copy       | L-2, L-3   | fe-i18n-constants, fe-documentation-maintenance | `validate:i18n-parity`, `sync:check` | Claude   | done   |
+| L-5 | Verify with the clinozy-be sibling: before / after, 375 / 1440 | verify     | L-1–L-4    | fe-kickoff-iteration                            | BRIEF criteria 1–5, recordings       | Claude   | done   |
+| L-6 | Gates, `AS-BUILT.md`, Status `done`, commit, push              | gate       | L-5        | fe-before-commit-guard                          | §8 green; no pull request            | Claude   | done   |
