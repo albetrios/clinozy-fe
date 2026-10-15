@@ -23,7 +23,16 @@
       "addOrganization": "Add organization",
       "invited": "Invited",
       "invitedRow": "Invited · {{roles}}",
-      "invitationCount": "Invitations: {{count}}"
+      "invitationCount": "Invitations: {{count}}",
+      "defaultBadge": "Default"
+    },
+    "signInClinic": {
+      "menuLabel": "Opens at sign-in",
+      "lastUsed": "Last used",
+      "automatic": "The clinic I used last",
+      "automaticHint": "Changes as you move between clinics",
+      "savedClinic": "Sign-in will open {{name}}",
+      "savedAutomatic": "Sign-in will open the clinic you used last"
     },
     "notifications": {
       "title": "Notifications",
@@ -69,7 +78,9 @@
       "jumpToSection": "Jump to a section",
       "listSearch": "Search the list",
       "leadRows": "Next or previous lead (in Leads)",
-      "closeDialog": "Close dialog"
+      "closeDialog": "Close dialog",
+      "saveForm": "Save the open form",
+      "dictate": "Speak into the field you're in"
     },
     "emailVerify": {
       "message": "Verify your email to secure your account.",

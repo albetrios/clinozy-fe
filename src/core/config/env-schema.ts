@@ -137,7 +137,7 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   VITE_CSP_REPORT_URI:
     'CSP violation report collector URI (e.g. a Sentry CSP ingest URL); empty = violations reach each visitor console only. Warned on in both deploy environments.',
   VITE_DISABLED_MODULES:
-    'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are app-today … app-users, every one on clinozy-be.',
+    'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are app-today … app-users and app-branches, every one on clinozy-be.',
   VITE_PERSONAL_ORGANIZATIONS:
     'Tri-state override for personal-org deployment mode (true/false/unset).',
   VITE_TEAM_ORGANIZATIONS:

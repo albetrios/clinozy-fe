@@ -1,10 +1,14 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { MessageSquare } from '@/shared/icons/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+import {
+  installFakeSpeechRecognition,
+  lastSpeechRecognition,
+} from '@/tests/utils/speech-recognition-doubles.ts';
 
 import type { ClinicalChip } from '../../../shared/patient-clinical.ts';
 import { ClinicalChipCard, type ClinicalChipCardProps } from './ClinicalChipCard.tsx';
@@ -46,6 +50,10 @@ async function renderCard(props: Partial<ClinicalChipCardProps> = {}) {
 }
 
 describe('ClinicalChipCard (H:780; patient-file.md:53)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('shows its chips, rings the ones added since the last visit and counts them', async () => {
     const { container } = await renderCard();
     const card = screen.getByTestId(ID);
@@ -76,6 +84,25 @@ describe('ClinicalChipCard (H:780; patient-file.md:53)', () => {
     await user.type(input, 'tanning on face{Enter}');
     await user.type(input, '   {Enter}');
     expect(onAdd).toHaveBeenCalledTimes(1);
+  });
+
+  it('adds a spoken phrase as chips at once, one per part, a repeat ignored', async () => {
+    installFakeSpeechRecognition();
+    const { onAdd, user } = await renderCard();
+    const input = screen.getByTestId(`${ID}-input`);
+    await user.type(input, 'Draft');
+    await user.keyboard('{Control>}{Shift>} {/Shift}{/Control}');
+    act(() =>
+      lastSpeechRecognition()?.say(
+        'dryness comma tanning on face comma itching at night full stop dryness',
+        true,
+      ),
+    );
+    expect(onAdd.mock.calls.map(([text]) => text)).toEqual([
+      'Dryness',
+      'Itching at night',
+    ]);
+    expect(input).toHaveValue('Draft');
   });
 
   it('removes a chip at once', async () => {

@@ -86,6 +86,7 @@ export function NewTaskWhatFields({
           {...form.register('title')}
           maxLength={TASK_TITLE_MAX}
           placeholder={t(K.titleField.placeholder)}
+          dictation
           data-testid={IDS.title}
         />
       </DrawerField>
@@ -181,6 +182,8 @@ export function NewTaskWhenFields({
             if (key) setField(form, 'owner', key);
           }}
           searchable
+          // Who the member assigns to most opens the list (feat-write-less, D11).
+          recentKey="tasks:owner"
           invalid={Boolean(ownerField.error)}
           testId={IDS.owner}
         />

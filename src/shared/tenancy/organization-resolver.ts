@@ -38,15 +38,14 @@ export interface RootTargetOptions {
   readonly pendingInvitations?: number;
 }
 
-/**
- * Whether the person could be sent to their invitations — a team deployment and no clinic to
- * enter. Only then is reading the invitations worth a request.
- */
-function mayLandOnInvitations(ctx: MeContext): boolean {
-  return (
-    resolveDeploymentMode(ctx.deploymentFlags) !== 'personal-only' &&
-    ctx.activeOrganization?.type !== 'TEAM'
-  );
+/** Whether the deployment has clinics — and so invitations to them (D84). */
+function hasClinics(ctx: MeContext): boolean {
+  return resolveDeploymentMode(ctx.deploymentFlags) !== 'personal-only';
+}
+
+/** A clinic deployment and no clinic to enter: an invitation is then the way in (D84). */
+function hasNoClinicToEnter(ctx: MeContext): boolean {
+  return hasClinics(ctx) && ctx.activeOrganization?.type !== 'TEAM';
 }
 
 /**
@@ -63,27 +62,25 @@ function mayLandOnInvitations(ctx: MeContext): boolean {
  * differ by mode, not whether onboarding runs. Driven by the backend
  * `onboarding_completed` flag.
  *
- * Then the active team organization's home. Everything else — no active org, a
- * personal active workspace, a personal-only deployment — lands on the picker:
- * personal workspaces have no clinic of their own (D44), and the picker's list
- * and "Create organization" are the way into one, so it is never a dead end.
+ * Then the active team organization's home — unless an invitation is pending: someone who
+ * already has a clinic lands on the picker too, where they accept or decline it and choose which
+ * clinic opens at sign-in (feat-choose-default-clinic). With one clinic and nothing pending, the
+ * picker never shows. Everything else — no active org, a personal active workspace, a
+ * personal-only deployment — lands on the picker: personal workspaces have no clinic of their
+ * own (D44), and the picker's list and "Create organization" are the way into one, so it is
+ * never a dead end.
  */
 export function resolveRootTarget(
   ctx: MeContext,
   options: RootTargetOptions = {},
 ): RootTarget {
-  if ((options.pendingInvitations ?? 0) > 0 && mayLandOnInvitations(ctx)) {
-    return organizationPicker();
-  }
+  const invited = (options.pendingInvitations ?? 0) > 0;
+  if (invited && hasNoClinicToEnter(ctx)) return organizationPicker();
   if (needsOnboarding(ctx)) return { to: '/onboarding' } as const;
 
   const active = ctx.activeOrganization;
-  if (
-    resolveDeploymentMode(ctx.deploymentFlags) !== 'personal-only' &&
-    active?.type === 'TEAM' &&
-    active.slug
-  ) {
-    return teamHomeOrPicker(ctx, active.slug);
+  if (hasClinics(ctx) && active?.type === 'TEAM' && active.slug) {
+    return invited ? organizationPicker() : teamHomeOrPicker(ctx, active.slug);
   }
   return organizationPicker();
 }
@@ -107,12 +104,12 @@ export function workspaceRedirectForTeamEntry(
 }
 
 /**
- * How many pending invitations could change where the person lands — read only when they could
- * (no clinic to enter), else 0. A failed read counts as none: an invitation must never stand
- * between someone and the app.
+ * How many pending invitations the person has — read in a clinic deployment, else 0 (a
+ * personal-only deployment has no invitations). A failed read counts as none: an invitation must
+ * never stand between someone and the app.
  */
 export async function countLandingInvitations(ctx: MeContext): Promise<number> {
-  if (!mayLandOnInvitations(ctx)) return 0;
+  if (!hasClinics(ctx)) return 0;
   const invitations = await ensureMyInvitations().catch(() => []);
   return invitations.length;
 }
@@ -128,8 +125,7 @@ export async function resolveRootTargetWithInvitations(
 
 /**
  * `/` resolver (dual-URL, research/11 §3.3): reads deployment mode + active org
- * from `me/context` (JWT-backed session context), and the pending invitations
- * when there is no clinic to enter.
+ * from `me/context` (JWT-backed session context), and the pending invitations.
  */
 export async function resolveRootRedirect(): Promise<RootTarget> {
   return resolveRootTargetWithInvitations(await ensureSessionContext());

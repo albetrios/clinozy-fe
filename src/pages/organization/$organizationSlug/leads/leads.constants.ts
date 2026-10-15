@@ -188,7 +188,6 @@ export const LEADS_KEYS = {
       /** The action of a person with an open lead: "Open lead". */
       open: 'newLead.hits.open',
       recreate: 'newLead.hits.recreate',
-      useContact: 'newLead.hits.useContact',
     },
     /** " · +<n> more". Plural. */
     more: 'newLead.more',

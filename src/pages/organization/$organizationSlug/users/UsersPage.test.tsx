@@ -6,13 +6,11 @@ import type * as CsvModule from '@/lib/csv.ts';
 import type * as BranchesApiModule from '@/shared/api/app/branches-api.ts';
 import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
+import { member, PLATFORM_ROLES, SELF } from '@/tests/utils/team-doubles.ts';
 
 import {
-  member,
-  PLATFORM_ROLES,
   renderUsersRoutes,
   resetUsersRoutes,
-  SELF,
 } from './__tests__/integration/users-test-router.tsx';
 import { UsersPage } from './UsersPage.tsx';
 

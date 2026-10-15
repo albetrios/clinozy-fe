@@ -217,7 +217,7 @@
     "date": {
       "label": "日付",
       "placeholder": "日付を選択",
-      "search": "日付を入力 · 例: 9/12",
+      "search": "日付を入力 · 9/12、2w、金",
       "today": "今日",
       "tomorrow": "明日",
       "yesterday": "昨日",

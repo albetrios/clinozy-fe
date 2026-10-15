@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Users",
-      "description": "Team, roles & access, branches"
+      "description": "Team, roles & access"
+    },
+    "branches": {
+      "label": "Branches",
+      "description": "Every branch: address, opening hours, team, rooms and machines"
     }
   },
   "tones": {
@@ -914,10 +918,6 @@
     "found_one": "{{count}} person found",
     "found_other": "{{count}} people found",
     "noMatch": "No existing match",
-    "use": "Use contact",
-    "addNamed": "Add “{{name}}” as a new contact",
-    "addPhone": "Add {{phone}} as a new contact",
-    "addNamedPhone": "Add “{{name}}” · {{phone}} as a new contact",
     "enterKey": "↵",
     "clearSearch": "Clear search",
     "added": "{{name}} added to contacts",
@@ -935,11 +935,7 @@
     },
     "patient": {
       "newPatient": "New patient",
-      "addNamed": "Add “{{name}}” as a new patient",
-      "addPhone": "Add {{phone}} as a new patient",
-      "addNamedPhone": "Add “{{name}}” · {{phone}} as a new patient",
       "add": "Add patient",
-      "use": "Use patient",
       "added": "{{name}} added as a patient",
       "existing": "{{name}} is already a patient · picked"
     }
@@ -1436,15 +1432,6 @@
       "signedAs": "Sent as {{name}}, with this page and the app version.",
       "close": "Close"
     },
-    "voice": {
-      "start": "Dictate with your voice",
-      "stop": "Stop dictating",
-      "listening": "Listening…",
-      "hearing": "Hearing you…",
-      "denied": "The microphone is blocked. Allow it in your browser to dictate.",
-      "noSpeech": "Didn't catch that — tap the mic and try again.",
-      "unavailable": "Voice input isn't available right now. You can still type."
-    },
     "send": {
       "idle": "Send",
       "sending": "Sending…",
@@ -1543,5 +1530,37 @@
       "whenFree": "Your {{name}} plan stays until {{date}}. After that the workspace is on Free.",
       "seatWarning": "{{used}} seats are taken, pending invitations included, and {{name}} includes {{seats}}. Up to {{excess}} of the most recently joined members, never owners, will be suspended until seats free up."
     }
+  },
+  "voice": {
+    "start": "Dictate with your voice",
+    "stop": "Stop dictating",
+    "listening": "Listening…",
+    "hearing": "Hearing you…",
+    "denied": "The microphone is blocked. Allow it in your browser to dictate.",
+    "noSpeech": "Didn't catch that — tap the mic and try again.",
+    "unavailable": "Voice input isn't available right now. You can still type.",
+    "say": {
+      "period": "full stop|period",
+      "comma": "comma",
+      "question": "question mark",
+      "exclamation": "exclamation mark|exclamation point",
+      "colon": "colon",
+      "newLine": "new line|next line",
+      "newParagraph": "new paragraph",
+      "scratch": "scratch that|delete that"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Say “full stop”, “comma”, “new line” or “scratch that”"
+  },
+  "pinPlace": {
+    "hint": "Fills in the area, city and state",
+    "unknown": "We don't know this PIN — type the area, city and state.",
+    "areaPick": "Pick your area"
   }
 }

@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2290 src files · ~1166 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
+Stats: ~2335 src files · ~1190 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -295,6 +295,22 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── change-branches-in-navbar-2026-10-14-zrml/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── change-compact-contact-picker-2026-10-14-ugly/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── change-contact-quick-pick-2026-10-13-ajvv/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
@@ -341,6 +357,30 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── change-natural-contact-search-2026-10-15-ozbi/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── change-patient-overview-photos-2026-10-14-ysis/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── change-photo-compare-zoom-2026-10-15-funk/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── change-plan-comparison-2026-10-14-hhus/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
@@ -379,7 +419,27 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── feat-choose-default-clinic-2026-10-15-yizz/
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── feat-clinic-setup-2026-10-13-sltd/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── feat-default-clinic-at-login-2026-10-14-cpjx/
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── feat-write-less-2026-10-14-oixr/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
 │   │   ├── plans/
@@ -397,6 +457,14 @@ clinozy-fe/
 │   │   │   ├── preset.md
 │   │   │   ├── schema-routes.md
 │   │   │   └── shell.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── fix-photo-compare-first-paint-2026-10-15-icne/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md
@@ -617,6 +685,7 @@ clinozy-fe/
 │   │   │   └── [10 test files]
 │   │   ├── routes/
 │   │   │   ├── appointments-builders.ts
+│   │   │   ├── branches-builders.ts
 │   │   │   ├── builders.ts
 │   │   │   ├── index.ts
 │   │   │   ├── invoice-builders.ts
@@ -633,10 +702,12 @@ clinozy-fe/
 │   │   │   ├── stock-builders.ts
 │   │   │   ├── tasks-builders.ts
 │   │   │   ├── users-builders.ts
-│   │   │   └── [16 test files]
+│   │   │   └── [17 test files]
+│   │   ├── amount-expression.ts
 │   │   ├── app-splash.ts
 │   │   ├── app-version.ts
 │   │   ├── appearance-surface.ts
+│   │   ├── apple-platform.ts
 │   │   ├── bidi-isolate.ts
 │   │   ├── brand-wordmark.ts
 │   │   ├── chunk-prefetch.ts
@@ -663,13 +734,14 @@ clinozy-fe/
 │   │   ├── telemetry-scrub.ts
 │   │   ├── utils.ts
 │   │   ├── zod-jitless.ts
-│   │   └── [29 test files]
+│   │   └── [31 test files]
 │   ├── locales/
 │   │   ├── ar/
 │   │   │   ├── app-stock.json
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -692,6 +764,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -714,6 +787,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -736,6 +810,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -758,6 +833,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -780,6 +856,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -802,6 +879,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -824,6 +902,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -846,6 +925,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -868,6 +948,7 @@ clinozy-fe/
 │   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
+│   │   │   ├── branches.json
 │   │   │   ├── common.json
 │   │   │   ├── consent.json
 │   │   │   ├── errors.json
@@ -890,6 +971,7 @@ clinozy-fe/
 │   │       ├── app.json
 │   │       ├── appointments.json
 │   │       ├── auth.json
+│   │       ├── branches.json
 │   │       ├── common.json
 │   │       ├── consent.json
 │   │       ├── errors.json
@@ -1028,6 +1110,33 @@ clinozy-fe/
 │   │       │   │   ├── appointments.search.ts
 │   │       │   │   ├── AppointmentsPage.tsx
 │   │       │   │   └── [6 test files]
+│   │       │   ├── branches/
+│   │       │   │   ├── $branchId/
+│   │       │   │   │   └── edit/
+│   │       │   │   ├── __tests__/
+│   │       │   │   │   └── integration/
+│   │       │   │   ├── components/
+│   │       │   │   │   ├── BranchCells/
+│   │       │   │   │   └── BranchDrawer/
+│   │       │   │   ├── create/
+│   │       │   │   │   ├── create.manifest.ts
+│   │       │   │   │   ├── CREATE.OVERVIEW.md
+│   │       │   │   │   ├── create.route.tsx
+│   │       │   │   │   ├── NewBranchPage.tsx
+│   │       │   │   │   └── [1 test file]
+│   │       │   │   ├── hooks/
+│   │       │   │   │   ├── useBranchesDialogRoute/
+│   │       │   │   │   ├── useBranchesTable/
+│   │       │   │   │   ├── useBranchPlaces/
+│   │       │   │   │   ├── useBranchRows/
+│   │       │   │   │   └── useBranchWrites/
+│   │       │   │   ├── branches.constants.ts
+│   │       │   │   ├── branches.manifest.ts
+│   │       │   │   ├── BRANCHES.OVERVIEW.md
+│   │       │   │   ├── branches.route.tsx
+│   │       │   │   ├── branches.search.ts
+│   │       │   │   ├── BranchesPage.tsx
+│   │       │   │   └── [2 test files]
 │   │       │   ├── components/
 │   │       │   │   └── AppHomeEmpty/
 │   │       │   │       ├── app-home-empty.constants.ts
@@ -1486,17 +1595,6 @@ clinozy-fe/
 │   │       │   │   │   └── edit/
 │   │       │   │   ├── __tests__/
 │   │       │   │   │   └── integration/
-│   │       │   │   ├── branches/
-│   │       │   │   │   ├── $branchId/
-│   │       │   │   │   ├── components/
-│   │       │   │   │   ├── create/
-│   │       │   │   │   ├── hooks/
-│   │       │   │   │   ├── branches.manifest.ts
-│   │       │   │   │   ├── BRANCHES.OVERVIEW.md
-│   │       │   │   │   ├── branches.route.tsx
-│   │       │   │   │   ├── branches.search.ts
-│   │       │   │   │   ├── BranchesPage.tsx
-│   │       │   │   │   └── [2 test files]
 │   │       │   │   ├── components/
 │   │       │   │   │   ├── TeamCells/
 │   │       │   │   │   ├── UserDeleteConfirm/
@@ -1683,9 +1781,10 @@ clinozy-fe/
 │   │   │   ├── step-up-api.ts
 │   │   │   ├── uploads-api.ts
 │   │   │   ├── user-avatar-api.ts
+│   │   │   ├── user-settings-api.ts
 │   │   │   ├── webhook-contracts.ts
 │   │   │   ├── webhooks-api.ts
-│   │   │   └── [19 test files]
+│   │   │   └── [20 test files]
 │   │   ├── app/
 │   │   │   ├── pin-directory/
 │   │   │   │   ├── data/
@@ -1845,10 +1944,6 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── BugReport/
-│   │   │   │   ├── VoiceInputButton/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── VoiceInputButton.tsx
-│   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── bug-report-text.ts
 │   │   │   │   ├── bug-report.constants.ts
 │   │   │   │   ├── bug-report.css
@@ -1965,7 +2060,7 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── use-contact-quick-pick.ts
 │   │   │   │   ├── use-quick-add-contact.ts
-│   │   │   │   └── [2 test files]
+│   │   │   │   └── [3 test files]
 │   │   │   ├── CreateOrganizationDialog/
 │   │   │   │   ├── CreateOrganizationDialog.tsx
 │   │   │   │   ├── index.ts
@@ -2256,6 +2351,11 @@ clinozy-fe/
 │   │   │   │   ├── Picker.tsx
 │   │   │   │   ├── picker.types.ts
 │   │   │   │   └── [4 test files]
+│   │   │   ├── PinAreaChips/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── pin-area-chips.constants.ts
+│   │   │   │   ├── PinAreaChips.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── PrintPreview/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── print-preview.constants.ts
@@ -2327,6 +2427,7 @@ clinozy-fe/
 │   │   │   │   ├── record-drawer-focus.ts
 │   │   │   │   ├── record-drawer-items.ts
 │   │   │   │   ├── record-drawer-pending.tsx
+│   │   │   │   ├── record-drawer-save-shortcut.ts
 │   │   │   │   ├── record-drawer-width.ts
 │   │   │   │   ├── record-drawer.constants.ts
 │   │   │   │   ├── RecordDrawer.tsx
@@ -2437,6 +2538,10 @@ clinozy-fe/
 │   │   │   │   │   │   ├── plan-labels.ts
 │   │   │   │   │   │   ├── plan-tier-look.ts
 │   │   │   │   │   │   └── [8 test files]
+│   │   │   │   │   ├── SignInClinicCard/
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── SignInClinicCard.tsx
+│   │   │   │   │   │   └── [1 test file]
 │   │   │   │   │   ├── AccountBillingPanel.tsx
 │   │   │   │   │   ├── AccountNotificationsPanel.tsx
 │   │   │   │   │   ├── AccountPanel.tsx
@@ -2537,6 +2642,22 @@ clinozy-fe/
 │   │   │   │   ├── upload-tray.constants.ts
 │   │   │   │   ├── UploadTray.tsx
 │   │   │   │   └── [2 test files]
+│   │   │   ├── VoiceField/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── use-voice-field.ts
+│   │   │   │   ├── use-voice-vocabulary.ts
+│   │   │   │   ├── voice-commands.ts
+│   │   │   │   ├── voice-shortcut.ts
+│   │   │   │   ├── VoiceField.tsx
+│   │   │   │   └── [3 test files]
+│   │   │   ├── VoiceInputButton/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── insert-phrase.ts
+│   │   │   │   ├── voice-input.constants.ts
+│   │   │   │   ├── voice-input.css
+│   │   │   │   ├── voice-status.ts
+│   │   │   │   ├── VoiceInputButton.tsx
+│   │   │   │   └── [3 test files]
 │   │   │   ├── WeightStableLabel/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── WeightStableLabel.tsx
@@ -2948,6 +3069,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePayments.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── usePinPlace/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePinPlace.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── usePlan/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePlan.ts
@@ -2971,6 +3096,10 @@ clinozy-fe/
 │   │   │   ├── useRequireOpenBranch/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useRequireOpenBranch.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useRoleDirectory/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useRoleDirectory.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useRoles/
 │   │   │   │   ├── index.ts
@@ -2996,6 +3125,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSavedViews.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useScrollEdges/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useScrollEdges.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useSessions/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSessions.ts
@@ -3003,6 +3136,10 @@ clinozy-fe/
 │   │   │   ├── useSettingsNav/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSettingsNav.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useSignInClinic/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useSignInClinic.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useSpeechRecognition/
 │   │   │   │   ├── index.ts
@@ -3099,7 +3236,7 @@ clinozy-fe/
 │   │   │   │   │   ├── AccountMenu/
 │   │   │   │   │   │   ├── AccountMenu.tsx
 │   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   └── [2 test files]
+│   │   │   │   │   │   └── [3 test files]
 │   │   │   │   │   ├── AllSections/
 │   │   │   │   │   │   ├── AllSections.tsx
 │   │   │   │   │   │   ├── index.ts
@@ -3330,9 +3467,11 @@ clinozy-fe/
 │   │   ├── renderWithProviders.tsx
 │   │   ├── setup.ts
 │   │   ├── shown-location.ts
+│   │   ├── speech-recognition-doubles.ts
 │   │   ├── stock-doubles.ts
 │   │   ├── task-doubles.ts
-│   │   └── task-row-fixture.ts
+│   │   ├── task-row-fixture.ts
+│   │   └── team-doubles.ts
 │   └── README.md
 ├── tooling/
 │   ├── agent-os/

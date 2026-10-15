@@ -3,8 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { queryClient } from '@/core/http/queryClient.ts';
 import type * as MyInvitationsModule from '@/shared/tenancy/my-invitations.ts';
 import type { MyInvitation } from '@/shared/tenancy/my-invitations.ts';
+import { myOrganizationsQueryKey } from '@/shared/tenancy/my-organization-summaries.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { InvitationList } from './InvitationList.tsx';
@@ -50,6 +52,7 @@ const INVITATION: MyInvitation = {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  queryClient.clear();
 });
 
 describe('InvitationList (D84)', () => {
@@ -87,6 +90,38 @@ describe('InvitationList (D84)', () => {
     );
     expect(acceptMock).toHaveBeenCalledExactlyOnceWith(INVITATION.id);
     expect(notifyMock.warning).not.toHaveBeenCalled();
+  });
+
+  it('keeps someone who already had a clinic here, to choose which opens at sign-in', async () => {
+    // The cached list the picker shows: they belong to a clinic already.
+    queryClient.setQueryData(myOrganizationsQueryKey, [
+      {
+        id: `org_${'a'.repeat(21)}`,
+        name: 'Ojas Dermatology & Aesthetics',
+        slug: 'ojas',
+        type: 'TEAM',
+        status: 'ACTIVE',
+        logoUrl: null,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      },
+    ]);
+    acceptMock.mockResolvedValue({
+      organizationId: INVITATION.organization.id,
+      slug: 'skin-studio',
+      switchError: null,
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<InvitationList invitations={[INVITATION]} />);
+
+    await user.click(
+      await screen.findByTestId(`organization-picker-invitation-accept-${INVITATION.id}`),
+    );
+
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith('You joined Skin Studio Adajan.'),
+    );
+    expect(navigateMock).not.toHaveBeenCalled();
   });
 
   it('says so when the join worked but this tab could not move in, and still hands off', async () => {

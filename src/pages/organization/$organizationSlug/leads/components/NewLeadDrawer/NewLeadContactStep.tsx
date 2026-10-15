@@ -51,10 +51,13 @@ function useHitLine() {
   };
 }
 
-/** A hit's action: "Open lead" while they have one, "Re-create lead" for a patient, else "Use contact". */
-function hitActionKey(hit: ContactSummary): string {
+/**
+ * A hit's action: "Open lead" while they have one, "Re-create lead" for a patient; none for anyone
+ * else — picking them only takes them (change-natural-contact-search D8).
+ */
+function hitActionKey(hit: ContactSummary): string | undefined {
   if (hit.openLeadId) return K.hits.open;
-  return hit.patientId ? K.hits.recreate : K.hits.useContact;
+  return hit.patientId ? K.hits.recreate : undefined;
 }
 
 /** The Quick start chips (H:6159): each sets the lead's source, never the steps. */
@@ -99,10 +102,10 @@ function QuickStart({
 /**
  * New lead's Contact step (H:1890–1895) on the shared contact picker
  * (change-contact-quick-pick): the 44px search — Recent before typing, then from 3 letters or
- * 4 digits, eight people at most, the typed words marked, ↑ ↓ ↵ — the Quick start chips, the
- * hits ("Open lead" for someone with one, "Re-create lead" for a patient, "Use contact" for
- * anyone else) and the add row, whose quick add takes a name and a 10-digit mobile ("More
- * details" opens the contact editor).
+ * 4 digits, eight people at most, every typed word marked, ↑ ↓ ↵ — the Quick start chips, the
+ * hits ("Open lead" for someone with one, "Re-create lead" for a patient, no words for anyone
+ * else) and the add row, whose quick add takes a name, a 10-digit mobile and a typed handle
+ * ("More details" opens the contact editor with them — change-natural-contact-search).
  */
 export function NewLeadContactStep({
   searchRef,
@@ -120,11 +123,14 @@ export function NewLeadContactStep({
       inputRef={searchRef}
       searchPlaceholder={t(K.search)}
       searchLabel={t(K.searchAria)}
-      describe={(hit) => ({
-        line: hitLine(hit),
-        action: t(hitActionKey(hit)),
-        tone: hit.patientId ? 'sage' : 'lav',
-      })}
+      describe={(hit) => {
+        const actionKey = hitActionKey(hit);
+        return {
+          line: hitLine(hit),
+          action: actionKey ? t(actionKey) : undefined,
+          tone: hit.patientId ? 'sage' : 'lav',
+        };
+      }}
       onPick={(hit) => {
         if (hit.openLeadId) onOpenLead(hit.openLeadId);
         else onPick(hit);

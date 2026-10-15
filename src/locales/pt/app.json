@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Usuários",
-      "description": "Equipe, funções e acesso, unidades"
+      "description": "Equipe, funções e acesso"
+    },
+    "branches": {
+      "label": "Unidades",
+      "description": "Cada unidade: endereço, horário, equipe, salas e equipamentos"
     }
   },
   "tones": {
@@ -927,10 +931,6 @@
     "found_many": "{{count}} pessoas encontradas",
     "found_other": "{{count}} pessoas encontradas",
     "noMatch": "Nenhuma correspondência",
-    "use": "Usar contato",
-    "addNamed": "Adicionar “{{name}}” como novo contato",
-    "addPhone": "Adicionar {{phone}} como novo contato",
-    "addNamedPhone": "Adicionar “{{name}}” · {{phone}} como novo contato",
     "enterKey": "↵",
     "clearSearch": "Limpar busca",
     "added": "{{name}} adicionado aos contatos",
@@ -948,11 +948,7 @@
     },
     "patient": {
       "newPatient": "Novo paciente",
-      "addNamed": "Adicionar “{{name}}” como novo paciente",
-      "addPhone": "Adicionar {{phone}} como novo paciente",
-      "addNamedPhone": "Adicionar “{{name}}” · {{phone}} como novo paciente",
       "add": "Adicionar paciente",
-      "use": "Usar paciente",
       "added": "{{name}} adicionado como paciente",
       "existing": "{{name}} já é paciente · selecionado"
     }
@@ -1457,15 +1453,6 @@
       "signedAs": "Enviado como {{name}}, com esta página e a versão do app.",
       "close": "Fechar"
     },
-    "voice": {
-      "start": "Ditar com a sua voz",
-      "stop": "Parar de ditar",
-      "listening": "Ouvindo…",
-      "hearing": "Estou ouvindo…",
-      "denied": "O microfone está bloqueado. Permita-o no navegador para ditar.",
-      "noSpeech": "Não entendi — toque no microfone e tente de novo.",
-      "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar."
-    },
     "send": {
       "idle": "Enviar",
       "sending": "Enviando…",
@@ -1564,5 +1551,37 @@
       "whenFree": "Seu plano {{name}} continua até {{date}}. Depois disso, o espaço de trabalho fica no Free.",
       "seatWarning": "Há {{used}} assentos ocupados, contando os convites pendentes, e o {{name}} inclui {{seats}}. Até {{excess}} dos membros que entraram mais recentemente, nunca os proprietários, serão suspensos até que assentos fiquem livres."
     }
+  },
+  "voice": {
+    "start": "Ditar com a sua voz",
+    "stop": "Parar de ditar",
+    "listening": "Ouvindo…",
+    "hearing": "Estou ouvindo…",
+    "denied": "O microfone está bloqueado. Permita-o no navegador para ditar.",
+    "noSpeech": "Não entendi — toque no microfone e tente de novo.",
+    "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar.",
+    "say": {
+      "period": "ponto|ponto final",
+      "comma": "vírgula",
+      "question": "ponto de interrogação",
+      "exclamation": "ponto de exclamação",
+      "colon": "dois pontos",
+      "newLine": "nova linha",
+      "newParagraph": "novo parágrafo",
+      "scratch": "apague isso|apagar isso"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Diga “ponto”, “vírgula”, “nova linha” ou “apague isso”"
+  },
+  "pinPlace": {
+    "hint": "Preenche o bairro, a cidade e o estado",
+    "unknown": "Não conhecemos este CEP — digite o bairro, a cidade e o estado.",
+    "areaPick": "Escolha seu bairro"
   }
 }

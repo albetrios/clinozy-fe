@@ -7,7 +7,7 @@ import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
  */
 export const BUG_REPORT_NS = I18N_NAMESPACES.app;
 
-/** The trigger, the panel, the voice button and the send states. */
+/** The trigger, the panel and the send states (the voice button's words: `VOICE_INPUT_KEYS`). */
 export const BUG_REPORT_KEYS = {
   trigger: 'bugReport.trigger',
   title: 'bugReport.panel.title',
@@ -16,13 +16,6 @@ export const BUG_REPORT_KEYS = {
   placeholder: 'bugReport.panel.placeholder',
   signedAs: 'bugReport.panel.signedAs',
   close: 'bugReport.panel.close',
-  voiceStart: 'bugReport.voice.start',
-  voiceStop: 'bugReport.voice.stop',
-  voiceListening: 'bugReport.voice.listening',
-  voiceHearing: 'bugReport.voice.hearing',
-  voiceDenied: 'bugReport.voice.denied',
-  voiceNoSpeech: 'bugReport.voice.noSpeech',
-  voiceUnavailable: 'bugReport.voice.unavailable',
   send: 'bugReport.send.idle',
   sending: 'bugReport.send.sending',
   sent: 'bugReport.send.sent',
@@ -45,6 +38,3 @@ export const BUG_REPORT_TEST_IDS = {
 
 /** How long the drawn check shows before the panel folds itself away. */
 export const BUG_REPORT_SENT_HOLD_MS = 1600;
-
-/** Bars in the voice-activity meter. */
-export const BUG_REPORT_VOICE_BAR_COUNT = 5;

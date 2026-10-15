@@ -148,6 +148,18 @@ describe('RoomToolbar — desktop and tablet', () => {
     expect(row.querySelector('span[aria-hidden="true"].flex-1')).not.toBeNull();
   });
 
+  it('draws the divider after the h1 only before views — none for a room without tabs', async () => {
+    const { unmount } = renderToolbar();
+    expect(
+      (await screen.findByRole('heading', { level: 1, name: 'Patients' })).className,
+    ).toContain('border-e');
+    unmount();
+    renderToolbar({ tabs: undefined });
+    expect(
+      (await screen.findByRole('heading', { level: 1, name: 'Patients' })).className,
+    ).not.toContain('border-e');
+  });
+
   it('puts a period right after the tabs, which then keep their width', async () => {
     renderToolbar({ period: <button type="button">Today</button> });
     const row = await screen.findByTestId('patients-toolbar');

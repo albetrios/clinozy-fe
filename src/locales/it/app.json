@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Utenti",
-      "description": "Team, ruoli e accessi, sedi"
+      "description": "Team, ruoli e accessi"
+    },
+    "branches": {
+      "label": "Sedi",
+      "description": "Ogni sede: indirizzo, orari, team, sale e macchinari"
     }
   },
   "tones": {
@@ -927,10 +931,6 @@
     "found_many": "{{count}} persone trovate",
     "found_other": "{{count}} persone trovate",
     "noMatch": "Nessuna corrispondenza",
-    "use": "Usa contatto",
-    "addNamed": "Aggiungi «{{name}}» come nuovo contatto",
-    "addPhone": "Aggiungi {{phone}} come nuovo contatto",
-    "addNamedPhone": "Aggiungi «{{name}}» · {{phone}} come nuovo contatto",
     "enterKey": "↵",
     "clearSearch": "Cancella ricerca",
     "added": "{{name}} aggiunto ai contatti",
@@ -948,11 +948,7 @@
     },
     "patient": {
       "newPatient": "Nuovo paziente",
-      "addNamed": "Aggiungi «{{name}}» come nuovo paziente",
-      "addPhone": "Aggiungi {{phone}} come nuovo paziente",
-      "addNamedPhone": "Aggiungi «{{name}}» · {{phone}} come nuovo paziente",
       "add": "Aggiungi paziente",
-      "use": "Usa paziente",
       "added": "{{name}} aggiunto come paziente",
       "existing": "{{name}} è già un paziente · selezionato"
     }
@@ -1457,15 +1453,6 @@
       "signedAs": "Inviato come {{name}}, con questa pagina e la versione dell'app.",
       "close": "Chiudi"
     },
-    "voice": {
-      "start": "Detta con la voce",
-      "stop": "Interrompi la dettatura",
-      "listening": "In ascolto…",
-      "hearing": "Ti sento…",
-      "denied": "Il microfono è bloccato. Consentilo nel browser per dettare.",
-      "noSpeech": "Non ho capito: tocca il microfono e riprova.",
-      "unavailable": "L'input vocale non è disponibile ora. Puoi comunque scrivere."
-    },
     "send": {
       "idle": "Invia",
       "sending": "Invio…",
@@ -1564,5 +1551,37 @@
       "whenFree": "Il piano {{name}} resta attivo fino al {{date}}. Poi lo spazio di lavoro passa a Free.",
       "seatWarning": "Sono occupate {{used}} postazioni, inviti in attesa compresi, e {{name}} ne include {{seats}}. Fino a {{excess}} dei membri entrati più di recente, mai i proprietari, saranno sospesi finché non si liberano postazioni."
     }
+  },
+  "voice": {
+    "start": "Detta con la voce",
+    "stop": "Interrompi la dettatura",
+    "listening": "In ascolto…",
+    "hearing": "Ti sento…",
+    "denied": "Il microfono è bloccato. Consentilo nel browser per dettare.",
+    "noSpeech": "Non ho capito: tocca il microfono e riprova.",
+    "unavailable": "L'input vocale non è disponibile ora. Puoi comunque scrivere.",
+    "say": {
+      "period": "punto",
+      "comma": "virgola",
+      "question": "punto interrogativo",
+      "exclamation": "punto esclamativo",
+      "colon": "due punti",
+      "newLine": "a capo|nuova riga",
+      "newParagraph": "nuovo paragrafo",
+      "scratch": "cancella questo|cancella quello"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Di’ «punto», «virgola», «a capo» o «cancella questo»"
+  },
+  "pinPlace": {
+    "hint": "Compila zona, città e stato",
+    "unknown": "Non conosciamo questo CAP — inserisci zona, città e stato.",
+    "areaPick": "Scegli la tua zona"
   }
 }

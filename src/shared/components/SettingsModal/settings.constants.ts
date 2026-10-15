@@ -388,6 +388,8 @@ export const SETTINGS_KEYS = {
       description: 'panels.account.description',
       infoTitle: 'panels.account.infoTitle',
       infoDescription: 'panels.account.infoDescription',
+      signInClinicTitle: 'panels.account.signInClinicTitle',
+      signInClinicDescription: 'panels.account.signInClinicDescription',
       accountIdLabel: 'panels.account.accountIdLabel',
       emailLabel: 'panels.account.emailLabel',
       roleLabel: 'panels.account.roleLabel',

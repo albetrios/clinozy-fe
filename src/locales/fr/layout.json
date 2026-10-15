@@ -23,7 +23,16 @@
       "addOrganization": "Ajouter une organisation",
       "invited": "Invitations",
       "invitedRow": "Invité · {{roles}}",
-      "invitationCount": "Invitations : {{count}}"
+      "invitationCount": "Invitations : {{count}}",
+      "defaultBadge": "Par défaut"
+    },
+    "signInClinic": {
+      "menuLabel": "S'ouvre à la connexion",
+      "lastUsed": "Dernière utilisée",
+      "automatic": "La dernière clinique utilisée",
+      "automaticHint": "Suit vos passages d'une clinique à l'autre",
+      "savedClinic": "La connexion ouvrira {{name}}",
+      "savedAutomatic": "La connexion ouvrira la dernière clinique utilisée"
     },
     "notifications": {
       "title": "Notifications",
@@ -69,7 +78,9 @@
       "jumpToSection": "Aller à une section",
       "listSearch": "Rechercher dans la liste",
       "leadRows": "Prospect suivant ou précédent (dans Prospects)",
-      "closeDialog": "Fermer la boîte de dialogue"
+      "closeDialog": "Fermer la boîte de dialogue",
+      "saveForm": "Enregistrer le formulaire ouvert",
+      "dictate": "Dicter dans le champ en cours"
     },
     "emailVerify": {
       "message": "Vérifiez votre e-mail pour sécuriser votre compte.",

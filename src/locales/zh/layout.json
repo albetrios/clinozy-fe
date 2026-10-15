@@ -23,7 +23,16 @@
       "addOrganization": "添加组织",
       "invited": "邀请",
       "invitedRow": "已邀请 · {{roles}}",
-      "invitationCount": "邀请：{{count}}"
+      "invitationCount": "邀请：{{count}}",
+      "defaultBadge": "默认"
+    },
+    "signInClinic": {
+      "menuLabel": "登录时打开",
+      "lastUsed": "上次使用",
+      "automatic": "我上次使用的诊所",
+      "automaticHint": "随你在诊所之间切换而变化",
+      "savedClinic": "登录时将打开{{name}}",
+      "savedAutomatic": "登录时将打开你上次使用的诊所"
     },
     "notifications": {
       "title": "通知",
@@ -85,7 +94,9 @@
       "jumpToSection": "跳转到版块",
       "listSearch": "搜索列表",
       "leadRows": "下一个或上一个潜在客户（在潜在客户中）",
-      "closeDialog": "关闭对话框"
+      "closeDialog": "关闭对话框",
+      "saveForm": "保存当前打开的表单",
+      "dictate": "在当前输入框中语音输入"
     },
     "orgCreate": {
       "namePlaceholder": "Acme Inc.",

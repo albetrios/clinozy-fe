@@ -50,15 +50,94 @@ function Stepped({ onChange = vi.fn() }: { onChange?: (value: number) => void })
   );
 }
 
+/** A money field with its form value shown, as a drawer reads it on save. */
+function MoneyWithValue({ max }: { max?: number }) {
+  const [value, setValue] = useState('');
+  return (
+    <>
+      <label htmlFor="amount">Amount</label>
+      <DrawerNumberInput
+        id="amount"
+        data-testid="amount"
+        value={value}
+        onValueChange={setValue}
+        prefix="₹"
+        max={max}
+        maxLength={7}
+      />
+      <output data-testid="amount-value">{value}</output>
+    </>
+  );
+}
+
+describe('DrawerNumberInput — sums (feat-write-less)', () => {
+  it('shows the result while the sum is open and writes it in on leaving', async () => {
+    const user = userEvent.setup();
+    render(<MoneyWithValue />);
+    const input = screen.getByLabelText('Amount');
+    await user.type(input, '1500+300');
+    expect(input).toHaveValue('1500+300');
+    expect(screen.getByTestId('amount-sum')).toHaveTextContent('= 1,800');
+    expect(screen.getByTestId('amount-value')).toHaveTextContent('1800');
+
+    await user.tab();
+    expect(input).toHaveValue('1800');
+    expect(screen.queryByTestId('amount-sum')).toBeNull();
+  });
+
+  it('reads 1.5k, 2L and 3x500, and Enter writes the result in', async () => {
+    const user = userEvent.setup();
+    render(<MoneyWithValue />);
+    const input = screen.getByLabelText('Amount');
+    await user.type(input, '1.5k');
+    expect(screen.getByTestId('amount-value')).toHaveTextContent('1500');
+    await user.clear(input);
+    await user.type(input, '2L');
+    expect(screen.getByTestId('amount-value')).toHaveTextContent('200000');
+    await user.clear(input);
+    await user.type(input, '3x500{Enter}');
+    expect(input).toHaveValue('1500');
+  });
+
+  it('takes no result from a sum that does not work out', async () => {
+    const user = userEvent.setup();
+    render(<MoneyWithValue />);
+    const input = screen.getByLabelText('Amount');
+    await user.type(input, '12+');
+    expect(screen.queryByTestId('amount-sum')).toBeNull();
+    expect(screen.getByTestId('amount-value')).toHaveTextContent('12');
+    await user.type(input, '{Backspace}{Backspace}{Backspace}100-300');
+    expect(screen.queryByTestId('amount-sum')).toBeNull();
+    await user.tab();
+    expect(input).toHaveValue('100');
+  });
+
+  it('caps a sum at the field’s maximum', async () => {
+    const user = userEvent.setup();
+    render(<MoneyWithValue max={1000} />);
+    await user.type(screen.getByLabelText('Amount'), '800+800');
+    expect(screen.getByTestId('amount-sum')).toHaveTextContent('= 1,000');
+    expect(screen.getByTestId('amount-value')).toHaveTextContent('1000');
+  });
+});
+
 describe('DrawerNumberInput (H:1592)', () => {
   it('takes digits and one point, behind its prefix tile', async () => {
     const user = userEvent.setup();
     const { container } = render(<Money />);
     const input = screen.getByLabelText('Price');
     expect(screen.getByText('₹')).toBeInTheDocument();
-    await user.type(input, '1a5.0.0x');
+    await user.type(input, '1a5.0.0');
     expect(input).toHaveValue('15.00');
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('keeps a plain figure within its length', async () => {
+    const user = userEvent.setup();
+    render(<Money />);
+    const input = screen.getByLabelText('Price');
+    await user.type(input, '123456789');
+    expect(input).toHaveValue('1234567');
   });
 
   it('caps a figure above its maximum', async () => {
@@ -96,6 +175,25 @@ describe('DrawerStepper (H:1593)', () => {
     expect(screen.getByRole('button', { name: 'Decrease' })).toBeDisabled();
     expect(onChange).toHaveBeenLastCalledWith(0);
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('answers ↑ ↓ by one and Page Up / Page Down by ten, within its bounds (feat-write-less)', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Stepped onChange={onChange} />);
+    const box = screen.getByRole('textbox', { name: 'Sessions' });
+    await user.click(box);
+    await user.keyboard('{ArrowUp}{ArrowUp}');
+    expect(box).toHaveValue('3');
+    await user.keyboard('{ArrowDown}');
+    expect(box).toHaveValue('2');
+    await user.keyboard('{PageUp}');
+    expect(box).toHaveValue('12');
+    await user.keyboard('{PageDown}{PageDown}');
+    expect(box).toHaveValue('0');
+    for (let press = 0; press < 11; press += 1) await user.keyboard('{PageUp}');
+    expect(box).toHaveValue('99');
+    expect(onChange).toHaveBeenLastCalledWith(99);
   });
 
   it('names its buttons for the field when "Decrease" alone is too vague', () => {

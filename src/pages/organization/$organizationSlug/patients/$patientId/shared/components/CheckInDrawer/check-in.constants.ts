@@ -27,8 +27,12 @@ export const CHECK_IN_KEYS = {
   details: 'checkIn.details',
   detailsLast: 'checkIn.detailsLast',
   detailsPlaceholder: 'checkIn.detailsPlaceholder',
+  /** The chip under Details that writes last time's plan (feat-write-less). */
+  useAdvised: 'checkIn.useAdvised',
   plan: 'checkIn.plan',
   planPlaceholder: 'checkIn.planPlaceholder',
+  /** The chip under Next plan that writes last time's plan again (feat-write-less). */
+  samePlan: 'checkIn.samePlan',
   offerings: 'checkIn.offerings',
   offeringsHint: 'checkIn.offeringsHint',
   offeringsPlaceholder: 'checkIn.offeringsPlaceholder',

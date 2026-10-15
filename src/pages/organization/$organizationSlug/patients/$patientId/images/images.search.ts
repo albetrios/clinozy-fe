@@ -21,6 +21,13 @@ export interface PatientImagesSearch {
   album?: Exclude<PhotoAlbum, 'general'>;
   /** The visit filter: a visit's id (`appt_…`), or "none" — every photo of the album when absent. */
   appointment?: string;
+  /**
+   * The comparison open over the section: photo ids (`pimg_…`), comma-joined. Typed
+   * here and not parsed: this module rides the entry chunk, and the router passes an
+   * unvalidated param through (`search.strict` is off), so the page reads it with
+   * `compareIdsOf` (`shared/photo-compare.ts`), which takes any value.
+   */
+  compare?: string;
 }
 
 /** Parse the Photos section's params; General and an unknown value are dropped. */

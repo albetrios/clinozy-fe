@@ -35,4 +35,10 @@ describe('the Photos section’s search params', () => {
         .appointment,
     ).toBeUndefined();
   });
+
+  it('leaves a comparison to the page — the router passes it through (this module rides the entry chunk)', () => {
+    expect(validatePatientImagesSearch({ compare: 'pimg_a,pimg_b' })).not.toHaveProperty(
+      'compare',
+    );
+  });
 });

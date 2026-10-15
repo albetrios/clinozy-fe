@@ -12,14 +12,6 @@ export const CONTACT_QUICK_PICK_KEYS = {
   /** Plural: "3 people found". */
   found: 'contactPick.found',
   noMatch: 'contactPick.noMatch',
-  /** "Use contact" — a person row's action where picking only takes them. */
-  use: 'contactPick.use',
-  /** "Add “<name>” as a new contact". */
-  addNamed: 'contactPick.addNamed',
-  /** "Add <phone> as a new contact". */
-  addPhone: 'contactPick.addPhone',
-  /** "Add “<name>” · <phone> as a new contact". */
-  addNamedPhone: 'contactPick.addNamedPhone',
   enterKey: 'contactPick.enterKey',
   clearSearch: 'contactPick.clearSearch',
   /** "<name> added to contacts" — a quick add that made the contact. */
@@ -40,11 +32,7 @@ export const CONTACT_QUICK_PICK_KEYS = {
   /** A patients-only picker's words (Receive payment, the Invoice drawer — D23). */
   patient: {
     newPatient: 'contactPick.patient.newPatient',
-    addNamed: 'contactPick.patient.addNamed',
-    addPhone: 'contactPick.patient.addPhone',
-    addNamedPhone: 'contactPick.patient.addNamedPhone',
     add: 'contactPick.patient.add',
-    use: 'contactPick.patient.use',
     added: 'contactPick.patient.added',
     existing: 'contactPick.patient.existing',
   },
@@ -55,16 +43,10 @@ export const CONTACT_QUICK_PICK_ADD_KEYS = {
   everyone: {
     /** The add row on an empty search, and the quick add's title. */
     newPerson: CONTACT_EDITOR_KEYS.newContact,
-    addNamed: CONTACT_QUICK_PICK_KEYS.addNamed,
-    addPhone: CONTACT_QUICK_PICK_KEYS.addPhone,
-    addNamedPhone: CONTACT_QUICK_PICK_KEYS.addNamedPhone,
     submit: CONTACT_QUICK_PICK_KEYS.quickAdd.add,
   },
   patients: {
     newPerson: CONTACT_QUICK_PICK_KEYS.patient.newPatient,
-    addNamed: CONTACT_QUICK_PICK_KEYS.patient.addNamed,
-    addPhone: CONTACT_QUICK_PICK_KEYS.patient.addPhone,
-    addNamedPhone: CONTACT_QUICK_PICK_KEYS.patient.addNamedPhone,
     submit: CONTACT_QUICK_PICK_KEYS.patient.add,
   },
 } as const;
@@ -85,6 +67,9 @@ export const CONTACT_QUICK_PICK_TEST_IDS = {
   quickAdd: (root: string) => `${root}-quick-add`,
   quickAddName: (root: string) => `${root}-quick-add-name`,
   quickAddMobile: (root: string) => `${root}-quick-add-mobile`,
+  quickAddInstagram: (root: string) => `${root}-quick-add-instagram`,
+  /** One value on the add row (`name`, `phone`, `instagram`), from the add row's own id. */
+  addValue: (addRow: string, kind: string) => `${addRow}-${kind}`,
   quickAddSubmit: (root: string) => `${root}-quick-add-submit`,
   quickAddMore: (root: string) => `${root}-quick-add-more`,
   quickAddBack: (root: string) => `${root}-quick-add-back`,

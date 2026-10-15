@@ -163,6 +163,12 @@ export function CheckInFollowedFields({
             placeholder={
               advised ? t(K.detailsLast, { text: advised }) : t(K.detailsPlaceholder)
             }
+            // Last time's plan in one tap, not retyped (feat-write-less, D12).
+            suggestions={
+              advised
+                ? [{ id: 'advised', label: t(K.useAdvised), text: advised }]
+                : undefined
+            }
             data-testid={`${CHECK_IN_TEST_ID}-details`}
             {...form.register('followedNote')}
           />
@@ -181,9 +187,10 @@ export function CheckInFollowedFields({
 export function CheckInNextFields({
   form,
   values,
+  previous,
   options,
   editing,
-}: Omit<CheckInStepFieldsProps, 'previous'> & {
+}: CheckInStepFieldsProps & {
   options: readonly PickerOption<CheckInOffering>[];
   /** A saved check-in: its offerings show, not pick. */
   editing: boolean;
@@ -192,6 +199,7 @@ export function CheckInNextFields({
   const field = useDrawerFieldIds(form, useId());
   const plan = field('nextPlan');
   const offerings = field('nextOfferingIds');
+  const lastPlan = previous?.nextPlan?.trim();
   return (
     <DrawerStepBody readOnly={false}>
       <DrawerFieldGrid>
@@ -201,6 +209,12 @@ export function CheckInNextFields({
             rows={3}
             maxLength={FEEDBACK_LIMITS.nextPlan}
             placeholder={t(K.planPlaceholder)}
+            // Carrying the plan on is common: one tap, not retyped (feat-write-less, D12).
+            suggestions={
+              lastPlan
+                ? [{ id: 'same', label: t(K.samePlan), text: lastPlan }]
+                : undefined
+            }
             data-testid={`${CHECK_IN_TEST_ID}-plan`}
             {...form.register('nextPlan')}
           />

@@ -16,6 +16,7 @@ import { PICKED_HALO } from '@/shared/app/app-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { RadioGroup } from '@/shared/components/ui/radio-group.tsx';
 import { Textarea } from '@/shared/components/ui/textarea.tsx';
+import { useVoiceField, VoiceField } from '@/shared/components/VoiceField/index.ts';
 import { mapValidationErrors } from '@/shared/errors/map-validation-errors.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -289,6 +290,12 @@ function ReasonFields({ draft, ids }: { draft: ReasonDraft; ids: ReasonIds }) {
   const { errors } = draft;
   const noteRequired = draft.picked !== '' && needsNote(draft.picked);
   const noteRef = useRef<HTMLTextAreaElement>(null);
+  // The note takes speech like every note field (the common voice field, feat-write-less D18).
+  const voice = useVoiceField({
+    multiline: true,
+    blocked: draft.busy,
+    testId: CONFIRM_TEST_IDS.note,
+  });
 
   // The server turned the note down: take the user straight to it.
   useEffect(() => {
@@ -334,27 +341,33 @@ function ReasonFields({ draft, ids }: { draft: ReasonDraft; ids: ReasonIds }) {
         testId={CONFIRM_TEST_IDS.reasonError}
         message={errors.reason}
       />
-      <Textarea
-        ref={noteRef}
-        rows={2}
-        maxLength={NOTE_MAX_LENGTH}
-        value={draft.typed}
-        onChange={(event) => draft.type(event.target.value)}
-        readOnly={draft.busy}
-        aria-label={t(REASON_CONFIRM_KEYS.note)}
-        aria-required={noteRequired || undefined}
-        aria-invalid={errors.note ? true : undefined}
-        aria-describedby={errors.note ? ids.noteError : undefined}
-        placeholder={t(
-          noteRequired
-            ? REASON_CONFIRM_KEYS.noteRequired
-            : REASON_CONFIRM_KEYS.notePlaceholder,
-        )}
-        data-testid={CONFIRM_TEST_IDS.note}
-        // A drag that starts in the note selects text; it never pulls the sheet.
-        data-vaul-no-drag=""
-        className="md:text-body field-sizing-fixed min-h-0 resize-y rounded-lg px-2.5 py-2"
-      />
+      <VoiceField voice={voice}>
+        <Textarea
+          {...voice.fieldProps}
+          ref={noteRef}
+          rows={2}
+          maxLength={NOTE_MAX_LENGTH}
+          value={draft.typed}
+          onChange={(event) => draft.type(event.target.value)}
+          readOnly={draft.busy}
+          aria-label={t(REASON_CONFIRM_KEYS.note)}
+          aria-required={noteRequired || undefined}
+          aria-invalid={errors.note ? true : undefined}
+          aria-describedby={errors.note ? ids.noteError : undefined}
+          placeholder={t(
+            noteRequired
+              ? REASON_CONFIRM_KEYS.noteRequired
+              : REASON_CONFIRM_KEYS.notePlaceholder,
+          )}
+          data-testid={CONFIRM_TEST_IDS.note}
+          // A drag that starts in the note selects text; it never pulls the sheet.
+          data-vaul-no-drag=""
+          className={cn(
+            'md:text-body field-sizing-fixed min-h-0 resize-y rounded-lg px-2.5 py-2',
+            voice.paddingClass,
+          )}
+        />
+      </VoiceField>
       <FieldError
         id={ids.noteError}
         testId={CONFIRM_TEST_IDS.noteError}

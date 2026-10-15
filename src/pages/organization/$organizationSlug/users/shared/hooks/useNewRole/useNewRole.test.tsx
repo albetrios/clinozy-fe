@@ -7,14 +7,14 @@ import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
 import {
   member,
   PLATFORM_ROLES,
   platformRole,
   SELF,
-  USERS_ADMIN_CODES,
-} from '../../../__tests__/integration/users-test-router.tsx';
+} from '@/tests/utils/team-doubles.ts';
+
+import { USERS_ADMIN_CODES } from '../../../__tests__/integration/users-test-router.tsx';
 import { useNewRole } from './useNewRole.ts';
 
 const { notifyMock } = vi.hoisted(() => ({

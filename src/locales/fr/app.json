@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Utilisateurs",
-      "description": "Équipe, rôles et accès, établissements"
+      "description": "Équipe, rôles et accès"
+    },
+    "branches": {
+      "label": "Établissements",
+      "description": "Chaque établissement : adresse, horaires, équipe, salles et appareils"
     }
   },
   "tones": {
@@ -927,10 +931,6 @@
     "found_many": "{{count}} personnes trouvées",
     "found_other": "{{count}} personnes trouvées",
     "noMatch": "Aucune correspondance",
-    "use": "Utiliser le contact",
-    "addNamed": "Ajouter « {{name}} » comme nouveau contact",
-    "addPhone": "Ajouter le {{phone}} comme nouveau contact",
-    "addNamedPhone": "Ajouter « {{name}} » · {{phone}} comme nouveau contact",
     "enterKey": "↵",
     "clearSearch": "Effacer la recherche",
     "added": "{{name}} ajouté aux contacts",
@@ -948,11 +948,7 @@
     },
     "patient": {
       "newPatient": "Nouveau patient",
-      "addNamed": "Ajouter « {{name}} » comme nouveau patient",
-      "addPhone": "Ajouter {{phone}} comme nouveau patient",
-      "addNamedPhone": "Ajouter « {{name}} » · {{phone}} comme nouveau patient",
       "add": "Ajouter le patient",
-      "use": "Choisir le patient",
       "added": "{{name}} ajouté comme patient",
       "existing": "{{name}} est déjà patient · sélectionné"
     }
@@ -1457,15 +1453,6 @@
       "signedAs": "Envoyé en tant que {{name}}, avec cette page et la version de l'app.",
       "close": "Fermer"
     },
-    "voice": {
-      "start": "Dicter avec votre voix",
-      "stop": "Arrêter la dictée",
-      "listening": "Écoute…",
-      "hearing": "Je vous entends…",
-      "denied": "Le micro est bloqué. Autorisez-le dans le navigateur pour dicter.",
-      "noSpeech": "Je n'ai pas compris — touchez le micro et réessayez.",
-      "unavailable": "La saisie vocale n'est pas disponible pour le moment. Vous pouvez écrire."
-    },
     "send": {
       "idle": "Envoyer",
       "sending": "Envoi…",
@@ -1564,5 +1551,37 @@
       "whenFree": "Votre offre {{name}} reste active jusqu’au {{date}}. Ensuite, l’espace de travail passe à Free.",
       "seatWarning": "{{used}} sièges sont occupés, invitations en attente comprises, et {{name}} en comprend {{seats}}. Jusqu’à {{excess}} des membres arrivés le plus récemment, jamais les propriétaires, seront suspendus jusqu’à ce que des sièges se libèrent."
     }
+  },
+  "voice": {
+    "start": "Dicter avec votre voix",
+    "stop": "Arrêter la dictée",
+    "listening": "Écoute…",
+    "hearing": "Je vous entends…",
+    "denied": "Le micro est bloqué. Autorisez-le dans le navigateur pour dicter.",
+    "noSpeech": "Je n'ai pas compris — touchez le micro et réessayez.",
+    "unavailable": "La saisie vocale n'est pas disponible pour le moment. Vous pouvez écrire.",
+    "say": {
+      "period": "point|point final",
+      "comma": "virgule",
+      "question": "point d'interrogation|point d’interrogation",
+      "exclamation": "point d'exclamation|point d’exclamation",
+      "colon": "deux-points|deux points",
+      "newLine": "à la ligne|nouvelle ligne",
+      "newParagraph": "nouveau paragraphe",
+      "scratch": "efface ça|annule ça"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Dites « point », « virgule », « à la ligne » ou « efface ça »"
+  },
+  "pinPlace": {
+    "hint": "Remplit le quartier, la ville et l’État",
+    "unknown": "Code postal inconnu — saisissez le quartier, la ville et l’État.",
+    "areaPick": "Choisissez votre quartier"
   }
 }

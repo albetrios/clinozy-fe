@@ -64,7 +64,7 @@ const CREATE_ROUTES = [
   },
   { path: 'stock/items/check', page: 'stock-items-page', drawer: 'stock-check-drawer' },
   { path: 'offerings/offers/create', page: 'offers-page', drawer: 'offer-drawer' },
-  { path: 'users/branches/create', page: 'users-branches-page', drawer: 'branch-drawer' },
+  { path: 'branches/create', page: 'branches-page', drawer: 'branch-drawer' },
 ] as const;
 
 /**
