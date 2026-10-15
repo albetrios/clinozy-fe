@@ -4,9 +4,6 @@ import {
   organizationUserCreate,
   organizationUserEdit,
   organizationUsers,
-  organizationUsersBranchCreate,
-  organizationUsersBranchEdit,
-  organizationUsersBranches,
   organizationUsersRoles,
 } from './users-builders.ts';
 
@@ -28,22 +25,10 @@ describe('the Users room builders', () => {
     });
   });
 
-  it('build Roles & access, Branches and the branch drawers (S:107–110)', () => {
+  it('build Roles & access (S:107)', () => {
     expect(organizationUsersRoles('acme')).toEqual({
       to: '/organization/$organizationSlug/users/roles',
       params: slug,
-    });
-    expect(organizationUsersBranches('acme')).toEqual({
-      to: '/organization/$organizationSlug/users/branches',
-      params: slug,
-    });
-    expect(organizationUsersBranchCreate('acme')).toEqual({
-      to: '/organization/$organizationSlug/users/branches/create',
-      params: slug,
-    });
-    expect(organizationUsersBranchEdit('acme', 'B1')).toEqual({
-      to: '/organization/$organizationSlug/users/branches/$branchId/edit',
-      params: { ...slug, branchId: 'B1' },
     });
   });
 });

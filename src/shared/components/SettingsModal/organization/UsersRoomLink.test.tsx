@@ -46,7 +46,7 @@ function renderLink(section: 'members' | 'roles' | 'branches') {
   });
   const branches = createRoute({
     getParentRoute: () => root,
-    path: '/organization/$organizationSlug/users/branches',
+    path: '/organization/$organizationSlug/branches',
     component: () => <p data-testid="room">branches</p>,
   });
   const router = createRouter({
@@ -93,16 +93,16 @@ describe('UsersRoomLink', () => {
     expect(router.state.location.pathname).toBe('/organization/acme/users/roles');
   });
 
-  it('opens Users › Branches from the Clinic section, leaving the Settings hash behind', async () => {
+  it('opens the Branches room from the Clinic section, leaving the Settings hash behind', async () => {
     const user = userEvent.setup();
     hold(['organization:read', 'branch:read']);
     const { router, container } = renderLink('branches');
-    const open = await screen.findByTestId('settings-branches-open-users');
+    const open = await screen.findByTestId('settings-branches-open-branches');
     expect(open.closest('section')).toHaveTextContent('Each branch holds the rest');
     expect(await axe(container)).toHaveNoViolations();
     await user.click(open);
     await waitFor(() => expect(screen.getByTestId('room')).toHaveTextContent('branches'));
-    expect(router.state.location.pathname).toBe('/organization/acme/users/branches');
+    expect(router.state.location.pathname).toBe('/organization/acme/branches');
     expect(router.state.location.hash).toBe('');
   });
 });

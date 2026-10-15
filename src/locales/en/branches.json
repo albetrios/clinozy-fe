@@ -1,0 +1,212 @@
+{
+  "manifest": {
+    "title": "Branches"
+  },
+  "record": "Branch",
+  "primary": {
+    "newBranch": "New branch"
+  },
+  "columns": {
+    "branch": "Branch",
+    "address": "Address",
+    "contact": "Contact",
+    "hours": "Opening hours",
+    "team": "Team",
+    "defaults": "Default people",
+    "status": "Status"
+  },
+  "mainPill": "Main",
+  "notSet": "Not set",
+  "defaults": {
+    "doctor": "Doctor · {{name}}",
+    "desk": "Desk · {{name}}",
+    "therapist": "Therapist · {{name}}",
+    "pharmacist": "Pharmacy · {{name}}"
+  },
+  "status": {
+    "open": "Open",
+    "closed": "Closed"
+  },
+  "records": "branches",
+  "empty": {
+    "title": "No branches yet",
+    "description": "The clinic's branches show up here."
+  },
+  "rowActions": {
+    "edit": "Edit"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "drawer": {
+    "title": {
+      "create": "New branch",
+      "edit": "Edit branch"
+    },
+    "sub": "Address, hours and the people who work here",
+    "summaryNew": "New branch",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} people",
+    "mainBadge": "Main branch",
+    "steps": {
+      "place": "Branch & address",
+      "contact": "Contact & opening hours",
+      "people": "People",
+      "places": "Places & days"
+    },
+    "groups": {
+      "branch": "Branch",
+      "address": "Address",
+      "contact": "Contact",
+      "hours": "Opening hours"
+    },
+    "fields": {
+      "name": "Name",
+      "colour": "Colour",
+      "main": "Main branch",
+      "status": "Status",
+      "line1": "Address line 1",
+      "line2": "Address line 2",
+      "area": "Area",
+      "city": "City",
+      "pin": "PIN code",
+      "state": "State",
+      "phone": "Phone",
+      "email": "Email",
+      "gstin": "GSTIN",
+      "reviewLink": "Google review link",
+      "days": "Days",
+      "opens": "Opens",
+      "closes": "Closes",
+      "team": "Team",
+      "doctor": "Default doctor",
+      "desk": "Default front desk",
+      "therapist": "Default therapist",
+      "pharmacist": "Default pharmacist"
+    },
+    "placeholders": {
+      "name": "e.g. Vesu",
+      "line1": "Shop / floor, building",
+      "line2": "Street, landmark",
+      "area": "e.g. Vesu",
+      "city": "City",
+      "pin": "6 digits",
+      "state": "State",
+      "email": "branch@clinic.com",
+      "gstin": "15 characters",
+      "reviewLink": "https://g.page/r/…/review",
+      "team": "Pick team",
+      "time": "Pick a time"
+    },
+    "hints": {
+      "colour": "marks this branch everywhere",
+      "phone": "10 digits",
+      "reviewLink": "sent when you ask a patient for a review after a payment",
+      "team": "who works here",
+      "preselected": "preselected in forms here",
+      "addFirst": {
+        "doctor": "add a doctor to the team first",
+        "desk": "add a front desk to the team first",
+        "therapist": "add a therapist to the team first",
+        "pharmacist": "add a pharmacist to the team first"
+      },
+      "main": "one per clinic · set when it opened"
+    },
+    "toggles": {
+      "mainOn": "Main · head office",
+      "mainOff": "Not the main branch",
+      "openOn": "Open · shown in pickers",
+      "openOff": "Closed · hidden everywhere"
+    },
+    "nobody": "Nobody",
+    "you": "{{name}} (you)",
+    "save": {
+      "create": "Add branch",
+      "edit": "Save branch"
+    },
+    "nameMissing": "Name the branch",
+    "addressMissing": "Add the address, area, city and PIN code",
+    "duplicate": "A branch called {{name}} already exists",
+    "phoneInvalid": "Phone needs 10 digits",
+    "emailInvalid": "Enter a valid email address",
+    "reviewLinkInvalid": "Enter a link that starts with https://",
+    "added": "{{name}} branch added",
+    "saved": "{{name}} saved",
+    "contactMissing": "Add the phone and email",
+    "pinInvalid": "PIN code needs 6 digits",
+    "places": {
+      "sections": {
+        "room": "Rooms",
+        "machine": "Machines",
+        "holiday": "Holidays"
+      },
+      "hints": {
+        "room": "where patients are seen",
+        "machine": "booked with a treatment",
+        "holiday": "closed all day · no bookings"
+      },
+      "counts": {
+        "room_one": "{{count}} room",
+        "room_other": "{{count}} rooms",
+        "machine_one": "{{count}} machine",
+        "machine_other": "{{count}} machines",
+        "holiday_one": "{{count}} holiday",
+        "holiday_other": "{{count}} holidays"
+      },
+      "nothingYet": "No rooms, machines or holidays yet",
+      "empty": {
+        "room": "No rooms yet",
+        "machine": "No machines yet",
+        "holiday": "No holidays coming up"
+      },
+      "newLabel": {
+        "room": "New room",
+        "machine": "New machine",
+        "holiday": "New holiday"
+      },
+      "placeholders": {
+        "room": "e.g. Room 1",
+        "machine": "e.g. Laser machine",
+        "holiday": "e.g. Diwali"
+      },
+      "fields": {
+        "name": "Name",
+        "date": "Date",
+        "label": "Holiday"
+      },
+      "add": "Add",
+      "rename": "Rename",
+      "save": "Save",
+      "cancel": "Cancel",
+      "remove": "Remove",
+      "toggle": {
+        "on": "In use",
+        "off": "Switched off",
+        "label": "{{name}} in use"
+      },
+      "removeTitle": {
+        "room": "Remove this room?",
+        "machine": "Remove this machine?",
+        "holiday": "Remove this holiday?"
+      },
+      "duplicate": {
+        "room": "A room called {{name}} already exists",
+        "machine": "A machine called {{name}} already exists",
+        "holiday": "{{date}} is already a holiday"
+      },
+      "nameMissing": "Add a name",
+      "nameTooLong": "At most 60 characters",
+      "dateMissing": "Pick the date",
+      "labelMissing": "Name the holiday",
+      "labelTooLong": "At most 60 characters",
+      "added": "{{name}} added",
+      "renamed": "{{name}} renamed",
+      "switchedOn": "{{name}} switched on",
+      "switchedOff": "{{name}} switched off",
+      "removed": "{{name}} removed",
+      "loadFailed": "Couldn't load the rooms, machines and holidays"
+    }
+  }
+}

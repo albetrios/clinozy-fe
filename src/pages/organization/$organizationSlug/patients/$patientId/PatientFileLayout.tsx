@@ -295,7 +295,11 @@ export function PatientFileLayout() {
       viewable: sections.viewable,
       masked: mask.masked,
       toggleMasked: () => setMask((current) => ({ ...current, masked: !current.masked })),
-      photos: { pick: photoUpload.pick, upload: photoUpload.upload },
+      photos: {
+        pick: photoUpload.pick,
+        capture: photoUpload.capture,
+        upload: photoUpload.upload,
+      },
     }),
     [
       patientId,
@@ -304,6 +308,7 @@ export function PatientFileLayout() {
       sections.viewable,
       mask.masked,
       photoUpload.pick,
+      photoUpload.capture,
       photoUpload.upload,
     ],
   );
@@ -323,6 +328,7 @@ export function PatientFileLayout() {
             <FileSkeleton />
           )}
           <input {...photoUpload.inputProps} />
+          <input {...photoUpload.cameraInputProps} />
         </div>
       </TooltipProvider>
     </PatientFileContext.Provider>

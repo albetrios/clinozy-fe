@@ -27,6 +27,9 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu.tsx';
 import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useAppRoles/index.ts';
@@ -38,6 +41,7 @@ import {
   useSetupUnfinished,
 } from '@/shared/hooks/useOnboardingSetup/index.ts';
 import { usePresence } from '@/shared/hooks/usePresence/index.ts';
+import { useSignInClinic } from '@/shared/hooks/useSignInClinic/index.ts';
 import {
   type AppIcon,
   Bell,
@@ -241,6 +245,88 @@ function StatusPills() {
         ))}
       </DropdownMenuRadioGroup>
     </PillGroup>
+  );
+}
+
+/** The radio value of "the clinic I used last" in the sign-in submenu — never an `org_…` id. */
+const SIGN_IN_AUTOMATIC = 'automatic';
+
+/**
+ * "Opens at sign-in ▸" (feat-choose-default-clinic D3): the clinic used last (automatic) or one
+ * pinned clinic, as radio items — one tap from any screen. The row shows the current choice; it is
+ * absent with fewer than two clinics. Saving, the toast and a failed save's rollback are
+ * {@link useSignInClinic}'s, shared with Settings › Account.
+ */
+function SignInClinicSubmenu() {
+  const { t } = useTranslation(LAYOUT_NS);
+  const signInKeys = LAYOUT_KEYS.app.signInClinic;
+  const { clinics, pinnedId, canChoose, choose } = useSignInClinic();
+  if (!canChoose) return null;
+  const pinned = clinics.find((clinic) => clinic.id === pinnedId);
+  const current = pinnedId ?? SIGN_IN_AUTOMATIC;
+  const label = t(signInKeys.menuLabel);
+  return (
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger
+        className="text-body h-9 gap-2.5 rounded-lg px-2.5 font-medium"
+        data-testid="account-menu-sign-in-clinic"
+      >
+        <span className="shrink-0 whitespace-nowrap">{label}</span>
+        <span className="text-muted-foreground text-caption ms-auto max-w-28 min-w-0 truncate">
+          {pinned?.name ?? t(signInKeys.lastUsed)}
+        </span>
+      </DropdownMenuSubTrigger>
+      {/* Wide enough for a long clinic name, which wraps rather than being cut; each row is a
+          comfortable 44px target. */}
+      <DropdownMenuSubContent className="w-80 max-w-[calc(100vw-2rem)]">
+        <DropdownMenuRadioGroup
+          value={current}
+          onValueChange={(value) => {
+            if (value === current) return;
+            choose(value === SIGN_IN_AUTOMATIC ? null : value);
+          }}
+          aria-label={label}
+        >
+          <DropdownMenuRadioItem
+            value={SIGN_IN_AUTOMATIC}
+            data-testid="account-menu-sign-in-clinic-automatic"
+            className="min-h-11 py-2"
+          >
+            <span className="flex min-w-0 flex-col">
+              <span className="text-sm font-medium break-words">
+                {t(signInKeys.automatic)}
+              </span>
+              <span className="text-muted-foreground text-xs break-words">
+                {t(signInKeys.automaticHint)}
+              </span>
+            </span>
+          </DropdownMenuRadioItem>
+          <DropdownMenuSeparator />
+          {clinics.map((clinic) => (
+            <DropdownMenuRadioItem
+              key={clinic.id}
+              value={clinic.id}
+              data-testid={`account-menu-sign-in-clinic-${clinic.slug ?? clinic.id}`}
+              className="min-h-11 py-2"
+            >
+              <span className="flex min-w-0 flex-col">
+                <span dir="auto" className="text-sm font-medium break-words">
+                  {clinic.name}
+                </span>
+                {clinic.slug ? (
+                  <span
+                    title={clinic.slug}
+                    className="text-muted-foreground truncate text-xs"
+                  >
+                    {clinic.slug}
+                  </span>
+                ) : null}
+              </span>
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuSubContent>
+    </DropdownMenuSub>
   );
 }
 
@@ -529,6 +615,7 @@ export function AccountMenu({
             submenuLabel={t(keys.switchClinic)}
             onSwitched={() => setOpen(false)}
           />
+          <SignInClinicSubmenu />
         </div>
         <DropdownMenuSeparator className="m-0" />
         <StatusPills />

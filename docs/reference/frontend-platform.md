@@ -128,7 +128,8 @@ records (`/api/v1/app/…`, schema `app`); the screens still say "clinic".
 | `app-payments`     | Payments and invoices                                      |
 | `app-tasks`        | Tasks                                                      |
 | `app-offerings`    | Offerings                                                  |
-| `app-users`        | Users (Team, Roles & access, Branches)                     |
+| `app-users`        | Users (Team, Roles & access)                               |
+| `app-branches`     | Branches (its own room since change-branches-in-navbar)    |
 
 UI should hide nav/settings entries via `isModuleEnabled()` when a module is
 off — routes still 404 via the gateway if linked directly.

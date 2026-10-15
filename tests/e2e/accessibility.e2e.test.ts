@@ -259,6 +259,10 @@ const ROOM_DRAWERS: Record<
     open: (page) => openFirstRow(page.getByTestId('users-team-table-row')),
     testId: 'user-drawer',
   },
+  branches: {
+    open: (page) => byTestId(page, 'branches-new-branch').click(),
+    testId: 'branch-drawer',
+  },
 };
 
 // Every room of a seeded clinic, the way its owner meets it — rows, not empty states — and

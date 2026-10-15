@@ -31,6 +31,10 @@ import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
+import {
+  type RoleDirectory,
+  useRoleDirectory,
+} from '@/shared/hooks/useRoleDirectory/index.ts';
 import { useTeam } from '@/shared/hooks/useTeam/index.ts';
 import { FileIcon, LogOut, PenLine, Trash, UserCog } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -45,10 +49,6 @@ import { useTeamTable } from './hooks/useTeamTable/index.ts';
 import { useUsersDialogRoute } from './hooks/useUsersDialogRoute/index.ts';
 import { RolesAccess } from './shared/components/RolesAccess/index.ts';
 import { UsersToolbar } from './shared/components/UsersToolbar/index.ts';
-import {
-  type RoleDirectory,
-  useRoleDirectory,
-} from './shared/hooks/useRoleDirectory/index.ts';
 import { TEAM_TABLE_ID, USERS_KEYS, USERS_NS } from './users.constants.ts';
 import { validateUserEditSearch } from './users.dialog-search.ts';
 import {

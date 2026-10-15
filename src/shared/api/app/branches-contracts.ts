@@ -1,7 +1,7 @@
 import type { Tone, Weekday } from './app-schema.ts';
 
 /*
- * The Branches domain as Users › Branches reads and writes it (KICKOFF §6.12 Branch drawer, D6;
+ * The Branches domain as the Branches room reads and writes it (KICKOFF §6.12 Branch drawer, D6;
  * clinozy-be `/app/branches`): a branch, what the branch drawer sends to save one, and its limits.
  * Who works at a branch is the branch's members (`PUT …/branches/:id/members`), each Team row's
  * `branchIds` on the read side.

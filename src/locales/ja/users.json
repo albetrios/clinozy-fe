@@ -6,8 +6,7 @@
   "tabs": {
     "label": "ユーザーの表示",
     "team": "チーム",
-    "roles": "ロールとアクセス",
-    "branches": "拠点"
+    "roles": "ロールとアクセス"
   },
   "search": {
     "placeholder": "名前、メール、携帯番号、#ID",
@@ -15,8 +14,7 @@
   },
   "primary": {
     "newUser": "新しいユーザー",
-    "newRole": "新しいロール",
-    "newBranch": "新しい拠点"
+    "newRole": "新しいロール"
   },
   "columns": {
     "seq": "ID",
@@ -221,10 +219,6 @@
         "role": {
           "label": "ロール",
           "description": "ロールとアクセス"
-        },
-        "branch": {
-          "label": "拠点",
-          "description": "拠点と各拠点のスタッフ"
         }
       }
     },
@@ -274,196 +268,6 @@
       "privateAlbum": {
         "label": "非公開アルバムを見る",
         "description": "患者ファイルの非公開写真を開けます"
-      }
-    }
-  },
-  "branches": {
-    "record": "拠点",
-    "columns": {
-      "branch": "拠点",
-      "address": "住所",
-      "contact": "連絡先",
-      "hours": "営業時間",
-      "team": "チーム",
-      "defaults": "既定の担当者",
-      "status": "ステータス"
-    },
-    "main": "本院",
-    "notSet": "未設定",
-    "defaults": {
-      "doctor": "医師 · {{name}}",
-      "desk": "受付 · {{name}}",
-      "therapist": "セラピスト · {{name}}",
-      "pharmacist": "薬局 · {{name}}"
-    },
-    "status": {
-      "open": "営業中",
-      "closed": "閉鎖"
-    },
-    "records": "拠点",
-    "empty": "拠点はまだありません",
-    "drawer": {
-      "title": {
-        "create": "新しい拠点",
-        "edit": "拠点を編集"
-      },
-      "sub": "住所、営業時間、ここで働く人",
-      "summaryNew": "新しい拠点",
-      "people_other": "{{count}} 人",
-      "mainBadge": "本院",
-      "steps": {
-        "place": "拠点と住所",
-        "contact": "連絡先と営業時間",
-        "people": "担当者",
-        "places": "場所と休業日"
-      },
-      "groups": {
-        "branch": "拠点",
-        "address": "住所",
-        "contact": "連絡先",
-        "hours": "営業時間"
-      },
-      "fields": {
-        "name": "名前",
-        "colour": "色",
-        "main": "本院",
-        "status": "ステータス",
-        "line1": "住所 1",
-        "line2": "住所 2",
-        "area": "エリア",
-        "city": "市区町村",
-        "pin": "郵便番号",
-        "state": "州・県",
-        "phone": "電話",
-        "email": "メール",
-        "gstin": "GSTIN",
-        "reviewLink": "Google レビューリンク",
-        "days": "曜日",
-        "opens": "開店",
-        "closes": "閉店",
-        "team": "チーム",
-        "doctor": "既定の医師",
-        "desk": "既定の受付",
-        "therapist": "既定のセラピスト",
-        "pharmacist": "既定の薬剤師"
-      },
-      "placeholders": {
-        "name": "例: Vesu",
-        "line1": "店舗 / 階、建物",
-        "line2": "通り、目印",
-        "area": "例: Vesu",
-        "city": "市区町村",
-        "pin": "6 桁",
-        "state": "州・県",
-        "email": "branch@clinic.com",
-        "gstin": "15 文字",
-        "reviewLink": "https://g.page/r/…/review",
-        "team": "チームを選択"
-      },
-      "hints": {
-        "colour": "この拠点をどこでも示す色です",
-        "phone": "10 桁",
-        "reviewLink": "支払い後に患者さんへレビューをお願いするときに送信されます",
-        "team": "ここで働く人",
-        "preselected": "この拠点のフォームで事前に選択されます",
-        "addFirst": {
-          "doctor": "先に医師をチームに追加してください",
-          "desk": "先に受付担当をチームに追加してください",
-          "therapist": "先にセラピストをチームに追加してください",
-          "pharmacist": "先に薬剤師をチームに追加してください"
-        },
-        "main": "クリニックに1つ · 開設時に設定"
-      },
-      "toggles": {
-        "mainOn": "本院 · 本部",
-        "mainOff": "本院ではありません",
-        "openOn": "営業中 · 選択肢に表示",
-        "openOff": "閉鎖 · どこにも表示しない"
-      },
-      "nobody": "なし",
-      "you": "{{name}}（あなた）",
-      "save": {
-        "create": "拠点を追加",
-        "edit": "拠点を保存"
-      },
-      "nameMissing": "拠点に名前を付けてください",
-      "addressMissing": "住所・地域・市区町村・PINコードを入力してください",
-      "duplicate": "{{name}} という拠点はすでにあります",
-      "phoneInvalid": "電話番号は 10 桁で入力してください",
-      "emailInvalid": "有効なメールアドレスを入力してください",
-      "reviewLinkInvalid": "https:// で始まるリンクを入力してください",
-      "added": "拠点 {{name}} を追加しました",
-      "saved": "{{name}} を保存しました",
-      "contactMissing": "電話番号とメールを入力してください",
-      "pinInvalid": "PINコードは6桁です",
-      "places": {
-        "sections": {
-          "room": "診察室",
-          "machine": "機器",
-          "holiday": "休業日"
-        },
-        "hints": {
-          "room": "患者さんを診る場所",
-          "machine": "施術と一緒に予約",
-          "holiday": "終日休業 · 予約不可"
-        },
-        "counts": {
-          "room_other": "{{count}} 室",
-          "machine_other": "{{count}} 台",
-          "holiday_other": "{{count}} 日"
-        },
-        "nothingYet": "診察室・機器・休業日はまだありません",
-        "empty": {
-          "room": "診察室はまだありません",
-          "machine": "機器はまだありません",
-          "holiday": "今後の休業日はありません"
-        },
-        "newLabel": {
-          "room": "新しい診察室",
-          "machine": "新しい機器",
-          "holiday": "新しい休業日"
-        },
-        "placeholders": {
-          "room": "例：診察室 1",
-          "machine": "例：レーザー機器",
-          "holiday": "例：ディワリ"
-        },
-        "fields": {
-          "name": "名前",
-          "date": "日付",
-          "label": "休業日"
-        },
-        "add": "追加",
-        "rename": "名前を変更",
-        "save": "保存",
-        "cancel": "キャンセル",
-        "remove": "削除",
-        "toggle": {
-          "on": "使用中",
-          "off": "停止中",
-          "label": "{{name}} 使用中"
-        },
-        "removeTitle": {
-          "room": "この診察室を削除しますか？",
-          "machine": "この機器を削除しますか？",
-          "holiday": "この休業日を削除しますか？"
-        },
-        "duplicate": {
-          "room": "{{name}} という診察室はすでにあります",
-          "machine": "{{name}} という機器はすでにあります",
-          "holiday": "{{date}} はすでに休業日です"
-        },
-        "nameMissing": "名前を入力してください",
-        "nameTooLong": "60 文字以内",
-        "dateMissing": "日付を選んでください",
-        "labelMissing": "休業日の名前を入力してください",
-        "labelTooLong": "60 文字以内",
-        "added": "{{name}} を追加しました",
-        "renamed": "{{name}} に名前を変更しました",
-        "switchedOn": "{{name}} を使用中にしました",
-        "switchedOff": "{{name}} を停止しました",
-        "removed": "{{name}} を削除しました",
-        "loadFailed": "診察室・機器・休業日を読み込めませんでした"
       }
     }
   }

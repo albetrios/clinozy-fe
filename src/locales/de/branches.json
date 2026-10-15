@@ -1,0 +1,212 @@
+{
+  "manifest": {
+    "title": "Filialen"
+  },
+  "record": "Filiale",
+  "primary": {
+    "newBranch": "Neue Filiale"
+  },
+  "columns": {
+    "branch": "Filiale",
+    "address": "Adresse",
+    "contact": "Kontakt",
+    "hours": "Öffnungszeiten",
+    "team": "Team",
+    "defaults": "Standardpersonen",
+    "status": "Status"
+  },
+  "mainPill": "Haupt",
+  "notSet": "Nicht festgelegt",
+  "defaults": {
+    "doctor": "Arzt · {{name}}",
+    "desk": "Empfang · {{name}}",
+    "therapist": "Therapeut · {{name}}",
+    "pharmacist": "Apotheke · {{name}}"
+  },
+  "status": {
+    "open": "Geöffnet",
+    "closed": "Geschlossen"
+  },
+  "records": "Filialen",
+  "empty": {
+    "title": "Noch keine Filialen",
+    "description": "Hier erscheinen die Filialen der Praxis."
+  },
+  "rowActions": {
+    "edit": "Bearbeiten"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "drawer": {
+    "title": {
+      "create": "Neue Filiale",
+      "edit": "Filiale bearbeiten"
+    },
+    "sub": "Adresse, Öffnungszeiten und die Menschen, die hier arbeiten",
+    "summaryNew": "Neue Filiale",
+    "people_one": "{{count}} Person",
+    "people_other": "{{count}} Personen",
+    "mainBadge": "Hauptfiliale",
+    "steps": {
+      "place": "Filiale & Adresse",
+      "contact": "Kontakt & Öffnungszeiten",
+      "people": "Personen",
+      "places": "Räume & Tage"
+    },
+    "groups": {
+      "branch": "Filiale",
+      "address": "Adresse",
+      "contact": "Kontakt",
+      "hours": "Öffnungszeiten"
+    },
+    "fields": {
+      "name": "Name",
+      "colour": "Farbe",
+      "main": "Hauptfiliale",
+      "status": "Status",
+      "line1": "Adresszeile 1",
+      "line2": "Adresszeile 2",
+      "area": "Gebiet",
+      "city": "Stadt",
+      "pin": "PLZ",
+      "state": "Bundesland",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "gstin": "GSTIN",
+      "reviewLink": "Google-Bewertungslink",
+      "days": "Tage",
+      "opens": "Öffnet",
+      "closes": "Schließt",
+      "team": "Team",
+      "doctor": "Standardarzt",
+      "desk": "Standard-Empfang",
+      "therapist": "Standardtherapeut",
+      "pharmacist": "Standardapotheker"
+    },
+    "placeholders": {
+      "name": "z. B. Vesu",
+      "line1": "Laden / Etage, Gebäude",
+      "line2": "Straße, Orientierungspunkt",
+      "area": "z. B. Vesu",
+      "city": "Stadt",
+      "pin": "6 Ziffern",
+      "state": "Bundesland",
+      "email": "filiale@klinik.de",
+      "gstin": "15 Zeichen",
+      "reviewLink": "https://g.page/r/…/review",
+      "team": "Team auswählen",
+      "time": "Uhrzeit wählen"
+    },
+    "hints": {
+      "colour": "kennzeichnet diese Filiale überall",
+      "phone": "10 Ziffern",
+      "reviewLink": "wird gesendet, wenn Sie nach einer Zahlung um eine Bewertung bitten",
+      "team": "wer hier arbeitet",
+      "preselected": "in Formularen hier vorausgewählt",
+      "addFirst": {
+        "doctor": "fügen Sie zuerst einen Arzt zum Team hinzu",
+        "desk": "fügen Sie zuerst jemanden vom Empfang zum Team hinzu",
+        "therapist": "fügen Sie zuerst einen Therapeuten zum Team hinzu",
+        "pharmacist": "fügen Sie zuerst einen Apotheker zum Team hinzu"
+      },
+      "main": "eine pro Praxis · bei der Eröffnung festgelegt"
+    },
+    "toggles": {
+      "mainOn": "Haupt · Zentrale",
+      "mainOff": "Nicht die Hauptfiliale",
+      "openOn": "Geöffnet · in Auswahllisten",
+      "openOff": "Geschlossen · überall ausgeblendet"
+    },
+    "nobody": "Niemand",
+    "you": "{{name}} (Sie)",
+    "save": {
+      "create": "Filiale hinzufügen",
+      "edit": "Filiale speichern"
+    },
+    "nameMissing": "Geben Sie der Filiale einen Namen",
+    "addressMissing": "Adresse, Gebiet, Stadt und PIN angeben",
+    "duplicate": "Eine Filiale namens {{name}} gibt es bereits",
+    "phoneInvalid": "Die Telefonnummer braucht 10 Ziffern",
+    "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
+    "reviewLinkInvalid": "Geben Sie einen Link ein, der mit https:// beginnt",
+    "added": "Filiale {{name}} hinzugefügt",
+    "saved": "{{name}} gespeichert",
+    "contactMissing": "Telefon und E-Mail angeben",
+    "pinInvalid": "Die PIN braucht 6 Ziffern",
+    "places": {
+      "sections": {
+        "room": "Räume",
+        "machine": "Geräte",
+        "holiday": "Schließtage"
+      },
+      "hints": {
+        "room": "wo Patienten behandelt werden",
+        "machine": "mit einer Behandlung gebucht",
+        "holiday": "ganztägig geschlossen · keine Termine"
+      },
+      "counts": {
+        "room_one": "{{count}} Raum",
+        "room_other": "{{count}} Räume",
+        "machine_one": "{{count}} Gerät",
+        "machine_other": "{{count}} Geräte",
+        "holiday_one": "{{count}} Schließtag",
+        "holiday_other": "{{count}} Schließtage"
+      },
+      "nothingYet": "Noch keine Räume, Geräte oder Schließtage",
+      "empty": {
+        "room": "Noch keine Räume",
+        "machine": "Noch keine Geräte",
+        "holiday": "Keine anstehenden Schließtage"
+      },
+      "newLabel": {
+        "room": "Neuer Raum",
+        "machine": "Neues Gerät",
+        "holiday": "Neuer Schließtag"
+      },
+      "placeholders": {
+        "room": "z. B. Raum 1",
+        "machine": "z. B. Lasergerät",
+        "holiday": "z. B. Diwali"
+      },
+      "fields": {
+        "name": "Name",
+        "date": "Datum",
+        "label": "Schließtag"
+      },
+      "add": "Hinzufügen",
+      "rename": "Umbenennen",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "remove": "Entfernen",
+      "toggle": {
+        "on": "In Betrieb",
+        "off": "Ausgeschaltet",
+        "label": "{{name}} in Betrieb"
+      },
+      "removeTitle": {
+        "room": "Diesen Raum entfernen?",
+        "machine": "Dieses Gerät entfernen?",
+        "holiday": "Diesen Schließtag entfernen?"
+      },
+      "duplicate": {
+        "room": "Einen Raum namens {{name}} gibt es bereits",
+        "machine": "Ein Gerät namens {{name}} gibt es bereits",
+        "holiday": "{{date}} ist bereits ein Schließtag"
+      },
+      "nameMissing": "Namen eingeben",
+      "nameTooLong": "Höchstens 60 Zeichen",
+      "dateMissing": "Datum wählen",
+      "labelMissing": "Schließtag benennen",
+      "labelTooLong": "Höchstens 60 Zeichen",
+      "added": "{{name}} hinzugefügt",
+      "renamed": "{{name}} umbenannt",
+      "switchedOn": "{{name}} eingeschaltet",
+      "switchedOff": "{{name}} ausgeschaltet",
+      "removed": "{{name}} entfernt",
+      "loadFailed": "Räume, Geräte und Schließtage konnten nicht geladen werden"
+    }
+  }
+}

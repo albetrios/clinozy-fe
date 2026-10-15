@@ -73,7 +73,7 @@ const ROLES: readonly RoleExpectation[] = [
       'tasks',
       'offerings',
     ],
-    sendsAway: ['medical', 'users'],
+    sendsAway: ['medical', 'users', 'branches'],
     landsOn: 'leads',
     shows: [
       ['today', 'today-new-booking'],
@@ -95,7 +95,7 @@ const ROLES: readonly RoleExpectation[] = [
       'tasks',
       'offerings',
     ],
-    sendsAway: ['stock', 'users'],
+    sendsAway: ['stock', 'users', 'branches'],
     landsOn: 'leads',
     shows: [
       ['patients', 'patients-new'],
@@ -109,7 +109,7 @@ const ROLES: readonly RoleExpectation[] = [
     role: 'Therapist',
     home: 'today',
     opens: ['appointments', 'patients', 'stock', 'tasks', 'offerings'],
-    sendsAway: ['leads', 'medical', 'payments', 'users'],
+    sendsAway: ['leads', 'medical', 'payments', 'users', 'branches'],
     landsOn: 'appointments',
     shows: [
       ['appointments', 'appointments-new-appointment'],
@@ -123,7 +123,7 @@ const ROLES: readonly RoleExpectation[] = [
     role: 'Counsellor',
     home: 'today',
     opens: ['leads', 'appointments', 'patients', 'payments', 'tasks', 'offerings'],
-    sendsAway: ['medical', 'stock', 'users'],
+    sendsAway: ['medical', 'stock', 'users', 'branches'],
     landsOn: 'leads',
     shows: [
       ['today', 'today-new-booking'],
@@ -148,7 +148,7 @@ const ROLES: readonly RoleExpectation[] = [
       'tasks',
       'offerings',
     ],
-    sendsAway: ['leads', 'users'],
+    sendsAway: ['leads', 'users', 'branches'],
     landsOn: 'appointments',
     // Sells and collects (payment:create); reads the patients and the day's visits only.
     shows: [['payments', 'payments-receive']],
@@ -163,7 +163,7 @@ const ROLES: readonly RoleExpectation[] = [
     role: 'Accountant',
     home: 'payments',
     opens: ['patients', 'medical', 'stock', 'payments', 'offerings'],
-    sendsAway: ['leads', 'appointments', 'tasks', 'users'],
+    sendsAway: ['leads', 'appointments', 'tasks', 'users', 'branches'],
     landsOn: 'patients',
     shows: [['payments', 'payments-receive']],
     hides: [
@@ -176,7 +176,7 @@ const ROLES: readonly RoleExpectation[] = [
     role: 'Marketing',
     home: 'leads',
     opens: ['leads', 'patients', 'tasks', 'offerings'],
-    sendsAway: ['appointments', 'medical', 'stock', 'payments', 'users'],
+    sendsAway: ['appointments', 'medical', 'stock', 'payments', 'users', 'branches'],
     landsOn: 'leads',
     shows: [
       ['leads', 'leads-new-lead'],

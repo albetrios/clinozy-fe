@@ -6,8 +6,7 @@
   "tabs": {
     "label": "Viste utenti",
     "team": "Team",
-    "roles": "Ruoli e accesso",
-    "branches": "Sedi"
+    "roles": "Ruoli e accesso"
   },
   "search": {
     "placeholder": "Nome, email, cellulare o #ID",
@@ -15,8 +14,7 @@
   },
   "primary": {
     "newUser": "Nuovo utente",
-    "newRole": "Nuovo ruolo",
-    "newBranch": "Nuova sede"
+    "newRole": "Nuovo ruolo"
   },
   "columns": {
     "seq": "ID",
@@ -223,10 +221,6 @@
         "role": {
           "label": "Ruoli",
           "description": "Ruoli e accessi"
-        },
-        "branch": {
-          "label": "Sedi",
-          "description": "Sedi e chi ci lavora"
         }
       }
     },
@@ -276,204 +270,6 @@
       "privateAlbum": {
         "label": "Vedere l’album privato",
         "description": "Apre le foto private nella scheda paziente"
-      }
-    }
-  },
-  "branches": {
-    "record": "Sede",
-    "columns": {
-      "branch": "Sede",
-      "address": "Indirizzo",
-      "contact": "Contatti",
-      "hours": "Orari",
-      "team": "Team",
-      "defaults": "Persone predefinite",
-      "status": "Stato"
-    },
-    "main": "Principale",
-    "notSet": "Non impostato",
-    "defaults": {
-      "doctor": "Medico · {{name}}",
-      "desk": "Reception · {{name}}",
-      "therapist": "Terapista · {{name}}",
-      "pharmacist": "Farmacia · {{name}}"
-    },
-    "status": {
-      "open": "Aperta",
-      "closed": "Chiusa"
-    },
-    "records": "sedi",
-    "empty": "Ancora nessuna sede",
-    "drawer": {
-      "title": {
-        "create": "Nuova sede",
-        "edit": "Modifica sede"
-      },
-      "sub": "Indirizzo, orari e le persone che ci lavorano",
-      "summaryNew": "Nuova sede",
-      "people_one": "{{count}} persona",
-      "people_many": "{{count}} persone",
-      "people_other": "{{count}} persone",
-      "mainBadge": "Sede principale",
-      "steps": {
-        "place": "Sede e indirizzo",
-        "contact": "Contatti e orari",
-        "people": "Persone",
-        "places": "Luoghi e giorni"
-      },
-      "groups": {
-        "branch": "Sede",
-        "address": "Indirizzo",
-        "contact": "Contatti",
-        "hours": "Orari"
-      },
-      "fields": {
-        "name": "Nome",
-        "colour": "Colore",
-        "main": "Sede principale",
-        "status": "Stato",
-        "line1": "Indirizzo (riga 1)",
-        "line2": "Indirizzo (riga 2)",
-        "area": "Zona",
-        "city": "Città",
-        "pin": "CAP",
-        "state": "Stato o regione",
-        "phone": "Telefono",
-        "email": "Email",
-        "gstin": "GSTIN",
-        "reviewLink": "Link recensioni Google",
-        "days": "Giorni",
-        "opens": "Apre",
-        "closes": "Chiude",
-        "team": "Team",
-        "doctor": "Medico predefinito",
-        "desk": "Reception predefinita",
-        "therapist": "Terapista predefinito",
-        "pharmacist": "Farmacista predefinito"
-      },
-      "placeholders": {
-        "name": "es. Vesu",
-        "line1": "Negozio / piano, edificio",
-        "line2": "Via, punto di riferimento",
-        "area": "es. Vesu",
-        "city": "Città",
-        "pin": "6 cifre",
-        "state": "Stato o regione",
-        "email": "sede@clinica.it",
-        "gstin": "15 caratteri",
-        "reviewLink": "https://g.page/r/…/review",
-        "team": "Scegli il team"
-      },
-      "hints": {
-        "colour": "contraddistingue questa sede ovunque",
-        "phone": "10 cifre",
-        "reviewLink": "inviato quando chiedi una recensione a un paziente dopo un pagamento",
-        "team": "chi lavora qui",
-        "preselected": "preselezionato nei moduli qui",
-        "addFirst": {
-          "doctor": "aggiungi prima un medico al team",
-          "desk": "aggiungi prima qualcuno della reception al team",
-          "therapist": "aggiungi prima un terapista al team",
-          "pharmacist": "aggiungi prima un farmacista al team"
-        },
-        "main": "una per clinica · impostata all’apertura"
-      },
-      "toggles": {
-        "mainOn": "Principale · sede centrale",
-        "mainOff": "Non è la sede principale",
-        "openOn": "Aperta · visibile negli elenchi",
-        "openOff": "Chiusa · nascosta ovunque"
-      },
-      "nobody": "Nessuno",
-      "you": "{{name}} (tu)",
-      "save": {
-        "create": "Aggiungi sede",
-        "edit": "Salva sede"
-      },
-      "nameMissing": "Dai un nome alla sede",
-      "addressMissing": "Aggiungi indirizzo, zona, città e codice PIN",
-      "duplicate": "Esiste già una sede chiamata {{name}}",
-      "phoneInvalid": "Il telefono deve avere 10 cifre",
-      "emailInvalid": "Inserisci un indirizzo email valido",
-      "reviewLinkInvalid": "Inserisci un link che inizi con https://",
-      "added": "Sede {{name}} aggiunta",
-      "saved": "{{name}} salvata",
-      "contactMissing": "Aggiungi telefono ed email",
-      "pinInvalid": "Il codice PIN deve avere 6 cifre",
-      "places": {
-        "sections": {
-          "room": "Stanze",
-          "machine": "Macchinari",
-          "holiday": "Giorni di chiusura"
-        },
-        "hints": {
-          "room": "dove si ricevono i pazienti",
-          "machine": "prenotati con un trattamento",
-          "holiday": "chiuso tutto il giorno · nessuna prenotazione"
-        },
-        "counts": {
-          "room_one": "{{count}} stanza",
-          "room_many": "{{count}} stanze",
-          "room_other": "{{count}} stanze",
-          "machine_one": "{{count}} macchinario",
-          "machine_many": "{{count}} macchinari",
-          "machine_other": "{{count}} macchinari",
-          "holiday_one": "{{count}} giorno di chiusura",
-          "holiday_many": "{{count}} giorni di chiusura",
-          "holiday_other": "{{count}} giorni di chiusura"
-        },
-        "nothingYet": "Ancora nessuna stanza, macchinario o giorno di chiusura",
-        "empty": {
-          "room": "Ancora nessuna stanza",
-          "machine": "Ancora nessun macchinario",
-          "holiday": "Nessun giorno di chiusura in arrivo"
-        },
-        "newLabel": {
-          "room": "Nuova stanza",
-          "machine": "Nuovo macchinario",
-          "holiday": "Nuovo giorno di chiusura"
-        },
-        "placeholders": {
-          "room": "es. Stanza 1",
-          "machine": "es. Macchinario laser",
-          "holiday": "es. Diwali"
-        },
-        "fields": {
-          "name": "Nome",
-          "date": "Data",
-          "label": "Giorno di chiusura"
-        },
-        "add": "Aggiungi",
-        "rename": "Rinomina",
-        "save": "Salva",
-        "cancel": "Annulla",
-        "remove": "Rimuovi",
-        "toggle": {
-          "on": "In uso",
-          "off": "Disattivato",
-          "label": "{{name}} in uso"
-        },
-        "removeTitle": {
-          "room": "Rimuovere questa stanza?",
-          "machine": "Rimuovere questo macchinario?",
-          "holiday": "Rimuovere questo giorno di chiusura?"
-        },
-        "duplicate": {
-          "room": "Esiste già una stanza chiamata {{name}}",
-          "machine": "Esiste già un macchinario chiamato {{name}}",
-          "holiday": "{{date}} è già un giorno di chiusura"
-        },
-        "nameMissing": "Aggiungi un nome",
-        "nameTooLong": "Al massimo 60 caratteri",
-        "dateMissing": "Scegli la data",
-        "labelMissing": "Dai un nome al giorno di chiusura",
-        "labelTooLong": "Al massimo 60 caratteri",
-        "added": "Aggiunto: {{name}}",
-        "renamed": "Rinominato: {{name}}",
-        "switchedOn": "Attivato: {{name}}",
-        "switchedOff": "Disattivato: {{name}}",
-        "removed": "Rimosso: {{name}}",
-        "loadFailed": "Impossibile caricare stanze, macchinari e giorni di chiusura"
       }
     }
   }

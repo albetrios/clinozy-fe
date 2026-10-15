@@ -1,6 +1,7 @@
 import {
   type InfiniteData,
   type QueryClient,
+  useQueries,
   useQueryClient,
 } from '@tanstack/react-query';
 
@@ -123,6 +124,46 @@ export function usePatientPhoto(patientId: string, imageId: string) {
     // The screen renders this failure itself (see above).
     notifyOnError: false,
   });
+}
+
+/** {@link usePatientPhotosByIds}: each photo by its id, in the ids' order. */
+export interface PatientPhotosById {
+  /** The photos read so far (a list page's copy while its own read runs); a missing one is left out. */
+  photos: PatientPhoto[];
+  /** Ids still being read with nothing to stand in. */
+  pending: string[];
+}
+
+/**
+ * Several photos by id — the comparison's read (change-patient-overview-photos
+ * D11): each the viewer's own query (`GET …/images/:patient_image_id`, the same
+ * key, so the viewer and the comparison share one cache), a list page's copy
+ * standing in while it runs, a photo that cannot be read (deleted) left out,
+ * and no toast — the comparison shows what it has.
+ */
+export function usePatientPhotosByIds(
+  patientId: string,
+  ids: readonly string[],
+): PatientPhotosById {
+  const organizationId = useOrganizationId();
+  const queryClient = useQueryClient();
+  const results = useQueries({
+    queries: ids.map((imageId) => ({
+      queryKey: patientImageQueryKeys.detail(organizationId, patientId, imageId),
+      queryFn: () => fetchPatientPhoto({ patientId, imageId }),
+      placeholderData: () => cachedPhoto(queryClient, organizationId, patientId, imageId),
+      ...FILE_LINK_QUERY_OPTIONS,
+      enabled: organizationId !== null && patientId !== '',
+      meta: { notifyOnError: false },
+    })),
+  });
+  const photos: PatientPhoto[] = [];
+  const pending: string[] = [];
+  results.forEach((result, index) => {
+    if (result.data) photos.push(result.data);
+    else if (result.isPending) pending.push(ids[index] ?? '');
+  });
+  return { photos, pending };
 }
 
 /** A Photo details save: the photo as read and what changed. */

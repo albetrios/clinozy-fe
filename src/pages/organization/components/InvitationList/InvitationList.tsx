@@ -15,18 +15,30 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { Building } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { acceptInvitationAndOpenClinic } from '@/shared/tenancy/accept-invitation.ts';
+import type { OrganizationSummary } from '@/shared/tenancy/me-context.ts';
 import {
   declineInvitation,
   invalidateMyInvitations,
   type MyInvitation,
   myInvitationsQueryKey,
 } from '@/shared/tenancy/my-invitations.ts';
+import { myOrganizationsQueryKey } from '@/shared/tenancy/my-organization-summaries.ts';
+
+/** Whether the person belonged to a clinic before this accept — read from the cached list. */
+function hadClinicBefore(): boolean {
+  const organizations =
+    queryClient.getQueryData<OrganizationSummary[]>(myOrganizationsQueryKey) ?? [];
+  return organizations.some((organization) => organization.type === 'TEAM');
+}
 
 /**
- * Accepting and declining from the picker. Accept joins the clinic, moves this tab into it and
- * hands off to `/` — the resolver runs onboarding's profile steps for someone who has not
- * finished it, else opens the clinic's home. Decline ends the invitation (the inviter is told);
- * with none left the resolver decides what is next (onboarding, or the clinic already active).
+ * Accepting and declining from the picker. Accept joins the clinic and moves this tab into it.
+ * Someone who already had a clinic stays here: the new clinic joins the list, and they choose
+ * which opens at sign-in — and which to open now (feat-choose-default-clinic). For a first
+ * clinic it hands off to `/` — the resolver runs onboarding's profile steps for someone who has
+ * not finished it, else opens the clinic's home. Decline ends the invitation (the inviter is
+ * told); with none left the resolver decides what is next (onboarding, or the clinic already
+ * active).
  */
 function useInvitationResponse() {
   const { t } = useTranslation(AUTH_NS);
@@ -39,8 +51,16 @@ function useInvitationResponse() {
     if (busyRef.current) return;
     busyRef.current = true;
     setAcceptingId(invitation.id);
+    // Read before the accept refreshes the list.
+    const staysToChoose = hadClinicBefore();
     try {
       const accepted = await acceptInvitationAndOpenClinic(invitation.id);
+      if (staysToChoose && !accepted.switchError) {
+        notify.success(
+          t(AUTH_KEYS.organizationPicker.joined, { name: invitation.organization.name }),
+        );
+        return;
+      }
       if (accepted.switchError) {
         // Joined all the same; say so and let the resolver find the way in.
         reportError(accepted.switchError, {

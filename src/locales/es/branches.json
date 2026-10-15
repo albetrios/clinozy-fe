@@ -1,0 +1,217 @@
+{
+  "manifest": {
+    "title": "Sucursales"
+  },
+  "record": "Sucursal",
+  "primary": {
+    "newBranch": "Nueva sucursal"
+  },
+  "columns": {
+    "branch": "Sucursal",
+    "address": "Dirección",
+    "contact": "Contacto",
+    "hours": "Horario",
+    "team": "Equipo",
+    "defaults": "Personas por defecto",
+    "status": "Estado"
+  },
+  "mainPill": "Principal",
+  "notSet": "Sin asignar",
+  "defaults": {
+    "doctor": "Médico · {{name}}",
+    "desk": "Recepción · {{name}}",
+    "therapist": "Terapeuta · {{name}}",
+    "pharmacist": "Farmacia · {{name}}"
+  },
+  "status": {
+    "open": "Abierta",
+    "closed": "Cerrada"
+  },
+  "records": "sucursales",
+  "empty": {
+    "title": "Aún no hay sucursales",
+    "description": "Aquí aparecen las sucursales de la clínica."
+  },
+  "rowActions": {
+    "edit": "Editar"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} fila exportada como CSV",
+    "exported_many": "{{count}} filas exportadas como CSV",
+    "exported_other": "{{count}} filas exportadas como CSV"
+  },
+  "drawer": {
+    "title": {
+      "create": "Nueva sucursal",
+      "edit": "Editar sucursal"
+    },
+    "sub": "Dirección, horario y las personas que trabajan aquí",
+    "summaryNew": "Nueva sucursal",
+    "people_one": "{{count}} persona",
+    "people_many": "{{count}} personas",
+    "people_other": "{{count}} personas",
+    "mainBadge": "Sucursal principal",
+    "steps": {
+      "place": "Sucursal y dirección",
+      "contact": "Contacto y horario",
+      "people": "Personas",
+      "places": "Lugares y días"
+    },
+    "groups": {
+      "branch": "Sucursal",
+      "address": "Dirección",
+      "contact": "Contacto",
+      "hours": "Horario"
+    },
+    "fields": {
+      "name": "Nombre",
+      "colour": "Color",
+      "main": "Sucursal principal",
+      "status": "Estado",
+      "line1": "Dirección (línea 1)",
+      "line2": "Dirección (línea 2)",
+      "area": "Zona",
+      "city": "Ciudad",
+      "pin": "Código postal",
+      "state": "Estado o provincia",
+      "phone": "Teléfono",
+      "email": "Correo electrónico",
+      "gstin": "GSTIN",
+      "reviewLink": "Enlace de reseñas de Google",
+      "days": "Días",
+      "opens": "Abre",
+      "closes": "Cierra",
+      "team": "Equipo",
+      "doctor": "Médico por defecto",
+      "desk": "Recepción por defecto",
+      "therapist": "Terapeuta por defecto",
+      "pharmacist": "Farmacéutico por defecto"
+    },
+    "placeholders": {
+      "name": "p. ej. Vesu",
+      "line1": "Local / planta, edificio",
+      "line2": "Calle, referencia",
+      "area": "p. ej. Vesu",
+      "city": "Ciudad",
+      "pin": "6 dígitos",
+      "state": "Estado o provincia",
+      "email": "sucursal@clinica.com",
+      "gstin": "15 caracteres",
+      "reviewLink": "https://g.page/r/…/review",
+      "team": "Elige el equipo",
+      "time": "Elige una hora"
+    },
+    "hints": {
+      "colour": "identifica esta sucursal en todas partes",
+      "phone": "10 dígitos",
+      "reviewLink": "se envía cuando pides una reseña a un paciente tras un pago",
+      "team": "quién trabaja aquí",
+      "preselected": "preseleccionado en los formularios de aquí",
+      "addFirst": {
+        "doctor": "añade primero un médico al equipo",
+        "desk": "añade primero a alguien de recepción al equipo",
+        "therapist": "añade primero un terapeuta al equipo",
+        "pharmacist": "añade primero un farmacéutico al equipo"
+      },
+      "main": "una por clínica · se fija al abrirla"
+    },
+    "toggles": {
+      "mainOn": "Principal · oficina central",
+      "mainOff": "No es la sucursal principal",
+      "openOn": "Abierta · aparece en las listas",
+      "openOff": "Cerrada · oculta en todas partes"
+    },
+    "nobody": "Nadie",
+    "you": "{{name}} (tú)",
+    "save": {
+      "create": "Añadir sucursal",
+      "edit": "Guardar sucursal"
+    },
+    "nameMissing": "Ponle nombre a la sucursal",
+    "addressMissing": "Añade la dirección, la zona, la ciudad y el código PIN",
+    "duplicate": "Ya existe una sucursal llamada {{name}}",
+    "phoneInvalid": "El teléfono necesita 10 dígitos",
+    "emailInvalid": "Introduce un correo electrónico válido",
+    "reviewLinkInvalid": "Introduce un enlace que empiece por https://",
+    "added": "Sucursal {{name}} añadida",
+    "saved": "{{name}} guardada",
+    "contactMissing": "Añade el teléfono y el correo",
+    "pinInvalid": "El código PIN necesita 6 dígitos",
+    "places": {
+      "sections": {
+        "room": "Salas",
+        "machine": "Máquinas",
+        "holiday": "Festivos"
+      },
+      "hints": {
+        "room": "donde se atienden las citas",
+        "machine": "se reservan con un tratamiento",
+        "holiday": "cerrado todo el día · sin citas"
+      },
+      "counts": {
+        "room_one": "{{count}} sala",
+        "room_many": "{{count}} salas",
+        "room_other": "{{count}} salas",
+        "machine_one": "{{count}} máquina",
+        "machine_many": "{{count}} máquinas",
+        "machine_other": "{{count}} máquinas",
+        "holiday_one": "{{count}} festivo",
+        "holiday_many": "{{count}} festivos",
+        "holiday_other": "{{count}} festivos"
+      },
+      "nothingYet": "Aún no hay salas, máquinas ni festivos",
+      "empty": {
+        "room": "Aún no hay salas",
+        "machine": "Aún no hay máquinas",
+        "holiday": "No hay festivos próximos"
+      },
+      "newLabel": {
+        "room": "Nueva sala",
+        "machine": "Nueva máquina",
+        "holiday": "Nuevo festivo"
+      },
+      "placeholders": {
+        "room": "p. ej., Sala 1",
+        "machine": "p. ej., Máquina láser",
+        "holiday": "p. ej., Diwali"
+      },
+      "fields": {
+        "name": "Nombre",
+        "date": "Fecha",
+        "label": "Festivo"
+      },
+      "add": "Añadir",
+      "rename": "Cambiar nombre",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "remove": "Quitar",
+      "toggle": {
+        "on": "En uso",
+        "off": "Desactivada",
+        "label": "{{name}} en uso"
+      },
+      "removeTitle": {
+        "room": "¿Quitar esta sala?",
+        "machine": "¿Quitar esta máquina?",
+        "holiday": "¿Quitar este festivo?"
+      },
+      "duplicate": {
+        "room": "Ya existe una sala llamada {{name}}",
+        "machine": "Ya existe una máquina llamada {{name}}",
+        "holiday": "{{date}} ya es festivo"
+      },
+      "nameMissing": "Añade un nombre",
+      "nameTooLong": "Como máximo 60 caracteres",
+      "dateMissing": "Elige la fecha",
+      "labelMissing": "Ponle nombre al festivo",
+      "labelTooLong": "Como máximo 60 caracteres",
+      "added": "Se añadió {{name}}",
+      "renamed": "Nombre cambiado: {{name}}",
+      "switchedOn": "Se activó {{name}}",
+      "switchedOff": "Se desactivó {{name}}",
+      "removed": "Se quitó {{name}}",
+      "loadFailed": "No se pudieron cargar las salas, las máquinas y los festivos"
+    }
+  }
+}

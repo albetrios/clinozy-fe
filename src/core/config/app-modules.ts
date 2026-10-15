@@ -14,4 +14,5 @@ export const APP_MODULES = {
   tasks: 'app-tasks',
   offerings: 'app-offerings',
   users: 'app-users',
+  branches: 'app-branches',
 } as const;

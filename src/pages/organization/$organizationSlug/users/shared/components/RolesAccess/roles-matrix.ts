@@ -37,7 +37,8 @@ type MatrixSectionRowId =
   | 'payment'
   | 'task'
   | 'offering'
-  | 'membership';
+  | 'membership'
+  | 'branch';
 
 /** The rows that sit under a section's own row, each named in its own words. */
 type MatrixSubRowId = Exclude<MatrixRowId, MatrixSectionRowId>;
@@ -107,7 +108,8 @@ export const MATRIX_ROWS: readonly MatrixRow[] = [
   { id: 'offering', section: 'offerings', sub: false, codes: crud('offering', ['view']) },
   { id: 'membership', section: 'users', sub: false, codes: crud('membership') },
   { id: 'role', section: 'users', sub: true, codes: crud('role') },
-  { id: 'branch', section: 'users', sub: true, codes: crud('branch') },
+  // Its own room since change-branches-in-navbar: a section row, after Users.
+  { id: 'branch', section: 'branches', sub: false, codes: crud('branch') },
 ];
 
 /** One special permission: a code no box holds, as a switch. */

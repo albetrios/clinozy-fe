@@ -6,8 +6,7 @@
   "tabs": {
     "label": "Visualizações de usuários",
     "team": "Equipe",
-    "roles": "Funções e acesso",
-    "branches": "Unidades"
+    "roles": "Funções e acesso"
   },
   "search": {
     "placeholder": "Nome, e-mail, celular ou #ID",
@@ -15,8 +14,7 @@
   },
   "primary": {
     "newUser": "Novo usuário",
-    "newRole": "Nova função",
-    "newBranch": "Nova unidade"
+    "newRole": "Nova função"
   },
   "columns": {
     "seq": "ID",
@@ -223,10 +221,6 @@
         "role": {
           "label": "Funções",
           "description": "Funções e acesso"
-        },
-        "branch": {
-          "label": "Unidades",
-          "description": "Unidades e quem trabalha em cada uma"
         }
       }
     },
@@ -276,204 +270,6 @@
       "privateAlbum": {
         "label": "Ver o álbum privado",
         "description": "Abre as fotos privadas da ficha do paciente"
-      }
-    }
-  },
-  "branches": {
-    "record": "Unidade",
-    "columns": {
-      "branch": "Unidade",
-      "address": "Endereço",
-      "contact": "Contato",
-      "hours": "Horário",
-      "team": "Equipe",
-      "defaults": "Pessoas padrão",
-      "status": "Status"
-    },
-    "main": "Principal",
-    "notSet": "Não definido",
-    "defaults": {
-      "doctor": "Médico · {{name}}",
-      "desk": "Recepção · {{name}}",
-      "therapist": "Terapeuta · {{name}}",
-      "pharmacist": "Farmácia · {{name}}"
-    },
-    "status": {
-      "open": "Aberta",
-      "closed": "Fechada"
-    },
-    "records": "unidades",
-    "empty": "Nenhuma unidade ainda",
-    "drawer": {
-      "title": {
-        "create": "Nova unidade",
-        "edit": "Editar unidade"
-      },
-      "sub": "Endereço, horário e as pessoas que trabalham aqui",
-      "summaryNew": "Nova unidade",
-      "people_one": "{{count}} pessoa",
-      "people_many": "{{count}} pessoas",
-      "people_other": "{{count}} pessoas",
-      "mainBadge": "Unidade principal",
-      "steps": {
-        "place": "Unidade e endereço",
-        "contact": "Contato e horário",
-        "people": "Pessoas",
-        "places": "Locais e dias"
-      },
-      "groups": {
-        "branch": "Unidade",
-        "address": "Endereço",
-        "contact": "Contato",
-        "hours": "Horário"
-      },
-      "fields": {
-        "name": "Nome",
-        "colour": "Cor",
-        "main": "Unidade principal",
-        "status": "Status",
-        "line1": "Endereço (linha 1)",
-        "line2": "Endereço (linha 2)",
-        "area": "Bairro",
-        "city": "Cidade",
-        "pin": "CEP",
-        "state": "Estado",
-        "phone": "Telefone",
-        "email": "E-mail",
-        "gstin": "GSTIN",
-        "reviewLink": "Link de avaliações do Google",
-        "days": "Dias",
-        "opens": "Abre",
-        "closes": "Fecha",
-        "team": "Equipe",
-        "doctor": "Médico padrão",
-        "desk": "Recepção padrão",
-        "therapist": "Terapeuta padrão",
-        "pharmacist": "Farmacêutico padrão"
-      },
-      "placeholders": {
-        "name": "ex.: Vesu",
-        "line1": "Loja / andar, prédio",
-        "line2": "Rua, ponto de referência",
-        "area": "ex.: Vesu",
-        "city": "Cidade",
-        "pin": "6 dígitos",
-        "state": "Estado",
-        "email": "unidade@clinica.com",
-        "gstin": "15 caracteres",
-        "reviewLink": "https://g.page/r/…/review",
-        "team": "Escolha a equipe"
-      },
-      "hints": {
-        "colour": "identifica esta unidade em todo lugar",
-        "phone": "10 dígitos",
-        "reviewLink": "enviado quando você pede uma avaliação a um paciente após um pagamento",
-        "team": "quem trabalha aqui",
-        "preselected": "pré-selecionado nos formulários daqui",
-        "addFirst": {
-          "doctor": "adicione primeiro um médico à equipe",
-          "desk": "adicione primeiro alguém da recepção à equipe",
-          "therapist": "adicione primeiro um terapeuta à equipe",
-          "pharmacist": "adicione primeiro um farmacêutico à equipe"
-        },
-        "main": "uma por clínica · definida na abertura"
-      },
-      "toggles": {
-        "mainOn": "Principal · sede",
-        "mainOff": "Não é a unidade principal",
-        "openOn": "Aberta · aparece nas listas",
-        "openOff": "Fechada · oculta em todo lugar"
-      },
-      "nobody": "Ninguém",
-      "you": "{{name}} (você)",
-      "save": {
-        "create": "Adicionar unidade",
-        "edit": "Salvar unidade"
-      },
-      "nameMissing": "Dê um nome à unidade",
-      "addressMissing": "Adicione o endereço, o bairro, a cidade e o código PIN",
-      "duplicate": "Já existe uma unidade chamada {{name}}",
-      "phoneInvalid": "O telefone precisa de 10 dígitos",
-      "emailInvalid": "Digite um e-mail válido",
-      "reviewLinkInvalid": "Digite um link que comece com https://",
-      "added": "Unidade {{name}} adicionada",
-      "saved": "{{name}} salva",
-      "contactMissing": "Adicione o telefone e o e-mail",
-      "pinInvalid": "O código PIN precisa de 6 dígitos",
-      "places": {
-        "sections": {
-          "room": "Salas",
-          "machine": "Máquinas",
-          "holiday": "Feriados"
-        },
-        "hints": {
-          "room": "onde os pacientes são atendidos",
-          "machine": "reservadas com um tratamento",
-          "holiday": "fechado o dia todo · sem agendamentos"
-        },
-        "counts": {
-          "room_one": "{{count}} sala",
-          "room_many": "{{count}} salas",
-          "room_other": "{{count}} salas",
-          "machine_one": "{{count}} máquina",
-          "machine_many": "{{count}} máquinas",
-          "machine_other": "{{count}} máquinas",
-          "holiday_one": "{{count}} feriado",
-          "holiday_many": "{{count}} feriados",
-          "holiday_other": "{{count}} feriados"
-        },
-        "nothingYet": "Ainda não há salas, máquinas nem feriados",
-        "empty": {
-          "room": "Ainda não há salas",
-          "machine": "Ainda não há máquinas",
-          "holiday": "Nenhum feriado próximo"
-        },
-        "newLabel": {
-          "room": "Nova sala",
-          "machine": "Nova máquina",
-          "holiday": "Novo feriado"
-        },
-        "placeholders": {
-          "room": "ex.: Sala 1",
-          "machine": "ex.: Máquina de laser",
-          "holiday": "ex.: Diwali"
-        },
-        "fields": {
-          "name": "Nome",
-          "date": "Data",
-          "label": "Feriado"
-        },
-        "add": "Adicionar",
-        "rename": "Renomear",
-        "save": "Salvar",
-        "cancel": "Cancelar",
-        "remove": "Remover",
-        "toggle": {
-          "on": "Em uso",
-          "off": "Desativada",
-          "label": "{{name}} em uso"
-        },
-        "removeTitle": {
-          "room": "Remover esta sala?",
-          "machine": "Remover esta máquina?",
-          "holiday": "Remover este feriado?"
-        },
-        "duplicate": {
-          "room": "Já existe uma sala chamada {{name}}",
-          "machine": "Já existe uma máquina chamada {{name}}",
-          "holiday": "{{date}} já é feriado"
-        },
-        "nameMissing": "Adicione um nome",
-        "nameTooLong": "No máximo 60 caracteres",
-        "dateMissing": "Escolha a data",
-        "labelMissing": "Dê um nome ao feriado",
-        "labelTooLong": "No máximo 60 caracteres",
-        "added": "Adicionado: {{name}}",
-        "renamed": "Renomeado: {{name}}",
-        "switchedOn": "Ativado: {{name}}",
-        "switchedOff": "Desativado: {{name}}",
-        "removed": "Removido: {{name}}",
-        "loadFailed": "Não foi possível carregar as salas, as máquinas e os feriados"
       }
     }
   }

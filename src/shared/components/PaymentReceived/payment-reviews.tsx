@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
+import { organizationBranchEdit } from '@/lib/routes/branches-builders.ts';
 import {
   organizationPatientSection,
   organizationReviewCreate,
 } from '@/lib/routes/patient-file-builders.ts';
-import { organizationUsersBranchEdit } from '@/lib/routes/users-builders.ts';
 import { cn } from '@/lib/utils.ts';
 import { localDateOf } from '@/shared/api/app/app-time.ts';
 import type { PatientReview } from '@/shared/api/app/feedback-contracts.ts';
@@ -106,7 +106,7 @@ function NoLinkNote({ branchId, canEdit }: { branchId: string; canEdit: boolean 
       {t(K.noLink)}{' '}
       {canEdit ? (
         <Link
-          {...organizationUsersBranchEdit(organizationSlug, branchId)}
+          {...organizationBranchEdit(organizationSlug, branchId)}
           data-testid={ids.addLink}
           className="text-foreground font-medium underline underline-offset-2"
         >

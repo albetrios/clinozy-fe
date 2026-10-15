@@ -11,12 +11,12 @@ import {
   type RoomToolbarFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
-import { type AppIcon, MapPin, Shield, Users } from '@/shared/icons/index.ts';
+import { type AppIcon, Shield, Users } from '@/shared/icons/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 
 /** The Users room's tabs, in the design's order (H:1086). */
-export type UsersTab = 'team' | 'roles' | 'branches';
+export type UsersTab = 'team' | 'roles';
 
 /** Each tab's route, 14px icon and the code that opens it. */
 const TABS: readonly {
@@ -37,19 +37,12 @@ const TABS: readonly {
     icon: Shield,
     code: 'role:read',
   },
-  {
-    id: 'branches',
-    to: '/organization/$organizationSlug/users/branches',
-    icon: MapPin,
-    code: 'branch:read',
-  },
 ];
 
 /** Each tab's toolbar id — its test-id prefix and its saved views' key. */
 const TOOLBAR_IDS: Readonly<Record<UsersTab, string>> = {
   team: 'users-team',
   roles: 'users-roles',
-  branches: 'users-branches',
 };
 
 /** Props of {@link UsersToolbar}. */
@@ -58,20 +51,20 @@ export interface UsersToolbarProps {
   tab: UsersTab;
   /** The Team's search ("Name, email, mobile or #ID"); the Team only. */
   search?: boolean;
-  /** The tab's Filters (Team and Branches). */
+  /** The tab's Filters (the Team). */
   filters?: RoomToolbarFilters;
   /** The Columns chooser (the Team only; hidden on a phone). */
   columns?: ReactNode;
-  /** "New user" / "New role" / "New branch" — absent without the right to create. */
+  /** "New user" / "New role" — absent without the right to create. */
   primary?: RoomAction;
 }
 
 /**
  * The Users toolbar (KICKOFF §6.12 Toolbar; H:1085–1090; `users.md:17`) on the
  * shared room toolbar, for all three tabs: h1 "Users" · the tabs — links to
- * Team, Roles & access and Branches, each shown with the code that opens it
- * (`membership:read`, `role:read`, `branch:read`) · the Team's search · Filters (Team and
- * Branches) · Columns (Team) · the tab's "New …" — a floating pill on a phone.
+ * Team and Roles & access, each shown with the code that opens it
+ * (`membership:read`, `role:read`) · the Team's search · Filters (Team) · Columns (Team) · the
+ * tab's "New …" — a floating pill on a phone. Branches is its own room (change-branches-in-navbar).
  * The phone rows follow the room toolbar's default: search + Filters, then the
  * tabs; Roles & access has the tabs alone.
  */

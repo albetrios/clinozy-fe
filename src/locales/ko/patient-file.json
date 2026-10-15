@@ -236,6 +236,50 @@
     "stages": {
       "before": "시술 전",
       "after": "시술 후"
+    },
+    "dropzone": {
+      "title": "여기에 사진을 놓으세요",
+      "body": "또는 복사한 이미지를 붙여넣기 · JPG 또는 PNG, 10MB까지",
+      "target": "{{album}}에 추가",
+      "choose": "사진 선택",
+      "camera": "사진 촬영",
+      "veil": "놓으면 {{album}}에 추가"
+    },
+    "select": {
+      "start": "선택",
+      "done": "완료",
+      "startHint": "비교할 사진 선택",
+      "toggle": "{{name}} 선택",
+      "hint": "비교할 사진을 2~8장 고르세요",
+      "limit": "한 번에 최대 {{max}}장까지 비교할 수 있습니다",
+      "clear": "지우기",
+      "compare": "비교",
+      "bar": "선택한 사진",
+      "count_other": "{{count}}장 선택됨"
+    },
+    "compare": {
+      "title": "사진 비교",
+      "layout": "레이아웃",
+      "row": "한 줄",
+      "grid": "그리드",
+      "zoomMode": "확대와 위치",
+      "linked": "연동",
+      "linkedHint": "모든 사진이 같은 확대와 위치를 따릅니다",
+      "separate": "개별",
+      "separateHint": "사진마다 따로 확대하고 배치",
+      "resetAll": "모두 초기화",
+      "resetAllHint": "모든 사진을 100%로 (0)",
+      "zoomOf": "{{name}} 확대",
+      "remove": "{{name}}을(를) 비교에서 제외",
+      "start": "시작",
+      "close": "비교 닫기",
+      "since_other": "+{{count}}일",
+      "hints": {
+        "zoom": "스크롤하거나 핀치해 모든 사진 확대",
+        "pan": "드래그해 함께 이동 · 두 번 클릭해 초기화",
+        "zoomEach": "사진 위에서 스크롤하거나 핀치해 그 사진만 확대",
+        "panEach": "사진을 드래그해 배치 · 두 번 클릭해 초기화"
+      }
     }
   },
   "rx": {
@@ -886,7 +930,10 @@
     },
     "photos": {
       "upload": "업로드",
-      "empty": "아직 사진이 없습니다 · 첫 사진을 업로드하세요"
+      "empty": "아직 사진이 없습니다 · 첫 사진을 업로드하세요",
+      "add": "사진 추가",
+      "drop": "여기에 사진을 놓거나 클릭해 업로드",
+      "dropBody": "JPG 또는 PNG, 10MB까지 · 붙여넣기도 됩니다"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",

@@ -54,8 +54,10 @@ export const PHOTO_SIZES: readonly PhotoSize[] = ['small', 'medium', 'large'];
 
 /** One thumbnail size's look, as full literals so Tailwind sees each one. */
 export interface PhotoSizeLook {
-  /** The grid: `repeat(auto-fill, minmax(<tile>, 1fr))` and its gap. */
-  grid: string;
+  /** A day's tiles: the gap between them (they wrap at the tile's width). */
+  row: string;
+  /** One tile's width — its height follows (a square). */
+  tile: string;
   /** The caption bar's padding. */
   bar: string;
   name: string;
@@ -67,12 +69,16 @@ export interface PhotoSizeLook {
 }
 
 /**
- * S / M / L (H:4766 `SZC`): 110px tiles gap 6, 160px gap 10 (default), 230px
- * gap 12; the bar's padding and type step up with them.
+ * S / M / L (H:4766 `SZC`): 112px tiles gap 6, 160px gap 10 (default), 224px
+ * gap 12 — the spacing scale's steps nearest the design's 110 and 230px; the
+ * bar's padding and type step up with them. The tiles keep their
+ * width so a day's group is only as wide as its photos and the days sit side
+ * by side (change-patient-overview-photos `BRIEF.md:30–31`).
  */
 export const PHOTO_SIZE_LOOK: Readonly<Record<PhotoSize, PhotoSizeLook>> = {
   small: {
-    grid: 'grid-cols-[repeat(auto-fill,minmax(6.875rem,1fr))] gap-1.5',
+    row: 'gap-1.5',
+    tile: 'w-28',
     bar: 'px-1.5 pt-3.5 pb-1.25',
     name: 'text-tiny',
     date: 'text-[length:calc(var(--text-xs)*19/24)]',
@@ -80,7 +86,8 @@ export const PHOTO_SIZE_LOOK: Readonly<Record<PhotoSize, PhotoSizeLook>> = {
     letter: 'text-tiny',
   },
   medium: {
-    grid: 'grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-2.5',
+    row: 'gap-2.5',
+    tile: 'w-40',
     bar: 'px-2 pt-4.5 pb-1.75',
     name: 'text-xs',
     date: 'text-tiny',
@@ -88,7 +95,8 @@ export const PHOTO_SIZE_LOOK: Readonly<Record<PhotoSize, PhotoSizeLook>> = {
     letter: 'text-caption',
   },
   large: {
-    grid: 'grid-cols-[repeat(auto-fill,minmax(14.375rem,1fr))] gap-3',
+    row: 'gap-3',
+    tile: 'w-56',
     bar: 'px-2.5 pt-5.5 pb-2.25',
     name: 'text-body',
     date: 'text-caption',

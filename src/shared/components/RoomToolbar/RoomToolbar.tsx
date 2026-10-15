@@ -111,6 +111,28 @@ export interface RoomToolbarProps {
 }
 
 /**
+ * The room's h1: hidden on a phone, and set off from its views by a divider — a room without views
+ * (Branches) has none. Leads keeps 20px at every width, 6px before the divider + 2px after
+ * (H:1681); the Tasks h1 keeps 2px more before its views (H:2130).
+ */
+function toolbarTitleClassName({
+  layout,
+  divided,
+}: {
+  layout: RoomToolbarLayout;
+  divided: boolean;
+}) {
+  return cn(
+    'text-foreground flex-none font-semibold tracking-[-0.015em] whitespace-nowrap max-md:sr-only',
+    divided && 'border-e',
+    layout === 'leads' ? 'me-0.5 pe-1.5 text-xl' : 'pe-2.5 text-lg xl:text-xl',
+    layout === 'tasks' && 'me-0.5',
+    // After the size: a later font size would drop an earlier line height.
+    'leading-[1.2]',
+  );
+}
+
+/**
  * The tabs, a period control right after them, then the free space: with a
  * period the tabs keep their width (a tablet's at least 120px, H:142) and the
  * space follows the period (H:1994); without one the tabs take it.
@@ -222,17 +244,7 @@ export function RoomToolbar({
         className,
       )}
     >
-      <h1
-        className={cn(
-          'text-foreground flex-none border-e font-semibold tracking-[-0.015em] whitespace-nowrap max-md:sr-only',
-          // Leads: 20px at every width, 6px before the divider + 2px after (H:1681).
-          layout === 'leads' ? 'me-0.5 pe-1.5 text-xl' : 'pe-2.5 text-lg xl:text-xl',
-          // The Tasks h1 keeps 2px more before its views (H:2130).
-          layout === 'tasks' && 'me-0.5',
-          // After the size: a later font size would drop an earlier line height.
-          'leading-[1.2]',
-        )}
-      >
+      <h1 className={toolbarTitleClassName({ layout, divided: Boolean(tabs ?? period) })}>
         {title}
       </h1>
       <ToolbarViews tabs={tabs} period={period} tabsClassName={placement.tabs} />
