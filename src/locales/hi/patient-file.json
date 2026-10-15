@@ -314,10 +314,9 @@
       "otherDays": "दिनों की कोई और संख्या",
       "otherDaysShort": "और",
       "when": "कब",
-      "morePlaces_one": "+ {{count}} और",
-      "morePlaces_other": "+ {{count}} और",
-      "fewerPlaces": "कम",
-      "meal": "भोजन"
+      "meal": "भोजन",
+      "more": "इस दवा के लिए और",
+      "remarks": "नोट"
     },
     "dose": {
       "group": "खुराक सुबह · दोपहर · रात",

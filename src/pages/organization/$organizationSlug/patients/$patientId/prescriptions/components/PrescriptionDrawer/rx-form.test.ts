@@ -338,6 +338,13 @@ describe('the same days for every line (change-prescription-one-click D6)', () =
     expect(lines[2]).toEqual(emptyRxLine());
   });
 
+  it('keeps the quantity of a line it is told to (a tube, change-prescription-one-line D11)', () => {
+    const tube = { ...gel, dose: '0-0-1' };
+    const lines = withRxDaysForAll([doxy, tube], 14, (item) => item === tube);
+    expect(lines[0]).toMatchObject({ days: 14, qty: 28 });
+    expect(lines[1]).toMatchObject({ days: 14, qty: 1 });
+  });
+
   it('names the course the written lines share, else none', () => {
     expect(rxSharedDays(withRxDaysForAll([doxy, gel], 10))).toBe(10);
     expect(

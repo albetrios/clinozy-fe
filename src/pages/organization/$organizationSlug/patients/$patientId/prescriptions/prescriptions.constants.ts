@@ -72,9 +72,10 @@ export const RX_KEYS = {
     when: 'rx.items.when',
     /** The Meal tray's group: a tablet's (change-prescription-compact-line D8). */
     meal: 'rx.items.meal',
-    /** "+ 9 more" / "Fewer" — the Where chips beyond the usual five. */
-    morePlaces: 'rx.items.morePlaces',
-    fewerPlaces: 'rx.items.fewerPlaces',
+    /** More's name — the line's rarer choices and its note (change-prescription-one-line D4). */
+    more: 'rx.items.more',
+    /** The note's name in More and under its line: "Note". */
+    remarks: 'rx.items.remarks',
     /** The medicine list's groups (D4). */
     groups: {
       store: 'rx.items.groups.store',

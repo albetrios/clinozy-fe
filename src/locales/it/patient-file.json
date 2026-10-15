@@ -325,11 +325,9 @@
       "otherDays": "Altro numero di giorni",
       "otherDaysShort": "Altro",
       "when": "Quando",
-      "morePlaces_one": "+ altro {{count}}",
-      "morePlaces_many": "+ altri {{count}}",
-      "morePlaces_other": "+ altri {{count}}",
-      "fewerPlaces": "Meno",
-      "meal": "Pasto"
+      "meal": "Pasto",
+      "more": "Altro per questo farmaco",
+      "remarks": "Nota"
     },
     "dose": {
       "group": "Dose mattina · pomeriggio · sera",

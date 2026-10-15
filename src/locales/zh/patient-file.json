@@ -303,9 +303,9 @@
       "otherDays": "其他天数",
       "otherDaysShort": "其他",
       "when": "何时",
-      "morePlaces_other": "+ 另外 {{count}} 个",
-      "fewerPlaces": "收起",
-      "meal": "用餐"
+      "meal": "用餐",
+      "more": "此药品的更多选项",
+      "remarks": "备注"
     },
     "dose": {
       "group": "剂量 早 · 中 · 晚",

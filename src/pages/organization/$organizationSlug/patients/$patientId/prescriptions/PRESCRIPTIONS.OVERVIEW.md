@@ -28,24 +28,25 @@ the Patients room's row action (feat-prescription-composer).
   Remove and Keep — no dialog. A save with a warning not yet answered opens Medicines, brings the warning into view
   and focuses Keep (change-prescription-writing D7); Keep is one tap, it never blocks.
 
-## The medicine rows (change-prescription-writing, change-prescription-one-click, change-prescription-compact-line, change-prescription-touch-picker)
+## The medicine rows (change-prescription-writing … change-prescription-one-line)
 
 - **Store or outside** (`components/PrescriptionDrawer/rx-medicine-cell.tsx`): the trigger names the medicine and its
   source — the store's stock (sage), out of stock (blush), or Outside (slate, a name written as text, `medicine_id`
   none). The list groups "In your medical store" and "Outside medicines"; a new name is an outside medicine; the
   list's footer switches the line store ↔ outside. On a touch screen the picker is 44px high, like the line's
   segments and quantity stepper (change-prescription-touch-picker); the shared picker keeps its sizes elsewhere.
-- **The compact line, one click, no dropdown** (change-prescription-compact-line;
+- **One line per medicine, one click, no dropdown** (change-prescription-compact-line, change-prescription-one-line;
   `components/PrescriptionDrawer/rx-item-cells.tsx`): every everyday choice is a small segment on a tray (a `muted`
   track, the lit segment in its tone and raised — 24px with a mouse, 44px high on touch); a second click clears it.
-  Line 1 — Medicine · **Dose · M A N** (the taps read as the dose, `1 0 1`; ×2 for two tablets at each lit time,
-  disabled until a time is lit; SOS) · **Days** (3 · 5 · 7 · 10 · 14 · 30 and a number box) · Qty. Days is a column
-  while the table is at least 760px wide with a mouse (1000px on touch, `useElementWidth`), else it leads the line
-  under the medicine. That line — `ItemsField`'s `rowDetail` with `noteBesideDetail` — holds **Meal** (a tablet:
-  Before · After · Empty stomach · With meal) or **When** (a skin medicine's time of day and how often —
-  `rxIsSkinLine`) and **Where** (five places, "+ 9 more" on the same tray), the note filling the rest. "All
-  medicines · Days" above the lines sets one course on every line. Each tray is an ARIA toolbar — one Tab stop,
-  the arrow keys within (mirrored right to left). The line's tracks are CSS variables the table sets per pointer.
+  Each line is numbered and reads Medicine · **Dose · M A N** (the taps read as the dose, `1 0 1`; SOS) · **Days**
+  (3 · 5 · 7 · 10 · 14 · 30 and a number box) · **Meal · Where** (a tablet's Before · After, a skin medicine's Face ·
+  Scalp — `rxIsSkinLine` — then **More**) · Qty. More is a popover with the rarer choices: every Meal or When timing,
+  every place, ×2 and the note; once one is set its words show on More, lit ("Neck +1"). The note shows as one quiet
+  line under its medicine only when there is one. Days and Meal · Where are columns while the table is at least
+  870px wide with a mouse (1090px on touch, `useElementWidth`), else both lead the line under the medicine
+  (`ItemsField`'s `rowDetail`). The medicine column takes only the room the others leave. "All medicines · Days"
+  above the lines sets one course on every line. Each tray is an ARIA toolbar — one Tab stop, the arrow keys within
+  (mirrored right to left). The line's tracks are CSS variables the table sets per pointer.
 - **Days**: a line's own `days` (the form's — the wire keeps them first in `remarks`, "7 days · …", split on open and
   joined on save, `components/PrescriptionDrawer/rx-form.ts` `rxSplitDays` / `rxRemarksOf`); the quantity follows
   days × doses a day.

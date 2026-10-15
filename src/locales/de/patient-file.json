@@ -314,10 +314,9 @@
       "otherDays": "Andere Anzahl Tage",
       "otherDaysShort": "Andere",
       "when": "Wann",
-      "morePlaces_one": "+ {{count}} weitere",
-      "morePlaces_other": "+ {{count}} weitere",
-      "fewerPlaces": "Weniger",
-      "meal": "Mahlzeit"
+      "meal": "Mahlzeit",
+      "more": "Mehr zu diesem Medikament",
+      "remarks": "Notiz"
     },
     "dose": {
       "group": "Dosis morgens · mittags · abends",

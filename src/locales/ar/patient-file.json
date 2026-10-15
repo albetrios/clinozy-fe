@@ -358,14 +358,9 @@
       "otherDays": "عدد أيام آخر",
       "otherDaysShort": "آخر",
       "when": "متى",
-      "morePlaces_zero": "+ {{count}} أخرى",
-      "morePlaces_one": "+ {{count}} أخرى",
-      "morePlaces_two": "+ {{count}} أخرى",
-      "morePlaces_few": "+ {{count}} أخرى",
-      "morePlaces_many": "+ {{count}} أخرى",
-      "morePlaces_other": "+ {{count}} أخرى",
-      "fewerPlaces": "أقل",
-      "meal": "الوجبة"
+      "meal": "الوجبة",
+      "more": "المزيد لهذا الدواء",
+      "remarks": "ملاحظة"
     },
     "dose": {
       "group": "الجرعة صباحًا · ظهرًا · ليلًا",

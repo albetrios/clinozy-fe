@@ -597,56 +597,66 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     expect(trigger()).toHaveAttribute('data-source', 'stocked');
   });
 
-  it('sets the dose, ×2, days and when with one click each — no dropdown', async () => {
+  it('sets the dose, days and meal with one click each on one line (change-prescription-one-line)', async () => {
     rxWorld.medicines = [SEPTRAN];
     const { user, drawer } = await openNew();
     await quickAdd(user, drawer, 'septran');
     const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
     const chip = (id: string) => within(row).getByTestId(`rx-items-${id}`);
+    // The line's number keeps each medicine apart (D7).
+    expect(chip('medicine-number')).toHaveTextContent('1');
     await user.click(chip('dose-morning'));
     expect(chip('dose-morning')).toHaveAttribute('aria-pressed', 'true');
     await user.click(chip('dose-morning'));
     expect(chip('dose-morning')).toHaveAttribute('aria-pressed', 'false');
-    // ×2 stays in its place, disabled until a time is lit (change-prescription-compact-line D4).
-    expect(chip('dose-double')).toBeDisabled();
 
     await user.click(chip('dose-morning'));
     await user.click(chip('dose-night'));
     expect(chip('dose-night')).toHaveAttribute('aria-pressed', 'true');
-    // The taps read as the dose itself: 1 0 1.
+    // The taps read as the dose itself: 1 0 1, then SOS (×2 is in More, D5).
     expect(
       within(chip('dose'))
         .getAllByRole('button')
         .map((button) => button.textContent),
-    ).toEqual(['1', '0', '1', '×2', 'SOS']);
-    expect(chip('dose-double')).toBeEnabled();
+    ).toEqual(['1', '0', '1', 'SOS']);
     await user.click(chip('days-10'));
     expect(chip('days-10')).toHaveAttribute('aria-pressed', 'true');
     expect(chip('qty')).toHaveValue('20');
 
-    await user.click(chip('dose-double'));
-    expect(chip('dose-double')).toHaveAttribute('aria-pressed', 'true');
-    expect(chip('dose-night')).toHaveAccessibleName('Night · 2');
-    expect(chip('qty')).toHaveValue('40');
-
-    // A second click clears; the box takes a course the chips lack.
+    // A second click clears; the box takes a course the segments lack.
     await user.click(chip('days-10'));
     expect(chip('days-10')).toHaveAttribute('aria-pressed', 'false');
     await user.type(chip('days-other'), '12');
     expect(chip('days-other')).toHaveValue('12');
-    expect(chip('qty')).toHaveValue('48');
+    expect(chip('qty')).toHaveValue('24');
 
-    // A tablet's When is the meal, short on its tray and in full in its title.
-    expect(chip('when')).toHaveAccessibleName('Meal');
+    // Meal is on the line (D3): Before · After, then More — no second row of options.
+    expect(chip('directions').closest('[data-column]')).toHaveAttribute(
+      'data-column',
+      'directions',
+    );
+    expect(chip('directions')).toHaveAccessibleName('Meal');
     expect(
-      within(chip('when'))
+      within(chip('directions'))
         .getAllByRole('button')
-        .map((button) => button.textContent),
-    ).toEqual(['Before', 'After', 'Empty stomach', 'With meal']);
-    expect(chip('when-before')).toHaveAttribute('title', 'Before meal');
-    await user.click(chip('when-after'));
-    expect(chip('when-after')).toHaveAttribute('aria-pressed', 'true');
-    expect(within(row).queryByTestId('rx-items-where')).toBeNull();
+        .map((button) => button.getAttribute('aria-label') ?? button.textContent),
+    ).toEqual(['Before', 'After', 'More for this medicine']);
+    expect(chip('directions-before')).toHaveAttribute('title', 'Before meal');
+    await user.click(chip('directions-after'));
+    expect(chip('directions-after')).toHaveAttribute('aria-pressed', 'true');
+    expect(within(row).queryByTestId('rx-items-rail')).toBeNull();
+
+    // More (D4): ×2 and the note; what is set there shows on the line.
+    await user.click(chip('directions-more'));
+    await user.click(screen.getByTestId('rx-items-dose-double'));
+    expect(chip('dose-night')).toHaveAccessibleName('Night · 2');
+    expect(chip('qty')).toHaveValue('48');
+    await user.type(screen.getByTestId('rx-items-remarks'), 'with water');
+    await user.keyboard('{Escape}');
+    expect(chip('directions-more')).toHaveTextContent('×2');
+    expect(chip('directions-more')).toHaveAccessibleName('More for this medicine · ×2');
+    // The note shows under its line, once written (D6).
+    expect(within(row).getByTestId('rx-items-note-line')).toHaveTextContent('with water');
 
     await user.click(within(drawer).getByTestId('rx-drawer-save'));
     await waitFor(() => expect(rxServerApi.createPrescription).toHaveBeenCalled());
@@ -657,16 +667,24 @@ describe('the prescription composer (feat-prescription-composer)', () => {
       doseNight: 2,
       meal: 'after',
       qty: 48,
-      remarks: '12 days',
+      remarks: '12 days · with water',
     });
   });
 
-  it('gives a skin medicine its timings and places, with + more in place', async () => {
+  it('gives a skin medicine its places on the line and its timings in More', async () => {
     rxWorld.medicines = [GLYCOLAC];
     const { user, drawer } = await openNew();
     await quickAdd(user, drawer, 'glyco');
     const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
-    const when = within(row).getByTestId('rx-items-when');
+    const directions = within(row).getByTestId('rx-items-directions');
+    expect(directions).toHaveAccessibleName('Where');
+    await user.click(within(directions).getByTestId('rx-items-directions-face'));
+    expect(within(directions).getByTestId('rx-items-directions-face')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await user.click(within(directions).getByTestId('rx-items-directions-more'));
+    const when = screen.getByTestId('rx-items-when');
     expect(
       within(when)
         .getAllByRole('button')
@@ -679,37 +697,35 @@ describe('the prescription composer (feat-prescription-composer)', () => {
       'Thrice a week',
       'Once a week',
     ]);
-    const where = within(row).getByTestId('rx-items-where');
-    expect(within(where).queryByTestId('rx-items-where-neck')).toBeNull();
-    await user.click(within(where).getByTestId('rx-items-where-more'));
-    await user.click(within(where).getByTestId('rx-items-where-neck'));
-    expect(within(where).getByTestId('rx-items-where-neck')).toHaveAttribute(
+    await user.click(within(when).getByTestId('rx-items-when-thrice_week'));
+    // Every place is in More, the line's two among them.
+    await user.click(screen.getByTestId('rx-items-where-neck'));
+    await user.keyboard('{Escape}');
+    // A place beyond the two, and the timing, show on the line, lit.
+    const more = within(row).getByTestId('rx-items-directions-more');
+    expect(more).toHaveTextContent('Neck+1');
+    expect(more).toHaveAccessibleName('More for this medicine · Neck · Thrice a week');
+    expect(within(directions).getByTestId('rx-items-directions-face')).toHaveAttribute(
       'aria-pressed',
-      'true',
-    );
-    await user.click(within(where).getByTestId('rx-items-where-more'));
-    // A place beyond the five stays in sight, lit, once they close again.
-    expect(within(where).getByTestId('rx-items-where-neck')).toHaveAttribute(
-      'aria-pressed',
-      'true',
+      'false',
     );
   });
 
-  it('keeps Days a column where the table has room (change-prescription-compact-line D6)', async () => {
+  it('keeps Days and Meal on the line where the table has room (D9)', async () => {
     rxWorld.medicines = [SEPTRAN];
     tableWidth.value = 896;
     const { user, drawer } = await openNew();
     await quickAdd(user, drawer, 'septran bd');
-    expect(within(drawer).getByTestId('rx-items-header')).toHaveTextContent('Days');
+    const header = within(drawer).getByTestId('rx-items-header');
+    expect(header).toHaveTextContent('Days');
+    expect(header).toHaveTextContent('Meal · Where');
     const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
-    const days = within(row).getByTestId('rx-items-days');
-    expect(days.closest('[data-column]')).toHaveAttribute('data-column', 'days');
-    // The line under it: the meal beside the note.
-    const rail = within(row).getByTestId('rx-items-rail');
-    expect(rail).not.toContainElement(days);
-    expect(rail.closest('[data-slot="items-row-line"]')).toContainElement(
-      within(row).getByTestId('rx-items-note'),
-    );
+    expect(
+      within(row).getByTestId('rx-items-days').closest('[data-column]'),
+    ).toHaveAttribute('data-column', 'days');
+    // Nothing under the line: no rail, and no note until one is written.
+    expect(within(row).queryByTestId('rx-items-rail')).toBeNull();
+    expect(within(row).queryByTestId('rx-items-note-line')).toBeNull();
   });
 
   it('grows the medicine picker to 44px on touch only (change-prescription-touch-picker D3)', async () => {
@@ -724,15 +740,18 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     );
   });
 
-  it('folds Days under the medicine where the table is narrow', async () => {
+  it('folds Days and Meal under the medicine where the table is narrow', async () => {
     rxWorld.medicines = [SEPTRAN];
     tableWidth.value = 640;
     const { user, drawer } = await openNew();
     await quickAdd(user, drawer, 'septran bd');
-    expect(within(drawer).getByTestId('rx-items-header')).not.toHaveTextContent('Days');
+    const header = within(drawer).getByTestId('rx-items-header');
+    expect(header).not.toHaveTextContent('Days');
+    expect(header).not.toHaveTextContent('Meal');
     const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
     expect(row.querySelector('[data-column="days"]')).toBeNull();
     const rail = within(row).getByTestId('rx-items-rail');
+    expect(rail).toContainElement(within(row).getByTestId('rx-items-directions'));
     await user.click(within(rail).getByTestId('rx-items-days-5'));
     expect(within(rail).getByTestId('rx-items-days-5')).toHaveAttribute(
       'aria-pressed',
@@ -765,15 +784,15 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     ).toHaveValue('28');
   });
 
-  it('makes each chip group one Tab stop, the arrow keys moving within it', async () => {
+  it('makes each tray one Tab stop, the arrow keys moving within it', async () => {
     rxWorld.medicines = [SEPTRAN];
     const { user, drawer } = await openNew();
     await quickAdd(user, drawer, 'septran bd');
     const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
     const dose = within(row).getByTestId('rx-items-dose');
     const chips = within(dose).getAllByRole('button');
-    // The lit chip holds the group's one stop.
-    expect(chips.map((chip) => chip.tabIndex)).toEqual([0, -1, -1, -1, -1]);
+    // The lit segment holds the tray's one stop.
+    expect(chips.map((chip) => chip.tabIndex)).toEqual([0, -1, -1, -1]);
     chips[0]?.focus();
     await user.keyboard('{ArrowRight}');
     expect(chips[1]).toHaveFocus();

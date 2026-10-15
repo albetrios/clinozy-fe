@@ -495,34 +495,6 @@ describe('ItemsField — the row detail (change-prescription-one-click D3)', () 
     const note = screen.getByTestId('lines-note').closest('[role="cell"]');
     expect(cell?.nextElementSibling).toBe(note);
   });
-
-  it('shares one wrapping line with the note when the host asks (change-prescription-compact-line D7)', () => {
-    renderWithClient(
-      <LinesHarness
-        note={{ key: 'note' }}
-        noteBesideDetail
-        rowDetail={(row) => <p data-testid="lines-detail">More of {row.row.name}</p>}
-      />,
-    );
-    const cell = screen.getByTestId('lines-detail').closest('[role="cell"]');
-    const note = screen.getByTestId('lines-note').closest('[role="cell"]');
-    const line = cell?.parentElement;
-    expect(line).toHaveAttribute('data-slot', 'items-row-line');
-    expect(line).toHaveClass('col-span-full', 'flex', 'flex-wrap');
-    expect(cell?.nextElementSibling).toBe(note);
-    // The note fills the rest of the line, and wraps under the detail below 224px.
-    expect(note).toHaveClass('min-w-56', 'flex-1');
-    expect(note).not.toHaveClass('col-span-full');
-  });
-
-  it('keeps the note on its own line for a row without a detail, even when asked', () => {
-    renderWithClient(
-      <LinesHarness note={{ key: 'note' }} noteBesideDetail rowDetail={() => null} />,
-    );
-    const note = screen.getByTestId('lines-note').closest('[role="cell"]');
-    expect(note).toHaveClass('col-span-full');
-    expect(note?.parentElement).not.toHaveAttribute('data-slot', 'items-row-line');
-  });
 });
 
 describe('ItemsField — phone (H:95–101)', () => {

@@ -218,67 +218,83 @@ export function RxMedicineCell({
   const words = sourceWords(source, stock);
 
   return (
-    <ItemsPickerCell<RxFormValues, RxCatalogMedicine>
-      {...row.bind('medicineName')}
-      options={optionsFor(line.medicineName)}
-      placeholder={t(K.items.medicine)}
-      searchPlaceholder={t(K.items.searchMedicine)}
-      createLabel={t(K.items.addOutside)}
-      autoCreate
-      minWidth={320}
-      onCreate={(query) => {
-        const name = query.trim().slice(0, NAME_MAX_LENGTH);
-        if (!name) return;
-        form.setValue(`${row.name}.medicineName`, name, { shouldDirty: true });
-        form.setValue(`${row.name}.medicineId`, null, { shouldDirty: true });
-      }}
-      onPick={(option) => {
-        const medicine = option?.data;
-        form.setValue(`${row.name}.medicineId`, medicine?.medicineId ?? null, {
-          shouldDirty: true,
-        });
-        if (!(medicine?.last && !line.dose && !line.when)) return;
-        const last = rxFormLineOf(medicine.last, labels.dayWords);
-        form.setValue(
-          row.name,
-          {
-            ...line,
-            ...last,
-            medicineName: medicine.name,
-            qty: rxQtyFor(last.dose, last.days) ?? last.qty,
-            remarks: line.remarks,
-          },
-          { shouldDirty: true },
-        );
-      }}
-      footer={sourceSwitchFooter({ form, row, medicines })}
-      disabled={readOnly}
-      renderTrigger={({ placeholder, invalid, describedBy }) => (
-        <PickerTrigger
-          size="sm"
-          inset="compact"
+    <div className="flex w-full min-w-0 items-center gap-2">
+      {/* The line's number: each medicine reads as its own line (change-prescription-one-line D7). */}
+      <span
+        aria-hidden="true"
+        data-testid={`${row.testId}-number`}
+        className="bg-muted text-tiny text-muted-foreground-strong flex size-5 flex-none items-center justify-center rounded-sm font-semibold tabular-nums pointer-coarse:size-6"
+      >
+        {row.index + 1}
+      </span>
+      <div className="min-w-0 flex-1">
+        <ItemsPickerCell<RxFormValues, RxCatalogMedicine>
+          {...row.bind('medicineName')}
+          options={optionsFor(line.medicineName)}
+          placeholder={t(K.items.medicine)}
+          searchPlaceholder={t(K.items.searchMedicine)}
+          createLabel={t(K.items.addOutside)}
+          autoCreate
+          minWidth={320}
+          onCreate={(query) => {
+            const name = query.trim().slice(0, NAME_MAX_LENGTH);
+            if (!name) return;
+            form.setValue(`${row.name}.medicineName`, name, { shouldDirty: true });
+            form.setValue(`${row.name}.medicineId`, null, { shouldDirty: true });
+          }}
+          onPick={(option) => {
+            const medicine = option?.data;
+            form.setValue(`${row.name}.medicineId`, medicine?.medicineId ?? null, {
+              shouldDirty: true,
+            });
+            if (!(medicine?.last && !line.dose && !line.when)) return;
+            const last = rxFormLineOf(medicine.last, labels.dayWords);
+            form.setValue(
+              row.name,
+              {
+                ...line,
+                ...last,
+                medicineName: medicine.name,
+                qty: rxQtyFor(last.dose, last.days) ?? last.qty,
+                remarks: line.remarks,
+              },
+              { shouldDirty: true },
+            );
+          }}
+          footer={sourceSwitchFooter({ form, row, medicines })}
           disabled={readOnly}
-          aria-invalid={invalid ? true : undefined}
-          aria-describedby={describedBy}
-          aria-label={[row.label, line.medicineName, words].filter(Boolean).join(' · ')}
-          title={words || undefined}
-          data-testid={row.testId}
-          data-source={source}
-          // 44px on touch, like the line's segments and stepper (change-prescription-touch-picker D3).
-          className="pe-2 pointer-coarse:min-h-11"
-        >
-          {line.medicineName ? (
-            <>
-              <span dir="auto" className="min-w-0 truncate">
-                {line.medicineName}
-              </span>
-              <RxSourcePill source={source} stock={stock} />
-            </>
-          ) : (
-            <span className={cn('text-muted-foreground truncate')}>{placeholder}</span>
+          renderTrigger={({ placeholder, invalid, describedBy }) => (
+            <PickerTrigger
+              size="sm"
+              inset="compact"
+              disabled={readOnly}
+              aria-invalid={invalid ? true : undefined}
+              aria-describedby={describedBy}
+              aria-label={[row.label, line.medicineName, words]
+                .filter(Boolean)
+                .join(' · ')}
+              title={words || undefined}
+              data-testid={row.testId}
+              data-source={source}
+              // 44px on touch, like the line's segments and stepper (change-prescription-touch-picker D3).
+              className="pe-2 pointer-coarse:min-h-11"
+            >
+              {line.medicineName ? (
+                <>
+                  <span dir="auto" className="min-w-0 truncate">
+                    {line.medicineName}
+                  </span>
+                  <RxSourcePill source={source} stock={stock} />
+                </>
+              ) : (
+                <span className={cn('text-muted-foreground truncate')}>
+                  {placeholder}
+                </span>
+              )}
+            </PickerTrigger>
           )}
-        </PickerTrigger>
-      )}
-    />
+        />
+      </div>
+    </div>
   );
 }

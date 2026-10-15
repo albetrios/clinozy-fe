@@ -29,7 +29,13 @@ import {
   rxSharedDays,
   withRxDaysForAll,
 } from './rx-form.ts';
-import { RxAllDays, RxDaysTray, RxDoseCell, RxLineRail } from './rx-item-cells.tsx';
+import {
+  RxAllDays,
+  RxDaysTray,
+  RxDirectionsCell,
+  RxDoseCell,
+  RxNoteLine,
+} from './rx-item-cells.tsx';
 import { RxMedicineCell } from './rx-medicine-cell.tsx';
 import { type ReadableRxPadLine, withRxPadLines } from './rx-pad.ts';
 import { RxPadPanel } from './rx-pad-panel.tsx';
@@ -41,29 +47,32 @@ const K = RX_KEYS;
 /**
  * The line's tracks per pointer, set on the table and read by its columns
  * (change-prescription-compact-line D9; change-prescription-touch-quantity
- * D6): Dose · Days · Qty — 160 · 224 · 92px with a mouse, 220 · 292 · 120px
- * on touch, where every segment is 44px.
+ * D6; change-prescription-one-line): Dose · Days · Meal · Where · Qty —
+ * 128 · 200 · 170 · 88px with a mouse, 176 · 284 · 212 · 120px on touch,
+ * where every segment is 44px.
  */
 const RX_TRACKS_CLASS =
-  '[--rx-dose-track:160px] [--rx-days-track:224px] [--rx-qty-track:92px] pointer-coarse:[--rx-dose-track:220px] pointer-coarse:[--rx-days-track:292px] pointer-coarse:[--rx-qty-track:120px]';
+  '[--rx-dose-track:128px] [--rx-days-track:200px] [--rx-directions-track:170px] [--rx-qty-track:88px] pointer-coarse:[--rx-dose-track:176px] pointer-coarse:[--rx-days-track:284px] pointer-coarse:[--rx-directions-track:212px] pointer-coarse:[--rx-qty-track:120px]';
 
 /**
- * The table width from which Days is a column of the line (D6): a 200px
- * medicine, the tracks above, the ×, the gaps and the padding — 760px with a
- * mouse, 1000px on touch. Narrower, Days leads the line under the medicine.
+ * The table width from which Days and Meal · Where are columns of the line
+ * (change-prescription-one-line D9): a medicine of about 200px, the tracks
+ * above, the ×, the gaps and the padding — 870px with a mouse (1280 beside
+ * the Rx check holds them), 1090px on touch. Narrower, both lead the line
+ * under the medicine.
  */
-const RX_DAYS_COLUMN_FROM = { mouse: 760, touch: 1000 } as const;
+const RX_ONE_LINE_FROM = { mouse: 870, touch: 1090 } as const;
 
 /**
- * Whether the table holds Days as a column now — measured on the table
- * itself, so the Rx check beside it counts; before the first measure (0) it
- * does.
+ * Whether the table holds a medicine on one line now — measured on the
+ * table itself, so the Rx check beside it counts; before the first measure
+ * (0) it does.
  */
-function useRxDaysColumn() {
+function useRxOneLine() {
   const [measure, width] = useElementWidth<HTMLDivElement>();
   const mouse = useCanHover();
-  const from = mouse ? RX_DAYS_COLUMN_FROM.mouse : RX_DAYS_COLUMN_FROM.touch;
-  return { measure, daysColumn: width === 0 || width >= from };
+  const from = mouse ? RX_ONE_LINE_FROM.mouse : RX_ONE_LINE_FROM.touch;
+  return { measure, oneLine: width === 0 || width >= from };
 }
 
 /** The Rx Pad's state, held by the drawer (its Esc closes the Pad first). */
@@ -135,49 +144,76 @@ function RxPadToggle({
 }
 
 /**
- * The item rows (change-prescription-compact-line): line 1 — Medicine (its
- * source pill) · Dose (`1 0 1`, ×2, SOS) · Days, where the table has room ·
- * Qty — and under it Days when folded, Meal or When · Where, beside the note;
- * with the quantity recompute: days × doses a day whenever the dose or the
- * days change (a note's own days count while Days is empty).
+ * The item rows (change-prescription-one-line): one numbered line per
+ * medicine — Medicine (its source pill) · Dose (`1 0 1`, SOS) · Days · Meal
+ * · Where (the two usual picks and More) · Qty — or, on a narrow table, Days
+ * and Meal · Where under the medicine; a note under its line when there is
+ * one. The quantity follows days × doses a day whenever the dose, the days or
+ * a note's own days (while Days is empty) change.
  */
 function useRxColumns({
   form,
   catalog,
   readOnly,
-  daysColumn,
+  oneLine,
 }: Pick<RxMedicinesFieldProps, 'form' | 'catalog' | 'readOnly'> & {
-  /** Days is a column of the line (D6), else the first tray under it. */
-  daysColumn: boolean;
+  /** Days and Meal · Where are columns of the line (D9), else under it. */
+  oneLine: boolean;
 }) {
   const { t } = useTranslation(RX_NS);
   const labels = useRxLabels();
   const medicines = catalog?.medicines ?? [];
 
-  const recompute = (
-    rowName: `items.${number}`,
-    line: Pick<RxFormLine, 'dose' | 'days' | 'remarks'>,
-  ) => {
+  const recompute = (rowName: `items.${number}`, line: RxFormLine) => {
+    // A tube or a bottle is not counted by the day (D11): its quantity stays as written.
+    if (rxIsSkinLine(line, medicines)) return;
     const days = line.days ?? rxDaysIn(line.remarks, labels.dayWords);
     const qty = rxQtyFor(line.dose, days);
     if (qty !== null) form.setValue(`${rowName}.qty`, qty, { shouldDirty: true });
   };
 
-  const set = <K extends 'days' | 'when' | 'where'>(
-    rowName: `items.${number}`,
+  type Row = ItemsRowContext<RxFormValues, 'items'>;
+  const set = <K extends 'days' | 'when' | 'where' | 'dose' | 'remarks'>(
+    row: Row,
     key: K,
     value: RxFormLine[K],
-  ) => form.setValue(`${rowName}.${key}`, value as never, { shouldDirty: true });
-  const setDays = (row: ItemsRowContext<RxFormValues, 'items'>, days: number | null) => {
-    set(row.name, 'days', days);
-    recompute(row.name, { ...row.row, days });
+  ) => {
+    form.setValue(`${row.name}.${key}`, value as never, { shouldDirty: true });
+    if (key === 'days' || key === 'dose' || key === 'remarks') {
+      recompute(row.name, { ...row.row, [key]: value });
+    }
   };
+
+  const daysTray = (row: Row, inColumn: boolean) => (
+    <RxDaysTray
+      days={row.row.days}
+      onDays={(days) => set(row, 'days', days)}
+      readOnly={readOnly}
+      testId={inColumn ? row.testId : 'rx-items-days'}
+      showLabel={!inColumn}
+    />
+  );
+  const directions = (row: Row, inColumn: boolean) => (
+    <RxDirectionsCell
+      line={row.row}
+      skin={rxIsSkinLine(row.row, medicines)}
+      readOnly={readOnly}
+      onWhen={(when) => set(row, 'when', when)}
+      onWhere={(where) => set(row, 'where', where)}
+      onDose={(dose) => set(row, 'dose', dose)}
+      onNote={(note) => set(row, 'remarks', note)}
+      testId={inColumn ? row.testId : 'rx-items-directions'}
+      panelTestId="rx-items"
+      showLabel={!inColumn}
+    />
+  );
 
   const columns: ItemsColumn<RxFormValues, 'items'>[] = [
     {
       id: 'medicine',
       header: t(K.items.medicine),
-      track: 'minmax(200px,1fr)',
+      // Only the room the other columns leave (D8).
+      track: 'minmax(190px,1fr)',
       cell: (row) => (
         <RxMedicineCell form={form} row={row} medicines={medicines} readOnly={readOnly} />
       ),
@@ -195,21 +231,21 @@ function useRxColumns({
         />
       ),
     },
-    ...(daysColumn
+    ...(oneLine
       ? [
           {
             id: 'days',
             header: t(K.items.days),
             track: 'var(--rx-days-track)',
-            cell: (row: ItemsRowContext<RxFormValues, 'items'>) => (
-              <RxDaysTray
-                days={row.row.days}
-                onDays={(days) => setDays(row, days)}
-                readOnly={readOnly}
-                testId={row.testId}
-                showLabel={false}
-              />
-            ),
+            cell: (row: Row) => daysTray(row, true),
+          } satisfies ItemsColumn<RxFormValues, 'items'>,
+          {
+            id: 'directions',
+            header: `${t(K.items.meal)} · ${t(K.items.where)}`,
+            track: 'var(--rx-directions-track)',
+            // A line without a medicine has no meal or place to pick yet.
+            cell: (row: Row) =>
+              row.row.medicineName.trim() === '' ? null : directions(row, true),
           } satisfies ItemsColumn<RxFormValues, 'items'>,
         ]
       : []),
@@ -233,35 +269,38 @@ function useRxColumns({
       ),
     },
   ];
-  // The line under the medicine: Days when folded, Meal or When · Where — beside the note.
-  const rowDetail = (row: ItemsRowContext<RxFormValues, 'items'>) =>
-    row.row.medicineName.trim() === '' ? null : (
-      <RxLineRail
-        days={
-          daysColumn
-            ? undefined
-            : { value: row.row.days, onDays: (days) => setDays(row, days) }
-        }
-        when={row.row.when}
-        where={row.row.where}
-        skin={rxIsSkinLine(row.row, medicines)}
-        readOnly={readOnly}
-        onWhen={(when) => set(row.name, 'when', when)}
-        onWhere={(where) => set(row.name, 'where', where)}
-        testId="rx-items"
-      />
+  // Under the line: Days and Meal · Where on a narrow table, then the note when there is one.
+  const rowDetail = (row: Row) => {
+    const note = row.row.remarks.trim();
+    // A line without a medicine has no meal or place to pick yet.
+    const folded = !oneLine && row.row.medicineName.trim() !== '';
+    if (!(folded || note)) return null;
+    return (
+      <div className="flex flex-col gap-1.5">
+        {folded ? (
+          <div
+            data-testid="rx-items-rail"
+            className="flex flex-wrap items-center gap-x-4 gap-y-1.5"
+          >
+            {daysTray(row, false)}
+            {directions(row, false)}
+          </div>
+        ) : null}
+        {note ? <RxNoteLine note={note} testId="rx-items-note-line" /> : null}
+      </div>
     );
-  return { columns, recompute, rowDetail };
+  };
+  return { columns, rowDetail };
 }
 
 /**
  * Step 2 "Medicines" (H:4806–4807; `patient-file.md:111–112`;
- * change-prescription-compact-line): the quick line, Browse and the Pad above
+ * change-prescription-one-line): the quick line, Browse and the Pad above
  * the item rows, and "All medicines · Days" once two medicines are written.
- * Each row — Medicine (the store's with its stock, or an outside name) · Dose
- * `1 0 1` · Days (where the table has room) · Qty · × — has under it its Meal
- * or When · Where trays beside its dashed note and, for a line that matches
- * an allergy, its warning; "+ Add medicine". No everyday choice needs a
+ * Each row is one numbered line — Medicine (the store's with its stock, or an
+ * outside name) · Dose `1 0 1` · Days · Meal · Where (and More) · Qty · × —
+ * with its note under it when there is one and, for a line that matches an
+ * allergy, its warning; "+ Add medicine". No everyday choice needs a
  * dropdown. The table keeps one row.
  */
 export function RxMedicinesField({
@@ -279,13 +318,8 @@ export function RxMedicinesField({
 }: RxMedicinesFieldProps) {
   const { t } = useTranslation(RX_NS);
   const quickLine = useRxQuickLine(form, catalog, items);
-  const { measure, daysColumn } = useRxDaysColumn();
-  const { columns, recompute, rowDetail } = useRxColumns({
-    form,
-    catalog,
-    readOnly,
-    daysColumn,
-  });
+  const { measure, oneLine } = useRxOneLine();
+  const { columns, rowDetail } = useRxColumns({ form, catalog, readOnly, oneLine });
   const padId = useId();
   // The Pad adds its lines as the quick line adds one: a blank row first, the last dosage.
   const addPadLines = (lines: readonly ReadableRxPadLine[]) => {
@@ -323,9 +357,14 @@ export function RxMedicinesField({
         <RxAllDays
           days={rxSharedDays(items)}
           onDays={(days) =>
-            form.setValue('items', withRxDaysForAll(form.getValues('items'), days), {
-              shouldDirty: true,
-            })
+            form.setValue(
+              'items',
+              // A tube or a bottle keeps its quantity (D11).
+              withRxDaysForAll(form.getValues('items'), days, (item) =>
+                rxIsSkinLine(item, catalog?.medicines ?? []),
+              ),
+              { shouldDirty: true },
+            )
           }
           testId="rx-items-all-days"
         />
@@ -334,7 +373,7 @@ export function RxMedicinesField({
   );
 
   return (
-    <div ref={measure} data-days-column={daysColumn} className="min-w-0">
+    <div ref={measure} data-one-line={oneLine} className="min-w-0">
       <ItemsField<RxFormValues, 'items'>
         control={form.control}
         name="items"
@@ -344,15 +383,7 @@ export function RxMedicinesField({
         addLabel={t(K.items.addMedicine)}
         minRows={1}
         readOnly={readOnly}
-        note={{
-          key: 'remarks',
-          placeholder: t(K.items.note),
-          maxLength: 200,
-          // A note's own days count only while Days is empty.
-          onChange: (value, row) => recompute(row.name, { ...row.row, remarks: value }),
-        }}
         rowDetail={rowDetail}
-        noteBesideDetail
         rowFooter={rowFooter}
         toolbar={toolbar}
         testId="rx-items"

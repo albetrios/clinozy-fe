@@ -303,9 +303,9 @@
       "otherDays": "다른 일수",
       "otherDaysShort": "기타",
       "when": "언제",
-      "morePlaces_other": "+ {{count}}개 더",
-      "fewerPlaces": "줄이기",
-      "meal": "식사"
+      "meal": "식사",
+      "more": "이 약의 추가 옵션",
+      "remarks": "메모"
     },
     "dose": {
       "group": "용량 아침 · 점심 · 저녁",

@@ -163,14 +163,11 @@ export const RX_SKIN_WHEN = [
   'once_week',
 ] as const satisfies readonly RxTiming[];
 
-/** The places shown before "+ more" (D5) — the rest of `RX_PLACES` open in place. */
-export const RX_TOP_PLACES = [
-  'face',
-  'scalp',
-  'body',
-  'hair',
-  'affectedArea',
-] as const satisfies readonly RxPlaceKey[];
+/** A tablet's two usual meal picks, one click each on its line (change-prescription-one-line D3). */
+export const RX_MEAL_PICKS = ['before', 'after'] as const;
+
+/** A skin medicine's two usual places, one click each on its line (D3); the rest are in More. */
+export const RX_PLACE_PICKS = ['face', 'scalp'] as const satisfies readonly RxPlaceKey[];
 
 /**
  * A line put on the skin (D5): the store's medicine's form, else the name's
@@ -189,16 +186,21 @@ export function rxIsSkinLine(
   return (known?.form ?? medicineForm(line.medicineName)) === 'topical';
 }
 
-/** Every written line on one course (D6), its quantity following days × doses a day. */
+/**
+ * Every written line on one course (D6), its quantity following days × doses
+ * a day — except a line `keepsQty` names (a tube or a bottle is not counted
+ * by the day, change-prescription-one-line D11).
+ */
 export function withRxDaysForAll(
   items: readonly RxFormLine[],
   days: number | null,
+  keepsQty: (item: RxFormLine) => boolean = () => false,
 ): RxFormLine[] {
-  return items.map((item) =>
-    item.medicineName.trim() === ''
-      ? item
-      : { ...item, days, qty: rxQtyFor(item.dose, days) ?? item.qty },
-  );
+  return items.map((item) => {
+    if (item.medicineName.trim() === '') return item;
+    const qty = keepsQty(item) ? null : rxQtyFor(item.dose, days);
+    return { ...item, days, qty: qty ?? item.qty };
+  });
 }
 
 /** The course every written line shares, or null when they differ (or none is written). */

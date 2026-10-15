@@ -303,9 +303,9 @@
       "otherDays": "その他の日数",
       "otherDaysShort": "その他",
       "when": "いつ",
-      "morePlaces_other": "+ ほか {{count}} 件",
-      "fewerPlaces": "少なく表示",
-      "meal": "食事"
+      "meal": "食事",
+      "more": "この薬のその他",
+      "remarks": "メモ"
     },
     "dose": {
       "group": "用量 朝 · 昼 · 夜",
