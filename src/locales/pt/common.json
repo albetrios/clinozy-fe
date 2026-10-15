@@ -219,7 +219,7 @@
     "date": {
       "label": "Data",
       "placeholder": "Escolha uma data",
-      "search": "Digite uma data · ex.: 12 set",
+      "search": "Digite uma data · 12 set, 2w, sex",
       "today": "Hoje",
       "tomorrow": "Amanhã",
       "yesterday": "Ontem",

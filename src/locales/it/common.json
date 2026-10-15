@@ -219,7 +219,7 @@
     "date": {
       "label": "Data",
       "placeholder": "Scegli una data",
-      "search": "Digita una data · es. 12 set",
+      "search": "Digita una data · 12 set, 2w, ven",
       "today": "Oggi",
       "tomorrow": "Domani",
       "yesterday": "Ieri",

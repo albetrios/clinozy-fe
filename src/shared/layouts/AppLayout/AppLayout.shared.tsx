@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
 import { PageTransition } from '@/lib/animations/PageTransition.tsx';
+import { isApplePlatform } from '@/lib/apple-platform.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
@@ -46,8 +47,7 @@ export function SkipLink() {
  */
 export function SearchTrigger({ className }: { className?: string }) {
   const { t } = useTranslation(LAYOUT_NS);
-  const isMac =
-    typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+  const isMac = isApplePlatform();
   const open = () => useUIStore.getState().setCommandPaletteOpen(true);
   const keys = LAYOUT_KEYS.app.sectionBar;
   return (

@@ -1432,20 +1432,43 @@
       "signedAs": "Gesendet als {{name}}, mit dieser Seite und der App-Version.",
       "close": "Schließen"
     },
-    "voice": {
-      "start": "Per Sprache diktieren",
-      "stop": "Diktat beenden",
-      "listening": "Hört zu…",
-      "hearing": "Ich höre Sie…",
-      "denied": "Das Mikrofon ist blockiert. Erlauben Sie es im Browser, um zu diktieren.",
-      "noSpeech": "Nicht verstanden – tippen Sie aufs Mikrofon und versuchen Sie es erneut.",
-      "unavailable": "Spracheingabe ist gerade nicht verfügbar. Sie können weiterhin tippen."
-    },
     "send": {
       "idle": "Senden",
       "sending": "Wird gesendet…",
       "sent": "Danke – das Team hat es.",
       "error": "Die Meldung konnte nicht gesendet werden. Ihr Text ist noch da – versuchen Sie es erneut."
     }
+  },
+  "voice": {
+    "start": "Per Sprache diktieren",
+    "stop": "Diktat beenden",
+    "listening": "Hört zu…",
+    "hearing": "Ich höre Sie…",
+    "denied": "Das Mikrofon ist blockiert. Erlauben Sie es im Browser, um zu diktieren.",
+    "noSpeech": "Nicht verstanden – tippen Sie aufs Mikrofon und versuchen Sie es erneut.",
+    "unavailable": "Spracheingabe ist gerade nicht verfügbar. Sie können weiterhin tippen.",
+    "say": {
+      "period": "Punkt",
+      "comma": "Komma",
+      "question": "Fragezeichen",
+      "exclamation": "Ausrufezeichen",
+      "colon": "Doppelpunkt",
+      "newLine": "neue Zeile",
+      "newParagraph": "neuer Absatz",
+      "scratch": "lösch das|lösche das"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Sagen Sie „Punkt“, „Komma“, „neue Zeile“ oder „lösch das“"
+  },
+  "pinPlace": {
+    "hint": "Füllt Gebiet, Stadt und Bundesland aus",
+    "unknown": "Diese PLZ kennen wir nicht — geben Sie Gebiet, Stadt und Bundesland ein.",
+    "areaPick": "Wählen Sie Ihr Gebiet"
   }
 }

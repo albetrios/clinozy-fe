@@ -131,6 +131,7 @@ function DifferenceReason({
         readOnly={!canAct}
         aria-required="true"
         aria-invalid={error ? true : undefined}
+        dictation
         data-testid={id}
       />
     </DrawerField>

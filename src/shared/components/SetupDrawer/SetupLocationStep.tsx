@@ -11,7 +11,6 @@ import {
   fetchOnboardingSetup,
   onboardingSetupQueryKeys,
 } from '@/shared/api/app/onboarding-setup-api.ts';
-import { lookupPin, type PinPlace } from '@/shared/app/pin-directory/index.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -20,10 +19,16 @@ import {
   DrawerPhoneInput,
 } from '@/shared/components/DrawerField/index.ts';
 import { nextTimeSlot, TimePicker } from '@/shared/components/Picker/TimePicker/index.ts';
+import {
+  PIN_PLACE_KEYS,
+  PIN_PLACE_NS,
+  PinAreaChips,
+} from '@/shared/components/PinAreaChips/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useHoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
+import { usePinPlace } from '@/shared/hooks/usePinPlace/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -42,7 +47,6 @@ import type { SetupStepProps } from './setup-step-props.ts';
 const K = SETUP_KEYS.steps.location;
 
 /** The most areas offered as chips under the PIN; the field stays editable either way. */
-const AREA_CHIP_LIMIT = 12;
 
 /** The error line for a problem, naming the field when it is required. */
 function useProblemText() {
@@ -206,6 +210,7 @@ export function SetupLocationStep({
   onSaved,
 }: SetupStepProps) {
   const { t } = useTranslation(SETUP_NS);
+  const { t: tPin } = useTranslation(PIN_PLACE_NS);
   const problemText = useProblemText();
   const email = useAuthStore((state) => state.user?.email ?? '');
   const queryClient = useQueryClient();
@@ -215,7 +220,7 @@ export function SetupLocationStep({
   });
   const { isDirty } = useFormState({ control: form.control });
   const [problems, setProblems] = useState<ReturnType<typeof locationProblems>>({});
-  const [place, setPlace] = useState<PinPlace | null | undefined>(undefined);
+  const { place, lookUp, areaFor } = usePinPlace();
   const [hoursOpen, setHoursOpen] = useState(false);
   const values = useFormValues(form);
 
@@ -247,18 +252,12 @@ export function SetupLocationStep({
   });
 
   const onPin = async (pin: string) => {
-    if (!/^\d{6}$/.test(pin)) {
-      setPlace(undefined);
-      return;
-    }
-    const found = await lookupPin(pin);
-    if (form.getValues('pin') !== pin) return;
-    setPlace(found);
+    const found = await lookUp(pin);
     if (!found) return;
     form.setValue('city', found.district, { shouldDirty: true });
     form.setValue('state', found.state, { shouldDirty: true });
-    if (found.areas.length === 1)
-      form.setValue('area', found.areas[0] ?? '', { shouldDirty: true });
+    const area = areaFor(found, form.getValues('area'));
+    if (area !== undefined) form.setValue('area', area, { shouldDirty: true });
   };
 
   const submit = async (event: SubmitEvent<HTMLFormElement>) => {
@@ -312,15 +311,13 @@ export function SetupLocationStep({
     </DrawerField>
   );
 
-  const areas = place?.areas ?? [];
-
   return (
     <form id={formId} onSubmit={submit} noValidate className="flex flex-col gap-3">
       <p className="text-muted-foreground text-detail">{t(K.why)}</p>
       <DrawerFieldGrid>
         <DrawerField
           label={t(K.pin)}
-          hint={t(K.pinHint)}
+          hint={tPin(PIN_PLACE_KEYS.hint)}
           htmlFor="setup-pin"
           required
           error={problemText(problems.pin, t(K.pin))}
@@ -332,27 +329,12 @@ export function SetupLocationStep({
         {text('city', t(K.city), { maxLength: BRANCH_LIMITS.place })}
         {text('state', t(K.state), { maxLength: BRANCH_LIMITS.state })}
       </DrawerFieldGrid>
-      {place === null ? (
-        <p
-          className="text-muted-foreground text-xs"
-          data-testid="setup-location-pin-unknown"
-        >
-          {t(K.pinUnknown)}
-        </p>
-      ) : null}
-      {areas.length > 1 ? (
-        <DrawerField label={t(K.areaPick)}>
-          <DrawerChips<string>
-            label={t(K.areaPick)}
-            options={areas
-              .slice(0, AREA_CHIP_LIMIT)
-              .map((area) => ({ value: area, label: area }))}
-            value={values.area || null}
-            onChange={(area) => form.setValue('area', area ?? '', { shouldDirty: true })}
-            testId="setup-location-area-pick"
-          />
-        </DrawerField>
-      ) : null}
+      <PinAreaChips
+        place={place}
+        area={values.area}
+        onAreaChange={(area) => form.setValue('area', area, { shouldDirty: true })}
+        testId="setup-location"
+      />
       <DrawerFieldGrid>
         {text('addressLine', t(K.address), {
           maxLength: BRANCH_LIMITS.address,

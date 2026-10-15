@@ -1,13 +1,14 @@
 import { type ComponentProps, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { clampNumber, sanitizeNumberText } from '@/lib/number-text.ts';
+import { clampNumber, readTypedNumber, sanitizeNumberText } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { Minus, Plus } from '@/shared/icons/index.ts';
 
 /**
@@ -42,11 +43,65 @@ export interface DrawerNumberInputProps extends Omit<
   inputClassName?: string;
 }
 
+/** A figure as text, capped at `max` when there is one. */
+function cappedText(figure: number | string, max: number | undefined): string {
+  const text = String(figure);
+  return max !== undefined && Number.parseFloat(text) > max ? String(max) : text;
+}
+
+/**
+ * The sum open in a number field (feat-write-less, D9): the box keeps what was typed while a sum is
+ * open, the form takes its result at every keystroke, and leaving the field (or Enter) closes it,
+ * so the box shows the result the form already holds.
+ */
+function useTypedSum({
+  value,
+  decimals,
+  max,
+  maxLength,
+  onValueChange,
+}: {
+  /** The form's value now — what a sum that stops working out falls back to. */
+  value: string;
+  decimals: number;
+  max: number | undefined;
+  /** The longest plain figure; a sum is not held to it (it is never stored as typed). */
+  maxLength: number | undefined;
+  onValueChange: (text: string) => void;
+}) {
+  const [sum, setSum] = useState<{
+    typed: string;
+    result: number | null;
+    /** The value before the sum was opened. */
+    base: string;
+  } | null>(null);
+  const type = (raw: string) => {
+    const read = readTypedNumber(raw, decimals);
+    if (read.kind === 'figure') {
+      setSum(null);
+      const figure = maxLength === undefined ? read.text : read.text.slice(0, maxLength);
+      onValueChange(cappedText(figure, max));
+      return;
+    }
+    const base = sum?.base ?? value;
+    setSum({ typed: read.typed, result: read.result, base });
+    onValueChange(read.result === null ? base : cappedText(read.result, max));
+  };
+  const close = () => setSum(null);
+  const result = sum?.result == null ? null : Number(cappedText(sum.result, max));
+  return { typed: sum?.typed ?? null, result, type, close };
+}
+
 /**
  * A drawer's number field (`_patterns.md:34`; H:1592): a 36px box with an
  * optional prefix tile ("₹", `muted`) and unit ("%"), taking digits and one
  * point only and selecting its figure on focus. The value stays text, so
  * "12." can be typed; the form reads it on save.
+ *
+ * It also does sums (feat-write-less-2026-10-14-oixr): `1500+300`, `3x500`, `4500/3`, `1.5k`,
+ * `2L` — the result shows at the box's end ("= 1,800") while the sum is open, the form holds it
+ * already, and leaving the field or Enter writes it into the box. While a sum does not work out
+ * (`12+`, below zero) it shows no result and the form holds the value from before the sum.
  */
 export function DrawerNumberInput({
   value,
@@ -58,8 +113,15 @@ export function DrawerNumberInput({
   className,
   inputClassName,
   onFocus,
+  onBlur,
+  onKeyDown,
+  maxLength,
   ...props
 }: DrawerNumberInputProps) {
+  const { formatNumber } = useLocaleFormat();
+  // `maxLength` bounds a plain figure here, not on the input, so a longer sum can be typed.
+  const sum = useTypedSum({ value, decimals, max, maxLength, onValueChange });
+  const testId = (props as { 'data-testid'?: string })['data-testid'];
   return (
     <div
       data-slot="number-field"
@@ -79,19 +141,31 @@ export function DrawerNumberInput({
         type="text"
         inputMode={decimals > 0 ? 'decimal' : 'numeric'}
         autoComplete="off"
-        value={value}
-        onChange={(event) => {
-          const text = sanitizeNumberText(event.target.value, decimals);
-          onValueChange(
-            max !== undefined && Number.parseFloat(text) > max ? String(max) : text,
-          );
-        }}
+        value={sum.typed ?? value}
+        onChange={(event) => sum.type(event.target.value)}
         onFocus={(event) => {
           event.currentTarget.select();
           onFocus?.(event);
         }}
+        onBlur={(event) => {
+          sum.close();
+          onBlur?.(event);
+        }}
+        onKeyDown={(event) => {
+          // Enter writes an open sum's result into the box before anything else reads it.
+          if (event.key === 'Enter' && sum.typed !== null) sum.close();
+          onKeyDown?.(event);
+        }}
         className={cn(NUMBER_INPUT_CLASS, inputClassName)}
       />
+      {sum.result !== null ? (
+        <output
+          data-testid={testId ? `${testId}-sum` : undefined}
+          className="text-detail text-muted-foreground flex-none pe-2.5 whitespace-nowrap tabular-nums"
+        >
+          = {formatNumber(sum.result, { maximumFractionDigits: decimals })}
+        </output>
+      ) : null}
       {suffix ? (
         <span
           aria-hidden="true"
@@ -196,11 +270,20 @@ export interface DrawerStepperProps extends Omit<
   testId?: string;
 }
 
+/** How far each key moves a stepper (feat-write-less): ↑ ↓ one, Page Up / Page Down ten. */
+const STEPPER_KEY_STEPS: Readonly<Record<string, number>> = {
+  ArrowUp: 1,
+  ArrowDown: -1,
+  PageUp: 10,
+  PageDown: -10,
+};
+
 /**
  * A drawer's stepper (H:1593, H:1602): "−" · the figure (13.5px/500, centred,
  * typed or stepped) and its unit · "+", 36px, then optional quick picks. The
  * figure is a whole number between `min` and `max`; an empty box reads as
- * `min` once it loses focus.
+ * `min` once it loses focus. ↑ / ↓ step it by one and Page Up / Page Down by ten
+ * (feat-write-less-2026-10-14-oixr), within the same limits.
  */
 export function DrawerStepper({
   value,
@@ -258,6 +341,14 @@ export function DrawerStepper({
             if (draft === '') set(min);
             setDraft(null);
             onBlur?.(event);
+          }}
+          onKeyDown={(event) => {
+            const step = STEPPER_KEY_STEPS[event.key];
+            if (step === undefined || event.altKey || event.metaKey || event.ctrlKey)
+              return;
+            event.preventDefault();
+            setDraft(null);
+            set(value + step);
           }}
           // The figure is centred, so it needs no side padding — a phone's third
           // (≈94px at 375) still shows two digits between "−" and "+".

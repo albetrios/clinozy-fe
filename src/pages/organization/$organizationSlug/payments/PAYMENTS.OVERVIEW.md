@@ -92,7 +92,8 @@ read's `updated_at`.
 **Send payment** (`components/SendPaymentDrawer/`, L-39b) — `POST /app/payments`, 680px in steps:
 "Pay against a bill" (new, while bills are open — Clinic stock's with `stock_item:read`, Medical's
 with `medicine:read`; the bill picker and "Pending longest"; a failed read offers Retry) ·
-"Expense" (Category — or the bill, which takes none — Paid to, Note) · "Payment" (Amount, Date —
+"Expense" (Category — or the bill, which takes none — Paid to, its chips the clinic's four most
+recent payees from its expenses then "Electricity", feat-write-less D14 — Note) · "Payment" (Amount, Date —
 never ahead, fixed on an edit — Mode, the bill photo). A bill pays as `supplier_bill` with its
 `stock_purchase_id` or `medical_purchase_order_id` and the supplier as payee; other spend as
 `expense` in its category. The photos upload through the tray and file onto the saved entry's

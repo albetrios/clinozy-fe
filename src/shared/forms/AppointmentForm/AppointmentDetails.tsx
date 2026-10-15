@@ -293,6 +293,7 @@ export function AppointmentDetails({
           onChange={(event) =>
             onChange({ kind: 'reason', text: event.currentTarget.value })
           }
+          dictation
           data-testid={IDS.reason}
           className="text-body md:text-body"
         />

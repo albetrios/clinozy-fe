@@ -59,7 +59,7 @@ describe('DatePicker', () => {
     expect(panel.className).toContain('min-w-62.5');
     expect(screen.getByTestId('date-picker-search')).toHaveAttribute(
       'placeholder',
-      'Type a date · e.g. 12 sep',
+      'Type a date · 12 sep, 2w, fri',
     );
     const today = screen.getByTestId(`date-picker-option-${TODAY}`);
     expect(today).toHaveTextContent(/^Today · /);
@@ -103,6 +103,34 @@ describe('DatePicker', () => {
     await waitFor(() =>
       expect(screen.getByTestId('date-picker')).toHaveAccessibleName(/^Date · .*25/),
     );
+  });
+
+  it('reads shorthand from today — 2w, fri, in 3 days — and Enter picks it (feat-write-less)', async () => {
+    const onPick = vi.fn();
+    const { user } = renderWithClient(<Controlled onPick={onPick} />);
+    await user.click(screen.getByTestId('date-picker'));
+    const search = await screen.findByTestId('date-picker-search');
+
+    await user.type(search, '2w');
+    expect(screen.getAllByRole('option')[0]).toHaveAttribute(
+      'data-testid',
+      'date-picker-option-2026-10-17',
+    );
+    await user.clear(search);
+    await user.type(search, 'in 3 days');
+    expect(screen.getAllByRole('option')[0]).toHaveAttribute(
+      'data-testid',
+      'date-picker-option-2026-10-06',
+    );
+    await user.clear(search);
+    // TODAY is a Saturday: the next Friday is the 9th.
+    await user.type(search, 'fri');
+    expect(screen.getAllByRole('option')[0]).toHaveAttribute(
+      'data-testid',
+      'date-picker-option-2026-10-09',
+    );
+    await user.keyboard('{Enter}');
+    expect(onPick).toHaveBeenLastCalledWith('2026-10-09');
   });
 
   it('refuses a typed date outside min / max', async () => {

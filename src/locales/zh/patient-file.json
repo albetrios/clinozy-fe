@@ -767,7 +767,9 @@
     "updated": "回访已更新",
     "record": "回访",
     "noScore": "请选择患者自评分",
-    "offeringsPlanned": "已加入服务建议"
+    "offeringsPlanned": "已加入服务建议",
+    "useAdvised": "使用上次建议的方案",
+    "samePlan": "沿用上次的方案"
   },
   "review": {
     "title": "记录评价",

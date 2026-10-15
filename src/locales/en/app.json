@@ -1432,20 +1432,43 @@
       "signedAs": "Sent as {{name}}, with this page and the app version.",
       "close": "Close"
     },
-    "voice": {
-      "start": "Dictate with your voice",
-      "stop": "Stop dictating",
-      "listening": "Listening…",
-      "hearing": "Hearing you…",
-      "denied": "The microphone is blocked. Allow it in your browser to dictate.",
-      "noSpeech": "Didn't catch that — tap the mic and try again.",
-      "unavailable": "Voice input isn't available right now. You can still type."
-    },
     "send": {
       "idle": "Send",
       "sending": "Sending…",
       "sent": "Thanks — the team has it.",
       "error": "Couldn't send your report. Your words are still here — try again."
     }
+  },
+  "voice": {
+    "start": "Dictate with your voice",
+    "stop": "Stop dictating",
+    "listening": "Listening…",
+    "hearing": "Hearing you…",
+    "denied": "The microphone is blocked. Allow it in your browser to dictate.",
+    "noSpeech": "Didn't catch that — tap the mic and try again.",
+    "unavailable": "Voice input isn't available right now. You can still type.",
+    "say": {
+      "period": "full stop|period",
+      "comma": "comma",
+      "question": "question mark",
+      "exclamation": "exclamation mark|exclamation point",
+      "colon": "colon",
+      "newLine": "new line|next line",
+      "newParagraph": "new paragraph",
+      "scratch": "scratch that|delete that"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Say “full stop”, “comma”, “new line” or “scratch that”"
+  },
+  "pinPlace": {
+    "hint": "Fills in the area, city and state",
+    "unknown": "We don't know this PIN — type the area, city and state.",
+    "areaPick": "Pick your area"
   }
 }

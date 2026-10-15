@@ -219,7 +219,7 @@
     "date": {
       "label": "Date",
       "placeholder": "Choisir une date",
-      "search": "Saisissez une date · ex. 12 sept",
+      "search": "Saisissez une date · 12 sept, 2w, ven",
       "today": "Aujourd’hui",
       "tomorrow": "Demain",
       "yesterday": "Hier",
