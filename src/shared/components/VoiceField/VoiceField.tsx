@@ -119,7 +119,7 @@ function VoiceFieldStatus({
   const { t } = useTranslation(VOICE_INPUT_NS);
   const statusKey = voiceStatusKey(speech);
   const interim = speech.interim.trim();
-  const shown = Boolean(statusKey || interim);
+  const shown = statusKey !== null || interim !== '';
   return (
     <>
       <span aria-live="polite" className="sr-only">

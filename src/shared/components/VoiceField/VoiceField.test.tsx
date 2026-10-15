@@ -125,6 +125,20 @@ describe('VoiceField — the common voice field', () => {
     expect(note).toHaveFocus();
   });
 
+  it('puts the caret in its own field when a mic is pressed from elsewhere', async () => {
+    installFakeSpeechRecognition();
+    const user = userEvent.setup();
+    render(
+      <>
+        <Field testId="first" />
+        <Field testId="second" />
+      </>,
+    );
+    await user.click(screen.getByRole('textbox', { name: 'first' }));
+    await user.click(screen.getByTestId('second-voice'));
+    expect(screen.getByRole('textbox', { name: 'second' })).toHaveFocus();
+  });
+
   it('lets one field listen at a time', async () => {
     installFakeSpeechRecognition();
     const user = userEvent.setup();

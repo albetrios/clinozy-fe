@@ -191,6 +191,12 @@ export function useVoiceField({
     if (stopListeningField && stopListeningField !== speech.stop) stopListeningField();
     stopListeningField = speech.stop;
     writtenRef.current = [];
+    // A press on a mic puts the caret in its field (at the end), so the words are seen going in.
+    const field = fieldOf();
+    if (field && field.ownerDocument.activeElement !== field) {
+      field.focus({ preventScroll: true });
+      field.setSelectionRange(field.value.length, field.value.length);
+    }
     speech.start();
   };
 
