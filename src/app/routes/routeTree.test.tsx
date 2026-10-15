@@ -22,6 +22,7 @@ import { manifest as suspendedManifest } from '@/pages/organization/$organizatio
 import { manifest as taskManifest } from '@/pages/organization/$organizationSlug/tasks/$taskId/task-id.manifest.ts';
 import { manifest as taskCreateManifest } from '@/pages/organization/$organizationSlug/tasks/create/create.manifest.ts';
 import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
+import type * as AppHomeModule from '@/shared/app/app-home.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
 
 import {
@@ -75,7 +76,11 @@ vi.mock('@/pages/organization/$organizationSlug/components/AppHomeEmpty/index.ts
   shellLoads.emptyHome();
   return { AppHomeEmpty: () => null };
 });
-vi.mock('@/shared/app/app-home.ts', () => ({ appHomeRoute }));
+vi.mock('@/shared/app/app-home.ts', async (importOriginal) => ({
+  appHomeRoute,
+  redirectFromUsersBranches: (await importOriginal<typeof AppHomeModule>())
+    .redirectFromUsersBranches,
+}));
 vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   notify: { info: notifyInfo },
@@ -455,6 +460,44 @@ async function thrownBy(run: () => Promise<void> | void): Promise<unknown> {
     return error;
   }
 }
+
+describe("Branches' old home redirects into the Branches room (change-branches-in-navbar)", () => {
+  const OLD = '/organization/$organizationSlug/users/branches/$';
+  const at = (splat: string) => ({
+    location: { href: `/organization/acme/users/branches/${splat}` },
+    params: { organizationSlug: 'acme', _splat: splat },
+    preload: false,
+  });
+
+  it('keeps the drawer the old URL named, its search and its hash', async () => {
+    const edit = await thrownBy(() => beforeLoadOf(OLD)(at('brn_1/edit')));
+    expect(isRedirect(edit)).toBe(true);
+    expect(edit).toMatchObject({
+      options: {
+        to: '/organization/$organizationSlug/branches/$branchId/edit',
+        params: { organizationSlug: 'acme', branchId: 'brn_1' },
+        search: true,
+        hash: true,
+        replace: true,
+      },
+    });
+    const create = await thrownBy(() => beforeLoadOf(OLD)(at('create')));
+    expect(create).toMatchObject({
+      options: { to: '/organization/$organizationSlug/branches/create' },
+    });
+    const list = await thrownBy(() => beforeLoadOf(OLD)(at('')));
+    expect(list).toMatchObject({
+      options: { to: '/organization/$organizationSlug/branches' },
+    });
+  });
+
+  it('does nothing on a hover preload', async () => {
+    const thrown = await thrownBy(() =>
+      beforeLoadOf(OLD)({ ...at('create'), preload: true }),
+    );
+    expect(thrown).toBeUndefined();
+  });
+});
 
 describe('the org home replaces the dashboard as every landing (L-63)', () => {
   const HOME = '/organization/$organizationSlug/';

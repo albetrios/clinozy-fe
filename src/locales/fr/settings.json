@@ -283,7 +283,7 @@
       "save": "Enregistrer les modifications",
       "saved": "Paramètres de la clinique enregistrés",
       "branchesTitle": "Chaque établissement gère le reste",
-      "branchesBody": "Horaires d'ouverture, jours fériés, salles et appareils, GST et liens d'avis se règlent par établissement dans Utilisateurs › Établissements.",
+      "branchesBody": "Horaires d'ouverture, jours fériés, salles et appareils, GST et liens d'avis se règlent par établissement dans Établissements.",
       "branchesOpen": "Ouvrir Établissements",
       "logoTitle": "Logo",
       "logoBody": "Le logo de la clinique se règle dans Général.",

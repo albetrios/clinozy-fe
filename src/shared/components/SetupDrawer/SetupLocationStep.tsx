@@ -196,7 +196,7 @@ function PinInput({
  * blocks nothing), then the address, phone, email and branch name — the clinic's name. The hours
  * are one line; "Change" opens the days and times. "Next" creates the branch with the owner on its
  * team — the clinic's first branch becomes its main branch (RC-4). A main branch made meanwhile
- * (another admin, Users › Branches) counts: the step reads the setup again first and creates none.
+ * (another admin, the Branches room) counts: the step reads the setup again first and creates none.
  */
 export function SetupLocationStep({
   formId,

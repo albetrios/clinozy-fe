@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Users",
-      "description": "Team, roles & access, branches"
+      "description": "Team, roles & access"
+    },
+    "branches": {
+      "label": "Branches",
+      "description": "Every branch: address, opening hours, team, rooms and machines"
     }
   },
   "tones": {

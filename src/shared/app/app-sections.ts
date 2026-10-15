@@ -15,6 +15,7 @@ export const APP_SECTION_ORDER: readonly Section[] = [
   'tasks',
   'offerings',
   'users',
+  'branches',
 ];
 
 /** Whether a string (a manifest's `nav.section`, say) names a clinic section. */

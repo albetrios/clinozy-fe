@@ -17,8 +17,8 @@ src/pages/organization/$organizationSlug/tasks/$taskId/ #page-root
 src/pages/organization/$organizationSlug/tasks/create/ #page-root
 src/pages/organization/$organizationSlug/users/create/ #page-root
 src/pages/organization/$organizationSlug/users/$userId/edit/ #page-root
-src/pages/organization/$organizationSlug/users/branches/create/ #page-root
-src/pages/organization/$organizationSlug/users/branches/$branchId/edit/ #page-root
+src/pages/organization/$organizationSlug/branches/create/ #page-root
+src/pages/organization/$organizationSlug/branches/$branchId/edit/ #page-root
 src/pages/organization/$organizationSlug/payments/receive/ #page-root
 src/pages/organization/$organizationSlug/payments/pay/ #page-root
 src/pages/organization/$organizationSlug/payments/$paymentId/edit/ #page-root

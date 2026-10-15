@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Utenti",
-      "description": "Team, ruoli e accessi, sedi"
+      "description": "Team, ruoli e accessi"
+    },
+    "branches": {
+      "label": "Sedi",
+      "description": "Ogni sede: indirizzo, orari, team, sale e macchinari"
     }
   },
   "tones": {

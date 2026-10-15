@@ -73,8 +73,9 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
 "sub-pages" segment and the mirror must be literal. "Everything between two `*.route.tsx` files
 belongs to the parent" still holds.
 
-> **Built today:** `suspended/` and the ten clinic rooms (`today/`, `leads/`, `appointments/`,
-> `patients/`, `medical/`, `stock/`, `payments/`, `tasks/`, `offerings/`, `users/`) exist under
+> **Built today:** `suspended/` and the eleven clinic rooms (`today/`, `leads/`, `appointments/`,
+> `patients/`, `medical/`, `stock/`, `payments/`, `tasks/`, `offerings/`, `users/`, `branches/`)
+> exist under
 > `$organizationSlug/`. The `billing/` and `reports/` islands below are **shapes** (planned,
 > not on disk) — scaffold them against these rules when requirements land.
 
@@ -285,7 +286,7 @@ is the separate `AppearanceDialog` on the root route.)
   `organization:read` to view and `organization:update` to save (read-only otherwise). The
   clinic's specialties and timezone (`PATCH /tenancy/organization`) and its booking-reminder
   hour, lead hold and retarget days, each with its default (`PATCH
-/tenancy/organization/settings`). It links to Users › Branches for hours, holidays, rooms,
+/tenancy/organization/settings`). It links to the Branches room for hours, holidays, rooms,
   machines, GST and review links, and to General for the logo. "Show the setup guide again"
   appears while the guide is hidden. No cash-drawer float (D17).
 

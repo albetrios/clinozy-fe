@@ -1,7 +1,7 @@
 # `src/shared/app/`
 
-Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
-`launch-2026-09-30-jxmr`):
+Cross-room clinic UI vocabulary for the clinic's eleven rooms (iteration
+`launch-2026-09-30-jxmr`; Branches, the eleventh, since `change-branches-in-navbar`):
 
 - `app.constants.ts` — the `app` i18n namespace's keys (section names and
   descriptions, roles; the lead statuses, sources and interests; the list error
@@ -18,7 +18,7 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   shared hook's toast reads it in any room — and so does the shared chat
   column, whose copy is the namespace's `chatColumn.*` (keys in
   `shared/components/ChatColumn/chat-column.constants.ts`). Room-only copy
-  stays in each room's own namespace (`today`, `leads`, … `users`).
+  stays in each room's own namespace (`today`, `leads`, … `users`, `branches`).
 - `app-tones.ts` — each section's, role's and appointment status's tone, and
   a lead's status, source and interest tones (`LEAD_STATUS_TONES`,
   `LEAD_SOURCE_TONES`, `LEAD_INTEREST_TONES` — the contract's `Tone`), an

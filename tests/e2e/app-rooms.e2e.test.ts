@@ -156,6 +156,15 @@ const HAPPY_PATHS: Record<AppRoom, (page: Page) => Promise<void>> = {
       url: /\/users\/[^/?]+\/edit(?:\?|$)/,
     });
   },
+
+  // Open the main branch: the branch drawer.
+  branches: async (page) => {
+    await openAndCloseDrawer(page, 'branches', {
+      open: () => openFirstRow(page.getByTestId('branches-table-row')),
+      testId: 'branch-drawer',
+      url: /\/branches\/[^/?]+\/edit(?:\?|$)/,
+    });
+  },
 };
 
 test.beforeEach(async () => {
