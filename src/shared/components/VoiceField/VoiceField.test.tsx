@@ -64,6 +64,11 @@ describe('VoiceField — the common voice field', () => {
     render(<Field />);
     const note = screen.getByRole('textbox', { name: 'note' });
 
+    // Bottom inline-end corner, as far from the end as from the bottom.
+    expect(screen.getByTestId('note-voice').parentElement).toHaveClass(
+      'end-1.5',
+      'bottom-1.5',
+    );
     await user.click(screen.getByTestId('note-voice'));
     expect(screen.getByTestId('note-voice-hint')).toHaveTextContent(
       'Say “full stop”, “comma”, “new line” or “scratch that”',
@@ -161,6 +166,8 @@ describe('VoiceField — the common voice field', () => {
     const reason = screen.getByRole('textbox', { name: 'reason' });
     const micBox = screen.getByTestId('reason-voice').parentElement;
     expect(micBox).toHaveClass('opacity-0', 'pointer-events-none');
+    // Centred in a square as tall as the line: the same gap at the end and the bottom.
+    expect(micBox).toHaveClass('inset-y-0', 'end-0', 'aspect-square');
 
     await user.click(reason);
     await user.keyboard('{Control>}{Shift>} {/Shift}{/Control}');

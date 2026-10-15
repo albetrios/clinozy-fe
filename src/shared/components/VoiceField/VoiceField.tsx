@@ -32,7 +32,10 @@ const LINE_STATUS_CLASS =
 const partId = (testId: string | undefined, part: string) =>
   testId ? `${testId}-${part}` : undefined;
 
-/** The microphone: a note's at its bottom inline-end corner (clear of the resize grip), a line's at its end. */
+/**
+ * The microphone in the field's bottom inline-end corner, as far from the end as from the bottom:
+ * 6px in a note; in a line, centred in a square as tall as the line (6px each way in a 36px one).
+ */
 function VoiceFieldMic({
   speech,
   multiline,
@@ -60,8 +63,8 @@ function VoiceFieldMic({
       testId={partId(testId, 'voice')}
       className={
         multiline
-          ? 'absolute end-4 bottom-1.5'
-          : cn('absolute end-1 top-1/2 -translate-y-1/2', LINE_MIC_REVEAL)
+          ? 'absolute end-1.5 bottom-1.5'
+          : cn('absolute inset-y-0 end-0 aspect-square justify-center', LINE_MIC_REVEAL)
       }
     />
   );
