@@ -70,7 +70,7 @@ export function PlanMark({ rank, size = 'md' }: { rank: number; size?: 'sm' | 'm
     <span
       aria-hidden
       className={cn(
-        'grid shrink-0 place-items-center',
+        'flex shrink-0 items-center justify-center',
         size === 'md' ? 'size-10 rounded-xl' : 'size-7 rounded-lg',
         TONE_CLASSES[look.tone].surface,
       )}
@@ -128,8 +128,8 @@ function PlanPriceBlock({
 
   return (
     <div className="flex flex-col gap-1.5" data-testid={`plan-price-${plan.id}`}>
-      <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
-        <span className="text-3xl leading-none font-semibold tracking-tight tabular-nums">
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span className="text-2xl leading-none font-semibold tracking-tight tabular-nums">
           {formatCurrency(monthlyCents, plan.currency, wholeAmountOptions(monthlyCents))}
         </span>
         <span className="text-muted-foreground text-xs">{t(PLAN_KEYS.perMonth)}</span>
@@ -301,7 +301,7 @@ export function BillingPlanCard({
         >
           {plan.name}
         </h3>
-        <p className="text-muted-foreground min-h-[2lh] text-xs leading-[1.45] text-pretty">
+        <p className="text-muted-foreground min-h-9 text-xs leading-[1.45] text-pretty">
           {planTagline({ plan, t, format })}
         </p>
       </div>

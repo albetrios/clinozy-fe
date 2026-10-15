@@ -81,9 +81,9 @@ describe('BillingPlanTable', () => {
     const [head] = within(table).getAllByRole('rowgroup');
     if (!head) throw new Error('the table has no head');
     for (const header of within(head).getAllByRole('columnheader')) {
-      expect(header).toHaveClass('@3xl:sticky', '@3xl:top-0');
+      expect(header).toHaveClass('sticky', 'top-0');
     }
-    expect(screen.getByTestId('plan-compare-table')).toHaveClass('@3xl:overflow-visible');
+    expect(screen.getByTestId('plan-compare-table')).toHaveClass('md:overflow-visible');
   });
 
   it('groups the rows as pricing, team and features', () => {

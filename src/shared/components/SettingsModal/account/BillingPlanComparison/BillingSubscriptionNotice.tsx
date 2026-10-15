@@ -65,7 +65,7 @@ export function BillingSubscriptionNotice({
     <div
       className={cn(
         'flex min-h-12 items-center gap-3 rounded-xl border px-4 py-2.5',
-        warning ? TONE_CLASSES.butter.surface : 'bg-muted/40',
+        warning ? TONE_CLASSES.butter.surface : 'bg-muted/30',
       )}
       data-testid="billing-notice"
       data-kind={kind}

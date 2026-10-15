@@ -22,13 +22,15 @@ import {
 const PICKER_KEYS = BILLING_PLAN_KEYS.picker;
 
 /**
- * Every plan in one row once the picker is wide enough (`@3xl`, 48rem — the 1040px drawer); two
- * by two below it; stacked on a phone. A count with no row of its own wraps by two.
+ * Every plan in one row once the picker is a side panel (`md`, where the drawer is 1040px wide);
+ * two by two from `sm`; stacked on a phone. A count with no row of its own wraps by two. Viewport
+ * steps the first-paint stylesheet already ships: the 36 kB budget has no room for container
+ * queries of the picker's own.
  */
 const ROW_COLUMNS: Readonly<Record<number, string>> = {
-  2: '@xl:grid-cols-2',
-  3: '@xl:grid-cols-2 @3xl:grid-cols-3',
-  4: '@xl:grid-cols-2 @3xl:grid-cols-4',
+  2: 'sm:grid-cols-2',
+  3: 'sm:grid-cols-3',
+  4: 'sm:grid-cols-2 md:grid-cols-4',
 };
 
 /** Props of {@link BillingPlanComparison}. */
@@ -70,7 +72,7 @@ export function BillingPlanComparison({
   const next = nextPlanUp({ sorted, current });
 
   return (
-    <div className="@container flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div
         className={cn('grid gap-3', ROW_COLUMNS[sorted.length] ?? ROW_COLUMNS[2])}
         data-testid="plan-options"

@@ -36,7 +36,7 @@ describe('BillingPlanComparison', () => {
   it('puts every plan in one row, cheapest first', () => {
     renderComparison();
     const row = screen.getByTestId('plan-options');
-    expect(row).toHaveClass('@xl:grid-cols-2', '@3xl:grid-cols-4');
+    expect(row).toHaveClass('sm:grid-cols-2', 'md:grid-cols-4');
     expect(
       within(row)
         .getAllByRole('heading', { level: 3 })

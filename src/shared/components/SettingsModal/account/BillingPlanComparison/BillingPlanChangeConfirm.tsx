@@ -97,7 +97,10 @@ function PlanChangeRoute({
         rank={rankOf(current)}
         emphasis={false}
       />
-      <span aria-hidden className="text-muted-foreground grid place-items-center">
+      <span
+        aria-hidden
+        className="text-muted-foreground flex items-center justify-center"
+      >
         <ChevronRight className="size-4 rtl:-scale-x-100" />
       </span>
       <PlanChip

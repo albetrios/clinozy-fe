@@ -20,20 +20,26 @@ const PLAN_KEYS = BILLING_PLAN_KEYS.plan;
 const COMPARE_KEYS = BILLING_PLAN_KEYS.compare;
 
 /**
- * The row-name column: held at the inline start while the plans scroll sideways,
- * with a hairline at its inline end (a pseudo-element — a collapsed table's own
- * border would stay behind when the cell sticks).
+ * The row-name column: held at the inline start while the plans scroll sideways, with the
+ * column's border at its inline end. Every class here is one the first-paint stylesheet already
+ * ships (its 36 kB budget has no room left): a collapsed table's border stays with the table, so
+ * on a phone the line scrolls on with the plans while the names stay.
  */
 const ROW_HEAD =
-  'bg-card after:bg-border sticky start-0 z-10 w-40 px-3 py-2.5 text-start align-top font-normal after:absolute after:inset-y-0 after:end-0 after:w-px';
-const CELL = 'px-3 py-2.5 align-top';
+  'bg-card sticky start-0 z-10 w-40 border-e px-3 py-2.5 text-start font-normal';
+const CELL = 'px-3 py-2.5';
 /**
- * The head row, held at the picker's top once the table no longer scrolls sideways. The picker's
- * scroll box has no padding of its own (it would inset where the row may rest), so the row
- * sits flush with its edge, no strip of rows showing above it.
+ * The head row, held at the picker's top. Where the table scrolls sideways (below `md`) its box
+ * is the head's scroll container, so the head stays put — sticking only does anything once the
+ * box lets the picker scroll it (`md:overflow-visible`). The picker's scroll box has no padding of
+ * its own (it would inset where the row may rest), so the row sits flush with its edge.
  */
-const STICKY_HEAD =
-  '@3xl:sticky @3xl:top-0 @3xl:z-20 @3xl:shadow-[0_1px_0_var(--color-border)]';
+const STICKY_HEAD = 'sticky top-0 z-20 shadow-xs';
+/**
+ * Each plan's column, all one width: a column takes its share of the table's width by its own,
+ * so equal widths keep the plans even whatever their heads hold (the current one's pill).
+ */
+const PLAN_COLUMN = 'w-32';
 
 /** A tick or a dash, each with its word for assistive tech. */
 function Mark({ included, label }: { included: boolean; label: string }) {
@@ -73,7 +79,7 @@ export interface BillingPlanTableProps {
  * Every plan side by side, as the detail under the cards — claude.com's "Compare features across
  * plans": one column per plan (the current one marked and tinted), rows grouped as pricing, team
  * and features, each row named with a one-line explanation. A real table — the plans are column
- * headers, the rows row headers. Where the picker is wide enough for the whole table (`@3xl`), its
+ * headers, the rows row headers. Where the picker is wide enough for the whole table (`md`), its
  * head row stays in view while the picker scrolls; narrower, it scrolls sideways with the row
  * names held in place (a box that scrolls sideways cannot also let its head stick to the page).
  */
@@ -136,14 +142,15 @@ export function BillingPlanTable({ plans, currentPlanId }: BillingPlanTableProps
 
   return (
     <div
-      className="overflow-x-auto rounded-xl border @3xl:overflow-visible"
+      className="overflow-x-auto rounded-xl border md:overflow-visible"
       data-testid="plan-compare-table"
     >
-      <table className="text-detail w-full min-w-[34rem] table-fixed border-collapse tabular-nums">
+      <table className="text-detail w-full min-w-140 border-collapse tabular-nums">
         <caption className="sr-only">{t(COMPARE_KEYS.caption)}</caption>
         <thead>
           <tr>
-            <td className={cn(ROW_HEAD, STICKY_HEAD, 'py-3')} />
+            {/* The corner sticks both ways, above the head row and the row names. */}
+            <td className={cn(ROW_HEAD, STICKY_HEAD, 'z-30 py-3')} />
             {plans.map((plan) => {
               const current = plan.id === currentPlanId;
               return (
@@ -154,6 +161,7 @@ export function BillingPlanTable({ plans, currentPlanId }: BillingPlanTableProps
                   className={cn(
                     CELL,
                     STICKY_HEAD,
+                    PLAN_COLUMN,
                     'py-3 text-start font-semibold',
                     current ? 'bg-muted' : 'bg-card',
                   )}
@@ -174,13 +182,13 @@ export function BillingPlanTable({ plans, currentPlanId }: BillingPlanTableProps
         <tbody>
           {sections.map((section) => (
             <Fragment key={section.id}>
-              <tr className="bg-muted/40 border-t">
+              <tr className="bg-muted/30 border-t">
                 <th
                   scope="colgroup"
                   colSpan={plans.length + 1}
                   className="text-muted-foreground-strong px-3 py-1.5 text-start text-xs font-medium tracking-wide uppercase"
                 >
-                  <span className="sticky start-3">
+                  <span className="sticky start-2">
                     {t(COMPARE_KEYS.groups[section.id])}
                   </span>
                 </th>
@@ -203,7 +211,7 @@ export function BillingPlanTable({ plans, currentPlanId }: BillingPlanTableProps
                     {plans.map((plan) => (
                       <td
                         key={plan.id}
-                        className={cn(CELL, plan.id === currentPlanId && 'bg-muted/50')}
+                        className={cn(CELL, plan.id === currentPlanId && 'bg-muted/30')}
                       >
                         {cell(row, plan)}
                       </td>
