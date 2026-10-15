@@ -137,17 +137,17 @@ bump).
 
 ## 9. The route — the ordered ledger
 
-| #   | Work item                                                                                | Kind       | Depends on | Skill/driver                                             | Acceptance                          | Assignee | Status  |
-| --- | ---------------------------------------------------------------------------------------- | ---------- | ---------- | -------------------------------------------------------- | ----------------------------------- | -------- | ------- |
-| L-1 | `Unlink` in the icon registry                                                            | foundation | —          | fe-code-structure                                        | `pnpm type-check`                   | Claude   | pending |
-| L-2 | Copy: the new `patient-file` keys in 11 locales + constants and test ids                 | copy       | —          | fe-i18n-constants                                        | i18n parity                         | Claude   | pending |
-| L-3 | `useDevicePrefsStore`: mode, layout, framings per comparison                             | foundation | —          | fe-state-management · fe-test-generation                 | §8 row 5                            | Claude   | pending |
-| L-4 | `usePhotoZoom` for many photos; the viewer on it                                         | structural | L-3        | fe-component-promotion · fe-test-generation              | §8 rows 2, 3, 6                     | Claude   | pending |
-| L-5 | The comparison: mode switch, panel zoom groups, Reset all, remembered state, percent pan | screen     | L-1–L-4    | frontend-design · web-design-guidelines · fe-e2e-testids | §8 rows 1–4                         | Claude   | pending |
-| L-6 | Docs: `IMAGES`, `IMAGE_ID` overviews, the test-id inventory                              | copy       | L-5        | fe-documentation-maintenance                             | `pnpm sync:check`, `pnpm docs:lint` | Claude   | pending |
-| L-7 | Verify in the running app: screenshots, the video                                        | verify     | L-5        | fe-kickoff-iteration                                     | every §8 row proven                 | Claude   | pending |
-| L-8 | Gates                                                                                    | gate       | L-7        | fe-before-commit-guard                                   | §8 last row                         | Claude   | pending |
-| L-9 | Close: `AS-BUILT.md` (rows, summary, Standing deviations), Status `done`, then `frozen`  | verify     | L-8        | fe-kickoff-iteration                                     | README Status `frozen`              | Claude   | pending |
+| #   | Work item                                                                                | Kind       | Depends on | Skill/driver                                             | Acceptance                          | Assignee | Status |
+| --- | ---------------------------------------------------------------------------------------- | ---------- | ---------- | -------------------------------------------------------- | ----------------------------------- | -------- | ------ |
+| L-1 | `Unlink` in the icon registry                                                            | foundation | —          | fe-code-structure                                        | `pnpm type-check`                   | Claude   | done   |
+| L-2 | Copy: the new `patient-file` keys in 11 locales + constants and test ids                 | copy       | —          | fe-i18n-constants                                        | i18n parity                         | Claude   | done   |
+| L-3 | `useDevicePrefsStore`: mode, layout, framings per comparison                             | foundation | —          | fe-state-management · fe-test-generation                 | §8 row 5                            | Claude   | done   |
+| L-4 | `usePhotoZoom` for many photos; the viewer on it                                         | structural | L-3        | fe-component-promotion · fe-test-generation              | §8 rows 2, 3, 6                     | Claude   | done   |
+| L-5 | The comparison: mode switch, panel zoom groups, Reset all, remembered state, percent pan | screen     | L-1–L-4    | frontend-design · web-design-guidelines · fe-e2e-testids | §8 rows 1–4                         | Claude   | done   |
+| L-6 | Docs: `IMAGES`, `IMAGE_ID` overviews, the test-id inventory                              | copy       | L-5        | fe-documentation-maintenance                             | `pnpm sync:check`, `pnpm docs:lint` | Claude   | done   |
+| L-7 | Verify in the running app: screenshots, the video                                        | verify     | L-5        | fe-kickoff-iteration                                     | every §8 row proven                 | Claude   | done   |
+| L-8 | Gates                                                                                    | gate       | L-7        | fe-before-commit-guard                                   | §8 last row                         | Claude   | done   |
+| L-9 | Close: `AS-BUILT.md` (rows, summary, Standing deviations), Status `done`, then `frozen`  | verify     | L-8        | fe-kickoff-iteration                                     | README Status `frozen`              | Claude   | done   |
 
 ## Appendix A — Coverage matrix
 
