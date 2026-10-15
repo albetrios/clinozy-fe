@@ -29,9 +29,12 @@ export interface AppPreferences {
   recentPicks: string[];
 }
 
-/** What a user starts with (H:4079 pins, D26 file pins, all branches, light). */
+/**
+ * What a user starts with (H:4079 pins + Branches, change-branches-in-navbar; D26 file pins, all
+ * branches, light) — clinozy-be's column defaults.
+ */
 export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
-  pinnedSections: ['appointments', 'leads', 'patients', 'payments'],
+  pinnedSections: ['appointments', 'leads', 'patients', 'payments', 'branches'],
   branchFilter: [],
   theme: 'light',
   patientFilePins: ['overview', 'visits', 'prescriptions', 'invoices'],
@@ -66,6 +69,7 @@ const API_PINNED_SECTIONS = [
   'tasks',
   'offerings',
   'users',
+  'branches',
 ] as const;
 
 /** The patient file's sections, as the API names them. */
@@ -84,9 +88,18 @@ const API_FILE_PINS = [
 ] as const;
 type ApiFilePin = (typeof API_FILE_PINS)[number];
 
+type ApiPinnedSection = (typeof API_PINNED_SECTIONS)[number];
+
+const isApiPinnedSection = (value: string): value is ApiPinnedSection =>
+  (API_PINNED_SECTIONS as readonly string[]).includes(value);
+
 const preferencesWire = wireSchema<ApiPreferences>()(
   z.object({
-    pinned_sections: z.array(z.enum(API_PINNED_SECTIONS)),
+    // A section clinozy-be names that this build does not know yet (it shipped first) is dropped,
+    // not a failed read: the member keeps every other saved choice.
+    pinned_sections: z
+      .array(z.string())
+      .transform((sections) => sections.filter(isApiPinnedSection)),
     theme: themeSchema,
     branch_ids: z.array(z.string()),
     patient_file_pins: z.array(z.enum(API_FILE_PINS)),

@@ -2,11 +2,11 @@ import { useTranslation } from 'react-i18next';
 
 import { nextCustomRoleName, nextCustomRoleTone } from '@/shared/api/app/access-api.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useRoleDirectory } from '@/shared/hooks/useRoleDirectory/index.ts';
 import { useCreateRole } from '@/shared/hooks/useRoles/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
-import { useRoleDirectory } from '../useRoleDirectory/index.ts';
 
 /**
  * "New role" (KICKOFF §6.12; H:5187): one clinozy-be role (`POST …/roles`) named "New role",

@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { Branch } from '@/shared/api/app/app-schema.ts';
 import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
+import type { RoleDirectory } from '@/shared/hooks/useRoleDirectory/index.ts';
 
-import type { RoleDirectory } from '../../shared/hooks/useRoleDirectory/index.ts';
 import { useTeamTable } from './useTeamTable.tsx';
 
 const ADAJAN = { id: 'b1', name: 'Adajan', tone: 'sage' } as Branch;

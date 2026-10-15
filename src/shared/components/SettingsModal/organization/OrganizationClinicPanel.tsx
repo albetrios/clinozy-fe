@@ -74,7 +74,7 @@ const ID_PREFIX = 'org-clinic';
  * Settings › Clinic (feat-clinic-setup KICKOFF §6.6; BRIEF.md:123–133) — the clinic's deeper
  * setup, every value with its default: the specialties and timezone (`PATCH
  * /tenancy/organization`), the booking-reminder hour, lead hold and retarget days (`PATCH
- * /tenancy/organization/settings`), a link to Users › Branches for hours, holidays, rooms,
+ * /tenancy/organization/settings`), a link to the Branches room for hours, holidays, rooms,
  * machines, GST and review links, a link to General for the logo, and — while the clinic's
  * setup guide is hidden — "Show the setup guide again". TEAM organizations only; viewed with
  * `organization:read`, saved with `organization:update` (read-only otherwise). No cash-drawer
@@ -476,12 +476,12 @@ function ClinicOperationsCard({
 }
 
 /**
- * Hours, holidays, rooms, machines, GST and review links live on each branch: a link to Users ›
- * Branches, shown where the member can open it (the `app-users` module, `branch:read`).
+ * Hours, holidays, rooms, machines, GST and review links live on each branch: a link to the
+ * Branches room, shown where the member can open it (the `app-branches` module, `branch:read`).
  */
 function BranchesLink() {
   const canReadBranches = useCan({ permission: 'branch:read' });
-  if (!(canReadBranches && isModuleEnabled(APP_MODULES.users))) return null;
+  if (!(canReadBranches && isModuleEnabled(APP_MODULES.branches))) return null;
   return <UsersRoomLinkCard target="branches" />;
 }
 

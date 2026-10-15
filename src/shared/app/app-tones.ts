@@ -26,7 +26,10 @@ import type {
 import type { LeadRecordSource } from '@/shared/api/app/leads-fixture-contracts.ts';
 import type { OfferStatus } from '@/shared/api/app/offerings-contracts.ts';
 
-/** Each clinic section's tone — one per section, never shared (`shell.md:42`). */
+/**
+ * Each clinic section's tone — one per section, never shared (`shell.md:42`). Branches takes
+ * stone, the eleventh section tone of the design (its Blueprint section, never built).
+ */
 export const SECTION_TONES: Readonly<Record<Section, Tone>> = {
   today: 'butter',
   leads: 'lav',
@@ -38,6 +41,7 @@ export const SECTION_TONES: Readonly<Record<Section, Tone>> = {
   tasks: 'plum',
   offerings: 'lime',
   users: 'slate',
+  branches: 'stone',
 };
 
 /**

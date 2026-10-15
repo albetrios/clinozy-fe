@@ -12,12 +12,9 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+import { member, PLATFORM_ROLES } from '@/tests/utils/team-doubles.ts';
 
-import {
-  member,
-  PLATFORM_ROLES,
-  USERS_ADMIN_CODES,
-} from '../../__tests__/integration/users-test-router.tsx';
+import { USERS_ADMIN_CODES } from '../../__tests__/integration/users-test-router.tsx';
 import { UserDrawer } from './UserDrawer.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
