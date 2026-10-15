@@ -55,6 +55,19 @@ describe('insertPhrase', () => {
     expect(insertPhrase({ value: 'abcd', phrase: 'x', maxLength: 4 }).value).toBe('abcd');
   });
 
+  it('writes a spoken mark or line break straight after the words before it', () => {
+    expect(insertPhrase({ value: 'Mild redness ', phrase: '. avoid sun' }).value).toBe(
+      'Mild redness. avoid sun',
+    );
+    expect(insertPhrase({ value: 'Mild redness', phrase: ',' }).value).toBe(
+      'Mild redness,',
+    );
+    expect(insertPhrase({ value: '原因', phrase: '。' }).value).toBe('原因。');
+    const broken = insertPhrase({ value: 'Day one plan', phrase: '\n', start: 7 });
+    expect(broken.value).toBe('Day one\nplan');
+    expect(broken.caret).toBe(8);
+  });
+
   it('leaves the text alone for an empty phrase', () => {
     expect(insertPhrase({ value: 'Kept', phrase: '   ' })).toEqual({
       value: 'Kept',

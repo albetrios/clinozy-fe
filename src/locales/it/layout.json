@@ -70,7 +70,8 @@
       "listSearch": "Cerca nell’elenco",
       "leadRows": "Lead successivo o precedente (in Lead)",
       "closeDialog": "Chiudi finestra di dialogo",
-      "saveForm": "Salva il modulo aperto"
+      "saveForm": "Salva il modulo aperto",
+      "dictate": "Detta nel campo in cui ti trovi"
     },
     "emailVerify": {
       "message": "Verifica la tua e-mail per proteggere l'account.",

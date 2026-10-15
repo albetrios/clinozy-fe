@@ -1,4 +1,9 @@
-export { type InsertedPhrase, insertPhrase } from './insert-phrase.ts';
+export {
+  capitalizeFirst,
+  type InsertedPhrase,
+  insertPhrase,
+  trimSpaces,
+} from './insert-phrase.ts';
 export {
   VOICE_BAR_COUNT,
   VOICE_INPUT_KEYS,

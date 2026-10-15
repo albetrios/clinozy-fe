@@ -217,6 +217,8 @@ export function NotesBentoCard({ onOpen, canPost }: CardLinks & { canPost: boole
             maxLength={CONTACT_NOTE_MAX}
             placeholder={t(K.placeholder)}
             aria-label={t(K.label)}
+            dictation
+            boxClassName="min-w-0 flex-1"
             data-testid={TIMELINE_TEST_IDS.noteInput}
             className="bg-canvas min-w-0 flex-1 px-3"
           />

@@ -31,6 +31,10 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
 import {
+  readSpokenPhrase,
+  useVoiceVocabulary,
+} from '@/shared/components/VoiceField/index.ts';
+import {
   VOICE_INPUT_KEYS,
   VoiceInputButton,
   voiceStatusKey,
@@ -193,11 +197,36 @@ function BugReportPanel({ onClose }: { onClose: () => void }) {
   const [typed, setTyped] = useState(false);
   const [sent, setSent] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const vocabulary = useVoiceVocabulary();
+  // The text as last written, so phrases arriving together build on each other; and each spoken
+  // phrase's text before and after, so "scratch that" takes the last one back.
+  const textRef = useRef('');
+  const spokenRef = useRef<{ before: string; after: string }[]>([]);
 
-  const appendFinal = useCallback((phrase: string) => {
-    setUsedVoice(true);
-    setText((current) => appendPhrase(current, phrase));
-  }, []);
+  useEffect(() => {
+    textRef.current = text;
+  }, [text]);
+
+  const appendFinal = useCallback(
+    (phrase: string) => {
+      const spoken = readSpokenPhrase({ phrase, vocabulary, multiline: true });
+      let next = textRef.current;
+      for (let count = 0; count < spoken.undo; count += 1) {
+        const last = spokenRef.current.pop();
+        if (last?.after === next) next = last.before;
+      }
+      if (spoken.text) {
+        const written = appendPhrase(next, spoken.text);
+        spokenRef.current.push({ before: next, after: written });
+        next = written;
+      }
+      if (next === textRef.current) return;
+      textRef.current = next;
+      setUsedVoice(true);
+      setText(next);
+    },
+    [vocabulary],
+  );
 
   const speech = useSpeechRecognition({
     language: resolveSpeechLanguage({
@@ -254,7 +283,10 @@ function BugReportPanel({ onClose }: { onClose: () => void }) {
 
   const toggleVoice = () => {
     if (speech.listening) speech.stop();
-    else speech.start();
+    else {
+      spokenRef.current = [];
+      speech.start();
+    }
     textareaRef.current?.focus();
   };
 

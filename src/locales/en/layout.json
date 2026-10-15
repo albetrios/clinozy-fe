@@ -70,7 +70,8 @@
       "listSearch": "Search the list",
       "leadRows": "Next or previous lead (in Leads)",
       "closeDialog": "Close dialog",
-      "saveForm": "Save the open form"
+      "saveForm": "Save the open form",
+      "dictate": "Speak into the field you're in"
     },
     "emailVerify": {
       "message": "Verify your email to secure your account.",

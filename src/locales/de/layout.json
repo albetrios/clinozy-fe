@@ -70,7 +70,8 @@
       "listSearch": "Liste durchsuchen",
       "leadRows": "Nächster oder vorheriger Lead (in Leads)",
       "closeDialog": "Dialog schließen",
-      "saveForm": "Geöffnetes Formular speichern"
+      "saveForm": "Geöffnetes Formular speichern",
+      "dictate": "Ins aktuelle Feld diktieren"
     },
     "emailVerify": {
       "message": "Bestätigen Sie Ihre E-Mail, um Ihr Konto zu sichern.",

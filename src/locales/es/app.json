@@ -1471,7 +1471,25 @@
     "hearing": "Te escucho…",
     "denied": "El micrófono está bloqueado. Permítelo en el navegador para dictar.",
     "noSpeech": "No te he entendido: toca el micrófono e inténtalo de nuevo.",
-    "unavailable": "La entrada por voz no está disponible ahora. Puedes escribir."
+    "unavailable": "La entrada por voz no está disponible ahora. Puedes escribir.",
+    "say": {
+      "period": "punto|punto final",
+      "comma": "coma",
+      "question": "signo de interrogación",
+      "exclamation": "signo de exclamación",
+      "colon": "dos puntos",
+      "newLine": "nueva línea|salto de línea",
+      "newParagraph": "nuevo párrafo",
+      "scratch": "borra eso|borrar eso"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Di «punto», «coma», «nueva línea» o «borra eso»"
   },
   "pinPlace": {
     "hint": "Rellena la zona, la ciudad y el estado",

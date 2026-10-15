@@ -1471,7 +1471,25 @@
     "hearing": "Estou ouvindo…",
     "denied": "O microfone está bloqueado. Permita-o no navegador para ditar.",
     "noSpeech": "Não entendi — toque no microfone e tente de novo.",
-    "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar."
+    "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar.",
+    "say": {
+      "period": "ponto|ponto final",
+      "comma": "vírgula",
+      "question": "ponto de interrogação",
+      "exclamation": "ponto de exclamação",
+      "colon": "dois pontos",
+      "newLine": "nova linha",
+      "newParagraph": "novo parágrafo",
+      "scratch": "apague isso|apagar isso"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Diga “ponto”, “vírgula”, “nova linha” ou “apague isso”"
   },
   "pinPlace": {
     "hint": "Preenche o bairro, a cidade e o estado",

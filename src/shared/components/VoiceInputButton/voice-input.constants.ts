@@ -15,6 +15,27 @@ export const VOICE_INPUT_KEYS = {
   denied: 'voice.denied',
   noSpeech: 'voice.noSpeech',
   unavailable: 'voice.unavailable',
+  /** What to say for a mark or to take words back, `|` between the ways to say it. */
+  say: {
+    period: 'voice.say.period',
+    comma: 'voice.say.comma',
+    question: 'voice.say.question',
+    exclamation: 'voice.say.exclamation',
+    colon: 'voice.say.colon',
+    newLine: 'voice.say.newLine',
+    newParagraph: 'voice.say.newParagraph',
+    scratch: 'voice.say.scratch',
+  },
+  /** The mark each is written as, in the language's own script ("." / "。" / "।"). */
+  marks: {
+    period: 'voice.marks.period',
+    comma: 'voice.marks.comma',
+    question: 'voice.marks.question',
+    exclamation: 'voice.marks.exclamation',
+    colon: 'voice.marks.colon',
+  },
+  /** The line under a field while it listens: what can be said besides the words. */
+  sayHint: 'voice.sayHint',
 } as const;
 
 /** Bars in the voice-activity meter. */

@@ -86,6 +86,7 @@ export function NewTaskWhatFields({
           {...form.register('title')}
           maxLength={TASK_TITLE_MAX}
           placeholder={t(K.titleField.placeholder)}
+          dictation
           data-testid={IDS.title}
         />
       </DrawerField>

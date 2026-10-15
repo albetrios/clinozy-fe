@@ -1471,7 +1471,25 @@
     "hearing": "Je vous entends…",
     "denied": "Le micro est bloqué. Autorisez-le dans le navigateur pour dicter.",
     "noSpeech": "Je n'ai pas compris — touchez le micro et réessayez.",
-    "unavailable": "La saisie vocale n'est pas disponible pour le moment. Vous pouvez écrire."
+    "unavailable": "La saisie vocale n'est pas disponible pour le moment. Vous pouvez écrire.",
+    "say": {
+      "period": "point|point final",
+      "comma": "virgule",
+      "question": "point d'interrogation|point d’interrogation",
+      "exclamation": "point d'exclamation|point d’exclamation",
+      "colon": "deux-points|deux points",
+      "newLine": "à la ligne|nouvelle ligne",
+      "newParagraph": "nouveau paragraphe",
+      "scratch": "efface ça|annule ça"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Dites « point », « virgule », « à la ligne » ou « efface ça »"
   },
   "pinPlace": {
     "hint": "Remplit le quartier, la ville et l’État",

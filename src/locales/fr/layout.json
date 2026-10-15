@@ -70,7 +70,8 @@
       "listSearch": "Rechercher dans la liste",
       "leadRows": "Prospect suivant ou précédent (dans Prospects)",
       "closeDialog": "Fermer la boîte de dialogue",
-      "saveForm": "Enregistrer le formulaire ouvert"
+      "saveForm": "Enregistrer le formulaire ouvert",
+      "dictate": "Dicter dans le champ en cours"
     },
     "emailVerify": {
       "message": "Vérifiez votre e-mail pour sécuriser votre compte.",

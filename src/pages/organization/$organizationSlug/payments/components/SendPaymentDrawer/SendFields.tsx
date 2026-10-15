@@ -296,6 +296,7 @@ export function SendExpenseFields({
           placeholder={t(K.notePlaceholder)}
           autoComplete="off"
           readOnly={readOnly}
+          dictation
           data-testid={`${testId}-note`}
         />
       </DrawerField>

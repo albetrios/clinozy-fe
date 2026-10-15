@@ -1450,7 +1450,25 @@
     "hearing": "Ich höre Sie…",
     "denied": "Das Mikrofon ist blockiert. Erlauben Sie es im Browser, um zu diktieren.",
     "noSpeech": "Nicht verstanden – tippen Sie aufs Mikrofon und versuchen Sie es erneut.",
-    "unavailable": "Spracheingabe ist gerade nicht verfügbar. Sie können weiterhin tippen."
+    "unavailable": "Spracheingabe ist gerade nicht verfügbar. Sie können weiterhin tippen.",
+    "say": {
+      "period": "Punkt",
+      "comma": "Komma",
+      "question": "Fragezeichen",
+      "exclamation": "Ausrufezeichen",
+      "colon": "Doppelpunkt",
+      "newLine": "neue Zeile",
+      "newParagraph": "neuer Absatz",
+      "scratch": "lösch das|lösche das"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Sagen Sie „Punkt“, „Komma“, „neue Zeile“ oder „lösch das“"
   },
   "pinPlace": {
     "hint": "Füllt Gebiet, Stadt und Bundesland aus",

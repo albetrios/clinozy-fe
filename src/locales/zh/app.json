@@ -1429,7 +1429,25 @@
     "hearing": "正在听你说…",
     "denied": "麦克风已被阻止。请在浏览器中允许后再使用语音输入。",
     "noSpeech": "没有听清，请点击麦克风再试一次。",
-    "unavailable": "语音输入暂时不可用，你仍可以打字。"
+    "unavailable": "语音输入暂时不可用，你仍可以打字。",
+    "say": {
+      "period": "句号",
+      "comma": "逗号",
+      "question": "问号",
+      "exclamation": "感叹号",
+      "colon": "冒号",
+      "newLine": "换行",
+      "newParagraph": "新段落|另起一段",
+      "scratch": "删掉刚才那句|撤销刚才那句"
+    },
+    "marks": {
+      "period": "。",
+      "comma": "，",
+      "question": "？",
+      "exclamation": "！",
+      "colon": "："
+    },
+    "sayHint": "可以说“句号”“逗号”“换行”或“删掉刚才那句”"
   },
   "pinPlace": {
     "hint": "自动填写区域、城市和邦/省",

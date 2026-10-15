@@ -615,15 +615,17 @@ Below, `<d>` is that root id.
 ### Drawer fields — write less (feat-write-less-2026-10-14-oixr)
 
 The shared field pieces derive these from the field's own `data-testid` (`<f>` below), so every
-drawer that tags its field gets them.
+drawer that tags its field gets them. The voice ones come from the common `VoiceField`, so the
+reason confirm's note (`confirm-note`) and an appointment's cancel note carry them too.
 
-| Test ID               | Element                                                                                              | Source                                                         |
-| --------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `<f>-voice`           | A note field's microphone — only where the browser recognises speech; `aria-pressed` while listening | `DrawerField/drawer-text-controls.tsx` (`DrawerTextarea`)      |
-| `<f>-voice-status`    | "Listening…" / "Hearing you…" / a blocked-microphone or no-speech note under the field               | DrawerTextarea                                                 |
-| `<f>-interim`         | Words still being recognised (shimmering, not yet in the field)                                      | DrawerTextarea                                                 |
-| `<f>-suggestion-<id>` | A chip under the field that writes its text into it (hides once used)                                | DrawerTextarea                                                 |
-| `<f>-sum`             | A number field's "= 1,800" while a sum (`1500+300`, `1.5k`, `2L`) is open                            | `DrawerField/drawer-number-controls.tsx` (`DrawerNumberInput`) |
+| Test ID               | Element                                                                                                                                                 | Source                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `<f>-voice`           | A field's microphone — only where the browser recognises speech; `aria-pressed` while listening; out of the tab order (⌘ / Ctrl ⇧ Space from the field) | `VoiceField/` (`DrawerTextarea`, a `DrawerInput` with `dictation`, the reason and cancel notes) |
+| `<f>-voice-status`    | "Listening…" / "Hearing you…" / a blocked-microphone or no-speech note — under a note, floating under a line                                            | VoiceField                                                                                      |
+| `<f>-voice-hint`      | "Say “full stop”, “comma”, “new line” or “scratch that”" after "Listening…", before any words                                                           | VoiceField                                                                                      |
+| `<f>-interim`         | Words still being recognised (shimmering, not yet in the field)                                                                                         | VoiceField                                                                                      |
+| `<f>-suggestion-<id>` | A chip under the field that writes its text into it (hides once used)                                                                                   | DrawerTextarea                                                                                  |
+| `<f>-sum`             | A number field's "= 1,800" while a sum (`1500+300`, `1.5k`, `2L`) is open                                                                               | `DrawerField/drawer-number-controls.tsx` (`DrawerNumberInput`)                                  |
 
 ### Patient drawer (shared, launch L-32b)
 

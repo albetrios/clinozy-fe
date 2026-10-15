@@ -20,3 +20,27 @@ export function isApplePlatform(
     navigatorLike.userAgentData?.platform ?? navigatorLike.userAgent,
   );
 }
+
+/** A shortcut's keys as a key hint draws them ("⌘ ↵") and as `aria-keyshortcuts` names them. */
+export interface ShortcutKeys {
+  label: string;
+  aria: string;
+}
+
+/**
+ * One shortcut's keys for this device: the Apple keyboard's on a Mac, iPhone or iPad
+ * ({@link isApplePlatform}), the other keyboards' elsewhere.
+ *
+ * @param keys.apple - The keys with ⌘ ("⌘ ↵", `Meta+Enter`).
+ * @param keys.other - The keys with Ctrl ("Ctrl ↵", `Control+Enter`).
+ * @returns The pair for this device.
+ */
+export function platformShortcutKeys({
+  apple,
+  other,
+}: {
+  apple: ShortcutKeys;
+  other: ShortcutKeys;
+}): ShortcutKeys {
+  return isApplePlatform() ? apple : other;
+}

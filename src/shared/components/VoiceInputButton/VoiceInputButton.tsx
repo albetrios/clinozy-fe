@@ -1,5 +1,6 @@
 import './voice-input.css';
 
+import type { ShortcutKeys } from '@/lib/apple-platform.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Mic } from '@/shared/icons/index.ts';
@@ -47,6 +48,13 @@ export interface VoiceInputButtonProps {
   size?: 'md' | 'sm';
   /** The meter beside the orb while listening (Report a bug); a field shows its own on the status line. */
   meter?: boolean;
+  /** The keys that toggle it from the field (`VoiceField`): in its tooltip and `aria-keyshortcuts`. */
+  shortcut?: ShortcutKeys;
+  /**
+   * A field's mic: a press leaves the focus and the caret in the field, and Tab passes it by —
+   * the field's own shortcut is the keyboard's way in.
+   */
+  keepFieldFocus?: boolean;
   testId?: string;
   className?: string;
 }
@@ -66,6 +74,8 @@ export function VoiceInputButton({
   disabled = false,
   size = 'md',
   meter = true,
+  shortcut,
+  keepFieldFocus = false,
   testId,
   className,
 }: VoiceInputButtonProps) {
@@ -85,7 +95,10 @@ export function VoiceInputButton({
         data-listening={listening || undefined}
         aria-pressed={listening}
         aria-label={label}
-        title={label}
+        aria-keyshortcuts={shortcut?.aria}
+        title={shortcut ? `${label} (${shortcut.label})` : label}
+        tabIndex={keepFieldFocus ? -1 : undefined}
+        onMouseDown={keepFieldFocus ? (event) => event.preventDefault() : undefined}
         disabled={disabled}
         onClick={onToggle}
       >

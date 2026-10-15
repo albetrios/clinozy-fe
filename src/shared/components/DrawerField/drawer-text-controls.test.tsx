@@ -83,6 +83,64 @@ describe('DrawerInput — first letter capitalised as typed (H:4515–4521)', ()
   });
 });
 
+describe('DrawerInput — speak into a prose line (feat-write-less D18)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('has no microphone unless the line asks for one', () => {
+    installFakeSpeechRecognition();
+    render(<DrawerInput aria-label="Name" data-testid="name" />);
+    expect(screen.queryByTestId('name-voice')).toBeNull();
+    expect(screen.getByTestId('name').parentElement).toBe(document.body.firstChild);
+  });
+
+  it('writes a spoken phrase into a dictated line, the box taking the line’s place in its row', async () => {
+    installFakeSpeechRecognition();
+    const user = userEvent.setup();
+    function Reason() {
+      const { register, watch } = useForm<{ reason: string }>({
+        defaultValues: { reason: '' },
+      });
+      return (
+        <>
+          <DrawerInput
+            aria-label="Reason"
+            data-testid="reason"
+            dictation
+            boxClassName="min-w-0 flex-1"
+            {...register('reason')}
+          />
+          <output data-testid="reason-value">{watch('reason')}</output>
+        </>
+      );
+    }
+    render(<Reason />);
+    const field = screen.getByRole('textbox', { name: 'Reason' });
+    expect(field.parentElement).toHaveClass('flex-1');
+    expect(field).toHaveClass('pe-8');
+    await user.click(field);
+    await user.click(screen.getByTestId('reason-voice'));
+    act(() => lastSpeechRecognition()?.say('pigmentation on cheeks', true));
+    expect(field).toHaveValue('Pigmentation on cheeks');
+    expect(screen.getByTestId('reason-value')).toHaveTextContent(
+      'Pigmentation on cheeks',
+    );
+  });
+
+  it('hands a spoken phrase to onDictation instead of the field', async () => {
+    installFakeSpeechRecognition();
+    const user = userEvent.setup();
+    const onDictation = vi.fn();
+    render(<DrawerInput aria-label="Add" data-testid="add" onDictation={onDictation} />);
+    await user.click(screen.getByRole('textbox', { name: 'Add' }));
+    await user.click(screen.getByTestId('add-voice'));
+    act(() => lastSpeechRecognition()?.say('acne', true));
+    expect(onDictation).toHaveBeenCalledWith('acne');
+    expect(screen.getByRole('textbox', { name: 'Add' })).toHaveValue('');
+  });
+});
+
 describe('DrawerTextarea', () => {
   it('capitalises a note but not a message', async () => {
     const user = userEvent.setup();

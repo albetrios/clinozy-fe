@@ -176,6 +176,18 @@ describe('BugReport', () => {
     });
   });
 
+  it('writes a spoken full stop and takes a phrase back on "scratch that"', async () => {
+    installFakeSpeechRecognition();
+    const user = await openPanel();
+    await user.click(screen.getByTestId(BUG_REPORT_TEST_IDS.voice));
+    act(() => lastSpeechRecognition()?.say('it froze full stop on save', true));
+    act(() => lastSpeechRecognition()?.say('the list went blank', true));
+    act(() => lastSpeechRecognition()?.say('scratch that', true));
+    expect(screen.getByTestId(BUG_REPORT_TEST_IDS.description)).toHaveValue(
+      'It froze. On save',
+    );
+  });
+
   it('says when the microphone is blocked', async () => {
     installFakeSpeechRecognition();
     const user = await openPanel();

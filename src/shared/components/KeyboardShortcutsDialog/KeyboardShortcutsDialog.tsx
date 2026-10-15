@@ -7,6 +7,7 @@ import {
 } from '@/shared/components/RecordDrawer/index.ts';
 import { saveShortcutKeys } from '@/shared/components/RecordDrawer/record-drawer-save-shortcut.ts';
 import { SettingsList, SettingsListRow } from '@/shared/components/SettingsCard/index.ts';
+import { voiceShortcutKeys } from '@/shared/components/VoiceField/voice-shortcut.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
@@ -42,6 +43,7 @@ export function KeyboardShortcutsDialog() {
     { labelKey: sk.listSearch, keys: '/' },
     { labelKey: sk.leadRows, keys: 'j · k' },
     { labelKey: sk.saveForm, keys: saveShortcutKeys().label },
+    { labelKey: sk.dictate, keys: voiceShortcutKeys().label },
     { labelKey: sk.closeDialog, keys: 'Esc' },
   ];
 

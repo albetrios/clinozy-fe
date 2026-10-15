@@ -1429,7 +1429,25 @@
     "hearing": "듣고 있어요…",
     "denied": "마이크가 차단되어 있습니다. 음성으로 입력하려면 브라우저에서 허용하세요.",
     "noSpeech": "알아듣지 못했어요. 마이크를 눌러 다시 시도해 주세요.",
-    "unavailable": "지금은 음성 입력을 사용할 수 없습니다. 직접 입력할 수 있어요."
+    "unavailable": "지금은 음성 입력을 사용할 수 없습니다. 직접 입력할 수 있어요.",
+    "say": {
+      "period": "마침표",
+      "comma": "쉼표",
+      "question": "물음표",
+      "exclamation": "느낌표",
+      "colon": "콜론",
+      "newLine": "줄 바꿈|새 줄",
+      "newParagraph": "새 단락",
+      "scratch": "방금 거 지워|방금 것 지워"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "“마침표”, “쉼표”, “줄 바꿈” 또는 “방금 거 지워”라고 말해 보세요"
   },
   "pinPlace": {
     "hint": "지역, 도시, 주를 자동으로 채웁니다",

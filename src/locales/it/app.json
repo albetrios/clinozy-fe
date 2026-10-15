@@ -1471,7 +1471,25 @@
     "hearing": "Ti sento…",
     "denied": "Il microfono è bloccato. Consentilo nel browser per dettare.",
     "noSpeech": "Non ho capito: tocca il microfono e riprova.",
-    "unavailable": "L'input vocale non è disponibile ora. Puoi comunque scrivere."
+    "unavailable": "L'input vocale non è disponibile ora. Puoi comunque scrivere.",
+    "say": {
+      "period": "punto",
+      "comma": "virgola",
+      "question": "punto interrogativo",
+      "exclamation": "punto esclamativo",
+      "colon": "due punti",
+      "newLine": "a capo|nuova riga",
+      "newParagraph": "nuovo paragrafo",
+      "scratch": "cancella questo|cancella quello"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Di’ «punto», «virgola», «a capo» o «cancella questo»"
   },
   "pinPlace": {
     "hint": "Compila zona, città e stato",

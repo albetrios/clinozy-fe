@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { isApplePlatform } from './apple-platform.ts';
+import { isApplePlatform, platformShortcutKeys } from './apple-platform.ts';
 
 describe('isApplePlatform', () => {
   it('reads Client Hints first, then the user agent', () => {
@@ -20,5 +20,23 @@ describe('isApplePlatform', () => {
 
   it('draws the Mac keys without a navigator', () => {
     expect(isApplePlatform(null)).toBe(true);
+  });
+});
+
+describe('platformShortcutKeys', () => {
+  const keys = {
+    apple: { label: '⌘ ↵', aria: 'Meta+Enter' },
+    other: { label: 'Ctrl ↵', aria: 'Control+Enter' },
+  };
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('hands the ⌘ keys to an Apple device and the Ctrl keys to the rest', () => {
+    vi.stubGlobal('navigator', { userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X)' });
+    expect(platformShortcutKeys(keys)).toBe(keys.apple);
+    vi.stubGlobal('navigator', { userAgent: 'Mozilla/5.0 (Windows NT 10.0)' });
+    expect(platformShortcutKeys(keys)).toBe(keys.other);
   });
 });

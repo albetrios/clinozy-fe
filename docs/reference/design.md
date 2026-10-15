@@ -302,11 +302,14 @@ organization" note.
 - Respect reduced-motion; keep motion fast and few.
 - Compose from shadcn/ui primitives; extend via `cn()` + `cva` variants.
 - Let the field do the work before the person types (feat-write-less-2026-10-14-oixr): build forms
-  from the shared drawer pieces, which already take speech (`DrawerTextarea`'s microphone), save on
-  ⌘ / Ctrl Enter (`RecordDrawer`), work sums out (`DrawerNumberInput`: `1500+300`, `1.5k`, `2L`),
-  read date shorthand (`DatePicker`: `2w`, `fri`), step on the arrow keys (`DrawerStepper`) and
-  remember the last picks (`Picker` `recentKey`) — and offer known text as a chip (`suggestions`)
-  instead of a placeholder the person must retype.
+  from the shared drawer pieces, which already take speech (every `DrawerTextarea`, a prose
+  `DrawerInput` with `dictation` — the common `VoiceField`, with spoken marks, "scratch that" and
+  ⌘ / Ctrl ⇧ Space), save on ⌘ / Ctrl Enter (`RecordDrawer`), work sums out (`DrawerNumberInput`:
+  `1500+300`, `1.5k`, `2L`), read date shorthand (`DatePicker`: `2w`, `fri`), step on the arrow keys
+  (`DrawerStepper`) and remember the last picks (`Picker` `recentKey`) — and offer known text as a
+  chip (`suggestions`) instead of a placeholder the person must retype. A text field outside the
+  drawer pieces takes speech by wrapping itself in `VoiceField` (`useVoiceField`); never a name, a
+  code or a contact detail, where every letter has to be right.
 
 **Don't**
 
