@@ -5,8 +5,8 @@ file (KICKOFF §6.6, D26; H:827–832; `iterations/launch-2026-09-30-jxmr/intake
 It renders in the file layout's content column through the family's section frame
 (`../shared/components/PatientSection/`). Search (`images.search.ts`): `album` (`private` ·
 `lhr`; General when absent), `appointment` (a visit id, or `none`; every photo when absent) and
-`compare` (2–8 photo ids, comma-joined — the comparison; fewer than two drop it, more than eight
-keep the first eight).
+`compare` (2–8 photo ids, comma-joined — the comparison, read by the page with `compareIdsOf`:
+fewer than two open nothing, more than eight keep the first eight).
 
 Gated by the file layout (membership, the `app-patients` module, the org status, the
 section's `patient:clinical_record:read`); in-room access is `useAppAccess` through
@@ -93,7 +93,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `images.route.tsx`                      | Route marker — exports `Component` rendering `PatientImagesPage`.                                                                    |
 | `images.manifest.ts`                    | Manifest — `kind: 'layout'` over `$imageId`, permission `organization:read`, title "Photos".                                         |
-| `images.search.ts`                      | URL schema (`validateSearch`): `album`, `appointment`, `compare` (kept as text). Rides the entry chunk.                              |
+| `images.search.ts`                      | URL schema (`validateSearch`): `album`, `appointment`, `compare` typed only (the router passes it through). Rides the entry chunk.   |
 | `PatientImagesPage.tsx`                 | The section: toolbar, upload, grid, paging, drop, paste, selection, the delete confirm, the comparison; hosts the dialogs' `Outlet`. |
 | `components/PhotoToolbar/`              | Album tabs, count, visit filter, Select / Done, size radios.                                                                         |
 | `components/PhotoGrid/`                 | Day groups (side by side) and tiles, with the check circle and select mode.                                                          |

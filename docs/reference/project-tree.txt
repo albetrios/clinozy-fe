@@ -402,6 +402,13 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── fix-photo-compare-first-paint-2026-10-15-icne/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── fix-settings-drawer-header-2026-10-13-kutv/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md

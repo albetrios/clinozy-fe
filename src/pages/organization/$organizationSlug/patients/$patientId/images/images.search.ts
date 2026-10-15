@@ -22,9 +22,10 @@ export interface PatientImagesSearch {
   /** The visit filter: a visit's id (`appt_…`), or "none" — every photo of the album when absent. */
   appointment?: string;
   /**
-   * The comparison open over the section: photo ids (`pimg_…`), comma-joined. Kept as
-   * text here — this module rides the entry chunk; the page reads it with
-   * `compareIdsOf` (`shared/photo-compare.ts`).
+   * The comparison open over the section: photo ids (`pimg_…`), comma-joined. Typed
+   * here and not parsed: this module rides the entry chunk, and the router passes an
+   * unvalidated param through (`search.strict` is off), so the page reads it with
+   * `compareIdsOf` (`shared/photo-compare.ts`), which takes any value.
    */
   compare?: string;
 }
@@ -38,6 +39,5 @@ export function validatePatientImagesSearch(
   return {
     album: album === 'general' ? undefined : album,
     appointment: visit === NO_VISIT || PUBLIC_ID.test(visit) ? visit : undefined,
-    compare: textOf(search.compare) || undefined,
   };
 }

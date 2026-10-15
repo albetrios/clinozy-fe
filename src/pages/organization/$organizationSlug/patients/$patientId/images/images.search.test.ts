@@ -36,11 +36,9 @@ describe('the Photos section’s search params', () => {
     ).toBeUndefined();
   });
 
-  it('keeps a comparison as text — the page reads its ids (this module rides the entry chunk)', () => {
-    expect(validatePatientImagesSearch({ compare: ' pimg_a,pimg_b ' }).compare).toBe(
-      'pimg_a,pimg_b',
+  it('leaves a comparison to the page — the router passes it through (this module rides the entry chunk)', () => {
+    expect(validatePatientImagesSearch({ compare: 'pimg_a,pimg_b' })).not.toHaveProperty(
+      'compare',
     );
-    expect(validatePatientImagesSearch({ compare: '' }).compare).toBeUndefined();
-    expect(validatePatientImagesSearch({}).compare).toBeUndefined();
   });
 });
