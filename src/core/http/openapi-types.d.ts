@@ -33762,6 +33762,7 @@ export interface operations {
                     /** @enum {string} */
                     analytics_consent?: "granted" | "denied";
                     analytics_consent_version?: number;
+                    default_organization_id?: string | null;
                     is_dark_mode_enabled?: boolean;
                     is_notifications_enabled?: boolean;
                     language?: string;
