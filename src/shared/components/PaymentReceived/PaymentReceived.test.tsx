@@ -204,6 +204,9 @@ describe('PaymentReceived', () => {
     show();
     expect(await screen.findAllByTestId('payment-received-review')).toHaveLength(3);
     expect(screen.getByText('Needs a call')).toBeInTheDocument();
+    // The stars are drawn for the eye; a screen reader hears the rating as words.
+    expect(screen.getByText('Rated 5 of 5')).toHaveClass('sr-only');
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByTestId('payment-received-all-reviews')).toHaveTextContent(
       'All reviews (4)',
     );

@@ -45,15 +45,12 @@ function useReviewDay(): (review: PatientReview) => string {
     );
 }
 
-/** Five stars, the rating's filled; a screen reader hears "Rated 4 of 5". */
+/** Five stars, the rating's filled; a screen reader hears "Rated 4 of 5" and not the stars. */
 function Stars({ rating }: { rating: number }) {
   const { t } = useTranslation(PAYMENT_RECEIVED_NS);
   return (
-    <span
-      role="img"
-      aria-label={t(K.rated, { rating })}
-      className="flex items-center gap-0.5"
-    >
+    <span className="flex items-center gap-0.5">
+      <span className="sr-only">{t(K.rated, { rating })}</span>
       {[1, 2, 3, 4, 5].map((step) => (
         <Star
           key={step}
