@@ -153,6 +153,9 @@ export const LAYOUT_KEYS = {
       jumpToSection: 'app.shortcuts.jumpToSection',
       listSearch: 'app.shortcuts.listSearch',
       leadRows: 'app.shortcuts.leadRows',
+      todayLanes: 'app.shortcuts.todayLanes',
+      todayNewBooking: 'app.shortcuts.todayNewBooking',
+      todayWalkIn: 'app.shortcuts.todayWalkIn',
     },
     emailVerify: {
       message: 'app.emailVerify.message',

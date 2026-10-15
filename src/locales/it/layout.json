@@ -69,7 +69,10 @@
       "jumpToSection": "Vai a una sezione",
       "listSearch": "Cerca nell’elenco",
       "leadRows": "Lead successivo o precedente (in Lead)",
-      "closeDialog": "Chiudi finestra di dialogo"
+      "closeDialog": "Chiudi finestra di dialogo",
+      "todayLanes": "Corsia precedente o successiva (in Oggi)",
+      "todayNewBooking": "Nuova prenotazione (in Oggi)",
+      "todayWalkIn": "Senza appuntamento (in Oggi)"
     },
     "emailVerify": {
       "message": "Verifica la tua e-mail per proteggere l'account.",

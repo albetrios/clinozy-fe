@@ -85,7 +85,10 @@
       "jumpToSection": "跳转到版块",
       "listSearch": "搜索列表",
       "leadRows": "下一个或上一个潜在客户（在潜在客户中）",
-      "closeDialog": "关闭对话框"
+      "closeDialog": "关闭对话框",
+      "todayLanes": "上一个或下一个泳道（在今天）",
+      "todayNewBooking": "新预约（在今天）",
+      "todayWalkIn": "到店咨询（在今天）"
     },
     "orgCreate": {
       "namePlaceholder": "Acme Inc.",

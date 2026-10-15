@@ -1,5 +1,5 @@
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -21,21 +21,27 @@ import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { House } from '@/shared/icons/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import { LanePanel } from './components/LanePanel/index.ts';
+import { FloorFinder } from './components/FloorFinder/index.ts';
+import { LanePanel, type TodaySpotlight } from './components/LanePanel/index.ts';
 import { LaneTiles } from './components/LaneTiles/index.ts';
+import { NeedsYouNow } from './components/NeedsYouNow/index.ts';
 import {
   TodayBooking,
   type TodayBookingRequest,
 } from './components/TodayBooking/index.ts';
 import { TodayGreeting } from './components/TodayGreeting/index.ts';
 import { WorkQueue, type WorkQueueTeam } from './components/WorkQueue/index.ts';
+import { useCheckoutDues } from './hooks/useCheckoutDues/index.ts';
 import { useFloorActions } from './hooks/useFloorActions/index.ts';
 import { useTodayFloorView } from './hooks/useTodayFloorView/index.ts';
+import { useTodayShortcuts } from './hooks/useTodayShortcuts/index.ts';
 import { useWorkQueue, type WorkQueueScope } from './hooks/useWorkQueue/index.ts';
+import { todayAttention, todayLaneAlerts } from './today.attention.ts';
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from './today.constants.ts';
 import {
   defaultTodayLane,
   readableTodayLanes,
+  type TodayCard,
   todayFocus,
   type TodayLanes,
 } from './today.lanes.ts';
@@ -151,13 +157,49 @@ function useGreetingActions(organizationSlug: string) {
 }
 
 /**
- * Today (KICKOFF §6.2; `today.md`): the clinic floor now. The greeting row —
- * the greeting is the title — over the seven lane tiles and the selected
- * lane's cards, with the work queue beside them (under them on a phone). The
- * lane and the queue's scope live in the URL (`today.search.ts`); the floor
- * is the header's branches, polled every 60s. Lanes outside the member's
- * focus dim; the default lane is the first in focus with people. First load
- * wears the in-place skeleton; later visits show the cache at once.
+ * The floor's lanes as one command surface (change-today-command-center): a picked card —
+ * the finder's, a Needs-you-now lane chip — opens its lane and is spotlit; `[` and `]` step
+ * through the lanes the member reads (round the end); `/` focuses the finder.
+ */
+function useFloorNavigation(
+  visibleLanes: readonly TodayLane[],
+  lane: TodayLane,
+  patchSearch: (patch: { lane?: TodayLane }) => void,
+) {
+  const [spotlight, setSpotlight] = useState<TodaySpotlight | null>(null);
+  const finderRef = useRef<HTMLInputElement>(null);
+  // The lane the last step asked for: two quick presses step twice, before the URL catches up.
+  const steppedTo = useRef(lane);
+  useEffect(() => {
+    steppedTo.current = lane;
+  }, [lane]);
+  const jumpTo = (card: TodayCard) => {
+    patchSearch({ lane: card.lane });
+    setSpotlight((previous) => ({ cardId: card.id, nonce: (previous?.nonce ?? 0) + 1 }));
+  };
+  const stepLane = (step: -1 | 1) => {
+    const count = visibleLanes.length;
+    if (count === 0) return;
+    const index = visibleLanes.indexOf(steppedTo.current);
+    const next = visibleLanes[(index + step + count) % count];
+    if (!next) return;
+    steppedTo.current = next;
+    patchSearch({ lane: next });
+  };
+  return { spotlight, finderRef, jumpTo, stepLane };
+}
+
+/**
+ * Today (KICKOFF §6.2; `today.md`; change-today-command-center): the clinic floor now. The
+ * greeting row — the greeting is the title, then the floor finder and the buttons — over
+ * Needs you now (who needs someone, ranked, each with the lane's action), the journey strip
+ * of seven connected lane tiles with their alert badges, and the selected lane's cards, with
+ * the work queue beside them (under them on a phone). The lane and the queue's scope live in
+ * the URL (`today.search.ts`); the floor is the header's branches, polled every 60s. Lanes
+ * outside the member's focus dim, and Needs you now lists the focus lanes only; the default
+ * lane is the first in focus with people. Keys: `/`, `[`, `]`, `N`, `W`
+ * (`useTodayShortcuts`). First load wears the in-place skeleton; later visits show the cache
+ * at once.
  */
 export function TodayPage() {
   const { t } = useTranslation(TODAY_NS);
@@ -181,8 +223,25 @@ export function TodayPage() {
   );
   const { visibleLanes, lane } = useTodayLanes(floor.lanes, focus, search.lane);
   const loading = floor.loading || (queue.shown && queue.loading);
+  // Today's open bills while anyone is at checkout — the cards' and Needs you now's "₹n to pay".
+  const dues = useCheckoutDues({
+    enabled: !floor.loading && floor.lanes.checkout.length > 0,
+    today,
+  });
+  const attention = useMemo(
+    () => todayAttention({ lanes: floor.lanes, now, dues, focus, visible: visibleLanes }),
+    [floor.lanes, now, dues, focus, visibleLanes],
+  );
+  const alerts = useMemo(() => todayLaneAlerts(floor.lanes, now), [floor.lanes, now]);
+  const navigation = useFloorNavigation(visibleLanes, lane, patchSearch);
 
   const { newBooking, walkIn } = useGreetingActions(organizationSlug);
+  useTodayShortcuts({
+    onFind: () => navigation.finderRef.current?.focus(),
+    onLane: navigation.stepLane,
+    onNewBooking: newBooking,
+    onWalkIn: walkIn,
+  });
 
   return (
     <section
@@ -208,15 +267,40 @@ export function TodayPage() {
             counts={floor.pulse}
             onNewBooking={newBooking}
             onWalkIn={walkIn}
+            onShortcuts={() => useUIStore.getState().setShortcutsOpen(true)}
+            finder={
+              visibleLanes.length > 0 ? (
+                <FloorFinder
+                  lanes={floor.lanes}
+                  visible={visibleLanes}
+                  today={today}
+                  onPick={navigation.jumpTo}
+                  onSearchEveryone={() =>
+                    useUIStore.getState().setCommandPaletteOpen(true)
+                  }
+                  inputRef={navigation.finderRef}
+                />
+              ) : null
+            }
           />
           {visibleLanes.length > 0 ? (
             <>
+              <NeedsYouNow
+                items={attention}
+                loading={floor.loading}
+                now={now}
+                today={today}
+                actionOf={actions.actionOf}
+                onOpen={actions.open}
+                onJump={navigation.jumpTo}
+              />
               <LaneTiles
                 lanes={floor.lanes}
                 selected={lane}
                 focus={focus}
                 visible={visibleLanes}
                 today={today}
+                alerts={alerts}
                 onSelect={(next) => patchSearch({ lane: next })}
               />
               <LanePanel
@@ -227,6 +311,8 @@ export function TodayPage() {
                 today={today}
                 actionOf={actions.actionOf}
                 onOpen={actions.open}
+                dues={dues}
+                spotlight={navigation.spotlight}
               />
             </>
           ) : (

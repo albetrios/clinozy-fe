@@ -11,6 +11,8 @@
   "pulse": "{{inClinic}} في العيادة · {{waiting}} بالانتظار · {{arriving}} قادمون · {{day}}، {{time}}",
   "newBooking": "حجز جديد",
   "walkIn": "زيارة مباشرة",
+  "live": "مباشر · يتحدّث كل دقيقة",
+  "shortcuts": "اختصارات لوحة المفاتيح",
   "loading": "جارٍ تحميل حالة اليوم",
   "lanes": {
     "label": "المراحل",
@@ -58,12 +60,48 @@
   },
   "flags": {
     "newLead": "عميل محتمل جديد",
+    "late": "متأخر {{minutes}} د",
+    "dueNow": "موعده الآن",
+    "dueIn": "بعد {{minutes}} د",
     "confirmed": "مؤكَّد",
     "unconfirmed": "غير مؤكَّد",
     "waiting": "ينتظر {{minutes}} د",
     "inRoom": "في الغرفة {{minutes}} د",
     "rxApproved": "الوصفة معتمدة {{time}}",
     "toPay": "{{amount}} للدفع"
+  },
+  "attention": {
+    "title": "يحتاجونك الآن",
+    "calm": "كل شيء هادئ — لا أحد ينتظرك.",
+    "more": "عرض {{more}} أخرى",
+    "less": "عرض أقل",
+    "jump": "إظهار {{name}} في {{lane}}",
+    "atCheckout": "عند الدفع",
+    "rxReady": "الوصفة جاهزة",
+    "noReply": "بلا رد {{age}}",
+    "age": {
+      "minutes": "{{minutes}} د",
+      "hours": "{{hours}} س"
+    },
+    "context": {
+      "booked": "محجوز {{time}}",
+      "since": "منذ {{time}}",
+      "approved": "اعتُمدت {{time}}",
+      "heard": "آخر رسالة {{time}}"
+    }
+  },
+  "alerts": {
+    "late": "متأخرون: {{people}}",
+    "waiting": "انتظار طويل: {{people}}",
+    "inRoom": "تجاوزوا الوقت: {{people}}",
+    "reply": "بانتظار رد: {{people}}"
+  },
+  "finder": {
+    "label": "ابحث عن شخص في العيادة اليوم",
+    "placeholder": "ابحث في العيادة",
+    "results": "في العيادة: {{found}}",
+    "none": "لا أحد بهذا الاسم في العيادة اليوم.",
+    "everyone": "البحث في كل جهات الاتصال"
   },
   "toasts": {
     "checkedIn": "تم تسجيل حضور {{name}} · تم إبلاغ قائمة الطبيب والغرفة",

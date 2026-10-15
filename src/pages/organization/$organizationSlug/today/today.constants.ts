@@ -31,8 +31,12 @@ export const TODAY_KEYS = {
   } satisfies Record<GreetingPart | 'nobody', string>,
   /** "<n> in clinic · <n> waiting · <n> arriving · <Ddd D Mon>, <HH:MM>". */
   pulse: 'pulse',
+  /** The live dot's title — the floor refreshes every minute. */
+  live: 'live',
   newBooking: 'newBooking',
   walkIn: 'walkIn',
+  /** The keyboard button: the app's shortcuts list. */
+  shortcuts: 'shortcuts',
   /** Where the screen is still loading (read by screen readers while the bars show). */
   loading: 'loading',
   lanes: {
@@ -78,6 +82,9 @@ export const TODAY_KEYS = {
   },
   flags: {
     newLead: 'flags.newLead',
+    late: 'flags.late',
+    dueNow: 'flags.dueNow',
+    dueIn: 'flags.dueIn',
     confirmed: 'flags.confirmed',
     unconfirmed: 'flags.unconfirmed',
     waiting: 'flags.waiting',
@@ -85,6 +92,39 @@ export const TODAY_KEYS = {
     /** "₹1,500 to pay" — a Checkout card's open bill today. */
     toPay: 'flags.toPay',
     rxApproved: 'flags.rxApproved',
+  },
+  attention: {
+    title: 'attention.title',
+    calm: 'attention.calm',
+    more: 'attention.more',
+    less: 'attention.less',
+    jump: 'attention.jump',
+    atCheckout: 'attention.atCheckout',
+    rxReady: 'attention.rxReady',
+    noReply: 'attention.noReply',
+    age: {
+      minutes: 'attention.age.minutes',
+      hours: 'attention.age.hours',
+    },
+    context: {
+      booked: 'attention.context.booked',
+      since: 'attention.context.since',
+      approved: 'attention.context.approved',
+      heard: 'attention.context.heard',
+    },
+  },
+  alerts: {
+    late: 'alerts.late',
+    waiting: 'alerts.waiting',
+    inRoom: 'alerts.inRoom',
+    reply: 'alerts.reply',
+  },
+  finder: {
+    label: 'finder.label',
+    placeholder: 'finder.placeholder',
+    results: 'finder.results',
+    none: 'finder.none',
+    everyone: 'finder.everyone',
   },
   toasts: {
     checkedIn: 'toasts.checkedIn',
@@ -116,6 +156,22 @@ export const TODAY_TEST_IDS = {
   pulse: 'today-pulse',
   newBooking: 'today-new-booking',
   walkIn: 'today-walk-in',
+  shortcuts: 'today-shortcuts',
+  attention: 'today-attention',
+  attentionRow: 'today-attention-row',
+  attentionOpen: 'today-attention-open',
+  attentionJump: 'today-attention-jump',
+  attentionAction: 'today-attention-action',
+  attentionMore: 'today-attention-more',
+  attentionCalm: 'today-attention-calm',
+  laneAlert: 'today-lane-alert',
+  finder: 'today-finder',
+  finderInput: 'today-finder-input',
+  finderResults: 'today-finder-results',
+  finderResult: 'today-finder-result',
+  finderNone: 'today-finder-none',
+  finderEveryone: 'today-finder-everyone',
+  waitMeter: 'today-card-wait',
   lanes: 'today-lanes',
   /** The note in place of the tiles when the member can read no lane (F3, D163). */
   noLanes: 'today-no-lanes',

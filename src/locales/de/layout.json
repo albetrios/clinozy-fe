@@ -69,7 +69,10 @@
       "jumpToSection": "Zu einem Bereich springen",
       "listSearch": "Liste durchsuchen",
       "leadRows": "Nächster oder vorheriger Lead (in Leads)",
-      "closeDialog": "Dialog schließen"
+      "closeDialog": "Dialog schließen",
+      "todayLanes": "Vorherige oder nächste Spalte (in Heute)",
+      "todayNewBooking": "Neue Buchung (in Heute)",
+      "todayWalkIn": "Laufkundschaft (in Heute)"
     },
     "emailVerify": {
       "message": "Bestätigen Sie Ihre E-Mail, um Ihr Konto zu sichern.",

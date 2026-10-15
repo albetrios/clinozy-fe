@@ -1,1 +1,6 @@
-export { LanePanel, type LanePanelProps } from './LanePanel.tsx';
+export {
+  LanePanel,
+  type LanePanelProps,
+  SPOTLIGHT_MS,
+  type TodaySpotlight,
+} from './LanePanel.tsx';

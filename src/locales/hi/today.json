@@ -11,6 +11,8 @@
   "pulse": "{{inClinic}} क्लिनिक में · {{waiting}} प्रतीक्षा में · {{arriving}} आने वाले · {{day}}, {{time}}",
   "newBooking": "नई बुकिंग",
   "walkIn": "सीधे आए",
+  "live": "लाइव · हर मिनट ताज़ा होता है",
+  "shortcuts": "कीबोर्ड शॉर्टकट",
   "loading": "आज का फ़्लोर लोड हो रहा है",
   "lanes": {
     "label": "चरण",
@@ -50,12 +52,48 @@
   },
   "flags": {
     "newLead": "नई लीड",
+    "late": "{{minutes}} मिनट देर",
+    "dueNow": "अभी का समय",
+    "dueIn": "{{minutes}} मिनट में",
     "confirmed": "पुष्ट",
     "unconfirmed": "अपुष्ट",
     "waiting": "{{minutes}} मिनट से प्रतीक्षा",
     "inRoom": "कमरे में {{minutes}} मिनट",
     "rxApproved": "पर्चा स्वीकृत {{time}}",
     "toPay": "{{amount}} देना है"
+  },
+  "attention": {
+    "title": "अभी आपकी ज़रूरत है",
+    "calm": "सब शांत है — कोई आपका इंतज़ार नहीं कर रहा।",
+    "more": "{{more}} और दिखाएँ",
+    "less": "कम दिखाएँ",
+    "jump": "{{name}} को {{lane}} में दिखाएँ",
+    "atCheckout": "भुगतान पर",
+    "rxReady": "पर्चा तैयार",
+    "noReply": "{{age}} से जवाब नहीं",
+    "age": {
+      "minutes": "{{minutes}} मिनट",
+      "hours": "{{hours}} घंटे"
+    },
+    "context": {
+      "booked": "{{time}} की बुकिंग",
+      "since": "{{time}} से",
+      "approved": "{{time}} स्वीकृत",
+      "heard": "आख़िरी संदेश {{time}}"
+    }
+  },
+  "alerts": {
+    "late": "देर से: {{people}}",
+    "waiting": "लंबा इंतज़ार: {{people}}",
+    "inRoom": "देर हो रही: {{people}}",
+    "reply": "जवाब का इंतज़ार: {{people}}"
+  },
+  "finder": {
+    "label": "आज क्लिनिक में किसी को खोजें",
+    "placeholder": "क्लिनिक में खोजें",
+    "results": "क्लिनिक में मिले: {{found}}",
+    "none": "आज क्लिनिक में इस नाम का कोई नहीं है।",
+    "everyone": "सभी संपर्कों में खोजें"
   },
   "toasts": {
     "checkedIn": "{{name}} चेक-इन हुए · डॉक्टर की कतार और कमरे को सूचना दी गई",

@@ -11,6 +11,8 @@
   "pulse": "{{inClinic}} in der Klinik · {{waiting}} wartend · {{arriving}} erwartet · {{day}}, {{time}}",
   "newBooking": "Neue Buchung",
   "walkIn": "Laufkundschaft",
+  "live": "Live · aktualisiert jede Minute",
+  "shortcuts": "Tastenkürzel",
   "loading": "Der heutige Betrieb wird geladen",
   "lanes": {
     "label": "Bereiche",
@@ -50,12 +52,48 @@
   },
   "flags": {
     "newLead": "Neuer Lead",
+    "late": "{{minutes}} Min. zu spät",
+    "dueNow": "Jetzt fällig",
+    "dueIn": "In {{minutes}} Min.",
     "confirmed": "Bestätigt",
     "unconfirmed": "Unbestätigt",
     "waiting": "Wartet {{minutes}} Min.",
     "inRoom": "Im Raum {{minutes}} Min.",
     "rxApproved": "Rezept freigegeben {{time}}",
     "toPay": "{{amount}} zu zahlen"
+  },
+  "attention": {
+    "title": "Braucht dich jetzt",
+    "calm": "Alles ruhig — niemand wartet auf dich.",
+    "more": "{{more}} weitere anzeigen",
+    "less": "Weniger anzeigen",
+    "jump": "{{name}} in {{lane}} zeigen",
+    "atCheckout": "An der Kasse",
+    "rxReady": "Rezept bereit",
+    "noReply": "Keine Antwort {{age}}",
+    "age": {
+      "minutes": "{{minutes}} Min.",
+      "hours": "{{hours}} Std."
+    },
+    "context": {
+      "booked": "gebucht {{time}}",
+      "since": "seit {{time}}",
+      "approved": "freigegeben {{time}}",
+      "heard": "zuletzt gehört {{time}}"
+    }
+  },
+  "alerts": {
+    "late": "Verspätet: {{people}}",
+    "waiting": "Lange Wartezeit: {{people}}",
+    "inRoom": "Dauert lange: {{people}}",
+    "reply": "Wartet auf Antwort: {{people}}"
+  },
+  "finder": {
+    "label": "Jemanden auf der heutigen Fläche finden",
+    "placeholder": "Auf der Fläche finden",
+    "results": "Auf der Fläche gefunden: {{found}}",
+    "none": "Niemand mit diesem Namen ist heute hier.",
+    "everyone": "Alle Kontakte durchsuchen"
   },
   "toasts": {
     "checkedIn": "{{name}} eingecheckt · Arztliste und Raum benachrichtigt",

@@ -88,4 +88,35 @@ describe('TodayGreeting (KICKOFF §6.2 Greeting row)', () => {
     await screen.findByTestId('today-greeting');
     expect(screen.queryByTestId('today-walk-in')).not.toBeInTheDocument();
   });
+
+  it('leads the pulse with a live dot, and makes "New booking" the primary button', async () => {
+    renderGreeting({ onNewBooking: vi.fn(), onWalkIn: vi.fn() });
+    const pulse = await screen.findByTestId('today-pulse');
+    const dot = pulse.querySelector('span[aria-hidden="true"]');
+    expect(dot).toHaveAttribute('title', 'Live · refreshes every minute');
+    expect(dot?.className).toContain('motion-reduce:animate-none');
+    const newBooking = screen.getByTestId('today-new-booking');
+    expect(newBooking).toHaveAttribute('data-variant', 'default');
+    expect(newBooking).toHaveAttribute('aria-keyshortcuts', 'N');
+    expect(screen.getByTestId('today-walk-in')).toHaveAttribute(
+      'data-variant',
+      'outline',
+    );
+    expect(screen.getByTestId('today-walk-in')).toHaveAttribute('aria-keyshortcuts', 'W');
+  });
+
+  it('holds the floor finder and the keyboard button, which opens the shortcuts list', async () => {
+    const user = userEvent.setup();
+    const onShortcuts = vi.fn();
+    renderGreeting({
+      onShortcuts,
+      finder: <input aria-label="Find someone on today’s floor" />,
+    });
+    expect(
+      await screen.findByRole('textbox', { name: 'Find someone on today’s floor' }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Keyboard shortcuts' }));
+    expect(onShortcuts).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('today-shortcuts')).toHaveClass('max-md:hidden');
+  });
 });

@@ -166,7 +166,7 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
     expect(face).not.toHaveClass('text-tone-butter-foreground');
   });
 
-  it('selects a lane on click, and is a snap strip below md, a grid from md', async () => {
+  it('selects a lane on click, and is one connected strip — snapping wherever it scrolls', async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     renderWithProviders(
@@ -182,23 +182,60 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
     expect(onSelect).toHaveBeenCalledWith('checkout');
     const strip = screen.getByTestId('today-lanes');
     expect(strip).toHaveClass(
+      'flex',
       'snap-x',
       'snap-mandatory',
       'overflow-x-auto',
       '-mx-3',
       'px-3',
     );
-    // 106px tracks: a 12-hour "since 10:40 AM" fits in one line at 1024; from
-    // `lg` 114px, so "oldest 12:40 PM" does too at 1280 (seven 125px tiles).
-    expect(strip).toHaveClass(
-      'md:grid',
-      'md:grid-cols-[repeat(auto-fill,minmax(106px,1fr))]',
-      'lg:grid-cols-[repeat(auto-fill,minmax(114px,1fr))]',
-    );
+    // One row at every width: from `md` the tiles share it, each at least 116px (the widest
+    // 12-hour hint, "oldest 12:40 PM", on one line); no grid that wraps.
+    expect(strip.className).not.toContain('md:grid');
     expect(screen.getByTestId('today-lane-checkout')).toHaveClass(
       'w-32',
       'snap-start',
       'md:w-auto',
+      'md:min-w-29',
+      'md:flex-1',
     );
+    // A chevron between each pair of tiles, hidden from assistive tech, flipped under RTL.
+    const chevrons = strip.querySelectorAll(':scope > svg');
+    expect(chevrons).toHaveLength(6);
+    for (const chevron of chevrons) {
+      expect(chevron).toHaveAttribute('aria-hidden', 'true');
+      expect(chevron.getAttribute('class')).toContain('rtl:-scale-x-100');
+    }
+  });
+
+  it('badges a lane’s late, long-waiting or unanswered people — the words in its name', async () => {
+    const { container } = renderWithProviders(
+      <LaneTiles
+        lanes={LANES}
+        selected="waiting"
+        focus={todayFocus([])}
+        today="2026-10-03"
+        alerts={{
+          arriving: { kind: 'late', count: 2, hot: true },
+          waiting: { kind: 'waiting', count: 1, hot: false },
+        }}
+        onSelect={vi.fn()}
+      />,
+    );
+    const arriving = await screen.findByTestId('today-lane-arriving');
+    const late = within(arriving).getByTestId('today-lane-alert');
+    expect(late).toHaveAttribute('data-hot', 'true');
+    expect(late.className).toContain('bg-tone-blush');
+    expect(arriving).toHaveAccessibleName(expect.stringContaining('Running late: 2'));
+    const waiting = within(screen.getByTestId('today-lane-waiting')).getByTestId(
+      'today-lane-alert',
+    );
+    expect(waiting).not.toHaveAttribute('data-hot');
+    expect(waiting.className).toContain('bg-tone-butter');
+    expect(waiting).toHaveTextContent('Waiting long: 1');
+    expect(
+      within(screen.getByTestId('today-lane-checkout')).queryByTestId('today-lane-alert'),
+    ).not.toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

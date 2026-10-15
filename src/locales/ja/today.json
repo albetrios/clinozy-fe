@@ -11,6 +11,8 @@
   "pulse": "院内 {{inClinic}} · 待合 {{waiting}} · 来院予定 {{arriving}} · {{day}} {{time}}",
   "newBooking": "新規予約",
   "walkIn": "飛び込み",
+  "live": "ライブ · 1分ごとに更新",
+  "shortcuts": "キーボードショートカット",
   "loading": "本日のフロアを読み込み中",
   "lanes": {
     "label": "レーン",
@@ -48,12 +50,48 @@
   },
   "flags": {
     "newLead": "新規リード",
+    "late": "{{minutes}}分遅れ",
+    "dueNow": "まもなく",
+    "dueIn": "あと{{minutes}}分",
     "confirmed": "確認済み",
     "unconfirmed": "未確認",
     "waiting": "待ち {{minutes}}分",
     "inRoom": "入室 {{minutes}}分",
     "rxApproved": "処方承認 {{time}}",
     "toPay": "支払い {{amount}}"
+  },
+  "attention": {
+    "title": "今すぐ対応",
+    "calm": "すべて順調 — 対応待ちの人はいません。",
+    "more": "さらに{{more}}件表示",
+    "less": "表示を減らす",
+    "jump": "{{lane}}の{{name}}さんを表示",
+    "atCheckout": "会計待ち",
+    "rxReady": "処方準備完了",
+    "noReply": "未返信 {{age}}",
+    "age": {
+      "minutes": "{{minutes}}分",
+      "hours": "{{hours}}時間"
+    },
+    "context": {
+      "booked": "予約 {{time}}",
+      "since": "{{time}} から",
+      "approved": "承認 {{time}}",
+      "heard": "最終メッセージ {{time}}"
+    }
+  },
+  "alerts": {
+    "late": "遅れ: {{people}}",
+    "waiting": "長い待ち: {{people}}",
+    "inRoom": "長引き: {{people}}",
+    "reply": "返信待ち: {{people}}"
+  },
+  "finder": {
+    "label": "今日の院内で人を探す",
+    "placeholder": "院内で探す",
+    "results": "院内で見つかった人: {{found}}",
+    "none": "今日の院内にその名前の人はいません。",
+    "everyone": "すべての連絡先を検索"
   },
   "toasts": {
     "checkedIn": "{{name}}さんを受付 · 医師の待ち行列と部屋に通知しました",

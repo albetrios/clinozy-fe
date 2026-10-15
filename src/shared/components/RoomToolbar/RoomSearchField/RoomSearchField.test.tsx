@@ -66,4 +66,37 @@ describe('RoomSearchField', () => {
     await user.keyboard('{Escape}');
     expect(input).not.toHaveFocus();
   });
+
+  it('becomes a combobox over a listbox: keys reach its owner first, a prevented Esc stays', async () => {
+    const user = userEvent.setup();
+    const onKeyDown = vi.fn((event: { key: string; preventDefault: () => void }) => {
+      if (event.key === 'Escape') event.preventDefault();
+    });
+    const onFocusChange = vi.fn();
+    render(
+      <Field
+        layout="fill"
+        combobox={{
+          expanded: true,
+          controls: 'results',
+          activeDescendant: 'result-first',
+        }}
+        onKeyDown={onKeyDown}
+        onFocusChange={onFocusChange}
+      />,
+    );
+    const input = screen.getByRole('combobox', { name: 'Search settings' });
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input).toHaveAttribute('aria-controls', 'results');
+    expect(input).toHaveAttribute('aria-activedescendant', 'result-first');
+    expect(input).toHaveAttribute('aria-autocomplete', 'list');
+
+    await user.click(input);
+    expect(onFocusChange).toHaveBeenLastCalledWith(true);
+    await user.keyboard('{ArrowDown}{Escape}');
+    expect(onKeyDown).toHaveBeenCalledTimes(2);
+    expect(input).toHaveFocus();
+    await user.tab();
+    expect(onFocusChange).toHaveBeenLastCalledWith(false);
+  });
 });

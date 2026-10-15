@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from 'react';
+import { type CSSProperties, type RefObject, useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -21,17 +21,23 @@ import {
   UserPlus,
 } from '@/shared/icons/index.ts';
 
-import { useCheckoutDues } from '../../hooks/useCheckoutDues/index.ts';
+import { useCardServiceLine } from '../../hooks/useCardServiceLine/index.ts';
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
 import {
-  TODAY_FLAG_TONES,
+  NO_DUES,
   todayCardFlags,
   type TodayDues,
   type TodayFlag,
+  todayFlagTone,
+  todayWaitMeter,
+  WAIT_LEVEL_TONES,
 } from '../../today.flags.ts';
 import { takeVisitCard } from '../../today.focus.ts';
-import { TODAY_LANE_META, type TodayCard } from '../../today.lanes.ts';
-import { useCardServiceLine } from './use-card-service-line.ts';
+import {
+  TODAY_LANE_META,
+  type TodayCard,
+  type TodayLaneTone,
+} from '../../today.lanes.ts';
 
 /** Props for {@link LanePanel}. */
 export interface LanePanelProps {
@@ -47,7 +53,37 @@ export interface LanePanelProps {
   actionOf: (card: TodayCard) => (() => void) | null;
   /** The name and service area: their lead, their patient file, or a toast. */
   onOpen: (card: TodayCard) => void;
+  /**
+   * Today's open bills by person — a Checkout card's "₹n to pay" (the page reads them while
+   * Checkout has people, `useCheckoutDues`).
+   */
+  dues?: TodayDues;
+  /**
+   * The card the floor finder or Needs you now picked: scrolled into view, its name focused
+   * and ringed for {@link SPOTLIGHT_MS}. A new `nonce` lights the same card again.
+   */
+  spotlight?: TodaySpotlight | null;
 }
+
+/** A card to light up on the floor (the finder's pick, a Needs-you-now jump). */
+export interface TodaySpotlight {
+  cardId: string;
+  /** Changes on every pick, so picking the same card twice lights it twice. */
+  nonce: number;
+}
+
+/** How long a spotlit card keeps its ring. */
+export const SPOTLIGHT_MS = 2000;
+
+/** The spotlight's ring in each lane tone — full literals, so Tailwind sees each. */
+const SPOTLIGHT_RING: Readonly<Record<TodayLaneTone, string>> = {
+  lav: 'ring-tone-lav-dot',
+  sky: 'ring-tone-sky-dot',
+  butter: 'ring-tone-butter-dot',
+  blush: 'ring-tone-blush-dot',
+  sage: 'ring-tone-sage-dot',
+  mint: 'ring-tone-mint-dot',
+};
 
 /** A flag in words. */
 function useFlagWords(today: string): (flag: TodayFlag) => string {
@@ -61,6 +97,10 @@ function useFlagWords(today: string): (flag: TodayFlag) => string {
     switch (flag.id) {
       case 'channel':
         return tApp(APP_KEYS.channels[flag.channel]);
+      case 'late':
+        return t(K.late, { minutes: formatNumber(flag.minutes) });
+      case 'dueIn':
+        return t(K.dueIn, { minutes: formatNumber(flag.minutes) });
       case 'waiting':
         return t(K.waiting, { minutes: formatNumber(flag.minutes) });
       case 'inRoom':
@@ -76,9 +116,38 @@ function useFlagWords(today: string): (flag: TodayFlag) => string {
 }
 
 /**
+ * A Waiting or With-doctor card's wait meter (change-today-command-center): a 3px track
+ * filling to the hot mark, sage → butter → blush as the wait crosses its marks. Decorative —
+ * the card's flag says the minutes.
+ */
+function WaitMeter({ card, now }: { card: TodayCard; now: Date }) {
+  const meter = todayWaitMeter(card, now);
+  if (!meter) return null;
+  return (
+    <span
+      aria-hidden="true"
+      data-slot="pill"
+      data-testid={TODAY_TEST_IDS.waitMeter}
+      data-level={meter.level}
+      className="bg-muted block h-0.75 overflow-hidden rounded-full"
+    >
+      <span
+        data-slot="pill"
+        className={cn(
+          'block h-full w-(--fill) rounded-full transition-[width] duration-700 ease-out motion-reduce:transition-none',
+          TONE_CLASSES[WAIT_LEVEL_TONES[meter.level]].dot,
+        )}
+        // The fill's share of the hot mark — never quite empty, so a fresh wait still shows.
+        style={{ '--fill': `${Math.max(meter.fill, 0.04) * 100}%` } as CSSProperties}
+      />
+    </span>
+  );
+}
+
+/**
  * One visit card (KICKOFF §6.2 Visit cards; `today.md:53–59`; H:603–609): the
  * name and time over the service line — one button that opens the person —
- * the flags, and the lane's action across the card's width.
+ * the wait meter, the flags, and the lane's action across the card's width.
  */
 function VisitCard({
   card,
@@ -108,7 +177,11 @@ function VisitCard({
     <div
       data-testid={TODAY_TEST_IDS.card}
       data-card-id={card.id}
-      className="bg-canvas flex flex-col gap-1.5 rounded-lg border p-2.5"
+      className={cn(
+        // The spotlight's ring (`useSpotlight` marks the card `data-spotlight`).
+        'bg-canvas ring-offset-background flex scroll-m-3 flex-col gap-1.5 rounded-lg border p-2.5 transition-shadow duration-500 data-spotlight:ring-2 data-spotlight:ring-offset-2 motion-reduce:transition-none',
+        SPOTLIGHT_RING[meta.tone],
+      )}
     >
       <button
         type="button"
@@ -128,6 +201,7 @@ function VisitCard({
           <span className="text-foreground-soft text-xs leading-[normal]">{line}</span>
         ) : null}
       </button>
+      <WaitMeter card={card} now={now} />
       {flags.length > 0 ? (
         <span className="flex flex-wrap gap-1">
           {flags.map((flag) => (
@@ -136,7 +210,7 @@ function VisitCard({
               data-slot="pill"
               className={cn(
                 'text-micro rounded-full px-1.75 py-px leading-[normal]',
-                TONE_CLASSES[TODAY_FLAG_TONES[flag.id]].surface,
+                TONE_CLASSES[todayFlagTone(flag)].surface,
               )}
             >
               {flagWords(flag)}
@@ -217,13 +291,50 @@ function useVisitCardFocus(loading: boolean) {
 }
 
 /**
+ * Light the spotlit card once the panel shows it — the pick usually lands before its lane does,
+ * so this waits for the card to arrive: scroll it into view (no smooth scroll under reduced
+ * motion), focus its name and mark it `data-spotlight` for {@link SPOTLIGHT_MS} (the card's
+ * ring). Each pick (`nonce`) lights once, so a refetch of the lane never steals focus again.
+ * The mark is the DOM's alone — no state, no re-render.
+ */
+function useSpotlight(
+  panel: RefObject<HTMLElement | null>,
+  spotlight: TodaySpotlight | null | undefined,
+  cards: readonly TodayCard[],
+  ready: boolean,
+): void {
+  const done = useRef<number | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (!(spotlight && ready) || done.current === spotlight.nonce) return;
+    if (!cards.some((card) => card.id === spotlight.cardId)) return;
+    const card = panel.current?.querySelector<HTMLElement>(
+      `[data-card-id="${CSS.escape(spotlight.cardId)}"]`,
+    );
+    if (!card) return;
+    done.current = spotlight.nonce;
+    const reduce = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    card.scrollIntoView?.({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+    card
+      .querySelector<HTMLElement>(`[data-testid="${TODAY_TEST_IDS.cardOpen}"]`)
+      ?.focus({ preventScroll: true });
+    clearTimeout(timer.current);
+    card.dataset.spotlight = 'true';
+    timer.current = setTimeout(() => {
+      delete card.dataset.spotlight;
+    }, SPOTLIGHT_MS);
+  }, [panel, spotlight, cards, ready]);
+}
+
+/**
  * The selected lane's panel (KICKOFF §6.2; `today.md:20, 52–57`; H:599–614): a
  * card in the lane's fill and line — its name and "<n> people", then the
  * visit cards on an `auto-fill` 210px grid (four across at 1440, two at 1024
  * and 820, one on a phone), or "No one here right now.". From `md` it fills
  * the rest of the column and its cards scroll inside; on a phone it grows with
- * its cards and the page scrolls. The Checkout lane reads today's open bills
- * once for its cards' "₹n to pay" (`useCheckoutDues`).
+ * its cards and the page scrolls. Checkout cards say "₹n to pay" from the
+ * page's read of today's bills (`dues`); a picked card is spotlit (`spotlight`).
  */
 export function LanePanel({
   lane,
@@ -233,14 +344,13 @@ export function LanePanel({
   today,
   actionOf,
   onOpen,
+  dues = NO_DUES,
+  spotlight,
 }: LanePanelProps) {
   const { t } = useTranslation(TODAY_NS);
   const headingId = useId();
   const panel = useVisitCardFocus(loading);
-  const dues = useCheckoutDues({
-    enabled: lane === 'checkout' && !loading && cards.length > 0,
-    today,
-  });
+  useSpotlight(panel, spotlight, cards, !loading && cards.length > 0);
   const paint = TONE_CLASSES[TODAY_LANE_META[lane].tone];
   const EmptyIcon = LANE_EMPTY_ICONS[lane];
   return (

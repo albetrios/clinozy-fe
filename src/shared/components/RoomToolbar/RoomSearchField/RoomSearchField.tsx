@@ -1,4 +1,4 @@
-import { type Ref, useState } from 'react';
+import { type KeyboardEvent, type Ref, useState } from 'react';
 
 import { cn } from '@/lib/utils.ts';
 import { Label } from '@/shared/components/ui/label.tsx';
@@ -31,6 +31,38 @@ export interface RoomSearchFieldProps {
   inputRef?: Ref<HTMLInputElement>;
   /** Placement classes (a toolbar's flex and order, a rail's surface). */
   className?: string;
+  /**
+   * The field as a combobox over its own listbox (Today's floor finder): the input takes
+   * `role="combobox"` and points at the list and its highlighted option. Absent, a searchbox.
+   */
+  combobox?: {
+    /** Whether the listbox shows. */
+    expanded: boolean;
+    /** The listbox's id. */
+    controls: string;
+    /** The highlighted option's id, if any. */
+    activeDescendant?: string;
+  };
+  /**
+   * Keys before the field's own: Escape still leaves the field unless this handler prevented
+   * it (a combobox closes its list first).
+   */
+  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
+  /** The input gained or lost focus. */
+  onFocusChange?: (focused: boolean) => void;
+}
+
+/** The input's role: a searchbox, or a combobox pointing at its listbox and highlighted option. */
+function roleAttributes(combobox: RoomSearchFieldProps['combobox']) {
+  if (!combobox) return { role: 'searchbox' } as const;
+  return {
+    role: 'combobox',
+    'aria-expanded': combobox.expanded,
+    'aria-controls': combobox.controls,
+    'aria-activedescendant': combobox.activeDescendant,
+    'aria-autocomplete': 'list',
+    autoComplete: 'off',
+  } as const;
 }
 
 /**
@@ -54,6 +86,9 @@ export function RoomSearchField({
   inputTestId,
   inputRef,
   className,
+  combobox,
+  onKeyDown,
+  onFocusChange,
 }: RoomSearchFieldProps) {
   const [focused, setFocused] = useState(false);
   const toolbar = layout === 'toolbar';
@@ -85,7 +120,7 @@ export function RoomSearchField({
       <input
         ref={inputRef}
         type="text"
-        role="searchbox"
+        {...roleAttributes(combobox)}
         inputMode="search"
         value={value}
         maxLength={maxLength}
@@ -94,10 +129,19 @@ export function RoomSearchField({
         enterKeyHint="search"
         data-testid={inputTestId}
         onChange={(event) => onValueChange(event.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onFocus={() => {
+          setFocused(true);
+          onFocusChange?.(true);
+        }}
+        onBlur={() => {
+          setFocused(false);
+          onFocusChange?.(false);
+        }}
         onKeyDown={(event) => {
-          if (event.key === 'Escape') event.currentTarget.blur();
+          onKeyDown?.(event);
+          if (event.key === 'Escape' && !event.defaultPrevented) {
+            event.currentTarget.blur();
+          }
         }}
         className={cn(
           'text-field text-foreground placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent outline-none',

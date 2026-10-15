@@ -1,5 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -15,16 +16,9 @@ import {
 
 /** A row's id for the tests. */
 const rowId = (n: number) => publicId('appt', n);
-import { useCheckoutDues } from '../../hooks/useCheckoutDues/index.ts';
 import { rememberVisitCard, takeVisitCard } from '../../today.focus.ts';
 import { groupTodayLanes, type TodayCard } from '../../today.lanes.ts';
-import { LanePanel, type LanePanelProps } from './LanePanel.tsx';
-
-/** Today's open bills by person — its own read is `useCheckoutDues`' to test. */
-const dues = vi.hoisted(() => ({ byContact: new Map<string, number>() }));
-vi.mock('../../hooks/useCheckoutDues/index.ts', () => ({
-  useCheckoutDues: vi.fn(() => dues.byContact),
-}));
+import { LanePanel, type LanePanelProps, SPOTLIGHT_MS } from './LanePanel.tsx';
 
 /** 10:42 in the clinic (IST) on the seed day. */
 const NOW = new Date('2026-10-03T05:12:00.000Z');
@@ -83,8 +77,6 @@ function renderPanel(props: Partial<LanePanelProps> = {}) {
 const initialHourCycle = useLocaleStore.getState().hourCycle;
 beforeEach(() => {
   useLocaleStore.setState({ hourCycle: 'h23' });
-  dues.byContact = new Map();
-  vi.mocked(useCheckoutDues).mockClear();
 });
 afterEach(() => useLocaleStore.setState({ hourCycle: initialHourCycle }));
 
@@ -125,35 +117,70 @@ describe('LanePanel (KICKOFF §6.2 Selected lane panel, Visit cards)', () => {
     expect(asked).toHaveTextContent('New lead');
   });
 
-  it('says what a Checkout card owes on today’s bills, read once for the lane', async () => {
+  it('says what a Checkout card owes on today’s bills — the page’s read, by person', async () => {
     // The flag's words, as the locale spec adds them.
     i18n.addResource('en', 'today', 'flags.toPay', '{{amount}} to pay');
     const [checkout] = LANES.checkout;
     if (checkout?.kind !== 'booking') throw new Error('no checkout card');
-    dues.byContact = new Map([[checkout.row.contactId, 1500.5]]);
-    renderPanel({ lane: 'checkout', cards: LANES.checkout });
-    const card = await screen.findByTestId('today-card');
-    expect(card).toHaveTextContent('₹1,500.50 to pay');
-    expect(useCheckoutDues).toHaveBeenLastCalledWith({
-      enabled: true,
-      today: '2026-10-03',
+    const { unmount } = renderPanel({
+      lane: 'checkout',
+      cards: LANES.checkout,
+      dues: new Map([[checkout.row.contactId, 1500.5]]),
     });
+    expect(await screen.findByTestId('today-card')).toHaveTextContent('₹1,500.50 to pay');
+    unmount();
+    // No bills read: no amount.
+    renderPanel({ lane: 'checkout', cards: LANES.checkout });
+    expect(await screen.findByTestId('today-card')).not.toHaveTextContent('to pay');
   });
 
-  it('reads no bills outside Checkout, nor while the floor loads', async () => {
+  it('draws a wait meter on Waiting and With-doctor cards, and times an arrival', async () => {
     const { unmount } = renderPanel();
-    await screen.findByTestId('today-card');
-    expect(useCheckoutDues).toHaveBeenLastCalledWith({
-      enabled: false,
-      today: '2026-10-03',
-    });
+    // Waiting 6 of the 30-minute mark: calm.
+    const meter = within(await screen.findByTestId('today-card')).getByTestId(
+      'today-card-wait',
+    );
+    expect(meter).toHaveAttribute('data-level', 'calm');
+    expect(meter).toHaveAttribute('aria-hidden', 'true');
     unmount();
-    renderPanel({ lane: 'checkout', cards: LANES.checkout, loading: true });
-    await screen.findByTestId('today-panel');
-    expect(useCheckoutDues).toHaveBeenLastCalledWith({
-      enabled: false,
-      today: '2026-10-03',
-    });
+    const arriving = groupTodayLanes(
+      [floorRow({ id: rowId(6), startTime: '10:30' })],
+      [],
+    ).arriving;
+    renderPanel({ lane: 'arriving', cards: arriving });
+    const card = await screen.findByTestId('today-card');
+    expect(card).toHaveTextContent('Late 12 min');
+    expect(within(card).queryByTestId('today-card-wait')).not.toBeInTheDocument();
+  });
+
+  it('spotlights a picked card: into view, its name focused, ringed for 2s', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const scrollIntoView = vi.fn();
+      Element.prototype.scrollIntoView = scrollIntoView;
+      renderPanel({ spotlight: { cardId: rowId(1), nonce: 1 } });
+      const card = await screen.findByTestId('today-card');
+      await vi.waitFor(() => expect(card).toHaveAttribute('data-spotlight', 'true'));
+      expect(within(card).getByTestId('today-card-open')).toHaveFocus();
+      expect(scrollIntoView).toHaveBeenCalledWith(
+        expect.objectContaining({ block: 'nearest' }),
+      );
+      expect(card.className).toContain('ring-tone-butter-dot');
+      // The ring's timer starts once the lit card has rendered.
+      await act(async () => {});
+      await act(async () => {
+        vi.advanceTimersByTime(SPOTLIGHT_MS);
+      });
+      expect(card).not.toHaveAttribute('data-spotlight');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('lights nothing for a card not in the lane', async () => {
+    renderPanel({ spotlight: { cardId: rowId(9), nonce: 1 } });
+    const card = await screen.findByTestId('today-card');
+    expect(card).not.toHaveAttribute('data-spotlight');
   });
 
   it('opens the person from the name area and runs the lane action', async () => {

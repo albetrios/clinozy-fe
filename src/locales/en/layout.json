@@ -69,7 +69,10 @@
       "jumpToSection": "Jump to a section",
       "listSearch": "Search the list",
       "leadRows": "Next or previous lead (in Leads)",
-      "closeDialog": "Close dialog"
+      "closeDialog": "Close dialog",
+      "todayLanes": "Previous or next lane (in Today)",
+      "todayNewBooking": "New booking (in Today)",
+      "todayWalkIn": "Walk-in (in Today)"
     },
     "emailVerify": {
       "message": "Verify your email to secure your account.",

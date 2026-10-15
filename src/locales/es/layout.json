@@ -85,7 +85,10 @@
       "jumpToSection": "Ir a una sección",
       "listSearch": "Buscar en la lista",
       "leadRows": "Prospecto siguiente o anterior (en Prospectos)",
-      "closeDialog": "Cerrar diálogo"
+      "closeDialog": "Cerrar diálogo",
+      "todayLanes": "Carril anterior o siguiente (en Hoy)",
+      "todayNewBooking": "Nueva reserva (en Hoy)",
+      "todayWalkIn": "Sin cita (en Hoy)"
     },
     "orgCreate": {
       "namePlaceholder": "Acme Inc.",

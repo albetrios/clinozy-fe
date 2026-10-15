@@ -45,6 +45,9 @@ export function KeyboardShortcutsDialog() {
     { labelKey: sk.jumpToSection, keys: '1–9 · 0' },
     { labelKey: sk.listSearch, keys: '/' },
     { labelKey: sk.leadRows, keys: 'j · k' },
+    { labelKey: sk.todayLanes, keys: '[ · ]' },
+    { labelKey: sk.todayNewBooking, keys: 'N' },
+    { labelKey: sk.todayWalkIn, keys: 'W' },
     { labelKey: sk.closeDialog, keys: 'Esc' },
   ];
 

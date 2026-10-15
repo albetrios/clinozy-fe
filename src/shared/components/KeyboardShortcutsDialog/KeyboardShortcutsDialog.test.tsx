@@ -28,6 +28,9 @@ const SHORTCUTS: readonly [label: string, keys: string | RegExp][] = [
   ['Jump to a section', '1–9 · 0'],
   ['Search the list', '/'],
   ['Next or previous lead (in Leads)', 'j · k'],
+  ['Previous or next lane (in Today)', '[ · ]'],
+  ['New booking (in Today)', 'N'],
+  ['Walk-in (in Today)', 'W'],
   ['Close dialog', 'Esc'],
 ];
 
@@ -47,7 +50,7 @@ describe('KeyboardShortcutsDialog — the drawer', () => {
   });
   afterEach(() => act(() => useUIStore.setState({ shortcutsOpen: false })));
 
-  it('lists every shortcut with its keys: ⌘K, ?, G, 1–9 · 0, /, j · k in Leads, Esc', async () => {
+  it('lists every shortcut with its keys: ⌘K, ?, G, 1–9 · 0, /, j · k in Leads, [ · ] N W in Today, Esc', async () => {
     await renderDrawer();
     const rows = within(
       await screen.findByTestId('keyboard-shortcuts-dialog'),

@@ -3,7 +3,14 @@ import { describe, expect, it } from 'vitest';
 import type { TodayFloorRow } from '@/shared/api/app/today-contracts.ts';
 
 import { enquiry, floorRow, publicId } from './__tests__/integration/today-fixtures.ts';
-import { TODAY_FLAG_TONES, todayCardFlags } from './today.flags.ts';
+import {
+  minutesToStart,
+  TODAY_FLAG_TONES,
+  todayCardFlags,
+  todayFlagTone,
+  todayWaitLevel,
+  todayWaitMeter,
+} from './today.flags.ts';
 import { groupTodayLanes, type TodayCard } from './today.lanes.ts';
 
 /** 10:42 in the clinic (IST) on the seed day. */
@@ -33,13 +40,28 @@ describe('todayCardFlags (today.md:59 — derived, never stored)', () => {
     expect(todayCardFlags(google, NOW)).toEqual([{ id: 'newLead' }]);
   });
 
-  it('marks an arriving booking confirmed or not', () => {
+  it('marks an arriving booking confirmed or not, after its timing', () => {
+    // 11:00 at 10:42 — in 18 minutes.
     expect(todayCardFlags(cardOf(floorRow({ status: 'scheduled' })), NOW)).toEqual([
+      { id: 'dueIn', minutes: 18 },
       { id: 'unconfirmed' },
     ]);
-    expect(todayCardFlags(cardOf(floorRow({ status: 'confirmed' })), NOW)).toEqual([
-      { id: 'confirmed' },
-    ]);
+    expect(
+      todayCardFlags(cardOf(floorRow({ status: 'confirmed', startTime: '12:30' })), NOW),
+    ).toEqual([{ id: 'confirmed' }]);
+  });
+
+  it('says how an arrival runs: late from 5 minutes past, due around the start, in n min within the hour', () => {
+    const timing = (startTime: string) =>
+      todayCardFlags(cardOf(floorRow({ status: 'confirmed', startTime })), NOW)[0];
+    expect(timing('10:30')).toEqual({ id: 'late', minutes: 12 });
+    expect(timing('10:37')).toEqual({ id: 'late', minutes: 5 });
+    expect(timing('10:38')).toEqual({ id: 'dueNow' });
+    expect(timing('10:42')).toEqual({ id: 'dueNow' });
+    expect(timing('10:43')).toEqual({ id: 'dueIn', minutes: 1 });
+    expect(timing('11:42')).toEqual({ id: 'dueIn', minutes: 60 });
+    expect(timing('11:43')).toEqual({ id: 'confirmed' });
+    expect(minutesToStart('09:00', NOW)).toBe(-102);
   });
 
   it('counts the minutes waiting and in the room from the stage, else from the check-in', () => {
@@ -112,10 +134,59 @@ describe('todayCardFlags (today.md:59 — derived, never stored)', () => {
     ).toEqual(['waiting']);
   });
 
+  it('measures a wait on its clock: warm and hot marks, the meter full at the hot mark', () => {
+    expect(todayWaitLevel('waiting', 14)).toBe('calm');
+    expect(todayWaitLevel('waiting', 15)).toBe('warm');
+    expect(todayWaitLevel('waiting', 30)).toBe('hot');
+    expect(todayWaitLevel('inRoom', 29)).toBe('calm');
+    expect(todayWaitLevel('inRoom', 30)).toBe('warm');
+    expect(todayWaitLevel('inRoom', 45)).toBe('hot');
+
+    // Waiting since 10:27 (15 min), half a hot mark.
+    const waiting = cardOf(
+      floorRow({ status: 'checked_in', checkedInAt: '2026-10-03T04:57:00.000Z' }),
+    );
+    expect(todayWaitMeter(waiting, NOW)).toEqual({
+      kind: 'waiting',
+      minutes: 15,
+      level: 'warm',
+      fill: 0.5,
+    });
+    // In the room since 09:42 — an hour, the meter full, hot.
+    const consult = cardOf(
+      floorRow({
+        status: 'checked_in',
+        visitStage: 'with_doctor',
+        checkedInAt: '2026-10-03T03:00:00.000Z',
+        visitStageChangedAt: '2026-10-03T04:12:00.000Z',
+      }),
+    );
+    expect(todayWaitMeter(consult, NOW)).toEqual({
+      kind: 'inRoom',
+      minutes: 60,
+      level: 'hot',
+      fill: 1,
+    });
+    // Only Waiting and With doctor run a clock.
+    expect(todayWaitMeter(cardOf(floorRow({ status: 'confirmed' })), NOW)).toBeNull();
+    const [enquiryCard] = groupTodayLanes([], [enquiry()]).enquiries;
+    if (!enquiryCard) throw new Error('no enquiry card');
+    expect(todayWaitMeter(enquiryCard, NOW)).toBeNull();
+  });
+
+  it('turns a hot wait blush; every other flag keeps its tone', () => {
+    expect(todayFlagTone({ id: 'waiting', minutes: 29 })).toBe('butter');
+    expect(todayFlagTone({ id: 'waiting', minutes: 30 })).toBe('blush');
+    expect(todayFlagTone({ id: 'dueIn', minutes: 5 })).toBe('sky');
+  });
+
   it('paints every flag in a tone', () => {
     expect(TODAY_FLAG_TONES).toEqual({
       channel: 'lav',
       newLead: 'lav',
+      late: 'blush',
+      dueNow: 'butter',
+      dueIn: 'sky',
       confirmed: 'sage',
       unconfirmed: 'blush',
       waiting: 'butter',

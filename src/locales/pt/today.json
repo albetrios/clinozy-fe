@@ -11,6 +11,8 @@
   "pulse": "{{inClinic}} na clínica · {{waiting}} aguardando · {{arriving}} chegando · {{day}}, {{time}}",
   "newBooking": "Novo agendamento",
   "walkIn": "Sem agendamento",
+  "live": "Ao vivo · atualiza a cada minuto",
+  "shortcuts": "Atalhos de teclado",
   "loading": "Carregando o dia de hoje",
   "lanes": {
     "label": "Etapas",
@@ -52,12 +54,48 @@
   },
   "flags": {
     "newLead": "Novo lead",
+    "late": "Atrasado {{minutes}} min",
+    "dueNow": "Na hora",
+    "dueIn": "Em {{minutes}} min",
     "confirmed": "Confirmada",
     "unconfirmed": "Não confirmada",
     "waiting": "Aguardando {{minutes}} min",
     "inRoom": "Na sala {{minutes}} min",
     "rxApproved": "Receita aprovada {{time}}",
     "toPay": "{{amount}} a pagar"
+  },
+  "attention": {
+    "title": "Precisam de você agora",
+    "calm": "Tudo tranquilo — ninguém está esperando por você.",
+    "more": "Mostrar mais {{more}}",
+    "less": "Mostrar menos",
+    "jump": "Mostrar {{name}} em {{lane}}",
+    "atCheckout": "No caixa",
+    "rxReady": "Receita pronta",
+    "noReply": "Sem resposta há {{age}}",
+    "age": {
+      "minutes": "{{minutes}} min",
+      "hours": "{{hours}} h"
+    },
+    "context": {
+      "booked": "agendado {{time}}",
+      "since": "desde {{time}}",
+      "approved": "aprovada {{time}}",
+      "heard": "última mensagem {{time}}"
+    }
+  },
+  "alerts": {
+    "late": "Atrasados: {{people}}",
+    "waiting": "Espera longa: {{people}}",
+    "inRoom": "Demorando: {{people}}",
+    "reply": "Aguardando resposta: {{people}}"
+  },
+  "finder": {
+    "label": "Encontrar alguém na clínica hoje",
+    "placeholder": "Encontrar na clínica",
+    "results": "Na clínica: {{found}}",
+    "none": "Ninguém com esse nome na clínica hoje.",
+    "everyone": "Buscar em todos os contatos"
   },
   "toasts": {
     "checkedIn": "Chegada de {{name}} registrada · fila do médico e sala avisadas",

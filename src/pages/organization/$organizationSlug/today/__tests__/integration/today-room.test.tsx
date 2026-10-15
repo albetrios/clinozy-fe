@@ -525,3 +525,104 @@ describe('the Today room (KICKOFF §6.2)', () => {
     expect(LANE_ORDER.map(countOf)).toEqual(['2', '0', '0', '0', '0', '0', '0']);
   });
 });
+
+describe('the floor’s command center (change-today-command-center)', () => {
+  /** Needs you now's rows, by name. */
+  const attentionNames = () =>
+    within(screen.getByTestId('today-attention'))
+      .queryAllByTestId('today-attention-open')
+      .map((name) => name.textContent);
+
+  it('lists who needs the front desk now — hot first — and runs the lane’s action from the row', async () => {
+    const user = userEvent.setup();
+    renderTodayRoute(TODAY_PATH, TodayPage);
+    await loaded();
+    // Rhea has waited 37 minutes (hot), Kavya 22 (warm), Nidhi is at checkout; Sana's consult
+    // and Harsh's Rx are not the front desk's lanes.
+    expect(attentionNames()).toEqual(['Rhea Shah', 'Kavya Mehta', 'Nidhi Rao']);
+    await user.click(screen.getByRole('button', { name: 'Send in, Rhea Shah' }));
+    await waitFor(() => expect(countOf('with_doctor')).toBe('2'));
+    expect(notify.success).toHaveBeenCalledWith('Rhea Shah sent in to the doctor');
+    await waitFor(() => expect(attentionNames()).toEqual(['Kavya Mehta', 'Nidhi Rao']));
+  });
+
+  it('badges the strip: the Waiting tile counts its long waits', async () => {
+    renderTodayRoute(TODAY_PATH, TodayPage);
+    await loaded();
+    const badge = within(tileOf('waiting')).getByTestId('today-lane-alert');
+    expect(badge).toHaveTextContent('Waiting long: 2');
+    expect(badge).toHaveAttribute('data-hot', 'true');
+    expect(within(tileOf('arriving')).queryByTestId('today-lane-alert')).toBeNull();
+  });
+
+  it('jumps from a row’s lane chip to the card: its lane opens and the card is spotlit', async () => {
+    const user = userEvent.setup();
+    const { router } = renderTodayRoute(TODAY_PATH, TodayPage);
+    await loaded();
+    await user.click(screen.getByRole('button', { name: 'Show Nidhi Rao in Checkout' }));
+    await waitFor(() =>
+      expect(router.state.location.search).toMatchObject({ lane: 'checkout' }),
+    );
+    await waitFor(() =>
+      expect(cardNamed('Nidhi Rao')).toHaveAttribute('data-spotlight', 'true'),
+    );
+    expect(within(cardNamed('Nidhi Rao')).getByTestId('today-card-open')).toHaveFocus();
+  });
+
+  it('finds anyone on the floor from "/" and opens them in their lane', async () => {
+    const user = userEvent.setup();
+    const { router } = renderTodayRoute(TODAY_PATH, TodayPage);
+    await loaded();
+    await user.keyboard('/');
+    const finder = screen.getByRole('combobox', {
+      name: 'Find someone on today’s floor',
+    });
+    expect(finder).toHaveFocus();
+    await user.keyboard('harsh');
+    expect(screen.getByRole('option', { name: /Harsh Trivedi/ })).toBeInTheDocument();
+    await user.keyboard('{Enter}');
+    await waitFor(() =>
+      expect(router.state.location.search).toMatchObject({ lane: 'pharmacy' }),
+    );
+    await waitFor(() =>
+      expect(cardNamed('Harsh Trivedi')).toHaveAttribute('data-spotlight', 'true'),
+    );
+    // No one by that name: every contact, through the command menu.
+    await user.click(finder);
+    await user.keyboard('zed');
+    await user.click(screen.getByRole('button', { name: 'Search all contacts' }));
+    expect(useUIStore.getState().commandPaletteOpen).toBe(true);
+  });
+
+  it('steps through the lanes with [ and ], round the ends; N and W open booking and walk-in', async () => {
+    const user = userEvent.setup();
+    const { router } = renderTodayRoute(TODAY_PATH, TodayPage);
+    await loaded();
+    await user.keyboard(']');
+    await waitFor(() =>
+      expect(router.state.location.search).toMatchObject({ lane: 'arriving' }),
+    );
+    // user-event escapes `[` as `[[`: two presses of `[`.
+    await user.keyboard('[[[[');
+    await waitFor(() =>
+      expect(router.state.location.search).toMatchObject({ lane: 'pharmacy' }),
+    );
+    expect(panel()).toHaveAttribute('data-lane', 'pharmacy');
+    await user.keyboard('w');
+    expect(useUIStore.getState().commandPaletteOpen).toBe(true);
+    useUIStore.setState({ commandPaletteOpen: false });
+    await user.keyboard('n');
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/leads/create'),
+    );
+  });
+
+  it('opens the app’s shortcuts list from the keyboard button', async () => {
+    const user = userEvent.setup();
+    renderTodayRoute(TODAY_PATH, TodayPage);
+    await loaded();
+    await user.click(screen.getByRole('button', { name: 'Keyboard shortcuts' }));
+    expect(useUIStore.getState().shortcutsOpen).toBe(true);
+    useUIStore.setState({ shortcutsOpen: false });
+  });
+});

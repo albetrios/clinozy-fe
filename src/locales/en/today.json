@@ -11,6 +11,8 @@
   "pulse": "{{inClinic}} in clinic · {{waiting}} waiting · {{arriving}} arriving · {{day}}, {{time}}",
   "newBooking": "New booking",
   "walkIn": "Walk-in",
+  "live": "Live · refreshes every minute",
+  "shortcuts": "Keyboard shortcuts",
   "loading": "Loading today’s floor",
   "lanes": {
     "label": "Lanes",
@@ -50,12 +52,48 @@
   },
   "flags": {
     "newLead": "New lead",
+    "late": "Late {{minutes}} min",
+    "dueNow": "Due now",
+    "dueIn": "In {{minutes}} min",
     "confirmed": "Confirmed",
     "unconfirmed": "Unconfirmed",
     "waiting": "Waiting {{minutes}} min",
     "inRoom": "In room {{minutes}} min",
     "rxApproved": "Rx approved {{time}}",
     "toPay": "{{amount}} to pay"
+  },
+  "attention": {
+    "title": "Needs you now",
+    "calm": "All calm — no one is waiting on you.",
+    "more": "Show {{more}} more",
+    "less": "Show less",
+    "jump": "Show {{name}} in {{lane}}",
+    "atCheckout": "At checkout",
+    "rxReady": "Rx ready",
+    "noReply": "No reply {{age}}",
+    "age": {
+      "minutes": "{{minutes}} min",
+      "hours": "{{hours}} h"
+    },
+    "context": {
+      "booked": "booked {{time}}",
+      "since": "since {{time}}",
+      "approved": "approved {{time}}",
+      "heard": "last heard {{time}}"
+    }
+  },
+  "alerts": {
+    "late": "Running late: {{people}}",
+    "waiting": "Waiting long: {{people}}",
+    "inRoom": "Running long: {{people}}",
+    "reply": "Awaiting a reply: {{people}}"
+  },
+  "finder": {
+    "label": "Find someone on today’s floor",
+    "placeholder": "Find on the floor",
+    "results": "Found on the floor: {{found}}",
+    "none": "No one by that name on today’s floor.",
+    "everyone": "Search all contacts"
   },
   "toasts": {
     "checkedIn": "{{name}} checked in · Dr. queue and room notified",

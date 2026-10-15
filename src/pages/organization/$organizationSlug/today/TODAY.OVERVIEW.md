@@ -18,14 +18,36 @@ codes too (D163, `readableTodayLanes`): Enquiries needs `lead:read`, the six flo
 Enquiries alone), and a member with neither (the Accountant) gets one line —
 `today-no-lanes` — in place of the tiles and the panel.
 
-The screen: the greeting is its h1 — no other title ("Good morning, <first name>" on the
-clinic-local clock, `greetingFor`; "there" without a name) — then the pulse ("<n> in clinic ·
-<n> waiting · <n> arriving · <day>, <time>"), "New booking" (→ `/leads/create`) and "Walk-in"
-(→ ⌘K). Up to seven lane tiles (a grid from `md`, a snap strip of 128px tiles below it) over the
-selected lane's panel of visit cards; lanes outside the member's role focus recede — the fill
+The screen (change-today-command-center): the greeting is its h1 — no other title ("Good
+morning, <first name>" on the clinic-local clock, `greetingFor`; "there" without a name) — over
+the pulse after a live dot ("● <n> in clinic · <n> waiting · <n> arriving · <day>, <time>"); at
+the inline end the floor finder, the keyboard button (the app's shortcuts list), "Walk-in" (→ ⌘K)
+and the primary "New booking" (→ `/leads/create`). Then **Needs you now** — the people who need
+someone now, ranked (`today.attention.ts`): late arrivals (5 min past the start; hot from 15),
+arrivals due in the next 10 minutes, waits from 15 min (hot 30), consults from 30 (hot 45),
+everyone at checkout ("₹n to pay"), an approved Rx, enquiries with no reply for 30 min (hot
+2 h); hot, then warm, then soon, the longest overdue first. Only the member's focus lanes (Owner
+and Admin: every readable lane). A row: the urgency chip, the name (opens them, as a card's), the
+lane chip (opens the lane and spotlights the card) and the lane's own action; three rows, then
+"Show n more"; nothing urgent, "All calm — no one is waiting on you.". Then the **journey strip**
+— up to seven lane tiles joined by chevrons in one row (each at least 116px from `md`, a snap
+strip of 128px tiles below it; the row scrolls with snap where seven do not fit), each tile's
+count wearing an alert badge for its late, long-waiting, long-in-room or unanswered people
+(blush when any is hot) — over the selected lane's panel of visit cards; lanes outside the
+member's role focus recede — the fill
 at 60%, the text a step lighter at AA contrast (`todayFocus`: the union of their clinic roles,
 the View-as role while previewing; Owner and Admin dim nothing). The default lane is the first in focus with people, else the first with
-people, else the first lane shown; a picked lane lives in the URL for the session (`?lane=`). The work
+people, else the first lane shown; a picked lane lives in the URL for the session (`?lane=`).
+An Arriving card says "Late n min", "Due now" or "In n min" (within the hour) before Confirmed;
+a Waiting or With-doctor card carries a wait meter (sage → butter → blush, full at the hot
+mark) and a hot wait's flag turns blush. The **floor finder** ("Find on the floor") is a combobox
+over the floor: a name's word from its start (accents ignored) or 3+ phone digits, up to eight
+results with their lane and time; ↑ ↓ Enter Escape; a pick opens the lane and spotlights the
+card (scrolled into view, focus on its name, a 2s ring); no match offers "Search all contacts"
+(⌘K). Keys on Today (`hooks/useTodayShortcuts/`): `/` find, `[` `]` the previous and next lane
+(round the ends), `N` New booking, `W` Walk-in — never in a field, an open list or a dialog, never
+with a modifier; the app's `?`, `G`, digits and ⌘K keep theirs, and its shortcuts list names the
+Today rows. The work
 queue (`?queue=everyone`; Mine by default — the member's tasks and the unowned ones in their
 roles' queues, the server's `scope=mine`) is the Tasks room's one task model: its open tasks by
 due time and the ones closed today, the type's pill and the outcomes the member can run, the
@@ -63,9 +85,9 @@ idempotency key and a refusal toasts the server's words. "Open session" and "Che
 the patient's own page with the visit flow (`patients/$patientId/timeline?visit=open&from=today`,
 §6.6), and the flow's Pause / Complete visit come back here, focus on the card's action
 (`today.focus.ts`). The design's first visit, pack, dues, allergies and the enquiry's words
-have no field in the API and are not shown (G1). A Checkout card says "₹1,500 to pay" — what
-the person still owes on today's open invoices at the header's branches, one read while the
-Checkout lane is open (`hooks/useCheckoutDues/`, `payment:read`; G-P17). The role focus
+have no field in the API and are not shown (G1). A Checkout card — and its Needs-you-now row —
+says "₹1,500 to pay": what the person still owes on today's open invoices at the header's
+branches, read while anyone is at checkout (`hooks/useCheckoutDues/`, `payment:read`; G-P17). The role focus
 still reads the member's clinic roles from the Users room's staff profiles (fixtures until
 Users moves, G5) — it only dims lanes. A failed read toasts "Couldn’t load this list · connection dropped. Showing
 the last copy." with Retry and keeps the last copy; the first load wears the in-place skeleton.
@@ -79,12 +101,18 @@ the last copy." with Retry and keeps the last copy; the first load wears the in-
 | `today.search.ts`           | URL schema (`validateSearch`): `lane` (one of the seven), `queue` (`mine`, `everyone`) — entry-resident, so built on `src/lib/routes/search-params.ts` only.                                                                                                                                                |
 | `today.constants.ts`        | `TODAY_NS` / `TODAY_KEYS` (the `today` namespace; the work queue's rule copy is the `tasks` namespace's), `TODAY_TEST_IDS`.                                                                                                                                                                                 |
 | `today.lanes.ts`            | Pure: the lanes' tones and actions, the tile paint, `groupTodayLanes`, `todayFocus` / `isLaneInFocus`, `defaultTodayLane`, `laneHint`, `laneFaces`, `todayPulse`.                                                                                                                                           |
-| `today.flags.ts`            | Pure: a card's flags from its record (`todayCardFlags`: channel, new lead, confirmed, minutes waiting or in the room, the Rx) and their tones.                                                                                                                                                              |
+| `today.flags.ts`            | Pure: a card's flags from its record (`todayCardFlags`: channel, new lead, late / due now / in n min, confirmed, minutes waiting or in the room, the Rx) and their tones; the clocks (`minutesToStart`, `stageMinutes`, `waitMinutes`), wait levels and the wait meter.                                     |
+| `today.attention.ts`        | Pure: Needs you now (`todayAttention`: items, tiers, ranking, the focus filter) and the strip's alert badges (`todayLaneAlerts`).                                                                                                                                                                           |
+| `today.finder.ts`           | Pure: the floor finder's matching (`findOnFloor`: a name's word from its start, accents ignored, or phone digits).                                                                                                                                                                                          |
 | `today.focus.ts`            | The card whose lane action opened the patient's visit flow, remembered for its panel to focus again (memory only, handed out once).                                                                                                                                                                         |
-| `TodayPage.tsx`             | Room page — greeting row, tiles, panel, work queue, the stacked booking form. Owns `data-testid="today-page"`.                                                                                                                                                                                              |
-| `components/TodayGreeting/` | The greeting (the page's h1), the pulse, "New booking" and "Walk-in".                                                                                                                                                                                                                                       |
-| `components/LaneTiles/`     | The seven tiles: count, faces, hint, focus dimming; grid from `md`, snap strip below.                                                                                                                                                                                                                       |
-| `components/LanePanel/`     | The selected lane's panel and its visit cards (`components/LanePanel/use-card-service-line.ts` words the second line).                                                                                                                                                                                      |
+| `TodayPage.tsx`             | Room page — greeting row, Needs you now, the strip, panel, work queue, the stacked booking form; the floor navigation (a pick spotlights its card, `[` `]` step lanes), the page's checkout-bills read and the keys. Owns `data-testid="today-page"`.                                                       |
+| `components/TodayGreeting/` | The greeting (the page's h1), the live dot and pulse, the finder slot, the keyboard button, "Walk-in" and the primary "New booking".                                                                                                                                                                        |
+| `components/NeedsYouNow/`   | Needs you now: the ranked rows (chip, name, lane chip, context, the lane's action), "Show n more", the calm line.                                                                                                                                                                                           |
+| `components/FloorFinder/`   | The floor finder: a combobox on the rooms' `RoomSearchField` over a listbox of results; no match → "Search all contacts".                                                                                                                                                                                   |
+| `components/LaneTiles/`     | The journey strip: seven tiles joined by chevrons in one row — count and its alert badge, faces, hint, focus dimming; snap where it scrolls.                                                                                                                                                                |
+| `components/LanePanel/`     | The selected lane's panel and its visit cards — timing flags, the wait meter, the spotlight (`data-spotlight`).                                                                                                                                                                                             |
+| `hooks/useCardServiceLine/` | A card's second line (service and room or doctor, an Rx's medicines, an enquiry's interest) — shared by the panel, Needs you now and the finder.                                                                                                                                                            |
+| `hooks/useTodayShortcuts/`  | Today's keys: `/`, `[`, `]`, `N`, `W` (`todayShortcut` pure), never in a field, a list or a dialog.                                                                                                                                                                                                         |
 | `components/WorkQueue/`     | The work queue aside: header, Mine · Everyone, task cards with the outcomes the member can run, or their result.                                                                                                                                                                                            |
 | `components/TodayBooking/`  | The shared appointment form stacked over Today for a work-queue booking follow-on (lazy chunk, warmed after paint).                                                                                                                                                                                         |
 | `hooks/useTodayFloorView/`  | The floor in the header's branches → lanes, pulse, loading; the list-error toast.                                                                                                                                                                                                                           |
@@ -96,10 +124,15 @@ the last copy." with Retry and keeps the last copy; the first load wears the in-
 ## Test ids
 
 `today-page`, `today-greeting`, `today-pulse`, `today-new-booking`, `today-walk-in`,
+`today-shortcuts`, `today-finder`, `today-finder-input`, `today-finder-results`,
+`today-finder-result`, `today-finder-none`, `today-finder-everyone`, `today-attention`,
+`today-attention-row` (`data-kind`, `data-tier`), `today-attention-open`, `today-attention-jump`,
+`today-attention-action`, `today-attention-more`, `today-attention-calm`,
 `today-lanes`, `today-lane-<lane>` (`enquiries`, `arriving`, `waiting`, `with-doctor`,
-`treatment`, `checkout`, `pharmacy`; `aria-pressed`, `data-dimmed`), `today-panel`
-(`data-lane`), `today-card` (`data-card-id`), `today-card-open`, `today-card-action`
-(`data-action`), `today-empty`, `today-queue`, `today-queue-scope-<mine|everyone>`,
+`treatment`, `checkout`, `pharmacy`; `aria-pressed`, `data-dimmed`), `today-lane-alert`
+(`data-hot`), `today-panel` (`data-lane`), `today-card` (`data-card-id`, `data-spotlight`),
+`today-card-open`, `today-card-wait` (`data-level`), `today-card-action` (`data-action`),
+`today-empty`, `today-queue`, `today-queue-scope-<mine|everyone>`,
 `today-queue-card` (`data-task-id`, `data-closed`), `today-queue-outcome` (`data-outcome`),
 `today-queue-empty`, `today-booking-error`, `today-no-lanes` — listed in `docs/reference/e2e-testids-inventory.md`
 › Today.

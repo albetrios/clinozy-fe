@@ -11,6 +11,8 @@
   "pulse": "院内 {{inClinic}} · 候诊 {{waiting}} · 待到达 {{arriving}} · {{day}}，{{time}}",
   "newBooking": "新预约",
   "walkIn": "到店咨询",
+  "live": "实时 · 每分钟刷新",
+  "shortcuts": "键盘快捷键",
   "loading": "正在加载今日看板",
   "lanes": {
     "label": "流程",
@@ -48,12 +50,48 @@
   },
   "flags": {
     "newLead": "新线索",
+    "late": "迟到 {{minutes}} 分钟",
+    "dueNow": "现在到点",
+    "dueIn": "{{minutes}} 分钟后",
     "confirmed": "已确认",
     "unconfirmed": "未确认",
     "waiting": "已等 {{minutes}} 分钟",
     "inRoom": "在诊室 {{minutes}} 分钟",
     "rxApproved": "处方已批准 {{time}}",
     "toPay": "应付 {{amount}}"
+  },
+  "attention": {
+    "title": "需要你现在处理",
+    "calm": "一切平稳 — 没有人在等你。",
+    "more": "再显示 {{more}} 项",
+    "less": "收起",
+    "jump": "在{{lane}}中显示{{name}}",
+    "atCheckout": "待结账",
+    "rxReady": "处方已备好",
+    "noReply": "未回复 {{age}}",
+    "age": {
+      "minutes": "{{minutes}} 分钟",
+      "hours": "{{hours}} 小时"
+    },
+    "context": {
+      "booked": "预约 {{time}}",
+      "since": "自 {{time}}",
+      "approved": "批准于 {{time}}",
+      "heard": "最后消息 {{time}}"
+    }
+  },
+  "alerts": {
+    "late": "迟到：{{people}}",
+    "waiting": "久等：{{people}}",
+    "inRoom": "超时：{{people}}",
+    "reply": "待回复：{{people}}"
+  },
+  "finder": {
+    "label": "在今天的诊所中找人",
+    "placeholder": "在诊所中查找",
+    "results": "诊所中找到：{{found}}",
+    "none": "今天诊所里没有这个名字的人。",
+    "everyone": "搜索所有联系人"
   },
   "toasts": {
     "checkedIn": "{{name}} 已签到 · 已通知医生队列和诊室",

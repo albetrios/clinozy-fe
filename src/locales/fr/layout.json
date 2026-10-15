@@ -69,7 +69,10 @@
       "jumpToSection": "Aller à une section",
       "listSearch": "Rechercher dans la liste",
       "leadRows": "Prospect suivant ou précédent (dans Prospects)",
-      "closeDialog": "Fermer la boîte de dialogue"
+      "closeDialog": "Fermer la boîte de dialogue",
+      "todayLanes": "Colonne précédente ou suivante (dans Aujourd’hui)",
+      "todayNewBooking": "Nouvelle réservation (dans Aujourd’hui)",
+      "todayWalkIn": "Visite spontanée (dans Aujourd’hui)"
     },
     "emailVerify": {
       "message": "Vérifiez votre e-mail pour sécuriser votre compte.",
