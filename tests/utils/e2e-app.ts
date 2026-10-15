@@ -29,6 +29,7 @@ export const APP_ROOMS = [
   'tasks',
   'offerings',
   'users',
+  'branches',
 ] as const;
 
 /** A clinic room's nav id (`nav-<room>`, `all-sections-<room>`). */
@@ -61,18 +62,24 @@ export const APP_ROOM_PAGES: Record<
   tasks: { path: 'tasks', testId: 'tasks-page', heading: /^Tasks$/ },
   offerings: { path: 'offerings', testId: 'offerings-page', heading: /^Offerings$/ },
   users: { path: 'users', testId: 'users-page', heading: /^Users$/ },
+  branches: { path: 'branches', testId: 'branches-page', heading: /^Branches$/ },
 };
 
 /**
  * The rooms a new member has pinned (`preferences-api.ts`): the header's tabs
- * from `md`, the phone's tab bar. Every other room opens from All sections.
+ * from `md`; the phone's tab bar holds the first four. Every other room opens
+ * from All sections.
  */
 const PINNED_BY_DEFAULT: readonly AppRoom[] = [
   'appointments',
   'leads',
   'patients',
   'payments',
+  'branches',
 ];
+
+/** How many pins the phone's tab bar holds (`AppLayout.shared.tsx`, D30). */
+const PHONE_TAB_BAR_PINS = 4;
 
 /** The two viewports the launch smoke runs at (KICKOFF §8.6): desktop and phone. */
 export const APP_VIEWPORTS = {
@@ -352,7 +359,9 @@ export async function openRoomFromShell(
   room: AppRoom,
   tier: AppTier,
 ): Promise<void> {
-  if (PINNED_BY_DEFAULT.includes(room)) {
+  const tabs =
+    tier === 'phone' ? PINNED_BY_DEFAULT.slice(0, PHONE_TAB_BAR_PINS) : PINNED_BY_DEFAULT;
+  if (tabs.includes(room)) {
     await byTestId(page, `nav-${room}`).click();
   } else {
     const phone = tier === 'phone';

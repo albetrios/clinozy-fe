@@ -50,6 +50,8 @@ import type {
 } from '@/pages/organization/$organizationSlug/appointments/appointments.dialog-search.ts';
 import { manifest as appointmentsManifest } from '@/pages/organization/$organizationSlug/appointments/appointments.manifest.ts';
 import { validateAppointmentsSearch } from '@/pages/organization/$organizationSlug/appointments/appointments.search.ts';
+import { manifest as branchesManifest } from '@/pages/organization/$organizationSlug/branches/branches.manifest.ts';
+import { validateBranchesSearch } from '@/pages/organization/$organizationSlug/branches/branches.search.ts';
 import type { InvoiceCreateSearch } from '@/pages/organization/$organizationSlug/invoices/invoices.dialog-search.ts';
 import { manifest as invoicesManifest } from '@/pages/organization/$organizationSlug/invoices/invoices.manifest.ts';
 import { validateInvoiceSearch } from '@/pages/organization/$organizationSlug/invoices/invoices.search.ts';
@@ -113,8 +115,6 @@ import { manifest as tasksManifest } from '@/pages/organization/$organizationSlu
 import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
 import { validateTodaySearch } from '@/pages/organization/$organizationSlug/today/today.search.ts';
-import { manifest as usersBranchesManifest } from '@/pages/organization/$organizationSlug/users/branches/branches.manifest.ts';
-import { validateBranchesSearch } from '@/pages/organization/$organizationSlug/users/branches/branches.search.ts';
 import { manifest as usersRolesManifest } from '@/pages/organization/$organizationSlug/users/roles/roles.manifest.ts';
 import type { UserEditSearch } from '@/pages/organization/$organizationSlug/users/users.dialog-search.ts';
 import { manifest as usersManifest } from '@/pages/organization/$organizationSlug/users/users.manifest.ts';
@@ -354,7 +354,7 @@ const OfferingsPage = roomRoute('OfferingsPage');
 const OffersPage = roomRoute('OffersPage');
 const UsersPage = roomRoute('UsersPage');
 const UsersRolesPage = roomRoute('UsersRolesPage');
-const UsersBranchesPage = roomRoute('UsersBranchesPage');
+const BranchesPage = roomRoute('BranchesPage');
 const MedicalLayout = roomRoute('MedicalLayout');
 const MedicalSalesPage = roomRoute('MedicalSalesPage');
 const MedicalMedicinesPage = roomRoute('MedicalMedicinesPage');
@@ -1298,29 +1298,44 @@ const organizationUsersRolesRoute = createRoute({
   errorComponent: RouteErrorBoundary,
 });
 
-// Branches sits beside the Team too (`S:108`); its drawers are URL-driven
-// dialogs over the list (D24, S:109–110).
-const organizationUsersBranchesRoute = createRoute({
+// Branches — its own room in the primary nav (`S:108`; change-branches-in-navbar);
+// its drawers are URL-driven dialogs over the list (D24, S:109–110).
+const organizationBranchesRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
-  path: 'users/branches',
-  head: manifestHead(usersBranchesManifest),
-  staticData: { manifest: usersBranchesManifest },
+  path: 'branches',
+  head: manifestHead(branchesManifest),
+  staticData: { manifest: branchesManifest },
   validateSearch: validateBranchesSearch,
-  beforeLoad: roomLeafGate(usersBranchesManifest),
-  component: UsersBranchesPage,
+  beforeLoad: roomLeafGate(branchesManifest),
+  component: BranchesPage,
   errorComponent: RouteErrorBoundary,
 });
 
-const organizationUsersBranchCreateRoute = createRoute({
-  getParentRoute: () => organizationUsersBranchesRoute,
+const organizationBranchCreateRoute = createRoute({
+  getParentRoute: () => organizationBranchesRoute,
   path: 'create',
-  ...dialogRoute('usersBranchCreate'),
+  ...dialogRoute('branchCreate'),
 });
 
-const organizationUsersBranchEditRoute = createRoute({
-  getParentRoute: () => organizationUsersBranchesRoute,
+const organizationBranchEditRoute = createRoute({
+  getParentRoute: () => organizationBranchesRoute,
   path: '$branchId/edit',
-  ...dialogRoute('usersBranchEdit'),
+  ...dialogRoute('branchEdit'),
+});
+
+// Branches' old home, Users › Branches (before change-branches-in-navbar): a pure
+// redirect, like `/`, to the same place in the Branches room — a drawer
+// (`create`, `$branchId/edit`), the search and the hash (Settings) kept — so a
+// bookmark or a shared link still opens the same thing.
+const organizationUsersBranchesRedirectRoute = createRoute({
+  getParentRoute: () => organizationShellRoute,
+  path: 'users/branches/$',
+  beforeLoad: async ({ params, preload }) => {
+    if (preload) return;
+    const { redirectFromUsersBranches } = await import('@/shared/app/app-home.ts');
+    redirectFromUsersBranches(params);
+  },
+  errorComponent: RouteErrorBoundary,
 });
 
 const organizationMedicalRoute = createRoute({
@@ -1840,10 +1855,11 @@ const routeTree = rootRoute.addChildren([
       organizationUserEditRoute,
     ]),
     organizationUsersRolesRoute,
-    organizationUsersBranchesRoute.addChildren([
-      organizationUsersBranchCreateRoute,
-      organizationUsersBranchEditRoute,
+    organizationBranchesRoute.addChildren([
+      organizationBranchCreateRoute,
+      organizationBranchEditRoute,
     ]),
+    organizationUsersBranchesRedirectRoute,
     organizationNotFoundRoute,
   ]),
   retiredDashboardRoute,

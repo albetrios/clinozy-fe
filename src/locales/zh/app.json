@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "用户",
-      "description": "团队、角色与权限、分店"
+      "description": "团队、角色与权限"
+    },
+    "branches": {
+      "label": "分院",
+      "description": "每家分院：地址、营业时间、团队、诊室和设备"
     }
   },
   "tones": {

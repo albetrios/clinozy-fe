@@ -3,13 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
+import { member, PLATFORM_ROLES, SELF } from '@/tests/utils/team-doubles.ts';
 
 import {
-  member,
-  PLATFORM_ROLES,
   renderUsersRoutes,
   resetUsersRoutes,
-  SELF,
 } from '../__tests__/integration/users-test-router.tsx';
 import { RolesPage } from './RolesPage.tsx';
 

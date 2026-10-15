@@ -1,11 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import { organizationBranches } from '@/lib/routes/branches-builders.ts';
 import {
   organizationUsers,
-  organizationUsersBranches,
   organizationUsersRoles,
 } from '@/lib/routes/users-builders.ts';
+import { cn } from '@/lib/utils.ts';
+import { SECTION_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
@@ -13,14 +15,15 @@ import {
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { ArrowUpRight, MapPin, ShieldCheck, Users } from '@/shared/icons/index.ts';
+import { ArrowUpRight, Building, ShieldCheck, Users } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 const PANELS = SETTINGS_KEYS.panels;
 
 /**
- * The Users room's pages a settings section points at: what lives there now, the link's label,
- * the route and the page's icon.
+ * The room pages a settings section points at — the Users room's Team and Roles & access, and
+ * the Branches room: what lives there now, the link's label, the route, the room (its tile's
+ * tone and the link's test id) and the page's icon.
  */
 const LINKS = {
   members: {
@@ -28,6 +31,7 @@ const LINKS = {
     body: PANELS.members.movedBody,
     open: PANELS.members.open,
     route: organizationUsers,
+    room: 'users',
     icon: Users,
   },
   roles: {
@@ -35,6 +39,7 @@ const LINKS = {
     body: PANELS.roles.movedBody,
     open: PANELS.roles.open,
     route: organizationUsersRoles,
+    room: 'users',
     icon: ShieldCheck,
   },
   /** Settings › Clinic: hours, holidays, rooms, machines, GST and review links (KICKOFF §6.6). */
@@ -42,29 +47,33 @@ const LINKS = {
     title: PANELS.clinic.branchesTitle,
     body: PANELS.clinic.branchesBody,
     open: PANELS.clinic.branchesOpen,
-    route: organizationUsersBranches,
-    icon: MapPin,
+    route: organizationBranches,
+    room: 'branches',
+    icon: Building,
   },
 } as const;
 
-/** A Users room page {@link UsersRoomLinkCard} opens. */
+/** A room page {@link UsersRoomLinkCard} opens. */
 export type UsersRoomTarget = keyof typeof LINKS;
 
 /**
- * One card pointing at a Users room page: the room's own tile (slate, its section tone) beside
- * what lives there, and a link to it — the Team, Roles & access or Branches. The link leaves the
- * hash behind, so the Settings drawer closes as the room opens.
+ * One card pointing at a room page: the room's own tile (its section tone — Users slate,
+ * Branches stone) beside what lives there, and a link to it — the Team, Roles & access or the
+ * Branches room. The link leaves the hash behind, so the Settings drawer closes as the room opens.
  */
 export function UsersRoomLinkCard({ target }: { target: UsersRoomTarget }) {
   const { t } = useTranslation(SETTINGS_NS);
   const organizationSlug = useOrganizationStore((state) => state.organizationSlug) ?? '';
-  const { title, body, open, route, icon: Icon } = LINKS[target];
+  const { title, body, open, route, room, icon: Icon } = LINKS[target];
   return (
     <SettingsCard>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <span
           aria-hidden="true"
-          className="bg-tone-slate text-tone-slate-foreground flex size-10 flex-none items-center justify-center rounded-xl"
+          className={cn(
+            TONE_CLASSES[SECTION_TONES[room]].surface,
+            'flex size-10 flex-none items-center justify-center rounded-xl',
+          )}
         >
           <Icon className="size-4.5" />
         </span>
@@ -77,7 +86,7 @@ export function UsersRoomLinkCard({ target }: { target: UsersRoomTarget }) {
         <Button asChild size="sm" className="self-start sm:self-center">
           <Link
             {...route(organizationSlug)}
-            data-testid={`settings-${target}-open-users`}
+            data-testid={`settings-${target}-open-${room}`}
           >
             {t(open)}
             <ArrowUpRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />

@@ -15574,7 +15574,7 @@ export interface operations {
                             created_at?: string | null;
                             id?: string | null;
                             patient_file_pins?: ("overview" | "activity" | "clinical_notes" | "appointments" | "prescriptions" | "treatments" | "images" | "reports" | "packages" | "invoices" | "payments")[];
-                            pinned_sections?: ("today" | "contacts" | "activity" | "leads" | "appointments" | "patients" | "medical" | "stock" | "payments" | "tasks" | "offerings" | "users")[];
+                            pinned_sections?: ("today" | "contacts" | "activity" | "leads" | "appointments" | "patients" | "medical" | "stock" | "payments" | "tasks" | "offerings" | "users" | "branches")[];
                             recent_picks?: string[];
                             /** @enum {string} */
                             theme?: "light" | "dark" | "system";
@@ -15610,7 +15610,7 @@ export interface operations {
                     /** Format: date-time */
                     expected_updated_at?: string;
                     patient_file_pins?: ("overview" | "activity" | "clinical_notes" | "appointments" | "prescriptions" | "treatments" | "images" | "reports" | "packages" | "invoices" | "payments")[];
-                    pinned_sections?: ("today" | "contacts" | "activity" | "leads" | "appointments" | "patients" | "medical" | "stock" | "payments" | "tasks" | "offerings" | "users")[];
+                    pinned_sections?: ("today" | "contacts" | "activity" | "leads" | "appointments" | "patients" | "medical" | "stock" | "payments" | "tasks" | "offerings" | "users" | "branches")[];
                     recent_picks?: string[];
                     /** @enum {string} */
                     theme?: "light" | "dark" | "system";
@@ -15631,7 +15631,7 @@ export interface operations {
                             created_at?: string | null;
                             id?: string | null;
                             patient_file_pins?: ("overview" | "activity" | "clinical_notes" | "appointments" | "prescriptions" | "treatments" | "images" | "reports" | "packages" | "invoices" | "payments")[];
-                            pinned_sections?: ("today" | "contacts" | "activity" | "leads" | "appointments" | "patients" | "medical" | "stock" | "payments" | "tasks" | "offerings" | "users")[];
+                            pinned_sections?: ("today" | "contacts" | "activity" | "leads" | "appointments" | "patients" | "medical" | "stock" | "payments" | "tasks" | "offerings" | "users" | "branches")[];
                             recent_picks?: string[];
                             /** @enum {string} */
                             theme?: "light" | "dark" | "system";

@@ -1,6 +1,7 @@
 import type { Section } from '@/shared/api/app/app-schema.ts';
 import {
   type AppIcon,
+  Building,
   Calendar,
   House,
   Package,
@@ -29,4 +30,5 @@ export const APP_SECTION_ICONS: Readonly<Record<Section, AppIcon>> = {
   tasks: SquareCheck,
   offerings: Tag,
   users: Shield,
+  branches: Building,
 };
