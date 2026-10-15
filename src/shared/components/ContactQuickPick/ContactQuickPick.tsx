@@ -57,9 +57,13 @@ const SKELETON_CHIPS = ['w-24', 'w-20', 'w-28'] as const;
 const RECENT_LABEL_CLASS =
   'text-tiny text-muted-foreground shrink-0 font-medium tracking-wider uppercase';
 
-/** A fade at one end of the rail, over the chips there is more of that way. */
+/**
+ * A fade at one end of the rail, over the chips there is more of that way. Under RTL it is
+ * mirrored (`rtl:-scale-x-100`, already in the stylesheet) rather than given the opposite
+ * gradient: an `rtl:` gradient is two more first-paint rules per end.
+ */
 const RAIL_FADE_CLASS =
-  'from-card pointer-events-none absolute inset-y-0 w-6 to-transparent';
+  'from-card pointer-events-none absolute inset-y-0 w-6 to-transparent rtl:-scale-x-100';
 
 /** The ↵ hint on the highlighted row (tablet and desktop — a phone has no ↵ to press). */
 const ENTER_KEY_CLASS =
@@ -377,13 +381,13 @@ function RecentRail({
       {moreBefore ? (
         <span
           aria-hidden="true"
-          className={cn(RAIL_FADE_CLASS, 'start-0 bg-linear-to-r rtl:bg-linear-to-l')}
+          className={cn(RAIL_FADE_CLASS, 'start-0 bg-linear-to-r')}
         />
       ) : null}
       {moreAfter ? (
         <span
           aria-hidden="true"
-          className={cn(RAIL_FADE_CLASS, 'end-0 bg-linear-to-l rtl:bg-linear-to-r')}
+          className={cn(RAIL_FADE_CLASS, 'end-0 bg-linear-to-l')}
         />
       ) : null}
     </CommandGroup>
