@@ -310,13 +310,14 @@
       "toOutsideHint": "The patient buys it elsewhere; it is not sold from this prescription",
       "toStore": "Take it from your medical store",
       "note": "Remarks · e.g. apply thin layer, avoid sun",
-      "dose": "Dose",
+      "dose": "Dose · M A N",
       "otherDays": "Other number of days",
       "otherDaysShort": "Other",
       "when": "When",
       "morePlaces_one": "+ {{count}} more",
       "morePlaces_other": "+ {{count}} more",
-      "fewerPlaces": "Fewer"
+      "fewerPlaces": "Fewer",
+      "meal": "Meal"
     },
     "dose": {
       "group": "Dose morning · afternoon · night",
@@ -333,6 +334,8 @@
       "doubleHint": "Two tablets at each time"
     },
     "meal": {
+      "before": "Before",
+      "after": "After",
       "beforeHint": "Before meal",
       "afterHint": "After meal"
     },

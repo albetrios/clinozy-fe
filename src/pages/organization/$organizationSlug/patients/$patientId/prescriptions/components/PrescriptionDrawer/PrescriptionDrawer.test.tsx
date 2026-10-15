@@ -36,6 +36,12 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   readViewportTier: () => viewport.tier,
 }));
 
+/** The medicines table's measured width: 0 (not measured yet) keeps Days a column. */
+const tableWidth = vi.hoisted(() => ({ value: 0 }));
+vi.mock('@/shared/hooks/useElementWidth/index.ts', () => ({
+  useElementWidth: () => [() => undefined, tableWidth.value] as const,
+}));
+
 const { notifyMock, printMock } = vi.hoisted(() => ({
   notifyMock: {
     success: vi.fn(),
@@ -110,6 +116,7 @@ const written = () => rxWorld.prescriptions.at(-1);
 
 beforeEach(() => {
   viewport.tier = 'desktop';
+  tableWidth.value = 0;
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   printMock.mockClear();
   for (const fn of Object.values(rxServerApi)) fn.mockClear();
@@ -600,11 +607,19 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     expect(chip('dose-morning')).toHaveAttribute('aria-pressed', 'true');
     await user.click(chip('dose-morning'));
     expect(chip('dose-morning')).toHaveAttribute('aria-pressed', 'false');
-    expect(within(row).queryByTestId('rx-items-dose-double')).toBeNull();
+    // ×2 stays in its place, disabled until a time is lit (change-prescription-compact-line D4).
+    expect(chip('dose-double')).toBeDisabled();
 
     await user.click(chip('dose-morning'));
     await user.click(chip('dose-night'));
     expect(chip('dose-night')).toHaveAttribute('aria-pressed', 'true');
+    // The taps read as the dose itself: 1 0 1.
+    expect(
+      within(chip('dose'))
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['1', '0', '1', '×2', 'SOS']);
+    expect(chip('dose-double')).toBeEnabled();
     await user.click(chip('days-10'));
     expect(chip('days-10')).toHaveAttribute('aria-pressed', 'true');
     expect(chip('qty')).toHaveValue('20');
@@ -621,12 +636,14 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     expect(chip('days-other')).toHaveValue('12');
     expect(chip('qty')).toHaveValue('48');
 
-    // A tablet's When is the meal.
+    // A tablet's When is the meal, short on its tray and in full in its title.
+    expect(chip('when')).toHaveAccessibleName('Meal');
     expect(
       within(chip('when'))
         .getAllByRole('button')
         .map((button) => button.textContent),
-    ).toEqual(['Before meal', 'After meal', 'Empty stomach', 'With meal']);
+    ).toEqual(['Before', 'After', 'Empty stomach', 'With meal']);
+    expect(chip('when-before')).toHaveAttribute('title', 'Before meal');
     await user.click(chip('when-after'));
     expect(chip('when-after')).toHaveAttribute('aria-pressed', 'true');
     expect(within(row).queryByTestId('rx-items-where')).toBeNull();
@@ -676,6 +693,40 @@ describe('the prescription composer (feat-prescription-composer)', () => {
       'aria-pressed',
       'true',
     );
+  });
+
+  it('keeps Days a column where the table has room (change-prescription-compact-line D6)', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    tableWidth.value = 896;
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran bd');
+    expect(within(drawer).getByTestId('rx-items-header')).toHaveTextContent('Days');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    const days = within(row).getByTestId('rx-items-days');
+    expect(days.closest('[data-column]')).toHaveAttribute('data-column', 'days');
+    // The line under it: the meal beside the note.
+    const rail = within(row).getByTestId('rx-items-rail');
+    expect(rail).not.toContainElement(days);
+    expect(rail.closest('[data-slot="items-row-line"]')).toContainElement(
+      within(row).getByTestId('rx-items-note'),
+    );
+  });
+
+  it('folds Days under the medicine where the table is narrow', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    tableWidth.value = 640;
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran bd');
+    expect(within(drawer).getByTestId('rx-items-header')).not.toHaveTextContent('Days');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    expect(row.querySelector('[data-column="days"]')).toBeNull();
+    const rail = within(row).getByTestId('rx-items-rail');
+    await user.click(within(rail).getByTestId('rx-items-days-5'));
+    expect(within(rail).getByTestId('rx-items-days-5')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(within(row).getByTestId('rx-items-qty')).toHaveValue('10');
   });
 
   it('puts every line on the same course in one click', async () => {

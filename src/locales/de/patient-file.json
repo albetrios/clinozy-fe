@@ -310,13 +310,14 @@
       "toOutsideHint": "Der Patient kauft es anderswo; es wird nicht über dieses Rezept verkauft",
       "toStore": "Aus Ihrer Apotheke nehmen",
       "note": "Hinweise · z. B. dünn auftragen, Sonne meiden",
-      "dose": "Dosis",
+      "dose": "Dosis · M M A",
       "otherDays": "Andere Anzahl Tage",
       "otherDaysShort": "Andere",
       "when": "Wann",
       "morePlaces_one": "+ {{count}} weitere",
       "morePlaces_other": "+ {{count}} weitere",
-      "fewerPlaces": "Weniger"
+      "fewerPlaces": "Weniger",
+      "meal": "Mahlzeit"
     },
     "dose": {
       "group": "Dosis morgens · mittags · abends",
@@ -333,6 +334,8 @@
       "doubleHint": "Zwei Tabletten pro Einnahme"
     },
     "meal": {
+      "before": "Vorher",
+      "after": "Nachher",
       "beforeHint": "Vor dem Essen",
       "afterHint": "Nach dem Essen"
     },

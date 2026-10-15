@@ -321,14 +321,15 @@
       "toOutsideHint": "Il paziente lo compra altrove; non viene venduto da questa ricetta",
       "toStore": "Prendilo dalla tua farmacia",
       "note": "Note · es. strato sottile, evitare il sole",
-      "dose": "Dose",
+      "dose": "Dose · M P S",
       "otherDays": "Altro numero di giorni",
       "otherDaysShort": "Altro",
       "when": "Quando",
       "morePlaces_one": "+ altro {{count}}",
       "morePlaces_many": "+ altri {{count}}",
       "morePlaces_other": "+ altri {{count}}",
-      "fewerPlaces": "Meno"
+      "fewerPlaces": "Meno",
+      "meal": "Pasto"
     },
     "dose": {
       "group": "Dose mattina · pomeriggio · sera",
@@ -345,6 +346,8 @@
       "doubleHint": "Due compresse ogni volta"
     },
     "meal": {
+      "before": "Prima",
+      "after": "Dopo",
       "beforeHint": "Prima dei pasti",
       "afterHint": "Dopo i pasti"
     },

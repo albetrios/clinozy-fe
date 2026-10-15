@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import type { ItemsCellBinding } from '@/shared/forms/ItemsField/index.ts';
-import { type AppIcon, Moon, Sun, Sunrise } from '@/shared/icons/index.ts';
 
 import { RX_KEYS, RX_NS } from '../../prescriptions.constants.ts';
 import {
@@ -28,33 +27,41 @@ import { useRxLabels } from './use-rx-labels.ts';
 const K = RX_KEYS;
 
 /*
- * The medicine line's chips (change-prescription-one-click): every everyday
- * choice is one visible click — no dropdown to open first. A second click on
- * a lit chip clears it. Each group is one Tab stop; the arrow keys move
- * within it (mirrored right to left). On a touch screen the chips are 44px.
+ * The medicine line's trays (change-prescription-compact-line D3): every
+ * everyday choice is one click on a small segment — no dropdown to open
+ * first, no large chip. A second click on a lit segment clears it. Each tray
+ * is one Tab stop; the arrow keys move within it (mirrored right to left).
  */
 
 /**
- * A chip: 30px (44px on touch), lit in its tone. Its pill shape sits beside
- * its `data-slot="pill"` (the Sharp shape squares it) and its focus ring is
- * the theme's (`data-focus` on any slot).
+ * A tray: a `muted` track holding its segments 2px apart — the app's own
+ * segmented pattern (the GST rate toggle). It wraps inside itself on a narrow
+ * screen, and nothing clips a segment's focus ring.
  */
-const CHIP_CLASS =
-  'inline-flex h-7.5 flex-none touch-manipulation items-center gap-1 border px-2.75 text-xs whitespace-nowrap tabular-nums transition-[background-color,border-color,color,box-shadow] duration-150 outline-none focus-visible:outline-hidden disabled:pointer-events-none motion-reduce:transition-none pointer-coarse:h-11 pointer-coarse:px-3.5 pointer-coarse:text-sm';
+const TRAY_CLASS =
+  'bg-muted inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-md p-0.5';
 
-/** A group's small-caps label. */
-const GROUP_LABEL_CLASS =
-  'text-micro text-muted-foreground me-0.5 font-semibold tracking-[0.05em] whitespace-nowrap uppercase';
+/**
+ * A segment: 24px (44px high, 36px wide on touch), 12px digits and words, lit
+ * in its tone and raised. Its focus ring is the theme's (`data-focus` on any
+ * slot), lifted over its neighbours.
+ */
+const SEGMENT_CLASS =
+  'relative inline-flex h-6 min-w-6 flex-none touch-manipulation items-center justify-center rounded-sm px-1.5 text-xs whitespace-nowrap tabular-nums transition-[background-color,color,box-shadow] duration-150 outline-none focus-visible:z-10 focus-visible:outline-hidden disabled:pointer-events-none motion-reduce:transition-none pointer-coarse:h-11 pointer-coarse:min-w-9 pointer-coarse:px-2.5 pointer-coarse:text-sm';
 
-/** The three times of day, with their marks. */
-const TIMES: readonly { time: 'morning' | 'afternoon' | 'night'; icon: AppIcon }[] = [
-  { time: 'morning', icon: Sunrise },
-  { time: 'afternoon', icon: Sun },
-  { time: 'night', icon: Moon },
-];
+/** An unlit segment: quiet ink, a hint of the lit surface on hover. */
+const SEGMENT_OFF_CLASS =
+  'text-muted-foreground-strong hover:bg-background/70 hover:text-foreground disabled:text-disabled';
 
-/** One chip as a group draws it. */
-interface ChipItem {
+/**
+ * A tray's small-caps name, before it on the line under the medicine — at
+ * least 40px, so the trays of Days, Meal and When start in one column.
+ */
+const TRAY_LABEL_CLASS =
+  'text-micro text-muted-foreground min-w-10 font-semibold tracking-[0.05em] whitespace-nowrap uppercase';
+
+/** One segment as a tray draws it. */
+interface SegmentItem {
   key: string;
   label: ReactNode;
   /** Spoken in full when the label is short ("5" → "5 days"). */
@@ -62,82 +69,101 @@ interface ChipItem {
   title?: string;
   on: boolean;
   tone: Tone;
-  icon?: AppIcon;
   onPress: () => void;
   testId: string;
+  /** Shown but not pressable now (×2 before a time is lit). */
+  disabled?: boolean;
+  /** Its ink is faint while it is off (a dose's 0). */
+  faint?: boolean;
+  /** A hairline before it: the dose's ×2 and SOS after the three times. */
+  split?: boolean;
+  /** Shown on a read-only line even when off (the dose's `1 0 1`). */
+  keepWhenRead?: boolean;
 }
 
-/** The arrow keys' step within a group, mirrored right to left. */
+/** The arrow keys' step within a tray, mirrored right to left. */
 function arrowStep(key: string, rtl: boolean): number {
   if (key === 'ArrowRight') return rtl ? -1 : 1;
   if (key === 'ArrowLeft') return rtl ? 1 : -1;
   return 0;
 }
 
-/** Arrow keys, Home and End move between a group's chips. */
+/** Arrow keys, Home and End move between a tray's segments. */
 function moveWithin(event: KeyboardEvent<HTMLElement>) {
-  const chips = [
-    ...event.currentTarget.querySelectorAll<HTMLButtonElement>('button[data-chip]'),
-  ].filter((chip) => !chip.disabled);
-  const at = chips.indexOf(document.activeElement as HTMLButtonElement);
+  const segments = [
+    ...event.currentTarget.querySelectorAll<HTMLButtonElement>('button[data-segment]'),
+  ].filter((segment) => !segment.disabled);
+  const at = segments.indexOf(document.activeElement as HTMLButtonElement);
   if (at < 0) return;
   const step = arrowStep(
     event.key,
     getComputedStyle(event.currentTarget).direction === 'rtl',
   );
   let next: number | null = null;
-  if (step !== 0) next = (at + step + chips.length) % chips.length;
+  if (step !== 0) next = (at + step + segments.length) % segments.length;
   else if (event.key === 'Home') next = 0;
-  else if (event.key === 'End') next = chips.length - 1;
+  else if (event.key === 'End') next = segments.length - 1;
   if (next === null) return;
   event.preventDefault();
-  chips[next]?.focus();
+  segments[next]?.focus();
 }
 
-/** One chip: a toggle button, lit in its tone. */
-function Chip({
+/** One segment: a toggle button, lit in its tone. */
+function Segment({
   item,
   readOnly,
   tabbable,
 }: {
-  item: ChipItem;
+  item: SegmentItem;
   readOnly: boolean;
   tabbable: boolean;
 }) {
-  const Icon = item.icon;
   const tone = TONE_CLASSES[item.tone];
   return (
-    <button
-      type="button"
-      data-chip=""
-      aria-pressed={item.on}
-      aria-label={item.ariaLabel}
-      title={item.title}
-      disabled={readOnly}
-      tabIndex={tabbable ? 0 : -1}
-      onClick={item.onPress}
-      data-testid={item.testId}
-      data-slot="pill"
-      className={cn(
-        'rounded-full',
-        CHIP_CLASS,
-        item.on
-          ? cn(tone.surface, tone.border, 'font-semibold')
-          : 'bg-background text-foreground-soft hover:border-disabled hover:text-foreground',
-      )}
-    >
-      {Icon ? <Icon aria-hidden="true" className="size-3.5 flex-none" /> : null}
-      {item.label}
-    </button>
+    <>
+      {item.split ? (
+        <span aria-hidden="true" className="bg-border mx-0.5 h-3.5 w-px flex-none" />
+      ) : null}
+      <button
+        type="button"
+        data-segment=""
+        aria-pressed={item.on}
+        aria-label={item.ariaLabel}
+        title={item.title}
+        disabled={readOnly || item.disabled}
+        tabIndex={tabbable ? 0 : -1}
+        onClick={item.onPress}
+        data-testid={item.testId}
+        data-slot="segment"
+        className={cn(
+          SEGMENT_CLASS,
+          item.on
+            ? cn(tone.surface, 'font-semibold shadow-xs')
+            : cn(SEGMENT_OFF_CLASS, item.faint && 'text-disabled'),
+        )}
+      >
+        {item.label}
+      </button>
+    </>
+  );
+}
+
+/** The segment that takes the tray's Tab stop: the first lit one, else the first. */
+function tabStopOf(items: readonly SegmentItem[]): number {
+  const lit = items.findIndex((item) => item.on && !item.disabled);
+  if (lit >= 0) return lit;
+  return Math.max(
+    0,
+    items.findIndex((item) => !item.disabled),
   );
 }
 
 /**
- * A labelled group of chips — an ARIA toolbar: one Tab stop (its lit chip,
- * else its first) and the arrow keys within it. Read only, it shows its lit
- * chips alone.
+ * A tray of segments — an ARIA toolbar: one Tab stop and the arrow keys
+ * within it — with its small-caps name before it when `showLabel`. Read
+ * only, it shows its lit segments alone (and those kept for reading).
  */
-function ChipGroup({
+function Tray({
   label,
   items,
   readOnly,
@@ -146,99 +172,115 @@ function ChipGroup({
   showLabel = true,
 }: {
   label: string;
-  items: readonly ChipItem[];
+  items: readonly SegmentItem[];
   readOnly: boolean;
   testId: string;
-  /** After the chips: the Days box, "+ more". */
+  /** Inside the tray, after its segments: the Days box, "+ more". */
   after?: ReactNode;
   showLabel?: boolean;
 }) {
-  const shown = readOnly ? items.filter((item) => item.on) : items;
+  const shown = readOnly ? items.filter((item) => item.on || item.keepWhenRead) : items;
   if (readOnly && shown.length === 0) return null;
-  const stop = Math.max(
-    0,
-    shown.findIndex((item) => item.on),
-  );
+  const stop = tabStopOf(shown);
   return (
-    <div
-      // A toolbar: one Tab stop, the arrow keys between its chips (WAI-ARIA toolbar pattern).
-      role="toolbar"
-      aria-label={label}
-      data-testid={testId}
-      onKeyDown={moveWithin}
-      className="flex min-w-0 flex-wrap items-center gap-1.5"
-    >
+    // The tray goes under its name when the two do not fit side by side (a phone).
+    <div className="flex max-w-full min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
       {showLabel ? (
-        <span aria-hidden="true" className={GROUP_LABEL_CLASS}>
+        <span aria-hidden="true" className={TRAY_LABEL_CLASS}>
           {label}
         </span>
       ) : null}
-      {shown.map((item, index) => (
-        <Chip key={item.key} item={item} readOnly={readOnly} tabbable={index === stop} />
-      ))}
-      {readOnly ? null : after}
+      <div
+        // A toolbar: one Tab stop, the arrow keys between its segments (WAI-ARIA toolbar pattern).
+        role="toolbar"
+        aria-label={label}
+        data-testid={testId}
+        onKeyDown={moveWithin}
+        className={TRAY_CLASS}
+      >
+        {shown.map((item, index) => (
+          <Segment
+            key={item.key}
+            item={item}
+            readOnly={readOnly}
+            tabbable={index === stop}
+          />
+        ))}
+        {readOnly ? null : after}
+      </div>
     </div>
   );
 }
 
-/** Props of the row's chip cells: the binding, and view only. */
+/** Props of the row's tray cells: the binding, and view only. */
 interface RxCellProps<TForm extends FieldValues> extends ItemsCellBinding<TForm> {
   readOnly?: boolean;
 }
 
-/** The Dose chips of one value: the three times, ×2 once a time is lit, SOS. */
-function useDoseChips(value: string, emit: (next: string) => void, testId: string) {
+const TIMES = ['morning', 'afternoon', 'night'] as const;
+
+/**
+ * The Dose segments of one value: the three times as their counts
+ * (`1 0 1`), then ×2 and SOS. ×2 is always there — disabled until a time is
+ * lit — so nothing moves when the first time lights.
+ */
+function useDoseItems(value: string, emit: (next: string) => void, testId: string) {
   const { t } = useTranslation(RX_NS);
   const sos = value === 'sos';
   const dose = rxDoseOf(value);
   const taps = Array.isArray(dose) ? dose : [0, 0, 0];
-  const items: ChipItem[] = TIMES.map(({ time, icon }, index) => {
+  const lit = !sos && taps.some((tap) => tap > 0);
+  const items: SegmentItem[] = TIMES.map((time, index) => {
     const count = taps[index] ?? 0;
     const word = t(K.dose.times[time]);
     const on = !sos && count > 0;
     return {
       key: time,
-      label: on && count > 2 ? `${word} · ${count}` : word,
+      // Under SOS the times stand down: a dot, as on the earlier table.
+      label: sos ? '·' : String(count),
       ariaLabel: `${word} · ${count}`,
       title: on
         ? t(K.dose.on, { time: word, taps: count })
         : t(K.dose.off, { time: word }),
       on,
       tone: 'sage',
-      icon,
+      faint: true,
+      keepWhenRead: !sos,
       onPress: () => emit(rxToggledDose(value, index)),
       testId: `${testId}-${time}`,
     };
   });
-  if (!sos && taps.some((tap) => tap > 0)) {
-    items.push({
+  items.push(
+    {
       key: 'double',
       label: t(K.dose.double),
       ariaLabel: t(K.dose.doubleHint),
       title: t(K.dose.doubleHint),
       on: rxIsDoubled(value),
       tone: 'sage',
+      disabled: !lit,
+      split: true,
       onPress: () => emit(rxDoubledDose(value)),
       testId: `${testId}-double`,
-    });
-  }
-  items.push({
-    key: 'sos',
-    label: t(K.dose.sos),
-    title: t(K.dose.sosHint),
-    on: sos,
-    tone: 'butter',
-    onPress: () => emit(sos ? '' : 'sos'),
-    testId: `${testId}-sos`,
-  });
+    },
+    {
+      key: 'sos',
+      label: t(K.dose.sos),
+      title: t(K.dose.sosHint),
+      on: sos,
+      tone: 'butter',
+      onPress: () => emit(sos ? '' : 'sos'),
+      testId: `${testId}-sos`,
+    },
+  );
   return items;
 }
 
 /**
- * "Dose" (change-prescription-one-click D4): Morning · Afternoon · Night —
- * one click on, one click off — then ×2 (two tablets at each lit time) and
- * SOS (butter), which stands in for the times. A count above two reads on its
- * time ("Morning · 3").
+ * "Dose · M A N" (change-prescription-compact-line D4): the morning,
+ * afternoon and night taps read as the dose itself — `1 0 1`, one click on,
+ * one click off — then ×2 (two tablets at each lit time) and SOS (butter),
+ * which stands in for the times.
  */
 export function RxDoseCell<TForm extends FieldValues>({
   control,
@@ -250,7 +292,7 @@ export function RxDoseCell<TForm extends FieldValues>({
   const { t } = useTranslation(RX_NS);
   const { field } = useController({ control, name });
   const value = String(field.value ?? '');
-  const items = useDoseChips(
+  const items = useDoseItems(
     value,
     (next) => {
       field.onChange(next);
@@ -259,7 +301,7 @@ export function RxDoseCell<TForm extends FieldValues>({
     testId,
   );
   return (
-    <ChipGroup
+    <Tray
       label={t(K.dose.group)}
       items={items}
       readOnly={readOnly}
@@ -269,28 +311,35 @@ export function RxDoseCell<TForm extends FieldValues>({
   );
 }
 
-/**
- * "Days" (D6): the usual courses as chips and a number box for any other —
- * it shows a course the chips lack. A change hands the days back so the
- * row's quantity follows (days × doses a day).
- */
-function DaysGroup({
-  days,
-  onDays,
-  readOnly,
-  testId,
-}: {
+/** Props of {@link RxDaysTray}. */
+export interface RxDaysTrayProps {
   days: number | null;
   onDays: (days: number | null) => void;
   readOnly: boolean;
   testId: string;
-}) {
+  /** Its "Days" name before it — on the line under the medicine, not under the column's header. */
+  showLabel?: boolean;
+}
+
+/**
+ * "Days" (D5): the usual courses as segments and a number box for any other
+ * — it shows a course the segments lack. A change hands the days back so the
+ * row's quantity follows (days × doses a day). A column of the line where the
+ * table has room, else the first tray under it (D6).
+ */
+export function RxDaysTray({
+  days,
+  onDays,
+  readOnly,
+  testId,
+  showLabel = true,
+}: RxDaysTrayProps) {
   const { t } = useTranslation(RX_NS);
   const inputId = useId();
   const [draft, setDraft] = useState<string | null>(null);
   const listed = days !== null && (RX_DAY_CHIPS as readonly number[]).includes(days);
   const other = listed || days === null ? '' : String(days);
-  const items: ChipItem[] = RX_DAY_CHIPS.map((count) => ({
+  const items: SegmentItem[] = RX_DAY_CHIPS.map((count) => ({
     key: String(count),
     label: String(count),
     ariaLabel: t(K.daysNote, { count }),
@@ -311,11 +360,12 @@ function DaysGroup({
     });
   }
   return (
-    <ChipGroup
+    <Tray
       label={t(K.items.days)}
       items={items}
       readOnly={readOnly}
       testId={testId}
+      showLabel={showLabel}
       after={
         <>
           <label htmlFor={inputId} className="sr-only">
@@ -336,14 +386,13 @@ function DaysGroup({
             }}
             onBlur={() => setDraft(null)}
             data-testid={`${testId}-other`}
-            data-slot="pill"
+            data-slot="segment"
             className={cn(
-              'rounded-full',
-              CHIP_CLASS,
-              'placeholder:text-muted-foreground w-15 text-center pointer-coarse:w-20',
+              SEGMENT_CLASS,
+              'placeholder:text-muted-foreground w-12 text-center pointer-coarse:w-14 pointer-coarse:px-1',
               other
-                ? cn(TONE_CLASSES.sky.surface, TONE_CLASSES.sky.border, 'font-semibold')
-                : 'bg-background border-dashed',
+                ? cn(TONE_CLASSES.sky.surface, 'font-semibold shadow-xs')
+                : 'bg-background/60 text-foreground',
             )}
           />
         </>
@@ -366,15 +415,16 @@ const isWhen = (value: string) =>
   typedText(value) !== null ||
   (RX_MORE_TIMINGS as readonly string[]).includes(value);
 
-/** A chip's test-id part: the value, or `typed` for a typed one. */
-const chipPart = (key: string) => (typedText(key) === null ? key : 'typed');
+/** A segment's test-id part: the value, or `typed` for a typed one. */
+const segmentPart = (key: string) => (typedText(key) === null ? key : 'typed');
 
 /**
- * "When" (D5): for a tablet the meal — before, after, an empty stomach, with
- * food; for a skin medicine the time of day and how often. A value the list
- * lacks (a typed timing, another of the contract's) shows lit before them.
+ * "Meal" for a tablet — Before · After · Empty stomach · With meal — or
+ * "When" for a skin medicine — the time of day and how often (D8). A value
+ * the list lacks (a typed timing, another of the contract's) shows lit
+ * before them.
  */
-function WhenGroup({
+function WhenTray({
   value,
   skin,
   onWhen,
@@ -391,17 +441,25 @@ function WhenGroup({
   const labels = useRxLabels();
   const listed: readonly string[] = skin ? RX_SKIN_WHEN : RX_MOUTH_WHEN;
   const extra = value && !listed.includes(value) && isWhen(value) ? [value] : [];
-  const items: ChipItem[] = [...extra, ...listed].map((key) => ({
+  // A tablet's meal reads short on its tray ("Before"), in full in its title.
+  const short = (key: string) => {
+    if (skin) return labels.when(key);
+    if (key === 'before') return t(K.meal.before);
+    if (key === 'after') return t(K.meal.after);
+    return labels.when(key);
+  };
+  const items: SegmentItem[] = [...extra, ...listed].map((key) => ({
     key,
-    label: labels.when(key),
+    label: short(key),
+    title: labels.when(key),
     on: value === key,
     tone: whenTone(key),
     onPress: () => onWhen(value === key ? '' : key),
-    testId: `${testId}-${chipPart(key)}`,
+    testId: `${testId}-${segmentPart(key)}`,
   }));
   return (
-    <ChipGroup
-      label={t(K.items.when)}
+    <Tray
+      label={skin ? t(K.items.when) : t(K.items.meal)}
       items={items}
       readOnly={readOnly}
       testId={testId}
@@ -410,11 +468,11 @@ function WhenGroup({
 }
 
 /**
- * "Where" (D5): the five usual places, then "+ N more" opening the others in
- * place — no list to scroll. A typed place, or one beyond the five while
+ * "Where": the five usual places, then "+ N more" opening the others on the
+ * same tray — no list to scroll. A typed place, or one beyond the five while
  * they are closed, shows lit before them.
  */
-function WhereGroup({
+function WhereTray({
   value,
   onWhere,
   readOnly,
@@ -435,16 +493,16 @@ function WhereGroup({
   const shownLater = open && rest.includes(value);
   const lead = value && !top.includes(value) && !shownLater ? [value] : [];
   const keys = [...lead, ...top, ...(open ? rest : [])];
-  const items: ChipItem[] = keys.map((key) => ({
+  const items: SegmentItem[] = keys.map((key) => ({
     key,
     label: labels.where(key),
     on: value === key,
     tone: 'mint',
     onPress: () => onWhere(value === key ? '' : key),
-    testId: `${testId}-${chipPart(key)}`,
+    testId: `${testId}-${segmentPart(key)}`,
   }));
   return (
-    <ChipGroup
+    <Tray
       label={t(K.items.where)}
       items={items}
       readOnly={readOnly}
@@ -452,14 +510,17 @@ function WhereGroup({
       after={
         <button
           type="button"
-          // Reached with the arrow keys, as the chips are: the group keeps one Tab stop.
-          data-chip=""
+          // Reached with the arrow keys, as the segments are: the tray keeps one Tab stop.
+          data-segment=""
           tabIndex={-1}
           aria-expanded={open}
           onClick={() => setOpen((current) => !current)}
           data-testid={`${testId}-more`}
-          data-slot="button"
-          className="text-caption text-muted-foreground hover:text-foreground rounded-md px-1.5 py-1 font-medium outline-none focus-visible:outline-hidden pointer-coarse:min-h-11"
+          data-slot="segment"
+          className={cn(
+            SEGMENT_CLASS,
+            'text-muted-foreground hover:text-foreground font-medium',
+          )}
         >
           {open ? t(K.items.fewerPlaces) : t(K.items.morePlaces, { count: rest.length })}
         </button>
@@ -468,25 +529,26 @@ function WhereGroup({
   );
 }
 
-/** Props of {@link RxLineRail}: what the rail reads and writes of its row. */
+/** Props of {@link RxLineRail}: what the line under the medicine reads and writes. */
 export interface RxLineRailProps {
-  days: number | null;
+  /** The course — its tray leads the line when the table folds Days out of its columns (D6). */
+  days?: { value: number | null; onDays: (days: number | null) => void };
   when: string;
   where: string;
-  /** The medicine is put on the skin: its timings, and Where (D5). */
+  /** The medicine is put on the skin: its timings, and Where. */
   skin: boolean;
   readOnly: boolean;
-  onDays: (days: number | null) => void;
   onWhen: (value: string) => void;
   onWhere: (value: string) => void;
-  /** `rx-items`; the groups derive `-days`, `-when`, `-where`. */
+  /** `rx-items`; the trays derive `-days`, `-when`, `-where`. */
   testId: string;
 }
 
 /**
- * The line's second row (change-prescription-one-click D3): Days · When ·
- * Where, each a chip group — how long, when and where at one glance, each
- * change one click. Where shows for a skin medicine, or once a place is set.
+ * The line under the medicine (change-prescription-compact-line): Days when
+ * the table folds it, then Meal (a tablet) or When and Where (a skin
+ * medicine), each a tray — the note fills the rest of the line beside them.
+ * Where shows for a skin medicine, or once a place is set.
  */
 export function RxLineRail({
   days,
@@ -494,7 +556,6 @@ export function RxLineRail({
   where,
   skin,
   readOnly,
-  onDays,
   onWhen,
   onWhere,
   testId,
@@ -502,15 +563,17 @@ export function RxLineRail({
   return (
     <div
       data-testid={`${testId}-rail`}
-      className="flex flex-wrap items-center gap-x-5 gap-y-2"
+      className="flex flex-wrap items-center gap-x-4 gap-y-1.5"
     >
-      <DaysGroup
-        days={days}
-        onDays={onDays}
-        readOnly={readOnly}
-        testId={`${testId}-days`}
-      />
-      <WhenGroup
+      {days ? (
+        <RxDaysTray
+          days={days.value}
+          onDays={days.onDays}
+          readOnly={readOnly}
+          testId={`${testId}-days`}
+        />
+      ) : null}
+      <WhenTray
         value={when}
         skin={skin}
         onWhen={onWhen}
@@ -518,7 +581,7 @@ export function RxLineRail({
         testId={`${testId}-when`}
       />
       {skin || where ? (
-        <WhereGroup
+        <WhereTray
           value={where}
           onWhere={onWhere}
           readOnly={readOnly}
@@ -530,8 +593,9 @@ export function RxLineRail({
 }
 
 /**
- * "Same days for all" (D6): above the lines once two medicines are written —
- * one click puts every line on the same course; lit when they already share it.
+ * "All medicines · Days": one slim line above the lines once two medicines
+ * are written — one click puts every line on the same course; lit when they
+ * already share it.
  */
 export function RxAllDays({
   days,
@@ -544,22 +608,21 @@ export function RxAllDays({
   testId: string;
 }) {
   const { t } = useTranslation(RX_NS);
-  const items: ChipItem[] = RX_DAY_CHIPS.map((count) => ({
+  const items: SegmentItem[] = RX_DAY_CHIPS.map((count) => ({
     key: String(count),
-    label: t(K.daysNote, { count }),
+    label: String(count),
+    ariaLabel: t(K.daysNote, { count }),
     on: days === count,
     tone: 'sky',
     onPress: () => onDays(count),
     testId: `${testId}-${count}`,
   }));
   return (
-    <div className="bg-canvas rounded-lg border border-dashed px-3 py-2">
-      <ChipGroup
-        label={t(K.allDays.label)}
-        items={items}
-        readOnly={false}
-        testId={testId}
-      />
-    </div>
+    <Tray
+      label={`${t(K.allDays.label)} · ${t(K.items.days)}`}
+      items={items}
+      readOnly={false}
+      testId={testId}
+    />
   );
 }

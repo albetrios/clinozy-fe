@@ -274,7 +274,7 @@ describe('a line’s days (change-prescription-writing D3)', () => {
     expect(rxTypedDays('0')).toBeNull();
     expect(rxTypedDays('400')).toBeNull();
     expect(rxTypedDays('days')).toBeNull();
-    expect(RX_DAY_CHIPS).toEqual([5, 7, 10, 14, 30, 60]);
+    expect(RX_DAY_CHIPS).toEqual([3, 5, 7, 10, 14, 30]);
   });
 });
 

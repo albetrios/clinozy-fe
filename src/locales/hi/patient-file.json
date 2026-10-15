@@ -310,13 +310,14 @@
       "toOutsideHint": "मरीज़ इसे कहीं और से ख़रीदता है; यह इस पर्चे से नहीं बेची जाती",
       "toStore": "अपने मेडिकल स्टोर से लें",
       "note": "टिप्पणी · जैसे पतली परत लगाएँ, धूप से बचें",
-      "dose": "खुराक",
+      "dose": "खुराक · सु दो रा",
       "otherDays": "दिनों की कोई और संख्या",
       "otherDaysShort": "और",
       "when": "कब",
       "morePlaces_one": "+ {{count}} और",
       "morePlaces_other": "+ {{count}} और",
-      "fewerPlaces": "कम"
+      "fewerPlaces": "कम",
+      "meal": "भोजन"
     },
     "dose": {
       "group": "खुराक सुबह · दोपहर · रात",
@@ -333,6 +334,8 @@
       "doubleHint": "हर बार दो गोलियाँ"
     },
     "meal": {
+      "before": "पहले",
+      "after": "बाद",
       "beforeHint": "भोजन से पहले",
       "afterHint": "भोजन के बाद"
     },

@@ -147,8 +147,8 @@ export const rxIsDoubled = (value: string): boolean => {
   return Array.isArray(dose) && dose.some((tap) => tap > 1);
 };
 
-/** The Days chips (change-prescription-one-click D6): the courses a doctor writes most. */
-export const RX_DAY_CHIPS = [5, 7, 10, 14, 30, 60] as const;
+/** The usual courses (change-prescription-compact-line D5): azithromycin's three days to a month. */
+export const RX_DAY_CHIPS = [3, 5, 7, 10, 14, 30] as const;
 
 /** When for a medicine taken by mouth (D5): the meal, an empty stomach, with food. */
 export const RX_MOUTH_WHEN = ['before', 'after', 'empty_stomach', 'with_meal'] as const;

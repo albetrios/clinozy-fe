@@ -87,6 +87,12 @@ export interface ItemsFieldProps<
    */
   rowDetail?: (row: ItemsRowContext<TForm, TName>) => ReactNode;
   /**
+   * The note shares the detail's line (`rowDetail`): the detail first, the
+   * note filling the rest and wrapping under it when the line runs short —
+   * the Rx line's Meal and its note on one line. Off by default.
+   */
+  noteBesideDetail?: boolean;
+  /**
    * A full-width line under a row's note — a warning that belongs to that row
    * (the Rx allergy match). Rendered for a row only when it returns something.
    */
@@ -149,6 +155,18 @@ function cellClass(phone: boolean, first: boolean, last: boolean, align?: string
   return cn('flex min-w-0', align === 'end' && 'justify-end');
 }
 
+/**
+ * A full-width line of the row (its detail, its note, its footer): the grid's
+ * every track, or a phone row's own line. Beside the note, the detail takes
+ * only its own width and the note the rest of their shared line (at least
+ * 224px, else it wraps under).
+ */
+function lineClass(phone: boolean, part: 'line' | 'detail' | 'note', beside: boolean) {
+  if (beside) return part === 'note' ? 'min-w-56 flex-1' : 'min-w-0 max-w-full';
+  if (phone) return 'basis-full';
+  return part === 'note' ? 'col-span-full -mt-0.5' : 'col-span-full';
+}
+
 /** The dashed note line under a row (H:924): "NOTE" and a 12.5px input. */
 function RowNote<TForm extends FieldValues, TName extends FieldArrayPath<TForm>>({
   control,
@@ -156,6 +174,7 @@ function RowNote<TForm extends FieldValues, TName extends FieldArrayPath<TForm>>
   context,
   span,
   phone,
+  beside = false,
   readOnly,
   testId,
 }: {
@@ -164,6 +183,8 @@ function RowNote<TForm extends FieldValues, TName extends FieldArrayPath<TForm>>
   context: ItemsRowContext<TForm, TName>;
   span: number;
   phone: boolean;
+  /** On the detail's line (`noteBesideDetail`). */
+  beside?: boolean;
   readOnly: boolean;
   testId: string;
 }) {
@@ -177,7 +198,7 @@ function RowNote<TForm extends FieldValues, TName extends FieldArrayPath<TForm>>
     <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
       role="cell"
       aria-colspan={span}
-      className={phone ? 'basis-full' : 'col-span-full -mt-0.5'}
+      className={lineClass(phone, 'note', beside)}
     >
       <Label className="bg-canvas text-muted-foreground focus-within:border-ring focus-within:ring-ring/50 flex h-7.5 items-center gap-2 rounded-md border border-dashed px-2 font-normal focus-within:ring-[3px]">
         <span
@@ -209,6 +230,59 @@ function RowNote<TForm extends FieldValues, TName extends FieldArrayPath<TForm>>
   );
 }
 
+/** Whether a row's detail and its note share one line: asked for, and both there. */
+function sharesLine(asked: boolean, detail: ReactNode, note: unknown): boolean {
+  return asked && Boolean(detail) && note !== undefined;
+}
+
+/**
+ * A row's detail and its note: two full-width lines, or — `beside` — one
+ * shared line that wraps the note under the detail when it runs short.
+ */
+function RowDetailAndNote({
+  detail,
+  note,
+  beside,
+  phone,
+  span,
+}: {
+  detail: ReactNode;
+  note: ReactNode;
+  beside: boolean;
+  phone: boolean;
+  span: number;
+}) {
+  const detailCell = detail ? (
+    <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
+      role="cell"
+      aria-colspan={span}
+      className={lineClass(phone, 'detail', beside)}
+    >
+      {detail}
+    </div>
+  ) : null;
+  if (!beside) {
+    return (
+      <>
+        {detailCell}
+        {note}
+      </>
+    );
+  }
+  return (
+    <div
+      data-slot="items-row-line"
+      className={cn(
+        lineClass(phone, 'line', false),
+        'flex flex-wrap items-center gap-x-4 gap-y-1.5',
+      )}
+    >
+      {detailCell}
+      {note}
+    </div>
+  );
+}
+
 interface ItemsRowProps<TForm extends FieldValues, TName extends FieldArrayPath<TForm>> {
   control: Control<TForm>;
   index: number;
@@ -217,6 +291,7 @@ interface ItemsRowProps<TForm extends FieldValues, TName extends FieldArrayPath<
   columns: readonly ItemsColumn<TForm, TName>[];
   note?: ItemsRowNote<TForm, TName>;
   rowDetail?: (row: ItemsRowContext<TForm, TName>) => ReactNode;
+  noteBesideDetail?: boolean;
   rowFooter?: (row: ItemsRowContext<TForm, TName>) => ReactNode;
   /** The table has the × column. */
   removable: boolean;
@@ -238,6 +313,7 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
   columns,
   note,
   rowDetail,
+  noteBesideDetail = false,
   rowFooter,
   removable,
   canRemove,
@@ -269,6 +345,19 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
   const detail = rowDetail?.(contextFor('', `${testId}-row-detail`));
   const footer = rowFooter?.(contextFor('', `${testId}-row-footer`));
   const span = columns.length + Number(removable);
+  const beside = sharesLine(noteBesideDetail, detail, note);
+  const noteCell = note ? (
+    <RowNote
+      control={control}
+      note={note}
+      context={contextFor(note.placeholder ?? '', ids.note)}
+      span={span}
+      phone={phone}
+      beside={beside}
+      readOnly={readOnly}
+      testId={ids.note}
+    />
+  ) : null;
 
   return (
     <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
@@ -316,31 +405,18 @@ function ItemsRow<TForm extends FieldValues, TName extends FieldArrayPath<TForm>
           role="cell"
         />
       ) : null}
-      {detail ? (
-        <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
-          role="cell"
-          aria-colspan={span}
-          className={phone ? 'basis-full' : 'col-span-full'}
-        >
-          {detail}
-        </div>
-      ) : null}
-      {note ? (
-        <RowNote
-          control={control}
-          note={note}
-          context={contextFor(note.placeholder ?? '', ids.note)}
-          span={columns.length + Number(removable)}
-          phone={phone}
-          readOnly={readOnly}
-          testId={ids.note}
-        />
-      ) : null}
+      <RowDetailAndNote
+        detail={detail}
+        note={noteCell}
+        beside={beside}
+        phone={phone}
+        span={span}
+      />
       {footer ? (
         <div // NOSONAR(S6819): grid/flex ARIA table, see the note above ROW_GRID_CLASS
           role="cell"
           aria-colspan={span}
-          className={phone ? 'basis-full' : 'col-span-full'}
+          className={lineClass(phone, 'line', false)}
         >
           {footer}
         </div>
@@ -482,7 +558,8 @@ function ItemsFooter({
  * the first cell takes the first line, the others follow, the last sits at the
  * inline end and the note keeps a line of its own (H:95–101). A host's
  * `rowDetail` adds a full-width line of the row's own controls before its
- * note, and its `rowFooter` a full-width line under the note — a warning that
+ * note (or, with `noteBesideDetail`, shares one line with the note), and its
+ * `rowFooter` a full-width line under the note — a warning that
  * belongs to that row. Inside a
  * `RecordDrawer`, a field that is not `compact` widens the drawer to 840px
  * through its width rule.
@@ -565,6 +642,7 @@ export function ItemsField<
                   columns={columns}
                   note={props.note}
                   rowDetail={props.rowDetail}
+                  noteBesideDetail={props.noteBesideDetail}
                   rowFooter={props.rowFooter}
                   removable={removable}
                   canRemove={removable && canRemove(index)}

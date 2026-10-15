@@ -68,8 +68,10 @@ export const RX_KEYS = {
     /** The Days box (change-prescription-one-click D6): its name and its short placeholder. */
     otherDays: 'rx.items.otherDays',
     otherDaysShort: 'rx.items.otherDaysShort',
-    /** The When chips' group. */
+    /** The When tray's group: a skin medicine's timings. */
     when: 'rx.items.when',
+    /** The Meal tray's group: a tablet's (change-prescription-compact-line D8). */
+    meal: 'rx.items.meal',
     /** "+ 9 more" / "Fewer" — the Where chips beyond the usual five. */
     morePlaces: 'rx.items.morePlaces',
     fewerPlaces: 'rx.items.fewerPlaces',
@@ -114,6 +116,9 @@ export const RX_KEYS = {
     doubleHint: 'rx.dose.doubleHint',
   },
   meal: {
+    /** The Meal tray's short words: "Before" / "After" (change-prescription-compact-line D8). */
+    before: 'rx.meal.before',
+    after: 'rx.meal.after',
     beforeHint: 'rx.meal.beforeHint',
     afterHint: 'rx.meal.afterHint',
   },

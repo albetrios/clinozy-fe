@@ -321,14 +321,15 @@
       "toOutsideHint": "Le patient l’achète ailleurs ; il n’est pas vendu depuis cette ordonnance",
       "toStore": "Le prendre dans votre pharmacie",
       "note": "Remarques · p. ex. couche fine, éviter le soleil",
-      "dose": "Dose",
+      "dose": "Dose · M M S",
       "otherDays": "Autre nombre de jours",
       "otherDaysShort": "Autre",
       "when": "Quand",
       "morePlaces_one": "+ {{count}} de plus",
       "morePlaces_many": "+ {{count}} de plus",
       "morePlaces_other": "+ {{count}} de plus",
-      "fewerPlaces": "Moins"
+      "fewerPlaces": "Moins",
+      "meal": "Repas"
     },
     "dose": {
       "group": "Dose matin · midi · soir",
@@ -345,6 +346,8 @@
       "doubleHint": "Deux comprimés à chaque prise"
     },
     "meal": {
+      "before": "Avant",
+      "after": "Après",
       "beforeHint": "Avant le repas",
       "afterHint": "Après le repas"
     },

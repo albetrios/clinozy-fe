@@ -299,12 +299,13 @@
       "toOutsideHint": "환자가 다른 곳에서 구입하며 이 처방전으로 판매되지 않습니다",
       "toStore": "원내 약국 약으로 바꾸기",
       "note": "메모 · 예: 얇게 바르기, 햇빛 피하기",
-      "dose": "용량",
+      "dose": "용량 · 아 점 저",
       "otherDays": "다른 일수",
       "otherDaysShort": "기타",
       "when": "언제",
       "morePlaces_other": "+ {{count}}개 더",
-      "fewerPlaces": "줄이기"
+      "fewerPlaces": "줄이기",
+      "meal": "식사"
     },
     "dose": {
       "group": "용량 아침 · 점심 · 저녁",
@@ -321,6 +322,8 @@
       "doubleHint": "매번 두 알"
     },
     "meal": {
+      "before": "식전",
+      "after": "식후",
       "beforeHint": "식전",
       "afterHint": "식후"
     },

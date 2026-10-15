@@ -354,7 +354,7 @@
       "toOutsideHint": "يشتريه المريض من مكان آخر؛ لا يُباع من هذه الوصفة",
       "toStore": "خذه من صيدليتك",
       "note": "ملاحظات · مثل طبقة رقيقة، تجنّب الشمس",
-      "dose": "الجرعة",
+      "dose": "الجرعة · ص ظ ل",
       "otherDays": "عدد أيام آخر",
       "otherDaysShort": "آخر",
       "when": "متى",
@@ -364,7 +364,8 @@
       "morePlaces_few": "+ {{count}} أخرى",
       "morePlaces_many": "+ {{count}} أخرى",
       "morePlaces_other": "+ {{count}} أخرى",
-      "fewerPlaces": "أقل"
+      "fewerPlaces": "أقل",
+      "meal": "الوجبة"
     },
     "dose": {
       "group": "الجرعة صباحًا · ظهرًا · ليلًا",
@@ -381,6 +382,8 @@
       "doubleHint": "قرصان في كل مرة"
     },
     "meal": {
+      "before": "قبل",
+      "after": "بعد",
       "beforeHint": "قبل الأكل",
       "afterHint": "بعد الأكل"
     },

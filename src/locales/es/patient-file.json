@@ -321,14 +321,15 @@
       "toOutsideHint": "El paciente lo compra fuera; no se vende desde esta receta",
       "toStore": "Tomarlo de tu farmacia",
       "note": "Observaciones · p. ej. capa fina, evitar el sol",
-      "dose": "Dosis",
+      "dose": "Dosis · M T N",
       "otherDays": "Otro número de días",
       "otherDaysShort": "Otro",
       "when": "Cuándo",
       "morePlaces_one": "+ {{count}} más",
       "morePlaces_many": "+ {{count}} más",
       "morePlaces_other": "+ {{count}} más",
-      "fewerPlaces": "Menos"
+      "fewerPlaces": "Menos",
+      "meal": "Comida"
     },
     "dose": {
       "group": "Dosis mañana · tarde · noche",
@@ -345,6 +346,8 @@
       "doubleHint": "Dos comprimidos cada vez"
     },
     "meal": {
+      "before": "Antes",
+      "after": "Después",
       "beforeHint": "Antes de comer",
       "afterHint": "Después de comer"
     },

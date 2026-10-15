@@ -12,6 +12,8 @@ import {
   ItemsQtyCell,
   type ItemsRowContext,
 } from '@/shared/forms/ItemsField/index.ts';
+import { useCanHover } from '@/shared/hooks/useCanHover/index.ts';
+import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
 import { ClipboardList } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -27,7 +29,7 @@ import {
   rxSharedDays,
   withRxDaysForAll,
 } from './rx-form.ts';
-import { RxAllDays, RxDoseCell, RxLineRail } from './rx-item-cells.tsx';
+import { RxAllDays, RxDaysTray, RxDoseCell, RxLineRail } from './rx-item-cells.tsx';
 import { RxMedicineCell } from './rx-medicine-cell.tsx';
 import { type ReadableRxPadLine, withRxPadLines } from './rx-pad.ts';
 import { RxPadPanel } from './rx-pad-panel.tsx';
@@ -35,6 +37,34 @@ import { useRxLabels } from './use-rx-labels.ts';
 import { useRxQuickLine } from './use-rx-quick-line.ts';
 
 const K = RX_KEYS;
+
+/**
+ * The line's tracks per pointer, set on the table and read by its columns
+ * (change-prescription-compact-line D9; change-prescription-touch-quantity
+ * D6): Dose · Days · Qty — 160 · 224 · 92px with a mouse, 220 · 292 · 120px
+ * on touch, where every segment is 44px.
+ */
+const RX_TRACKS_CLASS =
+  '[--rx-dose-track:160px] [--rx-days-track:224px] [--rx-qty-track:92px] pointer-coarse:[--rx-dose-track:220px] pointer-coarse:[--rx-days-track:292px] pointer-coarse:[--rx-qty-track:120px]';
+
+/**
+ * The table width from which Days is a column of the line (D6): a 200px
+ * medicine, the tracks above, the ×, the gaps and the padding — 760px with a
+ * mouse, 1000px on touch. Narrower, Days leads the line under the medicine.
+ */
+const RX_DAYS_COLUMN_FROM = { mouse: 760, touch: 1000 } as const;
+
+/**
+ * Whether the table holds Days as a column now — measured on the table
+ * itself, so the Rx check beside it counts; before the first measure (0) it
+ * does.
+ */
+function useRxDaysColumn() {
+  const [measure, width] = useElementWidth<HTMLDivElement>();
+  const mouse = useCanHover();
+  const from = mouse ? RX_DAYS_COLUMN_FROM.mouse : RX_DAYS_COLUMN_FROM.touch;
+  return { measure, daysColumn: width === 0 || width >= from };
+}
 
 /** The Rx Pad's state, held by the drawer (its Esc closes the Pad first). */
 export interface RxPadState {
@@ -105,17 +135,21 @@ function RxPadToggle({
 }
 
 /**
- * The item rows (change-prescription-one-click D3): line 1 — Medicine (its
- * source pill) · Dose (the time chips, ×2, SOS) · Qty — and the rail under
- * it — Days · When · Where, a chip each; with the quantity recompute: days ×
- * doses a day whenever the dose or the days change (a note's own days count
- * while Days is empty).
+ * The item rows (change-prescription-compact-line): line 1 — Medicine (its
+ * source pill) · Dose (`1 0 1`, ×2, SOS) · Days, where the table has room ·
+ * Qty — and under it Days when folded, Meal or When · Where, beside the note;
+ * with the quantity recompute: days × doses a day whenever the dose or the
+ * days change (a note's own days count while Days is empty).
  */
 function useRxColumns({
   form,
   catalog,
   readOnly,
-}: Pick<RxMedicinesFieldProps, 'form' | 'catalog' | 'readOnly'>) {
+  daysColumn,
+}: Pick<RxMedicinesFieldProps, 'form' | 'catalog' | 'readOnly'> & {
+  /** Days is a column of the line (D6), else the first tray under it. */
+  daysColumn: boolean;
+}) {
   const { t } = useTranslation(RX_NS);
   const labels = useRxLabels();
   const medicines = catalog?.medicines ?? [];
@@ -134,6 +168,10 @@ function useRxColumns({
     key: K,
     value: RxFormLine[K],
   ) => form.setValue(`${rowName}.${key}`, value as never, { shouldDirty: true });
+  const setDays = (row: ItemsRowContext<RxFormValues, 'items'>, days: number | null) => {
+    set(row.name, 'days', days);
+    recompute(row.name, { ...row.row, days });
+  };
 
   const columns: ItemsColumn<RxFormValues, 'items'>[] = [
     {
@@ -147,8 +185,8 @@ function useRxColumns({
     {
       id: 'dose',
       header: t(K.items.dose),
-      // Fixed, not `auto`: each row is a grid of its own, and the header lines up only with a set track.
-      track: 'minmax(0,384px)',
+      // Set, not `auto`: each row is a grid of its own, and the header lines up only with a set track.
+      track: 'var(--rx-dose-track)',
       cell: (row) => (
         <RxDoseCell<RxFormValues>
           {...row.bind('dose')}
@@ -157,34 +195,57 @@ function useRxColumns({
         />
       ),
     },
+    ...(daysColumn
+      ? [
+          {
+            id: 'days',
+            header: t(K.items.days),
+            track: 'var(--rx-days-track)',
+            cell: (row: ItemsRowContext<RxFormValues, 'items'>) => (
+              <RxDaysTray
+                days={row.row.days}
+                onDays={(days) => setDays(row, days)}
+                readOnly={readOnly}
+                testId={row.testId}
+                showLabel={false}
+              />
+            ),
+          } satisfies ItemsColumn<RxFormValues, 'items'>,
+        ]
+      : []),
     {
       id: 'qty',
       header: t(K.items.qty),
-      track: '92px',
+      // 92px with a mouse, 120px on touch for the 44px buttons (change-prescription-touch-quantity D6).
+      track: 'var(--rx-qty-track)',
       align: 'end',
       cell: (row) => (
-        <ItemsQtyCell<RxFormValues>
-          {...row.bind('qty')}
-          min={1}
-          max={999}
-          readOnly={readOnly}
-        />
+        // The track's width on a phone row too, where no track holds the stepper.
+        <div className="w-(--rx-qty-track) max-w-full">
+          <ItemsQtyCell<RxFormValues>
+            {...row.bind('qty')}
+            min={1}
+            max={999}
+            readOnly={readOnly}
+            largeOnTouch
+          />
+        </div>
       ),
     },
   ];
-  // The line's second row (D3): how long, when, where — a chip each.
+  // The line under the medicine: Days when folded, Meal or When · Where — beside the note.
   const rowDetail = (row: ItemsRowContext<RxFormValues, 'items'>) =>
     row.row.medicineName.trim() === '' ? null : (
       <RxLineRail
-        days={row.row.days}
+        days={
+          daysColumn
+            ? undefined
+            : { value: row.row.days, onDays: (days) => setDays(row, days) }
+        }
         when={row.row.when}
         where={row.row.where}
         skin={rxIsSkinLine(row.row, medicines)}
         readOnly={readOnly}
-        onDays={(days) => {
-          set(row.name, 'days', days);
-          recompute(row.name, { ...row.row, days });
-        }}
         onWhen={(when) => set(row.name, 'when', when)}
         onWhere={(where) => set(row.name, 'where', where)}
         testId="rx-items"
@@ -195,12 +256,13 @@ function useRxColumns({
 
 /**
  * Step 2 "Medicines" (H:4806–4807; `patient-file.md:111–112`;
- * change-prescription-one-click): the quick line, Browse and the Pad above the
- * item rows, and "Same days for all" once two medicines are written. Each row
- * — Medicine (the store's with its stock, or an outside name) · Dose (chips) ·
- * Qty · × — has its rail of Days · When · Where chips, its dashed note line
- * and, for a line that matches an allergy, its warning; "+ Add medicine". No
- * everyday choice needs a dropdown. The table keeps one row.
+ * change-prescription-compact-line): the quick line, Browse and the Pad above
+ * the item rows, and "All medicines · Days" once two medicines are written.
+ * Each row — Medicine (the store's with its stock, or an outside name) · Dose
+ * `1 0 1` · Days (where the table has room) · Qty · × — has under it its Meal
+ * or When · Where trays beside its dashed note and, for a line that matches
+ * an allergy, its warning; "+ Add medicine". No everyday choice needs a
+ * dropdown. The table keeps one row.
  */
 export function RxMedicinesField({
   form,
@@ -217,7 +279,13 @@ export function RxMedicinesField({
 }: RxMedicinesFieldProps) {
   const { t } = useTranslation(RX_NS);
   const quickLine = useRxQuickLine(form, catalog, items);
-  const { columns, recompute, rowDetail } = useRxColumns({ form, catalog, readOnly });
+  const { measure, daysColumn } = useRxDaysColumn();
+  const { columns, recompute, rowDetail } = useRxColumns({
+    form,
+    catalog,
+    readOnly,
+    daysColumn,
+  });
   const padId = useId();
   // The Pad adds its lines as the quick line adds one: a blank row first, the last dosage.
   const addPadLines = (lines: readonly ReadableRxPadLine[]) => {
@@ -266,26 +334,30 @@ export function RxMedicinesField({
   );
 
   return (
-    <ItemsField<RxFormValues, 'items'>
-      control={form.control}
-      name="items"
-      label={t(K.items.label)}
-      columns={columns}
-      newRow={emptyRxLine}
-      addLabel={t(K.items.addMedicine)}
-      minRows={1}
-      readOnly={readOnly}
-      note={{
-        key: 'remarks',
-        placeholder: t(K.items.note),
-        maxLength: 200,
-        // A note's own days count only while Days is empty.
-        onChange: (value, row) => recompute(row.name, { ...row.row, remarks: value }),
-      }}
-      rowDetail={rowDetail}
-      rowFooter={rowFooter}
-      toolbar={toolbar}
-      testId="rx-items"
-    />
+    <div ref={measure} data-days-column={daysColumn} className="min-w-0">
+      <ItemsField<RxFormValues, 'items'>
+        control={form.control}
+        name="items"
+        label={t(K.items.label)}
+        columns={columns}
+        newRow={emptyRxLine}
+        addLabel={t(K.items.addMedicine)}
+        minRows={1}
+        readOnly={readOnly}
+        note={{
+          key: 'remarks',
+          placeholder: t(K.items.note),
+          maxLength: 200,
+          // A note's own days count only while Days is empty.
+          onChange: (value, row) => recompute(row.name, { ...row.row, remarks: value }),
+        }}
+        rowDetail={rowDetail}
+        noteBesideDetail
+        rowFooter={rowFooter}
+        toolbar={toolbar}
+        testId="rx-items"
+        className={RX_TRACKS_CLASS}
+      />
+    </div>
   );
 }
