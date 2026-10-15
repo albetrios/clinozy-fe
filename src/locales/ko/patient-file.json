@@ -277,16 +277,11 @@
     "items": {
       "label": "약",
       "medicine": "약",
-      "dose": "용량 · 아 점 저",
-      "meal": "식사",
       "where": "부위",
       "qty": "수량",
       "searchMedicine": "약 검색",
       "addMedicine": "약 추가",
-      "use": "사용",
       "days": "일수",
-      "searchDays": "일수 입력 (예: 12)",
-      "noDays": "일수 없음",
       "groups": {
         "store": "원내 약국",
         "outside": "원외 약"
@@ -303,7 +298,13 @@
       "toOutside": "원외 약으로 작성",
       "toOutsideHint": "환자가 다른 곳에서 구입하며 이 처방전으로 판매되지 않습니다",
       "toStore": "원내 약국 약으로 바꾸기",
-      "note": "메모 · 예: 얇게 바르기, 햇빛 피하기"
+      "note": "메모 · 예: 얇게 바르기, 햇빛 피하기",
+      "dose": "용량",
+      "otherDays": "다른 일수",
+      "otherDaysShort": "기타",
+      "when": "언제",
+      "morePlaces_other": "+ {{count}}개 더",
+      "fewerPlaces": "줄이기"
     },
     "dose": {
       "group": "용량 아침 · 점심 · 저녁",
@@ -316,28 +317,12 @@
       "sosHint": "필요할 때만 (SOS)",
       "on": "{{time}} · {{taps}} — 탭하여 끄기",
       "off": "{{time}} — 탭하여 1",
-      "presets": "자주 쓰는 용량",
-      "presetsHint": "자주 쓰는 용량, 필요 시, 또는 두 알 이상",
-      "presetNames": {
-        "morning": "아침",
-        "night": "밤",
-        "twice": "하루 두 번",
-        "thrice": "하루 세 번",
-        "afternoon": "점심",
-        "sos": "필요 시"
-      },
-      "counts": "한 번에 먹는 알 수",
-      "less": "하나 줄이기 · {{time}}",
-      "more": "하나 늘리기 · {{time}}",
-      "clear": "용량 지우기"
+      "double": "×2",
+      "doubleHint": "매번 두 알"
     },
     "meal": {
-      "before": "식전",
-      "after": "식후",
       "beforeHint": "식전",
-      "afterHint": "식후",
-      "more": "다른 시간",
-      "change": "{{timing}} · 변경"
+      "afterHint": "식후"
     },
     "timings": {
       "empty_stomach": "공복",
@@ -477,6 +462,9 @@
       "kept": "{{allergies}} 알레르기를 알고도 유지함",
       "undo": "되돌리기",
       "held": "{{medicine}}이(가) 알레르기에 해당합니다 — 먼저 유지하거나 제거하세요"
+    },
+    "allDays": {
+      "label": "모든 약"
     }
   },
   "treatment": {

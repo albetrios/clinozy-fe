@@ -91,6 +91,7 @@ import {
   Star as LuStar,
   Stethoscope as LuStethoscope,
   Sun as LuSun,
+  Sunrise as LuSunrise,
   Tag as LuTag,
   Trash2 as LuTrash,
   TriangleAlert as LuTriangleAlert,
@@ -248,6 +249,8 @@ export const Star: AppIcon = LuStar;
 /** Lucide `stethoscope`: clinical notes. */
 export const Stethoscope: AppIcon = LuStethoscope;
 export const Sun: AppIcon = LuSun;
+/** Lucide `sunrise`: a morning dose. */
+export const Sunrise: AppIcon = LuSunrise;
 /** Lucide `tag`: offerings and discounts. */
 export const Tag: AppIcon = LuTag;
 export const Trash: AppIcon = LuTrash;

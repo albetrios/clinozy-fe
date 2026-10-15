@@ -480,6 +480,23 @@ describe('ItemsField — the row footer (change-prescription-writing D7)', () =>
   });
 });
 
+describe('ItemsField — the row detail (change-prescription-one-click D3)', () => {
+  it('puts a host’s full-width line after the cells and before the note', () => {
+    renderWithClient(
+      <LinesHarness
+        note={{ key: 'note' }}
+        rowDetail={(row) => <p data-testid="lines-detail">More of {row.row.name}</p>}
+      />,
+    );
+    const detail = screen.getByTestId('lines-detail');
+    const cell = detail.closest('[role="cell"]');
+    expect(cell).toHaveClass('col-span-full');
+    expect(cell).toHaveAttribute('aria-colspan', '4');
+    const note = screen.getByTestId('lines-note').closest('[role="cell"]');
+    expect(cell?.nextElementSibling).toBe(note);
+  });
+});
+
 describe('ItemsField — phone (H:95–101)', () => {
   beforeEach(() => {
     viewport.tier = 'phone';

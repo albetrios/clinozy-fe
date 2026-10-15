@@ -3,8 +3,8 @@ import type {
   PrescriptionItem,
   RxMeal,
   RxTiming,
-  Tone,
 } from '@/shared/api/app/app-schema.ts';
+import { medicineForm } from '@/shared/api/app/medicines-contracts.ts';
 import type {
   PrescriptionFields,
   PrescriptionRecord,
@@ -101,12 +101,6 @@ export const RX_PLACES = [
 /** One of the Where list's places. */
 export type RxPlaceKey = (typeof RX_PLACES)[number]['key'];
 
-/** The meal buttons (H:4807): Before (butter) and After (sky). */
-export const RX_MEALS = [
-  { value: 'before', tone: 'butter' },
-  { value: 'after', tone: 'sky' },
-] as const satisfies readonly { value: RxMeal; tone: Tone }[];
-
 /** "More timings" (H:4807): the contract's `rx_timing`, in the design's order. */
 export const RX_MORE_TIMINGS = [
   'empty_stomach',
@@ -125,44 +119,97 @@ const isTiming = (value: string): value is RxTiming =>
   (RX_MORE_TIMINGS as readonly string[]).includes(value);
 
 /**
- * The dose ⌄'s common doses (change-prescription-writing D5), in the order a
- * doctor reaches for them; SOS last.
- */
-export const RX_DOSE_PRESETS = [
-  { id: 'morning', value: '1-0-0' },
-  { id: 'night', value: '0-0-1' },
-  { id: 'twice', value: '1-0-1' },
-  { id: 'thrice', value: '1-1-1' },
-  { id: 'afternoon', value: '0-1-0' },
-  { id: 'sos', value: 'sos' },
-] as const;
-
-/** The most of one tap a dose takes from the ⌄'s + (D5). */
-export const RX_MAX_TAP = 4;
-
-/**
- * A dose after a tap (D5): a time that is off turns on (1); one that is on —
- * one tablet or more — turns off. A tap on an SOS dose starts the taps over.
+ * A dose after a tap on one time (change-prescription-one-click D4): a time
+ * that is off turns on — with as many tablets as the lit times take (×2
+ * keeps two) — and one that is on turns off. A tap on an SOS dose starts the
+ * taps over.
  */
 export function rxToggledDose(value: string, index: number): string {
   const dose = rxDoseOf(value);
   const taps = Array.isArray(dose) ? [...dose] : [0, 0, 0];
-  taps[index] = (taps[index] ?? 0) > 0 ? 0 : 1;
+  const each = Math.max(1, ...taps);
+  taps[index] = (taps[index] ?? 0) > 0 ? 0 : each;
   return taps.some((tap) => tap > 0) ? taps.join('-') : '';
 }
 
-/** A dose after the ⌄'s − or + on one time, kept within 0 and {@link RX_MAX_TAP}. */
-export function rxSteppedDose(value: string, index: number, step: 1 | -1): string {
+/** Two tablets at each lit time — or back to one (D4); a dose with no lit time is kept. */
+export function rxDoubledDose(value: string): string {
   const dose = rxDoseOf(value);
-  const taps = Array.isArray(dose) ? [...dose] : [0, 0, 0];
-  taps[index] = Math.min(RX_MAX_TAP, Math.max(0, (taps[index] ?? 0) + step));
-  return taps.some((tap) => tap > 0) ? taps.join('-') : '';
+  const lit = Array.isArray(dose) && dose.some((tap) => tap > 0);
+  if (!(lit && Array.isArray(dose))) return value;
+  const each = dose.some((tap) => tap > 1) ? 1 : 2;
+  return dose.map((tap) => (tap > 0 ? each : 0)).join('-');
 }
 
-/** The Days list (D6): the courses a doctor writes most, in days. */
-export const RX_DAY_PRESETS = [3, 5, 7, 10, 14, 21, 30, 45, 60, 90] as const;
+/** The dose takes two tablets at a lit time — ×2 is lit. */
+export const rxIsDoubled = (value: string): boolean => {
+  const dose = rxDoseOf(value);
+  return Array.isArray(dose) && dose.some((tap) => tap > 1);
+};
 
-/** Days typed into the Days list ("12", "12 days") — 1 to a year — or null. */
+/** The Days chips (change-prescription-one-click D6): the courses a doctor writes most. */
+export const RX_DAY_CHIPS = [5, 7, 10, 14, 30, 60] as const;
+
+/** When for a medicine taken by mouth (D5): the meal, an empty stomach, with food. */
+export const RX_MOUTH_WHEN = ['before', 'after', 'empty_stomach', 'with_meal'] as const;
+
+/** When for a medicine put on the skin (D5): the time of day and how often. */
+export const RX_SKIN_WHEN = [
+  'night',
+  'morning',
+  'morning_night',
+  'alternate_days',
+  'thrice_week',
+  'once_week',
+] as const satisfies readonly RxTiming[];
+
+/** The places shown before "+ more" (D5) — the rest of `RX_PLACES` open in place. */
+export const RX_TOP_PLACES = [
+  'face',
+  'scalp',
+  'body',
+  'hair',
+  'affectedArea',
+] as const satisfies readonly RxPlaceKey[];
+
+/**
+ * A line put on the skin (D5): the store's medicine's form, else the name's
+ * (`medicineForm` — lotion, cream, gel, shampoo …); a tablet otherwise.
+ */
+export function rxIsSkinLine(
+  line: Pick<RxFormLine, 'medicineId' | 'medicineName'>,
+  medicines: readonly Pick<RxCatalogMedicine, 'medicineId' | 'name' | 'form'>[],
+): boolean {
+  const name = line.medicineName.trim().toLowerCase();
+  const known = medicines.find((medicine) =>
+    line.medicineId === null
+      ? medicine.name.toLowerCase() === name
+      : medicine.medicineId === line.medicineId,
+  );
+  return (known?.form ?? medicineForm(line.medicineName)) === 'topical';
+}
+
+/** Every written line on one course (D6), its quantity following days × doses a day. */
+export function withRxDaysForAll(
+  items: readonly RxFormLine[],
+  days: number | null,
+): RxFormLine[] {
+  return items.map((item) =>
+    item.medicineName.trim() === ''
+      ? item
+      : { ...item, days, qty: rxQtyFor(item.dose, days) ?? item.qty },
+  );
+}
+
+/** The course every written line shares, or null when they differ (or none is written). */
+export function rxSharedDays(items: readonly RxFormLine[]): number | null {
+  const named = namedRxLines(items);
+  const days = named[0]?.days ?? null;
+  if (days === null) return null;
+  return named.every((item) => item.days === days) ? days : null;
+}
+
+/** Days typed into the Days box ("12", "12 days") — 1 to a year — or null. */
 export function rxTypedDays(text: string): number | null {
   const days = Number(/^\s*(\d{1,3})/.exec(text)?.[1] ?? 0);
   return days >= 1 && days <= RX_MAX_DAYS ? days : null;

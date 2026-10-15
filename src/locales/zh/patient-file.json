@@ -277,16 +277,11 @@
     "items": {
       "label": "药物",
       "medicine": "药物",
-      "dose": "剂量 · 早 中 晚",
-      "meal": "用餐",
       "where": "部位",
       "qty": "数量",
       "searchMedicine": "搜索药物",
       "addMedicine": "添加药物",
-      "use": "使用",
       "days": "天数",
-      "searchDays": "输入天数，例如 12",
-      "noDays": "不限天数",
       "groups": {
         "store": "本院药房",
         "outside": "院外药品"
@@ -303,7 +298,13 @@
       "toOutside": "改为院外药品",
       "toOutsideHint": "患者在别处购买；不从此处方销售",
       "toStore": "改用本院药房的",
-      "note": "备注 · 例如 薄涂一层、避免日晒"
+      "note": "备注 · 例如 薄涂一层、避免日晒",
+      "dose": "剂量",
+      "otherDays": "其他天数",
+      "otherDaysShort": "其他",
+      "when": "何时",
+      "morePlaces_other": "+ 另外 {{count}} 个",
+      "fewerPlaces": "收起"
     },
     "dose": {
       "group": "剂量 早 · 中 · 晚",
@@ -316,28 +317,12 @@
       "sosHint": "仅在需要时 (SOS)",
       "on": "{{time}} · {{taps}} — 点按取消",
       "off": "{{time}} — 点按设为 1",
-      "presets": "常用剂量",
-      "presetsHint": "常用剂量、按需服用或多于一片",
-      "presetNames": {
-        "morning": "早上",
-        "night": "晚上",
-        "twice": "每日两次",
-        "thrice": "每日三次",
-        "afternoon": "中午",
-        "sos": "需要时"
-      },
-      "counts": "每次片数",
-      "less": "少一片 · {{time}}",
-      "more": "多一片 · {{time}}",
-      "clear": "清除剂量"
+      "double": "×2",
+      "doubleHint": "每次两片"
     },
     "meal": {
-      "before": "饭前",
-      "after": "饭后",
       "beforeHint": "饭前",
-      "afterHint": "饭后",
-      "more": "更多时间",
-      "change": "{{timing}} · 更改"
+      "afterHint": "饭后"
     },
     "timings": {
       "empty_stomach": "空腹",
@@ -477,6 +462,9 @@
       "kept": "已知情保留，尽管对 {{allergies}} 过敏",
       "undo": "撤销",
       "held": "{{medicine}} 与过敏相符 — 请先保留或移除"
+    },
+    "allDays": {
+      "label": "全部药品"
     }
   },
   "treatment": {

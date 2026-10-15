@@ -297,16 +297,11 @@
     "items": {
       "label": "Medicamentos",
       "medicine": "Medicamento",
-      "dose": "Dosis · M T N",
-      "meal": "Comida",
       "where": "Dónde",
       "qty": "Cant.",
       "searchMedicine": "Buscar medicamento",
       "addMedicine": "Añadir medicamento",
-      "use": "Usar",
       "days": "Días",
-      "searchDays": "Escribe días, p. ej. 12",
-      "noDays": "Sin días",
       "groups": {
         "store": "En tu farmacia",
         "outside": "Medicamentos externos"
@@ -325,7 +320,15 @@
       "toOutside": "Escribir como medicamento externo",
       "toOutsideHint": "El paciente lo compra fuera; no se vende desde esta receta",
       "toStore": "Tomarlo de tu farmacia",
-      "note": "Observaciones · p. ej. capa fina, evitar el sol"
+      "note": "Observaciones · p. ej. capa fina, evitar el sol",
+      "dose": "Dosis",
+      "otherDays": "Otro número de días",
+      "otherDaysShort": "Otro",
+      "when": "Cuándo",
+      "morePlaces_one": "+ {{count}} más",
+      "morePlaces_many": "+ {{count}} más",
+      "morePlaces_other": "+ {{count}} más",
+      "fewerPlaces": "Menos"
     },
     "dose": {
       "group": "Dosis mañana · tarde · noche",
@@ -338,28 +341,12 @@
       "sosHint": "Solo si es necesario (SOS)",
       "on": "{{time}} · {{taps}} — toca para quitar",
       "off": "{{time}} — toca para 1",
-      "presets": "Dosis habituales",
-      "presetsHint": "Dosis habituales, SOS o más de una pastilla",
-      "presetNames": {
-        "morning": "Mañana",
-        "night": "Noche",
-        "twice": "Dos veces al día",
-        "thrice": "Tres veces al día",
-        "afternoon": "Tarde",
-        "sos": "Si es necesario"
-      },
-      "counts": "Pastillas cada vez",
-      "less": "Una menos · {{time}}",
-      "more": "Una más · {{time}}",
-      "clear": "Borrar la dosis"
+      "double": "×2",
+      "doubleHint": "Dos comprimidos cada vez"
     },
     "meal": {
-      "before": "Antes",
-      "after": "Después",
       "beforeHint": "Antes de comer",
-      "afterHint": "Después de comer",
-      "more": "Más horarios",
-      "change": "{{timing}} · cambiar"
+      "afterHint": "Después de comer"
     },
     "timings": {
       "empty_stomach": "En ayunas",
@@ -513,6 +500,9 @@
       "kept": "Mantenido a sabiendas pese a la alergia a {{allergies}}",
       "undo": "Deshacer",
       "held": "{{medicine}} coincide con una alergia: mantenlo o quítalo primero"
+    },
+    "allDays": {
+      "label": "Todos los medicamentos"
     }
   },
   "treatment": {

@@ -590,53 +590,132 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     expect(trigger()).toHaveAttribute('data-source', 'stocked');
   });
 
-  it('toggles a time in one tap, sets a common dose from the ⌄, and days fill the quantity', async () => {
+  it('sets the dose, ×2, days and when with one click each — no dropdown', async () => {
     rxWorld.medicines = [SEPTRAN];
     const { user, drawer } = await openNew();
     await quickAdd(user, drawer, 'septran');
     const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
-    const tap = (time: string) => within(row).getByTestId(`rx-items-dose-${time}`);
-    await user.click(tap('morning'));
-    expect(tap('morning')).toHaveAttribute('aria-pressed', 'true');
-    await user.click(tap('morning'));
-    expect(tap('morning')).toHaveAttribute('aria-pressed', 'false');
+    const chip = (id: string) => within(row).getByTestId(`rx-items-${id}`);
+    await user.click(chip('dose-morning'));
+    expect(chip('dose-morning')).toHaveAttribute('aria-pressed', 'true');
+    await user.click(chip('dose-morning'));
+    expect(chip('dose-morning')).toHaveAttribute('aria-pressed', 'false');
+    expect(within(row).queryByTestId('rx-items-dose-double')).toBeNull();
 
-    await user.click(within(row).getByTestId('rx-items-dose-presets'));
-    await user.click(await screen.findByTestId('rx-items-dose-preset-twice'));
-    expect(tap('morning')).toHaveAttribute('aria-pressed', 'true');
-    expect(tap('afternoon')).toHaveAttribute('aria-pressed', 'false');
-    expect(tap('night')).toHaveAttribute('aria-pressed', 'true');
+    await user.click(chip('dose-morning'));
+    await user.click(chip('dose-night'));
+    expect(chip('dose-night')).toHaveAttribute('aria-pressed', 'true');
+    await user.click(chip('days-10'));
+    expect(chip('days-10')).toHaveAttribute('aria-pressed', 'true');
+    expect(chip('qty')).toHaveValue('20');
 
-    await user.click(within(row).getByTestId('rx-items-days'));
-    await user.click(await screen.findByTestId('rx-items-days-option-10'));
-    expect(within(row).getByTestId('rx-items-days')).toHaveTextContent('10 days');
-    expect(within(row).getByTestId('rx-items-qty')).toHaveValue('20');
+    await user.click(chip('dose-double'));
+    expect(chip('dose-double')).toHaveAttribute('aria-pressed', 'true');
+    expect(chip('dose-night')).toHaveAccessibleName('Night · 2');
+    expect(chip('qty')).toHaveValue('40');
 
-    await user.click(within(row).getByTestId('rx-items-dose-presets'));
-    await user.click(await screen.findByTestId('rx-items-dose-night-more'));
-    expect(screen.getByTestId('rx-items-dose-night-count')).toHaveTextContent('2');
-    await user.keyboard('{Escape}');
-    expect(within(row).getByTestId('rx-items-qty')).toHaveValue('30');
+    // A second click clears; the box takes a course the chips lack.
+    await user.click(chip('days-10'));
+    expect(chip('days-10')).toHaveAttribute('aria-pressed', 'false');
+    await user.type(chip('days-other'), '12');
+    expect(chip('days-other')).toHaveValue('12');
+    expect(chip('qty')).toHaveValue('48');
 
-    // "No days" clears the course; a typed number sets one the list lacks.
-    await user.click(within(row).getByTestId('rx-items-days'));
-    await user.click(await screen.findByTestId('rx-items-days-option-none'));
-    expect(within(row).getByTestId('rx-items-days')).toHaveTextContent('Days');
-    await user.click(within(row).getByTestId('rx-items-days'));
-    await user.type(await screen.findByTestId('rx-items-days-search'), '10');
-    await user.click(await screen.findByTestId('rx-items-days-create'));
-    expect(within(row).getByTestId('rx-items-days')).toHaveTextContent('10 days');
+    // A tablet's When is the meal.
+    expect(
+      within(chip('when'))
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['Before meal', 'After meal', 'Empty stomach', 'With meal']);
+    await user.click(chip('when-after'));
+    expect(chip('when-after')).toHaveAttribute('aria-pressed', 'true');
+    expect(within(row).queryByTestId('rx-items-where')).toBeNull();
 
     await user.click(within(drawer).getByTestId('rx-drawer-save'));
     await waitFor(() => expect(rxServerApi.createPrescription).toHaveBeenCalled());
     expect(
       rxServerApi.createPrescription.mock.lastCall?.[0].fields.items[0],
     ).toMatchObject({
-      doseMorning: 1,
+      doseMorning: 2,
       doseNight: 2,
-      qty: 30,
-      remarks: '10 days',
+      meal: 'after',
+      qty: 48,
+      remarks: '12 days',
     });
+  });
+
+  it('gives a skin medicine its timings and places, with + more in place', async () => {
+    rxWorld.medicines = [GLYCOLAC];
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'glyco');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    const when = within(row).getByTestId('rx-items-when');
+    expect(
+      within(when)
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual([
+      'Night',
+      'Morning',
+      'Morning & night',
+      'Alternate days',
+      'Thrice a week',
+      'Once a week',
+    ]);
+    const where = within(row).getByTestId('rx-items-where');
+    expect(within(where).queryByTestId('rx-items-where-neck')).toBeNull();
+    await user.click(within(where).getByTestId('rx-items-where-more'));
+    await user.click(within(where).getByTestId('rx-items-where-neck'));
+    expect(within(where).getByTestId('rx-items-where-neck')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await user.click(within(where).getByTestId('rx-items-where-more'));
+    // A place beyond the five stays in sight, lit, once they close again.
+    expect(within(where).getByTestId('rx-items-where-neck')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  it('puts every line on the same course in one click', async () => {
+    rxWorld.medicines = [SEPTRAN, GLYCOLAC];
+    const { user, drawer } = await openNew();
+    expect(within(drawer).queryByTestId('rx-items-all-days')).toBeNull();
+    await quickAdd(user, drawer, 'septran bd');
+    await quickAdd(user, drawer, 'glyco');
+    await user.click(within(drawer).getByTestId('rx-items-all-days-14'));
+    for (const row of within(drawer).getAllByTestId('rx-items-row')) {
+      expect(within(row).getByTestId('rx-items-days-14')).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+    }
+    expect(within(drawer).getByTestId('rx-items-all-days-14')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(
+      within(within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement).getByTestId(
+        'rx-items-qty',
+      ),
+    ).toHaveValue('28');
+  });
+
+  it('makes each chip group one Tab stop, the arrow keys moving within it', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran bd');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    const dose = within(row).getByTestId('rx-items-dose');
+    const chips = within(dose).getAllByRole('button');
+    // The lit chip holds the group's one stop.
+    expect(chips.map((chip) => chip.tabIndex)).toEqual([0, -1, -1, -1, -1]);
+    chips[0]?.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(chips[1]).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(within(dose).getByTestId('rx-items-dose-sos')).toHaveFocus();
   });
 
   it('steps through the earlier prescriptions and adds their lines', async () => {
@@ -695,9 +774,9 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     expect(notifyMock.success).toHaveBeenCalledWith('2 medicines added');
     const rows = within(drawer).getAllByTestId('rx-items-row');
     expect(rows).toHaveLength(3);
-    expect(within(rows[1] as HTMLElement).getByTestId('rx-items-days')).toHaveTextContent(
-      '30 days',
-    );
+    expect(
+      within(rows[1] as HTMLElement).getByTestId('rx-items-days-30'),
+    ).toHaveAttribute('aria-pressed', 'true');
     expect(within(earlier).getAllByTestId('rx-sidekick-earlier-held')).toHaveLength(2);
   });
 

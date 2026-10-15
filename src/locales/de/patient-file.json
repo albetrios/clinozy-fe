@@ -287,16 +287,11 @@
     "items": {
       "label": "Medikamente",
       "medicine": "Medikament",
-      "dose": "Dosis · M M A",
-      "meal": "Mahlzeit",
       "where": "Wo",
       "qty": "Menge",
       "searchMedicine": "Medikament suchen",
       "addMedicine": "Medikament hinzufügen",
-      "use": "Übernehmen",
       "days": "Tage",
-      "searchDays": "Tage eingeben, z. B. 12",
-      "noDays": "Keine Tage",
       "groups": {
         "store": "In Ihrer Apotheke",
         "outside": "Externe Medikamente"
@@ -314,7 +309,14 @@
       "toOutside": "Als externes Medikament schreiben",
       "toOutsideHint": "Der Patient kauft es anderswo; es wird nicht über dieses Rezept verkauft",
       "toStore": "Aus Ihrer Apotheke nehmen",
-      "note": "Hinweise · z. B. dünn auftragen, Sonne meiden"
+      "note": "Hinweise · z. B. dünn auftragen, Sonne meiden",
+      "dose": "Dosis",
+      "otherDays": "Andere Anzahl Tage",
+      "otherDaysShort": "Andere",
+      "when": "Wann",
+      "morePlaces_one": "+ {{count}} weitere",
+      "morePlaces_other": "+ {{count}} weitere",
+      "fewerPlaces": "Weniger"
     },
     "dose": {
       "group": "Dosis morgens · mittags · abends",
@@ -327,28 +329,12 @@
       "sosHint": "Nur bei Bedarf (SOS)",
       "on": "{{time}} · {{taps}} — tippen zum Entfernen",
       "off": "{{time}} — tippen für 1",
-      "presets": "Übliche Dosierungen",
-      "presetsHint": "Übliche Dosierungen, SOS oder mehr als eine Tablette",
-      "presetNames": {
-        "morning": "Morgens",
-        "night": "Abends",
-        "twice": "Zweimal täglich",
-        "thrice": "Dreimal täglich",
-        "afternoon": "Mittags",
-        "sos": "Bei Bedarf"
-      },
-      "counts": "Tabletten pro Einnahme",
-      "less": "Eine weniger · {{time}}",
-      "more": "Eine mehr · {{time}}",
-      "clear": "Dosis löschen"
+      "double": "×2",
+      "doubleHint": "Zwei Tabletten pro Einnahme"
     },
     "meal": {
-      "before": "Vorher",
-      "after": "Nachher",
       "beforeHint": "Vor dem Essen",
-      "afterHint": "Nach dem Essen",
-      "more": "Weitere Zeitpunkte",
-      "change": "{{timing}} · ändern"
+      "afterHint": "Nach dem Essen"
     },
     "timings": {
       "empty_stomach": "Auf nüchternen Magen",
@@ -495,6 +481,9 @@
       "kept": "Bewusst behalten trotz Allergie gegen {{allergies}}",
       "undo": "Rückgängig",
       "held": "{{medicine}} passt zu einer Allergie — erst behalten oder entfernen"
+    },
+    "allDays": {
+      "label": "Alle Medikamente"
     }
   },
   "treatment": {

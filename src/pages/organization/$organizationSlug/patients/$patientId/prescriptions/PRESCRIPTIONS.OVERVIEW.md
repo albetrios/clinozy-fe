@@ -28,18 +28,22 @@ the Patients room's row action (feat-prescription-composer).
   Remove and Keep — no dialog. A save with a warning not yet answered opens Medicines, brings the warning into view
   and focuses Keep (change-prescription-writing D7); Keep is one tap, it never blocks.
 
-## The medicine rows (change-prescription-writing)
+## The medicine rows (change-prescription-writing, change-prescription-one-click)
 
 - **Store or outside** (`components/PrescriptionDrawer/rx-medicine-cell.tsx`): the trigger names the medicine and its
   source — the store's stock (sage), out of stock (blush), or Outside (slate, a name written as text, `medicine_id`
   none). The list groups "In your medical store" and "Outside medicines"; a new name is an outside medicine; the
   list's footer switches the line store ↔ outside.
-- **Dose** (`components/PrescriptionDrawer/rx-item-cells.tsx`): Morning · Afternoon · Night toggle with one tap; the ⌄
-  holds the common doses in words, SOS, and a − / + per time for more than one tablet.
+- **One click, no dropdown** (change-prescription-one-click; `components/PrescriptionDrawer/rx-item-cells.tsx`): every
+  everyday choice is a visible chip, a second click clears it. Line 1 — Medicine · **Dose** (Morning · Afternoon ·
+  Night, ×2 for two tablets at each lit time, SOS) · Qty. Under it, through `ItemsField`'s `rowDetail`, the rail:
+  **Days** (5 · 7 · 10 · 14 · 30 · 60 and a number box), **When** (a tablet's meal, or a skin medicine's time of day
+  and how often — `rxIsSkinLine`) and **Where** for a skin medicine (five places, "+ more" in place). "All
+  medicines" above the lines sets one course on every line. Each chip group is an ARIA toolbar — one Tab stop, the
+  arrow keys within; chips are 44px on a touch screen.
 - **Days**: a line's own `days` (the form's — the wire keeps them first in `remarks`, "7 days · …", split on open and
-  joined on save, `components/PrescriptionDrawer/rx-form.ts` `rxSplitDays` / `rxRemarksOf`); the shared Picker with the usual courses or a typed
-  number; the quantity follows days × doses a day.
-- **Touch**: on a coarse pointer the row's taps and buttons are 36px.
+  joined on save, `components/PrescriptionDrawer/rx-form.ts` `rxSplitDays` / `rxRemarksOf`); the quantity follows
+  days × doses a day.
 - **Earlier prescriptions** (the sidekick): the patient's other prescriptions one at a time with ‹ ›, each line in plain
   words with + Add (or "In this Rx"), Add all, and the advice.
 

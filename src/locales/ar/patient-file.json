@@ -327,16 +327,11 @@
     "items": {
       "label": "الأدوية",
       "medicine": "الدواء",
-      "dose": "الجرعة · ص ظ ل",
-      "meal": "الوجبة",
       "where": "المكان",
       "qty": "الكمية",
       "searchMedicine": "ابحث عن دواء",
       "addMedicine": "إضافة دواء",
-      "use": "استخدام",
       "days": "الأيام",
-      "searchDays": "اكتب الأيام، مثلًا 12",
-      "noDays": "بلا أيام",
       "groups": {
         "store": "في صيدليتك",
         "outside": "أدوية من الخارج"
@@ -358,7 +353,18 @@
       "toOutside": "اكتبه كدواء من الخارج",
       "toOutsideHint": "يشتريه المريض من مكان آخر؛ لا يُباع من هذه الوصفة",
       "toStore": "خذه من صيدليتك",
-      "note": "ملاحظات · مثل طبقة رقيقة، تجنّب الشمس"
+      "note": "ملاحظات · مثل طبقة رقيقة، تجنّب الشمس",
+      "dose": "الجرعة",
+      "otherDays": "عدد أيام آخر",
+      "otherDaysShort": "آخر",
+      "when": "متى",
+      "morePlaces_zero": "+ {{count}} أخرى",
+      "morePlaces_one": "+ {{count}} أخرى",
+      "morePlaces_two": "+ {{count}} أخرى",
+      "morePlaces_few": "+ {{count}} أخرى",
+      "morePlaces_many": "+ {{count}} أخرى",
+      "morePlaces_other": "+ {{count}} أخرى",
+      "fewerPlaces": "أقل"
     },
     "dose": {
       "group": "الجرعة صباحًا · ظهرًا · ليلًا",
@@ -371,28 +377,12 @@
       "sosHint": "عند الحاجة فقط (SOS)",
       "on": "{{time}} · {{taps}} — المس للإزالة",
       "off": "{{time}} — المس لـ 1",
-      "presets": "جرعات شائعة",
-      "presetsHint": "جرعات شائعة، أو عند الحاجة، أو أكثر من قرص",
-      "presetNames": {
-        "morning": "صباحًا",
-        "night": "ليلًا",
-        "twice": "مرتين يوميًا",
-        "thrice": "ثلاث مرات يوميًا",
-        "afternoon": "ظهرًا",
-        "sos": "عند الحاجة"
-      },
-      "counts": "الأقراص في كل مرة",
-      "less": "أقل بواحد · {{time}}",
-      "more": "أكثر بواحد · {{time}}",
-      "clear": "امسح الجرعة"
+      "double": "×2",
+      "doubleHint": "قرصان في كل مرة"
     },
     "meal": {
-      "before": "قبل",
-      "after": "بعد",
       "beforeHint": "قبل الأكل",
-      "afterHint": "بعد الأكل",
-      "more": "توقيتات أخرى",
-      "change": "{{timing}} · تغيير"
+      "afterHint": "بعد الأكل"
     },
     "timings": {
       "empty_stomach": "على معدة فارغة",
@@ -567,6 +557,9 @@
       "kept": "أُبقي عن علم رغم حساسية {{allergies}}",
       "undo": "تراجع",
       "held": "{{medicine}} يطابق حساسية — أبقِه أو أزله أولًا"
+    },
+    "allDays": {
+      "label": "كل الأدوية"
     }
   },
   "treatment": {

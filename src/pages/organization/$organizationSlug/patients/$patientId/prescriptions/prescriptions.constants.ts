@@ -58,18 +58,21 @@ export const RX_KEYS = {
     label: 'rx.items.label',
     medicine: 'rx.items.medicine',
     dose: 'rx.items.dose',
-    meal: 'rx.items.meal',
     where: 'rx.items.where',
     qty: 'rx.items.qty',
     searchMedicine: 'rx.items.searchMedicine',
     addMedicine: 'rx.items.addMedicine',
-    use: 'rx.items.use',
     note: 'rx.items.note',
     /** The Days cell (change-prescription-writing D6): its header and its search. */
     days: 'rx.items.days',
-    searchDays: 'rx.items.searchDays',
-    /** The Days list's first row once a course is set. */
-    noDays: 'rx.items.noDays',
+    /** The Days box (change-prescription-one-click D6): its name and its short placeholder. */
+    otherDays: 'rx.items.otherDays',
+    otherDaysShort: 'rx.items.otherDaysShort',
+    /** The When chips' group. */
+    when: 'rx.items.when',
+    /** "+ 9 more" / "Fewer" — the Where chips beyond the usual five. */
+    morePlaces: 'rx.items.morePlaces',
+    fewerPlaces: 'rx.items.fewerPlaces',
     /** The medicine list's groups (D4). */
     groups: {
       store: 'rx.items.groups.store',
@@ -106,31 +109,13 @@ export const RX_KEYS = {
     off: 'rx.dose.off',
     sos: 'rx.dose.sos',
     sosHint: 'rx.dose.sosHint',
-    /** The ⌄ beside the taps (D5): its name, its two headings, the presets' words. */
-    presets: 'rx.dose.presets',
-    presetsHint: 'rx.dose.presetsHint',
-    presetNames: {
-      morning: 'rx.dose.presetNames.morning',
-      night: 'rx.dose.presetNames.night',
-      twice: 'rx.dose.presetNames.twice',
-      thrice: 'rx.dose.presetNames.thrice',
-      afternoon: 'rx.dose.presetNames.afternoon',
-      sos: 'rx.dose.presetNames.sos',
-    },
-    counts: 'rx.dose.counts',
-    /** "One less · Morning" / "One more · Morning". */
-    less: 'rx.dose.less',
-    more: 'rx.dose.more',
-    clear: 'rx.dose.clear',
+    /** ×2 (change-prescription-one-click D4): two tablets at each lit time. */
+    double: 'rx.dose.double',
+    doubleHint: 'rx.dose.doubleHint',
   },
   meal: {
-    before: 'rx.meal.before',
-    after: 'rx.meal.after',
     beforeHint: 'rx.meal.beforeHint',
     afterHint: 'rx.meal.afterHint',
-    more: 'rx.meal.more',
-    /** "Morning & night · change". */
-    change: 'rx.meal.change',
   },
   timings: {
     empty_stomach: 'rx.timings.empty_stomach',
@@ -275,6 +260,8 @@ export const RX_KEYS = {
     sos: 'rx.plain.sos',
     total: 'rx.plain.total',
   },
+  /** "All medicines: 5 · 7 · 10 days" — one course for every line (change-prescription-one-click D6). */
+  allDays: { label: 'rx.allDays.label' },
   /** The allergy warning under a matching row (change-prescription-writing D7). */
   rowAllergy: {
     /** "Allergic to Sulfa drugs". */

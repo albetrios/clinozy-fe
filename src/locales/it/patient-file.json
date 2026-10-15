@@ -297,16 +297,11 @@
     "items": {
       "label": "Farmaci",
       "medicine": "Farmaco",
-      "dose": "Dose · M P S",
-      "meal": "Pasto",
       "where": "Dove",
       "qty": "Qtà",
       "searchMedicine": "Cerca farmaco",
       "addMedicine": "Aggiungi farmaco",
-      "use": "Usa",
       "days": "Giorni",
-      "searchDays": "Digita i giorni, es. 12",
-      "noDays": "Nessun giorno",
       "groups": {
         "store": "Nella tua farmacia",
         "outside": "Farmaci esterni"
@@ -325,7 +320,15 @@
       "toOutside": "Scrivi come farmaco esterno",
       "toOutsideHint": "Il paziente lo compra altrove; non viene venduto da questa ricetta",
       "toStore": "Prendilo dalla tua farmacia",
-      "note": "Note · es. strato sottile, evitare il sole"
+      "note": "Note · es. strato sottile, evitare il sole",
+      "dose": "Dose",
+      "otherDays": "Altro numero di giorni",
+      "otherDaysShort": "Altro",
+      "when": "Quando",
+      "morePlaces_one": "+ altro {{count}}",
+      "morePlaces_many": "+ altri {{count}}",
+      "morePlaces_other": "+ altri {{count}}",
+      "fewerPlaces": "Meno"
     },
     "dose": {
       "group": "Dose mattina · pomeriggio · sera",
@@ -338,28 +341,12 @@
       "sosHint": "Solo al bisogno (SOS)",
       "on": "{{time}} · {{taps}} — tocca per togliere",
       "off": "{{time}} — tocca per 1",
-      "presets": "Dosi abituali",
-      "presetsHint": "Dosi abituali, SOS o più di una compressa",
-      "presetNames": {
-        "morning": "Mattina",
-        "night": "Sera",
-        "twice": "Due volte al giorno",
-        "thrice": "Tre volte al giorno",
-        "afternoon": "Pomeriggio",
-        "sos": "Al bisogno"
-      },
-      "counts": "Compresse ogni volta",
-      "less": "Una in meno · {{time}}",
-      "more": "Una in più · {{time}}",
-      "clear": "Cancella la dose"
+      "double": "×2",
+      "doubleHint": "Due compresse ogni volta"
     },
     "meal": {
-      "before": "Prima",
-      "after": "Dopo",
       "beforeHint": "Prima dei pasti",
-      "afterHint": "Dopo i pasti",
-      "more": "Altri orari",
-      "change": "{{timing}} · cambia"
+      "afterHint": "Dopo i pasti"
     },
     "timings": {
       "empty_stomach": "A stomaco vuoto",
@@ -513,6 +500,9 @@
       "kept": "Tenuto consapevolmente nonostante l’allergia a {{allergies}}",
       "undo": "Annulla",
       "held": "{{medicine}} corrisponde a un’allergia: prima tienilo o rimuovilo"
+    },
+    "allDays": {
+      "label": "Tutti i farmaci"
     }
   },
   "treatment": {

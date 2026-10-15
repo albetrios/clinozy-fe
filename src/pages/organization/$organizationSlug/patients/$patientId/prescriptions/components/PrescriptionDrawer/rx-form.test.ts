@@ -10,28 +10,32 @@ import {
   initialRxForm,
   namedRxLines,
   newRxForm,
-  RX_DAY_PRESETS,
-  RX_DOSE_PRESETS,
-  RX_MAX_TAP,
+  RX_DAY_CHIPS,
+  RX_MOUTH_WHEN,
+  RX_SKIN_WHEN,
   rxCountOf,
   rxDaysIn,
   rxDoseOf,
+  rxDoubledDose,
   rxFieldsOf,
   rxFormLineOf,
   rxFormOf,
   rxFormWithMedicines,
+  rxIsDoubled,
+  rxIsSkinLine,
   rxItemOf,
   rxLineFor,
   rxLineSource,
   rxQtyFor,
   rxRemarksOf,
+  rxSharedDays,
   rxSplitDays,
-  rxSteppedDose,
   rxStoreMedicineFor,
   rxToggledDose,
   rxTypedDays,
   steppedRxLines,
   typedValue,
+  withRxDaysForAll,
   withRxLine,
 } from './rx-form.ts';
 
@@ -270,12 +274,12 @@ describe('a line’s days (change-prescription-writing D3)', () => {
     expect(rxTypedDays('0')).toBeNull();
     expect(rxTypedDays('400')).toBeNull();
     expect(rxTypedDays('days')).toBeNull();
-    expect(RX_DAY_PRESETS).toContain(7);
+    expect(RX_DAY_CHIPS).toEqual([5, 7, 10, 14, 30, 60]);
   });
 });
 
-describe('the dose taps and the ⌄ (change-prescription-writing D5)', () => {
-  it('toggles a time on and off with one tap, from any count or SOS', () => {
+describe('the dose chips (change-prescription-one-click D4)', () => {
+  it('toggles a time on and off with one click, from any count or SOS', () => {
     expect(rxToggledDose('', 0)).toBe('1-0-0');
     expect(rxToggledDose('1-0-0', 2)).toBe('1-0-1');
     expect(rxToggledDose('1-0-1', 0)).toBe('0-0-1');
@@ -283,12 +287,66 @@ describe('the dose taps and the ⌄ (change-prescription-writing D5)', () => {
     expect(rxToggledDose('sos', 1)).toBe('0-1-0');
   });
 
-  it('steps one time’s tablets between none and the most', () => {
-    expect(rxSteppedDose('1-0-1', 0, 1)).toBe('2-0-1');
-    expect(rxSteppedDose('1-0-0', 0, -1)).toBe('');
-    expect(rxSteppedDose('sos', 2, 1)).toBe('0-0-1');
-    expect(rxSteppedDose(`${RX_MAX_TAP}-0-0`, 0, 1)).toBe(`${RX_MAX_TAP}-0-0`);
-    expect(RX_DOSE_PRESETS.map((preset) => preset.value)).toContain('sos');
+  it('lights a new time with as many tablets as the lit ones take', () => {
+    expect(rxToggledDose('2-0-0', 2)).toBe('2-0-2');
+  });
+
+  it('doubles every lit time with ×2, and halves it back', () => {
+    expect(rxDoubledDose('1-0-1')).toBe('2-0-2');
+    expect(rxDoubledDose('2-0-2')).toBe('1-0-1');
+    expect(rxDoubledDose('2-0-1')).toBe('1-0-1');
+    expect(rxDoubledDose('sos')).toBe('sos');
+    expect(rxDoubledDose('')).toBe('');
+    expect(rxIsDoubled('1-0-2')).toBe(true);
+    expect(rxIsDoubled('1-0-1')).toBe(false);
+    expect(rxIsDoubled('sos')).toBe(false);
+  });
+});
+
+describe('the chips that fit a medicine (change-prescription-one-click D5)', () => {
+  const medicines = [
+    { name: 'Glycolac Cream', medicineId: 'med_glyco', form: 'topical' as const },
+    { name: 'Doxycycline 100', medicineId: 'med_doxy', form: 'oral' as const },
+  ];
+  const line = (medicineName: string, medicineId: string | null = null) => ({
+    medicineName,
+    medicineId,
+  });
+
+  it('reads the store’s form, else the name', () => {
+    expect(rxIsSkinLine(line('Glycolac Cream', 'med_glyco'), medicines)).toBe(true);
+    expect(rxIsSkinLine(line('Doxycycline 100', 'med_doxy'), medicines)).toBe(false);
+    expect(rxIsSkinLine(line('Kojic gel'), medicines)).toBe(true);
+    expect(rxIsSkinLine(line('Septran DS'), medicines)).toBe(false);
+  });
+
+  it('offers the meal to a tablet and the time of day to the skin', () => {
+    expect(RX_MOUTH_WHEN).toContain('after');
+    expect(RX_SKIN_WHEN).toContain('night');
+    expect(RX_SKIN_WHEN).not.toContain('after');
+  });
+});
+
+describe('the same days for every line (change-prescription-one-click D6)', () => {
+  const doxy = { ...emptyRxLine(), medicineName: 'Doxy', dose: '1-0-1', qty: 3 };
+  const gel = { ...emptyRxLine(), medicineName: 'Gel', dose: '', qty: 1 };
+
+  it('sets the course on every written line, the quantity following', () => {
+    const lines = withRxDaysForAll([doxy, gel, emptyRxLine()], 7);
+    expect(lines[0]).toMatchObject({ days: 7, qty: 14 });
+    expect(lines[1]).toMatchObject({ days: 7, qty: 1 });
+    expect(lines[2]).toEqual(emptyRxLine());
+  });
+
+  it('names the course the written lines share, else none', () => {
+    expect(rxSharedDays(withRxDaysForAll([doxy, gel], 10))).toBe(10);
+    expect(
+      rxSharedDays([
+        { ...doxy, days: 5 },
+        { ...gel, days: 7 },
+      ]),
+    ).toBeNull();
+    expect(rxSharedDays([emptyRxLine()])).toBeNull();
   });
 });
 

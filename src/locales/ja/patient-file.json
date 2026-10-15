@@ -277,16 +277,11 @@
     "items": {
       "label": "薬",
       "medicine": "薬",
-      "dose": "用量 · 朝 昼 夜",
-      "meal": "食事",
       "where": "部位",
       "qty": "数量",
       "searchMedicine": "薬を検索",
       "addMedicine": "薬を追加",
-      "use": "使用",
       "days": "日数",
-      "searchDays": "日数を入力 (例: 12)",
-      "noDays": "日数なし",
       "groups": {
         "store": "院内の薬局",
         "outside": "院外の薬"
@@ -303,7 +298,13 @@
       "toOutside": "院外の薬として書く",
       "toOutsideHint": "患者が別の場所で購入します。この処方から販売されません",
       "toStore": "院内の薬局のものにする",
-      "note": "メモ · 例: 薄く塗る、日光を避ける"
+      "note": "メモ · 例: 薄く塗る、日光を避ける",
+      "dose": "用量",
+      "otherDays": "その他の日数",
+      "otherDaysShort": "その他",
+      "when": "いつ",
+      "morePlaces_other": "+ ほか {{count}} 件",
+      "fewerPlaces": "少なく表示"
     },
     "dose": {
       "group": "用量 朝 · 昼 · 夜",
@@ -316,28 +317,12 @@
       "sosHint": "必要なときのみ (SOS)",
       "on": "{{time}} · {{taps}} — タップで外す",
       "off": "{{time}} — タップで 1",
-      "presets": "よく使う用量",
-      "presetsHint": "よく使う用量、頓用、または2錠以上",
-      "presetNames": {
-        "morning": "朝",
-        "night": "夜",
-        "twice": "1日2回",
-        "thrice": "1日3回",
-        "afternoon": "昼",
-        "sos": "必要時"
-      },
-      "counts": "1回の錠数",
-      "less": "1つ減らす · {{time}}",
-      "more": "1つ増やす · {{time}}",
-      "clear": "用量を消す"
+      "double": "×2",
+      "doubleHint": "毎回2錠"
     },
     "meal": {
-      "before": "食前",
-      "after": "食後",
       "beforeHint": "食前",
-      "afterHint": "食後",
-      "more": "ほかのタイミング",
-      "change": "{{timing}} · 変更"
+      "afterHint": "食後"
     },
     "timings": {
       "empty_stomach": "空腹時",
@@ -477,6 +462,9 @@
       "kept": "{{allergies}} アレルギーを承知の上で残しました",
       "undo": "元に戻す",
       "held": "{{medicine}} がアレルギーに該当します — 先に残すか削除してください"
+    },
+    "allDays": {
+      "label": "すべての薬"
     }
   },
   "treatment": {

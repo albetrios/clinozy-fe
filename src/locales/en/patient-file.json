@@ -287,16 +287,11 @@
     "items": {
       "label": "Medicines",
       "medicine": "Medicine",
-      "dose": "Dose · M A N",
-      "meal": "Meal",
       "where": "Where",
       "qty": "Qty",
       "searchMedicine": "Search medicine",
       "addMedicine": "Add medicine",
-      "use": "Use",
       "days": "Days",
-      "searchDays": "Type days, e.g. 12",
-      "noDays": "No days",
       "groups": {
         "store": "In your medical store",
         "outside": "Outside medicines"
@@ -314,7 +309,14 @@
       "toOutside": "Write as an outside medicine",
       "toOutsideHint": "The patient buys it elsewhere; it is not sold from this prescription",
       "toStore": "Take it from your medical store",
-      "note": "Remarks · e.g. apply thin layer, avoid sun"
+      "note": "Remarks · e.g. apply thin layer, avoid sun",
+      "dose": "Dose",
+      "otherDays": "Other number of days",
+      "otherDaysShort": "Other",
+      "when": "When",
+      "morePlaces_one": "+ {{count}} more",
+      "morePlaces_other": "+ {{count}} more",
+      "fewerPlaces": "Fewer"
     },
     "dose": {
       "group": "Dose morning · afternoon · night",
@@ -327,28 +329,12 @@
       "sosHint": "Only when needed (SOS)",
       "on": "{{time}} · {{taps}} — tap to turn off",
       "off": "{{time}} — tap for 1",
-      "presets": "Common doses",
-      "presetsHint": "Common doses, SOS, or more than one tablet",
-      "presetNames": {
-        "morning": "Morning",
-        "night": "Night",
-        "twice": "Twice a day",
-        "thrice": "Thrice a day",
-        "afternoon": "Afternoon",
-        "sos": "When needed"
-      },
-      "counts": "Tablets each time",
-      "less": "One less · {{time}}",
-      "more": "One more · {{time}}",
-      "clear": "Clear the dose"
+      "double": "×2",
+      "doubleHint": "Two tablets at each time"
     },
     "meal": {
-      "before": "Before",
-      "after": "After",
       "beforeHint": "Before meal",
-      "afterHint": "After meal",
-      "more": "More timings",
-      "change": "{{timing}} · change"
+      "afterHint": "After meal"
     },
     "timings": {
       "empty_stomach": "Empty stomach",
@@ -495,6 +481,9 @@
       "kept": "Kept knowingly despite the {{allergies}} allergy",
       "undo": "Undo",
       "held": "{{medicine}} matches an allergy — keep it or remove it first"
+    },
+    "allDays": {
+      "label": "All medicines"
     }
   },
   "treatment": {

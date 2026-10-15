@@ -333,6 +333,14 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── change-prescription-one-click-2026-10-15-jzxk/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── change-prescription-writing-2026-10-15-wmdt/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
