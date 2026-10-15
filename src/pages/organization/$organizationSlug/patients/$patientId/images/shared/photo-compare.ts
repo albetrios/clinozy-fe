@@ -1,10 +1,23 @@
 import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts';
-
-/** The comparison's layouts: every photo in one row, or a grid of rows. */
-export type PhotoCompareLayout = 'row' | 'grid';
+import type {
+  PhotoCompareLayout,
+  PhotoCompareZoom,
+} from '@/shared/store/useDevicePrefsStore/index.ts';
 
 /** The comparison's layouts, in the switch's order. */
 export const PHOTO_COMPARE_LAYOUTS: readonly PhotoCompareLayout[] = ['row', 'grid'];
+
+/** The comparison's zoom modes, in the switch's order (change-photo-compare-zoom D6–D7). */
+export const PHOTO_COMPARE_ZOOMS: readonly PhotoCompareZoom[] = ['linked', 'separate'];
+
+/**
+ * The key a comparison is remembered under (change-photo-compare-zoom D9): its
+ * photo ids sorted, so the same photos — in any order, from any selection —
+ * reopen as they were left.
+ */
+export function photoCompareKey(ids: readonly string[]): string {
+  return [...ids].sort((a, b) => a.localeCompare(b)).join(',');
+}
 
 /** Up to this many photos open in one row; more open as a grid (`BRIEF.md:41–42`). */
 const ROW_MOST = 4;

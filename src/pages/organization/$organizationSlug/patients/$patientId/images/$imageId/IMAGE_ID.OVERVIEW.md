@@ -27,7 +27,8 @@ viewer leaves once it lands.
 made on every read (`../../shared/components/PhotoThumb/`, `object-contain`) — and zooms 100–600%:
 the bar's zoom group (− · the level, which resets · +), the wheel (×1.12 a notch), a double-click
 (100% ↔ 200%), a pinch, the `+ − 0` keys; a drag pans once zoomed and a swipe browses on touch
-(`../shared/hooks/usePhotoZoom/` — the Photos family's, the comparison zooms with it too), with
+(`../shared/hooks/usePhotoZoom/` — the Photos family's, here with one photo; the comparison zooms
+many with it), with
 the hints for them; the round buttons and the zoom group are the family's
 `../shared/components/PhotoChrome/`. A photo whose upload is gone — or whose link
 fails to load — shows the image glyph, its file's name and "Preview not available".

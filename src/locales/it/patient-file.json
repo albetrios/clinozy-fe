@@ -280,6 +280,14 @@
       "layout": "Disposizione",
       "row": "Una riga",
       "grid": "Griglia",
+      "zoomMode": "Zoom e posizione",
+      "linked": "Collegate",
+      "linkedHint": "Tutte le foto seguono lo stesso zoom e la stessa posizione",
+      "separate": "Separate",
+      "separateHint": "Ingrandisci e posiziona ogni foto da sola",
+      "resetAll": "Ripristina tutto",
+      "resetAllHint": "Tutte le foto di nuovo al 100% (0)",
+      "zoomOf": "Zoom di {{name}}",
       "remove": "Togli {{name}} dal confronto",
       "start": "Inizio",
       "close": "Chiudi confronto",
@@ -288,7 +296,9 @@
       "since_other": "+{{count}} giorni",
       "hints": {
         "zoom": "Scorri o pizzica per ingrandire tutte le foto",
-        "pan": "Trascina per spostarle insieme · doppio clic per ripristinare"
+        "pan": "Trascina per spostarle insieme · doppio clic per ripristinare",
+        "zoomEach": "Scorri o pizzica su una foto per ingrandire solo quella",
+        "panEach": "Trascina una foto per posizionarla · doppio clic per ripristinarla"
       }
     }
   },

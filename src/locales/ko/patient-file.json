@@ -262,13 +262,23 @@
       "layout": "레이아웃",
       "row": "한 줄",
       "grid": "그리드",
+      "zoomMode": "확대와 위치",
+      "linked": "연동",
+      "linkedHint": "모든 사진이 같은 확대와 위치를 따릅니다",
+      "separate": "개별",
+      "separateHint": "사진마다 따로 확대하고 배치",
+      "resetAll": "모두 초기화",
+      "resetAllHint": "모든 사진을 100%로 (0)",
+      "zoomOf": "{{name}} 확대",
       "remove": "{{name}}을(를) 비교에서 제외",
       "start": "시작",
       "close": "비교 닫기",
       "since_other": "+{{count}}일",
       "hints": {
         "zoom": "스크롤하거나 핀치해 모든 사진 확대",
-        "pan": "드래그해 함께 이동 · 두 번 클릭해 초기화"
+        "pan": "드래그해 함께 이동 · 두 번 클릭해 초기화",
+        "zoomEach": "사진 위에서 스크롤하거나 핀치해 그 사진만 확대",
+        "panEach": "사진을 드래그해 배치 · 두 번 클릭해 초기화"
       }
     }
   },

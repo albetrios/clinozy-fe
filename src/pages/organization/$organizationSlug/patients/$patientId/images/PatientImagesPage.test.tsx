@@ -100,7 +100,12 @@ beforeEach(() => {
       status: 'completed',
     }),
   ]);
-  useDevicePrefsStore.setState({ photoSize: 'medium' });
+  useDevicePrefsStore.setState({
+    photoSize: 'medium',
+    photoCompareZoom: 'linked',
+    photoCompareLayout: null,
+    photoCompareFramings: {},
+  });
 });
 afterEach(() => resetPhotos());
 

@@ -70,11 +70,24 @@ export interface PhotoZoomGroupProps {
   onZoomOut: () => void;
   onReset: () => void;
   testIds: PhotoZoomGroupTestIds;
+  /**
+   * `bar` — the chrome's group, hidden on a phone where the pinch zooms; `panel` — the
+   * glass pill on one photo of the comparison (Separate), on every screen.
+   */
+  variant?: 'bar' | 'panel';
+  /** The group's name — "Zoom" by default; a panel names its photo. */
+  label?: string;
 }
 
+const ZOOM_GROUP_LOOK = {
+  bar: { step: 'w-9 text-base', level: 'min-w-14 px-2 text-xs' },
+  panel: { step: 'w-7 text-sm', level: 'min-w-11 px-1 text-tiny' },
+} as const;
+
 /**
- * The chrome's zoom group: − · the level (it resets) · + (H:2683). Hidden on a phone, where the
- * pinch zooms.
+ * The chrome's zoom group: − · the level (it resets) · + (H:2683). The bar's is hidden on a
+ * phone, where the pinch zooms; a comparison panel's shows everywhere
+ * (change-photo-compare-zoom D7, D12).
  */
 export function PhotoZoomGroup({
   level,
@@ -82,13 +95,22 @@ export function PhotoZoomGroup({
   onZoomOut,
   onReset,
   testIds,
+  variant = 'bar',
+  label,
 }: PhotoZoomGroupProps) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const { formatNumber } = useLocaleFormat();
+  const look = ZOOM_GROUP_LOOK[variant];
   return (
     <fieldset
-      aria-label={t(K.zoom)}
-      className="border-canvas/20 m-0 flex h-9.5 min-w-0 flex-none items-center overflow-hidden rounded-lg border p-0 max-md:hidden"
+      aria-label={label ?? t(K.zoom)}
+      data-slot={variant === 'panel' ? 'pill' : undefined}
+      className={cn(
+        'm-0 flex min-w-0 flex-none items-center overflow-hidden p-0',
+        variant === 'panel'
+          ? 'bg-overlay/60 text-canvas h-7 rounded-full backdrop-blur-sm'
+          : 'border-canvas/20 h-9.5 rounded-lg border max-md:hidden',
+      )}
     >
       <button
         type="button"
@@ -96,7 +118,7 @@ export function PhotoZoomGroup({
         aria-label={t(K.zoomOut)}
         title={t(K.zoomOutHint)}
         data-testid={testIds.zoomOut}
-        className="hover:bg-canvas/10 h-full w-9 text-base"
+        className={cn('hover:bg-canvas/10 h-full', look.step)}
       >
         −
       </button>
@@ -105,7 +127,10 @@ export function PhotoZoomGroup({
         onClick={onReset}
         title={t(K.zoomReset)}
         data-testid={testIds.zoomReset}
-        className="border-canvas/20 hover:bg-canvas/10 h-full min-w-14 border-x px-2 text-xs font-semibold tabular-nums"
+        className={cn(
+          'border-canvas/20 hover:bg-canvas/10 h-full border-x font-semibold tabular-nums',
+          look.level,
+        )}
       >
         {formatNumber(level, { style: 'percent', maximumFractionDigits: 0 })}
       </button>
@@ -115,7 +140,7 @@ export function PhotoZoomGroup({
         aria-label={t(K.zoomIn)}
         title={t(K.zoomInHint)}
         data-testid={testIds.zoomIn}
-        className="hover:bg-canvas/10 h-full w-9 text-base"
+        className={cn('hover:bg-canvas/10 h-full', look.step)}
       >
         +
       </button>

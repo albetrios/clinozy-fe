@@ -97,6 +97,17 @@ export const PATIENT_PHOTOS_KEYS = {
     layout: 'photos.compare.layout',
     row: 'photos.compare.row',
     grid: 'photos.compare.grid',
+    /** Linked ↔ Separate — the radios' group name. */
+    zoomMode: 'photos.compare.zoomMode',
+    linked: 'photos.compare.linked',
+    linkedHint: 'photos.compare.linkedHint',
+    separate: 'photos.compare.separate',
+    separateHint: 'photos.compare.separateHint',
+    /** Separate: every photo back to 100%. */
+    resetAll: 'photos.compare.resetAll',
+    resetAllHint: 'photos.compare.resetAllHint',
+    /** "Zoom of IMG_5100" — a panel's own zoom group (Separate). */
+    zoomOf: 'photos.compare.zoomOf',
     /** "Remove IMG_5100 from the comparison". */
     remove: 'photos.compare.remove',
     /** The first photo's mark. */
@@ -107,6 +118,9 @@ export const PATIENT_PHOTOS_KEYS = {
     hints: {
       zoom: 'photos.compare.hints.zoom',
       pan: 'photos.compare.hints.pan',
+      /** Separate's hints. */
+      zoomEach: 'photos.compare.hints.zoomEach',
+      panEach: 'photos.compare.hints.panEach',
     },
   },
   delete: {

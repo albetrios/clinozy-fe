@@ -262,13 +262,23 @@
       "layout": "布局",
       "row": "一行",
       "grid": "网格",
+      "zoomMode": "缩放与位置",
+      "linked": "联动",
+      "linkedHint": "所有照片使用相同的缩放和位置",
+      "separate": "独立",
+      "separateHint": "分别缩放和摆放每张照片",
+      "resetAll": "全部重置",
+      "resetAllHint": "所有照片恢复到 100% (0)",
+      "zoomOf": "{{name}} 的缩放",
       "remove": "将 {{name}} 移出对比",
       "start": "起点",
       "close": "关闭对比",
       "since_other": "+{{count}} 天",
       "hints": {
         "zoom": "滚动或双指缩放所有照片",
-        "pan": "拖动以一起移动 · 双击重置"
+        "pan": "拖动以一起移动 · 双击重置",
+        "zoomEach": "在照片上滚动或双指缩放，只缩放这一张",
+        "panEach": "拖动照片调整位置 · 双击重置"
       }
     }
   },

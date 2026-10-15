@@ -271,6 +271,14 @@
       "layout": "Layout",
       "row": "One row",
       "grid": "Grid",
+      "zoomMode": "Zoom and position",
+      "linked": "Linked",
+      "linkedHint": "Every photo follows the same zoom and position",
+      "separate": "Separate",
+      "separateHint": "Zoom and place each photo on its own",
+      "resetAll": "Reset all",
+      "resetAllHint": "Every photo back to 100% (0)",
+      "zoomOf": "Zoom of {{name}}",
       "remove": "Remove {{name}} from the comparison",
       "start": "Start",
       "close": "Close comparison",
@@ -278,7 +286,9 @@
       "since_other": "+{{count}} days",
       "hints": {
         "zoom": "Scroll or pinch to zoom every photo",
-        "pan": "Drag to move them together · double-click to reset"
+        "pan": "Drag to move them together · double-click to reset",
+        "zoomEach": "Scroll or pinch on a photo to zoom only that one",
+        "panEach": "Drag a photo to place it · double-click to reset it"
       }
     }
   },

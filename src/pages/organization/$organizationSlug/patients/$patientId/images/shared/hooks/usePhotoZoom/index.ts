@@ -1,1 +1,9 @@
-export { clampZoom, PHOTO_ZOOM, type PhotoZoom, usePhotoZoom } from './usePhotoZoom.ts';
+export {
+  clampZoom,
+  PHOTO_ZOOM,
+  type PhotoStageHandlers,
+  type PhotoZoom,
+  type PhotoZoomOptions,
+  type PhotoZooms,
+  usePhotoZoom,
+} from './usePhotoZoom.ts';

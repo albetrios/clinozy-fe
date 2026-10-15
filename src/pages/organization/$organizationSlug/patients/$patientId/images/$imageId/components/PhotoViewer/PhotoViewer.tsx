@@ -81,7 +81,7 @@ export function PhotoViewer({
   const step = (by: 1 | -1) => {
     if (multi) onStep(by);
   };
-  const zoom = usePhotoZoom(photo.id, step);
+  const zoom = usePhotoZoom({ photoIds: [photo.id], onSwipe: step }).of(photo.id);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.metaKey || event.ctrlKey || event.altKey) return;

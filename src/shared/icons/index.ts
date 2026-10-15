@@ -97,6 +97,7 @@ import {
   Trash2 as LuTrash,
   TriangleAlert as LuTriangleAlert,
   Truck as LuTruck,
+  Unlink as LuUnlink,
   User as LuUser,
   UserCog as LuUserCog,
   UserPlus as LuUserPlus,
@@ -260,6 +261,8 @@ export const Trash: AppIcon = LuTrash;
 export const TriangleAlert: AppIcon = LuTriangleAlert;
 /** Lucide `truck`: suppliers and vendors. */
 export const Truck: AppIcon = LuTruck;
+/** Lucide `unlink`: a broken chain — the photo comparison's Separate zoom. */
+export const Unlink: AppIcon = LuUnlink;
 export const User: AppIcon = LuUser;
 export const UserCog: AppIcon = LuUserCog;
 export const UserPlus: AppIcon = LuUserPlus;

@@ -68,13 +68,19 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
   time". The bar pinned to the bottom (above the phone's tab bar): × , "3 selected", "Pick 2 to 8
   photos to compare", Clear, Compare (from two). Esc or "Done" leaves.
 - **Comparison** (`components/PhotoCompare/`, `?compare=`): full screen on the viewer's dark
-  chrome — "Compare photos", "4 photos · 23 Jul – Today", One row ↔ Grid (one row up to four, a
-  grid from five; a phone shows two columns), the zoom group and Close; the photos oldest first
+  chrome — "Compare photos", "4 photos · 23 Jul – Today", Linked ↔ Separate (icons only on a
+  phone), One row ↔ Grid (one row up to four, a grid from five; a phone shows two columns), the
+  zoom group (Linked) or "Reset all" (Separate) and Close; the photos oldest first
   (`shared/photo-compare.ts`), each with its place and day, its pills and "Start" / "+21 days"
-  from the first. **One zoom for every panel** (`shared/hooks/usePhotoZoom/`): the wheel, the
-  buttons, a double-click, a pinch or a drag on any panel moves them all. × takes one out while
-  more than two remain; Esc and Back close it. Each photo is read by its id
-  (`usePatientPhotosByIds`, the viewer's query and cache).
+  from the first. **Linked** (`shared/hooks/usePhotoZoom/`): the wheel, the buttons, a
+  double-click, a pinch or a drag on any panel moves every photo by the same step from where it
+  stands, so photos aligned one by one stay aligned. **Separate**: a gesture moves the photo under
+  it, and each panel has its own zoom group (− · its level, which resets it · +) in its bottom end
+  corner. `+ − 0` act on every photo in both. **Remembered on this device**
+  (`useDevicePrefsStore`): the mode, the layout once picked, and — per comparison, keyed by its
+  photo ids sorted — where each photo stands (the pan a share of the panel, so it holds across
+  layouts); 24 comparisons are kept. × takes one out while more than two remain; Esc and Back
+  close it. Each photo is read by its id (`usePatientPhotosByIds`, the viewer's query and cache).
 - **Empty / failed:** for a member who uploads, the empty album is the drop zone — the Photos art,
   "No photos in General yet", the upload line and "Choose photos"; for a reader, "No photos in
   General yet" · "Drag photos here or upload from your computer."; a first read that fails says
@@ -92,12 +98,12 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 | `components/PhotoGrid/`                 | Day groups (side by side) and tiles, with the check circle and select mode.                                                          |
 | `components/PhotoUploadZone/`           | The upload strip and the empty album's drop zone.                                                                                    |
 | `components/PhotoSelectionBar/`         | The selection bar: count, hint, Clear, Compare.                                                                                      |
-| `components/PhotoCompare/`              | The comparison (`?compare=`): panels, One row ↔ Grid, the shared zoom.                                                               |
+| `components/PhotoCompare/`              | The comparison (`?compare=`): panels, Linked ↔ Separate, One row ↔ Grid, the remembered framings.                                    |
 | `hooks/usePhotoSelection/`              | The picks (at most eight), Esc to leave.                                                                                             |
 | `shared/photo-looks.ts`                 | Album icons and tones, body-part and stage tones, the S / M / L looks.                                                               |
-| `shared/photo-compare.ts`               | The comparison's order, "+N days", layouts and columns.                                                                              |
-| `shared/components/PhotoChrome/`        | The dark chrome's round button and zoom group (the viewer's and the comparison's).                                                   |
-| `shared/hooks/usePhotoZoom/`            | Zoom and pan — one photo in the viewer, every panel at once in the comparison.                                                       |
+| `shared/photo-compare.ts`               | The comparison's order, "+N days", layouts, zoom modes, columns and the key it is remembered under.                                  |
+| `shared/components/PhotoChrome/`        | The dark chrome's round button and zoom group (the bar's, and a comparison panel's glass pill).                                      |
+| `shared/hooks/usePhotoZoom/`            | Zoom and pan of many photos — the viewer's one, the comparison's Linked or Separate.                                                 |
 | `shared/photo-view.ts`                  | The read's params, the visit filter, day groups, the filter's visits, stepping a list.                                               |
 | `shared/components/PhotoDeleteConfirm/` | "Delete this photo?" with its reasons and Undo.                                                                                      |
 | `shared/hooks/usePhotoAccess/`          | What the member may do with the photos.                                                                                              |

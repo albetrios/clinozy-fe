@@ -8,6 +8,7 @@ import {
   comparisonOrder,
   daysBetween,
   defaultCompareLayout,
+  photoCompareKey,
 } from './photo-compare.ts';
 
 const photo = (id: string, takenOn: string): PatientPhoto => photoDouble({ id, takenOn });
@@ -48,5 +49,10 @@ describe('the photo comparison', () => {
     expect(compareColumns({ count: 7, layout: 'grid', narrow: false })).toBe(4);
     expect(compareColumns({ count: 8, layout: 'row', narrow: true })).toBe(2);
     expect(compareColumns({ count: 2, layout: 'grid', narrow: true })).toBe(2);
+  });
+
+  it('remembers a comparison under its photo ids sorted, whatever their order', () => {
+    expect(photoCompareKey(['pim_c', 'pim_a', 'pim_b'])).toBe('pim_a,pim_b,pim_c');
+    expect(photoCompareKey(['pim_b', 'pim_a'])).toBe(photoCompareKey(['pim_a', 'pim_b']));
   });
 });
