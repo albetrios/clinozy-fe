@@ -1,6 +1,6 @@
 /**
- * Route builders for the Users room — the Team, Roles & access, Branches and their
- * drawers (KICKOFF §6.12; `S:104–110`) — `{ to, params }` for TanStack Router's
+ * Route builders for the Users room — the Team, Roles & access and their drawers
+ * (KICKOFF §6.12; `S:104–107`) — `{ to, params }` for TanStack Router's
  * typed `navigate` / `Link`, like `builders.ts`. A module of their own, imported
  * by path and never through the `@/lib/routes/index.ts` barrel, which rides the
  * entry chunk: only the code that goes to these routes loads them.
@@ -27,30 +27,6 @@ export function organizationUsersRoles(organizationSlug: string) {
   return {
     to: '/organization/$organizationSlug/users/roles',
     params: { organizationSlug },
-  } as const;
-}
-
-/** Users › Branches (`S:108`) — every branch, open and closed. */
-export function organizationUsersBranches(organizationSlug: string) {
-  return {
-    to: '/organization/$organizationSlug/users/branches',
-    params: { organizationSlug },
-  } as const;
-}
-
-/** The New branch drawer over Branches (`S:109`). */
-export function organizationUsersBranchCreate(organizationSlug: string) {
-  return {
-    to: '/organization/$organizationSlug/users/branches/create',
-    params: { organizationSlug },
-  } as const;
-}
-
-/** A branch's drawer over Branches (`S:110`). */
-export function organizationUsersBranchEdit(organizationSlug: string, branchId: string) {
-  return {
-    to: '/organization/$organizationSlug/users/branches/$branchId/edit',
-    params: { organizationSlug, branchId },
   } as const;
 }
 

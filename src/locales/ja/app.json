@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "ユーザー",
-      "description": "チーム、ロールとアクセス、支店"
+      "description": "チーム、ロールとアクセス"
+    },
+    "branches": {
+      "label": "拠点",
+      "description": "各拠点：住所、営業時間、チーム、部屋と機器"
     }
   },
   "tones": {

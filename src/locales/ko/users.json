@@ -6,8 +6,7 @@
   "tabs": {
     "label": "사용자 보기",
     "team": "팀",
-    "roles": "역할 및 권한",
-    "branches": "지점"
+    "roles": "역할 및 권한"
   },
   "search": {
     "placeholder": "이름, 이메일, 휴대폰 또는 #ID",
@@ -15,8 +14,7 @@
   },
   "primary": {
     "newUser": "새 사용자",
-    "newRole": "새 역할",
-    "newBranch": "새 지점"
+    "newRole": "새 역할"
   },
   "columns": {
     "seq": "ID",
@@ -221,10 +219,6 @@
         "role": {
           "label": "역할",
           "description": "역할 및 접근 권한"
-        },
-        "branch": {
-          "label": "지점",
-          "description": "지점과 지점별 근무자"
         }
       }
     },
@@ -274,192 +268,6 @@
       "privateAlbum": {
         "label": "비공개 앨범 보기",
         "description": "환자 파일의 비공개 사진을 엽니다"
-      }
-    }
-  },
-  "branches": {
-    "record": "지점",
-    "columns": {
-      "branch": "지점",
-      "address": "주소",
-      "contact": "연락처",
-      "hours": "운영 시간",
-      "team": "팀",
-      "defaults": "기본 담당자",
-      "status": "상태"
-    },
-    "main": "본점",
-    "notSet": "설정 안 됨",
-    "defaults": {
-      "doctor": "의사 · {{name}}",
-      "desk": "데스크 · {{name}}",
-      "therapist": "치료사 · {{name}}",
-      "pharmacist": "약국 · {{name}}"
-    },
-    "status": {
-      "open": "운영 중",
-      "closed": "닫힘"
-    },
-    "records": "지점",
-    "empty": "아직 지점이 없습니다",
-    "drawer": {
-      "title": {
-        "create": "새 지점",
-        "edit": "지점 편집"
-      },
-      "sub": "주소, 운영 시간, 이곳에서 일하는 사람",
-      "summaryNew": "새 지점",
-      "people_other": "{{count}}명",
-      "mainBadge": "본점",
-      "steps": {
-        "place": "지점 및 주소",
-        "contact": "연락처 및 운영 시간",
-        "people": "담당자",
-        "places": "장소와 휴무일"
-      },
-      "groups": {
-        "branch": "지점",
-        "address": "주소",
-        "contact": "연락처",
-        "hours": "운영 시간"
-      },
-      "fields": {
-        "name": "이름",
-        "colour": "색상",
-        "main": "본점",
-        "status": "상태",
-        "line1": "주소 1",
-        "line2": "주소 2",
-        "area": "지역",
-        "city": "도시",
-        "pin": "우편번호",
-        "state": "주",
-        "phone": "전화",
-        "email": "이메일",
-        "gstin": "GSTIN",
-        "days": "요일",
-        "opens": "여는 시간",
-        "closes": "닫는 시간",
-        "team": "팀",
-        "doctor": "기본 의사",
-        "desk": "기본 프런트 데스크",
-        "therapist": "기본 치료사",
-        "pharmacist": "기본 약사"
-      },
-      "placeholders": {
-        "name": "예: Vesu",
-        "line1": "매장 / 층, 건물",
-        "line2": "도로명, 랜드마크",
-        "area": "예: Vesu",
-        "city": "도시",
-        "pin": "6자리",
-        "state": "주",
-        "email": "branch@clinic.com",
-        "gstin": "15자",
-        "team": "팀 선택"
-      },
-      "hints": {
-        "colour": "이 지점을 어디서나 표시합니다",
-        "phone": "10자리",
-        "team": "이곳에서 일하는 사람",
-        "preselected": "이 지점 양식에서 미리 선택됨",
-        "addFirst": {
-          "doctor": "먼저 팀에 의사를 추가하세요",
-          "desk": "먼저 팀에 프런트 데스크를 추가하세요",
-          "therapist": "먼저 팀에 치료사를 추가하세요",
-          "pharmacist": "먼저 팀에 약사를 추가하세요"
-        },
-        "main": "클리닉당 하나 · 개설 시 지정"
-      },
-      "toggles": {
-        "mainOn": "본점 · 본사",
-        "mainOff": "본점이 아님",
-        "openOn": "운영 중 · 선택 목록에 표시",
-        "openOff": "닫힘 · 어디에도 표시 안 함"
-      },
-      "nobody": "없음",
-      "you": "{{name}} (나)",
-      "save": {
-        "create": "지점 추가",
-        "edit": "지점 저장"
-      },
-      "nameMissing": "지점 이름을 입력하세요",
-      "addressMissing": "주소, 지역, 도시, PIN 코드를 입력하세요",
-      "duplicate": "{{name}} 지점이 이미 있습니다",
-      "phoneInvalid": "전화번호는 10자리여야 합니다",
-      "emailInvalid": "올바른 이메일 주소를 입력하세요",
-      "added": "{{name}} 지점을 추가했습니다",
-      "saved": "{{name}}을(를) 저장했습니다",
-      "contactMissing": "전화번호와 이메일을 입력하세요",
-      "pinInvalid": "PIN 코드는 6자리여야 합니다",
-      "places": {
-        "sections": {
-          "room": "진료실",
-          "machine": "장비",
-          "holiday": "휴무일"
-        },
-        "hints": {
-          "room": "환자를 보는 곳",
-          "machine": "시술과 함께 예약",
-          "holiday": "종일 휴무 · 예약 불가"
-        },
-        "counts": {
-          "room_other": "진료실 {{count}}개",
-          "machine_other": "장비 {{count}}대",
-          "holiday_other": "휴무일 {{count}}일"
-        },
-        "nothingYet": "아직 진료실, 장비, 휴무일이 없습니다",
-        "empty": {
-          "room": "아직 진료실이 없습니다",
-          "machine": "아직 장비가 없습니다",
-          "holiday": "예정된 휴무일이 없습니다"
-        },
-        "newLabel": {
-          "room": "새 진료실",
-          "machine": "새 장비",
-          "holiday": "새 휴무일"
-        },
-        "placeholders": {
-          "room": "예: 진료실 1",
-          "machine": "예: 레이저 장비",
-          "holiday": "예: 디왈리"
-        },
-        "fields": {
-          "name": "이름",
-          "date": "날짜",
-          "label": "휴무일"
-        },
-        "add": "추가",
-        "rename": "이름 변경",
-        "save": "저장",
-        "cancel": "취소",
-        "remove": "삭제",
-        "toggle": {
-          "on": "사용 중",
-          "off": "사용 중지",
-          "label": "{{name}} 사용 중"
-        },
-        "removeTitle": {
-          "room": "이 진료실을 삭제할까요?",
-          "machine": "이 장비를 삭제할까요?",
-          "holiday": "이 휴무일을 삭제할까요?"
-        },
-        "duplicate": {
-          "room": "{{name}} 진료실이 이미 있습니다",
-          "machine": "{{name}} 장비가 이미 있습니다",
-          "holiday": "{{date}}은(는) 이미 휴무일입니다"
-        },
-        "nameMissing": "이름을 입력하세요",
-        "nameTooLong": "최대 60자",
-        "dateMissing": "날짜를 선택하세요",
-        "labelMissing": "휴무일 이름을 입력하세요",
-        "labelTooLong": "최대 60자",
-        "added": "{{name}}을(를) 추가했습니다",
-        "renamed": "이름을 {{name}}(으)로 변경했습니다",
-        "switchedOn": "{{name}}을(를) 사용으로 전환했습니다",
-        "switchedOff": "{{name}}을(를) 사용 중지했습니다",
-        "removed": "{{name}}을(를) 삭제했습니다",
-        "loadFailed": "진료실, 장비, 휴무일을 불러오지 못했습니다"
       }
     }
   }

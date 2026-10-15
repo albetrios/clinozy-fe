@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Usuários",
-      "description": "Equipe, funções e acesso, unidades"
+      "description": "Equipe, funções e acesso"
+    },
+    "branches": {
+      "label": "Unidades",
+      "description": "Cada unidade: endereço, horário, equipe, salas e equipamentos"
     }
   },
   "tones": {

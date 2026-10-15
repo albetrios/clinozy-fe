@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Utilisateurs",
-      "description": "Équipe, rôles et accès, établissements"
+      "description": "Équipe, rôles et accès"
+    },
+    "branches": {
+      "label": "Établissements",
+      "description": "Chaque établissement : adresse, horaires, équipe, salles et appareils"
     }
   },
   "tones": {

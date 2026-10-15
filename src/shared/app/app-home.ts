@@ -1,3 +1,5 @@
+import { redirect } from '@tanstack/react-router';
+
 import { APP_MODULES } from '@/core/config/app-modules.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { isModuleEnabled } from '@/core/security/gates/require-module.ts';
@@ -25,6 +27,7 @@ export const APP_SECTION_ROUTES = {
   tasks: '/organization/$organizationSlug/tasks',
   offerings: '/organization/$organizationSlug/offerings',
   users: '/organization/$organizationSlug/users',
+  branches: '/organization/$organizationSlug/branches',
 } as const satisfies Record<Section, string>;
 
 /**
@@ -85,4 +88,53 @@ export async function appHomeRoute(organizationSlug: string) {
   return section
     ? { to: APP_SECTION_ROUTES[section], params: { organizationSlug } }
     : null;
+}
+
+/**
+ * Where an old Users › Branches path lands (before change-branches-in-navbar): `rest` is what
+ * followed `/users/branches/` — `create` opens New branch, `<id>/edit` that branch's drawer, and
+ * anything else the list. The paths are spelled here rather than taken from
+ * `branches-builders.ts` so the redirect pulls no other chunk.
+ */
+export function movedBranchesLocation({
+  organizationSlug,
+  rest,
+}: {
+  organizationSlug: string;
+  rest: string;
+}) {
+  const params = { organizationSlug };
+  const edit = /^([^/]+)\/edit\/?$/.exec(rest);
+  if (edit?.[1]) {
+    return {
+      to: '/organization/$organizationSlug/branches/$branchId/edit',
+      params: { ...params, branchId: edit[1] },
+    } as const;
+  }
+  return {
+    to: /^create\/?$/.test(rest)
+      ? '/organization/$organizationSlug/branches/create'
+      : APP_SECTION_ROUTES.branches,
+    params,
+  } as const;
+}
+
+/**
+ * The redirect route's whole job, loaded on demand like {@link appHomeRoute} so it stays off the
+ * entry chunk: throws the redirect to {@link movedBranchesLocation}, keeping the search and the
+ * hash (Settings) as the old URL had them.
+ */
+export function redirectFromUsersBranches(params: {
+  organizationSlug: string;
+  _splat?: string;
+}): never {
+  throw redirect({
+    ...movedBranchesLocation({
+      organizationSlug: params.organizationSlug,
+      rest: params._splat ?? '',
+    }),
+    search: true,
+    hash: true,
+    replace: true,
+  });
 }

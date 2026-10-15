@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Usuarios",
-      "description": "Equipo, roles y acceso, sucursales"
+      "description": "Equipo, roles y acceso"
+    },
+    "branches": {
+      "label": "Sucursales",
+      "description": "Cada sucursal: dirección, horario, equipo, salas y máquinas"
     }
   },
   "tones": {

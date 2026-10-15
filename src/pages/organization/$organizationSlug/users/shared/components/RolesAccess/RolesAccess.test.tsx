@@ -12,14 +12,16 @@ import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-
 import {
   member,
   PLATFORM_ROLES,
   platformRole,
+  SELF,
+} from '@/tests/utils/team-doubles.ts';
+
+import {
   renderUsersRoutes,
   resetUsersRoutes,
-  SELF,
   USERS_ADMIN_CODES,
 } from '../../../__tests__/integration/users-test-router.tsx';
 import { validateRolesSearch } from '../../../users.search.ts';

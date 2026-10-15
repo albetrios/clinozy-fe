@@ -265,16 +265,18 @@ describe('OrganizationClinicPanel', () => {
     expect(fetchSetupMock).not.toHaveBeenCalled();
   });
 
-  it('links to Users › Branches only for a member who can open it', async () => {
+  it('links to the Branches room only for a member who can open it', async () => {
     const { unmount } = renderPanel();
-    const open = await screen.findByTestId('settings-branches-open-users');
-    expect(open).toHaveAttribute('href', '/organization/sunrise/users/branches');
+    const open = await screen.findByTestId('settings-branches-open-branches');
+    expect(open).toHaveAttribute('href', '/organization/sunrise/branches');
     unmount();
 
     hold(['organization:read', 'organization:update']);
     renderPanel();
     await screen.findByTestId('org-clinic-specialties-skin');
-    expect(screen.queryByTestId('settings-branches-open-users')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('settings-branches-open-branches'),
+    ).not.toBeInTheDocument();
   });
 
   it('switches to General for the logo, keeping the page underneath', async () => {

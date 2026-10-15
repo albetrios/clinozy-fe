@@ -18,13 +18,13 @@ import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useHoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 import { useResendInvitation } from '@/shared/hooks/useInvitations/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
-import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
-import { notify } from '@/shared/notify/index.ts';
-
 import {
   type RoleDirectory,
   useRoleDirectory,
-} from '../../shared/hooks/useRoleDirectory/index.ts';
+} from '@/shared/hooks/useRoleDirectory/index.ts';
+import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
+import { notify } from '@/shared/notify/index.ts';
+
 import { USER_DRAWER_TEST_ID, USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import type { UserDeleteTarget } from '../UserDeleteConfirm/index.ts';
 import { type UserSaveOutcome, useUserSave } from './use-user-save.ts';
