@@ -68,9 +68,10 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
   time". The bar pinned to the bottom (above the phone's tab bar): × , "3 selected", "Pick 2 to 8
   photos to compare", Clear, Compare (from two). Esc or "Done" leaves.
 - **Comparison** (`components/PhotoCompare/`, `?compare=`): full screen on the viewer's dark
-  chrome — "Compare photos", "4 photos · 23 Jul – Today", Linked ↔ Separate (icons only on a
-  phone), One row ↔ Grid (one row up to four, a grid from five; a phone shows two columns), the
-  zoom group (Linked) or "Reset all" (Separate) and Close; the photos oldest first
+  chrome — "Compare photos", "4 photos · 23 Jul – Today", Linked ↔ Separate, One row ↔ Grid
+  (one row up to four, a grid from five; a phone shows two columns), the zoom group (Linked) or
+  "Reset all" (Separate; not on a phone) and Close — the radios in words, no icons (each icon
+  the app registers rides the first-paint chunk); the photos oldest first
   (`shared/photo-compare.ts`), each with its place and day, its pills and "Start" / "+21 days"
   from the first. **Linked** (`shared/hooks/usePhotoZoom/`): the wheel, the buttons, a
   double-click, a pinch or a drag on any panel moves every photo by the same step from where it
@@ -92,7 +93,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `images.route.tsx`                      | Route marker — exports `Component` rendering `PatientImagesPage`.                                                                    |
 | `images.manifest.ts`                    | Manifest — `kind: 'layout'` over `$imageId`, permission `organization:read`, title "Photos".                                         |
-| `images.search.ts`                      | URL schema (`validateSearch`): `album`, `appointment`, `compare` (`compareIdsOf`, `PHOTO_COMPARE`). Rides the entry chunk.           |
+| `images.search.ts`                      | URL schema (`validateSearch`): `album`, `appointment`, `compare` (kept as text). Rides the entry chunk.                              |
 | `PatientImagesPage.tsx`                 | The section: toolbar, upload, grid, paging, drop, paste, selection, the delete confirm, the comparison; hosts the dialogs' `Outlet`. |
 | `components/PhotoToolbar/`              | Album tabs, count, visit filter, Select / Done, size radios.                                                                         |
 | `components/PhotoGrid/`                 | Day groups (side by side) and tiles, with the check circle and select mode.                                                          |
@@ -101,7 +102,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 | `components/PhotoCompare/`              | The comparison (`?compare=`): panels, Linked ↔ Separate, One row ↔ Grid, the remembered framings.                                    |
 | `hooks/usePhotoSelection/`              | The picks (at most eight), Esc to leave.                                                                                             |
 | `shared/photo-looks.ts`                 | Album icons and tones, body-part and stage tones, the S / M / L looks.                                                               |
-| `shared/photo-compare.ts`               | The comparison's order, "+N days", layouts, zoom modes, columns and the key it is remembered under.                                  |
+| `shared/photo-compare.ts`               | The comparison's ids (`compareIdsOf`, 2–8), order, "+N days", layouts, zoom modes, columns and the key it is remembered under.       |
 | `shared/components/PhotoChrome/`        | The dark chrome's round button and zoom group (the bar's, and a comparison panel's glass pill).                                      |
 | `shared/hooks/usePhotoZoom/`            | Zoom and pan of many photos — the viewer's one, the comparison's Linked or Separate.                                                 |
 | `shared/photo-view.ts`                  | The read's params, the visit filter, day groups, the filter's visits, stepping a list.                                               |

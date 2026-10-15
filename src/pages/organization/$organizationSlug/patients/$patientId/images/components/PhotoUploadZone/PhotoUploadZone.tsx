@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { EmptyStateArt } from '@/shared/components/EmptyState/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Camera, ImagePlus } from '@/shared/icons/index.ts';
+import { Camera, ImageIcon } from '@/shared/icons/index.ts';
 
 import {
   PATIENT_PHOTOS_KEYS,
@@ -56,7 +56,7 @@ function ZoneButtons({
         data-testid={PHOTO_UPLOAD_ZONE_TEST_IDS.choose}
         className={cn('gap-1.5', !primary && 'bg-card shadow-none')}
       >
-        <ImagePlus aria-hidden="true" className="size-4" />
+        <ImageIcon aria-hidden="true" className="size-4" />
         {t(K.dropzone.choose)}
       </Button>
     </span>
@@ -112,7 +112,7 @@ export function PhotoUploadZone({
           TONE_CLASSES.blush.surface,
         )}
       >
-        <ImagePlus className="size-4.5" />
+        <Camera className="size-4.5" />
       </span>
       <span className="flex min-w-40 flex-1 flex-col gap-0.5">
         <span className="text-body font-semibold">{t(K.dropzone.title)}</span>

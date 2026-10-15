@@ -5,12 +5,7 @@ import {
   PATIENT_PHOTO_ALBUMS,
 } from '@/shared/api/app/patient-images-contracts.ts';
 
-import {
-  compareIdsOf,
-  NO_VISIT,
-  PHOTO_ALBUMS,
-  validatePatientImagesSearch,
-} from './images.search.ts';
+import { NO_VISIT, PHOTO_ALBUMS, validatePatientImagesSearch } from './images.search.ts';
 
 const VISIT = 'appt_co7tgiahg3uze2okuj98w';
 
@@ -41,24 +36,11 @@ describe('the Photos section’s search params', () => {
     ).toBeUndefined();
   });
 
-  it('keeps a comparison of two to eight distinct photo ids, the first eight', () => {
-    const ids = Array.from(
-      { length: 10 },
-      (_, index) => `pimg_${String(index).repeat(21)}`,
+  it('keeps a comparison as text — the page reads its ids (this module rides the entry chunk)', () => {
+    expect(validatePatientImagesSearch({ compare: ' pimg_a,pimg_b ' }).compare).toBe(
+      'pimg_a,pimg_b',
     );
-    expect(compareIdsOf(ids.slice(0, 2).join(','))).toEqual(ids.slice(0, 2));
-    expect(compareIdsOf(ids.join(','))).toEqual(ids.slice(0, 8));
-    expect(compareIdsOf(`${ids[0]},${ids[0]},${ids[1]}`)).toEqual(ids.slice(0, 2));
-    expect(
-      validatePatientImagesSearch({ compare: ids.slice(0, 3).join(',') }).compare,
-    ).toBe(ids.slice(0, 3).join(','));
-  });
-
-  it('drops a comparison of fewer than two valid ids', () => {
-    const one = `pimg_${'a'.repeat(21)}`;
-    expect(compareIdsOf(one)).toEqual([]);
-    expect(compareIdsOf(`${one},not-an-id`)).toEqual([]);
-    expect(validatePatientImagesSearch({ compare: one }).compare).toBeUndefined();
+    expect(validatePatientImagesSearch({ compare: '' }).compare).toBeUndefined();
     expect(validatePatientImagesSearch({}).compare).toBeUndefined();
   });
 });

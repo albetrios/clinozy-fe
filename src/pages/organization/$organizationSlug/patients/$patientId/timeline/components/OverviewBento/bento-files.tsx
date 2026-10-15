@@ -17,7 +17,7 @@ import {
 } from '@/shared/hooks/useContactActivities/index.ts';
 import { usePatientPhotos } from '@/shared/hooks/usePatientPhotos/index.ts';
 import { usePatientReports } from '@/shared/hooks/usePatientReports/index.ts';
-import { Camera, FileIcon, ImagePlus, MessageSquare } from '@/shared/icons/index.ts';
+import { Camera, FileIcon, MessageSquare } from '@/shared/icons/index.ts';
 
 import { useTableDay } from '../../../shared/components/PatientSectionTable/index.ts';
 import { PhotoThumb } from '../../../shared/components/PhotoThumb/index.ts';
@@ -60,7 +60,7 @@ function AddPhotosTile({ onClick }: { onClick: () => void }) {
       data-testid={TIMELINE_TEST_IDS.photosAdd}
       className="border-border-strong text-muted-foreground-strong hover:border-muted-foreground hover:bg-canvas hover:text-foreground flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed transition-colors"
     >
-      <ImagePlus aria-hidden="true" className="size-5" />
+      <Camera aria-hidden="true" className="size-5" />
       <span className="text-caption px-1 text-center leading-tight font-medium">
         {t(TIMELINE_KEYS.photos.add)}
       </span>
@@ -85,7 +85,7 @@ function PhotosDropZone({ onClick, testId }: { onClick: () => void; testId: stri
           TONE_CLASSES[OVERVIEW_CARD_TONES.photos].surface,
         )}
       >
-        <ImagePlus className="size-5" />
+        <Camera className="size-5" />
       </span>
       <span className="text-body text-foreground-soft font-medium">
         {t(TIMELINE_KEYS.photos.drop)}

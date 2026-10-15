@@ -17,15 +17,7 @@ import {
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { usePatientPhotosByIds } from '@/shared/hooks/usePatientPhotos/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import {
-  type AppIcon,
-  Columns,
-  ImageIcon,
-  LayoutGrid,
-  LinkIcon,
-  Unlink,
-  X,
-} from '@/shared/icons/index.ts';
+import { ImageIcon, X } from '@/shared/icons/index.ts';
 import {
   type PhotoCompareLayout,
   type PhotoCompareZoom,
@@ -71,39 +63,36 @@ export interface PhotoCompareProps {
   onClose: () => void;
 }
 
-/** A radio on the comparison's bar: its icon, its name and, for a mode, what it does. */
+/**
+ * A radio on the comparison's bar: its name and, for a mode, what it does. Words only —
+ * every icon the app registers rides the first-paint chunk (change-photo-compare-zoom D14).
+ */
 interface CompareOption<T extends string> {
   value: T;
-  icon: AppIcon;
   label: string;
   hint?: string;
 }
 
 const LAYOUT_OPTIONS: readonly CompareOption<PhotoCompareLayout>[] =
-  PHOTO_COMPARE_LAYOUTS.map((value) =>
-    value === 'row'
-      ? { value, icon: Columns, label: K.compare.row }
-      : { value, icon: LayoutGrid, label: K.compare.grid },
-  );
+  PHOTO_COMPARE_LAYOUTS.map((value) => ({
+    value,
+    label: value === 'row' ? K.compare.row : K.compare.grid,
+  }));
 
 const ZOOM_OPTIONS: readonly CompareOption<PhotoCompareZoom>[] = PHOTO_COMPARE_ZOOMS.map(
   (value) =>
     value === 'linked'
-      ? { value, icon: LinkIcon, label: K.compare.linked, hint: K.compare.linkedHint }
-      : { value, icon: Unlink, label: K.compare.separate, hint: K.compare.separateHint },
+      ? { value, label: K.compare.linked, hint: K.compare.linkedHint }
+      : { value, label: K.compare.separate, hint: K.compare.separateHint },
 );
 
-/**
- * Two radios on the dark chrome — One row ↔ Grid, Linked ↔ Separate. `iconsOnPhone`
- * keeps only the icons below `md`; each radio keeps its name for a screen reader.
- */
+/** Two radios on the dark chrome — One row ↔ Grid, Linked ↔ Separate. */
 function CompareRadios<T extends string>({
   label,
   testId,
   value,
   options,
   onChange,
-  iconsOnPhone = false,
   className,
 }: {
   label: string;
@@ -111,7 +100,6 @@ function CompareRadios<T extends string>({
   value: T;
   options: readonly CompareOption<T>[];
   onChange: (value: T) => void;
-  iconsOnPhone?: boolean;
   className?: string;
 }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
@@ -126,7 +114,6 @@ function CompareRadios<T extends string>({
       )}
     >
       {options.map((option) => {
-        const { icon: Icon } = option;
         const checked = option.value === value;
         return (
           <button // NOSONAR(S6819): styled-button radiogroup on the dark chrome, like the viewer's zoom group
@@ -138,14 +125,11 @@ function CompareRadios<T extends string>({
             onClick={() => onChange(option.value)}
             data-testid={`${testId}-${option.value}`}
             className={cn(
-              'flex h-full items-center gap-1.5 rounded-md px-2.5 text-xs font-semibold transition-colors',
+              'flex h-full items-center rounded-md px-2.5 text-xs font-semibold transition-colors',
               checked ? 'bg-canvas text-foreground' : 'text-canvas/80 hover:bg-canvas/10',
             )}
           >
-            <Icon aria-hidden="true" className="size-3.5" />
-            <span className={iconsOnPhone ? 'max-md:sr-only' : undefined}>
-              {t(option.label)}
-            </span>
+            {t(option.label)}
           </button>
         );
       })}
@@ -315,7 +299,10 @@ function PendingPanel() {
   );
 }
 
-/** Separate's "Reset all": every photo back to 100%, idle while none has moved. */
+/**
+ * Separate's "Reset all": every photo back to 100%, idle while none has moved. Not on a
+ * phone, where the bar has no room and each photo's own level resets it.
+ */
 function ResetAllButton({
   disabled,
   onReset,
@@ -331,7 +318,7 @@ function ResetAllButton({
       disabled={disabled}
       title={t(K.compare.resetAllHint)}
       data-testid={PHOTO_COMPARE_TEST_IDS.resetAll}
-      className="border-canvas/20 hover:bg-canvas/10 flex h-9.5 flex-none items-center rounded-lg border px-2.5 text-xs font-semibold transition-colors disabled:pointer-events-none disabled:opacity-40"
+      className="border-canvas/20 hover:bg-canvas/10 flex h-9.5 flex-none items-center rounded-lg border px-2.5 text-xs font-semibold transition-colors disabled:pointer-events-none disabled:opacity-40 max-md:hidden"
     >
       {t(K.compare.resetAll)}
     </button>
@@ -447,7 +434,6 @@ export function PhotoCompare({ ids, dayLabel, onRemove, onClose }: PhotoCompareP
               value={mode}
               options={ZOOM_OPTIONS}
               onChange={setMode}
-              iconsOnPhone
             />
             {count > 2 ? (
               <CompareRadios

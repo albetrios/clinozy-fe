@@ -19,7 +19,7 @@ import {
   type PatientPhotoList,
   usePatientPhotos,
 } from '@/shared/hooks/usePatientPhotos/index.ts';
-import { Camera, ImagePlus } from '@/shared/icons/index.ts';
+import { Camera } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -41,14 +41,11 @@ import {
   usePhotoSelection,
 } from './hooks/usePhotoSelection/index.ts';
 import { manifest } from './images.manifest.ts';
-import {
-  compareIdsOf,
-  type PatientImagesSearch,
-  type PhotoAlbum,
-} from './images.search.ts';
+import type { PatientImagesSearch, PhotoAlbum } from './images.search.ts';
 import { PhotoDeleteConfirm } from './shared/components/PhotoDeleteConfirm/index.ts';
 import { type PhotoAccess, usePhotoAccess } from './shared/hooks/usePhotoAccess/index.ts';
 import { usePhotoVisits } from './shared/hooks/usePhotoVisits/index.ts';
+import { compareIdsOf } from './shared/photo-compare.ts';
 import { photoDays, photoListParamsOf, PHOTOS_PAGE } from './shared/photo-view.ts';
 
 const K = PATIENT_PHOTOS_KEYS;
@@ -253,7 +250,7 @@ function DropVeil({ album }: { album: string }) {
         data-slot="pill"
         className="bg-primary text-primary-foreground sticky top-1/2 mt-10 flex h-11 items-center gap-2 self-start rounded-full px-5 text-sm font-semibold shadow-(--elevation-fab)"
       >
-        <ImagePlus className="size-4.5" />
+        <Camera className="size-4.5" />
         {t(K.dropzone.veil, { album })}
       </span>
     </div>

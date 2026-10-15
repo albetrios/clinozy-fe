@@ -5,6 +5,7 @@ import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts'
 import { photoDouble } from '../__tests__/integration/photo-api-double.ts';
 import {
   compareColumns,
+  compareIdsOf,
   comparisonOrder,
   daysBetween,
   defaultCompareLayout,
@@ -54,5 +55,21 @@ describe('the photo comparison', () => {
   it('remembers a comparison under its photo ids sorted, whatever their order', () => {
     expect(photoCompareKey(['pim_c', 'pim_a', 'pim_b'])).toBe('pim_a,pim_b,pim_c');
     expect(photoCompareKey(['pim_b', 'pim_a'])).toBe(photoCompareKey(['pim_a', 'pim_b']));
+  });
+
+  it('keeps a comparison of two to eight distinct photo ids, the first eight', () => {
+    const ids = Array.from(
+      { length: 10 },
+      (_, index) => `pimg_${String(index).repeat(21)}`,
+    );
+    expect(compareIdsOf(ids.slice(0, 2).join(','))).toEqual(ids.slice(0, 2));
+    expect(compareIdsOf(ids.join(','))).toEqual(ids.slice(0, 8));
+    expect(compareIdsOf(`${ids[0]},${ids[0]},${ids[1]}`)).toEqual(ids.slice(0, 2));
+  });
+
+  it('drops a comparison of fewer than two valid ids', () => {
+    const one = `pimg_${'a'.repeat(21)}`;
+    expect(compareIdsOf(one)).toEqual([]);
+    expect(compareIdsOf(`${one},not-an-id`)).toEqual([]);
   });
 });

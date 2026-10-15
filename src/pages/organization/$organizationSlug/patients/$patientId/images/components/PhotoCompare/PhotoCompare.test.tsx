@@ -287,14 +287,22 @@ describe('PhotoCompare', () => {
     });
   });
 
-  it('keeps only the mode icons on a phone, each radio still named', async () => {
+  it('names the modes in words, explains each, and leaves Reset all off a phone', async () => {
+    const user = userEvent.setup();
     viewport.tier = 'phone';
     read.photos = threePhotos();
     renderCompare(['pimg_a', 'pimg_b', 'pimg_c']);
     const compare = await screen.findByTestId('patient-photo-compare');
     const separate = within(compare).getByRole('radio', { name: 'Separate' });
-    expect(within(separate).getByText('Separate')).toHaveClass('max-md:sr-only');
     expect(separate).toHaveAttribute('title', 'Zoom and place each photo on its own');
+    expect(within(compare).getByRole('radio', { name: 'Linked' })).toHaveAttribute(
+      'title',
+      'Every photo follows the same zoom and position',
+    );
+    await user.click(separate);
+    expect(within(compare).getByTestId('patient-photo-compare-reset-all')).toHaveClass(
+      'max-md:hidden',
+    );
     expect(await axe(compare)).toHaveNoViolations();
   });
 });

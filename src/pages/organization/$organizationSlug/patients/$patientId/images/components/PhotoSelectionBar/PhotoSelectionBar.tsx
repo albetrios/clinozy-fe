@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Columns, X } from '@/shared/icons/index.ts';
+import { X } from '@/shared/icons/index.ts';
 
 import {
   PATIENT_PHOTOS_KEYS,
@@ -83,9 +83,8 @@ export function PhotoSelectionBar({
         onClick={onCompare}
         disabled={!comparable}
         data-testid={PHOTO_SELECTION_BAR_TEST_IDS.compare}
-        className="flex-none gap-1.5"
+        className="flex-none"
       >
-        <Columns aria-hidden="true" className="size-4" />
         {t(K.compare)}
       </Button>
     </section>

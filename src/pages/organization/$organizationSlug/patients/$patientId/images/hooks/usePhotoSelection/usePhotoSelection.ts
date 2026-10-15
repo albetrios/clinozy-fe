@@ -8,7 +8,7 @@ import {
   PATIENT_PHOTOS_KEYS,
   PATIENT_PHOTOS_NS,
 } from '../../../shared/patient-photos.constants.ts';
-import { PHOTO_COMPARE } from '../../images.search.ts';
+import { PHOTO_COMPARE } from '../../shared/photo-compare.ts';
 
 /** What {@link usePhotoSelection} gives the Photos section. */
 export interface PhotoSelection {

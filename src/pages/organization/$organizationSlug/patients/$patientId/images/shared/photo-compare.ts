@@ -1,8 +1,29 @@
+import { PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
 import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts';
 import type {
   PhotoCompareLayout,
   PhotoCompareZoom,
 } from '@/shared/store/useDevicePrefsStore/index.ts';
+
+/** How many photos a comparison takes (change-patient-overview-photos `BRIEF.md:32–46`). */
+export const PHOTO_COMPARE = { min: 2, max: 8 } as const;
+
+/**
+ * The photos a `?compare=` names: distinct public ids, the first eight; none
+ * below two. Read here, in the page, not in `images.search.ts`, which rides the
+ * entry chunk.
+ */
+export function compareIdsOf(value: unknown): string[] {
+  const ids = [
+    ...new Set(
+      textOf(value)
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => PUBLIC_ID.test(id)),
+    ),
+  ].slice(0, PHOTO_COMPARE.max);
+  return ids.length >= PHOTO_COMPARE.min ? ids : [];
+}
 
 /** The comparison's layouts, in the switch's order. */
 export const PHOTO_COMPARE_LAYOUTS: readonly PhotoCompareLayout[] = ['row', 'grid'];

@@ -30,7 +30,6 @@ import {
   ChevronsUpDown as LuChevronsUpDown,
   ClipboardList as LuClipboardList,
   Clock as LuClock,
-  Columns3 as LuColumns,
   Compass as LuCompass,
   Copy as LuCopy,
   CreditCard as LuCreditCard,
@@ -43,7 +42,6 @@ import {
   FolderOpen as LuFolderOpen,
   House as LuHouse,
   Image as LuImage,
-  ImagePlus as LuImagePlus,
   Info as LuInfo,
   Keyboard as LuKeyboard,
   Laptop as LuLaptop,
@@ -97,7 +95,6 @@ import {
   Trash2 as LuTrash,
   TriangleAlert as LuTriangleAlert,
   Truck as LuTruck,
-  Unlink as LuUnlink,
   User as LuUser,
   UserCog as LuUserCog,
   UserPlus as LuUserPlus,
@@ -150,8 +147,6 @@ export const ChevronsRight: AppIcon = LuChevronsRight;
 export const ChevronsUpDown: AppIcon = LuChevronsUpDown;
 /** Lucide `clipboard-list`: reports, stock checks and the clinic setup ("Finish setup"). */
 export const ClipboardList: AppIcon = LuClipboardList;
-/** Lucide `columns` (three of them): side by side — the photo comparison and its one-row layout. */
-export const Columns: AppIcon = LuColumns;
 /** Lucide `clock`: planned and time-bound items. */
 export const Clock: AppIcon = LuClock;
 /** Lucide `compass`: all sections, the tab bar's More. */
@@ -173,8 +168,6 @@ export const Github: AppIcon = LuGithub;
 export const House: AppIcon = LuHouse;
 /** Lucide `image`: photos; named so it never shadows the DOM `Image`. */
 export const ImageIcon: AppIcon = LuImage;
-/** Lucide `image-plus`: add photos — the upload tiles and drop zones. */
-export const ImagePlus: AppIcon = LuImagePlus;
 /** Lucide `info`: hints and notes. */
 export const Info: AppIcon = LuInfo;
 /** Instagram brand mark, drawn locally (lucide-react ships no brand icons). */
@@ -261,8 +254,6 @@ export const Trash: AppIcon = LuTrash;
 export const TriangleAlert: AppIcon = LuTriangleAlert;
 /** Lucide `truck`: suppliers and vendors. */
 export const Truck: AppIcon = LuTruck;
-/** Lucide `unlink`: a broken chain — the photo comparison's Separate zoom. */
-export const Unlink: AppIcon = LuUnlink;
 export const User: AppIcon = LuUser;
 export const UserCog: AppIcon = LuUserCog;
 export const UserPlus: AppIcon = LuUserPlus;
