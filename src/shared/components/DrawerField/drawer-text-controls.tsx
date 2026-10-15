@@ -204,7 +204,7 @@ function useFieldDictation() {
   return { speech, boxRef, writePhrase, toggle, markUsed };
 }
 
-/** The 28px microphone in the field's bottom inline-end corner, clear of the resize grip. */
+/** The small microphone in the field's bottom inline-end corner, clear of the resize grip. */
 function DictationButton({
   speech,
   onToggle,
@@ -271,12 +271,12 @@ function TextSuggestionChips({
  * A drawer's textarea (9px 10px, 13.5px / 1.45, vertical resize) with the same
  * first-letter capitalisation as {@link DrawerInput} — a message box is left alone.
  *
- * Every note field also takes speech (feat-write-less-2026-10-14-oixr): a 28px microphone in its
- * bottom inline-end corner — Report a bug's orb — where the browser recognises speech; each settled
- * phrase is written where the caret is (the end, before the field is used), spaced and capitalised,
- * within `maxLength`, through the field's own `onChange` (so `register()` and controlled fields both
- * see it). The live words and "Listening…" show under the field. `suggestions` add chips under it
- * that write their text the same way.
+ * Every note field also takes speech (feat-write-less-2026-10-14-oixr): a small microphone in its
+ * bottom inline-end corner (Report a bug's button at its quiet `sm` size) where the browser
+ * recognises speech; each settled phrase is written where the caret is (the end, before the field
+ * is used), spaced and capitalised, within `maxLength`, through the field's own `onChange` (so
+ * `register()` and controlled fields both see it). The live words and "Listening…" show under the
+ * field. `suggestions` add chips under it that write their text the same way.
  */
 export function DrawerTextarea({
   capitalize = true,
@@ -297,7 +297,7 @@ export function DrawerTextarea({
   const textarea = (
     <Textarea
       {...props}
-      className={cn(DRAWER_TEXTAREA_CLASS, voice && 'pe-12', className)}
+      className={cn(DRAWER_TEXTAREA_CLASS, voice && 'pe-10', className)}
       onFocus={(event) => {
         markUsed();
         onFocus?.(event);

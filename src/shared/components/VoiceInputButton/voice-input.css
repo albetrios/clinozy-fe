@@ -37,6 +37,19 @@
   animation-delay: 0.9s;
 }
 
+/* A note field's small mic (size sm): no orb, glow or ripples — the icon takes the brand color on
+   a faint tint while listening; the status line under the field carries the meter. */
+.voice-orb[data-size='sm'][data-listening],
+.voice-orb[data-size='sm'][data-listening]:hover {
+  background-color: color-mix(in oklch, var(--color-brand-mark) 16%, transparent);
+  color: var(--color-brand-mark-strong);
+  box-shadow: none;
+}
+.voice-orb[data-size='sm'][data-listening]::before,
+.voice-orb[data-size='sm'][data-listening]::after {
+  content: none;
+}
+
 /* The meter: it breathes while the room is quiet and jumps while the browser
    hears speech — five bars on different beats so it never looks like a loop. */
 .voice-bars {

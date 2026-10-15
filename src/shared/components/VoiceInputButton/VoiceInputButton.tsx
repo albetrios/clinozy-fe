@@ -40,7 +40,10 @@ export interface VoiceInputButtonProps {
   label: string;
   onToggle: () => void;
   disabled?: boolean;
-  /** `md` — Report a bug's 36px orb; `sm` — a drawer note field's 28px corner button. */
+  /**
+   * `md` — Report a bug's 36px orb; `sm` — a drawer note field's small corner mic: a 12px icon in a
+   * 24px target that only tints while listening (no orb, glow or ripples).
+   */
   size?: 'md' | 'sm';
   /** The meter beside the orb while listening (Report a bug); a field shows its own on the status line. */
   meter?: boolean;
@@ -50,7 +53,8 @@ export interface VoiceInputButtonProps {
 
 /**
  * The voice button: a quiet mic at rest; while listening, a glowing orb with two ripple rings and,
- * beside it by default, the five-bar {@link VoiceMeter} (`voice-input.css`). Purely presentational —
+ * beside it by default, the five-bar {@link VoiceMeter} (`voice-input.css`); at `size="sm"` it stays a
+ * small mic that only tints while listening. Purely presentational —
  * `useSpeechRecognition` owns the state. Report a bug and every drawer note field (`DrawerTextarea`)
  * draw the same one.
  */
@@ -74,8 +78,9 @@ export function VoiceInputButton({
         data-slot="pill"
         className={cn(
           'voice-orb text-muted-foreground hover:text-foreground relative rounded-full',
-          size === 'sm' && 'size-7 [&_svg]:size-3.5',
+          size === 'sm' && 'size-6 [&_svg]:size-3',
         )}
+        data-size={size}
         data-testid={testId}
         data-listening={listening || undefined}
         aria-pressed={listening}

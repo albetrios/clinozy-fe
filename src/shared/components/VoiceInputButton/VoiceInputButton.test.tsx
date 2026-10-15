@@ -61,7 +61,7 @@ describe('VoiceInputButton', () => {
     );
   });
 
-  it('draws the 28px corner button with no meter for a note field', () => {
+  it('draws the small corner mic with no meter for a note field', () => {
     const { container } = render(
       <VoiceInputButton
         listening
@@ -73,7 +73,9 @@ describe('VoiceInputButton', () => {
         testId={TEST_ID}
       />,
     );
-    expect(screen.getByTestId(TEST_ID)).toHaveClass('size-7');
+    const button = screen.getByTestId(TEST_ID);
+    expect(button).toHaveClass('size-6', '[&_svg]:size-3');
+    expect(button).toHaveAttribute('data-size', 'sm');
     expect(container.querySelector('.voice-bars')).toBeNull();
   });
 });
