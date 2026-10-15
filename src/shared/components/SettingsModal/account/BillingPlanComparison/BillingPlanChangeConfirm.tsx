@@ -1,4 +1,4 @@
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, type RefObject, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -10,6 +10,7 @@ import type {
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   CONFIRM_BUTTON_CLASS,
+  type ConfirmLayout,
   ConfirmPanel,
 } from '@/shared/components/ConfirmDialog/index.ts';
 import { SETTINGS_NS } from '@/shared/components/SettingsModal/settings.constants.ts';
@@ -268,6 +269,53 @@ function SeatWarning({
   );
 }
 
+/**
+ * The confirm's two buttons for its layout (panel or sheet), as `ConfirmDialog` builds its own:
+ * "Keep <plan>" (or "Not now") holds the focus and waits while the move runs; the other repeats
+ * the title and runs it.
+ */
+function planChangeFooter(
+  layout: ConfirmLayout,
+  {
+    keepRef,
+    keepLabel,
+    acceptLabel,
+    busy,
+    onConfirm,
+    onDismiss,
+  }: {
+    keepRef: RefObject<HTMLButtonElement | null>;
+    keepLabel: string;
+    acceptLabel: string;
+    busy: boolean;
+    onConfirm: () => void;
+    onDismiss: () => void;
+  },
+): ReactNode {
+  return (
+    <>
+      <Button
+        ref={keepRef}
+        variant="outline"
+        className={CONFIRM_BUTTON_CLASS[layout]}
+        disabled={busy}
+        onClick={onDismiss}
+        data-testid="plan-change-confirm-keep"
+      >
+        {keepLabel}
+      </Button>
+      <Button
+        className={CONFIRM_BUTTON_CLASS[layout]}
+        isLoading={busy}
+        onClick={onConfirm}
+        data-testid="plan-change-confirm-accept"
+      >
+        {acceptLabel}
+      </Button>
+    </>
+  );
+}
+
 /** Props of {@link BillingPlanChangeConfirm}. */
 export interface BillingPlanChangeConfirmProps {
   /** The plan being moved to; `null` closes the confirm. */
@@ -331,30 +379,18 @@ export function BillingPlanChangeConfirm({
       testId="plan-change-confirm"
       initialFocusRef={keepRef}
       description={<PlanChangeRoute current={current} target={target} sorted={sorted} />}
-      footer={(layout) => (
-        <>
-          <Button
-            ref={keepRef}
-            variant="outline"
-            className={CONFIRM_BUTTON_CLASS[layout]}
-            disabled={busy}
-            onClick={onDismiss}
-            data-testid="plan-change-confirm-keep"
-          >
-            {current
-              ? t(CONFIRM_KEYS.keep, { name: current.name })
-              : t(CONFIRM_KEYS.notNow)}
-          </Button>
-          <Button
-            className={CONFIRM_BUTTON_CLASS[layout]}
-            isLoading={busy}
-            onClick={onConfirm}
-            data-testid="plan-change-confirm-accept"
-          >
-            {title}
-          </Button>
-        </>
-      )}
+      footer={(layout) =>
+        planChangeFooter(layout, {
+          keepRef,
+          keepLabel: current
+            ? t(CONFIRM_KEYS.keep, { name: current.name })
+            : t(CONFIRM_KEYS.notNow),
+          acceptLabel: title,
+          busy,
+          onConfirm,
+          onDismiss,
+        })
+      }
     >
       <div className="flex flex-col gap-5 px-(--drawer-pad-x) py-4">
         <PlanChangeSummary
