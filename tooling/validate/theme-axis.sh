@@ -15,7 +15,7 @@
 #   6. `rounded-full` the Sharp shape cannot reach — round-by-design is a SHAPE
 #      decision, so the element needs a slot the `[data-shape='sharp']` list in
 #      index.css squares: its own `data-slot=` (usually "pill"), or a primitive
-#      that brings one (<Button>, <Avatar>, <Skeleton>). Indicators are
+#      that brings one (<Button>, <Avatar>, <Skeleton>, <SkeletonBar>). Indicators are
 #      exempt — status dots ≤ 10px, blurred glows, the ping halo, and
 #      pseudo-element markers (squared in index.css through their nav item).
 #   7. Fixed-size spacing — a padding / margin / gap written as `p-[24px]` or
@@ -168,7 +168,7 @@ PILL_RAW=$(grep -rEn 'rounded-full' src --include='*.tsx' --include='*.ts' \
   | grep -Ev "(^|[\"'\` ])(size-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5)|h-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5) w-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5))([^0-9.]|\$)" \
   || true)
 report_hits "rounded-full the Sharp shape cannot square (add data-slot=\"pill\")" \
-  "$(without_nearby "$PILL_RAW" 5 'data-slot=|<(Button|Avatar|AvatarFallback|Skeleton)([[:space:]/>]|$)')"
+  "$(without_nearby "$PILL_RAW" 5 'data-slot=|<(Button|Avatar|AvatarFallback|Skeleton|SkeletonBar)([[:space:]/>]|$)')"
 
 # 7 — spacing that ignores the Density axis. Only the spacing utilities, and
 # only a bare number + unit: sizes (`h-[640px]`), offsets (`top-[20%]`) and

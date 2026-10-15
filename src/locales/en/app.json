@@ -918,10 +918,6 @@
     "found_one": "{{count}} person found",
     "found_other": "{{count}} people found",
     "noMatch": "No existing match",
-    "use": "Use contact",
-    "addNamed": "Add “{{name}}” as a new contact",
-    "addPhone": "Add {{phone}} as a new contact",
-    "addNamedPhone": "Add “{{name}}” · {{phone}} as a new contact",
     "enterKey": "↵",
     "clearSearch": "Clear search",
     "added": "{{name}} added to contacts",
@@ -939,11 +935,7 @@
     },
     "patient": {
       "newPatient": "New patient",
-      "addNamed": "Add “{{name}}” as a new patient",
-      "addPhone": "Add {{phone}} as a new patient",
-      "addNamedPhone": "Add “{{name}}” · {{phone}} as a new patient",
       "add": "Add patient",
-      "use": "Use patient",
       "added": "{{name}} added as a patient",
       "existing": "{{name}} is already a patient · picked"
     }

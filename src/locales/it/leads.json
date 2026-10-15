@@ -172,8 +172,7 @@
       "contact": "{{id}} · {{phone}}",
       "openLead": "Lead aperto · {{id}} · {{phone}}",
       "open": "Apri lead",
-      "recreate": "Ricrea lead",
-      "useContact": "Usa contatto"
+      "recreate": "Ricrea lead"
     },
     "more_one": " · +{{count}} altro",
     "more_many": " · +{{count}} altri",

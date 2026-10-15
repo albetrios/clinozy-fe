@@ -169,8 +169,7 @@
       "contact": "{{id}} · {{phone}}",
       "openLead": "खुली लीड · {{id}} · {{phone}}",
       "open": "लीड खोलें",
-      "recreate": "लीड फिर से बनाएँ",
-      "useContact": "संपर्क इस्तेमाल करें"
+      "recreate": "लीड फिर से बनाएँ"
     },
     "more_one": " · +{{count}} और",
     "more_other": " · +{{count}} और",

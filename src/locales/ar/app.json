@@ -970,10 +970,6 @@
     "found_many": "عُثر على {{count}} شخصًا",
     "found_other": "عُثر على {{count}} شخص",
     "noMatch": "لا توجد نتيجة مطابقة",
-    "use": "استخدام جهة الاتصال",
-    "addNamed": "إضافة «{{name}}» كجهة اتصال جديدة",
-    "addPhone": "إضافة {{phone}} كجهة اتصال جديدة",
-    "addNamedPhone": "إضافة «{{name}}» · {{phone}} كجهة اتصال جديدة",
     "enterKey": "↵",
     "clearSearch": "مسح البحث",
     "added": "تمت إضافة {{name}} إلى جهات الاتصال",
@@ -991,11 +987,7 @@
     },
     "patient": {
       "newPatient": "مريض جديد",
-      "addNamed": "إضافة «{{name}}» كمريض جديد",
-      "addPhone": "إضافة {{phone}} كمريض جديد",
-      "addNamedPhone": "إضافة «{{name}}» · {{phone}} كمريض جديد",
       "add": "إضافة المريض",
-      "use": "اختيار المريض",
       "added": "تمت إضافة {{name}} كمريض",
       "existing": "{{name}} مريض بالفعل · تم اختياره"
     }

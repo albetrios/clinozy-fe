@@ -905,10 +905,6 @@
     "searching": "検索中…",
     "found_other": "{{count}} 人見つかりました",
     "noMatch": "一致する人はいません",
-    "use": "連絡先を使う",
-    "addNamed": "「{{name}}」を新しい連絡先として追加",
-    "addPhone": "{{phone}} を新しい連絡先として追加",
-    "addNamedPhone": "「{{name}}」· {{phone}} を新しい連絡先として追加",
     "enterKey": "↵",
     "clearSearch": "検索をクリア",
     "added": "{{name}} を連絡先に追加しました",
@@ -926,11 +922,7 @@
     },
     "patient": {
       "newPatient": "新しい患者",
-      "addNamed": "「{{name}}」を新しい患者として追加",
-      "addPhone": "{{phone}} を新しい患者として追加",
-      "addNamedPhone": "「{{name}}」· {{phone}} を新しい患者として追加",
       "add": "患者を追加",
-      "use": "この患者を使う",
       "added": "{{name}} を患者として追加しました",
       "existing": "{{name}} はすでに患者です · 選択しました"
     }

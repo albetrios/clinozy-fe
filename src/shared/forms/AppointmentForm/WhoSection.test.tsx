@@ -145,7 +145,7 @@ describe('WhoSection — the person search (H:2749–2753)', () => {
     expect(search).toHaveAccessibleName('Search person');
     await user.type(search, 'ri');
     expect(withoutBidiMarks(screen.getByTestId(IDS.whoCreate).textContent)).toBe(
-      'Add “ri” as a new contact↵',
+      'New contact ri↵',
     );
     expect(screen.getByTestId('appointment-form-who-hint')).toHaveTextContent(
       'Keep typing — 3 letters or 4 digits',
@@ -155,9 +155,10 @@ describe('WhoSection — the person search (H:2749–2753)', () => {
     const hits = await screen.findAllByTestId(IDS.whoHit);
     expect(searchContactsMock).toHaveBeenCalledWith('riy', 'everyone');
     expect(hits).toHaveLength(2);
-    expect(hits[0]).toHaveTextContent('Riya Mehta+91 98250 11241Use contact');
+    expect(hits[0]).toHaveTextContent('Riya Mehta+91 98250 11241');
+    expect(hits[0]).not.toHaveTextContent('Use contact');
     // A patient's hit says so (its avatar carries the "P"), not their number.
-    expect(hits[1]).toHaveTextContent('Riyan ShahPatientUse contact');
+    expect(hits[1]).toHaveTextContent('Riyan ShahPatient');
     expect(hits[1]).not.toHaveTextContent('+91');
     // The section sits inside the drawer's dialog in the app: no page landmarks here.
     expect(

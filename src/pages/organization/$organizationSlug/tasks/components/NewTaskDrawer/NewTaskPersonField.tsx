@@ -5,8 +5,6 @@ import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
-  CONTACT_QUICK_PICK_KEYS,
-  CONTACT_QUICK_PICK_NS,
   ContactQuickPickField,
   useQuickAddContact,
 } from '@/shared/components/ContactQuickPick/index.ts';
@@ -51,7 +49,6 @@ export function NewTaskPersonField({
   testId,
 }: NewTaskPersonFieldProps) {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tPick } = useTranslation(CONTACT_QUICK_PICK_NS);
   const kindLabel = usePersonKindLabel();
   const addContact = useQuickAddContact();
   const K = TASKS_KEYS.newTask.forField;
@@ -84,7 +81,6 @@ export function NewTaskPersonField({
             displayId.contact(hit.contactNumber),
             hit.primaryPhone ? formatAppPhone(hit.primaryPhone) : '',
           ]),
-          action: tPick(CONTACT_QUICK_PICK_KEYS.use),
           tone: PERSON_TONES[person.kind],
         };
       }}
