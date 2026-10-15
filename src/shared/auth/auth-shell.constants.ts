@@ -120,6 +120,7 @@ export const AUTH_KEYS = {
     declineDescription: 'organizationPicker.declineDescription',
     declined: 'organizationPicker.declined',
     createOwn: 'organizationPicker.createOwn',
+    joined: 'organizationPicker.joined',
   },
   validation: {
     emailRequired: 'validation.emailRequired',

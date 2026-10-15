@@ -137,7 +137,10 @@ function OrganizationOption({
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-medium">{org.name}</span>
+        {/* A long clinic name wraps rather than being cut; the slug stays one line. */}
+        <span dir="auto" className="block text-sm font-medium break-words">
+          {org.name}
+        </span>
         {org.slug ? (
           <span className="text-muted-foreground block truncate text-xs">{org.slug}</span>
         ) : null}

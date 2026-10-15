@@ -522,6 +522,9 @@ it may have been deleted"); an unknown path inside the organization goes to the 
 | `organization-page`                                            | Organization picker page                                      | `pages/organization/OrganizationPickerPage.tsx`                    |
 | `organization-picker-option-<slug>`                            | Picker card per organization                                  | `pages/organization/OrganizationPickerPage.tsx`                    |
 | `organization-picker-create`                                   | Picker create-organization button                             | `pages/organization/OrganizationPickerPage.tsx`                    |
+| `organization-picker-default-<slug>`                           | The star that makes a clinic open at sign-in                  | `pages/organization/OrganizationPickerPage.tsx`                    |
+| `organization-picker-default-badge-<slug>`                     | "Default" on the clinic that opens at sign-in                 | `pages/organization/OrganizationPickerPage.tsx`                    |
+| `organization-picker-default-hint`                             | The hint under the list about the star                        | `pages/organization/OrganizationPickerPage.tsx`                    |
 | `organization-picker-invitations`                              | Picker's pending-invitations section (D84)                    | `pages/organization/components/InvitationList/`                    |
 | `organization-picker-invitation-<id>`                          | One pending invitation row                                    | `pages/organization/components/InvitationList/`                    |
 | `organization-picker-invitation-accept-<id>` / `-decline-<id>` | Accept / Decline an invitation                                | `pages/organization/components/InvitationList/`                    |

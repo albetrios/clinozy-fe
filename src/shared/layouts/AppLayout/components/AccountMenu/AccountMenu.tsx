@@ -276,7 +276,9 @@ function SignInClinicSubmenu() {
           {pinned?.name ?? t(signInKeys.lastUsed)}
         </span>
       </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent className="w-72">
+      {/* Wide enough for a long clinic name, which wraps rather than being cut; each row is a
+          comfortable 44px target. */}
+      <DropdownMenuSubContent className="w-80 max-w-[calc(100vw-2rem)]">
         <DropdownMenuRadioGroup
           value={current}
           onValueChange={(value) => {
@@ -288,12 +290,13 @@ function SignInClinicSubmenu() {
           <DropdownMenuRadioItem
             value={SIGN_IN_AUTOMATIC}
             data-testid="account-menu-sign-in-clinic-automatic"
+            className="min-h-11 py-2"
           >
             <span className="flex min-w-0 flex-col">
-              <span className="truncate text-sm font-medium">
+              <span className="text-sm font-medium break-words">
                 {t(signInKeys.automatic)}
               </span>
-              <span className="text-muted-foreground truncate text-xs">
+              <span className="text-muted-foreground text-xs break-words">
                 {t(signInKeys.automaticHint)}
               </span>
             </span>
@@ -304,11 +307,17 @@ function SignInClinicSubmenu() {
               key={clinic.id}
               value={clinic.id}
               data-testid={`account-menu-sign-in-clinic-${clinic.slug ?? clinic.id}`}
+              className="min-h-11 py-2"
             >
               <span className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-medium">{clinic.name}</span>
+                <span dir="auto" className="text-sm font-medium break-words">
+                  {clinic.name}
+                </span>
                 {clinic.slug ? (
-                  <span className="text-muted-foreground truncate text-xs">
+                  <span
+                    title={clinic.slug}
+                    className="text-muted-foreground truncate text-xs"
+                  >
                     {clinic.slug}
                   </span>
                 ) : null}

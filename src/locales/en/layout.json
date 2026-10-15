@@ -32,7 +32,10 @@
       "automatic": "The clinic I used last",
       "automaticHint": "Changes as you move between clinics",
       "savedClinic": "Sign-in will open {{name}}",
-      "savedAutomatic": "Sign-in will open the clinic you used last"
+      "savedAutomatic": "Sign-in will open the clinic you used last",
+      "makeDefault": "Open {{name}} at sign-in",
+      "removeDefault": "Stop opening {{name}} at sign-in",
+      "pickerHint": "Star a clinic to open it every time you sign in."
     },
     "notifications": {
       "title": "Notifications",

@@ -122,6 +122,9 @@ export const LAYOUT_KEYS = {
       automaticHint: 'app.signInClinic.automaticHint',
       savedClinic: 'app.signInClinic.savedClinic',
       savedAutomatic: 'app.signInClinic.savedAutomatic',
+      makeDefault: 'app.signInClinic.makeDefault',
+      removeDefault: 'app.signInClinic.removeDefault',
+      pickerHint: 'app.signInClinic.pickerHint',
     },
     notifications: {
       title: 'app.notifications.title',

@@ -233,9 +233,21 @@ describe('pending invitations (D84)', () => {
     ).toBeNull();
   });
 
-  it('keeps a member of a clinic where they are — the invitation waits in the switcher', () => {
+  it('shows a member of a clinic the picker while an invitation is pending — to accept it and choose the default', () => {
     expect(
       resolveRootTarget(meCtx(activeOrg('TEAM', 'acme')), { pendingInvitations: 2 }),
+    ).toEqual({ to: '/organization' });
+    // Only `/` decides that: entering a clinic by its URL is never held up by an invitation.
+    expect(
+      workspaceRedirectForTeamEntry(meCtx(activeOrg('TEAM', 'acme')), {
+        pendingInvitations: 2,
+      }),
+    ).toBeNull();
+  });
+
+  it('opens the clinic straight away with nothing pending', () => {
+    expect(
+      resolveRootTarget(meCtx(activeOrg('TEAM', 'acme')), { pendingInvitations: 0 }),
     ).toEqual({
       to: '/organization/$organizationSlug',
       params: { organizationSlug: 'acme' },
@@ -258,16 +270,22 @@ describe('pending invitations (D84)', () => {
     });
   });
 
-  it('reads the invitations only when they could change the answer', async () => {
+  it('reads the invitations in a clinic deployment, never in a personal-only one', async () => {
     vi.mocked(ensureMyInvitations).mockResolvedValue([AN_INVITATION]);
 
-    expect(await countLandingInvitations(meCtx(activeOrg('TEAM', 'acme')))).toBe(0);
+    const personalOnly = meCtx(null, false);
+    personalOnly.deploymentFlags = {
+      personalOrganizations: true,
+      teamOrganizations: false,
+    };
+    expect(await countLandingInvitations(personalOnly)).toBe(0);
     expect(ensureMyInvitations).not.toHaveBeenCalled();
 
+    expect(await countLandingInvitations(meCtx(activeOrg('TEAM', 'acme')))).toBe(1);
     expect(await resolveRootTargetWithInvitations(meCtx(null, false))).toEqual({
       to: '/organization',
     });
-    expect(ensureMyInvitations).toHaveBeenCalledOnce();
+    expect(ensureMyInvitations).toHaveBeenCalledTimes(2);
   });
 
   it('decides as if there were none when the invitations cannot be read', async () => {
@@ -276,6 +294,13 @@ describe('pending invitations (D84)', () => {
     expect(await resolveRootTargetWithInvitations(meCtx(null, false))).toEqual({
       to: '/onboarding',
     });
+  });
+
+  it('sends `/` to the picker for an invited member of a clinic', async () => {
+    vi.mocked(ensureMyInvitations).mockResolvedValue([AN_INVITATION]);
+    vi.mocked(ensureSessionContext).mockResolvedValue(meCtx(activeOrg('TEAM', 'acme')));
+
+    expect(await resolveRootRedirect()).toEqual({ to: '/organization' });
   });
 
   it('sends `/` to the picker for an invited person with no clinic', async () => {

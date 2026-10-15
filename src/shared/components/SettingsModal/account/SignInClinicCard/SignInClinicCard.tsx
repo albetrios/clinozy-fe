@@ -13,7 +13,10 @@ import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 /** The radio value of "the clinic I used last" — never an organization id (`org_…`). */
 export const SIGN_IN_CLINIC_AUTOMATIC = 'automatic';
 
-/** One choice: a full-width row with its radio, a name and a muted second line. */
+/**
+ * One choice: a tile with its radio, the name — wrapping onto a second line, never cut — and a
+ * muted second line. Tiles in one row share a height.
+ */
 function SignInClinicOption({
   value,
   label,
@@ -31,19 +34,24 @@ function SignInClinicOption({
       data-testid={testId}
       // The focus ring is the theme's (`data-focus` reaches any `data-slot`), never a fixed one.
       data-slot="radio-row"
-      className="border-border hover:bg-muted/60 data-[state=checked]:border-primary data-[state=checked]:bg-muted flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-start transition-colors"
+      className="border-border hover:bg-muted/60 data-[state=checked]:border-primary data-[state=checked]:bg-muted flex h-full min-h-14 w-full items-start gap-3 rounded-lg border px-3 py-2.5 text-start transition-colors"
     >
       <span
         aria-hidden
         data-slot="pill"
-        className="border-input flex size-4 shrink-0 items-center justify-center rounded-full border"
+        className="border-input mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border"
       >
         <RadioGroupPrimitive.Indicator className="bg-primary size-2 rounded-full" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="text-body block truncate font-medium">{label}</span>
+        <span dir="auto" className="text-body block font-medium break-words">
+          {label}
+        </span>
         {hint ? (
-          <span className="text-muted-foreground text-caption block truncate">
+          <span
+            title={hint}
+            className="text-muted-foreground text-caption block truncate"
+          >
             {hint}
           </span>
         ) : null}
@@ -72,31 +80,35 @@ export function SignInClinicCard() {
       description={t(SETTINGS_KEYS.panels.account.signInClinicDescription)}
       data-testid="sign-in-clinic-card"
     >
-      <RadioGroup
-        value={current}
-        onValueChange={(value) => {
-          if (value === current) return;
-          choose(value === SIGN_IN_CLINIC_AUTOMATIC ? null : value);
-        }}
-        aria-label={title}
-        className="gap-1.5"
-      >
-        <SignInClinicOption
-          value={SIGN_IN_CLINIC_AUTOMATIC}
-          label={tLayout(LAYOUT_KEYS.app.signInClinic.automatic)}
-          hint={tLayout(LAYOUT_KEYS.app.signInClinic.automaticHint)}
-          testId="sign-in-clinic-option-automatic"
-        />
-        {clinics.map((clinic) => (
+      {/* Two tiles a row once the card is wide enough (a container query — the Settings modal
+          is narrower than the viewport), one on a phone. */}
+      <div className="@container">
+        <RadioGroup
+          value={current}
+          onValueChange={(value) => {
+            if (value === current) return;
+            choose(value === SIGN_IN_CLINIC_AUTOMATIC ? null : value);
+          }}
+          aria-label={title}
+          className="grid gap-2 @md:grid-cols-2"
+        >
           <SignInClinicOption
-            key={clinic.id}
-            value={clinic.id}
-            label={clinic.name}
-            hint={clinic.slug}
-            testId={`sign-in-clinic-option-${clinic.slug ?? clinic.id}`}
+            value={SIGN_IN_CLINIC_AUTOMATIC}
+            label={tLayout(LAYOUT_KEYS.app.signInClinic.automatic)}
+            hint={tLayout(LAYOUT_KEYS.app.signInClinic.automaticHint)}
+            testId="sign-in-clinic-option-automatic"
           />
-        ))}
-      </RadioGroup>
+          {clinics.map((clinic) => (
+            <SignInClinicOption
+              key={clinic.id}
+              value={clinic.id}
+              label={clinic.name}
+              hint={clinic.slug}
+              testId={`sign-in-clinic-option-${clinic.slug ?? clinic.id}`}
+            />
+          ))}
+        </RadioGroup>
+      </div>
     </SettingsCard>
   );
 }

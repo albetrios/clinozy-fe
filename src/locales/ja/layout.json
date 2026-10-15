@@ -32,7 +32,10 @@
       "automatic": "最後に使ったクリニック",
       "automaticHint": "クリニックを移動するたびに切り替わります",
       "savedClinic": "サインイン時に{{name}}を開きます",
-      "savedAutomatic": "サインイン時に最後に使ったクリニックを開きます"
+      "savedAutomatic": "サインイン時に最後に使ったクリニックを開きます",
+      "makeDefault": "サインイン時に{{name}}を開く",
+      "removeDefault": "サインイン時に{{name}}を開かない",
+      "pickerHint": "クリニックに星を付けると、サインインのたびにそのクリニックが開きます。"
     },
     "notifications": {
       "title": "通知",

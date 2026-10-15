@@ -21,6 +21,16 @@ build, which reads the local `.env.local` (dev tooling on); the new code ships i
 `index.html`'s initial set (`index`, `query`, `rolldown-runtime`, `vendor`, `zod`). CI measures with no
 env file.
 
+### Review changes (D11 – D13)
+
+| #   | From         | Actually built                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Difference                                                                                   | Why                                      | Decision | Commit        |
+| --- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------- | -------- | ------------- |
+| #5  | review (D11) | `SignInClinicCard`: a `@container` grid — `@md:grid-cols-2`, tiles `h-full min-h-14`, the radio on the first line; names `break-words`, slugs one line with a `title`. `AccountMenu` submenu `w-80 max-w-[calc(100vw-2rem)]`, rows `min-h-11`, names wrap. `OrganizationSwitcher` names wrap. Checked at 1200px and 390px on the local stack                                                                                                                                                                                                                                                                                                                                | —                                                                                            | the user's review                        | D11      | (this commit) |
+| #6  | review (D12) | `OrganizationPickerPage`: a star (`organization-picker-default-<slug>`, `aria-pressed`, "Open … at sign-in" / "Stop opening … at sign-in") and "Default" (`organization-picker-default-badge-<slug>`) per row, the hint (`organization-picker-default-hint`); the row became a `div` with the link's `after:` layer covering it. Strings `app.signInClinic.makeDefault` / `removeDefault` / `pickerHint` in 11 languages. Tests: picker +4 (star pins and unpins, "Default", wrapping, no star with one clinic, `vitest-axe`); the two row-shape assertions read the row around the link. Live: star → saved, "Default", toast, still on the picker; star again → automatic | —                                                                                            | the user's review                        | D12      | (this commit) |
+| #7  | review (D13) | `organization-resolver.ts`: `hasClinics` / `hasNoClinicToEnter`; an onboarded member of a clinic with an invitation pending → the picker; `countLandingInvitations` reads in every clinic deployment. `InvitationList`: someone who had a clinic stays after an accept, `organizationPicker.joined` ("You joined …") in 11 languages. Docs: `routing-and-tenancy.md`, `TENANCY.FLOWS.md`, `ORGANIZATION.OVERVIEW.md`, `e2e-testids-inventory.md` (3 ids). Tests: resolver (+3, 1 rewritten: picker while invited, straight in otherwise, team entry never held up, reads in clinic deployments only), `InvitationList` (+1, stays after an accept)                          | launch D84 kept a member of a clinic where they were — the invitation waited in the switcher | the user asked for the picker at sign-in | D13      | (this commit) |
+
+Checked: `type-check` ✓ · ESLint and Prettier on every touched file ✓ · `validate:testids` / `validate:structure` / `validate:tokens` / `validate:theme-axis` ✓ · `sync:check` ✓ · the related Vitest files ✓ (478 files, 3185 tests).
+
 ## Revisions to upcoming rows
 
 None.
@@ -30,7 +40,9 @@ None.
 - **Built:** two places to choose the clinic that opens at sign-in — Settings › Account and the
   account menu — and a "Default" label in Switch clinic, over one shared hook (D3 – D6).
 - **Verified:** F-1 – F-5 ✓ (F-4 in the real app, recorded).
-- **Planned, not built:** none. **Built, not planned:** none.
+- **Planned, not built:** none. **Built, not planned:** the review changes #5 – #7 (D11 – D13):
+  sized choices, the picker's star and "Default", and the picker at sign-in while an invitation
+  is pending.
 
 ## Standing deviations
 

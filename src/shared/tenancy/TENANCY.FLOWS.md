@@ -12,7 +12,8 @@ Where a bare `/` lands, decided from the JWT-backed session context.
    `me/context`: onboarding flag + deployment flags + active org; refetches only
    on a cold boot).
 2. `resolveRootTarget(ctx, { pendingInvitations })` (`resolveRootTargetWithInvitations` reads the
-   invitations only when there is no active team org — a failed read counts as none):
+   invitations in every clinic deployment — never in `personal-only` — and a failed read counts as
+   none):
    - **Invited with no clinic (D84):** pending invitations, a team deployment and no active team
      org → `/organization`, the picker, which lists them with Accept / Decline. Checked _before_
      onboarding: team-only onboarding creates a clinic, and an invitee must not get a second,
@@ -23,6 +24,10 @@ Where a bare `/` lands, decided from the JWT-backed session context.
      `!user.onboarding_completed`) → `/onboarding`. This is checked _before_ any
      active-org routing, so a personal deployment's auto-provisioned org does not
      short-circuit a fresh user past the wizard.
+   - **Invited member of a clinic (feat-choose-default-clinic):** an active TEAM and pending
+     invitations → `/organization`, where they accept or decline them and star the clinic that
+     opens at sign-in. Only `/` decides this; `workspaceRedirectForTeamEntry` never holds a
+     clinic's URL up for an invitation. One clinic and nothing pending → straight in.
    - Then the active org: a TEAM with a slug (outside a `personal-only`
      deployment) → its home, `/organization/$slug` (`organizationHome(slug)`),
      which sends the member on to their role home (D25: Today for most roles) —

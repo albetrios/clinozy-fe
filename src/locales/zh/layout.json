@@ -32,7 +32,10 @@
       "automatic": "我上次使用的诊所",
       "automaticHint": "随你在诊所之间切换而变化",
       "savedClinic": "登录时将打开{{name}}",
-      "savedAutomatic": "登录时将打开你上次使用的诊所"
+      "savedAutomatic": "登录时将打开你上次使用的诊所",
+      "makeDefault": "登录时打开{{name}}",
+      "removeDefault": "登录时不再打开{{name}}",
+      "pickerHint": "为诊所加星标，每次登录时都会打开它。"
     },
     "notifications": {
       "title": "通知",

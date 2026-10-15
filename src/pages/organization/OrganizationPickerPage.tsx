@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils.ts';
 import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import {
@@ -18,7 +19,9 @@ import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
-import { Building, ChevronRight, Plus } from '@/shared/icons/index.ts';
+import { useSignInClinic } from '@/shared/hooks/useSignInClinic/index.ts';
+import { Building, ChevronRight, Plus, Star } from '@/shared/icons/index.ts';
+import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useMyInvitations } from '@/shared/tenancy/my-invitations.ts';
 import {
   type MyOrganizationSummary,
@@ -27,54 +30,111 @@ import {
 
 import { InvitationList } from './components/InvitationList/index.ts';
 
+/** The picker's say in which clinic opens at sign-in (feat-choose-default-clinic). */
+interface DefaultChoice {
+  /** The pinned clinic, or `null` for the clinic used last. */
+  readonly pinnedId: string | null;
+  /** Pin a clinic, or `null` to go back to the clinic used last. */
+  readonly choose: (organizationId: string | null) => void;
+}
+
 /**
  * One organization as an All sections row (`shell.md:43`; H:532): the 28px
  * tile in the name's hashed tone with the 16px icon, the name 13px/600 over
  * the slug 11.5px, a chevron at the end. The active organization is the
  * current row — `canvas` with the `border-strong` edge — and hover is `muted`.
+ *
+ * With two or more clinics a star sits before the chevron: it makes the clinic the one that
+ * opens at sign-in, or — on the default clinic, which also reads "Default" — goes back to the
+ * clinic used last. The link's `after:` layer makes the whole row open the clinic; only the
+ * star sits above it. A long name wraps rather than being cut.
  */
 function OrganizationRow({
   organization,
+  defaultChoice,
 }: {
   organization: MyOrganizationSummary & { slug: string };
+  defaultChoice: DefaultChoice | null;
 }) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const isDefault = defaultChoice?.pinnedId === organization.id;
+  const starLabel = t(
+    isDefault
+      ? LAYOUT_KEYS.app.signInClinic.removeDefault
+      : LAYOUT_KEYS.app.signInClinic.makeDefault,
+    { name: organization.name },
+  );
   return (
-    <Link
-      {...organizationHome(organization.slug)}
-      aria-current={organization.isActive ? 'true' : undefined}
+    <div
       className={cn(
-        'flex min-w-0 items-center gap-2.5 rounded-lg border py-1.5 ps-1.5 pe-2 text-start transition-colors',
+        'relative flex min-w-0 items-center gap-1.5 rounded-lg border py-1.5 ps-1.5 pe-2 transition-colors',
         organization.isActive
           ? 'bg-canvas border-border-strong'
           : 'hover:bg-muted border-transparent',
       )}
-      data-testid={`organization-picker-option-${organization.slug}`}
     >
-      <span
-        aria-hidden="true"
-        className={cn(
-          'flex size-7 flex-none items-center justify-center rounded-md',
-          TONE_CLASSES[toneForLabel(organization.name)].surface,
-        )}
+      <Link
+        {...organizationHome(organization.slug)}
+        aria-current={organization.isActive ? 'true' : undefined}
+        className="flex min-w-0 flex-1 items-center gap-2.5 text-start after:absolute after:inset-0 after:rounded-lg"
+        data-testid={`organization-picker-option-${organization.slug}`}
       >
-        <Building className="size-4" />
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span dir="auto" className="text-body truncate leading-[1.3] font-semibold">
-          {organization.name}
-        </span>
         <span
-          dir="ltr"
-          className="text-muted-foreground text-caption truncate [text-align:match-parent] leading-[1.3]"
+          aria-hidden="true"
+          className={cn(
+            'flex size-7 flex-none items-center justify-center rounded-md',
+            TONE_CLASSES[toneForLabel(organization.name)].surface,
+          )}
         >
-          {organization.slug}
+          <Building className="size-4" />
         </span>
-      </span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span dir="auto" className="text-body leading-[1.3] font-semibold break-words">
+            {organization.name}
+          </span>
+          <span
+            dir="ltr"
+            className="text-muted-foreground text-caption truncate [text-align:match-parent] leading-[1.3]"
+          >
+            {organization.slug}
+          </span>
+        </span>
+        {isDefault ? (
+          <TonePill
+            tone="neutral"
+            size="sm"
+            className="shrink-0"
+            data-testid={`organization-picker-default-badge-${organization.slug}`}
+          >
+            {t(LAYOUT_KEYS.app.orgSwitcher.defaultBadge)}
+          </TonePill>
+        ) : null}
+      </Link>
+      {defaultChoice ? (
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-pressed={isDefault}
+          aria-label={starLabel}
+          title={starLabel}
+          onClick={() => defaultChoice.choose(isDefault ? null : organization.id)}
+          className={cn(
+            'relative z-10 shrink-0',
+            isDefault ? 'text-primary' : 'text-muted-foreground',
+          )}
+          data-testid={`organization-picker-default-${organization.slug}`}
+        >
+          <Star
+            className={cn('size-4', isDefault && 'fill-current')}
+            aria-hidden="true"
+          />
+        </Button>
+      ) : null}
       <ChevronRight
         className="text-muted-foreground size-4 shrink-0 rtl:rotate-180"
         aria-hidden="true"
       />
-    </Link>
+    </div>
   );
 }
 
@@ -87,6 +147,7 @@ function OrganizationRow({
  */
 function OrganizationList({ invited }: { invited: boolean }) {
   const { t } = useTranslation(AUTH_NS);
+  const { t: tLayout } = useTranslation(LAYOUT_NS);
   /*
    * The same list, under the same cache key, that the guard chain and the
    * switcher read. The guard that sent the user here already resolved
@@ -102,6 +163,9 @@ function OrganizationList({ invited }: { invited: boolean }) {
 
   // Someone who is only invited has their invitations above, not "you're not part of any yet".
   const isEmpty = !(isLoading || isError || invited) && organizations.length === 0;
+  // The clinic that opens at sign-in — only with two or more clinics to choose between.
+  const { pinnedId, canChoose, choose } = useSignInClinic();
+  const defaultChoice: DefaultChoice | null = canChoose ? { pinnedId, choose } : null;
 
   return (
     <>
@@ -149,8 +213,21 @@ function OrganizationList({ invited }: { invited: boolean }) {
 
       {!(isLoading || isError) &&
         organizations.map((organization) => (
-          <OrganizationRow key={organization.id} organization={organization} />
+          <OrganizationRow
+            key={organization.id}
+            organization={organization}
+            defaultChoice={defaultChoice}
+          />
         ))}
+
+      {defaultChoice && !(isLoading || isError) ? (
+        <p
+          className="text-muted-foreground text-caption px-1.5 pt-1"
+          data-testid="organization-picker-default-hint"
+        >
+          {tLayout(LAYOUT_KEYS.app.signInClinic.pickerHint)}
+        </p>
+      ) : null}
     </>
   );
 }
