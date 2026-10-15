@@ -111,20 +111,20 @@ phone, patient-file section switches, dark, Arabic, reduced motion; `pnpm size`.
 
 | #    | Work item                                                                                | Kind       | Depends on | Skill/driver                               | Acceptance             | Assignee | Status |
 | ---- | ---------------------------------------------------------------------------------------- | ---------- | ---------- | ------------------------------------------ | ---------------------- | -------- | ------ |
-| L-1  | lottie-web, `LottiePlayer`, the authored animation and its stylesheet                    | global     | —          | fe-dependency-management · emil-design-eng | criterion 3            | Claude   | todo   |
-| L-2  | `PaymentReceived` view                                                                   | structural | L-1        | fe-code-structure · emil-design-eng        | criterion 1            | Claude   | todo   |
-| L-3  | The review section: previous reviews, the ask, Log a review                              | structural | L-2        | fe-code-structure                          | criterion 4            | Claude   | todo   |
-| L-4  | The branch's review link: contracts, Branch drawer, template values, Send on WhatsApp    | api        | L-3, BE    | fe-resource-crud                           | criteria 5–6           | Claude   | todo   |
-| L-5  | Receive payment → the view                                                               | wiring     | L-2        | fe-kickoff-iteration                       | criterion 1            | Claude   | todo   |
-| L-6  | Invoice paid now, credit got back → the view                                             | wiring     | L-5        | fe-kickoff-iteration                       | criterion 2            | Claude   | todo   |
-| L-7  | Bottom sheets in the primitive                                                           | styling    | —          | shadcn · emil-design-eng                   | criterion 7            | Claude   | todo   |
-| L-8  | Same room, no page rise; the thumb's continuity                                          | structural | —          | emil-design-eng                            | criterion 8            | Claude   | todo   |
-| L-9  | Smooth scrolls, toggles, progress, cookie banner                                         | styling    | —          | emil-design-eng                            | criterion 9            | Claude   | todo   |
-| L-10 | Copy in every locale                                                                     | copy       | L-2–L-6    | fe-i18n-constants                          | `pnpm sync:check`      | Claude   | todo   |
-| L-11 | Docs and the motion policy                                                               | copy       | L-1–L-10   | fe-documentation-maintenance               | `pnpm docs:lint`       | Claude   | todo   |
-| L-12 | Verify in the running app: the moment, the review states, every drawer, sheets, sections | verify     | L-1–L-11   | fe-kickoff-iteration                       | every criterion proven | Claude   | todo   |
-| L-13 | Gates                                                                                    | gate       | L-12       | fe-before-commit-guard                     | criterion 10           | Claude   | todo   |
-| L-14 | Close: `AS-BUILT.md`, Status `done`                                                      | verify     | L-13       | fe-kickoff-iteration                       | README Status `done`   | Claude   | todo   |
+| L-1  | lottie-web, `LottiePlayer`, the authored animation and its stylesheet                    | global     | —          | fe-dependency-management · emil-design-eng | criterion 3            | Claude   | done   |
+| L-2  | `PaymentReceived` view                                                                   | structural | L-1        | fe-code-structure · emil-design-eng        | criterion 1            | Claude   | done   |
+| L-3  | The review section: previous reviews, the ask, Log a review                              | structural | L-2        | fe-code-structure                          | criterion 4            | Claude   | done   |
+| L-4  | The branch's review link: contracts, Branch drawer, template values, Send on WhatsApp    | api        | L-3, BE    | fe-resource-crud                           | criteria 5–6           | Claude   | done   |
+| L-5  | Receive payment → the view                                                               | wiring     | L-2        | fe-kickoff-iteration                       | criterion 1            | Claude   | done   |
+| L-6  | Invoice paid now, credit got back → the view                                             | wiring     | L-5        | fe-kickoff-iteration                       | criterion 2            | Claude   | done   |
+| L-7  | Bottom sheets in the primitive                                                           | styling    | —          | shadcn · emil-design-eng                   | criterion 7            | Claude   | done   |
+| L-8  | Same room, no page rise; the thumb's continuity                                          | structural | —          | emil-design-eng                            | criterion 8            | Claude   | done   |
+| L-9  | Smooth scrolls, toggles, progress, cookie banner                                         | styling    | —          | emil-design-eng                            | criterion 9            | Claude   | done   |
+| L-10 | Copy in every locale                                                                     | copy       | L-2–L-6    | fe-i18n-constants                          | `pnpm sync:check`      | Claude   | done   |
+| L-11 | Docs and the motion policy                                                               | copy       | L-1–L-10   | fe-documentation-maintenance               | `pnpm docs:lint`       | Claude   | done   |
+| L-12 | Verify in the running app: the moment, the review states, every drawer, sheets, sections | verify     | L-1–L-11   | fe-kickoff-iteration                       | every criterion proven | Claude   | done   |
+| L-13 | Gates                                                                                    | gate       | L-12       | fe-before-commit-guard                     | criterion 10           | Claude   | done   |
+| L-14 | Close: `AS-BUILT.md`, Status `done`                                                      | verify     | L-13       | fe-kickoff-iteration                       | README Status `done`   | Claude   | done   |
 
 ## Appendix A — Coverage matrix
 
