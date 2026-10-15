@@ -1418,6 +1418,98 @@
       "error": "无法发送报告。你写的内容还在，请重试。"
     }
   },
+  "billingPlans": {
+    "upgradeTo": "升级到 {{name}}",
+    "plan": {
+      "perMonth": "/ 月",
+      "billedYearlyTotal": "按年计费 · 每年 {{price}}",
+      "monthlyOnly": "仅按月计费 — 无年付选项",
+      "freeForever": "永久免费",
+      "save": "节省 {{percent}}%",
+      "saveUpTo": "最多节省 {{percent}}%",
+      "includes": "包含：",
+      "everythingInPlus": "{{name}} 的全部功能，另加：",
+      "everythingIn": "{{name}} 的全部功能",
+      "audienceSolo": "适合单人执业",
+      "audienceTeam": "适合最多 {{seats}} 人的团队",
+      "audienceAny": "适合任意规模的团队",
+      "seatsOne": "1 个席位",
+      "seatsUpTo": "最多 {{seats}} 个席位",
+      "seatsUnlimited": "不限席位",
+      "nextStepUp": "下一档",
+      "freeFrom": "{{date}} 起免费"
+    },
+    "compare": {
+      "caption": "所有套餐并排比较",
+      "current": "当前",
+      "included": "包含",
+      "notIncluded": "不包含",
+      "notOffered": "不提供",
+      "unlimited": "不限",
+      "groups": {
+        "pricing": "价格",
+        "team": "团队",
+        "features": "功能"
+      },
+      "rows": {
+        "monthly": "月付价格",
+        "monthlyHint": "每月计费。",
+        "yearly": "年付价格",
+        "yearlyHint": "每年计费一次。",
+        "seats": "包含席位",
+        "seatsHint": "可以登录此工作区的人数。"
+      }
+    },
+    "features": {
+      "auditLog": "审计日志",
+      "auditLogHint": "查看谁在何时改了什么。",
+      "sso": "单点登录 (SSO)",
+      "ssoHint": "团队通过公司的身份提供商登录。",
+      "prioritySupport": "优先支持",
+      "prioritySupportHint": "您的请求会被优先处理。"
+    },
+    "picker": {
+      "title": "套餐",
+      "sub": "所有套餐并排对比。团队准备好时再切换。",
+      "compareTitle": "比较各套餐功能",
+      "compareSub": "逐行列出每个套餐包含的内容。"
+    },
+    "yourPlan": {
+      "adjust": "调整方案",
+      "upgrade": "升级方案",
+      "view": "查看方案",
+      "seatsUsed": "已使用 {{used}}/{{total}} 个席位",
+      "seatsUsedUnlimited": "已使用 {{used}} 个席位 · 不限",
+      "noPlanLine": "选择一个方案即可开始。"
+    },
+    "notice": {
+      "renews": "你的方案将于 {{date}} 续订。",
+      "ends": "你的订阅将于 {{date}} 取消。",
+      "resubscribe": "重新订阅",
+      "trialEnds": "你的试用将于 {{date}} 结束。",
+      "pastDue": "你上一次付款未成功。请更新付款方式以保留 {{name}}。",
+      "incomplete": "你的首次付款尚未完成。"
+    },
+    "confirm": {
+      "keep": "保留 {{name}}",
+      "notNow": "暂不",
+      "now": "当前",
+      "next": "变更后",
+      "price": "价格",
+      "seats": "席位",
+      "billedYearly": "按年计费",
+      "gains": "你将获得",
+      "losses": "你将失去",
+      "nothingLost": "其他内容不变。",
+      "when": "生效时间",
+      "whenNow": "立即生效。计费周期保持不变。",
+      "whenProrated": "立即生效。本计费周期剩余部分的差额将按比例计入下一张账单。",
+      "whenFirst": "立即生效。",
+      "whenFirstPayment": "立即生效——下一步确认付款方式。",
+      "whenFree": "{{name}} 套餐保留至 {{date}}，之后工作区将使用 Free。",
+      "seatWarning": "已占用 {{used}} 个席位（含待接受的邀请），{{name}} 包含 {{seats}} 个席位。最近加入的成员中最多 {{excess}} 名（不含所有者）将被暂停，直到有空余席位。"
+    }
+  },
   "voice": {
     "start": "用语音输入",
     "stop": "停止语音输入",

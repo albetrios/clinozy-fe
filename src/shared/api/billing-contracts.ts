@@ -16,6 +16,13 @@ export type BillingSubscriptionStatus =
 
 export type BillingCycle = 'monthly' | 'yearly';
 
+/**
+ * A plan's capability map as clinozy-be sends it (`billing.plans.features`): a key
+ * per capability, a boolean toggle or a number/text value. Open by design — the
+ * keys the UI knows are listed in the billing plan comparison's feature catalog.
+ */
+export type BillingPlanFeatures = Record<string, boolean | number | string>;
+
 export type BillingPlan = {
   id: string;
   name: string;
@@ -26,6 +33,8 @@ export type BillingPlan = {
   currency: string;
   isActive: boolean;
   seatLimit: number | null;
+  /** What the plan includes, keyed by capability. */
+  features: BillingPlanFeatures;
 };
 
 export type BillingSubscription = {

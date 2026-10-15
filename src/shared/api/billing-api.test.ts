@@ -75,6 +75,23 @@ describe('billing-api', () => {
     });
   });
 
+  // The comparison's checklist and table read these: parsed by the wire schema
+  // all along, they were dropped by the mapper until the plan comparison needed them.
+  it('keeps the plan capability map and the seat allowance', async () => {
+    getMock.mockResolvedValue({
+      data: [
+        {
+          ...PLAN_WIRE,
+          features: { audit_log: true, sso: false, max_branches: 3 },
+          limits: { seats: 25 },
+        },
+      ],
+    });
+    const [plan] = await listBillingPlans();
+    expect(plan?.features).toEqual({ audit_log: true, sso: false, max_branches: 3 });
+    expect(plan?.seatLimit).toBe(25);
+  });
+
   it('keeps a monthly-only plan, its yearly price null', async () => {
     getMock.mockResolvedValue({
       data: [{ ...PLAN_WIRE, price_yearly: null, billing_cycles: ['monthly'] }],

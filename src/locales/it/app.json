@@ -1460,6 +1460,98 @@
       "error": "Impossibile inviare la segnalazione. Il tuo testo è ancora qui: riprova."
     }
   },
+  "billingPlans": {
+    "upgradeTo": "Passa a {{name}}",
+    "plan": {
+      "perMonth": "/ mese",
+      "billedYearlyTotal": "Fatturazione annuale · {{price}} all’anno",
+      "monthlyOnly": "Fatturazione mensile — nessuna opzione annuale",
+      "freeForever": "Gratis per sempre",
+      "save": "Risparmi il {{percent}}%",
+      "saveUpTo": "Risparmi fino al {{percent}}%",
+      "includes": "Include:",
+      "everythingInPlus": "Tutto di {{name}}, più:",
+      "everythingIn": "Tutto di {{name}}",
+      "audienceSolo": "Per un singolo professionista",
+      "audienceTeam": "Per team fino a {{seats}}",
+      "audienceAny": "Per team di ogni dimensione",
+      "seatsOne": "1 postazione",
+      "seatsUpTo": "Fino a {{seats}} postazioni",
+      "seatsUnlimited": "Postazioni illimitate",
+      "nextStepUp": "Livello successivo",
+      "freeFrom": "Gratis dal {{date}}"
+    },
+    "compare": {
+      "caption": "Tutti i piani, fianco a fianco",
+      "current": "Attuale",
+      "included": "Incluso",
+      "notIncluded": "Non incluso",
+      "notOffered": "Non disponibile",
+      "unlimited": "Illimitate",
+      "groups": {
+        "pricing": "Prezzi",
+        "team": "Team",
+        "features": "Funzioni"
+      },
+      "rows": {
+        "monthly": "Prezzo mensile",
+        "monthlyHint": "Fatturato ogni mese.",
+        "yearly": "Prezzo annuale",
+        "yearlyHint": "Fatturato una volta all’anno.",
+        "seats": "Postazioni incluse",
+        "seatsHint": "Le persone che possono accedere a questo spazio di lavoro."
+      }
+    },
+    "features": {
+      "auditLog": "Registro attività",
+      "auditLogHint": "Scopri chi ha cambiato cosa, e quando.",
+      "sso": "Single sign-on (SSO)",
+      "ssoHint": "Il tuo team accede con il provider di identità della tua azienda.",
+      "prioritySupport": "Assistenza prioritaria",
+      "prioritySupportHint": "Le tue richieste hanno la precedenza."
+    },
+    "picker": {
+      "title": "Piani",
+      "sub": "Tutti i piani fianco a fianco. Cambia quando il tuo team è pronto.",
+      "compareTitle": "Confronta le funzioni dei piani",
+      "compareSub": "Cosa include ogni piano, riga per riga."
+    },
+    "yourPlan": {
+      "adjust": "Modifica piano",
+      "upgrade": "Passa a un piano superiore",
+      "view": "Vedi i piani",
+      "seatsUsed": "{{used}} di {{total}} postazioni in uso",
+      "seatsUsedUnlimited": "{{used}} postazioni in uso · nessun limite",
+      "noPlanLine": "Scegli un piano per iniziare."
+    },
+    "notice": {
+      "renews": "Il tuo piano si rinnova il {{date}}.",
+      "ends": "Il tuo abbonamento verrà annullato il {{date}}.",
+      "resubscribe": "Riabbonati",
+      "trialEnds": "La tua prova termina il {{date}}.",
+      "pastDue": "Il tuo ultimo pagamento non è andato a buon fine. Aggiorna il metodo di pagamento per mantenere {{name}}.",
+      "incomplete": "Il tuo primo pagamento non è ancora andato a buon fine."
+    },
+    "confirm": {
+      "keep": "Mantieni {{name}}",
+      "notNow": "Non ora",
+      "now": "Attuale",
+      "next": "Nuovo",
+      "price": "Prezzo",
+      "seats": "Postazioni",
+      "billedYearly": "fatturazione annuale",
+      "gains": "Cosa ottieni",
+      "losses": "Cosa perdi",
+      "nothingLost": "Nient’altro cambia.",
+      "when": "Quando",
+      "whenNow": "Subito. Il ciclo di fatturazione resta lo stesso.",
+      "whenProrated": "Subito. La differenza per il resto di questo periodo viene calcolata in proporzione sulla prossima fattura.",
+      "whenFirst": "Subito.",
+      "whenFirstPayment": "Subito: poi confermi il metodo di pagamento.",
+      "whenFree": "Il piano {{name}} resta attivo fino al {{date}}. Poi lo spazio di lavoro passa a Free.",
+      "seatWarning": "Sono occupate {{used}} postazioni, inviti in attesa compresi, e {{name}} ne include {{seats}}. Fino a {{excess}} dei membri entrati più di recente, mai i proprietari, saranno sospesi finché non si liberano postazioni."
+    }
+  },
   "voice": {
     "start": "Detta con la voce",
     "stop": "Interrompi la dettatura",

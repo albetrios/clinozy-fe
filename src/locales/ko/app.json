@@ -1418,6 +1418,98 @@
       "error": "신고를 보내지 못했습니다. 작성한 내용은 그대로 있어요. 다시 시도해 주세요."
     }
   },
+  "billingPlans": {
+    "upgradeTo": "{{name}}(으)로 업그레이드",
+    "plan": {
+      "perMonth": "/ 월",
+      "billedYearlyTotal": "연간 청구 · 연 {{price}}",
+      "monthlyOnly": "월간 청구만 가능 — 연간 옵션 없음",
+      "freeForever": "평생 무료",
+      "save": "{{percent}}% 절약",
+      "saveUpTo": "최대 {{percent}}% 절약",
+      "includes": "포함 항목:",
+      "everythingInPlus": "{{name}}의 모든 기능, 추가로:",
+      "everythingIn": "{{name}}의 모든 기능",
+      "audienceSolo": "1인 진료자용",
+      "audienceTeam": "최대 {{seats}}명 팀용",
+      "audienceAny": "모든 규모의 팀용",
+      "seatsOne": "1석",
+      "seatsUpTo": "최대 {{seats}}석",
+      "seatsUnlimited": "무제한 좌석",
+      "nextStepUp": "다음 단계",
+      "freeFrom": "{{date}}부터 무료"
+    },
+    "compare": {
+      "caption": "모든 요금제를 나란히 비교",
+      "current": "현재",
+      "included": "포함",
+      "notIncluded": "미포함",
+      "notOffered": "제공 안 함",
+      "unlimited": "무제한",
+      "groups": {
+        "pricing": "가격",
+        "team": "팀",
+        "features": "기능"
+      },
+      "rows": {
+        "monthly": "월간 가격",
+        "monthlyHint": "매월 청구됩니다.",
+        "yearly": "연간 가격",
+        "yearlyHint": "1년에 한 번 청구됩니다.",
+        "seats": "포함 좌석",
+        "seatsHint": "이 워크스페이스에 로그인할 수 있는 사람 수."
+      }
+    },
+    "features": {
+      "auditLog": "감사 로그",
+      "auditLogHint": "누가 무엇을 언제 변경했는지 확인하세요.",
+      "sso": "싱글 사인온(SSO)",
+      "ssoHint": "팀이 회사의 ID 공급자로 로그인합니다.",
+      "prioritySupport": "우선 지원",
+      "prioritySupportHint": "문의에 가장 먼저 답변합니다."
+    },
+    "picker": {
+      "title": "요금제",
+      "sub": "모든 요금제를 나란히 비교하세요. 팀이 준비되면 변경하세요.",
+      "compareTitle": "요금제 기능 비교",
+      "compareSub": "각 요금제에 포함된 항목을 줄별로."
+    },
+    "yourPlan": {
+      "adjust": "플랜 조정",
+      "upgrade": "플랜 업그레이드",
+      "view": "플랜 보기",
+      "seatsUsed": "{{total}}석 중 {{used}}석 사용 중",
+      "seatsUsedUnlimited": "{{used}}석 사용 중 · 제한 없음",
+      "noPlanLine": "플랜을 선택해 시작하세요."
+    },
+    "notice": {
+      "renews": "플랜이 {{date}}에 갱신됩니다.",
+      "ends": "구독이 {{date}}에 취소됩니다.",
+      "resubscribe": "다시 구독",
+      "trialEnds": "체험 기간이 {{date}}에 끝납니다.",
+      "pastDue": "지난 결제가 완료되지 않았습니다. {{name}}을(를) 유지하려면 결제 수단을 업데이트하세요.",
+      "incomplete": "첫 결제가 아직 완료되지 않았습니다."
+    },
+    "confirm": {
+      "keep": "{{name}} 유지",
+      "notNow": "나중에",
+      "now": "현재",
+      "next": "변경 후",
+      "price": "가격",
+      "seats": "좌석",
+      "billedYearly": "연간 청구",
+      "gains": "추가되는 항목",
+      "losses": "없어지는 항목",
+      "nothingLost": "다른 변경 사항은 없습니다.",
+      "when": "적용 시점",
+      "whenNow": "즉시 적용됩니다. 청구 주기는 그대로입니다.",
+      "whenProrated": "즉시 적용됩니다. 이번 청구 기간의 남은 차액은 다음 청구서에 일할 계산됩니다.",
+      "whenFirst": "즉시 적용됩니다.",
+      "whenFirstPayment": "즉시 적용됩니다. 다음 단계에서 결제 수단을 확인합니다.",
+      "whenFree": "{{name}} 요금제는 {{date}}까지 유지됩니다. 그 후 워크스페이스는 Free로 전환됩니다.",
+      "seatWarning": "대기 중인 초대를 포함해 {{used}}석이 사용 중이고 {{name}}에는 {{seats}}석이 포함됩니다. 가장 최근에 합류한 멤버 중 최대 {{excess}}명(소유자 제외)이 좌석이 생길 때까지 정지됩니다."
+    }
+  },
   "voice": {
     "start": "음성으로 입력",
     "stop": "음성 입력 중지",

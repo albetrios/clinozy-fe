@@ -1439,6 +1439,98 @@
       "error": "Die Meldung konnte nicht gesendet werden. Ihr Text ist noch da – versuchen Sie es erneut."
     }
   },
+  "billingPlans": {
+    "upgradeTo": "Auf {{name}} upgraden",
+    "plan": {
+      "perMonth": "/ Monat",
+      "billedYearlyTotal": "Jährliche Abrechnung · {{price}} pro Jahr",
+      "monthlyOnly": "Monatliche Abrechnung — keine jährliche Option",
+      "freeForever": "Für immer kostenlos",
+      "save": "{{percent}} % sparen",
+      "saveUpTo": "Bis zu {{percent}} % sparen",
+      "includes": "Enthält:",
+      "everythingInPlus": "Alles aus {{name}}, plus:",
+      "everythingIn": "Alles aus {{name}}",
+      "audienceSolo": "Für eine einzelne Fachkraft",
+      "audienceTeam": "Für Teams bis {{seats}}",
+      "audienceAny": "Für Teams jeder Größe",
+      "seatsOne": "1 Platz",
+      "seatsUpTo": "Bis zu {{seats}} Plätze",
+      "seatsUnlimited": "Unbegrenzte Plätze",
+      "nextStepUp": "Nächste Stufe",
+      "freeFrom": "Ab {{date}} kostenlos"
+    },
+    "compare": {
+      "caption": "Alle Tarife im Vergleich",
+      "current": "Aktuell",
+      "included": "Enthalten",
+      "notIncluded": "Nicht enthalten",
+      "notOffered": "Nicht angeboten",
+      "unlimited": "Unbegrenzt",
+      "groups": {
+        "pricing": "Preise",
+        "team": "Team",
+        "features": "Funktionen"
+      },
+      "rows": {
+        "monthly": "Monatspreis",
+        "monthlyHint": "Monatlich abgerechnet.",
+        "yearly": "Jahrespreis",
+        "yearlyHint": "Einmal im Jahr abgerechnet.",
+        "seats": "Enthaltene Plätze",
+        "seatsHint": "Personen, die sich in diesem Arbeitsbereich anmelden können."
+      }
+    },
+    "features": {
+      "auditLog": "Audit-Protokoll",
+      "auditLogHint": "Sehen Sie, wer was wann geändert hat.",
+      "sso": "Single Sign-on (SSO)",
+      "ssoHint": "Ihr Team meldet sich über den Identitätsanbieter Ihres Unternehmens an.",
+      "prioritySupport": "Bevorzugter Support",
+      "prioritySupportHint": "Ihre Anfragen werden zuerst beantwortet."
+    },
+    "picker": {
+      "title": "Tarife",
+      "sub": "Alle Tarife nebeneinander. Wechseln Sie, wenn Ihr Team so weit ist.",
+      "compareTitle": "Funktionen der Tarife vergleichen",
+      "compareSub": "Was jeder Tarif enthält, Zeile für Zeile."
+    },
+    "yourPlan": {
+      "adjust": "Tarif anpassen",
+      "upgrade": "Tarif upgraden",
+      "view": "Tarife ansehen",
+      "seatsUsed": "{{used}} von {{total}} Plätzen belegt",
+      "seatsUsedUnlimited": "{{used}} Plätze belegt · ohne Limit",
+      "noPlanLine": "Wählen Sie einen Tarif, um loszulegen."
+    },
+    "notice": {
+      "renews": "Ihr Tarif verlängert sich am {{date}}.",
+      "ends": "Ihr Abonnement wird am {{date}} gekündigt.",
+      "resubscribe": "Wieder abonnieren",
+      "trialEnds": "Ihre Testphase endet am {{date}}.",
+      "pastDue": "Ihre letzte Zahlung ist nicht durchgegangen. Aktualisieren Sie Ihre Zahlungsmethode, um {{name}} zu behalten.",
+      "incomplete": "Ihre erste Zahlung ist noch nicht durchgegangen."
+    },
+    "confirm": {
+      "keep": "{{name}} behalten",
+      "notNow": "Nicht jetzt",
+      "now": "Aktuell",
+      "next": "Neu",
+      "price": "Preis",
+      "seats": "Plätze",
+      "billedYearly": "jährlich abgerechnet",
+      "gains": "Das bekommen Sie",
+      "losses": "Das entfällt",
+      "nothingLost": "Sonst ändert sich nichts.",
+      "when": "Wann",
+      "whenNow": "Sofort. Ihr Abrechnungszeitraum bleibt gleich.",
+      "whenProrated": "Sofort. Die Differenz für den Rest dieses Zeitraums wird anteilig auf Ihrer nächsten Rechnung verrechnet.",
+      "whenFirst": "Sofort.",
+      "whenFirstPayment": "Sofort – als Nächstes bestätigen Sie Ihre Zahlungsmethode.",
+      "whenFree": "Ihr Tarif {{name}} bleibt bis zum {{date}}. Danach ist der Arbeitsbereich auf Free.",
+      "seatWarning": "{{used}} Plätze sind belegt, offene Einladungen eingerechnet, und {{name}} enthält {{seats}}. Bis zu {{excess}} der zuletzt beigetretenen Mitglieder, nie Inhaber, werden gesperrt, bis Plätze frei werden."
+    }
+  },
   "voice": {
     "start": "Per Sprache diktieren",
     "stop": "Diktat beenden",

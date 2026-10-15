@@ -1439,6 +1439,98 @@
       "error": "Couldn't send your report. Your words are still here — try again."
     }
   },
+  "billingPlans": {
+    "upgradeTo": "Upgrade to {{name}}",
+    "plan": {
+      "perMonth": "/ month",
+      "billedYearlyTotal": "Billed yearly · {{price}} a year",
+      "monthlyOnly": "Billed monthly — no yearly option",
+      "freeForever": "Free for ever",
+      "save": "Save {{percent}}%",
+      "saveUpTo": "Save up to {{percent}}%",
+      "includes": "Includes:",
+      "everythingInPlus": "Everything in {{name}}, plus:",
+      "everythingIn": "Everything in {{name}}",
+      "audienceSolo": "For one practitioner",
+      "audienceTeam": "For teams of up to {{seats}}",
+      "audienceAny": "For teams of any size",
+      "seatsOne": "1 seat",
+      "seatsUpTo": "Up to {{seats}} seats",
+      "seatsUnlimited": "Unlimited seats",
+      "nextStepUp": "Next step up",
+      "freeFrom": "Free from {{date}}"
+    },
+    "compare": {
+      "caption": "Every plan, side by side",
+      "current": "Current",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "notOffered": "Not offered",
+      "unlimited": "Unlimited",
+      "groups": {
+        "pricing": "Pricing",
+        "team": "Team",
+        "features": "Features"
+      },
+      "rows": {
+        "monthly": "Monthly price",
+        "monthlyHint": "Billed every month.",
+        "yearly": "Yearly price",
+        "yearlyHint": "Billed once a year.",
+        "seats": "Seats included",
+        "seatsHint": "People who can sign in to this workspace."
+      }
+    },
+    "features": {
+      "auditLog": "Audit log",
+      "auditLogHint": "See who changed what, and when.",
+      "sso": "Single sign-on (SSO)",
+      "ssoHint": "Your team signs in with your company's identity provider.",
+      "prioritySupport": "Priority support",
+      "prioritySupportHint": "Your requests are answered first."
+    },
+    "picker": {
+      "title": "Plans",
+      "sub": "Every plan side by side. Change when your team is ready.",
+      "compareTitle": "Compare features across plans",
+      "compareSub": "What each plan includes, row by row."
+    },
+    "yourPlan": {
+      "adjust": "Adjust plan",
+      "upgrade": "Upgrade plan",
+      "view": "View plans",
+      "seatsUsed": "{{used}} of {{total}} seats used",
+      "seatsUsedUnlimited": "{{used}} seats used · no limit",
+      "noPlanLine": "Choose a plan to get started."
+    },
+    "notice": {
+      "renews": "Your plan renews on {{date}}.",
+      "ends": "Your subscription will be canceled on {{date}}.",
+      "resubscribe": "Resubscribe",
+      "trialEnds": "Your trial ends on {{date}}.",
+      "pastDue": "Your last payment didn't go through. Update your payment method to keep {{name}}.",
+      "incomplete": "Your first payment hasn't gone through yet."
+    },
+    "confirm": {
+      "keep": "Keep {{name}}",
+      "notNow": "Not now",
+      "now": "Now",
+      "next": "New",
+      "price": "Price",
+      "seats": "Seats",
+      "billedYearly": "billed yearly",
+      "gains": "What you get",
+      "losses": "What you lose",
+      "nothingLost": "Nothing else changes.",
+      "when": "When",
+      "whenNow": "Right away. Your billing cycle stays the same.",
+      "whenProrated": "Right away. The difference for the rest of this billing period is prorated on your next invoice.",
+      "whenFirst": "Right away.",
+      "whenFirstPayment": "Right away — you confirm your payment method next.",
+      "whenFree": "Your {{name}} plan stays until {{date}}. After that the workspace is on Free.",
+      "seatWarning": "{{used}} seats are taken, pending invitations included, and {{name}} includes {{seats}}. Up to {{excess}} of the most recently joined members, never owners, will be suspended until seats free up."
+    }
+  },
   "voice": {
     "start": "Dictate with your voice",
     "stop": "Stop dictating",

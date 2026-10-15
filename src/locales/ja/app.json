@@ -1418,6 +1418,98 @@
       "error": "報告を送信できませんでした。入力内容は残っています。もう一度お試しください。"
     }
   },
+  "billingPlans": {
+    "upgradeTo": "{{name}} にアップグレード",
+    "plan": {
+      "perMonth": "/ 月",
+      "billedYearlyTotal": "年払い · 年額 {{price}}",
+      "monthlyOnly": "月払いのみ — 年払いはありません",
+      "freeForever": "ずっと無料",
+      "save": "{{percent}}% お得",
+      "saveUpTo": "最大 {{percent}}% お得",
+      "includes": "含まれるもの:",
+      "everythingInPlus": "{{name}} のすべてに加えて:",
+      "everythingIn": "{{name}} のすべて",
+      "audienceSolo": "個人の施術者向け",
+      "audienceTeam": "最大 {{seats}} 人のチーム向け",
+      "audienceAny": "あらゆる規模のチーム向け",
+      "seatsOne": "1 席",
+      "seatsUpTo": "最大 {{seats}} 席",
+      "seatsUnlimited": "席数無制限",
+      "nextStepUp": "次のステップ",
+      "freeFrom": "{{date}} から無料"
+    },
+    "compare": {
+      "caption": "すべてのプランを並べて比較",
+      "current": "現在",
+      "included": "含まれる",
+      "notIncluded": "含まれない",
+      "notOffered": "提供なし",
+      "unlimited": "無制限",
+      "groups": {
+        "pricing": "料金",
+        "team": "チーム",
+        "features": "機能"
+      },
+      "rows": {
+        "monthly": "月額料金",
+        "monthlyHint": "毎月請求されます。",
+        "yearly": "年額料金",
+        "yearlyHint": "年に一度請求されます。",
+        "seats": "含まれる席数",
+        "seatsHint": "このワークスペースにサインインできる人数。"
+      }
+    },
+    "features": {
+      "auditLog": "監査ログ",
+      "auditLogHint": "誰が・何を・いつ変更したかを確認できます。",
+      "sso": "シングルサインオン (SSO)",
+      "ssoHint": "チームは会社の ID プロバイダーでサインインします。",
+      "prioritySupport": "優先サポート",
+      "prioritySupportHint": "お問い合わせに優先して対応します。"
+    },
+    "picker": {
+      "title": "プラン",
+      "sub": "すべてのプランを並べて表示。チームの準備ができたら変更しましょう。",
+      "compareTitle": "プランの機能を比較",
+      "compareSub": "各プランに含まれるものを行ごとに。"
+    },
+    "yourPlan": {
+      "adjust": "プランを調整",
+      "upgrade": "プランをアップグレード",
+      "view": "プランを見る",
+      "seatsUsed": "{{total}} 席中 {{used}} 席を使用中",
+      "seatsUsedUnlimited": "{{used}} 席を使用中 · 上限なし",
+      "noPlanLine": "プランを選んで始めましょう。"
+    },
+    "notice": {
+      "renews": "プランは {{date}} に更新されます。",
+      "ends": "サブスクリプションは {{date}} にキャンセルされます。",
+      "resubscribe": "再登録",
+      "trialEnds": "トライアルは {{date}} に終了します。",
+      "pastDue": "前回のお支払いが完了していません。{{name}} を続けるには支払い方法を更新してください。",
+      "incomplete": "最初のお支払いがまだ完了していません。"
+    },
+    "confirm": {
+      "keep": "{{name}} のままにする",
+      "notNow": "今はしない",
+      "now": "現在",
+      "next": "変更後",
+      "price": "料金",
+      "seats": "席",
+      "billedYearly": "年払い",
+      "gains": "追加されるもの",
+      "losses": "なくなるもの",
+      "nothingLost": "ほかに変更はありません。",
+      "when": "反映時期",
+      "whenNow": "すぐに反映されます。請求サイクルは変わりません。",
+      "whenProrated": "すぐに反映されます。この期間の残りの差額は次回の請求書で日割り計算されます。",
+      "whenFirst": "すぐに反映されます。",
+      "whenFirstPayment": "すぐに反映されます。次に支払い方法を確認します。",
+      "whenFree": "{{name}} プランは {{date}} まで続きます。その後、ワークスペースは Free になります。",
+      "seatWarning": "保留中の招待を含めて {{used}} 席が使用中で、{{name}} の席数は {{seats}} です。最近参加したメンバーのうち最大 {{excess}} 人（オーナーは対象外）が、席が空くまで停止されます。"
+    }
+  },
   "voice": {
     "start": "音声で入力",
     "stop": "音声入力を停止",
