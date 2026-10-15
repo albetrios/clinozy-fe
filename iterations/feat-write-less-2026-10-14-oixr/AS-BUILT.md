@@ -47,7 +47,12 @@ What was actually built, ledger row by ledger row, against the approved plan in
     budget or the local env's locales need their own change.
   - In the playground, the seat-limit job suspends the demo clinic's non-owner staff (demo user
     included) after a while; screenshots were taken as the owner.
-  - `frozen` goes in the last commit before the PR, once the user confirms (D15).
+  - `frozen` goes in the last commit before the PR, once the user confirms (D15) — confirmed on
+    2026-10-15 ("raise the PR and make it green and merge it").
+- **Overlap with iterations merged meanwhile:** `change-branches-in-navbar-2026-10-14-zrml` moved
+  Branches to its own room: the branch drawer's PIN look-up (#10) now lives at `/branches`, its
+  copy in `branches` beside this iteration's `app` › `pinPlace`; the old `/users/branches` URLs
+  used in this iteration's evidence redirect there.
 
 ## Standing deviations
 
