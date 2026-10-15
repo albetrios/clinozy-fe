@@ -155,6 +155,7 @@ function DetailFields({ form, values, idPrefix, testId, today }: BodyProps) {
           maxLength={120}
           placeholder={t(K.fields.samplesPlaceholder)}
           autoComplete="off"
+          dictation
           data-testid={`${testId}-samples`}
         />
       </DrawerField>

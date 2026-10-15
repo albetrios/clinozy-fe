@@ -1461,20 +1461,43 @@
       "signedAs": "Se envía como {{name}}, con esta página y la versión de la app.",
       "close": "Cerrar"
     },
-    "voice": {
-      "start": "Dictar con tu voz",
-      "stop": "Dejar de dictar",
-      "listening": "Escuchando…",
-      "hearing": "Te escucho…",
-      "denied": "El micrófono está bloqueado. Permítelo en el navegador para dictar.",
-      "noSpeech": "No te he entendido: toca el micrófono e inténtalo de nuevo.",
-      "unavailable": "La entrada por voz no está disponible ahora. Puedes escribir."
-    },
     "send": {
       "idle": "Enviar",
       "sending": "Enviando…",
       "sent": "Gracias, el equipo ya lo tiene.",
       "error": "No se pudo enviar el informe. Tu texto sigue aquí; inténtalo de nuevo."
     }
+  },
+  "voice": {
+    "start": "Dictar con tu voz",
+    "stop": "Dejar de dictar",
+    "listening": "Escuchando…",
+    "hearing": "Te escucho…",
+    "denied": "El micrófono está bloqueado. Permítelo en el navegador para dictar.",
+    "noSpeech": "No te he entendido: toca el micrófono e inténtalo de nuevo.",
+    "unavailable": "La entrada por voz no está disponible ahora. Puedes escribir.",
+    "say": {
+      "period": "punto|punto final",
+      "comma": "coma",
+      "question": "signo de interrogación",
+      "exclamation": "signo de exclamación",
+      "colon": "dos puntos",
+      "newLine": "nueva línea|salto de línea",
+      "newParagraph": "nuevo párrafo",
+      "scratch": "borra eso|borrar eso"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Di «punto», «coma», «nueva línea» o «borra eso»"
+  },
+  "pinPlace": {
+    "hint": "Rellena la zona, la ciudad y el estado",
+    "unknown": "No conocemos este código postal — escribe la zona, la ciudad y el estado.",
+    "areaPick": "Elige tu zona"
   }
 }

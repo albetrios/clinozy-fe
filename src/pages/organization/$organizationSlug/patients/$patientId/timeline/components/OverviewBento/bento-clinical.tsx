@@ -121,6 +121,8 @@ export function ClinicalBentoCard({
             maxLength={SMART_NOTE_MAX}
             placeholder={t(K.smartPlaceholder, { example: t(K.smartExample) })}
             aria-label={t(K.smartLabel)}
+            dictation
+            boxClassName="min-w-0 flex-1"
             data-testid={TIMELINE_TEST_IDS.smartInput}
             className="bg-canvas min-w-0 flex-1 px-3"
           />

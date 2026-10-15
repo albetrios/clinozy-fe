@@ -40,7 +40,13 @@ describe('DrawerFooter', () => {
     renderFooter();
 
     const footer = screen.getByTestId('pt-footer');
-    const order = [...footer.children].map((node) => node.textContent);
+    // The primary's key hint is decoration (aria-hidden), not its words.
+    const wordsOf = (node: Element) => {
+      const copy = node.cloneNode(true) as Element;
+      for (const kbd of copy.querySelectorAll('[data-slot="kbd"]')) kbd.remove();
+      return copy.textContent;
+    };
+    const order = [...footer.children].map(wordsOf);
     expect(order).toEqual([
       'Priya Shah · Aesthetic',
       'Delete',

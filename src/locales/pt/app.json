@@ -1461,20 +1461,43 @@
       "signedAs": "Enviado como {{name}}, com esta página e a versão do app.",
       "close": "Fechar"
     },
-    "voice": {
-      "start": "Ditar com a sua voz",
-      "stop": "Parar de ditar",
-      "listening": "Ouvindo…",
-      "hearing": "Estou ouvindo…",
-      "denied": "O microfone está bloqueado. Permita-o no navegador para ditar.",
-      "noSpeech": "Não entendi — toque no microfone e tente de novo.",
-      "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar."
-    },
     "send": {
       "idle": "Enviar",
       "sending": "Enviando…",
       "sent": "Obrigado — a equipe já recebeu.",
       "error": "Não foi possível enviar o relato. Seu texto continua aqui — tente de novo."
     }
+  },
+  "voice": {
+    "start": "Ditar com a sua voz",
+    "stop": "Parar de ditar",
+    "listening": "Ouvindo…",
+    "hearing": "Estou ouvindo…",
+    "denied": "O microfone está bloqueado. Permita-o no navegador para ditar.",
+    "noSpeech": "Não entendi — toque no microfone e tente de novo.",
+    "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar.",
+    "say": {
+      "period": "ponto|ponto final",
+      "comma": "vírgula",
+      "question": "ponto de interrogação",
+      "exclamation": "ponto de exclamação",
+      "colon": "dois pontos",
+      "newLine": "nova linha",
+      "newParagraph": "novo parágrafo",
+      "scratch": "apague isso|apagar isso"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Diga “ponto”, “vírgula”, “nova linha” ou “apague isso”"
+  },
+  "pinPlace": {
+    "hint": "Preenche o bairro, a cidade e o estado",
+    "unknown": "Não conhecemos este CEP — digite o bairro, a cidade e o estado.",
+    "areaPick": "Escolha seu bairro"
   }
 }

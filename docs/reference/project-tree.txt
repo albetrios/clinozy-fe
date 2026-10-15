@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2303 src files · ~1171 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
+Stats: ~2320 src files · ~1180 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -399,6 +399,14 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── feat-write-less-2026-10-14-oixr/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── fix-empty-state-actions-2026-10-14-iazm/
 │   │   ├── intake-files/
 │   │   │   ├── _index.md
@@ -655,9 +663,11 @@ clinozy-fe/
 │   │   │   ├── tasks-builders.ts
 │   │   │   ├── users-builders.ts
 │   │   │   └── [17 test files]
+│   │   ├── amount-expression.ts
 │   │   ├── app-splash.ts
 │   │   ├── app-version.ts
 │   │   ├── appearance-surface.ts
+│   │   ├── apple-platform.ts
 │   │   ├── bidi-isolate.ts
 │   │   ├── brand-wordmark.ts
 │   │   ├── chunk-prefetch.ts
@@ -684,7 +694,7 @@ clinozy-fe/
 │   │   ├── telemetry-scrub.ts
 │   │   ├── utils.ts
 │   │   ├── zod-jitless.ts
-│   │   └── [29 test files]
+│   │   └── [31 test files]
 │   ├── locales/
 │   │   ├── ar/
 │   │   │   ├── app-stock.json
@@ -1894,10 +1904,6 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── BugReport/
-│   │   │   │   ├── VoiceInputButton/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── VoiceInputButton.tsx
-│   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── bug-report-text.ts
 │   │   │   │   ├── bug-report.constants.ts
 │   │   │   │   ├── bug-report.css
@@ -2305,6 +2311,11 @@ clinozy-fe/
 │   │   │   │   ├── Picker.tsx
 │   │   │   │   ├── picker.types.ts
 │   │   │   │   └── [4 test files]
+│   │   │   ├── PinAreaChips/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── pin-area-chips.constants.ts
+│   │   │   │   ├── PinAreaChips.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── PrintPreview/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── print-preview.constants.ts
@@ -2376,6 +2387,7 @@ clinozy-fe/
 │   │   │   │   ├── record-drawer-focus.ts
 │   │   │   │   ├── record-drawer-items.ts
 │   │   │   │   ├── record-drawer-pending.tsx
+│   │   │   │   ├── record-drawer-save-shortcut.ts
 │   │   │   │   ├── record-drawer-width.ts
 │   │   │   │   ├── record-drawer.constants.ts
 │   │   │   │   ├── RecordDrawer.tsx
@@ -2575,6 +2587,22 @@ clinozy-fe/
 │   │   │   │   ├── upload-tray.constants.ts
 │   │   │   │   ├── UploadTray.tsx
 │   │   │   │   └── [2 test files]
+│   │   │   ├── VoiceField/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── use-voice-field.ts
+│   │   │   │   ├── use-voice-vocabulary.ts
+│   │   │   │   ├── voice-commands.ts
+│   │   │   │   ├── voice-shortcut.ts
+│   │   │   │   ├── VoiceField.tsx
+│   │   │   │   └── [3 test files]
+│   │   │   ├── VoiceInputButton/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── insert-phrase.ts
+│   │   │   │   ├── voice-input.constants.ts
+│   │   │   │   ├── voice-input.css
+│   │   │   │   ├── voice-status.ts
+│   │   │   │   ├── VoiceInputButton.tsx
+│   │   │   │   └── [3 test files]
 │   │   │   ├── WeightStableLabel/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── WeightStableLabel.tsx
@@ -2986,6 +3014,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePayments.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── usePinPlace/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePinPlace.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── usePlan/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePlan.ts
@@ -3376,6 +3408,7 @@ clinozy-fe/
 │   │   ├── renderWithProviders.tsx
 │   │   ├── setup.ts
 │   │   ├── shown-location.ts
+│   │   ├── speech-recognition-doubles.ts
 │   │   ├── stock-doubles.ts
 │   │   ├── task-doubles.ts
 │   │   ├── task-row-fixture.ts

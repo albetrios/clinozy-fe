@@ -219,6 +219,7 @@ export function WhatsNextSheet({ task, result, onClose }: WhatsNextSheetProps) {
             {...form.register('note')}
             maxLength={TASK_WHY_MAX}
             placeholder={t(K.note.placeholder)}
+            dictation
             data-testid={IDS.note}
           />
         </DrawerField>

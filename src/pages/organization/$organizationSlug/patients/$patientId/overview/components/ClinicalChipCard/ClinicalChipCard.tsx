@@ -8,6 +8,7 @@ import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
+import { capitalizeFirst } from '@/shared/components/VoiceInputButton/index.ts';
 import type { AppIcon } from '@/shared/icons/index.ts';
 
 import type { ClinicalChip } from '../../../shared/patient-clinical.ts';
@@ -15,6 +16,9 @@ import { CLINICAL_KEYS, CLINICAL_NS } from '../../overview.constants.ts';
 
 /** How long a chip may be (`patient-file.md:541`). */
 const CHIP_MAX = 60;
+
+/** Where one spoken chip ends and the next begins: a comma or a sentence's end, in any script. */
+const SPOKEN_CHIP_BREAKS = /[,،，、;.。!?！？\n]/u;
 
 /** Props of {@link ClinicalChipCard}. */
 export interface ClinicalChipCardProps {
@@ -39,7 +43,8 @@ export interface ClinicalChipCardProps {
  * the title and a dark "1 new" pill (chips added since the last visit carry a
  * 1.5px ring); the chips — tinted, wrapping anywhere, each with a 20px ×
  * that removes it at once — or "Nothing added yet"; and a dashed input that
- * adds one on Enter (≤60, the first letter capitalised, a repeat ignored).
+ * adds one on Enter (≤60, the first letter capitalised, a repeat ignored) — or,
+ * spoken into its microphone, one chip per phrase part (feat-write-less D18).
  * A chip still saving has its × off until it is a note.
  */
 export function ClinicalChipCard({
@@ -67,6 +72,17 @@ export function ClinicalChipCard({
     if (!items.some((item) => item.text.toLowerCase() === text.toLowerCase()))
       onAdd(text);
     setDraft('');
+  };
+  // Spoken, a phrase is chips at once — "acne, pigmentation full stop" adds two — each capitalised,
+  // within the chip's length, a repeat (of a chip or of each other) ignored; the typed draft stays.
+  const addSpoken = (phrase: string) => {
+    const known = new Set(items.map((item) => item.text.toLowerCase()));
+    for (const piece of phrase.split(SPOKEN_CHIP_BREAKS)) {
+      const text = capitalizeFirst(piece.trim()).slice(0, CHIP_MAX).trim();
+      if (!text || known.has(text.toLowerCase())) continue;
+      known.add(text.toLowerCase());
+      onAdd(text);
+    }
   };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
@@ -156,6 +172,7 @@ export function ClinicalChipCard({
           maxLength={CHIP_MAX}
           onChange={(event) => setDraft(event.currentTarget.value)}
           onKeyDown={onKeyDown}
+          onDictation={addSpoken}
           placeholder={t(CLINICAL_KEYS.placeholder)}
           aria-label={t(CLINICAL_KEYS.add, { title })}
           data-testid={`${testId}-input`}

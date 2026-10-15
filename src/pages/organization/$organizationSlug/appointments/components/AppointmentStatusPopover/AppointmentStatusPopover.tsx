@@ -30,6 +30,7 @@ import {
   PopoverTrigger,
 } from '@/shared/components/ui/popover.tsx';
 import { Textarea } from '@/shared/components/ui/textarea.tsx';
+import { useVoiceField, VoiceField } from '@/shared/components/VoiceField/index.ts';
 import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
 import { ChevronLeft } from '@/shared/icons/index.ts';
 
@@ -138,6 +139,10 @@ function CancelView({
   const { t } = useTranslation([APPOINTMENTS_NS, APP_NS]);
   const [note, setNote] = useState<string | null>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
+  const voice = useVoiceField({
+    multiline: true,
+    testId: APPOINTMENTS_TEST_IDS.cancelNote,
+  });
   const formId = useId();
   const hintId = useId();
   const noting = note !== null;
@@ -217,28 +222,34 @@ function CancelView({
             submit();
           }}
         >
-          <Textarea
-            ref={noteRef}
-            rows={2}
-            maxLength={NOTE_MAX_LENGTH}
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-            onKeyDown={(event) => {
-              if (
-                event.key !== 'Enter' ||
-                event.shiftKey ||
-                event.nativeEvent.isComposing
-              )
-                return;
-              event.preventDefault();
-              submit();
-            }}
-            aria-label={t(REASON_CONFIRM_KEYS.note, { ns: APP_NS })}
-            aria-required
-            placeholder={t(REASON_CONFIRM_KEYS.noteRequired, { ns: APP_NS })}
-            data-testid={APPOINTMENTS_TEST_IDS.cancelNote}
-            className="md:text-body field-sizing-fixed min-h-0 resize-none rounded-lg px-2.5 py-2"
-          />
+          <VoiceField voice={voice}>
+            <Textarea
+              {...voice.fieldProps}
+              ref={noteRef}
+              rows={2}
+              maxLength={NOTE_MAX_LENGTH}
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              onKeyDown={(event) => {
+                if (
+                  event.key !== 'Enter' ||
+                  event.shiftKey ||
+                  event.nativeEvent.isComposing
+                )
+                  return;
+                event.preventDefault();
+                submit();
+              }}
+              aria-label={t(REASON_CONFIRM_KEYS.note, { ns: APP_NS })}
+              aria-required
+              placeholder={t(REASON_CONFIRM_KEYS.noteRequired, { ns: APP_NS })}
+              data-testid={APPOINTMENTS_TEST_IDS.cancelNote}
+              className={cn(
+                'md:text-body field-sizing-fixed min-h-0 resize-none rounded-lg px-2.5 py-2',
+                voice.paddingClass,
+              )}
+            />
+          </VoiceField>
           <div className="flex items-center gap-2">
             <span
               id={hintId}
