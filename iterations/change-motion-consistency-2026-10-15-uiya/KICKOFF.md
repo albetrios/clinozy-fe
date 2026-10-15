@@ -107,9 +107,9 @@ captures, and `pnpm size`.
 | L-7  | Reduced motion: gentler, not zero                                                                | styling    | L-2, L-6   | emil-design-eng                     | criterion 8            | Claude   | done   |
 | L-8  | No `transition-all`                                                                              | styling    | —          | review-animations                   | criterion 9            | Claude   | done   |
 | L-9  | Docs: `design.md` §5 Motion; the policy test                                                     | copy       | L-1–L-8    | fe-documentation-maintenance        | `pnpm docs:lint`       | Claude   | done   |
-| L-10 | Verify in the running app: slow motion before/after, stills, reduced motion, Ctrl+K              | verify     | L-1–L-9    | fe-kickoff-iteration                | every criterion proven | Claude   | todo   |
-| L-11 | Gates                                                                                            | gate       | L-10       | fe-before-commit-guard              | criterion 10           | Claude   | todo   |
-| L-12 | Close: `AS-BUILT.md`, Status `done`                                                              | verify     | L-11       | fe-kickoff-iteration                | README Status `done`   | Claude   | todo   |
+| L-10 | Verify in the running app: slow motion before/after, stills, reduced motion, Ctrl+K              | verify     | L-1–L-9    | fe-kickoff-iteration                | every criterion proven | Claude   | done   |
+| L-11 | Gates                                                                                            | gate       | L-10       | fe-before-commit-guard              | criterion 10           | Claude   | done   |
+| L-12 | Close: `AS-BUILT.md`, Status `done`                                                              | verify     | L-11       | fe-kickoff-iteration                | README Status `done`   | Claude   | done   |
 
 ## Appendix A — Coverage matrix
 

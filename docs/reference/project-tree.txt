@@ -339,6 +339,7 @@ clinozy-fe/
 │   │   ├── plans/
 │   │   │   ├── decisions.md
 │   │   │   └── motion-audit.md
+│   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
 │   ├── change-motion-polish-2026-10-14-uvgh/
