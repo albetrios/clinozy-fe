@@ -1469,10 +1469,11 @@
       "audienceAny": "For teams of any size",
       "seatsOne": "1 seat",
       "seatsUpTo": "Up to {{seats}} seats",
-      "seatsUnlimited": "Unlimited seats"
+      "seatsUnlimited": "Unlimited seats",
+      "nextStepUp": "Next step up",
+      "freeFrom": "Free from {{date}}"
     },
     "compare": {
-      "toggle": "Compare all features",
       "caption": "Every plan, side by side",
       "current": "Current",
       "included": "Included",
@@ -1500,6 +1501,41 @@
       "ssoHint": "Your team signs in with your company's identity provider.",
       "prioritySupport": "Priority support",
       "prioritySupportHint": "Your requests are answered first."
+    },
+    "picker": {
+      "open": "Compare plans",
+      "title": "Plans",
+      "sub": "Every plan side by side. Change when your team is ready.",
+      "compareTitle": "Compare features across plans",
+      "compareSub": "What each plan includes, row by row."
+    },
+    "yourPlan": {
+      "eyebrow": "Your plan",
+      "renews": "Renews {{date}}",
+      "ends": "Ends {{date}}",
+      "seats": "Seats",
+      "seatsUsed": "{{used}} of {{total}} in use",
+      "seatsUsedUnlimited": "{{used}} in use · no limit",
+      "includes": "What's included"
+    },
+    "confirm": {
+      "keep": "Keep {{name}}",
+      "notNow": "Not now",
+      "now": "Now",
+      "next": "New",
+      "price": "Price",
+      "seats": "Seats",
+      "billedYearly": "billed yearly",
+      "gains": "What you get",
+      "losses": "What you lose",
+      "nothingLost": "Nothing else changes.",
+      "when": "When",
+      "whenNow": "Right away. Your billing cycle stays the same.",
+      "whenProrated": "Right away. The difference for the rest of this billing period is prorated on your next invoice.",
+      "whenFirst": "Right away.",
+      "whenFirstPayment": "Right away — you confirm your payment method next.",
+      "whenFree": "Your {{name}} plan stays until {{date}}. After that the workspace is on Free.",
+      "seatWarning": "{{used}} seats are taken, pending invitations included, and {{name}} includes {{seats}}. Up to {{excess}} of the most recently joined members, never owners, will be suspended until seats free up."
     }
   }
 }

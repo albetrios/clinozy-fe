@@ -27,6 +27,13 @@ const COMPARE_KEYS = BILLING_PLAN_KEYS.compare;
 const ROW_HEAD =
   'bg-card after:bg-border sticky start-0 z-10 w-40 px-3 py-2.5 text-start align-top font-normal after:absolute after:inset-y-0 after:end-0 after:w-px';
 const CELL = 'px-3 py-2.5 align-top';
+/**
+ * The head row, held at the picker's top once the table no longer scrolls sideways. The picker's
+ * scroll box has no padding of its own (it would inset where the row may rest), so the row
+ * sits flush with its edge, no strip of rows showing above it.
+ */
+const STICKY_HEAD =
+  '@3xl:sticky @3xl:top-0 @3xl:z-20 @3xl:shadow-[0_1px_0_var(--color-border)]';
 
 /** A tick or a dash, each with its word for assistive tech. */
 function Mark({ included, label }: { included: boolean; label: string }) {
@@ -57,27 +64,20 @@ function rowLabels(row: PlanComparisonRow): { label: string; hint: string } {
 
 /** Props of {@link BillingPlanTable}. */
 export interface BillingPlanTableProps {
-  /** The region's id — the "Compare all features" button controls it. */
-  id: string;
   /** Plans cheapest first, one column each. */
   plans: readonly BillingPlan[];
   currentPlanId: string | null;
-  hidden: boolean;
 }
 
 /**
- * Every plan side by side, as the detail behind the cards: one column per plan (the
- * current one marked and tinted), rows grouped as pricing, team and features, each
- * row named with a one-line explanation. A real table — the plans are column
- * headers, the rows row headers — that scrolls sideways on a phone with the row
- * names held in place.
+ * Every plan side by side, as the detail under the cards — claude.com's "Compare features across
+ * plans": one column per plan (the current one marked and tinted), rows grouped as pricing, team
+ * and features, each row named with a one-line explanation. A real table — the plans are column
+ * headers, the rows row headers. Where the picker is wide enough for the whole table (`@3xl`), its
+ * head row stays in view while the picker scrolls; narrower, it scrolls sideways with the row
+ * names held in place (a box that scrolls sideways cannot also let its head stick to the page).
  */
-export function BillingPlanTable({
-  id,
-  plans,
-  currentPlanId,
-  hidden,
-}: BillingPlanTableProps) {
+export function BillingPlanTable({ plans, currentPlanId }: BillingPlanTableProps) {
   const { t } = useTranslation(BILLING_PLAN_NS);
   const { formatCurrency, formatNumber } = useLocaleFormat();
   const sections = comparisonSections(plans);
@@ -136,16 +136,14 @@ export function BillingPlanTable({
 
   return (
     <div
-      id={id}
-      hidden={hidden}
-      className="overflow-x-auto rounded-lg border"
+      className="overflow-x-auto rounded-xl border @3xl:overflow-visible"
       data-testid="plan-compare-table"
     >
       <table className="text-detail w-full min-w-[34rem] table-fixed border-collapse tabular-nums">
         <caption className="sr-only">{t(COMPARE_KEYS.caption)}</caption>
         <thead>
           <tr>
-            <td className={cn(ROW_HEAD, 'py-3')} />
+            <td className={cn(ROW_HEAD, STICKY_HEAD, 'py-3')} />
             {plans.map((plan) => {
               const current = plan.id === currentPlanId;
               return (
@@ -155,8 +153,9 @@ export function BillingPlanTable({
                   data-current={current || undefined}
                   className={cn(
                     CELL,
+                    STICKY_HEAD,
                     'py-3 text-start font-semibold',
-                    current && 'bg-muted/50',
+                    current ? 'bg-muted' : 'bg-card',
                   )}
                 >
                   <span className="flex flex-wrap items-center gap-1.5">

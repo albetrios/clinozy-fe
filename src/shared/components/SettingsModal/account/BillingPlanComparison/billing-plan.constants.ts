@@ -8,7 +8,10 @@ import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
  */
 export const BILLING_PLAN_NS = I18N_NAMESPACES.app;
 
-/** The plan cards, the cycle switch's saving, the comparison table and the capability names. */
+/**
+ * The plan cards, the cycle switch's saving, the plan picker, "Your plan", the plan-change
+ * confirm, the comparison table and the capability names.
+ */
 export const BILLING_PLAN_KEYS = {
   upgradeTo: 'billingPlans.upgradeTo',
   plan: {
@@ -27,9 +30,45 @@ export const BILLING_PLAN_KEYS = {
     seatsOne: 'billingPlans.plan.seatsOne',
     seatsUpTo: 'billingPlans.plan.seatsUpTo',
     seatsUnlimited: 'billingPlans.plan.seatsUnlimited',
+    nextStepUp: 'billingPlans.plan.nextStepUp',
+    freeFrom: 'billingPlans.plan.freeFrom',
+  },
+  picker: {
+    open: 'billingPlans.picker.open',
+    title: 'billingPlans.picker.title',
+    sub: 'billingPlans.picker.sub',
+    compareTitle: 'billingPlans.picker.compareTitle',
+    compareSub: 'billingPlans.picker.compareSub',
+  },
+  yourPlan: {
+    eyebrow: 'billingPlans.yourPlan.eyebrow',
+    renews: 'billingPlans.yourPlan.renews',
+    ends: 'billingPlans.yourPlan.ends',
+    seats: 'billingPlans.yourPlan.seats',
+    seatsUsed: 'billingPlans.yourPlan.seatsUsed',
+    seatsUsedUnlimited: 'billingPlans.yourPlan.seatsUsedUnlimited',
+    includes: 'billingPlans.yourPlan.includes',
+  },
+  confirm: {
+    keep: 'billingPlans.confirm.keep',
+    notNow: 'billingPlans.confirm.notNow',
+    now: 'billingPlans.confirm.now',
+    next: 'billingPlans.confirm.next',
+    price: 'billingPlans.confirm.price',
+    seats: 'billingPlans.confirm.seats',
+    billedYearly: 'billingPlans.confirm.billedYearly',
+    gains: 'billingPlans.confirm.gains',
+    losses: 'billingPlans.confirm.losses',
+    nothingLost: 'billingPlans.confirm.nothingLost',
+    when: 'billingPlans.confirm.when',
+    whenNow: 'billingPlans.confirm.whenNow',
+    whenProrated: 'billingPlans.confirm.whenProrated',
+    whenFirst: 'billingPlans.confirm.whenFirst',
+    whenFirstPayment: 'billingPlans.confirm.whenFirstPayment',
+    whenFree: 'billingPlans.confirm.whenFree',
+    seatWarning: 'billingPlans.confirm.seatWarning',
   },
   compare: {
-    toggle: 'billingPlans.compare.toggle',
     caption: 'billingPlans.compare.caption',
     current: 'billingPlans.compare.current',
     included: 'billingPlans.compare.included',

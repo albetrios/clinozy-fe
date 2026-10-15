@@ -1490,10 +1490,11 @@
       "audienceAny": "Pour les équipes de toute taille",
       "seatsOne": "1 siège",
       "seatsUpTo": "Jusqu’à {{seats}} sièges",
-      "seatsUnlimited": "Sièges illimités"
+      "seatsUnlimited": "Sièges illimités",
+      "nextStepUp": "Palier suivant",
+      "freeFrom": "Gratuit à partir du {{date}}"
     },
     "compare": {
-      "toggle": "Comparer toutes les fonctionnalités",
       "caption": "Toutes les offres, côte à côte",
       "current": "Actuelle",
       "included": "Inclus",
@@ -1521,6 +1522,41 @@
       "ssoHint": "Votre équipe se connecte avec le fournisseur d’identité de votre entreprise.",
       "prioritySupport": "Assistance prioritaire",
       "prioritySupportHint": "Vos demandes sont traitées en premier."
+    },
+    "picker": {
+      "open": "Comparer les offres",
+      "title": "Offres",
+      "sub": "Toutes les offres côte à côte. Changez quand votre équipe est prête.",
+      "compareTitle": "Comparer les fonctionnalités des offres",
+      "compareSub": "Ce que comprend chaque offre, ligne par ligne."
+    },
+    "yourPlan": {
+      "eyebrow": "Votre offre",
+      "renews": "Renouvellement le {{date}}",
+      "ends": "Se termine le {{date}}",
+      "seats": "Sièges",
+      "seatsUsed": "{{used}} sur {{total}} utilisés",
+      "seatsUsedUnlimited": "{{used}} utilisés · sans limite",
+      "includes": "Ce qui est inclus"
+    },
+    "confirm": {
+      "keep": "Garder {{name}}",
+      "notNow": "Pas maintenant",
+      "now": "Actuelle",
+      "next": "Nouvelle",
+      "price": "Prix",
+      "seats": "Sièges",
+      "billedYearly": "facturé à l’année",
+      "gains": "Ce que vous obtenez",
+      "losses": "Ce que vous perdez",
+      "nothingLost": "Rien d’autre ne change.",
+      "when": "Quand",
+      "whenNow": "Tout de suite. Votre cycle de facturation reste le même.",
+      "whenProrated": "Tout de suite. La différence pour le reste de cette période est calculée au prorata sur votre prochaine facture.",
+      "whenFirst": "Tout de suite.",
+      "whenFirstPayment": "Tout de suite — vous confirmez ensuite votre moyen de paiement.",
+      "whenFree": "Votre offre {{name}} reste active jusqu’au {{date}}. Ensuite, l’espace de travail passe à Free.",
+      "seatWarning": "{{used}} sièges sont occupés, invitations en attente comprises, et {{name}} en comprend {{seats}}. Jusqu’à {{excess}} des membres arrivés le plus récemment, jamais les propriétaires, seront suspendus jusqu’à ce que des sièges se libèrent."
     }
   }
 }

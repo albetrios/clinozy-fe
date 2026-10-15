@@ -2,6 +2,7 @@ import type {
   BillingCycle,
   BillingPlan,
   BillingPlanFeatures,
+  BillingSubscription,
 } from '@/shared/api/billing-contracts.ts';
 
 import { BILLING_PLAN_KEYS } from './billing-plan.constants.ts';
@@ -216,4 +217,168 @@ export function wholeAmountOptions(cents: number): Intl.NumberFormatOptions | un
   return cents % 100 === 0
     ? { minimumFractionDigits: 0, maximumFractionDigits: 0 }
     : undefined;
+}
+
+/** A plan that costs nothing on either cycle. */
+export function isFreePlan(plan: BillingPlan): boolean {
+  return plan.priceMonthly <= 0 && (plan.priceYearly ?? 0) <= 0;
+}
+
+/**
+ * The plan a workspace without a paid subscription is on: the cheapest active plan, when it
+ * costs nothing — clinozy-be's own reading (it holds such a workspace to that plan's seats,
+ * `findFreePlanSeatCeiling`). `null` when the cheapest plan has a price.
+ */
+export function freePlanOf(sorted: readonly BillingPlan[]): BillingPlan | null {
+  const cheapest = sorted[0];
+  return cheapest && isFreePlan(cheapest) ? cheapest : null;
+}
+
+/** The plan the workspace is on: its subscription's, else Free. */
+export function currentPlanOf({
+  sorted,
+  subscriptionPlanId,
+}: {
+  sorted: readonly BillingPlan[];
+  subscriptionPlanId: string | null;
+}): BillingPlan | null {
+  if (subscriptionPlanId !== null) {
+    return sorted.find((plan) => plan.id === subscriptionPlanId) ?? null;
+  }
+  return freePlanOf(sorted);
+}
+
+/** The plan right above the current one by price — "Next step up" and the upgrade shortcut. */
+export function nextPlanUp({
+  sorted,
+  current,
+}: {
+  sorted: readonly BillingPlan[];
+  current: BillingPlan | null;
+}): BillingPlan | null {
+  if (!current) return null;
+  return sorted.find((plan) => plan.priceMonthly > current.priceMonthly) ?? null;
+}
+
+/** What a move from one plan to another changes, for the confirm. */
+export interface PlanDifference {
+  /** A dearer plan (by its monthly price) is an upgrade; anything else a downgrade. */
+  direction: 'upgrade' | 'downgrade';
+  /** More seats (the new allowance), and capabilities the new plan adds or raises. */
+  gains: PlanHighlight[];
+  /** Fewer seats (the allowance given up), and capabilities the new plan does not have. */
+  losses: PlanHighlight[];
+}
+
+/**
+ * What a move adds and takes away, as the cards' own checklist lines: the seats first, then the
+ * capabilities of the catalog the cards and the table read. The price is shown beside it, not in
+ * it. `from` is `null` when the workspace is on no plan at all — everything is then a gain.
+ */
+export function planDifference({
+  from,
+  to,
+}: {
+  from: BillingPlan | null;
+  to: BillingPlan;
+}): PlanDifference {
+  const gains: PlanHighlight[] = [];
+  const losses: PlanHighlight[] = [];
+  if (!from || moreSeats(to.seatLimit, from.seatLimit)) {
+    gains.push({ kind: 'seats', seats: to.seatLimit });
+  } else if (moreSeats(from.seatLimit, to.seatLimit)) {
+    losses.push({ kind: 'seats', seats: from.seatLimit });
+  }
+  for (const feature of PLAN_FEATURE_CATALOG) {
+    const before = from
+      ? readPlanFeature(from.features, feature.key)
+      : ({ kind: 'excluded' } as const);
+    const after = readPlanFeature(to.features, feature.key);
+    if (sameFeatureValue(before, after)) continue;
+    if (after.kind === 'excluded')
+      losses.push({ kind: 'feature', feature, value: before });
+    else gains.push({ kind: 'feature', feature, value: after });
+  }
+  const direction =
+    !from || to.priceMonthly > from.priceMonthly ? 'upgrade' : 'downgrade';
+  return { direction, gains, losses };
+}
+
+/**
+ * How many taken seats a plan cannot hold — an upper bound on the members clinozy-be suspends,
+ * the most recently joined first and never an owner (`suspendExcessActiveMembersToFitCeiling`).
+ * `seats_used` counts pending invitations too and the suspension only active members, so the
+ * confirm says "up to". `0` when the plan has no limit or room for everyone.
+ */
+export function seatsOverLimit({
+  seatsUsed,
+  seatLimit,
+}: {
+  seatsUsed: number;
+  seatLimit: number | null;
+}): number {
+  if (seatLimit === null) return 0;
+  return Math.max(0, seatsUsed - seatLimit);
+}
+
+/**
+ * What a card's button does, decided from the subscription: nothing (a member who may not manage
+ * billing), the plan in force, Free from the date a cancelled plan ends, or a move — which opens
+ * the confirm, never the change itself.
+ */
+export type PlanCardAction =
+  | { kind: 'none' }
+  | { kind: 'current' }
+  | { kind: 'freeFrom'; date: string }
+  | { kind: 'choose' | 'upgrade' | 'switch' };
+
+/** A dearer plan than the current one is a step up. */
+function isStepUp(plan: BillingPlan, current: BillingPlan | null): boolean {
+  return current !== null && plan.priceMonthly > current.priceMonthly;
+}
+
+/**
+ * What `plan`'s button does for this workspace: the current plan is marked; a member who may not
+ * manage billing gets nothing else; with no subscription a dearer plan than Free is an upgrade and
+ * any other a choice; subscribed, Free is a switch (an end at period end — or "Free from" once
+ * that is set), a dearer plan an upgrade, a cheaper one a switch.
+ */
+export function planCardAction({
+  plan,
+  current,
+  subscription,
+  canManage,
+}: {
+  plan: BillingPlan;
+  current: BillingPlan | null;
+  subscription: BillingSubscription | null;
+  canManage: boolean;
+}): PlanCardAction {
+  if (current?.id === plan.id) return { kind: 'current' };
+  if (!canManage) return { kind: 'none' };
+  if (subscription && isFreePlan(plan)) {
+    return subscription.cancelAtPeriodEnd
+      ? { kind: 'freeFrom', date: subscription.currentPeriodEnd }
+      : { kind: 'switch' };
+  }
+  if (isStepUp(plan, current)) return { kind: 'upgrade' };
+  return subscription ? { kind: 'switch' } : { kind: 'choose' };
+}
+
+/**
+ * What confirming does: start a first plan, move between paid plans, or end the paid plan at the
+ * end of its period (Free — the backend's cancellation).
+ */
+export type PlanChangeKind = 'first' | 'change' | 'toFree';
+
+/** Which kind of move `target` is for this workspace. */
+export function planChangeKind({
+  target,
+  subscription,
+}: {
+  target: BillingPlan;
+  subscription: BillingSubscription | null;
+}): PlanChangeKind {
+  if (!subscription) return 'first';
+  return isFreePlan(target) ? 'toFree' : 'change';
 }

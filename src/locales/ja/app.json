@@ -1448,10 +1448,11 @@
       "audienceAny": "あらゆる規模のチーム向け",
       "seatsOne": "1 席",
       "seatsUpTo": "最大 {{seats}} 席",
-      "seatsUnlimited": "席数無制限"
+      "seatsUnlimited": "席数無制限",
+      "nextStepUp": "次のステップ",
+      "freeFrom": "{{date}} から無料"
     },
     "compare": {
-      "toggle": "すべての機能を比較",
       "caption": "すべてのプランを並べて比較",
       "current": "現在",
       "included": "含まれる",
@@ -1479,6 +1480,41 @@
       "ssoHint": "チームは会社の ID プロバイダーでサインインします。",
       "prioritySupport": "優先サポート",
       "prioritySupportHint": "お問い合わせに優先して対応します。"
+    },
+    "picker": {
+      "open": "プランを比較",
+      "title": "プラン",
+      "sub": "すべてのプランを並べて表示。チームの準備ができたら変更しましょう。",
+      "compareTitle": "プランの機能を比較",
+      "compareSub": "各プランに含まれるものを行ごとに。"
+    },
+    "yourPlan": {
+      "eyebrow": "現在のプラン",
+      "renews": "{{date}} に更新",
+      "ends": "{{date}} に終了",
+      "seats": "席",
+      "seatsUsed": "{{total}} 席中 {{used}} 席使用中",
+      "seatsUsedUnlimited": "{{used}} 席使用中 · 上限なし",
+      "includes": "含まれるもの"
+    },
+    "confirm": {
+      "keep": "{{name}} のままにする",
+      "notNow": "今はしない",
+      "now": "現在",
+      "next": "変更後",
+      "price": "料金",
+      "seats": "席",
+      "billedYearly": "年払い",
+      "gains": "追加されるもの",
+      "losses": "なくなるもの",
+      "nothingLost": "ほかに変更はありません。",
+      "when": "反映時期",
+      "whenNow": "すぐに反映されます。請求サイクルは変わりません。",
+      "whenProrated": "すぐに反映されます。この期間の残りの差額は次回の請求書で日割り計算されます。",
+      "whenFirst": "すぐに反映されます。",
+      "whenFirstPayment": "すぐに反映されます。次に支払い方法を確認します。",
+      "whenFree": "{{name}} プランは {{date}} まで続きます。その後、ワークスペースは Free になります。",
+      "seatWarning": "保留中の招待を含めて {{used}} 席が使用中で、{{name}} の席数は {{seats}} です。最近参加したメンバーのうち最大 {{excess}} 人（オーナーは対象外）が、席が空くまで停止されます。"
     }
   }
 }

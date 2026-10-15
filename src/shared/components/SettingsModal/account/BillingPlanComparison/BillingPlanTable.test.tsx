@@ -46,10 +46,8 @@ function renderTable(
 ) {
   const view = render(
     <BillingPlanTable
-      id="compare"
       plans={props.plans ?? PLANS}
       currentPlanId={props.currentPlanId ?? null}
-      hidden={false}
     />,
   );
   const table = screen.getByRole('table', { name: 'Every plan, side by side' });
@@ -76,7 +74,16 @@ describe('BillingPlanTable', () => {
     ).toEqual(['Free', 'StarterCurrent', 'Pro']);
     const current = within(head).getByRole('columnheader', { name: /Starter/ });
     expect(current).toHaveAttribute('data-current', 'true');
-    expect(current).toHaveClass('bg-muted/50');
+  });
+
+  it('keeps its head row in view once the picker is wide enough', () => {
+    const { table } = renderTable();
+    const [head] = within(table).getAllByRole('rowgroup');
+    if (!head) throw new Error('the table has no head');
+    for (const header of within(head).getAllByRole('columnheader')) {
+      expect(header).toHaveClass('@3xl:sticky', '@3xl:top-0');
+    }
+    expect(screen.getByTestId('plan-compare-table')).toHaveClass('@3xl:overflow-visible');
   });
 
   it('groups the rows as pricing, team and features', () => {

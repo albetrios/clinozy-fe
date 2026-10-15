@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -18,7 +18,7 @@ import type {
 } from '@/shared/api/billing-contracts.ts';
 import { billingQueryKeys } from '@/shared/api/billing-query-keys.ts';
 import { isStripeEnabled } from '@/shared/billing/stripe-config.ts';
-import { type PillTone, TonePill } from '@/shared/components/Cells/TonePill/index.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import { BillingCancellationSection } from '@/shared/components/SettingsModal/account/BillingCancellationSection/index.ts';
@@ -28,7 +28,12 @@ import {
   bestYearlySavingsPercent,
   BILLING_PLAN_KEYS,
   BILLING_PLAN_NS,
-  BillingPlanComparison,
+  BillingCurrentPlan,
+  BillingPlanChangeConfirm,
+  BillingPlanPicker,
+  currentPlanOf,
+  isFreePlan,
+  sortPlansForComparison,
 } from '@/shared/components/SettingsModal/account/BillingPlanComparison/index.ts';
 import {
   SETTINGS_KEYS,
@@ -38,24 +43,15 @@ import { SettingsSectionHeader } from '@/shared/components/SettingsModal/Setting
 import { StripePaymentForm } from '@/shared/components/StripePaymentForm/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useCan } from '@/shared/hooks/useCan/index.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import {
   useBillingPlans,
+  useCancelSubscription,
   useSelectBillingPlan,
   useSubscription,
 } from '@/shared/hooks/useSubscription/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 const BILLING_KEYS = SETTINGS_KEYS.panels.billing;
-
-/** A subscription status's pill tone: running sage, payment trouble blush, else plain. */
-function statusTone(status: BillingSubscription['status']): PillTone {
-  if (status === 'active' || status === 'trialing') return 'sage';
-  if (status === 'incomplete' || status === 'past_due' || status === 'unpaid') {
-    return 'blush';
-  }
-  return 'neutral';
-}
 
 /**
  * The plan change SUCCEEDED and the payment step did not. Silence here leaves an
@@ -144,70 +140,6 @@ function BillingCycleSwitch({
   );
 }
 
-interface ChangePlanCardProps {
-  sub: BillingSubscription | null;
-  plans: BillingPlan[];
-  canManage: boolean;
-  /** The cycle every card is priced on — the subscription's own once there is one. */
-  billingCycle: BillingCycle;
-  /** The cycle picked on the switch, before there is a subscription. */
-  chosenCycle: BillingCycle;
-  onChooseCycle: (cycle: BillingCycle) => void;
-  /** The plan whose switch is in flight, if any — at most one at a time. */
-  pendingPlanId: string | null;
-  onSelect: (planId: string) => Promise<void>;
-}
-
-/**
- * The Change plan card: the Monthly · Yearly switch (managers, before there is a
- * subscription) over the plan comparison.
- */
-function ChangePlanCard({
-  sub,
-  plans,
-  canManage,
-  billingCycle,
-  chosenCycle,
-  onChooseCycle,
-  pendingPlanId,
-  onSelect,
-}: ChangePlanCardProps) {
-  const { t } = useTranslation(SETTINGS_NS);
-  return (
-    <SettingsCard
-      title={t(BILLING_KEYS.changePlanTitle)}
-      description={t(BILLING_KEYS.changePlanDescription)}
-    >
-      {/* Above the cards, not in the card head: with its saving it needs the
-          room a phone's head row does not have (Claude centres it there too). */}
-      {canManage && !sub ? (
-        <BillingCycleSwitch
-          value={chosenCycle}
-          savingsPercent={bestYearlySavingsPercent(plans)}
-          onChange={onChooseCycle}
-        />
-      ) : null}
-      <BillingPlanComparison
-        plans={plans}
-        currentPlanId={sub?.planId ?? null}
-        // `Boolean`, not `!== null`: this was the one check in the file that
-        // told `undefined` apart from `null`, and it decides whether the
-        // buttons read "Choose Free" or "Switch to Free". An `undefined` here
-        // therefore put "Switch to …" on every card of a workspace whose own
-        // summary says "No active subscription yet. Choose a plan below." —
-        // the card telling the user they are on a plan while the heading above
-        // it says they are not. Every other read of `sub` in this component
-        // (`sub ?`, `!sub`, `Boolean(sub)`) already treats the two alike.
-        hasSubscription={Boolean(sub)}
-        canManage={canManage}
-        billingCycle={billingCycle}
-        pendingPlanId={pendingPlanId}
-        onSelect={onSelect}
-      />
-    </SettingsCard>
-  );
-}
-
 interface BillingContentProps {
   sub: BillingSubscription | null;
   plans: BillingPlan[];
@@ -217,7 +149,6 @@ function BillingContent({ sub, plans }: BillingContentProps) {
   const { t } = useTranslation(SETTINGS_NS);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { formatDate } = useLocaleFormat();
   const canManage = useCan({
     permission: 'subscription:manage',
     teamOrganizationOnly: true,
@@ -234,10 +165,14 @@ function BillingContent({ sub, plans }: BillingContentProps) {
    * showed a spinner - the click read as "the page froze" (SET-13).
    */
   const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
+  /** The plan picker over Settings, and the plan whose confirm is open (null: none). */
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [confirmPlanId, setConfirmPlanId] = useState<string | null>(null);
+  const cancelSubscription = useCancelSubscription();
 
-  const currentPlan = sub?.planId
-    ? plans.find((plan) => plan.id === sub.planId)
-    : undefined;
+  const sorted = useMemo(() => sortPlansForComparison(plans), [plans]);
+  const current = currentPlanOf({ sorted, subscriptionPlanId: sub?.planId ?? null });
+  const confirmTarget = sorted.find((plan) => plan.id === confirmPlanId) ?? null;
 
   const stripeEnabled = isStripeEnabled();
   const showBillingExtras = stripeEnabled && Boolean(sub);
@@ -287,66 +222,64 @@ function BillingContent({ sub, plans }: BillingContentProps) {
   }, [sub, stripeEnabled, canManage, paymentClientSecret]);
 
   /**
-   * Never rejects. It is called from an `onClick`, where a rejection is an
-   * unhandled promise and nothing else — no toast, no rollback, no clue.
+   * Never rejects; resolves whether the plan change went through. It runs from the
+   * confirm's button, where a rejection is an unhandled promise and nothing else —
+   * no toast, no rollback, no clue.
    */
-  async function handlePlanSelect(planId: string) {
+  async function handlePlanSelect(planId: string): Promise<boolean> {
     // A second plan cannot be chosen while the first switch is still running;
     // the ref-based guard in `useAppMutation` would silently join it to the
     // first, charging for a plan the user did not press.
-    if (pendingPlanId !== null) return;
+    if (pendingPlanId !== null) return false;
     setPendingPlanId(planId);
     try {
       const updated = await selectPlan.mutateAsync({ planId, billingCycle });
-      if (updated.status !== 'incomplete' || !stripeEnabled) return;
+      if (updated.status !== 'incomplete' || !stripeEnabled) return true;
       // The plan change itself went through — a payment step that will not
       // start is a separate failure, and needs to say so.
       const clientSecret = await loadPaymentSetup(updated.id);
       if (clientSecret) setPaymentClientSecret(clientSecret);
+      return true;
     } catch {
       // `useAppMutation` already toasted the mapped error; swallow so the click
       // handler cannot leave an unhandled rejection behind.
+      return false;
     } finally {
       setPendingPlanId(null);
     }
   }
 
-  const summaryDescription = sub
-    ? t(BILLING_KEYS.summary, {
-        used: sub.seatsUsed,
-        total: sub.seatsTotal ?? '∞',
-        date: formatDate(sub.currentPeriodEnd),
-      })
-    : t(BILLING_KEYS.noSubscription);
+  /** Free is no subscription: moving there ends the paid plan at the end of its period. */
+  async function endPaidPlan(subscriptionId: string): Promise<boolean> {
+    try {
+      await cancelSubscription.mutateAsync(subscriptionId);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** The confirm's button: the move, then — when it went through — back to Billing. */
+  async function confirmPlanChange() {
+    if (!confirmTarget) return;
+    const done =
+      sub && isFreePlan(confirmTarget)
+        ? await endPaidPlan(sub.id)
+        : await handlePlanSelect(confirmTarget.id);
+    if (!done) return;
+    setConfirmPlanId(null);
+    setPickerOpen(false);
+  }
 
   return (
     <div className="flex flex-col gap-4">
-      <SettingsCard
-        data-testid="billing-summary"
-        title={
-          currentPlan
-            ? t(BILLING_KEYS.planHeading, { name: currentPlan.name })
-            : t(BILLING_KEYS.noPlan)
-        }
-        description={summaryDescription}
-        action={
-          sub ? (
-            <TonePill tone={statusTone(sub.status)} dot className="capitalize">
-              {sub.status.replace('_', ' ')}
-            </TonePill>
-          ) : undefined
-        }
-      >
-        {sub ? (
-          <p className="text-muted-foreground-strong text-xs">
-            {t(
-              sub.billingCycle === 'yearly'
-                ? BILLING_KEYS.billedYearly
-                : BILLING_KEYS.billedMonthly,
-            )}
-          </p>
-        ) : null}
-      </SettingsCard>
+      <BillingCurrentPlan
+        plans={plans}
+        subscription={sub}
+        canManage={canManage}
+        onCompare={() => setPickerOpen(true)}
+        onUpgrade={setConfirmPlanId}
+      />
 
       {paymentClientSecret ? (
         <SettingsCard
@@ -378,17 +311,6 @@ function BillingContent({ sub, plans }: BillingContentProps) {
 
       <BillingInvoicesTable enabled={showBillingExtras} />
 
-      <ChangePlanCard
-        sub={sub}
-        plans={plans}
-        canManage={canManage}
-        billingCycle={billingCycle}
-        chosenCycle={chosenCycle}
-        onChooseCycle={setChosenCycle}
-        pendingPlanId={pendingPlanId}
-        onSelect={handlePlanSelect}
-      />
-
       {sub ? (
         // Ending a subscription is its own failure domain: a throw here must not
         // take the plan grid and the invoice history with it.
@@ -399,6 +321,39 @@ function BillingContent({ sub, plans }: BillingContentProps) {
           <BillingCancellationSection subscription={sub} canManage={canManage} />
         </SectionErrorBoundary>
       ) : null}
+
+      <BillingPlanPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        plans={plans}
+        subscription={sub}
+        canManage={canManage}
+        billingCycle={billingCycle}
+        // The cycle is chosen only before there is a subscription (change-plan keeps it).
+        cycleSwitch={
+          canManage && !sub ? (
+            <BillingCycleSwitch
+              value={chosenCycle}
+              savingsPercent={bestYearlySavingsPercent(plans)}
+              onChange={setChosenCycle}
+            />
+          ) : undefined
+        }
+        pendingPlanId={pendingPlanId}
+        onChoose={setConfirmPlanId}
+      />
+
+      <BillingPlanChangeConfirm
+        target={confirmTarget}
+        current={current}
+        sorted={sorted}
+        subscription={sub}
+        billingCycle={billingCycle}
+        paymentsEnabled={stripeEnabled}
+        busy={pendingPlanId !== null || cancelSubscription.isPending}
+        onConfirm={() => void confirmPlanChange()}
+        onDismiss={() => setConfirmPlanId(null)}
+      />
     </div>
   );
 }

@@ -1490,10 +1490,11 @@
       "audienceAny": "Per team di ogni dimensione",
       "seatsOne": "1 postazione",
       "seatsUpTo": "Fino a {{seats}} postazioni",
-      "seatsUnlimited": "Postazioni illimitate"
+      "seatsUnlimited": "Postazioni illimitate",
+      "nextStepUp": "Livello successivo",
+      "freeFrom": "Gratis dal {{date}}"
     },
     "compare": {
-      "toggle": "Confronta tutte le funzioni",
       "caption": "Tutti i piani, fianco a fianco",
       "current": "Attuale",
       "included": "Incluso",
@@ -1521,6 +1522,41 @@
       "ssoHint": "Il tuo team accede con il provider di identità della tua azienda.",
       "prioritySupport": "Assistenza prioritaria",
       "prioritySupportHint": "Le tue richieste hanno la precedenza."
+    },
+    "picker": {
+      "open": "Confronta i piani",
+      "title": "Piani",
+      "sub": "Tutti i piani fianco a fianco. Cambia quando il tuo team è pronto.",
+      "compareTitle": "Confronta le funzioni dei piani",
+      "compareSub": "Cosa include ogni piano, riga per riga."
+    },
+    "yourPlan": {
+      "eyebrow": "Il tuo piano",
+      "renews": "Si rinnova il {{date}}",
+      "ends": "Termina il {{date}}",
+      "seats": "Postazioni",
+      "seatsUsed": "{{used}} di {{total}} in uso",
+      "seatsUsedUnlimited": "{{used}} in uso · senza limite",
+      "includes": "Cosa include"
+    },
+    "confirm": {
+      "keep": "Mantieni {{name}}",
+      "notNow": "Non ora",
+      "now": "Attuale",
+      "next": "Nuovo",
+      "price": "Prezzo",
+      "seats": "Postazioni",
+      "billedYearly": "fatturazione annuale",
+      "gains": "Cosa ottieni",
+      "losses": "Cosa perdi",
+      "nothingLost": "Nient’altro cambia.",
+      "when": "Quando",
+      "whenNow": "Subito. Il ciclo di fatturazione resta lo stesso.",
+      "whenProrated": "Subito. La differenza per il resto di questo periodo viene calcolata in proporzione sulla prossima fattura.",
+      "whenFirst": "Subito.",
+      "whenFirstPayment": "Subito: poi confermi il metodo di pagamento.",
+      "whenFree": "Il piano {{name}} resta attivo fino al {{date}}. Poi lo spazio di lavoro passa a Free.",
+      "seatWarning": "Sono occupate {{used}} postazioni, inviti in attesa compresi, e {{name}} ne include {{seats}}. Fino a {{excess}} dei membri entrati più di recente, mai i proprietari, saranno sospesi finché non si liberano postazioni."
     }
   }
 }

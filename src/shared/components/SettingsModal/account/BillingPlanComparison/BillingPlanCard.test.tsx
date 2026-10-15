@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { BillingCycle, BillingPlan } from '@/shared/api/billing-contracts.ts';
 
 import { BillingPlanCard } from './BillingPlanCard.tsx';
-import { planTiers } from './plan-comparison.ts';
+import { type PlanCardAction, planTiers } from './plan-comparison.ts';
 
 function plan(
   overrides: Partial<BillingPlan> & Pick<BillingPlan, 'id' | 'name'>,
@@ -36,43 +36,49 @@ interface CardOptions {
   plans?: BillingPlan[];
   at?: number;
   billingCycle?: BillingCycle;
-  current?: boolean;
-  currentPriceMonthly?: number | null;
-  hasSubscription?: boolean;
-  canManage?: boolean;
-  pendingPlanId?: string | null;
+  action?: PlanCardAction;
+  nextStepUp?: boolean;
+  busy?: boolean;
+  held?: boolean;
 }
 
-/** Renders the card of `plans[at]`, as the comparison would. */
+/** Renders the card of `plans[at]`, as the picker would. */
 function renderCard({
   plans = [FREE, STARTER],
   at = 1,
   billingCycle = 'monthly',
-  current = false,
-  currentPriceMonthly = null,
-  hasSubscription = false,
-  canManage = true,
-  pendingPlanId = null,
+  action = { kind: 'choose' },
+  nextStepUp = false,
+  busy = false,
+  held = false,
 }: CardOptions = {}) {
   const tier = planTiers(plans)[at];
   if (!tier) throw new Error(`no tier at ${at}`);
-  const onSelect = vi.fn().mockResolvedValue(undefined);
+  const onAction = vi.fn();
   render(
     <BillingPlanCard
       tier={tier}
+      rank={at}
       billingCycle={billingCycle}
-      current={current}
-      currentPriceMonthly={currentPriceMonthly}
-      hasSubscription={hasSubscription}
-      canManage={canManage}
-      pendingPlanId={pendingPlanId}
-      onSelect={onSelect}
+      action={action}
+      nextStepUp={nextStepUp}
+      busy={busy}
+      held={held}
+      onAction={onAction}
     />,
   );
-  return { onSelect, card: screen.getByTestId(`plan-card-${tier.plan.id}`) };
+  return { onAction, card: screen.getByTestId(`plan-card-${tier.plan.id}`) };
 }
 
 describe('BillingPlanCard', () => {
+  it('names the plan as an article heading', () => {
+    renderCard();
+    expect(screen.getByRole('article', { name: 'Starter' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Starter' }),
+    ).toBeInTheDocument();
+  });
+
   describe('the tagline', () => {
     it.each([
       [1, 'For one practitioner'],
@@ -160,9 +166,7 @@ describe('BillingPlanCard', () => {
     });
 
     it('shows a capability value next to its name', () => {
-      renderCard({
-        plans: [FREE, { ...STARTER, features: { audit_log: 90 } }],
-      });
+      renderCard({ plans: [FREE, { ...STARTER, features: { audit_log: 90 } }] });
       expect(screen.getByTestId('plan-highlights-pln_starter')).toHaveTextContent(
         'Audit log · 90',
       );
@@ -170,30 +174,30 @@ describe('BillingPlanCard', () => {
   });
 
   describe('the action', () => {
-    it('reads "Choose" before there is a subscription', async () => {
+    it('opens the move it names — never the change itself', async () => {
       const user = userEvent.setup();
-      const { onSelect } = renderCard();
-      await user.click(screen.getByTestId('plan-pln_starter'));
+      const { onAction } = renderCard({ action: { kind: 'upgrade' } });
+      const button = screen.getByTestId('plan-pln_starter');
+      expect(button).toHaveTextContent('Upgrade to Starter');
+      expect(button).toHaveAttribute('data-variant', 'default');
+      await user.click(button);
+      expect(onAction).toHaveBeenCalledWith('pln_starter');
+    });
+
+    it('reads "Choose" for a first plan and "Switch to" on the quieter button', () => {
+      renderCard({ action: { kind: 'choose' } });
       expect(screen.getByTestId('plan-pln_starter')).toHaveTextContent('Choose Starter');
-      expect(onSelect).toHaveBeenCalledWith('pln_starter');
     });
 
-    it('reads "Upgrade to" for a dearer plan', () => {
-      renderCard({ hasSubscription: true, currentPriceMonthly: 0 });
-      expect(screen.getByTestId('plan-pln_starter')).toHaveTextContent(
-        'Upgrade to Starter',
-      );
-    });
-
-    it('reads "Switch to" on the quieter button for a cheaper plan', () => {
-      renderCard({ at: 0, hasSubscription: true, currentPriceMonthly: 1000 });
+    it('reads "Switch to" on the quieter button', () => {
+      renderCard({ at: 0, action: { kind: 'switch' } });
       const button = screen.getByTestId('plan-pln_free');
       expect(button).toHaveTextContent('Switch to Free');
       expect(button).toHaveAttribute('data-variant', 'outline');
     });
 
-    it('is a disabled "Current plan" on the plan the subscription is on', () => {
-      const { card } = renderCard({ current: true, hasSubscription: true });
+    it('is a disabled "Current plan" on the plan in force, with the ink edge', () => {
+      const { card } = renderCard({ action: { kind: 'current' } });
       expect(screen.getByTestId('plan-current')).toBeDisabled();
       expect(screen.getByTestId('plan-current')).toHaveTextContent('Current plan');
       expect(screen.queryByTestId('plan-pln_starter')).not.toBeInTheDocument();
@@ -201,21 +205,35 @@ describe('BillingPlanCard', () => {
       expect(card).toHaveClass('border-foreground', 'ring-1');
     });
 
-    it('offers nothing to a member who may not manage billing, and still names the current plan', () => {
-      renderCard({ canManage: false, current: true, hasSubscription: true });
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      expect(screen.getByText('Current plan')).toBeInTheDocument();
+    it('reads "Free from <date>" once the paid plan is set to end', () => {
+      renderCard({
+        at: 0,
+        action: { kind: 'freeFrom', date: '2026-12-01T00:00:00.000Z' },
+      });
+      const button = screen.getByTestId('plan-free-from-pln_free');
+      expect(button).toBeDisabled();
+      expect(button.textContent).toMatch(/^Free from /);
     });
 
-    it('spins the pressed plan and holds the others', () => {
-      renderCard({ pendingPlanId: 'pln_starter' });
+    it('offers nothing to a member who may not manage billing', () => {
+      renderCard({ action: { kind: 'none' } });
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('spins the pressed plan', () => {
+      renderCard({ busy: true, held: true });
       expect(screen.getByTestId('plan-pln_starter')).toHaveTextContent('Switching…');
     });
 
-    it('holds a plan while another one switches', () => {
-      renderCard({ pendingPlanId: 'pln_free' });
+    it('holds a plan while another one moves', () => {
+      renderCard({ held: true });
       expect(screen.getByTestId('plan-pln_starter')).toBeDisabled();
       expect(screen.getByTestId('plan-pln_starter')).toHaveTextContent('Choose Starter');
     });
+  });
+
+  it('marks the plan above the current one as the next step up', () => {
+    renderCard({ nextStepUp: true, action: { kind: 'upgrade' } });
+    expect(screen.getByTestId('plan-next-pln_starter')).toHaveTextContent('Next step up');
   });
 });

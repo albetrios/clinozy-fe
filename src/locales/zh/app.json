@@ -1448,10 +1448,11 @@
       "audienceAny": "适合任意规模的团队",
       "seatsOne": "1 个席位",
       "seatsUpTo": "最多 {{seats}} 个席位",
-      "seatsUnlimited": "不限席位"
+      "seatsUnlimited": "不限席位",
+      "nextStepUp": "下一档",
+      "freeFrom": "{{date}} 起免费"
     },
     "compare": {
-      "toggle": "比较全部功能",
       "caption": "所有套餐并排比较",
       "current": "当前",
       "included": "包含",
@@ -1479,6 +1480,41 @@
       "ssoHint": "团队通过公司的身份提供商登录。",
       "prioritySupport": "优先支持",
       "prioritySupportHint": "您的请求会被优先处理。"
+    },
+    "picker": {
+      "open": "比较套餐",
+      "title": "套餐",
+      "sub": "所有套餐并排对比。团队准备好时再切换。",
+      "compareTitle": "比较各套餐功能",
+      "compareSub": "逐行列出每个套餐包含的内容。"
+    },
+    "yourPlan": {
+      "eyebrow": "当前套餐",
+      "renews": "{{date}} 续订",
+      "ends": "{{date}} 结束",
+      "seats": "席位",
+      "seatsUsed": "已使用 {{used}} / {{total}}",
+      "seatsUsedUnlimited": "已使用 {{used}} · 不限",
+      "includes": "包含内容"
+    },
+    "confirm": {
+      "keep": "保留 {{name}}",
+      "notNow": "暂不",
+      "now": "当前",
+      "next": "变更后",
+      "price": "价格",
+      "seats": "席位",
+      "billedYearly": "按年计费",
+      "gains": "你将获得",
+      "losses": "你将失去",
+      "nothingLost": "其他内容不变。",
+      "when": "生效时间",
+      "whenNow": "立即生效。计费周期保持不变。",
+      "whenProrated": "立即生效。本计费周期剩余部分的差额将按比例计入下一张账单。",
+      "whenFirst": "立即生效。",
+      "whenFirstPayment": "立即生效——下一步确认付款方式。",
+      "whenFree": "{{name}} 套餐保留至 {{date}}，之后工作区将使用 Free。",
+      "seatWarning": "已占用 {{used}} 个席位（含待接受的邀请），{{name}} 包含 {{seats}} 个席位。最近加入的成员中最多 {{excess}} 名（不含所有者）将被暂停，直到有空余席位。"
     }
   }
 }

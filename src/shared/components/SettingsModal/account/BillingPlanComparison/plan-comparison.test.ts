@@ -2,14 +2,23 @@ import { describe, expect, it } from 'vitest';
 
 import type { BillingPlan } from '@/shared/api/billing-contracts.ts';
 
+import { subscriptionFixture } from './billing-plan.fixtures.ts';
 import {
   bestYearlySavingsPercent,
   comparisonSections,
+  currentPlanOf,
+  freePlanOf,
+  isFreePlan,
+  nextPlanUp,
   PLAN_FEATURE_CATALOG,
   planAudience,
+  planCardAction,
+  planChangeKind,
+  planDifference,
   planPrice,
   planTiers,
   readPlanFeature,
+  seatsOverLimit,
   sortPlansForComparison,
   wholeAmountOptions,
   yearlySavingsPercent,
@@ -241,5 +250,176 @@ describe('wholeAmountOptions', () => {
       maximumFractionDigits: 0,
     });
     expect(wholeAmountOptions(833)).toBeUndefined();
+  });
+});
+
+describe('the plan in force', () => {
+  it('reads a plan as Free only when it costs nothing on either cycle', () => {
+    expect(isFreePlan(FREE)).toBe(true);
+    expect(isFreePlan({ ...FREE, priceYearly: 0 })).toBe(true);
+    expect(isFreePlan(STARTER)).toBe(false);
+    expect(isFreePlan({ ...FREE, priceYearly: 5000 })).toBe(false);
+  });
+
+  it('finds Free as the cheapest plan, or none when everything has a price', () => {
+    expect(freePlanOf(CATALOG)).toBe(FREE);
+    expect(freePlanOf([STARTER, PRO])).toBeNull();
+    expect(freePlanOf([])).toBeNull();
+  });
+
+  it('is the subscribed plan, or Free when there is no subscription', () => {
+    expect(currentPlanOf({ sorted: CATALOG, subscriptionPlanId: 'pln_growth' })).toBe(
+      GROWTH,
+    );
+    expect(currentPlanOf({ sorted: CATALOG, subscriptionPlanId: null })).toBe(FREE);
+    expect(
+      currentPlanOf({ sorted: [STARTER, PRO], subscriptionPlanId: null }),
+    ).toBeNull();
+    // A subscription on a plan no longer offered is not silently read as Free.
+    expect(
+      currentPlanOf({ sorted: CATALOG, subscriptionPlanId: 'pln_retired' }),
+    ).toBeNull();
+  });
+
+  it('steps up to the next dearer plan, and none from the top or from nothing', () => {
+    expect(nextPlanUp({ sorted: CATALOG, current: FREE })).toBe(STARTER);
+    expect(nextPlanUp({ sorted: CATALOG, current: GROWTH })).toBe(PRO);
+    expect(nextPlanUp({ sorted: CATALOG, current: PRO })).toBeNull();
+    expect(nextPlanUp({ sorted: CATALOG, current: null })).toBeNull();
+  });
+});
+
+describe('planDifference', () => {
+  const keys = (lines: ReturnType<typeof planDifference>['gains']) =>
+    lines.map((line) =>
+      line.kind === 'seats' ? `seats:${line.seats}` : line.feature.key,
+    );
+
+  it('lists what an upgrade adds — the new seat allowance first — and loses nothing', () => {
+    const difference = planDifference({ from: GROWTH, to: PRO });
+    expect(difference.direction).toBe('upgrade');
+    expect(keys(difference.gains)).toEqual(['seats:25', 'sso', 'priority_support']);
+    expect(difference.losses).toEqual([]);
+  });
+
+  it('lists what a downgrade takes away, with the value it had', () => {
+    const difference = planDifference({
+      from: { ...PRO, features: { ...PRO.features, priority_support: '24 h' } },
+      to: STARTER,
+    });
+    expect(difference.direction).toBe('downgrade');
+    expect(difference.gains).toEqual([]);
+    // The seats given up are the allowance the workspace HAD, not the one it moves to.
+    expect(keys(difference.losses)).toEqual(['seats:25', 'sso', 'priority_support']);
+    expect(difference.losses[2]).toEqual(
+      expect.objectContaining({ value: { kind: 'value', value: '24 h' } }),
+    );
+  });
+
+  it('counts unlimited seats as more, and leaves equal seats out', () => {
+    expect(
+      keys(
+        planDifference({ from: PRO, to: { ...PRO, id: 'pln_max', seatLimit: null } })
+          .gains,
+      ),
+    ).toEqual(['seats:null']);
+    expect(planDifference({ from: STARTER, to: { ...STARTER, id: 'pln_twin' } })).toEqual(
+      {
+        direction: 'downgrade',
+        gains: [],
+        losses: [],
+      },
+    );
+  });
+
+  it('counts the seats and every capability of a first plan as gains', () => {
+    const difference = planDifference({ from: null, to: STARTER });
+    expect(difference.direction).toBe('upgrade');
+    expect(keys(difference.gains)).toEqual(['seats:5', 'audit_log']);
+  });
+
+  it('reads a changed value as a gain on the plan moved to', () => {
+    const difference = planDifference({
+      from: { ...STARTER, features: { audit_log: 30 } },
+      to: { ...GROWTH, features: { audit_log: 90 } },
+    });
+    expect(difference.gains).toEqual([
+      { kind: 'seats', seats: 15 },
+      expect.objectContaining({ value: { kind: 'value', value: 90 } }),
+    ]);
+  });
+});
+
+describe('seatsOverLimit', () => {
+  it('counts the members a plan cannot seat, never below zero', () => {
+    expect(seatsOverLimit({ seatsUsed: 9, seatLimit: 5 })).toBe(4);
+    expect(seatsOverLimit({ seatsUsed: 3, seatLimit: 5 })).toBe(0);
+    expect(seatsOverLimit({ seatsUsed: 40, seatLimit: null })).toBe(0);
+  });
+});
+
+describe('planCardAction', () => {
+  const subscription = subscriptionFixture({ planId: 'pln_growth' });
+
+  it('marks the plan in force as current, for anyone', () => {
+    expect(
+      planCardAction({ plan: GROWTH, current: GROWTH, subscription, canManage: false }),
+    ).toEqual({ kind: 'current' });
+  });
+
+  it('offers nothing else to a member who may not manage billing', () => {
+    expect(
+      planCardAction({ plan: PRO, current: GROWTH, subscription, canManage: false }),
+    ).toEqual({ kind: 'none' });
+  });
+
+  it('upgrades to a dearer plan and switches to a cheaper one', () => {
+    const at = (plan: BillingPlan) =>
+      planCardAction({ plan, current: GROWTH, subscription, canManage: true });
+    expect(at(PRO)).toEqual({ kind: 'upgrade' });
+    expect(at(STARTER)).toEqual({ kind: 'switch' });
+    expect(at(FREE)).toEqual({ kind: 'switch' });
+  });
+
+  it('reads Free as "Free from <date>" once the paid plan is set to end', () => {
+    expect(
+      planCardAction({
+        plan: FREE,
+        current: GROWTH,
+        subscription: { ...subscription, cancelAtPeriodEnd: true },
+        canManage: true,
+      }),
+    ).toEqual({ kind: 'freeFrom', date: subscription.currentPeriodEnd });
+  });
+
+  it('upgrades off Free with no subscription, and chooses when there is no plan at all', () => {
+    expect(
+      planCardAction({
+        plan: STARTER,
+        current: FREE,
+        subscription: null,
+        canManage: true,
+      }),
+    ).toEqual({ kind: 'upgrade' });
+    expect(
+      planCardAction({
+        plan: STARTER,
+        current: null,
+        subscription: null,
+        canManage: true,
+      }),
+    ).toEqual({ kind: 'choose' });
+  });
+});
+
+describe('planChangeKind', () => {
+  it('is a first plan without a subscription, the end of the paid plan to Free, else a change', () => {
+    expect(planChangeKind({ target: STARTER, subscription: null })).toBe('first');
+    expect(planChangeKind({ target: FREE, subscription: subscriptionFixture() })).toBe(
+      'toFree',
+    );
+    expect(planChangeKind({ target: PRO, subscription: subscriptionFixture() })).toBe(
+      'change',
+    );
   });
 });

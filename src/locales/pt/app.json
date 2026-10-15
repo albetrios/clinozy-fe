@@ -1490,10 +1490,11 @@
       "audienceAny": "Para equipes de qualquer tamanho",
       "seatsOne": "1 assento",
       "seatsUpTo": "Até {{seats}} assentos",
-      "seatsUnlimited": "Assentos ilimitados"
+      "seatsUnlimited": "Assentos ilimitados",
+      "nextStepUp": "Próximo nível",
+      "freeFrom": "Grátis a partir de {{date}}"
     },
     "compare": {
-      "toggle": "Comparar todos os recursos",
       "caption": "Todos os planos, lado a lado",
       "current": "Atual",
       "included": "Incluído",
@@ -1521,6 +1522,41 @@
       "ssoHint": "Sua equipe entra com o provedor de identidade da sua empresa.",
       "prioritySupport": "Suporte prioritário",
       "prioritySupportHint": "Suas solicitações são atendidas primeiro."
+    },
+    "picker": {
+      "open": "Comparar planos",
+      "title": "Planos",
+      "sub": "Todos os planos lado a lado. Mude quando sua equipe estiver pronta.",
+      "compareTitle": "Compare os recursos dos planos",
+      "compareSub": "O que cada plano inclui, linha por linha."
+    },
+    "yourPlan": {
+      "eyebrow": "Seu plano",
+      "renews": "Renova em {{date}}",
+      "ends": "Termina em {{date}}",
+      "seats": "Assentos",
+      "seatsUsed": "{{used}} de {{total}} em uso",
+      "seatsUsedUnlimited": "{{used}} em uso · sem limite",
+      "includes": "O que está incluído"
+    },
+    "confirm": {
+      "keep": "Manter {{name}}",
+      "notNow": "Agora não",
+      "now": "Atual",
+      "next": "Novo",
+      "price": "Preço",
+      "seats": "Assentos",
+      "billedYearly": "cobrança anual",
+      "gains": "O que você ganha",
+      "losses": "O que você perde",
+      "nothingLost": "Nada mais muda.",
+      "when": "Quando",
+      "whenNow": "Imediatamente. Seu ciclo de cobrança continua o mesmo.",
+      "whenProrated": "Imediatamente. A diferença do restante deste período é proporcional na próxima fatura.",
+      "whenFirst": "Imediatamente.",
+      "whenFirstPayment": "Imediatamente — em seguida você confirma sua forma de pagamento.",
+      "whenFree": "Seu plano {{name}} continua até {{date}}. Depois disso, o espaço de trabalho fica no Free.",
+      "seatWarning": "Há {{used}} assentos ocupados, contando os convites pendentes, e o {{name}} inclui {{seats}}. Até {{excess}} dos membros que entraram mais recentemente, nunca os proprietários, serão suspensos até que assentos fiquem livres."
     }
   }
 }
