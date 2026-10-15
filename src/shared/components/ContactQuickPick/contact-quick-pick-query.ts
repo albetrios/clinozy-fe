@@ -104,6 +104,8 @@ export function quickAddDraftOf(typed: string): QuickAddDraft {
 export interface NamePiece {
   text: string;
   marked: boolean;
+  /** Where the piece starts in the name — its stable key. */
+  start: number;
 }
 
 /**
@@ -134,7 +136,7 @@ export function markWords(name: string, typed: string): NamePiece[] | null {
     const isMarked = marked[index] ?? false;
     const last = pieces.at(-1);
     if (last && last.marked === isMarked) last.text += name[index];
-    else pieces.push({ text: name[index] ?? '', marked: isMarked });
+    else pieces.push({ text: name[index] ?? '', marked: isMarked, start: index });
   }
   return pieces;
 }

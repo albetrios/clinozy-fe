@@ -150,18 +150,16 @@ function MarkedName({ name, typed }: { name: string; typed: string }) {
   return (
     <span dir="auto" className="text-body truncate [text-align:match-parent] font-medium">
       {pieces
-        ? pieces.map((piece, index) =>
+        ? pieces.map((piece) =>
             piece.marked ? (
               <mark
-                // The pieces of one name never reorder.
-                // biome-ignore lint/suspicious/noArrayIndexKey: a name's pieces, in order
-                key={index}
+                key={piece.start}
                 className="bg-tone-butter text-tone-butter-foreground rounded-xs"
               >
                 {piece.text}
               </mark>
             ) : (
-              piece.text
+              <span key={piece.start}>{piece.text}</span>
             ),
           )
         : name}
