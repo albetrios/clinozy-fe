@@ -69,13 +69,10 @@ describe('UsersToolbar (users.md:17)', () => {
     );
   });
 
-  it('links Branches and marks it current on its page and its drawers', async () => {
-    renderUsersRoutes('/organization/acme/users/branches/create', vi.fn(), {
-      Branches: () => <UsersToolbar tab="branches" />,
-    });
-    const branches = await screen.findByRole('link', { name: 'Branches' });
-    expect(branches).toHaveAttribute('href', '/organization/acme/users/branches');
-    expect(branches).toHaveAttribute('aria-current', 'page');
+  it('has no Branches tab — Branches is its own room', async () => {
+    renderUsersRoutes('/organization/acme/users', () => <UsersToolbar tab="team" />);
+    await screen.findByRole('link', { name: 'Team' });
+    expect(screen.queryByRole('link', { name: 'Branches' })).not.toBeInTheDocument();
   });
 
   it('keeps Roles & access current behind a drawer opened from it', async () => {

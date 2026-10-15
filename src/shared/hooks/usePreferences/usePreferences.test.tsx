@@ -41,6 +41,7 @@ describe('usePreferences', () => {
       'leads',
       'patients',
       'payments',
+      'branches',
     ]);
     await waitFor(() => expect(result.current.isPending).toBe(false));
   });

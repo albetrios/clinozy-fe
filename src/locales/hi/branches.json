@@ -1,0 +1,208 @@
+{
+  "manifest": {
+    "title": "शाखाएँ"
+  },
+  "record": "शाखा",
+  "primary": {
+    "newBranch": "नई शाखा"
+  },
+  "columns": {
+    "branch": "शाखा",
+    "address": "पता",
+    "contact": "संपर्क",
+    "hours": "खुलने का समय",
+    "team": "टीम",
+    "defaults": "डिफ़ॉल्ट लोग",
+    "status": "स्थिति"
+  },
+  "mainPill": "मुख्य",
+  "notSet": "सेट नहीं",
+  "defaults": {
+    "doctor": "डॉक्टर · {{name}}",
+    "desk": "डेस्क · {{name}}",
+    "therapist": "थेरेपिस्ट · {{name}}",
+    "pharmacist": "फ़ार्मेसी · {{name}}"
+  },
+  "status": {
+    "open": "खुली",
+    "closed": "बंद"
+  },
+  "records": "शाखाएँ",
+  "empty": {
+    "title": "अभी कोई शाखा नहीं",
+    "description": "क्लिनिक की शाखाएँ यहाँ दिखती हैं।"
+  },
+  "rowActions": {
+    "edit": "संपादित करें"
+  },
+  "bulk": {
+    "export": "एक्सपोर्ट करें",
+    "exported_one": "{{count}} पंक्ति CSV के रूप में एक्सपोर्ट हुई",
+    "exported_other": "{{count}} पंक्तियाँ CSV के रूप में एक्सपोर्ट हुईं"
+  },
+  "drawer": {
+    "title": {
+      "create": "नई शाखा",
+      "edit": "शाखा संपादित करें"
+    },
+    "sub": "पता, समय और यहाँ काम करने वाले लोग",
+    "summaryNew": "नई शाखा",
+    "people_one": "{{count}} व्यक्ति",
+    "people_other": "{{count}} लोग",
+    "mainBadge": "मुख्य शाखा",
+    "steps": {
+      "place": "शाखा और पता",
+      "contact": "संपर्क और खुलने का समय",
+      "people": "लोग",
+      "places": "जगहें और दिन"
+    },
+    "groups": {
+      "branch": "शाखा",
+      "address": "पता",
+      "contact": "संपर्क",
+      "hours": "खुलने का समय"
+    },
+    "fields": {
+      "name": "नाम",
+      "colour": "रंग",
+      "main": "मुख्य शाखा",
+      "status": "स्थिति",
+      "line1": "पता पंक्ति 1",
+      "line2": "पता पंक्ति 2",
+      "area": "क्षेत्र",
+      "city": "शहर",
+      "pin": "पिन कोड",
+      "state": "राज्य",
+      "phone": "फ़ोन",
+      "email": "ईमेल",
+      "gstin": "GSTIN",
+      "days": "दिन",
+      "opens": "खुलता है",
+      "closes": "बंद होता है",
+      "team": "टीम",
+      "doctor": "डिफ़ॉल्ट डॉक्टर",
+      "desk": "डिफ़ॉल्ट फ्रंट डेस्क",
+      "therapist": "डिफ़ॉल्ट थेरेपिस्ट",
+      "pharmacist": "डिफ़ॉल्ट फ़ार्मासिस्ट"
+    },
+    "placeholders": {
+      "name": "जैसे वेसु",
+      "line1": "दुकान / मंज़िल, इमारत",
+      "line2": "गली, लैंडमार्क",
+      "area": "जैसे वेसु",
+      "city": "शहर",
+      "pin": "6 अंक",
+      "state": "राज्य",
+      "email": "branch@clinic.com",
+      "gstin": "15 अक्षर",
+      "team": "टीम चुनें",
+      "time": "समय चुनें"
+    },
+    "hints": {
+      "colour": "इस शाखा को हर जगह पहचान देता है",
+      "phone": "10 अंक",
+      "team": "यहाँ कौन काम करता है",
+      "preselected": "यहाँ के फ़ॉर्म में पहले से चुना हुआ",
+      "addFirst": {
+        "doctor": "पहले टीम में कोई डॉक्टर जोड़ें",
+        "desk": "पहले टीम में कोई फ्रंट डेस्क जोड़ें",
+        "therapist": "पहले टीम में कोई थेरेपिस्ट जोड़ें",
+        "pharmacist": "पहले टीम में कोई फ़ार्मासिस्ट जोड़ें"
+      },
+      "main": "हर क्लिनिक में एक · खुलते समय तय"
+    },
+    "toggles": {
+      "mainOn": "मुख्य · मुख्यालय",
+      "mainOff": "मुख्य शाखा नहीं",
+      "openOn": "खुली · सूचियों में दिखती है",
+      "openOff": "बंद · हर जगह छिपी"
+    },
+    "nobody": "कोई नहीं",
+    "you": "{{name}} (आप)",
+    "save": {
+      "create": "शाखा जोड़ें",
+      "edit": "शाखा सहेजें"
+    },
+    "nameMissing": "शाखा को नाम दें",
+    "addressMissing": "पता, क्षेत्र, शहर और PIN कोड जोड़ें",
+    "duplicate": "{{name}} नाम की शाखा पहले से मौजूद है",
+    "phoneInvalid": "फ़ोन में 10 अंक होने चाहिए",
+    "emailInvalid": "मान्य ईमेल पता दर्ज करें",
+    "added": "{{name}} शाखा जोड़ी गई",
+    "saved": "{{name}} सहेजी गई",
+    "contactMissing": "फ़ोन और ईमेल जोड़ें",
+    "pinInvalid": "PIN कोड में 6 अंक चाहिए",
+    "places": {
+      "sections": {
+        "room": "कमरे",
+        "machine": "मशीनें",
+        "holiday": "छुट्टियाँ"
+      },
+      "hints": {
+        "room": "जहाँ मरीज़ देखे जाते हैं",
+        "machine": "ट्रीटमेंट के साथ बुक होती हैं",
+        "holiday": "पूरे दिन बंद · कोई बुकिंग नहीं"
+      },
+      "counts": {
+        "room_one": "{{count}} कमरा",
+        "room_other": "{{count}} कमरे",
+        "machine_one": "{{count}} मशीन",
+        "machine_other": "{{count}} मशीनें",
+        "holiday_one": "{{count}} छुट्टी",
+        "holiday_other": "{{count}} छुट्टियाँ"
+      },
+      "nothingYet": "अभी कोई कमरा, मशीन या छुट्टी नहीं",
+      "empty": {
+        "room": "अभी कोई कमरा नहीं",
+        "machine": "अभी कोई मशीन नहीं",
+        "holiday": "आगे कोई छुट्टी नहीं"
+      },
+      "newLabel": {
+        "room": "नया कमरा",
+        "machine": "नई मशीन",
+        "holiday": "नई छुट्टी"
+      },
+      "placeholders": {
+        "room": "जैसे कमरा 1",
+        "machine": "जैसे लेज़र मशीन",
+        "holiday": "जैसे दिवाली"
+      },
+      "fields": {
+        "name": "नाम",
+        "date": "तारीख",
+        "label": "छुट्टी"
+      },
+      "add": "जोड़ें",
+      "rename": "नाम बदलें",
+      "save": "सहेजें",
+      "cancel": "रद्द करें",
+      "remove": "हटाएँ",
+      "toggle": {
+        "on": "इस्तेमाल में",
+        "off": "बंद",
+        "label": "{{name}} इस्तेमाल में"
+      },
+      "removeTitle": {
+        "room": "यह कमरा हटाएँ?",
+        "machine": "यह मशीन हटाएँ?",
+        "holiday": "यह छुट्टी हटाएँ?"
+      },
+      "duplicate": {
+        "room": "{{name}} नाम का कमरा पहले से मौजूद है",
+        "machine": "{{name}} नाम की मशीन पहले से मौजूद है",
+        "holiday": "{{date}} पहले से छुट्टी है"
+      },
+      "nameMissing": "नाम जोड़ें",
+      "nameTooLong": "ज़्यादा से ज़्यादा 60 अक्षर",
+      "dateMissing": "तारीख चुनें",
+      "labelMissing": "छुट्टी का नाम लिखें",
+      "labelTooLong": "ज़्यादा से ज़्यादा 60 अक्षर",
+      "added": "{{name}} जोड़ा गया",
+      "renamed": "नाम बदलकर {{name}} किया गया",
+      "switchedOn": "{{name}} चालू किया गया",
+      "switchedOff": "{{name}} बंद किया गया",
+      "removed": "{{name}} हटाया गया",
+      "loadFailed": "कमरे, मशीनें और छुट्टियाँ लोड नहीं हो सकीं"
+    }
+  }
+}

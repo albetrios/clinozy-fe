@@ -256,7 +256,7 @@ pages/organization/                       → /organization (picker)
     ├── organization-slug.route.tsx
     ├── organization-slug.manifest.ts         kind: 'layout', children: ['suspended', 'today', …]
     ├── OrganizationLayout.tsx
-    ├── today/                            full island shape, recursively (one of the ten clinic rooms)
+    ├── today/                            full island shape, recursively (one of the eleven clinic rooms)
     └── suspended/
 ```
 

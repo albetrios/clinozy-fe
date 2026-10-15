@@ -5,8 +5,9 @@ single members surface (D17; the spec is the intake's users.md). The bare URL is
 (every page read up front), each carrying the member's clinic details — mobile, colour, branches,
 days, hours and commission — searched, filtered and sorted in place. Its children are URL-driven dialogs over the Team (D24): New user
 (`create/`, an invitation — never an admin-set password) and the member drawer
-(`$userId/edit/`, keyed by membership id) — and the other tabs, Roles & access (`roles/`) and
-Branches (`branches/`), registered beside the Team in the route tree. A member opened from a role page
+(`$userId/edit/`, keyed by membership id) — and the other tab, Roles & access (`roles/`),
+registered beside the Team in the route tree. Branches, once the third tab, is its own room
+(`../branches/`, change-branches-in-navbar). A member opened from a role page
 (`?from=roles`) keeps Roles & access behind the drawer, and closing it returns to that role.
 
 Gated on `membership:read` and the `app-users` module, then `requireOrgStatus`. In-room, the
@@ -14,7 +15,7 @@ Users section follows the member's clinozy-be codes (D17): "New user" needs `mem
 and `role:read` (its role picker); edit, status and "Resend invitation" need `membership:update`;
 removing a member and cancelling an invitation need `membership:delete`; Export needs only
 `membership:read`. Each tab shows with its own code — Team `membership:read`, Roles & access
-`role:read`, Branches `branch:read` — and the tab you are on always shows. View-as narrows it all
+`role:read` — and the tab you are on always shows. View-as narrows it all
 to the previewed role's codes. Never a
 Delete on your own row or the owner's: your own row and drawer offer **Leave clinic** instead
 (`components/UserLeaveConfirm/`) — any member but the owner, through clinozy-be's self-service
@@ -29,17 +30,18 @@ Status; remove → Delete; leave the clinic yourself → Leave clinic; create, r
 the permissions of and delete a role → Roles & access. Where the room is off or shut to the member, Settings keeps its panels.
 
 The toolbar (h1, the tab links, search, Filters, Columns, "New user" — the floating pill on a
-phone) is family-shared in `shared/components/UsersToolbar/`, with the role directory
-(`shared/hooks/useRoleDirectory/`, each role's name and tone), Roles & access itself
-(`shared/components/RolesAccess/`) and "New role" (`shared/hooks/useNewRole/`). The words for
-days and hours are root shared since the clinic setup reads them too (`src/shared/hooks/useHoursFormat/`).
+phone) is family-shared in `shared/components/UsersToolbar/`, with Roles & access itself
+(`shared/components/RolesAccess/`) and "New role" (`shared/hooks/useNewRole/`). The role
+directory (each role's name and tone) is root shared since the Branches room reads it too
+(`src/shared/hooks/useRoleDirectory/`), and so are the words for days and hours, which the clinic
+setup reads (`src/shared/hooks/useHoursFormat/`).
 
 ## Files
 
 | File                              | Responsibility                                                                                                                                                                                                    |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `users.route.tsx`                 | Route marker — exports `Component` rendering `UsersPage`.                                                                                                                                                         |
-| `users.manifest.ts`               | Manifest — `kind: 'layout'`, children `create`, `$userId`, `roles`, `branches`; `membership:read`, module `app-users`, nav `users`.                                                                               |
+| `users.manifest.ts`               | Manifest — `kind: 'layout'`, children `create`, `$userId`, `roles`; `membership:read`, module `app-users`, nav `users`.                                                                                           |
 | `users.search.ts`                 | `validateUsersSearch` (`q`, `role` — a role id, `branch`, `status`, `created`, `sort`), `validateRolesSearch` (`role`, a role id).                                                                                |
 | `users.dialog-search.ts`          | `validateUserEditSearch` (`from`) — the member drawer's own param, parsed by the Team; loads with the room.                                                                                                       |
 | `users.constants.ts`              | `USERS_NS` / `USERS_KEYS` (the `users` namespace), `TEAM_TABLE_ID`, `USER_DRAWER_TEST_ID`.                                                                                                                        |
@@ -50,10 +52,8 @@ days and hours are root shared since the clinic setup reads them too (`src/share
 | `hooks/useTeamTable/`             | The Team's columns and table instance (Roles is the phone key column; no Branches column with one open branch).                                                                                                   |
 | `hooks/useUsersDialogRoute/`      | Which drawer the URL opens; refusal and "User not found" back to the Team (or to the role it was opened from).                                                                                                    |
 | `roles/`                          | Roles & access (`/users/roles`) — renders `RolesAccess` for the URL's `role`.                                                                                                                                     |
-| `branches/`                       | Branches (`/users/branches`) and the branch drawer — its own island with `branches/create/` and `branches/$branchId/edit/`.                                                                                       |
 | `shared/components/UsersToolbar/` | The room toolbar for every tab.                                                                                                                                                                                   |
 | `shared/components/RolesAccess/`  | Roles & access: the role list, the role page, the matrix, the special permissions; instant writes with rollback.                                                                                                  |
-| `shared/hooks/useRoleDirectory/`  | Every listed role named and toned (presets by the clinic vocabulary, custom roles by name).                                                                                                                       |
 | `shared/hooks/useNewRole/`        | "New role": the next "New role" name, `organization:read` only, the next custom tone; selects it.                                                                                                                 |
 | `__tests__/integration/`          | The test router (the family's routes over a mocked clinozy-be) and the drawer / removal flows.                                                                                                                    |
 

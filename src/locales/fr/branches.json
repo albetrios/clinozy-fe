@@ -1,0 +1,213 @@
+{
+  "manifest": {
+    "title": "Établissements"
+  },
+  "record": "Établissement",
+  "primary": {
+    "newBranch": "Nouvel établissement"
+  },
+  "columns": {
+    "branch": "Établissement",
+    "address": "Adresse",
+    "contact": "Contact",
+    "hours": "Horaires",
+    "team": "Équipe",
+    "defaults": "Personnes par défaut",
+    "status": "Statut"
+  },
+  "mainPill": "Principal",
+  "notSet": "Non défini",
+  "defaults": {
+    "doctor": "Médecin · {{name}}",
+    "desk": "Accueil · {{name}}",
+    "therapist": "Thérapeute · {{name}}",
+    "pharmacist": "Pharmacie · {{name}}"
+  },
+  "status": {
+    "open": "Ouvert",
+    "closed": "Fermé"
+  },
+  "records": "établissements",
+  "empty": {
+    "title": "Aucun établissement pour l’instant",
+    "description": "Les établissements de la clinique apparaissent ici."
+  },
+  "rowActions": {
+    "edit": "Modifier"
+  },
+  "bulk": {
+    "export": "Exporter",
+    "exported_one": "{{count}} ligne exportée en CSV",
+    "exported_many": "{{count}} lignes exportées en CSV",
+    "exported_other": "{{count}} lignes exportées en CSV"
+  },
+  "drawer": {
+    "title": {
+      "create": "Nouvel établissement",
+      "edit": "Modifier l’établissement"
+    },
+    "sub": "Adresse, horaires et les personnes qui y travaillent",
+    "summaryNew": "Nouvel établissement",
+    "people_one": "{{count}} personne",
+    "people_many": "{{count}} personnes",
+    "people_other": "{{count}} personnes",
+    "mainBadge": "Établissement principal",
+    "steps": {
+      "place": "Établissement et adresse",
+      "contact": "Contact et horaires",
+      "people": "Personnes",
+      "places": "Lieux et jours"
+    },
+    "groups": {
+      "branch": "Établissement",
+      "address": "Adresse",
+      "contact": "Contact",
+      "hours": "Horaires"
+    },
+    "fields": {
+      "name": "Nom",
+      "colour": "Couleur",
+      "main": "Établissement principal",
+      "status": "Statut",
+      "line1": "Adresse (ligne 1)",
+      "line2": "Adresse (ligne 2)",
+      "area": "Quartier",
+      "city": "Ville",
+      "pin": "Code postal",
+      "state": "État",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "gstin": "GSTIN",
+      "days": "Jours",
+      "opens": "Ouvre",
+      "closes": "Ferme",
+      "team": "Équipe",
+      "doctor": "Médecin par défaut",
+      "desk": "Accueil par défaut",
+      "therapist": "Thérapeute par défaut",
+      "pharmacist": "Pharmacien par défaut"
+    },
+    "placeholders": {
+      "name": "ex. Vesu",
+      "line1": "Boutique / étage, bâtiment",
+      "line2": "Rue, point de repère",
+      "area": "ex. Vesu",
+      "city": "Ville",
+      "pin": "6 chiffres",
+      "state": "État",
+      "email": "etablissement@clinique.fr",
+      "gstin": "15 caractères",
+      "team": "Choisir l’équipe",
+      "time": "Choisir une heure"
+    },
+    "hints": {
+      "colour": "identifie cet établissement partout",
+      "phone": "10 chiffres",
+      "team": "qui travaille ici",
+      "preselected": "présélectionné dans les formulaires ici",
+      "addFirst": {
+        "doctor": "ajoutez d’abord un médecin à l’équipe",
+        "desk": "ajoutez d’abord une personne de l’accueil à l’équipe",
+        "therapist": "ajoutez d’abord un thérapeute à l’équipe",
+        "pharmacist": "ajoutez d’abord un pharmacien à l’équipe"
+      },
+      "main": "un par clinique · défini à l’ouverture"
+    },
+    "toggles": {
+      "mainOn": "Principal · siège",
+      "mainOff": "Pas l’établissement principal",
+      "openOn": "Ouvert · visible dans les listes",
+      "openOff": "Fermé · masqué partout"
+    },
+    "nobody": "Personne",
+    "you": "{{name}} (vous)",
+    "save": {
+      "create": "Ajouter l’établissement",
+      "edit": "Enregistrer l’établissement"
+    },
+    "nameMissing": "Nommez l’établissement",
+    "addressMissing": "Ajoutez l’adresse, le quartier, la ville et le code PIN",
+    "duplicate": "Un établissement nommé {{name}} existe déjà",
+    "phoneInvalid": "Le téléphone doit comporter 10 chiffres",
+    "emailInvalid": "Saisissez une adresse e-mail valide",
+    "added": "Établissement {{name}} ajouté",
+    "saved": "{{name}} enregistré",
+    "contactMissing": "Ajoutez le téléphone et l’e-mail",
+    "pinInvalid": "Le code PIN doit comporter 6 chiffres",
+    "places": {
+      "sections": {
+        "room": "Salles",
+        "machine": "Appareils",
+        "holiday": "Jours de fermeture"
+      },
+      "hints": {
+        "room": "où les patients sont reçus",
+        "machine": "réservés avec un soin",
+        "holiday": "fermé toute la journée · aucun rendez-vous"
+      },
+      "counts": {
+        "room_one": "{{count}} salle",
+        "room_many": "{{count}} salles",
+        "room_other": "{{count}} salles",
+        "machine_one": "{{count}} appareil",
+        "machine_many": "{{count}} appareils",
+        "machine_other": "{{count}} appareils",
+        "holiday_one": "{{count}} jour de fermeture",
+        "holiday_many": "{{count}} jours de fermeture",
+        "holiday_other": "{{count}} jours de fermeture"
+      },
+      "nothingYet": "Aucune salle, aucun appareil ni jour de fermeture pour l’instant",
+      "empty": {
+        "room": "Aucune salle pour l’instant",
+        "machine": "Aucun appareil pour l’instant",
+        "holiday": "Aucun jour de fermeture à venir"
+      },
+      "newLabel": {
+        "room": "Nouvelle salle",
+        "machine": "Nouvel appareil",
+        "holiday": "Nouveau jour de fermeture"
+      },
+      "placeholders": {
+        "room": "ex. Salle 1",
+        "machine": "ex. Appareil laser",
+        "holiday": "ex. Diwali"
+      },
+      "fields": {
+        "name": "Nom",
+        "date": "Date",
+        "label": "Jour de fermeture"
+      },
+      "add": "Ajouter",
+      "rename": "Renommer",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "remove": "Retirer",
+      "toggle": {
+        "on": "En service",
+        "off": "Désactivé",
+        "label": "{{name}} en service"
+      },
+      "removeTitle": {
+        "room": "Retirer cette salle ?",
+        "machine": "Retirer cet appareil ?",
+        "holiday": "Retirer ce jour de fermeture ?"
+      },
+      "duplicate": {
+        "room": "Une salle nommée {{name}} existe déjà",
+        "machine": "Un appareil nommé {{name}} existe déjà",
+        "holiday": "{{date}} est déjà un jour de fermeture"
+      },
+      "nameMissing": "Ajoutez un nom",
+      "nameTooLong": "60 caractères au maximum",
+      "dateMissing": "Choisissez la date",
+      "labelMissing": "Nommez le jour de fermeture",
+      "labelTooLong": "60 caractères au maximum",
+      "added": "Ajouté : {{name}}",
+      "renamed": "Renommé : {{name}}",
+      "switchedOn": "Activé : {{name}}",
+      "switchedOff": "Désactivé : {{name}}",
+      "removed": "Retiré : {{name}}",
+      "loadFailed": "Impossible de charger les salles, les appareils et les jours de fermeture"
+    }
+  }
+}

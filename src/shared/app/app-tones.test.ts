@@ -27,10 +27,12 @@ import {
 } from './app-tones.ts';
 
 describe('clinic tones', () => {
-  it('gives every section its own tone', () => {
+  it("gives every section its own tone — stone, the design's eleventh, only to Branches", () => {
     const tones = SECTION_VALUES.map((section) => SECTION_TONES[section]);
     expect(new Set(tones).size).toBe(SECTION_VALUES.length);
-    expect(tones).not.toContain('stone');
+    expect(
+      SECTION_VALUES.filter((section) => SECTION_TONES[section] === 'stone'),
+    ).toEqual(['branches']);
   });
 
   it('gives every role a tone', () => {
