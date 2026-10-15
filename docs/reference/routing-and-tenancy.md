@@ -43,17 +43,26 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
   file and the lead drawer link into it, keeping the page they came from behind the drawer
   (`from`). Never add a second detail URL for the same resource.
 - **`/` (root):** a resolver route — reads `me/context` and redirects. **Invitations first
-  (D84):** someone with pending invitations (`GET /users/me/membership-invitations`, read only
-  when there is no active team org) and no clinic to enter → the `/organization` picker, which
-  lists them with Accept / Decline — never the onboarding whose team-only finish would create a
-  second, empty clinic. **Then onboarding:**
+  (D84):** someone with pending invitations (`GET /users/me/membership-invitations`, read in
+  every clinic deployment) and no clinic to enter → the `/organization` picker, which lists them
+  with Accept / Decline — never the onboarding whose team-only finish would create a second,
+  empty clinic. A member of a clinic with an invitation pending lands on the picker too
+  (feat-choose-default-clinic), once onboarded: they accept or decline it there, and star the
+  clinic that opens at sign-in. With one clinic and nothing pending the picker never shows.
+  Only `/` decides that — a clinic's own URL is never held up by an invitation. **Then
+  onboarding:**
   a not-yet-onboarded user (`!user.onboarding_completed`) → `/onboarding` in every deployment
   mode (even personal, whose org is auto-provisioned); after an accept the wizard asks only for
   the profile. Once onboarded: an active TEAM →
   `/organization/$organizationSlug` (the clinic's home, which sends the member on to their
   role home — Today for most roles), else the `/organization` picker. Personal workspaces
   have no clinic (D44), so a PERSONAL active org lands on the picker too: its list and
-  "Create organization" lead into one. `/` keeps no UI, and the retired `/dashboard`
+  "Create organization" lead into one. Which org is active after a sign-in is clinozy-be's
+  login default: the clinic the person pinned (Settings › Account, or the account menu's
+  "Opens at sign-in" — `feat-choose-default-clinic`), else the clinic they last switched to
+  (every `/auth/switch-to-organization` remembers it), else their newest clinic, and the personal workspace only when they have no
+  clinic — so a returning member lands in their clinic, not on the picker
+  (`feat-default-clinic-at-login`). `/` keeps no UI, and the retired `/dashboard`
   redirects to it (L-63).
 - Auth islands (`/login`, `/mfa`, `/callback`, …), `/onboarding`, `/accept-invite/$invitationId`
   stay top-level, unchanged.

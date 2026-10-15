@@ -228,6 +228,8 @@
       "description": "بيانات الحساب والإجراءات التي لا يمكن التراجع عنها.",
       "infoTitle": "معلومات الحساب",
       "infoDescription": "تفاصيل حسابك.",
+      "signInClinicTitle": "العيادة عند تسجيل الدخول",
+      "signInClinicDescription": "اختر العيادة التي تُفتح عند تسجيل الدخول. ينطبق ذلك على كل أجهزتك.",
       "accountIdLabel": "معرّف الحساب",
       "emailLabel": "البريد الإلكتروني",
       "roleLabel": "الدور",

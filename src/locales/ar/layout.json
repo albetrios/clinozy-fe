@@ -23,7 +23,16 @@
       "addOrganization": "إضافة مؤسسة",
       "invited": "دعوات",
       "invitedRow": "مدعو · {{roles}}",
-      "invitationCount": "الدعوات: {{count}}"
+      "invitationCount": "الدعوات: {{count}}",
+      "defaultBadge": "افتراضية"
+    },
+    "signInClinic": {
+      "menuLabel": "تُفتح عند تسجيل الدخول",
+      "lastUsed": "آخر استخدام",
+      "automatic": "آخر عيادة استخدمتها",
+      "automaticHint": "تتغير كلما انتقلت بين العيادات",
+      "savedClinic": "سيفتح تسجيل الدخول {{name}}",
+      "savedAutomatic": "سيفتح تسجيل الدخول آخر عيادة استخدمتها"
     },
     "notifications": {
       "title": "الإشعارات",

@@ -107,6 +107,21 @@ export const LAYOUT_KEYS = {
       invited: 'app.orgSwitcher.invited',
       invitedRow: 'app.orgSwitcher.invitedRow',
       invitationCount: 'app.orgSwitcher.invitationCount',
+      /** The label on the clinic pinned to open at sign-in. */
+      defaultBadge: 'app.orgSwitcher.defaultBadge',
+    },
+    /**
+     * The clinic that opens at sign-in (feat-choose-default-clinic): the account menu's row and
+     * the toasts, shared with Settings › Account — in this always-loaded namespace so the menu
+     * never shows a key before Settings has loaded its own.
+     */
+    signInClinic: {
+      menuLabel: 'app.signInClinic.menuLabel',
+      lastUsed: 'app.signInClinic.lastUsed',
+      automatic: 'app.signInClinic.automatic',
+      automaticHint: 'app.signInClinic.automaticHint',
+      savedClinic: 'app.signInClinic.savedClinic',
+      savedAutomatic: 'app.signInClinic.savedAutomatic',
     },
     notifications: {
       title: 'app.notifications.title',
