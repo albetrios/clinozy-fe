@@ -58,9 +58,10 @@ const RECENT_LABEL_CLASS =
   'text-tiny text-muted-foreground shrink-0 font-medium tracking-wider uppercase';
 
 /**
- * A fade at one end of the rail, over the chips there is more of that way. Under RTL it is
- * mirrored (`rtl:-scale-x-100`, already in the stylesheet) rather than given the opposite
- * gradient: an `rtl:` gradient is two more first-paint rules per end.
+ * A fade at one end of the rail, over the chips there is more of that way. Both ends draw the one
+ * gradient (`bg-linear-to-r`) — the end's turned by `rotate-180` — and RTL mirrors them with
+ * `rtl:-scale-x-100`: every class here is already in the first-paint stylesheet, where an `rtl:`
+ * or second gradient would add rules to it (the Initial CSS budget).
  */
 const RAIL_FADE_CLASS =
   'from-card pointer-events-none absolute inset-y-0 w-6 to-transparent rtl:-scale-x-100';
@@ -277,7 +278,7 @@ function RecentChip({
       title={hit.name}
       data-testid={testId}
       data-slot="pill"
-      className="bg-card hover:bg-canvas data-[selected=true]:bg-canvas data-[selected=true]:text-foreground data-[selected=true]:ring-ring/60 h-8 shrink-0 cursor-pointer gap-1.5 rounded-full border py-0 ps-0.75 pe-2.5 data-[selected=true]:ring-1"
+      className="bg-card hover:bg-canvas data-[selected=true]:bg-canvas data-[selected=true]:text-foreground data-[selected=true]:border-ring h-8 shrink-0 cursor-pointer gap-1.5 rounded-full border py-0 ps-0.75 pe-2.5"
     >
       <PersonAvatar
         initials={personInitials(hit.name)}
@@ -362,34 +363,37 @@ function RecentRail({
     <CommandGroup
       heading={<span className={RECENT_LABEL_CLASS}>{t(K.recent)}</span>}
       data-testid={IDS.recent(testId)}
-      className="border-b-muted flex items-center gap-2 border-b p-0 ps-3 [&_[cmdk-group-heading]]:p-0 [&_[cmdk-group-items]]:relative [&_[cmdk-group-items]]:min-w-0 [&_[cmdk-group-items]]:flex-1"
+      // The label, then the rail in a column that may shrink below its chips (it scrolls).
+      className="border-b-muted grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 border-b p-0 ps-3 [&_[cmdk-group-heading]]:p-0"
     >
-      <div
-        ref={attachTrack}
-        className="flex [scrollbar-width:none] gap-1.5 overflow-x-auto overscroll-x-contain py-2 ps-0.5 pe-3 [&::-webkit-scrollbar]:hidden"
-      >
-        {people.map((hit) => (
-          <RecentChip
-            key={hit.id}
-            hit={hit}
-            row={describe(hit)}
-            onPick={onPick}
-            testId={testIds.hit(hit)}
+      <div className="relative">
+        <div
+          ref={attachTrack}
+          className="flex [scrollbar-width:none] gap-1.5 overflow-x-auto overscroll-x-contain py-2 ps-0.5 pe-3 [&::-webkit-scrollbar]:hidden"
+        >
+          {people.map((hit) => (
+            <RecentChip
+              key={hit.id}
+              hit={hit}
+              row={describe(hit)}
+              onPick={onPick}
+              testId={testIds.hit(hit)}
+            />
+          ))}
+        </div>
+        {moreBefore ? (
+          <span
+            aria-hidden="true"
+            className={cn(RAIL_FADE_CLASS, 'start-0 bg-linear-to-r')}
           />
-        ))}
+        ) : null}
+        {moreAfter ? (
+          <span
+            aria-hidden="true"
+            className={cn(RAIL_FADE_CLASS, 'end-0 rotate-180 bg-linear-to-r')}
+          />
+        ) : null}
       </div>
-      {moreBefore ? (
-        <span
-          aria-hidden="true"
-          className={cn(RAIL_FADE_CLASS, 'start-0 bg-linear-to-r')}
-        />
-      ) : null}
-      {moreAfter ? (
-        <span
-          aria-hidden="true"
-          className={cn(RAIL_FADE_CLASS, 'end-0 bg-linear-to-l')}
-        />
-      ) : null}
     </CommandGroup>
   );
 }
@@ -631,8 +635,8 @@ function PickList({
       aria-busy={view.refreshing || view.waiting}
       // A window of about three and a half rows (change-compact-contact-picker D7): more people
       // scroll under the add row, pinned below them, and the fade over them; the scroll padding
-      // keeps a row the keys move to clear of both.
-      className="max-h-50 scroll-pb-12 overscroll-contain [&_[cmdk-list-sizer]]:flex [&_[cmdk-list-sizer]]:flex-col"
+      // (40px, over the 36px add row) keeps a row the keys move to clear of the add row.
+      className="max-h-50 scroll-pb-10 overscroll-contain [&_[cmdk-list-sizer]]:flex [&_[cmdk-list-sizer]]:flex-col"
     >
       {view.recent.length > 0 ? (
         <RecentRail
