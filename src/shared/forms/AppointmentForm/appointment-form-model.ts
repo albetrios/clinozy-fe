@@ -561,6 +561,9 @@ export function movesAtCheckIn(
 
 // ── The slot grid (H:6001–6002) ──
 
+/** Where the day's slot read stands: `ready` has the day; the rest say why there is none. */
+export type AppointmentSlotsStatus = 'idle' | 'loading' | 'error' | 'ready';
+
 /** One hour row of the slot grid. */
 export interface SlotHour {
   /** 0–23. */

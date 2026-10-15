@@ -311,6 +311,7 @@ export function StepsBlock({
           onChange={state.change}
           saved={state.saved}
           slots={state.slots}
+          slotsStatus={state.slotsStatus}
           slotStep={state.slotStep}
           onSlotStepChange={state.setSlotStep}
           month={ui.month}
