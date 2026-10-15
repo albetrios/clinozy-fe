@@ -107,6 +107,8 @@ function NoLinkNote({ branchId, canEdit }: { branchId: string; canEdit: boolean 
       {canEdit ? (
         <Link
           {...organizationBranchEdit(organizationSlug, branchId)}
+          // Straight to the step that holds the Google review link.
+          search={{ step: 'contact' }}
           data-testid={ids.addLink}
           className="text-foreground font-medium underline underline-offset-2"
         >

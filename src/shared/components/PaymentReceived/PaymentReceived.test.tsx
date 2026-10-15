@@ -175,7 +175,7 @@ describe('PaymentReceived', () => {
     expect(await screen.findByTestId('payment-received-send')).toBeDisabled();
     expect(screen.getByTestId('payment-received-add-link')).toHaveAttribute(
       'href',
-      expect.stringContaining(`/branches/${BRANCH}/edit`),
+      expect.stringMatching(new RegExp(`/branches/${BRANCH}/edit\\?step=contact$`)),
     );
     unmount();
     state.codes.delete('branch:update');

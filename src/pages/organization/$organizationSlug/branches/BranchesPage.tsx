@@ -135,7 +135,7 @@ export function BranchesPage() {
   const openEdit = (row: BranchRow) =>
     void navigate({
       ...organizationBranchEdit(organizationSlug, row.branch.id),
-      search: true,
+      search: (current: Record<string, unknown>) => ({ ...current, step: undefined }),
     });
 
   // A branch is closed from its drawer (Status), never deleted: Edit is the row's one action.
@@ -236,6 +236,7 @@ export function BranchesPage() {
         mode="edit"
         open={dialog.kind === 'edit'}
         row={dialog.kind === 'edit' ? dialog.row : undefined}
+        startStep={search.step}
         access={{
           resolved: access.isResolved,
           canWrite: access.canEdit,

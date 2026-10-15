@@ -472,6 +472,21 @@ describe('the branch drawer — Edit branch', () => {
     expect(save.memberIds).toEqual(save.memberIdsBefore);
   });
 
+  it('opens on the step a link names, and saves the Google review link from it', async () => {
+    const user = userEvent.setup();
+    renderBranches(`/organization/acme/branches/${VESU.id}/edit?step=contact`);
+    const link = await screen.findByTestId('branch-drawer-review-link');
+    expect(screen.queryByTestId('branch-drawer-name')).not.toBeInTheDocument();
+    await user.type(link, 'https://g.page/r/vesu/review');
+    // A link is not prose: its first letter stays as typed.
+    expect(link).toHaveValue('https://g.page/r/vesu/review');
+    await user.click(screen.getByTestId('branch-drawer-save'));
+    await waitFor(() => expect(notifyMock.success).toHaveBeenCalledWith('Vesu saved'));
+    expect(sentSave().input).toMatchObject({
+      reviewLink: 'https://g.page/r/vesu/review',
+    });
+  });
+
   it('closing all but one branch turns the branch UI off app-wide', async () => {
     const user = userEvent.setup();
     renderBranches(`/organization/acme/branches/${VESU.id}/edit`);
