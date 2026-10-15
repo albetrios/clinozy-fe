@@ -146,7 +146,7 @@ function AttentionRow({
       data-card-id={card.id}
       data-kind={item.kind}
       data-tier={item.tier}
-      className="motion-safe:animate-fade-in grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-3.5 py-2 [grid-template-areas:'chip_action'_'body_body'] md:grid-cols-[9.5rem_minmax(0,1fr)_auto] md:[grid-template-areas:'chip_body_action']"
+      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-3.5 py-2 [grid-template-areas:'chip_action'_'body_body'] md:grid-cols-[9.5rem_minmax(0,1fr)_auto] md:[grid-template-areas:'chip_body_action']"
     >
       <span
         data-slot="pill"

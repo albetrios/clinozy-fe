@@ -54,7 +54,7 @@ function LaneAlertBadge({ alert }: { alert: TodayLaneAlert }) {
         TONE_CLASSES[alert.hot ? 'blush' : 'butter'].surface,
       )}
     >
-      <Clock aria-hidden="true" className="size-2.75" />
+      <Clock aria-hidden="true" className="size-3" />
       <span aria-hidden="true">{people}</span>
       <span className="sr-only">{t(TODAY_KEYS.alerts[alert.kind], { people })}</span>
     </span>
@@ -115,7 +115,7 @@ export function LaneTiles({
     >
       <div
         data-testid={TODAY_TEST_IDS.lanes}
-        className="-mx-3 -my-1 flex snap-x snap-mandatory scroll-px-3 [scrollbar-width:none] items-stretch gap-0.5 overflow-x-auto px-3 py-1 md:-mx-1 md:snap-proximity md:scroll-px-1 md:px-1 [&::-webkit-scrollbar]:hidden"
+        className="-mx-3 -my-1 flex snap-x snap-mandatory scroll-px-3 [scrollbar-width:none] items-stretch gap-0.5 overflow-x-auto px-3 py-1 md:-mx-1 md:scroll-px-1 md:px-1 [&::-webkit-scrollbar]:hidden"
       >
         {visible.map((lane, index) => {
           const cards = lanes[lane];

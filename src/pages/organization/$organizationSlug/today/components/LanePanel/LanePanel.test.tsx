@@ -165,13 +165,15 @@ describe('LanePanel (KICKOFF §6.2 Selected lane panel, Visit cards)', () => {
       expect(scrollIntoView).toHaveBeenCalledWith(
         expect.objectContaining({ block: 'nearest' }),
       );
-      expect(card.className).toContain('ring-tone-butter-dot');
+      // The lane's picked ring (the tone's `selected`), only while lit.
+      expect(card.className).toContain('inset-ring-tone-butter-edge');
       // The ring's timer starts once the lit card has rendered.
       await act(async () => {});
       await act(async () => {
         vi.advanceTimersByTime(SPOTLIGHT_MS);
       });
       expect(card).not.toHaveAttribute('data-spotlight');
+      expect(card.className).not.toContain('inset-ring-tone-butter-edge');
     } finally {
       vi.useRealTimers();
     }

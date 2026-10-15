@@ -27,7 +27,7 @@ export type TodayAttentionTier = 'hot' | 'warm' | 'soon';
  * Why a person needs someone: late for their booking, due in the next minutes, a long wait, a
  * long consult, at checkout, an Rx ready to dispense, an enquiry with no reply.
  */
-export type TodayAttentionKind =
+type TodayAttentionKind =
   'late' | 'due' | 'waiting' | 'inRoom' | 'checkout' | 'rx' | 'reply';
 
 /** One person who needs someone now. */
@@ -49,7 +49,7 @@ export interface TodayAttentionItem {
  * The marks, in minutes: late from 5 (hot from 15); due within the next 10; an enquiry
  * unanswered from 30 (hot from 120). The waits' marks are the cards' (`WAIT_LEVEL_MINUTES`).
  */
-export const ATTENTION_MINUTES = {
+const ATTENTION_MINUTES = {
   lateHot: 15,
   dueSoon: 10,
   reply: { warm: 30, hot: 120 },

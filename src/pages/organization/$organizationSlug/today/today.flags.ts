@@ -78,7 +78,7 @@ export function minutesToStart(time: string, now: Date): number {
 export const LATE_AFTER_MINUTES = 5;
 
 /** Within this many minutes of its start an arriving card says "In n min". */
-export const ARRIVING_SOON_MINUTES = 60;
+const ARRIVING_SOON_MINUTES = 60;
 
 /** How long a wait is: under the warm mark, past it, or past the hot mark. */
 export type TodayWaitLevel = 'calm' | 'warm' | 'hot';

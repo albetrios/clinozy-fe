@@ -92,7 +92,10 @@ function FinderOption({
         onPick(card);
       }}
       onMouseEnter={onHover}
-      className="aria-selected:bg-accent flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.75"
+      className={cn(
+        'flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.75',
+        selected && 'bg-muted',
+      )}
     >
       <span
         aria-hidden="true"
@@ -216,7 +219,7 @@ export function FloorFinder({
   return (
     <div
       data-testid={TODAY_TEST_IDS.finder}
-      className={cn('relative w-full md:w-56 lg:w-60 xl:w-72', className)}
+      className={cn('relative w-full md:w-60', className)}
     >
       <RoomSearchField
         layout="fill"
@@ -255,7 +258,7 @@ export function FloorFinder({
         // A popover surface: the menu style (translucent, glass) reaches it.
         <div
           data-slot="popover-content"
-          className="bg-popover text-popover-foreground animate-dropdown-in absolute end-0 top-full z-30 mt-1 w-full min-w-72 overflow-hidden rounded-lg border shadow-(--elevation-menu) max-md:start-0"
+          className="bg-popover text-popover-foreground animate-dropdown-in absolute end-0 top-full z-30 mt-1 w-full min-w-72 overflow-hidden rounded-lg border shadow-(--elevation-menu)"
         >
           {matches.length > 0 ? (
             <div // NOSONAR(S6819): the combobox's popup list (focus stays in the field, aria-activedescendant) — a native <select> or <datalist> cannot hold these rows

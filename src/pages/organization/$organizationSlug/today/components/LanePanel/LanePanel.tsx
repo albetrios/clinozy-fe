@@ -33,11 +33,7 @@ import {
   WAIT_LEVEL_TONES,
 } from '../../today.flags.ts';
 import { takeVisitCard } from '../../today.focus.ts';
-import {
-  TODAY_LANE_META,
-  type TodayCard,
-  type TodayLaneTone,
-} from '../../today.lanes.ts';
+import { TODAY_LANE_META, type TodayCard } from '../../today.lanes.ts';
 
 /** Props for {@link LanePanel}. */
 export interface LanePanelProps {
@@ -74,16 +70,6 @@ export interface TodaySpotlight {
 
 /** How long a spotlit card keeps its ring. */
 export const SPOTLIGHT_MS = 2000;
-
-/** The spotlight's ring in each lane tone — full literals, so Tailwind sees each. */
-const SPOTLIGHT_RING: Readonly<Record<TodayLaneTone, string>> = {
-  lav: 'ring-tone-lav-dot',
-  sky: 'ring-tone-sky-dot',
-  butter: 'ring-tone-butter-dot',
-  blush: 'ring-tone-blush-dot',
-  sage: 'ring-tone-sage-dot',
-  mint: 'ring-tone-mint-dot',
-};
 
 /** A flag in words. */
 function useFlagWords(today: string): (flag: TodayFlag) => string {
@@ -134,7 +120,7 @@ function WaitMeter({ card, now }: { card: TodayCard; now: Date }) {
       <span
         data-slot="pill"
         className={cn(
-          'block h-full w-(--fill) rounded-full transition-[width] duration-700 ease-out motion-reduce:transition-none',
+          'block h-full w-(--fill) rounded-full',
           TONE_CLASSES[WAIT_LEVEL_TONES[meter.level]].dot,
         )}
         // The fill's share of the hot mark — never quite empty, so a fresh wait still shows.
@@ -177,11 +163,7 @@ function VisitCard({
     <div
       data-testid={TODAY_TEST_IDS.card}
       data-card-id={card.id}
-      className={cn(
-        // The spotlight's ring (`useSpotlight` marks the card `data-spotlight`).
-        'bg-canvas ring-offset-background flex scroll-m-3 flex-col gap-1.5 rounded-lg border p-2.5 transition-shadow duration-500 data-spotlight:ring-2 data-spotlight:ring-offset-2 motion-reduce:transition-none',
-        SPOTLIGHT_RING[meta.tone],
-      )}
+      className="bg-canvas flex flex-col gap-1.5 rounded-lg border p-2.5"
     >
       <button
         type="button"
@@ -293,8 +275,9 @@ function useVisitCardFocus(loading: boolean) {
 /**
  * Light the spotlit card once the panel shows it — the pick usually lands before its lane does,
  * so this waits for the card to arrive: scroll it into view (no smooth scroll under reduced
- * motion), focus its name and mark it `data-spotlight` for {@link SPOTLIGHT_MS} (the card's
- * ring). Each pick (`nonce`) lights once, so a refetch of the lane never steals focus again.
+ * motion), focus its name, mark it `data-spotlight` and ring it in the lane's picked ring (the
+ * tone's `selected` — the app's one picked look, already in the first-paint CSS) for
+ * {@link SPOTLIGHT_MS}. Each pick (`nonce`) lights once, so a refetch of the lane never steals focus again.
  * The mark is the DOM's alone — no state, no re-render.
  */
 function useSpotlight(
@@ -302,6 +285,8 @@ function useSpotlight(
   spotlight: TodaySpotlight | null | undefined,
   cards: readonly TodayCard[],
   ready: boolean,
+  /** The ring's classes — the lane tone's `selected` (the app's picked look). */
+  ring: string,
 ): void {
   const done = useRef<number | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -320,11 +305,14 @@ function useSpotlight(
       .querySelector<HTMLElement>(`[data-testid="${TODAY_TEST_IDS.cardOpen}"]`)
       ?.focus({ preventScroll: true });
     clearTimeout(timer.current);
+    const classes = ring.split(' ');
     card.dataset.spotlight = 'true';
+    card.classList.add(...classes);
     timer.current = setTimeout(() => {
       delete card.dataset.spotlight;
+      card.classList.remove(...classes);
     }, SPOTLIGHT_MS);
-  }, [panel, spotlight, cards, ready]);
+  }, [panel, spotlight, cards, ready, ring]);
 }
 
 /**
@@ -350,7 +338,13 @@ export function LanePanel({
   const { t } = useTranslation(TODAY_NS);
   const headingId = useId();
   const panel = useVisitCardFocus(loading);
-  useSpotlight(panel, spotlight, cards, !loading && cards.length > 0);
+  useSpotlight(
+    panel,
+    spotlight,
+    cards,
+    !loading && cards.length > 0,
+    TONE_CLASSES[TODAY_LANE_META[lane].tone].selected,
+  );
   const paint = TONE_CLASSES[TODAY_LANE_META[lane].tone];
   const EmptyIcon = LANE_EMPTY_ICONS[lane];
   return (
