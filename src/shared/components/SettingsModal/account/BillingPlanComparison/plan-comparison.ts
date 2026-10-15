@@ -382,3 +382,33 @@ export function planChangeKind({
   if (!subscription) return 'first';
   return isFreePlan(target) ? 'toFree' : 'change';
 }
+
+/** Which line the Billing notice reads, by the subscription's state. */
+export type SubscriptionNoticeKind =
+  'renews' | 'ends' | 'trial' | 'pastDue' | 'incomplete';
+
+/**
+ * The one notice under the plan, as Claude's billing page states its subscription: set to end
+ * beats everything (it carries "Resubscribe"); a trial says when it ends; a payment that failed or
+ * has not gone through says so; a running plan says when it renews. `null` with no subscription
+ * (Free) or one that is already over.
+ */
+export function subscriptionNoticeKind(
+  subscription: BillingSubscription | null,
+): SubscriptionNoticeKind | null {
+  if (!subscription) return null;
+  if (subscription.cancelAtPeriodEnd) return 'ends';
+  switch (subscription.status) {
+    case 'active':
+      return 'renews';
+    case 'trialing':
+      return 'trial';
+    case 'past_due':
+    case 'unpaid':
+      return 'pastDue';
+    case 'incomplete':
+      return 'incomplete';
+    default:
+      return null;
+  }
+}

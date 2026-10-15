@@ -420,8 +420,6 @@
       "plansLoadFailed": "Não foi possível carregar os planos. Tente novamente.",
       "planHeading": "Plano {{name}}",
       "noPlan": "Sem plano",
-      "noSubscription": "Ainda não há assinatura ativa. Escolha um plano abaixo.",
-      "summary": "{{used}} de {{total}} assentos usados · renova em {{date}}",
       "billedMonthly": "Cobrança mensal",
       "billedYearly": "Cobrança anual",
       "currentPlan": "Plano atual",
@@ -455,13 +453,13 @@
       },
       "invoices": {
         "title": "Faturas",
-        "description": "Data, vencimento, valor e status do seu provedor de cobrança.",
+        "description": "Data, valor e status do seu provedor de cobrança.",
         "loadFailed": "Não foi possível carregar as faturas. Tente novamente.",
         "empty": "Ainda não há faturas.",
         "view": "Ver fatura",
+        "downloadPdf": "Baixar PDF",
         "columns": {
           "date": "Data",
-          "due": "Vencimento",
           "total": "Total",
           "status": "Status",
           "actions": "Ações"
@@ -469,10 +467,7 @@
       },
       "cancellation": {
         "title": "Cancelamento",
-        "endsOn": "Sua assinatura termina em {{date}}. Você mantém o acesso até lá.",
         "cancelAnytime": "Cancele quando quiser — o acesso continua até {{date}}.",
-        "resume": "Retomar assinatura",
-        "resuming": "Retomando…",
         "cancelAction": "Cancelar no fim do período",
         "confirmTitle": "Cancelar assinatura?",
         "confirmDescription": "Seu workspace mantém acesso completo até {{date}}. Depois disso, a assinatura termina e os recursos pagos podem ficar limitados.",

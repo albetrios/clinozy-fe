@@ -25,9 +25,9 @@ import { bearerHeaders, createTeamOrganization } from '@/tests/utils/e2e-tenancy
 
 const API = 'http://localhost:3000/api/v1';
 
-/** "Compare plans" on the Your plan card opens the plan picker over Settings. */
+/** The plan header's one button ("Adjust plan" / "Upgrade plan" / "View plans") opens the picker. */
 async function openPlanPicker(page: Page) {
-  await page.getByTestId('billing-compare-plans').click();
+  await page.getByTestId('billing-adjust-plan').click();
   const picker = page.getByTestId('billing-plan-picker');
   await expect(picker).toBeVisible();
   return picker;
@@ -127,6 +127,9 @@ test.describe('Billing & subscription', () => {
     ).toBeVisible();
 
     await expect(page.getByTestId('billing-summary')).toBeVisible();
+    // On Free: one button that invites the upgrade, and no renewal notice to give.
+    await expect(page.getByTestId('billing-adjust-plan')).toHaveText('Upgrade plan');
+    await expect(page.getByTestId('billing-notice')).toHaveCount(0);
     const picker = await openPlanPicker(page);
     // a11y guard: the picker is a named dialog with every plan as an article.
     await expect(page.getByRole('dialog', { name: 'Plans' })).toBeVisible();
@@ -145,7 +148,7 @@ test.describe('Billing & subscription', () => {
     test.skip(ctx?.planCount === 0, 'no billing plans seeded in this environment');
 
     await openSettingsHash(page, 'account', 'billing');
-    await expect(page.getByTestId('billing-compare-plans')).toBeVisible({
+    await expect(page.getByTestId('billing-adjust-plan')).toBeVisible({
       timeout: 15000,
     });
     const picker = await openPlanPicker(page);
@@ -230,7 +233,7 @@ test.describe('Billing & subscription', () => {
     });
 
     // Plan-management controls are team-only — never exposed to a personal account.
-    await expect(page.getByTestId('billing-upgrade-next')).toHaveCount(0);
+    await expect(page.getByTestId('billing-adjust-plan')).toHaveText('View plans');
     await expect(page.getByTestId('billing-cancellation-card')).toHaveCount(0);
     // Comparing is reading: the picker opens, with prices and no moves.
     const picker = await openPlanPicker(page);
@@ -282,12 +285,15 @@ test.describe('Billing & subscription', () => {
     const summary = page.getByTestId('billing-summary');
     await expect(summary).toBeVisible({ timeout: 15000 });
 
-    // "Upgrade to <next>" on the Your plan card opens the confirm for the next plan up; its
-    // button changes the subscription. Depending on the Stripe config that lands as a trial,
-    // an active switch, or the in-app payment step — all of which update the summary away
-    // from the current plan.
+    // A subscribed plan says when it renews, and "Adjust plan" opens the picker; an
+    // "Upgrade to <plan>" there opens its confirm, whose button changes the subscription.
+    // Depending on the Stripe config that lands as a trial, an active switch, or the in-app
+    // payment step — all of which update the header away from the current plan.
+    await expect(page.getByTestId('billing-notice')).toBeVisible();
+    await expect(page.getByTestId('billing-adjust-plan')).toHaveText('Adjust plan');
     const beforeSummary = (await summary.innerText()).trim();
-    const upgrade = page.getByTestId('billing-upgrade-next');
+    const picker = await openPlanPicker(page);
+    const upgrade = picker.getByRole('button', { name: /^Upgrade to / }).first();
     test.skip((await upgrade.count()) === 0, 'no dearer plan seeded to upgrade to');
     await upgrade.click();
     const confirm = page.getByTestId('plan-change-confirm');

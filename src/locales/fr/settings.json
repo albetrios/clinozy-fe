@@ -420,8 +420,6 @@
       "plansLoadFailed": "Impossible de charger les offres. Veuillez réessayer.",
       "planHeading": "Offre {{name}}",
       "noPlan": "Aucune offre",
-      "noSubscription": "Aucun abonnement actif pour l'instant. Choisissez une offre ci-dessous.",
-      "summary": "{{used}} sièges utilisés sur {{total}} · renouvellement le {{date}}",
       "billedMonthly": "Facturation mensuelle",
       "billedYearly": "Facturation annuelle",
       "currentPlan": "Offre actuelle",
@@ -455,13 +453,13 @@
       },
       "invoices": {
         "title": "Factures",
-        "description": "Date, échéance, montant et statut fournis par votre prestataire de facturation.",
+        "description": "Date, montant et statut fournis par votre prestataire de facturation.",
         "loadFailed": "Impossible de charger les factures. Veuillez réessayer.",
         "empty": "Aucune facture pour l'instant.",
         "view": "Voir la facture",
+        "downloadPdf": "Télécharger le PDF",
         "columns": {
           "date": "Date",
-          "due": "Échéance",
           "total": "Total",
           "status": "Statut",
           "actions": "Actions"
@@ -469,10 +467,7 @@
       },
       "cancellation": {
         "title": "Résiliation",
-        "endsOn": "Votre abonnement se termine le {{date}}. Vous conservez l'accès jusque-là.",
         "cancelAnytime": "Résiliez à tout moment — l'accès se poursuit jusqu'au {{date}}.",
-        "resume": "Reprendre l'abonnement",
-        "resuming": "Reprise…",
         "cancelAction": "Résilier à la fin de la période",
         "confirmTitle": "Résilier l'abonnement ?",
         "confirmDescription": "Votre espace de travail conserve l'accès complet jusqu'au {{date}}. Ensuite, l'abonnement prend fin et les fonctionnalités payantes peuvent être limitées.",

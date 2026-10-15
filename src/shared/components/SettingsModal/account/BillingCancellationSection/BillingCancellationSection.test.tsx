@@ -134,15 +134,16 @@ describe('BillingCancellationSection', () => {
     );
   });
 
-  it('shows the resume button working, not just greyed out', async () => {
-    const user = userEvent.setup();
+  it('goes once the plan is set to end — the notice carries Resubscribe then', () => {
     renderSection(true, { ...SUB, cancelAtPeriodEnd: true });
+    expect(screen.queryByTestId('billing-cancellation-card')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('billing-resume')).not.toBeInTheDocument();
+  });
 
-    await user.click(screen.getByTestId('billing-resume'));
-
-    const resume = screen.getByTestId('billing-resume');
-    expect(resume).toHaveAttribute('aria-busy', 'true');
-    expect(resume.querySelector('.animate-spin')).not.toBeNull();
-    expect(resume).toHaveTextContent(copy(KEYS.resuming));
+  it('reads the end of the period as a day', () => {
+    renderSection();
+    expect(screen.getByTestId('billing-cancellation-card')).toHaveTextContent(
+      'Dec 1, 2026',
+    );
   });
 });

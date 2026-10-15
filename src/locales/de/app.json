@@ -1503,20 +1503,26 @@
       "prioritySupportHint": "Ihre Anfragen werden zuerst beantwortet."
     },
     "picker": {
-      "open": "Tarife vergleichen",
       "title": "Tarife",
       "sub": "Alle Tarife nebeneinander. Wechseln Sie, wenn Ihr Team so weit ist.",
       "compareTitle": "Funktionen der Tarife vergleichen",
       "compareSub": "Was jeder Tarif enthält, Zeile für Zeile."
     },
     "yourPlan": {
-      "eyebrow": "Ihr Tarif",
-      "renews": "Verlängerung am {{date}}",
-      "ends": "Endet am {{date}}",
-      "seats": "Plätze",
-      "seatsUsed": "{{used}} von {{total}} belegt",
-      "seatsUsedUnlimited": "{{used}} belegt · ohne Limit",
-      "includes": "Enthalten"
+      "adjust": "Tarif anpassen",
+      "upgrade": "Tarif upgraden",
+      "view": "Tarife ansehen",
+      "seatsUsed": "{{used}} von {{total}} Plätzen belegt",
+      "seatsUsedUnlimited": "{{used}} Plätze belegt · ohne Limit",
+      "noPlanLine": "Wählen Sie einen Tarif, um loszulegen."
+    },
+    "notice": {
+      "renews": "Ihr Tarif verlängert sich am {{date}}.",
+      "ends": "Ihr Abonnement wird am {{date}} gekündigt.",
+      "resubscribe": "Wieder abonnieren",
+      "trialEnds": "Ihre Testphase endet am {{date}}.",
+      "pastDue": "Ihre letzte Zahlung ist nicht durchgegangen. Aktualisieren Sie Ihre Zahlungsmethode, um {{name}} zu behalten.",
+      "incomplete": "Ihre erste Zahlung ist noch nicht durchgegangen."
     },
     "confirm": {
       "keep": "{{name}} behalten",

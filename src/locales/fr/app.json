@@ -1524,20 +1524,26 @@
       "prioritySupportHint": "Vos demandes sont traitées en premier."
     },
     "picker": {
-      "open": "Comparer les offres",
       "title": "Offres",
       "sub": "Toutes les offres côte à côte. Changez quand votre équipe est prête.",
       "compareTitle": "Comparer les fonctionnalités des offres",
       "compareSub": "Ce que comprend chaque offre, ligne par ligne."
     },
     "yourPlan": {
-      "eyebrow": "Votre offre",
-      "renews": "Renouvellement le {{date}}",
-      "ends": "Se termine le {{date}}",
-      "seats": "Sièges",
-      "seatsUsed": "{{used}} sur {{total}} utilisés",
-      "seatsUsedUnlimited": "{{used}} utilisés · sans limite",
-      "includes": "Ce qui est inclus"
+      "adjust": "Modifier l’offre",
+      "upgrade": "Passer à une offre supérieure",
+      "view": "Voir les offres",
+      "seatsUsed": "{{used}} sièges utilisés sur {{total}}",
+      "seatsUsedUnlimited": "{{used}} sièges utilisés · sans limite",
+      "noPlanLine": "Choisissez une offre pour commencer."
+    },
+    "notice": {
+      "renews": "Votre offre se renouvelle le {{date}}.",
+      "ends": "Votre abonnement sera annulé le {{date}}.",
+      "resubscribe": "Se réabonner",
+      "trialEnds": "Votre essai se termine le {{date}}.",
+      "pastDue": "Votre dernier paiement n’a pas abouti. Mettez à jour votre moyen de paiement pour conserver {{name}}.",
+      "incomplete": "Votre premier paiement n’a pas encore abouti."
     },
     "confirm": {
       "keep": "Garder {{name}}",

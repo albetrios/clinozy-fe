@@ -416,8 +416,6 @@
       "plansLoadFailed": "Tarife konnten nicht geladen werden. Bitte erneut versuchen.",
       "planHeading": "Tarif {{name}}",
       "noPlan": "Kein Tarif",
-      "noSubscription": "Noch kein aktives Abo. Wählen Sie unten einen Tarif.",
-      "summary": "{{used}} von {{total}} Plätzen belegt · Verlängerung am {{date}}",
       "billedMonthly": "Monatliche Abrechnung",
       "billedYearly": "Jährliche Abrechnung",
       "currentPlan": "Aktueller Tarif",
@@ -451,13 +449,13 @@
       },
       "invoices": {
         "title": "Rechnungen",
-        "description": "Datum, Fälligkeit, Betrag und Status von Ihrem Abrechnungsanbieter.",
+        "description": "Datum, Betrag und Status von Ihrem Abrechnungsanbieter.",
         "loadFailed": "Rechnungen konnten nicht geladen werden. Bitte erneut versuchen.",
         "empty": "Noch keine Rechnungen.",
         "view": "Rechnung ansehen",
+        "downloadPdf": "PDF herunterladen",
         "columns": {
           "date": "Datum",
-          "due": "Fällig",
           "total": "Gesamt",
           "status": "Status",
           "actions": "Aktionen"
@@ -465,10 +463,7 @@
       },
       "cancellation": {
         "title": "Kündigung",
-        "endsOn": "Ihr Abo endet am {{date}}. Bis dahin behalten Sie den Zugriff.",
         "cancelAnytime": "Jederzeit kündbar – der Zugriff läuft bis zum {{date}} weiter.",
-        "resume": "Abo fortsetzen",
-        "resuming": "Wird fortgesetzt…",
         "cancelAction": "Zum Periodenende kündigen",
         "confirmTitle": "Abo kündigen?",
         "confirmDescription": "Ihr Workspace behält bis zum {{date}} vollen Zugriff. Danach endet das Abo und kostenpflichtige Funktionen können eingeschränkt werden.",

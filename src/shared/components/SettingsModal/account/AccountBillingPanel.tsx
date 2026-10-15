@@ -31,6 +31,7 @@ import {
   BillingCurrentPlan,
   BillingPlanChangeConfirm,
   BillingPlanPicker,
+  BillingSubscriptionNotice,
   currentPlanOf,
   isFreePlan,
   sortPlansForComparison,
@@ -273,12 +274,17 @@ function BillingContent({ sub, plans }: BillingContentProps) {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* As Claude's billing page opens: the plan on one line with one button, then its state. */}
       <BillingCurrentPlan
         plans={plans}
         subscription={sub}
         canManage={canManage}
-        onCompare={() => setPickerOpen(true)}
-        onUpgrade={setConfirmPlanId}
+        onOpenPlans={() => setPickerOpen(true)}
+      />
+      <BillingSubscriptionNotice
+        subscription={sub}
+        planName={current?.name ?? ''}
+        canManage={canManage}
       />
 
       {paymentClientSecret ? (

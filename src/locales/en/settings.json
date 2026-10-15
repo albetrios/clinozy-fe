@@ -416,8 +416,6 @@
       "plansLoadFailed": "Couldn't load plans. Please try again.",
       "planHeading": "{{name}} plan",
       "noPlan": "No plan",
-      "noSubscription": "No active subscription yet. Choose a plan below.",
-      "summary": "{{used}} of {{total}} seats used · renews {{date}}",
       "billedMonthly": "Billed monthly",
       "billedYearly": "Billed yearly",
       "currentPlan": "Current plan",
@@ -451,13 +449,13 @@
       },
       "invoices": {
         "title": "Invoices",
-        "description": "Date, due date, amount, and status from your billing provider.",
+        "description": "Date, amount and status from your billing provider.",
         "loadFailed": "Couldn't load invoices. Please try again.",
         "empty": "No invoices yet.",
         "view": "View invoice",
+        "downloadPdf": "Download PDF",
         "columns": {
           "date": "Date",
-          "due": "Due",
           "total": "Total",
           "status": "Status",
           "actions": "Actions"
@@ -465,10 +463,7 @@
       },
       "cancellation": {
         "title": "Cancellation",
-        "endsOn": "Your subscription ends on {{date}}. You keep access until then.",
         "cancelAnytime": "Cancel anytime — access continues through {{date}}.",
-        "resume": "Resume subscription",
-        "resuming": "Resuming…",
         "cancelAction": "Cancel at period end",
         "confirmTitle": "Cancel subscription?",
         "confirmDescription": "Your workspace keeps full access until {{date}}. After that, the subscription ends and paid features may be limited.",

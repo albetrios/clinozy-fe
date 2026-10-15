@@ -167,9 +167,9 @@ function setupUser() {
   return userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 }
 
-/** "Compare plans" on the Your plan card opens the picker. */
+/** The plan header's one button ("Adjust plan", "Upgrade plan", "View plans") opens the picker. */
 async function openPicker(user: ReturnType<typeof setupUser>) {
-  await user.click(screen.getByTestId('billing-compare-plans'));
+  await user.click(screen.getByTestId('billing-adjust-plan'));
   return screen.findByTestId('billing-plan-picker');
 }
 
@@ -253,7 +253,7 @@ describe('AccountBillingPanel', () => {
     expect(screen.getByTestId('plan-options')).toBeInTheDocument();
   });
 
-  it('opens with Your plan, and the plans side by side behind "Compare plans"', async () => {
+  it('opens on the plan, and the plans side by side behind its one button', async () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -438,7 +438,7 @@ describe('AccountBillingPanel', () => {
       const user = setupUser();
       renderPanel();
 
-      expect(screen.getByTestId('billing-summary')).toHaveTextContent('Billed yearly');
+      expect(screen.getByTestId('billing-plan-line')).toHaveTextContent('billed yearly');
       await openPicker(user);
       expect(screen.queryByTestId('billing-cycle-toggle')).not.toBeInTheDocument();
       expect(screen.getByTestId('plan-options')).toHaveTextContent(
@@ -503,28 +503,45 @@ describe('AccountBillingPanel', () => {
     );
   });
 
-  it('upgrades straight from Your plan, through the same confirm', async () => {
+  it('names its one button for the plan: Adjust on a paid plan, Upgrade on Free', () => {
     useSubscriptionMock.mockReturnValue({
-      data: SUB,
+      data: { ...SUB, planId: 'pln_plus' },
       isPending: false,
       isLoading: false,
       isError: false,
     });
     setCanManage(true);
-    selectPlanMutateAsync.mockResolvedValue({ ...SUB, planId: 'pln_plus' });
-    const user = setupUser();
-    renderPanel();
+    const { unmount } = renderPanel();
+    expect(screen.getByTestId('billing-adjust-plan')).toHaveTextContent('Adjust plan');
+    unmount();
 
-    await user.click(screen.getByTestId('billing-upgrade-next'));
-    const confirm = await screen.findByTestId('plan-change-confirm');
-    expect(
-      within(confirm).getByRole('heading', { name: 'Upgrade to Plus' }),
-    ).toBeVisible();
-    await user.click(within(confirm).getByTestId('plan-change-confirm-accept'));
-    expect(selectPlanMutateAsync).toHaveBeenCalledWith({
-      planId: 'pln_plus',
-      billingCycle: 'monthly',
+    useSubscriptionMock.mockReturnValue({
+      data: null,
+      isPending: false,
+      isLoading: false,
+      isError: false,
     });
+    renderPanel();
+    expect(screen.getByTestId('billing-adjust-plan')).toHaveTextContent('Upgrade plan');
+    // No second, competing button: the picker is where a plan is chosen.
+    expect(screen.getByTestId('billing-summary').querySelectorAll('button')).toHaveLength(
+      1,
+    );
+  });
+
+  it('says when the plan renews under it, and offers Resubscribe once it is set to end', () => {
+    useSubscriptionMock.mockReturnValue({
+      data: { ...SUB, cancelAtPeriodEnd: true },
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+    expect(screen.getByTestId('billing-notice')).toHaveTextContent(
+      'Your subscription will be canceled on Dec 1, 2026.',
+    );
+    expect(screen.getByTestId('billing-resubscribe')).toBeInTheDocument();
   });
 
   it('changes nothing when the confirm is kept', async () => {
@@ -576,7 +593,7 @@ describe('AccountBillingPanel', () => {
     const user = setupUser();
     renderPanel();
     expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
-    expect(screen.queryByTestId('billing-upgrade-next')).not.toBeInTheDocument();
+    expect(screen.getByTestId('billing-adjust-plan')).toHaveTextContent('View plans');
     // Comparing is reading — anyone may; changing is not.
     await openPicker(user);
     expect(screen.getByTestId('plan-options')).toBeInTheDocument();
@@ -603,14 +620,14 @@ describe('AccountBillingPanel', () => {
     const user = setupUser();
     renderPanel();
 
-    expect(screen.queryByTestId('billing-upgrade-next')).not.toBeInTheDocument();
+    expect(screen.getByTestId('billing-adjust-plan')).toHaveTextContent('View plans');
     await openPicker(user);
     expect(screen.getByTestId('plan-options')).toBeInTheDocument();
     expect(screen.queryByTestId('plan-pln_pro')).not.toBeInTheDocument();
     expect(screen.queryByTestId('billing-cycle-toggle')).not.toBeInTheDocument();
   });
 
-  it('states the seats used out of the plan seats in the summary', () => {
+  it('states the seats used out of the plan seats on the plan line', () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -623,7 +640,7 @@ describe('AccountBillingPanel', () => {
     expect(screen.getByTestId('billing-summary')).toHaveTextContent('1 of 3 seats used');
   });
 
-  it('states an unlimited plan as ∞ seats', () => {
+  it('states an unlimited plan as no limit', () => {
     useSubscriptionMock.mockReturnValue({
       data: { ...SUB, seatsTotal: null, seatsUsed: 4 },
       isPending: false,
@@ -633,7 +650,9 @@ describe('AccountBillingPanel', () => {
     setCanManage(true);
     renderPanel();
 
-    expect(screen.getByTestId('billing-summary')).toHaveTextContent('4 of ∞ seats used');
+    expect(screen.getByTestId('billing-plan-line')).toHaveTextContent(
+      '4 seats used · no limit',
+    );
   });
 
   it('strips Stripe return params through the router after a succeeded redirect', () => {
@@ -763,7 +782,7 @@ describe('AccountBillingPanel', () => {
     await waitFor(() =>
       expect(screen.queryByTestId('plan-change-confirm')).not.toBeInTheDocument(),
     );
-    expect(screen.getByTestId('billing-compare-plans')).toBeEnabled();
+    expect(screen.getByTestId('billing-adjust-plan')).toBeEnabled();
   });
 
   it('leaves no unhandled rejection when the plan switch fails', async () => {
@@ -818,7 +837,7 @@ describe('AccountBillingPanel', () => {
     expect(await screen.findByTestId('billing-payment-form-error')).toBeInTheDocument();
     // The rest of the panel is untouched.
     expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
-    expect(screen.getByTestId('billing-compare-plans')).toBeInTheDocument();
+    expect(screen.getByTestId('billing-adjust-plan')).toBeInTheDocument();
     consoleError.mockRestore();
   });
 
@@ -837,7 +856,7 @@ describe('AccountBillingPanel', () => {
     renderPanel();
 
     expect(await screen.findByTestId('billing-cancellation-error')).toBeInTheDocument();
-    expect(screen.getByTestId('billing-compare-plans')).toBeInTheDocument();
+    expect(screen.getByTestId('billing-adjust-plan')).toBeInTheDocument();
     expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
     consoleError.mockRestore();
   });

@@ -420,8 +420,6 @@
       "plansLoadFailed": "No se pudieron cargar los planes. Inténtalo de nuevo.",
       "planHeading": "Plan {{name}}",
       "noPlan": "Sin plan",
-      "noSubscription": "Aún no hay una suscripción activa. Elige un plan abajo.",
-      "summary": "{{used}} de {{total}} asientos usados · se renueva el {{date}}",
       "billedMonthly": "Facturación mensual",
       "billedYearly": "Facturación anual",
       "currentPlan": "Plan actual",
@@ -455,13 +453,13 @@
       },
       "invoices": {
         "title": "Facturas",
-        "description": "Fecha, vencimiento, importe y estado según tu proveedor de facturación.",
+        "description": "Fecha, importe y estado de tu proveedor de facturación.",
         "loadFailed": "No se pudieron cargar las facturas. Inténtalo de nuevo.",
         "empty": "Aún no hay facturas.",
         "view": "Ver factura",
+        "downloadPdf": "Descargar PDF",
         "columns": {
           "date": "Fecha",
-          "due": "Vencimiento",
           "total": "Total",
           "status": "Estado",
           "actions": "Acciones"
@@ -469,10 +467,7 @@
       },
       "cancellation": {
         "title": "Cancelación",
-        "endsOn": "Tu suscripción termina el {{date}}. Conservas el acceso hasta entonces.",
         "cancelAnytime": "Cancela cuando quieras: el acceso continúa hasta el {{date}}.",
-        "resume": "Reanudar suscripción",
-        "resuming": "Reanudando…",
         "cancelAction": "Cancelar al final del periodo",
         "confirmTitle": "¿Cancelar la suscripción?",
         "confirmDescription": "Tu espacio de trabajo conserva el acceso completo hasta el {{date}}. Después, la suscripción termina y las funciones de pago pueden quedar limitadas.",

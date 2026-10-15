@@ -1524,20 +1524,26 @@
       "prioritySupportHint": "Tus solicitudes se atienden primero."
     },
     "picker": {
-      "open": "Comparar planes",
       "title": "Planes",
       "sub": "Todos los planes, uno al lado del otro. Cambia cuando tu equipo esté listo.",
       "compareTitle": "Compara las funciones de los planes",
       "compareSub": "Lo que incluye cada plan, fila por fila."
     },
     "yourPlan": {
-      "eyebrow": "Tu plan",
-      "renews": "Se renueva el {{date}}",
-      "ends": "Termina el {{date}}",
-      "seats": "Asientos",
-      "seatsUsed": "{{used}} de {{total}} en uso",
-      "seatsUsedUnlimited": "{{used}} en uso · sin límite",
-      "includes": "Qué incluye"
+      "adjust": "Ajustar plan",
+      "upgrade": "Mejorar plan",
+      "view": "Ver planes",
+      "seatsUsed": "{{used}} de {{total}} asientos en uso",
+      "seatsUsedUnlimited": "{{used}} asientos en uso · sin límite",
+      "noPlanLine": "Elige un plan para empezar."
+    },
+    "notice": {
+      "renews": "Tu plan se renueva el {{date}}.",
+      "ends": "Tu suscripción se cancelará el {{date}}.",
+      "resubscribe": "Volver a suscribirse",
+      "trialEnds": "Tu prueba termina el {{date}}.",
+      "pastDue": "Tu último pago no se completó. Actualiza tu método de pago para conservar {{name}}.",
+      "incomplete": "Tu primer pago aún no se ha completado."
     },
     "confirm": {
       "keep": "Mantener {{name}}",

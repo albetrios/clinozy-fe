@@ -414,8 +414,6 @@
       "plansLoadFailed": "无法加载套餐。请重试。",
       "planHeading": "{{name}} 套餐",
       "noPlan": "无套餐",
-      "noSubscription": "尚无有效订阅。请在下方选择套餐。",
-      "summary": "已使用 {{total}} 个席位中的 {{used}} 个 · {{date}} 续订",
       "billedMonthly": "按月计费",
       "billedYearly": "按年计费",
       "currentPlan": "当前套餐",
@@ -449,13 +447,13 @@
       },
       "invoices": {
         "title": "发票",
-        "description": "来自账单服务商的日期、到期日、金额和状态。",
+        "description": "来自账单服务商的日期、金额和状态。",
         "loadFailed": "无法加载发票。请重试。",
         "empty": "暂无发票。",
         "view": "查看发票",
+        "downloadPdf": "下载 PDF",
         "columns": {
           "date": "日期",
-          "due": "到期日",
           "total": "合计",
           "status": "状态",
           "actions": "操作"
@@ -463,10 +461,7 @@
       },
       "cancellation": {
         "title": "取消订阅",
-        "endsOn": "您的订阅将于 {{date}} 结束。在此之前您仍可使用。",
         "cancelAnytime": "随时可取消——访问权限将持续到 {{date}}。",
-        "resume": "恢复订阅",
-        "resuming": "恢复中…",
         "cancelAction": "在周期结束时取消",
         "confirmTitle": "取消订阅？",
         "confirmDescription": "您的工作区在 {{date}} 之前保持完整访问权限。之后订阅结束，付费功能可能受限。",

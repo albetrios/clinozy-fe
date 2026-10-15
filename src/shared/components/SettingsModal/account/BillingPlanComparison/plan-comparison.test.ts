@@ -20,6 +20,7 @@ import {
   readPlanFeature,
   seatsOverLimit,
   sortPlansForComparison,
+  subscriptionNoticeKind,
   wholeAmountOptions,
   yearlySavingsPercent,
 } from './plan-comparison.ts';
@@ -421,5 +422,35 @@ describe('planChangeKind', () => {
     expect(planChangeKind({ target: PRO, subscription: subscriptionFixture() })).toBe(
       'change',
     );
+  });
+});
+
+describe('subscriptionNoticeKind', () => {
+  it('has nothing to say on Free', () => {
+    expect(subscriptionNoticeKind(null)).toBeNull();
+  });
+
+  it('says a plan set to end ends, whatever else its state', () => {
+    expect(subscriptionNoticeKind(subscriptionFixture({ cancelAtPeriodEnd: true }))).toBe(
+      'ends',
+    );
+    expect(
+      subscriptionNoticeKind(
+        subscriptionFixture({ cancelAtPeriodEnd: true, status: 'trialing' }),
+      ),
+    ).toBe('ends');
+  });
+
+  it.each([
+    ['active', 'renews'],
+    ['trialing', 'trial'],
+    ['past_due', 'pastDue'],
+    ['unpaid', 'pastDue'],
+    ['incomplete', 'incomplete'],
+    ['canceled', null],
+    ['incomplete_expired', null],
+    ['paused', null],
+  ] as const)('reads %s as %s', (status, kind) => {
+    expect(subscriptionNoticeKind(subscriptionFixture({ status }))).toBe(kind);
   });
 });

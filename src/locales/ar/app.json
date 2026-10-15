@@ -1587,20 +1587,26 @@
       "prioritySupportHint": "يُرد على طلباتك أولًا."
     },
     "picker": {
-      "open": "قارن الخطط",
       "title": "الخطط",
       "sub": "كل الخطط جنبًا إلى جنب. بدّل عندما يكون فريقك جاهزًا.",
       "compareTitle": "قارن ميزات الخطط",
       "compareSub": "ما تتضمنه كل خطة، صفًا صفًا."
     },
     "yourPlan": {
-      "eyebrow": "خطتك",
-      "renews": "تتجدد في {{date}}",
-      "ends": "تنتهي في {{date}}",
-      "seats": "المقاعد",
-      "seatsUsed": "{{used}} من {{total}} مستخدمة",
-      "seatsUsedUnlimited": "{{used}} مستخدمة · بلا حد",
-      "includes": "ما تتضمنه"
+      "adjust": "تعديل الخطة",
+      "upgrade": "ترقية الخطة",
+      "view": "عرض الخطط",
+      "seatsUsed": "{{used}} من {{total}} مقاعد مستخدمة",
+      "seatsUsedUnlimited": "{{used}} مقاعد مستخدمة · بلا حد",
+      "noPlanLine": "اختر خطة للبدء."
+    },
+    "notice": {
+      "renews": "تتجدد خطتك في {{date}}.",
+      "ends": "سيُلغى اشتراكك في {{date}}.",
+      "resubscribe": "إعادة الاشتراك",
+      "trialEnds": "تنتهي فترتك التجريبية في {{date}}.",
+      "pastDue": "لم تتم دفعتك الأخيرة. حدّث وسيلة الدفع للاحتفاظ بخطة {{name}}.",
+      "incomplete": "لم تتم دفعتك الأولى بعد."
     },
     "confirm": {
       "keep": "الإبقاء على {{name}}",

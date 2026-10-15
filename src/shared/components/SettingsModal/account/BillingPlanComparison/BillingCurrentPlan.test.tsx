@@ -8,15 +8,14 @@ import type { BillingPlan, BillingSubscription } from '@/shared/api/billing-cont
 import { SEEDED_PLANS, subscriptionFixture } from './billing-plan.fixtures.ts';
 import { BillingCurrentPlan } from './BillingCurrentPlan.tsx';
 
-function renderCard(
+function renderHeader(
   props: Partial<{
     plans: readonly BillingPlan[];
     subscription: BillingSubscription | null;
     canManage: boolean;
   }> = {},
 ) {
-  const onCompare = vi.fn();
-  const onUpgrade = vi.fn();
+  const onOpenPlans = vi.fn();
   const view = render(
     <BillingCurrentPlan
       plans={props.plans ?? SEEDED_PLANS}
@@ -24,86 +23,82 @@ function renderCard(
         props.subscription === undefined ? subscriptionFixture() : props.subscription
       }
       canManage={props.canManage ?? true}
-      onCompare={onCompare}
-      onUpgrade={onUpgrade}
+      onOpenPlans={onOpenPlans}
     />,
   );
-  return { ...view, onCompare, onUpgrade, card: screen.getByTestId('billing-summary') };
+  return {
+    ...view,
+    onOpenPlans,
+    header: screen.getByTestId('billing-summary'),
+    line: screen.getByTestId('billing-plan-line'),
+    button: screen.getByTestId('billing-adjust-plan'),
+  };
 }
 
 describe('BillingCurrentPlan', () => {
-  it('shows the plan, its status, price and cycle, seats and renewal', () => {
-    const { card } = renderCard();
+  it('names the plan on one line, with its price and the seats used', () => {
+    const { line } = renderHeader();
     expect(screen.getByRole('heading', { name: 'Starter plan' })).toBeVisible();
-    expect(card).toHaveTextContent('Your plan');
-    expect(card).toHaveTextContent('active');
-    expect(card).toHaveTextContent('$10/ month· Billed monthly');
-    expect(card).toHaveTextContent(/1 of 5 seats used · renews /);
-    expect(screen.getByTestId('billing-seat-meter')).toHaveAttribute(
-      'aria-label',
-      'Seats',
-    );
+    expect(line).toHaveTextContent('$10 / month · 1 of 5 seats used');
   });
 
-  it('lists what the plan includes', () => {
-    renderCard();
-    expect(screen.getByTestId('billing-current-plan-includes')).toHaveTextContent(
-      'Up to 5 seatsAudit log',
-    );
-  });
-
-  it('opens the picker and offers the next plan up', async () => {
+  it('has one button — "Adjust plan" on a paid plan — that opens the plans', async () => {
     const user = userEvent.setup();
-    const { onCompare, onUpgrade } = renderCard();
-    await user.click(screen.getByTestId('billing-compare-plans'));
-    expect(onCompare).toHaveBeenCalled();
-    expect(screen.getByTestId('billing-upgrade-next')).toHaveTextContent(
-      'Upgrade to Growth',
-    );
-    await user.click(screen.getByTestId('billing-upgrade-next'));
-    expect(onUpgrade).toHaveBeenCalledWith('pln_growth');
+    const { header, button, onOpenPlans } = renderHeader();
+    expect(header.querySelectorAll('button')).toHaveLength(1);
+    expect(button).toHaveTextContent('Adjust plan');
+    expect(button).toHaveAttribute('data-variant', 'outline');
+    await user.click(button);
+    expect(onOpenPlans).toHaveBeenCalledTimes(1);
   });
 
-  it('has no upgrade on the top plan, and none for a member who may not manage billing', () => {
-    renderCard({ subscription: subscriptionFixture({ planId: 'pln_pro' }) });
-    expect(screen.queryByTestId('billing-upgrade-next')).not.toBeInTheDocument();
-  });
-
-  it('lets a member who may not manage billing compare, not upgrade', () => {
-    renderCard({ canManage: false });
-    expect(screen.getByTestId('billing-compare-plans')).toBeInTheDocument();
-    expect(screen.queryByTestId('billing-upgrade-next')).not.toBeInTheDocument();
-  });
-
-  it('is Free with no subscription', () => {
-    const { card } = renderCard({ subscription: null });
+  it('is Free with no subscription, and invites an upgrade', () => {
+    const { line, button } = renderHeader({ subscription: null });
     expect(screen.getByRole('heading', { name: 'Free plan' })).toBeVisible();
-    expect(card).toHaveTextContent('$0/ month· Free for ever');
-    expect(screen.queryByTestId('billing-seat-meter')).not.toBeInTheDocument();
-    expect(screen.getByTestId('billing-upgrade-next')).toHaveTextContent(
-      'Upgrade to Starter',
-    );
+    expect(line).toHaveTextContent('Free for ever · 1 seat');
+    expect(button).toHaveTextContent('Upgrade plan');
+    expect(button).toHaveAttribute('data-variant', 'default');
+  });
+
+  it('lets a member who may not manage billing view the plans, not adjust them', () => {
+    const { button } = renderHeader({ canManage: false });
+    expect(button).toHaveTextContent('View plans');
   });
 
   it('says there is no plan when even the cheapest has a price', () => {
-    renderCard({
+    const { line, button } = renderHeader({
       subscription: null,
       plans: SEEDED_PLANS.filter((plan) => plan.id !== 'pln_free'),
     });
     expect(screen.getByRole('heading', { name: 'No plan' })).toBeVisible();
-    expect(screen.queryByTestId('billing-current-plan-includes')).not.toBeInTheDocument();
+    expect(line).toHaveTextContent('Choose a plan to get started.');
+    expect(button).toHaveTextContent('View plans');
   });
 
-  it('states an unlimited plan as ∞ seats, with no meter', () => {
-    const { card } = renderCard({
+  it('prices a yearly plan per month and says it is billed yearly', () => {
+    const { line } = renderHeader({
+      subscription: subscriptionFixture({ planId: 'pln_growth', billingCycle: 'yearly' }),
+    });
+    expect(line).toHaveTextContent('$25 / month · billed yearly · 1 of 5 seats used');
+  });
+
+  it('states an unlimited plan as no limit', () => {
+    const { line } = renderHeader({
       subscription: subscriptionFixture({ seatsTotal: null, seatsUsed: 7 }),
     });
-    expect(card).toHaveTextContent(/7 of ∞ seats used/);
-    expect(screen.queryByTestId('billing-seat-meter')).not.toBeInTheDocument();
+    expect(line).toHaveTextContent('7 seats used · no limit');
+  });
+
+  it('shows the status only when it needs attention', () => {
+    const { unmount } = renderHeader();
+    expect(screen.queryByTestId('billing-status')).not.toBeInTheDocument();
+    unmount();
+    renderHeader({ subscription: subscriptionFixture({ status: 'past_due' }) });
+    expect(screen.getByTestId('billing-status')).toHaveTextContent('past due');
   });
 
   it('has no axe violations', async () => {
-    const { container } = renderCard();
+    const { container } = renderHeader();
     expect(await axe(container)).toHaveNoViolations();
   });
 });
