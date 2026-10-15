@@ -918,7 +918,8 @@
       "back": "검색으로 돌아가기",
       "addName": "이름을 입력하세요",
       "needMobile": "10자리 휴대폰 번호를 입력하세요",
-      "mobileDigits": "휴대폰 번호는 10자리여야 합니다"
+      "mobileDigits": "휴대폰 번호는 10자리여야 합니다",
+      "mobileStart": "유효한 휴대폰 번호가 아닙니다 — 인도 휴대폰 번호는 6, 7, 8 또는 9로 시작합니다"
     },
     "patient": {
       "newPatient": "새 환자",
@@ -1025,7 +1026,8 @@
       "mobileLabel": "휴대폰",
       "save": "저장",
       "addName": "이름을 입력하세요",
-      "mobileDigits": "휴대폰 번호는 10자리여야 합니다"
+      "mobileDigits": "휴대폰 번호는 10자리여야 합니다",
+      "mobileStart": "유효한 휴대폰 번호가 아닙니다 — 인도 휴대폰 번호는 6, 7, 8 또는 9로 시작합니다"
     },
     "links": {
       "connected": "연결된 리드",

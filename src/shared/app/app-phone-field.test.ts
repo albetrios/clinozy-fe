@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   APP_PHONE_PREFIX,
   appPhoneDigits,
+  appPhoneProblem,
   formatAppPhoneDigits,
   phoneDigitsOf,
   phoneIsInvalid,
@@ -37,5 +38,14 @@ describe('a clinic mobile field', () => {
     expect(phoneIsInvalid('98250')).toBe(true);
     expect(phoneIsInvalid('')).toBe(false);
     expect(phoneIsInvalid('9825044120')).toBe(false);
+  });
+
+  it('says what is wrong with typed digits: too few, or a first digit no mobile has', () => {
+    expect(appPhoneProblem('')).toBe('length');
+    expect(appPhoneProblem('98250')).toBe('length');
+    expect(appPhoneProblem('5555555555')).toBe('start');
+    expect(appPhoneProblem('0123456789')).toBe('start');
+    expect(appPhoneProblem('6000000000')).toBeNull();
+    expect(appPhoneProblem('9825044120')).toBeNull();
   });
 });

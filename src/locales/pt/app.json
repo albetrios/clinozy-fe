@@ -944,7 +944,8 @@
       "back": "Voltar à busca",
       "addName": "Adicione um nome",
       "needMobile": "Adicione um celular de 10 dígitos",
-      "mobileDigits": "O celular precisa de 10 dígitos"
+      "mobileDigits": "O celular precisa de 10 dígitos",
+      "mobileStart": "Celular inválido: celulares indianos começam com 6, 7, 8 ou 9"
     },
     "patient": {
       "newPatient": "Novo paciente",
@@ -1051,7 +1052,8 @@
       "mobileLabel": "Celular",
       "save": "Salvar",
       "addName": "Adicione um nome",
-      "mobileDigits": "O celular precisa de 10 dígitos"
+      "mobileDigits": "O celular precisa de 10 dígitos",
+      "mobileStart": "Celular inválido: celulares indianos começam com 6, 7, 8 ou 9"
     },
     "links": {
       "connected": "Lead vinculado",

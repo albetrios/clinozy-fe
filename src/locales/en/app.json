@@ -931,7 +931,8 @@
       "back": "Back to search",
       "addName": "Add a name",
       "needMobile": "Add a 10-digit mobile",
-      "mobileDigits": "Mobile needs 10 digits"
+      "mobileDigits": "Mobile needs 10 digits",
+      "mobileStart": "Not a valid mobile number — Indian mobiles start with 6, 7, 8 or 9"
     },
     "patient": {
       "newPatient": "New patient",
@@ -1038,7 +1039,8 @@
       "mobileLabel": "Mobile",
       "save": "Save",
       "addName": "Add a name",
-      "mobileDigits": "Mobile needs 10 digits"
+      "mobileDigits": "Mobile needs 10 digits",
+      "mobileStart": "Not a valid mobile number — Indian mobiles start with 6, 7, 8 or 9"
     },
     "links": {
       "connected": "Connected lead",

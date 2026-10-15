@@ -96,6 +96,9 @@ describe('saveProblem — the checks before the request (appointments.md:249)', 
     expect(saveProblem('create', { ...fresh, newPhone: '98111' }, null, now)).toBe(
       'mobile',
     );
+    expect(saveProblem('create', { ...fresh, newPhone: '5555555555' }, null, now)).toBe(
+      'mobileStart',
+    );
     expect(
       saveProblem('create', { ...fresh, newPhone: '9811122233' }, null, now),
     ).toBeNull();
@@ -176,6 +179,11 @@ describe('useAppointmentSave — the write and its refusals', () => {
     await act(() => result.current.save(draft({ who: MEERA, newPhone: '98' })));
     expect(onProblem).toHaveBeenLastCalledWith('mobile');
     expect(notifyMock.warning).toHaveBeenLastCalledWith('Mobile needs 10 digits');
+    await act(() => result.current.save(draft({ who: MEERA, newPhone: '5555555555' })));
+    expect(onProblem).toHaveBeenLastCalledWith('mobileStart');
+    expect(notifyMock.warning).toHaveBeenLastCalledWith(
+      'Not a valid mobile number — Indian mobiles start with 6, 7, 8 or 9',
+    );
     await act(() =>
       result.current.save(draft({ date: APPOINTMENT_TODAY, time: '08:00' })),
     );

@@ -6,6 +6,7 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { appInstant } from '@/shared/api/app/app-time.ts';
 import { appointmentQueryKeys } from '@/shared/api/app/appointments-api.ts';
 import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { appPhoneProblem } from '@/shared/app/app-phone-field.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -52,7 +53,7 @@ export type AppointmentSaveOutcome =
 
 /** What the save checks before it asks (`appointments.md:249`; KICKOFF §6.4 Save). */
 export type AppointmentSaveProblem =
-  'who' | 'mobile' | 'slot' | 'doctor' | 'passed' | 'branch' | null;
+  'who' | 'mobile' | 'mobileStart' | 'slot' | 'doctor' | 'passed' | 'branch' | null;
 
 /**
  * The first thing a save would refuse, checked before the request — the
@@ -67,7 +68,10 @@ export function saveProblem(
   now: Date,
 ): AppointmentSaveProblem {
   if (!draft.who) return 'who';
-  if (draft.who.kind === 'new' && !newContactPhone(draft)) return 'mobile';
+  if (draft.who.kind === 'new' && !newContactPhone(draft)) {
+    // Ten digits that no Indian mobile starts with say so — not "needs 10 digits".
+    return appPhoneProblem(draft.newPhone) === 'start' ? 'mobileStart' : 'mobile';
+  }
   if (!(draft.date && draft.time)) return 'slot';
   if (!draft.doctorId) return 'doctor';
   const checksSlot = mode !== 'edit' || slotMoved(draft, saved);
@@ -197,6 +201,7 @@ export function useAppointmentSave({
       const message = {
         who: V.who,
         mobile: APPOINTMENT_FORM_KEYS.who.mobileDigits,
+        mobileStart: APPOINTMENT_FORM_KEYS.who.mobileStart,
         slot: V.slot,
         doctor: V.doctor,
         passed: V.passed,

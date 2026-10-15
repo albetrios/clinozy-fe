@@ -931,7 +931,8 @@
       "back": "Zurück zur Suche",
       "addName": "Geben Sie einen Namen ein",
       "needMobile": "Geben Sie eine 10-stellige Mobilnummer ein",
-      "mobileDigits": "Die Mobilnummer braucht 10 Ziffern"
+      "mobileDigits": "Die Mobilnummer braucht 10 Ziffern",
+      "mobileStart": "Keine gültige Mobilnummer — indische Mobilnummern beginnen mit 6, 7, 8 oder 9"
     },
     "patient": {
       "newPatient": "Neuer Patient",
@@ -1038,7 +1039,8 @@
       "mobileLabel": "Mobilnummer",
       "save": "Speichern",
       "addName": "Geben Sie einen Namen ein",
-      "mobileDigits": "Die Mobilnummer braucht 10 Ziffern"
+      "mobileDigits": "Die Mobilnummer braucht 10 Ziffern",
+      "mobileStart": "Keine gültige Mobilnummer — indische Mobilnummern beginnen mit 6, 7, 8 oder 9"
     },
     "links": {
       "connected": "Verknüpfter Lead",

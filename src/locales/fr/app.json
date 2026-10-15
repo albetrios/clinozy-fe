@@ -944,7 +944,8 @@
       "back": "Retour à la recherche",
       "addName": "Ajoutez un nom",
       "needMobile": "Ajoutez un mobile à 10 chiffres",
-      "mobileDigits": "Le mobile doit compter 10 chiffres"
+      "mobileDigits": "Le mobile doit compter 10 chiffres",
+      "mobileStart": "Numéro de mobile non valide — les mobiles indiens commencent par 6, 7, 8 ou 9"
     },
     "patient": {
       "newPatient": "Nouveau patient",
@@ -1051,7 +1052,8 @@
       "mobileLabel": "Mobile",
       "save": "Enregistrer",
       "addName": "Ajoutez un nom",
-      "mobileDigits": "Le mobile doit compter 10 chiffres"
+      "mobileDigits": "Le mobile doit compter 10 chiffres",
+      "mobileStart": "Numéro de mobile non valide — les mobiles indiens commencent par 6, 7, 8 ou 9"
     },
     "links": {
       "connected": "Prospect lié",

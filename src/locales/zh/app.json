@@ -918,7 +918,8 @@
       "back": "返回搜索",
       "addName": "请填写姓名",
       "needMobile": "请填写 10 位手机号",
-      "mobileDigits": "手机号需要 10 位数字"
+      "mobileDigits": "手机号需要 10 位数字",
+      "mobileStart": "手机号无效 — 印度手机号以 6、7、8 或 9 开头"
     },
     "patient": {
       "newPatient": "新患者",
@@ -1025,7 +1026,8 @@
       "mobileLabel": "手机号",
       "save": "保存",
       "addName": "请填写姓名",
-      "mobileDigits": "手机号需要 10 位数字"
+      "mobileDigits": "手机号需要 10 位数字",
+      "mobileStart": "手机号无效 — 印度手机号以 6、7、8 或 9 开头"
     },
     "links": {
       "connected": "关联的潜在客户",
