@@ -121,6 +121,9 @@ export const AUTH_KEYS = {
     declined: 'organizationPicker.declined',
     createOwn: 'organizationPicker.createOwn',
     joined: 'organizationPicker.joined',
+    makeDefault: 'organizationPicker.makeDefault',
+    removeDefault: 'organizationPicker.removeDefault',
+    defaultHint: 'organizationPicker.defaultHint',
   },
   validation: {
     emailRequired: 'validation.emailRequired',

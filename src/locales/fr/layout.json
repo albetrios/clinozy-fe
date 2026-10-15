@@ -32,10 +32,7 @@
       "automatic": "La dernière clinique utilisée",
       "automaticHint": "Suit vos passages d'une clinique à l'autre",
       "savedClinic": "La connexion ouvrira {{name}}",
-      "savedAutomatic": "La connexion ouvrira la dernière clinique utilisée",
-      "makeDefault": "Ouvrir {{name}} à la connexion",
-      "removeDefault": "Ne plus ouvrir {{name}} à la connexion",
-      "pickerHint": "Ajoutez une étoile à une clinique pour l’ouvrir à chaque connexion."
+      "savedAutomatic": "La connexion ouvrira la dernière clinique utilisée"
     },
     "notifications": {
       "title": "Notifications",

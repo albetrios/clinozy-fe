@@ -32,10 +32,7 @@
       "automatic": "La última clínica que usé",
       "automaticHint": "Cambia a medida que pasas de una clínica a otra",
       "savedClinic": "Al iniciar sesión se abrirá {{name}}",
-      "savedAutomatic": "Al iniciar sesión se abrirá la última clínica que usaste",
-      "makeDefault": "Abrir {{name}} al iniciar sesión",
-      "removeDefault": "Dejar de abrir {{name}} al iniciar sesión",
-      "pickerHint": "Marca una clínica con la estrella para abrirla cada vez que inicies sesión."
+      "savedAutomatic": "Al iniciar sesión se abrirá la última clínica que usaste"
     },
     "notifications": {
       "title": "Notificaciones",

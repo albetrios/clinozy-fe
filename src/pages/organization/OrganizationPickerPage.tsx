@@ -56,12 +56,15 @@ function OrganizationRow({
   organization: MyOrganizationSummary & { slug: string };
   defaultChoice: DefaultChoice | null;
 }) {
-  const { t } = useTranslation(LAYOUT_NS);
+  const { t } = useTranslation(AUTH_NS);
+  const { t: tLayout } = useTranslation(LAYOUT_NS);
   const isDefault = defaultChoice?.pinnedId === organization.id;
+  // The picker's own copy lives in `auth`, which this page loads — not in `layout`, whose
+  // English strings ship in the first-paint chunk.
   const starLabel = t(
     isDefault
-      ? LAYOUT_KEYS.app.signInClinic.removeDefault
-      : LAYOUT_KEYS.app.signInClinic.makeDefault,
+      ? AUTH_KEYS.organizationPicker.removeDefault
+      : AUTH_KEYS.organizationPicker.makeDefault,
     { name: organization.name },
   );
   return (
@@ -106,7 +109,7 @@ function OrganizationRow({
             className="shrink-0"
             data-testid={`organization-picker-default-badge-${organization.slug}`}
           >
-            {t(LAYOUT_KEYS.app.orgSwitcher.defaultBadge)}
+            {tLayout(LAYOUT_KEYS.app.orgSwitcher.defaultBadge)}
           </TonePill>
         ) : null}
       </Link>
@@ -147,7 +150,6 @@ function OrganizationRow({
  */
 function OrganizationList({ invited }: { invited: boolean }) {
   const { t } = useTranslation(AUTH_NS);
-  const { t: tLayout } = useTranslation(LAYOUT_NS);
   /*
    * The same list, under the same cache key, that the guard chain and the
    * switcher read. The guard that sent the user here already resolved
@@ -225,7 +227,7 @@ function OrganizationList({ invited }: { invited: boolean }) {
           className="text-muted-foreground text-caption px-1.5 pt-1"
           data-testid="organization-picker-default-hint"
         >
-          {tLayout(LAYOUT_KEYS.app.signInClinic.pickerHint)}
+          {t(AUTH_KEYS.organizationPicker.defaultHint)}
         </p>
       ) : null}
     </>

@@ -377,8 +377,26 @@ const config = [
      * Trimmed first: "Finish setup" draws the registry's `ClipboardList` instead
      * of adding `ListChecks` to the icon set; the drawer, the guide, the starter
      * list and the PIN directory load on demand. ~0.1 kB of headroom.
+     *
+     * 239.4 → 239.7 kB: a declared exemption, itemised — the clinic that opens at
+     * sign-in (iterations/feat-choose-default-clinic-2026-10-15-yizz, decision D15;
+     * for the owner's review). +0.18 kB, all English copy in the `boot` entry chunk:
+     * main (7cd2640) 239.40 kB and this branch 239.58 kB, built the same way on one
+     * machine (no env file, no ambient VITE_ variables; this branch's CI read
+     * 239.59 kB before the trim below):
+     * - `layout` › `app.signInClinic` — the account menu's "Opens at sign-in" row
+     *   and its choices ("The clinic I used last" and its hint), and the two save
+     *   toasts. `en/layout.json` is imported statically, and the account menu draws
+     *   before any lazy namespace loads, so these cannot wait on one.
+     * - `layout` › `app.orgSwitcher.defaultBadge` ("Default"), drawn by Switch
+     *   clinic and the picker.
+     * Trimmed first: the picker's own copy — the star's two labels and its hint —
+     * moved to the lazy `auth` namespace the picker already loads (−0.04 kB); the
+     * Settings card's title and description were already in the deferred part of
+     * `settings`, and every component, the hook and the API module load on demand.
+     * ~0.1 kB of headroom.
      */
-    limit: '239.4 kB',
+    limit: '239.7 kB',
     gzip: true,
   },
   ...(cssPaths.length

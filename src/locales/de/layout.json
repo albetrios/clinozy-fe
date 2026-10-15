@@ -32,10 +32,7 @@
       "automatic": "Die zuletzt genutzte Klinik",
       "automaticHint": "Wechselt mit, wenn du zwischen Kliniken wechselst",
       "savedClinic": "Bei der Anmeldung öffnet sich {{name}}",
-      "savedAutomatic": "Bei der Anmeldung öffnet sich die zuletzt genutzte Klinik",
-      "makeDefault": "{{name}} bei der Anmeldung öffnen",
-      "removeDefault": "{{name}} nicht mehr bei der Anmeldung öffnen",
-      "pickerHint": "Markieren Sie eine Klinik mit dem Stern, um sie bei jeder Anmeldung zu öffnen."
+      "savedAutomatic": "Bei der Anmeldung öffnet sich die zuletzt genutzte Klinik"
     },
     "notifications": {
       "title": "Benachrichtigungen",

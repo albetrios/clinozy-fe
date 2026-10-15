@@ -32,10 +32,7 @@
       "automatic": "L'ultima clinica usata",
       "automaticHint": "Cambia mentre passi da una clinica all'altra",
       "savedClinic": "All'accesso si aprirà {{name}}",
-      "savedAutomatic": "All'accesso si aprirà l'ultima clinica usata",
-      "makeDefault": "Apri {{name}} all'accesso",
-      "removeDefault": "Non aprire più {{name}} all'accesso",
-      "pickerHint": "Aggiungi la stella a una clinica per aprirla a ogni accesso."
+      "savedAutomatic": "All'accesso si aprirà l'ultima clinica usata"
     },
     "notifications": {
       "title": "Notifiche",
