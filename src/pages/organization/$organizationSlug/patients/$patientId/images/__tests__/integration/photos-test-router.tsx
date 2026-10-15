@@ -66,7 +66,7 @@ export function renderPhotos(
     codes = PHOTO_CODES,
     role,
     file = patientFile(),
-    photos = { pick: () => undefined, upload: () => undefined },
+    photos = { pick: () => undefined, capture: () => undefined, upload: () => undefined },
   }: RenderPhotosOptions = {},
 ) {
   signInTestMember();

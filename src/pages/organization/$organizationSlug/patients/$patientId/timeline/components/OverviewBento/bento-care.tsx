@@ -154,6 +154,7 @@ export function VisitsBentoCard({
         emptyTitle={t(TIMELINE_KEYS.visits.empty)}
         section="visits"
         testId={testId}
+        emptyAction={onBook ? { label: t(TIMELINE_KEYS.visits.book), run: onBook } : null}
       />
     </BentoCard>
   );
@@ -294,6 +295,7 @@ export function PrescriptionsBentoCard({ onOpen, onNew }: NewCardLinks) {
         label={title}
         emptyTitle={t(TIMELINE_KEYS.prescriptions.empty)}
         section="prescriptions"
+        emptyAction={onNew}
         testId={testId}
       />
     </BentoCard>
@@ -350,6 +352,7 @@ export function TreatmentsBentoCard({
         label={title}
         emptyTitle={t(TIMELINE_KEYS.treatments.empty)}
         section="treatments"
+        emptyAction={onNew}
         testId={testId}
       />
     </BentoCard>

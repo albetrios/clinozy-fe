@@ -63,6 +63,66 @@ export const PATIENT_PHOTOS_KEYS = {
   notImages: 'photos.notImages',
   /** "2 photos uploaded to General" (plural). */
   uploaded: 'photos.uploaded',
+  /** The upload strip, the empty album's drop zone and the drag veil (change-patient-overview-photos). */
+  dropzone: {
+    title: 'photos.dropzone.title',
+    body: 'photos.dropzone.body',
+    /** "Adds to General". */
+    target: 'photos.dropzone.target',
+    choose: 'photos.dropzone.choose',
+    camera: 'photos.dropzone.camera',
+    /** "Drop to add to General". */
+    veil: 'photos.dropzone.veil',
+  },
+  /** Selecting photos to compare. */
+  select: {
+    start: 'photos.select.start',
+    done: 'photos.select.done',
+    startHint: 'photos.select.startHint',
+    /** "Select IMG_5100" — a tile's check circle. */
+    toggle: 'photos.select.toggle',
+    /** "3 selected" (plural). */
+    count: 'photos.select.count',
+    hint: 'photos.select.hint',
+    /** "You can compare up to 8 photos at a time". */
+    limit: 'photos.select.limit',
+    clear: 'photos.select.clear',
+    compare: 'photos.select.compare',
+    /** The selection bar's name. */
+    bar: 'photos.select.bar',
+  },
+  /** The comparison (`?compare=`). */
+  compare: {
+    title: 'photos.compare.title',
+    layout: 'photos.compare.layout',
+    row: 'photos.compare.row',
+    grid: 'photos.compare.grid',
+    /** Linked ↔ Separate — the radios' group name. */
+    zoomMode: 'photos.compare.zoomMode',
+    linked: 'photos.compare.linked',
+    linkedHint: 'photos.compare.linkedHint',
+    separate: 'photos.compare.separate',
+    separateHint: 'photos.compare.separateHint',
+    /** Separate: every photo back to 100%. */
+    resetAll: 'photos.compare.resetAll',
+    resetAllHint: 'photos.compare.resetAllHint',
+    /** "Zoom of IMG_5100" — a panel's own zoom group (Separate). */
+    zoomOf: 'photos.compare.zoomOf',
+    /** "Remove IMG_5100 from the comparison". */
+    remove: 'photos.compare.remove',
+    /** The first photo's mark. */
+    start: 'photos.compare.start',
+    /** "+21 days" (plural) — from the first photo. */
+    since: 'photos.compare.since',
+    close: 'photos.compare.close',
+    hints: {
+      zoom: 'photos.compare.hints.zoom',
+      pan: 'photos.compare.hints.pan',
+      /** Separate's hints. */
+      zoomEach: 'photos.compare.hints.zoomEach',
+      panEach: 'photos.compare.hints.panEach',
+    },
+  },
   delete: {
     title: 'photos.delete.title',
     reasons: {
