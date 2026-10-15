@@ -8,7 +8,7 @@
 | Opened | 2026-10-15 |
 | Branch | feat/plan-comparison |
 | Baseline | none |
-| Status | done |
+| Status | frozen |
 | Summary | Billing reads like Claude's: the plan on one line with a single "Adjust plan" button, a notice that says when the plan renews or ends (with "Resubscribe" beside it), then payment and invoices — nothing else to scan. |
 | Drop placed | 2026-10-15 |
 | Drop source | /tmp/claude-0/-home-user/828e7c03-e192-547d-a530-023392c2f708/scratchpad/brief-v3/BRIEF.md |
@@ -23,3 +23,4 @@
 - 2026-10-15 · ready-for-approval → approved · — · Claude
 - 2026-10-15 · approved → implementing · — · Claude
 - 2026-10-15 · implementing → done · — · Claude
+- 2026-10-15 · done → frozen · — · Claude
