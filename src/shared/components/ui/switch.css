@@ -1,8 +1,18 @@
-/* The switch's thumb travels on the strong ease-out (change-motion-polish):
-   200ms instead of the utility's default curve. Plain CSS outside a layer, so
-   it times the thumb's `transition-transform`. Ships with the switch's lazy
-   chunk; the reduced-motion rule (`src/index.css`, end) lands it at once. */
+/* The switch's motion (change-motion-polish; change-motion-consistency): the
+   thumb travels — 200ms on the strong ease-in-out, the curve for movement on
+   screen — and the track's colour fades on `ease`. Plain CSS outside a layer,
+   so it times the thumb's `transition-transform`. Ships with the switch's
+   lazy chunk. Reduced motion: the thumb lands at once (the global rule), the
+   track's colour still fades over 160ms — gentler, not zero. */
 [data-slot='switch-thumb'] {
   transition-duration: 200ms;
-  transition-timing-function: var(--ease-out-strong);
+  transition-timing-function: var(--ease-in-out-strong);
+}
+[data-slot='switch'] {
+  transition-timing-function: ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='switch'] {
+    transition-duration: 160ms !important;
+  }
 }

@@ -33,13 +33,13 @@ export interface RollingNumberProps {
 /**
  * A number that rolls to its next value (change-motion-polish D10): when it
  * changes, the old value leaves and the new one arrives — upward when it grew,
- * downward when it shrank — 280ms on the strong ease-out with a 2px blur
+ * downward when it shrank — 240ms on the strong ease-out with a 2px blur
  * (`rolling-number.css`), so a live count says WHICH way it moved. The first
  * paint rolls nothing, and neither does a change while {@link
  * RollingNumberProps.still}. The leaving value is drawn by CSS from
  * `data-value` — never text, so the number's text is always just its value —
- * and goes when its animation ends; under reduced motion that is at once (the
- * app's rule cuts every animation short). Both share one grid cell, clipped to
+ * and goes when its animation ends; under reduced motion the two values
+ * crossfade instead (160ms) — gentler, not zero. Both share one grid cell, clipped to
  * the line, so nothing beside the number moves.
  */
 export function RollingNumber({

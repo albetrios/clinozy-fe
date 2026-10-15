@@ -81,11 +81,11 @@ export function SearchTrigger({ className }: { className?: string }) {
   );
 }
 
-/** A slot: icon over label, above the lens; its ink fades with the lens's slide. */
+/** A slot: icon over label, above the lens; its ink fades with the lens's 240ms glide. */
 const tabSlotClassName =
-  'relative flex min-w-0 flex-col items-center justify-center transition-colors duration-300 [-webkit-tap-highlight-color:transparent]';
+  'relative flex min-w-0 flex-col items-center justify-center transition-colors duration-240 [-webkit-tap-highlight-color:transparent]';
 /**
- * Icon over label; `tab-content` is what dips to 92% while the slot is
+ * Icon over label; `tab-content` is what dips to 95% while the slot is
  * pressed (`index.css`, not under reduced motion).
  */
 const tabContentClassName = 'relative flex w-full min-w-0 flex-col items-center gap-0.5';
@@ -139,8 +139,8 @@ function TabBarItem({
 /**
  * The selection lens: one capsule behind the current slot, in its room's
  * tone. `index.css` places it from `data-lens` — a fifth of the bar per slot,
- * mirrored for right-to-left — and slides it to the next slot when the room
- * changes (320ms, the sheet curve); it fades out when no slot is current.
+ * mirrored for right-to-left — and glides it to the next slot when the room
+ * changes (240ms, the strong ease-in-out); it fades out when no slot is current.
  * Reduced motion cuts the transition, so it lands at once.
  */
 function TabBarLens({ index, tone }: { index: number | null; tone: string | null }) {

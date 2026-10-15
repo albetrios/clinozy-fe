@@ -372,24 +372,32 @@
   --font-heading: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
+  /* Easing (change-motion-consistency D7): Tailwind's own names resolve to
+     Emil Kowalski's strong curves (`:root` below), so every `ease-out` /
+     `ease-in-out` utility and every transition without its own curve follows
+     them. The built-in curves are too weak to read as intent. */
+  --ease-out: var(--ease-out-strong);
+  --ease-in-out: var(--ease-in-out-strong);
+  --default-transition-timing-function: var(--ease-out-strong);
+
   /* Animations */
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-accordion-down: accordion-down 0.2s var(--ease-out-strong);
+  --animate-accordion-up: accordion-up 0.2s var(--ease-out-strong);
   /* Subtle, professional content reveal used for page/route transitions. */
-  --animate-fade-in: fade-in 0.2s ease-out both;
-  --animate-fade-in-up: route-rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.2s var(--ease-out-strong) both;
+  --animate-fade-in-up: route-rise 0.28s var(--ease-out-strong) both;
   --animate-caret-blink: caret-blink 1.25s ease-out infinite;
   --animate-otp-shake: otp-shake 0.42s ease-in-out;
   /* Clinic motion (the design's cz* keyframes, named without digits). Declared
      inside @theme so a keyframe ships only once a component uses it. */
-  --animate-dropdown-in: dropdown-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  --animate-dropdown-up: dropdown-up 160ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-dropdown-in: dropdown-in 160ms var(--ease-out-strong) both;
+  --animate-dropdown-up: dropdown-up 160ms var(--ease-out-strong) both;
   --animate-drawer-in: drawer-in 340ms var(--ease-sheet) both;
   --animate-backdrop-in: backdrop-in 340ms var(--ease-sheet) both;
-  --animate-pop-in: pop-in 200ms ease 200ms both;
+  --animate-pop-in: pop-in 200ms var(--ease-out-strong) 200ms both;
   --animate-bulk-in: bulk-in 220ms var(--ease-sheet) both;
-  --animate-reveal: reveal 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  --animate-fade: fade-in 150ms ease both;
+  --animate-reveal: reveal 240ms var(--ease-out-strong) both;
+  --animate-fade: fade-in 150ms var(--ease-out-strong) both;
   --animate-spinner: spinner 700ms linear infinite;
   --animate-sheet-up: sheet-up 260ms var(--ease-sheet) both;
 
@@ -850,15 +858,18 @@
    comfortable at ≥ 1440 × 800, the phone column below `md`. Read them as
    `p-(--room-toolbar-pad)` and the like. They are not the Density axis
    (`--spacing`), which keeps scaling the rest of the app. */
-/* The two motion curves (change-motion-polish D6). The sheet curve: drawers,
-   sheets, the bulk bar and every selection that glides — the phone tab bar's
-   lens, the room tracks' thumb, the section bar's lens. The strong ease-out:
-   what answers a press or arrives — a pressed button, a tick, a count that
-   rolls, a refreshed list that settles. Plain properties, not @theme, so the
-   co-located stylesheets that read them always find them. */
+/* The three motion curves — Emil Kowalski's, chosen by the kind of motion
+   (change-motion-consistency; `docs/reference/design.md` §5). The strong
+   ease-out: what enters, leaves or answers a press. The strong ease-in-out:
+   what travels on screen from one resting place to another — every selection
+   that glides, the switch's thumb, the sign-in dial's thread. The sheet curve:
+   drawers, sheets, the bulk bar. A colour change alone keeps `ease`. Plain
+   properties, not @theme, so the co-located stylesheets always find them;
+   scripts read their twin, `src/lib/animations/motion-curves.ts`. */
 :root {
-  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 :root {
@@ -1540,15 +1551,15 @@
   outline-color: var(--color-border-strong);
 }
 /* The selection lens: a fifth of the bar per slot (`data-lens`), mirrored for
-   right-to-left, sliding on the sheet curve. Reduced motion cuts the
-   transition (below), so it lands at once. */
+   right-to-left, travelling like every glide — 240ms on the strong ease-in-out.
+   Reduced motion cuts the transition (below), so it lands at once. */
 [data-lens] {
   inset-block: 0.25rem;
   inset-inline-start: 0.25rem;
   width: calc(20% - 0.1rem);
   translate: calc(var(--lens, 0) * 100%);
   /* translate, the tone's crossfade and the fade-out alike. */
-  transition: 320ms var(--ease-sheet);
+  transition: 240ms var(--ease-in-out-strong);
 }
 [dir='rtl'] [data-lens] {
   translate: calc(var(--lens, 0) * -100%);
@@ -1565,13 +1576,14 @@
 [data-lens='4'] {
   --lens: 4;
 }
-/* A pressed slot's icon and label dip to 92% and spring back. */
+/* A pressed slot's icon and label dip to 95% and spring back — the press
+   every pressable has, a step deeper for a small icon target. */
 [data-slot='tab-content'] {
-  transition: scale 100ms;
+  transition: scale 160ms var(--ease-out-strong);
 }
 @media (prefers-reduced-motion: no-preference) {
   [data-slot='mobile-nav'] :active > [data-slot='tab-content'] {
-    scale: 0.92;
+    scale: 0.95;
   }
 }
 /* The phone bottom stack (clinic screens, D30), bottom to top: tab bar →

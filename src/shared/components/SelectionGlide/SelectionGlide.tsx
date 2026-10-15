@@ -79,13 +79,16 @@ function glideMode(
   return item !== state.item && !resized ? 'glide' : 'still';
 }
 
-/** The mode first, then the box: one style change, read with the mode's transition. */
+/**
+ * The mode first, then the box: one style change, read with the mode's
+ * transition. The thumb's own `translate`, `width` and `height` — set on the
+ * element directly, never through a custom property.
+ */
 function writeGlide(thumb: HTMLElement, mode: GlideMode, box: GlideBox): void {
   thumb.setAttribute('data-glide', mode);
-  thumb.style.setProperty('--glide-x', `${box.x}px`);
-  thumb.style.setProperty('--glide-y', `${box.y}px`);
-  thumb.style.setProperty('--glide-w', `${box.width}px`);
-  thumb.style.setProperty('--glide-h', `${box.height}px`);
+  thumb.style.translate = `${box.x}px ${box.y}px`;
+  thumb.style.width = `${box.width}px`;
+  thumb.style.height = `${box.height}px`;
 }
 
 /** Nothing is selected: the cover comes off and the thumb fades out (if it showed). */
@@ -183,8 +186,10 @@ export interface SelectionGlideProps {
 
 /**
  * One thumb for a row's selection (change-motion-polish D7): it sits under the
- * selected item and, when the selection moves, glides there on the sheet curve
- * (280ms) — size and colour with it — instead of the selection jumping. Render
+ * selected item and, when the selection moves, glides there — 240ms on the
+ * strong ease-in-out, the curve for movement on screen, size and colour with
+ * it, the label's ink in step (change-motion-consistency) — instead of the
+ * selection jumping. Render
  * it as the FIRST child of the row; the row must be positioned and isolated
  * (`relative isolate`), since the thumb is absolutely placed behind the items
  * (`z-index: -1`, `selection-glide.css`). While it covers an item, the item

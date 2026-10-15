@@ -21,7 +21,7 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 bg-overlay/50 fixed inset-0 z-50',
+        'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 bg-overlay/50 fixed inset-0 z-50 ease-out data-[state=closed]:duration-100',
         className,
       )}
       {...props}
@@ -49,7 +49,8 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          'bg-background data-[state=closed]:animate-out data-[state=open]:animate-in fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+          // Local change (change-motion-consistency): in over 340ms on the sheet curve, out in 200ms (was 500 / 300ms on ease-in-out).
+          'bg-background data-[state=closed]:animate-out data-[state=open]:animate-in fixed z-50 flex flex-col gap-4 shadow-lg transition ease-(--ease-sheet) data-[state=closed]:duration-200 data-[state=open]:duration-340',
           side === 'end' &&
             'data-[state=closed]:slide-out-to-end data-[state=open]:slide-in-from-end inset-y-0 end-0 h-full w-3/4 border-s sm:max-w-sm',
           side === 'start' &&

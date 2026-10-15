@@ -52,7 +52,7 @@ describe('useRefreshSettle', () => {
       [{ opacity: REFRESH_SETTLE.from }, { opacity: 1 }],
       {
         duration: REFRESH_SETTLE.duration,
-        easing: REFRESH_SETTLE.fallbackEasing,
+        easing: REFRESH_SETTLE.easing,
       },
     );
     unmount();
@@ -77,13 +77,16 @@ describe('useRefreshSettle', () => {
     unmount();
   });
 
-  it('lands at once under reduced motion', async () => {
+  it('still settles under reduced motion — opacity only, shorter (gentler, not zero)', async () => {
     vi.mocked(prefersReducedMotion).mockReturnValue(true);
     const { unmount } = renderHook(() => useRefreshSettle());
     const rows = list(true);
     rows.removeAttribute('data-refreshing');
     await flush();
-    expect(animate).not.toHaveBeenCalled();
+    expect(animate).toHaveBeenCalledWith(
+      [{ opacity: REFRESH_SETTLE.from }, { opacity: 1 }],
+      { duration: REFRESH_SETTLE.reducedDuration, easing: REFRESH_SETTLE.easing },
+    );
     unmount();
   });
 
@@ -98,18 +101,12 @@ describe('useRefreshSettle', () => {
 });
 
 describe('settleRefreshed', () => {
-  it('reads the strong ease-out the stylesheet declares', () => {
-    document.documentElement.style.setProperty(
-      '--ease-out-strong',
-      'cubic-bezier(0, 0, 1, 1)',
-    );
-    const rows = list(false);
-    settleRefreshed(rows);
+  it('settles on the strong ease-out, the twin of --ease-out-strong', () => {
+    settleRefreshed(list(false));
     expect(animate).toHaveBeenCalledWith(expect.any(Array), {
       duration: REFRESH_SETTLE.duration,
-      easing: 'cubic-bezier(0, 0, 1, 1)',
+      easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
     });
-    document.documentElement.style.removeProperty('--ease-out-strong');
   });
 
   it('does nothing without Web Animations', () => {

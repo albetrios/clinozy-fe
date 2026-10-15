@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -64,13 +64,23 @@ const ANIMATABLE = new Set([
 describe('the motion curves (src/index.css)', () => {
   const index = read('src/index.css');
 
-  it('names the sheet curve and the strong ease-out on :root', () => {
-    expect(index).toContain('--ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);');
+  it('names the three curves on :root — strong ease-out, strong ease-in-out, sheet', () => {
     expect(index).toContain('--ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);');
+    expect(index).toContain('--ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);');
+    expect(index).toContain('--ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);');
   });
 
-  it('spells the sheet curve once — its users read the name', () => {
-    expect(index.match(/cubic-bezier\(0\.32, 0\.72, 0, 1\)/g)).toHaveLength(1);
+  it("points Tailwind's own easings and the default transition curve at the strong curves", () => {
+    expect(index).toContain('--ease-out: var(--ease-out-strong);');
+    expect(index).toContain('--ease-in-out: var(--ease-in-out-strong);');
+    expect(index).toContain(
+      '--default-transition-timing-function: var(--ease-out-strong);',
+    );
+  });
+
+  it('spells each curve once — the route-progress sweep is the only other literal', () => {
+    expect(index.match(/cubic-bezier\(/g)).toHaveLength(4);
+    expect(index).toContain('route-progress 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite');
     for (const animation of [
       'drawer-in 340ms',
       'backdrop-in 340ms',
@@ -79,6 +89,21 @@ describe('the motion curves (src/index.css)', () => {
     ]) {
       expect(index).toContain(`${animation} var(--ease-sheet) both`);
     }
+    for (const animation of [
+      'accordion-down 0.2s',
+      'fade-in 0.2s',
+      'route-rise 0.28s',
+      'dropdown-in 160ms',
+      'dropdown-up 160ms',
+      'reveal 240ms',
+      'fade-in 150ms',
+    ]) {
+      expect(index).toContain(`${animation} var(--ease-out-strong)`);
+    }
+  });
+
+  it('glides the phone lens like every glide: 240ms on the strong ease-in-out', () => {
+    expect(index).toContain('transition: 240ms var(--ease-in-out-strong);');
   });
 
   it('keeps the new motion out of the first-paint stylesheet', () => {
@@ -93,6 +118,46 @@ describe('the motion curves (src/index.css)', () => {
   });
 });
 
+describe('the selection glide (selection-glide.css)', () => {
+  const rules = read('src/shared/components/SelectionGlide/selection-glide.css');
+
+  it('travels on the strong ease-in-out, 240ms — size with it', () => {
+    for (const property of ['translate', 'width', 'height']) {
+      expect(rules).toContain(`${property} 240ms var(--ease-in-out-strong)`);
+    }
+  });
+
+  it("darkens the selected label on the thumb's own curve, so the two arrive together", () => {
+    expect(rules).toContain('transition: color 240ms var(--ease-in-out-strong);');
+  });
+});
+
+describe('the app source', () => {
+  const files = (dir: string): string[] =>
+    readdirSync(join(root, dir), { withFileTypes: true }).flatMap((entry) => {
+      const path = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) return files(path);
+      return /\.(css|tsx?)$/.test(entry.name) && !/\.test\.tsx?$/.test(entry.name)
+        ? [path]
+        : [];
+    });
+  const sources = files('src').filter(
+    (path) => path !== 'src/index.css' && path !== 'src/lib/animations/motion-curves.ts',
+  );
+
+  it('writes no curve of its own — it names one of the three', () => {
+    const literal = sources.filter((path) => read(path).includes('cubic-bezier('));
+    expect(literal).toEqual([]);
+  });
+
+  it('never transitions `all`', () => {
+    const all = sources.filter((path) =>
+      /\btransition-all\b|transition:\s*all\b/.test(read(path)),
+    );
+    expect(all).toEqual([]);
+  });
+});
+
 describe.each(STYLESHEETS)('$css', ({ css, importer, declares }) => {
   const rules = read(css);
 
@@ -101,16 +166,28 @@ describe.each(STYLESHEETS)('$css', ({ css, importer, declares }) => {
     expect(readFileSync(join(root, importer), 'utf8')).toContain(`import './${file}';`);
   });
 
-  it('moves on the two named curves only (colour fades may ease)', () => {
+  it('moves on the three named curves only (colour fades may ease)', () => {
     expect(rules).not.toMatch(/cubic-bezier\(/);
     const curves = [...rules.matchAll(/\b(\d+)ms\s+(var\(--[\w-]+\)|[\w-]+)/g)].map(
       (match) => match[2],
     );
     for (const curve of curves) {
-      expect(['var(--ease-sheet)', 'var(--ease-out-strong)', 'ease', 'both']).toContain(
-        curve,
-      );
+      expect([
+        'var(--ease-out-strong)',
+        'var(--ease-in-out-strong)',
+        'var(--ease-sheet)',
+        'ease',
+        'both',
+      ]).toContain(curve);
     }
+  });
+
+  it('under reduced motion, keeps only fades — opacity or colour, 160ms', () => {
+    const at = rules.indexOf('@media (prefers-reduced-motion: reduce)');
+    expect(at).toBeGreaterThan(-1);
+    const block = rules.slice(at);
+    expect(block).toContain('160ms');
+    expect(block).not.toMatch(/\b(translate|scale):/);
   });
 
   it('keeps every element under 300ms', () => {

@@ -59,12 +59,13 @@ function thumb(): HTMLElement {
 
 function placement() {
   const { style } = thumb();
+  const [x = '', y = ''] = style.translate.split(' ');
   return {
     mode: thumb().getAttribute('data-glide'),
-    x: style.getPropertyValue('--glide-x'),
-    y: style.getPropertyValue('--glide-y'),
-    width: style.getPropertyValue('--glide-w'),
-    height: style.getPropertyValue('--glide-h'),
+    x,
+    y,
+    width: style.width,
+    height: style.height,
   };
 }
 

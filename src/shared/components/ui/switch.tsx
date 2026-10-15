@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils.ts';
 /**
  * Local change to the shadcn switch (re-apply after a shadcn refresh): the
  * track animates its colour and focus ring, not `all`; the thumb travels 200ms
- * on the strong ease-out (`switch.css`, change-motion-polish).
+ * on the strong ease-in-out (`switch.css`, change-motion-consistency).
  */
 function Switch({
   className,

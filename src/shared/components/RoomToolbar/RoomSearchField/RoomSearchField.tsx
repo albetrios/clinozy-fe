@@ -70,7 +70,7 @@ export function RoomSearchField({
         'focus-within:border-disabled focus-within:ring-ring/50 focus-within:ring-[3px]',
         toolbar
           ? cn(
-              '[transition:flex-basis_220ms_cubic-bezier(.2,.8,.2,1),max-width_220ms_cubic-bezier(.2,.8,.2,1),min-width_220ms_cubic-bezier(.2,.8,.2,1),background-color_120ms_ease]',
+              '[transition:flex-basis_220ms_var(--ease-out-strong),max-width_220ms_var(--ease-out-strong),min-width_220ms_var(--ease-out-strong),background-color_120ms_ease]',
               'md:h-9 md:max-w-55 md:min-w-37.5 md:flex-[0_1_200px] md:px-2.5',
               width === 'wide' && 'md:max-w-none md:flex-[0_1_220px]',
             )

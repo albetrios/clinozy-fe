@@ -1,54 +1,67 @@
-/* The selection glide (`SelectionGlide`, change-motion-polish D7): one thumb
-   behind a row's items, under the selected one. Its box comes from the
-   component as four properties; it is anchored at the row's inline start, so
-   right-to-left rows are measured from their right edge. Behind the items:
-   the row is `relative isolate`, so -1 still paints above the row's own fill.
+/* The selection glide (`SelectionGlide`, change-motion-polish D7; retuned by
+   change-motion-consistency): one thumb behind a row's items, under the
+   selected one. The component places it with its own `translate`, `width`
+   and `height`, anchored at the row's inline start (right-to-left rows are
+   measured from their right edge). Behind the items: the row is
+   `relative isolate`, so -1 still paints above the row's own fill.
 
    Shipped with the lazy chunks that render a glide, never the first paint
    (the initial stylesheet is a ratchet, `pnpm size`). Plain CSS outside a
    layer: the covered item's own fill and shadow step aside over its utilities.
 
-   Modes (`data-glide`): none yet — hidden; `still` — placed at once; `glide`
-   — slides there on the sheet curve, its size with it; `appear` — fades in
-   where it lands; `gone` — fades out. Its colour crossfades in every mode.
-   The reduced-motion rule (`src/index.css`, end) lands every one at once. */
+   It travels like every glide in the app — 240ms on the strong ease-in-out,
+   the curve for movement on screen (`docs/reference/design.md` §5). Modes
+   (`data-glide`): none yet — hidden; `still` — placed at once; `glide` —
+   travels there, its size with it; `appear` — fades in where it lands;
+   `gone` — fades out. Its colour always crossfades: a row's tone may change a
+   render before its selection moves (the section bar's room, then the link). */
 [data-slot='selection-glide'] {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
   z-index: -1;
-  width: var(--glide-w, 0);
-  height: var(--glide-h, 0);
-  translate: var(--glide-x, 0) var(--glide-y, 0);
   opacity: 0;
-  /* Its colour always crossfades: a row's tone may change a render before
-     its selection moves (the section bar's room, then the link). */
-  transition: background-color 280ms var(--ease-sheet);
+  transition: background-color 240ms ease;
 }
 [data-slot='selection-glide'][data-glide] {
   opacity: 1;
 }
 [data-slot='selection-glide'][data-glide='glide'] {
   transition:
-    translate 280ms var(--ease-sheet),
-    width 280ms var(--ease-sheet),
-    height 280ms var(--ease-sheet),
-    background-color 280ms var(--ease-sheet);
+    translate 240ms var(--ease-in-out-strong),
+    width 240ms var(--ease-in-out-strong),
+    height 240ms var(--ease-in-out-strong),
+    background-color 240ms ease;
 }
 [data-slot='selection-glide'][data-glide='appear'] {
   transition:
-    opacity 200ms var(--ease-out-strong),
-    background-color 280ms var(--ease-sheet);
+    opacity 160ms var(--ease-out-strong),
+    background-color 240ms ease;
 }
 [data-slot='selection-glide'][data-glide='gone'] {
   opacity: 0;
-  transition: opacity 160ms var(--ease-out-strong);
+  transition: opacity 100ms var(--ease-out-strong);
 }
-/* The covered item's own fill and shadow step aside — never a focus ring,
-   which stock shadcn draws as a box-shadow too. */
+
+/* The covered item — the selected one — lets the thumb be its fill and
+   shadow (never a focus ring, which stock shadcn draws as a box-shadow too),
+   and its ink follows the thumb: the label darkens on the thumb's own curve,
+   arriving with it. The label it leaves fades on its own, faster (an exit). */
 [data-glide-covered] {
   background-color: transparent;
+  transition: color 240ms var(--ease-in-out-strong);
 }
 [data-glide-covered]:not(:focus-visible) {
   box-shadow: none;
+}
+
+/* Reduced motion: the thumb lands at once (no travel), but its tone and the
+   label's ink still fade — gentler, not zero. Beats the global reduce rule. */
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='selection-glide'] {
+    transition: background-color 160ms ease !important;
+  }
+  [data-glide-covered] {
+    transition: color 160ms ease !important;
+  }
 }
