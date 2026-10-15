@@ -56,7 +56,7 @@ Esc goes back to the list when no surface above takes it
 (`hooks/useEscapeBack/`). A patient that is gone toasts "Patient not found · it may have been
 deleted" and goes back to the list; another failure keeps the screen and toasts Retry.
 
-The layout also renders the photo picker once and hands the photo uploads down the context
+The layout also renders the photo picker and the camera input once and hands the photo uploads down the context
 (`shared/hooks/usePatientPhotoUpload/`): Photos' drop and "Upload images" and the Add menu's
 "Photo" (General, then Photos) go through the shared upload tray — "2 photos uploaded to
 General" once the last of a batch is filed.
@@ -107,7 +107,9 @@ one loader for the whole file.
 | `shared/patient-file-nav.ts`             | Section tones, icons and groups; the tab strip; pin toggling; the section a URL shows.                                                                                                                                |
 | `shared/patient-file.constants.ts`       | `PATIENT_FILE_NS` / `PATIENT_FILE_KEYS` — the section names.                                                                                                                                                          |
 | `shared/hooks/usePatientFileActions/`    | The Add-to-record items the member may use and what each runs (Invoice and Payment on `payment:create`; "Nothing due" from the server's due); each section's primary item.                                            |
-| `shared/hooks/usePatientPhotoUpload/`    | The photo uploads and the hidden picker: drop, "Upload images", the Add menu's "Photo".                                                                                                                               |
+| `shared/hooks/usePatientPhotoUpload/`    | The photo uploads and the hidden picker and camera: drop, paste, "Upload images", the strip, "Take photo", the Add menu's "Photo".                                                                                    |
+| `shared/hooks/usePhotoDrop/`             | Files dragged over a photo drop target — Photos and the Overview's Photos card.                                                                                                                                       |
+| `shared/hooks/usePhotoPaste/`            | Images pasted while Photos or the Overview is on screen (not in a field, not under a dialog).                                                                                                                         |
 | `shared/patient-photos.constants.ts`     | `PATIENT_PHOTOS_NS` / `PATIENT_PHOTOS_KEYS` — Photos, the viewer and Photo details.                                                                                                                                   |
 | `shared/components/PatientAddMenu/`      | The Add-to-record menu ("+" and a section's "⌄").                                                                                                                                                                     |
 | `shared/components/PatientSection/`      | The section frame every child renders.                                                                                                                                                                                |

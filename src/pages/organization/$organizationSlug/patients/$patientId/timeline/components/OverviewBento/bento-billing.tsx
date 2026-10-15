@@ -232,6 +232,7 @@ export function BillingBentoCard({
         label={title}
         emptyTitle={t(K.empty)}
         section="invoices"
+        emptyAction={onNew}
         testId={testId}
       />
     </BentoCard>

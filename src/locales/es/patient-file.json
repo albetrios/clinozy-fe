@@ -252,6 +252,54 @@
     "stages": {
       "before": "Antes",
       "after": "Después"
+    },
+    "dropzone": {
+      "title": "Suelta las fotos aquí",
+      "body": "o pega una imagen copiada · JPG o PNG de hasta 10 MB",
+      "target": "Se añade a {{album}}",
+      "choose": "Elegir fotos",
+      "camera": "Hacer foto",
+      "veil": "Suelta para añadir a {{album}}"
+    },
+    "select": {
+      "start": "Seleccionar",
+      "done": "Listo",
+      "startHint": "Selecciona fotos para comparar",
+      "toggle": "Seleccionar {{name}}",
+      "hint": "Elige de 2 a 8 fotos para comparar",
+      "limit": "Puedes comparar hasta {{max}} fotos a la vez",
+      "clear": "Borrar",
+      "compare": "Comparar",
+      "bar": "Fotos seleccionadas",
+      "count_one": "{{count}} seleccionada",
+      "count_many": "{{count}} seleccionadas",
+      "count_other": "{{count}} seleccionadas"
+    },
+    "compare": {
+      "title": "Comparar fotos",
+      "layout": "Disposición",
+      "row": "Una fila",
+      "grid": "Cuadrícula",
+      "zoomMode": "Zoom y posición",
+      "linked": "Vinculadas",
+      "linkedHint": "Todas las fotos siguen el mismo zoom y posición",
+      "separate": "Por separado",
+      "separateHint": "Amplía y coloca cada foto por su cuenta",
+      "resetAll": "Restablecer todo",
+      "resetAllHint": "Todas las fotos de vuelta al 100 % (0)",
+      "zoomOf": "Zoom de {{name}}",
+      "remove": "Quitar {{name}} de la comparación",
+      "start": "Inicio",
+      "close": "Cerrar comparación",
+      "since_one": "+{{count}} día",
+      "since_many": "+{{count}} días",
+      "since_other": "+{{count}} días",
+      "hints": {
+        "zoom": "Desplaza o pellizca para ampliar todas las fotos",
+        "pan": "Arrastra para moverlas juntas · doble clic para restablecer",
+        "zoomEach": "Desplaza o pellizca sobre una foto para ampliar solo esa",
+        "panEach": "Arrastra una foto para colocarla · doble clic para restablecerla"
+      }
     }
   },
   "rx": {
@@ -944,7 +992,10 @@
     },
     "photos": {
       "upload": "Subir",
-      "empty": "Aún no hay fotos · sube la primera"
+      "empty": "Aún no hay fotos · sube la primera",
+      "add": "Añadir fotos",
+      "drop": "Suelta las fotos aquí o haz clic para subirlas",
+      "dropBody": "JPG o PNG de hasta 10 MB · también puedes pegar"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",
