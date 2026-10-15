@@ -264,7 +264,8 @@ export function RxMedicineCell({
           title={words || undefined}
           data-testid={row.testId}
           data-source={source}
-          className="pe-2"
+          // 44px on touch, like the line's segments and stepper (change-prescription-touch-picker D3).
+          className="pe-2 pointer-coarse:min-h-11"
         >
           {line.medicineName ? (
             <>

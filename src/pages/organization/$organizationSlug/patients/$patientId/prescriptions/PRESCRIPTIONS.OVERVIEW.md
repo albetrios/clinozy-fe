@@ -28,12 +28,13 @@ the Patients room's row action (feat-prescription-composer).
   Remove and Keep — no dialog. A save with a warning not yet answered opens Medicines, brings the warning into view
   and focuses Keep (change-prescription-writing D7); Keep is one tap, it never blocks.
 
-## The medicine rows (change-prescription-writing, change-prescription-one-click, change-prescription-compact-line)
+## The medicine rows (change-prescription-writing, change-prescription-one-click, change-prescription-compact-line, change-prescription-touch-picker)
 
 - **Store or outside** (`components/PrescriptionDrawer/rx-medicine-cell.tsx`): the trigger names the medicine and its
   source — the store's stock (sage), out of stock (blush), or Outside (slate, a name written as text, `medicine_id`
   none). The list groups "In your medical store" and "Outside medicines"; a new name is an outside medicine; the
-  list's footer switches the line store ↔ outside.
+  list's footer switches the line store ↔ outside. On a touch screen the picker is 44px high, like the line's
+  segments and quantity stepper (change-prescription-touch-picker); the shared picker keeps its sizes elsewhere.
 - **The compact line, one click, no dropdown** (change-prescription-compact-line;
   `components/PrescriptionDrawer/rx-item-cells.tsx`): every everyday choice is a small segment on a tray (a `muted`
   track, the lit segment in its tone and raised — 24px with a mouse, 44px high on touch); a second click clears it.

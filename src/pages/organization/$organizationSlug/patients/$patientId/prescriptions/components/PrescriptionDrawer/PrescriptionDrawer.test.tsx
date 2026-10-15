@@ -712,6 +712,18 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     );
   });
 
+  it('grows the medicine picker to 44px on touch only (change-prescription-touch-picker D3)', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran bd');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    // 32px with a mouse, the shared small trigger; 44px on a coarse pointer, set by this line alone.
+    expect(within(row).getByTestId('rx-items-medicine')).toHaveClass(
+      'min-h-8',
+      'pointer-coarse:min-h-11',
+    );
+  });
+
   it('folds Days under the medicine where the table is narrow', async () => {
     rxWorld.medicines = [SEPTRAN];
     tableWidth.value = 640;
