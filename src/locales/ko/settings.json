@@ -215,6 +215,8 @@
       "description": "계정 정보와 되돌릴 수 없는 작업.",
       "infoTitle": "계정 정보",
       "infoDescription": "계정에 대한 세부 정보.",
+      "signInClinicTitle": "로그인 시 클리닉",
+      "signInClinicDescription": "로그인할 때 열릴 클리닉을 선택하세요. 모든 기기에 적용됩니다.",
       "accountIdLabel": "계정 ID",
       "emailLabel": "이메일",
       "roleLabel": "역할",

@@ -216,6 +216,8 @@
       "description": "Kontodaten und unwiderrufliche Aktionen.",
       "infoTitle": "Kontoinformationen",
       "infoDescription": "Details zu Ihrem Konto.",
+      "signInClinicTitle": "Klinik bei der Anmeldung",
+      "signInClinicDescription": "Wähle, welche Klinik sich beim Anmelden öffnet. Das gilt auf jedem Gerät.",
       "accountIdLabel": "Konto-ID",
       "emailLabel": "E-Mail",
       "roleLabel": "Rolle",

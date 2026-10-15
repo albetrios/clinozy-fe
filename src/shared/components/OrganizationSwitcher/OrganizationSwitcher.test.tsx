@@ -62,6 +62,16 @@ vi.mock('@/shared/tenancy/my-organization-summaries.ts', async (importOriginal) 
 vi.mock('@/shared/tenancy/my-invitations.ts', () => ({
   useMyInvitations: useMyInvitationsMock,
 }));
+// The clinic pinned to open at sign-in (feat-choose-default-clinic): none unless a test pins one.
+const signInClinic = vi.hoisted(() => ({ pinnedId: null as string | null }));
+vi.mock('@/shared/hooks/useSignInClinic/index.ts', () => ({
+  useSignInClinic: () => ({
+    clinics: [],
+    pinnedId: signInClinic.pinnedId,
+    canChoose: false,
+    choose: () => undefined,
+  }),
+}));
 vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: useMeContextMock,
   meContextQueryKey: ['auth', 'me-context'],
@@ -119,6 +129,7 @@ beforeEach(() => {
   useMeContextMock.mockReturnValue({ data: CTX, isLoading: false });
   useMyOrganizationSummariesMock.mockReturnValue({ data: ORGS, isPending: false });
   useMyInvitationsMock.mockReturnValue({ data: [] });
+  signInClinic.pinnedId = null;
 });
 
 const INVITATION: MyInvitation = {
@@ -187,6 +198,20 @@ describe('OrganizationSwitcher', () => {
       await screen.findByTestId('organization-switcher-option-personal'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('organization-switcher-create')).toBeInTheDocument();
+  });
+
+  it('labels the clinic pinned to open at sign-in "Default", and only that one', async () => {
+    signInClinic.pinnedId = ACME.id;
+    const user = userEvent.setup();
+    renderWithProviders(<OrganizationSwitcher />);
+    await user.click(await screen.findByTestId('organization-switcher-trigger'));
+
+    expect(
+      await screen.findByTestId('organization-switcher-option-default-acme'),
+    ).toHaveTextContent('Default');
+    expect(
+      screen.queryByTestId('organization-switcher-option-default-personal'),
+    ).not.toBeInTheDocument();
   });
 
   it('lists team organizations without a personal section in team-only mode', async () => {
