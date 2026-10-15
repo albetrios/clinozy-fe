@@ -23,7 +23,16 @@
       "addOrganization": "Ajouter une organisation",
       "invited": "Invitations",
       "invitedRow": "Invité · {{roles}}",
-      "invitationCount": "Invitations : {{count}}"
+      "invitationCount": "Invitations : {{count}}",
+      "defaultBadge": "Par défaut"
+    },
+    "signInClinic": {
+      "menuLabel": "S'ouvre à la connexion",
+      "lastUsed": "Dernière utilisée",
+      "automatic": "La dernière clinique utilisée",
+      "automaticHint": "Suit vos passages d'une clinique à l'autre",
+      "savedClinic": "La connexion ouvrira {{name}}",
+      "savedAutomatic": "La connexion ouvrira la dernière clinique utilisée"
     },
     "notifications": {
       "title": "Notifications",

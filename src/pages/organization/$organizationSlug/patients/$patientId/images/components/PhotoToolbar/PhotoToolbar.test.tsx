@@ -107,4 +107,26 @@ describe('PhotoToolbar', () => {
     expect(screen.queryByText(/^\d+ photos?$/)).not.toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'General' })).toBeInTheDocument();
   });
+
+  it('offers Select, and Done while selecting', async () => {
+    const user = userEvent.setup();
+    const onSelectingChange = vi.fn();
+    const { unmount } = renderToolbar({ onSelectingChange });
+    const toggle = await screen.findByTestId('patient-photos-select');
+    expect(toggle).toHaveTextContent('Select');
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await user.click(toggle);
+    expect(onSelectingChange).toHaveBeenCalledWith(true);
+    unmount();
+    renderToolbar({ selecting: true, onSelectingChange });
+    expect(await screen.findByTestId('patient-photos-select')).toHaveTextContent('Done');
+    await user.click(screen.getByTestId('patient-photos-select'));
+    expect(onSelectingChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it('offers no Select without photos to pick', async () => {
+    renderToolbar();
+    await screen.findByRole('radio', { name: 'Medium thumbnails' });
+    expect(screen.queryByTestId('patient-photos-select')).not.toBeInTheDocument();
+  });
 });

@@ -1,5 +1,5 @@
 import { Dialog as DialogPrimitive } from 'radix-ui';
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef } from 'react';
+import { type CSSProperties, type KeyboardEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -22,7 +22,11 @@ import {
   PATIENT_PHOTOS_KEYS,
   PATIENT_PHOTOS_NS,
 } from '../../../../shared/patient-photos.constants.ts';
-import { usePhotoZoom } from '../../hooks/usePhotoZoom/index.ts';
+import {
+  PhotoRoundButton,
+  PhotoZoomGroup,
+} from '../../../shared/components/PhotoChrome/index.ts';
+import { usePhotoZoom } from '../../../shared/hooks/usePhotoZoom/index.ts';
 import { PHOTO_VIEWER_TEST_IDS } from './photo-viewer.constants.ts';
 
 const K = PATIENT_PHOTOS_KEYS.viewer;
@@ -45,95 +49,6 @@ export interface PhotoViewerProps {
   onEdit?: () => void;
   /** Delete — hidden without `patient:update`. */
   onDelete?: () => void;
-}
-
-/** A 40px round control on the dark chrome (H:2683–2684). */
-function RoundButton({
-  label,
-  hint,
-  onClick,
-  danger = false,
-  testId,
-  className,
-  children,
-}: {
-  label: string;
-  hint: string;
-  onClick: () => void;
-  danger?: boolean;
-  testId: string;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      title={hint}
-      data-testid={testId}
-      data-slot="pill"
-      className={cn(
-        'bg-canvas/12 text-canvas flex size-10 flex-none items-center justify-center rounded-full transition-colors',
-        danger ? 'hover:bg-destructive' : 'hover:bg-canvas/20',
-        className,
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-/** The bar's zoom group: − · the level (it resets) · + (H:2683). Hidden on a phone. */
-function ZoomGroup({
-  level,
-  onZoomIn,
-  onZoomOut,
-  onReset,
-}: {
-  level: number;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  onReset: () => void;
-}) {
-  const { t } = useTranslation(PATIENT_PHOTOS_NS);
-  const { formatNumber } = useLocaleFormat();
-  return (
-    <fieldset
-      aria-label={t(K.zoom)}
-      className="border-canvas/20 m-0 flex h-9.5 min-w-0 flex-none items-center overflow-hidden rounded-lg border p-0 max-md:hidden"
-    >
-      <button
-        type="button"
-        onClick={onZoomOut}
-        aria-label={t(K.zoomOut)}
-        title={t(K.zoomOutHint)}
-        data-testid={PHOTO_VIEWER_TEST_IDS.zoomOut}
-        className="hover:bg-canvas/10 h-full w-9 text-base"
-      >
-        −
-      </button>
-      <button
-        type="button"
-        onClick={onReset}
-        title={t(K.zoomReset)}
-        data-testid={PHOTO_VIEWER_TEST_IDS.zoomReset}
-        className="border-canvas/20 hover:bg-canvas/10 h-full min-w-14 border-x px-2 text-xs font-semibold tabular-nums"
-      >
-        {formatNumber(level, { style: 'percent', maximumFractionDigits: 0 })}
-      </button>
-      <button
-        type="button"
-        onClick={onZoomIn}
-        aria-label={t(K.zoomIn)}
-        title={t(K.zoomInHint)}
-        data-testid={PHOTO_VIEWER_TEST_IDS.zoomIn}
-        className="hover:bg-canvas/10 h-full w-9 text-base"
-      >
-        +
-      </button>
-    </fieldset>
-  );
 }
 
 /**
@@ -166,7 +81,7 @@ export function PhotoViewer({
   const step = (by: 1 | -1) => {
     if (multi) onStep(by);
   };
-  const zoom = usePhotoZoom(photo.id, step);
+  const zoom = usePhotoZoom({ photoIds: [photo.id], onSwipe: step }).of(photo.id);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -230,24 +145,25 @@ export function PhotoViewer({
                 {t(K.position, { index: index + 1, total })}
               </span>
             )}
-            <ZoomGroup
+            <PhotoZoomGroup
               level={zoom.zoom}
               onZoomIn={zoom.zoomIn}
               onZoomOut={zoom.zoomOut}
               onReset={zoom.reset}
+              testIds={PHOTO_VIEWER_TEST_IDS}
             />
             {onEdit ? (
-              <RoundButton
+              <PhotoRoundButton
                 label={t(PATIENT_PHOTOS_KEYS.tile.edit)}
                 hint={t(PATIENT_PHOTOS_KEYS.tile.editHint)}
                 onClick={onEdit}
                 testId={PHOTO_VIEWER_TEST_IDS.edit}
               >
                 <PenLine aria-hidden="true" className="size-4" />
-              </RoundButton>
+              </PhotoRoundButton>
             ) : null}
             {onDelete ? (
-              <RoundButton
+              <PhotoRoundButton
                 label={t(PATIENT_PHOTOS_KEYS.tile.delete)}
                 hint={t(PATIENT_PHOTOS_KEYS.tile.delete)}
                 onClick={onDelete}
@@ -255,20 +171,20 @@ export function PhotoViewer({
                 testId={PHOTO_VIEWER_TEST_IDS.delete}
               >
                 <Trash aria-hidden="true" className="size-4" />
-              </RoundButton>
+              </PhotoRoundButton>
             ) : null}
-            <RoundButton
+            <PhotoRoundButton
               label={t(K.close)}
               hint={t(K.closeHint)}
               onClick={onClose}
               testId={PHOTO_VIEWER_TEST_IDS.close}
             >
               <X aria-hidden="true" className="size-5" />
-            </RoundButton>
+            </PhotoRoundButton>
           </div>
           <div className="relative z-0 min-h-0 overflow-hidden">
             {multi ? (
-              <RoundButton
+              <PhotoRoundButton
                 label={t(K.previous)}
                 hint={t(K.previousHint)}
                 onClick={() => onStep(-1)}
@@ -276,7 +192,7 @@ export function PhotoViewer({
                 className="absolute start-4 top-1/2 z-2 -translate-y-1/2"
               >
                 <ChevronLeft aria-hidden="true" className="size-4.5 rtl:-scale-x-100" />
-              </RoundButton>
+              </PhotoRoundButton>
             ) : null}
             <div
               {...zoom.stage}
@@ -311,7 +227,7 @@ export function PhotoViewer({
               </div>
             </div>
             {multi ? (
-              <RoundButton
+              <PhotoRoundButton
                 label={t(K.next)}
                 hint={t(K.nextHint)}
                 onClick={() => onStep(1)}
@@ -319,7 +235,7 @@ export function PhotoViewer({
                 className="absolute end-4 top-1/2 z-2 -translate-y-1/2"
               >
                 <ChevronRight aria-hidden="true" className="size-4.5 rtl:-scale-x-100" />
-              </RoundButton>
+              </PhotoRoundButton>
             ) : null}
           </div>
           <div className="text-disabled flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 text-xs leading-[normal]">

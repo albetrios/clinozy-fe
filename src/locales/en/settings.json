@@ -216,6 +216,8 @@
       "description": "Account metadata and irreversible actions.",
       "infoTitle": "Account information",
       "infoDescription": "Details about your account.",
+      "signInClinicTitle": "Clinic at sign-in",
+      "signInClinicDescription": "Choose which clinic opens when you sign in. It applies on every device.",
       "accountIdLabel": "Account ID",
       "emailLabel": "Email",
       "roleLabel": "Role",

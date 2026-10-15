@@ -92,7 +92,11 @@ function renderLists(
             viewable,
             masked: true,
             toggleMasked: () => undefined,
-            photos: { pick: () => undefined, upload: () => undefined },
+            photos: {
+              pick: () => undefined,
+              capture: () => undefined,
+              upload: () => undefined,
+            },
           }}
         >
           {children}

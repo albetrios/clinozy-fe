@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import type { PatientPhotoAlbum } from '@/shared/api/app/patient-images-contracts.ts';
 import { photoName } from '@/shared/api/app/patient-images-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -19,9 +21,12 @@ import { Camera, FileIcon, MessageSquare } from '@/shared/icons/index.ts';
 
 import { useTableDay } from '../../../shared/components/PatientSectionTable/index.ts';
 import { PhotoThumb } from '../../../shared/components/PhotoThumb/index.ts';
+import { usePhotoDrop } from '../../../shared/hooks/usePhotoDrop/index.ts';
+import { usePhotoPaste } from '../../../shared/hooks/usePhotoPaste/index.ts';
 import { useStaffLookup } from '../../../shared/hooks/useStaffLookup/index.ts';
 import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 import {
+  OVERVIEW_CARD_TONES,
   TIMELINE_KEYS,
   TIMELINE_NS,
   TIMELINE_TEST_IDS,
@@ -45,77 +50,148 @@ interface NewCardLinks extends CardLinks {
   onNew?: { label: string; run: () => void } | null;
 }
 
+/** The card's "Add photos" tile — the first of the thumbnails, for a member who uploads. */
+function AddPhotosTile({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation(TIMELINE_NS);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      data-testid={TIMELINE_TEST_IDS.photosAdd}
+      className="border-border-strong text-muted-foreground-strong hover:border-muted-foreground hover:bg-canvas hover:text-foreground flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed transition-colors"
+    >
+      <Camera aria-hidden="true" className="size-5" />
+      <span className="text-caption px-1 text-center leading-tight font-medium">
+        {t(TIMELINE_KEYS.photos.add)}
+      </span>
+    </button>
+  );
+}
+
+/** The empty card as one drop zone: drop, paste or click (change-patient-overview-photos `BRIEF.md:21–22`). */
+function PhotosDropZone({ onClick, testId }: { onClick: () => void; testId: string }) {
+  const { t } = useTranslation(TIMELINE_NS);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      data-testid={testId}
+      className="border-border-strong hover:border-muted-foreground hover:bg-canvas flex min-h-30 flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-6 text-center transition-colors"
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          'flex size-10 items-center justify-center rounded-xl',
+          TONE_CLASSES[OVERVIEW_CARD_TONES.photos].surface,
+        )}
+      >
+        <Camera className="size-5" />
+      </span>
+      <span className="text-body text-foreground-soft font-medium">
+        {t(TIMELINE_KEYS.photos.drop)}
+      </span>
+      <span className="text-muted-foreground text-xs">
+        {t(TIMELINE_KEYS.photos.dropBody)}
+      </span>
+    </button>
+  );
+}
+
 /**
- * Photos (two columns wide; H:772, H:4992): "Upload"; the newest eight
- * (`GET …/images`, one page) — each the photo from its `file_url` (D86), named
- * for the reader, with its album's pill, opening Photos on that album; the server's
- * count; "No photos yet · upload the first". ("Compare" is not built — its
- * mode never rendered, H:4766.)
+ * Photos (H:772, H:4992): the newest eight (`GET …/images`, one page) — each the
+ * photo from its `file_url` (D86), named for the reader, with its album's pill,
+ * opening Photos on that album — and the server's count. For a member who
+ * uploads it is an upload target too (change-patient-overview-photos): "Upload"
+ * in the head, an "Add photos" tile before the thumbnails, files dropped on the
+ * card or an image pasted on the Overview filed in General, and — with no photo
+ * yet — the card one drop zone. A reader keeps "No photos yet · upload the first".
  */
 export function PhotosBentoCard({
   onOpen,
   onUpload,
   onAlbum,
+  className,
 }: CardLinks & {
   onUpload: (() => void) | null;
   onAlbum: (album: PatientPhotoAlbum) => void;
+  className?: string;
 }) {
   const { t } = useTranslation(TIMELINE_NS);
-  const { patientId } = usePatientFileContext();
+  const { patientId, photos: uploads } = usePatientFileContext();
   // The server leaves the Private album out for a member who may not open it.
   const photos = usePatientPhotos(patientId, { limit: THUMBS });
-  const rows = photos.photos.slice(0, THUMBS);
+  const toGeneral = onUpload
+    ? (files: FileList | readonly File[]) => uploads.upload(files, 'general')
+    : null;
+  const drop = usePhotoDrop(toGeneral);
+  usePhotoPaste(toGeneral);
+  const rows = photos.photos.slice(0, onUpload ? THUMBS - 1 : THUMBS);
   const title = t(TIMELINE_KEYS.cards.photos);
   const testId = TIMELINE_TEST_IDS.card('photos');
   const read: BentoRead = { ...photos, retry: photos.refetch };
+  const emptyDropZone = onUpload && photos.isSuccess && rows.length === 0;
   return (
-    <BentoCard
-      card="photos"
-      title={title}
-      icon={Camera}
-      count={photos.total ?? undefined}
-      wide
-      actions={
-        onUpload ? (
-          <BentoButton onClick={onUpload} testId={`${testId}-upload`}>
-            {t(TIMELINE_KEYS.photos.upload)}
-          </BentoButton>
-        ) : null
-      }
-      onOpen={onOpen}
+    <div
+      {...drop.handlers}
+      data-dropping={drop.over || undefined}
+      className={cn(
+        'h-full min-w-0 rounded-xl transition-shadow',
+        drop.over && 'ring-primary ring-2',
+        className,
+      )}
     >
-      {rows.length > 0 ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2">
-          {rows.map((photo) => (
-            <button
-              key={photo.id}
-              type="button"
-              onClick={() => onAlbum(photo.album)}
-              title={photoName(photo)}
-              aria-label={photoName(photo)}
-              data-testid={`${testId}-thumb`}
-              className="bg-muted hover:border-muted-foreground relative aspect-square overflow-hidden rounded-lg border transition-colors"
-            >
-              <PhotoThumb src={photo.fileUrl} />
-              <span
-                data-slot="pill"
-                className="bg-card/90 text-tiny text-muted-foreground-strong absolute start-1 bottom-1 flex h-4.5 items-center rounded-full px-1.5 font-medium"
+      <BentoCard
+        card="photos"
+        title={title}
+        icon={Camera}
+        count={photos.total ?? undefined}
+        actions={
+          onUpload ? (
+            <BentoButton onClick={onUpload} testId={`${testId}-upload`}>
+              {t(TIMELINE_KEYS.photos.upload)}
+            </BentoButton>
+          ) : null
+        }
+        onOpen={onOpen}
+      >
+        {rows.length > 0 ? (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2">
+            {onUpload ? <AddPhotosTile onClick={onUpload} /> : null}
+            {rows.map((photo) => (
+              <button
+                key={photo.id}
+                type="button"
+                onClick={() => onAlbum(photo.album)}
+                title={photoName(photo)}
+                aria-label={photoName(photo)}
+                data-testid={`${testId}-thumb`}
+                className="bg-muted hover:border-muted-foreground relative aspect-square overflow-hidden rounded-lg border transition-colors"
               >
-                {t(TIMELINE_KEYS.photos.albums[photo.album])}
-              </span>
-            </button>
-          ))}
-        </div>
-      ) : null}
-      <BentoReadState
-        read={read}
-        empty={rows.length === 0}
-        label={title}
-        emptyTitle={t(TIMELINE_KEYS.photos.empty)}
-        section="images"
-        testId={testId}
-      />
-    </BentoCard>
+                <PhotoThumb src={photo.fileUrl} />
+                <span
+                  data-slot="pill"
+                  className="bg-card/90 text-tiny text-muted-foreground-strong absolute start-1 bottom-1 flex h-4.5 items-center rounded-full px-1.5 font-medium"
+                >
+                  {t(TIMELINE_KEYS.photos.albums[photo.album])}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {emptyDropZone ? (
+          <PhotosDropZone onClick={onUpload} testId={`${testId}-empty`} />
+        ) : (
+          <BentoReadState
+            read={read}
+            empty={rows.length === 0}
+            label={title}
+            emptyTitle={t(TIMELINE_KEYS.photos.empty)}
+            section="images"
+            testId={testId}
+          />
+        )}
+      </BentoCard>
+    </div>
   );
 }
 
@@ -162,6 +238,7 @@ export function ReportsBentoCard({ onOpen, onNew }: NewCardLinks) {
         label={title}
         emptyTitle={t(TIMELINE_KEYS.reports.empty)}
         section="reports"
+        emptyAction={onNew}
         testId={testId}
       />
     </BentoCard>
@@ -169,7 +246,7 @@ export function ReportsBentoCard({ onOpen, onNew }: NewCardLinks) {
 }
 
 /**
- * Team notes (two columns wide; H:778, H:4999; §6 #3): the person's `note`
+ * Team notes (H:778, H:4999; §6 #3): the person's `note`
  * entries on clinozy-be (`GET /app/contacts/:contact_id/activities?type=note`,
  * the newest three, the server's count) with their author and time; the
  * composer — "Write a note for the team…" and "Post", Enter posting it
@@ -200,7 +277,6 @@ export function NotesBentoCard({ onOpen, canPost }: CardLinks & { canPost: boole
       title={title}
       icon={MessageSquare}
       count={notes.total ?? undefined}
-      wide
       onOpen={onOpen}
     >
       {canPost ? (

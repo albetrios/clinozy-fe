@@ -289,7 +289,7 @@ describe('usePatientFileActions', () => {
 
   it('opens the photo picker for General, then Photos (KICKOFF §6.6 Add menu)', async () => {
     const user = userEvent.setup();
-    const photos = { pick: vi.fn(), upload: vi.fn() };
+    const photos = { pick: vi.fn(), capture: vi.fn(), upload: vi.fn() };
     const { router } = renderInPatientFile(<ActionsProbe />, {
       file: patientFile(),
       photos,

@@ -219,6 +219,8 @@
       "description": "Métadonnées du compte et actions irréversibles.",
       "infoTitle": "Informations du compte",
       "infoDescription": "Détails de votre compte.",
+      "signInClinicTitle": "Clinique à la connexion",
+      "signInClinicDescription": "Choisissez la clinique qui s'ouvre à la connexion. Le choix s'applique sur tous vos appareils.",
       "accountIdLabel": "Identifiant du compte",
       "emailLabel": "E-mail",
       "roleLabel": "Rôle",

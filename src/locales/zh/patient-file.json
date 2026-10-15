@@ -236,6 +236,50 @@
     "stages": {
       "before": "治疗前",
       "after": "治疗后"
+    },
+    "dropzone": {
+      "title": "将照片拖到这里",
+      "body": "或粘贴复制的图片 · JPG 或 PNG，最大 10 MB",
+      "target": "添加到{{album}}",
+      "choose": "选择照片",
+      "camera": "拍照",
+      "veil": "松开以添加到{{album}}"
+    },
+    "select": {
+      "start": "选择",
+      "done": "完成",
+      "startHint": "选择要对比的照片",
+      "toggle": "选择 {{name}}",
+      "hint": "选择 2 到 8 张照片进行对比",
+      "limit": "一次最多可对比 {{max}} 张照片",
+      "clear": "清除",
+      "compare": "对比",
+      "bar": "已选照片",
+      "count_other": "已选 {{count}} 张"
+    },
+    "compare": {
+      "title": "对比照片",
+      "layout": "布局",
+      "row": "一行",
+      "grid": "网格",
+      "zoomMode": "缩放与位置",
+      "linked": "联动",
+      "linkedHint": "所有照片使用相同的缩放和位置",
+      "separate": "独立",
+      "separateHint": "分别缩放和摆放每张照片",
+      "resetAll": "全部重置",
+      "resetAllHint": "所有照片恢复到 100% (0)",
+      "zoomOf": "{{name}} 的缩放",
+      "remove": "将 {{name}} 移出对比",
+      "start": "起点",
+      "close": "关闭对比",
+      "since_other": "+{{count}} 天",
+      "hints": {
+        "zoom": "滚动或双指缩放所有照片",
+        "pan": "拖动以一起移动 · 双击重置",
+        "zoomEach": "在照片上滚动或双指缩放，只缩放这一张",
+        "panEach": "拖动照片调整位置 · 双击重置"
+      }
     }
   },
   "rx": {
@@ -888,7 +932,10 @@
     },
     "photos": {
       "upload": "上传",
-      "empty": "暂无照片 · 上传第一张"
+      "empty": "暂无照片 · 上传第一张",
+      "add": "添加照片",
+      "drop": "将照片拖到这里或点击上传",
+      "dropBody": "JPG 或 PNG，最大 10 MB · 也可以粘贴"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",

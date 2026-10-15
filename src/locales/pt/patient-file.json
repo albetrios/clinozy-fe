@@ -252,6 +252,54 @@
     "stages": {
       "before": "Antes",
       "after": "Depois"
+    },
+    "dropzone": {
+      "title": "Solte as fotos aqui",
+      "body": "ou cole uma imagem copiada · JPG ou PNG até 10 MB",
+      "target": "Vão para {{album}}",
+      "choose": "Escolher fotos",
+      "camera": "Tirar foto",
+      "veil": "Solte para adicionar a {{album}}"
+    },
+    "select": {
+      "start": "Selecionar",
+      "done": "Concluído",
+      "startHint": "Selecione fotos para comparar",
+      "toggle": "Selecionar {{name}}",
+      "hint": "Escolha de 2 a 8 fotos para comparar",
+      "limit": "Pode comparar até {{max}} fotos de cada vez",
+      "clear": "Limpar",
+      "compare": "Comparar",
+      "bar": "Fotos selecionadas",
+      "count_one": "{{count}} selecionada",
+      "count_many": "{{count}} selecionadas",
+      "count_other": "{{count}} selecionadas"
+    },
+    "compare": {
+      "title": "Comparar fotos",
+      "layout": "Disposição",
+      "row": "Uma linha",
+      "grid": "Grelha",
+      "zoomMode": "Zoom e posição",
+      "linked": "Ligadas",
+      "linkedHint": "Todas as fotos seguem o mesmo zoom e posição",
+      "separate": "Separadas",
+      "separateHint": "Amplie e posicione cada foto à parte",
+      "resetAll": "Repor tudo",
+      "resetAllHint": "Todas as fotos de volta a 100% (0)",
+      "zoomOf": "Zoom de {{name}}",
+      "remove": "Remover {{name}} da comparação",
+      "start": "Início",
+      "close": "Fechar comparação",
+      "since_one": "+{{count}} dia",
+      "since_many": "+{{count}} dias",
+      "since_other": "+{{count}} dias",
+      "hints": {
+        "zoom": "Role ou belisque para ampliar todas as fotos",
+        "pan": "Arraste para movê-las juntas · duplo clique para repor",
+        "zoomEach": "Role ou belisque numa foto para ampliar só essa",
+        "panEach": "Arraste uma foto para a posicionar · duplo clique para a repor"
+      }
     }
   },
   "rx": {
@@ -946,7 +994,10 @@
     },
     "photos": {
       "upload": "Enviar",
-      "empty": "Nenhuma foto ainda · envie a primeira"
+      "empty": "Nenhuma foto ainda · envie a primeira",
+      "add": "Adicionar fotos",
+      "drop": "Solte as fotos aqui ou clique para carregar",
+      "dropBody": "JPG ou PNG até 10 MB · também pode colar"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",
