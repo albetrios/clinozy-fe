@@ -23,7 +23,16 @@
       "addOrganization": "संगठन जोड़ें",
       "invited": "आमंत्रित",
       "invitedRow": "आमंत्रित · {{roles}}",
-      "invitationCount": "आमंत्रण: {{count}}"
+      "invitationCount": "आमंत्रण: {{count}}",
+      "defaultBadge": "डिफ़ॉल्ट"
+    },
+    "signInClinic": {
+      "menuLabel": "साइन-इन पर खुलता है",
+      "lastUsed": "आख़िरी उपयोग",
+      "automatic": "जिस क्लिनिक का मैंने आख़िरी बार उपयोग किया",
+      "automaticHint": "क्लिनिक बदलने के साथ यह भी बदलता है",
+      "savedClinic": "साइन इन करने पर {{name}} खुलेगा",
+      "savedAutomatic": "साइन इन करने पर आपका आख़िरी उपयोग किया गया क्लिनिक खुलेगा"
     },
     "notifications": {
       "title": "सूचनाएँ",

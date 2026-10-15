@@ -1,5 +1,5 @@
 /**
- * clinozy-be's API (OpenAPI 9.0.1) as TypeScript types — generated, never edited.
+ * clinozy-be's API (OpenAPI 9.1.0) as TypeScript types — generated, never edited.
  *
  * Written by `pnpm api:types` (tooling/codegen/api-types.mjs) from clinozy-be's OpenAPI
  * document; `pnpm api:types:check` fails when it drifts. Read through `src/core/http/api.ts`.
@@ -33762,6 +33762,7 @@ export interface operations {
                     /** @enum {string} */
                     analytics_consent?: "granted" | "denied";
                     analytics_consent_version?: number;
+                    default_organization_id?: string | null;
                     is_dark_mode_enabled?: boolean;
                     is_notifications_enabled?: boolean;
                     language?: string;

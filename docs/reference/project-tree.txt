@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2280 src files · ~1159 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
+Stats: ~2285 src files · ~1163 tests in src/ · 91 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -363,9 +363,21 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── feat-choose-default-clinic-2026-10-15-yizz/
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── feat-clinic-setup-2026-10-13-sltd/
 │   │   ├── intake-files/
 │   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
+│   ├── feat-default-clinic-at-login-2026-10-14-cpjx/
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md
@@ -1695,9 +1707,10 @@ clinozy-fe/
 │   │   │   ├── step-up-api.ts
 │   │   │   ├── uploads-api.ts
 │   │   │   ├── user-avatar-api.ts
+│   │   │   ├── user-settings-api.ts
 │   │   │   ├── webhook-contracts.ts
 │   │   │   ├── webhooks-api.ts
-│   │   │   └── [19 test files]
+│   │   │   └── [20 test files]
 │   │   ├── app/
 │   │   │   ├── pin-directory/
 │   │   │   │   ├── data/
@@ -2434,6 +2447,10 @@ clinozy-fe/
 │   │   │   │   │   │   ├── BillingPaymentMethods.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── [1 test file]
+│   │   │   │   │   ├── SignInClinicCard/
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── SignInClinicCard.tsx
+│   │   │   │   │   │   └── [1 test file]
 │   │   │   │   │   ├── AccountBillingPanel.tsx
 │   │   │   │   │   ├── AccountNotificationsPanel.tsx
 │   │   │   │   │   ├── AccountPanel.tsx
@@ -3005,6 +3022,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSettingsNav.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useSignInClinic/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useSignInClinic.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useSpeechRecognition/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useSpeechRecognition.ts
@@ -3100,7 +3121,7 @@ clinozy-fe/
 │   │   │   │   │   ├── AccountMenu/
 │   │   │   │   │   │   ├── AccountMenu.tsx
 │   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   └── [2 test files]
+│   │   │   │   │   │   └── [3 test files]
 │   │   │   │   │   ├── AllSections/
 │   │   │   │   │   │   ├── AllSections.tsx
 │   │   │   │   │   │   ├── index.ts

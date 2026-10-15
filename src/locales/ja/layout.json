@@ -23,7 +23,16 @@
       "addOrganization": "組織を追加",
       "invited": "招待",
       "invitedRow": "招待中 · {{roles}}",
-      "invitationCount": "招待: {{count}}"
+      "invitationCount": "招待: {{count}}",
+      "defaultBadge": "既定"
+    },
+    "signInClinic": {
+      "menuLabel": "サインイン時に開く",
+      "lastUsed": "前回のクリニック",
+      "automatic": "最後に使ったクリニック",
+      "automaticHint": "クリニックを移動するたびに切り替わります",
+      "savedClinic": "サインイン時に{{name}}を開きます",
+      "savedAutomatic": "サインイン時に最後に使ったクリニックを開きます"
     },
     "notifications": {
       "title": "通知",

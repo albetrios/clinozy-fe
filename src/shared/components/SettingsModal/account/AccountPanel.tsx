@@ -24,6 +24,7 @@ import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
 import { AccountPrivacyCard } from './AccountPrivacyCard/index.ts';
+import { SignInClinicCard } from './SignInClinicCard/index.ts';
 
 /**
  * One fact about the account: the label muted at the start, the value at the
@@ -133,6 +134,8 @@ export function AccountPanel() {
           </InfoRow>
         </dl>
       </SettingsCard>
+
+      <SignInClinicCard />
 
       <AccountPrivacyCard />
 
