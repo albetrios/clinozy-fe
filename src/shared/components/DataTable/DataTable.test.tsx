@@ -817,6 +817,30 @@ describe('DataTable — j / k (Leads)', () => {
     expect(onRowClick.mock.calls[0]?.[0].original).toEqual(patient(1));
   });
 
+  it('opens the j / k row on an Enter that beats its focus frame', async () => {
+    const user = userEvent.setup();
+    const onRowClick = vi.fn();
+    render(
+      <Room
+        data={[patient(1), patient(2), patient(3)]}
+        keyboardNav
+        onRowClick={onRowClick}
+      />,
+    );
+    const rows = () => screen.getAllByTestId('patients-table-row');
+    // Hold every focus frame: the row k left keeps DOM focus, as it does for
+    // the frame between the key and the focus move.
+    const frames = vi.spyOn(window, 'requestAnimationFrame').mockReturnValue(0);
+
+    await user.keyboard('jjk');
+    expect(rows()[0]).toHaveAttribute('data-kfocus', 'true');
+    rows()[1]?.focus();
+    await user.keyboard('{Enter}');
+    frames.mockRestore();
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    expect(onRowClick.mock.calls[0]?.[0].original).toEqual(patient(1));
+  });
+
   it('ignores j and k while typing', async () => {
     const user = userEvent.setup();
     render(
