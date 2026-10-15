@@ -341,6 +341,7 @@
         "phone": "Téléphone",
         "email": "E-mail",
         "gstin": "GSTIN",
+        "reviewLink": "Lien d’avis Google",
         "days": "Jours",
         "opens": "Ouvre",
         "closes": "Ferme",
@@ -360,11 +361,13 @@
         "state": "État",
         "email": "etablissement@clinique.fr",
         "gstin": "15 caractères",
+        "reviewLink": "https://g.page/r/…/review",
         "team": "Choisir l’équipe"
       },
       "hints": {
         "colour": "identifie cet établissement partout",
         "phone": "10 chiffres",
+        "reviewLink": "envoyé quand vous demandez un avis à un patient après un paiement",
         "team": "qui travaille ici",
         "preselected": "présélectionné dans les formulaires ici",
         "addFirst": {
@@ -392,6 +395,7 @@
       "duplicate": "Un établissement nommé {{name}} existe déjà",
       "phoneInvalid": "Le téléphone doit comporter 10 chiffres",
       "emailInvalid": "Saisissez une adresse e-mail valide",
+      "reviewLinkInvalid": "Saisissez un lien qui commence par https://",
       "added": "Établissement {{name}} ajouté",
       "saved": "{{name}} enregistré",
       "contactMissing": "Ajoutez le téléphone et l’e-mail",

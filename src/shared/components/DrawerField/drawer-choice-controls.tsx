@@ -135,7 +135,7 @@ export function DrawerToggle({
       >
         <SwitchPrimitive.Thumb
           data-slot="pill"
-          className="bg-background absolute start-0.5 top-0.5 block size-4 rounded-full shadow-(--elevation-control) transition-transform duration-150 data-[state=checked]:translate-x-3.5 rtl:data-[state=checked]:-translate-x-3.5"
+          className="bg-background absolute start-0.5 top-0.5 block size-4 rounded-full shadow-(--elevation-control) transition-transform duration-200 ease-in-out data-[state=checked]:translate-x-3.5 rtl:data-[state=checked]:-translate-x-3.5"
         />
       </span>
       <span className="min-w-0">{checked ? onLabel : offLabel}</span>

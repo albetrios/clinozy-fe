@@ -339,6 +339,7 @@
         "phone": "फ़ोन",
         "email": "ईमेल",
         "gstin": "GSTIN",
+        "reviewLink": "Google रिव्यू लिंक",
         "days": "दिन",
         "opens": "खुलता है",
         "closes": "बंद होता है",
@@ -358,11 +359,13 @@
         "state": "राज्य",
         "email": "branch@clinic.com",
         "gstin": "15 अक्षर",
+        "reviewLink": "https://g.page/r/…/review",
         "team": "टीम चुनें"
       },
       "hints": {
         "colour": "इस शाखा को हर जगह पहचान देता है",
         "phone": "10 अंक",
+        "reviewLink": "भुगतान के बाद मरीज़ से रिव्यू माँगने पर भेजा जाता है",
         "team": "यहाँ कौन काम करता है",
         "preselected": "यहाँ के फ़ॉर्म में पहले से चुना हुआ",
         "addFirst": {
@@ -390,6 +393,7 @@
       "duplicate": "{{name}} नाम की शाखा पहले से मौजूद है",
       "phoneInvalid": "फ़ोन में 10 अंक होने चाहिए",
       "emailInvalid": "मान्य ईमेल पता दर्ज करें",
+      "reviewLinkInvalid": "https:// से शुरू होने वाला लिंक डालें",
       "added": "{{name}} शाखा जोड़ी गई",
       "saved": "{{name}} सहेजी गई",
       "contactMissing": "फ़ोन और ईमेल जोड़ें",

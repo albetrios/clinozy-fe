@@ -56,6 +56,8 @@ function TextField({
   span,
   stretch,
   required,
+  hint,
+  inputMode,
   testId,
 }: {
   form: UseFormReturn<BranchFormValues>;
@@ -68,13 +70,16 @@ function TextField({
     | 'city'
     | 'state'
     | 'email'
-    | 'gstNumber';
+    | 'gstNumber'
+    | 'reviewLink';
   label: string;
   placeholder: string;
   maxLength: number;
   span: 'full' | 'half' | 'third';
   stretch?: boolean;
   required?: boolean;
+  hint?: string;
+  inputMode?: 'url';
   testId: string;
 }) {
   return (
@@ -83,6 +88,7 @@ function TextField({
       stretch={stretch}
       label={label}
       htmlFor={field.id}
+      hint={hint}
       required={required}
       error={field.error}
     >
@@ -92,6 +98,7 @@ function TextField({
         aria-required={required ? 'true' : undefined}
         maxLength={maxLength}
         placeholder={placeholder}
+        inputMode={inputMode}
         autoComplete="off"
         data-testid={testId}
       />
@@ -254,7 +261,8 @@ export function BranchPlaceFields({
 
 /**
  * Step 2, "Contact & opening hours" (`users.md:187–192`): Contact — Phone*
- * ("+91", 10 digits), Email*, GSTIN (upper-cased); Opening hours — Days,
+ * ("+91", 10 digits), Email*, GSTIN (upper-cased), the Google review link (`https://`; the
+ * payment received view's review ask sends it, `feat-payment-celebration`); Opening hours — Days,
  * Opens, Closes (06:00–23:30 every 30 minutes; Closes lists only times after
  * Opens, `S:174`).
  */
@@ -338,6 +346,18 @@ export function BranchContactFields({
             )}
           />
         </DrawerField>
+        <TextField
+          form={form}
+          field={field('reviewLink')}
+          name="reviewLink"
+          label={t(K.fields.reviewLink)}
+          placeholder={t(K.placeholders.reviewLink)}
+          hint={t(K.hints.reviewLink)}
+          inputMode="url"
+          maxLength={BRANCH_LIMITS.reviewLink}
+          span="full"
+          testId={`${testId}-review-link`}
+        />
       </DrawerFieldGrid>
 
       <DrawerFieldGrid title={t(K.groups.hours)}>

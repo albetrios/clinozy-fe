@@ -64,6 +64,7 @@ export const OFFERINGS_TAB_BRANCHES: BranchOption[] = [
     opensAt: '10:00',
     closesAt: '20:00',
     workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+    reviewLink: null,
   },
   {
     id: VESU_ID,
@@ -73,6 +74,7 @@ export const OFFERINGS_TAB_BRANCHES: BranchOption[] = [
     opensAt: '10:00',
     closesAt: '20:00',
     workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+    reviewLink: null,
   },
 ];
 

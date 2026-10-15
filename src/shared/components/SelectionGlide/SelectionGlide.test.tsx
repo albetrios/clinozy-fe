@@ -51,6 +51,25 @@ function Row({ current }: { current: string | null }) {
   );
 }
 
+/** A room's tabs, drawn again by every page of the room (D13). */
+function ContinuousRow({ current }: { current: string }) {
+  return (
+    <div data-testid="track" className="relative isolate">
+      <SelectionGlide selected='[aria-current="page"]' continuity="room-tabs:test" />
+      {['agenda', 'day', 'week'].map((id) => (
+        <button
+          key={id}
+          type="button"
+          data-testid={id}
+          aria-current={id === current ? 'page' : undefined}
+        >
+          {id}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function thumb(): HTMLElement {
   const found = document.querySelector<HTMLElement>('[data-slot="selection-glide"]');
   if (!found) throw new Error('no glide');
@@ -155,5 +174,25 @@ describe('SelectionGlide', () => {
     const agenda = screen.getByTestId('agenda');
     unmount();
     expect(agenda).not.toHaveAttribute(GLIDE_COVERED_ATTRIBUTE);
+  });
+
+  it('carries a remounted track’s thumb on from where it stood, then travels (D13)', () => {
+    render(<ContinuousRow current="agenda" />).unmount();
+    render(<ContinuousRow current="week" />);
+    expect(placement()).toEqual({
+      mode: 'glide',
+      x: '126.5px',
+      y: '4px',
+      width: '60px',
+      height: '28px',
+    });
+  });
+
+  it('places a track mounted long after the last one left, without travelling', () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1_000);
+    render(<ContinuousRow current="agenda" />).unmount();
+    now.mockReturnValue(5_000);
+    render(<ContinuousRow current="week" />);
+    expect(placement().mode).toBe('still');
   });
 });

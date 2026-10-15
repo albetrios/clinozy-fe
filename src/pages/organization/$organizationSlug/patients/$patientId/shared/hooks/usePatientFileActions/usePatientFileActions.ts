@@ -1,6 +1,7 @@
 import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import { markSamePageNavigation } from '@/lib/animations/same-page-navigation.ts';
 import { organizationAppointment } from '@/lib/routes/appointments-builders.ts';
 import {
   organizationPatientSection,
@@ -135,8 +136,11 @@ export function usePatientFileActions(): PatientFileActions {
   const passes = (gate: 'prescriptions' | 'treatments') =>
     access.isResolved && passesPatientFileGate(access, gate);
 
-  const openSection = (target: PatientFileSectionSlug) => () =>
+  // Another section of the same file: the file bar, header and rail stay still (D13).
+  const openSection = (target: PatientFileSectionSlug) => () => {
+    markSamePageNavigation();
     void navigate(organizationPatientSection(organizationSlug, patientId, target));
+  };
   const go = (navigation: ReturnType<typeof appCommandNavigation>) =>
     void navigate(navigation);
 

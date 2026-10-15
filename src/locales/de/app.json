@@ -1451,5 +1451,38 @@
       "sent": "Danke – das Team hat es.",
       "error": "Die Meldung konnte nicht gesendet werden. Ihr Text ist noch da – versuchen Sie es erneut."
     }
+  },
+  "paymentReceived": {
+    "title": "Zahlung erhalten",
+    "amount": "{{amount}} erhalten",
+    "from": "von {{name}}",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "Rechnung {{invoice}} vollständig bezahlt",
+      "due": "Noch {{amount}} offen auf Rechnung {{invoice}}",
+      "advance": "Als Anzahlung verbucht",
+      "creditSettled": "{{credit}} vollständig ausgeglichen",
+      "creditLeft": "Noch {{amount}} offen auf {{credit}}"
+    },
+    "summary": "In Zahlungen gespeichert",
+    "done": "Fertig",
+    "reviews": {
+      "askTitle": "{{first}} um eine Google-Bewertung bitten",
+      "askBody": "Der Besuch ist frisch – der beste Moment zum Fragen.",
+      "send": "Per WhatsApp senden",
+      "sending": "Wird eingereiht…",
+      "queued": "In {{first}}s Chat eingereiht",
+      "failed": "Nachricht konnte nicht eingereiht werden · erneut versuchen",
+      "log": "Bewertung erfassen",
+      "noLink": "Diese Filiale hat noch keinen Google-Bewertungslink.",
+      "addLink": "Link hinzufügen",
+      "askAdmin": "Bitten Sie eine Admin-Person, ihn unter Benutzer › Filialen hinzuzufügen.",
+      "thanked": "Auf Google bewertet · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Auf Google bewertet · {{date}}",
+      "previous": "Frühere Bewertungen",
+      "all": "Alle Bewertungen ({{count}})",
+      "needsCall": "Rückruf nötig",
+      "rated": "Bewertet mit {{rating}} von 5"
+    }
   }
 }

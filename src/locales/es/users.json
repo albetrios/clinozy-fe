@@ -341,6 +341,7 @@
         "phone": "Teléfono",
         "email": "Correo electrónico",
         "gstin": "GSTIN",
+        "reviewLink": "Enlace de reseñas de Google",
         "days": "Días",
         "opens": "Abre",
         "closes": "Cierra",
@@ -360,11 +361,13 @@
         "state": "Estado o provincia",
         "email": "sucursal@clinica.com",
         "gstin": "15 caracteres",
+        "reviewLink": "https://g.page/r/…/review",
         "team": "Elige el equipo"
       },
       "hints": {
         "colour": "identifica esta sucursal en todas partes",
         "phone": "10 dígitos",
+        "reviewLink": "se envía cuando pides una reseña a un paciente tras un pago",
         "team": "quién trabaja aquí",
         "preselected": "preseleccionado en los formularios de aquí",
         "addFirst": {
@@ -392,6 +395,7 @@
       "duplicate": "Ya existe una sucursal llamada {{name}}",
       "phoneInvalid": "El teléfono necesita 10 dígitos",
       "emailInvalid": "Introduce un correo electrónico válido",
+      "reviewLinkInvalid": "Introduce un enlace que empiece por https://",
       "added": "Sucursal {{name}} añadida",
       "saved": "{{name}} guardada",
       "contactMissing": "Añade el teléfono y el correo",

@@ -118,6 +118,16 @@ import {
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
+// Payment received plays its animation through lottie-web, which jsdom cannot draw.
+vi.mock('lottie-web/build/player/lottie_light', () => ({
+  default: {
+    loadAnimation: () => ({ totalFrames: 1, goToAndStop: vi.fn(), destroy: vi.fn() }),
+  },
+}));
+vi.mock('@/shared/api/app/feedback-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPatientFeedback: vi.fn().mockResolvedValue([]),
+}));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => viewport.tier,
   readViewportTier: () => viewport.tier,
@@ -557,7 +567,7 @@ describe('InvoiceDrawer — New invoice on clinozy-be (KICKOFF §6.9)', () => {
     expect(createInvoice).not.toHaveBeenCalled();
   });
 
-  it('creates the invoice with "Full" paid now — one receipt, in rupees — "Clinic invoice #6 created"', async () => {
+  it('creates the invoice with "Full" paid now — one receipt, in rupees — then Payment received', async () => {
     const user = setUser();
     signIn();
     const { onCreated } = renderCreate({ patientId: TEST_MONEY_PATIENT_ID });
@@ -567,7 +577,20 @@ describe('InvoiceDrawer — New invoice on clinozy-be (KICKOFF §6.9)', () => {
     await user.click(screen.getByTestId('invoice-drawer-payment-fill-full'));
     expect(totals('due')).toHaveTextContent('₹0');
     await user.click(screen.getByTestId('invoice-drawer-save'));
-    await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
+    // Money from a patient turns the drawer into Payment received (feat-payment-celebration
+    // D9): "Clinic invoice #6 created" moves to its footer, and Done hands the invoice over.
+    expect(await screen.findByTestId('payment-received-amount')).toHaveTextContent(
+      '₹1,947.59 received',
+    );
+    expect(screen.getByTestId('payment-received-outcome')).toHaveTextContent(
+      'Invoice #6 paid in full',
+    );
+    expect(screen.getByTestId('invoice-drawer-summary')).toHaveTextContent(
+      'Clinic invoice #6 created',
+    );
+    expect(onCreated).not.toHaveBeenCalled();
+    await user.click(screen.getByTestId('invoice-drawer-done'));
+    expect(onCreated).toHaveBeenCalledTimes(1);
     expect(createInvoice).toHaveBeenCalledWith({
       input: expect.objectContaining({
         type: 'clinic',
@@ -590,7 +613,7 @@ describe('InvoiceDrawer — New invoice on clinozy-be (KICKOFF §6.9)', () => {
       }),
       idempotencyKey: expect.any(String),
     });
-    expect(notifyMock.success).toHaveBeenCalledWith('Clinic invoice #6 created');
+    expect(notifyMock.success).not.toHaveBeenCalled();
     expect(onCreated).toHaveBeenCalledWith(
       expect.objectContaining({ seq: 6, type: 'clinic', planLinked: 0 }),
     );

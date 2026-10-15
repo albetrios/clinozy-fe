@@ -220,7 +220,7 @@ export function AllSectionsSheet({
         data-testid="all-sections-sheet"
         data-slot="drawer-content"
         data-sections-surface
-        className="bg-card animate-sheet-up max-h-[85vh] rounded-t-2xl border-t p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] data-[vaul-drawer-direction=bottom]:max-h-[85vh] data-[vaul-drawer-direction=bottom]:rounded-t-2xl"
+        className="bg-card max-h-[85vh] rounded-t-2xl border-t p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] data-[vaul-drawer-direction=bottom]:max-h-[85vh] data-[vaul-drawer-direction=bottom]:rounded-t-2xl"
       >
         <DrawerTitle className="sr-only">{t(keys.allSections)}</DrawerTitle>
         <DrawerDescription className="sr-only">{t(keys.pinFooter)}</DrawerDescription>

@@ -58,7 +58,8 @@ export function RoleSwitchCard({
         <span
           data-slot="pill"
           className={cn(
-            'bg-background absolute start-0.5 top-0.5 size-3.5 rounded-full shadow-xs transition-transform duration-150',
+            // Travels like the shared switch's thumb: 200ms on the strong ease-in-out.
+            'bg-background absolute start-0.5 top-0.5 size-3.5 rounded-full shadow-xs transition-transform duration-200 ease-in-out',
             on && 'translate-x-3.5 rtl:-translate-x-3.5',
           )}
         />

@@ -231,6 +231,28 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   (`selection-glide.css`, `rolling-number.css`, `lane-panel.css`, `checkbox.css`,
   `switch.css`), never in `index.css` (iterations `change-motion-polish-2026-10-14-uvgh`
   and `change-motion-consistency-2026-10-15-uiya`).
+- **A payment received is a moment.** The drawer that takes money from a person — Receive
+  payment, an invoice saved with Paid now, a credit got back — turns into **Payment
+  received** (`src/shared/components/PaymentReceived/`): an original Lottie animation (a
+  disc, a check drawn in, a ripple and eight sparks in the room tones, ≈ 0.85s, the check
+  drawn by 0.5s) plays once through lottie-web's light SVG player (no `eval`), loaded on
+  demand by `LottiePlayer` and warmed when the drawer opens; its layers carry class names,
+  so `payment-received.css` paints them from tokens in every theme. The amount line takes
+  focus; every line is there from the first frame and Done works at once; reduced motion
+  shows the last frame. For a patient it then asks for a Google review — the composer's
+  Review message with the branch's link, queued in their chat, or a review logged at the
+  desk — and lists their three newest reviews (iteration
+  `feat-payment-celebration-2026-10-15-xpkw`).
+- **A room's own header stays still.** Moving between a room's tabs (they are routes) or
+  the patient file's sections is no page change: the link marks the move
+  (`markSamePageNavigation`) and `PageTransition` keeps the rise for real page changes,
+  while the tab track's thumb carries on across the remount (`SelectionGlide`'s
+  `continuity`) and travels as an in-page track does.
+- **One bottom sheet.** Every vaul sheet — All sections on a phone, a phone confirm, the
+  picker sheets — rises 28px and fades in 260ms on the sheet curve with its scrim, and
+  leaves at once; set once in `ui/drawer.tsx`, over vaul's own 500ms slide. Custom
+  toggles move their thumb like the shared switch; smooth scrolls driven by script ask
+  for reduced motion first.
 - **Tabs keep their place.** A tab drawn bolder when current keeps its bold width
   (`WeightStableLabel`), so switching tabs never moves its neighbours.
 - **Product motion.** Prefer **Anime.js** for intentional numeric or timeline

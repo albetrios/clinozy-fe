@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import {
   Controller,
   useForm,
@@ -24,6 +24,14 @@ import {
   DrawerFieldGrid,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
+import {
+  modesOf,
+  PAYMENT_RECEIVED_KEYS,
+  PAYMENT_RECEIVED_NS,
+  PaymentReceived,
+  preloadPaymentReceived,
+  type ReceivedPayment,
+} from '@/shared/components/PaymentReceived/index.ts';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
@@ -118,12 +126,15 @@ function useSettleSave({
   credit,
   owed,
   onClose,
+  onReceived,
 }: {
   form: UseFormReturn<SettleFormValues>;
   credit: CreditRow;
   /** Paise. */
   owed: number;
   onClose: () => void;
+  /** Money got back from a person: the drawer turns into Payment received (`feat-payment-celebration` D9). */
+  onReceived: (payment: ReceivedPayment) => void;
 }) {
   const { t } = useTranslation(SETTLE_CREDIT_NS);
   const formatPaise = usePaiseFormat();
@@ -163,6 +174,20 @@ function useSettleSave({
         }),
       }),
     onDone: (result) => {
+      const settlement = settlementOf({
+        values: form.getValues(),
+        direction: way,
+        fallbackBranch,
+      });
+      if (way === 'take' && credit.contactId !== null && 'splits' in settlement) {
+        onReceived(
+          receivedFromSettlement(credit, result, {
+            branchId: settlement.branchId,
+            modes: modesOf(settlement.splits),
+          }),
+        );
+        return;
+      }
       notify.success(
         t(K.done[way], {
           amount: formatRupees(result.amount),
@@ -263,6 +288,28 @@ function SettleFields({
   );
 }
 
+/** Money got back on a credit, as Payment received shows it: settled in full, or what is left. */
+function receivedFromSettlement(
+  credit: CreditRow,
+  result: CreditSettleResult,
+  settlement: Pick<ReceivedPayment, 'branchId' | 'modes'>,
+): ReceivedPayment {
+  const left = result.credit.left;
+  return {
+    amount: result.amount,
+    modes: settlement.modes,
+    payerName: credit.partyName,
+    paymentSeq: result.paymentSeq,
+    outcome:
+      left > 0
+        ? { kind: 'creditLeft', creditSeq: credit.seq, left }
+        : { kind: 'creditSettled', creditSeq: credit.seq },
+    patientId: credit.patientId,
+    contactId: credit.contactId,
+    branchId: settlement.branchId,
+  };
+}
+
 /** One opening of the drawer: its fields, its checks, its write. */
 function SettleSession({
   credit,
@@ -278,6 +325,7 @@ function SettleSession({
   onClose: () => void;
 }) {
   const { t } = useTranslation(SETTLE_CREDIT_NS);
+  const { t: tReceived } = useTranslation(PAYMENT_RECEIVED_NS);
   const formatPaise = usePaiseFormat();
   const { openBranches } = useBranches();
   const way = credit.direction;
@@ -285,7 +333,35 @@ function SettleSession({
   const form = useForm<SettleFormValues>({ defaultValues: start });
   const rows = useWatch({ control: form.control, name: 'splits' });
   const { isDirty } = useFormState({ control: form.control });
-  const { saveState, save } = useSettleSave({ form, credit, owed, onClose });
+  const [received, setReceived] = useState<ReceivedPayment | null>(null);
+  const { saveState, save } = useSettleSave({
+    form,
+    credit,
+    owed,
+    onClose,
+    onReceived: setReceived,
+  });
+  // A got-back may end in Payment received: its player and animation load meanwhile.
+  useEffect(() => {
+    if (way === 'take') preloadPaymentReceived();
+  }, [way]);
+  if (received) {
+    return (
+      <RecordDrawer
+        open={open}
+        onClose={onClose}
+        title={tReceived(PAYMENT_RECEIVED_KEYS.title)}
+        tag={displayId.pendingCredit(credit.seq)}
+        content={CONTENT_PROFILE}
+        stacked
+        summary={tReceived(PAYMENT_RECEIVED_KEYS.summary)}
+        doneLabel={tReceived(PAYMENT_RECEIVED_KEYS.done)}
+        testId={SETTLE_CREDIT_TEST_ID}
+      >
+        <PaymentReceived payment={received} />
+      </RecordDrawer>
+    );
+  }
   return (
     <RecordDrawer
       open={open}

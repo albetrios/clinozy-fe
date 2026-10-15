@@ -46,6 +46,16 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+// Payment received plays its animation through lottie-web, which jsdom cannot draw.
+vi.mock('lottie-web/build/player/lottie_light', () => ({
+  default: {
+    loadAnimation: () => ({ totalFrames: 1, goToAndStop: vi.fn(), destroy: vi.fn() }),
+  },
+}));
+vi.mock('@/shared/api/app/feedback-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPatientFeedback: vi.fn().mockResolvedValue([]),
+}));
 vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   receivePayment: vi.fn(),
@@ -219,7 +229,9 @@ describe('ReceivePaymentDrawer — new (payments.md:95–110)', () => {
     await user.click(part('quick-fill-full'));
     await user.type(part('reference'), '4321');
     await user.click(part('save'));
-    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect(await screen.findByTestId('payment-received-amount')).toHaveTextContent(
+      '₹100 received',
+    );
     expect(receivePayment).toHaveBeenCalledWith({
       input: expect.objectContaining({
         contactId: TEST_MONEY_CONTACT_ID,
@@ -229,7 +241,12 @@ describe('ReceivePaymentDrawer — new (payments.md:95–110)', () => {
       }),
       idempotencyKey: expect.any(String),
     });
-    expect(notifyMock.success).toHaveBeenCalledWith('₹100 received from Kavya Mehta');
+    // The drawer turned into Payment received (feat-payment-celebration D2): no toast, and
+    // "Done" closes it the way Save did.
+    expect(notifyMock.success).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+    await user.click(part('done'));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('fills the oldest open invoice and its due when a patient is picked; "+ Split" adds a mode', async () => {

@@ -347,6 +347,7 @@
         "phone": "الهاتف",
         "email": "البريد الإلكتروني",
         "gstin": "GSTIN",
+        "reviewLink": "رابط تقييمات Google",
         "days": "الأيام",
         "opens": "يفتح",
         "closes": "يغلق",
@@ -366,11 +367,13 @@
         "state": "الولاية",
         "email": "branch@clinic.com",
         "gstin": "15 حرفًا",
+        "reviewLink": "https://g.page/r/…/review",
         "team": "اختر الفريق"
       },
       "hints": {
         "colour": "يميّز هذا الفرع في كل مكان",
         "phone": "10 أرقام",
+        "reviewLink": "يُرسل عندما تطلب من مريض تقييمًا بعد الدفع",
         "team": "من يعمل هنا",
         "preselected": "محدد مسبقًا في النماذج هنا",
         "addFirst": {
@@ -398,6 +401,7 @@
       "duplicate": "يوجد فرع باسم {{name}} بالفعل",
       "phoneInvalid": "يجب أن يتكون الهاتف من 10 أرقام",
       "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
+      "reviewLinkInvalid": "أدخل رابطًا يبدأ بـ https://",
       "added": "تمت إضافة فرع {{name}}",
       "saved": "تم حفظ {{name}}",
       "contactMissing": "أضف الهاتف والبريد الإلكتروني",

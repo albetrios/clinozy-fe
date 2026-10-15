@@ -3,6 +3,7 @@ import { Tabs as TabsPrimitive } from 'radix-ui';
 import { type ReactNode, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { markSamePageNavigation } from '@/lib/animations/same-page-navigation.ts';
 import { fitTabs, measureTextWidth } from '@/lib/fit-tabs.ts';
 import { cn } from '@/lib/utils.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
@@ -208,9 +209,12 @@ export function RoomTabs({
       className="flex w-full min-w-0"
     >
       <div data-room-tabs-track="" className={cn(TRACK, 'w-max')}>
+        {/* The room's tabs are routes: each page draws this track again, so the thumb
+            carries on from where it stood (feat-payment-celebration D13). */}
         <SelectionGlide
           selected='[data-slot="room-tab"][aria-current="page"]'
           className={TRACK_THUMB}
+          continuity={`room-tabs:${testIdPrefix}`}
         />
         {visible.map((tab) => {
           const isCurrent = tab === tabs[currentIndex];
@@ -224,6 +228,8 @@ export function RoomTabs({
               // current on `/offerings/offers` too: `isCurrent` decides instead.
               activeOptions={{ exact: true }}
               aria-current={isCurrent ? 'page' : undefined}
+              // Another tab of this room is no new page: the header stays still.
+              onClick={isCurrent ? undefined : markSamePageNavigation}
               data-testid={ids.tab(tab.id)}
               data-slot="room-tab"
               className={cn(
@@ -248,7 +254,9 @@ export function RoomTabs({
             }))}
             onChange={(id) => {
               const tab = folded.find((entry) => entry.id === id);
-              if (tab) void navigate({ to: tab.to, params: tab.params });
+              if (!tab) return;
+              markSamePageNavigation();
+              void navigate({ to: tab.to, params: tab.params });
             }}
             minWidth={200}
             testId={ids.tabsMore}

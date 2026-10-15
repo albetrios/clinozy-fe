@@ -337,6 +337,7 @@
         "phone": "電話",
         "email": "メール",
         "gstin": "GSTIN",
+        "reviewLink": "Google レビューリンク",
         "days": "曜日",
         "opens": "開店",
         "closes": "閉店",
@@ -356,11 +357,13 @@
         "state": "州・県",
         "email": "branch@clinic.com",
         "gstin": "15 文字",
+        "reviewLink": "https://g.page/r/…/review",
         "team": "チームを選択"
       },
       "hints": {
         "colour": "この拠点をどこでも示す色です",
         "phone": "10 桁",
+        "reviewLink": "支払い後に患者さんへレビューをお願いするときに送信されます",
         "team": "ここで働く人",
         "preselected": "この拠点のフォームで事前に選択されます",
         "addFirst": {
@@ -388,6 +391,7 @@
       "duplicate": "{{name}} という拠点はすでにあります",
       "phoneInvalid": "電話番号は 10 桁で入力してください",
       "emailInvalid": "有効なメールアドレスを入力してください",
+      "reviewLinkInvalid": "https:// で始まるリンクを入力してください",
       "added": "拠点 {{name}} を追加しました",
       "saved": "{{name}} を保存しました",
       "contactMissing": "電話番号とメールを入力してください",

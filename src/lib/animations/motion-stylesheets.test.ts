@@ -132,6 +132,55 @@ describe('the selection glide (selection-glide.css)', () => {
   });
 });
 
+describe('the Payment received moment (feat-payment-celebration)', () => {
+  const folder = 'src/shared/components/PaymentReceived';
+  const rules = read(`${folder}/payment-received.css`);
+  const animation = JSON.parse(
+    readFileSync(join(root, `${folder}/payment-received.lottie.json`), 'utf8'),
+  ) as { fr: number; ip: number; op: number; layers: { cl?: string }[] };
+
+  it('paints the animation from tokens, ships with the view, and moves nothing itself', () => {
+    expect(readFileSync(join(root, `${folder}/PaymentReceived.tsx`), 'utf8')).toContain(
+      "import './payment-received.css';",
+    );
+    expect(rules).not.toContain('@keyframes');
+    const declarations = rules
+      .split(/[;{}]/)
+      .map((declaration) => declaration.trim())
+      .filter((declaration) => declaration.includes(':'));
+    expect(declarations.length).toBeGreaterThan(0);
+    for (const declaration of declarations) {
+      const [property, value] = declaration.split(':').map((part) => part.trim());
+      expect(property).toMatch(/^(fill|stroke)$/);
+      expect(value).toMatch(/^var\(--color-[\w-]+\)$/);
+    }
+    expect(read('src/index.css')).not.toContain('payment-received');
+  });
+
+  it('plays under a second and names every layer the stylesheet paints', () => {
+    expect((animation.op - animation.ip) / animation.fr).toBeLessThan(1);
+    const classes = animation.layers.flatMap((layer) => layer.cl?.split(' ') ?? []);
+    for (const [, name] of rules.matchAll(/\.(pr-[\w-]+) path/g)) {
+      expect(classes).toContain(name);
+    }
+  });
+
+  it('carries no expressions — the light player runs none, and CSP allows no eval', () => {
+    const expressions: unknown[] = [];
+    const walk = (value: unknown): void => {
+      if (Array.isArray(value)) value.forEach(walk);
+      else if (value !== null && typeof value === 'object') {
+        for (const [key, inner] of Object.entries(value)) {
+          if (key === 'x' && typeof inner === 'string') expressions.push(inner);
+          walk(inner);
+        }
+      }
+    };
+    walk(animation);
+    expect(expressions).toEqual([]);
+  });
+});
+
 describe('the app source', () => {
   const files = (dir: string): string[] =>
     readdirSync(join(root, dir), { withFileTypes: true }).flatMap((entry) => {

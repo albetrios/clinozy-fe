@@ -6,6 +6,7 @@ export {
   composerShowsLabels,
   CONTACT_PREFERENCES,
   firstNameOf,
+  reviewRequestText,
 } from './chat-composer.ts';
 export type { ChatHistoryTarget } from './chat-history.ts';
 export { ChatColumn, type ChatColumnProps } from './ChatColumn.tsx';

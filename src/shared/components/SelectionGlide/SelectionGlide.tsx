@@ -55,6 +55,24 @@ function sameBox(a: GlideBox | null, b: GlideBox): boolean {
   );
 }
 
+/**
+ * Where each continuous track's thumb was when it unmounted (`feat-payment-celebration` D13): a
+ * room's tabs are routes, so moving between them remounts the track — the new one starts its
+ * thumb where the old one stood, then travels, as an in-page track does. Kept briefly: a track
+ * mounted later (another room, a minute on) just places its thumb.
+ */
+const CONTINUITY = new Map<string, { box: GlideBox; at: number }>();
+/** How long a left thumb's place is worth starting from — a route change, not a later visit. */
+const CONTINUITY_MS = 1000;
+
+/** The place a remounted track's thumb starts from, once; null when there is none (or it is stale). */
+function takeContinuity(key: string | undefined): GlideBox | null {
+  if (key === undefined) return null;
+  const left = CONTINUITY.get(key);
+  CONTINUITY.delete(key);
+  return left && performance.now() - left.at < CONTINUITY_MS ? left.box : null;
+}
+
 /** What the thumb last showed: the item it covered, its box, whether it is showing. */
 interface GlideState {
   item: HTMLElement | null;
@@ -140,14 +158,27 @@ function placeGlide(
  * the selected element changed) and on every resize of the track or an item
  * (a window, a font swap, a label that grew — placed at once).
  */
-function useSelectionGlide(ref: RefObject<HTMLSpanElement | null>, selector: string) {
+function useSelectionGlide(
+  ref: RefObject<HTMLSpanElement | null>,
+  selector: string,
+  continuity: string | undefined,
+) {
   const state = useRef<GlideState>({ item: null, box: null, shown: false });
 
   const place = useCallback(
     (resized: boolean) => {
-      if (ref.current) placeGlide(ref.current, selector, state.current, resized);
+      const thumb = ref.current;
+      if (!thumb) return;
+      const from = state.current.shown ? null : takeContinuity(continuity);
+      if (from) {
+        // Stand where the last track's thumb stood, let the browser take it, then travel.
+        writeGlide(thumb, 'still', from);
+        thumb.getBoundingClientRect();
+        Object.assign(state.current, { item: null, box: from, shown: true });
+      }
+      placeGlide(thumb, selector, state.current, resized);
     },
-    [ref, selector],
+    [ref, selector, continuity],
   );
 
   useLayoutEffect(() => {
@@ -166,11 +197,16 @@ function useSelectionGlide(ref: RefObject<HTMLSpanElement | null>, selector: str
     return () => observer.disconnect();
   }, [ref, place]);
 
-  // Leaving: the item it covered draws itself again.
+  // Leaving: the item it covered draws itself again, and a continuous track leaves its place.
   useEffect(() => {
     const current = state.current;
-    return () => current.item?.removeAttribute(GLIDE_COVERED_ATTRIBUTE);
-  }, []);
+    return () => {
+      current.item?.removeAttribute(GLIDE_COVERED_ATTRIBUTE);
+      if (continuity !== undefined && current.shown && current.box) {
+        CONTINUITY.set(continuity, { box: current.box, at: performance.now() });
+      }
+    };
+  }, [continuity]);
 }
 
 /** Props for {@link SelectionGlide}. */
@@ -182,6 +218,11 @@ export interface SelectionGlideProps {
   selected: string;
   /** The thumb's surface — the selected look's fill, ring, shadow and radius. */
   className?: string;
+  /**
+   * The same track on every page it is drawn on (a room's tabs, which are routes): when it
+   * remounts within a second, the thumb starts where it stood and travels (D13).
+   */
+  continuity?: string;
 }
 
 /**
@@ -197,9 +238,9 @@ export interface SelectionGlideProps {
  * aside; with no layout it covers nothing. Logical placement, so a
  * right-to-left row is measured from its right edge.
  */
-export function SelectionGlide({ selected, className }: SelectionGlideProps) {
+export function SelectionGlide({ selected, className, continuity }: SelectionGlideProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  useSelectionGlide(ref, selected);
+  useSelectionGlide(ref, selected, continuity);
   return (
     <span
       ref={ref}

@@ -339,6 +339,7 @@
         "phone": "Telefon",
         "email": "E-Mail",
         "gstin": "GSTIN",
+        "reviewLink": "Google-Bewertungslink",
         "days": "Tage",
         "opens": "Öffnet",
         "closes": "Schließt",
@@ -358,11 +359,13 @@
         "state": "Bundesland",
         "email": "filiale@klinik.de",
         "gstin": "15 Zeichen",
+        "reviewLink": "https://g.page/r/…/review",
         "team": "Team auswählen"
       },
       "hints": {
         "colour": "kennzeichnet diese Filiale überall",
         "phone": "10 Ziffern",
+        "reviewLink": "wird gesendet, wenn Sie nach einer Zahlung um eine Bewertung bitten",
         "team": "wer hier arbeitet",
         "preselected": "in Formularen hier vorausgewählt",
         "addFirst": {
@@ -390,6 +393,7 @@
       "duplicate": "Eine Filiale namens {{name}} gibt es bereits",
       "phoneInvalid": "Die Telefonnummer braucht 10 Ziffern",
       "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
+      "reviewLinkInvalid": "Geben Sie einen Link ein, der mit https:// beginnt",
       "added": "Filiale {{name}} hinzugefügt",
       "saved": "{{name}} gespeichert",
       "contactMissing": "Telefon und E-Mail angeben",

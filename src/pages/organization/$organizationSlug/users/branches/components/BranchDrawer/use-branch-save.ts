@@ -19,6 +19,7 @@ import {
   isBranchEmailInvalid,
   isBranchPhoneIncomplete,
   isBranchPinIncomplete,
+  isBranchReviewLinkInvalid,
 } from './branch-form.ts';
 
 const K = USERS_KEYS.branches.drawer;
@@ -41,6 +42,7 @@ const FIELD_STEPS: Readonly<Record<BranchField, BranchDrawerStepId>> = {
   phone: 'contact',
   email: 'contact',
   gstNumber: 'contact',
+  reviewLink: 'contact',
   workingDays: 'contact',
   opensAt: 'contact',
   closesAt: 'contact',
@@ -122,6 +124,9 @@ export function useBranchSave({
       }
       if (isBranchEmailInvalid(values.email)) {
         return { fields: ['email'], message: t(K.emailInvalid) };
+      }
+      if (isBranchReviewLinkInvalid(values.reviewLink)) {
+        return { fields: ['reviewLink'], message: t(K.reviewLinkInvalid) };
       }
       return null;
     },

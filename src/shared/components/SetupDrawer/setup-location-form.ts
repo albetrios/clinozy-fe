@@ -111,6 +111,7 @@ export function locationBranchInput(values: LocationFormValues): BranchInput {
     phone: toAppPhone(values.phone) ?? values.phone,
     email: values.email.trim(),
     gstNumber: null,
+    reviewLink: null,
     workingDays: values.workingDays,
     opensAt: values.opensAt,
     closesAt: values.closesAt,

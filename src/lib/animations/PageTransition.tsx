@@ -3,6 +3,8 @@ import { type ReactNode, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils.ts';
 
+import { riseChangedPart } from './rise-changed-part.ts';
+import { takeSamePageNavigation } from './same-page-navigation.ts';
 import { useReplayedAnimation } from './useReplayedAnimation.ts';
 
 interface PageTransitionProps {
@@ -49,7 +51,9 @@ function usePageKey(): string {
 
 /**
  * Wraps the route `<Outlet />` and plays a single, subtle fade + rise whenever
- * the page changes — not when a dialog route opens over it. Uses
+ * the page changes — not when a dialog route opens over it, nor on a move within
+ * the same room ({@link takeSamePageNavigation}: its tabs, the patient file's sections), where
+ * only the part that changed rises ({@link riseChangedPart}). Uses
  * transform-only `route-rise` (no opacity fade) so copy stays visible if
  * animation is skipped or reduced-motion overrides duration.
  *
@@ -60,7 +64,13 @@ export function PageTransition({ children, className }: PageTransitionProps) {
   const page = usePageKey();
   const ref = useRef<HTMLDivElement>(null);
 
-  useReplayedAnimation(ref, ROUTE_ANIMATION_CLASS, page);
+  // A room's own tab or a patient-file section is no new page: what stays on screen stays
+  // still, and only the part that changed rises.
+  useReplayedAnimation(ref, ROUTE_ANIMATION_CLASS, page, () => {
+    if (!takeSamePageNavigation()) return true;
+    if (ref.current) riseChangedPart(ref.current);
+    return false;
+  });
 
   return (
     <div ref={ref} data-route={page} className={cn('text-foreground', className)}>

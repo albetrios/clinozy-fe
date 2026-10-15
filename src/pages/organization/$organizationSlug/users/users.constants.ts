@@ -397,6 +397,7 @@ export const USERS_KEYS = {
         phone: 'branches.drawer.fields.phone',
         email: 'branches.drawer.fields.email',
         gstin: 'branches.drawer.fields.gstin',
+        reviewLink: 'branches.drawer.fields.reviewLink',
         days: 'branches.drawer.fields.days',
         opens: 'branches.drawer.fields.opens',
         closes: 'branches.drawer.fields.closes',
@@ -416,6 +417,7 @@ export const USERS_KEYS = {
         state: 'branches.drawer.placeholders.state',
         email: 'branches.drawer.placeholders.email',
         gstin: 'branches.drawer.placeholders.gstin',
+        reviewLink: 'branches.drawer.placeholders.reviewLink',
         team: 'branches.drawer.placeholders.team',
       },
       hints: {
@@ -423,6 +425,8 @@ export const USERS_KEYS = {
         /** "one per clinic · set when it opened" — the Main branch switch is read-only. */
         main: 'branches.drawer.hints.main',
         phone: 'branches.drawer.hints.phone',
+        /** "sent with a review ask after a payment". */
+        reviewLink: 'branches.drawer.hints.reviewLink',
         team: 'branches.drawer.hints.team',
         /** "preselected in forms here" — a default with someone to pick. */
         preselected: 'branches.drawer.hints.preselected',
@@ -453,6 +457,7 @@ export const USERS_KEYS = {
       pinInvalid: 'branches.drawer.pinInvalid',
       phoneInvalid: 'branches.drawer.phoneInvalid',
       emailInvalid: 'branches.drawer.emailInvalid',
+      reviewLinkInvalid: 'branches.drawer.reviewLinkInvalid',
       /** "Vesu branch added" / "Vesu saved". */
       added: 'branches.drawer.added',
       saved: 'branches.drawer.saved',

@@ -1472,5 +1472,38 @@
       "sent": "Gracias, el equipo ya lo tiene.",
       "error": "No se pudo enviar el informe. Tu texto sigue aquí; inténtalo de nuevo."
     }
+  },
+  "paymentReceived": {
+    "title": "Pago recibido",
+    "amount": "{{amount}} recibidos",
+    "from": "de {{name}}",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "Factura {{invoice}} pagada por completo",
+      "due": "Quedan {{amount}} por pagar en la factura {{invoice}}",
+      "advance": "Guardado como anticipo",
+      "creditSettled": "{{credit}} saldado por completo",
+      "creditLeft": "Quedan {{amount}} pendientes en {{credit}}"
+    },
+    "summary": "Guardado en Pagos",
+    "done": "Listo",
+    "reviews": {
+      "askTitle": "Pide a {{first}} una reseña en Google",
+      "askBody": "La visita está reciente: el mejor momento para pedirla.",
+      "send": "Enviar por WhatsApp",
+      "sending": "Poniendo en cola…",
+      "queued": "En cola en el chat de {{first}}",
+      "failed": "No se pudo poner el mensaje en cola · inténtalo de nuevo",
+      "log": "Registrar una reseña",
+      "noLink": "Esta sucursal aún no tiene enlace de reseñas de Google.",
+      "addLink": "Añadir el enlace",
+      "askAdmin": "Pide a un administrador que lo añada en Usuarios › Sucursales.",
+      "thanked": "Reseña en Google · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Reseña en Google · {{date}}",
+      "previous": "Reseñas anteriores",
+      "all": "Todas las reseñas ({{count}})",
+      "needsCall": "Requiere una llamada",
+      "rated": "Valoración: {{rating}} de 5"
+    }
   }
 }

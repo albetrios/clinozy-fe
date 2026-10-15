@@ -1,5 +1,6 @@
 import { useParams, useSearch } from '@tanstack/react-router';
 
+import { markSamePageNavigation } from '@/lib/animations/same-page-navigation.ts';
 import { organizationAppointment } from '@/lib/routes/appointments-builders.ts';
 import {
   organizationPatientEdit,
@@ -102,8 +103,11 @@ export function usePatientFileNavigation(): PatientFileNavigation {
   const can = (area: 'patients' | 'appointments', action: 'create' | 'edit') =>
     access.isResolved && access.can(area, action);
 
-  const openSection = (target: PatientFileSectionSlug) =>
+  // Another section of the same file: the file bar, header and rail stay still (D13).
+  const openSection = (target: PatientFileSectionSlug) => {
+    if (target !== section) markSamePageNavigation();
     void navigate(organizationPatientSection(organizationSlug, patientId, target));
+  };
   const book = () =>
     void navigate(
       appCommandNavigation('newAppointment', {

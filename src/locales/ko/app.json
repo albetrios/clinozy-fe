@@ -1430,5 +1430,38 @@
       "sent": "감사합니다. 팀에 전달됐어요.",
       "error": "신고를 보내지 못했습니다. 작성한 내용은 그대로 있어요. 다시 시도해 주세요."
     }
+  },
+  "paymentReceived": {
+    "title": "결제 완료",
+    "amount": "{{amount}} 받음",
+    "from": "{{name}} 님",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "청구서 {{invoice}} 전액 결제됨",
+      "due": "청구서 {{invoice}} 미결제 {{amount}}",
+      "advance": "선수금으로 저장됨",
+      "creditSettled": "{{credit}} 전액 정산됨",
+      "creditLeft": "{{credit}} 잔액 {{amount}}"
+    },
+    "summary": "결제에 저장됨",
+    "done": "완료",
+    "reviews": {
+      "askTitle": "{{first}} 님에게 Google 리뷰 요청하기",
+      "askBody": "방문 직후인 지금이 요청하기 가장 좋은 때입니다.",
+      "send": "WhatsApp으로 보내기",
+      "sending": "대기열에 추가하는 중…",
+      "queued": "{{first}} 님 채팅 대기열에 추가됨",
+      "failed": "메시지를 대기열에 추가하지 못했습니다 · 다시 시도하세요",
+      "log": "리뷰 기록",
+      "noLink": "이 지점에는 아직 Google 리뷰 링크가 없습니다.",
+      "addLink": "링크 추가",
+      "askAdmin": "관리자에게 사용자 › 지점에서 추가해 달라고 요청하세요.",
+      "thanked": "Google에 리뷰 남김 · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Google에 리뷰 남김 · {{date}}",
+      "previous": "이전 리뷰",
+      "all": "전체 리뷰 ({{count}})",
+      "needsCall": "연락 필요",
+      "rated": "5점 중 {{rating}}점"
+    }
   }
 }

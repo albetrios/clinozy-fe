@@ -208,6 +208,11 @@ export interface RecordDrawerProps {
    * another record (`keepWhenReadOnly`), and the read-only note.
    */
   readOnly?: boolean;
+  /**
+   * The work is done (a payment received): the footer's one button, with these words, closes the
+   * drawer — no Cancel, no Save.
+   */
+  doneLabel?: string;
   /** A child stacked on a parent drawer: the close button reads "Back". */
   stacked?: boolean;
   /** The close button's own words ("Nothing next"), in place of Cancel / Back. */
@@ -608,6 +613,7 @@ function DrawerForm({
           start={props.footerStart}
           summary={props.summary}
           readOnly={props.readOnly}
+          doneLabel={props.doneLabel}
           stacked={props.stacked}
           onDismiss={props.onDismiss ?? onDismiss}
           dismissLabel={props.dismissLabel}

@@ -22,6 +22,11 @@ export interface DrawerFooterProps {
   summary?: string;
   /** View only: "Close", no Save / Delete, and the read-only summary. */
   readOnly?: boolean;
+  /**
+   * The work is done — a payment received: one primary with these words ("Done") that closes
+   * the drawer the way Save closed it, and nothing else.
+   */
+  doneLabel?: string;
   /** A child drawer stacked on a parent: the close button reads "Back". */
   stacked?: boolean;
   /** Cancel / Back / Close — the caller guards it like every other exit. */
@@ -86,7 +91,10 @@ const FOOTER_BUTTON =
 /** The compact footer's 32px buttons from `md` (still 44px on a phone). */
 const COMPACT_BUTTON = 'md:h-8';
 
-type EditActionsProps = Omit<DrawerFooterProps, 'summary' | 'readOnly' | 'start'>;
+type EditActionsProps = Omit<
+  DrawerFooterProps,
+  'summary' | 'readOnly' | 'doneLabel' | 'start'
+>;
 
 /**
  * The primary: "Saving…" (or the screen's own words) while a save runs, "Retry
@@ -244,6 +252,46 @@ function EditActions({
   );
 }
 
+/** The footer's buttons: one "Done" once the work is done, "Close" when view only, else the edit set. */
+function FooterActions({
+  doneLabel,
+  readOnly,
+  actions,
+}: {
+  doneLabel: string | undefined;
+  readOnly: boolean;
+  actions: EditActionsProps;
+}) {
+  const { t } = useTranslation(RECORD_DRAWER_NS);
+  const className = cn(FOOTER_BUTTON, actions.compact && COMPACT_BUTTON);
+  if (readOnly) {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        onClick={actions.onDismiss}
+        data-testid={actions.dismissTestId ?? `${actions.testId}-dismiss`}
+        className={className}
+      >
+        {t(RECORD_DRAWER_KEYS.close)}
+      </Button>
+    );
+  }
+  if (doneLabel) {
+    return (
+      <Button
+        type="button"
+        onClick={actions.onDismiss}
+        data-testid={`${actions.testId}-done`}
+        className={className}
+      >
+        {doneLabel}
+      </Button>
+    );
+  }
+  return <EditActions {...actions} />;
+}
+
 /**
  * The record drawer's footer (`_patterns.md:35–36`, H:938–945): summary ·
  * "Delete" · close ("Cancel", "Back" in a stacked child, "Close" when
@@ -257,6 +305,7 @@ function EditActions({
 export function DrawerFooter({
   summary,
   readOnly = false,
+  doneLabel,
   start,
   ...actions
 }: DrawerFooterProps) {
@@ -287,19 +336,7 @@ export function DrawerFooter({
         {readOnly ? t(RECORD_DRAWER_KEYS.readOnly) : summary}
       </span>
 
-      {readOnly ? (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={actions.onDismiss}
-          data-testid={actions.dismissTestId ?? `${actions.testId}-dismiss`}
-          className={cn(FOOTER_BUTTON, actions.compact && COMPACT_BUTTON)}
-        >
-          {t(RECORD_DRAWER_KEYS.close)}
-        </Button>
-      ) : (
-        <EditActions {...actions} />
-      )}
+      <FooterActions doneLabel={doneLabel} readOnly={readOnly} actions={actions} />
     </div>
   );
 }
