@@ -1418,6 +1418,39 @@
       "error": "无法发送报告。你写的内容还在，请重试。"
     }
   },
+  "paymentReceived": {
+    "title": "已收到付款",
+    "amount": "已收到 {{amount}}",
+    "from": "来自 {{name}}",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "发票 {{invoice}} 已全额付清",
+      "due": "发票 {{invoice}} 尚欠 {{amount}}",
+      "advance": "已记为预付款",
+      "creditSettled": "{{credit}} 已全额结清",
+      "creditLeft": "{{credit}} 尚欠 {{amount}}"
+    },
+    "summary": "已保存到“付款”",
+    "done": "完成",
+    "reviews": {
+      "askTitle": "请 {{first}} 在 Google 上留下评价",
+      "askBody": "刚就诊完——正是邀请评价的最佳时机。",
+      "send": "通过 WhatsApp 发送",
+      "sending": "正在加入队列…",
+      "queued": "已加入 {{first}} 的聊天队列",
+      "failed": "无法将消息加入队列 · 请重试",
+      "log": "记录评价",
+      "noLink": "此分院还没有 Google 评价链接。",
+      "addLink": "添加链接",
+      "askAdmin": "请管理员在“用户 › 分院”中添加。",
+      "thanked": "已在 Google 评价 · {{rating}}★ · {{date}}",
+      "thankedNoRating": "已在 Google 评价 · {{date}}",
+      "previous": "以往评价",
+      "all": "全部评价（{{count}}）",
+      "needsCall": "需要回电",
+      "rated": "评分 {{rating}}/5"
+    }
+  },
   "billingPlans": {
     "upgradeTo": "升级到 {{name}}",
     "plan": {

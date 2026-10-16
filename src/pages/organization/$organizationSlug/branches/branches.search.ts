@@ -14,9 +14,19 @@ import {
 /** Validated `?…` search params for `/branches` and its dialog routes. */
 export interface BranchesSearch {
   created?: CreatedFilter;
+  /**
+   * The edit drawer's step to open on (`?step=`), as the link wrote it — Payment received's
+   * "Add the link" opens Contact, where the Google review link is (`feat-payment-celebration`).
+   * The page reads it with `readBranchDrawerStep`, once, as the drawer opens: the step list stays
+   * with the lazy drawer, off the first paint this validator ships in.
+   */
+  step?: unknown;
 }
 
 /** Parse `/branches` search params. */
 export function validateBranchesSearch(search: Record<string, unknown>): BranchesSearch {
-  return { created: readCreatedFilter(search.created) };
+  return {
+    created: readCreatedFilter(search.created),
+    step: search.step,
+  };
 }

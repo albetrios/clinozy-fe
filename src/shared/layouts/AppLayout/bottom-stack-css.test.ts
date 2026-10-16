@@ -101,7 +101,8 @@ describe('phone bottom stack (index.css)', () => {
     const lens = declarations('[data-lens]');
     expect(lens).toContain('width: calc(20% - 0.1rem)');
     expect(lens).toContain('translate: calc(var(--lens, 0) * 100%)');
-    expect(lens).toContain('transition: 320ms cubic-bezier(0.32, 0.72, 0, 1)');
+    // A glide, like every glide: 240ms on the strong ease-in-out (change-motion-consistency).
+    expect(lens).toContain('transition: 240ms var(--ease-in-out-strong)');
     expect(declarations("[dir='rtl'] [data-lens]")).toContain(
       'translate: calc(var(--lens, 0) * -100%)',
     );
@@ -110,13 +111,16 @@ describe('phone bottom stack (index.css)', () => {
     }
   });
 
-  it('dips a pressed slot only when motion is allowed', () => {
+  it('dips a pressed slot only when motion is allowed — 95% over 160ms on the strong ease-out', () => {
     expect(
       declarations(
         "[data-slot='mobile-nav'] :active > [data-slot='tab-content']",
         '(prefers-reduced-motion: no-preference)',
       ),
-    ).toContain('scale: 0.92');
+    ).toContain('scale: 0.95');
+    expect(declarations("[data-slot='tab-content']")).toContain(
+      'transition: scale 160ms var(--ease-out-strong)',
+    );
   });
 
   it('a showing notice pill publishes 52px and a mounted "New" 60px, on phone only', () => {

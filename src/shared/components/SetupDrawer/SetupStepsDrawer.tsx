@@ -55,7 +55,7 @@ function SetupProgress({
         value={Math.round((done / total) * 100)}
         aria-label={label}
         data-testid="setup-drawer-progress"
-        className="bg-success/20 [&>[data-slot=progress-indicator]]:bg-success h-1.5 [&>[data-slot=progress-indicator]]:duration-200 [&>[data-slot=progress-indicator]]:ease-in-out motion-reduce:[&>[data-slot=progress-indicator]]:duration-1"
+        className="bg-success/20 [&>[data-slot=progress-indicator]]:bg-success h-1.5"
       />
     </div>
   );

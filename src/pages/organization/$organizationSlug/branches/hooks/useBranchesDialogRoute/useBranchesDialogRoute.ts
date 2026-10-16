@@ -53,7 +53,11 @@ export function useBranchesDialogRoute(
     setClosing(pathname);
     void navigate({
       ...organizationBranches(organizationSlug),
-      search: (current: Record<string, unknown>) => validateBranchesSearch(current),
+      // The step a link opened on belongs to that opening only.
+      search: (current: Record<string, unknown>) => ({
+        ...validateBranchesSearch(current),
+        step: undefined,
+      }),
       hash: true,
       replace: true,
     });

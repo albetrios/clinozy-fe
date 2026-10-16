@@ -10,6 +10,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { ensureMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';
 
 import type { Channel } from './app-schema.ts';
+import { fetchActiveBranches } from './branches-api.ts';
 import { fetchMemberNames } from './directory-api.ts';
 import type {
   ChatAuthor,
@@ -346,20 +347,25 @@ export async function fetchContactMessagingStatus(): Promise<MessagingStatus> {
 }
 
 /**
- * What a contact's templates fill in: the clinic's name. The branch's address, maps and review
- * links are not on the branches a member reads (`/app/branches/my`), and the free slots need a
- * booking's length to ask `/app/appointments/slots` with — both stay empty (api-integration
- * §8, backend asks).
+ * What a contact's templates fill in: the clinic's name and the Google review link of the main
+ * branch the member works in (`/app/branches/my` carries it since `feat-payment-celebration`;
+ * empty when no branch has one, or the read fails). The address and maps link are not on that
+ * read, and the free slots need a booking's length to ask `/app/appointments/slots` with — they
+ * stay empty (api-integration §8, backend asks).
  */
 export async function fetchContactTemplateValues(): Promise<ChatTemplateValues> {
   const organizationId = useOrganizationStore.getState().organizationId;
-  const organizations = await ensureMyOrganizationSummaries();
+  const [organizations, branches] = await Promise.all([
+    ensureMyOrganizationSummaries(),
+    fetchActiveBranches().catch(() => []),
+  ]);
   const organization = organizations.find((entry) => entry.id === organizationId);
+  const branch = branches.find((entry) => entry.isMain) ?? branches[0];
   return {
     clinicName: organization?.name ?? '',
     address: '',
     mapsLink: '',
-    reviewLink: '',
+    reviewLink: branch?.reviewLink ?? '',
     freeSlots: [],
   };
 }

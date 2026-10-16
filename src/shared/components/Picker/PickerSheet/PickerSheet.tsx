@@ -117,9 +117,9 @@ export function PickerSheet({
           data-picker-surface="sheet"
           onOpenAutoFocus={handleOpenAutoFocus}
           onEscapeKeyDown={onEscapeKeyDown}
-          overlayClassName={cn(SHEET_VARIANTS[sheet].layer, 'animate-none!')}
+          overlayClassName={SHEET_VARIANTS[sheet].layer}
           className={cn(
-            'data-[state=open]:animate-sheet-up! pb-[env(safe-area-inset-bottom)] data-[state=closed]:animate-none! data-[vaul-drawer-direction=bottom]:rounded-t-2xl',
+            'pb-[env(safe-area-inset-bottom)] data-[vaul-drawer-direction=bottom]:rounded-t-2xl',
             SHEET_VARIANTS[sheet].height,
             sheetClassName,
           )}

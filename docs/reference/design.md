@@ -184,6 +184,77 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   dot's `pulse-dot` (2.4s) is global. Under reduced motion the dial stands still with
   every stop named. Motion never takes text below WCAG AA: a stop lifts (scale) and
   is never dimmed, pinned in `AuthShowcase.test.tsx`.
+- **One motion system — Emil Kowalski's.** The app's motion follows Emil Kowalski's
+  design-engineering standards (`agent-os/skills/emil-design-eng`,
+  `review-animations/STANDARDS.md`); the audit that applied them is
+  `iterations/change-motion-consistency-2026-10-15-uiya/plans/motion-audit.md`.
+- **Three curves, chosen by the kind of motion.** Named once on `:root` (`index.css`):
+  **`--ease-out-strong`** (`cubic-bezier(0.23, 1, 0.32, 1)`) for what enters, leaves
+  or answers a press; **`--ease-in-out-strong`** (`cubic-bezier(0.77, 0, 0.175, 1)`) for
+  what travels on screen from one resting place to another; **`--ease-sheet`**
+  (`cubic-bezier(0.32, 0.72, 0, 1)`) for drawers and sheets. A colour change alone
+  keeps `ease`. Tailwind's `ease-out` / `ease-in-out` and the default transition curve
+  point at the strong curves, so every transition follows. Scripts (anime.js,
+  Web Animations) read the twin, `src/lib/animations/motion-curves.ts`. No other
+  curve is written in app code (the route-progress sweep aside).
+- **Durations by frequency.** Presses 150–160ms; tooltips in 120ms, out 100ms; menus
+  and popovers in 150–160ms, out 100ms (exits faster than entrances); glides 240ms;
+  drawers and sheets 340ms in. Every UI element stays under 300ms, and only
+  `translate` / `scale`, opacity, a short blur and colours animate — plus the width of
+  the one glide thumb, which moves no layout. Pinned by
+  `src/lib/animations/motion-stylesheets.test.ts`.
+- **Selections travel.** A segmented track's selected card (`RoomTabs`, `RoomViewTabs`
+  `look="track"`), the section bar's pinned-tab tint and Today's Mine · Everyone are
+  one **`SelectionGlide`** thumb each, measured under the selected item (logical, so
+  right-to-left too); the phone tab bar's lens is its CSS sibling. Every glide — and
+  the switch's thumb (200ms) — moves on the strong ease-in-out, 240ms, its colour
+  crossfading on `ease`; the selected label's ink changes on the thumb's own curve, so
+  the text darkens as the thumb arrives. A row whose tabs paint their own selected
+  colours (the composer's channels, the patient file bar) keeps its look. The item
+  keeps its own selected classes; the thumb only covers them once it has a real size.
+- **Numbers say which way they moved.** A live count (Today's lane tiles) is a
+  **`RollingNumber`**: a change rolls up when it grew and down when it shrank (240ms,
+  a 2px blur); a first load lands without rolling (`still`).
+- **Lists settle, lanes cascade.** When the in-place skeleton (`data-refreshing`)
+  leaves a subtree, `useRefreshSettle` (mounted once by the app shell) brings it up
+  from half opacity over 200ms. Choosing a lane on Today cascades its first four cards
+  30ms apart (200ms each).
+- **One press.** Every button but a text link, and Today's lane tiles, sink to 97%
+  while held; the phone tab bar's icons to 95% — 160ms on the strong ease-out. A
+  checkbox's tick appears from 90%, never from nothing. Menus grow from their trigger
+  (Radix's transform origin), never a fixed corner.
+- **Where motion stays out.** Nothing animates on a keyboard action: the command
+  palette (Ctrl+K) opens and closes at once. A tooltip opened while another shows
+  appears with no animation. Nothing moves on hover except behind
+  `(hover: hover) and (pointer: fine)`; the drawers keep no exit motion. The new rules
+  ship in co-located stylesheets with the lazy chunks that use them
+  (`selection-glide.css`, `rolling-number.css`, `lane-panel.css`, `checkbox.css`,
+  `switch.css`), never in `index.css` (iterations `change-motion-polish-2026-10-14-uvgh`
+  and `change-motion-consistency-2026-10-15-uiya`).
+- **A payment received is a moment.** The drawer that takes money from a person — Receive
+  payment, an invoice saved with Paid now, a credit got back — turns into **Payment
+  received** (`src/shared/components/PaymentReceived/`): an original Lottie animation (a
+  disc, a check drawn in, a ripple and eight sparks in the room tones, ≈ 0.85s, the check
+  drawn by 0.5s) plays once through lottie-web's light SVG player (no `eval`), loaded on
+  demand by `LottiePlayer` and warmed when the drawer opens; its layers carry class names,
+  so `payment-received.css` paints them from tokens in every theme. The amount line takes
+  focus; every line is there from the first frame and Done works at once; reduced motion
+  shows the last frame. For a patient it then asks for a Google review — the composer's
+  Review message with the branch's link, queued in their chat, or a review logged at the
+  desk — and lists their three newest reviews (iteration
+  `feat-payment-celebration-2026-10-15-xpkw`).
+- **A room's own header stays still.** Moving between a room's tabs (they are routes) or
+  the patient file's sections is no page change: a room tab marks the click
+  (`markSamePageNavigation`), the patient file's layout route says it is one room
+  (`staticData.room`), and `PageTransition` keeps the page still and rises only the part
+  that changed — the section, or what sits under the room toolbar (`riseChangedPart`, the
+  page rise's own 6px and 280ms). The tab track's thumb carries on across the remount
+  (`SelectionGlide`'s `continuity`) and travels as an in-page track does.
+- **One bottom sheet.** Every vaul sheet — All sections on a phone, a phone confirm, the
+  picker sheets — rises 28px and fades in 260ms on the sheet curve with its scrim, and
+  leaves at once; set once in `ui/drawer.tsx`, over vaul's own 500ms slide. Custom
+  toggles move their thumb like the shared switch; smooth scrolls driven by script ask
+  for reduced motion first.
 - **Tabs keep their place.** A tab drawn bolder when current keeps its bold width
   (`WeightStableLabel`), so switching tabs never moves its neighbours.
 - **Product motion.** Prefer **Anime.js** for intentional numeric or timeline
@@ -192,9 +263,12 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
 - **High-impact moments over confetti.** One well-orchestrated reveal on
   navigation reads as more polished than scattered micro-interactions. Prefer a
   single staggered entrance to many competing animations.
-- **Honour reduced motion.** A global `prefers-reduced-motion` block neutralises
-  animation/transition/scroll for users who ask for it — design so the
-  motion-free experience is still complete.
+- **Honour reduced motion — gentler, not zero.** A global `prefers-reduced-motion`
+  block neutralises animation/transition/scroll for users who ask for it — design so
+  the motion-free experience is still complete. The fades that explain a change opt
+  back in at 160ms, opacity and colour only: a count crossfades instead of rolling,
+  lane cards and a tick fade in without rising or scaling, a refreshed list still
+  settles, and a glide's tone and label still crossfade where it lands.
 - **Interaction affordance.** Interactive elements show a pointer cursor
   (restored app-wide after Tailwind v4 Preflight); hover/focus states are visible
   and never rely on colour alone.

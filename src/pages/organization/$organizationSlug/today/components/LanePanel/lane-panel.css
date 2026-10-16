@@ -1,0 +1,49 @@
+/* Today's lane panel follows the tile (`LanePanel`, change-motion-polish;
+   retuned by change-motion-consistency): choosing another lane crossfades the
+   panel's fill, line and heading into the lane's tone (200ms, `ease` — a
+   colour change), and its first four cards rise into place 30ms apart — 200ms
+   each on the strong ease-out, 4px — the rest with the fourth. `lane-cascade`
+   is replayed on the card grid when the lane changes (`useReplayedAnimation`),
+   not when the same lane refreshes. Only opacity, translate and colours move.
+   Ships with Today's lazy chunk. Reduced motion: the cards fade in without
+   rising and the tone still crossfades (160ms) — gentler, not zero. */
+[data-slot='lane-panel'] {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease;
+}
+[data-slot='lane-panel'] h2 {
+  transition: color 200ms ease;
+}
+.lane-cascade > * {
+  animation: lane-card-rise 200ms var(--ease-out-strong) both;
+}
+.lane-cascade > :nth-child(2) {
+  animation-delay: 30ms;
+}
+.lane-cascade > :nth-child(3) {
+  animation-delay: 60ms;
+}
+.lane-cascade > :nth-child(n + 4) {
+  animation-delay: 90ms;
+}
+@keyframes lane-card-rise {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+@keyframes lane-card-fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='lane-panel'],
+  [data-slot='lane-panel'] h2 {
+    transition-duration: 160ms !important;
+  }
+  .lane-cascade > * {
+    animation: lane-card-fade 160ms ease both !important;
+  }
+}

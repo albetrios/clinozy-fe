@@ -78,6 +78,7 @@
       "phone": "Telefono",
       "email": "Email",
       "gstin": "GSTIN",
+      "reviewLink": "Link recensioni Google",
       "days": "Giorni",
       "opens": "Apre",
       "closes": "Chiude",
@@ -97,12 +98,14 @@
       "state": "Stato o regione",
       "email": "sede@clinica.it",
       "gstin": "15 caratteri",
+      "reviewLink": "https://g.page/r/…/review",
       "team": "Scegli il team",
       "time": "Scegli un orario"
     },
     "hints": {
       "colour": "contraddistingue questa sede ovunque",
       "phone": "10 cifre",
+      "reviewLink": "inviato quando chiedi una recensione a un paziente dopo un pagamento",
       "team": "chi lavora qui",
       "preselected": "preselezionato nei moduli qui",
       "addFirst": {
@@ -130,6 +133,7 @@
     "duplicate": "Esiste già una sede chiamata {{name}}",
     "phoneInvalid": "Il telefono deve avere 10 cifre",
     "emailInvalid": "Inserisci un indirizzo email valido",
+    "reviewLinkInvalid": "Inserisci un link che inizi con https://",
     "added": "Sede {{name}} aggiunta",
     "saved": "{{name}} salvata",
     "contactMissing": "Aggiungi telefono ed email",

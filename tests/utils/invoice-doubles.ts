@@ -55,6 +55,7 @@ export const INVOICE_TEST_BRANCHES: BranchOption[] = [
     opensAt: '10:00',
     closesAt: '19:00',
     workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+    reviewLink: null,
   },
   {
     id: TEST_VESU_BRANCH_ID,
@@ -64,6 +65,7 @@ export const INVOICE_TEST_BRANCHES: BranchOption[] = [
     opensAt: '10:00',
     closesAt: '19:00',
     workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+    reviewLink: null,
   },
 ];
 

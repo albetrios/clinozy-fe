@@ -576,11 +576,21 @@ export function templateText(kind: TemplateKind, ctx: MessageContext): string {
     case 'followUp':
       return tm(content.templates.followUp, { first: ctx.first, interest: ctx.interest });
     case 'review':
-      return tm(content.templates.review, {
-        first: ctx.first,
-        reviewLink: fillToken(tm, 'reviewLink'),
-      });
+      return reviewRequestText(tm, ctx.first, fillToken(tm, 'reviewLink'));
   }
+}
+
+/**
+ * The Review template's message — "Thank you for visiting us, Bhooshan! … <review link>" — in
+ * the message language `tm` speaks: the composer fills the link's placeholder, the Payment
+ * received view the branch's link itself (`feat-payment-celebration` D12) — one text, two places.
+ */
+export function reviewRequestText(
+  tm: TFunction,
+  first: string,
+  reviewLink: string,
+): string {
+  return tm(content.templates.review, { first, reviewLink });
 }
 
 /** The "Explain <term>" chip's message (`_patterns.md:182`). */

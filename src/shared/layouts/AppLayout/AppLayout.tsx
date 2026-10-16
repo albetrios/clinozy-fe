@@ -1,6 +1,7 @@
 import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import { useRefreshSettle } from '@/lib/animations/index.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { BugReportLazy } from '@/shared/components/BugReport/index.ts';
 import { CommandPaletteLazy } from '@/shared/components/CommandPalette/index.ts';
@@ -18,10 +19,12 @@ import { SectionBarShell } from '@/shared/layouts/AppLayout/AppLayoutSectionBar.
  * Main authenticated layout: the clinic launch's one shell, the section bar
  * (KICKOFF §3.2) — one design per surface, so there is no shell to pick. The
  * org shell route only renders it for a team deployment (`requireTeamDeployment`,
- * D44). Exports `Component` for lazy() resolution.
+ * D44). Exports `Component` for lazy() resolution. It also settles every list
+ * the in-place skeleton leaves (`useRefreshSettle`, change-motion-polish).
  */
 export function Component() {
   useOrgBrand();
+  useRefreshSettle();
   const { t } = useTranslation(ERRORS_NS);
   const { organizationSlug = '' } = useParams({ strict: false });
   const { entries: navItems } = useAppNav();

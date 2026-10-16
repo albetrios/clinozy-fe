@@ -1,0 +1,66 @@
+/* A number that rolls to its next value (`RollingNumber`, change-motion-polish
+   D10; retuned by change-motion-consistency): the old and the new value share
+   one grid cell, clipped to the line; the new one arrives from below when the
+   number grew (`data-roll="up"`) and from above when it shrank, the old one
+   (drawn from `data-value`) leaving the other way — 240ms on the strong
+   ease-out, through a 2px blur. Only translate, opacity and the blur move.
+   Shipped with the lazy chunks that roll a number, never the first paint.
+   Reduced motion: no roll, but the two values still crossfade (160ms) — the
+   change stays visible; gentler, not zero. */
+[data-slot='rolling-number'] {
+  display: inline-grid;
+  overflow: hidden;
+}
+[data-slot='rolling-number'] > * {
+  grid-area: 1 / 1;
+}
+[data-slot='rolling-number'][data-roll='up'] {
+  --roll-from: 0.7em;
+  --roll-to: -0.7em;
+}
+[data-slot='rolling-number'][data-roll='down'] {
+  --roll-from: -0.7em;
+  --roll-to: 0.7em;
+}
+[data-roll-layer='in'] {
+  animation: rolling-number-in 240ms var(--ease-out-strong) both;
+}
+[data-roll-layer='out'] {
+  animation: rolling-number-out 240ms var(--ease-out-strong) both;
+}
+/* The leaving value is drawn, not written: the number's text stays its value. */
+[data-roll-layer='out']::before {
+  content: attr(data-value);
+}
+@keyframes rolling-number-in {
+  from {
+    translate: 0 var(--roll-from);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+@keyframes rolling-number-out {
+  to {
+    translate: 0 var(--roll-to);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+@keyframes rolling-number-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rolling-number-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-roll-layer='in'] {
+    animation: rolling-number-fade-in 160ms ease both !important;
+  }
+  [data-roll-layer='out'] {
+    animation: rolling-number-fade-out 160ms ease both !important;
+  }
+}

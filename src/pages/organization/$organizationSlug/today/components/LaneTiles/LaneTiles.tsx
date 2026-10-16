@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import { TODAY_LANES, type TodayLane } from '@/shared/api/app/today-contracts.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { RollingNumber } from '@/shared/components/RollingNumber/index.ts';
 import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
@@ -27,6 +28,8 @@ export interface LaneTilesProps {
   visible?: readonly TodayLane[];
   /** The clinic day, for wording each hint's time. */
   today: string;
+  /** The floor's first load: its counts arrive, they do not change — none rolls. */
+  loading?: boolean;
   onSelect: (lane: TodayLane) => void;
 }
 
@@ -57,11 +60,13 @@ const DIMMED_TILE_INK = {
  * 12:40 PM", 86px) stays on one line wherever the row lands: at 1280 seven
  * 125px tiles (106 made eight 108px tracks there — 81px for the hint), at
  * 1440 eight 128px tracks. The time itself never breaks (`useAppClock`
- * keeps it one token). Below `md` one snap strip of 128px tiles that bleeds to
- * the screen edges. Each tile: the label in the lane's ink, the
- * count, up to four faces then "+N", and the hint. Lanes outside the member's
- * focus recede ({@link DIMMED_TILE_INK}); hover inks the border at once (no
- * transition).
+ * keeps it one token). Below `md` one snap strip of 128px tiles that bleeds
+ * to the screen edges. Each tile: the label in the lane's ink, the count (a
+ * {@link RollingNumber}: a check-in rolls Arriving down and Waiting up —
+ * change-motion-polish), up to four faces then "+N", and the hint. Lanes
+ * outside the member's focus recede ({@link DIMMED_TILE_INK}); hover inks the
+ * border at once (no transition); a held tile sinks to 97%, like a button
+ * (change-motion-consistency).
  */
 export function LaneTiles({
   lanes,
@@ -69,6 +74,7 @@ export function LaneTiles({
   focus,
   visible = TODAY_LANES,
   today,
+  loading = false,
   onSelect,
 }: LaneTilesProps) {
   const { t } = useTranslation(TODAY_NS);
@@ -109,6 +115,8 @@ export function LaneTiles({
               onClick={() => onSelect(lane)}
               className={cn(
                 'text-foreground flex w-32 shrink-0 snap-start flex-col items-start gap-1.5 rounded-lg border-[1.5px] px-3 py-2.5 text-start md:w-auto',
+                // The press every pressable has: 97% while held (the button's own class).
+                'transition-transform motion-safe:active:not-data-[variant=link]:scale-[0.97]',
                 dimmed ? tile.dimFill : paint.bg,
                 border,
                 tile.hover,
@@ -128,7 +136,12 @@ export function LaneTiles({
                   dimmed && DIMMED_TILE_INK.count,
                 )}
               >
-                {formatNumber(cards.length)}
+                {/* A count that changes while Today is open rolls to it (D10). */}
+                <RollingNumber
+                  value={cards.length}
+                  format={formatNumber}
+                  still={loading}
+                />
               </span>
               <span aria-hidden="true" className="flex min-h-5.5 items-center">
                 {faces.faces.map((face) => (

@@ -16,6 +16,8 @@ export const BRANCH_LIMITS = {
   pin: 6,
   email: 120,
   gstNumber: 15,
+  /** The Google review link: `https://`, ≤ 512 (clinozy-be's column). */
+  reviewLink: 512,
 } as const;
 
 /** One branch of the clinic (`GET /app/branches?include_inactive=true`). */
@@ -39,6 +41,8 @@ export interface AppBranch {
   phone: string;
   email: string;
   gstNumber: string | null;
+  /** The Google review link a review ask sends (`https://…`); null when not set. */
+  reviewLink: string | null;
   /** `HH:mm`, clinic-local. */
   opensAt: string;
   closesAt: string;
@@ -72,6 +76,8 @@ export interface BranchInput {
   phone: string;
   email: string;
   gstNumber: string | null;
+  /** `https://…`, or null for none. */
+  reviewLink: string | null;
   workingDays: Weekday[];
   opensAt: string;
   closesAt: string;

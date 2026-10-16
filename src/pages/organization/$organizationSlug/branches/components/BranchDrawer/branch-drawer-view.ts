@@ -110,6 +110,11 @@ export function useBranchDrawerView({
         },
         {
           kind: 'value',
+          label: t(K.fields.reviewLink),
+          value: values.reviewLink.trim(),
+        },
+        {
+          kind: 'value',
           label: t(K.fields.days),
           value: format.days(values.workingDays),
         },

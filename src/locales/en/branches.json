@@ -76,6 +76,7 @@
       "phone": "Phone",
       "email": "Email",
       "gstin": "GSTIN",
+      "reviewLink": "Google review link",
       "days": "Days",
       "opens": "Opens",
       "closes": "Closes",
@@ -95,12 +96,14 @@
       "state": "State",
       "email": "branch@clinic.com",
       "gstin": "15 characters",
+      "reviewLink": "https://g.page/r/…/review",
       "team": "Pick team",
       "time": "Pick a time"
     },
     "hints": {
       "colour": "marks this branch everywhere",
       "phone": "10 digits",
+      "reviewLink": "sent when you ask a patient for a review after a payment",
       "team": "who works here",
       "preselected": "preselected in forms here",
       "addFirst": {
@@ -128,6 +131,7 @@
     "duplicate": "A branch called {{name}} already exists",
     "phoneInvalid": "Phone needs 10 digits",
     "emailInvalid": "Enter a valid email address",
+    "reviewLinkInvalid": "Enter a link that starts with https://",
     "added": "{{name}} branch added",
     "saved": "{{name}} saved",
     "contactMissing": "Add the phone and email",

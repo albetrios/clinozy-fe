@@ -13,10 +13,13 @@ import { cn } from '@/lib/utils.ts';
  * light-red `danger` (a tinted fill, red ink and edge: the row actions'
  * destructive button, H:128) beside the red-filled `destructive`, and the
  * phone's floating `pill` (52px, 14px, the FAB shadow; H:103). A `pill`
- * carries `data-slot="pill"`, so the Sharp shape squares it.
+ * carries `data-slot="pill"`, so the Sharp shape squares it. And the press
+ * (change-motion-polish): every variant but `link` (its `data-variant`) sinks
+ * to 97% while held — `scale` rides the button's own transition — and not
+ * under reduced motion. One base class, so the entry chunk carries it once.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-body font-medium transition-[color,background-color,border-color,box-shadow] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-body font-medium transition-[color,background-color,border-color,box-shadow,scale] motion-safe:active:not-data-[variant=link]:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {

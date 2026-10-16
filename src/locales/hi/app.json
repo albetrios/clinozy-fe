@@ -1439,6 +1439,39 @@
       "error": "रिपोर्ट नहीं भेजी जा सकी। आपका लिखा हुआ यहीं है — फिर से कोशिश करें।"
     }
   },
+  "paymentReceived": {
+    "title": "भुगतान मिल गया",
+    "amount": "{{amount}} मिले",
+    "from": "{{name}} से",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "इनवॉइस {{invoice}} का पूरा भुगतान हो गया",
+      "due": "इनवॉइस {{invoice}} पर अभी {{amount}} बाकी हैं",
+      "advance": "अग्रिम के रूप में रखा गया",
+      "creditSettled": "{{credit}} पूरी तरह निपट गया",
+      "creditLeft": "{{credit}} पर अभी {{amount}} बाकी हैं"
+    },
+    "summary": "भुगतान में सहेजा गया",
+    "done": "हो गया",
+    "reviews": {
+      "askTitle": "{{first}} से Google रिव्यू माँगें",
+      "askBody": "विज़िट अभी ताज़ा है — पूछने का सबसे अच्छा समय।",
+      "send": "WhatsApp पर भेजें",
+      "sending": "कतार में डाल रहे हैं…",
+      "queued": "{{first}} की चैट में कतार में",
+      "failed": "संदेश कतार में नहीं डाला जा सका · फिर से कोशिश करें",
+      "log": "रिव्यू दर्ज करें",
+      "noLink": "इस शाखा का Google रिव्यू लिंक अभी नहीं है।",
+      "addLink": "लिंक जोड़ें",
+      "askAdmin": "किसी एडमिन से इसे उपयोगकर्ता › शाखाएँ में जोड़ने को कहें।",
+      "thanked": "Google पर रिव्यू दिया · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Google पर रिव्यू दिया · {{date}}",
+      "previous": "पिछले रिव्यू",
+      "all": "सभी रिव्यू ({{count}})",
+      "needsCall": "कॉल करना है",
+      "rated": "5 में से {{rating}} रेटिंग"
+    }
+  },
   "billingPlans": {
     "upgradeTo": "{{name}} पर अपग्रेड करें",
     "plan": {

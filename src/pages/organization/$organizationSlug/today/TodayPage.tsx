@@ -217,6 +217,7 @@ export function TodayPage() {
                 focus={focus}
                 visible={visibleLanes}
                 today={today}
+                loading={floor.loading}
                 onSelect={(next) => patchSearch({ lane: next })}
               />
               <LanePanel

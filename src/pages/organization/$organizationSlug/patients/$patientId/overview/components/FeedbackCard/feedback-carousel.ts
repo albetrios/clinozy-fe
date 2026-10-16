@@ -1,3 +1,4 @@
+import { prefersReducedMotion } from '@/lib/animations/prefers-reduced-motion.ts';
 import { useScrollEdges } from '@/shared/hooks/useScrollEdges/index.ts';
 
 /** How far a ‹ › press scrolls: 90% of the track (H:4389). */
@@ -27,7 +28,8 @@ export function useFeedbackCarousel(): FeedbackCarousel {
     const rtl = getComputedStyle(node).direction === 'rtl';
     node.scrollBy({
       left: node.clientWidth * STEP * direction * (rtl ? -1 : 1),
-      behavior: 'smooth',
+      // A scripted smooth scroll ignores the global reduce rule: it asks (feat-payment-celebration).
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
     });
   };
 

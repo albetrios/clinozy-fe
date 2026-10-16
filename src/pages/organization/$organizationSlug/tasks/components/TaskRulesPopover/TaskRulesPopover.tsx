@@ -28,7 +28,7 @@ import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
  * stays the page colour in both modes, as the design's.
  */
 const RULE_SWITCH =
-  'h-5 w-8.5 p-px duration-150 data-[state=checked]:bg-success data-[state=unchecked]:bg-border-strong dark:data-[state=unchecked]:bg-border-strong [&>[data-slot=switch-thumb]]:bg-background';
+  'h-5 w-8.5 p-px data-[state=checked]:bg-success data-[state=unchecked]:bg-border-strong dark:data-[state=unchecked]:bg-border-strong [&>[data-slot=switch-thumb]]:bg-background';
 
 /** The rows the panel stands in for while the settings load. */
 const SKELETON_RULES = 6;

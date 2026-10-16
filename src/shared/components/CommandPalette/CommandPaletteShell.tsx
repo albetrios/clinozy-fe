@@ -79,10 +79,13 @@ export function CommandPaletteShell({ children }: { children: ReactNode }) {
       >
         <DialogPrimitive.Portal>
           {/* The dim behind the menu; a press on it closes the menu. The slot
-              marks a modal dialog as up (it hides the feedback trigger). */}
+              marks a modal dialog as up (it hides the feedback trigger). The
+              menu and its dim appear and leave at once: it is opened from the
+              keyboard many times a day, and a keyboard action never animates
+              (change-motion-consistency D8). */}
           <DialogPrimitive.Overlay
             data-slot="dialog-overlay"
-            className="bg-overlay/35 animate-fade fixed inset-0 z-50"
+            className="bg-overlay/35 fixed inset-0 z-50"
           />
           {/* The design's frame (H:2669–2671): 12vh from the top and a 16px
               gutter at every width — min(640px, 100% − 32px), 358px at 390 —
@@ -100,7 +103,7 @@ export function CommandPaletteShell({ children }: { children: ReactNode }) {
               // shell's cleanup hands it back, so Radix's own return stands down.
               onCloseAutoFocus={(event) => event.preventDefault()}
               data-slot="dialog-content"
-              className="bg-popover text-popover-foreground animate-dropdown-in pointer-events-auto box-content flex max-h-[min(35rem,76vh)] w-full max-w-160 flex-col overflow-hidden rounded-xl border outline-none"
+              className="bg-popover text-popover-foreground pointer-events-auto box-content flex max-h-[min(35rem,76vh)] w-full max-w-160 flex-col overflow-hidden rounded-xl border outline-none"
             >
               {children}
             </DialogPrimitive.Content>
