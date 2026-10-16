@@ -1118,6 +1118,9 @@
       "time": "Uhrzeit",
       "pickDate": "Wählen Sie ein Datum, um Zeiten zu sehen",
       "none": "An diesem Tag sind keine Zeiten buchbar · wählen Sie ein anderes Datum",
+      "loading": "Zeiten werden geladen…",
+      "failed": "Zeiten konnten nicht geladen werden · wählen Sie das Datum erneut, um es noch einmal zu versuchen",
+      "unasked": "Für Zeiten braucht es einen Arzt und eine geöffnete Filiale · prüfen Sie beides",
       "closed": {
         "past": "Dieser Tag ist vorbei · wählen Sie ein anderes Datum",
         "branchInactive": "Diese Filiale nimmt keine Buchungen an",

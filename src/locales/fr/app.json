@@ -1134,6 +1134,9 @@
       "time": "Heure",
       "pickDate": "Choisissez une date pour voir les heures",
       "none": "Aucun horaire à réserver ce jour-là · choisissez une autre date",
+      "loading": "Chargement des horaires…",
+      "failed": "Impossible de charger les horaires · choisissez à nouveau la date pour réessayer",
+      "unasked": "Les horaires nécessitent un médecin et une agence ouverte · vérifiez les deux",
       "closed": {
         "past": "Ce jour est passé · choisissez une autre date",
         "branchInactive": "Cette agence ne prend pas de réservations",

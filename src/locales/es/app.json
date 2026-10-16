@@ -1134,6 +1134,9 @@
       "time": "Hora",
       "pickDate": "Elige una fecha para ver horarios",
       "none": "No hay horarios para reservar este día · elige otra fecha",
+      "loading": "Cargando horarios…",
+      "failed": "No se pudieron cargar los horarios · elige la fecha de nuevo para reintentar",
+      "unasked": "Los horarios necesitan un médico y una sede abierta · revisa ambos",
       "closed": {
         "past": "Este día ya pasó · elige otra fecha",
         "branchInactive": "Esta sede no acepta reservas",
