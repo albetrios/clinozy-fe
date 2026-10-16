@@ -1128,6 +1128,9 @@
       "time": "Time",
       "pickDate": "Pick a date to see times",
       "none": "No times to book on this day · pick another date",
+      "loading": "Loading times…",
+      "failed": "Couldn't load times · pick the date again to retry",
+      "unasked": "Times need a doctor and an open branch · check both",
       "closed": {
         "past": "This day has passed · pick another date",
         "branchInactive": "This branch is not taking bookings",

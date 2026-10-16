@@ -1144,6 +1144,9 @@
       "time": "Ora",
       "pickDate": "Scegli una data per vedere gli orari",
       "none": "Nessun orario prenotabile in questo giorno · scegli un’altra data",
+      "loading": "Caricamento degli orari…",
+      "failed": "Impossibile caricare gli orari · scegli di nuovo la data per riprovare",
+      "unasked": "Gli orari richiedono un medico e una sede aperta · controlla entrambi",
       "closed": {
         "past": "Questo giorno è passato · scegli un’altra data",
         "branchInactive": "Questa sede non accetta prenotazioni",

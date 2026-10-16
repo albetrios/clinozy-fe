@@ -31,6 +31,7 @@ import {
 import {
   type AppointmentDraft,
   type AppointmentFormChange,
+  type AppointmentSlotsStatus,
   hourLabel,
   type SavedSlot,
   slotColumns,
@@ -58,6 +59,8 @@ export interface DateTimeStepProps {
    * — undefined until a date and a doctor are set.
    */
   slots: AppointmentSlotDay | undefined;
+  /** Why `slots` is missing — drives the line shown in place of the grid. */
+  slotsStatus: AppointmentSlotsStatus;
   slotStep: AppointmentSlotStep;
   onSlotStepChange: (step: AppointmentSlotStep) => void;
   /** The calendar's month, `YYYY-MM-01` — its own, not the date's. */
@@ -312,10 +315,21 @@ const CLOSED_KEYS: Readonly<Record<AppointmentClosedReason, string>> = {
  * day, a holiday by its name, the doctor off), or an open day with no free
  * start left ("No times to book on this day"); null when the grid shows.
  */
-function useSlotHint(date: string | null, slots: AppointmentSlotDay | undefined) {
+function useSlotHint({
+  date,
+  slots,
+  status,
+}: {
+  date: string | null;
+  slots: AppointmentSlotDay | undefined;
+  status: AppointmentSlotsStatus;
+}) {
   const { t } = useTranslation(APPOINTMENT_FORM_NS);
   if (!date) return t(K.pickDate);
-  if (!slots) return null;
+  if (!slots) {
+    if (status === 'error') return t(K.failed);
+    return status === 'idle' ? t(K.unasked) : t(K.loading);
+  }
   if (!slots.isOpen) {
     const reason = slots.closedReason ?? 'closed_day';
     if (reason === 'holiday' && !slots.closedLabel) return t(K.closed.closedDay);
@@ -337,6 +351,7 @@ export function DateTimeStep({
   onChange,
   saved,
   slots,
+  slotsStatus,
   slotStep,
   onSlotStepChange,
   month,
@@ -352,7 +367,7 @@ export function DateTimeStep({
   };
   const hours = slotHours(slots?.slots ?? []);
   const columns = slotColumns(hours);
-  const hint = useSlotHint(draft.date, slots);
+  const hint = useSlotHint({ date: draft.date, slots, status: slotsStatus });
   return (
     <div className="flex flex-col gap-2.5">
       <QuickDates draft={draft} today={today} disabled={disabled} onPick={pickDate} />

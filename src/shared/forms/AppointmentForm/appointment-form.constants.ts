@@ -113,6 +113,10 @@ export const APPOINTMENT_FORM_KEYS = {
     pickDate: 'appointmentForm.slot.pickDate',
     /** An open day with no free start left. */
     none: 'appointmentForm.slot.none',
+    /** The day's read is on its way / failed / not asked (no open branch or no doctor). */
+    loading: 'appointmentForm.slot.loading',
+    failed: 'appointmentForm.slot.failed',
+    unasked: 'appointmentForm.slot.unasked',
     /** Why the server closed the day (`closed_reason`); `holiday` takes `{{label}}`. */
     closed: {
       past: 'appointmentForm.slot.closed.past',

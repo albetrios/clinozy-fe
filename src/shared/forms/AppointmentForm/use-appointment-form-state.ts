@@ -29,6 +29,7 @@ import {
   type AppointmentFormChange,
   type AppointmentFormMode,
   type AppointmentFormPrefill,
+  type AppointmentSlotsStatus,
   emptyDraft,
   isDraftDirty,
   newDraftOf,
@@ -90,6 +91,8 @@ export interface AppointmentFormState {
   locked: boolean;
   /** The day's free starts, or why it is closed; undefined while it loads or nothing is asked. */
   slots: AppointmentSlotDay | undefined;
+  /** Why `slots` is missing: nothing asked yet, still loading, or the read failed. */
+  slotsStatus: AppointmentSlotsStatus;
   slotStep: AppointmentSlotStep;
   setSlotStep: (step: AppointmentSlotStep) => void;
   canEdit: boolean;
@@ -227,6 +230,24 @@ function bookingFlags(
   return { closed, inert: readOnly || closed, canEdit: !readOnly && mayEdit };
 }
 
+/**
+ * Why the grid has no day to draw: nothing asked (no branch or doctor yet), the read failed, or
+ * it is still on its way — never a blank.
+ */
+function slotsStatusOf({
+  asked,
+  isError,
+  hasData,
+}: {
+  asked: boolean;
+  isError: boolean;
+  hasData: boolean;
+}): AppointmentSlotsStatus {
+  if (hasData) return 'ready';
+  if (!asked) return 'idle';
+  return isError ? 'error' : 'loading';
+}
+
 /** What hangs off the draft: the free slots. */
 function useDraftReads(
   draft: AppointmentDraft,
@@ -235,13 +256,17 @@ function useDraftReads(
 ) {
   const locked = row !== undefined && isAppointmentSlotLocked(draft.status);
   const [slotStep, setSlotStep] = useState<AppointmentSlotStep>(30);
-  const slots = useAppointmentSlots(
-    slotQueryOf(draft, { locked, step: slotStep, branchId }),
-  );
+  const query = slotQueryOf(draft, { locked, step: slotStep, branchId });
+  const slots = useAppointmentSlots(query);
   return {
     isPatient: draft.who?.kind === 'patient',
     locked,
     slots: slots.data,
+    slotsStatus: slotsStatusOf({
+      asked: query !== null,
+      isError: slots.isError,
+      hasData: slots.data !== undefined,
+    }),
     slotStep,
     setSlotStep,
   };

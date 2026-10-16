@@ -1144,6 +1144,9 @@
       "time": "Horário",
       "pickDate": "Escolha uma data para ver os horários",
       "none": "Não há horários para agendar neste dia · escolha outra data",
+      "loading": "Carregando horários…",
+      "failed": "Não foi possível carregar os horários · escolha a data novamente para tentar de novo",
+      "unasked": "Os horários precisam de um médico e de uma unidade aberta · verifique os dois",
       "closed": {
         "past": "Este dia já passou · escolha outra data",
         "branchInactive": "Esta unidade não aceita agendamentos",
