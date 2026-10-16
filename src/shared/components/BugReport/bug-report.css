@@ -6,7 +6,9 @@
    strong ease-out from the trigger's corner (never from nothing), leave faster
    than it came, press feedback on every button, hover motion only for a fine
    pointer, and only transform / opacity / filter animated. The global
-   reduced-motion block in index.css collapses every loop to its resting frame. */
+   reduced-motion block in index.css collapses every loop to its resting frame.
+   The voice button's orb, meter and live words are the shared `VoiceInputButton`'s
+   (`src/shared/components/VoiceInputButton/voice-input.css`). */
 /* Every pressable here answers the press. */
 .bug-report-press {
   transition: transform 160ms var(--ease-out-strong);
@@ -58,92 +60,6 @@
 }
 .bug-report-stagger > :nth-child(4) {
   animation-delay: 135ms;
-}
-
-/* Listening: the mic becomes a glowing orb with two ripple rings, half a
-   cycle apart, so a ring is always leaving. */
-.bug-report-orb {
-  isolation: isolate;
-  transition:
-    background-color 200ms ease,
-    color 200ms ease,
-    box-shadow 240ms var(--ease-out-strong),
-    transform 160ms var(--ease-out-strong);
-}
-.bug-report-orb[data-listening],
-.bug-report-orb[data-listening]:hover {
-  background-color: var(--color-brand-mark-strong);
-  color: var(--color-brand-foreground);
-  box-shadow: 0 0 22px -2px color-mix(in oklch, var(--color-brand-mark) 70%, transparent);
-}
-.bug-report-orb:active:not(:disabled) {
-  transform: scale(0.94);
-}
-.bug-report-orb[data-listening]::before,
-.bug-report-orb[data-listening]::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: var(--color-brand-mark);
-  animation: bug-report-ripple 1.8s var(--ease-out-strong) infinite;
-}
-.bug-report-orb[data-listening]::after {
-  animation-delay: 0.9s;
-}
-
-/* The meter: it breathes while the room is quiet and jumps while the browser
-   hears speech — five bars on different beats so it never looks like a loop. */
-.bug-report-bars {
-  animation: bug-report-rise 200ms var(--ease-out-strong) both;
-}
-.bug-report-bars > span {
-  background-color: var(--color-brand-mark-strong);
-  transform: scaleY(0.25);
-  animation: bug-report-breathe 1.8s ease-in-out infinite;
-}
-.bug-report-bars[data-hearing] > span {
-  animation: bug-report-bar 760ms var(--ease-in-out-strong) infinite;
-}
-.bug-report-bars > span:nth-child(2) {
-  animation-delay: 120ms;
-}
-.bug-report-bars > span:nth-child(3) {
-  animation-delay: 240ms;
-}
-.bug-report-bars > span:nth-child(4) {
-  animation-delay: 60ms;
-}
-.bug-report-bars > span:nth-child(5) {
-  animation-delay: 300ms;
-}
-.bug-report-bars[data-hearing] > span:nth-child(2) {
-  animation-duration: 640ms;
-}
-.bug-report-bars[data-hearing] > span:nth-child(3) {
-  animation-duration: 820ms;
-}
-.bug-report-bars[data-hearing] > span:nth-child(4) {
-  animation-duration: 700ms;
-}
-.bug-report-bars[data-hearing] > span:nth-child(5) {
-  animation-duration: 900ms;
-}
-
-/* Words still being recognised shimmer, then settle into the text. */
-.bug-report-interim {
-  background: linear-gradient(
-    90deg,
-    var(--color-muted-foreground) 0%,
-    var(--color-foreground) 45%,
-    var(--color-muted-foreground) 90%
-  );
-  background-size: 220% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: bug-report-shimmer 2.2s linear infinite;
 }
 
 /* Sent: the panel's body crossfades (blurred, so it reads as one morph) into
@@ -202,42 +118,6 @@
     filter: blur(2px);
   }
 }
-@keyframes bug-report-ripple {
-  from {
-    opacity: 0.45;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(2.2);
-  }
-}
-@keyframes bug-report-breathe {
-  0%,
-  100% {
-    transform: scaleY(0.22);
-  }
-  50% {
-    transform: scaleY(0.42);
-  }
-}
-@keyframes bug-report-bar {
-  0%,
-  100% {
-    transform: scaleY(0.3);
-  }
-  50% {
-    transform: scaleY(1);
-  }
-}
-@keyframes bug-report-shimmer {
-  from {
-    background-position: 110% 0;
-  }
-  to {
-    background-position: -110% 0;
-  }
-}
 @keyframes bug-report-pop {
   from {
     opacity: 0;
@@ -253,13 +133,9 @@
     stroke-dashoffset: 0;
   }
 }
-/* Reduced motion keeps what aids reading: the interim words in a plain muted
-   tone instead of a moving gradient (the global block in index.css stops the loops). */
+/* Reduced motion shows the drawn check at once (the global block in index.css stops the loops;
+   the voice button's own reduced-motion rules live in `VoiceInputButton/voice-input.css`). */
 @media (prefers-reduced-motion: reduce) {
-  .bug-report-interim {
-    background: none;
-    color: var(--color-muted-foreground);
-  }
   .bug-report-check circle,
   .bug-report-check path {
     stroke-dashoffset: 0;

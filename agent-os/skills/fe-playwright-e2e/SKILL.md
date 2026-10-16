@@ -91,6 +91,7 @@ reads as deferred — nothing is written. A spec about the setup itself calls
 | `app-writes.e2e.test.ts`        | Write flows: each room saves through its drawer, and a reload still lists it |
 | `app-roles.e2e.test.ts`         | Role QA: four presets' rooms, homes and controls by code (View-as) |
 | `app-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)                                  |
+| `patient-photos.e2e.test.ts` | Patient photos: upload, select, compare Linked / Separate, remembered on a cold load (needs object storage) |
 | `settings.e2e.test.ts`             | Hash modal `#settings/...`                                         |
 | `navigation.e2e.test.ts`           | 404, auth guards                                                   |
 | `organization.e2e.test.ts`         | Picker at `/organization`                                          |

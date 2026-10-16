@@ -24,7 +24,7 @@
 | Unit / component | `src/**/*.test.tsx`       | No — `vi.mock()`                                                  |
 | E2E              | `tests/e2e/*.e2e.test.ts` | **clinozy-be** on `:3000` (required — global-setup fails if down) |
 
-**Running E2E locally:** follow `docs/reference/testing.md` → E2E → **"Local run — required env & steps"**. Required env lives in each repo's **`.env.local`** (never a plain `.env`): clinozy-be needs `RATE_LIMIT_RELAXED_CAPS=true` + `DATABASE_TLS_ENFORCED=false` + `DATABASE_RLS_SAFETY_ENFORCED=false`; clinozy-fe needs `VITE_DEV_API_URL=http://localhost:3000`. When clinozy-be's `ALLOWED_ORIGINS` admits only the dev server's origin, point the suite at that running server instead of its own `:5180` one: `E2E_BASE_URL=http://localhost:5173 pnpm test:e2e` (skips the config's `webServer`).
+**Running E2E locally:** follow `docs/reference/testing.md` → E2E → **"Local run — required env & steps"**. Required env lives in each repo's **`.env.local`** (never a plain `.env`): clinozy-be needs `RATE_LIMIT_RELAXED_CAPS=true` + `DATABASE_TLS_ENFORCED=false` + `DATABASE_RLS_SAFETY_ENFORCED=false`; clinozy-fe needs `VITE_DEV_API_URL=http://localhost:3000`. `patient-photos.e2e.test.ts` also needs object storage on clinozy-be (`S3_*` set — `pnpm setup:local` fills them). When clinozy-be's `ALLOWED_ORIGINS` admits only the dev server's origin, point the suite at that running server instead of its own `:5180` one: `E2E_BASE_URL=http://localhost:5173 pnpm test:e2e` (skips the config's `webServer`).
 
 ## Commands
 

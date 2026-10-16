@@ -6,6 +6,10 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import {
+  DRAWER_PRIMARY_ATTRIBUTE,
+  saveShortcutKeys,
+} from '@/shared/components/RecordDrawer/record-drawer-save-shortcut.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
@@ -99,7 +103,8 @@ type EditActionsProps = Omit<
 /**
  * The primary: "Saving…" (or the screen's own words) while a save runs, "Retry
  * save" after one failed; disabled until there is something to save, at 50%
- * while incomplete. With `saveFormId` it is that form's submit button.
+ * while incomplete. With `saveFormId` it is that form's submit button. ⌘ / Ctrl Enter anywhere in
+ * the drawer presses it; its hint shows the keys from `md` on a fine pointer.
  */
 function PrimaryAction({
   saveLabel,
@@ -125,6 +130,7 @@ function PrimaryAction({
   | 'testId'
 > & { className: string }) {
   const { t } = useTranslation(RECORD_DRAWER_NS);
+  const keys = saveShortcutKeys();
   const saving = saveState === 'saving';
   let label = saveLabel ?? t(RECORD_DRAWER_KEYS.save);
   if (saving) label = savingLabel ?? t(RECORD_DRAWER_KEYS.saving);
@@ -141,9 +147,21 @@ function PrimaryAction({
       data-incomplete={saveIncomplete || undefined}
       onClick={saveFormId ? undefined : onSave}
       data-testid={saveTestId ?? `${testId}-save`}
+      // ⌘ / Ctrl Enter anywhere in the drawer presses this button (feat-write-less, D8).
+      {...{ [DRAWER_PRIMARY_ATTRIBUTE]: '' }}
+      aria-keyshortcuts={keys.aria}
       className={cn(className, 'px-4', saveIncomplete && 'opacity-50')}
     >
       {label}
+      {/* The keys, quietly, where a keyboard is likely: from `md` with a fine pointer. */}
+      <span
+        aria-hidden="true"
+        data-slot="kbd"
+        data-testid={`${testId}-save-keys`}
+        className="border-primary-foreground/25 text-primary-foreground/70 ms-0.5 hidden h-4.5 items-center rounded-xs border px-1 font-sans text-[0.625rem] leading-none font-medium tracking-wide md:pointer-fine:inline-flex"
+      >
+        {keys.label}
+      </span>
     </Button>
   );
 }

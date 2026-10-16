@@ -166,8 +166,7 @@
       "contact": "{{id}} · {{phone}}",
       "openLead": "対応中のリード · {{id}} · {{phone}}",
       "open": "リードを開く",
-      "recreate": "リードを再作成",
-      "useContact": "連絡先を使う"
+      "recreate": "リードを再作成"
     },
     "more_other": " · 他 +{{count}}",
     "change": "変更",

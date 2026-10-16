@@ -292,6 +292,7 @@ export function ReceiveFields({
           placeholder={t(K.notePlaceholder)}
           autoComplete="off"
           readOnly={readOnly}
+          dictation
           data-testid={`${testId}-note`}
         />
       </DrawerField>

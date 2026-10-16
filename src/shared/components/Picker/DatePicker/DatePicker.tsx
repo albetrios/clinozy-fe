@@ -61,9 +61,10 @@ const ORDER_PROBE = new Date(2026, 10, 22);
 /**
  * The date dropdown (H:4453–4459): a {@link Picker} of "Today · Sat 3 Oct",
  * "Tomorrow · Sun 4 Oct", … grouped Today / Coming up / <Mon YYYY>, 250px
- * wide, at most 320px tall. Its search ("Type a date · e.g. 12 sep") filters
+ * wide, at most 320px tall. Its search ("Type a date · 12 sep, 2w, fri") filters
  * the list and also reads a typed date — "12 sep", "sep 12", "12/9",
- * "2026-09-12" — offering it first even outside the window. Values are civil
+ * "2026-09-12", and from today "3d", "2w", "1m", "fri", "in 2 weeks"
+ * (feat-write-less) — offering it first even outside the window. Values are civil
  * dates (`YYYY-MM-DD`); labels come from {@link useLocaleFormat}.
  */
 export function DatePicker({
@@ -127,9 +128,17 @@ export function DatePicker({
     );
     const dayAt = probe.indexOf('22');
     const monthAt = probe.indexOf('11');
+    // 11 October 2026 is a Sunday: the week from it names every weekday, Sunday first.
+    const weekday = (day: number) =>
+      (['short', 'long'] as const).map((width) =>
+        formatDate(new Date(2026, 9, 11 + day), { weekday: width }, { civilDay: true })
+          .toLowerCase()
+          .replace(/\.$/, ''),
+      );
     return {
       months: ENGLISH_MONTH_NAMES.map((english, month) => [...names(month), ...english]),
       dayFirst: dayAt < 0 || monthAt < 0 || dayAt < monthAt,
+      weekdays: Array.from({ length: 7 }, (_unused, day) => weekday(day)),
     };
   }, [formatDate]);
 

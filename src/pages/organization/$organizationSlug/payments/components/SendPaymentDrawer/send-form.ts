@@ -173,8 +173,34 @@ export const SEND_QUICK_FILLS = [
   values: { category: ExpenseCategory; amount: number; mode: SendMode };
 }[];
 
-/** The "Paid to" quick chips (`payments.md:119`); "Electricity" is a word, not a name. */
-export const PAID_TO_QUICK = ['Medline Surgicals', 'Meta ads'] as const;
+/** How many of the clinic's recent payees "Paid to" offers as chips, before "Electricity". */
+const RECENT_PAYEES_LIMIT = 4;
+
+/**
+ * The "Paid to" quick chips (`payments.md:119`; feat-write-less, D14): the clinic's own most
+ * recent payees — from its expenses, newest first, each name once (case aside), as the clinic typed
+ * it — then "Electricity", a word in the viewer's language. Never a made-up name.
+ *
+ * @param rows - Expense rows, newest first (the ledger's first page).
+ * @param electricity - "Electricity" in the viewer's language.
+ * @returns At most {@link RECENT_PAYEES_LIMIT} payees, then "Electricity" unless it is one of them.
+ */
+export function paidToQuick(
+  rows: readonly { payeeName: string | null }[],
+  electricity: string,
+): string[] {
+  const seen = new Set<string>();
+  const payees: string[] = [];
+  for (const row of rows) {
+    const name = row.payeeName?.trim() ?? '';
+    const key = name.toLocaleLowerCase();
+    if (!name || seen.has(key)) continue;
+    seen.add(key);
+    payees.push(name);
+    if (payees.length === RECENT_PAYEES_LIMIT) break;
+  }
+  return seen.has(electricity.toLocaleLowerCase()) ? payees : [...payees, electricity];
+}
 
 /** The amount quick chips, in paise: ₹500 · ₹1,000 · ₹2,000 · ₹5,000. */
 export const AMOUNT_QUICK = [50_000, 100_000, 200_000, 500_000] as const;

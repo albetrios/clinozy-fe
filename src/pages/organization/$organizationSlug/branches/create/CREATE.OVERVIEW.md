@@ -5,8 +5,10 @@ the Branches room (KICKOFF §4, §6.12, D24; `S:109`). The route renders nothing
 page reads the URL and opens the branch drawer over the list, so a refresh or a shared link
 reopens it. A new branch starts not main, Open, Mon–Sat 10:00–19:00, in the next of mint ·
 lav · blush · peach · plum, with City and State copied from the main branch and you on its
-team. Name, the address, Area, City, a six-digit PIN code, Phone and Email are required, as
-clinozy-be requires them; the branch and its team go in one `POST /app/branches`, and a name
+team. The PIN's sixth digit fills City and State — and Area when the PIN has one area, or offers
+its areas as chips — from the bundled directory (`usePinPlace` and `PinAreaChips`, as the clinic
+setup does; feat-write-less, D13); an unknown PIN says so and fills nothing. Name, the address,
+Area, City, a six-digit PIN code, Phone and Email are required, as clinozy-be requires them; the branch and its team go in one `POST /app/branches`, and a name
 another branch has (409) outlines Name. Gated like Branches — `branch:read` and the
 `app-branches` module, then `requireOrgStatus`; "New branch" itself needs `branch:create` —
 without it the link lands back on the list with the permission toast. The drawer is the room's

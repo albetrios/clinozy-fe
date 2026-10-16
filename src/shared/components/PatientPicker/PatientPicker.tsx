@@ -4,11 +4,7 @@ import { isolateJoin } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type { ContactHit } from '@/shared/api/app/contacts-contracts.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
-import {
-  CONTACT_QUICK_PICK_KEYS,
-  CONTACT_QUICK_PICK_NS,
-  ContactQuickPickField,
-} from '@/shared/components/ContactQuickPick/index.ts';
+import { ContactQuickPickField } from '@/shared/components/ContactQuickPick/index.ts';
 import { usePatient } from '@/shared/hooks/usePatients/index.ts';
 
 import type { PatientPick } from './patient-pick.ts';
@@ -63,7 +59,6 @@ export function PatientPicker({
   ...rest
 }: PatientPickerProps) {
   const { t } = useTranslation(PATIENT_PICKER_NS);
-  const { t: tPick } = useTranslation(CONTACT_QUICK_PICK_NS);
   const current = usePatient(value ?? undefined);
   const addPatient = useQuickAddPatient();
   const picked = current.data
@@ -88,6 +83,8 @@ export function PatientPicker({
       searchPlaceholder={t(PATIENT_PICKER_KEYS.placeholder)}
       searchLabel={t(PATIENT_PICKER_KEYS.label)}
       requirePhone
+      // A patient file keeps a name and a mobile; a typed handle is left out (D6).
+      takesInstagram={false}
       describe={(hit) => ({
         // Each part isolated: the phone stays whole on a right-to-left page.
         line: isolateJoin([
@@ -96,7 +93,6 @@ export function PatientPicker({
             : displayId.patient(hit.patientNumber),
           hit.primaryPhone ? formatAppPhone(hit.primaryPhone) : '',
         ]),
-        action: tPick(CONTACT_QUICK_PICK_KEYS.patient.use),
         tone: 'sage',
       })}
       onPick={(hit) => {

@@ -8,7 +8,9 @@ vi.mock('../../stock-api.ts', async (importOriginal) => ({
   fetchAllStockItems: vi.fn(),
   fetchAllStockVendors: vi.fn(),
 }));
+import { saveMyPreferences } from '@/shared/api/app/preferences-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   stockItemRow,
   stockVendorRow,
@@ -120,5 +122,25 @@ describe('StockVendorPicker and StockItemPicker (clinic-stock.md:118, 146, 149)'
       query: 'Cotton',
       vendorId: ANKIT,
     });
+  });
+});
+
+describe('StockItemPicker — Recent (feat-write-less, D11)', () => {
+  it('opens a long item list on the member’s recent picks', async () => {
+    signInTestMember();
+    const items = Array.from({ length: 9 }, (_unused, index) =>
+      stockItemRow({
+        id: `sitm_item${String(index).padStart(16, '0')}`,
+        name: `Item ${String.fromCodePoint(65 + index)}`,
+      }),
+    );
+    vi.mocked(fetchAllStockItems).mockResolvedValue(items);
+    await saveMyPreferences({ recentPicks: [`stock:item:${items[6]?.id}`] });
+    const user = setup();
+    renderStockDrawer(<Pickers />);
+
+    await user.click(await screen.findByTestId('item'));
+    const recent = await screen.findByRole('group', { name: 'Recent' });
+    expect(recent).toHaveTextContent('Item G');
   });
 });

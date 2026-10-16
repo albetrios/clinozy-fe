@@ -67,19 +67,22 @@ describe('BillingInvoicesTable', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('falls back to the PDF when there is no hosted page', () => {
-    answer([
-      {
-        ...INVOICE,
-        hostedInvoiceUrl: null,
-        invoicePdfUrl: 'https://stripe.test/in_1.pdf',
-      },
-    ]);
+  it('offers the PDF as "Download PDF", ahead of the hosted page', () => {
+    answer([{ ...INVOICE, invoicePdfUrl: 'https://stripe.test/in_1.pdf' }]);
     renderTable();
-    expect(screen.getByRole('link', { name: 'View invoice' })).toHaveAttribute(
-      'href',
-      'https://stripe.test/in_1.pdf',
+    const link = screen.getByRole('link', { name: 'Download PDF' });
+    expect(link).toHaveAttribute('href', 'https://stripe.test/in_1.pdf');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(screen.queryByRole('link', { name: 'View invoice' })).not.toBeInTheDocument();
+  });
+
+  it('reads date, total, status and the action — no due date — with the date as a day', () => {
+    renderTable();
+    // Each row reads date · total · status · action; the due date (Feb 1) went with its column.
+    expect(screen.getByTestId('billing-invoices-table')).toHaveTextContent(
+      'Jan 1, 2026$12.00paidView invoice',
     );
+    expect(screen.getByTestId('billing-invoices-table')).not.toHaveTextContent('Feb 1');
   });
 
   it('offers no link for an invoice with neither', () => {

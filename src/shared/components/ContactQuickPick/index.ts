@@ -4,7 +4,9 @@ export {
   CONTACT_QUICK_PICK_TEST_IDS,
 } from './contact-quick-pick.constants.ts';
 export {
-  markMatch,
+  EMPTY_QUICK_ADD_DRAFT,
+  markWords,
+  type NamePiece,
   QUICK_ADD_NAME_MAX,
   type QuickAddDraft,
   quickAddDraftOf,
@@ -21,4 +23,8 @@ export {
   type ContactQuickPickFieldProps,
   type ContactQuickPickFieldValue,
 } from './ContactQuickPickField.tsx';
-export { findQuickAddMobile, useQuickAddContact } from './use-quick-add-contact.ts';
+export {
+  contactValueOfDraft,
+  findQuickAddMobile,
+  useQuickAddContact,
+} from './use-quick-add-contact.ts';

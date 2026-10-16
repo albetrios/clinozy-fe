@@ -182,6 +182,10 @@ const REACHABLE = [
     '<Skeleton className="h-5 w-8 rounded-full" />',
   ],
   [
+    'a <SkeletonBar>, which draws a <Skeleton>',
+    '<SkeletonBar\n  shape="field"\n  className="h-8 w-24 rounded-full"\n/>',
+  ],
+  [
     'an <Avatar> and its <AvatarFallback>',
     '<><Avatar className="rounded-full" /><AvatarFallback className="rounded-full" /></>',
   ],

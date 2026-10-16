@@ -931,10 +931,6 @@
     "found_many": "{{count}} pessoas encontradas",
     "found_other": "{{count}} pessoas encontradas",
     "noMatch": "Nenhuma correspondência",
-    "use": "Usar contato",
-    "addNamed": "Adicionar “{{name}}” como novo contato",
-    "addPhone": "Adicionar {{phone}} como novo contato",
-    "addNamedPhone": "Adicionar “{{name}}” · {{phone}} como novo contato",
     "enterKey": "↵",
     "clearSearch": "Limpar busca",
     "added": "{{name}} adicionado aos contatos",
@@ -952,11 +948,7 @@
     },
     "patient": {
       "newPatient": "Novo paciente",
-      "addNamed": "Adicionar “{{name}}” como novo paciente",
-      "addPhone": "Adicionar {{phone}} como novo paciente",
-      "addNamedPhone": "Adicionar “{{name}}” · {{phone}} como novo paciente",
       "add": "Adicionar paciente",
-      "use": "Usar paciente",
       "added": "{{name}} adicionado como paciente",
       "existing": "{{name}} já é paciente · selecionado"
     }
@@ -1461,15 +1453,6 @@
       "signedAs": "Enviado como {{name}}, com esta página e a versão do app.",
       "close": "Fechar"
     },
-    "voice": {
-      "start": "Ditar com a sua voz",
-      "stop": "Parar de ditar",
-      "listening": "Ouvindo…",
-      "hearing": "Estou ouvindo…",
-      "denied": "O microfone está bloqueado. Permita-o no navegador para ditar.",
-      "noSpeech": "Não entendi — toque no microfone e tente de novo.",
-      "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar."
-    },
     "send": {
       "idle": "Enviar",
       "sending": "Enviando…",
@@ -1509,5 +1492,129 @@
       "needsCall": "Precisa de ligação",
       "rated": "Nota {{rating}} de 5"
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "Fazer upgrade para {{name}}",
+    "plan": {
+      "perMonth": "/ mês",
+      "billedYearlyTotal": "Cobrança anual · {{price}} por ano",
+      "monthlyOnly": "Cobrança mensal — sem opção anual",
+      "freeForever": "Grátis para sempre",
+      "save": "Economize {{percent}}%",
+      "saveUpTo": "Economize até {{percent}}%",
+      "includes": "Inclui:",
+      "everythingInPlus": "Tudo do {{name}}, e mais:",
+      "everythingIn": "Tudo do {{name}}",
+      "audienceSolo": "Para um profissional sozinho",
+      "audienceTeam": "Para equipes de até {{seats}}",
+      "audienceAny": "Para equipes de qualquer tamanho",
+      "seatsOne": "1 assento",
+      "seatsUpTo": "Até {{seats}} assentos",
+      "seatsUnlimited": "Assentos ilimitados",
+      "nextStepUp": "Próximo nível",
+      "freeFrom": "Grátis a partir de {{date}}"
+    },
+    "compare": {
+      "caption": "Todos os planos, lado a lado",
+      "current": "Atual",
+      "included": "Incluído",
+      "notIncluded": "Não incluído",
+      "notOffered": "Não oferecido",
+      "unlimited": "Ilimitados",
+      "groups": {
+        "pricing": "Preços",
+        "team": "Equipe",
+        "features": "Recursos"
+      },
+      "rows": {
+        "monthly": "Preço mensal",
+        "monthlyHint": "Cobrado todo mês.",
+        "yearly": "Preço anual",
+        "yearlyHint": "Cobrado uma vez por ano.",
+        "seats": "Assentos incluídos",
+        "seatsHint": "Pessoas que podem entrar neste espaço de trabalho."
+      }
+    },
+    "features": {
+      "auditLog": "Registro de auditoria",
+      "auditLogHint": "Veja quem mudou o quê, e quando.",
+      "sso": "Login único (SSO)",
+      "ssoHint": "Sua equipe entra com o provedor de identidade da sua empresa.",
+      "prioritySupport": "Suporte prioritário",
+      "prioritySupportHint": "Suas solicitações são atendidas primeiro."
+    },
+    "picker": {
+      "title": "Planos",
+      "sub": "Todos os planos lado a lado. Mude quando sua equipe estiver pronta.",
+      "compareTitle": "Compare os recursos dos planos",
+      "compareSub": "O que cada plano inclui, linha por linha."
+    },
+    "yourPlan": {
+      "adjust": "Ajustar plano",
+      "upgrade": "Fazer upgrade",
+      "view": "Ver planos",
+      "seatsUsed": "{{used}} de {{total}} assentos em uso",
+      "seatsUsedUnlimited": "{{used}} assentos em uso · sem limite",
+      "noPlanLine": "Escolha um plano para começar."
+    },
+    "notice": {
+      "renews": "Seu plano é renovado em {{date}}.",
+      "ends": "Sua assinatura será cancelada em {{date}}.",
+      "resubscribe": "Assinar novamente",
+      "trialEnds": "Seu teste termina em {{date}}.",
+      "pastDue": "Seu último pagamento não foi concluído. Atualize sua forma de pagamento para manter o {{name}}.",
+      "incomplete": "Seu primeiro pagamento ainda não foi concluído."
+    },
+    "confirm": {
+      "keep": "Manter {{name}}",
+      "notNow": "Agora não",
+      "now": "Atual",
+      "next": "Novo",
+      "price": "Preço",
+      "seats": "Assentos",
+      "billedYearly": "cobrança anual",
+      "gains": "O que você ganha",
+      "losses": "O que você perde",
+      "nothingLost": "Nada mais muda.",
+      "when": "Quando",
+      "whenNow": "Imediatamente. Seu ciclo de cobrança continua o mesmo.",
+      "whenProrated": "Imediatamente. A diferença do restante deste período é proporcional na próxima fatura.",
+      "whenFirst": "Imediatamente.",
+      "whenFirstPayment": "Imediatamente — em seguida você confirma sua forma de pagamento.",
+      "whenFree": "Seu plano {{name}} continua até {{date}}. Depois disso, o espaço de trabalho fica no Free.",
+      "seatWarning": "Há {{used}} assentos ocupados, contando os convites pendentes, e o {{name}} inclui {{seats}}. Até {{excess}} dos membros que entraram mais recentemente, nunca os proprietários, serão suspensos até que assentos fiquem livres."
+    }
+  },
+  "voice": {
+    "start": "Ditar com a sua voz",
+    "stop": "Parar de ditar",
+    "listening": "Ouvindo…",
+    "hearing": "Estou ouvindo…",
+    "denied": "O microfone está bloqueado. Permita-o no navegador para ditar.",
+    "noSpeech": "Não entendi — toque no microfone e tente de novo.",
+    "unavailable": "A entrada por voz não está disponível agora. Você ainda pode digitar.",
+    "say": {
+      "period": "ponto|ponto final",
+      "comma": "vírgula",
+      "question": "ponto de interrogação",
+      "exclamation": "ponto de exclamação",
+      "colon": "dois pontos",
+      "newLine": "nova linha",
+      "newParagraph": "novo parágrafo",
+      "scratch": "apague isso|apagar isso"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Diga “ponto”, “vírgula”, “nova linha” ou “apague isso”"
+  },
+  "pinPlace": {
+    "hint": "Preenche o bairro, a cidade e o estado",
+    "unknown": "Não conhecemos este CEP — digite o bairro, a cidade e o estado.",
+    "areaPick": "Escolha seu bairro"
   }
 }

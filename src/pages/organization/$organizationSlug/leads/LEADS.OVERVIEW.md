@@ -44,9 +44,10 @@ route renders nothing — this page reads the URL and opens the drawer over the 
 
 - `create/` — New lead (L-35), prefilled from `?name=&phone=`: the Contact step on the shared
   `ContactQuickPick` (change-contact-quick-pick — Recent before typing, then the person search
-  `GET /app/contacts?q=`, the typed words marked, ↑ ↓ ↵ — "Open lead" for someone with one,
-  "Re-create lead" for a patient, "Use contact" — Quick start Walk-in / Instagram DM, and the add
-  row's quick add, Name + Mobile prefilled from the search, "More details" → the shared
+  `GET /app/contacts?q=` by every word, the typed words marked, ↑ ↓ ↵ — "Open lead" for someone
+  with one, "Re-create lead" for a patient, nothing for anyone else — Quick start Walk-in /
+  Instagram DM, and the add row's quick add, Name + Mobile (+ Instagram for a typed handle)
+  prefilled from the search, "More details" → the shared
   `ContactEditor`) and Lead details, locked until there is a person. Create sends the picked
   person's `contact_id` or the new one's fields; a 409 shows the server's words
   (`lead_open_exists` with "Open"). A created lead is picked out in the list; the drawer

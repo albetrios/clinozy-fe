@@ -39,6 +39,7 @@ import {
 } from './record-drawer-chrome.tsx';
 import { useDrawerTitleFocus } from './record-drawer-focus.ts';
 import { DrawerItemsContext, withMountedItems } from './record-drawer-items.ts';
+import { pressDrawerPrimary } from './record-drawer-save-shortcut.ts';
 import {
   DRAWER_WIDTH_CLASS,
   type DrawerContentProfile,
@@ -763,6 +764,8 @@ export function RecordDrawer(props: RecordDrawerProps) {
         onOpenAutoFocus={onOpenAutoFocus}
         onCloseAutoFocus={onCloseAutoFocus}
         onEscapeKeyDown={props.onEscapeKeyDown}
+        // ⌘ / Ctrl Enter presses the footer primary, from any field (feat-write-less, D8).
+        onKeyDown={pressDrawerPrimary}
         style={{ ...panelStyle(props.panelWidth, aside), ...enter.style }}
         className={cn(
           RECORD_DRAWER_PANEL_CLASS,

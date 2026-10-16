@@ -1,7 +1,9 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import type { ContactScope } from '@/shared/api/app/contacts-api.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   DrawerField,
   DrawerInput,
@@ -9,6 +11,10 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import {
+  CONTACT_EDITOR_KEYS,
+  CONTACT_HANDLE_MAX,
+} from '@/shared/forms/ContactEditor/index.ts';
 import { ChevronLeft, UserPlus } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -42,7 +48,9 @@ export interface ContactQuickAddProps {
 
 /**
  * The contact picker's inline quick add (change-contact-quick-pick D8): Name and Mobile (+91)
- * prefilled from the search, the focus on the first empty one; ↵ in either field adds. "Add
+ * prefilled from the search, the focus on the first empty one; ↵ in either field adds. One line
+ * on a wide card; on a narrow one Name, then Mobile beside the Add button drawn as its glyph
+ * (change-compact-contact-picker D10). "Add
  * contact" checks a name ("Add a name") and the mobile — ten digits when one is required ("Add
  * a 10-digit mobile"), or when one is typed ("Mobile needs 10 digits"). While the host's add is
  * on its way (a patient being registered) the button spins and a second press waits; a failed
@@ -58,10 +66,14 @@ export function ContactQuickAdd({
   testId,
 }: ContactQuickAddProps) {
   const { t } = useTranslation(CONTACT_QUICK_PICK_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const words = CONTACT_QUICK_PICK_ADD_KEYS[scope];
   const id = useId();
   const [name, setName] = useState(draft.name);
   const [phone, setPhone] = useState(draft.phone);
+  const [instagram, setInstagram] = useState(draft.instagram);
+  // A handle typed in the search opens its own field (change-natural-contact-search D4).
+  const withHandle = draft.instagram !== '';
   const [adding, setAdding] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
@@ -74,6 +86,7 @@ export function ContactQuickAdd({
   const values = (): QuickAddDraft => ({
     name: name.trim().slice(0, QUICK_ADD_NAME_MAX),
     phone,
+    instagram: instagram.trim(),
   });
   const valid = (): boolean => {
     if (!name.trim()) {
@@ -107,7 +120,7 @@ export function ContactQuickAdd({
       }}
       aria-labelledby={`${id}-title`}
       data-testid={IDS.quickAdd(testId)}
-      className="animate-reveal @container flex flex-col gap-3 p-3"
+      className="animate-reveal @container flex flex-col gap-2.5 p-3"
     >
       <div className="flex items-center gap-1.5">
         <Button
@@ -138,9 +151,24 @@ export function ContactQuickAdd({
           </Button>
         ) : null}
       </div>
-      {/* Name · Mobile · Add in one row, stacked in a narrow drawer — the who editor's grid. */}
-      <div className="grid grid-cols-[minmax(0,1fr)_minmax(150px,190px)_auto] items-end gap-2 @max-[480px]:grid-cols-1">
-        <DrawerField label={t(K.name)} htmlFor={`${id}-name`}>
+      {/*
+        Name · Mobile · Add in one row — the who editor's grid; on a narrow card Name takes the
+        first line and Mobile shares the second with Add (change-compact-contact-picker D10). With
+        a handle: Name · Mobile, then Instagram · Add.
+      */}
+      <div
+        className={cn(
+          'grid items-end gap-2 @max-[480px]:grid-cols-[minmax(0,1fr)_auto]',
+          withHandle
+            ? 'grid-cols-[minmax(0,1fr)_minmax(150px,190px)]'
+            : 'grid-cols-[minmax(0,1fr)_minmax(150px,190px)_auto]',
+        )}
+      >
+        <DrawerField
+          label={t(K.name)}
+          htmlFor={`${id}-name`}
+          className="@max-[480px]:col-span-2"
+        >
           <DrawerInput
             ref={nameRef}
             id={`${id}-name`}
@@ -152,7 +180,11 @@ export function ContactQuickAdd({
             data-testid={IDS.quickAddName(testId)}
           />
         </DrawerField>
-        <DrawerField label={t(K.mobile)} htmlFor={`${id}-mobile`}>
+        <DrawerField
+          label={t(K.mobile)}
+          htmlFor={`${id}-mobile`}
+          className={cn(withHandle && '@max-[480px]:col-span-2')}
+        >
           <DrawerPhoneInput
             ref={phoneRef}
             id={`${id}-mobile`}
@@ -161,13 +193,36 @@ export function ContactQuickAdd({
             data-testid={IDS.quickAddMobile(testId)}
           />
         </DrawerField>
+        {withHandle ? (
+          <DrawerField
+            label={tApp(APP_KEYS.channels.instagram)}
+            htmlFor={`${id}-instagram`}
+          >
+            <DrawerInput
+              id={`${id}-instagram`}
+              capitalize={false}
+              value={instagram}
+              maxLength={CONTACT_HANDLE_MAX}
+              autoComplete="off"
+              placeholder={t(CONTACT_EDITOR_KEYS.handlePlaceholder)}
+              onChange={(event) => setInstagram(event.currentTarget.value)}
+              data-testid={IDS.quickAddInstagram(testId)}
+            />
+          </DrawerField>
+        ) : null}
+        {/* On a narrow card the button is its glyph, so the mobile keeps its width; its name stays. */}
         <Button
           type="submit"
           aria-busy={adding || undefined}
+          title={t(words.submit)}
           data-testid={IDS.quickAddSubmit(testId)}
+          className={cn(
+            '@max-[480px]:w-9 @max-[480px]:px-0',
+            withHandle && 'justify-self-end',
+          )}
         >
           {adding ? <Spinner /> : <UserPlus aria-hidden="true" />}
-          {t(words.submit)}
+          <span className="@max-[480px]:sr-only">{t(words.submit)}</span>
         </Button>
       </div>
     </form>

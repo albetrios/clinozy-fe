@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
+import { isApplePlatform } from '@/lib/apple-platform.ts';
 import {
   type DrawerContentProfile,
   RecordDrawer,
 } from '@/shared/components/RecordDrawer/index.ts';
+import { saveShortcutKeys } from '@/shared/components/RecordDrawer/record-drawer-save-shortcut.ts';
 import { SettingsList, SettingsListRow } from '@/shared/components/SettingsCard/index.ts';
+import { voiceShortcutKeys } from '@/shared/components/VoiceField/voice-shortcut.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
@@ -17,12 +20,6 @@ const KEYBOARD_SHORTCUTS_TEST_ID = 'keyboard-shortcuts-dialog';
  */
 const SHORTCUTS_DRAWER_CONTENT: DrawerContentProfile = { fieldCount: 0 };
 
-function isMacPlatform(): boolean {
-  if (typeof navigator === 'undefined') return true;
-  const uaData = (navigator as { userAgentData?: { platform?: string } }).userAgentData;
-  return /Mac|iPhone|iPad|iPod/i.test(uaData?.platform ?? navigator.userAgent);
-}
-
 /**
  * Keyboard shortcuts reference — opened via `?` or Cmd/Ctrl+/ from anywhere in
  * the app shell, and from the Account menu and ⌘K. A drawer like every other
@@ -34,7 +31,7 @@ export function KeyboardShortcutsDialog() {
   const { t } = useTranslation(LAYOUT_NS);
   const open = useUIStore((s) => s.shortcutsOpen);
   const setOpen = useUIStore((s) => s.setShortcutsOpen);
-  const mac = isMacPlatform();
+  const mac = isApplePlatform();
   const sk = LAYOUT_KEYS.app.shortcuts;
 
   const rows: { labelKey: string; keys: string }[] = [
@@ -45,6 +42,8 @@ export function KeyboardShortcutsDialog() {
     { labelKey: sk.jumpToSection, keys: '1–9 · 0' },
     { labelKey: sk.listSearch, keys: '/' },
     { labelKey: sk.leadRows, keys: 'j · k' },
+    { labelKey: sk.saveForm, keys: saveShortcutKeys().label },
+    { labelKey: sk.dictate, keys: voiceShortcutKeys().label },
     { labelKey: sk.closeDialog, keys: 'Esc' },
   ];
 

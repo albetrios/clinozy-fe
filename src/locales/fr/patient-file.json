@@ -805,7 +805,9 @@
     "updated": "Suivi mis à jour",
     "record": "Suivi",
     "noScore": "Choisissez la note du patient",
-    "offeringsPlanned": "Ajouté aux suggestions"
+    "offeringsPlanned": "Ajouté aux suggestions",
+    "useAdvised": "Reprendre le plan conseillé",
+    "samePlan": "Même plan que la dernière fois"
   },
   "review": {
     "title": "Noter un avis",

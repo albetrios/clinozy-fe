@@ -226,12 +226,26 @@ describe('ItemsNumberInput — a number cell', () => {
     await user.type(final, '12.');
     expect(final).toHaveValue('12.');
     expect(onValue).toHaveBeenLastCalledWith(1200);
-    await user.type(final, '5x0');
+    await user.type(final, '5a0');
     expect(final).toHaveValue('12.50');
     expect(onValue).toHaveBeenLastCalledWith(1250);
 
     await user.tab();
     expect(final).toHaveValue('12.5');
+  });
+
+  it('does a sum in rupees and stores its paise (feat-write-less)', async () => {
+    const onValue = vi.fn();
+    const { user } = renderCells(<NumberHarness money onValue={onValue} />);
+    const final = screen.getByRole('textbox', { name: 'Final' });
+    await user.type(final, '1500+300');
+    expect(final).toHaveValue('1500+300');
+    expect(onValue).toHaveBeenLastCalledWith(180_000);
+    await user.type(final, '+');
+    expect(onValue).toHaveBeenLastCalledWith(150_000);
+    await user.type(final, '{Backspace}');
+    await user.tab();
+    expect(final).toHaveValue('1800');
   });
 
   it('takes whole numbers by default, under a "0" placeholder', async () => {
