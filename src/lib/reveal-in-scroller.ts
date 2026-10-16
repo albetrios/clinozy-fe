@@ -1,3 +1,5 @@
+import { prefersReducedMotion } from '@/lib/animations/prefers-reduced-motion.ts';
+
 /** The nearest ancestor that scrolls vertically; null when the page itself scrolls. */
 function scrollerOf(element: HTMLElement): HTMLElement | null {
   let node = element.parentElement;
@@ -27,7 +29,8 @@ export function revealInScroller(element: HTMLElement | null, margin = 12): void
     const end = scroller.scrollTop + (box.bottom - view.bottom) + margin;
     scroller.scrollTo({
       top: box.height > view.height ? top : Math.min(top, end),
-      behavior: 'smooth',
+      // A scripted smooth scroll ignores the global reduce rule: it asks (feat-payment-celebration).
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
     });
   });
 }

@@ -1,4 +1,4 @@
-import { type RefObject, useLayoutEffect } from 'react';
+import { type RefObject, useEffectEvent, useLayoutEffect, useRef } from 'react';
 
 /** Present on an element while {@link useReplayedAnimation}'s replay plays. */
 export const REPLAYING_ATTRIBUTE = 'data-replaying';
@@ -38,11 +38,20 @@ export function useReplayedAnimation(
   ref: RefObject<HTMLElement | null>,
   animationClass: string,
   replayKey: string,
+  /**
+   * Asked as the key moves: false keeps the element still this time (the page transition's
+   * same-room moves). Not asked on the first play.
+   */
+  shouldReplay?: () => boolean,
 ): void {
+  const played = useRef(false);
+  const replays = useEffectEvent(() => shouldReplay?.() ?? true);
   // biome-ignore lint/correctness/useExhaustiveDependencies: replayKey is the replay signal, not a value the body reads — dropping it would leave the animation stuck on its first play
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (played.current && !replays()) return;
+    played.current = true;
     el.classList.remove(animationClass);
     // Reading layout forces a reflow. Without it the browser coalesces the
     // remove + add into no change at all and the animation never replays.

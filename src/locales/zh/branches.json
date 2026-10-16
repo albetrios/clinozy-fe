@@ -74,6 +74,7 @@
       "phone": "电话",
       "email": "邮箱",
       "gstin": "GSTIN",
+      "reviewLink": "Google 评价链接",
       "days": "营业日",
       "opens": "开门",
       "closes": "关门",
@@ -93,12 +94,14 @@
       "state": "邦/省",
       "email": "branch@clinic.com",
       "gstin": "15 个字符",
+      "reviewLink": "https://g.page/r/…/review",
       "team": "选择团队",
       "time": "选择时间"
     },
     "hints": {
       "colour": "在各处标识这个分院",
       "phone": "10 位数字",
+      "reviewLink": "付款后邀请患者评价时发送",
       "team": "谁在这里工作",
       "preselected": "在此处的表单中预先选中",
       "addFirst": {
@@ -126,6 +129,7 @@
     "duplicate": "已存在名为 {{name}} 的分院",
     "phoneInvalid": "电话需要 10 位数字",
     "emailInvalid": "请输入有效的邮箱地址",
+    "reviewLinkInvalid": "请输入以 https:// 开头的链接",
     "added": "已添加 {{name}} 分院",
     "saved": "已保存 {{name}}",
     "contactMissing": "请填写电话和邮箱",

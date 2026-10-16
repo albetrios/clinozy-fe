@@ -26,6 +26,7 @@ import { notify } from '@/shared/notify/index.ts';
 
 import { BRANCHES_KEYS, BRANCHES_NS, BRANCHES_TABLE_ID } from './branches.constants.ts';
 import { validateBranchesSearch } from './branches.search.ts';
+import { readBranchDrawerStep } from './components/BranchDrawer/branch-form.ts';
 import { BranchDrawer } from './components/BranchDrawer/index.ts';
 import { useBranchesDialogRoute } from './hooks/useBranchesDialogRoute/index.ts';
 import { useBranchesTable } from './hooks/useBranchesTable/index.ts';
@@ -113,6 +114,8 @@ export function BranchesPage() {
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const search = validateBranchesSearch(useSearch({ strict: false }));
+  // The step a link opens the edit drawer on, read here — the step list ships with the drawer.
+  const startStep = readBranchDrawerStep(search.step);
   const access = useBranchAccess();
   const list = useBranchRows();
   useListLoadError(list, BRANCHES_TABLE_ID);
@@ -135,7 +138,7 @@ export function BranchesPage() {
   const openEdit = (row: BranchRow) =>
     void navigate({
       ...organizationBranchEdit(organizationSlug, row.branch.id),
-      search: true,
+      search: (current: Record<string, unknown>) => ({ ...current, step: undefined }),
     });
 
   // A branch is closed from its drawer (Status), never deleted: Edit is the row's one action.
@@ -236,6 +239,7 @@ export function BranchesPage() {
         mode="edit"
         open={dialog.kind === 'edit'}
         row={dialog.kind === 'edit' ? dialog.row : undefined}
+        startStep={startStep}
         access={{
           resolved: access.isResolved,
           canWrite: access.canEdit,

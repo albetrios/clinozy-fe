@@ -143,7 +143,8 @@ export function ConsentBanner() {
         'inset-x-3 bottom-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom,0rem)+0.75rem)]',
         'sm:inset-x-auto sm:start-6 sm:w-[28.5rem]',
         'sm:bottom-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom,0rem)+1.5rem)]',
-        'animate-in fade-in slide-in-from-bottom-4 duration-300 motion-reduce:animate-none',
+        // An entrance: the strong ease-out, under 300ms (feat-payment-celebration).
+        'animate-in fade-in slide-in-from-bottom-4 duration-240 ease-out motion-reduce:animate-none',
       )}
     >
       <h2 id={titleId} className="text-lg leading-6 font-semibold">

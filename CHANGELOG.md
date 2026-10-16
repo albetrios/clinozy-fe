@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.15.0](https://github.com/albetrios/clinozy-fe/compare/v1.14.0...v1.15.0) (2026-10-15)
+
+
+### Added
+
+* **account:** choose the clinic that opens at sign-in ([#79](https://github.com/albetrios/clinozy-fe/issues/79)) ([4d42e1c](https://github.com/albetrios/clinozy-fe/commit/4d42e1c5ee8279e7db109683f70bfdcd7a665ca3))
+* **app:** a compact contact picker that keeps what was typed ([#82](https://github.com/albetrios/clinozy-fe/issues/82)) ([227d82f](https://github.com/albetrios/clinozy-fe/commit/227d82f6e97a1d76a186f797bccc530aeb93fde7))
+* **app:** give Branches its own room in the main navbar ([#77](https://github.com/albetrios/clinozy-fe/issues/77)) ([7cd2640](https://github.com/albetrios/clinozy-fe/commit/7cd2640be1f7cc54d9617912f87e85681dfa67d2))
+* **billing:** plans side by side, a confirm before every move, and Billing at a glance ([#84](https://github.com/albetrios/clinozy-fe/issues/84)) ([7da7111](https://github.com/albetrios/clinozy-fe/commit/7da7111092326b83f8feeaa0ca152d3ef2bfbc5c))
+* **fields:** write less — a common voice field, sums, date shorthand and recent picks ([#81](https://github.com/albetrios/clinozy-fe/issues/81)) ([f8c571a](https://github.com/albetrios/clinozy-fe/commit/f8c571a89e53b0403a8058e6b9647f3db888bbb4))
+* **patients:** structured Overview, easy photo upload, and Linked or Separate photo comparison ([#80](https://github.com/albetrios/clinozy-fe/issues/80)) ([aa3b53b](https://github.com/albetrios/clinozy-fe/commit/aa3b53b30f0475e952f8f44ea2b35358b599ad91))
+
 ## [1.14.0](https://github.com/albetrios/clinozy-fe/compare/v1.13.0...v1.14.0) (2026-10-14)
 
 

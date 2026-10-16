@@ -351,6 +351,16 @@ describe('ContactQuickPick — add faster', () => {
     await user.click(screen.getByTestId(IDS.quickAddSubmit(ROOT)));
     expect(notify.warning).toHaveBeenLastCalledWith('Mobile needs 10 digits');
 
+    const mobile = screen.getByTestId(IDS.quickAddMobile(ROOT));
+    await user.clear(mobile);
+    await user.type(mobile, '5555555555');
+    expect(mobile).toHaveAttribute('aria-invalid', 'true');
+    await user.click(screen.getByTestId(IDS.quickAddSubmit(ROOT)));
+    expect(notify.warning).toHaveBeenLastCalledWith(
+      'Not a valid mobile number — Indian mobiles start with 6, 7, 8 or 9',
+    );
+    expect(callbacks.onQuickAdd).not.toHaveBeenCalled();
+
     await user.clear(screen.getByTestId(IDS.quickAddMobile(ROOT)));
     await user.click(screen.getByTestId(IDS.quickAddSubmit(ROOT)));
     expect(callbacks.onQuickAdd).toHaveBeenCalledWith({

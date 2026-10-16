@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils.ts';
 import type { AppointmentStatus, Tone } from '@/shared/api/app/app-schema.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
-import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
+import { appPhoneDigits, appPhoneProblem } from '@/shared/app/app-phone-field.ts';
 import { LEAD_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { appointmentContactCard } from '@/shared/app/appointment-display.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
@@ -152,8 +152,9 @@ function WhoEditor({
       notify.warning(t(K.addName));
       return;
     }
-    if (phone && phone.length !== 10) {
-      notify.warning(t(K.mobileDigits));
+    const problem = phone ? appPhoneProblem(phone) : null;
+    if (problem) {
+      notify.warning(t(problem === 'start' ? K.mobileStart : K.mobileDigits));
       return;
     }
     setSaving(true);
@@ -190,6 +191,7 @@ function WhoEditor({
           value={phone}
           onChange={setPhone}
           onKeyDown={onKeyDown}
+          aria-invalid={appPhoneProblem(phone) === 'start' || undefined}
           data-testid={IDS.whoEditMobile}
         />
       </DrawerField>
@@ -374,6 +376,7 @@ export function WhoSection({
               onChange={(digits) => onChange({ kind: 'newPhone', digits })}
               placeholder={t(K.mobile)}
               aria-label={t(K.mobile)}
+              aria-invalid={appPhoneProblem(draft.newPhone) === 'start' || undefined}
               disabled={disabled}
               data-testid={IDS.whoMobile}
             />

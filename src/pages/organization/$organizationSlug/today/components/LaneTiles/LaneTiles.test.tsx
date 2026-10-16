@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
-import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+import {
+  renderWithProviders,
+  renderWithQueryClient,
+} from '@/tests/utils/renderWithProviders.tsx';
 
 import { floorRow, publicId } from '../../__tests__/integration/today-fixtures.ts';
 import { groupTodayLanes, todayFocus } from '../../today.lanes.ts';
@@ -29,6 +32,28 @@ const LANES = groupTodayLanes(
   ),
   [],
 );
+
+/** A tile's count: the span that carries its ink, around its RollingNumber. */
+function countOf(tile: HTMLElement): HTMLElement {
+  const number = tile.querySelector<HTMLElement>('[data-slot="rolling-number"]');
+  const count = number?.parentElement;
+  if (!count) throw new Error('no count');
+  return count;
+}
+
+/** The tiles as Today draws them, for a rerender that keeps them mounted. */
+function tiles(lanes: typeof LANES, loading = false) {
+  return (
+    <LaneTiles
+      lanes={lanes}
+      selected="waiting"
+      focus={todayFocus(['owner'])}
+      today="2026-10-03"
+      loading={loading}
+      onSelect={vi.fn()}
+    />
+  );
+}
 
 const initialHourCycle = useLocaleStore.getState().hourCycle;
 beforeEach(() => useLocaleStore.setState({ hourCycle: 'h23' }));
@@ -135,7 +160,8 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
     expect(within(arriving).getByText('Arriving')).toHaveClass(
       'text-muted-foreground-strong',
     );
-    expect(within(arriving).getByText('0')).toHaveClass('text-foreground-soft');
+    // The count's ink sits on the span around its RollingNumber.
+    expect(countOf(arriving)).toHaveClass('text-foreground-soft');
 
     // A lane in focus keeps its full fill and the lane's ink.
     const waiting = screen.getByTestId('today-lane-waiting');
@@ -144,7 +170,8 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
     expect(within(waiting).getByText('Waiting')).toHaveClass(
       'text-tone-butter-foreground',
     );
-    expect(within(waiting).getByText('6')).not.toHaveClass('text-foreground-soft');
+    expect(countOf(waiting)).toHaveTextContent(/^6$/);
+    expect(countOf(waiting)).not.toHaveClass('text-foreground-soft');
 
     expect(await axe(container)).toHaveNoViolations();
   });
@@ -200,5 +227,28 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
       'snap-start',
       'md:w-auto',
     );
+  });
+  it('rolls a count that changes — down for the lane it left, up for the one it joined', async () => {
+    // No router: rerendering keeps the tiles mounted, as Today does.
+    const { rerender } = renderWithQueryClient(tiles(LANES));
+    const waiting = await screen.findByTestId('today-lane-waiting');
+    const number = () => countOf(waiting).firstElementChild;
+    expect(number()).not.toHaveAttribute('data-roll');
+
+    const fewer = { ...LANES, waiting: LANES.waiting.slice(1) };
+    rerender(tiles(fewer));
+    expect(number()).toHaveAttribute('data-roll', 'down');
+    expect(countOf(waiting)).toHaveTextContent(/^5$/);
+    rerender(tiles(LANES));
+    expect(number()).toHaveAttribute('data-roll', 'up');
+  });
+
+  it('lands the counts of a first load without rolling', async () => {
+    const empty = groupTodayLanes([], []);
+    const { rerender } = renderWithQueryClient(tiles(empty, true));
+    rerender(tiles(LANES, false));
+    const waiting = await screen.findByTestId('today-lane-waiting');
+    expect(countOf(waiting)).toHaveTextContent(/^6$/);
+    expect(countOf(waiting).firstElementChild).not.toHaveAttribute('data-roll');
   });
 });

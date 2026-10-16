@@ -81,7 +81,7 @@ export function PatientAddMenu({
         aria-label={t(PATIENT_ADD_MENU_KEYS.label)}
         data-testid={PATIENT_ADD_MENU_TEST_ID}
         className={cn(
-          'data-[state=open]:animate-dropdown-in flex max-w-[calc(100vw-1rem)] origin-top-right flex-col gap-px rounded-xl p-1.5 data-[state=closed]:animate-none',
+          'data-[state=open]:animate-dropdown-in flex max-w-[calc(100vw-1rem)] flex-col gap-px rounded-xl p-1.5 data-[state=closed]:animate-none',
           section ? 'w-60' : 'w-61.5',
         )}
       >

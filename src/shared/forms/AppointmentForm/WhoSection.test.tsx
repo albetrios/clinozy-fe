@@ -268,6 +268,17 @@ describe('WhoSection — the person (H:2748–2755)', () => {
     expect(notifyMock.warning).toHaveBeenLastCalledWith('Mobile needs 10 digits');
     expect(onSaveContact).not.toHaveBeenCalled();
 
+    await user.clear(mobile);
+    await user.type(mobile, '5555555555');
+    expect(mobile).toHaveAttribute('aria-invalid', 'true');
+    await user.click(within(editor).getByTestId(IDS.whoEditSave));
+    expect(notifyMock.warning).toHaveBeenLastCalledWith(
+      'Not a valid mobile number — Indian mobiles start with 6, 7, 8 or 9',
+    );
+    expect(onSaveContact).not.toHaveBeenCalled();
+    await user.clear(mobile);
+    await user.type(mobile, '98765');
+
     await user.type(mobile, '00001');
     await user.click(within(editor).getByTestId(IDS.whoEditSave));
     expect(onSaveContact).toHaveBeenCalledExactlyOnceWith(RIYA_PATIENT, {

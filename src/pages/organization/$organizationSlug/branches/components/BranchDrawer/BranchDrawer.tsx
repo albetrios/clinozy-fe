@@ -93,6 +93,8 @@ export interface BranchEditDrawerProps extends BranchDrawerBaseProps {
   /** Undefined while the list is still loading — the drawer shows its skeleton. */
   row: BranchRow | undefined;
   onSaved: () => void;
+  /** The step to open on (`?step=`; Payment received's "Add the link" → Contact), else Branch. */
+  startStep?: BranchDrawerStepId;
 }
 
 /** Props of {@link BranchDrawer}. */
@@ -279,7 +281,9 @@ function BranchDrawerSession(props: BranchDrawerProps) {
   const form = useForm<BranchFormValues>({ defaultValues: initial });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
-  const [openStep, setOpenStep] = useState<BranchDrawerStepId>('place');
+  const [openStep, setOpenStep] = useState<BranchDrawerStepId>(
+    (props.mode === 'edit' && props.startStep) || 'place',
+  );
   const readouts = useBranchDrawerView({ values, members: props.members, format });
   // The fourth step's rows save on their own; text typed there and not yet saved still asks.
   const drafts = usePlaceDrafts();

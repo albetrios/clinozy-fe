@@ -63,5 +63,6 @@ export async function fixtureActiveBranches(): Promise<BranchOption[]> {
       opensAt: branch.opensAt,
       closesAt: branch.closesAt,
       workingDays: branch.workingDays,
+      reviewLink: null,
     }));
 }

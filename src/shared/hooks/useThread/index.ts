@@ -3,6 +3,7 @@ export {
   type ChatRecipient,
   useContactHistory,
   useMessagingStatus,
+  useQueueContactMessage,
   useResendMessage,
   useSendMessage,
   useTemplateValues,

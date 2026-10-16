@@ -52,15 +52,20 @@ describe('CommandPaletteShell', () => {
       'max-w-160',
       'max-h-[min(35rem,76vh)]',
       'rounded-xl',
-      'animate-dropdown-in',
     );
     expect(dialog.parentElement).toHaveClass('px-4', 'pt-[12vh]', 'items-start');
+  });
+
+  it('opens with no animation — a keyboard action never animates (change-motion-consistency)', async () => {
+    const { dialog } = await renderShell(<span>Content</span>);
+    expect(dialog.className).not.toMatch(/\banimate-/);
+    expect(overlay().className).not.toMatch(/\banimate-/);
   });
 
   it('dims the page under the menu and closes on a press outside', async () => {
     await renderShell(<span>Content</span>);
 
-    expect(overlay()).toHaveClass('bg-overlay/35', 'animate-fade');
+    expect(overlay()).toHaveClass('bg-overlay/35');
     await user().click(overlay());
 
     await waitFor(() => expect(useUIStore.getState().commandPaletteOpen).toBe(false));

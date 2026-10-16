@@ -18,6 +18,7 @@ import {
 } from '@/shared/app/task-rules.constants.ts';
 import { personFirstName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { SelectionGlide } from '@/shared/components/SelectionGlide/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
@@ -294,8 +295,10 @@ export function WorkQueue({
         </div>
         <fieldset
           aria-label={t(TODAY_KEYS.queue.scope)}
-          className="m-0 flex min-w-0 flex-none overflow-hidden rounded-md border p-0"
+          className="relative isolate m-0 flex min-w-0 flex-none overflow-hidden rounded-md border p-0"
         >
+          {/* The pressed half's fill glides to the half picked (change-motion-polish D7). */}
+          <SelectionGlide selected='[aria-pressed="true"]' className="bg-muted" />
           {(['mine', 'everyone'] as const).map((value) => (
             <button
               key={value}

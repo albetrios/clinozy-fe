@@ -49,6 +49,7 @@ function branchInputOf(branch: AppBranch): BranchInput {
     phone: branch.phone,
     email: branch.email,
     gstNumber: branch.gstNumber,
+    reviewLink: branch.reviewLink,
     workingDays: branch.workingDays,
     opensAt: branch.opensAt,
     closesAt: branch.closesAt,

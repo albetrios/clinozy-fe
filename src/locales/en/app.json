@@ -931,7 +931,8 @@
       "back": "Back to search",
       "addName": "Add a name",
       "needMobile": "Add a 10-digit mobile",
-      "mobileDigits": "Mobile needs 10 digits"
+      "mobileDigits": "Mobile needs 10 digits",
+      "mobileStart": "Not a valid mobile number — Indian mobiles start with 6, 7, 8 or 9"
     },
     "patient": {
       "newPatient": "New patient",
@@ -1038,7 +1039,8 @@
       "mobileLabel": "Mobile",
       "save": "Save",
       "addName": "Add a name",
-      "mobileDigits": "Mobile needs 10 digits"
+      "mobileDigits": "Mobile needs 10 digits",
+      "mobileStart": "Not a valid mobile number — Indian mobiles start with 6, 7, 8 or 9"
     },
     "links": {
       "connected": "Connected lead",
@@ -1440,6 +1442,39 @@
       "sending": "Sending…",
       "sent": "Thanks — the team has it.",
       "error": "Couldn't send your report. Your words are still here — try again."
+    }
+  },
+  "paymentReceived": {
+    "title": "Payment received",
+    "amount": "{{amount}} received",
+    "from": "from {{name}}",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "Invoice {{invoice}} paid in full",
+      "due": "{{amount}} still due on invoice {{invoice}}",
+      "advance": "Kept as an advance",
+      "creditSettled": "{{credit}} settled in full",
+      "creditLeft": "{{amount}} still owed on {{credit}}"
+    },
+    "summary": "Saved to Payments",
+    "done": "Done",
+    "reviews": {
+      "askTitle": "Ask {{first}} for a Google review",
+      "askBody": "The visit is fresh — the best moment to ask.",
+      "send": "Send on WhatsApp",
+      "sending": "Queuing…",
+      "queued": "Queued in {{first}}’s chat",
+      "failed": "Couldn’t queue the message · try again",
+      "log": "Log a review",
+      "noLink": "This branch has no Google review link yet.",
+      "addLink": "Add the link",
+      "askAdmin": "Ask an admin to add it in Users › Branches.",
+      "thanked": "Reviewed on Google · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Reviewed on Google · {{date}}",
+      "previous": "Previous reviews",
+      "all": "All reviews ({{count}})",
+      "needsCall": "Needs a call",
+      "rated": "Rated {{rating}} of 5"
     }
   },
   "billingPlans": {

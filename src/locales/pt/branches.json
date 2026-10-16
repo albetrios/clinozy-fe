@@ -78,6 +78,7 @@
       "phone": "Telefone",
       "email": "E-mail",
       "gstin": "GSTIN",
+      "reviewLink": "Link de avaliações do Google",
       "days": "Dias",
       "opens": "Abre",
       "closes": "Fecha",
@@ -97,12 +98,14 @@
       "state": "Estado",
       "email": "unidade@clinica.com",
       "gstin": "15 caracteres",
+      "reviewLink": "https://g.page/r/…/review",
       "team": "Escolha a equipe",
       "time": "Escolha um horário"
     },
     "hints": {
       "colour": "identifica esta unidade em todo lugar",
       "phone": "10 dígitos",
+      "reviewLink": "enviado quando você pede uma avaliação a um paciente após um pagamento",
       "team": "quem trabalha aqui",
       "preselected": "pré-selecionado nos formulários daqui",
       "addFirst": {
@@ -130,6 +133,7 @@
     "duplicate": "Já existe uma unidade chamada {{name}}",
     "phoneInvalid": "O telefone precisa de 10 dígitos",
     "emailInvalid": "Digite um e-mail válido",
+    "reviewLinkInvalid": "Digite um link que comece com https://",
     "added": "Unidade {{name}} adicionada",
     "saved": "{{name}} salva",
     "contactMissing": "Adicione o telefone e o e-mail",

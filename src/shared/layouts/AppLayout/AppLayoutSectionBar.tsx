@@ -155,7 +155,8 @@ export function SectionBarShell({
         <SectionChip entry={nav.current} />
         <nav
           aria-label={t(LAYOUT_KEYS.app.sectionBar.nav)}
-          className="ms-1 hidden flex-none items-center gap-0.5 md:flex"
+          // Positioned and isolated for the pinned tabs' lens (PinnedTabs).
+          className="relative isolate ms-1 hidden flex-none items-center gap-0.5 md:flex"
         >
           <AllSectionsPopover
             nav={nav}

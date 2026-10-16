@@ -207,6 +207,18 @@ describe('WorkQueue (KICKOFF §6.2 Work queue aside; one task model, Q-T3)', () 
     expect(onScopeChange).toHaveBeenCalledWith('everyone');
   });
 
+  it('glides the pressed half’s fill between Mine and Everyone (change-motion-polish)', async () => {
+    renderQueue();
+    const mine = await screen.findByTestId('today-queue-scope-mine');
+    const scope = mine.parentElement;
+    expect(scope).toHaveClass('relative', 'isolate');
+    const thumb = scope?.firstElementChild;
+    expect(thumb).toHaveAttribute('data-slot', 'selection-glide');
+    expect(thumb).toHaveClass('bg-muted');
+    // No layout in jsdom: the pressed half keeps its own fill.
+    expect(mine).toHaveClass('bg-muted');
+  });
+
   it('reads the To do line when nothing is left, and shows bars while loading', async () => {
     const { unmount } = renderQueue({ entries: [] });
     expect(await screen.findByTestId('today-queue-empty')).toHaveTextContent(

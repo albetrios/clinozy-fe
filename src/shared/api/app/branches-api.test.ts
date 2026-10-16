@@ -43,6 +43,7 @@ describe('fetchActiveBranches', () => {
         opensAt: '09:00',
         closesAt: '20:00',
         workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+        reviewLink: null,
       },
       expect.objectContaining({ id: 'br_otheraaaaaaaaaaaaaaaa', isMain: false }),
     ]);

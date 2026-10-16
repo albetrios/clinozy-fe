@@ -87,6 +87,24 @@ export function useMessagingStatus(person: ChatPerson) {
   });
 }
 
+/**
+ * Queue one message on a contact's stream from outside the chat — the Payment received view's
+ * review ask (`feat-payment-celebration` D12): the same `send-message` the composer posts, so it
+ * joins their thread (read again) and their stream; clinozy-be queues it in its outbox. A
+ * failure is the caller's to show (no toast).
+ */
+export function useQueueContactMessage(contactId: string) {
+  const threadKey = messageQueryKeys.thread(
+    chatPersonKey({ kind: 'contact', contactId }),
+  );
+  return useAppMutation<ChatMessage, { channel: ComposerMode; body: string }>({
+    mutationFn: ({ channel, body }, action) =>
+      sendContactActivity({ contactId, channel, body, ...action }),
+    invalidateKeys: [threadKey, ...MESSAGE_SIDE_EFFECT_KEYS, contactQueryKeys.all],
+    notifyOnError: false,
+  });
+}
+
 /** The clinic's name, branch address and links and the free slots the composer fills in. */
 export function useTemplateValues(person: ChatPerson) {
   return useAppQuery({

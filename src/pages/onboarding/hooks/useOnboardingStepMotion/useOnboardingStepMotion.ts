@@ -1,15 +1,16 @@
 import { animate, createTimeline, cubicBezier } from 'animejs';
 import { useLayoutEffect, useRef } from 'react';
 
+import { MOTION_CURVES } from '@/lib/animations/motion-curves.ts';
 import { prefersReducedMotion } from '@/lib/animations/prefers-reduced-motion.ts';
 
 import { ONBOARDING_MOTION } from '../../onboarding.constants.ts';
 
 /** Strong ease-out — entering wizard steps (Emil: responsive, not ease-in). */
-const EASE_STEP_ENTER = cubicBezier(0.23, 1, 0.32, 1);
+const EASE_STEP_ENTER = cubicBezier(...MOTION_CURVES.outStrong);
 
-/** iOS-like settle for the card shell (drawer curve). */
-const EASE_CARD_ENTER = cubicBezier(0.32, 0.72, 0, 1);
+/** iOS-like settle for the card shell (the sheet curve). */
+const EASE_CARD_ENTER = cubicBezier(...MOTION_CURVES.sheet);
 
 /** Settle element at rest so Strict Mode remounts never flash mid-animation. */
 function settleMotionTarget(el: HTMLElement | null) {

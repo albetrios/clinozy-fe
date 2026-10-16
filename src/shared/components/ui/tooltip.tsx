@@ -8,7 +8,10 @@ import { cn } from '@/lib/utils.ts';
  * app's one tooltip (design H:426, H:4467–4472; KICKOFF §3.5). It shows 160ms
  * after hover, never below `md` (H:94 — the aria-label carries the name), for
  * 1,400ms on a touch press, and hides on scroll, wheel, any key or a click.
- * Callers keep the stock API.
+ * Callers keep the stock API. Its motion (change-motion-consistency): in over
+ * 120ms on the strong ease-out from its trigger, out in 100ms, and a tooltip
+ * opened while another shows (Radix's `instant-open`) appears with no
+ * animation — the delay and the motion are paid once per toolbar.
  */
 
 /** How long a touch press keeps a tooltip up (H:4470). */
@@ -114,7 +117,7 @@ function TooltipContent({
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
-          'bg-primary text-primary-foreground text-caption animate-in fade-in-0 slide-in-from-bottom-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-[2px] z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-2 py-1.25 font-medium whitespace-nowrap duration-120 max-md:hidden',
+          'bg-primary text-primary-foreground text-caption animate-in fade-in-0 slide-in-from-bottom-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-[2px] z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-2 py-1.25 font-medium whitespace-nowrap duration-120 ease-out data-[state=closed]:duration-100 data-[state=instant-open]:animate-none max-md:hidden',
           className,
         )}
         {...props}

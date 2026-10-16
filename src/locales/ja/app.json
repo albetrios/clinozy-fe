@@ -918,7 +918,8 @@
       "back": "検索に戻る",
       "addName": "名前を入力してください",
       "needMobile": "10 桁の携帯番号を入力してください",
-      "mobileDigits": "携帯番号は10桁必要です"
+      "mobileDigits": "携帯番号は10桁必要です",
+      "mobileStart": "有効な携帯番号ではありません — インドの携帯番号は6、7、8、9のいずれかで始まります"
     },
     "patient": {
       "newPatient": "新しい患者",
@@ -1025,7 +1026,8 @@
       "mobileLabel": "携帯",
       "save": "保存",
       "addName": "名前を入力してください",
-      "mobileDigits": "携帯番号は10桁必要です"
+      "mobileDigits": "携帯番号は10桁必要です",
+      "mobileStart": "有効な携帯番号ではありません — インドの携帯番号は6、7、8、9のいずれかで始まります"
     },
     "links": {
       "connected": "関連リード",
@@ -1416,6 +1418,39 @@
       "sending": "送信中…",
       "sent": "ありがとうございます。チームに届きました。",
       "error": "報告を送信できませんでした。入力内容は残っています。もう一度お試しください。"
+    }
+  },
+  "paymentReceived": {
+    "title": "支払いを受け取りました",
+    "amount": "{{amount}}を受領",
+    "from": "{{name}}さんから",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "請求書 {{invoice}} は全額支払い済み",
+      "due": "請求書 {{invoice}} の未払いは {{amount}}",
+      "advance": "前受金として保存",
+      "creditSettled": "{{credit}} を全額精算",
+      "creditLeft": "{{credit}} の残りは {{amount}}"
+    },
+    "summary": "支払いに保存しました",
+    "done": "完了",
+    "reviews": {
+      "askTitle": "{{first}}さんに Google のレビューをお願いする",
+      "askBody": "来院直後の今が、お願いするのに最適なタイミングです。",
+      "send": "WhatsApp で送信",
+      "sending": "キューに追加中…",
+      "queued": "{{first}}さんのチャットにキュー済み",
+      "failed": "メッセージをキューに追加できませんでした · もう一度お試しください",
+      "log": "レビューを記録",
+      "noLink": "この拠点にはまだ Google のレビューリンクがありません。",
+      "addLink": "リンクを追加",
+      "askAdmin": "管理者に「ユーザー › 拠点」で追加してもらってください。",
+      "thanked": "Google でレビュー済み · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Google でレビュー済み · {{date}}",
+      "previous": "これまでのレビュー",
+      "all": "すべてのレビュー（{{count}}）",
+      "needsCall": "要連絡",
+      "rated": "5 段階中 {{rating}}"
     }
   },
   "billingPlans": {

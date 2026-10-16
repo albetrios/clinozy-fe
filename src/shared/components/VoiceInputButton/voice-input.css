@@ -11,8 +11,8 @@
   transition:
     background-color 200ms ease,
     color 200ms ease,
-    box-shadow 240ms cubic-bezier(0.23, 1, 0.32, 1),
-    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow 240ms var(--ease-out-strong),
+    transform 160ms var(--ease-out-strong);
 }
 .voice-orb[data-listening],
 .voice-orb[data-listening]:hover {
@@ -31,7 +31,7 @@
   z-index: -1;
   border-radius: inherit;
   background: var(--color-brand-mark);
-  animation: voice-ripple 1.8s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+  animation: voice-ripple 1.8s var(--ease-out-strong) infinite;
 }
 .voice-orb[data-listening]::after {
   animation-delay: 0.9s;
@@ -53,7 +53,7 @@
 /* The meter: it breathes while the room is quiet and jumps while the browser
    hears speech — five bars on different beats so it never looks like a loop. */
 .voice-bars {
-  animation: voice-rise 200ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation: voice-rise 200ms var(--ease-out-strong) both;
 }
 .voice-bars > span {
   background-color: var(--color-brand-mark-strong);
@@ -61,7 +61,7 @@
   animation: voice-breathe 1.8s ease-in-out infinite;
 }
 .voice-bars[data-hearing] > span {
-  animation: voice-bar 760ms cubic-bezier(0.77, 0, 0.175, 1) infinite;
+  animation: voice-bar 760ms var(--ease-in-out-strong) infinite;
 }
 .voice-bars > span:nth-child(2) {
   animation-delay: 120ms;

@@ -87,7 +87,7 @@ export function LeadTitleChips({ lead }: { lead: LeadRecord }) {
             #{seq}
             <Copy
               aria-hidden="true"
-              className="-ms-1 size-0 opacity-0 transition-all duration-150 group-hover/copy:ms-0 group-hover/copy:size-3 group-hover/copy:opacity-100"
+              className="-ms-1 size-0 opacity-0 transition-[margin-inline-start,width,height,opacity] duration-150 group-hover/copy:ms-0 group-hover/copy:size-3 group-hover/copy:opacity-100"
             />
           </button>
         </TooltipTrigger>

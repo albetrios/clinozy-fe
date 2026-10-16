@@ -1,8 +1,8 @@
 /** Input types whose value is prose — anything else (tel, email, number, url…) is left alone. */
 const TEXT_TYPES = new Set(['text', 'search', '']);
 
-/** Input modes that announce a number, a phone or an email (H:4518). */
-const EXEMPT_INPUT_MODES = /tel|email|numeric|decimal/;
+/** Input modes that announce a number, a phone, an email or a link (H:4518). */
+const EXEMPT_INPUT_MODES = /tel|email|url|numeric|decimal/;
 
 /**
  * Words in a label, aria-label or placeholder that name a field which is not

@@ -31,6 +31,8 @@ const myBranchWire = wireSchema<ApiMyBranch>()(
     opens_at: clockTimeSchema,
     closes_at: clockTimeSchema,
     working_days: z.array(weekdaySchema),
+    // clinozy-be returns it to every member since feat-payment-celebration; absent before.
+    review_link: z.string().nullish(),
   }),
 );
 
@@ -45,6 +47,8 @@ export interface BranchOption {
   opensAt: string;
   closesAt: string;
   workingDays: Weekday[];
+  /** The branch's Google review link (`https://…`); null when not set. */
+  reviewLink: string | null;
 }
 
 /** A wire row as the rooms read it. */
@@ -57,6 +61,7 @@ function toBranchOption(row: z.output<typeof myBranchWire>): BranchOption {
     opensAt: row.opens_at,
     closesAt: row.closes_at,
     workingDays: row.working_days,
+    reviewLink: row.review_link ?? null,
   };
 }
 

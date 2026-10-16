@@ -13,12 +13,19 @@ import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 const state = vi.hoisted(() => ({
   setup: undefined as OnboardingSetup | undefined,
   profile: undefined as ClinicProfile | undefined,
+  setupFailed: false,
+  setupRefetch: vi.fn(),
   changeMutate: vi.fn(),
   changeMutateAsync: vi.fn(),
   updateProfileMutateAsync: vi.fn(),
 }));
 vi.mock('@/shared/hooks/useOnboardingSetup/index.ts', () => ({
-  useOnboardingSetup: () => ({ data: state.setup }),
+  useOnboardingSetup: () => ({
+    data: state.setup,
+    isError: state.setupFailed,
+    isFetching: false,
+    refetch: state.setupRefetch,
+  }),
   useChangeOnboardingSetup: () => ({
     mutate: state.changeMutate,
     mutateAsync: state.changeMutateAsync,
@@ -135,6 +142,8 @@ beforeEach(() => {
   useOrganizationStore.getState().setOrganization('org_test', 'acme');
   state.setup = setupOf();
   state.profile = PROFILE;
+  state.setupFailed = false;
+  state.setupRefetch.mockResolvedValue({});
   state.changeMutateAsync.mockResolvedValue(setupOf());
   state.updateProfileMutateAsync.mockResolvedValue(PROFILE);
 });
@@ -260,6 +269,37 @@ describe('SetupDrawer — the three steps', () => {
 
     await user.click(await screen.findByTestId('setup-drawer-dismiss'));
 
+    await waitFor(() => expect(router.state.location.hash).toBe(''));
+    expect(state.changeMutate).not.toHaveBeenCalled();
+  });
+});
+
+describe('SetupDrawer — when the setup cannot be read', () => {
+  it('says so with a retry instead of an endless skeleton', async () => {
+    state.setup = undefined;
+    state.setupFailed = true;
+    renderAt('setup/location');
+
+    const drawer = await screen.findByTestId('setup-drawer');
+    expect(within(drawer).getByTestId('setup-drawer-title')).toHaveTextContent(
+      'Set up Acme Skin Clinic',
+    );
+    expect(within(drawer).getByRole('alert')).toHaveTextContent(
+      "Couldn't load your clinic's setup.",
+    );
+    expect(within(drawer).queryByTestId('setup-drawer-skeleton')).not.toBeInTheDocument();
+
+    await userEvent.click(within(drawer).getByTestId('retry-button'));
+    expect(state.setupRefetch).toHaveBeenCalledTimes(1);
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+  });
+
+  it('closes without deferring the setup it never read', async () => {
+    state.setup = undefined;
+    state.setupFailed = true;
+    const { router } = renderAt('setup');
+
+    await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(router.state.location.hash).toBe(''));
     expect(state.changeMutate).not.toHaveBeenCalled();
   });

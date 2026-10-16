@@ -28,6 +28,8 @@ export const CONTACT_QUICK_PICK_KEYS = {
     addName: 'contactPick.quickAdd.addName',
     needMobile: 'contactPick.quickAdd.needMobile',
     mobileDigits: 'contactPick.quickAdd.mobileDigits',
+    /** Ten digits, but not a first digit an Indian mobile has (6–9). */
+    mobileStart: 'contactPick.quickAdd.mobileStart',
   },
   /** A patients-only picker's words (Receive payment, the Invoice drawer — D23). */
   patient: {
