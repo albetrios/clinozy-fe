@@ -16,13 +16,22 @@ import { bearerHeaders, createTeamOrganization } from '@/tests/utils/e2e-tenancy
  * Billing & subscription UI flow (`#settings/account/billing`).
  *
  * The HTTP contract is covered by `billing-api.e2e.test.ts`; this spec drives the
- * actual panel: plan catalog, billing-cycle toggle, subscription summary,
- * invoices, payment methods, cancellation, and the personal-org gate. Billing is
+ * actual panel: the Your plan card, the plan picker ("Compare plans") with its
+ * billing-cycle toggle and feature table, the change confirm, invoices, payment
+ * methods, cancellation, and the personal-org gate. Billing is
  * a team-org feature (`subscription:manage`, `teamOrganizationOnly`), so the
  * setup creates a team org via the API and hydrates the team-scoped session.
  */
 
 const API = 'http://localhost:3000/api/v1';
+
+/** The plan header's one button ("Adjust plan" / "Upgrade plan" / "View plans") opens the picker. */
+async function openPlanPicker(page: Page) {
+  await page.getByTestId('billing-adjust-plan').click();
+  const picker = page.getByTestId('billing-plan-picker');
+  await expect(picker).toBeVisible();
+  return picker;
+}
 
 type TeamContext = { slug: string; subscribed: boolean; planCount: number };
 
@@ -118,9 +127,16 @@ test.describe('Billing & subscription', () => {
     ).toBeVisible();
 
     await expect(page.getByTestId('billing-summary')).toBeVisible();
-    await expect(page.getByTestId('plan-options')).toBeVisible();
+    // On Free: one button that invites the upgrade, and no renewal notice to give.
+    await expect(page.getByTestId('billing-adjust-plan')).toHaveText('Upgrade plan');
+    await expect(page.getByTestId('billing-notice')).toHaveCount(0);
+    const picker = await openPlanPicker(page);
+    // a11y guard: the picker is a named dialog with every plan as an article.
+    await expect(page.getByRole('dialog', { name: 'Plans' })).toBeVisible();
+    await expect(picker.getByTestId('plan-options')).toBeVisible();
+    await expect(picker.getByRole('article').first()).toBeVisible();
     // Manager-only controls are exposed.
-    await expect(page.getByTestId('billing-cycle-toggle')).toBeVisible();
+    await expect(picker.getByTestId('billing-cycle-toggle')).toBeVisible();
   });
 
   test('the billing-cycle toggle switches plan pricing between monthly and yearly', async ({
@@ -132,18 +148,57 @@ test.describe('Billing & subscription', () => {
     test.skip(ctx?.planCount === 0, 'no billing plans seeded in this environment');
 
     await openSettingsHash(page, 'account', 'billing');
-    await expect(page.getByTestId('billing-cycle-toggle')).toBeVisible({
+    await expect(page.getByTestId('billing-adjust-plan')).toBeVisible({
       timeout: 15000,
     });
+    const picker = await openPlanPicker(page);
+    const options = picker.getByTestId('plan-options');
 
-    // Defaults to monthly pricing on the plan cards.
-    await expect(page.getByText(/\/\s*mo/).first()).toBeVisible();
+    // Every card reads per month; the cycle says how it is billed.
+    await expect(page.getByTestId('billing-cycle-monthly')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(options.getByText('Billed monthly').first()).toBeVisible();
 
     await page.getByTestId('billing-cycle-yearly').click();
-    await expect(page.getByText(/\/\s*yr/).first()).toBeVisible();
+    await expect(options.getByText(/^Billed yearly · /).first()).toBeVisible();
 
     await page.getByTestId('billing-cycle-monthly').click();
-    await expect(page.getByText(/\/\s*mo/).first()).toBeVisible();
+    await expect(options.getByText('Billed monthly').first()).toBeVisible();
+  });
+
+  test('the plan picker compares features, and a move asks before it changes anything', async ({
+    page,
+    playwright,
+  }) => {
+    const ctx = await setUpTeamBilling(page, playwright, { withSubscription: false });
+    test.skip(ctx === null, 'team org could not be provisioned in this environment');
+    test.skip((ctx?.planCount ?? 0) < 2, 'fewer than two billing plans seeded');
+
+    await openSettingsHash(page, 'account', 'billing');
+    await expect(page.getByTestId('billing-summary')).toBeVisible({ timeout: 15000 });
+    const picker = await openPlanPicker(page);
+    await expect(picker.getByTestId('plan-compare-table')).toBeVisible();
+    await expect(
+      picker.getByRole('table', { name: 'Every plan, side by side' }),
+    ).toBeVisible();
+
+    // A card press opens the confirm — from → to, the price and what you get.
+    await picker
+      .getByTestId(/^plan-pln_/)
+      .first()
+      .click();
+    const confirm = page.getByTestId('plan-change-confirm');
+    await expect(confirm).toBeVisible();
+    await expect(confirm.getByTestId('plan-change-route')).toBeVisible();
+    await expect(confirm.getByTestId('plan-change-summary')).toBeVisible();
+    await expect(confirm.getByTestId('plan-change-when')).toBeVisible();
+
+    // Keep closes it and leaves the picker where it was: nothing moved.
+    await confirm.getByTestId('plan-change-confirm-keep').click();
+    await expect(confirm).toHaveCount(0);
+    await expect(picker).toBeVisible();
   });
 
   test('a subscription surfaces summary, invoices, payment methods, and cancellation', async ({
@@ -163,6 +218,8 @@ test.describe('Billing & subscription', () => {
     await expect(page.getByTestId('billing-cancellation-card')).toBeVisible();
     // A subscription keeps its own cycle (change-plan takes the plan alone), so the
     // Monthly · Yearly switch is offered only before there is one.
+    const picker = await openPlanPicker(page);
+    await expect(picker.getByTestId('plan-options')).toBeVisible();
     await expect(page.getByTestId('billing-cycle-toggle')).toHaveCount(0);
   });
 
@@ -176,8 +233,13 @@ test.describe('Billing & subscription', () => {
     });
 
     // Plan-management controls are team-only — never exposed to a personal account.
-    await expect(page.getByTestId('billing-cycle-toggle')).toHaveCount(0);
+    await expect(page.getByTestId('billing-adjust-plan')).toHaveText('View plans');
     await expect(page.getByTestId('billing-cancellation-card')).toHaveCount(0);
+    // Comparing is reading: the picker opens, with prices and no moves.
+    const picker = await openPlanPicker(page);
+    await expect(picker.getByTestId('plan-options')).toBeVisible();
+    await expect(picker.getByTestId(/^plan-pln_/)).toHaveCount(0);
+    await expect(page.getByTestId('billing-cycle-toggle')).toHaveCount(0);
   });
 
   test('cancelling a subscription runs the confirm flow without error', async ({
@@ -223,15 +285,22 @@ test.describe('Billing & subscription', () => {
     const summary = page.getByTestId('billing-summary');
     await expect(summary).toBeVisible({ timeout: 15000 });
 
-    // The current plan shows a badge, not a button — so the first plan button is
-    // an alternate plan. Selecting it changes the subscription; depending on the
-    // Stripe config that lands as a trial, an active switch, or the in-app
-    // payment step — all of which update the summary away from the current plan.
+    // A subscribed plan says when it renews, and "Adjust plan" opens the picker; an
+    // "Upgrade to <plan>" there opens its confirm, whose button changes the subscription.
+    // Depending on the Stripe config that lands as a trial, an active switch, or the in-app
+    // payment step — all of which update the header away from the current plan.
+    await expect(page.getByTestId('billing-notice')).toBeVisible();
+    await expect(page.getByTestId('billing-adjust-plan')).toHaveText('Adjust plan');
     const beforeSummary = (await summary.innerText()).trim();
-    const switchButton = page.getByTestId('plan-options').getByRole('button').first();
-    test.skip(!(await switchButton.isVisible()), 'no alternate plan seeded to switch to');
-    await switchButton.click();
+    const picker = await openPlanPicker(page);
+    const upgrade = picker.getByRole('button', { name: /^Upgrade to / }).first();
+    test.skip((await upgrade.count()) === 0, 'no dearer plan seeded to upgrade to');
+    await upgrade.click();
+    const confirm = page.getByTestId('plan-change-confirm');
+    await expect(confirm).toBeVisible();
+    await confirm.getByTestId('plan-change-confirm-accept').click();
 
+    await expect(confirm).toHaveCount(0, { timeout: 20000 });
     await expect(summary).not.toHaveText(beforeSummary, { timeout: 20000 });
   });
 

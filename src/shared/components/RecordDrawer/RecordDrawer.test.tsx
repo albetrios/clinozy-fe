@@ -859,3 +859,135 @@ describe('RecordDrawer — accessibility', () => {
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 });
+
+describe('RecordDrawer — ⌘ / Ctrl Enter saves (feat-write-less)', () => {
+  it('presses the primary from any field, with Ctrl or ⌘, and names the keys', async () => {
+    const onSave = vi.fn();
+    const { u } = await openDrawer({
+      onSave,
+      saveLabel: 'Create patient',
+      children: <input aria-label="Name" />,
+    });
+    const primary = screen.getByTestId('pt-save');
+    expect(primary).toHaveAttribute('aria-keyshortcuts', 'Control+Enter');
+    expect(primary).toHaveAccessibleName('Create patient');
+    expect(screen.getByTestId('pt-save-keys')).toHaveTextContent('Ctrl ↵');
+
+    await u.click(screen.getByRole('textbox', { name: 'Name' }));
+    await u.keyboard('{Control>}{Enter}{/Control}');
+    expect(onSave).toHaveBeenCalledTimes(1);
+    await u.keyboard('{Meta>}{Enter}{/Meta}');
+    expect(onSave).toHaveBeenCalledTimes(2);
+  });
+
+  it('leaves Enter alone with Shift or Alt, and alone without a modifier', async () => {
+    const onSave = vi.fn();
+    const { u } = await openDrawer({ onSave, children: <input aria-label="Name" /> });
+    await u.click(screen.getByRole('textbox', { name: 'Name' }));
+    await u.keyboard('{Control>}{Shift>}{Enter}{/Shift}{/Control}');
+    await u.keyboard('{Control>}{Alt>}{Enter}{/Alt}{/Control}');
+    await u.keyboard('{Enter}');
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it('does nothing while the primary is disabled, or when a field used the keys first', async () => {
+    const onSave = vi.fn();
+    const { u } = await openDrawer({
+      onSave,
+      saveDisabled: true,
+      children: <input aria-label="Name" />,
+    });
+    await u.click(screen.getByRole('textbox', { name: 'Name' }));
+    await u.keyboard('{Control>}{Enter}{/Control}');
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it('lets a field that sends on the keys keep them', async () => {
+    const onSave = vi.fn();
+    const onSend = vi.fn();
+    const { u } = await openDrawer({
+      onSave,
+      children: (
+        <textarea
+          aria-label="Message"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && event.ctrlKey) {
+              event.preventDefault();
+              onSend();
+            }
+          }}
+        />
+      ),
+    });
+    await u.click(screen.getByRole('textbox', { name: 'Message' }));
+    await u.keyboard('{Control>}{Enter}{/Control}');
+    expect(onSend).toHaveBeenCalledTimes(1);
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it('submits a form drawer’s form', async () => {
+    const onSubmit = vi.fn((event: { preventDefault: () => void }) =>
+      event.preventDefault(),
+    );
+    const { u } = await openDrawer({
+      onSave: undefined,
+      saveFormId: 'pt-form',
+      children: (
+        <form id="pt-form" onSubmit={onSubmit}>
+          <input aria-label="Name" />
+        </form>
+      ),
+    });
+    await u.click(screen.getByRole('textbox', { name: 'Name' }));
+    await u.keyboard('{Control>}{Enter}{/Control}');
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it('saves only the stacked child it was pressed in', async () => {
+    const onParentSave = vi.fn();
+    const onChildSave = vi.fn();
+    function Stacked() {
+      const child = useStackedDrawer<{ name: string }>(() => undefined);
+      return (
+        <>
+          <RecordDrawer
+            open
+            title="New purchase"
+            testId="po"
+            onClose={vi.fn()}
+            onSave={onParentSave}
+          >
+            <button type="button" onClick={() => child.open('Medline')}>
+              New supplier
+            </button>
+          </RecordDrawer>
+          <RecordDrawer
+            open={child.isOpen}
+            stacked
+            title="New supplier"
+            testId="sup"
+            onClose={child.close}
+            onSave={onChildSave}
+          >
+            <input aria-label="Supplier name" />
+          </RecordDrawer>
+        </>
+      );
+    }
+    const u = user();
+    renderWithProviders(<Stacked />);
+    await u.click(await screen.findByRole('button', { name: 'New supplier' }));
+    await u.click(await screen.findByRole('textbox', { name: 'Supplier name' }));
+    await u.keyboard('{Control>}{Enter}{/Control}');
+    expect(onChildSave).toHaveBeenCalledTimes(1);
+    expect(onParentSave).not.toHaveBeenCalled();
+  });
+
+  it('has nothing to press on a view-only drawer', async () => {
+    const { u, drawer } = await openDrawer({ readOnly: true });
+    drawer.focus();
+    await u.keyboard('{Control>}{Enter}{/Control}');
+    expect(screen.queryByTestId('pt-save')).not.toBeInTheDocument();
+    expect(screen.getByTestId('pt')).toBeInTheDocument();
+  });
+});

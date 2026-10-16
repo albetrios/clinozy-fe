@@ -176,7 +176,9 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
     expect(within(patient).getByText('Anvi Galani')).toHaveAttribute('dir', 'auto');
     expect(
       withoutBidiMarks(screen.getByTestId('new-lead-hit-10412').textContent),
-    ).toContain('Anjali ShahC-10412 · +91 98250 11241Use contact');
+    ).toContain('Anjali ShahC-10412 · +91 98250 11241');
+    // Anyone else: picking only takes them — no "Use contact" (change-natural-contact-search D8).
+    expect(screen.getByTestId('new-lead-hit-10412')).not.toHaveTextContent('Use contact');
   });
 
   it('"Open lead" goes to the person’s open lead, the form untouched', async () => {
@@ -339,6 +341,9 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
     const recent = await screen.findByTestId('new-lead-contact-recent');
     expect(within(recent).getByText('Recent')).toBeInTheDocument();
     expect(within(recent).getByTestId('new-lead-hit-10412')).toHaveTextContent(
+      'Anjali Shah',
+    );
+    expect(within(recent).getByTestId('new-lead-hit-10412')).not.toHaveTextContent(
       'Use contact',
     );
     await waitFor(() => expect(screen.getByTestId('new-lead-search')).toHaveFocus());

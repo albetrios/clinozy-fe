@@ -222,7 +222,7 @@
     "date": {
       "label": "التاريخ",
       "placeholder": "اختر تاريخًا",
-      "search": "اكتب تاريخًا · مثل 12 sep",
+      "search": "اكتب تاريخًا · 12 sep، 2w، fri",
       "today": "اليوم",
       "tomorrow": "غدًا",
       "yesterday": "أمس",

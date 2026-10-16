@@ -12,6 +12,7 @@ import {
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
+import { PLAN_DATE } from '@/shared/components/SettingsModal/account/BillingPlanComparison/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
@@ -39,13 +40,7 @@ function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
       {
         accessorKey: 'createdAt',
         header: t(INVOICE_KEYS.columns.date),
-        cell: ({ row }) => formatDate(row.original.createdAt),
-      },
-      {
-        id: 'due',
-        header: t(INVOICE_KEYS.columns.due),
-        cell: ({ row }) =>
-          row.original.dueDate ? formatDate(row.original.dueDate) : '—',
+        cell: ({ row }) => formatDate(row.original.createdAt, PLAN_DATE),
       },
       {
         id: 'total',
@@ -68,13 +63,20 @@ function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
       {
         id: 'actions',
         header: t(INVOICE_KEYS.columns.actions),
+        // As Claude's invoices read: the PDF when the provider gives one, else its hosted page.
         cell: ({ row }) => {
-          const url = row.original.hostedInvoiceUrl ?? row.original.invoicePdfUrl ?? null;
+          const { invoicePdfUrl, hostedInvoiceUrl } = row.original;
+          const url = invoicePdfUrl ?? hostedInvoiceUrl;
           if (!url) return <span className="text-muted-foreground text-body">—</span>;
           return (
-            <Button variant="ghost" size="sm" asChild data-testid="billing-invoice-view">
-              <a href={url} target="_blank" rel="noopener noreferrer">
-                {t(INVOICE_KEYS.view)}
+            <Button variant="link" size="sm" asChild data-testid="billing-invoice-view">
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-auto px-0 underline"
+              >
+                {t(invoicePdfUrl ? INVOICE_KEYS.downloadPdf : INVOICE_KEYS.view)}
               </a>
             </Button>
           );

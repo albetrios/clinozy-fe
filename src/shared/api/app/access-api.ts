@@ -14,8 +14,8 @@ import type { Section, Tone } from './app-schema.ts';
 /**
  * The clinozy-be code behind each action on a clinic section — the per-resource codes of its
  * catalog (`GET /tenancy/permissions`). Offerings have no read code: reading them is
- * `organization:read`. The Users room is its Team (`membership:*`); its Roles and Branches tabs
- * ask their own codes. Today has none: every member sees it, and each lane asks its own read.
+ * `organization:read`. The Users room is its Team (`membership:*`); its Roles tab asks its own
+ * codes. Branches is its own room on `branch:*`. Today has none: every member sees it, and each lane asks its own read.
  */
 export const SECTION_ACTION_CODES: Readonly<
   Record<Exclude<Section, 'today'>, Readonly<Record<AppAction, OrganizationPermission>>>
@@ -73,6 +73,12 @@ export const SECTION_ACTION_CODES: Readonly<
     create: 'membership:create',
     edit: 'membership:update',
     delete: 'membership:delete',
+  },
+  branches: {
+    view: 'branch:read',
+    create: 'branch:create',
+    edit: 'branch:update',
+    delete: 'branch:delete',
   },
 };
 

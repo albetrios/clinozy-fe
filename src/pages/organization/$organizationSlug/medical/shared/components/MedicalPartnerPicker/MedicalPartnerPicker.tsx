@@ -154,6 +154,12 @@ export function MedicalPartnerPicker(props: MedicalPartnerPickerProps) {
   return props.multiple ? (
     <Picker {...shared} multiple value={props.value} onChange={props.onChange} />
   ) : (
-    <Picker {...shared} value={props.value} onChange={(id) => props.onChange(id)} />
+    <Picker
+      {...shared}
+      // The member's last picks of this kind open the list (feat-write-less, D11).
+      recentKey={`medical:${kind}`}
+      value={props.value}
+      onChange={(id) => props.onChange(id)}
+    />
   );
 }

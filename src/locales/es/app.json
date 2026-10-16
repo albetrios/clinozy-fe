@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "Usuarios",
-      "description": "Equipo, roles y acceso, sucursales"
+      "description": "Equipo, roles y acceso"
+    },
+    "branches": {
+      "label": "Sucursales",
+      "description": "Cada sucursal: dirección, horario, equipo, salas y máquinas"
     }
   },
   "tones": {
@@ -937,10 +941,6 @@
     "found_many": "{{count}} personas encontradas",
     "found_other": "{{count}} personas encontradas",
     "noMatch": "Ninguna coincidencia",
-    "use": "Usar contacto",
-    "addNamed": "Añadir «{{name}}» como contacto nuevo",
-    "addPhone": "Añadir {{phone}} como contacto nuevo",
-    "addNamedPhone": "Añadir «{{name}}» · {{phone}} como contacto nuevo",
     "enterKey": "↵",
     "clearSearch": "Borrar búsqueda",
     "added": "{{name}} añadido a contactos",
@@ -958,11 +958,7 @@
     },
     "patient": {
       "newPatient": "Paciente nuevo",
-      "addNamed": "Añadir «{{name}}» como paciente nuevo",
-      "addPhone": "Añadir {{phone}} como paciente nuevo",
-      "addNamedPhone": "Añadir «{{name}}» · {{phone}} como paciente nuevo",
       "add": "Añadir paciente",
-      "use": "Usar paciente",
       "added": "{{name}} añadido como paciente",
       "existing": "{{name}} ya es paciente · seleccionado"
     }
@@ -1467,20 +1463,135 @@
       "signedAs": "Se envía como {{name}}, con esta página y la versión de la app.",
       "close": "Cerrar"
     },
-    "voice": {
-      "start": "Dictar con tu voz",
-      "stop": "Dejar de dictar",
-      "listening": "Escuchando…",
-      "hearing": "Te escucho…",
-      "denied": "El micrófono está bloqueado. Permítelo en el navegador para dictar.",
-      "noSpeech": "No te he entendido: toca el micrófono e inténtalo de nuevo.",
-      "unavailable": "La entrada por voz no está disponible ahora. Puedes escribir."
-    },
     "send": {
       "idle": "Enviar",
       "sending": "Enviando…",
       "sent": "Gracias, el equipo ya lo tiene.",
       "error": "No se pudo enviar el informe. Tu texto sigue aquí; inténtalo de nuevo."
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "Mejorar a {{name}}",
+    "plan": {
+      "perMonth": "/ mes",
+      "billedYearlyTotal": "Facturación anual · {{price}} al año",
+      "monthlyOnly": "Facturación mensual — sin opción anual",
+      "freeForever": "Gratis para siempre",
+      "save": "Ahorra un {{percent}} %",
+      "saveUpTo": "Ahorra hasta un {{percent}} %",
+      "includes": "Incluye:",
+      "everythingInPlus": "Todo lo de {{name}}, y además:",
+      "everythingIn": "Todo lo de {{name}}",
+      "audienceSolo": "Para un solo profesional",
+      "audienceTeam": "Para equipos de hasta {{seats}}",
+      "audienceAny": "Para equipos de cualquier tamaño",
+      "seatsOne": "1 asiento",
+      "seatsUpTo": "Hasta {{seats}} asientos",
+      "seatsUnlimited": "Asientos ilimitados",
+      "nextStepUp": "Siguiente nivel",
+      "freeFrom": "Gratis desde el {{date}}"
+    },
+    "compare": {
+      "caption": "Todos los planes, uno al lado del otro",
+      "current": "Actual",
+      "included": "Incluido",
+      "notIncluded": "No incluido",
+      "notOffered": "No disponible",
+      "unlimited": "Ilimitados",
+      "groups": {
+        "pricing": "Precios",
+        "team": "Equipo",
+        "features": "Funciones"
+      },
+      "rows": {
+        "monthly": "Precio mensual",
+        "monthlyHint": "Se factura cada mes.",
+        "yearly": "Precio anual",
+        "yearlyHint": "Se factura una vez al año.",
+        "seats": "Asientos incluidos",
+        "seatsHint": "Personas que pueden iniciar sesión en este espacio de trabajo."
+      }
+    },
+    "features": {
+      "auditLog": "Registro de auditoría",
+      "auditLogHint": "Consulta quién cambió qué y cuándo.",
+      "sso": "Inicio de sesión único (SSO)",
+      "ssoHint": "Tu equipo inicia sesión con el proveedor de identidad de tu empresa.",
+      "prioritySupport": "Soporte prioritario",
+      "prioritySupportHint": "Tus solicitudes se atienden primero."
+    },
+    "picker": {
+      "title": "Planes",
+      "sub": "Todos los planes, uno al lado del otro. Cambia cuando tu equipo esté listo.",
+      "compareTitle": "Compara las funciones de los planes",
+      "compareSub": "Lo que incluye cada plan, fila por fila."
+    },
+    "yourPlan": {
+      "adjust": "Ajustar plan",
+      "upgrade": "Mejorar plan",
+      "view": "Ver planes",
+      "seatsUsed": "{{used}} de {{total}} asientos en uso",
+      "seatsUsedUnlimited": "{{used}} asientos en uso · sin límite",
+      "noPlanLine": "Elige un plan para empezar."
+    },
+    "notice": {
+      "renews": "Tu plan se renueva el {{date}}.",
+      "ends": "Tu suscripción se cancelará el {{date}}.",
+      "resubscribe": "Volver a suscribirse",
+      "trialEnds": "Tu prueba termina el {{date}}.",
+      "pastDue": "Tu último pago no se completó. Actualiza tu método de pago para conservar {{name}}.",
+      "incomplete": "Tu primer pago aún no se ha completado."
+    },
+    "confirm": {
+      "keep": "Mantener {{name}}",
+      "notNow": "Ahora no",
+      "now": "Ahora",
+      "next": "Nuevo",
+      "price": "Precio",
+      "seats": "Asientos",
+      "billedYearly": "facturación anual",
+      "gains": "Lo que obtienes",
+      "losses": "Lo que pierdes",
+      "nothingLost": "Nada más cambia.",
+      "when": "Cuándo",
+      "whenNow": "De inmediato. Tu ciclo de facturación no cambia.",
+      "whenProrated": "De inmediato. La diferencia del resto de este periodo se prorratea en tu próxima factura.",
+      "whenFirst": "De inmediato.",
+      "whenFirstPayment": "De inmediato: a continuación confirmas tu método de pago.",
+      "whenFree": "Tu plan {{name}} se mantiene hasta el {{date}}. Después, el espacio de trabajo pasa a Free.",
+      "seatWarning": "Hay {{used}} asientos ocupados, contando las invitaciones pendientes, y {{name}} incluye {{seats}}. Hasta {{excess}} de los miembros que se unieron más recientemente, nunca los propietarios, quedarán suspendidos hasta que haya asientos libres."
+    }
+  },
+  "voice": {
+    "start": "Dictar con tu voz",
+    "stop": "Dejar de dictar",
+    "listening": "Escuchando…",
+    "hearing": "Te escucho…",
+    "denied": "El micrófono está bloqueado. Permítelo en el navegador para dictar.",
+    "noSpeech": "No te he entendido: toca el micrófono e inténtalo de nuevo.",
+    "unavailable": "La entrada por voz no está disponible ahora. Puedes escribir.",
+    "say": {
+      "period": "punto|punto final",
+      "comma": "coma",
+      "question": "signo de interrogación",
+      "exclamation": "signo de exclamación",
+      "colon": "dos puntos",
+      "newLine": "nueva línea|salto de línea",
+      "newParagraph": "nuevo párrafo",
+      "scratch": "borra eso|borrar eso"
+    },
+    "marks": {
+      "period": ".",
+      "comma": ",",
+      "question": "?",
+      "exclamation": "!",
+      "colon": ":"
+    },
+    "sayHint": "Di «punto», «coma», «nueva línea» o «borra eso»"
+  },
+  "pinPlace": {
+    "hint": "Rellena la zona, la ciudad y el estado",
+    "unknown": "No conocemos este código postal — escribe la zona, la ciudad y el estado.",
+    "areaPick": "Elige tu zona"
   }
 }

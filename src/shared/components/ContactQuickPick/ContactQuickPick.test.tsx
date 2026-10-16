@@ -100,7 +100,6 @@ function renderPick(props: Partial<ContactQuickPickProps> = {}) {
         searchLabel="Search person"
         describe={(hit) => ({
           line: hit.patientId ? 'Patient' : hit.primaryPhone,
-          action: 'Use contact',
           tone: hit.patientId ? 'sage' : 'lav',
         })}
         testId={ROOT}
@@ -181,7 +180,7 @@ describe('ContactQuickPick — select faster', () => {
 
     const asha = await screen.findByTestId('who-hit-10234');
     expect(within(asha).getByText('Ash', { selector: 'mark' })).toBeInTheDocument();
-    expect(asha).toHaveTextContent('Asha Patel+919825011241Use contact');
+    expect(asha).toHaveTextContent('Asha Patel+919825011241');
     expect(screen.getByTestId('who-hit-10235')).toHaveTextContent('Patient');
     await waitFor(() =>
       expect(screen.getByTestId(IDS.status(ROOT))).toHaveTextContent('2 people found'),
@@ -291,7 +290,7 @@ describe('ContactQuickPick — add faster', () => {
     );
     expect(screen.getByTestId(IDS.status(ROOT))).toHaveTextContent('No existing match');
     expect(withoutBidiMarks(screen.getByTestId('who-add').textContent)).toBe(
-      'Add “Meera Iyer” as a new contact↵',
+      'New contact Meera Iyer↵',
     );
 
     await user.keyboard('{Enter}');
@@ -304,6 +303,7 @@ describe('ContactQuickPick — add faster', () => {
     expect(callbacks.onQuickAdd).toHaveBeenCalledWith({
       name: 'Meera Iyer',
       phone: '9825011299',
+      instagram: '',
     });
     expect(screen.queryByTestId(IDS.quickAdd(ROOT))).toBeNull();
     expect(search()).toHaveValue('');
@@ -314,7 +314,7 @@ describe('ContactQuickPick — add faster', () => {
     const { user } = renderPick();
     await user.type(search(), '98250 11299');
     expect(withoutBidiMarks(screen.getByTestId('who-add').textContent)).toContain(
-      'Add +91 98250 11299 as a new contact',
+      'New contact +91 98250 11299',
     );
     await user.click(screen.getByTestId('who-add'));
     expect(screen.getByTestId(IDS.quickAddMobile(ROOT))).toHaveValue('98250 11299');
@@ -353,7 +353,11 @@ describe('ContactQuickPick — add faster', () => {
 
     await user.clear(screen.getByTestId(IDS.quickAddMobile(ROOT)));
     await user.click(screen.getByTestId(IDS.quickAddSubmit(ROOT)));
-    expect(callbacks.onQuickAdd).toHaveBeenCalledWith({ name: 'Meera', phone: '' });
+    expect(callbacks.onQuickAdd).toHaveBeenCalledWith({
+      name: 'Meera',
+      phone: '',
+      instagram: '',
+    });
   });
 
   it('"More details" hands the values on; "Back to search" keeps the search', async () => {
@@ -368,6 +372,7 @@ describe('ContactQuickPick — add faster', () => {
     expect(callbacks.onMoreDetails).toHaveBeenCalledWith({
       name: 'Meera',
       phone: '9825011299',
+      instagram: '',
     });
     expect(callbacks.onQuickAdd).not.toHaveBeenCalled();
   });
@@ -410,5 +415,171 @@ describe('ContactQuickPick — states', () => {
     await user.clear(search());
     await user.click(screen.getByTestId('who-add'));
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('ContactQuickPick — a short picker (change-compact-contact-picker)', () => {
+  it('draws Recent as one line of chips: a short name to see, the whole person to hear', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([KAVYA, ASHWIN]);
+    renderPick();
+    const kavya = await screen.findByTestId('who-hit-10236');
+    const recent = screen.getByTestId(IDS.recent(ROOT));
+    expect(within(recent).getAllByRole('option')).toHaveLength(2);
+    expect(kavya).toHaveAttribute('data-slot', 'pill');
+    expect(kavya).toHaveAttribute('title', 'Kavya Shah');
+    // The short name is seen, not heard; the whole name, line and action are heard.
+    const short = within(kavya).getByText('Kavya S.');
+    expect(short).toHaveAttribute('aria-hidden', 'true');
+    expect(kavya).toHaveAccessibleName('Kavya Shah +919825011243');
+    expect(screen.getByTestId('who-hit-10235')).toHaveAccessibleName(
+      'Ashwin Rao Patient',
+    );
+  });
+
+  it('shimmers chip-shaped bars on Recent’s line while it loads', async () => {
+    vi.mocked(fetchRecentContacts).mockReturnValue(new Promise(() => {}));
+    renderPick();
+    const loading = await screen.findByTestId(IDS.loading(ROOT));
+    expect(loading).toHaveTextContent('Recent');
+    const bars = loading.querySelectorAll('.skeleton-sheen');
+    expect(bars).toHaveLength(3);
+    for (const bar of bars) expect(bar).toHaveClass('h-8', 'rounded-full');
+  });
+
+  it('moves along the rail with ← / →, held at the ends, and ↵ picks the chip', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([KAVYA, ASHA, ASHWIN]);
+    const { user } = renderPick();
+    const kavya = await screen.findByTestId('who-hit-10236');
+    await user.click(search());
+    expect(kavya).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{ArrowLeft}');
+    expect(kavya).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{ArrowRight}{ArrowRight}');
+    expect(screen.getByTestId('who-hit-10235')).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByTestId('who-hit-10235')).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{ArrowLeft}');
+    expect(screen.getByTestId('who-hit-10234')).toHaveAttribute('data-selected', 'true');
+    await user.keyboard('{Enter}');
+    expect(callbacks.onPick).toHaveBeenCalledWith(
+      expect.objectContaining({ id: ASHA.id }),
+    );
+  });
+
+  it('mirrors the rail’s keys on a right-to-left page: ← is forward', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([KAVYA, ASHA]);
+    const computed = window.getComputedStyle;
+    const spy = vi
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation((element) =>
+        Object.assign(computed(element), { direction: 'rtl' }),
+      );
+    try {
+      const { user } = renderPick();
+      await screen.findByTestId('who-hit-10236');
+      await user.click(search());
+      await user.keyboard('{ArrowLeft}');
+      expect(screen.getByTestId('who-hit-10234')).toHaveAttribute(
+        'data-selected',
+        'true',
+      );
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('leaves ← / → to the caret once something is typed', async () => {
+    const { user } = renderPick();
+    await screen.findByTestId('who-hit-10236');
+    await user.type(search(), 'ash');
+    const asha = await screen.findByTestId('who-hit-10234');
+    await waitFor(() => expect(asha).toHaveAttribute('data-selected', 'true'));
+    await user.keyboard('{ArrowRight}');
+    expect(asha).toHaveAttribute('data-selected', 'true');
+    expect(screen.queryByTestId(IDS.recent(ROOT))).toBeNull();
+  });
+
+  it('keeps the results to a short window above a 36px add row', async () => {
+    const { user } = renderPick();
+    await user.type(search(), 'ash');
+    await screen.findByTestId('who-hit-10234');
+    expect(screen.getByRole('listbox')).toHaveClass('max-h-50');
+    expect(screen.getByTestId('who-add')).toHaveClass('h-9');
+  });
+});
+
+describe('ContactQuickPick — what was typed becomes the contact (change-natural-contact-search)', () => {
+  it('shows each value the add row would use, and fills the quick add with them', async () => {
+    vi.mocked(searchContacts).mockResolvedValue([]);
+    const { user } = renderPick();
+    await user.type(search(), 'Meera Iyer 98250 11241 @meera.iyer');
+    const add = screen.getByTestId('who-add');
+    await waitFor(() =>
+      expect(withoutBidiMarks(add.textContent)).toBe(
+        'New contact Meera Iyer +91 98250 11241 @meera.iyer',
+      ),
+    );
+    expect(screen.getByTestId(IDS.addValue('who-add', 'phone'))).toHaveAttribute(
+      'dir',
+      'ltr',
+    );
+    await user.click(add);
+    expect(screen.getByTestId(IDS.quickAddName(ROOT))).toHaveValue('Meera Iyer');
+    expect(screen.getByTestId(IDS.quickAddMobile(ROOT))).toHaveValue('98250 11241');
+    expect(screen.getByTestId(IDS.quickAddInstagram(ROOT))).toHaveValue('@meera.iyer');
+    await user.click(screen.getByTestId(IDS.quickAddSubmit(ROOT)));
+    expect(callbacks.onQuickAdd).toHaveBeenCalledWith({
+      name: 'Meera Iyer',
+      phone: '9825011241',
+      instagram: '@meera.iyer',
+    });
+  });
+
+  it('opens no Instagram field without a handle, and takes none where the host keeps none', async () => {
+    vi.mocked(searchContacts).mockResolvedValue([]);
+    const { user } = renderPick({ takesInstagram: false });
+    await user.type(search(), 'Meera @meera.iyer');
+    const add = screen.getByTestId('who-add');
+    await waitFor(() =>
+      expect(withoutBidiMarks(add.textContent)).toBe('New contact Meera'),
+    );
+    await user.click(add);
+    expect(screen.queryByTestId(IDS.quickAddInstagram(ROOT))).toBeNull();
+    await user.click(screen.getByTestId(IDS.quickAddSubmit(ROOT)));
+    expect(callbacks.onQuickAdd).toHaveBeenCalledWith({
+      name: 'Meera',
+      phone: '',
+      instagram: '',
+    });
+  });
+
+  it('marks every typed word of a hit, in any order', async () => {
+    const { user } = renderPick();
+    await user.type(search(), 'patel asha');
+    vi.mocked(searchContacts).mockResolvedValue([ASHA]);
+    await user.type(search(), ' ');
+    const asha = await screen.findByTestId('who-hit-10234');
+    expect([...asha.querySelectorAll('mark')].map((mark) => mark.textContent)).toEqual([
+      'Asha',
+      'Patel',
+    ]);
+  });
+
+  it('says what a pick does only when it does more than take the person', async () => {
+    const { user } = renderPick({
+      describe: (hit) => ({
+        line: hit.primaryPhone ?? '',
+        action: hit.patientId ? 'Re-create lead' : undefined,
+        tone: 'lav',
+      }),
+    });
+    await user.type(search(), 'ash');
+    expect(await screen.findByTestId('who-hit-10235')).toHaveTextContent(
+      'Re-create lead',
+    );
+    expect(screen.getByTestId('who-hit-10234')).toHaveTextContent(
+      'Asha Patel+919825011241',
+    );
+    expect(screen.getByTestId('who-hit-10234')).not.toHaveTextContent('lead');
   });
 });

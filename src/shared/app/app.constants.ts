@@ -31,6 +31,10 @@ export const APP_KEYS = {
       description: 'sections.offerings.description',
     },
     users: { label: 'sections.users.label', description: 'sections.users.description' },
+    branches: {
+      label: 'sections.branches.label',
+      description: 'sections.branches.description',
+    },
   },
   /** Each tone's name — a colour swatch's accessible name (the drawers' Colour fields). */
   tones: {

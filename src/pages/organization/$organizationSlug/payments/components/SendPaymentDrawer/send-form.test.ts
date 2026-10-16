@@ -8,6 +8,7 @@ import {
   amountText,
   billOf,
   emptySendForm,
+  paidToQuick,
   SEND_QUICK_FILLS,
   sendAmount,
   sendFormOf,
@@ -195,5 +196,26 @@ describe('the send form', () => {
       billNo: null,
       supplierName: 'ZZ Research Vendor',
     });
+  });
+});
+
+describe('paidToQuick — the clinic’s own payees (feat-write-less)', () => {
+  const rows = (...names: (string | null)[]) => names.map((payeeName) => ({ payeeName }));
+
+  it('takes the newest four names, each once, then Electricity', () => {
+    expect(
+      paidToQuick(
+        rows('Ankur', 'Meta ads', 'ankur', null, 'Tea', 'Courier', 'Rent'),
+        'Electricity',
+      ),
+    ).toEqual(['Ankur', 'Meta ads', 'Tea', 'Courier', 'Electricity']);
+  });
+
+  it('is Electricity alone without history, and never twice', () => {
+    expect(paidToQuick([], 'Electricity')).toEqual(['Electricity']);
+    expect(paidToQuick(rows('electricity', 'Tea'), 'Electricity')).toEqual([
+      'electricity',
+      'Tea',
+    ]);
   });
 });

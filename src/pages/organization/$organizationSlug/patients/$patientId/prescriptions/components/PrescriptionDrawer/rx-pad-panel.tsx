@@ -1,11 +1,11 @@
 import { type Ref, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { commandKeyLabel } from '@/lib/mac-platform.ts';
 import { occurrenceKeys } from '@/lib/occurrence-keys.ts';
 import { cn } from '@/lib/utils.ts';
 import type { RxCatalogMedicine } from '@/shared/api/app/prescriptions-contracts.ts';
 import { nameNumbers } from '@/shared/components/QuickLine/index.ts';
+import { saveShortcutKeys } from '@/shared/components/RecordDrawer/record-drawer-save-shortcut.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Textarea } from '@/shared/components/ui/textarea.tsx';
 import { Check, ClipboardList, Plus, TriangleAlert, X } from '@/shared/icons/index.ts';
@@ -314,7 +314,7 @@ export function RxPadPanel({
             aria-hidden="true"
             className="text-micro rounded-sm border border-current/25 px-1 font-mono opacity-75"
           >
-            {`${commandKeyLabel()} ↵`}
+            {saveShortcutKeys().label}
           </span>
         </Button>
       </div>

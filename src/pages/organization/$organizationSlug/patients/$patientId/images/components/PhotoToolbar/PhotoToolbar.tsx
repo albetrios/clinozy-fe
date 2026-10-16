@@ -7,7 +7,7 @@ import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { ChevronDown } from '@/shared/icons/index.ts';
+import { Check, ChevronDown, SquareCheck } from '@/shared/icons/index.ts';
 import type { PhotoSize } from '@/shared/store/useDevicePrefsStore/index.ts';
 
 import {
@@ -53,6 +53,10 @@ export interface PhotoToolbarProps {
   dayLabel: (date: string) => string;
   size: PhotoSize;
   onSizeChange: (size: PhotoSize) => void;
+  /** Selecting photos to compare; with `onSelectingChange` the toolbar offers "Select" / "Done". */
+  selecting?: boolean;
+  /** Turn selection on ("Select") or off ("Done"); none — no photos to pick. */
+  onSelectingChange?: ((selecting: boolean) => void) | null;
 }
 
 /**
@@ -163,7 +167,8 @@ function PhotoSizeRadios({
  * segmented track — General `ImageIcon`, Private `Lock`, LHR `Sparkles` — each
  * with the server's count, "3 photos", the visit filter "All photos ⌄" ("All
  * photos" · "Not attached to a visit" · each visit a photo can be filed under),
- * then the S / M / L radios at the end. It wraps on a phone.
+ * then "Select" — "Done" while selecting (change-patient-overview-photos) — and
+ * the S / M / L radios at the end. It wraps on a phone.
  */
 export function PhotoToolbar({
   album,
@@ -177,6 +182,8 @@ export function PhotoToolbar({
   dayLabel,
   size,
   onSizeChange,
+  selecting = false,
+  onSelectingChange,
 }: PhotoToolbarProps) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const albumLabel = t(K.albums[album]);
@@ -248,7 +255,28 @@ export function PhotoToolbar({
         )}
       />
       <span className="flex-1" />
-      <PhotoSizeRadios size={size} onSizeChange={onSizeChange} />
+      {/* Select and the sizes wrap together, at the end. */}
+      <span className="ms-auto flex flex-none items-center gap-2.5">
+        {onSelectingChange ? (
+          <Button
+            type="button"
+            variant={selecting ? 'default' : 'outline'}
+            onClick={() => onSelectingChange(!selecting)}
+            aria-pressed={selecting}
+            title={selecting ? undefined : t(K.select.startHint)}
+            data-testid={PHOTO_TOOLBAR_TEST_IDS.select}
+            className={cn('flex-none gap-1.5', !selecting && 'bg-card shadow-none')}
+          >
+            {selecting ? (
+              <Check aria-hidden="true" className="size-4" />
+            ) : (
+              <SquareCheck aria-hidden="true" className="size-4" />
+            )}
+            {t(selecting ? K.select.done : K.select.start)}
+          </Button>
+        ) : null}
+        <PhotoSizeRadios size={size} onSizeChange={onSizeChange} />
+      </span>
     </div>
   );
 }

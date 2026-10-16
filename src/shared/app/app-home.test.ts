@@ -11,7 +11,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { holdPreset, PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
 
-import { appHomeRoute, appHomeSection } from './app-home.ts';
+import { appHomeRoute, appHomeSection, movedBranchesLocation } from './app-home.ts';
 
 const disabled = vi.hoisted(() => ({ modules: new Set<string>() }));
 vi.mock('@/core/security/gates/require-module.ts', () => ({
@@ -109,8 +109,31 @@ describe('appHomeRoute', () => {
       'app-tasks',
       'app-offerings',
       'app-users',
+      'app-branches',
     ]);
     holdPreset('owner');
     expect(await appHomeRoute('acme')).toBeNull();
+  });
+});
+
+describe('movedBranchesLocation (change-branches-in-navbar)', () => {
+  const at = (rest: string) => movedBranchesLocation({ organizationSlug: 'acme', rest });
+  const slug = { organizationSlug: 'acme' };
+
+  it('sends an old Users › Branches path to the same place in the Branches room', () => {
+    expect(at('')).toEqual({
+      to: '/organization/$organizationSlug/branches',
+      params: slug,
+    });
+    expect(at('create')).toEqual({
+      to: '/organization/$organizationSlug/branches/create',
+      params: slug,
+    });
+    expect(at('create/')).toEqual(at('create'));
+    expect(at('brn_1/edit')).toEqual({
+      to: '/organization/$organizationSlug/branches/$branchId/edit',
+      params: { ...slug, branchId: 'brn_1' },
+    });
+    expect(at('brn_1')).toEqual(at(''));
   });
 });

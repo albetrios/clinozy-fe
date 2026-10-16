@@ -6,6 +6,7 @@ import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import {
   fetchPayment,
+  listLedger,
   listOpenSupplierBills,
   payExpense,
   updatePayment,
@@ -41,6 +42,7 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listOpenSupplierBills: vi.fn(),
+  listLedger: vi.fn(),
   payExpense: vi.fn(),
   updatePayment: vi.fn(),
   fetchPayment: vi.fn(),
@@ -132,6 +134,9 @@ beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   vi.mocked(listOpenSupplierBills).mockReset().mockResolvedValue([STOCK_2, PO_431]);
+  vi.mocked(listLedger)
+    .mockReset()
+    .mockResolvedValue({ rows: [], next: null, total: null });
   vi.mocked(payExpense).mockReset();
   vi.mocked(updatePayment).mockReset();
   vi.mocked(fetchPayment).mockReset();
@@ -162,6 +167,34 @@ describe('SendPaymentDrawer — new (payments.md:112–130)', () => {
     expect(listOpenSupplierBills).toHaveBeenCalledWith({ stock: true, medical: false });
     expect(part('save')).toHaveTextContent('Add expense');
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
+  });
+
+  it('offers the clinic’s own recent payees as Paid to chips, then Electricity (feat-write-less)', async () => {
+    vi.mocked(listLedger).mockResolvedValue({
+      rows: [
+        ledgerRow({ id: 'pay_a', payeeName: 'Ankur Pharma' }),
+        ledgerRow({ id: 'pay_b', payeeName: 'Meta ads' }),
+        ledgerRow({ id: 'pay_c', payeeName: 'ankur pharma ' }),
+        ledgerRow({ id: 'pay_d', payeeName: null }),
+        ledgerRow({ id: 'pay_e', payeeName: 'Courier Express' }),
+      ],
+      next: null,
+      total: null,
+    });
+    const user = setUser();
+    renderWithProviders(<SendPaymentDrawer open mode="create" onClose={vi.fn()} />);
+    await user.click(await screen.findByTestId(`${D}-step-expense-trigger`));
+    const chips = await screen.findByRole('group', { name: 'Paid to' });
+    await waitFor(() =>
+      expect(
+        within(chips)
+          .getAllByRole('button')
+          .map((chip) => chip.textContent),
+      ).toEqual(['Ankur Pharma', 'Meta ads', 'Courier Express', 'Electricity']),
+    );
+    expect(listLedger).toHaveBeenCalledWith({ kind: ['expense'] }, undefined);
+    await user.click(within(chips).getByRole('button', { name: 'Courier Express' }));
+    expect(screen.getByTestId(`${D}-paid-to`)).toHaveValue('Courier Express');
   });
 
   it('asks for who was paid and the amount, opening the step that misses them', async () => {

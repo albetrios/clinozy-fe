@@ -27,6 +27,10 @@ import { manifest as appointmentManifest } from '@/pages/organization/$organizat
 import { Component as AppointmentRoute } from '@/pages/organization/$organizationSlug/appointments/$appointmentId/appointment-id.route.tsx';
 import { manifest as appointmentCreateManifest } from '@/pages/organization/$organizationSlug/appointments/create/create.manifest.ts';
 import { Component as AppointmentCreateRoute } from '@/pages/organization/$organizationSlug/appointments/create/create.route.tsx';
+import { manifest as branchEditManifest } from '@/pages/organization/$organizationSlug/branches/$branchId/edit/edit.manifest.ts';
+import { Component as BranchEditRoute } from '@/pages/organization/$organizationSlug/branches/$branchId/edit/edit.route.tsx';
+import { manifest as branchCreateManifest } from '@/pages/organization/$organizationSlug/branches/create/create.manifest.ts';
+import { Component as BranchCreateRoute } from '@/pages/organization/$organizationSlug/branches/create/create.route.tsx';
 import { manifest as invoiceEditManifest } from '@/pages/organization/$organizationSlug/invoices/$invoiceId/edit/edit.manifest.ts';
 import { Component as InvoiceEditRoute } from '@/pages/organization/$organizationSlug/invoices/$invoiceId/edit/edit.route.tsx';
 import { manifest as invoiceManifest } from '@/pages/organization/$organizationSlug/invoices/$invoiceId/invoice-id.manifest.ts';
@@ -111,10 +115,6 @@ import { manifest as taskCreateManifest } from '@/pages/organization/$organizati
 import { Component as TaskCreateRoute } from '@/pages/organization/$organizationSlug/tasks/create/create.route.tsx';
 import { manifest as userEditManifest } from '@/pages/organization/$organizationSlug/users/$userId/edit/edit.manifest.ts';
 import { Component as UserEditRoute } from '@/pages/organization/$organizationSlug/users/$userId/edit/edit.route.tsx';
-import { manifest as branchEditManifest } from '@/pages/organization/$organizationSlug/users/branches/$branchId/edit/edit.manifest.ts';
-import { Component as BranchEditRoute } from '@/pages/organization/$organizationSlug/users/branches/$branchId/edit/edit.route.tsx';
-import { manifest as branchCreateManifest } from '@/pages/organization/$organizationSlug/users/branches/create/create.manifest.ts';
-import { Component as BranchCreateRoute } from '@/pages/organization/$organizationSlug/users/branches/create/create.route.tsx';
 import { manifest as userCreateManifest } from '@/pages/organization/$organizationSlug/users/create/create.manifest.ts';
 import { Component as UserCreateRoute } from '@/pages/organization/$organizationSlug/users/create/create.route.tsx';
 import { crossRoomNavigation } from '@/shared/app/app-referrer.ts';
@@ -153,8 +153,8 @@ export const DIALOG_ROUTES = {
   offerEdit: { manifest: offerEditManifest, Component: OfferEditRoute },
   userCreate: { manifest: userCreateManifest, Component: UserCreateRoute },
   userEdit: { manifest: userEditManifest, Component: UserEditRoute },
-  usersBranchCreate: { manifest: branchCreateManifest, Component: BranchCreateRoute },
-  usersBranchEdit: { manifest: branchEditManifest, Component: BranchEditRoute },
+  branchCreate: { manifest: branchCreateManifest, Component: BranchCreateRoute },
+  branchEdit: { manifest: branchEditManifest, Component: BranchEditRoute },
   saleCreate: { manifest: saleCreateManifest, Component: SaleCreateRoute },
   sale: { manifest: saleManifest, Component: SaleRoute },
   saleReturn: { manifest: saleReturnManifest, Component: SaleReturnRoute },

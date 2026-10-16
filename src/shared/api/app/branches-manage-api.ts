@@ -9,7 +9,7 @@ import { branchQueryKeys } from './branches-api.ts';
 import type { AppBranch, BranchInput, BranchSave } from './branches-contracts.ts';
 
 /*
- * Users › Branches' reads and writes on clinozy-be (KICKOFF §6.12 Branches, D6): every branch,
+ * The Branches room's reads and writes on clinozy-be (KICKOFF §6.12 Branches, D6): every branch,
  * open and closed (`GET /app/branches?include_inactive=true`), a new one (`POST`, its team in the
  * same call), an edit (`PATCH`, closing one included — there is no delete) and who works there
  * (`PUT …/members`, the whole set). Kept apart from `branches-api.ts`, which the shell's branch

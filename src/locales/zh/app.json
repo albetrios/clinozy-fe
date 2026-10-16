@@ -38,7 +38,11 @@
     },
     "users": {
       "label": "用户",
-      "description": "团队、角色与权限、分店"
+      "description": "团队、角色与权限"
+    },
+    "branches": {
+      "label": "分院",
+      "description": "每家分院：地址、营业时间、团队、诊室和设备"
     }
   },
   "tones": {
@@ -911,10 +915,6 @@
     "searching": "正在搜索…",
     "found_other": "找到 {{count}} 人",
     "noMatch": "没有匹配项",
-    "use": "使用联系人",
-    "addNamed": "将“{{name}}”添加为新联系人",
-    "addPhone": "将 {{phone}} 添加为新联系人",
-    "addNamedPhone": "将“{{name}}”· {{phone}} 添加为新联系人",
     "enterKey": "↵",
     "clearSearch": "清除搜索",
     "added": "已将 {{name}} 添加到联系人",
@@ -932,11 +932,7 @@
     },
     "patient": {
       "newPatient": "新患者",
-      "addNamed": "将“{{name}}”添加为新患者",
-      "addPhone": "将 {{phone}} 添加为新患者",
-      "addNamedPhone": "将“{{name}}”· {{phone}} 添加为新患者",
       "add": "添加患者",
-      "use": "选择患者",
       "added": "已将 {{name}} 添加为患者",
       "existing": "{{name}} 已是患者 · 已选中"
     }
@@ -1425,20 +1421,135 @@
       "signedAs": "将以 {{name}} 的身份发送，并附上当前页面和应用版本。",
       "close": "关闭"
     },
-    "voice": {
-      "start": "用语音输入",
-      "stop": "停止语音输入",
-      "listening": "正在聆听…",
-      "hearing": "正在听你说…",
-      "denied": "麦克风已被阻止。请在浏览器中允许后再使用语音输入。",
-      "noSpeech": "没有听清，请点击麦克风再试一次。",
-      "unavailable": "语音输入暂时不可用，你仍可以打字。"
-    },
     "send": {
       "idle": "发送",
       "sending": "正在发送…",
       "sent": "谢谢，团队已收到。",
       "error": "无法发送报告。你写的内容还在，请重试。"
     }
+  },
+  "billingPlans": {
+    "upgradeTo": "升级到 {{name}}",
+    "plan": {
+      "perMonth": "/ 月",
+      "billedYearlyTotal": "按年计费 · 每年 {{price}}",
+      "monthlyOnly": "仅按月计费 — 无年付选项",
+      "freeForever": "永久免费",
+      "save": "节省 {{percent}}%",
+      "saveUpTo": "最多节省 {{percent}}%",
+      "includes": "包含：",
+      "everythingInPlus": "{{name}} 的全部功能，另加：",
+      "everythingIn": "{{name}} 的全部功能",
+      "audienceSolo": "适合单人执业",
+      "audienceTeam": "适合最多 {{seats}} 人的团队",
+      "audienceAny": "适合任意规模的团队",
+      "seatsOne": "1 个席位",
+      "seatsUpTo": "最多 {{seats}} 个席位",
+      "seatsUnlimited": "不限席位",
+      "nextStepUp": "下一档",
+      "freeFrom": "{{date}} 起免费"
+    },
+    "compare": {
+      "caption": "所有套餐并排比较",
+      "current": "当前",
+      "included": "包含",
+      "notIncluded": "不包含",
+      "notOffered": "不提供",
+      "unlimited": "不限",
+      "groups": {
+        "pricing": "价格",
+        "team": "团队",
+        "features": "功能"
+      },
+      "rows": {
+        "monthly": "月付价格",
+        "monthlyHint": "每月计费。",
+        "yearly": "年付价格",
+        "yearlyHint": "每年计费一次。",
+        "seats": "包含席位",
+        "seatsHint": "可以登录此工作区的人数。"
+      }
+    },
+    "features": {
+      "auditLog": "审计日志",
+      "auditLogHint": "查看谁在何时改了什么。",
+      "sso": "单点登录 (SSO)",
+      "ssoHint": "团队通过公司的身份提供商登录。",
+      "prioritySupport": "优先支持",
+      "prioritySupportHint": "您的请求会被优先处理。"
+    },
+    "picker": {
+      "title": "套餐",
+      "sub": "所有套餐并排对比。团队准备好时再切换。",
+      "compareTitle": "比较各套餐功能",
+      "compareSub": "逐行列出每个套餐包含的内容。"
+    },
+    "yourPlan": {
+      "adjust": "调整方案",
+      "upgrade": "升级方案",
+      "view": "查看方案",
+      "seatsUsed": "已使用 {{used}}/{{total}} 个席位",
+      "seatsUsedUnlimited": "已使用 {{used}} 个席位 · 不限",
+      "noPlanLine": "选择一个方案即可开始。"
+    },
+    "notice": {
+      "renews": "你的方案将于 {{date}} 续订。",
+      "ends": "你的订阅将于 {{date}} 取消。",
+      "resubscribe": "重新订阅",
+      "trialEnds": "你的试用将于 {{date}} 结束。",
+      "pastDue": "你上一次付款未成功。请更新付款方式以保留 {{name}}。",
+      "incomplete": "你的首次付款尚未完成。"
+    },
+    "confirm": {
+      "keep": "保留 {{name}}",
+      "notNow": "暂不",
+      "now": "当前",
+      "next": "变更后",
+      "price": "价格",
+      "seats": "席位",
+      "billedYearly": "按年计费",
+      "gains": "你将获得",
+      "losses": "你将失去",
+      "nothingLost": "其他内容不变。",
+      "when": "生效时间",
+      "whenNow": "立即生效。计费周期保持不变。",
+      "whenProrated": "立即生效。本计费周期剩余部分的差额将按比例计入下一张账单。",
+      "whenFirst": "立即生效。",
+      "whenFirstPayment": "立即生效——下一步确认付款方式。",
+      "whenFree": "{{name}} 套餐保留至 {{date}}，之后工作区将使用 Free。",
+      "seatWarning": "已占用 {{used}} 个席位（含待接受的邀请），{{name}} 包含 {{seats}} 个席位。最近加入的成员中最多 {{excess}} 名（不含所有者）将被暂停，直到有空余席位。"
+    }
+  },
+  "voice": {
+    "start": "用语音输入",
+    "stop": "停止语音输入",
+    "listening": "正在聆听…",
+    "hearing": "正在听你说…",
+    "denied": "麦克风已被阻止。请在浏览器中允许后再使用语音输入。",
+    "noSpeech": "没有听清，请点击麦克风再试一次。",
+    "unavailable": "语音输入暂时不可用，你仍可以打字。",
+    "say": {
+      "period": "句号",
+      "comma": "逗号",
+      "question": "问号",
+      "exclamation": "感叹号",
+      "colon": "冒号",
+      "newLine": "换行",
+      "newParagraph": "新段落|另起一段",
+      "scratch": "删掉刚才那句|撤销刚才那句"
+    },
+    "marks": {
+      "period": "。",
+      "comma": "，",
+      "question": "？",
+      "exclamation": "！",
+      "colon": "："
+    },
+    "sayHint": "可以说“句号”“逗号”“换行”或“删掉刚才那句”"
+  },
+  "pinPlace": {
+    "hint": "自动填写区域、城市和邦/省",
+    "unknown": "无法识别此邮政编码——请输入区域、城市和邦/省。",
+    "areaPick": "选择您的区域"
   }
 }

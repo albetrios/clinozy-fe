@@ -64,6 +64,16 @@ describe('fetchMyPreferences', () => {
     expect(preferences.branchFilter).toEqual(['br_aaaaaaaaaaaaaaaaaaaaa']);
   });
 
+  it('reads Branches as a pin, and drops a section this build does not know yet', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      record({ pinned_sections: ['appointments', 'branches', 'a_later_room'] }) as never,
+    );
+
+    const preferences = await fetchMyPreferences();
+
+    expect(preferences.pinnedSections).toEqual(['appointments', 'branches']);
+  });
+
   it('refuses an answer shaped differently', async () => {
     vi.mocked(api.get).mockResolvedValueOnce(record({ theme: 'sepia' }) as never);
 

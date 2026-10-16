@@ -9,10 +9,7 @@ import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
 import { LEAD_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { appointmentContactCard } from '@/shared/app/appointment-display.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
-import {
-  CONTACT_QUICK_PICK_KEYS,
-  ContactQuickPick,
-} from '@/shared/components/ContactQuickPick/index.ts';
+import { ContactQuickPick } from '@/shared/components/ContactQuickPick/index.ts';
 import {
   DrawerField,
   DrawerInput,
@@ -98,11 +95,12 @@ function WhoSearch({
       searchLabel={t(K.searchLabel)}
       limit={HIT_LIMIT}
       disabled={disabled}
+      // A new person here is a name and a mobile; a typed handle is left out (D6).
+      takesInstagram={false}
       describe={(contact) => {
         const who = whoOfContact(contact);
         return {
           line: contact.patientId ? t(K.patient) : formatAppPhone(contact.primaryPhone),
-          action: t(CONTACT_QUICK_PICK_KEYS.use),
           tone: WHO_TONES[who.kind],
         };
       }}

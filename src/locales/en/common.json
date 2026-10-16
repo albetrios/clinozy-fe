@@ -218,7 +218,7 @@
     "date": {
       "label": "Date",
       "placeholder": "Pick a date",
-      "search": "Type a date · e.g. 12 sep",
+      "search": "Type a date · 12 sep, 2w, fri",
       "today": "Today",
       "tomorrow": "Tomorrow",
       "yesterday": "Yesterday",

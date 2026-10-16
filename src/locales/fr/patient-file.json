@@ -252,6 +252,54 @@
     "stages": {
       "before": "Avant",
       "after": "Après"
+    },
+    "dropzone": {
+      "title": "Déposez les photos ici",
+      "body": "ou collez une image copiée · JPG ou PNG jusqu’à 10 Mo",
+      "target": "Ajoutées à {{album}}",
+      "choose": "Choisir des photos",
+      "camera": "Prendre une photo",
+      "veil": "Déposez pour ajouter à {{album}}"
+    },
+    "select": {
+      "start": "Sélectionner",
+      "done": "Terminé",
+      "startHint": "Sélectionner des photos à comparer",
+      "toggle": "Sélectionner {{name}}",
+      "hint": "Choisissez de 2 à 8 photos à comparer",
+      "limit": "Vous pouvez comparer jusqu’à {{max}} photos à la fois",
+      "clear": "Effacer",
+      "compare": "Comparer",
+      "bar": "Photos sélectionnées",
+      "count_one": "{{count}} sélectionnée",
+      "count_many": "{{count}} sélectionnées",
+      "count_other": "{{count}} sélectionnées"
+    },
+    "compare": {
+      "title": "Comparer les photos",
+      "layout": "Disposition",
+      "row": "Une rangée",
+      "grid": "Grille",
+      "zoomMode": "Zoom et position",
+      "linked": "Liées",
+      "linkedHint": "Toutes les photos suivent le même zoom et la même position",
+      "separate": "Séparées",
+      "separateHint": "Zoomez et placez chaque photo séparément",
+      "resetAll": "Tout réinitialiser",
+      "resetAllHint": "Toutes les photos à 100 % (0)",
+      "zoomOf": "Zoom de {{name}}",
+      "remove": "Retirer {{name}} de la comparaison",
+      "start": "Début",
+      "close": "Fermer la comparaison",
+      "since_one": "+{{count}} jour",
+      "since_many": "+{{count}} jours",
+      "since_other": "+{{count}} jours",
+      "hints": {
+        "zoom": "Défilez ou pincez pour zoomer sur toutes les photos",
+        "pan": "Faites glisser pour les déplacer ensemble · double-clic pour réinitialiser",
+        "zoomEach": "Défilez ou pincez sur une photo pour ne zoomer qu’elle",
+        "panEach": "Faites glisser une photo pour la placer · double-clic pour la réinitialiser"
+      }
     }
   },
   "rx": {
@@ -876,7 +924,9 @@
     "updated": "Suivi mis à jour",
     "record": "Suivi",
     "noScore": "Choisissez la note du patient",
-    "offeringsPlanned": "Ajouté aux suggestions"
+    "offeringsPlanned": "Ajouté aux suggestions",
+    "useAdvised": "Reprendre le plan conseillé",
+    "samePlan": "Même plan que la dernière fois"
   },
   "review": {
     "title": "Noter un avis",
@@ -1063,7 +1113,10 @@
     },
     "photos": {
       "upload": "Importer",
-      "empty": "Aucune photo pour le moment · importez la première"
+      "empty": "Aucune photo pour le moment · importez la première",
+      "add": "Ajouter des photos",
+      "drop": "Déposez les photos ici ou cliquez pour importer",
+      "dropBody": "JPG ou PNG jusqu’à 10 Mo · le collage fonctionne aussi"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",

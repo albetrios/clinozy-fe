@@ -252,6 +252,54 @@
     "stages": {
       "before": "Prima",
       "after": "Dopo"
+    },
+    "dropzone": {
+      "title": "Trascina qui le foto",
+      "body": "o incolla un’immagine copiata · JPG o PNG fino a 10 MB",
+      "target": "Aggiunte a {{album}}",
+      "choose": "Scegli foto",
+      "camera": "Scatta foto",
+      "veil": "Rilascia per aggiungere a {{album}}"
+    },
+    "select": {
+      "start": "Seleziona",
+      "done": "Fine",
+      "startHint": "Seleziona le foto da confrontare",
+      "toggle": "Seleziona {{name}}",
+      "hint": "Scegli da 2 a 8 foto da confrontare",
+      "limit": "Puoi confrontare fino a {{max}} foto alla volta",
+      "clear": "Cancella",
+      "compare": "Confronta",
+      "bar": "Foto selezionate",
+      "count_one": "{{count}} selezionata",
+      "count_many": "{{count}} selezionate",
+      "count_other": "{{count}} selezionate"
+    },
+    "compare": {
+      "title": "Confronta foto",
+      "layout": "Disposizione",
+      "row": "Una riga",
+      "grid": "Griglia",
+      "zoomMode": "Zoom e posizione",
+      "linked": "Collegate",
+      "linkedHint": "Tutte le foto seguono lo stesso zoom e la stessa posizione",
+      "separate": "Separate",
+      "separateHint": "Ingrandisci e posiziona ogni foto da sola",
+      "resetAll": "Ripristina tutto",
+      "resetAllHint": "Tutte le foto di nuovo al 100% (0)",
+      "zoomOf": "Zoom di {{name}}",
+      "remove": "Togli {{name}} dal confronto",
+      "start": "Inizio",
+      "close": "Chiudi confronto",
+      "since_one": "+{{count}} giorno",
+      "since_many": "+{{count}} giorni",
+      "since_other": "+{{count}} giorni",
+      "hints": {
+        "zoom": "Scorri o pizzica per ingrandire tutte le foto",
+        "pan": "Trascina per spostarle insieme · doppio clic per ripristinare",
+        "zoomEach": "Scorri o pizzica su una foto per ingrandire solo quella",
+        "panEach": "Trascina una foto per posizionarla · doppio clic per ripristinarla"
+      }
     }
   },
   "rx": {
@@ -876,7 +924,9 @@
     "updated": "Controllo aggiornato",
     "record": "Controllo",
     "noScore": "Scegli il voto del paziente",
-    "offeringsPlanned": "Aggiunto ai suggerimenti"
+    "offeringsPlanned": "Aggiunto ai suggerimenti",
+    "useAdvised": "Usa il piano consigliato",
+    "samePlan": "Stesso piano dell'ultima volta"
   },
   "review": {
     "title": "Registra una recensione",
@@ -1063,7 +1113,10 @@
     },
     "photos": {
       "upload": "Carica",
-      "empty": "Ancora nessuna foto · carica la prima"
+      "empty": "Ancora nessuna foto · carica la prima",
+      "add": "Aggiungi foto",
+      "drop": "Trascina qui le foto o fai clic per caricarle",
+      "dropBody": "JPG o PNG fino a 10 MB · puoi anche incollare"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",

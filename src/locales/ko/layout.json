@@ -23,7 +23,16 @@
       "addOrganization": "조직 추가",
       "invited": "초대",
       "invitedRow": "초대됨 · {{roles}}",
-      "invitationCount": "초대: {{count}}"
+      "invitationCount": "초대: {{count}}",
+      "defaultBadge": "기본"
+    },
+    "signInClinic": {
+      "menuLabel": "로그인 시 열림",
+      "lastUsed": "마지막 사용",
+      "automatic": "마지막으로 사용한 클리닉",
+      "automaticHint": "클리닉을 옮길 때마다 바뀝니다",
+      "savedClinic": "로그인하면 {{name}}이(가) 열립니다",
+      "savedAutomatic": "로그인하면 마지막으로 사용한 클리닉이 열립니다"
     },
     "notifications": {
       "title": "알림",
@@ -69,7 +78,9 @@
       "jumpToSection": "섹션으로 이동",
       "listSearch": "목록 검색",
       "leadRows": "다음 또는 이전 리드 (리드에서)",
-      "closeDialog": "대화상자 닫기"
+      "closeDialog": "대화상자 닫기",
+      "saveForm": "열려 있는 양식 저장",
+      "dictate": "지금 입력 중인 칸에 음성으로 입력"
     },
     "emailVerify": {
       "message": "계정을 보호하려면 이메일을 확인하세요.",

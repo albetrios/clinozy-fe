@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -11,6 +11,7 @@ const {
   useBillingPlansMock,
   selectPlanMutateAsync,
   useSelectBillingPlanMock,
+  cancelMutateAsync,
   navigateMock,
   getPaymentSetupMock,
   notifyErrorMock,
@@ -20,6 +21,7 @@ const {
   useBillingPlansMock: vi.fn(),
   selectPlanMutateAsync: vi.fn(),
   useSelectBillingPlanMock: vi.fn(),
+  cancelMutateAsync: vi.fn(),
   navigateMock: vi.fn(),
   getPaymentSetupMock: vi.fn(),
   notifyErrorMock: vi.fn(),
@@ -29,6 +31,8 @@ const {
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => navigateMock,
+  // The plan picker is a drawer, whose unsaved-changes guard asks the router.
+  useBlocker: () => ({ proceed: vi.fn(), reset: vi.fn(), status: 'idle' }),
 }));
 
 vi.mock('@/shared/billing/stripe-config.ts', () => ({
@@ -80,7 +84,11 @@ vi.mock('@/shared/hooks/useSubscription/index.ts', () => ({
   useSubscription: useSubscriptionMock,
   useBillingPlans: useBillingPlansMock,
   useSelectBillingPlan: useSelectBillingPlanMock,
-  useCancelSubscription: () => ({ mutate: vi.fn(), isPending: false }),
+  useCancelSubscription: () => ({
+    mutate: vi.fn(),
+    mutateAsync: cancelMutateAsync,
+    isPending: false,
+  }),
   useResumeSubscription: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
@@ -110,7 +118,19 @@ const PLANS = [
     priceYearly: 0,
     currency: 'usd',
     isActive: true,
-    seatLimit: null,
+    seatLimit: 1,
+    features: { audit_log: false },
+  },
+  {
+    id: 'pln_plus',
+    name: 'Plus',
+    description: 'For small teams.',
+    priceMonthly: 2900,
+    priceYearly: 29000,
+    currency: 'usd',
+    isActive: true,
+    seatLimit: 5,
+    features: { audit_log: true },
   },
   {
     id: 'pln_pro',
@@ -121,6 +141,7 @@ const PLANS = [
     currency: 'usd',
     isActive: true,
     seatLimit: null,
+    features: { audit_log: true },
   },
 ];
 
@@ -140,6 +161,26 @@ const SUB = {
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
+
+/** Radix holds `pointer-events: none` on the page under a dialog; the checks are the subject elsewhere. */
+function setupUser() {
+  return userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+}
+
+/** The plan header's one button ("Adjust plan", "Upgrade plan", "View plans") opens the picker. */
+async function openPicker(user: ReturnType<typeof setupUser>) {
+  await user.click(screen.getByTestId('billing-adjust-plan'));
+  return screen.findByTestId('billing-plan-picker');
+}
+
+/** A card press in the picker opens its confirm; the confirm's button runs the move. */
+async function chooseAndConfirm(user: ReturnType<typeof setupUser>, planId: string) {
+  await openPicker(user);
+  await user.click(screen.getByTestId(`plan-${planId}`));
+  const confirm = await screen.findByTestId('plan-change-confirm');
+  await user.click(within(confirm).getByTestId('plan-change-confirm-accept'));
+  return confirm;
+}
 
 function setCanManage(value: boolean) {
   useAuthStore.setState({
@@ -196,7 +237,7 @@ describe('AccountBillingPanel', () => {
    * nothing at all: the plan list, which needs no permission and was fetching
    * fine, disappeared with it. The panel looked broken.
    */
-  it('still renders the plans when the subscription may not be read', () => {
+  it('still renders the plans when the subscription may not be read', async () => {
     useSubscriptionMock.mockReturnValue({
       data: undefined,
       isPending: true,
@@ -204,12 +245,15 @@ describe('AccountBillingPanel', () => {
       isError: false,
       fetchStatus: 'idle' as const,
     });
+    const user = setupUser();
     renderPanel();
-    expect(screen.getByTestId('plan-options')).toBeInTheDocument();
     expect(screen.queryByTestId('query-skeleton')).not.toBeInTheDocument();
+    expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
+    await openPicker(user);
+    expect(screen.getByTestId('plan-options')).toBeInTheDocument();
   });
 
-  it('renders the current plan summary and plan options', () => {
+  it('opens on the plan, and the plans side by side behind its one button', async () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -217,10 +261,14 @@ describe('AccountBillingPanel', () => {
       isError: false,
     });
     setCanManage(true);
+    const user = setupUser();
     renderPanel();
     expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
-    expect(screen.getByTestId('plan-options')).toBeInTheDocument();
-    expect(screen.getByTestId('plan-pln_pro')).toBeInTheDocument();
+    expect(screen.queryByTestId('plan-options')).not.toBeInTheDocument();
+    const picker = await openPicker(user);
+    expect(within(picker).getByTestId('plan-options')).toBeInTheDocument();
+    expect(within(picker).getByTestId('plan-pln_pro')).toBeInTheDocument();
+    expect(within(picker).getByTestId('plan-compare-table')).toBeInTheDocument();
   });
 
   /**
@@ -235,7 +283,7 @@ describe('AccountBillingPanel', () => {
     it.each([
       ['null', null],
       ['undefined', undefined],
-    ])('reads "Choose", not "Switch to", when sub is %s', (_label, value) => {
+    ])('is on Free, and upgrades off it, when sub is %s', async (_label, value) => {
       useSubscriptionMock.mockReturnValue({
         data: value,
         isPending: false,
@@ -243,16 +291,43 @@ describe('AccountBillingPanel', () => {
         isError: false,
       });
       setCanManage(true);
+      const user = setupUser();
       renderPanel();
 
-      expect(screen.getByText('No plan')).toBeInTheDocument();
-      expect(screen.getByTestId('plan-pln_free')).toHaveTextContent('Choose Free');
+      expect(screen.getByRole('heading', { name: 'Free plan' })).toBeInTheDocument();
+      await openPicker(user);
+      expect(screen.getByTestId('plan-current')).toHaveTextContent('Current plan');
+      expect(screen.queryByTestId('plan-pln_free')).not.toBeInTheDocument();
+      expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Upgrade to Pro');
+      expect(screen.getByTestId('plan-options')).not.toHaveTextContent('Switch to');
+    });
+
+    it('reads "Choose", not "Switch to", when even the cheapest plan has a price', async () => {
+      useBillingPlansMock.mockReturnValue({
+        data: PLANS.filter((plan) => plan.id !== 'pln_free'),
+        isPending: false,
+        isLoading: false,
+        isError: false,
+      });
+      useSubscriptionMock.mockReturnValue({
+        data: null,
+        isPending: false,
+        isLoading: false,
+        isError: false,
+      });
+      setCanManage(true);
+      const user = setupUser();
+      renderPanel();
+
+      expect(screen.getByRole('heading', { name: 'No plan' })).toBeInTheDocument();
+      await openPicker(user);
       expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Choose Pro');
       expect(screen.queryByText('Current plan')).not.toBeInTheDocument();
+      expect(screen.getByTestId('plan-options')).not.toHaveTextContent('Switch to');
     });
   });
 
-  it('marks the subscribed plan as current and offers a switch off it', () => {
+  it('marks the subscribed plan as current and offers an upgrade off it', async () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -260,17 +335,38 @@ describe('AccountBillingPanel', () => {
       isError: false,
     });
     setCanManage(true);
+    const user = setupUser();
     renderPanel();
 
     // The plan the subscription names is identified in two places at once: the
-    // summary heading and a badge on its own card, which has no button.
+    // summary heading and its own card, whose button is a disabled "Current plan".
     expect(screen.getByText('Free plan')).toBeInTheDocument();
-    expect(screen.getByText('Current plan')).toBeInTheDocument();
+    await openPicker(user);
+    expect(screen.getByTestId('plan-current')).toHaveTextContent('Current plan');
+    expect(screen.getByTestId('plan-current')).toBeDisabled();
     expect(screen.queryByTestId('plan-pln_free')).not.toBeInTheDocument();
-    expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Switch to Pro');
+    // Pro costs more than Free: the button says it is an upgrade.
+    expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Upgrade to Pro');
   });
 
-  it('draws the current plan with the ink edge', () => {
+  it('offers a switch, not an upgrade, to a cheaper plan', async () => {
+    useSubscriptionMock.mockReturnValue({
+      data: { ...SUB, planId: 'pln_pro' },
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    const user = setupUser();
+    renderPanel();
+    await openPicker(user);
+
+    expect(screen.getByTestId('plan-pln_plus')).toHaveTextContent('Switch to Plus');
+    expect(screen.getByTestId('plan-pln_free')).toHaveTextContent('Switch to Free');
+    expect(screen.queryByTestId('plan-pln_pro')).not.toBeInTheDocument();
+  });
+
+  it('draws the current plan with the ink edge', async () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -278,14 +374,16 @@ describe('AccountBillingPanel', () => {
       isError: false,
     });
     setCanManage(true);
+    const user = setupUser();
     renderPanel();
+    await openPicker(user);
 
     const current = screen.getByText('Current plan').closest('[data-current]');
     expect(current).toHaveClass('border-foreground', 'ring-1');
   });
 
   it('offers the cycle on a segmented track before there is a subscription', async () => {
-    const user = userEvent.setup();
+    const user = setupUser();
     useSubscriptionMock.mockReturnValue({
       data: null,
       isPending: false,
@@ -294,6 +392,7 @@ describe('AccountBillingPanel', () => {
     });
     setCanManage(true);
     renderPanel();
+    await openPicker(user);
 
     // Monthly · Yearly states which cycle is in force, and moves with a press.
     expect(screen.getByTestId('billing-cycle-monthly')).toHaveAttribute(
@@ -309,7 +408,14 @@ describe('AccountBillingPanel', () => {
       'aria-pressed',
       'false',
     );
-    expect(screen.getByTestId('plan-options')).toHaveTextContent('/ yr');
+    // Yearly says what it saves, and every card still reads per month.
+    expect(screen.getByTestId('billing-cycle-savings')).toHaveTextContent(
+      'Save up to 17%',
+    );
+    expect(screen.getByTestId('plan-options')).toHaveTextContent('$82.50/ month');
+    expect(screen.getByTestId('plan-options')).toHaveTextContent(
+      'Billed yearly · $990 a year',
+    );
   });
 
   /*
@@ -321,7 +427,7 @@ describe('AccountBillingPanel', () => {
   describe('with a subscription, its own cycle decides', () => {
     const YEARLY_SUB = { ...SUB, billingCycle: 'yearly' as const };
 
-    it('hides the cycle switch and prices every card on the subscription cycle', () => {
+    it('hides the cycle switch and prices every card on the subscription cycle', async () => {
       useSubscriptionMock.mockReturnValue({
         data: YEARLY_SUB,
         isPending: false,
@@ -329,12 +435,18 @@ describe('AccountBillingPanel', () => {
         isError: false,
       });
       setCanManage(true);
+      const user = setupUser();
       renderPanel();
 
+      expect(screen.getByTestId('billing-plan-line')).toHaveTextContent('billed yearly');
+      await openPicker(user);
       expect(screen.queryByTestId('billing-cycle-toggle')).not.toBeInTheDocument();
-      expect(screen.getByText('Billed yearly')).toBeInTheDocument();
-      expect(screen.getByTestId('plan-options')).toHaveTextContent('/ yr');
-      expect(screen.getByTestId('plan-options')).not.toHaveTextContent('/ mo');
+      expect(screen.getByTestId('plan-options')).toHaveTextContent(
+        'Billed yearly · $990 a year',
+      );
+      expect(screen.getByTestId('plan-options')).not.toHaveTextContent(
+        /Billed monthly(?! — no yearly option)/,
+      );
     });
 
     it('switches plan on the subscription cycle', async () => {
@@ -346,10 +458,10 @@ describe('AccountBillingPanel', () => {
       });
       setCanManage(true);
       selectPlanMutateAsync.mockResolvedValue({ ...YEARLY_SUB, planId: 'pln_pro' });
-      const user = userEvent.setup();
+      const user = setupUser();
       renderPanel();
 
-      await user.click(screen.getByTestId('plan-pln_pro'));
+      await chooseAndConfirm(user, 'pln_pro');
       expect(selectPlanMutateAsync).toHaveBeenCalledWith({
         planId: 'pln_pro',
         billingCycle: 'yearly',
@@ -357,7 +469,7 @@ describe('AccountBillingPanel', () => {
     });
   });
 
-  it('switches plan when allowed', async () => {
+  it('switches plan when allowed — only from the confirm, then back to Billing', async () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -370,16 +482,107 @@ describe('AccountBillingPanel', () => {
       planId: 'pln_pro',
       status: 'active',
     });
-    const user = userEvent.setup();
+    const user = setupUser();
     renderPanel();
+    await openPicker(user);
     await user.click(screen.getByTestId('plan-pln_pro'));
+    // A card press opens the confirm; nothing has changed yet.
+    expect(await screen.findByTestId('plan-change-confirm')).toBeInTheDocument();
+    expect(selectPlanMutateAsync).not.toHaveBeenCalled();
+
+    await user.click(screen.getByTestId('plan-change-confirm-accept'));
     expect(selectPlanMutateAsync).toHaveBeenCalledWith({
       planId: 'pln_pro',
       billingCycle: 'monthly',
     });
+    await waitFor(() =>
+      expect(screen.queryByTestId('plan-change-confirm')).not.toBeInTheDocument(),
+    );
+    await waitFor(() =>
+      expect(screen.queryByTestId('billing-plan-picker')).not.toBeInTheDocument(),
+    );
   });
 
-  it('hides plan-switch controls without the billing permission', () => {
+  it('names its one button for the plan: Adjust on a paid plan, Upgrade on Free', () => {
+    useSubscriptionMock.mockReturnValue({
+      data: { ...SUB, planId: 'pln_plus' },
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    const { unmount } = renderPanel();
+    expect(screen.getByTestId('billing-adjust-plan')).toHaveTextContent('Adjust plan');
+    unmount();
+
+    useSubscriptionMock.mockReturnValue({
+      data: null,
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    renderPanel();
+    expect(screen.getByTestId('billing-adjust-plan')).toHaveTextContent('Upgrade plan');
+    // No second, competing button: the picker is where a plan is chosen.
+    expect(screen.getByTestId('billing-summary').querySelectorAll('button')).toHaveLength(
+      1,
+    );
+  });
+
+  it('says when the plan renews under it, and offers Resubscribe once it is set to end', () => {
+    useSubscriptionMock.mockReturnValue({
+      data: { ...SUB, cancelAtPeriodEnd: true },
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+    expect(screen.getByTestId('billing-notice')).toHaveTextContent(
+      'Your subscription will be canceled on Dec 1, 2026.',
+    );
+    expect(screen.getByTestId('billing-resubscribe')).toBeInTheDocument();
+  });
+
+  it('changes nothing when the confirm is kept', async () => {
+    useSubscriptionMock.mockReturnValue({
+      data: SUB,
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    const user = setupUser();
+    renderPanel();
+    await openPicker(user);
+    await user.click(screen.getByTestId('plan-pln_pro'));
+    await user.click(await screen.findByTestId('plan-change-confirm-keep'));
+
+    await waitFor(() =>
+      expect(screen.queryByTestId('plan-change-confirm')).not.toBeInTheDocument(),
+    );
+    expect(screen.getByTestId('billing-plan-picker')).toBeInTheDocument();
+    expect(selectPlanMutateAsync).not.toHaveBeenCalled();
+  });
+
+  it('moves to Free by ending the paid plan at the end of its period', async () => {
+    useSubscriptionMock.mockReturnValue({
+      data: { ...SUB, planId: 'pln_pro' },
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    cancelMutateAsync.mockResolvedValue({ ...SUB, cancelAtPeriodEnd: true });
+    const user = setupUser();
+    renderPanel();
+
+    await chooseAndConfirm(user, 'pln_free');
+    expect(cancelMutateAsync).toHaveBeenCalledWith('sub_test');
+    expect(selectPlanMutateAsync).not.toHaveBeenCalled();
+  });
+
+  it('hides plan-switch controls without the billing permission', async () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -387,14 +590,19 @@ describe('AccountBillingPanel', () => {
       isError: false,
     });
     setCanManage(false);
+    const user = setupUser();
     renderPanel();
     expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
+    expect(screen.getByTestId('billing-adjust-plan')).toHaveTextContent('View plans');
+    // Comparing is reading — anyone may; changing is not.
+    await openPicker(user);
+    expect(screen.getByTestId('plan-options')).toBeInTheDocument();
     expect(screen.queryByTestId('plan-pln_pro')).not.toBeInTheDocument();
   });
 
   // Plan changes are a team-workspace act: a personal workspace that somehow holds
   // subscription:manage still gets no plan buttons and no cycle switch.
-  it('offers no plan changes in a personal workspace, even with subscription:manage', () => {
+  it('offers no plan changes in a personal workspace, even with subscription:manage', async () => {
     useSubscriptionMock.mockReturnValue({
       data: null,
       isPending: false,
@@ -409,14 +617,17 @@ describe('AccountBillingPanel', () => {
       organizationType: 'PERSONAL',
       permissions: ['subscription:manage'],
     });
+    const user = setupUser();
     renderPanel();
 
+    expect(screen.getByTestId('billing-adjust-plan')).toHaveTextContent('View plans');
+    await openPicker(user);
     expect(screen.getByTestId('plan-options')).toBeInTheDocument();
     expect(screen.queryByTestId('plan-pln_pro')).not.toBeInTheDocument();
     expect(screen.queryByTestId('billing-cycle-toggle')).not.toBeInTheDocument();
   });
 
-  it('states the seats used out of the plan seats in the summary', () => {
+  it('states the seats used out of the plan seats on the plan line', () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -429,7 +640,7 @@ describe('AccountBillingPanel', () => {
     expect(screen.getByTestId('billing-summary')).toHaveTextContent('1 of 3 seats used');
   });
 
-  it('states an unlimited plan as ∞ seats', () => {
+  it('states an unlimited plan as no limit', () => {
     useSubscriptionMock.mockReturnValue({
       data: { ...SUB, seatsTotal: null, seatsUsed: 4 },
       isPending: false,
@@ -439,7 +650,9 @@ describe('AccountBillingPanel', () => {
     setCanManage(true);
     renderPanel();
 
-    expect(screen.getByTestId('billing-summary')).toHaveTextContent('4 of ∞ seats used');
+    expect(screen.getByTestId('billing-plan-line')).toHaveTextContent(
+      '4 seats used · no limit',
+    );
   });
 
   it('strips Stripe return params through the router after a succeeded redirect', () => {
@@ -518,13 +731,19 @@ describe('AccountBillingPanel', () => {
     setCanManage(true);
     // Never settles: the busy state is the subject.
     selectPlanMutateAsync.mockReturnValue(new Promise(() => {}));
-    const user = userEvent.setup();
+    const user = setupUser();
     renderPanel();
 
-    await user.click(screen.getByTestId('plan-pln_pro'));
+    await chooseAndConfirm(user, 'pln_pro');
 
+    // The confirm says the move is running, and cannot be left half-way.
+    expect(screen.getByTestId('plan-change-confirm-accept')).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
+    expect(screen.getByTestId('plan-change-confirm-keep')).toBeDisabled();
     const pressed = screen.getByTestId('plan-pln_pro');
-    const other = screen.getByTestId('plan-pln_free');
+    const other = screen.getByTestId('plan-pln_plus');
     expect(pressed).toHaveAttribute('aria-busy', 'true');
     expect(pressed).toBeDisabled();
     expect(pressed.querySelector('.animate-spin')).not.toBeNull();
@@ -552,15 +771,18 @@ describe('AccountBillingPanel', () => {
       status: 'incomplete',
     });
     getPaymentSetupMock.mockRejectedValue(new Error('stripe is down'));
-    const user = userEvent.setup();
+    const user = setupUser();
     renderPanel();
 
-    await user.click(screen.getByTestId('plan-pln_pro'));
+    await chooseAndConfirm(user, 'pln_pro');
 
     await waitFor(() => expect(notifyErrorMock).toHaveBeenCalledTimes(1));
     expect(screen.queryByTestId('billing-payment-card')).not.toBeInTheDocument();
-    // And the grid is usable again — the failure is not a dead end.
-    await waitFor(() => expect(screen.getByTestId('plan-pln_pro')).toBeEnabled());
+    // The plan change went through, so the confirm closes — the failure is not a dead end.
+    await waitFor(() =>
+      expect(screen.queryByTestId('plan-change-confirm')).not.toBeInTheDocument(),
+    );
+    expect(screen.getByTestId('billing-adjust-plan')).toBeEnabled();
   });
 
   it('leaves no unhandled rejection when the plan switch fails', async () => {
@@ -577,11 +799,15 @@ describe('AccountBillingPanel', () => {
     });
     setCanManage(true);
     selectPlanMutateAsync.mockRejectedValue(new Error('card declined'));
-    const user = userEvent.setup();
+    const user = setupUser();
     renderPanel();
 
-    await user.click(screen.getByTestId('plan-pln_pro'));
-    await waitFor(() => expect(screen.getByTestId('plan-pln_pro')).toBeEnabled());
+    await chooseAndConfirm(user, 'pln_pro');
+    // The move failed: the confirm stays, ready for another try or Keep.
+    await waitFor(() =>
+      expect(screen.getByTestId('plan-change-confirm-accept')).toBeEnabled(),
+    );
+    expect(screen.getByTestId('plan-pln_pro')).toBeEnabled();
     await new Promise((resolve) => setTimeout(resolve, 20));
 
     process.off('unhandledRejection', onRejection);
@@ -611,7 +837,7 @@ describe('AccountBillingPanel', () => {
     expect(await screen.findByTestId('billing-payment-form-error')).toBeInTheDocument();
     // The rest of the panel is untouched.
     expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
-    expect(screen.getByTestId('plan-options')).toBeInTheDocument();
+    expect(screen.getByTestId('billing-adjust-plan')).toBeInTheDocument();
     consoleError.mockRestore();
   });
 
@@ -630,7 +856,7 @@ describe('AccountBillingPanel', () => {
     renderPanel();
 
     expect(await screen.findByTestId('billing-cancellation-error')).toBeInTheDocument();
-    expect(screen.getByTestId('plan-options')).toBeInTheDocument();
+    expect(screen.getByTestId('billing-adjust-plan')).toBeInTheDocument();
     expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
     consoleError.mockRestore();
   });

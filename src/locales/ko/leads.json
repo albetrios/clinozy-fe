@@ -166,8 +166,7 @@
       "contact": "{{id}} · {{phone}}",
       "openLead": "진행 중인 리드 · {{id}} · {{phone}}",
       "open": "리드 열기",
-      "recreate": "리드 다시 만들기",
-      "useContact": "연락처 사용"
+      "recreate": "리드 다시 만들기"
     },
     "more_other": " · +{{count}}개 더",
     "change": "변경",

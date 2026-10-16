@@ -236,6 +236,50 @@
     "stages": {
       "before": "施術前",
       "after": "施術後"
+    },
+    "dropzone": {
+      "title": "ここに写真をドロップ",
+      "body": "またはコピーした画像を貼り付け · JPG / PNG、10 MBまで",
+      "target": "{{album}}に追加",
+      "choose": "写真を選ぶ",
+      "camera": "写真を撮る",
+      "veil": "ドロップして{{album}}に追加"
+    },
+    "select": {
+      "start": "選択",
+      "done": "完了",
+      "startHint": "比較する写真を選択",
+      "toggle": "{{name}}を選択",
+      "hint": "比較する写真を2〜8枚選んでください",
+      "limit": "一度に比較できるのは{{max}}枚までです",
+      "clear": "クリア",
+      "compare": "比較",
+      "bar": "選択した写真",
+      "count_other": "{{count}}枚選択中"
+    },
+    "compare": {
+      "title": "写真を比較",
+      "layout": "レイアウト",
+      "row": "横一列",
+      "grid": "グリッド",
+      "zoomMode": "ズームと位置",
+      "linked": "連動",
+      "linkedHint": "すべての写真が同じズームと位置に従います",
+      "separate": "個別",
+      "separateHint": "写真ごとにズームと位置を調整",
+      "resetAll": "すべてリセット",
+      "resetAllHint": "すべての写真を100%に戻す (0)",
+      "zoomOf": "{{name}}のズーム",
+      "remove": "{{name}}を比較から外す",
+      "start": "開始",
+      "close": "比較を閉じる",
+      "since_other": "+{{count}}日",
+      "hints": {
+        "zoom": "スクロールかピンチで全写真をズーム",
+        "pan": "ドラッグでまとめて移動 · ダブルクリックでリセット",
+        "zoomEach": "写真の上でスクロールかピンチでその写真だけをズーム",
+        "panEach": "ドラッグで写真を配置 · ダブルクリックでリセット"
+      }
     }
   },
   "rx": {
@@ -828,7 +872,9 @@
     "updated": "経過確認を更新しました",
     "record": "経過確認",
     "noScore": "患者さん自身の評価を選んでください",
-    "offeringsPlanned": "提案に追加済み"
+    "offeringsPlanned": "提案に追加済み",
+    "useAdvised": "前回のアドバイスを使う",
+    "samePlan": "前回と同じプラン"
   },
   "review": {
     "title": "レビューを記録",
@@ -991,7 +1037,10 @@
     },
     "photos": {
       "upload": "アップロード",
-      "empty": "写真はまだありません · 最初の1枚をアップロード"
+      "empty": "写真はまだありません · 最初の1枚をアップロード",
+      "add": "写真を追加",
+      "drop": "ここに写真をドロップ、またはクリックしてアップロード",
+      "dropBody": "JPG / PNG、10 MBまで · 貼り付けもできます"
     },
     "packages": {
       "progress": "{{used}} / {{total}}",

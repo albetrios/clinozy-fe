@@ -1,18 +1,27 @@
 /*
- * What a contact search's text says about the person behind it (change-contact-quick-pick D8):
- * the quick add's start — the words fill Name, a number fills Mobile — and the part of a name
- * the typed text matched.
+ * What a contact search's text says about the person behind it (change-contact-quick-pick D8,
+ * change-natural-contact-search D4): the quick add's start — the words fill Name, a number fills
+ * Mobile, an Instagram handle fills Instagram — and the words of a name the typed text matched.
  */
 
-/** A quick add's values: a name and a mobile's local digits (`''` when none). */
+/** A quick add's values: a name, a mobile's local digits and a handle (`''` for each one missing). */
 export interface QuickAddDraft {
   name: string;
   /** At most ten digits, without `+91`. */
   phone: string;
+  /** An Instagram handle as the contact editor keeps it: `@meera.iyer`. */
+  instagram: string;
 }
 
 /** The longest name a contact takes (clinozy-be `first_name` + `last_name`, 60 each). */
 export const QUICK_ADD_NAME_MAX = 60;
+
+/** A quick add with nothing typed. */
+export const EMPTY_QUICK_ADD_DRAFT: QuickAddDraft = {
+  name: '',
+  phone: '',
+  instagram: '',
+};
 
 /** A record's number, not a person's: `C-12345`, `#2371`, `PT-0412`. */
 const RECORD_NUMBER = /^(?:c-?|#|pt-?)\s*\d{1,9}$/i;
@@ -22,6 +31,32 @@ const NUMBER_RUN = /\+?\d[\d\s().-]*/g;
 const PHONE_MIN_DIGITS = 4;
 /** Any letter, in any script. */
 const LETTER = /\p{L}/u;
+/** A handle's own characters, 1–30 (the contact editor's handle). */
+const HANDLE = /^[a-z0-9._]{1,30}$/i;
+/** What may come before a handle in a profile link someone pasted. */
+const PROFILE_LINK_PREFIXES = ['https://', 'http://', 'www.'] as const;
+/** The profile link's site. */
+const PROFILE_SITE = 'instagram.com/';
+
+/** An email — never a name; contacts keep none in the app (D5): something@somewhere.tld. */
+function isEmailWord(word: string): boolean {
+  const at = word.indexOf('@');
+  return at > 0 && word.slice(at + 1).includes('.');
+}
+
+/** The handle a word names — `@meera.iyer`, `instagram.com/meera.iyer/` — or undefined. */
+function handleOfWord(word: string): string | undefined {
+  let rest = word;
+  if (rest.startsWith('@')) rest = rest.slice(1);
+  else {
+    for (const prefix of PROFILE_LINK_PREFIXES) {
+      if (rest.toLowerCase().startsWith(prefix)) rest = rest.slice(prefix.length);
+    }
+    if (!rest.toLowerCase().startsWith(PROFILE_SITE)) return undefined;
+    rest = rest.slice(PROFILE_SITE.length).replace(/\/$/, '');
+  }
+  return HANDLE.test(rest) ? rest.toLowerCase() : undefined;
+}
 
 /** A typed number's local digits: no `+91` / `91` country code, no trunk `0`, at most ten. */
 function localDigitsOf(run: string): string {
@@ -31,43 +66,91 @@ function localDigitsOf(run: string): string {
   return digits.slice(0, 10);
 }
 
+/** The words of a search, the handle and the emails taken out. */
+function wordsOf(query: string): { words: string[]; instagram: string } {
+  let instagram = '';
+  const words = query.split(/\s+/).filter((word) => {
+    if (isEmailWord(word)) return false;
+    const handle = handleOfWord(word);
+    if (handle === undefined) return true;
+    if (instagram === '') instagram = `@${handle}`;
+    return false;
+  });
+  return { words, instagram };
+}
+
 /**
- * The quick add's start from what was typed: the first number with 4+ digits fills the
- * mobile, the words left fill the name (none when no letter is left); a record number fills
- * neither — "Meera 98250 11241" → Meera · 9825011241, "+91 98250-11241" → · 9825011241.
+ * The quick add's start from what was typed, each value in the field it belongs to (D4): an
+ * Instagram handle (`@x`, `instagram.com/x`) fills Instagram, the first number with 4+ digits
+ * fills Mobile, the words left fill Name (none when no letter is left); an email is dropped (D5)
+ * and a record number fills nothing — "Meera 98250 11241 @meera.iyer" → Meera · 9825011241 ·
+ * @meera.iyer, "+91 98250-11241" → · 9825011241.
  */
 export function quickAddDraftOf(typed: string): QuickAddDraft {
   const query = typed.trim();
-  if (query === '' || RECORD_NUMBER.test(query)) return { name: '', phone: '' };
-  const run = [...query.matchAll(NUMBER_RUN)].find(
+  if (query === '' || RECORD_NUMBER.test(query)) return EMPTY_QUICK_ADD_DRAFT;
+  const { words, instagram } = wordsOf(query);
+  const text = words.join(' ');
+  const run = [...text.matchAll(NUMBER_RUN)].find(
     ([match]) => match.replace(/\D/g, '').length >= PHONE_MIN_DIGITS,
   )?.[0];
   const phone = run ? localDigitsOf(run) : '';
-  const rest = (run ? query.replace(run, ' ') : query).replace(/\s+/g, ' ').trim();
+  const rest = (run ? text.replace(run, ' ') : text).replace(/\s+/g, ' ').trim();
   const name = LETTER.test(rest) ? rest.slice(0, QUICK_ADD_NAME_MAX).trim() : '';
-  return { name, phone };
+  return { name, phone, instagram };
 }
 
-/** A name cut around the part the search matched. */
-export interface MarkedName {
-  before: string;
-  match: string;
-  after: string;
+/** One piece of a name: marked when a typed word matched it. */
+export interface NamePiece {
+  text: string;
+  marked: boolean;
+  /** Where the piece starts in the name — its stable key. */
+  start: number;
 }
 
 /**
- * Where the typed words sit in a name, case-insensitively — the hit's highlight — or `null`
- * when they are not in it as typed (a number, a contact number, an email or a handle matched).
+ * The name cut into pieces, every typed word marked wherever it is in it — case-insensitive,
+ * overlapping matches merged (D9): "iyer meera" marks both words of "Meera Iyer". `null` when no
+ * word of a name was typed (a number, a contact number, a handle) or none is in it.
  */
-export function markMatch(name: string, typed: string): MarkedName | null {
-  const needle = quickAddDraftOf(typed).name;
-  if (needle === '') return null;
-  const start = name.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase());
-  if (start < 0) return null;
-  const end = start + needle.length;
-  return {
-    before: name.slice(0, start),
-    match: name.slice(start, end),
-    after: name.slice(end),
-  };
+export function markWords(name: string, typed: string): NamePiece[] | null {
+  const needles = quickAddDraftOf(typed)
+    .name.toLocaleLowerCase()
+    .split(' ')
+    .filter((word) => word !== '');
+  if (needles.length === 0) return null;
+  const haystack = name.toLocaleLowerCase();
+  const marked = new Array<boolean>(name.length).fill(false);
+  for (const needle of needles) {
+    for (
+      let at = haystack.indexOf(needle);
+      at >= 0;
+      at = haystack.indexOf(needle, at + 1)
+    ) {
+      marked.fill(true, at, at + needle.length);
+    }
+  }
+  if (!marked.includes(true)) return null;
+  const pieces: NamePiece[] = [];
+  for (let index = 0; index < name.length; index += 1) {
+    const isMarked = marked[index] ?? false;
+    const last = pieces.at(-1);
+    if (last && last.marked === isMarked) last.text += name[index];
+    else pieces.push({ text: name[index] ?? '', marked: isMarked, start: index });
+  }
+  return pieces;
+}
+
+/**
+ * A Recent chip's short name (change-compact-contact-picker D6): the first word and the last
+ * word's initial — "Kavya Shah" → "Kavya S.", "Dayaananda Namboothiri" → "Dayaananda N." — and a
+ * one-word name whole. The chip still carries the whole name (its title and accessible name).
+ */
+export function railName(name: string): string {
+  const words = name.trim().split(/\s+/);
+  const first = words[0] ?? '';
+  const last = words.length > 1 ? words.at(-1) : undefined;
+  // The initial is the last word's first character, a whole code point (`Array.from`).
+  const initial = last ? Array.from(last)[0] : undefined;
+  return initial ? `${first} ${initial.toLocaleUpperCase()}.` : first;
 }

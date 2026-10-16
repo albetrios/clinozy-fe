@@ -7,7 +7,7 @@ import {
   clampNumber,
   MONEY_SCALE,
   numberFromText,
-  sanitizeNumberText,
+  readTypedNumber,
   textFromNumber,
 } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
@@ -165,11 +165,28 @@ export function ItemsNumberInput({
   const { t } = useTranslation(ITEMS_FIELD_NS);
   const errorId = useId();
   const [draft, setDraft] = useState<string | null>(null);
+  // The value before a sum was opened — what the cell holds while the sum does not work out.
+  const [sumBase, setSumBase] = useState<number | null>(null);
   const scale = money ? MONEY_SCALE : 1;
   const places = decimals ?? (money ? 2 : 0);
+  const capped = (next: number) => (max !== undefined && next > max ? max : next);
 
   const change = (typed: string) => {
-    const text = sanitizeNumberText(typed, places);
+    const read = readTypedNumber(typed, places);
+    if (read.kind === 'sum') {
+      // A sum (feat-write-less): kept as typed, its result taken at every keystroke.
+      const base = sumBase ?? value;
+      setSumBase(base);
+      setDraft(read.typed);
+      if (read.result === null) onValueChange(base);
+      else
+        onValueChange(
+          capped(numberFromText(String(read.result), scale, money ? 0 : places)),
+        );
+      return;
+    }
+    setSumBase(null);
+    const text = read.text.slice(0, maxLength);
     const next = numberFromText(text, scale, money ? 0 : places);
     if (max !== undefined && next > max) {
       setDraft(textFromNumber(max, scale, places));
@@ -192,7 +209,6 @@ export function ItemsNumberInput({
           placeholder={
             placeholder ?? (money ? t(ITEMS_FIELD_KEYS.moneyPlaceholder) : '0')
           }
-          maxLength={maxLength}
           readOnly={readOnly}
           aria-label={label}
           aria-invalid={error ? true : undefined}
@@ -202,6 +218,7 @@ export function ItemsNumberInput({
           onChange={(event) => change(event.target.value)}
           onBlur={() => {
             setDraft(null);
+            setSumBase(null);
             onBlur?.();
           }}
           className={cn(CELL_INPUT_CLASS, align === 'end' && 'text-end', className)}

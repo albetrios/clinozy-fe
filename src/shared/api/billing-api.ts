@@ -65,6 +65,7 @@ function toBillingPlan(w: z.infer<typeof billingPlanWireSchema>): BillingPlan {
     currency: w.currency.toLowerCase(),
     isActive: w.is_active,
     seatLimit: w.limits.seats,
+    features: w.features,
   };
 }
 

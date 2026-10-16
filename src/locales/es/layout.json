@@ -23,7 +23,16 @@
       "addOrganization": "Añadir organización",
       "invited": "Invitaciones",
       "invitedRow": "Invitado · {{roles}}",
-      "invitationCount": "Invitaciones: {{count}}"
+      "invitationCount": "Invitaciones: {{count}}",
+      "defaultBadge": "Predeterminada"
+    },
+    "signInClinic": {
+      "menuLabel": "Se abre al iniciar sesión",
+      "lastUsed": "La última usada",
+      "automatic": "La última clínica que usé",
+      "automaticHint": "Cambia a medida que pasas de una clínica a otra",
+      "savedClinic": "Al iniciar sesión se abrirá {{name}}",
+      "savedAutomatic": "Al iniciar sesión se abrirá la última clínica que usaste"
     },
     "notifications": {
       "title": "Notificaciones",
@@ -85,7 +94,9 @@
       "jumpToSection": "Ir a una sección",
       "listSearch": "Buscar en la lista",
       "leadRows": "Prospecto siguiente o anterior (en Prospectos)",
-      "closeDialog": "Cerrar diálogo"
+      "closeDialog": "Cerrar diálogo",
+      "saveForm": "Guardar el formulario abierto",
+      "dictate": "Dictar en el campo en el que estás"
     },
     "orgCreate": {
       "namePlaceholder": "Acme Inc.",

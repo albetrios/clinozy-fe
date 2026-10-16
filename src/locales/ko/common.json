@@ -217,7 +217,7 @@
     "date": {
       "label": "날짜",
       "placeholder": "날짜 선택",
-      "search": "날짜 입력 · 예: 9/12",
+      "search": "날짜 입력 · 9/12, 2w, 금",
       "today": "오늘",
       "tomorrow": "내일",
       "yesterday": "어제",

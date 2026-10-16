@@ -1,9 +1,11 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { queryClient } from '@/core/http/queryClient.ts';
 import { fetchAllPages } from '@/shared/api/fetch-all-pages.ts';
+import type { UseSignInClinicResult } from '@/shared/hooks/useSignInClinic/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import type * as MyInvitationsModule from '@/shared/tenancy/my-invitations.ts';
 import type { MyInvitation } from '@/shared/tenancy/my-invitations.ts';
@@ -23,6 +25,16 @@ const invitationsRef = vi.hoisted(() => ({ value: [] as MyInvitation[] }));
 vi.mock('@/shared/tenancy/my-invitations.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof MyInvitationsModule>()),
   useMyInvitations: () => ({ data: invitationsRef.value }),
+}));
+
+// The clinic that opens at sign-in (feat-choose-default-clinic): nothing to choose unless a test
+// says so.
+const signInClinic = vi.hoisted(() => ({
+  value: { clinics: [], pinnedId: null, canChoose: false, choose: () => undefined } as
+    UseSignInClinicResult | undefined,
+}));
+vi.mock('@/shared/hooks/useSignInClinic/index.ts', () => ({
+  useSignInClinic: () => signInClinic.value,
 }));
 
 const fetchPagesMock = vi.mocked(fetchAllPages);
@@ -62,6 +74,12 @@ describe('OrganizationPickerPage', () => {
     fetchPagesMock.mockReset();
     queryClient.clear();
     invitationsRef.value = [];
+    signInClinic.value = {
+      clinics: [],
+      pinnedId: null,
+      canChoose: false,
+      choose: () => undefined,
+    };
   });
 
   it('lists the organizations to pick from', async () => {
@@ -126,7 +144,8 @@ describe('OrganizationPickerPage', () => {
     const { container } = renderWithProviders(<OrganizationPickerPage />);
 
     const row = await screen.findByTestId('organization-picker-option-acme');
-    expect(row).toHaveClass('rounded-lg', 'hover:bg-muted');
+    // The link opens the clinic; the row around it carries the shape.
+    expect(row.parentElement).toHaveClass('rounded-lg', 'hover:bg-muted');
     expect(row).toHaveTextContent('Acme Inc.acme');
     expect(row.querySelector('.size-7.rounded-md')).not.toBeNull();
     expect(await axe(container)).toHaveNoViolations();
@@ -141,7 +160,7 @@ describe('OrganizationPickerPage', () => {
 
       const row = await screen.findByTestId('organization-picker-option-acme');
       expect(row).toHaveAttribute('aria-current', 'true');
-      expect(row).toHaveClass('bg-canvas', 'border-border-strong');
+      expect(row.parentElement).toHaveClass('bg-canvas', 'border-border-strong');
     } finally {
       useOrganizationStore.setState({ organizationId: null });
     }
@@ -175,6 +194,84 @@ describe('OrganizationPickerPage', () => {
     expect(
       await screen.findByTestId('organization-picker-option-acme'),
     ).toBeInTheDocument();
+  });
+
+  describe('the clinic that opens at sign-in (feat-choose-default-clinic)', () => {
+    const DEMO_ID = `org_${'d'.repeat(21)}`;
+    const LONG_NAME = 'Breitenberg, Schroeder and Reilly-Nitzsche';
+
+    function choosable(pinnedId: string | null) {
+      const choose = vi.fn();
+      signInClinic.value = { clinics: [], pinnedId, canChoose: true, choose };
+      fetchPagesMock.mockResolvedValue([
+        wireRow(ACME_ID),
+        wireRow(DEMO_ID, { name: LONG_NAME, slug: 'demo' }),
+      ]);
+      return choose;
+    }
+
+    it('stars a clinic to open it at sign-in, with a hint under the list', async () => {
+      const choose = choosable(null);
+      const { container } = renderWithProviders(<OrganizationPickerPage />);
+
+      const star = await screen.findByTestId('organization-picker-default-acme');
+      expect(star).toHaveAttribute('aria-pressed', 'false');
+      expect(star).toHaveAccessibleName('Open Acme Inc. at sign-in');
+      expect(screen.getByTestId('organization-picker-default-hint')).toHaveTextContent(
+        'Star a clinic to open it every time you sign in.',
+      );
+      expect(
+        screen.queryByTestId(/^organization-picker-default-badge-/),
+      ).not.toBeInTheDocument();
+      expect(await axe(container)).toHaveNoViolations();
+
+      await userEvent.click(star);
+      expect(choose).toHaveBeenCalledWith(ACME_ID);
+    });
+
+    it('labels the default clinic and its star goes back to the clinic used last', async () => {
+      const choose = choosable(DEMO_ID);
+      renderWithProviders(<OrganizationPickerPage />);
+
+      const star = await screen.findByTestId('organization-picker-default-demo');
+      expect(star).toHaveAttribute('aria-pressed', 'true');
+      expect(star).toHaveAccessibleName(`Stop opening ${LONG_NAME} at sign-in`);
+      // "Default" is part of the link, so it is read with the clinic's name.
+      expect(screen.getByTestId('organization-picker-option-demo')).toHaveTextContent(
+        `${LONG_NAME}demoDefault`,
+      );
+      expect(screen.getByTestId('organization-picker-default-acme')).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      );
+
+      await userEvent.click(star);
+      expect(choose).toHaveBeenCalledWith(null);
+    });
+
+    it('lets a long name wrap instead of cutting it', async () => {
+      choosable(null);
+      renderWithProviders(<OrganizationPickerPage />);
+
+      const name = await screen.findByText(LONG_NAME);
+      expect(name).toHaveClass('break-words');
+      expect(name).not.toHaveClass('truncate');
+    });
+
+    it('offers no star when there is nothing to choose between', async () => {
+      fetchPagesMock.mockResolvedValue([wireRow(ACME_ID)]);
+      renderWithProviders(<OrganizationPickerPage />);
+
+      expect(
+        await screen.findByTestId('organization-picker-option-acme'),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId('organization-picker-default-acme'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('organization-picker-default-hint'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe('pending invitations (D84)', () => {

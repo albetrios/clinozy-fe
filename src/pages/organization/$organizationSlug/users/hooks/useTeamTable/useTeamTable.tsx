@@ -23,6 +23,7 @@ import {
 } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 import { useHoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
+import type { RoleDirectory } from '@/shared/hooks/useRoleDirectory/index.ts';
 
 import {
   TeamBranchesCell,
@@ -33,7 +34,6 @@ import {
   TeamTextCell,
   TeamUserCell,
 } from '../../components/TeamCells/index.ts';
-import type { RoleDirectory } from '../../shared/hooks/useRoleDirectory/index.ts';
 import { TEAM_TABLE_ID, USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import type { TeamSort } from '../../users.search.ts';
 

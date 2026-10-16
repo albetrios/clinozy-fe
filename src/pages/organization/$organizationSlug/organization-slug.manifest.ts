@@ -24,5 +24,6 @@ export const manifest = {
     'tasks',
     'offerings',
     'users',
+    'branches',
   ],
 } as const satisfies PageManifest;

@@ -132,4 +132,34 @@ describe('usePatientPhotoUpload', () => {
       expect(notifyMock.success).toHaveBeenCalledWith('1 photo uploaded to LHR'),
     );
   });
+
+  it('opens the camera for an album and files the shot there', async () => {
+    const { wrapper } = makeWrapper();
+    function Probe() {
+      const upload = usePatientPhotoUpload(PATIENT_ID);
+      return (
+        <>
+          <input {...upload.cameraInputProps} />
+          <button type="button" onClick={() => upload.capture('private')}>
+            Take
+          </button>
+        </>
+      );
+    }
+    const click = vi
+      .spyOn(HTMLInputElement.prototype, 'click')
+      .mockImplementation(() => {});
+    const { getByRole, getByTestId } = render(<Probe />, { wrapper });
+    fireEvent.click(getByRole('button', { name: 'Take' }));
+    expect(click).toHaveBeenCalledOnce();
+    click.mockRestore();
+    const camera = getByTestId('patient-photos-camera');
+    expect(camera).toHaveAttribute('capture', 'environment');
+    expect(camera).not.toHaveAttribute('multiple');
+    fireEvent.change(camera, { target: { files: [image('shot.jpg', 'image/jpeg')] } });
+    await act(() => tray.pending[0]?.());
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith('1 photo uploaded to Private'),
+    );
+  });
 });

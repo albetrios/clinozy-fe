@@ -127,7 +127,8 @@ describe('PatientPicker — the shared contact picker over the patients (D23)', 
     await user.type(await screen.findByTestId('patient-picker-search'), 'Kiran');
     const option = await screen.findByTestId(`patient-picker-option-${KIRAN.patientId}`);
     expect(option).toHaveTextContent(`${fsi('#3441')} · ${fsi('+91 98791 22840')}`);
-    expect(option).toHaveTextContent('Use patient');
+    // Picking only takes the patient: the row says nothing more (change-natural-contact-search D8).
+    expect(option).not.toHaveTextContent('Use patient');
     expect(searchContacts).toHaveBeenCalledWith('Kiran', 'patients');
 
     await user.click(option);
