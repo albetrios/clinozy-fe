@@ -569,7 +569,8 @@
       "newPatient": "Novo paciente",
       "newReceipt": "Novo recebimento",
       "openTasks": "Abrir tarefas",
-      "finishSetup": "Concluir configuração"
+      "finishSetup": "Concluir configuração",
+      "writePrescription": "Escrever receita"
     },
     "screen": "Tela",
     "move": "mover",
@@ -577,7 +578,16 @@
     "hint": "Digite 3+ letras ou 4+ dígitos para pesquisar pessoas",
     "empty": "Nenhum resultado. Tente um nome, telefone ou número C.",
     "personSub": "{{id}} · •••• {{lastDigits}}",
-    "setupSub": "{{done}} de {{total}}"
+    "setupSub": "{{done}} de {{total}}",
+    "prescribe": {
+      "chip": "Escrever receita",
+      "leave": "Voltar a todos os comandos",
+      "placeholder": "Qual paciente? Digite um nome ou telefone",
+      "thisPatient": "Este paciente",
+      "patients": "Pacientes",
+      "hint": "Digite 3+ letras ou 4+ dígitos para encontrar um paciente",
+      "empty": "Nenhum paciente encontrado. Tente um nome, telefone ou número do paciente."
+    }
   },
   "lists": {
     "loadError": "Não foi possível carregar esta lista · conexão perdida. Mostrando a última cópia.",

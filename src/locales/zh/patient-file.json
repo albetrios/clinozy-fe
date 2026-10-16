@@ -321,14 +321,35 @@
     "items": {
       "label": "药物",
       "medicine": "药物",
-      "dose": "剂量 · 早 中 晚",
-      "meal": "用餐",
       "where": "部位",
       "qty": "数量",
       "searchMedicine": "搜索药物",
       "addMedicine": "添加药物",
-      "use": "使用",
-      "note": "备注 · 例如 10 天、薄涂一层、避免日晒"
+      "days": "天数",
+      "groups": {
+        "store": "本院药房",
+        "outside": "院外药品"
+      },
+      "writtenBefore": "以前给此患者开过",
+      "addOutside": "院外药品",
+      "source": {
+        "stocked_other": "本院药房有 {{count}}",
+        "store": "来自本院药房",
+        "empty": "本院药房缺货",
+        "outside": "院外",
+        "outsideHint": "院外药品 — 患者在别处购买"
+      },
+      "toOutside": "改为院外药品",
+      "toOutsideHint": "患者在别处购买；不从此处方销售",
+      "toStore": "改用本院药房的",
+      "note": "备注 · 例如 薄涂一层、避免日晒",
+      "dose": "剂量 · 早 中 晚",
+      "otherDays": "其他天数",
+      "otherDaysShort": "其他",
+      "when": "何时",
+      "meal": "用餐",
+      "more": "此药品的更多选项",
+      "remarks": "备注"
     },
     "dose": {
       "group": "剂量 早 · 中 · 晚",
@@ -337,18 +358,18 @@
         "afternoon": "中午",
         "night": "晚上"
       },
-      "on": "{{time}} · {{taps}} — 点击更改",
-      "off": "{{time}} · 无 — 点击更改",
       "sos": "SOS",
-      "sosHint": "仅在需要时 (SOS)"
+      "sosHint": "仅在需要时 (SOS)",
+      "on": "{{time}} · {{taps}} — 点按取消",
+      "off": "{{time}} — 点按设为 1",
+      "double": "×2",
+      "doubleHint": "每次两片"
     },
     "meal": {
       "before": "饭前",
       "after": "饭后",
       "beforeHint": "饭前",
-      "afterHint": "饭后",
-      "more": "更多时间",
-      "change": "{{timing}} · 更改"
+      "afterHint": "饭后"
     },
     "timings": {
       "empty_stomach": "空腹",
@@ -407,7 +428,91 @@
       "draft": "草稿",
       "approved": "已批准"
     },
-    "approvedNote": "已批准 · 已批准的处方无法更改"
+    "approvedNote": "已批准 · 已批准的处方无法更改",
+    "pad": {
+      "toggle": "便签",
+      "toggleHint": "一次写入或粘贴多种药物",
+      "label": "Rx 便签",
+      "hint": "每行一种药物 · 可粘贴整张处方",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "在列表中找到",
+      "typed": "不在列表中 · 按输入添加",
+      "unreadable": "未写药名 · 已跳过",
+      "lines_other": "{{count}} 行",
+      "foundCount": "找到 {{value}} 个",
+      "typedCount": "新增 {{value}} 个",
+      "skippedCount": "跳过 {{value}} 个",
+      "overflow": "只读取前 {{max}} 行",
+      "add_other": "添加 {{count}} 种药物",
+      "clear": "清除",
+      "close": "关闭便签",
+      "empty": "每一行读取后显示在这里",
+      "added_other": "已添加 {{count}} 种药物"
+    },
+    "sidekick": {
+      "label": "Rx 核对",
+      "allergies": "过敏",
+      "noAllergies": "未记录过敏",
+      "matches": "{{medicine}} 与 {{allergies}} 相符",
+      "since": "自处方 {{number}} 起 · {{date}}",
+      "first": "该患者的第一张处方",
+      "kinds": {
+        "new": "新增",
+        "changed": "已更改",
+        "unchanged": "未变",
+        "stopped": "已停用"
+      },
+      "unchangedCount": "{{value}} 个未变",
+      "continue": "继续",
+      "continueLabel": "按上次处方继续 {{name}}",
+      "continued": "已继续 {{name}}",
+      "reads": "患者看到的内容",
+      "readsEmpty": "添加药物后，这里会用简单的话显示",
+      "summary": {
+        "allergy_other": "{{count}} 项过敏相符",
+        "changes_other": "自处方 {{number}} 起 {{count}} 处变化",
+        "noChanges": "与处方 {{number}} 相同",
+        "first": "第一张处方"
+      },
+      "show": "显示",
+      "hide": "隐藏",
+      "earlier": {
+        "title": "以前的处方",
+        "none": "没有以前的处方",
+        "position": "第 {{index}} / {{count}} 张",
+        "older": "更早的处方",
+        "newer": "更新的处方",
+        "inThisRx": "已在本处方",
+        "add": "添加",
+        "addLabel": "将 {{name}} 添加到本处方",
+        "addAll_other": "添加缺少的 {{count}} 种",
+        "advice": "医嘱",
+        "noLines": "没有药品"
+      }
+    },
+    "allergyBand": {
+      "label": "过敏"
+    },
+    "plain": {
+      "morning": "早上 {{value}}",
+      "afternoon": "中午 {{value}}",
+      "night": "晚上 {{value}}",
+      "sos": "仅在需要时",
+      "total": "共 {{value}}"
+    },
+    "rowAllergy": {
+      "warning": "患者对 {{allergies}} 过敏",
+      "keep": "保留",
+      "keepLabel": "保留 {{medicine}} — 知情开具",
+      "remove": "移除",
+      "removeLabel": "移除 {{medicine}}",
+      "kept": "已知情保留，尽管对 {{allergies}} 过敏",
+      "undo": "撤销",
+      "held": "{{medicine}} 与过敏相符 — 请先保留或移除"
+    },
+    "allDays": {
+      "label": "全部药品"
+    }
   },
   "treatment": {
     "record": "治疗",

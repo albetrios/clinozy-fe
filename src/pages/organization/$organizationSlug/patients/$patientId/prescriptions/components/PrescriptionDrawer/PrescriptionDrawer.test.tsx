@@ -7,7 +7,11 @@ import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
+import {
+  patientFile,
+  patientRecord,
+  TEST_PATIENT_ID,
+} from '@/tests/utils/patient-doubles.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
@@ -30,6 +34,12 @@ const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => viewport.tier,
   readViewportTier: () => viewport.tier,
+}));
+
+/** The medicines table's measured width: 0 (not measured yet) keeps Days a column. */
+const tableWidth = vi.hoisted(() => ({ value: 0 }));
+vi.mock('@/shared/hooks/useElementWidth/index.ts', () => ({
+  useElementWidth: () => [() => undefined, tableWidth.value] as const,
 }));
 
 const { notifyMock, printMock } = vi.hoisted(() => ({
@@ -106,6 +116,7 @@ const written = () => rxWorld.prescriptions.at(-1);
 
 beforeEach(() => {
   viewport.tier = 'desktop';
+  tableWidth.value = 0;
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   printMock.mockClear();
   for (const fn of Object.values(rxServerApi)) fn.mockClear();
@@ -224,7 +235,7 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37; Q19)', () => {
       },
     ];
     const { user, drawer } = await openNew();
-    await user.click(within(drawer).getByTestId('rx-drawer-step-medicines-trigger'));
+    // A new prescription opens on Medicines (feat-prescription-composer D9).
     const line = await within(drawer).findByRole('combobox', { name: 'Quick add' });
     await user.type(line, 'glyco 1-0-1 af 10d');
     expect(await screen.findByText(/4 in stock/)).toBeInTheDocument();
@@ -389,5 +400,526 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37; Q19)', () => {
     });
     expect(written()?.status).toBe('approved');
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+describe('the prescription composer (feat-prescription-composer)', () => {
+  const SEPTRAN = {
+    id: 'med_septran0000000000000000',
+    name: 'Septran DS',
+    composition: 'Sulfamethoxazole 800 mg + Trimethoprim 160 mg',
+    stock: 6,
+  };
+  const BACTRIM = {
+    id: 'med_bactrim0000000000000000',
+    name: 'Bactrim',
+    composition: 'Sulfamethoxazole 400 mg + Trimethoprim 80 mg',
+    stock: 3,
+  };
+  const GLYCOLAC = {
+    id: 'med_glycolac000000000000',
+    name: 'Glycolac Cream',
+    composition: null,
+    stock: 4,
+  };
+  /** Priya, allergic to sulfa drugs. */
+  const allergicFile = () =>
+    patientFile({ patient: patientRecord({ allergies: ['Sulfa drugs'] }) });
+
+  async function openNewFor(file = patientFile()) {
+    const user = userEvent.setup();
+    const view = renderPrescriptions(url('/create'), { member: { role: 'admin' }, file });
+    const drawer = await screen.findByTestId('rx-drawer');
+    return { ...view, user, drawer };
+  }
+
+  it('opens a new prescription on Medicines, the quick line focused and its list closed', async () => {
+    const { drawer } = await openNew();
+    expect(within(drawer).getByTestId('rx-drawer-step-medicines')).toHaveAttribute(
+      'data-status',
+      'open',
+    );
+    const line = within(drawer).getByRole('combobox', { name: 'Quick add' });
+    await waitFor(() => expect(line).toHaveFocus());
+    expect(screen.queryByTestId('rx-quick-line-matches')).toBeNull();
+  });
+
+  it('opens an edit on Medicines, its title keeping the focus', async () => {
+    const { drawer } = await openEdit();
+    expect(within(drawer).getByTestId('rx-drawer-step-medicines')).toHaveAttribute(
+      'data-status',
+      'open',
+    );
+    await waitFor(() =>
+      expect(within(drawer).getByTestId('rx-drawer-title')).toHaveFocus(),
+    );
+  });
+
+  it('reads a pasted prescription in the Pad and adds every readable line', async () => {
+    rxWorld.medicines = [GLYCOLAC];
+    const { user, drawer } = await openNew();
+    const toggle = within(drawer).getByTestId('rx-pad-toggle');
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    const pad = within(drawer).getByTestId('rx-pad');
+    const input = within(pad).getByRole('textbox', { name: 'Rx Pad' });
+    await waitFor(() => expect(input).toHaveFocus());
+
+    await user.paste('1. Tab. glyco 1-0-1 af 10d\n- kojic gel face\n0-0-1');
+
+    expect(
+      within(pad)
+        .getAllByTestId('rx-pad-line')
+        .map((line) => line.dataset.kind),
+    ).toEqual(['found', 'typed', 'unreadable']);
+    expect(within(pad).getByTestId('rx-pad-summary')).toHaveTextContent(
+      '3 lines · 1 found · 1 new · 1 skipped',
+    );
+    expect(within(pad).getAllByTestId('rx-pad-line')[0]).toHaveTextContent('4 in stock');
+    expect(within(pad).getByTestId('rx-pad-add')).toHaveTextContent('Add 2 medicines');
+
+    await user.keyboard('{Control>}{Enter}{/Control}');
+
+    expect(notifyMock.success).toHaveBeenCalledWith('2 medicines added');
+    expect(input).toHaveValue('');
+    const rows = within(drawer).getAllByTestId('rx-items-row');
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0] as HTMLElement).getByTestId('rx-items-qty')).toHaveValue('20');
+    expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent(
+      '2 medicines',
+    );
+  });
+
+  it('closes the Pad with Esc and keeps the drawer, the focus back on its toggle', async () => {
+    const { user, drawer } = await openNew();
+    await user.click(within(drawer).getByTestId('rx-pad-toggle'));
+    await waitFor(() =>
+      expect(within(drawer).getByRole('textbox', { name: 'Rx Pad' })).toHaveFocus(),
+    );
+    await user.keyboard('{Escape}');
+    expect(within(drawer).queryByTestId('rx-pad')).toBeNull();
+    expect(screen.getByTestId('rx-drawer')).toBeVisible();
+    expect(within(drawer).getByTestId('rx-pad-toggle')).toHaveFocus();
+  });
+
+  /** Adds a medicine through the quick line, as a doctor types it. */
+  async function quickAdd(
+    user: ReturnType<typeof userEvent.setup>,
+    drawer: HTMLElement,
+    text: string,
+  ) {
+    await user.type(within(drawer).getByRole('combobox', { name: 'Quick add' }), text);
+    await user.keyboard('{Enter}');
+  }
+
+  it('warns under the matching row — no dialog — and holds the save until it is kept', async () => {
+    rxWorld.medicines = [SEPTRAN, BACTRIM];
+    const { user, drawer } = await openNewFor(allergicFile());
+    const band = within(drawer).getByTestId('rx-drawer-allergy-band');
+    expect(band).toHaveTextContent('Allergies: Sulfa drugs');
+
+    await quickAdd(user, drawer, 'septran bd');
+    expect(within(band).getByTestId('rx-drawer-allergy-band-match')).toHaveTextContent(
+      `${fsi('Septran DS')} matches ${fsi('Sulfa drugs')}`,
+    );
+    const warning = within(drawer).getByTestId('rx-items-allergy');
+    expect(warning).toHaveTextContent(
+      `Septran DS — Patient is allergic to ${fsi('Sulfa drugs')}`,
+    );
+    expect(warning.closest('[data-testid="rx-items-row"]')).not.toBeNull();
+
+    await user.click(within(drawer).getByTestId('rx-drawer-save'));
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(rxServerApi.createPrescription).not.toHaveBeenCalled();
+    expect(notifyMock.warning).toHaveBeenCalledWith(
+      `${fsi('Septran DS')} matches an allergy — keep it or remove it first`,
+      { id: 'rx-allergy-held' },
+    );
+    const keep = within(drawer).getByTestId('rx-items-allergy-keep');
+    await waitFor(() => expect(keep).toHaveFocus());
+    expect(keep).toHaveAccessibleName(`Keep ${fsi('Septran DS')} — prescribed knowingly`);
+
+    await user.click(keep);
+    const kept = within(drawer).getByTestId('rx-items-allergy');
+    expect(kept).toHaveAttribute('data-kept', 'true');
+    expect(kept).toHaveTextContent(
+      `Kept knowingly despite the ${fsi('Sulfa drugs')} allergy`,
+    );
+
+    // A warning added later never takes the focus unasked; the next held save asks for it.
+    const line = within(drawer).getByRole('combobox', { name: 'Quick add' });
+    await quickAdd(user, drawer, 'bactrim');
+    expect(within(drawer).getAllByTestId('rx-items-allergy')).toHaveLength(2);
+    expect(line).toHaveFocus();
+    await user.click(within(drawer).getByTestId('rx-drawer-save'));
+    await waitFor(() =>
+      expect(within(drawer).getByTestId('rx-items-allergy-keep')).toHaveFocus(),
+    );
+    await user.click(within(drawer).getByTestId('rx-items-allergy-keep'));
+    await user.click(within(drawer).getByTestId('rx-drawer-save'));
+    await waitFor(() => expect(rxServerApi.createPrescription).toHaveBeenCalled());
+    expect(
+      rxServerApi.createPrescription.mock.lastCall?.[0].fields.items[0]?.medicineName,
+    ).toBe('Septran DS');
+  });
+
+  it('removes a matching line from its warning', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    const { user, drawer } = await openNewFor(allergicFile());
+    await quickAdd(user, drawer, 'septran bd');
+    await user.click(within(drawer).getByTestId('rx-items-allergy-remove'));
+    expect(within(drawer).queryByTestId('rx-items-allergy')).toBeNull();
+    expect(within(drawer).getAllByTestId('rx-items-row')).toHaveLength(1);
+    expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent(
+      '0 medicines',
+    );
+  });
+
+  it('names each row’s source — the store’s stock, or outside — and switches it', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran');
+    const trigger = () =>
+      within(drawer).getAllByTestId('rx-items-medicine')[0] as HTMLElement;
+    expect(trigger()).toHaveAttribute('data-source', 'stocked');
+    expect(trigger()).toHaveAccessibleName(
+      'Medicine · Septran DS · 6 in your medical store',
+    );
+
+    await user.click(trigger());
+    await user.click(await screen.findByTestId('rx-items-medicine-to-outside'));
+    expect(trigger()).toHaveAttribute('data-source', 'outside');
+    expect(trigger()).toHaveTextContent('Septran DSOutside');
+
+    await user.click(trigger());
+    await user.click(await screen.findByTestId('rx-items-medicine-to-store'));
+    expect(trigger()).toHaveAttribute('data-source', 'stocked');
+  });
+
+  it('sets the dose, days and meal with one click each on one line (change-prescription-one-line)', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    const chip = (id: string) => within(row).getByTestId(`rx-items-${id}`);
+    // The line's number keeps each medicine apart (D7).
+    expect(chip('medicine-number')).toHaveTextContent('1');
+    await user.click(chip('dose-morning'));
+    expect(chip('dose-morning')).toHaveAttribute('aria-pressed', 'true');
+    await user.click(chip('dose-morning'));
+    expect(chip('dose-morning')).toHaveAttribute('aria-pressed', 'false');
+
+    await user.click(chip('dose-morning'));
+    await user.click(chip('dose-night'));
+    expect(chip('dose-night')).toHaveAttribute('aria-pressed', 'true');
+    // The taps read as the dose itself: 1 0 1, then SOS (×2 is in More, D5).
+    expect(
+      within(chip('dose'))
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['1', '0', '1', 'SOS']);
+    await user.click(chip('days-10'));
+    expect(chip('days-10')).toHaveAttribute('aria-pressed', 'true');
+    expect(chip('qty')).toHaveValue('20');
+
+    // A second click clears; the box takes a course the segments lack.
+    await user.click(chip('days-10'));
+    expect(chip('days-10')).toHaveAttribute('aria-pressed', 'false');
+    await user.type(chip('days-other'), '12');
+    expect(chip('days-other')).toHaveValue('12');
+    expect(chip('qty')).toHaveValue('24');
+
+    // Meal is on the line (D3): Before · After, then More — no second row of options.
+    expect(chip('directions').closest('[data-column]')).toHaveAttribute(
+      'data-column',
+      'directions',
+    );
+    expect(chip('directions')).toHaveAccessibleName('Meal');
+    expect(
+      within(chip('directions'))
+        .getAllByRole('button')
+        .map((button) => button.getAttribute('aria-label') ?? button.textContent),
+    ).toEqual(['Before', 'After', 'More for this medicine']);
+    expect(chip('directions-before')).toHaveAttribute('title', 'Before meal');
+    await user.click(chip('directions-after'));
+    expect(chip('directions-after')).toHaveAttribute('aria-pressed', 'true');
+    expect(within(row).queryByTestId('rx-items-rail')).toBeNull();
+
+    // More (D4): ×2 and the note; what is set there shows on the line.
+    await user.click(chip('directions-more'));
+    await user.click(screen.getByTestId('rx-items-dose-double'));
+    expect(chip('dose-night')).toHaveAccessibleName('Night · 2');
+    expect(chip('qty')).toHaveValue('48');
+    await user.type(screen.getByTestId('rx-items-remarks'), 'with water');
+    await user.keyboard('{Escape}');
+    expect(chip('directions-more')).toHaveTextContent('×2');
+    expect(chip('directions-more')).toHaveAccessibleName('More for this medicine · ×2');
+    // The note shows under its line, once written (D6).
+    expect(within(row).getByTestId('rx-items-note-line')).toHaveTextContent('with water');
+
+    await user.click(within(drawer).getByTestId('rx-drawer-save'));
+    await waitFor(() => expect(rxServerApi.createPrescription).toHaveBeenCalled());
+    expect(
+      rxServerApi.createPrescription.mock.lastCall?.[0].fields.items[0],
+    ).toMatchObject({
+      doseMorning: 2,
+      doseNight: 2,
+      meal: 'after',
+      qty: 48,
+      remarks: '12 days · with water',
+    });
+  });
+
+  it('gives a skin medicine its places on the line and its timings in More', async () => {
+    rxWorld.medicines = [GLYCOLAC];
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'glyco');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    const directions = within(row).getByTestId('rx-items-directions');
+    expect(directions).toHaveAccessibleName('Where');
+    await user.click(within(directions).getByTestId('rx-items-directions-face'));
+    expect(within(directions).getByTestId('rx-items-directions-face')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await user.click(within(directions).getByTestId('rx-items-directions-more'));
+    const when = screen.getByTestId('rx-items-when');
+    expect(
+      within(when)
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual([
+      'Night',
+      'Morning',
+      'Morning & night',
+      'Alternate days',
+      'Thrice a week',
+      'Once a week',
+    ]);
+    await user.click(within(when).getByTestId('rx-items-when-thrice_week'));
+    // Every place is in More, the line's two among them.
+    await user.click(screen.getByTestId('rx-items-where-neck'));
+    await user.keyboard('{Escape}');
+    // A place beyond the two, and the timing, show on the line, lit.
+    const more = within(row).getByTestId('rx-items-directions-more');
+    expect(more).toHaveTextContent('Neck+1');
+    expect(more).toHaveAccessibleName('More for this medicine · Neck · Thrice a week');
+    expect(within(directions).getByTestId('rx-items-directions-face')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('keeps Days and Meal on the line where the table has room (D9)', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    tableWidth.value = 896;
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran bd');
+    const header = within(drawer).getByTestId('rx-items-header');
+    expect(header).toHaveTextContent('Days');
+    expect(header).toHaveTextContent('Meal · Where');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    expect(
+      within(row).getByTestId('rx-items-days').closest('[data-column]'),
+    ).toHaveAttribute('data-column', 'days');
+    // Nothing under the line: no rail, and no note until one is written.
+    expect(within(row).queryByTestId('rx-items-rail')).toBeNull();
+    expect(within(row).queryByTestId('rx-items-note-line')).toBeNull();
+  });
+
+  it('grows the medicine picker to 44px on touch only (change-prescription-touch-picker D3)', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran bd');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    // 32px with a mouse, the shared small trigger; 44px on a coarse pointer, set by this line
+    // alone through `rx-medicine-trigger` (prescription-drawer.css, pinned by its own test).
+    expect(within(row).getByTestId('rx-items-medicine')).toHaveClass(
+      'min-h-8',
+      'rx-medicine-trigger',
+    );
+  });
+
+  it('folds Days and Meal under the medicine where the table is narrow', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    tableWidth.value = 640;
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran bd');
+    const header = within(drawer).getByTestId('rx-items-header');
+    expect(header).not.toHaveTextContent('Days');
+    expect(header).not.toHaveTextContent('Meal');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    expect(row.querySelector('[data-column="days"]')).toBeNull();
+    const rail = within(row).getByTestId('rx-items-rail');
+    expect(rail).toContainElement(within(row).getByTestId('rx-items-directions'));
+    await user.click(within(rail).getByTestId('rx-items-days-5'));
+    expect(within(rail).getByTestId('rx-items-days-5')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(within(row).getByTestId('rx-items-qty')).toHaveValue('10');
+  });
+
+  it('puts every line on the same course in one click', async () => {
+    rxWorld.medicines = [SEPTRAN, GLYCOLAC];
+    const { user, drawer } = await openNew();
+    expect(within(drawer).queryByTestId('rx-items-all-days')).toBeNull();
+    await quickAdd(user, drawer, 'septran bd');
+    await quickAdd(user, drawer, 'glyco');
+    await user.click(within(drawer).getByTestId('rx-items-all-days-14'));
+    for (const row of within(drawer).getAllByTestId('rx-items-row')) {
+      expect(within(row).getByTestId('rx-items-days-14')).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+    }
+    expect(within(drawer).getByTestId('rx-items-all-days-14')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(
+      within(within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement).getByTestId(
+        'rx-items-qty',
+      ),
+    ).toHaveValue('28');
+  });
+
+  it('makes each tray one Tab stop, the arrow keys moving within it', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    const { user, drawer } = await openNew();
+    await quickAdd(user, drawer, 'septran bd');
+    const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
+    const dose = within(row).getByTestId('rx-items-dose');
+    const chips = within(dose).getAllByRole('button');
+    // The lit segment holds the tray's one stop.
+    expect(chips.map((chip) => chip.tabIndex)).toEqual([0, -1, -1, -1]);
+    chips[0]?.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(chips[1]).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(within(dose).getByTestId('rx-items-dose-sos')).toHaveFocus();
+  });
+
+  it('steps through the earlier prescriptions and adds their lines', async () => {
+    resetRxWorld({
+      prescriptions: [
+        prescriptionRecord(),
+        prescriptionRecord({
+          id: 'rx_rx49900000000000000000',
+          seq: 499,
+          date: '2026-09-01',
+          status: 'approved',
+          advice: null,
+          items: [
+            prescriptionLine({
+              medicineName: 'Clonix-B Lotion',
+              doseNight: 0,
+              meal: null,
+              timing: 'morning_night',
+              bodyPart: 'scalp',
+              qty: 1,
+              remarks: '30 days',
+            }),
+            prescriptionLine({
+              medicineName: 'Kojic Gel',
+              meal: null,
+              bodyPart: 'face',
+              qty: 1,
+            }),
+          ],
+        }),
+      ],
+      kits: [],
+    });
+    const { user, drawer } = await openNew();
+    const earlier = within(drawer).getByTestId('rx-sidekick-earlier');
+    expect(within(earlier).getByTestId('rx-sidekick-earlier-number')).toHaveTextContent(
+      '#500',
+    );
+    expect(earlier).toHaveTextContent('1 of 2');
+    expect(earlier).toHaveTextContent('Advice: Avoid sun');
+
+    await user.click(within(earlier).getByTestId('rx-sidekick-earlier-add'));
+    expect(notifyMock.success).toHaveBeenCalledWith(`${fsi('Flubolt 400')} added`);
+    expect(within(earlier).getByTestId('rx-sidekick-earlier-held')).toHaveTextContent(
+      'In this Rx',
+    );
+
+    await user.click(within(earlier).getByTestId('rx-sidekick-earlier-older'));
+    expect(within(earlier).getByTestId('rx-sidekick-earlier-number')).toHaveTextContent(
+      '#499',
+    );
+    expect(
+      within(earlier).getAllByTestId('rx-sidekick-earlier-line')[0],
+    ).toHaveTextContent('30 days');
+    await user.click(within(earlier).getByTestId('rx-sidekick-earlier-add-all'));
+    expect(notifyMock.success).toHaveBeenCalledWith('2 medicines added');
+    const rows = within(drawer).getAllByTestId('rx-items-row');
+    expect(rows).toHaveLength(3);
+    expect(
+      within(rows[1] as HTMLElement).getByTestId('rx-items-days-30'),
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(within(earlier).getAllByTestId('rx-sidekick-earlier-held')).toHaveLength(2);
+  });
+
+  it('keeps the guard quiet for a patient without allergies, or whose allergies it may not see', async () => {
+    const { drawer } = await openNewFor(
+      patientFile({ patient: patientRecord({ allergies: null }) }),
+    );
+    expect(within(drawer).queryByTestId('rx-drawer-allergy-band')).toBeNull();
+    expect(within(drawer).queryByTestId('rx-sidekick-allergies')).toBeNull();
+  });
+
+  it('shows what changed since the last prescription and continues a stopped medicine', async () => {
+    const { user, drawer } = await openNew();
+    const sidekick = within(drawer).getByTestId('rx-sidekick');
+    expect(sidekick).toHaveAttribute('data-layout', 'column');
+    expect(within(sidekick).getByTestId('rx-sidekick-allergies')).toHaveTextContent(
+      'No allergies recorded',
+    );
+    const since = within(sidekick).getByTestId('rx-sidekick-since');
+    expect(since).toHaveTextContent(`Since Rx ${fsi('#500')} · ${fsi('Oct 1')}`);
+    const changes = () =>
+      within(since)
+        .queryAllByTestId('rx-sidekick-change')
+        .map((change) => change.dataset.kind);
+    expect(changes()).toEqual(['stopped']);
+
+    await user.click(within(since).getByTestId('rx-sidekick-continue'));
+
+    expect(notifyMock.success).toHaveBeenCalledWith(`${fsi('Flubolt 400')} continued`);
+    expect(changes()).toEqual([]);
+    expect(within(since).getByTestId('rx-sidekick-unchanged')).toHaveTextContent(
+      '1 unchanged · Flubolt 400',
+    );
+    expect(within(sidekick).getByTestId('rx-sidekick-reads-line')).toHaveTextContent(
+      'Flubolt 4001 at night · After meal · 8 in all',
+    );
+  });
+
+  it('folds the sidekick into a card below xl, its summary first', async () => {
+    viewport.tier = 'tablet';
+    const { user, drawer } = await openNewFor(allergicFile());
+    const sidekick = within(drawer).getByTestId('rx-sidekick');
+    expect(sidekick).toHaveAttribute('data-layout', 'card');
+    const toggle = within(sidekick).getByTestId('rx-sidekick-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(within(sidekick).getByTestId('rx-sidekick-summary')).toHaveTextContent(
+      '1 change since Rx #500',
+    );
+    expect(within(sidekick).queryByTestId('rx-sidekick-since')).toBeNull();
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(within(sidekick).getByTestId('rx-sidekick-since')).toBeVisible();
+  });
+
+  it('has no axe violations with the Pad, the band and the sidekick open', async () => {
+    rxWorld.medicines = [SEPTRAN];
+    const { user, drawer, baseElement } = await openNewFor(allergicFile());
+    await user.click(within(drawer).getByTestId('rx-pad-toggle'));
+    await user.paste('septran bd 5d');
+    await within(drawer).findByTestId('rx-pad-line-allergy');
+    expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 });

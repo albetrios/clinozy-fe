@@ -18,7 +18,9 @@ Conversion (one) · Created · Follow-up date) · Columns · "New patient", whic
 Conversion / Age hidden by default (a device pref); only ID and Follow-up sort; folds on a
 tablet (4 columns at 820, 2 at 1024); selection and the bulk bar from `md` (Export as CSV
 with `patient:export`; View-as asks the role's `export` ability); row actions New invoice
-(`payment:create` — the shared Invoice drawer for her over the list) · Edit · Delete; infinite
+(`payment:create` — the shared Invoice drawer for her over the list) · Write prescription
+(`patient_prescription:create` — her file with the New prescription drawer;
+feat-prescription-composer) · Edit · Delete; infinite
 scroll over cursor pages, "All patients loaded". In clinic today, With dues, the Gender filter,
 the other sorts, the Due column, the row's "Collect ₹…" and who saved the record go — the API
 has no read for them per row (G4, Q22, G-P8).

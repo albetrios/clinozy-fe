@@ -321,14 +321,35 @@
     "items": {
       "label": "薬",
       "medicine": "薬",
-      "dose": "用量 · 朝 昼 夜",
-      "meal": "食事",
       "where": "部位",
       "qty": "数量",
       "searchMedicine": "薬を検索",
       "addMedicine": "薬を追加",
-      "use": "使用",
-      "note": "メモ · 例: 10日間、薄く塗る、日光を避ける"
+      "days": "日数",
+      "groups": {
+        "store": "院内の薬局",
+        "outside": "院外の薬"
+      },
+      "writtenBefore": "この患者に以前処方",
+      "addOutside": "院外の薬",
+      "source": {
+        "stocked_other": "院内の薬局に {{count}}",
+        "store": "院内の薬局から",
+        "empty": "院内の薬局で在庫切れ",
+        "outside": "院外",
+        "outsideHint": "院外の薬 — 患者が別の場所で購入します"
+      },
+      "toOutside": "院外の薬として書く",
+      "toOutsideHint": "患者が別の場所で購入します。この処方から販売されません",
+      "toStore": "院内の薬局のものにする",
+      "note": "メモ · 例: 薄く塗る、日光を避ける",
+      "dose": "用量 · 朝 昼 夜",
+      "otherDays": "その他の日数",
+      "otherDaysShort": "その他",
+      "when": "いつ",
+      "meal": "食事",
+      "more": "この薬のその他",
+      "remarks": "メモ"
     },
     "dose": {
       "group": "用量 朝 · 昼 · 夜",
@@ -337,18 +358,18 @@
         "afternoon": "昼",
         "night": "夜"
       },
-      "on": "{{time}} · {{taps}} — クリックで変更",
-      "off": "{{time}} · なし — クリックで変更",
       "sos": "SOS",
-      "sosHint": "必要なときのみ (SOS)"
+      "sosHint": "必要なときのみ (SOS)",
+      "on": "{{time}} · {{taps}} — タップで外す",
+      "off": "{{time}} — タップで 1",
+      "double": "×2",
+      "doubleHint": "毎回2錠"
     },
     "meal": {
       "before": "食前",
       "after": "食後",
       "beforeHint": "食前",
-      "afterHint": "食後",
-      "more": "ほかのタイミング",
-      "change": "{{timing}} · 変更"
+      "afterHint": "食後"
     },
     "timings": {
       "empty_stomach": "空腹時",
@@ -407,7 +428,91 @@
       "draft": "下書き",
       "approved": "承認済み"
     },
-    "approvedNote": "承認済み · 承認済みの処方箋は変更できません"
+    "approvedNote": "承認済み · 承認済みの処方箋は変更できません",
+    "pad": {
+      "toggle": "パッド",
+      "toggleHint": "複数の薬をまとめて入力・貼り付け",
+      "label": "Rx パッド",
+      "hint": "1行に1つの薬 · 処方箋をまるごと貼り付け",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "リストにあり",
+      "typed": "リストにない · 入力どおり追加",
+      "unreadable": "薬名なし · スキップ",
+      "lines_other": "{{count}}行",
+      "foundCount": "{{value}}件一致",
+      "typedCount": "{{value}}件新規",
+      "skippedCount": "{{value}}件スキップ",
+      "overflow": "最初の{{max}}行のみ読み取ります",
+      "add_other": "薬{{count}}件を追加",
+      "clear": "クリア",
+      "close": "パッドを閉じる",
+      "empty": "各行は読み取られるとここに表示されます",
+      "added_other": "薬{{count}}件を追加しました"
+    },
+    "sidekick": {
+      "label": "Rx チェック",
+      "allergies": "アレルギー",
+      "noAllergies": "アレルギーの記録なし",
+      "matches": "{{medicine}} は {{allergies}} に該当",
+      "since": "処方箋 {{number}} 以降 · {{date}}",
+      "first": "この患者の最初の処方箋",
+      "kinds": {
+        "new": "新規",
+        "changed": "変更",
+        "unchanged": "変更なし",
+        "stopped": "中止"
+      },
+      "unchangedCount": "{{value}}件変更なし",
+      "continue": "継続",
+      "continueLabel": "{{name}} を前回どおり継続",
+      "continued": "{{name}} を継続しました",
+      "reads": "患者が読む内容",
+      "readsEmpty": "薬を追加すると、わかりやすい言葉でここに表示されます",
+      "summary": {
+        "allergy_other": "アレルギー該当{{count}}件",
+        "changes_other": "処方箋 {{number}} から{{count}}件の変更",
+        "noChanges": "処方箋 {{number}} と同じ",
+        "first": "最初の処方箋"
+      },
+      "show": "表示",
+      "hide": "隠す",
+      "earlier": {
+        "title": "以前の処方",
+        "none": "以前の処方はありません",
+        "position": "{{count}} 件中 {{index}}",
+        "older": "古い処方",
+        "newer": "新しい処方",
+        "inThisRx": "この処方にあり",
+        "add": "追加",
+        "addLabel": "{{name}} をこの処方に追加",
+        "addAll_other": "不足の {{count}} 件を追加",
+        "advice": "指導",
+        "noLines": "薬なし"
+      }
+    },
+    "allergyBand": {
+      "label": "アレルギー"
+    },
+    "plain": {
+      "morning": "朝 {{value}}",
+      "afternoon": "昼 {{value}}",
+      "night": "夜 {{value}}",
+      "sos": "必要時のみ",
+      "total": "合計 {{value}}"
+    },
+    "rowAllergy": {
+      "warning": "患者は {{allergies}} にアレルギーがあります",
+      "keep": "残す",
+      "keepLabel": "{{medicine}} を残す — 承知の上で処方",
+      "remove": "削除",
+      "removeLabel": "{{medicine}} を削除",
+      "kept": "{{allergies}} アレルギーを承知の上で残しました",
+      "undo": "元に戻す",
+      "held": "{{medicine}} がアレルギーに該当します — 先に残すか削除してください"
+    },
+    "allDays": {
+      "label": "すべての薬"
+    }
   },
   "treatment": {
     "record": "施術",

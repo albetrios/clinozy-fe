@@ -1,0 +1,111 @@
+/* The prescription drawer — the sizes only it draws (iteration
+   fix-prescription-css-budget-2026-10-16-nfos, D4).
+   Loaded with the drawer (the prescriptions island), never on the first paint: every
+   utility a source file names lands in the one first-paint stylesheet, and its 36 kB
+   budget has no room for a screen that opens on demand. The values are the ones the
+   seven prescription iterations measured; plain and unlayered, so the touch sizes win
+   over the line's Tailwind defaults, as their `pointer-coarse:` variants did. */
+
+/* The line's tracks per pointer, set on the table and read by its columns
+   (change-prescription-compact-line D9; change-prescription-touch-quantity D6):
+   Dose · Days · Meal · Where · Qty — 128 · 200 · 170 · 88px with a mouse,
+   176 · 284 · 212 · 120px on touch, where every segment is 44px. */
+.rx-tracks {
+  --rx-dose-track: 128px;
+  --rx-days-track: 200px;
+  --rx-directions-track: 170px;
+  --rx-qty-track: 88px;
+}
+.rx-qty-box {
+  width: var(--rx-qty-track);
+}
+
+/* A segment: at least 24px wide; on touch 44px high, 36px wide, 14px words. */
+.rx-segment {
+  min-width: calc(var(--spacing) * 6);
+  touch-action: manipulation;
+}
+/* An unlit segment: a hint of the lit surface on hover; grey when it cannot be pressed. */
+.rx-segment-off:disabled {
+  color: var(--color-disabled);
+}
+@media (hover: hover) {
+  .rx-segment-off:hover {
+    background-color: color-mix(in oklab, var(--color-background) 70%, transparent);
+  }
+}
+/* The hairline before SOS. */
+.rx-segment-split {
+  margin-inline: calc(var(--spacing) * 0.5);
+}
+/* More gives way first: its words shorten so the tray keeps one row. */
+.rx-more {
+  max-width: calc(var(--spacing) * 24);
+}
+/* Days' typed count, unlit: the input shows through the tray. */
+.rx-days-other-idle {
+  background-color: color-mix(in oklab, var(--color-background) 60%, transparent);
+}
+/* A line's note, under the medicine's name, past the line's number. */
+.rx-note-line {
+  padding-inline-start: calc(var(--spacing) * 7);
+}
+/* A remark on an earlier prescription, set apart from its directions. */
+.rx-remark {
+  font-style: italic;
+}
+
+/* The Rx Pad: 6rem to start, 14rem before it scrolls; its preview, 16rem. */
+.rx-pad-input {
+  min-height: calc(var(--spacing) * 24);
+  max-height: calc(var(--spacing) * 56);
+}
+.rx-pad-preview {
+  max-height: calc(var(--spacing) * 64);
+}
+
+/* Touch: finger-size controls (change-prescription-touch-quantity,
+   change-prescription-touch-picker, change-prescription-one-line). */
+@media (pointer: coarse) {
+  .rx-tracks {
+    --rx-dose-track: 176px;
+    --rx-days-track: 284px;
+    --rx-directions-track: 212px;
+    --rx-qty-track: 120px;
+  }
+  .rx-segment {
+    height: calc(var(--spacing) * 11);
+    min-width: calc(var(--spacing) * 9);
+    padding-inline: calc(var(--spacing) * 2.5);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+  .rx-segment.rx-days-other {
+    width: calc(var(--spacing) * 14);
+    padding-inline: var(--spacing);
+  }
+  .rx-note-line {
+    padding-inline-start: calc(var(--spacing) * 8);
+  }
+  .rx-note-input {
+    height: calc(var(--spacing) * 11);
+  }
+  .rx-line-number {
+    width: calc(var(--spacing) * 6);
+    height: calc(var(--spacing) * 6);
+  }
+  .rx-medicine-trigger {
+    min-height: calc(var(--spacing) * 11);
+  }
+  /* The Rx check's and the allergy warning's small buttons. */
+  .rx-small-action {
+    height: calc(var(--spacing) * 9);
+  }
+  .rx-icon-action {
+    width: calc(var(--spacing) * 9);
+    height: calc(var(--spacing) * 9);
+  }
+  .rx-add-all {
+    height: calc(var(--spacing) * 10);
+  }
+}

@@ -58,13 +58,47 @@ export const RX_KEYS = {
     label: 'rx.items.label',
     medicine: 'rx.items.medicine',
     dose: 'rx.items.dose',
-    meal: 'rx.items.meal',
     where: 'rx.items.where',
     qty: 'rx.items.qty',
     searchMedicine: 'rx.items.searchMedicine',
     addMedicine: 'rx.items.addMedicine',
-    use: 'rx.items.use',
     note: 'rx.items.note',
+    /** The Days cell (change-prescription-writing D6): its header and its search. */
+    days: 'rx.items.days',
+    /** The Days box (change-prescription-one-click D6): its name and its short placeholder. */
+    otherDays: 'rx.items.otherDays',
+    otherDaysShort: 'rx.items.otherDaysShort',
+    /** The When tray's group: a skin medicine's timings. */
+    when: 'rx.items.when',
+    /** The Meal tray's group: a tablet's (change-prescription-compact-line D8). */
+    meal: 'rx.items.meal',
+    /** More's name — the line's rarer choices and its note (change-prescription-one-line D4). */
+    more: 'rx.items.more',
+    /** The note's name in More and under its line: "Note". */
+    remarks: 'rx.items.remarks',
+    /** The medicine list's groups (D4). */
+    groups: {
+      store: 'rx.items.groups.store',
+      outside: 'rx.items.groups.outside',
+    },
+    /** An outside name's line in the list: "Written for this patient before". */
+    writtenBefore: 'rx.items.writtenBefore',
+    /** The create row: "Outside medicine “Acnestar”". */
+    addOutside: 'rx.items.addOutside',
+    /** A row's source pill and its spoken words (D4). */
+    source: {
+      /** "24 in your medical store" (plural). */
+      stocked: 'rx.items.source.stocked',
+      store: 'rx.items.source.store',
+      empty: 'rx.items.source.empty',
+      /** The pill's word: "Outside". */
+      outside: 'rx.items.source.outside',
+      outsideHint: 'rx.items.source.outsideHint',
+    },
+    /** The list's footer: switch the picked line store ↔ outside. */
+    toOutside: 'rx.items.toOutside',
+    toOutsideHint: 'rx.items.toOutsideHint',
+    toStore: 'rx.items.toStore',
   },
   dose: {
     group: 'rx.dose.group',
@@ -78,15 +112,16 @@ export const RX_KEYS = {
     off: 'rx.dose.off',
     sos: 'rx.dose.sos',
     sosHint: 'rx.dose.sosHint',
+    /** ×2 (change-prescription-one-click D4): two tablets at each lit time. */
+    double: 'rx.dose.double',
+    doubleHint: 'rx.dose.doubleHint',
   },
   meal: {
+    /** The Meal tray's short words: "Before" / "After" (change-prescription-compact-line D8). */
     before: 'rx.meal.before',
     after: 'rx.meal.after',
     beforeHint: 'rx.meal.beforeHint',
     afterHint: 'rx.meal.afterHint',
-    more: 'rx.meal.more',
-    /** "Morning & night · change". */
-    change: 'rx.meal.change',
   },
   timings: {
     empty_stomach: 'rx.timings.empty_stomach',
@@ -145,6 +180,108 @@ export const RX_KEYS = {
   delete: { title: 'rx.delete.title', deleted: 'rx.delete.deleted' },
   /** "Prescription #500" — the shared print preview's title. */
   preview: 'rx.preview',
+  /** The Rx Pad (feat-prescription-composer §6.4): many shorthand lines at once. */
+  pad: {
+    toggle: 'rx.pad.toggle',
+    toggleHint: 'rx.pad.toggleHint',
+    label: 'rx.pad.label',
+    hint: 'rx.pad.hint',
+    placeholder: 'rx.pad.placeholder',
+    /** A preview line's state, read out beside its mark. */
+    found: 'rx.pad.found',
+    typed: 'rx.pad.typed',
+    unreadable: 'rx.pad.unreadable',
+    /** "3 lines" (plural) · "2 found" · "1 new" · "1 skipped". */
+    lines: 'rx.pad.lines',
+    foundCount: 'rx.pad.foundCount',
+    typedCount: 'rx.pad.typedCount',
+    skippedCount: 'rx.pad.skippedCount',
+    /** "Only the first 30 lines are read". */
+    overflow: 'rx.pad.overflow',
+    /** "Add 3 medicines" (plural). */
+    add: 'rx.pad.add',
+    clear: 'rx.pad.clear',
+    close: 'rx.pad.close',
+    empty: 'rx.pad.empty',
+    /** "3 medicines added" (plural) — the toast. */
+    added: 'rx.pad.added',
+  },
+  /** The Rx sidekick (§6.5): the allergies, since last Rx, the plain words. */
+  sidekick: {
+    label: 'rx.sidekick.label',
+    allergies: 'rx.sidekick.allergies',
+    noAllergies: 'rx.sidekick.noAllergies',
+    /** "Septran DS matches Sulfa drugs". */
+    matches: 'rx.sidekick.matches',
+    /** "Since Rx #12 · 30 Sep". */
+    since: 'rx.sidekick.since',
+    first: 'rx.sidekick.first',
+    kinds: {
+      new: 'rx.sidekick.kinds.new',
+      changed: 'rx.sidekick.kinds.changed',
+      unchanged: 'rx.sidekick.kinds.unchanged',
+      stopped: 'rx.sidekick.kinds.stopped',
+    },
+    /** "2 unchanged". */
+    unchangedCount: 'rx.sidekick.unchangedCount',
+    continue: 'rx.sidekick.continue',
+    continueLabel: 'rx.sidekick.continueLabel',
+    /** "Cetirizine 10 continued" — the toast. */
+    continued: 'rx.sidekick.continued',
+    reads: 'rx.sidekick.reads',
+    readsEmpty: 'rx.sidekick.readsEmpty',
+    /** Earlier prescriptions (change-prescription-writing D8). */
+    earlier: {
+      title: 'rx.sidekick.earlier.title',
+      none: 'rx.sidekick.earlier.none',
+      /** "2 of 5". */
+      position: 'rx.sidekick.earlier.position',
+      older: 'rx.sidekick.earlier.older',
+      newer: 'rx.sidekick.earlier.newer',
+      inThisRx: 'rx.sidekick.earlier.inThisRx',
+      add: 'rx.sidekick.earlier.add',
+      addLabel: 'rx.sidekick.earlier.addLabel',
+      /** "Add 3 missing" (plural). */
+      addAll: 'rx.sidekick.earlier.addAll',
+      advice: 'rx.sidekick.earlier.advice',
+      noLines: 'rx.sidekick.earlier.noLines',
+    },
+    /** The folded card's line (plurals): "1 allergy match · 3 changes since Rx #12". */
+    summary: {
+      allergy: 'rx.sidekick.summary.allergy',
+      changes: 'rx.sidekick.summary.changes',
+      noChanges: 'rx.sidekick.summary.noChanges',
+      first: 'rx.sidekick.summary.first',
+    },
+    show: 'rx.sidekick.show',
+    hide: 'rx.sidekick.hide',
+  },
+  /** The band under the header: "Allergies". */
+  allergyBand: { label: 'rx.allergyBand.label' },
+  /** A line in plain words: "1 in the morning + 1 at night · … · 20 in all". */
+  plain: {
+    morning: 'rx.plain.morning',
+    afternoon: 'rx.plain.afternoon',
+    night: 'rx.plain.night',
+    sos: 'rx.plain.sos',
+    total: 'rx.plain.total',
+  },
+  /** "All medicines: 5 · 7 · 10 days" — one course for every line (change-prescription-one-click D6). */
+  allDays: { label: 'rx.allDays.label' },
+  /** The allergy warning under a matching row (change-prescription-writing D7). */
+  rowAllergy: {
+    /** "Allergic to Sulfa drugs". */
+    warning: 'rx.rowAllergy.warning',
+    keep: 'rx.rowAllergy.keep',
+    keepLabel: 'rx.rowAllergy.keepLabel',
+    remove: 'rx.rowAllergy.remove',
+    removeLabel: 'rx.rowAllergy.removeLabel',
+    /** "Kept knowingly despite the Sulfa drugs allergy". */
+    kept: 'rx.rowAllergy.kept',
+    undo: 'rx.rowAllergy.undo',
+    /** The held save's toast: "Septran DS matches an allergy — keep it or remove it". */
+    held: 'rx.rowAllergy.held',
+  },
 } as const;
 
 /** A prescription's status pill: a draft waits (butter), an approved one is final (sage). */
@@ -160,4 +297,12 @@ export const RX_KIT_TONES: readonly Tone[] = ['lav', 'blush', 'butter', 'mint'];
 export const RX_TEST_IDS = {
   drawer: 'rx-drawer',
   preview: 'rx-print-preview',
+  /** The Rx Pad and its toggle beside Browse (`rx-pad-…`). */
+  pad: 'rx-pad',
+  /** The Rx sidekick — the drawer's column, or the folded card below `xl` (`rx-sidekick-…`). */
+  sidekick: 'rx-sidekick',
+  /** The allergy band under the drawer's header. */
+  allergyBand: 'rx-drawer-allergy-band',
+  /** The allergy warning under a matching row (`-keep`, `-remove`). */
+  rowAllergy: 'rx-items-allergy',
 } as const;

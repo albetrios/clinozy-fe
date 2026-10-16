@@ -345,14 +345,37 @@
     "items": {
       "label": "Farmaci",
       "medicine": "Farmaco",
-      "dose": "Dose · M P S",
-      "meal": "Pasto",
       "where": "Dove",
       "qty": "Qtà",
       "searchMedicine": "Cerca farmaco",
       "addMedicine": "Aggiungi farmaco",
-      "use": "Usa",
-      "note": "Note · es. 10 giorni, strato sottile, evitare il sole"
+      "days": "Giorni",
+      "groups": {
+        "store": "Nella tua farmacia",
+        "outside": "Farmaci esterni"
+      },
+      "writtenBefore": "Già prescritto a questo paziente",
+      "addOutside": "Farmaco esterno",
+      "source": {
+        "stocked_one": "{{count}} nella tua farmacia",
+        "stocked_many": "{{count}} nella tua farmacia",
+        "stocked_other": "{{count}} nella tua farmacia",
+        "store": "Dalla tua farmacia",
+        "empty": "Esaurito nella tua farmacia",
+        "outside": "Esterno",
+        "outsideHint": "Farmaco esterno: il paziente lo compra altrove"
+      },
+      "toOutside": "Scrivi come farmaco esterno",
+      "toOutsideHint": "Il paziente lo compra altrove; non viene venduto da questa ricetta",
+      "toStore": "Prendilo dalla tua farmacia",
+      "note": "Note · es. strato sottile, evitare il sole",
+      "dose": "Dose · M P S",
+      "otherDays": "Altro numero di giorni",
+      "otherDaysShort": "Altro",
+      "when": "Quando",
+      "meal": "Pasto",
+      "more": "Altro per questo farmaco",
+      "remarks": "Nota"
     },
     "dose": {
       "group": "Dose mattina · pomeriggio · sera",
@@ -361,18 +384,18 @@
         "afternoon": "Pomeriggio",
         "night": "Sera"
       },
-      "on": "{{time}} · {{taps}} — clicca per cambiare",
-      "off": "{{time}} · nessuna — clicca per cambiare",
       "sos": "SOS",
-      "sosHint": "Solo al bisogno (SOS)"
+      "sosHint": "Solo al bisogno (SOS)",
+      "on": "{{time}} · {{taps}} — tocca per togliere",
+      "off": "{{time}} — tocca per 1",
+      "double": "×2",
+      "doubleHint": "Due compresse ogni volta"
     },
     "meal": {
       "before": "Prima",
       "after": "Dopo",
       "beforeHint": "Prima dei pasti",
-      "afterHint": "Dopo i pasti",
-      "more": "Altri orari",
-      "change": "{{timing}} · cambia"
+      "afterHint": "Dopo i pasti"
     },
     "timings": {
       "empty_stomach": "A stomaco vuoto",
@@ -433,7 +456,103 @@
       "draft": "Bozza",
       "approved": "Approvata"
     },
-    "approvedNote": "Approvata · una prescrizione approvata non può essere modificata"
+    "approvedNote": "Approvata · una prescrizione approvata non può essere modificata",
+    "pad": {
+      "toggle": "Blocco",
+      "toggleHint": "Scrivi o incolla più farmaci insieme",
+      "label": "Blocco Rx",
+      "hint": "Un farmaco per riga · incolla un’intera ricetta",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "Trovato nell’elenco",
+      "typed": "Non in elenco · aggiunto così com’è",
+      "unreadable": "Nessun farmaco · saltato",
+      "lines_one": "{{count}} riga",
+      "lines_many": "{{count}} righe",
+      "lines_other": "{{count}} righe",
+      "foundCount": "{{value}} trovati",
+      "typedCount": "{{value}} nuovi",
+      "skippedCount": "{{value}} saltati",
+      "overflow": "Vengono lette solo le prime {{max}} righe",
+      "add_one": "Aggiungi {{count}} farmaco",
+      "add_many": "Aggiungi {{count}} farmaci",
+      "add_other": "Aggiungi {{count}} farmaci",
+      "clear": "Cancella",
+      "close": "Chiudi il blocco",
+      "empty": "Ogni riga appare qui appena letta",
+      "added_one": "{{count}} farmaco aggiunto",
+      "added_many": "{{count}} farmaci aggiunti",
+      "added_other": "{{count}} farmaci aggiunti"
+    },
+    "sidekick": {
+      "label": "Controllo Rx",
+      "allergies": "Allergie",
+      "noAllergies": "Nessuna allergia registrata",
+      "matches": "{{medicine}} corrisponde a {{allergies}}",
+      "since": "Dalla ricetta {{number}} · {{date}}",
+      "first": "Prima ricetta di questo paziente",
+      "kinds": {
+        "new": "Nuovo",
+        "changed": "Modificato",
+        "unchanged": "Invariato",
+        "stopped": "Sospeso"
+      },
+      "unchangedCount": "{{value}} invariati",
+      "continue": "Continua",
+      "continueLabel": "Continua {{name}} come nell’ultima ricetta",
+      "continued": "{{name}} continuato",
+      "reads": "Cosa legge il paziente",
+      "readsEmpty": "I farmaci appaiono qui in parole semplici man mano che li aggiungi",
+      "summary": {
+        "allergy_one": "{{count}} corrispondenza con allergie",
+        "allergy_many": "{{count}} corrispondenze con allergie",
+        "allergy_other": "{{count}} corrispondenze con allergie",
+        "changes_one": "{{count}} modifica dalla ricetta {{number}}",
+        "changes_many": "{{count}} modifiche dalla ricetta {{number}}",
+        "changes_other": "{{count}} modifiche dalla ricetta {{number}}",
+        "noChanges": "Uguale alla ricetta {{number}}",
+        "first": "Prima ricetta"
+      },
+      "show": "Mostra",
+      "hide": "Nascondi",
+      "earlier": {
+        "title": "Ricette precedenti",
+        "none": "Nessuna ricetta precedente",
+        "position": "{{index}} di {{count}}",
+        "older": "Ricetta più vecchia",
+        "newer": "Ricetta più recente",
+        "inThisRx": "In questa Rx",
+        "add": "Aggiungi",
+        "addLabel": "Aggiungi {{name}} a questa ricetta",
+        "addAll_one": "Aggiungi {{count}} mancante",
+        "addAll_many": "Aggiungi tutti i {{count}} mancanti",
+        "addAll_other": "Aggiungi tutti i {{count}} mancanti",
+        "advice": "Consiglio",
+        "noLines": "Nessun farmaco"
+      }
+    },
+    "allergyBand": {
+      "label": "Allergie"
+    },
+    "plain": {
+      "morning": "{{value}} al mattino",
+      "afternoon": "{{value}} al pomeriggio",
+      "night": "{{value}} alla sera",
+      "sos": "Solo al bisogno",
+      "total": "{{value}} in totale"
+    },
+    "rowAllergy": {
+      "warning": "Il paziente è allergico a {{allergies}}",
+      "keep": "Tieni",
+      "keepLabel": "Tieni {{medicine}}: prescritto consapevolmente",
+      "remove": "Rimuovi",
+      "removeLabel": "Rimuovi {{medicine}}",
+      "kept": "Tenuto consapevolmente nonostante l’allergia a {{allergies}}",
+      "undo": "Annulla",
+      "held": "{{medicine}} corrisponde a un’allergia: prima tienilo o rimuovilo"
+    },
+    "allDays": {
+      "label": "Tutti i farmaci"
+    }
   },
   "treatment": {
     "record": "Trattamento",

@@ -267,7 +267,8 @@ function MatchesList<TItem>({
  * The quick line of an items field (KICKOFF §3.5 Items table; H:3789–3808;
  * `_patterns.md:135–141`) — a shell: the grammar is the host's. A 44px line
  * with the search glyph, the parsed shorthand as 22px `success` pills and the
- * "↵ add" key cap; "Browse" beside it; matches in a popover under it (at most
+ * "↵ add" key cap; "Browse" beside it, then the host's own control (`trailing`) — the
+ * Rx drawer's Pad; matches in a popover under it (at most
  * eight, "Suggested · click to add" while nothing is typed, the "Not in the
  * list · add as typed" row, "No match. Check the spelling or try fewer
  * letters.") with "↑↓ choose · ↵ add · Esc clear" and the grammar's hint; the
@@ -276,11 +277,23 @@ function MatchesList<TItem>({
  * keeps the focus in it.
  */
 export function QuickLine<TItem, TValues>(props: QuickLineProps<TItem, TValues>) {
-  const { placeholder, hint, frequent, browse, disabled = false, testId } = props;
+  const {
+    placeholder,
+    hint,
+    frequent,
+    browse,
+    disabled = false,
+    inputRef,
+    quietFirstFocus = false,
+    trailing,
+    testId,
+  } = props;
   const { t } = useTranslation(QUICK_LINE_NS);
   const ids = quickLineTestIds(testId);
   const listId = useId();
   const boxRef = useRef<HTMLDivElement | null>(null);
+  // The host's own focus on open stays quiet once (`quietFirstFocus`).
+  const quietFocus = useRef(quietFirstFocus);
   const state = useQuickLineState(props, listId);
 
   return (
@@ -305,6 +318,7 @@ export function QuickLine<TItem, TValues>(props: QuickLineProps<TItem, TValues>)
                 className="text-muted-foreground size-3.75 flex-none"
               />
               <input
+                ref={inputRef}
                 type="text"
                 role="combobox"
                 aria-label={t(K.label)}
@@ -321,7 +335,10 @@ export function QuickLine<TItem, TValues>(props: QuickLineProps<TItem, TValues>)
                 disabled={disabled}
                 data-testid={ids.input}
                 onChange={(event) => state.type(event.target.value)}
-                onFocus={() => state.setOpen(true)}
+                onFocus={() => {
+                  if (quietFocus.current) quietFocus.current = false;
+                  else state.setOpen(true);
+                }}
                 onBlur={() => state.setOpen(false)}
                 onKeyDown={state.onKeyDown}
                 className="placeholder:text-muted-foreground h-full min-w-0 flex-1 bg-transparent text-sm outline-none"
@@ -356,6 +373,7 @@ export function QuickLine<TItem, TValues>(props: QuickLineProps<TItem, TValues>)
                 testId={testId}
               />
             ) : null}
+            {trailing}
           </div>
         </PopoverAnchor>
         <PopoverContent // NOSONAR(S6819): role="presentation" drops Radix's dialog role from the popup — no native element does that

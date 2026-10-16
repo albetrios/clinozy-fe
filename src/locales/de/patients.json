@@ -34,7 +34,8 @@
   "rowActions": {
     "edit": "Bearbeiten",
     "delete": "Löschen",
-    "newInvoice": "Neue Rechnung"
+    "newInvoice": "Neue Rechnung",
+    "writePrescription": "Rezept schreiben"
   },
   "bulk": {
     "export": "Exportieren",

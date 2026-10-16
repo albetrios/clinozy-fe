@@ -64,7 +64,8 @@ function RxPreview({
 
 /**
  * New or Edit prescription, once the patient's prescriptions, the medicines, the member's kits
- * and the default doctor are read; a new one opened from a smart note starts with the
+ * and the default doctor are read — with the patient's allergies from the file for the
+ * composer's guard (feat-prescription-composer D8); a new one opened from a smart note starts with the
  * medicines it named (`?medicines=`, AMBER A-F5). Opened from the visit flow (`?visit=open`)
  * with a visit open, a new one is written at that visit and closes back to the flow.
  */
@@ -101,6 +102,8 @@ function RxDrawerHost({
       access={access}
       today={today}
       medicines={prescription ? undefined : search.medicines}
+      // The file's read: null when the member may not see them (no guard).
+      allergies={file.patient.allergies}
       visit={
         flow.visit
           ? {

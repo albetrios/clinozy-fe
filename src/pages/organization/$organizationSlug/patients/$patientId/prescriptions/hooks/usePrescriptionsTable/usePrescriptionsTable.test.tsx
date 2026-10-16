@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
+import { render, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -78,6 +78,24 @@ describe('usePrescriptionsTable (H:4753)', () => {
     expect(value('medicines')).toBe('Flubolt 400, Clonix-B Lotion');
     expect(value('notes')).toBe('Avoid sun · Peel');
     expect(result.current.getColumn('id')?.columnDef.meta?.foldValue?.(RX)).toBe('#500');
+  });
+
+  it('reads each line’s directions under the names, its days included', () => {
+    const withDays = prescriptionRecord({
+      items: [
+        prescriptionLine({ doseMorning: 1, doseNight: 0, remarks: '7 days · avoid sun' }),
+      ],
+    });
+    const { result } = renderHook(() => usePrescriptionsTable([withDays]), { wrapper });
+    const cell = result.current.getColumn('medicines')?.columnDef.cell;
+    const { container } = render(
+      <QueryClientProvider client={client}>
+        {typeof cell === 'function'
+          ? cell({ row: { original: withDays } } as never)
+          : null}
+      </QueryClientProvider>,
+    );
+    expect(container).toHaveTextContent('1-0-0 · After meal · 7 days');
   });
 
   it('tells a draft from an approved one in Status', () => {

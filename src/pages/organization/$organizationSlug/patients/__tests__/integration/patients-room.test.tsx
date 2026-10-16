@@ -229,6 +229,22 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     });
   });
 
+  it('writes a prescription from the row: the patient’s New prescription drawer (feat-prescription-composer §6.2)', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
+    await waitFor(() => expect(rows()).toHaveLength(4));
+    await user.click(
+      within(rowOf('Dharti Galani')).getByTestId(
+        'patients-row-action-write-prescription',
+      ),
+    );
+    await waitFor(() =>
+      expect(shownLocation(router).pathname).toBe(
+        `${PATIENTS}/${DHARTI.id}/prescriptions/create`,
+      ),
+    );
+  });
+
   it('books the person from the contact card: New appointment over the list with who=<contact>', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
@@ -439,6 +455,9 @@ describe('access (§6.5 Access, D9)', () => {
     expect(
       screen.queryByTestId('patients-row-action-new-invoice'),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('patients-row-action-write-prescription'),
+    ).not.toBeInTheDocument();
   });
 
   it('a Front desk member edits but never deletes', async () => {
@@ -447,6 +466,10 @@ describe('access (§6.5 Access, D9)', () => {
     const dharti = within(rowOf('Dharti Galani'));
     expect(dharti.getByTestId('patients-row-action-edit')).toBeInTheDocument();
     expect(dharti.queryByTestId('patients-row-action-delete')).not.toBeInTheDocument();
+    // Front desk does not write prescriptions (`patient_prescription:create`).
+    expect(
+      dharti.queryByTestId('patients-row-action-write-prescription'),
+    ).not.toBeInTheDocument();
   });
 });
 

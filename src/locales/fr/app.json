@@ -569,7 +569,8 @@
       "newPatient": "Nouveau patient",
       "newReceipt": "Nouvel encaissement",
       "openTasks": "Ouvrir les tâches",
-      "finishSetup": "Terminer la configuration"
+      "finishSetup": "Terminer la configuration",
+      "writePrescription": "Rédiger une ordonnance"
     },
     "screen": "Écran",
     "move": "naviguer",
@@ -577,7 +578,16 @@
     "hint": "Saisissez 3+ lettres ou 4+ chiffres pour rechercher des personnes",
     "empty": "Aucun résultat. Essayez un nom, un téléphone ou un numéro C.",
     "personSub": "{{id}} · •••• {{lastDigits}}",
-    "setupSub": "{{done}} sur {{total}}"
+    "setupSub": "{{done}} sur {{total}}",
+    "prescribe": {
+      "chip": "Rédiger une ordonnance",
+      "leave": "Retour à toutes les commandes",
+      "placeholder": "Quel patient ? Saisissez un nom ou un téléphone",
+      "thisPatient": "Ce patient",
+      "patients": "Patients",
+      "hint": "Saisissez 3+ lettres ou 4+ chiffres pour trouver un patient",
+      "empty": "Aucun patient trouvé. Essayez un nom, un téléphone ou un numéro de patient."
+    }
   },
   "lists": {
     "loadError": "Impossible de charger cette liste · connexion interrompue. Affichage de la dernière copie.",

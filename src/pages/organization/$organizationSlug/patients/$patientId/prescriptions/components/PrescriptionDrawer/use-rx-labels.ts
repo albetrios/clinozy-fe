@@ -18,7 +18,7 @@ const isTiming = (value: string): value is RxTiming =>
 const isPlace = (value: string): value is RxPlaceKey =>
   RX_PLACES.some((place) => place.key === value);
 
-/** A line's values in the drawer's words: its dose, timing and place, and all three. */
+/** A line's values in the drawer's words: its dose, timing, place and days, and all of them. */
 export function useRxLabels() {
   const { t } = useTranslation(RX_NS);
   const dose = (value: string) => (value === 'sos' ? t(K.dose.sos) : value);
@@ -34,8 +34,24 @@ export function useRxLabels() {
     if (typed !== null) return typed;
     return isPlace(value) ? t(K.places[value]) : '';
   };
-  /** "0-0-1 · After meal · Scalp" — empty when the line sets none of them. */
-  const directions = (line: Pick<RxFormLine, 'dose' | 'when' | 'where'>) =>
-    [dose(line.dose), when(line.when), where(line.where)].filter(Boolean).join(' · ');
-  return { dose, when, where, directions };
+  /** "7 days" — the drawer's words for a line's days; the saved note starts with them (D3). */
+  const daysNote = (count: number) => t(K.daysNote, { count });
+  /** "days", "Tage": the words a typed or saved number of days is followed by. */
+  const dayWords = t(K.dayWords)
+    .split(',')
+    .map((word) => word.trim())
+    .filter(Boolean);
+  /** "0-0-1 · After meal · Scalp · 7 days" — empty when the line sets none of them. */
+  const directions = (
+    line: Pick<RxFormLine, 'dose' | 'when' | 'where'> & Partial<Pick<RxFormLine, 'days'>>,
+  ) =>
+    [
+      dose(line.dose),
+      when(line.when),
+      where(line.where),
+      line.days ? daysNote(line.days) : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+  return { dose, when, where, daysNote, dayWords, directions };
 }

@@ -22,6 +22,21 @@ export const COMMAND_MENU_KEYS = {
     newReceipt: 'commandMenu.actions.newReceipt',
     openTasks: 'commandMenu.actions.openTasks',
     finishSetup: 'commandMenu.actions.finishSetup',
+    /** "Write prescription" — opens the patient finder (feat-prescription-composer §6.1). */
+    writePrescription: 'commandMenu.actions.writePrescription',
+  },
+  /** The patient finder "Write prescription" turns the menu into. */
+  prescribe: {
+    /** The chip leading the search line. */
+    chip: 'commandMenu.prescribe.chip',
+    /** The chip's ×: back to every command. */
+    leave: 'commandMenu.prescribe.leave',
+    placeholder: 'commandMenu.prescribe.placeholder',
+    /** The group of the patient file the menu opened over. */
+    thisPatient: 'commandMenu.prescribe.thisPatient',
+    patients: 'commandMenu.prescribe.patients',
+    hint: 'commandMenu.prescribe.hint',
+    empty: 'commandMenu.prescribe.empty',
   },
   /** "Finish setup"'s sub — the setup's "n of 3" (feat-clinic-setup KICKOFF §3). */
   setupSub: 'commandMenu.setupSub',
@@ -33,8 +48,12 @@ export const COMMAND_MENU_KEYS = {
   empty: 'commandMenu.empty',
 } as const;
 
-/** Rows per group (H:4608); People shows every person the search answers (`COMMAND_SEARCH_LIMIT`). */
+/**
+ * Rows per group (H:4608); People shows every person the search answers (`COMMAND_SEARCH_LIMIT`).
+ * Actions holds six since "Write prescription" joined the design's five (feat-prescription-composer
+ * D13), so a member who may do everything still sees Open tasks.
+ */
 export const COMMAND_MENU_LIMITS = {
-  actions: 5,
+  actions: 6,
   goTo: 4,
 } as const;

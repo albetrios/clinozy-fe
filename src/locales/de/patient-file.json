@@ -333,14 +333,36 @@
     "items": {
       "label": "Medikamente",
       "medicine": "Medikament",
-      "dose": "Dosis · M M A",
-      "meal": "Mahlzeit",
       "where": "Wo",
       "qty": "Menge",
       "searchMedicine": "Medikament suchen",
       "addMedicine": "Medikament hinzufügen",
-      "use": "Übernehmen",
-      "note": "Hinweise · z. B. 10 Tage, dünn auftragen, Sonne meiden"
+      "days": "Tage",
+      "groups": {
+        "store": "In Ihrer Apotheke",
+        "outside": "Externe Medikamente"
+      },
+      "writtenBefore": "Diesem Patienten schon verschrieben",
+      "addOutside": "Externes Medikament",
+      "source": {
+        "stocked_one": "{{count}} in Ihrer Apotheke",
+        "stocked_other": "{{count}} in Ihrer Apotheke",
+        "store": "Aus Ihrer Apotheke",
+        "empty": "In Ihrer Apotheke nicht vorrätig",
+        "outside": "Extern",
+        "outsideHint": "Externes Medikament — der Patient kauft es anderswo"
+      },
+      "toOutside": "Als externes Medikament schreiben",
+      "toOutsideHint": "Der Patient kauft es anderswo; es wird nicht über dieses Rezept verkauft",
+      "toStore": "Aus Ihrer Apotheke nehmen",
+      "note": "Hinweise · z. B. dünn auftragen, Sonne meiden",
+      "dose": "Dosis · M M A",
+      "otherDays": "Andere Anzahl Tage",
+      "otherDaysShort": "Andere",
+      "when": "Wann",
+      "meal": "Mahlzeit",
+      "more": "Mehr zu diesem Medikament",
+      "remarks": "Notiz"
     },
     "dose": {
       "group": "Dosis morgens · mittags · abends",
@@ -349,18 +371,18 @@
         "afternoon": "Mittags",
         "night": "Abends"
       },
-      "on": "{{time}} · {{taps}} — zum Ändern klicken",
-      "off": "{{time}} · keine — zum Ändern klicken",
       "sos": "SOS",
-      "sosHint": "Nur bei Bedarf (SOS)"
+      "sosHint": "Nur bei Bedarf (SOS)",
+      "on": "{{time}} · {{taps}} — tippen zum Entfernen",
+      "off": "{{time}} — tippen für 1",
+      "double": "×2",
+      "doubleHint": "Zwei Tabletten pro Einnahme"
     },
     "meal": {
       "before": "Vorher",
       "after": "Nachher",
       "beforeHint": "Vor dem Essen",
-      "afterHint": "Nach dem Essen",
-      "more": "Weitere Zeitpunkte",
-      "change": "{{timing}} · ändern"
+      "afterHint": "Nach dem Essen"
     },
     "timings": {
       "empty_stomach": "Auf nüchternen Magen",
@@ -420,7 +442,97 @@
       "draft": "Entwurf",
       "approved": "Freigegeben"
     },
-    "approvedNote": "Freigegeben · ein freigegebenes Rezept kann nicht geändert werden"
+    "approvedNote": "Freigegeben · ein freigegebenes Rezept kann nicht geändert werden",
+    "pad": {
+      "toggle": "Block",
+      "toggleHint": "Mehrere Medikamente auf einmal schreiben oder einfügen",
+      "label": "Rx-Block",
+      "hint": "Ein Medikament pro Zeile · ganzes Rezept einfügen",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "In der Liste gefunden",
+      "typed": "Nicht in der Liste · wie eingegeben hinzugefügt",
+      "unreadable": "Kein Medikament · übersprungen",
+      "lines_one": "{{count}} Zeile",
+      "lines_other": "{{count}} Zeilen",
+      "foundCount": "{{value}} gefunden",
+      "typedCount": "{{value}} neu",
+      "skippedCount": "{{value}} übersprungen",
+      "overflow": "Nur die ersten {{max}} Zeilen werden gelesen",
+      "add_one": "{{count}} Medikament hinzufügen",
+      "add_other": "{{count}} Medikamente hinzufügen",
+      "clear": "Leeren",
+      "close": "Block schließen",
+      "empty": "Jede Zeile erscheint hier, sobald sie gelesen ist",
+      "added_one": "{{count}} Medikament hinzugefügt",
+      "added_other": "{{count}} Medikamente hinzugefügt"
+    },
+    "sidekick": {
+      "label": "Rx-Prüfung",
+      "allergies": "Allergien",
+      "noAllergies": "Keine Allergien erfasst",
+      "matches": "{{medicine}} passt zu {{allergies}}",
+      "since": "Seit Rezept {{number}} · {{date}}",
+      "first": "Erstes Rezept für diese Person",
+      "kinds": {
+        "new": "Neu",
+        "changed": "Geändert",
+        "unchanged": "Unverändert",
+        "stopped": "Abgesetzt"
+      },
+      "unchangedCount": "{{value}} unverändert",
+      "continue": "Fortsetzen",
+      "continueLabel": "{{name}} wie zuletzt verordnet fortsetzen",
+      "continued": "{{name}} fortgesetzt",
+      "reads": "Was die Person liest",
+      "readsEmpty": "Medikamente erscheinen hier in einfachen Worten, sobald du sie hinzufügst",
+      "summary": {
+        "allergy_one": "{{count}} Allergie-Treffer",
+        "allergy_other": "{{count}} Allergie-Treffer",
+        "changes_one": "{{count}} Änderung seit Rezept {{number}}",
+        "changes_other": "{{count}} Änderungen seit Rezept {{number}}",
+        "noChanges": "Wie Rezept {{number}}",
+        "first": "Erstes Rezept"
+      },
+      "show": "Anzeigen",
+      "hide": "Ausblenden",
+      "earlier": {
+        "title": "Frühere Rezepte",
+        "none": "Keine früheren Rezepte",
+        "position": "{{index}} von {{count}}",
+        "older": "Älteres Rezept",
+        "newer": "Neueres Rezept",
+        "inThisRx": "In diesem Rx",
+        "add": "Hinzufügen",
+        "addLabel": "{{name}} zu diesem Rezept hinzufügen",
+        "addAll_one": "{{count}} fehlendes hinzufügen",
+        "addAll_other": "Alle {{count}} fehlenden hinzufügen",
+        "advice": "Rat",
+        "noLines": "Keine Medikamente"
+      }
+    },
+    "allergyBand": {
+      "label": "Allergien"
+    },
+    "plain": {
+      "morning": "{{value}} morgens",
+      "afternoon": "{{value}} mittags",
+      "night": "{{value}} abends",
+      "sos": "Nur bei Bedarf",
+      "total": "{{value}} insgesamt"
+    },
+    "rowAllergy": {
+      "warning": "Der Patient ist allergisch gegen {{allergies}}",
+      "keep": "Behalten",
+      "keepLabel": "{{medicine}} behalten — bewusst verschrieben",
+      "remove": "Entfernen",
+      "removeLabel": "{{medicine}} entfernen",
+      "kept": "Bewusst behalten trotz Allergie gegen {{allergies}}",
+      "undo": "Rückgängig",
+      "held": "{{medicine}} passt zu einer Allergie — erst behalten oder entfernen"
+    },
+    "allDays": {
+      "label": "Alle Medikamente"
+    }
   },
   "treatment": {
     "record": "Behandlung",

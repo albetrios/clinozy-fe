@@ -15,6 +15,7 @@ import {
   type RxFormLine,
   type RxFormValues,
 } from './rx-form.ts';
+import { useRxLabels } from './use-rx-labels.ts';
 
 /** The drawer's steps, as the save opens them. */
 export type RxStepId = 'prescription' | 'medicines' | 'notes';
@@ -122,6 +123,7 @@ export function useRxSave({
   onStale,
 }: UseRxSaveOptions) {
   const { t } = useTranslation(RX_NS);
+  const { daysNote } = useRxLabels();
   const create = useCreatePrescription({ notifyOnError: false });
   const update = useUpdatePrescription({ notifyOnError: false });
   const server = rxServerFields(form.getValues('items'));
@@ -138,7 +140,7 @@ export function useRxSave({
     onField: (field) => onStep(rxStepOf(field)),
     onStale,
     write: async () => {
-      const fields = rxFieldsOf(form.getValues());
+      const fields = rxFieldsOf(form.getValues(), daysNote);
       return prescription
         ? update.mutateAsync({ prescription, fields, approve: approves })
         : create.mutateAsync({ patientId, fields, appointmentId, approve: approves });

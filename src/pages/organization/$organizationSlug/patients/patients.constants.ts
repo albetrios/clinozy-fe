@@ -42,6 +42,8 @@ export const PATIENTS_KEYS = {
   },
   rowActions: {
     newInvoice: 'rowActions.newInvoice',
+    /** Opens the patient's New prescription drawer (feat-prescription-composer §6.2). */
+    writePrescription: 'rowActions.writePrescription',
     edit: 'rowActions.edit',
     delete: 'rowActions.delete',
   },

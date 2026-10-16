@@ -333,14 +333,36 @@
     "items": {
       "label": "दवाएँ",
       "medicine": "दवा",
-      "dose": "खुराक · सु दो रा",
-      "meal": "भोजन",
       "where": "कहाँ",
       "qty": "मात्रा",
       "searchMedicine": "दवा खोजें",
       "addMedicine": "दवा जोड़ें",
-      "use": "उपयोग करें",
-      "note": "टिप्पणी · जैसे 10 दिन, पतली परत लगाएँ, धूप से बचें"
+      "days": "दिन",
+      "groups": {
+        "store": "आपके मेडिकल स्टोर में",
+        "outside": "बाहर की दवाएँ"
+      },
+      "writtenBefore": "इस मरीज़ को पहले लिखी गई",
+      "addOutside": "बाहर की दवा",
+      "source": {
+        "stocked_one": "आपके मेडिकल स्टोर में {{count}}",
+        "stocked_other": "आपके मेडिकल स्टोर में {{count}}",
+        "store": "आपके मेडिकल स्टोर से",
+        "empty": "आपके मेडिकल स्टोर में स्टॉक ख़त्म",
+        "outside": "बाहर",
+        "outsideHint": "बाहर की दवा — मरीज़ इसे कहीं और से ख़रीदता है"
+      },
+      "toOutside": "बाहर की दवा के रूप में लिखें",
+      "toOutsideHint": "मरीज़ इसे कहीं और से ख़रीदता है; यह इस पर्चे से नहीं बेची जाती",
+      "toStore": "अपने मेडिकल स्टोर से लें",
+      "note": "टिप्पणी · जैसे पतली परत लगाएँ, धूप से बचें",
+      "dose": "खुराक · सु दो रा",
+      "otherDays": "दिनों की कोई और संख्या",
+      "otherDaysShort": "और",
+      "when": "कब",
+      "meal": "भोजन",
+      "more": "इस दवा के लिए और",
+      "remarks": "नोट"
     },
     "dose": {
       "group": "खुराक सुबह · दोपहर · रात",
@@ -349,18 +371,18 @@
         "afternoon": "दोपहर",
         "night": "रात"
       },
-      "on": "{{time}} · {{taps}} — बदलने के लिए क्लिक करें",
-      "off": "{{time}} · कोई नहीं — बदलने के लिए क्लिक करें",
       "sos": "SOS",
-      "sosHint": "सिर्फ़ ज़रूरत पड़ने पर (SOS)"
+      "sosHint": "सिर्फ़ ज़रूरत पड़ने पर (SOS)",
+      "on": "{{time}} · {{taps}} — हटाने के लिए टैप करें",
+      "off": "{{time}} — 1 के लिए टैप करें",
+      "double": "×2",
+      "doubleHint": "हर बार दो गोलियाँ"
     },
     "meal": {
       "before": "पहले",
       "after": "बाद",
       "beforeHint": "भोजन से पहले",
-      "afterHint": "भोजन के बाद",
-      "more": "और समय",
-      "change": "{{timing}} · बदलें"
+      "afterHint": "भोजन के बाद"
     },
     "timings": {
       "empty_stomach": "ख़ाली पेट",
@@ -420,7 +442,97 @@
       "draft": "ड्राफ़्ट",
       "approved": "स्वीकृत"
     },
-    "approvedNote": "स्वीकृत · स्वीकृत पर्चा बदला नहीं जा सकता"
+    "approvedNote": "स्वीकृत · स्वीकृत पर्चा बदला नहीं जा सकता",
+    "pad": {
+      "toggle": "पैड",
+      "toggleHint": "एक साथ कई दवाएँ लिखें या पेस्ट करें",
+      "label": "Rx पैड",
+      "hint": "हर पंक्ति में एक दवा · पूरा पर्चा पेस्ट करें",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "सूची में मिली",
+      "typed": "सूची में नहीं · जैसा लिखा वैसा जोड़ा",
+      "unreadable": "कोई दवा नहीं · छोड़ी गई",
+      "lines_one": "{{count}} पंक्ति",
+      "lines_other": "{{count}} पंक्तियाँ",
+      "foundCount": "{{value}} मिलीं",
+      "typedCount": "{{value}} नई",
+      "skippedCount": "{{value}} छोड़ी गईं",
+      "overflow": "केवल पहली {{max}} पंक्तियाँ पढ़ी जाती हैं",
+      "add_one": "{{count}} दवा जोड़ें",
+      "add_other": "{{count}} दवाएँ जोड़ें",
+      "clear": "साफ़ करें",
+      "close": "पैड बंद करें",
+      "empty": "हर पंक्ति पढ़ते ही यहाँ दिखती है",
+      "added_one": "{{count}} दवा जोड़ी गई",
+      "added_other": "{{count}} दवाएँ जोड़ी गईं"
+    },
+    "sidekick": {
+      "label": "Rx जाँच",
+      "allergies": "एलर्जी",
+      "noAllergies": "कोई एलर्जी दर्ज नहीं",
+      "matches": "{{medicine}} {{allergies}} से मेल खाती है",
+      "since": "पर्चा {{number}} के बाद से · {{date}}",
+      "first": "इस मरीज़ का पहला पर्चा",
+      "kinds": {
+        "new": "नई",
+        "changed": "बदली",
+        "unchanged": "वही",
+        "stopped": "बंद"
+      },
+      "unchangedCount": "{{value}} वही",
+      "continue": "जारी रखें",
+      "continueLabel": "{{name}} पिछले पर्चे की तरह जारी रखें",
+      "continued": "{{name}} जारी रखी गई",
+      "reads": "मरीज़ क्या पढ़ेगा",
+      "readsEmpty": "दवाएँ जोड़ते ही यहाँ आसान शब्दों में दिखेंगी",
+      "summary": {
+        "allergy_one": "{{count}} एलर्जी मेल",
+        "allergy_other": "{{count}} एलर्जी मेल",
+        "changes_one": "पर्चा {{number}} के बाद {{count}} बदलाव",
+        "changes_other": "पर्चा {{number}} के बाद {{count}} बदलाव",
+        "noChanges": "पर्चा {{number}} जैसा ही",
+        "first": "पहला पर्चा"
+      },
+      "show": "दिखाएँ",
+      "hide": "छिपाएँ",
+      "earlier": {
+        "title": "पिछले पर्चे",
+        "none": "कोई पिछला पर्चा नहीं",
+        "position": "{{count}} में से {{index}}",
+        "older": "पुराना पर्चा",
+        "newer": "नया पर्चा",
+        "inThisRx": "इस Rx में",
+        "add": "जोड़ें",
+        "addLabel": "{{name}} को इस पर्चे में जोड़ें",
+        "addAll_one": "{{count}} छूटी दवा जोड़ें",
+        "addAll_other": "सभी {{count}} छूटी दवाएँ जोड़ें",
+        "advice": "सलाह",
+        "noLines": "कोई दवा नहीं"
+      }
+    },
+    "allergyBand": {
+      "label": "एलर्जी"
+    },
+    "plain": {
+      "morning": "सुबह {{value}}",
+      "afternoon": "दोपहर {{value}}",
+      "night": "रात {{value}}",
+      "sos": "केवल ज़रूरत पर",
+      "total": "कुल {{value}}"
+    },
+    "rowAllergy": {
+      "warning": "मरीज़ को {{allergies}} से एलर्जी है",
+      "keep": "रखें",
+      "keepLabel": "{{medicine}} रखें — जानबूझकर लिखी गई",
+      "remove": "हटाएँ",
+      "removeLabel": "{{medicine}} हटाएँ",
+      "kept": "{{allergies}} एलर्जी के बावजूद जानबूझकर रखी गई",
+      "undo": "वापस लें",
+      "held": "{{medicine}} एक एलर्जी से मेल खाती है — पहले इसे रखें या हटाएँ"
+    },
+    "allDays": {
+      "label": "सभी दवाएँ"
+    }
   },
   "treatment": {
     "record": "उपचार",

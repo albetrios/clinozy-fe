@@ -36,7 +36,8 @@ const prescriptionNotes = (prescription: PrescriptionRecord) =>
 
 /**
  * The Prescriptions columns (KICKOFF §6.6 Section tables; H:4753): ID · Date
- * · Medicines (the names over "0-0-1 · After meal | Morning & night") · Notes
+ * · Medicines (the names over "0-0-1 · After meal · 7 days | Morning & night" —
+ * the days since change-prescription-writing D8) · Notes
  * (hidden) · Doctor · Status (Draft · Approved, Q19) · Updated (hidden; when
  * only — the API names no author, G4), 1100px in all. On a phone Date leads,
  * Medicines is the key and the number and status fold under it; the doctor's
@@ -53,8 +54,12 @@ function usePrescriptionsColumns(): ColumnDef<DataTableFeatures, PrescriptionRec
   const directions = (prescription: PrescriptionRecord) =>
     prescription.items
       .map((item) => {
-        const line = rxFormLineOf(item);
-        return [labels.dose(line.dose), labels.when(line.when)]
+        const line = rxFormLineOf(item, labels.dayWords);
+        return [
+          labels.dose(line.dose),
+          labels.when(line.when),
+          line.days ? labels.daysNote(line.days) : '',
+        ]
           .filter(Boolean)
           .join(' · ');
       })

@@ -94,6 +94,31 @@ describe('ItemsQtyCell — the 32px stepper (H:924)', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
+  it('grows to 44px on a touch screen only when its row asks (largeOnTouch)', () => {
+    renderCells(
+      <CellHarness>
+        {(control) => (
+          <>
+            <ItemsQtyCell control={control} name="rows.0.qty" label="Qty" testId="qty" />
+            <ItemsQtyCell
+              control={control}
+              name="rows.0.qty"
+              label="Touch qty"
+              testId="touch-qty"
+              largeOnTouch
+            />
+          </>
+        )}
+      </CellHarness>,
+    );
+    const box = (testId: string) => screen.getByTestId(testId).closest('div');
+    // `items-field.css` sizes a stepper on touch only through this attribute.
+    expect(box('qty')).toHaveClass('items-stepper', 'h-8');
+    expect(box('qty')).not.toHaveAttribute('data-touch-size');
+    expect(box('touch-qty')).toHaveClass('items-stepper', 'h-8');
+    expect(box('touch-qty')).toHaveAttribute('data-touch-size', 'large');
+  });
+
   it('replaces the count as typed and brings an empty or too-small one back to min', async () => {
     const formRef: FormRef = { current: null };
     const { user } = renderCells(

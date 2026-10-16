@@ -333,14 +333,36 @@
     "items": {
       "label": "Medicines",
       "medicine": "Medicine",
-      "dose": "Dose · M A N",
-      "meal": "Meal",
       "where": "Where",
       "qty": "Qty",
       "searchMedicine": "Search medicine",
       "addMedicine": "Add medicine",
-      "use": "Use",
-      "note": "Remarks · e.g. 10 days, apply thin layer, avoid sun"
+      "days": "Days",
+      "groups": {
+        "store": "In your medical store",
+        "outside": "Outside medicines"
+      },
+      "writtenBefore": "Written for this patient before",
+      "addOutside": "Outside medicine",
+      "source": {
+        "stocked_one": "{{count}} in your medical store",
+        "stocked_other": "{{count}} in your medical store",
+        "store": "From your medical store",
+        "empty": "Out of stock in your medical store",
+        "outside": "Outside",
+        "outsideHint": "Outside medicine — the patient buys it elsewhere"
+      },
+      "toOutside": "Write as an outside medicine",
+      "toOutsideHint": "The patient buys it elsewhere; it is not sold from this prescription",
+      "toStore": "Take it from your medical store",
+      "note": "Remarks · e.g. apply thin layer, avoid sun",
+      "dose": "Dose · M A N",
+      "otherDays": "Other number of days",
+      "otherDaysShort": "Other",
+      "when": "When",
+      "meal": "Meal",
+      "more": "More for this medicine",
+      "remarks": "Note"
     },
     "dose": {
       "group": "Dose morning · afternoon · night",
@@ -349,18 +371,18 @@
         "afternoon": "Afternoon",
         "night": "Night"
       },
-      "on": "{{time}} · {{taps}} — click to change",
-      "off": "{{time}} · none — click to change",
       "sos": "SOS",
-      "sosHint": "Only when needed (SOS)"
+      "sosHint": "Only when needed (SOS)",
+      "on": "{{time}} · {{taps}} — tap to turn off",
+      "off": "{{time}} — tap for 1",
+      "double": "×2",
+      "doubleHint": "Two tablets at each time"
     },
     "meal": {
       "before": "Before",
       "after": "After",
       "beforeHint": "Before meal",
-      "afterHint": "After meal",
-      "more": "More timings",
-      "change": "{{timing}} · change"
+      "afterHint": "After meal"
     },
     "timings": {
       "empty_stomach": "Empty stomach",
@@ -420,7 +442,97 @@
       "draft": "Draft",
       "approved": "Approved"
     },
-    "approvedNote": "Approved · an approved prescription can’t be changed"
+    "approvedNote": "Approved · an approved prescription can’t be changed",
+    "pad": {
+      "toggle": "Pad",
+      "toggleHint": "Write or paste many medicines at once",
+      "label": "Rx Pad",
+      "hint": "One medicine a line · paste a whole prescription",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "Found in the list",
+      "typed": "Not in the list · added as typed",
+      "unreadable": "No medicine named · skipped",
+      "lines_one": "{{count}} line",
+      "lines_other": "{{count}} lines",
+      "foundCount": "{{value}} found",
+      "typedCount": "{{value}} new",
+      "skippedCount": "{{value}} skipped",
+      "overflow": "Only the first {{max}} lines are read",
+      "add_one": "Add {{count}} medicine",
+      "add_other": "Add {{count}} medicines",
+      "clear": "Clear",
+      "close": "Close the pad",
+      "empty": "Each line shows here as it is read",
+      "added_one": "{{count}} medicine added",
+      "added_other": "{{count}} medicines added"
+    },
+    "sidekick": {
+      "label": "Rx check",
+      "allergies": "Allergies",
+      "noAllergies": "No allergies recorded",
+      "matches": "{{medicine}} matches {{allergies}}",
+      "since": "Since Rx {{number}} · {{date}}",
+      "first": "First prescription for this patient",
+      "kinds": {
+        "new": "New",
+        "changed": "Changed",
+        "unchanged": "Unchanged",
+        "stopped": "Stopped"
+      },
+      "unchangedCount": "{{value}} unchanged",
+      "continue": "Continue",
+      "continueLabel": "Continue {{name}} as last prescribed",
+      "continued": "{{name}} continued",
+      "reads": "What the patient reads",
+      "readsEmpty": "Medicines show here in plain words as you add them",
+      "summary": {
+        "allergy_one": "{{count}} allergy match",
+        "allergy_other": "{{count}} allergy matches",
+        "changes_one": "{{count}} change since Rx {{number}}",
+        "changes_other": "{{count}} changes since Rx {{number}}",
+        "noChanges": "Same as Rx {{number}}",
+        "first": "First prescription"
+      },
+      "show": "Show",
+      "hide": "Hide",
+      "earlier": {
+        "title": "Earlier prescriptions",
+        "none": "No earlier prescriptions",
+        "position": "{{index}} of {{count}}",
+        "older": "Older prescription",
+        "newer": "Newer prescription",
+        "inThisRx": "In this Rx",
+        "add": "Add",
+        "addLabel": "Add {{name}} to this prescription",
+        "addAll_one": "Add {{count}} missing",
+        "addAll_other": "Add all {{count}} missing",
+        "advice": "Advice",
+        "noLines": "No medicines"
+      }
+    },
+    "allergyBand": {
+      "label": "Allergies"
+    },
+    "plain": {
+      "morning": "{{value}} in the morning",
+      "afternoon": "{{value}} in the afternoon",
+      "night": "{{value}} at night",
+      "sos": "Only when needed",
+      "total": "{{value}} in all"
+    },
+    "rowAllergy": {
+      "warning": "Patient is allergic to {{allergies}}",
+      "keep": "Keep",
+      "keepLabel": "Keep {{medicine}} — prescribed knowingly",
+      "remove": "Remove",
+      "removeLabel": "Remove {{medicine}}",
+      "kept": "Kept knowingly despite the {{allergies}} allergy",
+      "undo": "Undo",
+      "held": "{{medicine}} matches an allergy — keep it or remove it first"
+    },
+    "allDays": {
+      "label": "All medicines"
+    }
   },
   "treatment": {
     "record": "Treatment",

@@ -381,14 +381,40 @@
     "items": {
       "label": "الأدوية",
       "medicine": "الدواء",
-      "dose": "الجرعة · ص ظ ل",
-      "meal": "الوجبة",
       "where": "المكان",
       "qty": "الكمية",
       "searchMedicine": "ابحث عن دواء",
       "addMedicine": "إضافة دواء",
-      "use": "استخدام",
-      "note": "ملاحظات · مثل 10 أيام، طبقة رقيقة، تجنّب الشمس"
+      "days": "الأيام",
+      "groups": {
+        "store": "في صيدليتك",
+        "outside": "أدوية من الخارج"
+      },
+      "writtenBefore": "وُصف لهذا المريض من قبل",
+      "addOutside": "دواء من الخارج",
+      "source": {
+        "stocked_zero": "{{count}} في صيدليتك",
+        "stocked_one": "{{count}} في صيدليتك",
+        "stocked_two": "{{count}} في صيدليتك",
+        "stocked_few": "{{count}} في صيدليتك",
+        "stocked_many": "{{count}} في صيدليتك",
+        "stocked_other": "{{count}} في صيدليتك",
+        "store": "من صيدليتك",
+        "empty": "نفد من صيدليتك",
+        "outside": "من الخارج",
+        "outsideHint": "دواء من الخارج — يشتريه المريض من مكان آخر"
+      },
+      "toOutside": "اكتبه كدواء من الخارج",
+      "toOutsideHint": "يشتريه المريض من مكان آخر؛ لا يُباع من هذه الوصفة",
+      "toStore": "خذه من صيدليتك",
+      "note": "ملاحظات · مثل طبقة رقيقة، تجنّب الشمس",
+      "dose": "الجرعة · ص ظ ل",
+      "otherDays": "عدد أيام آخر",
+      "otherDaysShort": "آخر",
+      "when": "متى",
+      "meal": "الوجبة",
+      "more": "المزيد لهذا الدواء",
+      "remarks": "ملاحظة"
     },
     "dose": {
       "group": "الجرعة صباحًا · ظهرًا · ليلًا",
@@ -397,18 +423,18 @@
         "afternoon": "ظهرًا",
         "night": "ليلًا"
       },
-      "on": "{{time}} · {{taps}} — انقر للتغيير",
-      "off": "{{time}} · لا شيء — انقر للتغيير",
       "sos": "SOS",
-      "sosHint": "عند الحاجة فقط (SOS)"
+      "sosHint": "عند الحاجة فقط (SOS)",
+      "on": "{{time}} · {{taps}} — المس للإزالة",
+      "off": "{{time}} — المس لـ 1",
+      "double": "×2",
+      "doubleHint": "قرصان في كل مرة"
     },
     "meal": {
       "before": "قبل",
       "after": "بعد",
       "beforeHint": "قبل الأكل",
-      "afterHint": "بعد الأكل",
-      "more": "توقيتات أخرى",
-      "change": "{{timing}} · تغيير"
+      "afterHint": "بعد الأكل"
     },
     "timings": {
       "empty_stomach": "على معدة فارغة",
@@ -472,7 +498,121 @@
       "draft": "مسودة",
       "approved": "معتمدة"
     },
-    "approvedNote": "معتمدة · لا يمكن تغيير وصفة معتمدة"
+    "approvedNote": "معتمدة · لا يمكن تغيير وصفة معتمدة",
+    "pad": {
+      "toggle": "المفكرة",
+      "toggleHint": "اكتب أو الصق عدة أدوية دفعة واحدة",
+      "label": "مفكرة الوصفة",
+      "hint": "دواء واحد في كل سطر · الصق وصفة كاملة",
+      "placeholder": "flu 0-0-1 af 10d\nketo scalp\nminox scalp hs",
+      "found": "موجود في القائمة",
+      "typed": "ليس في القائمة · يُضاف كما كُتب",
+      "unreadable": "لا يوجد اسم دواء · تم التخطي",
+      "lines_zero": "لا أسطر",
+      "lines_one": "سطر واحد",
+      "lines_two": "سطران",
+      "lines_few": "{{count}} أسطر",
+      "lines_many": "{{count}} سطرًا",
+      "lines_other": "{{count}} سطر",
+      "foundCount": "تم العثور على {{value}}",
+      "typedCount": "{{value}} جديدة",
+      "skippedCount": "تم تخطي {{value}}",
+      "overflow": "تتم قراءة أول {{max}} سطرًا فقط",
+      "add_zero": "لا أدوية للإضافة",
+      "add_one": "إضافة دواء واحد",
+      "add_two": "إضافة دواءين",
+      "add_few": "إضافة {{count}} أدوية",
+      "add_many": "إضافة {{count}} دواءً",
+      "add_other": "إضافة {{count}} دواء",
+      "clear": "مسح",
+      "close": "إغلاق المفكرة",
+      "empty": "يظهر كل سطر هنا فور قراءته",
+      "added_zero": "لم تُضف أدوية",
+      "added_one": "تمت إضافة دواء واحد",
+      "added_two": "تمت إضافة دواءين",
+      "added_few": "تمت إضافة {{count}} أدوية",
+      "added_many": "تمت إضافة {{count}} دواءً",
+      "added_other": "تمت إضافة {{count}} دواء"
+    },
+    "sidekick": {
+      "label": "مراجعة الوصفة",
+      "allergies": "الحساسية",
+      "noAllergies": "لا توجد حساسية مسجلة",
+      "matches": "{{medicine}} يطابق {{allergies}}",
+      "since": "منذ الوصفة {{number}} · {{date}}",
+      "first": "أول وصفة لهذا المريض",
+      "kinds": {
+        "new": "جديد",
+        "changed": "تغيّر",
+        "unchanged": "بلا تغيير",
+        "stopped": "متوقف"
+      },
+      "unchangedCount": "{{value}} بلا تغيير",
+      "continue": "متابعة",
+      "continueLabel": "متابعة {{name}} كما في آخر وصفة",
+      "continued": "تمت متابعة {{name}}",
+      "reads": "ما يقرؤه المريض",
+      "readsEmpty": "تظهر الأدوية هنا بكلمات بسيطة عند إضافتها",
+      "summary": {
+        "allergy_zero": "لا تطابق مع الحساسية",
+        "allergy_one": "تطابق واحد مع الحساسية",
+        "allergy_two": "تطابقان مع الحساسية",
+        "allergy_few": "{{count}} تطابقات مع الحساسية",
+        "allergy_many": "{{count}} تطابقًا مع الحساسية",
+        "allergy_other": "{{count}} تطابق مع الحساسية",
+        "changes_zero": "لا تغييرات منذ الوصفة {{number}}",
+        "changes_one": "تغيير واحد منذ الوصفة {{number}}",
+        "changes_two": "تغييران منذ الوصفة {{number}}",
+        "changes_few": "{{count}} تغييرات منذ الوصفة {{number}}",
+        "changes_many": "{{count}} تغييرًا منذ الوصفة {{number}}",
+        "changes_other": "{{count}} تغيير منذ الوصفة {{number}}",
+        "noChanges": "مثل الوصفة {{number}}",
+        "first": "أول وصفة"
+      },
+      "show": "إظهار",
+      "hide": "إخفاء",
+      "earlier": {
+        "title": "الوصفات السابقة",
+        "none": "لا توجد وصفات سابقة",
+        "position": "{{index}} من {{count}}",
+        "older": "وصفة أقدم",
+        "newer": "وصفة أحدث",
+        "inThisRx": "في هذه الوصفة",
+        "add": "إضافة",
+        "addLabel": "أضف {{name}} إلى هذه الوصفة",
+        "addAll_zero": "لا شيء ناقص",
+        "addAll_one": "أضف الدواء الناقص",
+        "addAll_two": "أضف الدواءين الناقصين",
+        "addAll_few": "أضف {{count}} أدوية ناقصة",
+        "addAll_many": "أضف {{count}} دواءً ناقصًا",
+        "addAll_other": "أضف {{count}} دواء ناقص",
+        "advice": "النصيحة",
+        "noLines": "لا أدوية"
+      }
+    },
+    "allergyBand": {
+      "label": "الحساسية"
+    },
+    "plain": {
+      "morning": "{{value}} صباحًا",
+      "afternoon": "{{value}} ظهرًا",
+      "night": "{{value}} ليلًا",
+      "sos": "عند الحاجة فقط",
+      "total": "{{value}} إجمالًا"
+    },
+    "rowAllergy": {
+      "warning": "المريض لديه حساسية من {{allergies}}",
+      "keep": "إبقاء",
+      "keepLabel": "أبقِ {{medicine}} — وُصف عن علم",
+      "remove": "إزالة",
+      "removeLabel": "أزل {{medicine}}",
+      "kept": "أُبقي عن علم رغم حساسية {{allergies}}",
+      "undo": "تراجع",
+      "held": "{{medicine}} يطابق حساسية — أبقِه أو أزله أولًا"
+    },
+    "allDays": {
+      "label": "كل الأدوية"
+    }
   },
   "treatment": {
     "record": "العلاج",

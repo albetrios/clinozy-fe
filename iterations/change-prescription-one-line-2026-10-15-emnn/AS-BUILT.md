@@ -1,0 +1,31 @@
+# change-prescription-one-line-2026-10-15-emnn — as built
+
+What was actually built, ledger row by ledger row, against the approved plan in
+[`KICKOFF.md`](KICKOFF.md). Built 2026-10-15 on `feat/prescription-composer`, in the commit
+`feat(prescriptions): one numbered line per medicine, the rarer choices in More`.
+
+## Rows
+
+| #   | Ledger row | Planned                                                        | Actually built                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Difference                                                                                           |
+| --- | ---------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| #1  | L-1        | The cells: Dose, Meal · Where, More, the note line, the number | `rx-item-cells.tsx`: `RxDoseCell` is `1 0 1`, a hairline and SOS; `RxDirectionsCell` the two picks (`RX_MEAL_PICKS` Before · After, `RX_PLACE_PICKS` Face · Scalp, in `rx-form.ts` where the five top places were) and `MoreSegment` — a popover (`ui/popover`) with every Meal or When timing, every place, ×2 and the note (`ui/input`); what is set there shows on More, lit, its words and "+ n" (`useHiddenChoices`). `RxNoteLine` under the medicine's name. The "+ 9 more" toggle and its two keys are gone. `rx-medicine-cell.tsx`: the line's number before its picker                        | Days' numbers take 4px a side and its box is 40px; More's words shorten on one row (D12)             |
+| #2  | L-2        | The columns and the fold; `noteBesideDetail` removed           | `rx-medicines-field.tsx`: Medicine · Dose · Days · Meal · Where · Qty, the tracks per pointer, `useRxOneLine` (870px with a mouse, 1090px on touch); the line under the medicine holds Days and Meal · Where when folded and the note when there is one; the table's own note is off. `ItemsField.tsx` and its test are back to before `noteBesideDetail`. A skin medicine's quantity stays as written — the line's recompute and "All medicines" (`withRxDaysForAll`'s `keepsQty`) skip it (D11)                                                                                                      | Widths measured, the medicine at 190px and the touch fold at 1090px (D12); the tube's quantity (D11) |
+| #3  | L-3        | Copy in 11 locales; tests; docs                                | `rx.items.more` "More for this medicine" and `rx.items.remarks` "Note" added, `rx.items.morePlaces` and `fewerPlaces` removed — in all 11 locales; the column's header is "Meal · Where" from the two existing words. `PrescriptionDrawer.test.tsx`: the one-line test (Meal on the line, More's ×2 and note shown on the line, the save), a skin medicine's places on the line and its timings in More, Days and Meal as columns at 896px and folded at 640px, the tray's Tab stop. `rx-form.test.ts`: a tube's quantity kept. `PRESCRIPTIONS.OVERVIEW.md`, `docs/reference/e2e-testids-inventory.md` | As planned                                                                                           |
+| #4  | L-4        | Verify in the running app; walkthrough; gates; close           | 15 stills (1440: the table, More on a shampoo, More on a tablet, what was set; 1280 beside the Rx check; 820 folded; 1024 with touch and its skin lines; 390 with touch; dark; Arabic) and a 43s captioned walkthrough. `pnpm health`; SonarQube with the push                                                                                                                                                                                                                                                                                                                                         | The walkthrough found the tube's quantity (D11)                                                      |
+
+## Revisions to upcoming rows
+
+None — L-4 was the last row.
+
+## Summary
+
+- **Planned, not built:** — every ledger row is done.
+- **Planned, not kept:** a 160px medicine and a 1060px touch fold (D12).
+- **Built, not planned:** a skin medicine's quantity no longer follows the days (D11).
+- **Follow-ups for the next iteration:** none from this brief.
+
+## Standing deviations
+
+| Item                     | Design (`BRIEF.md`) says | Built as                                                                                                                            | Since iteration                                | Decision                                            |
+| ------------------------ | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------- |
+| A line on a narrow table | "A tablet is one line"   | One line wherever the table is 870px or more with a mouse (1090px on touch); narrower, Days and Meal · Where sit under the medicine | `change-prescription-one-line-2026-10-15-emnn` | [D9](plans/decisions.md), [D12](plans/decisions.md) |

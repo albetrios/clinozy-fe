@@ -1,3 +1,5 @@
+import './items-field.css';
+
 import { type ReactElement, type ReactNode, type Ref, useId, useState } from 'react';
 import { type FieldError, type FieldValues, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -331,14 +333,20 @@ export interface ItemsQtyCellProps<
   /** A message of the screen's own, over the field's validation. */
   error?: string;
   readOnly?: boolean;
+  /**
+   * On a touch screen (a coarse pointer) the box is 44px high and its buttons
+   * 44px wide — for a row whose other controls are 44px there (the Rx line's
+   * chips). Off by default: a table opts in once it is laid out for it.
+   */
+  largeOnTouch?: boolean;
 }
 
 /**
  * The quantity stepper of a row (H:924 `qty`): one 32px box of "−" · the
- * count · "+", the buttons on `canvas`. It is a spin button — ↑ / ↓ step it,
- * typing replaces the count (selected on focus), and a count left empty or
- * below `min` returns to `min` on blur — so its two buttons stay out of the
- * tab order.
+ * count · "+", the buttons on `canvas` — 44px on touch with `largeOnTouch`.
+ * It is a spin button — ↑ / ↓ step it, typing replaces the count (selected
+ * on focus), and a count left empty or below `min` returns to `min` on blur —
+ * so its two buttons stay out of the tab order.
  */
 export function ItemsQtyCell<TForm extends FieldValues>({
   control,
@@ -349,6 +357,7 @@ export function ItemsQtyCell<TForm extends FieldValues>({
   max = ITEMS_QTY_MAX,
   error,
   readOnly = false,
+  largeOnTouch = false,
 }: ItemsQtyCellProps<TForm>) {
   const { t } = useTranslation(ITEMS_FIELD_NS);
   const {
@@ -387,7 +396,11 @@ export function ItemsQtyCell<TForm extends FieldValues>({
 
   return (
     <>
-      <div className={cn(STEPPER_CLASS, message && 'border-destructive')}>
+      <div
+        // 44px on touch when its row asks (`items-field.css`): box, buttons and marks.
+        data-touch-size={largeOnTouch ? 'large' : undefined}
+        className={cn('items-stepper', STEPPER_CLASS, message && 'border-destructive')}
+      >
         <button
           type="button"
           tabIndex={-1}

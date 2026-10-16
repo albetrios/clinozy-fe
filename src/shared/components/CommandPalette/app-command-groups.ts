@@ -1,4 +1,5 @@
-import { useNavigate, useRouter } from '@tanstack/react-router';
+import { useNavigate, useParams, useRouter } from '@tanstack/react-router';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
@@ -8,6 +9,7 @@ import type { Section } from '@/shared/api/app/app-schema.ts';
 import { isCommandSearchQuery } from '@/shared/api/app/command-search-api.ts';
 import type { CommandSearchPerson } from '@/shared/api/app/command-search-contracts.ts';
 import { setupProgress } from '@/shared/api/app/onboarding-setup-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
 import { APP_KEYS } from '@/shared/app/app.constants.ts';
 import {
   type AppCommandNavigation,
@@ -15,6 +17,7 @@ import {
 } from '@/shared/app/app-command-targets.ts';
 import { referrerFromPath } from '@/shared/app/app-referrer.ts';
 import { APP_SECTION_ICONS } from '@/shared/app/app-section-icons.ts';
+import { passesPatientFileGate } from '@/shared/app/patient-file-sections.ts';
 import { setupHash } from '@/shared/components/SetupDrawer/setup-hash-grammar.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';
@@ -23,9 +26,10 @@ import {
   useOnboardingSetup,
   useSetupUnfinished,
 } from '@/shared/hooks/useOnboardingSetup/index.ts';
+import { usePatientFile } from '@/shared/hooks/usePatientFile/index.ts';
 import { useRequireOpenBranch } from '@/shared/hooks/useRequireOpenBranch/index.ts';
 import { readViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import { ClipboardList, UserPlus, Users } from '@/shared/icons/index.ts';
+import { ClipboardList, Pill, UserPlus, Users } from '@/shared/icons/index.ts';
 
 import {
   COMMAND_MENU_KEYS,
@@ -38,8 +42,23 @@ import {
   matchesCommandQuery,
 } from './command-palette-model.ts';
 
-/** The room actions — "Finish setup" is the clinic setup's own row, not a room's. */
-type ActionKey = Exclude<keyof typeof COMMAND_MENU_KEYS.actions, 'finishSetup'>;
+/**
+ * The room actions — "Finish setup" is the clinic setup's own row, not a room's, and "Write
+ * prescription" opens the menu's patient finder rather than a route.
+ */
+type ActionKey = Exclude<
+  keyof typeof COMMAND_MENU_KEYS.actions,
+  'finishSetup' | 'writePrescription'
+>;
+
+/** The actions "Write prescription" comes before: it follows New lead, appointment and patient. */
+const AFTER_PRESCRIBE: ReadonlySet<string> = new Set([
+  'action:newReceipt',
+  'action:openTasks',
+]);
+
+/** Words that find "Write prescription" in any language. */
+const PRESCRIBE_KEYWORDS: readonly string[] = ['rx', 'prescription', 'medicine'];
 
 /**
  * The Actions group (H:4600), in the design's order: each is shown when the
@@ -94,6 +113,16 @@ const NEEDS_BRANCH: ReadonlySet<ActionKey> = new Set([
 /** The design's "Go to" lists every room but Today (H:4602). */
 const NOT_A_GO_TO: Section = 'today';
 
+/** The patient finder's words, while "Write prescription" holds the menu. */
+export interface PrescribeMode {
+  chip: string;
+  /** The chip's ×. */
+  leave: string;
+  placeholder: string;
+  hint: string;
+  empty: string;
+}
+
 /** The clinic half of the command menu. */
 export interface AppCommandGroups {
   /** Actions, Go to, People — the non-empty ones, in that order. */
@@ -102,6 +131,8 @@ export interface AppCommandGroups {
   searchable: boolean;
   /** The search is waiting out its debounce or in flight. */
   isSearching: boolean;
+  /** The patient finder's words while it holds the menu (feat-prescription-composer §6.1). */
+  prescribe?: PrescribeMode;
 }
 
 /** What a personal workspace offers: no clinic at all. */
@@ -134,12 +165,18 @@ export function useAppCommandGroups({
   navEntries,
   go,
   run = (command) => command(),
+  prescribing = false,
+  onPrescribe,
 }: {
   query: string;
   organizationSlug: string;
   navEntries: readonly AppNavEntry[];
   go: (navigation: AppCommandNavigation) => void;
   run?: (command: () => void) => void;
+  /** "Write prescription" holds the menu: patients only, each opening a new prescription. */
+  prescribing?: boolean;
+  /** "Write prescription": turn the menu into the patient finder (the menu stays open). */
+  onPrescribe?: () => void;
 }): AppCommandGroups {
   const { t } = useTranslation(COMMAND_MENU_NS);
   const navigate = useNavigate();
@@ -159,27 +196,39 @@ export function useAppCommandGroups({
   };
   const searchable = opens.patients || opens.leads;
   const search = useCommandSearch(query, { enabled: searchable });
+  const prescribe = usePrescribeCommands({
+    // Writing a prescription: Patients in view and the file's create gate (View-as aware).
+    prescribes: opens.patients && passesPatientFileGate(access, 'prescriptions'),
+    prescribing,
+    onPrescribe,
+    query,
+    organizationSlug,
+    search,
+    go,
+  });
+  if (prescribe.finder) return prescribe.finder;
 
   const typed = query.trim();
   const fromHere = () => referrerFromPath(router.state.location.pathname);
 
   const actionRows: CommandRow[] = APP_ACTIONS.filter(({ section, grant }) =>
     allowed(section, grant),
-  )
-    .map(({ key, section, testId }) => ({
-      value: `action:${key}`,
-      label: t(COMMAND_MENU_KEYS.actions[key]),
-      sub: t(APP_KEYS.sections[section].label),
-      icon: APP_SECTION_ICONS[section],
-      testId,
-      onSelect: () => {
-        const open = () =>
-          go(appCommandNavigation(key, { organizationSlug, referrer: fromHere() }));
-        if (NEEDS_BRANCH.has(key)) run(() => requireOpenBranch(open));
-        else open();
-      },
-    }))
-    .filter((row) => matchesCommandQuery(row.label, undefined, typed))
+  ).map(({ key, section, testId }) => ({
+    value: `action:${key}`,
+    label: t(COMMAND_MENU_KEYS.actions[key]),
+    sub: t(APP_KEYS.sections[section].label),
+    icon: APP_SECTION_ICONS[section],
+    testId,
+    onSelect: () => {
+      const open = () =>
+        go(appCommandNavigation(key, { organizationSlug, referrer: fromHere() }));
+      if (NEEDS_BRANCH.has(key)) run(() => requireOpenBranch(open));
+      else open();
+    },
+  }));
+  if (prescribe.row) withPrescribeRow(actionRows, prescribe.row);
+  const shownActions = actionRows
+    .filter((row) => matchesCommandQuery(row.label, row.keywords, typed))
     .slice(0, COMMAND_MENU_LIMITS.actions);
   // "Finish setup" while the clinic setup is unfinished (feat-clinic-setup KICKOFF §3), first.
   if (setup && setupUnfinished) {
@@ -196,7 +245,7 @@ export function useAppCommandGroups({
         ),
     };
     if (matchesCommandQuery(setupRow.label, undefined, typed))
-      actionRows.unshift(setupRow);
+      shownActions.unshift(setupRow);
   }
 
   const goToRows: CommandRow[] = typed
@@ -260,7 +309,7 @@ export function useAppCommandGroups({
 
   const hits = isCommandSearchQuery(typed) ? search.data : undefined;
   const groups: CommandRowGroup[] = [
-    { id: 'actions', heading: t(COMMAND_MENU_KEYS.groups.actions), rows: actionRows },
+    { id: 'actions', heading: t(COMMAND_MENU_KEYS.groups.actions), rows: shownActions },
     { id: 'go-to', heading: t(COMMAND_MENU_KEYS.groups.goTo), rows: goToRows },
     {
       id: 'people',
@@ -275,5 +324,134 @@ export function useAppCommandGroups({
     groups: groups.filter((group) => group.rows.length > 0),
     searchable,
     isSearching: search.isSearching,
+  };
+}
+
+/** The Actions row "Write prescription" — it opens the patient finder, not a route. */
+function prescribeRow(t: TFunction, onPrescribe: () => void): CommandRow {
+  return {
+    value: 'action:writePrescription',
+    label: t(COMMAND_MENU_KEYS.actions.writePrescription),
+    sub: t(APP_KEYS.sections.patients.label),
+    icon: Pill,
+    keywords: PRESCRIBE_KEYWORDS,
+    testId: 'command-palette-action-write-prescription',
+    onSelect: onPrescribe,
+  };
+}
+
+/** Put "Write prescription" after New lead, appointment and patient — before New receipt and Open tasks. */
+function withPrescribeRow(rows: CommandRow[], row: CommandRow): void {
+  const before = rows.findIndex((candidate) => AFTER_PRESCRIBE.has(candidate.value));
+  rows.splice(before === -1 ? rows.length : before, 0, row);
+}
+
+/**
+ * "Write prescription" in the menu (feat-prescription-composer §6.1; `BRIEF.md:6–12`): its
+ * Actions row for a member who may write one, and — while it holds the menu — the patient
+ * finder in place of every group: the patient file the menu opened over first ("This
+ * patient" — the file's own read, already warm), then the people search's patients (a lead
+ * without a file is not offered), each opening their New prescription drawer.
+ */
+function usePrescribeCommands({
+  prescribes,
+  prescribing,
+  onPrescribe,
+  query,
+  organizationSlug,
+  search,
+  go,
+}: {
+  /** The member may write a prescription. */
+  prescribes: boolean;
+  prescribing: boolean;
+  onPrescribe: (() => void) | undefined;
+  query: string;
+  organizationSlug: string;
+  search: ReturnType<typeof useCommandSearch>;
+  go: (navigation: AppCommandNavigation) => void;
+}): { row: CommandRow | null; finder: AppCommandGroups | null } {
+  const { t } = useTranslation(COMMAND_MENU_NS);
+  const enabled = prescribes && prescribing;
+  const { patientId: herePatientId } = useParams({ strict: false });
+  const here = usePatientFile(enabled ? herePatientId : undefined).data?.patient;
+  const typed = query.trim();
+  if (!enabled) {
+    return {
+      row: prescribes && onPrescribe ? prescribeRow(t, onPrescribe) : null,
+      finder: null,
+    };
+  }
+  const people = isCommandSearchQuery(typed) ? search.data?.people : undefined;
+  const row = (
+    key: string,
+    patient: { id: string; name: string; number: number; phone: string },
+  ): CommandRow => ({
+    value: `prescribe:${key}`,
+    label: patient.name,
+    sub: t(
+      COMMAND_MENU_KEYS.personSub,
+      isolateValues({
+        id: displayId.patient(patient.number),
+        lastDigits: lastDigits(patient.phone),
+      }),
+    ),
+    icon: Pill,
+    testId: `command-palette-prescribe-${key}`,
+    onSelect: () =>
+      go(
+        appCommandNavigation('newPrescription', {
+          organizationSlug,
+          recordId: patient.id,
+        }),
+      ),
+  });
+  const herePatient = here
+    ? row('this-patient', {
+        id: here.id,
+        name: patientName(here),
+        number: here.seq,
+        phone: here.phone,
+      })
+    : null;
+  const thisPatient =
+    herePatient && matchesCommandQuery(herePatient.label, undefined, typed)
+      ? [herePatient]
+      : [];
+  const found = (people ?? []).flatMap((hit) =>
+    hit.patientId && hit.patientId !== here?.id
+      ? [
+          row(hit.id, {
+            id: hit.patientId,
+            name: hit.name,
+            number: hit.patientNumber ?? 0,
+            phone: hit.phone,
+          }),
+        ]
+      : [],
+  );
+  const groups: CommandRowGroup[] = [
+    {
+      id: 'this-patient',
+      heading: t(COMMAND_MENU_KEYS.prescribe.thisPatient),
+      rows: thisPatient,
+    },
+    { id: 'patients', heading: t(COMMAND_MENU_KEYS.prescribe.patients), rows: found },
+  ];
+  const keys = COMMAND_MENU_KEYS.prescribe;
+  return {
+    row: null,
+    finder: {
+      groups: groups.filter((group) => group.rows.length > 0),
+      searchable: true,
+      isSearching: search.isSearching,
+      prescribe: {
+        chip: t(keys.chip),
+        leave: t(keys.leave),
+        placeholder: t(keys.placeholder),
+        hint: t(keys.hint),
+        empty: t(keys.empty),
+      },
+    },
   };
 }
