@@ -41,14 +41,6 @@ clinozy-fe/
 │   │   ├── development.json
 │   │   ├── production.json
 │   │   └── README.md
-│   ├── pr-assets/
-│   │   └── setup-drawer-retry/
-│   │       ├── after-backend-v9-1-0.gif
-│   │       ├── after-backend-v9-1-0.png
-│   │       ├── after-retry-on-404.gif
-│   │       ├── after-retry-on-404.png
-│   │       ├── before-stuck-skeleton.gif
-│   │       └── before-stuck-skeleton.png
 │   ├── release-please/
 │   │   ├── config.json
 │   │   └── manifest.json
