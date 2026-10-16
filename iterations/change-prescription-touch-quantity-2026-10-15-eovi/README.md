@@ -8,7 +8,7 @@
 | Opened | 2026-10-15 |
 | Branch | feat/prescription-composer |
 | Baseline | none |
-| Status | done |
+| Status | frozen |
 | Summary | On a touch screen the medicine line's quantity stepper is 44px high with 44px buttons, like the line's chips — an opt-in on the shared stepper, so no other items table changes. |
 | Drop placed | 2026-10-15 |
 | Drop source | /tmp/claude-0/-home-user/7194471c-2448-5e73-b561-54b0f92838d3/scratchpad/brief-qty |
@@ -23,3 +23,4 @@
 - 2026-10-15 · ready-for-approval → approved · — · Claude
 - 2026-10-15 · approved → implementing · — · Claude
 - 2026-10-15 · implementing → done · — · Claude
+- 2026-10-16 · done → frozen · — · Claude
