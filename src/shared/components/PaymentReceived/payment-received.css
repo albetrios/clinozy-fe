@@ -25,3 +25,17 @@
 [data-slot='payment-received-animation'] .pr-spark-sky path {
   stroke: var(--color-tone-sky-dot);
 }
+
+/* The view's own sizes and colours, kept here with its lazy chunk rather than as utilities in the
+   first paint's stylesheet, which no other screen needs them in (the initial-CSS budget). The
+   animation's square — 28 steps of the Density axis — and the player filling it. */
+[data-slot='payment-received-animation'],
+[data-slot='payment-received-animation'] > [data-slot='lottie-player'] {
+  width: calc(var(--spacing) * 28);
+  height: calc(var(--spacing) * 28);
+}
+/* A previous review's rating: the stars it earned, filled in the warning colour. */
+[data-slot='review-stars'] [data-filled] {
+  color: var(--color-warning);
+  fill: var(--color-warning);
+}

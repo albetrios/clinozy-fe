@@ -139,7 +139,7 @@ describe('the Payment received moment (feat-payment-celebration)', () => {
     readFileSync(join(root, `${folder}/payment-received.lottie.json`), 'utf8'),
   ) as { fr: number; ip: number; op: number; layers: { cl?: string }[] };
 
-  it('paints the animation from tokens, ships with the view, and moves nothing itself', () => {
+  it('paints from tokens, sizes on the Density axis, ships with the view, and moves nothing itself', () => {
     expect(readFileSync(join(root, `${folder}/PaymentReceived.tsx`), 'utf8')).toContain(
       "import './payment-received.css';",
     );
@@ -151,7 +151,12 @@ describe('the Payment received moment (feat-payment-celebration)', () => {
     expect(declarations.length).toBeGreaterThan(0);
     for (const declaration of declarations) {
       const [property, value] = declaration.split(':').map((part) => part.trim());
-      expect(property).toMatch(/^(fill|stroke)$/);
+      // The view's own square (the initial-CSS budget keeps it off the first paint's stylesheet).
+      if (property === 'width' || property === 'height') {
+        expect(value).toMatch(/^calc\(var\(--spacing\) \* \d+\)$/);
+        continue;
+      }
+      expect(property).toMatch(/^(fill|stroke|color)$/);
       expect(value).toMatch(/^var\(--color-[\w-]+\)$/);
     }
     expect(read('src/index.css')).not.toContain('payment-received');

@@ -49,16 +49,14 @@ function useReviewDay(): (review: PatientReview) => string {
 function Stars({ rating }: { rating: number }) {
   const { t } = useTranslation(PAYMENT_RECEIVED_NS);
   return (
-    <span className="flex items-center gap-0.5">
+    <span data-slot="review-stars" className="flex items-center gap-0.5">
       <span className="sr-only">{t(K.rated, { rating })}</span>
       {[1, 2, 3, 4, 5].map((step) => (
         <Star
           key={step}
           aria-hidden="true"
-          className={cn(
-            'size-3.5',
-            step <= rating ? 'fill-warning text-warning' : 'text-disabled',
-          )}
+          data-filled={step <= rating ? '' : undefined}
+          className={cn('size-3.5', step > rating && 'text-disabled')}
         />
       ))}
     </span>
@@ -86,7 +84,7 @@ function ReviewLine({ review, day }: { review: PatientReview; day: string }) {
         ) : null}
       </div>
       {review.text ? (
-        <p className="text-detail text-muted-foreground-strong line-clamp-1">
+        <p className="text-detail text-muted-foreground-strong truncate">
           {isolateText(review.text)}
         </p>
       ) : null}

@@ -15,6 +15,7 @@ import {
   missingContactFields,
   missingPlaceFields,
   newBranchTone,
+  readBranchDrawerStep,
 } from './branch-form.ts';
 
 const DOCTOR = 'mem_doctor000000000000000';
@@ -131,5 +132,15 @@ describe('the branch form', () => {
     });
     expect(save.input).not.toHaveProperty('isMain');
     expect(save.memberIds).toEqual([DESK]);
+  });
+});
+
+describe('readBranchDrawerStep', () => {
+  it("opens on a step a link names, and on none the drawer doesn't have", () => {
+    expect(readBranchDrawerStep('contact')).toBe('contact');
+    expect(readBranchDrawerStep('places')).toBe('places');
+    expect(readBranchDrawerStep('billing')).toBeUndefined();
+    expect(readBranchDrawerStep(2)).toBeUndefined();
+    expect(readBranchDrawerStep(undefined)).toBeUndefined();
   });
 });

@@ -395,8 +395,25 @@ const config = [
      * Settings card's title and description were already in the deferred part of
      * `settings`, and every component, the hook and the API module load on demand.
      * ~0.1 kB of headroom.
+     *
+     * 239.7 → 239.9 kB: a declared exemption, itemised — the app's one motion system and
+     * Payment received (iterations/change-motion-polish-2026-10-14-uvgh,
+     * change-motion-consistency-2026-10-15-uiya and feat-payment-celebration-2026-10-15-xpkw;
+     * for the owner's review). +0.14 kB: main (7da7111) 239.64 kB and this branch 239.78 kB,
+     * built the same way side by side (no env file, no ambient VITE_ variables):
+     * - The entry's preload map names four more lazy files, each shared by several rooms
+     *   (+137 B raw, hashed names): `SelectionGlide`'s chunk and stylesheet (every selection
+     *   glides, change-motion-polish D7), `motion-curves` (the three curves' script twin,
+     *   change-motion-consistency D11) and the switch's stylesheet (its thumb on the named
+     *   curve, change-motion-consistency D5).
+     * - The press on every Button (+61 B raw): `scale` in its transition and one guarded
+     *   `motion-safe:active:not-data-[variant=link]:scale-[0.97]`, in the base class so the
+     *   entry carries it once.
+     * - The patient file's `room` flag and `?step=` passed to the Branches page (+20 B raw).
+     * Trimmed first: the Branch drawer's step list left the route's validator for the lazy
+     * drawer (`readBranchDrawerStep`, −0.04 kB). ~0.1 kB of headroom.
      */
-    limit: '239.7 kB',
+    limit: '239.9 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -568,8 +585,24 @@ const config = [
            * branch drawer's Places & days holiday rows (their 480px container
            * re-grid). Tailwind emits them with their files although the drawer
            * and the guide load on demand. ~0.17 kB of headroom.
+           *
+           * 36.0 → 36.2 kB: a declared exemption, itemised — the app's one motion system
+           * (iterations/change-motion-polish-2026-10-14-uvgh and
+           * change-motion-consistency-2026-10-15-uiya; for the owner's review). +0.06 kB:
+           * main (7da7111) 35.99 kB and this branch 36.05 kB, built the same way side by side
+           * (no env file), 11 rules in and 9 out: the three named curves on `:root` and
+           * Tailwind's ease names re-pointed at them (change-motion-consistency D7); the
+           * Button's press and `scale` in its transition; the sheet, drawer, tooltip and menu
+           * timings (`data-[state]` durations 100 / 200 / 340, the sheet curve, the drawer's
+           * backdrop, the tooltip's instant open); the lead drawer's pane transition; the
+           * 240ms of the consent banner and the app layout; the room search field's curve by
+           * name — less `transition-all`, the 300 / 500ms durations, `origin-top-*` and the
+           * literal curves that left. Trimmed first: Payment received's square and its review
+           * stars' colour moved to its own lazy stylesheet, its other one-off utilities onto
+           * ones every screen ships (`truncate`, `flex`), and the Lottie player's svg rule
+           * onto `flex` (−0.05 kB). ~0.15 kB of headroom.
            */
-          limit: '36.0 kB',
+          limit: '36.2 kB',
           gzip: true,
         },
       ]

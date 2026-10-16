@@ -54,7 +54,7 @@ function outcomeText(
 /** The static mark when the animation cannot load: the same disc and check, still. */
 function StillMark() {
   return (
-    <span className="bg-success text-success-foreground grid size-16 place-items-center rounded-full">
+    <span className="bg-success text-success-foreground flex size-16 items-center justify-center rounded-full">
       <Check aria-hidden="true" className="size-8" strokeWidth={3} />
     </span>
   );
@@ -90,11 +90,10 @@ export function PaymentReceived({ payment }: PaymentReceivedProps) {
       <div className="flex flex-col items-center gap-1.5 pt-2 text-center">
         <div
           data-slot="payment-received-animation"
-          className="grid size-28 place-items-center"
+          className="flex items-center justify-center"
         >
           <LottiePlayer
             animation={loadPaymentReceivedAnimation}
-            className="size-28"
             fallback={<StillMark />}
             testId={ids.animation}
           />

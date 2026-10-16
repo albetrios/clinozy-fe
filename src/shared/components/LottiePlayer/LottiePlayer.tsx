@@ -71,7 +71,7 @@ export function LottiePlayer({
       aria-hidden="true"
       data-slot="lottie-player"
       data-testid={testId}
-      className={cn('[&>svg]:block', className)}
+      className={cn('flex', className)}
     />
   );
 }

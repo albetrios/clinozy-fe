@@ -14,8 +14,8 @@ describe('validateBranchesSearch', () => {
     });
   });
 
-  it("keeps a drawer step a link opens on, and drops one the drawer doesn't have", () => {
+  it('passes ?step= through as the link wrote it — the drawer reads it, off the first paint', () => {
     expect(validateBranchesSearch({ step: 'contact' }).step).toBe('contact');
-    expect(validateBranchesSearch({ step: 'billing' }).step).toBeUndefined();
+    expect(validateBranchesSearch({ step: 'billing' }).step).toBe('billing');
   });
 });

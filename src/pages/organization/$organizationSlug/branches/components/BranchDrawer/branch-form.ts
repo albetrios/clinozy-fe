@@ -53,6 +53,22 @@ export interface BranchFormValues {
  */
 export type BranchDrawerStepId = 'place' | 'contact' | 'people' | 'places';
 
+/** The steps, in the drawer's order: what `?step=` may name. */
+const BRANCH_DRAWER_STEPS = [
+  'place',
+  'contact',
+  'people',
+  'places',
+] as const satisfies readonly BranchDrawerStepId[];
+
+/**
+ * `?step=` as a drawer step, or none for anything else (`feat-payment-celebration`): read here,
+ * with the lazy drawer, so the route's validator — on the first paint — carries no step list.
+ */
+export function readBranchDrawerStep(value: unknown): BranchDrawerStepId | undefined {
+  return BRANCH_DRAWER_STEPS.find((step) => step === value);
+}
+
 /** The Colour field's swatches, in the design's order (`users.md:180`). */
 export const BRANCH_TONES = [
   'sage',

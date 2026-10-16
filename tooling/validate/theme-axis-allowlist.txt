@@ -26,4 +26,4 @@ h-7 gap-1.5 rounded-full border border-border px-2.5 text-xs font-medium focus:b
 bg-card ps-1.5 pe-1.75
 # The Payment received still mark (`feat-payment-celebration`): the fallback twin of the Lottie
 # animation's disc, which is drawn round in every shape — the two stay alike, as status dots do.
-grid size-16 place-items-center rounded-full
+flex size-16 items-center justify-center rounded-full
