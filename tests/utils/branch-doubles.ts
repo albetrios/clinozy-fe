@@ -54,6 +54,7 @@ export const appBranch = (patch: Partial<AppBranch> = {}): AppBranch => ({
   phone: '+919876543210',
   email: 'vesu@clinic.com',
   gstNumber: null,
+  reviewLink: null,
   opensAt: '10:00',
   closesAt: '19:00',
   workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],

@@ -34,6 +34,16 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+// Payment received plays its animation through lottie-web, which jsdom cannot draw.
+vi.mock('lottie-web/build/player/lottie_light', () => ({
+  default: {
+    loadAnimation: () => ({ totalFrames: 1, goToAndStop: vi.fn(), destroy: vi.fn() }),
+  },
+}));
+vi.mock('@/shared/api/app/feedback-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPatientFeedback: vi.fn().mockResolvedValue([]),
+}));
 vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   settleCredit: vi.fn(),
@@ -254,5 +264,36 @@ describe('SettleCreditDrawer — Got it back', () => {
         splits: [{ mode: 'upi', amount: 800 }],
       }),
     );
+    // A supplier is no person to celebrate with: the toast, as before.
+    await waitFor(() => expect(notifyMock.success).toHaveBeenCalled());
+  });
+
+  it('turns into Payment received when a patient pays back (feat-payment-celebration D9)', async () => {
+    const user = setUser();
+    vi.mocked(settleCredit).mockImplementation(async ({ credit }) => ({
+      credit: { ...credit, settled: 300, left: 500, status: 'open' },
+      amount: 300,
+      paymentSeq: 9,
+      invoiceSeq: null,
+      creditNoteSeq: null,
+    }));
+    const { onClose } = renderDrawer({
+      ...KAVYA_CREDIT,
+      direction: 'take',
+      amount: 800,
+      settled: 0,
+      left: 800,
+    });
+    await typeAmount(user, '300');
+    await user.click(part('save'));
+    expect(await screen.findByTestId('payment-received-amount')).toHaveTextContent(
+      '₹300 received',
+    );
+    expect(screen.getByTestId('payment-received-outcome')).toHaveTextContent(
+      '₹500 still owed on CR-1',
+    );
+    expect(notifyMock.success).not.toHaveBeenCalled();
+    await user.click(part('done'));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

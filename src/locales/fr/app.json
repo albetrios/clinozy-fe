@@ -1470,6 +1470,39 @@
       "error": "Impossible d'envoyer le signalement. Votre texte est toujours là — réessayez."
     }
   },
+  "paymentReceived": {
+    "title": "Paiement reçu",
+    "amount": "{{amount}} reçus",
+    "from": "de {{name}}",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "Facture {{invoice}} entièrement réglée",
+      "due": "Reste {{amount}} à régler sur la facture {{invoice}}",
+      "advance": "Gardé comme acompte",
+      "creditSettled": "{{credit}} entièrement soldé",
+      "creditLeft": "Reste {{amount}} dû sur {{credit}}"
+    },
+    "summary": "Enregistré dans Paiements",
+    "done": "Terminé",
+    "reviews": {
+      "askTitle": "Demander un avis Google à {{first}}",
+      "askBody": "La visite est toute fraîche : le meilleur moment pour demander.",
+      "send": "Envoyer sur WhatsApp",
+      "sending": "Mise en file…",
+      "queued": "En file dans la conversation de {{first}}",
+      "failed": "Impossible de mettre le message en file · réessayez",
+      "log": "Saisir un avis",
+      "noLink": "Cet établissement n’a pas encore de lien d’avis Google.",
+      "addLink": "Ajouter le lien",
+      "askAdmin": "Demandez à un administrateur de l’ajouter dans Utilisateurs › Établissements.",
+      "thanked": "Avis laissé sur Google · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Avis laissé sur Google · {{date}}",
+      "previous": "Avis précédents",
+      "all": "Tous les avis ({{count}})",
+      "needsCall": "À rappeler",
+      "rated": "Noté {{rating}} sur 5"
+    }
+  },
   "billingPlans": {
     "upgradeTo": "Passer à {{name}}",
     "plan": {

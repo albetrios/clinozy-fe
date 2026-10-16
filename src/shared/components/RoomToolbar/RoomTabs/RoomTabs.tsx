@@ -3,6 +3,7 @@ import { Tabs as TabsPrimitive } from 'radix-ui';
 import { type ReactNode, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { markSamePageNavigation } from '@/lib/animations/same-page-navigation.ts';
 import { fitTabs, measureTextWidth } from '@/lib/fit-tabs.ts';
 import { cn } from '@/lib/utils.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
@@ -11,6 +12,7 @@ import {
   ROOM_TOOLBAR_NS,
   roomToolbarTestIds,
 } from '@/shared/components/RoomToolbar/room-toolbar.constants.ts';
+import { SelectionGlide } from '@/shared/components/SelectionGlide/index.ts';
 import {
   Tooltip,
   TooltipContent,
@@ -27,10 +29,11 @@ import { type AppIcon, ChevronDown } from '@/shared/icons/index.ts';
  * The segmented track (H:1086, H:228–231): 36px — 28px segments in 3px of
  * `muted` inside a 1px border of the same colour — scrolling sideways with no
  * scrollbar when it is narrower than its tabs. As wide as its tabs; a phone
- * toolbar row may stretch it (`data-room-tabs-track`).
+ * toolbar row may stretch it (`data-room-tabs-track`). Positioned and
+ * isolated for its {@link SelectionGlide} thumb.
  */
 const TRACK =
-  'bg-muted border-muted flex h-9 max-w-full min-w-0 flex-none items-center gap-0.5 overflow-x-auto rounded-lg border p-0.75 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden';
+  'bg-muted border-muted relative isolate flex h-9 max-w-full min-w-0 flex-none items-center gap-0.5 overflow-x-auto rounded-lg border p-0.75 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden';
 
 /** One 28px segment: 12.5px/500, `px-3`, an optional 14px icon 6px before the label. */
 const SEGMENT =
@@ -45,6 +48,14 @@ const SEGMENT_STATE = {
   selected: 'bg-card text-foreground shadow-(--elevation-control) ring-1 ring-border',
   idle: 'text-muted-foreground-strong hover:bg-background/55 hover:text-foreground active:bg-background/85',
 } as const;
+
+/**
+ * The track's thumb (change-motion-polish D7): the selected segment's card —
+ * its fill, ring, shadow and radius — as one surface that glides to the
+ * segment picked. The segment's own selected classes stay: with no layout
+ * nothing covers them.
+ */
+const TRACK_THUMB = 'bg-card shadow-(--elevation-control) ring-1 ring-border rounded-md';
 
 /** The 78px a "More" segment keeps, the track's 8px of padding and border, 2px gaps (H:4006). */
 const TRACK_FIT = { reserve: 78, gap: 2, padding: 8 } as const;
@@ -198,6 +209,13 @@ export function RoomTabs({
       className="flex w-full min-w-0"
     >
       <div data-room-tabs-track="" className={cn(TRACK, 'w-max')}>
+        {/* The room's tabs are routes: each page draws this track again, so the thumb
+            carries on from where it stood (feat-payment-celebration D13). */}
+        <SelectionGlide
+          selected='[data-slot="room-tab"][aria-current="page"]'
+          className={TRACK_THUMB}
+          continuity={`room-tabs:${testIdPrefix}`}
+        />
         {visible.map((tab) => {
           const isCurrent = tab === tabs[currentIndex];
           return (
@@ -210,6 +228,8 @@ export function RoomTabs({
               // current on `/offerings/offers` too: `isCurrent` decides instead.
               activeOptions={{ exact: true }}
               aria-current={isCurrent ? 'page' : undefined}
+              // Another tab of this room is no new page: the header stays still.
+              onClick={isCurrent ? undefined : markSamePageNavigation}
               data-testid={ids.tab(tab.id)}
               data-slot="room-tab"
               className={cn(
@@ -234,7 +254,9 @@ export function RoomTabs({
             }))}
             onChange={(id) => {
               const tab = folded.find((entry) => entry.id === id);
-              if (tab) void navigate({ to: tab.to, params: tab.params });
+              if (!tab) return;
+              markSamePageNavigation();
+              void navigate({ to: tab.to, params: tab.params });
             }}
             minWidth={200}
             testId={ids.tabsMore}
@@ -456,6 +478,9 @@ export function RoomViewTabs({
   const roomIds = roomToolbarTestIds(testIdPrefix ?? '');
   const ids = testIds ?? { list: roomIds.tabs, tab: roomIds.tab };
   const styles = VIEW_LOOKS[look];
+  // The track's thumb glides between its segments (D7) — unless a tab paints
+  // its own selected colour, which one thumb cannot be (D8).
+  const glides = look === 'track' && tabs.every((tab) => !tab.selectedClassName);
   // Radix tabs underneath, styled as the look's segments: the shadcn trigger's
   // own active, dark and underline rules would each need overriding.
   const list = (
@@ -465,6 +490,12 @@ export function RoomViewTabs({
       data-room-tabs-track={look === 'track' ? '' : undefined}
       className={cn(styles.list, fill ? 'w-full' : 'w-max')}
     >
+      {glides ? (
+        <SelectionGlide
+          selected='[data-slot="room-tab"][data-state="active"]'
+          className={TRACK_THUMB}
+        />
+      ) : null}
       {tabs.map((tab) => (
         <ViewTab
           key={tab.id}

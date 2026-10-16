@@ -1470,6 +1470,39 @@
       "error": "Impossibile inviare la segnalazione. Il tuo testo è ancora qui: riprova."
     }
   },
+  "paymentReceived": {
+    "title": "Pagamento ricevuto",
+    "amount": "{{amount}} ricevuti",
+    "from": "da {{name}}",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "Fattura {{invoice}} saldata per intero",
+      "due": "Restano {{amount}} da pagare sulla fattura {{invoice}}",
+      "advance": "Registrato come acconto",
+      "creditSettled": "{{credit}} saldato per intero",
+      "creditLeft": "Restano {{amount}} su {{credit}}"
+    },
+    "summary": "Salvato in Pagamenti",
+    "done": "Fatto",
+    "reviews": {
+      "askTitle": "Chiedi a {{first}} una recensione su Google",
+      "askBody": "La visita è recente: il momento migliore per chiedere.",
+      "send": "Invia su WhatsApp",
+      "sending": "In coda…",
+      "queued": "In coda nella chat di {{first}}",
+      "failed": "Impossibile mettere in coda il messaggio · riprova",
+      "log": "Registra una recensione",
+      "noLink": "Questa sede non ha ancora un link per le recensioni Google.",
+      "addLink": "Aggiungi il link",
+      "askAdmin": "Chiedi a un amministratore di aggiungerlo in Utenti › Sedi.",
+      "thanked": "Recensione su Google · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Recensione su Google · {{date}}",
+      "previous": "Recensioni precedenti",
+      "all": "Tutte le recensioni ({{count}})",
+      "needsCall": "Da richiamare",
+      "rated": "Valutazione {{rating}} su 5"
+    }
+  },
   "billingPlans": {
     "upgradeTo": "Passa a {{name}}",
     "plan": {

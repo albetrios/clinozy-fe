@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PageTransition } from './PageTransition.tsx';
+import { markSamePageNavigation } from './same-page-navigation.ts';
 
 const { matchesMock } = vi.hoisted(() => ({ matchesMock: vi.fn() }));
 vi.mock('@tanstack/react-router', async (importOriginal) => {
@@ -277,6 +278,96 @@ describe('PageTransition', () => {
       const { frames, wrapper } = walk(at('/leads', '/leads/1'), at('/leads'));
       expect(frames[1]?.classWrites).toBe(0);
       expect(wrapper).toHaveAttribute('data-route', '/leads');
+    });
+  });
+
+  describe('a move within the same room (feat-payment-celebration D13)', () => {
+    it('keeps the page still for a marked move, and rises for the next unmarked one', () => {
+      // A new element each time: the mocked matches do not re-render on their own.
+      const page = () => (
+        <PageTransition>
+          <p data-testid="copy">copy</p>
+        </PageTransition>
+      );
+      matchesMock.mockReturnValue(at('/organization/acme/medical/sales'));
+      const { rerender } = render(page());
+      const wrapper = screen.getByTestId('copy').parentElement as HTMLElement;
+      const classes = new MutationObserver(() => undefined);
+      classes.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
+
+      // Another tab of the room: no replay, but the page key moves on.
+      markSamePageNavigation();
+      matchesMock.mockReturnValue(at('/organization/acme/medical/purchases'));
+      rerender(page());
+      expect(classes.takeRecords()).toHaveLength(0);
+      expect(wrapper).toHaveAttribute(
+        'data-route',
+        '/organization/acme/medical/purchases',
+      );
+
+      // Another room: the page rises again — the mark was taken once.
+      matchesMock.mockReturnValue(at('/organization/acme/patients'));
+      rerender(page());
+      expect(classes.takeRecords().length).toBeGreaterThan(0);
+      classes.disconnect();
+    });
+
+    it('keeps a room layout still between its pages, unmarked, and rises only its section', () => {
+      const animate = vi.fn(
+        () => ({ finished: Promise.resolve() }) as unknown as Animation,
+      );
+      HTMLElement.prototype.animate = animate;
+      const file = (patient: string, section: string) => [
+        {
+          pathname: `/organization/acme/patients/${patient}`,
+          staticData: { room: true },
+        },
+        { pathname: `/organization/acme/patients/${patient}/${section}`, staticData: {} },
+      ];
+      const page = () => (
+        <PageTransition>
+          <nav data-testid="file-bar" />
+          <div data-slot="patient-file-section" data-testid="section" />
+        </PageTransition>
+      );
+      matchesMock.mockReturnValue(file('pat_a', 'timeline'));
+      const { rerender } = render(page());
+      const wrapper = screen.getByTestId('file-bar').parentElement as HTMLElement;
+      const classes = new MutationObserver(() => undefined);
+      classes.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
+
+      // Another section of the same file: the file stays, the section rises.
+      matchesMock.mockReturnValue(file('pat_a', 'visits'));
+      rerender(page());
+      expect(classes.takeRecords()).toHaveLength(0);
+      expect(animate.mock.contexts).toEqual([screen.getByTestId('section')]);
+
+      // Another patient's file is a new page.
+      matchesMock.mockReturnValue(file('pat_b', 'visits'));
+      rerender(page());
+      expect(classes.takeRecords().length).toBeGreaterThan(0);
+      classes.disconnect();
+    });
+
+    it('rises only what sits under the room toolbar on a marked move', () => {
+      const animate = vi.fn(
+        () => ({ finished: Promise.resolve() }) as unknown as Animation,
+      );
+      HTMLElement.prototype.animate = animate;
+      const page = () => (
+        <PageTransition>
+          <header data-slot="room-toolbar" />
+          <p data-testid="list">list</p>
+        </PageTransition>
+      );
+      matchesMock.mockReturnValue(at('/organization/acme/stock/items'));
+      const { rerender } = render(page());
+      expect(animate).not.toHaveBeenCalled();
+
+      markSamePageNavigation();
+      matchesMock.mockReturnValue(at('/organization/acme/stock/purchases'));
+      rerender(page());
+      expect(animate.mock.contexts).toEqual([screen.getByTestId('list')]);
     });
   });
 });

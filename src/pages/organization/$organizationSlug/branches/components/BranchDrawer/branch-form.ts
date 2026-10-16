@@ -1,7 +1,11 @@
 import { z } from 'zod';
 
 import type { Role, Tone, Weekday } from '@/shared/api/app/app-schema.ts';
-import type { AppBranch, BranchSave } from '@/shared/api/app/branches-contracts.ts';
+import {
+  type AppBranch,
+  BRANCH_LIMITS,
+  type BranchSave,
+} from '@/shared/api/app/branches-contracts.ts';
 import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { toAppPhone } from '@/shared/app/app-phone.ts';
 import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
@@ -33,6 +37,8 @@ export interface BranchFormValues {
   phone: string;
   email: string;
   gstNumber: string;
+  /** The Google review link, as typed (empty for none). */
+  reviewLink: string;
   workingDays: Weekday[];
   opensAt: string;
   closesAt: string;
@@ -46,6 +52,22 @@ export interface BranchFormValues {
  * branch a fourth, "Places & days" (D23).
  */
 export type BranchDrawerStepId = 'place' | 'contact' | 'people' | 'places';
+
+/** The steps, in the drawer's order: what `?step=` may name. */
+const BRANCH_DRAWER_STEPS = [
+  'place',
+  'contact',
+  'people',
+  'places',
+] as const satisfies readonly BranchDrawerStepId[];
+
+/**
+ * `?step=` as a drawer step, or none for anything else (`feat-payment-celebration`): read here,
+ * with the lazy drawer, so the route's validator — on the first paint — carries no step list.
+ */
+export function readBranchDrawerStep(value: unknown): BranchDrawerStepId | undefined {
+  return BRANCH_DRAWER_STEPS.find((step) => step === value);
+}
 
 /** The Colour field's swatches, in the design's order (`users.md:180`). */
 export const BRANCH_TONES = [
@@ -106,6 +128,7 @@ export function emptyBranchForm({
     phone: '',
     email: '',
     gstNumber: '',
+    reviewLink: '',
     workingDays: [...MON_SAT],
     opensAt: '10:00',
     closesAt: '19:00',
@@ -133,6 +156,7 @@ export function branchFormOf(
     phone: branch.phone ? appPhoneDigits(branch.phone) : '',
     email: branch.email,
     gstNumber: branch.gstNumber ?? '',
+    reviewLink: branch.reviewLink ?? '',
     workingDays: [...branch.workingDays],
     opensAt: branch.opensAt,
     closesAt: branch.closesAt,
@@ -205,6 +229,17 @@ export function isBranchPhoneIncomplete(digits: string): boolean {
   return digits.length > 0 && toAppPhone(digits) === null;
 }
 
+/**
+ * A filled Google review link that clinozy-be would refuse: not an `https://` address, or over
+ * its 512 characters (an empty one is no link).
+ */
+export function isBranchReviewLinkInvalid(value: string): boolean {
+  const link = value.trim();
+  if (link.length === 0) return false;
+  if (link.length > BRANCH_LIMITS.reviewLink || !link.startsWith('https://')) return true;
+  return !URL.canParse(link);
+}
+
 /** A filled PIN code that is not six digits. */
 export function isBranchPinIncomplete(pin: string): boolean {
   return pin.length > 0 && !/^\d{6}$/.test(pin);
@@ -246,6 +281,7 @@ export function branchSaveOf(
       phone: toAppPhone(values.phone) ?? '',
       email: values.email.trim(),
       gstNumber: values.gstNumber.trim().toUpperCase() || null,
+      reviewLink: values.reviewLink.trim() || null,
       workingDays: values.workingDays,
       opensAt: values.opensAt,
       closesAt: values.closesAt,

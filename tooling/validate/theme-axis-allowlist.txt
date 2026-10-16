@@ -24,3 +24,6 @@ h-7 gap-1.5 rounded-full border border-border px-2.5 text-xs font-medium focus:b
 # A calendar block's status pill sits white on the block's tint (H:2063): the
 # class lands on TonePill, whose span carries data-slot="pill" itself.
 bg-card ps-1.5 pe-1.75
+# The Payment received still mark (`feat-payment-celebration`): the fallback twin of the Lottie
+# animation's disc, which is drawn round in every shape — the two stay alike, as status dots do.
+flex size-16 items-center justify-center rounded-full

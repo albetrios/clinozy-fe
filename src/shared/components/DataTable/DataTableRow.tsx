@@ -451,6 +451,9 @@ export function DataTableRow<TData extends RowData>({
   const openOnEnter = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!onRowClick || event.key !== 'Enter' || event.target !== event.currentTarget)
       return;
+    // j / k moved the row focus to another row whose DOM focus lands a frame
+    // later: Enter belongs to that row (the document listener opens it).
+    if (context.focusIndex !== null && context.focusIndex !== index) return;
     event.preventDefault();
     onRowClick(row);
   };

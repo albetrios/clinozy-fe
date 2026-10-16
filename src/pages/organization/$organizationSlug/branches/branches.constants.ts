@@ -84,6 +84,7 @@ export const BRANCHES_KEYS = {
       phone: 'drawer.fields.phone',
       email: 'drawer.fields.email',
       gstin: 'drawer.fields.gstin',
+      reviewLink: 'drawer.fields.reviewLink',
       days: 'drawer.fields.days',
       opens: 'drawer.fields.opens',
       closes: 'drawer.fields.closes',
@@ -103,6 +104,7 @@ export const BRANCHES_KEYS = {
       state: 'drawer.placeholders.state',
       email: 'drawer.placeholders.email',
       gstin: 'drawer.placeholders.gstin',
+      reviewLink: 'drawer.placeholders.reviewLink',
       team: 'drawer.placeholders.team',
       /** "Pick a time" — the opening and closing time fields. */
       time: 'drawer.placeholders.time',
@@ -112,6 +114,8 @@ export const BRANCHES_KEYS = {
       /** "one per clinic · set when it opened" — the Main branch switch is read-only. */
       main: 'drawer.hints.main',
       phone: 'drawer.hints.phone',
+      /** "sent when you ask a patient for a review after a payment". */
+      reviewLink: 'drawer.hints.reviewLink',
       team: 'drawer.hints.team',
       /** "preselected in forms here" — a default with someone to pick. */
       preselected: 'drawer.hints.preselected',
@@ -142,6 +146,7 @@ export const BRANCHES_KEYS = {
     pinInvalid: 'drawer.pinInvalid',
     phoneInvalid: 'drawer.phoneInvalid',
     emailInvalid: 'drawer.emailInvalid',
+    reviewLinkInvalid: 'drawer.reviewLinkInvalid',
     /** "Vesu branch added" / "Vesu saved". */
     added: 'drawer.added',
     saved: 'drawer.saved',

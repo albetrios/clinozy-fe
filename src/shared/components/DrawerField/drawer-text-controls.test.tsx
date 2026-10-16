@@ -50,6 +50,10 @@ describe('DrawerInput — first letter capitalised as typed (H:4515–4521)', ()
     ['a phone type', { type: 'tel', 'aria-label': 'Mobile number' }],
     ['an email type', { type: 'email', 'aria-label': 'Work address' }],
     ['a numeric input mode', { inputMode: 'numeric' as const, 'aria-label': 'Qty' }],
+    [
+      'a link input mode',
+      { inputMode: 'url' as const, 'aria-label': 'Google review link' },
+    ],
     ['an Instagram placeholder', { placeholder: 'Instagram handle', 'aria-label': 'IG' }],
     ['the opt-out', { capitalize: false, 'aria-label': 'Code' }],
   ])('leaves %s alone', async (_case, props) => {

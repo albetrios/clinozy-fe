@@ -17,6 +17,10 @@ function DrawerPortal({ ...props }: React.ComponentProps<typeof DrawerPrimitive.
   return <DrawerPrimitive.Portal data-slot="drawer-portal" {...props} />;
 }
 
+// Local change (feat-payment-celebration D14): every bottom sheet moves the same way — it rises
+// 28px and fades in 260ms on the sheet curve (`animate-sheet-up`), its scrim fades in like a
+// record drawer's (`animate-backdrop-in`), and neither animates out. The `!` beats vaul's own
+// unlayered 500ms slide; vaul's drag physics are untouched.
 function DrawerOverlay({
   className,
   ...props
@@ -25,7 +29,7 @@ function DrawerOverlay({
     <DrawerPrimitive.Overlay
       data-slot="drawer-overlay"
       className={cn(
-        'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 bg-overlay/50 fixed inset-0 z-50',
+        'data-[state=open]:animate-backdrop-in! bg-overlay/50 fixed inset-0 z-50 data-[state=closed]:animate-none!',
         className,
       )}
       {...props}
@@ -50,7 +54,7 @@ function DrawerContent({
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         className={cn(
-          'group/drawer-content bg-background fixed z-50 flex h-auto flex-col',
+          'group/drawer-content bg-background data-[state=open]:animate-sheet-up! fixed z-50 flex h-auto flex-col data-[state=closed]:animate-none!',
           'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-lg data-[vaul-drawer-direction=bottom]:border-t',
           className,
         )}

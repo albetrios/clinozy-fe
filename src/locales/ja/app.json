@@ -1428,6 +1428,39 @@
       "error": "報告を送信できませんでした。入力内容は残っています。もう一度お試しください。"
     }
   },
+  "paymentReceived": {
+    "title": "支払いを受け取りました",
+    "amount": "{{amount}}を受領",
+    "from": "{{name}}さんから",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "請求書 {{invoice}} は全額支払い済み",
+      "due": "請求書 {{invoice}} の未払いは {{amount}}",
+      "advance": "前受金として保存",
+      "creditSettled": "{{credit}} を全額精算",
+      "creditLeft": "{{credit}} の残りは {{amount}}"
+    },
+    "summary": "支払いに保存しました",
+    "done": "完了",
+    "reviews": {
+      "askTitle": "{{first}}さんに Google のレビューをお願いする",
+      "askBody": "来院直後の今が、お願いするのに最適なタイミングです。",
+      "send": "WhatsApp で送信",
+      "sending": "キューに追加中…",
+      "queued": "{{first}}さんのチャットにキュー済み",
+      "failed": "メッセージをキューに追加できませんでした · もう一度お試しください",
+      "log": "レビューを記録",
+      "noLink": "この拠点にはまだ Google のレビューリンクがありません。",
+      "addLink": "リンクを追加",
+      "askAdmin": "管理者に「ユーザー › 拠点」で追加してもらってください。",
+      "thanked": "Google でレビュー済み · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Google でレビュー済み · {{date}}",
+      "previous": "これまでのレビュー",
+      "all": "すべてのレビュー（{{count}}）",
+      "needsCall": "要連絡",
+      "rated": "5 段階中 {{rating}}"
+    }
+  },
   "billingPlans": {
     "upgradeTo": "{{name}} にアップグレード",
     "plan": {

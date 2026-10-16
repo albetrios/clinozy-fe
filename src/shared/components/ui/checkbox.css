@@ -1,0 +1,25 @@
+/* The checkbox's tick pops in when it is checked (change-motion-polish;
+   retuned by change-motion-consistency): 160ms from 90% and transparent on
+   the strong ease-out — never from (near) nothing. The indicator mounts only
+   while checked, so unchecking takes it away at once. Ships with the
+   checkbox's lazy chunk, never the first paint. Reduced motion: the tick
+   fades in without scaling — gentler, not zero. */
+[data-slot='checkbox-indicator'] {
+  animation: checkbox-tick 160ms var(--ease-out-strong) both;
+}
+@keyframes checkbox-tick {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+@keyframes checkbox-tick-fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='checkbox-indicator'] {
+    animation: checkbox-tick-fade 160ms ease both !important;
+  }
+}

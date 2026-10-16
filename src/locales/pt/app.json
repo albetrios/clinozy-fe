@@ -1470,6 +1470,39 @@
       "error": "Não foi possível enviar o relato. Seu texto continua aqui — tente de novo."
     }
   },
+  "paymentReceived": {
+    "title": "Pagamento recebido",
+    "amount": "{{amount}} recebidos",
+    "from": "de {{name}}",
+    "meta": "{{modes}} · {{ref}}",
+    "outcome": {
+      "paid": "Fatura {{invoice}} paga integralmente",
+      "due": "Faltam {{amount}} na fatura {{invoice}}",
+      "advance": "Guardado como adiantamento",
+      "creditSettled": "{{credit}} quitado integralmente",
+      "creditLeft": "Faltam {{amount}} em {{credit}}"
+    },
+    "summary": "Salvo em Pagamentos",
+    "done": "Concluído",
+    "reviews": {
+      "askTitle": "Peça a {{first}} uma avaliação no Google",
+      "askBody": "A visita está recente: o melhor momento para pedir.",
+      "send": "Enviar pelo WhatsApp",
+      "sending": "Colocando na fila…",
+      "queued": "Na fila da conversa de {{first}}",
+      "failed": "Não foi possível colocar a mensagem na fila · tente novamente",
+      "log": "Registrar uma avaliação",
+      "noLink": "Esta unidade ainda não tem link de avaliações do Google.",
+      "addLink": "Adicionar o link",
+      "askAdmin": "Peça a um administrador para adicioná-lo em Usuários › Unidades.",
+      "thanked": "Avaliou no Google · {{rating}}★ · {{date}}",
+      "thankedNoRating": "Avaliou no Google · {{date}}",
+      "previous": "Avaliações anteriores",
+      "all": "Todas as avaliações ({{count}})",
+      "needsCall": "Precisa de ligação",
+      "rated": "Nota {{rating}} de 5"
+    }
+  },
   "billingPlans": {
     "upgradeTo": "Fazer upgrade para {{name}}",
     "plan": {

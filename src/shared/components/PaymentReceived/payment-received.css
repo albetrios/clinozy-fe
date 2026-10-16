@@ -1,0 +1,41 @@
+/* The Payment received animation's colours (`feat-payment-celebration` D8). The Lottie JSON
+   names its layers (`cl`); lottie-web keeps those names as classes on each layer's group and
+   writes the JSON's colours as presentation attributes, which any rule here beats — so light,
+   dark and every preset recolour it, and no colour is baked in that a theme cannot change.
+   Shipped with the lazy chunk that shows the view, never the first paint. No motion here: the
+   animation's timing is the JSON's, and reduced motion shows its last frame (`LottiePlayer`). */
+[data-slot='payment-received-animation'] .pr-disc path {
+  fill: var(--color-success);
+}
+[data-slot='payment-received-animation'] .pr-check path {
+  stroke: var(--color-success-foreground);
+}
+[data-slot='payment-received-animation'] .pr-ripple path {
+  stroke: var(--color-success);
+}
+[data-slot='payment-received-animation'] .pr-spark-peach path {
+  stroke: var(--color-tone-peach-dot);
+}
+[data-slot='payment-received-animation'] .pr-spark-butter path {
+  stroke: var(--color-tone-butter-dot);
+}
+[data-slot='payment-received-animation'] .pr-spark-sage path {
+  stroke: var(--color-tone-sage-dot);
+}
+[data-slot='payment-received-animation'] .pr-spark-sky path {
+  stroke: var(--color-tone-sky-dot);
+}
+
+/* The view's own sizes and colours, kept here with its lazy chunk rather than as utilities in the
+   first paint's stylesheet, which no other screen needs them in (the initial-CSS budget). The
+   animation's square — 28 steps of the Density axis — and the player filling it. */
+[data-slot='payment-received-animation'],
+[data-slot='payment-received-animation'] > [data-slot='lottie-player'] {
+  width: calc(var(--spacing) * 28);
+  height: calc(var(--spacing) * 28);
+}
+/* A previous review's rating: the stars it earned, filled in the warning colour. */
+[data-slot='review-stars'] [data-filled] {
+  color: var(--color-warning);
+  fill: var(--color-warning);
+}

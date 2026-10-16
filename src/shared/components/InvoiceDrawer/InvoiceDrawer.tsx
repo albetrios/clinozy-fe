@@ -1,7 +1,8 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
 import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
 import type {
@@ -17,6 +18,13 @@ import type {
   DrawerStep,
 } from '@/shared/components/DrawerSteps/index.ts';
 import { OfferingQuickCreate } from '@/shared/components/OfferingQuickCreate/index.ts';
+import {
+  PAYMENT_RECEIVED_KEYS,
+  PAYMENT_RECEIVED_NS,
+  PaymentReceived,
+  preloadPaymentReceived,
+  type ReceivedPayment,
+} from '@/shared/components/PaymentReceived/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
@@ -49,6 +57,7 @@ import {
   type InvoiceFormValues,
   type InvoicePrefill,
 } from './invoice-form.ts';
+import { paidNowReceived } from './invoice-paid-now.ts';
 import { useInvoiceQuickFill } from './invoice-presets.ts';
 import { printInvoice } from './invoice-sheet.tsx';
 import { InvoiceItemsField } from './InvoiceItemsField.tsx';
@@ -381,10 +390,17 @@ type SessionForm = ReturnType<typeof useSessionForm>;
  * Everything one opening derives from its form: the access, the reads and prefills, the
  * server's preview and the figures, the header's words, Quick fill and the save.
  */
+/** A save that took money from a patient: the payment, and the save's hand-off for Done. */
+interface InvoiceReceived {
+  payment: ReceivedPayment;
+  outcome: InvoiceDrawerOutcome;
+}
+
 function useSessionParts(
   session: SessionForm,
   props: InvoiceDrawerProps,
   onStep: (step: string) => void,
+  onReceived: (received: InvoiceReceived) => void,
 ) {
   const { input, form, values, invoice, detail, branchId } = session;
   const newRecord = invoice === null;
@@ -443,6 +459,7 @@ function useSessionParts(
     invoiceId: invoice?.id ?? null,
     onPrint: printPreset(detail),
   });
+  const toast = useSaveToast(saveToastKind(input), input.onSaved);
   const saving = useInvoiceSave({
     form,
     invoice,
@@ -455,7 +472,18 @@ function useSessionParts(
     floorVisible: access.floorVisible,
     onStep,
     onStale: newRecord ? undefined : () => void session.reload(),
-    onDone: useSaveToast(saveToastKind(input), input.onSaved),
+    onDone: (outcome) => {
+      const payment = paidNowReceived({
+        kind: saveToastKind(input),
+        sale,
+        values: form.getValues(),
+        due: money.figures.due,
+        fallbackBranchId,
+        outcome,
+      });
+      if (payment) onReceived({ payment, outcome });
+      else toast(outcome);
+    },
   });
   return {
     sale,
@@ -475,14 +503,21 @@ function useSessionParts(
 /** One opening of the drawer: the form, its catalogue, its checks and its save. */
 function InvoiceDrawerSession(props: InvoiceDrawerProps) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
+  const { t: tReceived } = useTranslation(PAYMENT_RECEIVED_NS);
   const idPrefix = `invoice-${useId().replace(/:/g, '')}`;
   // Every drawer opens on its first step, a prefilled patient's too (H:3840 `step`).
   const [openStep, setOpenStep] = useState<string>('party');
   const [deleting, setDeleting] = useState(false);
   const session = useSessionForm(props);
   const { form, values, invoice } = session;
-  const parts = useSessionParts(session, props, setOpenStep);
+  const [received, setReceived] = useState<InvoiceReceived | null>(null);
+  const parts = useSessionParts(session, props, setOpenStep, setReceived);
   const { access, view, money } = parts;
+  // A new clinic invoice may end in Payment received: its player and animation load meanwhile.
+  const celebrates = invoice === null && !props.sale;
+  useEffect(() => {
+    if (celebrates) preloadPaymentReceived();
+  }, [celebrates]);
 
   const switchType = (type: ClinicInvoiceType) => {
     form.setValue('type', type, { shouldDirty: true });
@@ -512,6 +547,28 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
   // switches between Clinic and Consultation only (MD28).
   const switchValue =
     props.sale || invoice || values.type === 'medical' ? null : values.type;
+
+  if (received) {
+    // Done — or any other way out — hands the saved invoice to the host, as the save did.
+    const finish = () => session.input.onSaved(received.outcome);
+    return (
+      <RecordDrawer
+        open={props.open}
+        onClose={finish}
+        title={tReceived(PAYMENT_RECEIVED_KEYS.title)}
+        tag={displayId.invoiceNumber(received.outcome.seq)}
+        content={CONTENT_PROFILE}
+        tone={INVOICE_DRAWER_TONE}
+        summary={t(K.toasts.created[received.outcome.type], {
+          seq: received.outcome.seq,
+        })}
+        doneLabel={tReceived(PAYMENT_RECEIVED_KEYS.done)}
+        testId={INVOICE_DRAWER_TEST_ID}
+      >
+        <PaymentReceived payment={received.payment} />
+      </RecordDrawer>
+    );
+  }
 
   return (
     <>

@@ -8343,6 +8343,7 @@ export interface operations {
                             opens_at?: string;
                             phone?: string;
                             postal_code?: string;
+                            review_link?: string | null;
                             state?: string;
                             tone?: string;
                             working_days?: ("mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun")[];

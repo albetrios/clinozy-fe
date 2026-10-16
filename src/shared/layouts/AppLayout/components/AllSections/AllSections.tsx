@@ -183,7 +183,7 @@ export function AllSectionsPopover({
         data-testid="all-sections"
         // The bar's own surface: G closes it from inside (section-bar-shortcuts.ts).
         data-sections-surface
-        className="data-[state=open]:animate-dropdown-in max-h-[calc(100vh-5.625rem)] w-[min(17.5rem,calc(100vw-2rem))] origin-top-left overflow-auto rounded-xl p-2"
+        className="data-[state=open]:animate-dropdown-in max-h-[calc(100vh-5.625rem)] w-[min(17.5rem,calc(100vw-2rem))] overflow-auto rounded-xl p-2"
       >
         <AllSectionsList
           nav={nav}
@@ -220,7 +220,7 @@ export function AllSectionsSheet({
         data-testid="all-sections-sheet"
         data-slot="drawer-content"
         data-sections-surface
-        className="bg-card animate-sheet-up max-h-[85vh] rounded-t-2xl border-t p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] data-[vaul-drawer-direction=bottom]:max-h-[85vh] data-[vaul-drawer-direction=bottom]:rounded-t-2xl"
+        className="bg-card max-h-[85vh] rounded-t-2xl border-t p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] data-[vaul-drawer-direction=bottom]:max-h-[85vh] data-[vaul-drawer-direction=bottom]:rounded-t-2xl"
       >
         <DrawerTitle className="sr-only">{t(keys.allSections)}</DrawerTitle>
         <DrawerDescription className="sr-only">{t(keys.pinFooter)}</DrawerDescription>

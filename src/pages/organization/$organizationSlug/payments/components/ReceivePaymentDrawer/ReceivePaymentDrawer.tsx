@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +14,13 @@ import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { defaultBranchId } from '@/shared/app/app-branch.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import type { PatientPick } from '@/shared/components/PatientPicker/index.ts';
+import {
+  PAYMENT_RECEIVED_KEYS,
+  PAYMENT_RECEIVED_NS,
+  PaymentReceived,
+  preloadPaymentReceived,
+  receivedFromLedgerRow,
+} from '@/shared/components/PaymentReceived/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
@@ -33,7 +40,6 @@ import {
   useUpdatePayment,
 } from '@/shared/hooks/usePayments/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
-import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -283,6 +289,7 @@ function useReceiveSave({
   onDayClosed,
   onStale,
   onClose,
+  onReceived,
 }: {
   form: UseFormReturn<ReceiveFormValues>;
   record: LedgerRow | null;
@@ -290,10 +297,11 @@ function useReceiveSave({
   onDayClosed: () => void;
   onStale: () => void;
   onClose: () => void;
+  /** A new receipt saved: the drawer turns into Payment received (`feat-payment-celebration`). */
+  onReceived: (row: LedgerRow) => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   const formatPaise = usePaiseFormat();
-  const formatRupees = useRupeeFormat();
   const { openBranches } = useBranches();
   const { preferences } = usePreferences();
   const receive = useReceivePayment({ notifyOnError: false });
@@ -320,11 +328,11 @@ function useReceiveSave({
         ? update.mutateAsync({ record, patch: receivePatchOf(form.getValues()) })
         : receive.mutateAsync(receiveInputOf(form.getValues(), fallbackBranch)),
     onDone: (row) => {
-      notify.success(
-        record
-          ? t(K.updated, { ref: displayId.payment(row.seq) })
-          : t(K.received, { amount: formatRupees(row.amount), name: row.partyName }),
-      );
+      if (!record) {
+        onReceived(row);
+        return;
+      }
+      notify.success(t(K.updated, { ref: displayId.payment(row.seq) }));
       onClose();
     },
   });
@@ -340,11 +348,18 @@ function ReceiveSession({
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   const { t: tApp } = useTranslation(APP_NS);
+  const { t: tReceived } = useTranslation(PAYMENT_RECEIVED_NS);
   const formatPaise = usePaiseFormat();
   const { openBranches } = useBranches();
   const idPrefix = `receive-${useId().replace(/:/g, '')}`;
   const [dayClosed, setDayClosed] = useState(false);
+  const [received, setReceived] = useState<LedgerRow | null>(null);
   const readOnly = useReadOnly(props) || dayClosed;
+  // A new receipt may end in Payment received: its player and animation load while the form is filled.
+  const creating = props.mode === 'create';
+  useEffect(() => {
+    if (creating) preloadPaymentReceived();
+  }, [creating]);
 
   const form = useForm<ReceiveFormValues>({ defaultValues: start.values });
   const { record, reload } = useEditingRecord({
@@ -367,6 +382,7 @@ function ReceiveSession({
     onDayClosed: () => setDayClosed(true),
     onStale: () => void reload(),
     onClose: props.onClose,
+    onReceived: setReceived,
   });
   const { pickPatient, pickInvoice } = usePicks(form);
 
@@ -375,6 +391,23 @@ function ReceiveSession({
   const amount = formatPaise(splitsTotal(values.splits));
   const quickFill =
     due !== null && !record ? quickFillItems(form, due, t, formatPaise) : undefined;
+
+  if (received) {
+    return (
+      <RecordDrawer
+        open={props.open}
+        onClose={props.onClose}
+        title={tReceived(PAYMENT_RECEIVED_KEYS.title)}
+        content={CONTENT_PROFILE}
+        tone={SECTION_TONES.payments}
+        summary={tReceived(PAYMENT_RECEIVED_KEYS.summary)}
+        doneLabel={tReceived(PAYMENT_RECEIVED_KEYS.done)}
+        testId={RECEIVE_DRAWER_TEST_ID}
+      >
+        <PaymentReceived payment={receivedFromLedgerRow(received)} />
+      </RecordDrawer>
+    );
+  }
 
   return (
     <RecordDrawer

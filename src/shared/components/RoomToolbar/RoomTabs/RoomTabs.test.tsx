@@ -110,6 +110,19 @@ describe('RoomTabs', () => {
     expect(screen.getByTestId('medical-tab-sales')).toBe(sales);
   });
 
+  it('glides one thumb under the current tab — the track positioned for it (change-motion-polish)', async () => {
+    renderRoom('/medical/sales', medical());
+    const sales = await screen.findByTestId('medical-tab-sales');
+    const track = sales.closest('[data-room-tabs-track]');
+    expect(track).toHaveClass('relative', 'isolate');
+    const thumb = track?.firstElementChild;
+    expect(thumb).toHaveAttribute('data-slot', 'selection-glide');
+    expect(thumb).toHaveClass('bg-card', 'ring-1', 'ring-border', 'rounded-md');
+    // No layout in jsdom: nothing is covered, the tab keeps its own card.
+    expect(sales).toHaveClass('bg-card');
+    expect(sales).not.toHaveAttribute('data-glide-covered');
+  });
+
   it('marks the deepest tab current when one tab’s URL holds another’s (Offerings)', async () => {
     const tabs: RoomLinkTab[] = [
       { id: 'offerings', label: 'Offerings', to: '/offerings' },
@@ -373,6 +386,14 @@ describe('RoomViewTabs', () => {
     );
   });
 
+  it('glides one thumb under the selected view on the track (change-motion-polish)', () => {
+    render(<Views />);
+    const list = screen.getByRole('tablist', { name: 'Patient views' });
+    expect(list).toHaveClass('relative', 'isolate');
+    expect(list.firstElementChild).toHaveAttribute('data-slot', 'selection-glide');
+    expect(within(list).getAllByRole('tab')).toHaveLength(3);
+  });
+
   it('moves with the arrows and opens a view only on Enter (no refetch per arrow)', async () => {
     const onValueChange = vi.fn();
     const user = userEvent.setup();
@@ -444,6 +465,30 @@ describe('RoomViewTabs — the other tab rows (card, plain, fill, automatic)', (
     // The tab's own selected colours win over the look's.
     expect(whatsapp.className).toContain('bg-channel-whatsapp');
     expect(whatsapp).not.toHaveTextContent('WhatsApp');
+    // No glide: one thumb cannot be every channel's colour (change-motion-polish D8).
+    expect(list.querySelector('[data-slot="selection-glide"]')).toBeNull();
+  });
+
+  it('keeps a track still when a tab paints its own selected colour (D8)', () => {
+    render(
+      <RoomViewTabs
+        label="Timeline filters"
+        value="visits"
+        onValueChange={vi.fn()}
+        testIdPrefix="timeline"
+        tabs={[
+          {
+            id: 'visits',
+            label: 'Visits',
+            selectedClassName: 'text-tone-sky-foreground',
+          },
+          { id: 'notes', label: 'Notes' },
+        ]}
+      />,
+    );
+    const list = screen.getByTestId('timeline-tabs');
+    expect(list).toHaveAttribute('data-room-tabs-track');
+    expect(list.querySelector('[data-slot="selection-glide"]')).toBeNull();
   });
 
   it('opens the tab the arrows reach, passing a disabled one by', async () => {
@@ -488,6 +533,8 @@ describe('RoomViewTabs — the other tab rows (card, plain, fill, automatic)', (
     const list = screen.getByTestId('patient-file-tabs');
     expect(list).not.toHaveAttribute('data-room-tabs-track');
     expect(list.className).not.toContain('bg-muted');
+    // Tabs in their own selected colours: no thumb could be every colour (D8).
+    expect(list.querySelector('[data-slot="selection-glide"]')).toBeNull();
     expect(screen.getByTestId('patient-file-tab-visits').className).toContain(
       'bg-tone-sky',
     );

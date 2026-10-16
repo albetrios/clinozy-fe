@@ -1,6 +1,9 @@
+import './lane-panel.css';
+
 import { useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useReplayedAnimation } from '@/lib/animations/index.ts';
 import { cn } from '@/lib/utils.ts';
 import type { TodayLane } from '@/shared/api/app/today-contracts.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
@@ -217,13 +220,21 @@ function useVisitCardFocus(loading: boolean) {
 }
 
 /**
+ * The cascade's class (`lane-panel.css`): replayed on the card grid each time
+ * the lane changes, so its cards rise into place one after another.
+ */
+const LANE_CASCADE_CLASS = 'lane-cascade';
+
+/**
  * The selected lane's panel (KICKOFF §6.2; `today.md:20, 52–57`; H:599–614): a
  * card in the lane's fill and line — its name and "<n> people", then the
  * visit cards on an `auto-fill` 210px grid (four across at 1440, two at 1024
  * and 820, one on a phone), or "No one here right now.". From `md` it fills
  * the rest of the column and its cards scroll inside; on a phone it grows with
  * its cards and the page scrolls. The Checkout lane reads today's open bills
- * once for its cards' "₹n to pay" (`useCheckoutDues`).
+ * once for its cards' "₹n to pay" (`useCheckoutDues`). Choosing another lane
+ * crossfades the panel into its tone and cascades its cards in
+ * (change-motion-polish, `lane-panel.css`); a refresh of the same lane does not.
  */
 export function LanePanel({
   lane,
@@ -243,11 +254,15 @@ export function LanePanel({
   });
   const paint = TONE_CLASSES[TODAY_LANE_META[lane].tone];
   const EmptyIcon = LANE_EMPTY_ICONS[lane];
+  // Another lane: its cards rise into place one after another (`lane-panel.css`).
+  const grid = useRef<HTMLDivElement>(null);
+  useReplayedAnimation(grid, LANE_CASCADE_CLASS, lane);
   return (
     <section
       ref={panel}
       aria-labelledby={headingId}
       data-testid={TODAY_TEST_IDS.panel}
+      data-slot="lane-panel"
       data-lane={lane}
       className={cn(
         'flex min-h-[150px] flex-col gap-2 rounded-lg border px-3.5 py-3 md:flex-1',
@@ -283,7 +298,10 @@ export function LanePanel({
           />
         </div>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] content-start gap-2 md:min-h-0 md:flex-1 md:overflow-y-auto">
+        <div
+          ref={grid}
+          className="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] content-start gap-2 md:min-h-0 md:flex-1 md:overflow-y-auto"
+        >
           {loading
             ? SKELETON_CARDS.map((key) => <VisitCardSkeleton key={key} />)
             : cards.map((card) => (

@@ -141,6 +141,7 @@ describe('locationBranchInput', () => {
       phone: '+919825044120',
       email: 'owner@acme.test',
       gstNumber: null,
+      reviewLink: null,
       workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
       opensAt: '10:00',
       closesAt: '20:00',

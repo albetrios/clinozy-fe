@@ -224,7 +224,11 @@ function PatientFileBody({
             }
             className={RAIL_TIER}
           />
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {/* The section: what a section switch changes, and the only part that rises (D13). */}
+          <div
+            data-slot="patient-file-section"
+            className="flex min-h-0 min-w-0 flex-1 flex-col"
+          >
             <Outlet />
           </div>
         </div>
