@@ -276,7 +276,7 @@ function ModeChip({ mode }: { mode: PrescribeMode & { onLeave: () => void } }) {
       data-testid="command-palette-mode"
       className={cn(
         TONE_CLASSES.sage.surface,
-        'inline-flex h-6.5 flex-none items-center gap-1 rounded-full ps-2 pe-0.5 text-xs font-medium whitespace-nowrap',
+        'inline-flex h-6.5 flex-none items-center gap-1 rounded-full ps-2 pe-1 text-xs font-medium whitespace-nowrap',
       )}
     >
       <Pill aria-hidden="true" className="size-3" />
@@ -288,7 +288,7 @@ function ModeChip({ mode }: { mode: PrescribeMode & { onLeave: () => void } }) {
         onClick={mode.onLeave}
         data-testid="command-palette-mode-leave"
         data-slot="pill"
-        className="hover:bg-background/60 grid size-5.5 place-items-center rounded-full"
+        className="hover:bg-background flex size-5.5 items-center justify-center rounded-full"
       >
         <X aria-hidden="true" className="size-3" />
       </button>

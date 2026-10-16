@@ -112,13 +112,11 @@ describe('ItemsQtyCell — the 32px stepper (H:924)', () => {
       </CellHarness>,
     );
     const box = (testId: string) => screen.getByTestId(testId).closest('div');
-    expect(box('qty')).toHaveClass('h-8');
-    expect(box('qty')).not.toHaveClass('pointer-coarse:h-11');
-    expect(screen.getByTestId('qty-increase')).not.toHaveClass('pointer-coarse:w-11');
-    expect(box('touch-qty')).toHaveClass('h-8', 'pointer-coarse:h-11');
+    // `items-field.css` sizes a stepper on touch only through this attribute.
+    expect(box('qty')).toHaveClass('items-stepper', 'h-8');
+    expect(box('qty')).not.toHaveAttribute('data-touch-size');
+    expect(box('touch-qty')).toHaveClass('items-stepper', 'h-8');
     expect(box('touch-qty')).toHaveAttribute('data-touch-size', 'large');
-    expect(screen.getByTestId('touch-qty-decrease')).toHaveClass('pointer-coarse:w-11');
-    expect(screen.getByTestId('touch-qty-increase')).toHaveClass('pointer-coarse:w-11');
   });
 
   it('replaces the count as typed and brings an empty or too-small one back to min', async () => {

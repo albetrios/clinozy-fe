@@ -26,7 +26,7 @@ export function RxAllergyBand({ allergies, matches }: RxAllergyBandProps) {
   return (
     <div
       data-testid={RX_TEST_IDS.allergyBand}
-      className="bg-destructive/8 text-destructive border-destructive/20 flex items-start gap-2 border-b px-(--drawer-pad-x) py-2"
+      className="bg-destructive-tint text-destructive border-destructive-border flex items-start gap-2 border-b px-(--drawer-pad-x) py-2"
     >
       <TriangleAlert aria-hidden="true" className="mt-0.5 size-3.5 flex-none" />
       <div className="text-detail flex min-w-0 flex-col gap-0.5">

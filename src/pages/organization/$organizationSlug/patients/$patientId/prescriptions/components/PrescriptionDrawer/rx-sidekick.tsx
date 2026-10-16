@@ -326,7 +326,9 @@ function EarlierLine({
         <span className="text-detail font-medium">{line.medicineName}</span>
         <span className="text-caption text-foreground-soft">{words.directions}</span>
         {words.note ? (
-          <span className="text-caption text-muted-foreground italic">{words.note}</span>
+          <span className="rx-remark text-caption text-muted-foreground">
+            {words.note}
+          </span>
         ) : null}
       </span>
       {held ? (
@@ -349,7 +351,7 @@ function EarlierLine({
           )}
           onClick={onAdd}
           data-testid={`${ID}-earlier-add`}
-          className="h-7 flex-none gap-1 px-2 text-xs shadow-none pointer-coarse:h-9"
+          className="rx-small-action h-7 flex-none gap-1 px-2 text-xs shadow-none"
         >
           <Plus aria-hidden="true" className="size-3" />
           {t(K.sidekick.earlier.add)}
@@ -411,7 +413,7 @@ function EarlierPager({
         title={t(K.sidekick.earlier.newer)}
         onClick={() => onMove(index - 1)}
         data-testid={`${ID}-earlier-newer`}
-        className="pointer-coarse:size-9"
+        className="rx-icon-action"
       >
         <ChevronLeft aria-hidden="true" className="size-3.5 rtl:rotate-180" />
       </Button>
@@ -430,7 +432,7 @@ function EarlierPager({
         title={t(K.sidekick.earlier.older)}
         onClick={() => onMove(index + 1)}
         data-testid={`${ID}-earlier-older`}
-        className="pointer-coarse:size-9"
+        className="rx-icon-action"
       >
         <ChevronRight aria-hidden="true" className="size-3.5 rtl:rotate-180" />
       </Button>
@@ -525,7 +527,7 @@ function EarlierSection({
           size="sm"
           onClick={() => onAdd(missing)}
           data-testid={`${ID}-earlier-add-all`}
-          className="gap-1.5 self-start shadow-none pointer-coarse:h-10"
+          className="rx-add-all gap-1.5 self-start shadow-none"
         >
           <Plus aria-hidden="true" className="size-3.5" />
           {t(K.sidekick.earlier.addAll, { count: missing.length })}
@@ -565,7 +567,7 @@ function ReadsSection({ lines }: { lines: readonly RxFormLine[] }) {
                     {words.directions}
                   </span>
                   {words.note ? (
-                    <span className="text-caption text-muted-foreground italic">
+                    <span className="rx-remark text-caption text-muted-foreground">
                       {words.note}
                     </span>
                   ) : null}
@@ -640,7 +642,7 @@ export function RxSidekick(props: RxSidekickProps) {
         aria-label={t(K.sidekick.label)}
         data-testid={ID}
         data-layout="column"
-        className="bg-canvas flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-5"
+        className="bg-canvas flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"
       >
         <h2 className="text-body font-semibold">{t(K.sidekick.label)}</h2>
         {body}
@@ -655,7 +657,7 @@ export function RxSidekick(props: RxSidekickProps) {
       data-testid={ID}
       data-layout="card"
       data-slot="card"
-      className={cn('bg-card rounded-xl border', alert && 'border-destructive/40')}
+      className={cn('bg-card rounded-xl border', alert && 'border-destructive-border')}
     >
       <button
         type="button"
@@ -691,7 +693,7 @@ export function RxSidekick(props: RxSidekickProps) {
         <ChevronDown
           aria-hidden="true"
           className={cn(
-            'text-muted-foreground size-4 transition-transform motion-reduce:transition-none',
+            'text-muted-foreground size-4 transition-transform',
             open && 'rotate-180',
           )}
         />

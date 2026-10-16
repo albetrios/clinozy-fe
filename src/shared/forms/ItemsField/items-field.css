@@ -1,0 +1,18 @@
+/* The items table's quantity stepper on a touch screen, when its row asks
+   (`ItemsQtyCell` `largeOnTouch` → `data-touch-size="large"`): a 44px box with 44px
+   buttons and 16px marks — finger-size, like the row's chips
+   (change-prescription-touch-quantity D3).
+   Loaded with the items table, never on the first paint
+   (fix-prescription-css-budget D5): a table that does not ask keeps its 32px stepper. */
+@media (pointer: coarse) {
+  .items-stepper[data-touch-size='large'] {
+    height: calc(var(--spacing) * 11);
+  }
+  .items-stepper[data-touch-size='large'] > button {
+    width: calc(var(--spacing) * 11);
+  }
+  .items-stepper[data-touch-size='large'] > button > svg {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+}

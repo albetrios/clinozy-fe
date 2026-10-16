@@ -733,10 +733,11 @@ describe('the prescription composer (feat-prescription-composer)', () => {
     const { user, drawer } = await openNew();
     await quickAdd(user, drawer, 'septran bd');
     const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
-    // 32px with a mouse, the shared small trigger; 44px on a coarse pointer, set by this line alone.
+    // 32px with a mouse, the shared small trigger; 44px on a coarse pointer, set by this line
+    // alone through `rx-medicine-trigger` (prescription-drawer.css, pinned by its own test).
     expect(within(row).getByTestId('rx-items-medicine')).toHaveClass(
       'min-h-8',
-      'pointer-coarse:min-h-11',
+      'rx-medicine-trigger',
     );
   });
 

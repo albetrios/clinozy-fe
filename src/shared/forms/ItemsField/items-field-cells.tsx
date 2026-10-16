@@ -1,3 +1,5 @@
+import './items-field.css';
+
 import { type ReactElement, type ReactNode, type Ref, useId, useState } from 'react';
 import { type FieldError, type FieldValues, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -50,17 +52,6 @@ const STEP_BUTTON_CLASS =
   'bg-canvas text-foreground-soft hover:bg-muted flex h-full w-6 shrink-0 items-center justify-center transition-colors disabled:pointer-events-none disabled:opacity-50';
 const STEPPER_INPUT_CLASS =
   'text-body h-full w-full min-w-0 flex-1 bg-transparent px-0.5 text-center font-medium tabular-nums outline-none';
-/**
- * The stepper on a touch screen, when its row asks (`largeOnTouch`): a 44px
- * box with 44px buttons and 16px marks — finger-size, like the row's chips.
- */
-const STEPPER_TOUCH = {
-  box: 'pointer-coarse:h-11',
-  button: 'pointer-coarse:w-11',
-  icon: 'pointer-coarse:size-4',
-} as const;
-/** The stepper's classes for a row that does not ask: no change on touch. */
-const STEPPER_NO_TOUCH = { box: '', button: '', icon: '' } as const;
 
 /**
  * A cell's message as the tooltip (H:3811 `badTip`): shown from `md` up, never
@@ -369,7 +360,6 @@ export function ItemsQtyCell<TForm extends FieldValues>({
   largeOnTouch = false,
 }: ItemsQtyCellProps<TForm>) {
   const { t } = useTranslation(ITEMS_FIELD_NS);
-  const touch = largeOnTouch ? STEPPER_TOUCH : STEPPER_NO_TOUCH;
   const {
     field: { ref, value: stored, onChange, onBlur },
     fieldState,
@@ -407,8 +397,9 @@ export function ItemsQtyCell<TForm extends FieldValues>({
   return (
     <>
       <div
+        // 44px on touch when its row asks (`items-field.css`): box, buttons and marks.
         data-touch-size={largeOnTouch ? 'large' : undefined}
-        className={cn(STEPPER_CLASS, touch.box, message && 'border-destructive')}
+        className={cn('items-stepper', STEPPER_CLASS, message && 'border-destructive')}
       >
         <button
           type="button"
@@ -417,9 +408,9 @@ export function ItemsQtyCell<TForm extends FieldValues>({
           disabled={readOnly || value <= min}
           onClick={() => step(value - 1)}
           data-testid={`${testId}-decrease`}
-          className={cn(STEP_BUTTON_CLASS, touch.button)}
+          className={STEP_BUTTON_CLASS}
         >
-          <Minus aria-hidden="true" className={cn('size-3.5', touch.icon)} />
+          <Minus aria-hidden="true" className="size-3.5" />
         </button>
         <CellMessage message={message}>
           <input
@@ -462,9 +453,9 @@ export function ItemsQtyCell<TForm extends FieldValues>({
           disabled={readOnly || value >= max}
           onClick={() => step(value + 1)}
           data-testid={`${testId}-increase`}
-          className={cn(STEP_BUTTON_CLASS, touch.button)}
+          className={STEP_BUTTON_CLASS}
         >
-          <Plus aria-hidden="true" className={cn('size-3.5', touch.icon)} />
+          <Plus aria-hidden="true" className="size-3.5" />
         </button>
       </div>
       <CellMessageText id={errorId} message={message} />

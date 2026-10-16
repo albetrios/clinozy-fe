@@ -47,6 +47,10 @@ the Patients room's row action (feat-prescription-composer).
   (`ItemsField`'s `rowDetail`). The medicine column takes only the room the others leave. "All medicines · Days"
   above the lines sets one course on every line. Each tray is an ARIA toolbar — one Tab stop, the arrow keys within
   (mirrored right to left). The line's tracks are CSS variables the table sets per pointer.
+- **The drawer's own stylesheet** (`components/PrescriptionDrawer/prescription-drawer.css`, fix-prescription-css-budget):
+  the tracks, the segments' sizes, every touch size and the Rx Pad's heights live here, imported by the drawer, so
+  they load with the prescriptions island instead of the 36 kB first-paint stylesheet. A size only this drawer draws
+  goes there, not into a new Tailwind utility; `components/PrescriptionDrawer/prescription-drawer-css.test.ts` pins the touch sizes.
 - **Days**: a line's own `days` (the form's — the wire keeps them first in `remarks`, "7 days · …", split on open and
   joined on save, `components/PrescriptionDrawer/rx-form.ts` `rxSplitDays` / `rxRemarksOf`); the quantity follows
   days × doses a day.

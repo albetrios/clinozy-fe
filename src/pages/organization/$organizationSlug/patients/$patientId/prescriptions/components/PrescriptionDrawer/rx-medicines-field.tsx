@@ -49,10 +49,10 @@ const K = RX_KEYS;
  * (change-prescription-compact-line D9; change-prescription-touch-quantity
  * D6; change-prescription-one-line): Dose · Days · Meal · Where · Qty —
  * 128 · 200 · 170 · 88px with a mouse, 176 · 284 · 212 · 120px on touch,
- * where every segment is 44px.
+ * where every segment is 44px. Declared in `prescription-drawer.css`, which
+ * loads with the drawer, not on the first paint (fix-prescription-css-budget D4).
  */
-const RX_TRACKS_CLASS =
-  '[--rx-dose-track:128px] [--rx-days-track:200px] [--rx-directions-track:170px] [--rx-qty-track:88px] pointer-coarse:[--rx-dose-track:176px] pointer-coarse:[--rx-days-track:284px] pointer-coarse:[--rx-directions-track:212px] pointer-coarse:[--rx-qty-track:120px]';
+const RX_TRACKS_CLASS = 'rx-tracks';
 
 /**
  * The table width from which Days and Meal · Where are columns of the line
@@ -129,6 +129,8 @@ function RxPadToggle({
       variant={pad.open ? 'default' : 'outline'}
       aria-pressed={pad.open}
       aria-controls={pad.open ? controls : undefined}
+      // Its word hides on a phone, so the name stays on the button.
+      aria-label={t(K.pad.toggle)}
       title={t(K.pad.toggleHint)}
       onClick={() => pad.onOpenChange(!pad.open)}
       data-testid={`${RX_TEST_IDS.pad}-toggle`}
@@ -138,7 +140,7 @@ function RxPadToggle({
       )}
     >
       <ClipboardList aria-hidden="true" className="size-3.75" />
-      <span className="max-sm:sr-only">{t(K.pad.toggle)}</span>
+      <span className="hidden sm:inline">{t(K.pad.toggle)}</span>
     </Button>
   );
 }
@@ -257,7 +259,7 @@ function useRxColumns({
       align: 'end',
       cell: (row) => (
         // The track's width on a phone row too, where no track holds the stepper.
-        <div className="w-(--rx-qty-track) max-w-full">
+        <div className="rx-qty-box max-w-full">
           <ItemsQtyCell<RxFormValues>
             {...row.bind('qty')}
             min={1}

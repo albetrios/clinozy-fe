@@ -1,3 +1,5 @@
+import './prescription-drawer.css';
+
 import type { TFunction } from 'i18next';
 import { type Ref, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';

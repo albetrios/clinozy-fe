@@ -223,7 +223,7 @@ export function RxMedicineCell({
       <span
         aria-hidden="true"
         data-testid={`${row.testId}-number`}
-        className="bg-muted text-tiny text-muted-foreground-strong flex size-5 flex-none items-center justify-center rounded-sm font-semibold tabular-nums pointer-coarse:size-6"
+        className="rx-line-number bg-muted text-tiny text-muted-foreground-strong flex size-5 flex-none items-center justify-center rounded-sm font-semibold tabular-nums"
       >
         {row.index + 1}
       </span>
@@ -277,7 +277,7 @@ export function RxMedicineCell({
               data-testid={row.testId}
               data-source={source}
               // 44px on touch, like the line's segments and stepper (change-prescription-touch-picker D3).
-              className="pe-2 pointer-coarse:min-h-11"
+              className="rx-medicine-trigger pe-2"
             >
               {line.medicineName ? (
                 <>

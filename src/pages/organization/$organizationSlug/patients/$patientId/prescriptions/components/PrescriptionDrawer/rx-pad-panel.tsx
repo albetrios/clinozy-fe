@@ -89,7 +89,7 @@ function PadPreviewRow({
       data-kind={line.kind}
       className={cn(
         'bg-background flex min-h-9 flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border px-2.5 py-1.5',
-        matched.length > 0 && 'border-destructive/40 bg-destructive/5',
+        matched.length > 0 && 'border-destructive-border bg-destructive-tint',
       )}
     >
       <Mark
@@ -253,13 +253,13 @@ export function RxPadPanel({
           }
         }}
         data-testid={`${ID}-input`}
-        className="bg-background max-h-56 min-h-24 font-mono text-sm leading-6"
+        className="rx-pad-input bg-background font-mono text-sm leading-6"
       />
       <ol
         aria-live="polite"
         aria-label={summary}
         data-testid={`${ID}-preview`}
-        className="flex max-h-64 flex-col gap-1 overflow-y-auto"
+        className="rx-pad-preview flex flex-col gap-1 overflow-y-auto"
       >
         {pad.lines.length === 0 ? (
           <li className="text-caption text-muted-foreground px-1">{t(K.pad.empty)}</li>
@@ -275,7 +275,10 @@ export function RxPadPanel({
         )}
       </ol>
       {pad.overflow > 0 ? (
-        <p data-testid={`${ID}-overflow`} className="text-caption text-warning">
+        <p
+          data-testid={`${ID}-overflow`}
+          className="text-caption text-tone-butter-foreground"
+        >
           {t(K.pad.overflow, { max: RX_PAD_LINES_MAX })}
         </p>
       ) : null}
@@ -312,7 +315,7 @@ export function RxPadPanel({
           <span
             data-slot="kbd"
             aria-hidden="true"
-            className="text-micro rounded-sm border border-current/25 px-1 font-mono opacity-75"
+            className="text-micro border-primary-foreground/25 text-primary-foreground/70 rounded-sm border px-1 font-mono"
           >
             {saveShortcutKeys().label}
           </span>

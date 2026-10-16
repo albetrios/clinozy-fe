@@ -92,12 +92,12 @@ export function RxRowAllergy({
       data-kept="false"
       data-emphasized={emphasized || undefined}
       className={cn(
-        'bg-destructive/8 border-destructive/30 text-destructive flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-md border px-2.5 py-1.5',
-        emphasized && 'ring-destructive/40 ring-[3px]',
+        'bg-destructive-tint border-destructive-border text-destructive flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-md border px-2.5 py-1.5',
+        emphasized && 'ring-destructive/40 ring-2',
       )}
     >
       <TriangleAlert aria-hidden="true" className="size-3.5 flex-none" />
-      <p className="text-detail min-w-48 flex-1">
+      <p className="text-detail min-w-45 flex-1">
         <span className="font-semibold">{match.medicineName}</span>
         {' — '}
         {t(K.rowAllergy.warning, isolateValues({ allergies }))}
@@ -114,7 +114,7 @@ export function RxRowAllergy({
             )}
             onClick={onRemove}
             data-testid={`${ID}-remove`}
-            className="border-destructive/40 text-destructive hover:bg-destructive-tint hover:text-destructive h-7 px-2.5 shadow-none pointer-coarse:h-9"
+            className="rx-small-action border-destructive-border text-destructive hover:bg-destructive-tint hover:text-destructive h-7 px-2.5 shadow-none"
           >
             {t(K.rowAllergy.remove)}
           </Button>
@@ -129,7 +129,7 @@ export function RxRowAllergy({
             )}
             onClick={() => onKeep(true)}
             data-testid={`${ID}-keep`}
-            className="h-7 px-2.5 shadow-none pointer-coarse:h-9"
+            className="rx-small-action h-7 px-2.5 shadow-none"
           >
             {t(K.rowAllergy.keep)}
           </Button>

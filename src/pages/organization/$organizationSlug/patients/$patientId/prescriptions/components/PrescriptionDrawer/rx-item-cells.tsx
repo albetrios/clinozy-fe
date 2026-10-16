@@ -54,14 +54,15 @@ const TRAY_CLASS =
 /**
  * A segment: 24px (44px high, 36px wide on touch), 12px digits and words, lit
  * in its tone and raised. Its focus ring is the theme's (`data-focus` on any
- * slot), lifted over its neighbours.
+ * slot), lifted over its neighbours. The sizes are `rx-segment`'s, in
+ * `prescription-drawer.css` (fix-prescription-css-budget D4).
  */
 const SEGMENT_CLASS =
-  'relative inline-flex h-6 min-w-6 flex-none touch-manipulation items-center justify-center rounded-sm px-1.5 text-xs whitespace-nowrap tabular-nums transition-[background-color,color,box-shadow] duration-150 outline-none focus-visible:z-10 focus-visible:outline-hidden disabled:pointer-events-none motion-reduce:transition-none pointer-coarse:h-11 pointer-coarse:min-w-9 pointer-coarse:px-2.5 pointer-coarse:text-sm';
+  'rx-segment relative inline-flex h-6 flex-none items-center justify-center rounded-sm px-1.5 text-xs whitespace-nowrap tabular-nums transition-[background-color,color,box-shadow] duration-150 outline-none focus-visible:z-10 focus-visible:outline-hidden disabled:pointer-events-none';
 
 /** An unlit segment: quiet ink, a hint of the lit surface on hover. */
 const SEGMENT_OFF_CLASS =
-  'text-muted-foreground-strong hover:bg-background/70 hover:text-foreground disabled:text-disabled';
+  'rx-segment-off text-muted-foreground-strong hover:text-foreground';
 
 /**
  * A tray's small-caps name, before it on the line under the medicine (or in
@@ -134,7 +135,10 @@ function Segment({
   return (
     <>
       {item.split ? (
-        <span aria-hidden="true" className="bg-border mx-0.5 h-3.5 w-px flex-none" />
+        <span
+          aria-hidden="true"
+          className="rx-segment-split bg-border h-3.5 w-px flex-none"
+        />
       ) : null}
       <button
         type="button"
@@ -393,10 +397,10 @@ export function RxDaysTray({
             data-slot="segment"
             className={cn(
               SEGMENT_CLASS,
-              'placeholder:text-muted-foreground w-10 px-0.5 text-center pointer-coarse:w-14 pointer-coarse:px-1',
+              'rx-days-other placeholder:text-muted-foreground w-10 px-0.5 text-center',
               other
                 ? cn(TONE_CLASSES.sky.surface, 'font-semibold shadow-xs')
-                : 'bg-background/60 text-foreground',
+                : 'rx-days-other-idle text-foreground',
             )}
           />
         </>
@@ -572,7 +576,7 @@ function NoteField({
         readOnly={readOnly}
         onChange={(event) => onNote(event.target.value)}
         data-testid={testId}
-        className="text-detail h-8 pointer-coarse:h-11"
+        className="rx-note-input text-detail h-8"
       />
     </div>
   );
@@ -617,7 +621,7 @@ function MoreSegment({
           className={cn(
             SEGMENT_CLASS,
             // It gives way first: its words shorten so the tray keeps one row.
-            'max-w-24 min-w-6 flex-initial gap-1',
+            'rx-more flex-initial gap-1',
             hidden.length > 0
               ? cn(TONE_CLASSES.lav.surface, 'font-semibold shadow-xs')
               : SEGMENT_OFF_CLASS,
@@ -730,7 +734,7 @@ export function RxNoteLine({ note, testId }: { note: string; testId: string }) {
     <p
       data-testid={testId}
       // Under the medicine's name, past the line's number.
-      className="text-caption text-muted-foreground flex min-w-0 items-center gap-1.5 ps-7 pointer-coarse:ps-8"
+      className="rx-note-line text-caption text-muted-foreground flex min-w-0 items-center gap-1.5"
     >
       <MessageSquare aria-hidden="true" className="size-3.5 flex-none" />
       <span className="sr-only">{t(K.items.remarks)}: </span>
