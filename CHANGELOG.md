@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.16.0](https://github.com/albetrios/clinozy-fe/compare/v1.15.0...v1.16.0) (2026-10-16)
+
+
+### Added
+
+* **motion:** a payment received is a moment, and the app moves as one ([#89](https://github.com/albetrios/clinozy-fe/issues/89)) ([8944617](https://github.com/albetrios/clinozy-fe/commit/89446178fff77dc465e61002af6a5050fbbbf509))
+* **prescriptions:** a faster prescription composer — one numbered line per medicine ([#88](https://github.com/albetrios/clinozy-fe/issues/88)) ([dc1af3a](https://github.com/albetrios/clinozy-fe/commit/dc1af3a44457ae016ee4e598fbdea49ca50978ae))
+
+
+### Fixed
+
+* **appointments:** say why a new contact's mobile is refused ([#85](https://github.com/albetrios/clinozy-fe/issues/85)) ([85c3459](https://github.com/albetrios/clinozy-fe/commit/85c345996b906b7914b33f2930b641e0a9054ddf))
+* **appointments:** say why the time grid is empty instead of showing nothing ([#86](https://github.com/albetrios/clinozy-fe/issues/86)) ([4a7937e](https://github.com/albetrios/clinozy-fe/commit/4a7937ea1403a013318dfc0543348c4cb026deb3))
+* **setup:** show a retry when the clinic setup cannot load ([#87](https://github.com/albetrios/clinozy-fe/issues/87)) ([70bf731](https://github.com/albetrios/clinozy-fe/commit/70bf731d9de3645e24748879e60a988aa35c4711))
+
 ## [1.15.0](https://github.com/albetrios/clinozy-fe/compare/v1.14.0...v1.15.0) (2026-10-15)
 
 
