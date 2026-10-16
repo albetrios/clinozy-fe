@@ -1,17 +1,16 @@
 {
   "drawer": {
     "title": "Configura {{clinic}}",
-    "sub": "Cerca de un minuto · Paso {{step}} de {{total}}",
+    "sub": "Cerca de un minuto · Pregunta {{step}} de {{total}}",
     "progressLabel": "Progreso de la configuración",
-    "stepAnnounce": "Paso {{step}} de {{total}}",
+    "stepAnnounce": "Pregunta {{step}} de {{total}}",
     "exploreFirst": "Explorar primero",
-    "next": "Siguiente: {{step}}",
+    "next": "Siguiente",
+    "back": "Atrás",
     "goLive": "Poner en marcha",
     "goingLive": "Poniendo en marcha…",
     "saving": "Guardando…",
     "notSaved": "No guardado · tus cambios se conservan",
-    "lockedHint": "Después de «{{step}}»",
-    "lockedToast": "Primero completa «{{step}}»",
     "saveFailed": "No se pudo guardar este paso. Tus respuestas se conservan — inténtalo de nuevo.",
     "loadFailed": "No se pudo cargar la configuración de tu clínica."
   },
@@ -24,8 +23,6 @@
       "required": "Elige al menos una especialidad."
     },
     "location": {
-      "title": "¿Dónde está tu clínica?",
-      "why": "Las reservas y las facturas necesitan un lugar.",
       "pin": "Código postal",
       "area": "Zona",
       "city": "Ciudad",
@@ -34,18 +31,23 @@
       "phone": "Teléfono",
       "email": "Correo",
       "branchName": "Nombre de la sucursal",
-      "hours": "Abre {{days}} · {{opens}}–{{closes}}",
-      "change": "Cambiar",
-      "done": "Listo",
-      "days": "Días laborables",
-      "opens": "Abre",
-      "closes": "Cierra",
-      "closesAfterOpens": "La hora de cierre debe ser posterior a la de apertura.",
       "requiredField": "El campo {{field}} es obligatorio.",
       "pinInvalid": "Introduce el código postal de seis dígitos.",
       "emailInvalid": "Introduce un correo válido.",
-      "phoneInvalid": "Introduce un número de teléfono válido.",
-      "mainExists": "Tu clínica ya tiene una sucursal principal — la configuración la usará."
+      "phoneInvalid": "Introduce un número de teléfono válido."
+    },
+    "pin": {
+      "title": "¿Cuál es el código postal de tu clínica?",
+      "why": "Con él completamos la zona, la ciudad y el estado."
+    },
+    "address": {
+      "title": "¿Cuál es la dirección?",
+      "why": "Aparece en tus facturas y mensajes.",
+      "edit": "Editar"
+    },
+    "phone": {
+      "title": "¿Cuál es el teléfono de la clínica?",
+      "why": "Los pacientes llaman a este número y aparece en tus facturas."
     },
     "you": {
       "title": "¿Tú también atiendes pacientes?",
@@ -58,12 +60,6 @@
       "required": "Elige una opción."
     }
   },
-  "peek": {
-    "specialties": "Especialidades",
-    "branch": "Sucursal",
-    "hours": "Horario",
-    "seesPatients": "Atiende pacientes"
-  },
   "checks": {
     "clinic_type": "el tipo de clínica",
     "main_branch": "dónde está",
@@ -75,6 +71,9 @@
     "sub": "{{clinic}} ya puede reservar y facturar.",
     "setUp": "Configuramos:",
     "branch": "Sucursal {{branch}}",
+    "branchDetails": "Abre {{hours}} · {{email}}",
+    "branchHours": "Abre {{hours}}",
+    "change": "Cambiar",
     "consultation": "{{name}} {{price}}",
     "youAsDoctor": "tú como médico",
     "youAsTherapist": "tú como terapeuta",

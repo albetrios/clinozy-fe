@@ -6,10 +6,40 @@ import {
 import type { SetupHashStep } from './setup-hash-grammar.ts';
 
 /** The drawer's three steps, in order — their hash names (KICKOFF §4). */
-export const SETUP_DRAWER_STEPS = ['clinic-type', 'location', 'you'] as const;
+const SETUP_DRAWER_STEPS = ['clinic-type', 'location', 'you'] as const;
 
 /** One of {@link SETUP_DRAWER_STEPS}. */
 export type SetupDrawerStep = (typeof SETUP_DRAWER_STEPS)[number];
+
+/**
+ * The questions the drawer asks, one per screen, in order (change-setup-one-question D1): step 1
+ * is the clinic type, step 2 three questions — the PIN, the street address, the phone — and step 3
+ * whether the owner sees patients. Only the steps have an address; a location question lives in the
+ * drawer until the phone creates the branch (D6).
+ */
+const SETUP_QUESTIONS = ['clinic-type', 'pin', 'address', 'phone', 'you'] as const;
+
+/** One of {@link SETUP_QUESTIONS}. */
+export type SetupQuestion = (typeof SETUP_QUESTIONS)[number];
+
+/** Step 2's questions, in order. */
+export const LOCATION_QUESTIONS = ['pin', 'address', 'phone'] as const;
+
+/** One of {@link LOCATION_QUESTIONS}. */
+export type LocationQuestion = (typeof LOCATION_QUESTIONS)[number];
+
+/** The question the drawer shows for a step — step 2's own question while it is open. */
+export function questionOf(
+  step: SetupDrawerStep,
+  locationQuestion: LocationQuestion,
+): SetupQuestion {
+  return step === 'location' ? locationQuestion : step;
+}
+
+/** "Question n of 5": the question's place, from one. */
+export function questionNumber(question: SetupQuestion): number {
+  return SETUP_QUESTIONS.indexOf(question) + 1;
+}
 
 /** A step's done flag as {@link setupStepsDone} names it. */
 const DONE_KEY = {

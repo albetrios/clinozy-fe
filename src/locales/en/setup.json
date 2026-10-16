@@ -1,17 +1,16 @@
 {
   "drawer": {
     "title": "Set up {{clinic}}",
-    "sub": "About a minute · Step {{step}} of {{total}}",
+    "sub": "About a minute · Question {{step}} of {{total}}",
     "progressLabel": "Setup progress",
-    "stepAnnounce": "Step {{step}} of {{total}}",
+    "stepAnnounce": "Question {{step}} of {{total}}",
     "exploreFirst": "Explore first",
-    "next": "Next: {{step}}",
+    "next": "Next",
+    "back": "Back",
     "goLive": "Go live",
     "goingLive": "Going live…",
     "saving": "Saving…",
     "notSaved": "Not saved · your changes are kept",
-    "lockedHint": "After “{{step}}”",
-    "lockedToast": "Finish “{{step}}” first",
     "saveFailed": "Couldn't save this step. Your answers are kept — try again.",
     "loadFailed": "Couldn't load your clinic's setup."
   },
@@ -24,8 +23,6 @@
       "required": "Pick at least one specialty."
     },
     "location": {
-      "title": "Where is your clinic?",
-      "why": "Bookings and bills need a place.",
       "pin": "PIN code",
       "area": "Area",
       "city": "City",
@@ -34,18 +31,23 @@
       "phone": "Phone",
       "email": "Email",
       "branchName": "Branch name",
-      "hours": "Open {{days}} · {{opens}}–{{closes}}",
-      "change": "Change",
-      "done": "Done",
-      "days": "Working days",
-      "opens": "Opens",
-      "closes": "Closes",
-      "closesAfterOpens": "Closing time must be after opening time.",
       "requiredField": "{{field}} is required.",
       "pinInvalid": "Enter the six-digit PIN code.",
       "emailInvalid": "Enter a valid email.",
-      "phoneInvalid": "Enter a valid phone number.",
-      "mainExists": "Your clinic already has a main branch — setup uses it."
+      "phoneInvalid": "Enter a valid phone number."
+    },
+    "pin": {
+      "title": "What's your clinic's PIN code?",
+      "why": "We fill in the area, city and state from it."
+    },
+    "address": {
+      "title": "What's the street address?",
+      "why": "Your bills and messages show it.",
+      "edit": "Edit"
+    },
+    "phone": {
+      "title": "What's the clinic's phone number?",
+      "why": "Patients call it, and your bills show it."
     },
     "you": {
       "title": "Do you see patients yourself?",
@@ -58,12 +60,6 @@
       "required": "Pick one."
     }
   },
-  "peek": {
-    "specialties": "Specialties",
-    "branch": "Branch",
-    "hours": "Hours",
-    "seesPatients": "Sees patients"
-  },
   "checks": {
     "clinic_type": "what kind of clinic",
     "main_branch": "where it is",
@@ -75,6 +71,9 @@
     "sub": "{{clinic}} can book and bill now.",
     "setUp": "We set up:",
     "branch": "{{branch}} branch",
+    "branchDetails": "Open {{hours}} · {{email}}",
+    "branchHours": "Open {{hours}}",
+    "change": "Change",
     "consultation": "{{name}} {{price}}",
     "youAsDoctor": "you as doctor",
     "youAsTherapist": "you as therapist",

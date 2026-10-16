@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
+import { appBranch } from '@/tests/utils/branch-doubles.ts';
+
 import {
+  branchInputOf,
   initialLocationForm,
   locationBranchInput,
+  locationBranchUpdate,
+  locationFormFromBranch,
   type LocationFormValues,
   locationProblems,
+  locationQuestionProblems,
   SETUP_BRANCH_HOURS,
 } from './setup-location-form.ts';
 
@@ -105,13 +111,66 @@ describe('locationProblems', () => {
     expect(locationProblems(filled({ phone: '+91 98250-44120' })).phone).toBeUndefined();
   });
 
-  it('refuses hours that close at or before they open', () => {
-    expect(
-      locationProblems(filled({ opensAt: '10:00', closesAt: '10:00' })).closesAt,
-    ).toBe('hours');
-    expect(
-      locationProblems(filled({ opensAt: '18:00', closesAt: '09:00' })).closesAt,
-    ).toBe('hours');
+  it('does not check the hours — setup never asks them', () => {
+    expect(locationProblems(filled({ opensAt: '18:00', closesAt: '09:00' }))).toEqual({});
+  });
+});
+
+describe('locationQuestionProblems', () => {
+  it('names only the open question’s own fields', () => {
+    const empty = filled({ pin: '', addressLine: '', area: '', phone: '' });
+    expect(locationQuestionProblems(empty, 'pin')).toEqual({ pin: 'required' });
+    expect(locationQuestionProblems(empty, 'address')).toEqual({
+      addressLine: 'required',
+      area: 'required',
+    });
+    expect(locationQuestionProblems(empty, 'phone')).toEqual({ phone: 'required' });
+  });
+
+  it('names the defaults the phone saves with it — the branch name and the email', () => {
+    expect(locationQuestionProblems(filled({ name: ' ', email: 'x' }), 'phone')).toEqual({
+      name: 'required',
+      email: 'email',
+    });
+  });
+});
+
+describe('locationFormFromBranch', () => {
+  it('reads a saved branch back into the answers, the phone as its ten digits', () => {
+    const branch = appBranch({ isMain: true });
+    expect(locationFormFromBranch(branch)).toEqual({
+      pin: '395007',
+      area: 'Vesu',
+      city: 'Surat',
+      state: 'Gujarat',
+      addressLine: '12, Ocean Arcade',
+      phone: '9876543210',
+      email: 'vesu@clinic.com',
+      name: 'Vesu',
+      workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+      opensAt: '10:00',
+      closesAt: '19:00',
+    });
+  });
+});
+
+describe('locationBranchUpdate', () => {
+  it('lays the place and the phone over the saved branch, keeping the rest', () => {
+    const branch = appBranch({
+      isMain: true,
+      defaultDoctorId: 'mem_doctoraaaaaaaaaaaaaaa',
+    });
+    const input = locationBranchUpdate(branch, {
+      ...locationFormFromBranch(branch),
+      addressLine: '7 Ring Road',
+      phone: '9123456780',
+      name: 'Ignored',
+    });
+    expect(input).toEqual({
+      ...branchInputOf(branch),
+      addressLine1: '7 Ring Road',
+      phone: '+919123456780',
+    });
   });
 });
 

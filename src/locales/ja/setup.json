@@ -1,17 +1,16 @@
 {
   "drawer": {
     "title": "{{clinic}}を設定",
-    "sub": "約1分 · ステップ {{step}}/{{total}}",
+    "sub": "約1分 · 質問 {{step}}/{{total}}",
     "progressLabel": "設定の進捗",
-    "stepAnnounce": "ステップ {{step}}/{{total}}",
+    "stepAnnounce": "質問 {{step}}/{{total}}",
     "exploreFirst": "先に見てみる",
-    "next": "次へ：{{step}}",
+    "next": "次へ",
+    "back": "戻る",
     "goLive": "利用を開始",
     "goingLive": "開始しています…",
     "saving": "保存しています…",
     "notSaved": "未保存 · 変更は保持されています",
-    "lockedHint": "「{{step}}」の後",
-    "lockedToast": "先に「{{step}}」を完了してください",
     "saveFailed": "このステップを保存できませんでした。回答は保持されています。もう一度お試しください。",
     "loadFailed": "クリニックの初期設定を読み込めませんでした。"
   },
@@ -24,8 +23,6 @@
       "required": "診療科を1つ以上選択してください。"
     },
     "location": {
-      "title": "クリニックはどこにありますか？",
-      "why": "予約と請求には所在地が必要です。",
       "pin": "郵便番号",
       "area": "エリア",
       "city": "市区町村",
@@ -34,18 +31,23 @@
       "phone": "電話",
       "email": "メール",
       "branchName": "拠点名",
-      "hours": "営業 {{days}} · {{opens}}–{{closes}}",
-      "change": "変更",
-      "done": "完了",
-      "days": "営業日",
-      "opens": "開店",
-      "closes": "閉店",
-      "closesAfterOpens": "閉店時刻は開店時刻より後にしてください。",
       "requiredField": "{{field}}は必須です。",
       "pinInvalid": "6桁の郵便番号を入力してください。",
       "emailInvalid": "有効なメールアドレスを入力してください。",
-      "phoneInvalid": "有効な電話番号を入力してください。",
-      "mainExists": "クリニックにはすでに本院があります。設定ではそちらを使います。"
+      "phoneInvalid": "有効な電話番号を入力してください。"
+    },
+    "pin": {
+      "title": "クリニックの郵便番号は？",
+      "why": "地域・市区・州を自動で入力します。"
+    },
+    "address": {
+      "title": "番地・通りの住所は？",
+      "why": "請求書とメッセージに表示されます。",
+      "edit": "編集"
+    },
+    "phone": {
+      "title": "クリニックの電話番号は？",
+      "why": "患者さんからの電話を受け、請求書にも表示されます。"
     },
     "you": {
       "title": "ご自身も患者を診ますか？",
@@ -58,12 +60,6 @@
       "required": "1つ選択してください。"
     }
   },
-  "peek": {
-    "specialties": "診療科",
-    "branch": "拠点",
-    "hours": "営業時間",
-    "seesPatients": "本人の診察"
-  },
   "checks": {
     "clinic_type": "クリニックの種類",
     "main_branch": "所在地",
@@ -75,6 +71,9 @@
     "sub": "{{clinic}}で予約と請求ができるようになりました。",
     "setUp": "設定した内容：",
     "branch": "拠点：{{branch}}",
+    "branchDetails": "営業 {{hours}} · {{email}}",
+    "branchHours": "営業 {{hours}}",
+    "change": "変更",
     "consultation": "{{name}} {{price}}",
     "youAsDoctor": "あなた（医師）",
     "youAsTherapist": "あなた（セラピスト）",

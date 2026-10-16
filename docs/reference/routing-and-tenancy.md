@@ -299,6 +299,8 @@ default room reopens the same step, and Back leaves the room as it was.
 ```text
 #setup                → the first unanswered step, or the guide once the clinic is live
 #setup/clinic-type    → step 1 · #setup/location → step 2 · #setup/you → step 3
+                         (five questions, one per screen: step 2 holds the PIN, the street
+                         address and the phone — change-setup-one-question D6)
 #setup/live           → "You're live" (after "Go live") · #setup/guide → the three-item guide
 ```
 
@@ -312,6 +314,9 @@ default room reopens the same step, and Back leaves the room as it was.
   the hash is cleared once access is resolved.
 - **Canonical** — a step not yet unlocked (the steps unlock in order, D14) or a place that does
   not fit the setup's state is rewritten with `replace`, never a new history entry.
+- **Between its own steps** — Next and Back move the address with `ignoreBlocker`: the steps
+  drawer holds the answers not saved yet, so moving between steps discards nothing and never asks
+  "Discard changes?"; closing the drawer still does (change-setup-one-question D6).
 - **Opens by itself** once per clinic, after the boot splash, while the clinic is neither live
   nor deferred and nothing else is open; closing it ("Explore first") stores the deferral on the
   server, so it never opens by itself again (D5).

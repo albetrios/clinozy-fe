@@ -3,7 +3,6 @@ import { type SubmitEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { branchQueryKeys } from '@/shared/api/app/branches-api.ts';
-import type { AppBranch, BranchInput } from '@/shared/api/app/branches-contracts.ts';
 import { fetchBranches, saveBranch } from '@/shared/api/app/branches-manage-api.ts';
 import { offeringQueryKeys } from '@/shared/api/app/offerings-api.ts';
 import {
@@ -26,6 +25,7 @@ import { fetchMeContext, meContextQueryKey } from '@/shared/tenancy/me-context.t
 import { runGoLive } from './go-live.ts';
 import { setupEvents } from './setup-analytics.ts';
 import { SETUP_KEYS, SETUP_NS } from './setup-drawer.constants.ts';
+import { branchInputOf } from './setup-location-form.ts';
 import type { SetupStepProps } from './setup-step-props.ts';
 import { useConsultationName } from './use-consultation-name.ts';
 
@@ -34,41 +34,18 @@ const K = SETUP_KEYS.steps.you;
 /** The step's answer: the owner sees patients as a doctor, as a therapist, or not at all. */
 export type SetupYouAnswer = 'doctor' | 'therapist' | 'no';
 
-/** A branch as an edit sends it back — every field as read, defaults included. */
-function branchInputOf(branch: AppBranch): BranchInput {
-  return {
-    name: branch.name,
-    tone: branch.tone,
-    active: branch.active,
-    addressLine1: branch.addressLine1,
-    addressLine2: branch.addressLine2,
-    area: branch.area,
-    city: branch.city,
-    state: branch.state,
-    pin: branch.pin,
-    phone: branch.phone,
-    email: branch.email,
-    gstNumber: branch.gstNumber,
-    reviewLink: branch.reviewLink,
-    workingDays: branch.workingDays,
-    opensAt: branch.opensAt,
-    closesAt: branch.closesAt,
-    defaultDoctorId: branch.defaultDoctorId,
-    defaultDeskId: branch.defaultDeskId,
-    defaultTherapistId: branch.defaultTherapistId,
-    defaultPharmacistId: branch.defaultPharmacistId,
-  };
-}
-
 /**
  * Step 3, "Do you see patients yourself?" and "Go live" (KICKOFF §6.1; BRIEF.md:65–76): Yes adds
  * Doctor or Therapist to the owner as an **extra** role (Owner stays main, D15) with the main
  * branch's days and hours as theirs (D16), and makes them the branch's default doctor or therapist;
  * then the answer is saved and the clinic goes live — the Consultations first, then the server's
- * complete. A refusal names what is missing and opens that step.
+ * complete. A tap on an answer goes live (change-setup-one-question D7); the footer's "Go live" does
+ * the same from the keyboard, and again after a refusal, which names what is missing and opens
+ * that step.
  */
 export function SetupYouStep({
   formId,
+  titleId,
   setup,
   profile,
   onDirtyChange,
@@ -161,16 +138,12 @@ export function SetupYouStep({
     ],
   });
 
-  const submit = async (event: SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Answered before (a go-live that was refused): going live again needs no new answer.
-    if (answer === null && !answeredBefore) {
-      setError(t(K.required));
-      return;
-    }
+  /** Goes live with this answer — `null` only when it was saved before (a refused go-live). */
+  const goLiveWith = async (chosen: SetupYouAnswer | null) => {
+    if (goLive.isPending) return;
     onSaveState('saving');
     try {
-      const result = await goLive.mutateAsync(answer);
+      const result = await goLive.mutateAsync(chosen);
       queryClient.setQueryData(
         onboardingSetupQueryKeys.detail(organizationId),
         result.setup,
@@ -196,15 +169,25 @@ export function SetupYouStep({
     }
   };
 
+  const submit = async (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Answered before (a go-live that was refused): going live again needs no new answer.
+    if (answer === null && !answeredBefore) {
+      setError(t(K.required));
+      return;
+    }
+    await goLiveWith(answer);
+  };
+
   return (
-    <form id={formId} onSubmit={submit} noValidate className="flex flex-col gap-3">
-      <p className="text-muted-foreground text-detail">{t(K.why)}</p>
-      <DrawerField
-        label={t(K.label)}
-        hint={answer === 'no' ? t(K.noHint) : undefined}
-        required={!answeredBefore}
-        error={error ?? undefined}
-      >
+    <form
+      id={formId}
+      onSubmit={submit}
+      noValidate
+      aria-labelledby={titleId}
+      className="flex flex-col gap-3"
+    >
+      <DrawerField error={error ?? undefined}>
         <DrawerChips<SetupYouAnswer>
           variant="button"
           label={t(K.label)}
@@ -217,9 +200,14 @@ export function SetupYouStep({
           onChange={(next) => {
             setAnswer(next);
             setError(null);
+            // A tap is the answer: the clinic goes live at once (D7).
+            if (next !== null) void goLiveWith(next);
           }}
           testId="setup-you"
         />
+        {answer === 'no' ? (
+          <p className="text-muted-foreground text-xs">{t(K.noHint)}</p>
+        ) : null}
       </DrawerField>
     </form>
   );

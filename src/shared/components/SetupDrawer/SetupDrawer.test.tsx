@@ -2,12 +2,14 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import type * as BranchesManageApiModule from '@/shared/api/app/branches-manage-api.ts';
 import type { ClinicProfile } from '@/shared/api/app/clinic-api.ts';
 import type { OnboardingSetup } from '@/shared/api/app/onboarding-setup-contracts.ts';
 import type * as AppRolesModule from '@/shared/hooks/useAppRoles/index.ts';
-import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { appBranch } from '@/tests/utils/branch-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 const state = vi.hoisted(() => ({
@@ -18,6 +20,18 @@ const state = vi.hoisted(() => ({
   changeMutate: vi.fn(),
   changeMutateAsync: vi.fn(),
   updateProfileMutateAsync: vi.fn(),
+  fetchBranches: vi.fn(),
+  openBranches: [] as BranchOption[],
+}));
+vi.mock('@/shared/hooks/useBranches/index.ts', () => ({
+  useBranches: () => ({
+    openBranches: state.openBranches,
+    isMultiBranch: state.openBranches.length > 1,
+  }),
+}));
+vi.mock('@/shared/api/app/branches-manage-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof BranchesManageApiModule>()),
+  fetchBranches: state.fetchBranches,
 }));
 vi.mock('@/shared/hooks/useOnboardingSetup/index.ts', () => ({
   useOnboardingSetup: () => ({
@@ -133,6 +147,9 @@ const LIVE: Partial<OnboardingSetup> = {
   completedByMembershipId: 'mem_owneraaaaaaaaaaaaaaaa',
 };
 
+/** The main branch setup made — read back when Back returns to its questions. */
+const MAIN_BRANCH = appBranch({ id: 'brn_mainaaaaaaaaaaaaaaaaa', isMain: true });
+
 function renderAt(hash: string) {
   return renderWithProviders(<SetupDrawer />, { initialEntries: [`/#${hash}`] });
 }
@@ -146,10 +163,12 @@ beforeEach(() => {
   state.setupRefetch.mockResolvedValue({});
   state.changeMutateAsync.mockResolvedValue(setupOf());
   state.updateProfileMutateAsync.mockResolvedValue(PROFILE);
+  state.fetchBranches.mockResolvedValue([MAIN_BRANCH]);
+  state.openBranches = [];
 });
 
-describe('SetupDrawer — the three steps', () => {
-  it('opens the first step, names the clinic and counts the steps, later steps locked', async () => {
+describe('SetupDrawer — one question at a time', () => {
+  it('opens the first question alone, names the clinic and counts the questions', async () => {
     const { router } = renderAt('setup');
 
     await waitFor(() => expect(router.state.location.hash).toBe('setup/clinic-type'));
@@ -157,34 +176,21 @@ describe('SetupDrawer — the three steps', () => {
     expect(within(drawer).getByTestId('setup-drawer-title')).toHaveTextContent(
       'Set up Acme Skin Clinic',
     );
-    expect(within(drawer).getByText('About a minute · Step 1 of 3')).toBeInTheDocument();
-    expect(screen.getByTestId('setup-drawer-step-announce')).toHaveTextContent(
-      'Step 1 of 3',
-    );
-
     expect(
-      screen.getByTestId('setup-drawer-step-clinic-type-trigger'),
-    ).not.toHaveAttribute('aria-disabled');
-    for (const step of ['location', 'you']) {
-      expect(screen.getByTestId(`setup-drawer-step-${step}-trigger`)).toHaveAttribute(
-        'aria-disabled',
-        'true',
-      );
-    }
-    expect(screen.getByTestId('setup-drawer-step-location')).toHaveTextContent(
-      'After “What kind of clinic is it?”',
+      within(drawer).getByText('About a minute · Question 1 of 5'),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('setup-drawer-step-announce')).toHaveTextContent(
+      'Question 1 of 5',
     );
-    expect(screen.getByTestId('setup-drawer-save')).toHaveTextContent(
-      'Next: Where is your clinic?',
+    expect(screen.getByTestId('setup-question-title')).toHaveTextContent(
+      'What kind of clinic is it?',
     );
+    // One question: no step cards, nothing of the questions after it.
+    expect(screen.queryByTestId('setup-drawer-step-location')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('setup-question-pin')).not.toBeInTheDocument();
+    expect(screen.getByTestId('setup-drawer-save')).toHaveTextContent('Next');
+    expect(screen.queryByTestId('setup-drawer-back')).not.toBeInTheDocument();
     expect(await axeForDialog(drawer)).toHaveNoViolations();
-  });
-
-  it('says what to finish first when a locked step is pressed', async () => {
-    renderAt('setup/clinic-type');
-    const user = userEvent.setup();
-    await user.click(await screen.findByTestId('setup-drawer-step-you-trigger'));
-    expect(notify.info).toHaveBeenCalledWith('Finish “Where is your clinic?” first');
   });
 
   it('moves a locked step’s address to the first open step', async () => {
@@ -192,21 +198,63 @@ describe('SetupDrawer — the three steps', () => {
     await waitFor(() => expect(router.state.location.hash).toBe('setup/clinic-type'));
   });
 
-  it('counts step 3 of 3 on the last step, which goes live', async () => {
+  it('asks the PIN second, and Back keeps what was typed', async () => {
+    state.setup = setupOf({
+      answeredSteps: ['clinic_type'],
+      liveChecks: { clinic_type: true, main_branch: false, services: false },
+      nextStep: 'location',
+    });
+    const { router } = renderAt('setup');
+    const user = userEvent.setup();
+
+    await waitFor(() => expect(router.state.location.hash).toBe('setup/location'));
+    expect(
+      await screen.findByText('About a minute · Question 2 of 5'),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('setup-question-title')).toHaveTextContent(
+      "What's your clinic's PIN code?",
+    );
+    await user.type(screen.getByTestId('setup-question-pin-input'), '3950');
+
+    await user.click(screen.getByTestId('setup-drawer-back'));
+    await waitFor(() => expect(router.state.location.hash).toBe('setup/clinic-type'));
+    expect(
+      await screen.findByText('About a minute · Question 1 of 5'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('setup-drawer-save'));
+    await waitFor(() => expect(router.state.location.hash).toBe('setup/location'));
+    expect(await screen.findByTestId('setup-question-pin-input')).toHaveValue('3950');
+  });
+
+  it('counts question 5 of 5 on the last, which goes live; Back shows the saved phone', async () => {
     state.setup = setupOf({
       answeredSteps: ['clinic_type'],
       liveChecks: { clinic_type: true, main_branch: true, services: false },
-      mainBranchId: 'brn_mainaaaaaaaaaaaaaaaaa',
+      mainBranchId: MAIN_BRANCH.id,
       nextStep: 'you',
     });
     const { router } = renderAt('setup');
+    const user = userEvent.setup();
 
     await waitFor(() => expect(router.state.location.hash).toBe('setup/you'));
-    expect(await screen.findByText('About a minute · Step 3 of 3')).toBeInTheDocument();
+    expect(
+      await screen.findByText('About a minute · Question 5 of 5'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('setup-drawer-save')).toHaveTextContent('Go live');
-    expect(screen.getByTestId('setup-drawer-step-clinic-type')).toHaveAttribute(
-      'data-status',
-      'done',
+
+    await user.click(screen.getByTestId('setup-drawer-back'));
+    await waitFor(() => expect(router.state.location.hash).toBe('setup/location'));
+    expect(
+      await screen.findByText('About a minute · Question 4 of 5'),
+    ).toBeInTheDocument();
+    // The main branch made already is read back into its questions.
+    await waitFor(() =>
+      expect(
+        (
+          screen.getByTestId('setup-question-phone-input') as HTMLInputElement
+        ).value.replaceAll(/\D/g, ''),
+      ).toBe('9876543210'),
     );
   });
 
@@ -318,6 +366,35 @@ describe('SetupDrawer — once live', () => {
     ).toBeInTheDocument();
     expect(screen.getByTestId('setup-live-book')).toHaveTextContent(
       'Book your first appointment',
+    );
+  });
+
+  it('shows the main branch’s hours and email, which setup did not ask, with Change', async () => {
+    state.setup = setupOf({ ...LIVE, mainBranchId: MAIN_BRANCH.id });
+    state.openBranches = [
+      {
+        id: MAIN_BRANCH.id,
+        name: MAIN_BRANCH.name,
+        tone: MAIN_BRANCH.tone,
+        isMain: true,
+        opensAt: MAIN_BRANCH.opensAt,
+        closesAt: MAIN_BRANCH.closesAt,
+        workingDays: MAIN_BRANCH.workingDays,
+        reviewLink: null,
+      },
+    ];
+    renderAt('setup/live');
+
+    const line = await screen.findByTestId('setup-live-branch');
+    expect(line).toHaveTextContent('Vesu branch');
+    await waitFor(() =>
+      expect(line).toHaveTextContent(
+        'Open mon, tue, wed, thu, fri, sat · 10:00–19:00 · vesu@clinic.com',
+      ),
+    );
+    expect(screen.getByTestId('setup-live-branch-change')).toHaveAttribute(
+      'href',
+      `/organization/acme/branches/${MAIN_BRANCH.id}/edit`,
     );
   });
 

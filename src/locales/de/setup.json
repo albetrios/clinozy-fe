@@ -1,17 +1,16 @@
 {
   "drawer": {
     "title": "{{clinic}} einrichten",
-    "sub": "Etwa eine Minute · Schritt {{step}} von {{total}}",
+    "sub": "Etwa eine Minute · Frage {{step}} von {{total}}",
     "progressLabel": "Einrichtungsfortschritt",
-    "stepAnnounce": "Schritt {{step}} von {{total}}",
+    "stepAnnounce": "Frage {{step}} von {{total}}",
     "exploreFirst": "Erst umsehen",
-    "next": "Weiter: {{step}}",
+    "next": "Weiter",
+    "back": "Zurück",
     "goLive": "Live schalten",
     "goingLive": "Wird live geschaltet…",
     "saving": "Wird gespeichert…",
     "notSaved": "Nicht gespeichert · Ihre Änderungen bleiben erhalten",
-    "lockedHint": "Nach „{{step}}“",
-    "lockedToast": "Schließen Sie zuerst „{{step}}“ ab",
     "saveFailed": "Dieser Schritt konnte nicht gespeichert werden. Ihre Antworten bleiben erhalten — versuchen Sie es erneut.",
     "loadFailed": "Die Einrichtung Ihrer Klinik konnte nicht geladen werden."
   },
@@ -24,8 +23,6 @@
       "required": "Wählen Sie mindestens eine Fachrichtung."
     },
     "location": {
-      "title": "Wo ist Ihre Klinik?",
-      "why": "Buchungen und Rechnungen brauchen einen Ort.",
       "pin": "PLZ",
       "area": "Gebiet",
       "city": "Stadt",
@@ -34,18 +31,23 @@
       "phone": "Telefon",
       "email": "E-Mail",
       "branchName": "Name der Filiale",
-      "hours": "Geöffnet {{days}} · {{opens}}–{{closes}}",
-      "change": "Ändern",
-      "done": "Fertig",
-      "days": "Arbeitstage",
-      "opens": "Öffnet",
-      "closes": "Schließt",
-      "closesAfterOpens": "Die Schließzeit muss nach der Öffnungszeit liegen.",
       "requiredField": "{{field}} ist erforderlich.",
       "pinInvalid": "Geben Sie die sechsstellige PLZ ein.",
       "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
-      "phoneInvalid": "Geben Sie eine gültige Telefonnummer ein.",
-      "mainExists": "Ihre Klinik hat bereits eine Hauptfiliale — die Einrichtung verwendet sie."
+      "phoneInvalid": "Geben Sie eine gültige Telefonnummer ein."
+    },
+    "pin": {
+      "title": "Wie lautet die PLZ Ihrer Klinik?",
+      "why": "Daraus füllen wir Gebiet, Stadt und Bundesland aus."
+    },
+    "address": {
+      "title": "Wie lautet die Straße und Hausnummer?",
+      "why": "Sie steht auf Ihren Rechnungen und Nachrichten.",
+      "edit": "Bearbeiten"
+    },
+    "phone": {
+      "title": "Wie lautet die Telefonnummer der Klinik?",
+      "why": "Patienten rufen sie an, und sie steht auf Ihren Rechnungen."
     },
     "you": {
       "title": "Behandeln Sie selbst Patienten?",
@@ -58,12 +60,6 @@
       "required": "Wählen Sie eine Option."
     }
   },
-  "peek": {
-    "specialties": "Fachrichtungen",
-    "branch": "Filiale",
-    "hours": "Öffnungszeiten",
-    "seesPatients": "Behandelt Patienten"
-  },
   "checks": {
     "clinic_type": "die Art der Klinik",
     "main_branch": "der Standort",
@@ -75,6 +71,9 @@
     "sub": "{{clinic}} kann jetzt buchen und abrechnen.",
     "setUp": "Wir haben eingerichtet:",
     "branch": "Filiale {{branch}}",
+    "branchDetails": "Geöffnet {{hours}} · {{email}}",
+    "branchHours": "Geöffnet {{hours}}",
+    "change": "Ändern",
     "consultation": "{{name}} {{price}}",
     "youAsDoctor": "Sie als Arzt",
     "youAsTherapist": "Sie als Therapeut",

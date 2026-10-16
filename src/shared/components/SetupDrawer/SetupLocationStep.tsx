@@ -1,52 +1,49 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { type SubmitEvent, useEffect, useState } from 'react';
-import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
+import { type ReactNode, type SubmitEvent, useEffect, useState } from 'react';
+import { Controller, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { type Weekday, WEEKDAY_VALUES } from '@/shared/api/app/app-schema.ts';
 import { branchQueryKeys } from '@/shared/api/app/branches-api.ts';
 import { BRANCH_LIMITS } from '@/shared/api/app/branches-contracts.ts';
-import { saveBranch } from '@/shared/api/app/branches-manage-api.ts';
+import { fetchBranches, saveBranch } from '@/shared/api/app/branches-manage-api.ts';
 import {
   fetchOnboardingSetup,
   onboardingSetupQueryKeys,
 } from '@/shared/api/app/onboarding-setup-api.ts';
+import { PIN_CODE_PATTERN } from '@/shared/app/pin-directory/index.ts';
 import {
-  DrawerChips,
   DrawerField,
   DrawerFieldGrid,
   DrawerInput,
   DrawerPhoneInput,
 } from '@/shared/components/DrawerField/index.ts';
-import { nextTimeSlot, TimePicker } from '@/shared/components/Picker/TimePicker/index.ts';
-import {
-  PIN_PLACE_KEYS,
-  PIN_PLACE_NS,
-  PinAreaChips,
-} from '@/shared/components/PinAreaChips/index.ts';
+import { PinAreaChips } from '@/shared/components/PinAreaChips/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
-import { useHoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 import { usePinPlace } from '@/shared/hooks/usePinPlace/index.ts';
-import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { MapPin } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { setupEvents } from './setup-analytics.ts';
 import { SETUP_KEYS, SETUP_NS } from './setup-drawer.constants.ts';
 import {
-  initialLocationForm,
+  LOCATION_QUESTION_FIELDS,
   locationBranchInput,
+  locationBranchUpdate,
   type LocationField,
   type LocationFormValues,
   type LocationProblem,
-  locationProblems,
+  locationQuestionProblems,
 } from './setup-location-form.ts';
+import { LOCATION_QUESTIONS, type LocationQuestion } from './setup-place.ts';
 import type { SetupStepProps } from './setup-step-props.ts';
 
 const K = SETUP_KEYS.steps.location;
 
-/** The most areas offered as chips under the PIN; the field stays editable either way. */
+/** The problems of the open question, by field. */
+type Problems = Partial<Record<LocationField, LocationProblem>>;
 
 /** The error line for a problem, naming the field when it is required. */
 function useProblemText() {
@@ -61,170 +58,254 @@ function useProblemText() {
         return t(K.emailInvalid);
       case 'phone':
         return t(K.phoneInvalid);
-      case 'hours':
-        return t(K.closesAfterOpens);
       default:
         return undefined;
     }
   };
 }
 
-/**
- * The hours on one line — "Open Mon–Sat · 10:00–20:00 · Change" — and, opened, the branch's days
- * and times (KICKOFF §6.1; F18).
- */
-function LocationHours({
-  form,
-  values,
-  open,
-  onOpenChange,
-  closesError,
-}: {
+/** Props of {@link SetupLocationStep}: a step's, plus the question it shows and its answers. */
+export interface SetupLocationStepProps extends SetupStepProps {
+  /** Step 2's answers, held by the drawer so Back never loses one. */
   form: UseFormReturn<LocationFormValues>;
-  values: LocationFormValues;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  closesError: string | undefined;
-}) {
-  const { t } = useTranslation(SETUP_NS);
-  const hours = useHoursFormat();
-  return (
-    <>
-      <div className="flex min-w-0 items-center gap-2" data-testid="setup-location-hours">
-        <span className="text-detail text-foreground min-w-0 truncate">
-          {t(K.hours, {
-            days: hours.days(values.workingDays),
-            opens: values.opensAt,
-            closes: values.closesAt,
-          })}
-        </span>
-        <Button
-          type="button"
-          variant="link"
-          size="sm"
-          className="h-auto px-0"
-          aria-expanded={open}
-          data-testid="setup-location-hours-change"
-          onClick={() => onOpenChange(!open)}
-        >
-          {open ? t(K.done) : t(K.change)}
-        </Button>
-      </div>
-      {open ? (
-        <DrawerFieldGrid>
-          <DrawerField label={t(K.days)}>
-            <DrawerChips<Weekday>
-              multiple
-              label={t(K.days)}
-              options={WEEKDAY_VALUES.map((day) => ({
-                value: day,
-                label: hours.weekday(day),
-              }))}
-              value={values.workingDays}
-              onChange={(days) =>
-                form.setValue('workingDays', days, { shouldDirty: true })
-              }
-              testId="setup-location-days"
-            />
-          </DrawerField>
-          <DrawerField span="half" label={t(K.opens)}>
-            <TimePicker
-              value={values.opensAt}
-              label={t(K.opens)}
-              onChange={(time) => {
-                form.setValue('opensAt', time, { shouldDirty: true });
-                if (form.getValues('closesAt') <= time) {
-                  form.setValue('closesAt', nextTimeSlot(time), { shouldDirty: true });
-                }
-              }}
-              testId="setup-location-opens"
-            />
-          </DrawerField>
-          <DrawerField span="half" label={t(K.closes)} error={closesError}>
-            <TimePicker
-              value={values.closesAt}
-              label={t(K.closes)}
-              from={nextTimeSlot(values.opensAt)}
-              onChange={(time) => form.setValue('closesAt', time, { shouldDirty: true })}
-              invalid={closesError !== undefined}
-              testId="setup-location-closes"
-            />
-          </DrawerField>
-        </DrawerFieldGrid>
-      ) : null}
-    </>
-  );
+  /** The open question: the PIN, the street address or the phone. */
+  question: LocationQuestion;
+  onQuestionChange: (question: LocationQuestion) => void;
 }
 
-/** The PIN: digits only, six at most; the sixth looks the place up (D27). */
-function PinInput({
+/** "What's your clinic's PIN code?" — digits only; the sixth looks the place up and moves on (D7). */
+function PinQuestion({
   form,
-  invalid,
+  titleId,
+  error,
   onPin,
 }: {
   form: UseFormReturn<LocationFormValues>;
-  invalid: boolean;
-  onPin: (pin: string) => Promise<void>;
+  titleId: string;
+  error: string | undefined;
+  onPin: (pin: string) => void;
 }) {
   return (
-    <Controller
-      control={form.control}
-      name="pin"
-      render={({ field }) => (
-        <DrawerInput
-          id="setup-pin"
-          ref={field.ref}
-          name={field.name}
-          value={field.value}
-          onBlur={field.onBlur}
-          inputMode="numeric"
-          autoComplete="postal-code"
-          capitalize={false}
-          maxLength={BRANCH_LIMITS.pin}
-          aria-invalid={invalid}
-          data-testid="setup-location-pin"
-          onChange={(event) => {
-            const pin = event.currentTarget.value.replaceAll(/\D/g, '').slice(0, 6);
-            field.onChange(pin);
-            void onPin(pin);
-          }}
-        />
-      )}
-    />
+    <DrawerField htmlFor="setup-pin" error={error}>
+      <Controller
+        control={form.control}
+        name="pin"
+        render={({ field }) => (
+          <DrawerInput
+            id="setup-pin"
+            ref={field.ref}
+            name={field.name}
+            value={field.value}
+            onBlur={field.onBlur}
+            inputMode="numeric"
+            autoComplete="postal-code"
+            capitalize={false}
+            maxLength={BRANCH_LIMITS.pin}
+            aria-labelledby={titleId}
+            aria-invalid={error !== undefined}
+            className="text-base tracking-[0.2em] tabular-nums"
+            data-setup-autofocus
+            data-testid="setup-question-pin-input"
+            onChange={(event) => {
+              const pin = event.currentTarget.value.replaceAll(/\D/g, '').slice(0, 6);
+              field.onChange(pin);
+              onPin(pin);
+            }}
+          />
+        )}
+      />
+    </DrawerField>
   );
 }
 
 /**
- * Step 2, "Where is your clinic?" (KICKOFF §6.1; BRIEF.md:59–64): the PIN fills area, city and
- * state from the bundled directory (every field stays editable; an unknown PIN fills nothing and
- * blocks nothing), then the address, phone, email and branch name — the clinic's name. The hours
- * are one line; "Change" opens the days and times. "Next" creates the branch with the owner on its
- * team — the clinic's first branch becomes its main branch (RC-4). A main branch made meanwhile
- * (another admin, the Branches room) counts: the step reads the setup again first and creates none.
+ * "What's the street address?" — the line, and under it the place the PIN filled ("Adajan · Surat ·
+ * Gujarat · Edit"); area, city and state as fields when the PIN is unknown, when one is missing, or
+ * on Edit. A PIN with several areas offers them as chips.
+ */
+function AddressQuestion({
+  form,
+  titleId,
+  problems,
+}: {
+  form: UseFormReturn<LocationFormValues>;
+  titleId: string;
+  problems: Problems;
+}) {
+  const { t } = useTranslation(SETUP_NS);
+  const problemText = useProblemText();
+  const values = useFormValues(form);
+  const { place, lookUp } = usePinPlace();
+  const [editing, setEditing] = useState(false);
+
+  // The place the PIN names, looked up again for its area chips — the answers themselves are kept.
+  useEffect(() => {
+    const pin = form.getValues('pin');
+    if (PIN_CODE_PATTERN.test(pin)) void lookUp(pin);
+  }, [form, lookUp]);
+
+  const showFields =
+    editing ||
+    place === null ||
+    !values.city.trim() ||
+    problems.area !== undefined ||
+    problems.city !== undefined;
+  const placeLine = [values.area, values.city, values.state]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(' · ');
+
+  const placeField = (
+    field: 'area' | 'city' | 'state',
+    label: string,
+    maxLength: number,
+  ) => (
+    <DrawerField
+      label={label}
+      htmlFor={`setup-${field}`}
+      required={field !== 'state'}
+      error={field === 'state' ? undefined : problemText(problems[field], label)}
+      span={field === 'state' ? 'full' : 'half'}
+    >
+      <DrawerInput
+        id={`setup-${field}`}
+        capitalize
+        maxLength={maxLength}
+        aria-invalid={field === 'state' ? undefined : problems[field] !== undefined}
+        data-testid={`setup-location-${field}`}
+        {...form.register(field)}
+      />
+    </DrawerField>
+  );
+
+  return (
+    <div className="flex flex-col gap-3">
+      <DrawerField
+        htmlFor="setup-address"
+        error={problemText(problems.addressLine, t(K.address))}
+      >
+        <DrawerInput
+          id="setup-address"
+          capitalize
+          maxLength={BRANCH_LIMITS.address}
+          autoComplete="street-address"
+          aria-labelledby={titleId}
+          aria-invalid={problems.addressLine !== undefined}
+          className="text-base"
+          data-setup-autofocus
+          data-testid="setup-question-address-input"
+          {...form.register('addressLine')}
+        />
+      </DrawerField>
+      {showFields ? (
+        <DrawerFieldGrid>
+          {placeField('area', t(K.area), BRANCH_LIMITS.place)}
+          {placeField('city', t(K.city), BRANCH_LIMITS.place)}
+          {placeField('state', t(K.state), BRANCH_LIMITS.state)}
+        </DrawerFieldGrid>
+      ) : (
+        <div
+          className="flex min-w-0 items-center gap-2"
+          data-testid="setup-question-address-place"
+        >
+          <MapPin aria-hidden className="text-muted-foreground size-4 flex-none" />
+          <span className="text-detail text-foreground min-w-0 truncate">
+            {placeLine}
+          </span>
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className="h-auto px-0"
+            onClick={() => setEditing(true)}
+            data-testid="setup-question-address-edit"
+          >
+            {t(SETUP_KEYS.steps.address.edit)}
+          </Button>
+        </div>
+      )}
+      <PinAreaChips
+        place={place}
+        area={values.area}
+        onAreaChange={(area) => form.setValue('area', area, { shouldDirty: true })}
+        testId="setup-location"
+      />
+    </div>
+  );
+}
+
+/** "What's the clinic's phone number?" — +91 and ten digits; a default it does not show is named here. */
+function PhoneQuestion({
+  form,
+  titleId,
+  problems,
+}: {
+  form: UseFormReturn<LocationFormValues>;
+  titleId: string;
+  problems: Problems;
+}) {
+  const { t } = useTranslation(SETUP_NS);
+  const problemText = useProblemText();
+  // The branch name and the email are not asked (D2); one the server would refuse is said here.
+  const hidden =
+    problemText(problems.name, t(K.branchName)) ??
+    problemText(problems.email, t(K.email));
+  return (
+    <div className="flex flex-col gap-3">
+      <DrawerField htmlFor="setup-phone" error={problemText(problems.phone, t(K.phone))}>
+        <Controller
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <DrawerPhoneInput
+              id="setup-phone"
+              ref={field.ref}
+              name={field.name}
+              value={field.value}
+              onBlur={field.onBlur}
+              onChange={field.onChange}
+              aria-labelledby={titleId}
+              aria-invalid={problems.phone !== undefined}
+              data-setup-autofocus
+              data-testid="setup-question-phone-input"
+            />
+          )}
+        />
+      </DrawerField>
+      {hidden ? (
+        <p role="alert" className="text-destructive text-xs">
+          {hidden}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Step 2, "Where is your clinic?", as three questions (change-setup-one-question; KICKOFF §6): the
+ * PIN (its sixth digit fills area, city and state from the bundled directory and moves on — an
+ * unknown PIN fills nothing and blocks nothing), the street address, the phone. The phone's Next
+ * creates the branch — named after the clinic, with the owner's email and the default hours — with
+ * the owner on its team; the clinic's first branch becomes its main branch (RC-4). A main branch
+ * made meanwhile (another admin, the Branches room) counts: the step reads the setup again first and
+ * creates none — a change typed over one already made is saved to it.
  */
 export function SetupLocationStep({
   formId,
-  profile,
-  onDirtyChange,
+  titleId,
+  form,
+  question,
+  onQuestionChange,
   onSaveState,
   onSaved,
-}: SetupStepProps) {
+}: SetupLocationStepProps) {
   const { t } = useTranslation(SETUP_NS);
-  const { t: tPin } = useTranslation(PIN_PLACE_NS);
   const problemText = useProblemText();
-  const email = useAuthStore((state) => state.user?.email ?? '');
   const queryClient = useQueryClient();
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const form = useForm<LocationFormValues>({
-    defaultValues: initialLocationForm({ clinicName: profile.name, email }),
-  });
   const { isDirty } = useFormState({ control: form.control });
-  const [problems, setProblems] = useState<ReturnType<typeof locationProblems>>({});
-  const { place, lookUp, areaFor } = usePinPlace();
-  const [hoursOpen, setHoursOpen] = useState(false);
-  const values = useFormValues(form);
-
-  useEffect(() => onDirtyChange(isDirty), [isDirty, onDirtyChange]);
+  const { lookUp, areaFor } = usePinPlace();
+  const [problems, setProblems] = useState<Problems>({});
 
   /** The setup as it stands, written to the cache the drawer reads. */
   const readSetup = () =>
@@ -234,14 +315,27 @@ export function SetupLocationStep({
       staleTime: 0,
     });
 
-  const createBranch = useAppMutation({
-    mutationFn: async (input: LocationFormValues, action) => {
+  const saveLocation = useAppMutation({
+    mutationFn: async (
+      input: { values: LocationFormValues; changed: boolean },
+      action,
+    ) => {
       const current = await readSetup();
-      if (current.liveChecks.main_branch) return;
+      if (current.liveChecks.main_branch) {
+        // Made already — by this setup or elsewhere: what was typed over it goes to that branch.
+        if (!input.changed) return;
+        const main = (await fetchBranches()).find((branch) => branch.isMain);
+        if (!main) return;
+        await saveBranch({
+          save: { branch: main, input: locationBranchUpdate(main, input.values) },
+          idempotencyKey: action.idempotencyKey,
+        });
+        return;
+      }
       // No team named: clinozy-be puts the creator on it (D13) — never a membership id read from
       // a me/context cached before this workspace existed.
       await saveBranch({
-        save: { input: locationBranchInput(input) },
+        save: { input: locationBranchInput(input.values) },
         idempotencyKey: action.idempotencyKey,
       });
       // The drawer moves on only once the setup it reads knows the main branch — else it would
@@ -251,7 +345,8 @@ export function SetupLocationStep({
     invalidateKeys: [branchQueryKeys.all],
   });
 
-  const onPin = async (pin: string) => {
+  /** A known PIN fills city, state and — when it has one — the area. */
+  const fillFromPin = async (pin: string) => {
     const found = await lookUp(pin);
     if (!found) return;
     form.setValue('city', found.district, { shouldDirty: true });
@@ -260,19 +355,55 @@ export function SetupLocationStep({
     if (area !== undefined) form.setValue('area', area, { shouldDirty: true });
   };
 
+  /** The PIN as typed: its sixth digit fills the place and moves on (D7). */
+  const onPin = (pin: string) => {
+    setProblems({});
+    if (pin.length < BRANCH_LIMITS.pin) return;
+    if (!PIN_CODE_PATTERN.test(pin)) {
+      setProblems({ pin: 'pin' });
+      return;
+    }
+    void fillFromPin(pin).then(() => {
+      if (form.getValues('pin') === pin) onQuestionChange('address');
+    });
+  };
+
+  /** Next: this question's answer checked, then the next question — or, on the phone, the branch. */
   const submit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const found = locationProblems(form.getValues());
-    setProblems(found);
-    const first = Object.keys(found)[0];
-    if (first) {
-      if (first === 'closesAt') setHoursOpen(true);
-      else form.setFocus(first as LocationField);
+    const values = form.getValues();
+    // The first question up to this one with a gap: this one, or one before it a refresh cleared.
+    const asked = LOCATION_QUESTIONS.slice(0, LOCATION_QUESTIONS.indexOf(question) + 1);
+    const gap = asked.find(
+      (each) => Object.keys(locationQuestionProblems(values, each)).length > 0,
+    );
+    if (gap !== undefined && gap !== question) {
+      onQuestionChange(gap);
+      return;
+    }
+    if (gap !== undefined) {
+      const found = locationQuestionProblems(values, gap);
+      setProblems(found);
+      const first = LOCATION_QUESTION_FIELDS[gap].find(
+        (field) => found[field] !== undefined && field !== 'name' && field !== 'email',
+      );
+      if (first) form.setFocus(first);
+      return;
+    }
+    setProblems({});
+    if (question === 'pin') {
+      await fillFromPin(values.pin);
+      onQuestionChange('address');
+      return;
+    }
+    if (question === 'address') {
+      onQuestionChange('phone');
       return;
     }
     onSaveState('saving');
     try {
-      await createBranch.mutateAsync(form.getValues());
+      await saveLocation.mutateAsync({ values, changed: isDirty });
+      resetFormInPlace(form, form.getValues());
       setupEvents.stepCompleted('location');
       onSaveState('idle');
       onSaved();
@@ -281,105 +412,25 @@ export function SetupLocationStep({
     }
   };
 
-  const text = (
-    field: Exclude<LocationField, 'phone' | 'pin'> | 'state',
-    label: string,
-    extra: {
-      type?: string;
-      capitalize?: boolean;
-      maxLength: number;
-      autoComplete?: string;
-    },
-  ) => (
-    <DrawerField
-      label={label}
-      htmlFor={`setup-${field}`}
-      required={field !== 'state'}
-      error={field === 'state' ? undefined : problemText(problems[field], label)}
-      span={field === 'addressLine' || field === 'name' ? 'full' : 'half'}
-    >
-      <DrawerInput
-        id={`setup-${field}`}
-        type={extra.type ?? 'text'}
-        capitalize={extra.capitalize ?? true}
-        maxLength={extra.maxLength}
-        autoComplete={extra.autoComplete}
-        aria-invalid={field === 'state' ? undefined : problems[field] !== undefined}
-        data-testid={`setup-location-${field}`}
-        {...form.register(field)}
+  let body: ReactNode;
+  if (question === 'pin') {
+    body = (
+      <PinQuestion
+        form={form}
+        titleId={titleId}
+        error={problemText(problems.pin, t(K.pin))}
+        onPin={onPin}
       />
-    </DrawerField>
-  );
+    );
+  } else if (question === 'address') {
+    body = <AddressQuestion form={form} titleId={titleId} problems={problems} />;
+  } else {
+    body = <PhoneQuestion form={form} titleId={titleId} problems={problems} />;
+  }
 
   return (
     <form id={formId} onSubmit={submit} noValidate className="flex flex-col gap-3">
-      <p className="text-muted-foreground text-detail">{t(K.why)}</p>
-      <DrawerFieldGrid>
-        <DrawerField
-          label={t(K.pin)}
-          hint={tPin(PIN_PLACE_KEYS.hint)}
-          htmlFor="setup-pin"
-          required
-          error={problemText(problems.pin, t(K.pin))}
-          span="half"
-        >
-          <PinInput form={form} invalid={problems.pin !== undefined} onPin={onPin} />
-        </DrawerField>
-        {text('area', t(K.area), { maxLength: BRANCH_LIMITS.place })}
-        {text('city', t(K.city), { maxLength: BRANCH_LIMITS.place })}
-        {text('state', t(K.state), { maxLength: BRANCH_LIMITS.state })}
-      </DrawerFieldGrid>
-      <PinAreaChips
-        place={place}
-        area={values.area}
-        onAreaChange={(area) => form.setValue('area', area, { shouldDirty: true })}
-        testId="setup-location"
-      />
-      <DrawerFieldGrid>
-        {text('addressLine', t(K.address), {
-          maxLength: BRANCH_LIMITS.address,
-          autoComplete: 'street-address',
-        })}
-        <DrawerField
-          label={t(K.phone)}
-          htmlFor="setup-phone"
-          required
-          error={problemText(problems.phone, t(K.phone))}
-          span="half"
-        >
-          <Controller
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <DrawerPhoneInput
-                id="setup-phone"
-                ref={field.ref}
-                name={field.name}
-                value={field.value}
-                onBlur={field.onBlur}
-                onChange={field.onChange}
-                aria-invalid={problems.phone !== undefined}
-                data-testid="setup-location-phone"
-              />
-            )}
-          />
-        </DrawerField>
-        {text('email', t(K.email), {
-          type: 'email',
-          capitalize: false,
-          maxLength: BRANCH_LIMITS.email,
-          autoComplete: 'email',
-        })}
-        {text('name', t(K.branchName), { maxLength: BRANCH_LIMITS.name })}
-      </DrawerFieldGrid>
-
-      <LocationHours
-        form={form}
-        values={values}
-        open={hoursOpen}
-        onOpenChange={setHoursOpen}
-        closesError={problemText(problems.closesAt, t(K.closes))}
-      />
+      {body}
     </form>
   );
 }
