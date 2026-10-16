@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { ContactScope } from '@/shared/api/app/contacts-api.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { appPhoneProblem } from '@/shared/app/app-phone-field.ts';
 import {
   DrawerField,
   DrawerInput,
@@ -94,9 +95,10 @@ export function ContactQuickAdd({
       nameRef.current?.focus();
       return false;
     }
-    const message = requirePhone ? K.needMobile : K.mobileDigits;
-    if ((requirePhone || phone) && phone.length !== 10) {
-      notify.warning(t(message));
+    const problem = requirePhone || phone ? appPhoneProblem(phone) : null;
+    if (problem) {
+      const lengthMessage = requirePhone ? K.needMobile : K.mobileDigits;
+      notify.warning(t(problem === 'start' ? K.mobileStart : lengthMessage));
       phoneRef.current?.focus();
       return false;
     }
@@ -190,6 +192,7 @@ export function ContactQuickAdd({
             id={`${id}-mobile`}
             value={phone}
             onChange={setPhone}
+            aria-invalid={appPhoneProblem(phone) === 'start' || undefined}
             data-testid={IDS.quickAddMobile(testId)}
           />
         </DrawerField>

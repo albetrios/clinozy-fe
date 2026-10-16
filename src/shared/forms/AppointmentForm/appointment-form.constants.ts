@@ -42,6 +42,8 @@ export const APPOINTMENT_FORM_KEYS = {
     save: 'appointmentForm.who.save',
     addName: 'appointmentForm.who.addName',
     mobileDigits: 'appointmentForm.who.mobileDigits',
+    /** Ten digits, but not a first digit an Indian mobile has (6–9). */
+    mobileStart: 'appointmentForm.who.mobileStart',
   },
   links: {
     connected: 'appointmentForm.links.connected',

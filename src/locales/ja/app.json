@@ -918,7 +918,8 @@
       "back": "検索に戻る",
       "addName": "名前を入力してください",
       "needMobile": "10 桁の携帯番号を入力してください",
-      "mobileDigits": "携帯番号は10桁必要です"
+      "mobileDigits": "携帯番号は10桁必要です",
+      "mobileStart": "有効な携帯番号ではありません — インドの携帯番号は6、7、8、9のいずれかで始まります"
     },
     "patient": {
       "newPatient": "新しい患者",
@@ -1025,7 +1026,8 @@
       "mobileLabel": "携帯",
       "save": "保存",
       "addName": "名前を入力してください",
-      "mobileDigits": "携帯番号は10桁必要です"
+      "mobileDigits": "携帯番号は10桁必要です",
+      "mobileStart": "有効な携帯番号ではありません — インドの携帯番号は6、7、8、9のいずれかで始まります"
     },
     "links": {
       "connected": "関連リード",

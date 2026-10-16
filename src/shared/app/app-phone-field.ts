@@ -41,6 +41,19 @@ export const phoneDigitsOf = (phone: string | null): string =>
 export const storedPhoneOf = (digits: string): string | null =>
   digits ? toAppPhone(digits) : null;
 
+/**
+ * Why typed digits are not a mobile the clinic can store: `length` — not ten
+ * digits; `start` — ten digits, but no Indian mobile starts with that digit
+ * (only 6, 7, 8 and 9 do). `null` when they are one.
+ */
+export type AppPhoneProblem = 'length' | 'start';
+
+/** What is wrong with typed mobile digits, so the message can say which (`null` = a mobile). */
+export function appPhoneProblem(digits: string): AppPhoneProblem | null {
+  if (digits.length !== MOBILE_DIGITS) return 'length';
+  return toAppPhone(digits) === null ? 'start' : null;
+}
+
 /** Typed digits that are not a 10-digit Indian mobile ("Enter a 10-digit mobile"). */
 export const phoneIsInvalid = (digits: string): boolean =>
   digits !== '' && toAppPhone(digits) === null;
