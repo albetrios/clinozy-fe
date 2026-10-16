@@ -8,7 +8,7 @@
 | Opened | 2026-10-14 |
 | Branch | feat/motion-polish |
 | Baseline | none |
-| Status | done |
+| Status | frozen |
 | Summary | Motion that explains what changed: one gliding thumb on every segmented track, a gliding tone lens on the section bar, Today's counts that roll and its lane panel that follows the tile, refreshed lists that settle, and buttons, ticks and switches that answer a press — on two named curves, outside the first-paint CSS. |
 | Drop placed | 2026-10-14 |
 | Drop source | /tmp/claude-0/-home-user/5ec400cc-e59a-5276-a49e-a50ed4633cb6/scratchpad/brief/BRIEF.md |
@@ -23,3 +23,4 @@
 - 2026-10-14 · ready-for-approval → approved · — · Claude
 - 2026-10-14 · approved → implementing · — · Claude
 - 2026-10-14 · implementing → done · — · Claude
+- 2026-10-16 · done → frozen · — · Claude
