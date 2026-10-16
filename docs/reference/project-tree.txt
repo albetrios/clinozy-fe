@@ -41,16 +41,6 @@ clinozy-fe/
 │   │   ├── development.json
 │   │   ├── production.json
 │   │   └── README.md
-│   ├── pr-media/
-│   │   └── pr-85/
-│   │       ├── after-booked.png
-│   │       ├── after-corrected.png
-│   │       ├── after-error.png
-│   │       ├── after.gif
-│   │       ├── after.mp4
-│   │       ├── before-error.png
-│   │       ├── before.gif
-│   │       └── before.mp4
 │   ├── release-please/
 │   │   ├── config.json
 │   │   └── manifest.json
