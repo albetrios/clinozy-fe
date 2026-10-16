@@ -1,17 +1,16 @@
 {
   "drawer": {
     "title": "设置{{clinic}}",
-    "sub": "约一分钟 · 第 {{step}}/{{total}} 步",
+    "sub": "约一分钟 · 第 {{step}} 题，共 {{total}} 题",
     "progressLabel": "设置进度",
-    "stepAnnounce": "第 {{step}} 步，共 {{total}} 步",
+    "stepAnnounce": "第 {{step}} 题，共 {{total}} 题",
     "exploreFirst": "先看看",
-    "next": "下一步：{{step}}",
+    "next": "下一步",
+    "back": "返回",
     "goLive": "正式上线",
     "goingLive": "正在上线…",
     "saving": "正在保存…",
     "notSaved": "未保存 · 您的更改已保留",
-    "lockedHint": "完成“{{step}}”后",
-    "lockedToast": "请先完成“{{step}}”",
     "saveFailed": "无法保存此步骤。您的回答已保留——请重试。",
     "loadFailed": "无法加载诊所的初始设置。"
   },
@@ -24,8 +23,6 @@
       "required": "请至少选择一个专科。"
     },
     "location": {
-      "title": "您的诊所在哪里？",
-      "why": "预约和账单都需要一个地点。",
       "pin": "邮政编码",
       "area": "区域",
       "city": "城市",
@@ -34,18 +31,23 @@
       "phone": "电话",
       "email": "邮箱",
       "branchName": "分院名称",
-      "hours": "营业 {{days}} · {{opens}}–{{closes}}",
-      "change": "更改",
-      "done": "完成",
-      "days": "营业日",
-      "opens": "开门",
-      "closes": "关门",
-      "closesAfterOpens": "关门时间必须晚于开门时间。",
       "requiredField": "请填写{{field}}。",
       "pinInvalid": "请输入 6 位邮政编码。",
       "emailInvalid": "请输入有效的邮箱。",
-      "phoneInvalid": "请输入有效的电话号码。",
-      "mainExists": "您的诊所已有总院——设置将直接使用它。"
+      "phoneInvalid": "请输入有效的电话号码。"
+    },
+    "pin": {
+      "title": "诊所的邮政编码是多少？",
+      "why": "我们会据此填写地区、城市和邦。"
+    },
+    "address": {
+      "title": "街道地址是什么？",
+      "why": "会显示在您的账单和消息中。",
+      "edit": "编辑"
+    },
+    "phone": {
+      "title": "诊所的电话号码是多少？",
+      "why": "患者会拨打这个号码，它也会显示在您的账单上。"
     },
     "you": {
       "title": "您本人也接诊吗？",
@@ -58,12 +60,6 @@
       "required": "请选择一项。"
     }
   },
-  "peek": {
-    "specialties": "专科",
-    "branch": "分院",
-    "hours": "营业时间",
-    "seesPatients": "本人接诊"
-  },
   "checks": {
     "clinic_type": "诊所类型",
     "main_branch": "诊所地点",
@@ -75,6 +71,9 @@
     "sub": "{{clinic}}现在可以预约和开票了。",
     "setUp": "我们已为您设置：",
     "branch": "{{branch}}分院",
+    "branchDetails": "营业 {{hours}} · {{email}}",
+    "branchHours": "营业 {{hours}}",
+    "change": "更改",
     "consultation": "{{name}} {{price}}",
     "youAsDoctor": "您本人（医生）",
     "youAsTherapist": "您本人（治疗师）",

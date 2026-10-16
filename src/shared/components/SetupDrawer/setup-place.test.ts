@@ -7,6 +7,8 @@ import {
   drawerStepsDone,
   firstOpenStep,
   isStepUnlocked,
+  questionNumber,
+  questionOf,
 } from './setup-place.ts';
 
 /** A clinic's setup, answered up to `answered` steps (the main branch is step 2's record). */
@@ -119,5 +121,19 @@ describe('canonicalSetupPlace', () => {
     expect(canonicalSetupPlace(live, null)).toBe('guide');
     expect(canonicalSetupPlace(live, 'clinic-type')).toBe('guide');
     expect(canonicalSetupPlace(live, 'location')).toBe('guide');
+  });
+});
+
+describe('questionOf / questionNumber', () => {
+  it('shows step 2’s own question while it is open, the step itself otherwise', () => {
+    expect(questionOf('location', 'address')).toBe('address');
+    expect(questionOf('clinic-type', 'phone')).toBe('clinic-type');
+    expect(questionOf('you', 'pin')).toBe('you');
+  });
+
+  it('counts five questions — step 2 is the second, third and fourth', () => {
+    expect(
+      (['clinic-type', 'pin', 'address', 'phone', 'you'] as const).map(questionNumber),
+    ).toEqual([1, 2, 3, 4, 5]);
   });
 });

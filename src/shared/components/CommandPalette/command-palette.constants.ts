@@ -38,7 +38,7 @@ export const COMMAND_MENU_KEYS = {
     hint: 'commandMenu.prescribe.hint',
     empty: 'commandMenu.prescribe.empty',
   },
-  /** "Finish setup"'s sub — the setup's "n of 3" (feat-clinic-setup KICKOFF §3). */
+  /** "Finish setup"'s sub — the setup's "n of 5", the guide's "n of 3" once live (feat-clinic-setup KICKOFF §3; change-setup-one-question D8). */
   setupSub: 'commandMenu.setupSub',
   screen: 'commandMenu.screen',
   personSub: 'commandMenu.personSub',

@@ -124,12 +124,15 @@ export function SetupDrawer() {
   const canonical =
     setup && place !== undefined ? canonicalSetupPlace(setup, place) : null;
 
+  // Moving between the drawer's own steps discards nothing — the steps drawer holds the answers not
+  // saved yet (change-setup-one-question D6) — so it never asks "Discard changes?".
   const goTo = (step: SetupHashStep) =>
     void navigate({
       to: '.',
       hash: setupHash(step),
       search: (previous) => previous,
       replace: true,
+      ignoreBlocker: true,
     });
 
   useEffect(() => {

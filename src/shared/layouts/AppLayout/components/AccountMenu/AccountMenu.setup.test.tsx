@@ -17,7 +17,7 @@ import { AccountMenu } from './AccountMenu.tsx';
 
 /*
  * The clinic setup's additions to the Account menu (feat-clinic-setup D28): the avatar's progress
- * ring, "Finish setup · n of 3" and "Clinic settings" — read through the real setup hooks over a
+ * ring, "Finish setup · n of 5" and "Clinic settings" — read through the real setup hooks over a
  * mocked `GET /app/onboarding-setup`.
  */
 
@@ -124,22 +124,22 @@ beforeEach(() => {
 });
 
 describe('AccountMenu — the clinic setup', () => {
-  it('rings the avatar with the steps done and says so in its name', async () => {
+  it('rings the avatar with the questions answered and says so in its name', async () => {
     await renderMenu();
 
     expect(await screen.findByTestId('user-menu-setup-ring')).toBeInTheDocument();
     expect(screen.getByTestId('user-menu-trigger')).toHaveAccessibleName(
-      'Riya Shah · Online · Setup 1 of 3 done',
+      'Riya Shah · Online · Setup 1 of 5 done',
     );
   });
 
-  it('opens the drawer from “Finish setup · n of 3”', async () => {
+  it('opens the drawer from “Finish setup · n of 5”', async () => {
     const { router } = await renderMenu();
     await screen.findByTestId('user-menu-setup-ring');
     const { user, menu } = await openMenu();
 
     const row = within(menu).getByTestId('account-menu-finish-setup');
-    expect(row).toHaveTextContent('Finish setup · 1 of 3');
+    expect(row).toHaveTextContent('Finish setup · 1 of 5');
     await user.click(row);
 
     await waitFor(() => expect(router.state.location.hash).toBe('setup'));

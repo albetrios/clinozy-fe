@@ -193,7 +193,7 @@ export function wasLiveBeforeSetup(setup: OnboardingSetup): boolean {
 
 /**
  * Whether setup still asks for attention — the steps while not live, the guide after until it is
- * done, skipped or hidden: the avatar ring, "Finish setup · n of 3" and ⌘K "Finish setup" show
+ * done, skipped or hidden: the avatar ring, "Finish setup · n of 5" (the guide's "n of 3" once live) and ⌘K "Finish setup" show
  * while it does (BRIEF.md:82–115, 269–272). Never for a clinic live before setup shipped (D7).
  */
 export function isSetupUnfinished(setup: OnboardingSetup): boolean {
@@ -202,8 +202,15 @@ export function isSetupUnfinished(setup: OnboardingSetup): boolean {
   return setup.guideDoneAt === null && firstOpenGuideItem(setup) !== null;
 }
 
-/** The drawer's three steps (D26) — the count shown while the clinic is not live. */
-export const ONBOARDING_SETUP_STEP_COUNT = 3;
+/**
+ * The drawer's five questions (change-setup-one-question D8) — the count shown while the clinic is
+ * not live: the clinic type is one, the main branch three (PIN, street address, phone), the "you"
+ * answer one.
+ */
+export const SETUP_QUESTION_COUNT = 5;
+
+/** How many of the five questions each step stands for. */
+const QUESTIONS_PER_STEP = { clinic_type: 1, location: 3, you: 1 } as const;
 
 /** Whether each of the three steps is done: the answers, and the main branch read from records. */
 export function setupStepsDone(
@@ -217,13 +224,17 @@ export function setupStepsDone(
 }
 
 /**
- * "n of 3" — the steps done while not live, the guide's items done or skipped after
- * (BRIEF.md:85–88).
+ * "n of 5" — the questions answered while not live (a step counts its questions), the guide's items
+ * done or skipped after (BRIEF.md:85–88; change-setup-one-question D8).
  */
 export function setupProgress(setup: OnboardingSetup): { done: number; total: number } {
   if (setup.isLive) return { done: setup.guideDoneCount, total: setup.guideTotalCount };
-  const done = Object.values(setupStepsDone(setup)).filter(Boolean).length;
-  return { done, total: ONBOARDING_SETUP_STEP_COUNT };
+  const stepsDone = setupStepsDone(setup);
+  const done =
+    (stepsDone.clinic_type ? QUESTIONS_PER_STEP.clinic_type : 0) +
+    (stepsDone.location ? QUESTIONS_PER_STEP.location : 0) +
+    (stepsDone.you ? QUESTIONS_PER_STEP.you : 0);
+  return { done, total: SETUP_QUESTION_COUNT };
 }
 
 /** The 409 reason of going live while a live check fails (RF§2.A.9). */

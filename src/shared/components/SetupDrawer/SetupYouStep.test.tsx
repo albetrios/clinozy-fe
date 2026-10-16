@@ -133,7 +133,14 @@ const props = {
 async function renderStep(setup: OnboardingSetup = setupOf()) {
   const rendered = renderWithProviders(
     <>
-      <SetupYouStep formId="setup-form-you" setup={setup} profile={PROFILE} {...props} />
+      <h3 id="setup-question-title">Do you see patients yourself?</h3>
+      <SetupYouStep
+        formId="setup-form-you"
+        titleId="setup-question-title"
+        setup={setup}
+        profile={PROFILE}
+        {...props}
+      />
       <button type="submit" form="setup-form-you">
         Go live
       </button>
@@ -184,13 +191,12 @@ describe('SetupYouStep — "Do you see patients yourself?"', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('“Yes, as a doctor” adds Doctor to the owner with the main branch’s hours, makes them its default doctor, then goes live', async () => {
+  it('a tap on “Yes, as a doctor” adds Doctor to the owner with the main branch’s hours, makes them its default doctor, and goes live', async () => {
     await renderStep();
     const user = userEvent.setup();
 
     await user.click(screen.getByTestId('setup-you-doctor'));
     expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
-    await user.click(screen.getByRole('button', { name: 'Go live' }));
 
     await waitFor(() => expect(props.onSaved).toHaveBeenCalledTimes(1));
     expect(api.updateMember).toHaveBeenCalledWith({
@@ -222,12 +228,11 @@ describe('SetupYouStep — "Do you see patients yourself?"', () => {
     expect(props.onSaveState).toHaveBeenLastCalledWith('idle');
   });
 
-  it('“Yes, as a therapist” makes the owner the branch’s default therapist', async () => {
+  it('a tap on “Yes, as a therapist” makes the owner the branch’s default therapist', async () => {
     await renderStep();
     const user = userEvent.setup();
 
     await user.click(screen.getByTestId('setup-you-therapist'));
-    await user.click(screen.getByRole('button', { name: 'Go live' }));
 
     await waitFor(() => expect(props.onSaved).toHaveBeenCalledTimes(1));
     expect(api.updateMember).toHaveBeenCalledWith(
@@ -247,12 +252,11 @@ describe('SetupYouStep — "Do you see patients yourself?"', () => {
     );
   });
 
-  it('“No” goes live without touching the owner or the branch', async () => {
+  it('a tap on “No” goes live without touching the owner or the branch', async () => {
     await renderStep();
     const user = userEvent.setup();
 
     await user.click(screen.getByTestId('setup-you-no'));
-    await user.click(screen.getByRole('button', { name: 'Go live' }));
 
     await waitFor(() => expect(props.onSaved).toHaveBeenCalledTimes(1));
     expect(api.updateMember).not.toHaveBeenCalled();
@@ -266,7 +270,6 @@ describe('SetupYouStep — "Do you see patients yourself?"', () => {
     const user = userEvent.setup();
 
     await user.click(screen.getByTestId('setup-you-doctor'));
-    await user.click(screen.getByRole('button', { name: 'Go live' }));
 
     await waitFor(() => expect(props.onSaved).toHaveBeenCalledTimes(1));
     expect(api.reportError).toHaveBeenCalledWith(expect.any(Error), {
@@ -298,7 +301,6 @@ describe('SetupYouStep — "Do you see patients yourself?"', () => {
     const user = userEvent.setup();
 
     await user.click(screen.getByTestId('setup-you-no'));
-    await user.click(screen.getByRole('button', { name: 'Go live' }));
 
     await waitFor(() => expect(notify.error).toHaveBeenCalledTimes(1));
     expect(api.fetchOnboardingSetup).toHaveBeenCalledTimes(1);
@@ -309,13 +311,30 @@ describe('SetupYouStep — "Do you see patients yourself?"', () => {
     expect(props.onSaved).not.toHaveBeenCalled();
   });
 
+  it('goes live once for a second tap while the first is going live', async () => {
+    const going: { finish?: (value: unknown) => void } = {};
+    api.runGoLive.mockReturnValue(
+      new Promise((resolve) => {
+        going.finish = resolve;
+      }),
+    );
+    await renderStep();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByTestId('setup-you-doctor'));
+    await user.click(screen.getByRole('button', { name: 'Go live' }));
+    going.finish?.({ setup: LIVE, created: [], consultations: [] });
+
+    await waitFor(() => expect(props.onSaved).toHaveBeenCalledTimes(1));
+    expect(api.runGoLive).toHaveBeenCalledTimes(1);
+  });
+
   it('says the save failed on any other refusal', async () => {
     api.runGoLive.mockRejectedValue(new Error('offline'));
     await renderStep();
     const user = userEvent.setup();
 
     await user.click(screen.getByTestId('setup-you-no'));
-    await user.click(screen.getByRole('button', { name: 'Go live' }));
 
     await waitFor(() => expect(notify.error).toHaveBeenCalledTimes(1));
     expect(api.fetchOnboardingSetup).not.toHaveBeenCalled();

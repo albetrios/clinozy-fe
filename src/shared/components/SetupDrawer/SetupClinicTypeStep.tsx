@@ -27,10 +27,11 @@ function sameSpecialties(
 /**
  * Step 1, "What kind of clinic is it?" (KICKOFF §6.1; BRIEF.md:58): the six specialty chips, pick
  * any, at least one; "Next" saves the clinic's specialties (only when they changed), then the
- * answered step.
+ * answered step. The drawer shows the question and why it is asked (change-setup-one-question).
  */
 export function SetupClinicTypeStep({
   formId,
+  titleId,
   profile,
   onDirtyChange,
   onSaveState,
@@ -65,14 +66,15 @@ export function SetupClinicTypeStep({
   };
 
   return (
-    <form id={formId} onSubmit={submit} noValidate className="flex flex-col gap-3">
-      <p className="text-muted-foreground text-detail">{t(K.why)}</p>
-      <DrawerField
-        label={t(K.label)}
-        hint={t(K.hint)}
-        required
-        error={error ?? undefined}
-      >
+    <form
+      id={formId}
+      onSubmit={submit}
+      noValidate
+      aria-labelledby={titleId}
+      className="flex flex-col gap-3"
+    >
+      <DrawerField error={error ?? undefined}>
+        <p className="text-muted-foreground text-xs">{t(K.hint)}</p>
         <DrawerChips<OfferingSpecialty>
           multiple
           ordered

@@ -1,17 +1,16 @@
 {
   "drawer": {
     "title": "{{clinic}} 설정하기",
-    "sub": "약 1분 · {{total}}단계 중 {{step}}단계",
+    "sub": "약 1분 · 질문 {{step}}/{{total}}",
     "progressLabel": "설정 진행률",
-    "stepAnnounce": "{{total}}단계 중 {{step}}단계",
+    "stepAnnounce": "질문 {{step}}/{{total}}",
     "exploreFirst": "먼저 둘러보기",
-    "next": "다음: {{step}}",
+    "next": "다음",
+    "back": "뒤로",
     "goLive": "운영 시작",
     "goingLive": "운영 시작 중…",
     "saving": "저장 중…",
     "notSaved": "저장되지 않음 · 변경 사항은 유지됩니다",
-    "lockedHint": "‘{{step}}’ 다음",
-    "lockedToast": "먼저 ‘{{step}}’ 단계를 완료하세요",
     "saveFailed": "이 단계를 저장하지 못했습니다. 답변은 유지됩니다 — 다시 시도하세요.",
     "loadFailed": "클리닉 초기 설정을 불러오지 못했습니다."
   },
@@ -24,8 +23,6 @@
       "required": "진료 분야를 하나 이상 선택하세요."
     },
     "location": {
-      "title": "클리닉은 어디에 있나요?",
-      "why": "예약과 청구에는 장소가 필요합니다.",
       "pin": "우편번호",
       "area": "지역",
       "city": "도시",
@@ -34,18 +31,23 @@
       "phone": "전화",
       "email": "이메일",
       "branchName": "지점 이름",
-      "hours": "영업 {{days}} · {{opens}}–{{closes}}",
-      "change": "변경",
-      "done": "완료",
-      "days": "영업일",
-      "opens": "여는 시간",
-      "closes": "닫는 시간",
-      "closesAfterOpens": "닫는 시간은 여는 시간보다 늦어야 합니다.",
       "requiredField": "{{field}} 항목은 필수입니다.",
       "pinInvalid": "6자리 우편번호를 입력하세요.",
       "emailInvalid": "올바른 이메일을 입력하세요.",
-      "phoneInvalid": "올바른 전화번호를 입력하세요.",
-      "mainExists": "클리닉에 이미 본점이 있습니다 — 설정에서 이 본점을 사용합니다."
+      "phoneInvalid": "올바른 전화번호를 입력하세요."
+    },
+    "pin": {
+      "title": "클리닉의 우편번호는 무엇인가요?",
+      "why": "지역, 도시, 주를 자동으로 채워 드려요."
+    },
+    "address": {
+      "title": "도로명 주소는 무엇인가요?",
+      "why": "청구서와 메시지에 표시돼요.",
+      "edit": "편집"
+    },
+    "phone": {
+      "title": "클리닉 전화번호는 무엇인가요?",
+      "why": "환자가 이 번호로 전화하고, 청구서에도 표시돼요."
     },
     "you": {
       "title": "직접 환자를 진료하시나요?",
@@ -58,12 +60,6 @@
       "required": "하나를 선택하세요."
     }
   },
-  "peek": {
-    "specialties": "진료 분야",
-    "branch": "지점",
-    "hours": "영업시간",
-    "seesPatients": "직접 진료"
-  },
   "checks": {
     "clinic_type": "클리닉 유형",
     "main_branch": "위치",
@@ -75,6 +71,9 @@
     "sub": "이제 {{clinic}}에서 예약과 청구를 할 수 있습니다.",
     "setUp": "설정한 항목:",
     "branch": "{{branch}} 지점",
+    "branchDetails": "영업 {{hours}} · {{email}}",
+    "branchHours": "영업 {{hours}}",
+    "change": "변경",
     "consultation": "{{name}} {{price}}",
     "youAsDoctor": "회원님(의사)",
     "youAsTherapist": "회원님(치료사)",

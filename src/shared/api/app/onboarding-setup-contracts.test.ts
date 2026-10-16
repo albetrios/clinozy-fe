@@ -244,8 +244,12 @@ describe('setupStepsDone', () => {
 });
 
 describe('setupProgress', () => {
-  it('counts the steps done of three while not live', () => {
-    expect(setupProgress(setupOf())).toEqual({ done: 0, total: 3 });
+  it('counts the questions answered of five while not live — the main branch is three', () => {
+    expect(setupProgress(setupOf())).toEqual({ done: 0, total: 5 });
+    expect(setupProgress(setupOf({ answeredSteps: ['clinic_type'] }))).toEqual({
+      done: 1,
+      total: 5,
+    });
     expect(
       setupProgress(
         setupOf({
@@ -253,7 +257,7 @@ describe('setupProgress', () => {
           liveChecks: { clinic_type: true, main_branch: true, services: false },
         }),
       ),
-    ).toEqual({ done: 2, total: 3 });
+    ).toEqual({ done: 4, total: 5 });
   });
 
   it('counts the guide’s items done or skipped once live', () => {

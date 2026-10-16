@@ -363,7 +363,7 @@ function AppearancePills() {
   );
 }
 
-/** The setup's "n of 3" while it still asks for attention, else null (BRIEF.md:85–88). */
+/** The setup's "n of 5" (the guide's "n of 3" once live) while it still asks for attention, else null (BRIEF.md:85–88). */
 function useSetupCount(): { done: number; total: number } | null {
   const { data } = useOnboardingSetup();
   const unfinished = useSetupUnfinished();
@@ -371,7 +371,7 @@ function useSetupCount(): { done: number; total: number } | null {
 }
 
 /**
- * The clinic setup's rows (feat-clinic-setup KICKOFF §3; BRIEF.md:82–92): "Finish setup · n of 3"
+ * The clinic setup's rows (feat-clinic-setup KICKOFF §3; BRIEF.md:82–92): "Finish setup · n of 5"
  * while setup is unfinished (it opens the drawer — the steps while not live, the guide after), and
  * "Clinic settings" for a manager of a team clinic, always.
  */
@@ -491,7 +491,7 @@ function PlatformRows({ onOpenNotifications }: { onOpenNotifications: () => void
 
 /**
  * The avatar's name for assistive tech: who and their status, then any pending invitations and
- * the clinic setup's "n of 3" — each only when there is one.
+ * the clinic setup's "n of 5" — each only when there is one.
  */
 function triggerLabel({
   t,
@@ -537,7 +537,7 @@ export function AccountMenu({
   // Pending invitations to other clinics (D84): a count on the avatar, so they are seen without
   // opening the menu; "Switch clinic" lists them.
   const invitationCount = useMyInvitations().data?.length ?? 0;
-  // The clinic setup's ring and its "n of 3" (feat-clinic-setup D28), managers only.
+  // The clinic setup's ring and its "n of 5" (feat-clinic-setup D28), managers only.
   const setupCount = useSetupCount();
   const [open, setOpen] = useState(false);
   // The inbox opens as this menu closes; the menu must not hand focus back to

@@ -6,6 +6,8 @@ import type { DrawerSaveState } from '@/shared/components/DrawerFooter/DrawerFoo
 export interface SetupStepProps {
   /** The step's `<form>` id — the footer's primary submits it. */
   formId: string;
+  /** The open question's title — the id that labels the step's answer (change-setup-one-question D1). */
+  titleId: string;
   setup: OnboardingSetup;
   profile: ClinicProfile;
   /** The step has unsaved edits — every exit asks "Discard changes?" while it does. */

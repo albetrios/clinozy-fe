@@ -413,8 +413,11 @@ See grep in `src/` or sections above for: `onboarding-*`, `accept-invite-*`, `or
 | `widget-error`                 | A section's contained throw — the dashed card (`WidgetErrorBoundary/`)     |
 | `offline-indicator`            | The offline notice pill (root-mounted)                                     |
 
-The clinic setup drawer's controls are `setup-drawer-*` (the steps: `setup-drawer-step-<step>`,
-`setup-specialty-<value>`, `setup-location-<field>`, `setup-you-<answer>`), `setup-live-*`,
+The clinic setup drawer's controls are `setup-drawer-*` (`setup-drawer-back`; one question per
+screen: `setup-question-<question>` with its `setup-question-title`, `setup-specialty-<value>`,
+`setup-question-pin-input`, `setup-question-address-input` / `-place` / `-edit`,
+`setup-location-<area|city|state>`, `setup-location-area-pick-<area>`,
+`setup-question-phone-input`, `setup-you-<answer>`), `setup-live-*` (`setup-live-branch`, `-change`),
 `setup-guide-*` (`setup-guide-item-<item>`, `-action`, `-skip`, `setup-guide-hide`) and
 `setup-starter-*`; the shell's entries are `user-menu-setup-ring`, `account-menu-finish-setup`,
 `account-menu-clinic-settings`, `command-palette-action-finish-setup` and `setup-member-notice`.
