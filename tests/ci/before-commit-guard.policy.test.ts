@@ -12,7 +12,7 @@ const runner = guard.slice(
   guard.indexOf('step_label() {'),
   guard.indexOf('echo ""\necho "3. $(step_label 3)..."'),
 );
-const READ_ONLY = [1, 2, 4, 5, 6, 7, 8, 9, 10];
+const READ_ONLY = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 function run(options: { failing?: number; script: string; tmpdir?: string }) {
   const stubs = READ_ONLY.map((step) =>
@@ -30,7 +30,7 @@ function run(options: { failing?: number; script: string; tmpdir?: string }) {
 
 describe('before-commit guard runner', () => {
   it('keeps the step list, with lint-staged first and the rest read-only', () => {
-    expect(guard).toContain('READ_ONLY_STEPS="1 2 4 5 6 7 8 9 10"');
+    expect(guard).toContain('READ_ONLY_STEPS="1 2 4 5 6 7 8 9 10 11 12"');
     expect(guard.indexOf('step_3\n\nstatus=0')).toBeGreaterThan(-1);
     for (const step of [...READ_ONLY, 3]) expect(guard).toContain(`step_${step}() {`);
   });
@@ -43,14 +43,14 @@ describe('before-commit guard runner', () => {
     );
     expect(headings).toEqual(READ_ONLY);
     expect(result.stdout).toMatch(/4\. Env\/mode sniffing gate\.\.\.\noutput 4\n/);
-    // Nine steps of 0.4 s each take 3.6 s one by one.
+    // Eleven steps of 0.4 s each take 4.4 s one by one.
     expect(result.seconds).toBeLessThan(2.5);
   });
 
   it('fails when a step fails, after printing every step', () => {
     const result = run({ failing: 5, script: 'run_parallel; echo "status $?"' });
     expect(result.stdout).toContain('status 1');
-    expect(result.stdout).toContain('output 10');
+    expect(result.stdout).toContain('output 12');
   });
 
   it('reports a broken runner, so the guard runs the steps one by one', () => {

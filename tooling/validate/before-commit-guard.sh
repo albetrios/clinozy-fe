@@ -90,6 +90,14 @@ step_9() {
 # Measures the STAGED blob, not the working tree — see the script header.
 step_10() { ./tooling/validate/large-staged-files.sh; }
 
+# ── 11. Dependency audit when pnpm-lock.yaml is staged (an early check) ──
+# Warn-only until 2026-10-31, then it blocks; an unreachable registry passes (the PR audits).
+step_11() { node tooling/ci/early-checks.mjs audit; }
+
+# ── 12. Client env allowlist when the env schema is staged (an early check) ──
+# validate:client-env for development and production; warn-only until 2026-10-31.
+step_12() { node tooling/ci/early-checks.mjs client-env; }
+
 step_label() {
   case "$1" in
     1) echo "Env example validation" ;;
@@ -102,11 +110,13 @@ step_label() {
     8) echo "Env-file guard" ;;
     9) echo "Merge conflict markers" ;;
     10) echo "Large staged files (>3MB; iterations/ exempt)" ;;
+    11) echo "Dependency audit (lockfile staged)" ;;
+    12) echo "Client env allowlist (env schema staged)" ;;
   esac
 }
 
 # The read-only steps, run after lint-staged.
-READ_ONLY_STEPS="1 2 4 5 6 7 8 9 10"
+READ_ONLY_STEPS="1 2 4 5 6 7 8 9 10 11 12"
 
 # One by one, in order; stops at the first failure.
 run_serial() {

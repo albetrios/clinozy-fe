@@ -36,6 +36,7 @@
     "test:e2e:report": "playwright show-report test-results/report",
     "security:secrets": "gitleaks detect --source . -v",
     "security:sast": "semgrep --config auto .",
+    "security:semgrep:push": "node tooling/ci/push-semgrep.mjs",
     "tsdoc:check": "node tooling/tsdoc-coverage/check-coverage.mjs",
     "tsdoc:check:report": "node tooling/tsdoc-coverage/check-coverage.mjs --report",
     "tsdoc:check:refresh-budget": "node tooling/tsdoc-coverage/check-coverage.mjs --refresh-budget",

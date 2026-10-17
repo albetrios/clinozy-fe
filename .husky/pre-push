@@ -57,6 +57,10 @@ else
   echo "Skipping unit tests on pre-push (no unit-relevant changes)."
 fi
 
+# Semgrep on the pushed auth, HTTP client and CSP code (the PR's Semgrep lane scans everything) —
+# an early check, warn-only until 2026-10-31; no semgrep → a warning.
+pnpm security:semgrep:push --base "$PUSH_BASE"
+
 # API contract drift — every endpoint this app references must exist in
 # clinozy-be's committed route catalog (skips with a notice when the sibling
 # clinozy-be checkout is absent). Catches endpoint typos before they ship.

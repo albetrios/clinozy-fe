@@ -23,10 +23,10 @@ clinozy-be's `pnpm guard:pre-commit` runner.
 
 ### Inside before-commit-guard.sh (steps 1–10)
 
-**Order:** step 3 (lint-staged) runs first, because it rewrites and restages files. The other nine
+**Order:** step 3 (lint-staged) runs first, because it rewrites and restages files. The other eleven
 only read, so they run **in parallel**, each into its own log, printed afterwards in step order under
 its own heading; the guard fails if any of them failed. If the parallel runner itself breaks (no
-temporary directory, a step that left no exit code), it says so and runs the nine one by one. ESLint
+temporary directory, a step that left no exit code), it says so and runs the eleven one by one. ESLint
 and Prettier keep caches under `node_modules/.cache`, and `type-check` is incremental
 (`tsconfig.app.json`'s `tsBuildInfoFile`), so a commit with nothing new to check takes about 9 s
 (67–78 s before, almost all of it a full `tsc`); the first run after a fresh install still builds the
@@ -42,6 +42,13 @@ cache (about 60 s).
 8. **Env-file guard** — reject committing any `.env*` except `.env.example` (mirrors the pr-governance CI guard, locally).
 9. **Merge conflict markers** — reject staged files containing `<<<<<<< ` / `>>>>>>> ` / bare `=======` lines (anchored so doc banner lines pass).
 10. **Large staged files** — reject staged blobs > 3MB, measured with `git cat-file -s :<path>` (the staged content, not the working tree — rename/partial-stage safe). `iterations/` is exempt: it holds design-tool exports, and a prototype bundle routinely exceeds 3MB. Lives in `tooling/validate/large-staged-files.sh`, pinned by `large-staged-files.test.mjs`.
+11. **Dependency audit** — _only when `pnpm-lock.yaml` is staged_ — `pnpm deps:audit:prod` (high and above). An unreachable registry warns and passes (the PR's audit lane runs it).
+12. **Client env allowlist** — _only when `src/core/config/env-schema.ts`, `.env.example` or `tooling/validate/client-env.ts` is staged_ — `pnpm validate:client-env --env development` and `--env production` (the deploy workflows' check, at commit).
+
+Steps 11 and 12 are **early checks** (`tooling/ci/early-checks.mjs`, as is Semgrep at push in
+`.husky/pre-push`): warn-only until 2026-10-31 (Asia/Calcutta), then a finding blocks. A finding the
+user judges wrong goes into `agent-os/evals/warn-only-false-positives.md`, so the rule is tuned
+before it blocks.
 
 ## How to Fix Failures
 
