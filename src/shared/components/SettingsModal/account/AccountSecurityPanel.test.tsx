@@ -65,9 +65,8 @@ vi.mock('@/shared/notify/index.ts', () => ({
 import { AccountSecurityPanel } from './AccountSecurityPanel.tsx';
 
 /**
- * Mounts the panel and waits for it. Two-factor setup and Add passkey are
- * drawers now, mounted closed with their cards, and a drawer's dirty guard
- * needs the router.
+ * Mounts the panel and waits for it. Two-factor setup is a drawer, mounted
+ * closed with its card, and a drawer's dirty guard needs the router.
  */
 async function renderPanel() {
   const view = renderWithProviders(<AccountSecurityPanel />);
@@ -120,13 +119,13 @@ beforeEach(() => {
     data: [
       {
         id: 'pk_1',
-        name: 'MacBook Touch ID',
+        synced: true,
         createdAt: '2026-02-10T10:00:00.000Z',
         lastUsedAt: null,
       },
     ],
   });
-  registerMutateAsync.mockResolvedValue({ id: 'pk_2', name: 'YubiKey' });
+  registerMutateAsync.mockResolvedValue(undefined);
   removePasskeyMutate.mockResolvedValue(undefined);
   passkeysCardCrashes.value = false;
 });
@@ -198,26 +197,37 @@ describe('AccountSecurityPanel', () => {
     await waitFor(() => expect(disableMutateAsync).toHaveBeenCalledTimes(1));
   });
 
-  it('names a new passkey in a child drawer stacked on Settings, the name focused', async () => {
+  it('starts the device ceremony straight from Add passkey — no name to fill in (AUTH-03)', async () => {
+    // clinozy-be keeps no passkey name, so the old name drawer collected a
+    // value that was never stored (and, sent as `{ name }`, made the options
+    // request 400 before any device prompt).
     const user = userEvent.setup();
     await renderPanel();
     await user.click(screen.getByTestId('add-passkey'));
-
-    const drawer = await screen.findByTestId('passkey-add-dialog');
-    expect(screen.getByRole('dialog', { name: 'Add a passkey' })).toBe(drawer);
-    expect(screen.getByTestId('passkey-add-dialog-dismiss')).toHaveTextContent('Back');
-    expect(screen.getByTestId('passkey-add-submit')).toHaveTextContent('Add passkey');
-    await waitFor(() => expect(screen.getByTestId('passkey-name')).toHaveFocus());
-    expect(await axeForDialog(drawer)).toHaveNoViolations();
+    await waitFor(() => expect(registerMutateAsync).toHaveBeenCalledTimes(1));
+    expect(registerMutateAsync).toHaveBeenCalledWith();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('registers a passkey via the add drawer (FE-32)', async () => {
+  it('leaves Add passkey usable after a dismissed device prompt (AUTH-03)', async () => {
     const user = userEvent.setup();
+    registerMutateAsync.mockRejectedValueOnce(new Error('AUTH_PASSKEY_CANCELLED'));
     await renderPanel();
     await user.click(screen.getByTestId('add-passkey'));
-    await user.type(await screen.findByTestId('passkey-name'), 'YubiKey');
-    await user.click(screen.getByTestId('passkey-add-submit'));
-    await waitFor(() => expect(registerMutateAsync).toHaveBeenCalledWith('YubiKey'));
+    await waitFor(() => expect(registerMutateAsync).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByTestId('add-passkey')).toBeEnabled());
+
+    await user.click(screen.getByTestId('add-passkey'));
+    await waitFor(() => expect(registerMutateAsync).toHaveBeenCalledTimes(2));
+  });
+
+  it('labels a row by what the server stores — sync type and the day it was added', async () => {
+    await renderPanel();
+    expect(screen.getByTestId('passkey-label')).toHaveTextContent('Synced passkey');
+    expect(screen.getByTestId('passkey-row')).toHaveTextContent(/Added .*2026/);
+    expect(screen.getByTestId('passkey-remove')).toHaveAccessibleName(
+      /^Remove Synced passkey, Added .*2026$/,
+    );
   });
 
   it('revokes a passkey (FE-32)', async () => {
@@ -305,8 +315,8 @@ describe('AccountSecurityPanel', () => {
       ...querySuccess(undefined),
       refetch: refetchPasskeys,
       data: [
-        { id: 'pk_1', name: 'MacBook Touch ID', createdAt: NOW, lastUsedAt: null },
-        { id: 'pk_2', name: 'YubiKey 5C', createdAt: NOW, lastUsedAt: null },
+        { id: 'pk_1', synced: true, createdAt: NOW, lastUsedAt: null },
+        { id: 'pk_2', synced: false, createdAt: NOW, lastUsedAt: null },
       ],
     });
     const user = userEvent.setup();

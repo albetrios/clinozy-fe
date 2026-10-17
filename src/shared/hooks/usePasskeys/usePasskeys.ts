@@ -22,10 +22,13 @@ export function usePasskeys() {
   });
 }
 
-/** Register a new passkey, then refresh the list. */
+/**
+ * Register a new passkey, then refresh the list. Takes no name: clinozy-be
+ * stores none, so the row is labelled from what it does store.
+ */
 export function useRegisterPasskey() {
   return useAppMutation({
-    mutationFn: (name: string) => registerPasskey(name),
+    mutationFn: () => registerPasskey(),
     invalidateKeys: [passkeysQueryKey],
     successMessage: i18n.t(ERRORS_KEYS.frontend.hooks.passkeys.addSuccess, {
       ns: ERRORS_NS,

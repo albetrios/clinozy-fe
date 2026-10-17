@@ -21,7 +21,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 
 const PASSKEY = {
   id: 'pk_1',
-  name: 'MacBook Touch ID',
+  synced: true,
   createdAt: '2026-02-10T10:00:00.000Z',
   lastUsedAt: null,
 };
@@ -36,7 +36,7 @@ function wrapper({ children }: { children: ReactNode }) {
 beforeEach(() => {
   vi.resetAllMocks();
   listMock.mockResolvedValue([PASSKEY]);
-  registerMock.mockResolvedValue({ ...PASSKEY, id: 'pk_2', name: 'YubiKey' });
+  registerMock.mockResolvedValue(undefined);
   removeMock.mockResolvedValue(undefined);
 });
 
@@ -49,10 +49,11 @@ describe('usePasskeys', () => {
 });
 
 describe('useRegisterPasskey', () => {
-  it('registers a passkey by name', async () => {
+  it('registers a passkey — no name: clinozy-be stores none (AUTH-03)', async () => {
     const { result } = renderHook(() => useRegisterPasskey(), { wrapper });
-    await result.current.mutateAsync('YubiKey');
-    expect(registerMock).toHaveBeenCalledWith('YubiKey');
+    await result.current.mutateAsync();
+    expect(registerMock).toHaveBeenCalledOnce();
+    expect(registerMock).toHaveBeenCalledWith();
   });
 });
 

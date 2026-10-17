@@ -61,11 +61,9 @@
       "add": "添加通行密钥",
       "empty": "暂无通行密钥。添加后可免密登录。",
       "removeAria": "移除 {{name}}",
-      "addTitle": "添加通行密钥",
-      "addDescription": "为其命名以便识别。设备将提示您创建通行密钥。",
-      "nameLabel": "名称",
-      "namePlaceholder": "MacBook Touch ID",
-      "submit": "添加通行密钥"
+      "synced": "已同步的通行密钥",
+      "singleDevice": "单设备通行密钥",
+      "added": "添加于 {{date}}"
     },
     "overview": {
       "title": "账户保护",

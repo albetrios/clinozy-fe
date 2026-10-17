@@ -33,6 +33,18 @@ describe('mapFrontendError', () => {
     expect(mapFrontendError(new AppError(code, 0, code))).toBe(message);
   });
 
+  // A dismissed device prompt and an authenticator that already holds one of the
+  // account's passkeys are the user's own outcomes, not a server failure (AUTH-03).
+  it.each([
+    [FRONTEND_ERROR_CODES.AUTH_PASSKEY_CANCELLED, 'Passkey registration was cancelled.'],
+    [
+      FRONTEND_ERROR_CODES.AUTH_PASSKEY_ALREADY_REGISTERED,
+      'This device already holds a passkey for your account.',
+    ],
+  ])('says the passkey outcome %s in words', (code, message) => {
+    expect(mapFrontendError(new AppError(code, 400, code))).toBe(message);
+  });
+
   it('maps invalid credentials AppError to localized auth message', () => {
     const err = new AppError(
       FRONTEND_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
