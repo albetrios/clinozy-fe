@@ -62,11 +62,9 @@
       "add": "Passkey hinzufügen",
       "empty": "Noch keine Passkeys. Fügen Sie einen hinzu, um sich ohne Passwort anzumelden.",
       "removeAria": "{{name}} entfernen",
-      "addTitle": "Passkey hinzufügen",
-      "addDescription": "Benennen Sie ihn, damit Sie ihn später erkennen. Ihr Gerät fordert Sie zur Erstellung auf.",
-      "nameLabel": "Name",
-      "namePlaceholder": "MacBook Touch ID",
-      "submit": "Passkey hinzufügen"
+      "synced": "Synchronisierter Passkey",
+      "singleDevice": "Passkey für ein Gerät",
+      "added": "Hinzugefügt am {{date}}"
     },
     "overview": {
       "title": "Kontoschutz",

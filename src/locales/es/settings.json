@@ -63,11 +63,9 @@
       "add": "Añadir llave de acceso",
       "empty": "Aún no hay llaves de acceso. Añade una para iniciar sesión sin contraseña.",
       "removeAria": "Eliminar {{name}}",
-      "addTitle": "Añadir llave de acceso",
-      "addDescription": "Ponle un nombre para reconocerla después. Tu dispositivo te pedirá crear la llave.",
-      "nameLabel": "Nombre",
-      "namePlaceholder": "Touch ID del MacBook",
-      "submit": "Añadir llave de acceso"
+      "synced": "Llave de acceso sincronizada",
+      "singleDevice": "Llave de acceso de un solo dispositivo",
+      "added": "Añadida el {{date}}"
     },
     "overview": {
       "title": "Protección de la cuenta",

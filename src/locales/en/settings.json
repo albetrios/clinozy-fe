@@ -62,11 +62,9 @@
       "add": "Add passkey",
       "empty": "No passkeys yet. Add one to sign in without a password.",
       "removeAria": "Remove {{name}}",
-      "addTitle": "Add a passkey",
-      "addDescription": "Name it so you can recognize it later. Your device will prompt you to create the passkey.",
-      "nameLabel": "Name",
-      "namePlaceholder": "MacBook Touch ID",
-      "submit": "Add passkey"
+      "synced": "Synced passkey",
+      "singleDevice": "Single-device passkey",
+      "added": "Added {{date}}"
     },
     "overview": {
       "title": "Account protection",

@@ -1,11 +1,12 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { copySensitiveText } from '@/lib/sensitive-clipboard.ts';
 import type { MfaEnrollment } from '@/shared/api/mfa-api.ts';
+import type { Passkey } from '@/shared/api/passkey-contracts.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
-import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import { DrawerField } from '@/shared/components/DrawerField/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { QrCode } from '@/shared/components/QrCode/index.ts';
@@ -30,6 +31,7 @@ import { useStepUpGuard } from '@/shared/components/StepUpDialog/index.ts';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
+import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import {
   useBeginMfaEnrollment,
   useConfirmMfaEnrollment,
@@ -46,9 +48,6 @@ import { notify } from '@/shared/notify/index.ts';
 
 /** The QR, the secret and the code — a light form: the 560px drawer (`_patterns.md:28`). */
 const MFA_SETUP_PROFILE = { fieldCount: 2 } as const;
-
-/** One name to type: the light 560px drawer. */
-const PASSKEY_ADD_PROFILE = { fieldCount: 1 } as const;
 
 /** The setup drawer's head for its phase: scan and verify, then the recovery codes. */
 function mfaSetupCopy(recoveryShown: boolean) {
@@ -341,9 +340,12 @@ function MfaDisableConfirm({
   );
 }
 
-/** Passkeys card: list + named registration + revoke (FE-32). */
 /**
  * One saved credential, and its own removal.
+ *
+ * clinozy-be stores no user-chosen label, so the row says what the server does
+ * know — whether the passkey syncs across devices, and the day it was added —
+ * which is also what tells two rows of the same kind apart.
  *
  * The mutation lives HERE, not on the card: `useRemovePasskey().isPending` is
  * one flag per instance, so a card-level instance greyed out every row's button
@@ -356,25 +358,39 @@ function PasskeyRow({
   guard,
   isSteppingUp,
 }: {
-  passkey: { id: string; name: string };
+  passkey: Passkey;
   guard: ReturnType<typeof useStepUpGuard>['guard'];
   /** A re-authentication dialog is open — no row may start another. */
   isSteppingUp: boolean;
 }) {
   const { t } = useTranslation(SETTINGS_NS);
+  const { formatDate } = useLocaleFormat();
   const remove = useRemovePasskey();
+  const label = t(
+    passkey.synced
+      ? SETTINGS_KEYS.security.passkeys.synced
+      : SETTINGS_KEYS.security.passkeys.singleDevice,
+  );
+  const added = t(SETTINGS_KEYS.security.passkeys.added, {
+    date: formatDate(passkey.createdAt, { dateStyle: 'medium' }),
+  });
 
   return (
     <SettingsListRow data-testid="passkey-row">
       <SettingsRowTile icon={Fingerprint} />
-      <span dir="auto" className="text-body min-w-0 flex-1 truncate font-medium">
-        {passkey.name}
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="text-body truncate font-medium" data-testid="passkey-label">
+          {label}
+        </span>
+        <span className="text-muted-foreground truncate text-xs">{added}</span>
       </span>
       <Button
         variant="outline"
         size="icon-sm"
         className={settingsRowActionClass(true)}
-        aria-label={t(SETTINGS_KEYS.security.passkeys.removeAria, { name: passkey.name })}
+        aria-label={t(SETTINGS_KEYS.security.passkeys.removeAria, {
+          name: `${label}, ${added}`,
+        })}
         onClick={() =>
           // Destructive — STRONG step-up only (never the email code).
           void guard(() => remove.mutateAsync(passkey.id), { allowEmailCode: false })
@@ -393,6 +409,7 @@ function PasskeyRow({
   );
 }
 
+/** Passkeys card: list + registration + revoke (FE-32). */
 function PasskeysCard() {
   const { t } = useTranslation(SETTINGS_NS);
   // Same reasoning as MfaCard: an empty list is a claim ("you have no
@@ -401,19 +418,13 @@ function PasskeysCard() {
   const passkeys = passkeysQuery.data ?? [];
   const register = useRegisterPasskey();
   const { guard, isGuarding, isSteppingUp, stepUpDialog } = useStepUpGuard();
-  const [addOpen, setAddOpen] = useState(false);
-  const [name, setName] = useState('');
-  // The name takes focus on open, as it did when this was a dialog.
-  const nameRef = useRef<HTMLInputElement>(null);
 
-  function closeAdd() {
-    setAddOpen(false);
-    setName('');
-  }
-
-  function submitAdd() {
-    // Registration is step-up gated; bootstrap email-code is allowed (first factor).
-    void guard(() => register.mutateAsync(name.trim() || 'New passkey').then(closeAdd));
+  function addPasskey() {
+    // Straight to the device prompt — there is nothing to fill in first (the
+    // backend keeps no name). Registration is step-up gated; the bootstrap
+    // email code is allowed (first factor). A dismissed prompt rejects the
+    // mutation, which toasts the reason and re-enables this button.
+    void guard(() => register.mutateAsync());
   }
 
   // Only rendered once the list is KNOWN — see passkeysQuery above.
@@ -448,10 +459,13 @@ function PasskeysCard() {
         <Button
           size="sm"
           variant="outline"
-          onClick={() => setAddOpen(true)}
+          onClick={addPasskey}
+          isLoading={register.isPending}
+          // One ceremony at a time: a step-up or a removal in flight holds it.
+          disabled={isGuarding || isSteppingUp}
           data-testid="add-passkey"
         >
-          <Fingerprint data-icon="inline-start" />
+          {register.isPending ? null : <Fingerprint data-icon="inline-start" />}
           {t(SETTINGS_KEYS.security.passkeys.add)}
         </Button>
       }
@@ -469,36 +483,6 @@ function PasskeysCard() {
         ) : null}
         {passkeysQuery.isSuccess ? passkeysBody : null}
       </div>
-
-      {/* Naming a new passkey: a child drawer stacked on Settings (L-65). */}
-      <RecordDrawer
-        open={addOpen}
-        onClose={closeAdd}
-        title={t(SETTINGS_KEYS.security.passkeys.addTitle)}
-        sub={t(SETTINGS_KEYS.security.passkeys.addDescription)}
-        content={PASSKEY_ADD_PROFILE}
-        stacked
-        initialFocusRef={nameRef}
-        saveLabel={t(SETTINGS_KEYS.security.passkeys.submit)}
-        onSave={submitAdd}
-        saveDisabled={register.isPending || isGuarding}
-        saveTestId="passkey-add-submit"
-        testId="passkey-add-dialog"
-      >
-        <DrawerField
-          label={t(SETTINGS_KEYS.security.passkeys.nameLabel)}
-          htmlFor="passkey-name"
-        >
-          <DrawerInput
-            ref={nameRef}
-            id="passkey-name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder={t(SETTINGS_KEYS.security.passkeys.namePlaceholder)}
-            data-testid="passkey-name"
-          />
-        </DrawerField>
-      </RecordDrawer>
 
       {stepUpDialog}
     </SettingsCard>
