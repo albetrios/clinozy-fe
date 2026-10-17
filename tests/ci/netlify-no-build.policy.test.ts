@@ -35,7 +35,18 @@ describe('Netlify never builds', () => {
     expect(commands.length).toBeGreaterThanOrEqual(2);
     for (const [name, line] of commands) {
       expect(line, name).toContain('--no-build');
-      expect(line, name).toContain('--dir=dist');
+      if (line.includes('--dir="$DEPLOY_DIR"')) {
+        // Production deploys dist-verified/: dist/ unpacked from its cosign-verified tarball.
+        const source = workflows.find(([file]) => file === name)?.[1] ?? '';
+        const directories = [...source.matchAll(/DEPLOY_DIR="([^"]+)"/g)].map(
+          (match) => match[1],
+        );
+        expect(directories.length, name).toBeGreaterThan(0);
+        for (const directory of directories)
+          expect(['dist', 'dist-verified'], name).toContain(directory);
+      } else {
+        expect(line, name).toContain('--dir=dist');
+      }
     }
   });
 
