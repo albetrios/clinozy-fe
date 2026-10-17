@@ -18,30 +18,30 @@ and a dev server that serves the app shell.
 
 ## Files
 
-| File                    | Role                                                                      |
-| ----------------------- | ------------------------------------------------------------------------- |
-| `bootstrap.sh`          | Orchestrator — runs all 10 steps, logs progress, enforces the hard gates  |
-| `lib.sh`                | Shared helpers (logging, arch detection, apt, download, PATH persistence) |
-| `install-node.sh`       | Pinned Node from `.nvmrc` into `/opt/node<major>`                         |
-| `install-apt-tools.sh`  | `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`                 |
-| `install-gh.sh`         | GitHub CLI from the official `cli/cli` release                            |
-| `install-gitleaks.sh`   | Secret scanner used by `.husky/pre-commit` and the CI gitleaks lane       |
-| `install-headroom.sh`   | `uv`/`uvx` — the prerequisite for the `headroom` MCP server               |
-| `install-playwright.sh` | E2E browsers; detects a pre-installed set instead of re-downloading       |
-| `healthcheck.sh`        | Probes the dev server for the real app shell                              |
+| File                    | Role                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| `bootstrap.sh`          | Orchestrator — runs all 10 steps, logs progress, enforces the hard gates      |
+| `lib.sh`                | Shared helpers (logging, arch detection, apt, download, PATH persistence)     |
+| `install-node.sh`       | Pinned Node from `.nvmrc` into `/opt/node<major>`, linked into `~/.local/bin` |
+| `install-apt-tools.sh`  | `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`                     |
+| `install-gh.sh`         | GitHub CLI from the official `cli/cli` release                                |
+| `install-gitleaks.sh`   | Secret scanner used by `.husky/pre-commit` and the CI gitleaks lane           |
+| `install-headroom.sh`   | `uv`/`uvx` — the prerequisite for the `headroom` MCP server                   |
+| `install-playwright.sh` | E2E browsers; detects a pre-installed set instead of re-downloading           |
+| `healthcheck.sh`        | Probes the dev server for the real app shell                                  |
 
 Each `install-*.sh` runs standalone as well as under `bootstrap.sh`.
 
 ## Steps and which ones can fail
 
-| #   | Step                                    | Gate        |
-| --- | --------------------------------------- | ----------- |
-| 1   | Node runtime (pinned major) + corepack  | **hard**¹   |
-| 2–5 | Distro tools, `gh`, gitleaks, `uv`      | best-effort |
-| 6   | `pnpm install --frozen-lockfile`        | **hard**    |
-| 7   | `.env.local` (`setup:local --only-env`) | **hard**    |
-| 8–9 | MCP default pair, Playwright browsers   | best-effort |
-| 10  | Dev server serves the app shell         | **hard**²   |
+| #   | Step                                                    | Gate        |
+| --- | ------------------------------------------------------- | ----------- |
+| 1   | Node runtime (pinned major) + corepack                  | **hard**¹   |
+| 2–5 | Distro tools, `gh`, gitleaks, `uv`                      | best-effort |
+| 6   | `pnpm install --frozen-lockfile`                        | **hard**    |
+| 7   | `.env.local` (`setup:local --only-env`)                 | **hard**    |
+| 8–9 | MCP default pair + codegraph index, Playwright browsers | best-effort |
+| 10  | Dev server serves the app shell                         | **hard**²   |
 
 ¹ The install itself is best-effort — a session Node of the right major is fine.
 Missing Node entirely is fatal.

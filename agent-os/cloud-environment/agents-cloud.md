@@ -40,7 +40,11 @@ Ten steps, in order:
    [`install-node.sh`](../../tooling/setup/agent/install-node.sh) downloads the
    pinned Node (`.nvmrc`, major 24) into `/opt/node24`, then `bootstrap.sh`
    activates it on `PATH` and persists that for the session via
-   `$CLAUDE_ENV_FILE`. It does **not** probe for a version manager: cloud images
+   `$CLAUDE_ENV_FILE`. It also links the pinned `node`, `npm`, `npx`, `corepack`
+   and `pnpm` into `~/.local/bin`, which the image puts ahead of its own
+   `/opt/node22/bin`, so every shell runs Node 24 even where no hook loads (a
+   session that holds both repos); `NODE_LINK_USER_BIN=0` turns that off, and a
+   Node from nvm is left alone. It does **not** probe for a version manager: cloud images
    ship Node 20/21/22 and no working one (`fnm` absent, the `nvm` shell function
    reports `N/A` with no `~/.nvm` tree), so probing silently leaves Node 22 in
    place and the install step then hard-fails on `engineStrict`. `.nvmrc` pins
@@ -57,7 +61,10 @@ Ten steps, in order:
    through to phase 5/5 and spawns a long-lived `pnpm dev`, which would hang
    this script.
 8. `pnpm mcp:setup:default` — writes the default MCP pair (codegraph + headroom)
-   to `.mcp.json`.
+   to `.mcp.json`; then `pnpm setup:local --only-codegraph` builds the codegraph
+   index the MCP server answers from (step 7's `--only-env` stops before it). The
+   first build takes about 2–3 minutes and ~250 MB in `.codegraph/`; later runs
+   only `sync` it.
 9. **Playwright browsers** — skipped when the image already ships them.
 10. **Healthcheck** — starts the dev server transiently, verifies it serves the
     real app shell, then stops it.

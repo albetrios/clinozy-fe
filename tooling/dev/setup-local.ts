@@ -17,6 +17,7 @@
  *   pnpm setup:local --skip-codegraph
  *   pnpm setup:local --skip-mac-tools    (skip the macOS external-tool install/upgrade)
  *   pnpm setup:local --only-env          (scaffold .env.local only, then exit)
+ *   pnpm setup:local --only-codegraph    (build or refresh the codegraph index only, then exit)
  *   pnpm setup:local --force-env          (rewrite .env.local from .env.example)
  */
 import { spawn, spawnSync } from 'node:child_process';
@@ -54,6 +55,7 @@ interface BootstrapOptions {
   skipCodegraph: boolean;
   skipMacTools: boolean;
   onlyEnv: boolean;
+  onlyCodegraph: boolean;
   forceEnvLocal: boolean;
 }
 
@@ -134,6 +136,7 @@ function parseArgs(): BootstrapOptions {
     skipCodegraph: has('--skip-codegraph'),
     skipMacTools: has('--skip-mac-tools'),
     onlyEnv: has('--only-env'),
+    onlyCodegraph: has('--only-codegraph'),
     forceEnvLocal: has('--force-env-local') || has('--force-env'),
   };
 }
@@ -538,6 +541,14 @@ async function main(): Promise<void> {
 
   if (options.onlyEnv) {
     runEnvScaffolding(reports, options);
+    printSummary(reports);
+    return;
+  }
+
+  // The cloud bootstrap scaffolds the env with --only-env, which stops before the MCP
+  // phase that indexes; it runs this separately so the codegraph MCP server has an index.
+  if (options.onlyCodegraph) {
+    runCodeGraphSetup(reports, options);
     printSummary(reports);
     return;
   }
