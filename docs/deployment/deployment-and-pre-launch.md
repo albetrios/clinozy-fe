@@ -55,7 +55,7 @@ Single trunk (`main`) drives both GitHub environments by **purpose**, not by bra
 - **After merge to `main`**
   - **Post-merge CI** (`.github/workflows/post-merge-ci.yml`) runs on push to `main`:
     - Every push → GitHub environment **`development`** → Netlify **alias** deploy (`development--clinozy-fe.netlify.app`, ungated).
-    - Runs single-channel **release-please**, keeping one standing `chore: release X.Y.Z` Release PR up to date.
+    - Runs single-channel **release-please** on demand — when a Release PR merges, or when dispatched with `gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true` to open or refresh the one standing `chore(main): release X.Y.Z` Release PR (an ordinary merge no longer refreshes it).
     - Does **not** re-run tests — pr-ci already gated the SHA.
 
 - **Shipping to production (a release)**
@@ -229,7 +229,7 @@ On **push to `main`**, **Post-merge CI** (`.github/workflows/post-merge-ci.yml`)
 
 1. Runs single-channel **release-please** (`release-please` job):
    - `.github/release-please/config.json` + `manifest.json` → stable releases (`CHANGELOG.md`).
-   - Calculates the next version from conventional commits and keeps one standing `chore: release X.Y.Z` Release PR up to date; merging it by hand (squash) creates a tag + GitHub Release. Release PRs are **not** auto-merged (release on cadence).
+   - Calculates the next version from conventional commits into one standing `chore(main): release X.Y.Z` Release PR, opened or refreshed on demand (`gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true`); merging it by hand (squash) creates a tag + GitHub Release. Release PRs are **not** auto-merged (release on cadence).
 2. Deploys via the reusable Netlify workflow, split by purpose:
    - **Every push to `main`** → GitHub environment **`development`** → **alias** deploy (`development--clinozy-fe.netlify.app`, ungated).
    - **A release** (release-please tag) → GitHub environment **`production`** → `--prod` deploy (`clinozy-fe.netlify.app`), via `release-deploy.yml` when the release is published.

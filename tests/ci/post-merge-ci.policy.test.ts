@@ -98,6 +98,21 @@ describe('post-merge CI policy (single trunk)', () => {
     expect(resolveBlock).toMatch(/mode: close\n\s+title: Post-merge CI failing/);
   });
 
+  it('runs release-please on demand: a merged Release PR, or a dispatch with release_pr', () => {
+    // An ordinary merge no longer refreshes the Release PR (each refresh re-ran its PR CI).
+    const releaseBlock = jobBlock(workflow, 'release-please');
+    expect(releaseBlock).toContain(
+      "(github.event_name == 'workflow_dispatch' && inputs.release_pr)",
+    );
+    expect(releaseBlock).toContain(
+      "startsWith(github.event.head_commit.message, 'chore(main): release ')",
+    );
+    expect(workflow).toMatch(
+      /release_pr:\n\s+description: Open or refresh the Release PR/,
+    );
+    expect(workflow).not.toContain('skip_release');
+  });
+
   it('does NOT auto-merge release PRs — release on cadence (manual merge is the ship button)', () => {
     // release-please keeps the standing Release PR fresh; a human merges it to ship.
     expect(workflow).not.toMatch(/gh pr merge[^\n]*--auto/);
