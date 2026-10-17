@@ -46,10 +46,10 @@ Granular procedures live in **skills** (invoked by name); these commands are **w
 
 **Review**
 
-| Command                | Purpose                                                                                                                                                                                                                                                   |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/fe-pre-merge-review` | Read-only pipeline (steps and their `when` from `agent-os/agents/pipelines.json`: the verifier always, fe-docs-auditor on docs changes) — the needed reviewers at once, in the background; one report in `REVIEW.md` → Findings format.                   |
-| `/fe-prod-readiness`   | Read-only production-readiness sweep: fe-dependency-auditor + fe-production-hardening-reviewer at once (the hardening reviewer once per HEAD), then fe-bundle-size-reviewer → fe-perf-auditor (each builds); one report in `REVIEW.md` → Findings format. |
+| Command                          | Purpose                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/fe-pre-merge-review [release]` | Read-only pipeline (steps and their `when` from `agent-os/agents/pipelines.json`: the verifier always, fe-docs-auditor on docs changes, fe-production-hardening-reviewer and the fe-full-code-review code pass when auth, tokens, CSP or tenancy change; `release`: everything since the last release tag) — the needed reviewers at once, in the background; one report in `REVIEW.md` → Findings format. |
+| `/fe-prod-readiness`             | Read-only production-readiness sweep: fe-dependency-auditor + fe-production-hardening-reviewer at once (the hardening reviewer once per HEAD), then fe-bundle-size-reviewer → fe-perf-auditor (each builds); one report in `REVIEW.md` → Findings format.                                                                                                                                                  |
 
 **PR lifecycle**
 
@@ -58,7 +58,7 @@ Granular procedures live in **skills** (invoked by name); these commands are **w
 | `/fe-open-pr [title]` | Push the branch + open a PR to **`main`** (explicit PR opt-in).                                                                                                                       |
 | `/fe-watch-pr <n>`    | Triage CI + review comments until both required contexts — **`Quality gate`** + **`Checks`** — are green.                                                                             |
 | `/fe-merge-pr <n>`    | Squash-merge once CI is green.                                                                                                                                                        |
-| `/fe-ship [title]`    | Full flow: open-pr → watch-pr → merge-pr.                                                                                                                                             |
+| `/fe-ship [title]`    | Full flow: pre-merge-review (warn-only until 2026-10-31, then a critical or major finding stops the push) → open-pr → watch-pr → merge-pr.                                            |
 | _Release_             | Trunk-based (single `main`): merge the standing release-please **Release PR** to ship → tag + prod deploy. See [trunk-based-workflow.md](../../docs/process/trunk-based-workflow.md). |
 
 **Maintenance**

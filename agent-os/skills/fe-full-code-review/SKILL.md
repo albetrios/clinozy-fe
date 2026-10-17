@@ -48,6 +48,14 @@ When the user asks the AI to generate the report:
 
 ---
 
+## Diff mode — the code pass of `/fe-pre-merge-review`
+
+When the caller gives a diff range (the `pre-merge-review` pipeline's `lenses` entry does, when auth,
+tokens, CSP or tenancy change), skip the script and the full report: read only the changed files and
+the code they call, through the dimensions below — security first, then performance, quality,
+readability, maintainability, scalability. Return each finding in `REVIEW.md` → Findings format
+(severity · `file:line` · check — failure scenario → fix), nothing else; no report file is written.
+
 ## Report Dimensions (from Plan)
 
 | Dimension           | What the script checks                                                                                                              |

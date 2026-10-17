@@ -36,6 +36,14 @@ For each item, verify against the actual code and mark **Satisfied** (file + ref
 7. **Env hardening:** production env profile forces diagnostics off and version-check on (`src/core/config/env-schema.ts` allowlist); no secret is `VITE_`-prefixed; behavior is flag-driven, never mode-sniffed.
 8. **Dependency posture:** `pnpm deps:audit` is clean (or documented) for the production dependency set.
 
+## Diff mode
+
+When the caller gives a diff range (the `/fe-pre-merge-review` pipeline does), review only what the
+diff changes: the changed files, and the code they call, against the checklist items above that
+apply to them — CSP and its two outputs, token storage, the single refresh path, cross-tab logout,
+redirect safety, tenancy guards, the env allowlist. Skip the rest of the sweep. Report each finding
+in `REVIEW.md` → Findings format, with the diff line it comes from.
+
 ## Output format
 
 ```markdown

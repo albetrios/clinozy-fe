@@ -512,7 +512,7 @@ if (existsSync(chainsFile)) {
   }
 }
 
-// ── Agent pipelines ↔ disk: steps are real agents; handoffs are real skills ──
+// ── Agent pipelines ↔ disk: steps are real agents; handoffs and lenses are real skills ──
 const pipelinesFile = join(agentOsDirectory, 'agents', 'pipelines.json');
 if (existsSync(pipelinesFile)) {
   const agentNames = new Set(agentFiles.map((file) => basename(file, '.md')));
@@ -526,6 +526,7 @@ if (existsSync(pipelinesFile)) {
               steps?: string[];
               handoff?: Record<string, string>;
               when?: Record<string, string>;
+              lenses?: Record<string, string>;
             }
           >;
         }
@@ -565,6 +566,13 @@ if (existsSync(pipelinesFile)) {
             `pipelines.json pipeline "${pipeline}" handoff "${step}" → "${skill}" has no skill directory`,
           );
       }
+      // `lenses` are skills a general-purpose agent applies to the same diff (not agents).
+      for (const lens of Object.keys(definition.lenses ?? {}))
+        if (!skillDirectoryNames.includes(lens))
+          error(
+            'agent-pipelines',
+            `pipelines.json pipeline "${pipeline}" lens "${lens}" has no skill directory`,
+          );
     }
   } catch {
     error('agent-pipelines', 'agent-os/agents/pipelines.json is not valid JSON');

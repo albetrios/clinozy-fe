@@ -3,15 +3,20 @@
   "pipelines": {
     "pre-merge-review": {
       "description": "Read-only review of the current diff before merge. The steps whose `when` matches the diff run at once, in the background; each returns findings in REVIEW.md → Findings format.",
-      "steps": ["fe-verifier", "fe-docs-auditor"],
+      "steps": ["fe-verifier", "fe-docs-auditor", "fe-production-hardening-reviewer"],
       "when": {
         "fe-verifier": "always",
-        "fe-docs-auditor": "a docs/**, *.md, *.mdc or agent-os/** file changed"
+        "fe-docs-auditor": "a docs/**, *.md, *.mdc or agent-os/** file changed",
+        "fe-production-hardening-reviewer": "diff mode — auth, tokens, CSP or tenancy changed: src/shared/auth/, src/core/http/, src/shared/tenancy/, src/app/guards/, src/core/config/, src/lib/csp-api-origin.ts, plugins/csp-api-origin.ts, index.html or netlify.toml"
       },
       "aggregate": "one report in REVIEW.md → Findings format — sorted by severity (critical first), duplicates merged, at most two nits; then the verifier's verdict and evidence",
       "handoff": {
         "fe-verifier": "fe-test-generation",
-        "fe-docs-auditor": "fe-documentation-maintenance"
+        "fe-docs-auditor": "fe-documentation-maintenance",
+        "fe-production-hardening-reviewer": "fe-code-quality-security"
+      },
+      "lenses": {
+        "fe-full-code-review": "the code pass, in diff mode, on the same files as fe-production-hardening-reviewer — one general-purpose agent applies the skill's Diff mode to the diff"
       }
     },
     "prod-readiness": {
