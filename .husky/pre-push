@@ -27,8 +27,12 @@ fi
 
 pnpm biome:check
 pnpm type-check
+# Dead code and the bundle-size budget: CI's Knip and Build lanes, which every recent red PR CI
+# run failed on.
+pnpm knip
 pnpm build
 pnpm build:check
+pnpm size
 
 # Markdown lint on the pushed diff (mirrors the Docs lint CI lane). lint-staged
 # only formats staged markdown; this lints every changed file in the push.

@@ -3519,7 +3519,7 @@ clinozy-fe/
 │   └── [1 test file]
 ├── tests/
 │   ├── ci/
-│   │   └── [49 test files]
+│   │   └── [50 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
@@ -3641,6 +3641,8 @@ clinozy-fe/
 │   │   ├── contract-drift-allowlist.json
 │   │   ├── coverage-summary.mjs
 │   │   ├── doc-staleness-allowlist.json
+│   │   ├── early-failure-alert.d.mts
+│   │   ├── early-failure-alert.mjs
 │   │   ├── first-paint.mjs
 │   │   ├── lint-changed-markdown.sh
 │   │   ├── run-size-limit.mjs
