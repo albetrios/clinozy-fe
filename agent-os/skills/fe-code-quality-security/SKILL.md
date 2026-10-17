@@ -1,6 +1,6 @@
 ---
 name: fe-code-quality-security
-description: Three-layer code quality and security pipeline. Use when adding ESLint rules, configuring pre-commit hooks, debugging CI failures, adding security checks, updating lint config, or reviewing the quality pipeline. Triggers on "add eslint rule", "configure pre-commit", "why is CI failing", "add security check", "update lint config", "what checks run on commit".
+description: The three-layer quality and security pipeline (ESLint, pre-commit, CI). Use when adding an ESLint rule or security check, changing lint config or hooks, or asking why CI or a commit failed.
 ---
 
 # Code Quality and Security Pipeline

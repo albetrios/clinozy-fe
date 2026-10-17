@@ -1,6 +1,6 @@
 ---
 name: fe-project-health-check
-description: Full project health audit after major code changes. Verifies docs, creates missing tests, fixes lint/type/format errors, ensures build and bundle size pass, and reports a summary. Use when the user asks to "check everything", "verify the project", or after large changes.
+description: A full project health audit after large changes — docs, missing tests, lint, types, format, build and bundle size, with a summary. Use for 'check everything' or 'verify the project'.
 ---
 
 # Project Health Check — Full Audit

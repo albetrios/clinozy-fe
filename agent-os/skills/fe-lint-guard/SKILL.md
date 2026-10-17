@@ -1,6 +1,6 @@
 ---
 name: fe-lint-guard
-description: Automatically fix lint, type-check, and code-quality issues after every implementation. Runs in the background without asking the user. Handles ESLint errors, TypeScript errors, nested ternaries, React purity, import ordering, and security warnings so the user only provides requirements and never sees lint failures.
+description: Fix lint, type-check and code-quality issues after every implementation, without asking — ESLint, TypeScript, nested ternaries, React purity, import order, security warnings.
 ---
 
 # Lint Guard — Background Code Quality

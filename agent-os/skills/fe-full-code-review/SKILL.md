@@ -1,6 +1,6 @@
 ---
 name: fe-full-code-review
-description: Generate a full code review report across security, performance, code quality, readability, maintainability, and scalability. Use when the user asks to "run code review", "generate code review report", or "full code review".
+description: A full code review report — security, performance, quality, readability, maintainability, scalability. Use when asked to run code review, generate a code review report or do a full code review.
 ---
 
 # Full Code Review — Report Generation

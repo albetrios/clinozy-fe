@@ -1,6 +1,6 @@
 ---
 name: fe-before-commit-guard
-description: Pre-commit gate that runs on every git commit. Ensures env docs, public assets, format, lint, and types pass before code is committed. Use when user asks about commit checks, pre-commit, path-to-production gates, or fixing commit failures.
+description: The pre-commit gate on every git commit (env docs, public assets, lint-staged, types, lockfile, gitleaks). Use when asked what runs on commit, or when a commit fails.
 ---
 
 # Before-Commit Guard — Path-to-Production Gate

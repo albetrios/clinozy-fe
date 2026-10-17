@@ -1,6 +1,6 @@
 ---
 name: fe-skill-registry
-description: Master catalog of all project skills with trigger scenarios, file locations, and decision guidance. Use when the user asks "which skill should I use", "list skills", "what skills exist", "how do I do X", or needs help finding the right approach for a task.
+description: The catalog of project skills and how to choose one. Use when asked which skill to use, what skills exist or how to do X, or to find the right approach for a task.
 ---
 
 # Skill Registry

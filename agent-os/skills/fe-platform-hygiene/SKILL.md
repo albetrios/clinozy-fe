@@ -1,6 +1,6 @@
 ---
 name: fe-platform-hygiene
-description: Platform config, env read paths, dead-code and deploy validators for clinozy-fe — platformConfig, build-env allowlist, knip, validate:vite-env, validate:client-env. Use when touching env schema, Vite env reads, knip, or platform config wiring.
+description: Platform config, env read paths, dead code and deploy validators (platformConfig, knip, validate:vite-env, validate:client-env). Use when touching env schema, Vite env reads, knip or platform wiring.
 ---
 
 # Platform hygiene (clinozy-fe)

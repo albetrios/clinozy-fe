@@ -1,6 +1,6 @@
 ---
 name: fe-safe-bulk-edits
-description: Apply many mechanical edits across a codebase without silent misses — assert every replacement matches exactly once, edit JSON packs preserving key order, and keep staging atomic so a failed attempt does not leak into the next commit. Use for sweeps, renames, codemods, or editing locale/config files in bulk.
+description: Apply many mechanical edits without silent misses — each replacement matches exactly once, JSON key order kept, staging atomic. Use for sweeps, renames, codemods or bulk locale and config edits.
 ---
 
 # Safe bulk edits (clinozy-fe)

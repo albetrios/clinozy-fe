@@ -1,6 +1,6 @@
 ---
 name: fe-pre-pr-sweep
-description: Catch the defect classes PR review actually finds — half-converted sweeps, incomplete deletions, ungated race paths, eager dynamic imports, stale derived artifacts and drifted PR bodies — before opening the PR. Use after implementation is done and before pushing or opening a pull request.
+description: Catch what PR review finds — half-converted sweeps, incomplete deletions, ungated races, eager dynamic imports, stale artifacts, drifted PR bodies. Use before pushing or opening a pull request.
 ---
 
 # Pre-PR sweep (clinozy-fe)

@@ -1,6 +1,6 @@
 ---
 name: fe-guard-authoring
-description: Author machine-enforced invariants that actually enforce — prove the gate fires, wire it into PR CI, avoid the ESLint flat-config replacement trap and external-binary silent passes. Use when adding or editing anything under tooling/validate/, an eslint.config.mjs restriction, or a static-sync CI step.
+description: Author invariants that really enforce — prove the gate fires, wire it into PR CI, avoid the flat-config and silent-pass traps. Use when editing tooling/validate/, an ESLint restriction or a CI step.
 ---
 
 # Guard authoring (clinozy-fe)

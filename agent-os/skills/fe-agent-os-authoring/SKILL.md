@@ -1,6 +1,6 @@
 ---
 name: fe-agent-os-authoring
-description: Add, rename or remove an agent-os skill or rule without breaking the integrity gates — every registration surface in one checklist, in the order that keeps agent-os:check, triggers:strict and generate:check green. Use when creating or editing anything under agent-os/skills or agent-os/rules.
+description: Add, rename or remove an agent-os skill or rule without breaking the gates (agent-os:check, triggers:strict, generate:check). Use when editing anything under agent-os/skills or agent-os/rules.
 ---
 
 # Agent-os authoring (clinozy-fe)

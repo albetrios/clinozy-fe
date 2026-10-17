@@ -1,6 +1,6 @@
 ---
 name: fe-env-schema-add
-description: Walk through adding, renaming, or removing an env var safely in clinozy-fe. Decides Secret vs Variable, picks the correct .env.example sub-section, keeps schema, template, validators, and GitHub Environments in sync. Use when src/core/config/env-schema.ts or .env.example changes.
+description: Add, rename or remove an env var safely — Secret vs Variable, the .env.example section, schema, validators and GitHub Environments in sync. Use when env-schema.ts or .env.example changes.
 ---
 
 # Env schema add (clinozy-fe)

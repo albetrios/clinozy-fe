@@ -1,6 +1,6 @@
 ---
 name: fe-kickoff-iteration
-description: Implement an approved design iteration — confirm which approved iteration to build (Step 0), pass the intake gate (iteration:intake --check — stop on failure) and move it to implementing, then follow its KICKOFF.md ledger one row at a time — build each screen through fe-design-ditto, verify by Intake mode (side by side at 375px and 1440px per state, or the BRIEF.md acceptance criteria), write the AS-BUILT.md entry, check the impact on upcoming rows (a scope change stops for the user) and stop for review before the next row. Closes with the static design gates, the AS-BUILT summary with its Standing deviations and iteration:status done. Use when the user says "kickoff", "kickoff iteration <name>", "start implementing <iteration>". Requires README Status approved.
+description: Build an approved design iteration from its KICKOFF.md ledger, one row at a time through fe-design-ditto, verified and recorded in AS-BUILT.md. Use for kickoff or 'kickoff iteration <name>'.
 ---
 
 # Kickoff an iteration (build an approved `KICKOFF.md`, row by row)

@@ -34,14 +34,14 @@
       ]
     },
     "ui-review": {
-      "description": "Building or restyling UI — craft, accessibility, and motion review.",
+      "description": "Building or restyling UI — craft, accessibility, and motion review. review-animations is manual-only (disable-model-invocation, /review-animations) and reviews motion code only, so it is optional — run it on a diff that animates.",
       "trigger": "src/**/components/**/*.tsx",
       "steps": [
         "frontend-design",
-        "web-design-guidelines",
-        "review-animations"
+        "web-design-guidelines"
       ],
       "optional": [
+        "review-animations",
         "fe-theme-axis-audit",
         "fe-visual-regression"
       ]

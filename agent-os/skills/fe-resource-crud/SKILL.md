@@ -1,6 +1,6 @@
 ---
 name: fe-resource-crud
-description: Scaffold backend resource pages in clinozy-fe — resource manifest, list page, URL-driven create/edit dialogs, $param folders, bootstrap registry, RBAC permissions. Use when adding a CRUD resource island (members, invoices, patients, etc.).
+description: Scaffold backend resource pages — resource manifest, list page, URL-driven create/edit dialogs, $param folders, RBAC permissions. Use when adding a CRUD resource island (members, invoices, patients).
 ---
 
 # Resource CRUD (clinozy-fe)

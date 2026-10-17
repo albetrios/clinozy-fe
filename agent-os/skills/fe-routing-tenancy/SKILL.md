@@ -1,6 +1,6 @@
 ---
 name: fe-routing-tenancy
-description: Org-scoped routing, guard chains, security gateway, session context, settings hash modal, and root resolver for clinozy-fe. Use when adding routes under organization/$organizationSlug, editing routeTree guards, gatewayFromManifest, or session hydrate/invalidate.
+description: Organization-scoped routing, guard chains, the security gateway, session context, the Settings hash modal and the root resolver. Use when editing routeTree guards or routes under $organizationSlug.
 ---
 
 # Routing & tenancy (clinozy-fe)

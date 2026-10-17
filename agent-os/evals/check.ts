@@ -48,6 +48,9 @@ const listFilesWithExtension = (absoluteDirectory: string, extension: string): s
     .sort();
 
 /** Extract a single frontmatter field, tolerating folded (`>`) / literal (`|`) scalars. */
+/** The longest description one of this repository's skills may have (the skill listing's budget). */
+const MAX_OWN_DESCRIPTION = 200;
+
 function frontmatterField(text: string, key: string): string | undefined {
   const block = text.match(/^---\n([\s\S]*?)\n---/)?.[1];
   if (!block) return undefined;
@@ -102,6 +105,14 @@ for (const skill of skillDirectoryNames) {
     warn(
       'skill-description',
       `skills/${skill}: description is ${description.length} chars — thin for auto-trigger`,
+    );
+  // Claude Code lists every skill's description in one budget (1% of the context window); over it,
+  // every description is shortened, and in a session of both repositories the long ones showed
+  // blank. This repository's own skills stay at 200 characters or fewer.
+  else if (skill.startsWith('fe-') && description.length > MAX_OWN_DESCRIPTION)
+    error(
+      'skill-description',
+      `skills/${skill}: description is ${description.length} chars — at most ${MAX_OWN_DESCRIPTION} for this repository's skills`,
     );
 }
 
@@ -475,13 +486,27 @@ if (existsSync(chainsFile)) {
           chains?: Record<string, { steps?: string[]; optional?: string[] }>;
         }
       ).chains ?? {};
-    for (const [chain, definition] of Object.entries(chains))
+    for (const [chain, definition] of Object.entries(chains)) {
       for (const step of [...(definition.steps ?? []), ...(definition.optional ?? [])])
         if (!skillDirectoryNames.includes(step))
           error(
             'skill-chains',
             `chains.json chain "${chain}" references "${step}" which has no skill directory`,
           );
+      // A required step the model cannot invoke (disable-model-invocation) stalls the chain; a
+      // manual-only skill belongs in `optional`, with a note on when to run it.
+      for (const step of definition.steps ?? []) {
+        const stepFile = join(agentOsDirectory, 'skills', step, 'SKILL.md');
+        if (
+          existsSync(stepFile) &&
+          frontmatterField(readText(stepFile), 'disable-model-invocation') === 'true'
+        )
+          error(
+            'skill-chains',
+            `chains.json chain "${chain}" requires "${step}", a manual-only skill (disable-model-invocation) — move it to optional`,
+          );
+      }
+    }
   } catch {
     error('skill-chains', 'agent-os/skills/chains.json is not valid JSON');
   }

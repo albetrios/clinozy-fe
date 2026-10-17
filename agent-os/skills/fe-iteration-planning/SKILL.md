@@ -1,6 +1,6 @@
 ---
 name: fe-iteration-planning
-description: Plan a design iteration under iterations/<iteration>/ — NO CODE. Confirm the iteration (it starts from scratch, Baseline none — never ask for or suggest a Baseline; use one only when the user names it), pass the intake gate (iteration:intake --check — stop on failure), read the resolved snapshot (coverage matrix), establish the change (from scratch: the drop or BRIEF.md plus the current code; with a named Baseline, by Intake mode — full/overlay: iteration:diff + the designer's "What changed"; brief: BRIEF.md — and the Baseline's Standing deviations), reconcile md ↔ prototype with file:line evidence, gate on blocking questions, then write KICKOFF.md with an ordered ledger and stop for approval. Use when the user says "plan iteration <name>", "iteration planning", "plan the next iteration", "plan from legacy", or asks to plan the build of a design drop. Next step after approval: fe-kickoff-iteration.
+description: Plan a design iteration under iterations/<iteration>/ with no code — gate, delta, reconcile, blocking questions, then KICKOFF.md and its ledger for approval. Use for 'plan iteration <name>'.
 ---
 
 # Iteration planning (plan from `iterations/<iteration>/intake-files/`)

@@ -1,6 +1,6 @@
 ---
 name: fe-theme-axis-audit
-description: Audit and fix UI so every Appearance/Shuffle theme axis (radius, elevation, density, etc.) applies consistently. Use when the user asks to audit theme config, fix appearance presets, "do elevation", "theme axis one by one", or continue the theme-axis playbook.
+description: Audit and fix UI so every Appearance theme axis (radius, elevation, density, and the rest) applies consistently. Use for theme config audits, appearance presets, 'do elevation' or the playbook.
 ---
 
 # Theme axis audit

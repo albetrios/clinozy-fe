@@ -1,6 +1,6 @@
 ---
 name: fe-locale-formatting
-description: Format dates, times, timezones, numbers and currency through useLocaleFormat so Appearance prefs apply — never bare Intl or toLocaleString. Covers the civil-day opt-in, the LocalizedCalendar wrapper, and the validate:no-bare-intl gate. Use when rendering any date, number, or money value.
+description: Format dates, times, numbers and money through useLocaleFormat so Appearance prefs apply — never bare Intl or toLocaleString. Use when rendering any date, number or money value.
 ---
 
 # Locale formatting (clinozy-fe)

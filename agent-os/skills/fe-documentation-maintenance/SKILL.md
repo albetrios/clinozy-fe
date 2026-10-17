@@ -1,6 +1,6 @@
 ---
 name: fe-documentation-maintenance
-description: When to update which doc and where docs live. Use when adding/changing docs, adding routes or features that affect README/CLAUDE, or when the user asks where to document something or how docs are organized.
+description: Which doc to update and where docs live. Use when adding or changing docs, adding routes or features that touch README or CLAUDE.md, or asking where something is documented.
 ---
 
 # Documentation Maintenance

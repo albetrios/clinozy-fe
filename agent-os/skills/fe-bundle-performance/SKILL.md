@@ -1,6 +1,6 @@
 ---
 name: fe-bundle-performance
-description: Keep the clinozy-fe production bundle within size-limit budgets — dynamic-import heavy or deferred modules off the first-paint path, lazy route-island boundaries, code-splitting, and heavy-import triage. Use when acting on a fe-bundle-size-reviewer finding or when a size budget is exceeded.
+description: Keep the bundle within its size-limit budgets — heavy modules off the first-paint path, lazy islands, code-splitting. Use on a fe-bundle-size-reviewer finding or a blown size budget.
 ---
 
 # Bundle performance

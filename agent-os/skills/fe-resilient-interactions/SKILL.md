@@ -1,6 +1,6 @@
 ---
 name: fe-resilient-interactions
-description: The worked reasoning behind the 31 always-on resilient-interaction rules — the concrete failure each one came from, the wrong fix, and the code that actually holds. Use when applying or arguing with a rule from agent-os/rules/fe-resilient-interactions.mdc, when a write can double-submit, when a component crash escapes its boundary, when a success message can outrun the work, or when a screen derives its shape from a query.
+description: The reasoning behind the always-on resilient-interaction rules. Use when applying or arguing with fe-resilient-interactions.mdc — double submits, crashes escaping a boundary, early success messages.
 ---
 
 # Resilient interactions — the reasoning
