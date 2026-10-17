@@ -22,6 +22,15 @@ command -v jq >/dev/null 2>&1 || exit 0
 FILE=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null || echo "")
 [[ -z "$FILE" ]] && exit 0
 
+# clinozy-fe's rules judge only files in this repository. A session that holds several
+# repositories runs every repository's hooks on every edit (tooling/agent-os/session-hooks.ts);
+# another repository's files are its own hooks' to judge.
+ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+case "$FILE" in
+  "$ROOT"/* | [!/]*) ;; # under this repository, or relative to it
+  *) exit 0 ;;
+esac
+
 # The text being written: Write.content, Edit.new_string, MultiEdit.edits[].new_string.
 CONTENT=$(printf '%s' "$INPUT" | jq -r '
   [ .tool_input.content, .tool_input.new_string, ( .tool_input.edits // [] | .[].new_string ) ]

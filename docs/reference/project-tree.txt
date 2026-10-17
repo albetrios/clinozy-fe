@@ -3508,7 +3508,7 @@ clinozy-fe/
 │   └── [1 test file]
 ├── tests/
 │   ├── ci/
-│   │   └── [41 test files]
+│   │   └── [43 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
@@ -3613,7 +3613,8 @@ clinozy-fe/
 ├── tooling/
 │   ├── agent-os/
 │   │   ├── generate.ts
-│   │   └── lock.ts
+│   │   ├── lock.ts
+│   │   └── session-hooks.ts
 │   ├── ci/
 │   │   ├── build.d.mts
 │   │   ├── build.mjs

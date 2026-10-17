@@ -49,12 +49,25 @@ The file→skill map these hooks consult lives in
   (machine-local permission overrides — gitignored).
 - **Cursor**: `.cursor/hooks.json` → `agent-os/platforms/cursor/hooks.json` (generated).
 - **Codex**: `.codex/hooks.json` and `.codex/config.toml` → `agent-os/platforms/codex/` (generated).
+- **Claude Code, several repositories in one session**: a web session that holds clinozy-fe and
+  clinozy-be runs from their parent (`/home/user`) and takes hooks only from
+  `/home/user/.claude/settings.json`. `pnpm agent-os:session-hooks`
+  ([`tooling/agent-os/session-hooks.ts`](../../tooling/agent-os/session-hooks.ts), run by the cloud
+  bootstrap's step 8) writes every repository's hooks there with absolute paths and
+  `CLAUDE_PROJECT_DIR="<repository>"` in front of each command; it is a no-op in a
+  single-repository checkout. Canary: the SessionStart context names the root the hooks ran from
+  (`clinozy-fe session ready (hooks from …)`), and each run adds a `session-start` row to the
+  gitignored `agent-os/hooks/.telemetry.log`.
 
 To change wiring, edit `hooks.json` then run `pnpm agent-os:generate`.
 
 ## Authoring tips
 
 - Keep hooks fail-open and dependency-light (`jq` optional).
+- **Own files only.** With several repositories in one session every repository's hooks see every
+  edit, so `guard-edits.sh`, `format-edits.sh`, `skill-reminder.sh` and the `guardrails.mjs`
+  warnings act only on files under `$CLAUDE_PROJECT_DIR`. The secret and destructive-shell blocks
+  cover every path. Pinned by `tests/ci/agent-hooks-repository-scope.policy.test.ts`.
 - New blocking rule? Make it **mechanically unambiguous** (a normal edit must
   never be denied) and mirror an existing CI/validator rule.
 - `update-config` (skill) writes `settings.json` safely; `hookify:hookify`

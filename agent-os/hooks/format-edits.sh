@@ -28,6 +28,14 @@ case "$FILE" in
 esac
 [[ -f "$ABS" ]] || exit 0
 
+# Only this repository's files: a session that holds several repositories runs every
+# repository's hooks on every edit (tooling/agent-os/session-hooks.ts), and clinozy-be
+# formats with Biome, not Prettier.
+case "$ABS" in
+  "$ROOT"/*) ;;
+  *) exit 0 ;;
+esac
+
 # Only Prettier-supported source/doc types; skip the lockfile + build output.
 case "$ABS" in
   *.ts | *.tsx | *.js | *.jsx | *.mjs | *.cjs | *.json | *.jsonc | *.css | *.md | *.html | *.yml | *.yaml) ;;

@@ -10,6 +10,15 @@ FILE=$(echo "$INPUT" | python3 -c \
 
 [[ -z "$FILE" ]] && exit 0
 
+# Remind only for files in this repository. A session that holds several
+# repositories runs every repository's hooks on every edit (tooling/agent-os/session-hooks.ts);
+# another repository's files are its own hooks' to judge.
+ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+case "$FILE" in
+  "$ROOT"/* | [!/]*) ;; # under this repository, or relative to it
+  *) exit 0 ;;
+esac
+
 REMINDERS=()
 
 [[ "$FILE" == *".route.tsx" || "$FILE" == *".manifest.ts" ]] && \

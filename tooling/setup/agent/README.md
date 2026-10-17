@@ -34,14 +34,14 @@ Each `install-*.sh` runs standalone as well as under `bootstrap.sh`.
 
 ## Steps and which ones can fail
 
-| #   | Step                                                    | Gate        |
-| --- | ------------------------------------------------------- | ----------- |
-| 1   | Node runtime (pinned major) + corepack                  | **hard**¹   |
-| 2–5 | Distro tools, `gh`, gitleaks, `uv`                      | best-effort |
-| 6   | `pnpm install --frozen-lockfile`                        | **hard**    |
-| 7   | `.env.local` (`setup:local --only-env`)                 | **hard**    |
-| 8–9 | MCP default pair + codegraph index, Playwright browsers | best-effort |
-| 10  | Dev server serves the app shell                         | **hard**²   |
+| #   | Step                                                   | Gate        |
+| --- | ------------------------------------------------------ | ----------- |
+| 1   | Node runtime (pinned major) + corepack                 | **hard**¹   |
+| 2–5 | Distro tools, `gh`, gitleaks, `uv`                     | best-effort |
+| 6   | `pnpm install --frozen-lockfile`                       | **hard**    |
+| 7   | `.env.local` (`setup:local --only-env`)                | **hard**    |
+| 8–9 | MCP pair + codegraph index + session hooks, Playwright | best-effort |
+| 10  | Dev server serves the app shell                        | **hard**²   |
 
 ¹ The install itself is best-effort — a session Node of the right major is fine.
 Missing Node entirely is fatal.
@@ -58,6 +58,7 @@ you a whole session over an optional linter.
 | `AGENT_SKIP_HEALTHCHECK=1`   | Skip step 10; no dev server is started                                                         |
 | `AGENT_SKIP_PLAYWRIGHT=1`    | Skip browser provisioning                                                                      |
 | `AGENT_SKIP_MCP_WARM=1`      | Install `uv` but skip the headroom pre-warm                                                    |
+| `AGENT_SESSION_HOOKS=0`      | Do not write the session root's hooks (step 8, `pnpm agent-os:session-hooks`)                  |
 | `AGENT_PLAYWRIGHT_BROWSERS`  | Browsers to install (default `chromium`)                                                       |
 | `AGENT_PLAYWRIGHT_WITH_DEPS` | Also install browser OS deps (needs root)                                                      |
 | `NODE_INSTALL_PREFIX`        | Parent dir for `node<major>` (default `/opt`)                                                  |

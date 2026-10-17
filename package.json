@@ -125,6 +125,7 @@
     "agent-os:triggers": "tsx agent-os/evals/trigger-eval.ts",
     "agent-os:triggers:strict": "tsx agent-os/evals/trigger-eval.ts --strict",
     "agent-os:lock": "tsx tooling/agent-os/lock.ts",
+    "agent-os:session-hooks": "tsx tooling/agent-os/session-hooks.ts",
     "test:visual": "rm -rf test-results && playwright test tests/e2e/visual.e2e.test.ts",
     "test:visual:update": "rm -rf test-results && playwright test tests/e2e/visual.e2e.test.ts --update-snapshots",
     "prepare": "husky",

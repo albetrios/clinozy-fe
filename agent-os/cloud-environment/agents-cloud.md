@@ -64,7 +64,13 @@ Ten steps, in order:
    to `.mcp.json`; then `pnpm setup:local --only-codegraph` builds the codegraph
    index the MCP server answers from (step 7's `--only-env` stops before it). The
    first build takes about 2–3 minutes and ~250 MB in `.codegraph/`; later runs
-   only `sync` it.
+   only `sync` it. Last, `pnpm agent-os:session-hooks` registers the hooks: a
+   session that holds both repos takes them only from `/home/user/.claude/settings.json`,
+   so it writes both repos' hooks there, each with absolute paths and its own
+   `CLAUDE_PROJECT_DIR` (a no-op with one repo; `AGENT_SESSION_HOOKS=0` turns it
+   off). Each repo's file hooks then act only on its own files. To check it in a
+   new session, look for one "session ready (hooks from …)" line per repo in the
+   session context.
 9. **Playwright browsers** — skipped when the image already ships them.
 10. **Healthcheck** — starts the dev server transiently, verifies it serves the
     real app shell, then stops it.

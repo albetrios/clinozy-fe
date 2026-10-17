@@ -203,8 +203,8 @@ for oauth_key in VITE_AUTH_OAUTH_GOOGLE VITE_AUTH_OAUTH_GITHUB; do
 done
 ok "[7/${TOTAL}] .env.local ready (OAuth buttons off in the cloud)"
 
-# 8) MCP default pair + the codegraph index it serves ------------------------
-step "[8/${TOTAL}] MCP default pair (.mcp.json) + codegraph index"
+# 8) MCP default pair + the codegraph index it serves + session hooks --------
+step "[8/${TOTAL}] MCP default pair (.mcp.json) + codegraph index + session hooks"
 pnpm mcp:setup:default >&2 || skip "mcp:setup:default failed — run it manually if MCP tools are missing"
 if [ -f .mcp.json ]; then
   ok "[8/${TOTAL}] .mcp.json written (codegraph + headroom)"
@@ -218,6 +218,10 @@ if [ -f .codegraph/codegraph.db ]; then
 else
   skip "[8/${TOTAL}] codegraph index absent — codegraph MCP answers nothing until it is built (non-fatal)"
 fi
+# A session that holds several repositories reads hooks only from the parent directory's
+# .claude/settings.json; agent-os:session-hooks writes every repository's there (a no-op in a
+# single-repository checkout).
+pnpm agent-os:session-hooks >&2 || skip "agent-os:session-hooks failed (non-fatal)"
 
 # 9) Playwright browsers -----------------------------------------------------
 step "[9/${TOTAL}] Playwright browsers (E2E)"

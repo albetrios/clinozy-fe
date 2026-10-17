@@ -104,3 +104,6 @@ __pycache__/
 
 # Playwright MCP scratch output (screenshots, console logs) from browser checks
 .playwright-mcp/
+
+# Hook run log — session-start appends a row per run (the multi-repository hooks canary)
+agent-os/hooks/.telemetry.log

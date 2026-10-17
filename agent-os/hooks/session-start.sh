@@ -95,8 +95,15 @@ map_file="$ROOT/agent-os/docs/skill-triggers.md"
 map_section=""
 [ -f "$map_file" ] && map_section="$(cat "$map_file")"
 
-context="$(printf 'clinozy-fe session ready — environment provisioned: %s.\n- Node %s (need >=%s) · deps %s · gh %s · mcp %s · gitleaks %s%s\n- Dev: pnpm dev (Vite :5173) + clinozy-be on :3000. Bootstrap: pnpm setup:local. Gates: pnpm health (all phases) · pnpm tsc · pnpm lint · pnpm validate:tokens · pnpm validate:structure · pnpm validate:testids · pnpm validate:theme-axis · pnpm test\n- Skill-first: consult agent-os/skills/fe-skill-registry/SKILL.md, then the listed skill(s) for the files you change.\n\n%s' \
-  "$provisioned" "$node_version" "$required_major" "$deps" "$gh_cli" "$mcp_status" "$gitleaks_status" "$node_note" "$map_section")"
+context="$(printf 'clinozy-fe session ready (hooks from %s) — environment provisioned: %s.\n- Node %s (need >=%s) · deps %s · gh %s · mcp %s · gitleaks %s%s\n- Dev: pnpm dev (Vite :5173) + clinozy-be on :3000. Bootstrap: pnpm setup:local. Gates: pnpm health (all phases) · pnpm tsc · pnpm lint · pnpm validate:tokens · pnpm validate:structure · pnpm validate:testids · pnpm validate:theme-axis · pnpm test\n- Skill-first: consult agent-os/skills/fe-skill-registry/SKILL.md, then the listed skill(s) for the files you change.\n\n%s' \
+  "$ROOT" "$provisioned" "$node_version" "$required_major" "$deps" "$gh_cli" "$mcp_status" "$gitleaks_status" "$node_note" "$map_section")"
+
+# Canary: the first context line names the root these hooks ran from, and each run appends a
+# row to the gitignored agent-os/hooks/.telemetry.log in clinozy-be's telemetry format, so
+# `grep session-start agent-os/hooks/.telemetry.log` shows the hook ran — including in a
+# session that holds several repositories (tooling/agent-os/session-hooks.ts).
+printf '%s,session-start,SessionStart,fired\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '?')" \
+  >>"$ROOT/agent-os/hooks/.telemetry.log" 2>/dev/null || true
 
 # Prefer the structured additionalContext envelope; fall back to plain stdout
 # (also injected as context) when jq is unavailable. Fail-open either way.
