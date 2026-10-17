@@ -26,6 +26,7 @@
     "test:unit": "vitest run --project unit",
     "test:security": "vitest run --project security",
     "test:ci-policy": "vitest run --project ci-policy",
+    "test:select": "node tooling/ci/select-tests.mjs",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "rm -rf test-results 2>/dev/null || true && playwright test",

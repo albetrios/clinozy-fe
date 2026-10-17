@@ -159,8 +159,28 @@ Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`.
 | `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be) |
 | `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)           |
 | `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                            |
+| `pnpm test:select [--why\|--run]`         | The Vitest files a change can affect, and why          |
 
 Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes.txt`.
+
+## Test selection (`pnpm test:select`)
+
+`tooling/ci/test-selection.mjs` names the Vitest files a set of changed files can affect (changes
+since the merge base with `origin/main` plus the working tree, or `--files a,b`). A test is selected
+when its imports reach a changed file (static and dynamic `import`, `vi.mock`, `import.meta.glob`),
+when it mentions the changed path (the `tests/ci` policy tests that read files), or when it is the
+changed test itself. Pages never import pages, so a page change stays inside its island. Any `src/`
+change also runs `tests/security/` and every test that imports nothing from the repository.
+
+It runs everything for the escalation list — dependencies, `tsconfig`, the Vitest and Vite config
+and the plugins they load, `src/locales/`, and the test setup (`tests/utils/setup.ts`) with
+everything it imports (i18n, `shared/api`, auth, the stores: every test runs through it) — and fails
+closed: a path outside the known roots, a deleted file nothing imports, or any error selects
+everything. `--why` lists each test's reason, `--json` the whole selection, `--run` runs it (`pnpm
+test` when everything is selected), `--changed-only` drops the always-run set, `--exclude <glob>`
+leaves tests out. The pre-push hook still runs the whole suite; the selector feeds the faster
+signals built on it. Its rules are pinned by `tooling/ci/test-selection.test.mjs` (`pnpm
+test:github-scripts`), which also pins its project list to `vitest.config.ts`.
 
 ## Mutation testing (Stryker, weekly)
 
