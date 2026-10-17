@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/albetrios/clinozy-fe/compare/v1.16.0...v1.17.0) (2026-10-16)
+
+
+### Added
+
+* **setup:** ask the clinic setup one question at a time ([#91](https://github.com/albetrios/clinozy-fe/issues/91)) ([4e90c81](https://github.com/albetrios/clinozy-fe/commit/4e90c81ca89fe2dc8c42572f1ce56004fc99052c))
+
 ## [1.16.0](https://github.com/albetrios/clinozy-fe/compare/v1.15.0...v1.16.0) (2026-10-16)
 
 
