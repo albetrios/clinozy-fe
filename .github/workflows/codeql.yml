@@ -59,3 +59,42 @@ jobs:
         uses: github/codeql-action/analyze@84498526a009a99c875e83ef4821a8ba52de7c22 # codeql-bundle-v2.25.5
         with:
           category: '/language:javascript-typescript'
+
+  resolve-success:
+    name: Close ci-failure issue
+    needs: [analyze]
+    if: always() && github.event_name != 'pull_request' && needs.analyze.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close the open ci-failure issue
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        with:
+          mode: close
+          title: CodeQL analysis failing
+
+  notify-failure:
+    name: Notify failure
+    needs: [analyze]
+    if: always() && github.event_name != 'pull_request' && (needs.analyze.result == 'failure')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update ci-failure issue
+        # A red scheduled run is invisible unless someone opens the Actions tab; one issue per
+        # check sends a real notification, collects repeats as comments, and closes on the next
+        # green run (clinozy-be's shared ci-failure-issue action).
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        with:
+          mode: open
+          title: CodeQL analysis failing
+          body: |
+            The scheduled (or manually run) CodeQL analysis of main failed. Read the Analyze job log; a new
+            finding shows under Security → Code scanning. PR runs never open this issue (the PR shows its own
+            result). The next green run closes it.

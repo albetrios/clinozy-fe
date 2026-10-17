@@ -88,11 +88,14 @@ describe('post-merge CI policy (single trunk)', () => {
   it('persists a tracked ci-failure issue on post-merge failure (not just a run ::error)', () => {
     const notifyBlock = jobBlock(workflow, 'notify-failure');
     expect(notifyBlock).not.toBe('');
-    // widened perms + github-script upsert of a labelled, marker-deduped issue.
+    // widened perms + clinozy-be's shared action: one labelled issue per title, repeats as
+    // comments, and the next green run closes it.
     expect(notifyBlock).toContain('issues: write');
-    expect(notifyBlock).toContain('actions/github-script@');
-    expect(notifyBlock).toContain("labels: ['ci-failure']");
-    expect(notifyBlock).toContain('post-merge-ci-failure');
+    expect(notifyBlock).toContain('/.github/actions/ci-failure-issue@');
+    expect(notifyBlock).toMatch(/mode: open\n\s+title: Post-merge CI failing/);
+    const resolveBlock = jobBlock(workflow, 'resolve-success');
+    expect(resolveBlock).toContain('issues: write');
+    expect(resolveBlock).toMatch(/mode: close\n\s+title: Post-merge CI failing/);
   });
 
   it('does NOT auto-merge release PRs — release on cadence (manual merge is the ship button)', () => {

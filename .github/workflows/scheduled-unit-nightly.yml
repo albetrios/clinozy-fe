@@ -26,3 +26,42 @@ concurrency:
 jobs:
   unit:
     uses: ./.github/workflows/reusable-vitest-unit-only.yml
+
+  resolve-success:
+    name: Close ci-failure issue
+    needs: [unit]
+    if: always() && needs.unit.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close the open ci-failure issue
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        with:
+          mode: close
+          title: Nightly unit suite failing
+
+  notify-failure:
+    name: Notify failure
+    needs: [unit]
+    if: always() && (needs.unit.result == 'failure')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update ci-failure issue
+        # A red scheduled run is invisible unless someone opens the Actions tab; one issue per
+        # check sends a real notification, collects repeats as comments, and closes on the next
+        # green run (clinozy-be's shared ci-failure-issue action).
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        with:
+          mode: open
+          title: Nightly unit suite failing
+          body: |
+            The nightly sharded unit suite on main failed — main is red without a PR (two green PRs that
+            conflict, or a dependency resolved differently). Read the failed shard. The next green night
+            closes this issue.

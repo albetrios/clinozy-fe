@@ -373,57 +373,37 @@ jobs:
           set -euo pipefail
           echo "::error title=Post-merge CI failed::release=${RELEASE_RESULT} deploy-dev=${DEV_DEPLOY_RESULT} — ${WORKFLOW_URL}"
 
-      # A run-scoped ::error annotation dies with the run. Persist a tracked issue
-      # (find-or-create by a hidden marker, labelled `ci-failure`) so a broken
-      # release/deploy stays visible until someone acts on it. Idempotent: reuses
-      # the open issue and appends a comment rather than spamming new ones.
+      # A run-scoped ::error annotation dies with the run. One tracked `ci-failure` issue keeps a
+      # broken release/deploy visible until it is fixed: repeats become comments, and the next
+      # green post-merge run closes it (clinozy-be's shared ci-failure-issue action).
       - name: Open or update the ci-failure issue
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          RELEASE_RESULT: ${{ needs.release-please.result }}
-          DEV_DEPLOY_RESULT: ${{ needs.deploy-development.result }}
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
         with:
-          script: |
-            const marker = '<!-- post-merge-ci-failure -->';
-            const { owner, repo } = context.repo;
-            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
-            const body = [
-              marker,
-              `Post-merge CI failed on \`${context.sha}\`.`,
-              '',
-              '| Job | Result |',
-              '| --- | --- |',
-              `| release-please | ${process.env.RELEASE_RESULT} |`,
-              `| deploy-development | ${process.env.DEV_DEPLOY_RESULT} |`,
-              '',
-              `Run: ${runUrl}`,
-            ].join('\n');
+          mode: open
+          title: Post-merge CI failing
+          body: |
+            Post-merge CI failed on `${{ github.sha }}`.
 
-            const open = await github.paginate(github.rest.issues.listForRepo, {
-              owner,
-              repo,
-              state: 'open',
-              labels: 'ci-failure',
-              per_page: 100,
-            });
-            const existing = open.find((issue) => (issue.body || '').includes(marker));
+            | Job | Result |
+            | --- | --- |
+            | release-please | ${{ needs.release-please.result }} |
+            | deploy-development | ${{ needs.deploy-development.result }} |
 
-            if (existing) {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: existing.number,
-                body,
-              });
-              core.notice(`Updated ci-failure issue #${existing.number}`);
-            } else {
-              // `labels` auto-creates the `ci-failure` label if it does not exist.
-              const created = await github.rest.issues.create({
-                owner,
-                repo,
-                title: 'Post-merge CI failing',
-                labels: ['ci-failure'],
-                body,
-              });
-              core.notice(`Opened ci-failure issue #${created.data.number}`);
-            }
+  resolve-success:
+    name: Close ci-failure issue
+    needs: [release-please, deploy-development]
+    if: |
+      always() &&
+      needs.release-please.result == 'success' &&
+      (needs.deploy-development.result == 'success' || needs.deploy-development.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close the open ci-failure issue
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        with:
+          mode: close
+          title: Post-merge CI failing
