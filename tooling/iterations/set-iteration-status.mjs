@@ -21,6 +21,7 @@ import {
   readIterationReadme,
   renderHistoryEntry,
   setReadmeField,
+  recordedProcess,
   validateStatusTransition,
 } from './iterations.mjs';
 
@@ -87,7 +88,12 @@ export function planStatusChange({ repositoryRoot, iteration, status, reason, to
       `${iteration}/README.md has Status "${current}", which is not a known status.`,
     );
   }
-  validateStatusTransition({ from: current, to: status, reason });
+  validateStatusTransition({
+    from: current,
+    to: status,
+    reason,
+    process: recordedProcess(readme.fields),
+  });
   const historyEntry = renderHistoryEntry({
     date: today ?? localDate(new Date()),
     change: `${current} → ${status}`,

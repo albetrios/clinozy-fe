@@ -67,6 +67,7 @@ import {
   NO_BASELINE,
   parseCommandLine,
   parseIterationName,
+  OPTIONAL_README_FIELDS,
   README_FIELD_LABELS,
   readIterationReadme,
   readResolvedSnapshot,
@@ -807,7 +808,9 @@ function planSide({
   diffs,
 }) {
   const status = readme.fields.get('Status') ?? '';
-  const missingRows = README_FIELD_LABELS.filter((field) => !readme.fields.has(field));
+  const missingRows = README_FIELD_LABELS.filter(
+    (field) => !readme.fields.has(field) && !OPTIONAL_README_FIELDS.has(field),
+  );
   if (missingRows.length > 0) {
     problems.push(
       `${label}: README.md has no ${missingRows.join(', ')} row — it predates the field; add the rows from tooling/iterations/templates/README.md.`,

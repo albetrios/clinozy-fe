@@ -40,6 +40,11 @@ PHASE 2 · KICKOFF  (the approved plan, built one ledger row at a time)
  │
  └─ 8 FROZEN      the last commit before the merge → iteration:status frozen
                   → never edited again; a correction is a new fix           [frozen]
+
+A LITE FIX  (pnpm iteration:new fix <topic> --lite — README Process lite)
+ new → "plan iteration <it>": KICKOFF.md + plans/decisions.md in ONE step, one stop for your go
+     → kickoff: planning → implementing (no ready-for-approval, no approved; no drop needed)
+     → done → frozen
 ```
 
 ## What is inside an iteration folder

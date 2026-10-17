@@ -4,7 +4,7 @@
  *
  * Usage:
  *   pnpm iteration:new launch
- *   pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--dry-run]
+ *   pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--lite] [--dry-run]
  *
  * Creates `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/README.md` — Owner, Opened, Branch,
  * Baseline `none` and Status `planning` filled in. Every iteration starts from scratch: nothing
@@ -19,6 +19,7 @@ import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadSetupConfig } from '../setup/github/setup-config.mjs';
 import {
+  DEFAULT_ITERATION_PROCESS,
   EMPTY_FIELD,
   INITIAL_ITERATION_STATUS,
   ITERATION_TYPES,
@@ -46,21 +47,23 @@ const TEMPLATE_PLACEHOLDER = /\{\{(\w+)\}\}/g;
 
 const USAGE = `Usage:
   pnpm iteration:new launch
-  pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--dry-run]
+  pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--lite] [--dry-run]
 
   --both            also open the folder in the sibling repository (clinozy-be)
   --sibling <path>  sibling repository path (default: ../<package name with -fe → -be>)
+  --lite            a fix only: planned in one step, Process lite (planning → implementing → done → frozen)
   --dry-run         print what would be created; write nothing`;
 
 /**
- * Parses `<type> [topic] [--both] [--sibling <path>] [--dry-run]`. `--sibling` implies `--both`.
+ * Parses `<type> [topic] [--both] [--sibling <path>] [--lite] [--dry-run]`. `--sibling` implies
+ * `--both`.
  *
  * @param {readonly string[]} commandLine
- * @returns {{ type: string | undefined, topic: string | undefined, createInSibling: boolean, siblingPath: string | undefined, dryRun: boolean, help: boolean }}
+ * @returns {{ type: string | undefined, topic: string | undefined, createInSibling: boolean, siblingPath: string | undefined, lite: boolean, dryRun: boolean, help: boolean }}
  */
 export function parseNewIterationArguments(commandLine) {
   const parsed = parseCommandLine(commandLine, {
-    flags: ['--both', '--dry-run'],
+    flags: ['--both', '--lite', '--dry-run'],
     maxPositionals: 2,
     usage: 'expected <type> [topic].',
   });
@@ -69,6 +72,7 @@ export function parseNewIterationArguments(commandLine) {
     topic: parsed.positionals[1],
     createInSibling: parsed.createInSibling,
     siblingPath: parsed.siblingPath,
+    lite: parsed.flags.has('--lite'),
     dryRun: parsed.flags.has('--dry-run'),
     help: parsed.help,
   };
@@ -211,6 +215,11 @@ function pickUniqueName({ type, topic, opened, takenNames, folderExists, nextId 
 export function planNewIteration(request) {
   const { repositoryRoot, baseBranch, siblingRoot } = request;
   const { type, topic } = validateTypeAndTopic(request);
+  if (request.lite === true && type !== 'fix') {
+    throw new Error(
+      `--lite is for a fix only; a ${type} runs the full planning procedure.`,
+    );
+  }
   const localNames = workingTreeIterationNames(repositoryRoot);
   const baseNames = baseBranchIterationNames({ repositoryRoot, baseBranch });
   const siblingNames =
@@ -252,6 +261,7 @@ export function planNewIteration(request) {
 
   const fields = {
     type,
+    process: request.lite === true ? 'lite' : DEFAULT_ITERATION_PROCESS,
     topic: topic ?? EMPTY_FIELD,
     owner,
     opened,
@@ -344,6 +354,13 @@ function describePlan(plan, repositoryRoot) {
 }
 
 function nextSteps(plan) {
+  if (plan.fields.process === 'lite')
+    return [
+      'Next (a lite fix):',
+      `  1. Write the Summary line in ${ITERATIONS_DIRECTORY}/${plan.name}/README.md.`,
+      `  2. Plan it in one step: "plan iteration ${plan.name}" (fe-iteration-planning, lite: KICKOFF.md and plans/decisions.md, one stop for the user's go).`,
+      `  3. On the go: pnpm iteration:status ${plan.name} implementing, then "kickoff iteration ${plan.name}".`,
+    ];
   const both = plan.siblingRoot === undefined ? '' : ' --both';
   const modes =
     plan.fields.type === 'launch'
@@ -383,6 +400,7 @@ export function runNewIteration(commandLine, context = {}) {
       : undefined,
     today: context.today,
     nextId: context.nextId,
+    lite: options.lite,
   });
   if (options.dryRun)
     return {

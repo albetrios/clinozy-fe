@@ -185,6 +185,51 @@ describe('validateStatusTransition', () => {
     }
   });
 
+  test('moves a lite fix planning → implementing → done → frozen, and back only with a reason', () => {
+    for (const [from, to] of [
+      ['planning', 'implementing'],
+      ['implementing', 'done'],
+      ['done', 'frozen'],
+    ]) {
+      validateStatusTransition({ from, to, reason: undefined, process: 'lite' });
+    }
+    assert.throws(
+      () =>
+        validateStatusTransition({
+          from: 'planning',
+          to: 'ready-for-approval',
+          reason: undefined,
+          process: 'lite',
+        }),
+      /a lite fix\)\. From planning the allowed next status is implementing/,
+    );
+    assert.throws(
+      () =>
+        validateStatusTransition({
+          from: 'implementing',
+          to: 'planning',
+          reason: undefined,
+          process: 'lite',
+        }),
+      /needs --reason/,
+    );
+    validateStatusTransition({
+      from: 'done',
+      to: 'planning',
+      reason: 'reopened',
+      process: 'lite',
+    });
+    assert.throws(
+      () =>
+        validateStatusTransition({
+          from: 'planning',
+          to: 'implementing',
+          reason: undefined,
+        }),
+      /allowed next status is ready-for-approval/,
+    );
+  });
+
   test('refuses skips, other moves back, and anything from frozen', () => {
     assert.throws(
       () =>

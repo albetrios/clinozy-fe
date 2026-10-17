@@ -24,6 +24,16 @@ export const ITERATION_STATUSES = [
   'frozen',
 ];
 
+/**
+ * How an iteration is run: `full`, the whole planning procedure with its approval; or `lite`, for a
+ * small fix — planned in one step and moved `planning → implementing → done → frozen` (as in
+ * clinozy-be).
+ */
+export const ITERATION_PROCESSES = ['full', 'lite'];
+
+/** The process a README without a Process row runs — every iteration opened before lite mode. */
+export const DEFAULT_ITERATION_PROCESS = 'full';
+
 /** Status a freshly opened iteration starts in. */
 export const INITIAL_ITERATION_STATUS = 'planning';
 
@@ -59,6 +69,7 @@ export const FINGERPRINT_LENGTH = 12;
 /** README field labels, in table order — the template lists exactly these rows. */
 export const README_FIELD_LABELS = [
   'Type',
+  'Process',
   'Topic',
   'Owner',
   'Opened',
@@ -73,6 +84,9 @@ export const README_FIELD_LABELS = [
   'Schema-routes',
   'Intake hash',
 ];
+
+/** README rows an older iteration may lack: a README without a Process row runs `full`. */
+export const OPTIONAL_README_FIELDS = new Set(['Process']);
 
 /**
  * How `pnpm iteration:intake` builds the snapshot: `full` — the whole drop as received; `overlay`
@@ -138,6 +152,29 @@ const FORWARD_TRANSITIONS = new Map([
 
 /** Statuses that may move back to `planning` — only with a reason. */
 const BACK_TO_PLANNING = new Set(['ready-for-approval', 'approved', 'implementing']);
+
+/**
+ * A lite fix's lifecycle: the user's go on the one-step plan moves `planning` straight to
+ * `implementing` (no `ready-for-approval` or `approved`).
+ */
+const LITE_FORWARD_TRANSITIONS = new Map([
+  ['planning', 'implementing'],
+  ['implementing', 'done'],
+  ['done', 'frozen'],
+]);
+
+/** The statuses a lite fix may take back to `planning`, with a reason. */
+const LITE_BACK_TO_PLANNING = new Set(['implementing', 'done']);
+
+/**
+ * The process an iteration runs, from its README's Process row (`full` when the row is missing).
+ *
+ * @param {ReadonlyMap<string, string>} fields
+ * @returns {'full' | 'lite'}
+ */
+export function recordedProcess(fields) {
+  return fields.get('Process') === 'lite' ? 'lite' : DEFAULT_ITERATION_PROCESS;
+}
 
 /**
  * Variables git exports into the hooks it runs. They take precedence over `cwd`, so a child
@@ -371,25 +408,29 @@ export function gitUserName(repositoryRoot) {
 /**
  * Checks one Status move: one step forward along `planning → ready-for-approval → approved →
  * implementing → done → frozen`, or `ready-for-approval`, `approved` or `implementing` back to
- * `planning` with a reason.
+ * `planning` with a reason. A `lite` fix moves `planning → implementing → done → frozen`, and
+ * `implementing` or `done` back to `planning` with a reason.
  *
- * @param {{ from: string, to: string, reason: string | undefined }} move
+ * @param {{ from: string, to: string, reason: string | undefined, process?: 'full' | 'lite' }} move
  * @throws with the allowed next statuses on any other move, and on a reasonless move back
  */
-export function validateStatusTransition({ from, to, reason }) {
-  if (FORWARD_TRANSITIONS.get(from) === to) return;
-  if (to === 'planning' && BACK_TO_PLANNING.has(from)) {
+export function validateStatusTransition({ from, to, reason, process: runAs }) {
+  const lite = runAs === 'lite';
+  const forward = lite ? LITE_FORWARD_TRANSITIONS : FORWARD_TRANSITIONS;
+  const backToPlanning = lite ? LITE_BACK_TO_PLANNING : BACK_TO_PLANNING;
+  if (forward.get(from) === to) return;
+  if (to === 'planning' && backToPlanning.has(from)) {
     if (reason === undefined || reason.trim() === '') {
       throw new Error(`Moving ${from} → planning needs --reason "<why it goes back>".`);
     }
     return;
   }
   const allowed = [
-    ...(FORWARD_TRANSITIONS.has(from) ? [FORWARD_TRANSITIONS.get(from)] : []),
-    ...(BACK_TO_PLANNING.has(from) ? ['planning (with --reason)'] : []),
+    ...(forward.has(from) ? [forward.get(from)] : []),
+    ...(backToPlanning.has(from) ? ['planning (with --reason)'] : []),
   ];
   throw new Error(
-    `Cannot move ${from} → ${to}. From ${from} the allowed next status is ${
+    `Cannot move ${from} → ${to}${lite ? ' (a lite fix)' : ''}. From ${from} the allowed next status is ${
       allowed.length === 0
         ? 'none — a frozen iteration is never edited'
         : allowed.join(' or ')

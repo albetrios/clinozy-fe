@@ -3,7 +3,7 @@
  * every change writes.
  */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, test } from 'node:test';
 import {
@@ -115,6 +115,42 @@ describe('status changes', () => {
     assert.equal(
       back.historyEntry,
       `- ${TODAY} · approved → planning · scope changed · ${OWNER}`,
+    );
+  });
+
+  test('moves a lite fix straight to implementing; a README without a Process row is full', () => {
+    const repositoryRoot = createRepository();
+    const fix = 'fix-rounding-2026-10-06-kqzx';
+    writeIteration({
+      repositoryRoot,
+      name: fix,
+      fields: { type: 'fix', process: 'lite', topic: 'rounding' },
+    });
+    const lite = planStatusChange({
+      repositoryRoot,
+      iteration: fix,
+      status: 'implementing',
+      reason: undefined,
+      today: TODAY,
+    });
+    assert.equal(parseIterationReadme(lite.content).get('Status'), 'implementing');
+
+    writeIteration({ repositoryRoot, name: NAME });
+    const readmePath = join(repositoryRoot, 'iterations', NAME, 'README.md');
+    writeFileSync(
+      readmePath,
+      readmeOf(repositoryRoot).replace(/^\| Process \|.*\n/m, ''),
+    );
+    assert.equal(parseIterationReadme(readmeOf(repositoryRoot)).has('Process'), false);
+    assert.throws(
+      () =>
+        planStatusChange({
+          repositoryRoot,
+          iteration: NAME,
+          status: 'implementing',
+          reason: undefined,
+        }),
+      /allowed next status is ready-for-approval/,
     );
   });
 

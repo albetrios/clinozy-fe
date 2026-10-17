@@ -21,6 +21,11 @@ A design change from Claude Design is an **iteration**: `iterations/<type>-<topi
    list of where the code differs from the design — and `frozen` in the last commit before the merge. A
    frozen iteration is never edited; a correction is a new `fix`.
 
+A small `fix` can run **lite** (`pnpm iteration:new fix <topic> --lite`, README Process `lite`):
+`fe-iteration-planning` plans it in one step — `KICKOFF.md` and `plans/decisions.md`, one stop for
+the user's go — and `fe-kickoff-iteration` moves it `planning → implementing → done → frozen`, with
+no `ready-for-approval` or `approved`, and no drop needed.
+
 - **Intake modes.** `full` — the whole drop (the launch is always full). `overlay` — only the changed
   files, laid over a named Baseline's snapshot. `brief` — no design files, only a written `BRIEF.md`
   ("implement these kinds of screens"; template `tooling/iterations/templates/BRIEF.md`): on its own
@@ -42,8 +47,9 @@ A design change from Claude Design is an **iteration**: `iterations/<type>-<topi
   `pnpm iteration:diff <baseline> <iteration>`, which compares the two resolved intakes only (in
   `brief` mode, `BRIEF.md` itself) — so a named Baseline's intake is mandatory — and planning reads its
   Standing deviations. Either way planning reads the current code: what was built beats what was drawn.
-- **Status** moves `planning → ready-for-approval → approved → implementing → done → frozen` only
-  through `pnpm iteration:status` (back to `planning` with `--reason`); it and `iteration:baseline`
+- **Status** moves `planning → ready-for-approval → approved → implementing → done → frozen` (a
+  lite fix: `planning → implementing → done → frozen`) only through `pnpm iteration:status` (back to
+  `planning` with `--reason`); it and `iteration:baseline`
   append the README's History. Never edit `intake-files/` or a README's values by hand (Summary
   excepted); `pnpm iteration:list` is the index.
 - **Both repos.** clinozy-be uses the same names, commands and README template (`--both` opens and

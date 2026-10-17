@@ -56,6 +56,21 @@ iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/
 - The README's Status and Baseline change only through `pnpm iteration:status`
   and `pnpm iteration:baseline`, which also append its History line.
 
+## Lite mode — a fix planned in one step
+
+When the README's Process is `lite` (a `fix` opened with `pnpm iteration:new fix <topic> --lite`):
+
+1. **Step 0** as below — confirm the iteration (Baseline `none` unless the user names one); run the
+   gate only when a drop was placed (Drop placed is not `—`).
+2. **One step, then one stop:** read the current code the fix touches, then write `KICKOFF.md` —
+   Header, Locked decisions, the ledger rows (each naming its skill) and **what proves the fix** (a
+   failing test turned green, at least; the 375px / 1440px check when a screen changes), every other
+   section `n/a — a lite fix` — and `plans/decisions.md` (what is decided and why). Show both in one
+   step review and ask the user's go with **AskUserQuestion**.
+3. No `ready-for-approval` and no `approved`: on the go, fe-kickoff-iteration moves it
+   `planning → implementing` and builds the rows. If the fix turns out bigger than a fix (a new
+   screen, a new route), stop and say so — it becomes a `change` with the full procedure.
+
 ## Procedure — stop after every step and wait
 
 ### Step 0 — Confirm the iteration. Stop until confirmed.

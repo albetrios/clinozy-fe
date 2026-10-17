@@ -41,6 +41,11 @@ plan after that, go back first:
 `ready-for-approval`, `approved` or `implementing`. A frozen iteration is never
 edited; a correction is a new `fix` iteration.
 
+A small fix can skip the drop and the approval round: `pnpm iteration:new fix <topic> --lite`
+(Process `lite`) is planned in one step — `KICKOFF.md` and `plans/decisions.md`, one stop for your
+go — and moves `planning → implementing → done → frozen`
+([iterations/README.md](../../../iterations/README.md) › Lifecycle).
+
 ## Iterations
 
 Every design change is its own folder under `iterations/`. The rules and the

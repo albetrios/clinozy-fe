@@ -108,6 +108,7 @@ nothing, changes no status and asks nothing else; it prints the command's output
 | Field         | Value                                                                                    |
 | ------------- | ---------------------------------------------------------------------------------------- |
 | Type          | `launch`, `feat`, `change` or `fix`                                                      |
+| Process       | `full`, or `lite` — a `fix` planned in one step (`--lite`); no row means `full`          |
 | Topic         | the kebab-case topic; `—` for launch                                                     |
 | Owner         | the person driving it (`git config user.name`)                                           |
 | Opened        | `YYYY-MM-DD`                                                                             |
@@ -168,10 +169,17 @@ Status moves one step at a time with `pnpm iteration:status <iteration> <status>
 `--reason "<why>"`; nothing else is allowed. Never edit a frozen iteration — a correction is a new
 `fix` iteration.
 
+A **lite** fix (Process `lite`, opened with `pnpm iteration:new fix <topic> --lite`) moves
+`planning → implementing → done → frozen`: fe-iteration-planning plans it in one step — `KICKOFF.md`
+and `plans/decisions.md`, one stop for the user's go — and fe-kickoff-iteration moves it to
+`implementing`, with no `ready-for-approval` or `approved`. It needs no drop; when one is placed, the
+gate runs as usual. `implementing` or `done` may go back to `planning` with `--reason`.
+
 ## Commands
 
 ```bash
 pnpm iteration:new feat pharmacy-returns --both                    # open (README only)
+pnpm iteration:new fix rounding --lite                             # a fix planned in one step
 pnpm iteration:intake <iteration> <source-folder> --both           # place a full drop + check it
 pnpm iteration:intake <iteration> <source-folder> --mode overlay   # only the changed files arrived (named Baseline)
 pnpm iteration:intake <iteration> <source-folder> --mode brief     # only BRIEF.md arrived

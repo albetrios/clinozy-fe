@@ -217,6 +217,7 @@ export function writeIteration({
     name,
     fields: {
       type: name.split('-')[0],
+      process: 'full',
       topic: EMPTY_FIELD,
       owner: OWNER,
       opened: /\d{4}-\d{2}-\d{2}/.exec(name)?.[0] ?? TODAY,

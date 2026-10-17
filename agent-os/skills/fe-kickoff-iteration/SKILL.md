@@ -22,7 +22,9 @@ Run `pnpm iteration:list` and show:
 
 Eligible = Status `approved` (not yet `implementing`), and Baseline `none` (from
 scratch, the default) or an iteration the user named that is `done` or `frozen` —
-a build never starts on an unbuilt Baseline. Recommend the earliest-opened eligible
+a build never starts on an unbuilt Baseline. A **lite** fix (README Process `lite`) is
+eligible in `planning` once the user gave the go on its `KICKOFF.md` (fe-iteration-planning ›
+Lite mode). Recommend the earliest-opened eligible
 iteration (the launch always comes first). If the user named one, check it against
 the rule. Confirm the iteration with **AskUserQuestion** — never pick silently —
 and never ask about or suggest a Baseline: it is whatever planning recorded.
@@ -35,9 +37,11 @@ pnpm iteration:intake <iteration> --check
 
 **Gate rule:** if it exits non-zero, stop now — write nothing, change no status, ask nothing
 else; print the command's output and end the turn. The intake has to be fixed (and the plan
-re-approved if it changed) before any build.
+re-approved if it changed) before any build. A lite fix with no drop placed (Drop placed `—`) has
+no intake to gate — the gate would only say "no intake yet" — so it is skipped; with a drop it runs.
 
-When it passes: `pnpm iteration:status <iteration> implementing`, and create `AS-BUILT.md` from
+When it passes: `pnpm iteration:status <iteration> implementing` (a lite fix moves there straight
+from `planning`), and create `AS-BUILT.md` from
 the skeleton below, dated today, with the Baseline's Standing deviations copied in as the starting
 list (empty for an iteration from scratch).
 

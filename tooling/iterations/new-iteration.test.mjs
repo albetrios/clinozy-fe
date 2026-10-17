@@ -66,10 +66,12 @@ describe('arguments and names', () => {
         topic: 'pharmacy-returns',
         createInSibling: true,
         siblingPath: undefined,
+        lite: false,
         dryRun: true,
         help: false,
       },
     );
+    assert.equal(parseNewIterationArguments(['fix', 'rounding', '--lite']).lite, true);
     assert.equal(
       parseNewIterationArguments(['fix', 'x', '--sibling', '../other-be']).siblingPath,
       '../other-be',
@@ -156,6 +158,7 @@ describe('the README template', () => {
       fields: Object.fromEntries(
         [
           'type',
+          'process',
           'topic',
           'owner',
           'opened',
@@ -180,14 +183,17 @@ describe('the README template', () => {
     );
   });
 
-  test('every iteration README in this repository carries all the fields', () => {
+  test('every iteration README in this repository carries all the fields (Process optional: none is full)', () => {
     for (const name of readdirSync(join(ROOT, 'iterations')).filter(
       (entry) => !entry.includes('.'),
     )) {
       const readme = readFileSync(join(ROOT, 'iterations', name, 'README.md'), 'utf-8');
+      const keys = [...parseIterationReadme(readme).keys()];
       assert.deepEqual(
-        [...parseIterationReadme(readme).keys()],
-        README_FIELD_LABELS,
+        keys,
+        README_FIELD_LABELS.filter(
+          (label) => label !== 'Process' || keys.includes('Process'),
+        ),
         name,
       );
       assert.ok(
@@ -213,6 +219,7 @@ describe('planNewIteration', () => {
     assert.equal(launch.name, `launch-${TODAY}-jxmr`);
     assert.deepEqual(launch.fields, {
       type: 'launch',
+      process: 'full',
       topic: '—',
       owner: OWNER,
       opened: TODAY,
@@ -363,9 +370,42 @@ describe('planNewIteration', () => {
       /user\.name/,
     );
   });
+
+  test('opens a lite fix with Process lite, and refuses --lite on anything but a fix', () => {
+    const repositoryRoot = createRepository();
+    writeIteration({ repositoryRoot, name: 'launch-2026-09-30-jxmr' });
+    const lite = plan(repositoryRoot, { type: 'fix', topic: 'rounding', lite: true });
+    assert.equal(lite.fields.process, 'lite');
+    assert.equal(parseIterationReadme(lite.files[0].content).get('Process'), 'lite');
+    assert.equal(
+      plan(repositoryRoot, { type: 'fix', topic: 'rounding' }).fields.process,
+      'full',
+    );
+    assert.throws(
+      () => plan(repositoryRoot, { type: 'feat', topic: 'returns', lite: true }),
+      /--lite is for a fix only/,
+    );
+  });
 });
 
 describe('runNewIteration', () => {
+  test('a lite fix is told to plan in one step — no drop to place', () => {
+    const repositoryRoot = createRepository();
+    writeIteration({ repositoryRoot, name: 'launch-2026-09-30-jxmr' });
+    const real = runNewIteration(['fix', 'rounding', '--lite'], {
+      repositoryRoot,
+      baseBranch: BASE_BRANCH,
+      today: TODAY,
+      nextId: () => 'kqzx',
+    });
+    assert.ok(real.lines.includes('Next (a lite fix):'));
+    assert.ok(real.lines.some((line) => line.includes('Plan it in one step')));
+    assert.equal(
+      real.lines.some((line) => line.includes('pnpm iteration:intake')),
+      false,
+    );
+  });
+
   test('a dry run prints the plan and writes nothing; a real run writes the README and the next steps', () => {
     const repositoryRoot = createRepository();
     const dry = runNewIteration(['launch', '--dry-run'], {
