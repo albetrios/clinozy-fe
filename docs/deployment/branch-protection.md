@@ -65,7 +65,10 @@ Delete the variable after upgrading the plan.
 ### Skipped PR CI jobs on docs-only pull requests
 
 When path filters detect **docs-only markdown** (`docs-only-md`), most PR CI jobs are
-**skipped**. Skipped required checks do **not** block merge.
+**skipped**. Skipped required checks do **not** block merge. A PR is docs-only only when **every**
+changed file is Markdown or under `docs/` (a second `paths-filter` step with
+`predicate-quantifier: every`): a root config such as `knip.jsonc` next to a README runs Knip and
+Build. Pinned by `tests/ci/pr-ci-docs-only.policy.test.ts`.
 
 ---
 
