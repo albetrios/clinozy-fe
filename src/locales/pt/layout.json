@@ -82,6 +82,11 @@
       "saveForm": "Salvar o formulário aberto",
       "dictate": "Ditar no campo em que você está"
     },
+    "planAccess": {
+      "grace": "O plano da sua clínica não está ativo. Os registros da clínica passarão a ser somente leitura em {{date}}.",
+      "readOnly": "Somente leitura — o plano da sua clínica não está ativo, então os registros não podem ser alterados. Escolha um plano para desbloquear.",
+      "choosePlan": "Escolher um plano"
+    },
     "emailVerify": {
       "message": "Verifique seu e-mail para proteger sua conta.",
       "resend": "Reenviar e-mail",

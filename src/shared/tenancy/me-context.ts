@@ -12,6 +12,32 @@ import {
 } from './deployment-mode.ts';
 
 // ── Wire schemas (snake_case — mirror the clinozy-be serializers) ──────────────
+
+/**
+ * Whether the active clinic's records can be changed, by its plan: `active` (paid, or
+ * enforcement off), `grace` (no paid plan — records turn read-only at `grace_ends_at`) or
+ * `read_only` (every write to `/api/v1/app/*` answers `403 organization_read_only`).
+ */
+export const PLAN_ACCESS_STATES = ['active', 'grace', 'read_only'] as const;
+/** One of {@link PLAN_ACCESS_STATES}. */
+export type PlanAccessState = (typeof PLAN_ACCESS_STATES)[number];
+
+const planAccessWire = z.object({
+  state: z.enum(PLAN_ACCESS_STATES),
+  /** When a `grace` period ends (ISO 8601); null when active. */
+  grace_ends_at: isoDateString.nullable(),
+});
+
+/** The active clinic's plan access, camel-cased (what the app consumes). */
+export interface PlanAccess {
+  state: PlanAccessState;
+  /** When records turn read-only (ISO 8601) — set during `grace`; null otherwise. */
+  graceEndsAt: string | null;
+}
+
+/** What a clinic with a paid plan — or a backend that sends no `plan_access` — has. */
+export const ACTIVE_PLAN_ACCESS: PlanAccess = { state: 'active', graceEndsAt: null };
+
 // clinozy-be #795 removed the per-org `capabilities` object. The app gates UI by
 // `my_permissions` (RBAC) + an explicit team-org guard (useCan teamOrganizationOnly).
 export const organizationWire = z.object({
@@ -22,6 +48,14 @@ export const organizationWire = z.object({
   status: z.enum(['ACTIVE', 'SUSPENDED', 'ARCHIVED']),
   logo_url: z.string().nullable(),
   brand_color: z.string().nullable().optional(),
+  /**
+   * The plan's hold on the clinic's records (me/context's active organization). Optional:
+   * an older backend omits it, and so may the other reads of this shape — absent is
+   * `active`. A value this app cannot read (a state added later) is also `active` rather
+   * than a failed me/context: the banner it drives is advice, and clinozy-be refuses the
+   * write either way.
+   */
+  plan_access: planAccessWire.optional().catch(undefined),
   created_at: isoDateString,
   updated_at: isoDateString,
 });
@@ -86,6 +120,8 @@ export interface OrganizationSummary {
   logoUrl: string | null;
   /** Optional per-org accent (hex/oklch) → `--color-brand` (FE-57); absent until the backend sends it. */
   brandColor?: string | null;
+  /** The plan's hold on the clinic's records; {@link ACTIVE_PLAN_ACCESS} when the wire omits it. */
+  planAccess?: PlanAccess;
   createdAt: string;
   updatedAt: string;
 }
@@ -137,6 +173,9 @@ export function toOrganization(w: z.infer<typeof organizationWire>): Organizatio
     status: w.status,
     logoUrl: w.logo_url,
     brandColor: w.brand_color ?? null,
+    planAccess: w.plan_access
+      ? { state: w.plan_access.state, graceEndsAt: w.plan_access.grace_ends_at }
+      : ACTIVE_PLAN_ACCESS,
     createdAt: w.created_at,
     updatedAt: w.updated_at,
   };

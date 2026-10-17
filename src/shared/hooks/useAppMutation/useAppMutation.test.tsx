@@ -18,6 +18,9 @@ vi.mock('@/shared/notify/index.ts', () => ({
   },
 }));
 
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { meContextQueryKey } from '@/shared/tenancy/me-context.ts';
+
 import { useAppMutation } from './useAppMutation.ts';
 
 function makeWrapper(client: QueryClient) {
@@ -68,6 +71,56 @@ describe('useAppMutation', () => {
 
     await expect(result.current.mutateAsync()).rejects.toThrow('boom');
     expect(errorMock).toHaveBeenCalledWith('boom');
+  });
+
+  it('says a read-only clinic in its own words and reads me/context again for the plan notice', async () => {
+    const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+    const invalidate = vi.spyOn(client, 'invalidateQueries').mockResolvedValue();
+    const refused = new HttpError('HTTP 403', 403, '/api/v1/app/patients', 'POST', {
+      error: {
+        code: 'forbidden',
+        reason: 'organization_read_only',
+        detail: 'Organization is read-only',
+      },
+    });
+    const { result } = renderHook(
+      () =>
+        useAppMutation({
+          mutationFn: async () => {
+            throw refused;
+          },
+        }),
+      { wrapper: makeWrapper(client) },
+    );
+
+    await expect(result.current.mutateAsync()).rejects.toBe(refused);
+    expect(errorMock).toHaveBeenCalledWith(
+      "Read-only — this clinic's plan isn't active. Choose a plan to make changes.",
+    );
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: meContextQueryKey });
+  });
+
+  it('leaves me/context alone for any other 403', async () => {
+    const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+    const invalidate = vi.spyOn(client, 'invalidateQueries').mockResolvedValue();
+    const refused = new HttpError('HTTP 403', 403, '/api/v1/app/patients', 'POST', {
+      error: { code: 'forbidden', reason: 'missing_permission' },
+    });
+    const { result } = renderHook(
+      () =>
+        useAppMutation({
+          mutationFn: async () => {
+            throw refused;
+          },
+        }),
+      { wrapper: makeWrapper(client) },
+    );
+
+    await expect(result.current.mutateAsync()).rejects.toBe(refused);
+    expect(errorMock).toHaveBeenCalledWith(
+      "You don't have permission to do this. Ask the clinic's owner or an admin.",
+    );
+    expect(invalidate).not.toHaveBeenCalled();
   });
 
   it('skips the error toast when notifyOnError is false', async () => {

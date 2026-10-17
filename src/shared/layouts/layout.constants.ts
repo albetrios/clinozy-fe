@@ -171,6 +171,12 @@ export const LAYOUT_KEYS = {
       listSearch: 'app.shortcuts.listSearch',
       leadRows: 'app.shortcuts.leadRows',
     },
+    /** The clinic's plan notice: a grace period ending, or records read-only. */
+    planAccess: {
+      grace: 'app.planAccess.grace',
+      readOnly: 'app.planAccess.readOnly',
+      choosePlan: 'app.planAccess.choosePlan',
+    },
     emailVerify: {
       message: 'app.emailVerify.message',
       resend: 'app.emailVerify.resend',

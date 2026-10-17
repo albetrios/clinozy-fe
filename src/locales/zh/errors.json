@@ -68,7 +68,8 @@
       "seatLimitReached": "你的方案没有空余席位。请在 设置 › 账单 中添加席位，然后重新邀请。",
       "membershipAlreadyExists": "此人已在诊所中。",
       "organizationSlugExists": "该工作空间 URL 已被占用，请选择其他 URL。",
-      "disposableEmail": "请使用长期有效的邮箱地址——不接受一次性邮箱。"
+      "disposableEmail": "请使用长期有效的邮箱地址——不接受一次性邮箱。",
+      "organizationReadOnly": "只读——此诊所的方案未生效。请选择方案后再进行更改。"
     }
   },
   "frontend": {

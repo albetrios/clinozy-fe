@@ -68,7 +68,8 @@
       "seatLimitReached": "Il tuo piano non ha posti liberi. Aggiungi un posto in Impostazioni › Fatturazione, poi invita di nuovo.",
       "membershipAlreadyExists": "Questa persona è già nella clinica.",
       "organizationSlugExists": "Questo URL dello spazio è già in uso. Scegline un altro.",
-      "disposableEmail": "Usa un indirizzo email permanente: quelli usa e getta non sono accettati."
+      "disposableEmail": "Usa un indirizzo email permanente: quelli usa e getta non sono accettati.",
+      "organizationReadOnly": "Sola lettura — il piano di questa clinica non è attivo. Scegli un piano per apportare modifiche."
     }
   },
   "frontend": {

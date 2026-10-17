@@ -68,6 +68,11 @@
       "switchOrganization": "切换到 {{name}}",
       "currentOrganization": "{{name}}（当前）"
     },
+    "planAccess": {
+      "grace": "您诊所的方案未生效。诊所记录将于 {{date}} 变为只读。",
+      "readOnly": "只读——您诊所的方案未生效，因此无法更改记录。选择方案即可解锁。",
+      "choosePlan": "选择方案"
+    },
     "emailVerify": {
       "message": "验证邮箱以保护您的账户。",
       "resend": "重新发送邮件",

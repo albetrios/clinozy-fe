@@ -121,6 +121,38 @@ describe('mapApiError / apiErrorReason (clinozy-be envelope)', () => {
     expect(mapApiError(err)).toBe('Invalid email or password.');
   });
 
+  describe('a 403 on a clinic write', () => {
+    const forbidden = (error: Record<string, unknown>) =>
+      new HttpError('HTTP 403', 403, '/api/v1/app/patients', 'POST', { error });
+
+    it('says a read-only clinic (organization_read_only) in our own words', () => {
+      const err = forbidden({
+        code: 'forbidden',
+        reason: 'organization_read_only',
+        detail: 'Organization is read-only',
+      });
+      expect(apiErrorReason(err)).toBe('organization_read_only');
+      expect(mapApiError(err)).toBe(
+        "Read-only — this clinic's plan isn't active. Choose a plan to make changes.",
+      );
+    });
+
+    it('keeps the server’s detail for any other 403 reason', () => {
+      const err = forbidden({
+        code: 'forbidden',
+        reason: 'branch_not_assigned',
+        detail: 'You are not assigned to this branch.',
+      });
+      expect(mapApiError(err)).toBe('You are not assigned to this branch.');
+    });
+
+    it('keeps the generic permission message for a bare 403', () => {
+      expect(mapApiError(forbidden({ code: 'forbidden' }))).toBe(
+        'You do not have permission to perform this action.',
+      );
+    });
+  });
+
   it('returns undefined reason for non-HTTP errors', () => {
     expect(apiErrorReason(new Error('boom'))).toBeUndefined();
     expect(apiErrorReason('nope')).toBeUndefined();

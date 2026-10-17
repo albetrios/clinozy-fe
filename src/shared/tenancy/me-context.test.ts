@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ACTIVE_PLAN_ACCESS,
   type MeContextWire,
   meContextWire,
   needsOnboarding,
@@ -172,6 +173,42 @@ describe('toMeContext', () => {
     const parsed = meContextWire.safeParse({ ...WIRE, user: userNoJob });
     expect(parsed.success).toBe(true);
     if (parsed.success) expect(toMeContext(parsed.data).user.jobTitle).toBeNull();
+  });
+});
+
+describe('plan_access (the clinic plan’s hold on its records)', () => {
+  const GRACE_ENDS_AT = '2026-10-31T00:00:00.000Z';
+  const withPlanAccess = (planAccess: unknown) => ({
+    ...WIRE,
+    active_organization: { ...WIRE.active_organization, plan_access: planAccess },
+  });
+  const planAccessOf = (raw: unknown) =>
+    toMeContext(meContextWire.parse(raw)).activeOrganization?.planAccess;
+
+  it.each([
+    ['active', null, { state: 'active', graceEndsAt: null }],
+    ['grace', GRACE_ENDS_AT, { state: 'grace', graceEndsAt: GRACE_ENDS_AT }],
+    ['read_only', null, { state: 'read_only', graceEndsAt: null }],
+  ])('maps the %s state', (state, graceEndsAt, expected) => {
+    expect(planAccessOf(withPlanAccess({ state, grace_ends_at: graceEndsAt }))).toEqual(
+      expected,
+    );
+  });
+
+  it('reads an absent plan_access (an older backend) as active', () => {
+    expect(planAccessOf(WIRE)).toEqual(ACTIVE_PLAN_ACCESS);
+  });
+
+  it('reads a plan_access it cannot understand as active instead of failing me/context', () => {
+    const parsed = meContextWire.safeParse(
+      withPlanAccess({ state: 'archived', grace_ends_at: 'soon' }),
+    );
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(toMeContext(parsed.data).activeOrganization?.planAccess).toEqual(
+        ACTIVE_PLAN_ACCESS,
+      );
+    }
   });
 });
 
