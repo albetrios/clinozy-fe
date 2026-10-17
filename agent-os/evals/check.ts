@@ -497,7 +497,11 @@ if (existsSync(pipelinesFile)) {
         JSON.parse(readText(pipelinesFile)) as {
           pipelines?: Record<
             string,
-            { steps?: string[]; handoff?: Record<string, string> }
+            {
+              steps?: string[];
+              handoff?: Record<string, string>;
+              when?: Record<string, string>;
+            }
           >;
         }
       ).pipelines ?? {};
@@ -508,6 +512,22 @@ if (existsSync(pipelinesFile)) {
             'agent-pipelines',
             `pipelines.json pipeline "${pipeline}" references agent "${step}" which has no agent file`,
           );
+      // `when` says which diffs need a step: its keys are steps, and a pipeline that has it scopes
+      // every step (`always` for one that always runs).
+      if (definition.when) {
+        for (const step of Object.keys(definition.when))
+          if (!(definition.steps ?? []).includes(step))
+            error(
+              'agent-pipelines',
+              `pipelines.json pipeline "${pipeline}" when key "${step}" is not one of its steps`,
+            );
+        for (const step of definition.steps ?? [])
+          if (!definition.when[step])
+            error(
+              'agent-pipelines',
+              `pipelines.json pipeline "${pipeline}" step "${step}" has no when (use "always")`,
+            );
+      }
       for (const [step, skill] of Object.entries(definition.handoff ?? {})) {
         if (!agentNames.has(step))
           error(

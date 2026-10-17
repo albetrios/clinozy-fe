@@ -39,7 +39,7 @@ Audit `docs/` and return a structured issues list. Read-only — never edit file
 
 ## Issues found
 
-- **path** — type: detail
+- **<severity>** · `<path:line>` · <type: index, naming, Mermaid, link> — <what is wrong> → fix: fe-documentation-maintenance
 
 ## OK
 
@@ -50,4 +50,4 @@ Audit `docs/` and return a structured issues list. Read-only — never edit file
 …
 ```
 
-Return only the report.
+Each issue is one line in `REVIEW.md` → Findings format (critical, major, minor, nit — a broken link or a missing index entry is `minor`). Return only the report.

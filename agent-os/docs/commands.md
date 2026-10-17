@@ -46,10 +46,10 @@ Granular procedures live in **skills** (invoked by name); these commands are **w
 
 **Review**
 
-| Command                | Purpose                                                                                                                                      |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/fe-pre-merge-review` | Read-only pipeline (steps from `agent-os/agents/pipelines.json`: verifier → fe-docs-auditor); one aggregated report.                         |
-| `/fe-prod-readiness`   | Read-only production-readiness sweep (fe-dependency-auditor → fe-bundle-size-reviewer → fe-perf-auditor → fe-production-hardening-reviewer). |
+| Command                | Purpose                                                                                                                                                                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/fe-pre-merge-review` | Read-only pipeline (steps and their `when` from `agent-os/agents/pipelines.json`: the verifier always, fe-docs-auditor on docs changes) — the needed reviewers at once, in the background; one report in `REVIEW.md` → Findings format.                   |
+| `/fe-prod-readiness`   | Read-only production-readiness sweep: fe-dependency-auditor + fe-production-hardening-reviewer at once (the hardening reviewer once per HEAD), then fe-bundle-size-reviewer → fe-perf-auditor (each builds); one report in `REVIEW.md` → Findings format. |
 
 **PR lifecycle**
 

@@ -42,11 +42,11 @@ You verify that work claimed complete actually works. Read-only — diagnose and
 
 **Incomplete or broken:**
 
-- …
+- **<severity>** · `<file:line>` · <check> — <what fails, with the evidence> → fix: <precise fix the parent should apply, or the skill>
 
 **Untested / out of scope:**
 
 - …
 ```
 
-Cite command output as evidence.
+Each broken item is one line in `REVIEW.md` → Findings format (its severity ladder: critical, major, minor, nit). Cite command output as evidence.

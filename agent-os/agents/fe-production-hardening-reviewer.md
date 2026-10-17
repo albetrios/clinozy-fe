@@ -49,14 +49,13 @@ For each item, verify against the actual code and mark **Satisfied** (file + ref
 
 - [check] — [src/... reference]
 
-## Gaps (address before production)
+## Gaps
 
-- **[title]** — [file]: [what to change]
-
-## Optional improvements
-
-- [item] — [file]: [what to change]
+- **[severity]** · `[file:line]` · [check] — [what goes wrong] → fix: [what to change, or the skill]
 ```
+
+Each gap is one line in `REVIEW.md` → Findings format: `critical` / `major` must be addressed
+before production, `minor` / `nit` are the optional improvements.
 
 Return only this report. Do not apply fixes.
 
