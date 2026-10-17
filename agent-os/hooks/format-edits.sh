@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code PostToolUse hook (Edit | Write) for clinozy-fe.
+# Claude Code PostToolUse hook (Edit | Write | MultiEdit) for clinozy-fe.
 #
 # Auto-formats the file Claude just edited with the project's Prettier config
 # (Prettier + prettier-plugin-tailwindcss own formatting here; Biome is a

@@ -32,7 +32,10 @@
       "id": "guardrails",
       "runtime": "node",
       "script": "guardrails.mjs",
-      "claude": { "event": "PreToolUse", "matcher": "Bash|Edit|Write" },
+      "claude": {
+        "event": "PreToolUse",
+        "matcher": "Bash|Read|Grep|Edit|Write|MultiEdit"
+      },
       "codex": {
         "event": "PreToolUse",
         "matcher": "^Bash$",
@@ -49,13 +52,13 @@
       "id": "format-edits",
       "runtime": "bash",
       "script": "format-edits.sh",
-      "claude": { "event": "PostToolUse", "matcher": "Edit|Write" }
+      "claude": { "event": "PostToolUse", "matcher": "Edit|Write|MultiEdit" }
     },
     {
       "id": "skill-reminder",
       "runtime": "bash",
       "script": "skill-reminder.sh",
-      "claude": { "event": "PostToolUse", "matcher": "Edit|Write" }
+      "claude": { "event": "PostToolUse", "matcher": "Edit|Write|MultiEdit" }
     },
     {
       "id": "gate-failure-hint",
@@ -67,7 +70,7 @@
       "id": "stop-gate-reminder",
       "runtime": "bash",
       "script": "stop-gate-reminder.sh",
-      "claude": { "event": "Stop" },
+      "claude": { "event": "PostToolUse", "matcher": "Edit|Write|MultiEdit" },
       "codex": {
         "event": "Stop",
         "statusMessage": "Checking clinozy-fe completion gates"

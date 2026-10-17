@@ -137,6 +137,7 @@ clinozy-fe/
 │   │   ├── README.md
 │   │   └── trigger-eval.ts
 │   ├── hooks/
+│   │   ├── _turn-once.sh
 │   │   ├── compact-resume-card.sh
 │   │   ├── cursor-shell-guard.mjs
 │   │   ├── format-edits.sh
@@ -3517,7 +3518,7 @@ clinozy-fe/
 │   └── [1 test file]
 ├── tests/
 │   ├── ci/
-│   │   └── [44 test files]
+│   │   └── [45 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/

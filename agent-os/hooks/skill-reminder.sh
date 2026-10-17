@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Claude Code PostToolUse hook (Edit | Write) for clinozy-fe.
-# Reads the edited file path from the tool JSON and prints relevant skill
-# reminders based on file-pattern matching. Plain stdout, never blocks.
+# Claude Code PostToolUse hook (Edit | Write | MultiEdit) for clinozy-fe.
+# Reads the edited file path from the tool JSON and adds the skill reminders its
+# file pattern implies as additionalContext — PostToolUse plain stdout never
+# reaches the model. Each reminder appears once per turn (_turn-once.sh), not on
+# every edit. Never blocks.
+source "$(dirname "${BASH_SOURCE[0]}")/_turn-once.sh"
 
 INPUT=$(cat)
 FILE=$(echo "$INPUT" | python3 -c \
@@ -9,6 +12,8 @@ FILE=$(echo "$INPUT" | python3 -c \
   2>/dev/null || echo "")
 
 [[ -z "$FILE" ]] && exit 0
+SESSION=$(echo "$INPUT" | python3 -c \
+  "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
 
 # Remind only for files in this repository. A session that holds several
 # repositories runs every repository's hooks on every edit (tooling/agent-os/session-hooks.ts);
@@ -44,13 +49,19 @@ esac
 [[ "$FILE" == *".env.example" ]] && \
   REMINDERS+=("env → fe-documentation-maintenance (VITE_ = public/bundled; secrets via environment, never committed)")
 
-if [[ "${#REMINDERS[@]}" -gt 0 ]]; then
-  echo ""
-  echo "⚡ Skill reminders for $(basename "$FILE"):"
-  for r in "${REMINDERS[@]}"; do
-    echo "  • $r"
-  done
-  echo "  Full map: agent-os/docs/skill-triggers.md"
+NEW_REMINDERS=()
+for r in "${REMINDERS[@]}"; do
+  turn_once "$SESSION" "skill-reminder:$r" && NEW_REMINDERS+=("$r")
+done
+[[ "${#NEW_REMINDERS[@]}" -gt 0 ]] || exit 0
+text="⚡ Skill reminders for $(basename "$FILE"):"
+for r in "${NEW_REMINDERS[@]}"; do
+  text+=$'\n'"  • $r"
+done
+text+=$'\n'"  Full map: agent-os/docs/skill-triggers.md"
+if command -v jq >/dev/null 2>&1; then
+  jq -cn --arg c "$text" '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:$c}}'
+else
+  printf '%s\n' "$text"
 fi
-
 exit 0

@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
-# Claude Code Stop hook for clinozy-fe.
+# Claude Code PostToolUse hook (Edit | Write | MultiEdit) and Codex Stop hook for clinozy-fe.
 #
-# At end of turn, look at the uncommitted working-tree changes and surface the
+# Look at the uncommitted working-tree changes and surface the
 # SPECIFIC gate(s) those files imply — reusing the same file→skill map as
 # [`skill-reminder.sh`](skill-reminder.sh) and
 # [`agent-os/docs/skill-triggers.md`](../docs/skill-triggers.md). When nothing
 # relevant changed (or the tree is clean), it falls back to the generic checks.
 #
-# Plain stdout, NON-blocking (never returns decision:block, so it cannot loop the
-# turn). Fails OPEN: any error exits 0.
+# Claude: after each edit, the gates not yet shown this turn go out as PostToolUse
+# additionalContext — a Stop hook's plain stdout never reaches the model, and a blocking
+# one would force another turn. Each gate appears once per turn (_turn-once.sh), and the
+# generic fallback is left out there so an ordinary edit adds nothing. Codex keeps the Stop
+# wiring and its plain-stdout checklist. NON-blocking either way. Fails OPEN: any error exits 0.
 set -uo pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/_turn-once.sh"
+INPUT=$(cat 2>/dev/null || true)
+EVENT=$(printf '%s' "$INPUT" | jq -r '.hook_event_name // empty' 2>/dev/null || echo "")
+SESSION=$(printf '%s' "$INPUT" | jq -r '.session_id // empty' 2>/dev/null || echo "")
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$ROOT" 2>/dev/null || exit 0
@@ -32,6 +40,22 @@ match '\.env\.example$' && \
   REMINDERS+=("env changed → keep VITE_ vars documented; secrets stay out of source (fe-documentation-maintenance)")
 match '\.md$|/docs/' && \
   REMINDERS+=("docs changed → pnpm docs:lint")
+
+if [[ "$EVENT" == "PostToolUse" ]]; then
+  NEW_REMINDERS=()
+  for r in "${REMINDERS[@]}"; do
+    turn_once "$SESSION" "stop-gate-reminder:$r" && NEW_REMINDERS+=("$r")
+  done
+  [[ "${#NEW_REMINDERS[@]}" -gt 0 ]] || exit 0
+  text="📋 Gates implied by your uncommitted changes (run them before you finish):"
+  for r in "${NEW_REMINDERS[@]}"; do
+    text+=$'\n'"  • $r"
+  done
+  text+=$'\n'"  Then: pnpm health (all phases). Full map: agent-os/docs/skill-triggers.md"
+  jq -cn --arg c "$text" '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:$c}}' 2>/dev/null \
+    || printf '%s\n' "$text"
+  exit 0
+fi
 
 echo ""
 if [[ "${#REMINDERS[@]}" -gt 0 ]]; then
