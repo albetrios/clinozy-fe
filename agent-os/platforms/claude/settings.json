@@ -132,29 +132,27 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write|MultiEdit",
+        "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/format-edits.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/edit-hooks.mjs\"",
+            "if": "Edit(**)"
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/edit-hooks.mjs\"",
+            "if": "Write(**)"
           }
         ]
-      },
+      }
+    ],
+    "Stop": [
       {
-        "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/skill-reminder.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/stop-gate-reminder.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/edit-hooks.mjs\""
           }
         ]
       }

@@ -1,7 +1,7 @@
 # clinozy-fe skill triggers
 
 The file→skill routing map the agent hooks consult (session-start,
-prompt-skill-router, skill-reminder, stop-gate-reminder). Always consult
+prompt-skill-router, edit-hooks). Always consult
 `agent-os/skills/fe-skill-registry/SKILL.md` FIRST, then run the listed skill(s) for
 the files you change. This is advisory: skills elevate craft within the
 guardrails (shadcn components, semantic tokens, configured fonts/brand).

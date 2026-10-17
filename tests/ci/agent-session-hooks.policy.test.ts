@@ -139,6 +139,25 @@ describe('tooling/agent-os/session-hooks.ts', () => {
     ).toHaveLength(1);
   });
 
+  it('anchors a relative if file rule to its repository, and keeps any other rule', () => {
+    const sessionRoot = makeSessionRoot({ own: REAL_SETTINGS, other: OTHER_SETTINGS });
+    expect(runScript({ sessionRoot }).status).toBe(0);
+    const handlers = Object.values(readSessionSettings(sessionRoot).hooks ?? {}).flatMap(
+      (groups) =>
+        groups.flatMap((group) => group.hooks as Array<{ command: string; if?: string }>),
+    );
+    const rules = handlers.flatMap((hook) => (hook.if ? [hook.if] : []));
+    // The edit hook's Edit(**) / Write(**) would match every repository's files from the
+    // session root, so they become absolute (`//` anchor) to this repository.
+    expect(rules).toEqual(
+      expect.arrayContaining([
+        `Edit(/${join(sessionRoot, 'own')}/**)`,
+        `Write(/${join(sessionRoot, 'own')}/**)`,
+      ]),
+    );
+    expect(rules.filter((rule) => rule.includes('(**)'))).toEqual([]);
+  });
+
   it('is idempotent', () => {
     const sessionRoot = makeSessionRoot({
       own: REAL_SETTINGS,

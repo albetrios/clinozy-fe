@@ -17,8 +17,9 @@ const HAS_JQ = spawnSync('/bin/bash', ['-c', 'command -v jq']).status === 0;
 
 interface HookManifest {
   hooks: Array<{
+    id: string;
     script: string;
-    claude?: { event: string; matcher?: string };
+    claude?: { event: string; matcher?: string; if?: string[] };
     codex?: { event: string };
   }>;
 }
@@ -27,6 +28,7 @@ const manifest = JSON.parse(
   readFileSync(join(HOOKS, 'hooks.json'), 'utf8'),
 ) as HookManifest;
 const entry = (script: string) => manifest.hooks.find((hook) => hook.script === script);
+const byId = (id: string) => manifest.hooks.find((hook) => hook.id === id);
 
 let turnDirectory = '';
 
@@ -64,17 +66,15 @@ describe('agent-os guard gaps', () => {
     expect(entry('guardrails.mjs')?.claude?.matcher?.split('|')).toEqual(
       expect.arrayContaining(['Bash', 'Read', 'Grep', 'Edit', 'Write', 'MultiEdit']),
     );
-    for (const script of [
-      'skill-reminder.sh',
-      'stop-gate-reminder.sh',
-      'format-edits.sh',
-    ]) {
-      expect(entry(script)?.claude).toEqual({
-        event: 'PostToolUse',
-        matcher: 'Edit|Write|MultiEdit',
-      });
-    }
-    expect(entry('stop-gate-reminder.sh')?.codex?.event).toBe('Stop');
+    // One edit hook (formatter + skill and gate reminders), spawned only for an Edit or Write call.
+    expect(byId('edit-hooks')?.claude).toEqual({
+      event: 'PostToolUse',
+      matcher: 'Edit|Write',
+      if: ['Edit(**)', 'Write(**)'],
+    });
+    expect(byId('edit-hooks-stop')?.claude?.event).toBe('Stop');
+    expect(byId('edit-hooks-stop')?.codex?.event).toBe('Stop');
+    expect(byId('edit-hooks-stop')?.script).toBe('edit-hooks.mjs');
   });
 
   it.each([
@@ -121,15 +121,15 @@ describe('agent-os guard gaps', () => {
       tool_name: 'Edit',
       tool_input: { file_path: 'src/pages/today/today.route.tsx' },
     };
-    const first = JSON.parse(runHook('skill-reminder.sh', edit).stdout) as {
+    const first = JSON.parse(runHook('edit-hooks.mjs', edit).stdout) as {
       hookSpecificOutput: { hookEventName: string; additionalContext: string };
     };
     expect(first.hookSpecificOutput.hookEventName).toBe('PostToolUse');
     expect(first.hookSpecificOutput.additionalContext).toContain('fe-route-island');
 
-    expect(runHook('skill-reminder.sh', edit).stdout.trim()).toBe('');
+    expect(runHook('edit-hooks.mjs', edit).stdout.trim()).toBe('');
 
     runHook('prompt-skill-router.sh', { session_id: 'policy-session', prompt: 'next' });
-    expect(runHook('skill-reminder.sh', edit).stdout).toContain('fe-route-island');
+    expect(runHook('edit-hooks.mjs', edit).stdout).toContain('fe-route-island');
   });
 });

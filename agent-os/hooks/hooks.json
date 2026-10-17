@@ -5,7 +5,10 @@
       "id": "session-start",
       "runtime": "bash",
       "script": "session-start.sh",
-      "claude": { "event": "SessionStart", "matcher": "startup|resume" },
+      "claude": {
+        "event": "SessionStart",
+        "matcher": "startup|resume"
+      },
       "codex": {
         "event": "SessionStart",
         "matcher": "startup|resume",
@@ -16,7 +19,9 @@
       "id": "prompt-skill-router",
       "runtime": "bash",
       "script": "prompt-skill-router.sh",
-      "claude": { "event": "UserPromptSubmit" },
+      "claude": {
+        "event": "UserPromptSubmit"
+      },
       "codex": {
         "event": "UserPromptSubmit",
         "statusMessage": "Checking clinozy-fe skill routing"
@@ -26,7 +31,10 @@
       "id": "guard-edits",
       "runtime": "bash",
       "script": "guard-edits.sh",
-      "claude": { "event": "PreToolUse", "matcher": "Edit|Write|MultiEdit" }
+      "claude": {
+        "event": "PreToolUse",
+        "matcher": "Edit|Write|MultiEdit"
+      }
     },
     {
       "id": "guardrails",
@@ -46,53 +54,66 @@
       "id": "no-unrequested-pr",
       "runtime": "bash",
       "script": "no-unrequested-pr.sh",
-      "claude": { "event": "PreToolUse", "matcher": "mcp__github__create_pull_request" }
+      "claude": {
+        "event": "PreToolUse",
+        "matcher": "mcp__github__create_pull_request"
+      }
     },
     {
-      "id": "format-edits",
-      "runtime": "bash",
-      "script": "format-edits.sh",
-      "claude": { "event": "PostToolUse", "matcher": "Edit|Write|MultiEdit" }
+      "id": "edit-hooks",
+      "runtime": "node",
+      "script": "edit-hooks.mjs",
+      "claude": {
+        "event": "PostToolUse",
+        "matcher": "Edit|Write",
+        "if": ["Edit(**)", "Write(**)"]
+      }
     },
     {
-      "id": "skill-reminder",
-      "runtime": "bash",
-      "script": "skill-reminder.sh",
-      "claude": { "event": "PostToolUse", "matcher": "Edit|Write|MultiEdit" }
-    },
-    {
-      "id": "gate-failure-hint",
-      "runtime": "bash",
-      "script": "gate-failure-hint.sh",
-      "claude": { "event": "PostToolUseFailure", "matcher": "Bash" }
-    },
-    {
-      "id": "stop-gate-reminder",
-      "runtime": "bash",
-      "script": "stop-gate-reminder.sh",
-      "claude": { "event": "PostToolUse", "matcher": "Edit|Write|MultiEdit" },
+      "id": "edit-hooks-stop",
+      "runtime": "node",
+      "script": "edit-hooks.mjs",
+      "claude": {
+        "event": "Stop"
+      },
       "codex": {
         "event": "Stop",
         "statusMessage": "Checking clinozy-fe completion gates"
       }
     },
     {
+      "id": "gate-failure-hint",
+      "runtime": "bash",
+      "script": "gate-failure-hint.sh",
+      "claude": {
+        "event": "PostToolUseFailure",
+        "matcher": "Bash"
+      }
+    },
+    {
       "id": "compact-resume-card",
       "runtime": "bash",
       "script": "compact-resume-card.sh",
-      "claude": { "event": "SessionStart", "matcher": "compact" }
+      "claude": {
+        "event": "SessionStart",
+        "matcher": "compact"
+      }
     },
     {
       "id": "session-end",
       "runtime": "bash",
       "script": "session-end.sh",
-      "claude": { "event": "SessionEnd" }
+      "claude": {
+        "event": "SessionEnd"
+      }
     },
     {
       "id": "cursor-shell-guard",
       "runtime": "node",
       "script": "cursor-shell-guard.mjs",
-      "cursor": { "event": "beforeShellExecution" }
+      "cursor": {
+        "event": "beforeShellExecution"
+      }
     }
   ]
 }

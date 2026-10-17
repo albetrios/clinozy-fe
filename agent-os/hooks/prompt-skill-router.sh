@@ -4,7 +4,7 @@
 # When a prompt describes a build/change task, inject the relevant skill chain —
 # plus the "consult fe-skill-registry FIRST" rule — as additionalContext. This
 # operationalizes CLAUDE.md's skill-first workflow at PROMPT time; the PostToolUse
-# skill-reminder ([`skill-reminder.sh`](skill-reminder.sh)) only fires reactively,
+# the skill reminders ([`edit-hooks.mjs`](edit-hooks.mjs)) only fire reactively,
 # AFTER an edit. The keyword→skill map mirrors
 # [`agent-os/docs/skill-triggers.md`](../docs/skill-triggers.md).
 #

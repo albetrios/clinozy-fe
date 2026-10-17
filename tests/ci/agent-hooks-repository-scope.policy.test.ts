@@ -19,11 +19,19 @@ const RAW_PALETTE = ['bg', 'red', '500'].join('-');
 
 const temporaryDirectories: string[] = [];
 
-function runHook({ script, payload }: { script: string; payload: unknown }) {
+function runHook({
+  script,
+  payload,
+  turnDirectory = mkdtempSync(join(tmpdir(), 'fe-hook-scope-turn-')),
+}: {
+  script: string;
+  payload: unknown;
+  turnDirectory?: string;
+}) {
   const runtime = script.endsWith('.mjs') ? process.execPath : '/bin/bash';
-  // Each run gets its own TMPDIR: the reminders' once-per-turn record (_turn-once.sh) lives there,
-  // and a record left by an earlier run would silence the next one.
-  const turnDirectory = mkdtempSync(join(tmpdir(), 'fe-hook-scope-turn-'));
+  // Each run gets its own TMPDIR unless one is passed: the reminders' once-per-turn record
+  // (_turn-once.sh) and the format queue live there, and an earlier run's record would silence
+  // the next one.
   temporaryDirectories.push(turnDirectory);
   return spawnSync(runtime, [join(HOOKS, script)], {
     input: JSON.stringify(payload),
@@ -103,26 +111,42 @@ describe.runIf(process.platform !== 'win32')(
       ).toBe('deny');
     });
 
-    it("format-edits.sh never runs Prettier on another repository's file", () => {
+    it("edit-hooks.mjs never queues or formats another repository's file", () => {
       const directory = mkdtempSync(join(tmpdir(), 'hooks-scope-'));
       temporaryDirectories.push(directory);
       const file = join(directory, 'unformatted.ts');
       const unformatted = 'const   a={b:1}\n';
       writeFileSync(file, unformatted);
-      const result = runHook({
-        script: 'format-edits.sh',
-        payload: { tool_input: { file_path: file } },
+      const turnDirectory = mkdtempSync(join(tmpdir(), 'fe-hook-scope-turn-'));
+      const session = { session_id: 'scope-format' };
+      const edited = runHook({
+        script: 'edit-hooks.mjs',
+        payload: {
+          ...session,
+          hook_event_name: 'PostToolUse',
+          tool_input: { file_path: file },
+        },
+        turnDirectory,
+      });
+      const stopped = runHook({
+        script: 'edit-hooks.mjs',
+        payload: { ...session, hook_event_name: 'Stop' },
+        turnDirectory,
       });
 
-      expect(result.status).toBe(0);
+      expect(edited.status).toBe(0);
+      expect(stopped.status).toBe(0);
       expect(readFileSync(file, 'utf8')).toBe(unformatted);
     });
 
-    it('skill-reminder.sh reminds only for this repository', () => {
+    it('edit-hooks.mjs reminds only for this repository', () => {
       const remind = (filePath: string) =>
         runHook({
-          script: 'skill-reminder.sh',
-          payload: { tool_input: { file_path: filePath } },
+          script: 'edit-hooks.mjs',
+          payload: {
+            hook_event_name: 'PostToolUse',
+            tool_input: { file_path: filePath },
+          },
         }).stdout;
 
       expect(remind(join(REPOSITORY_ROOT, 'src/pages/login/login.route.tsx'))).toContain(
