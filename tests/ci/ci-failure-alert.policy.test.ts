@@ -71,6 +71,26 @@ describe('ci-failure alert on every scheduled check', () => {
     }
   });
 
+  it.each(alerted)(
+    '%s alerts on a timed-out job too (it ends cancelled, not failed)',
+    (name) => {
+      for (const [job, block] of jobBlocks(text(name))) {
+        if (!/mode: open\n/.test(block)) continue;
+        if (name === 'post-merge-ci.yml') {
+          // A superseded development deploy is cancelled on purpose, so only release-please.
+          expect(block, job).toContain("needs.release-please.result == 'cancelled'");
+          expect(block, job).not.toContain(
+            "needs.deploy-development.result == 'cancelled'",
+          );
+          continue;
+        }
+        expect(block, `${name} → ${job}`).toContain(
+          "contains(needs.*.result, 'cancelled')",
+        );
+      }
+    },
+  );
+
   it('no workflow keeps its own ci-failure issue code', () => {
     const inline = files.filter((name) =>
       /labels: \['ci-failure'\]|--label ci-failure/.test(text(name)),

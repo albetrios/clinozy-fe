@@ -138,7 +138,7 @@ jobs:
   notify-failure:
     name: Notify failure
     needs: [environment-drift, pat-canary]
-    if: always() && (needs.environment-drift.result == 'failure' || needs.pat-canary.result == 'failure')
+    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

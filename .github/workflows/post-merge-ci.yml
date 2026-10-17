@@ -363,10 +363,14 @@ jobs:
   notify-failure:
     name: Notify failure
     needs: [release-please, deploy-development]
+    # A job past its timeout-minutes ends cancelled, not failed, so release-please (never
+    # cancelled by concurrency) alerts on cancelled too. deploy-development does not: a burst of
+    # merges cancels the superseded deploys on purpose (batching).
     if: |
       always() &&
       (
         needs.release-please.result == 'failure' ||
+        needs.release-please.result == 'cancelled' ||
         needs.deploy-development.result == 'failure'
       )
     runs-on: ubuntu-latest
