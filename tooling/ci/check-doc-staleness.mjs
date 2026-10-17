@@ -47,6 +47,17 @@ const JSON_MODE = process.argv.includes('--json');
 // The doc trees plus the root guidance files that reference code paths.
 const SCAN_DIRS = ['docs', 'agent-os'];
 const SCAN_ROOT_FILES = ['CLAUDE.md', 'AGENTS.md', 'README.md', 'CONTRIBUTING.md'];
+// The nested CLAUDE.md files that hold sections moved out of the root one (Claude Code loads each
+// when it works in that folder).
+const SCAN_NESTED_GUIDES = [
+  'src/pages/CLAUDE.md',
+  'src/shared/CLAUDE.md',
+  'src/core/CLAUDE.md',
+  'src/app/CLAUDE.md',
+  'iterations/CLAUDE.md',
+  '.github/CLAUDE.md',
+  'tests/CLAUDE.md',
+];
 const SCAN_EXTS = /\.(md|mdc)$/;
 const IGNORE_DIRS = new Set(['node_modules', '.git', 'dist', 'coverage', 'test-results']);
 
@@ -196,7 +207,7 @@ function docFiles() {
   };
   const files = [];
   for (const d of SCAN_DIRS) files.push(...walk(join(ROOT, d), (n) => SCAN_EXTS.test(n)));
-  for (const f of SCAN_ROOT_FILES) {
+  for (const f of [...SCAN_ROOT_FILES, ...SCAN_NESTED_GUIDES]) {
     const full = join(ROOT, f);
     if (existsSync(full)) files.push(full);
   }

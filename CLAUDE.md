@@ -2,6 +2,8 @@
 
 This document is the single source of truth for understanding and working in this codebase. Read it before making any changes.
 
+Nested `CLAUDE.md` files hold the detail for the folder you work in — Claude Code loads one when it works there: [`src/pages/`](src/pages/CLAUDE.md) (routes, page islands) · [`src/shared/`](src/shared/CLAUDE.md) (the shared layer, auth) · [`src/core/`](src/core/CLAUDE.md) (HTTP, environment variables, new-deployment detection, PWA) · [`src/app/`](src/app/CLAUDE.md) (routing) · [`iterations/`](iterations/CLAUDE.md) (design iterations) · [`.github/`](.github/CLAUDE.md) (quality gates, merge policy, lockfile discipline, branch naming) · [`tests/`](tests/CLAUDE.md) (testing). Read the one for the area you change, even from elsewhere.
+
 ## Quick Start
 
 ```bash
@@ -18,48 +20,7 @@ pnpm rebrand "<Product>"  # Rename the product (dry run; --apply to write) — s
 pnpm quality      # health + local SonarQube gate (Docker)
 ```
 
-**Quality gates (mirrors clinozy-be):** Biome is a second lint lane (`biome.json`; formatter
-disabled — Prettier + `prettier-plugin-tailwindcss` own formatting). SonarQube runs locally in
-Docker and is enforced by `.husky/pre-push` on deployed-surface changes (`pnpm sonar:scan`;
-no per-gate bypass — a red gate must be fixed, not skipped) — see docs/reference/quality/sonarqube-local.md.
-Coverage thresholds in `vitest.config.ts` are a **ratchet**: pinned just under measured
-coverage, raised as coverage rises, never lowered; the same raise-never philosophy applies to
-the **TSDoc budget** (`pnpm tsdoc:check`, `tooling/tsdoc-coverage/budget.json`) and to **patch
-coverage** (changed lines ≥ 90% — PR CI runs `tooling/ci/check-patch-coverage.mjs`; local
-mirror: `pnpm coverage:patch`). Vitest is split into
-`unit` (colocated src suites), `security` (tests/security — token storage, redirect
-safety, header tripwires), and `ci-policy` (tests/ci — workflow wiring, release-please
-manifests, Dependabot flow invariants) projects. Markdown is linted
-(`pnpm docs:lint`; emphasis style follows Prettier) in its own path-filtered workflow
-(`pr-docs-lane.yml`, outside the quality gate). CI (`.github/workflows/pr-ci.yml`) runs
-path-filtered parallel lanes — biome/eslint/prettier/tsc/vitest(+patch coverage)/security-tests/
-knip/structure+tsdoc/agent-os-gate/build+size+SBOM/gitleaks/semgrep/Trivy-IaC/deps-audit/
-dependency-review/actionlint/SonarQube —
-behind the aggregate `Quality gate` required check (`Checks` is the second required
-context; branch protection as code:
-`.github/rulesets/`, `pnpm github:sync`; personal↔team review posture via
-`pnpm github:tool:governance-mode` — see docs/reference/branch-governance.md). Playwright E2E is local-only (needs
-clinozy-be on `:3000` — CI never boots the backend). CodeQL, Stryker mutation tests, Lighthouse
-budgets, cache cleanup, release-flow guards (environment-drift canary),
-the sync-drift canary (weekly docs↔code drift → tracked issue),
-and Dependabot CI triage + approval-gated auto-merge (low-risk `npm-non-major` group only)
-run as scheduled/event workflows (enforced registry: docs/reference/scheduled-jobs.md).
-
-**Merge policy — never merge on red (enforced, not just convention):** the `main` ruleset carries
-**no `bypass_actors`**, so a PR with any failing or pending required check (`Quality gate`, `Checks`)
-**cannot be merged by anyone — the repo owner included**. Never re-add `bypass_actors` to
-`.github/rulesets/main.json`, and never merge with `--admin` or the merge API to skip a red gate: a
-flaky-red required check is **re-run (or its branch updated) to green**, never bypassed. `strict up-to-date`
-is off so a green PR merges cleanly with `gh pr merge --squash` (no bypass needed); `required_signatures`
-is intentionally absent (branch commits are unsigned — the squash-merge commit GitHub creates on `main`
-is signed regardless). The ruleset content is pinned by `tests/ci/rulesets.policy.test.ts`.
-
-**Lockfile discipline:** a `package.json` dependency or `pnpm-workspace.yaml` `overrides` change
-and its `pnpm-lock.yaml` regeneration are **one atomic commit** — run `pnpm install` and stage both.
-(pnpm 11+ reads settings only from `pnpm-workspace.yaml`; a `pnpm` field in `package.json` is ignored.)
-A desynced lockfile fails every frozen-install CI job (`ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`) and
-also reds any open release-please PR, so it must never reach main; the before-commit guard blocks
-it locally via `pnpm run validate:lockfile` (see `agent-os/skills/fe-platform-hygiene/SKILL.md`).
+**Quality gates, the merge policy and lockfile discipline:** [`.github/CLAUDE.md`](.github/CLAUDE.md). In short: never merge on red — no bypass, a flaky required check is re-run to green; a dependency change and its `pnpm-lock.yaml` are one commit (`pnpm run validate:lockfile`).
 
 ## Documentation
 
@@ -81,52 +42,7 @@ it locally via `pnpm run validate:lockfile` (see `agent-os/skills/fe-platform-hy
 
 ## Design iterations
 
-A design change from Claude Design is an **iteration**: `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/`
-(type `launch | feat | change | fix`; one launch, no topic). It runs in two phases — the rules are in
-`iterations/README.md`, a worked example in `docs/design-workflow/process/iteration-walkthrough.md`:
-
-1. **Planning — no code.** `pnpm iteration:new <type> [topic] [--both]` opens the folder and its
-   README; `pnpm iteration:intake <iteration> <source> [--mode full|overlay|brief] [--both]` stores
-   **what arrived** in `intake-files/` (exactly as delivered) and checks the required set on the
-   snapshot it resolves to. "plan iteration <name>" runs **`fe-iteration-planning`** (Steps 0–6, stopping after
-   each) → `KICKOFF.md` with its ordered ledger and `plans/decisions.md` → Status `ready-for-approval`.
-   The user's approval → `approved`, which locks `intake-files/` and freezes `KICKOFF.md`.
-2. **Kickoff — build.** "kickoff iteration <name>" runs **`fe-kickoff-iteration`**: one ledger row at a
-   time through its skill (screens through **`fe-design-ditto`**), verified by Intake mode (side by side
-   at 375px and 1440px, or the `BRIEF.md` acceptance criteria), recorded in `AS-BUILT.md`; a scope change
-   stops for the user. Then `done` — `AS-BUILT.md` closes with its **Standing deviations**, the complete
-   list of where the code differs from the design — and `frozen` in the last commit before the merge. A
-   frozen iteration is never edited; a correction is a new `fix`.
-
-- **Intake modes.** `full` — the whole drop (the launch is always full). `overlay` — only the changed
-  files, laid over a named Baseline's snapshot. `brief` — no design files, only a written `BRIEF.md`
-  ("implement these kinds of screens"; template `tooling/iterations/templates/BRIEF.md`): on its own
-  from scratch, or added to a named Baseline's snapshot. An `overlay` or a `brief` stores only what
-  arrived; a brief from scratch is its own whole snapshot, and otherwise every command resolves the
-  rest from the Baseline chain, the Intake hash covering that resolved snapshot. An older intake that
-  still stores copies of the Baseline's files is trimmed with
-  `pnpm iteration:intake <iteration> --compact`, which never changes the snapshot or its hash. The
-  README records the Intake mode, an Intake note and the Intake hash.
-- **The gate.** `pnpm iteration:intake <iteration> --check [--baseline <baseline>]` proves the mandatory
-  files are present and each Intake hash still matches; both skills run it first. When it exits
-  non-zero, **stop at once** — write nothing, change no status, ask nothing else; print its output and
-  end the turn.
-
-- **Mode — from scratch by default.** Every iteration opens with Baseline `none` (MODE initial):
-  never ask for a Baseline or suggest one, and take no earlier iteration or its files into account.
-  Only when the user names one ("build on <iteration>") is it recorded (`pnpm iteration:baseline`) and
-  the iteration incremental: the delta is then the designer's "What changed" plus
-  `pnpm iteration:diff <baseline> <iteration>`, which compares the two resolved intakes only (in
-  `brief` mode, `BRIEF.md` itself) — so a named Baseline's intake is mandatory — and planning reads its
-  Standing deviations. Either way planning reads the current code: what was built beats what was drawn.
-- **Status** moves `planning → ready-for-approval → approved → implementing → done → frozen` only
-  through `pnpm iteration:status` (back to `planning` with `--reason`); it and `iteration:baseline`
-  append the README's History. Never edit `intake-files/` or a README's values by hand (Summary
-  excepted); `pnpm iteration:list` is the index.
-- **Both repos.** clinozy-be uses the same names, commands and README template (`--both` opens and
-  fills the same-named folder there, in the same Intake mode, from scratch too unless the user names a
-  Baseline there; `PRD.md` and `schema-routes.md` — and `BRIEF.md` in brief mode — stay
-  byte-identical).
+A design change from Claude Design is an **iteration**: `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/` (type `launch | feat | change | fix`), planned (no code) by **`fe-iteration-planning`**, then built by **`fe-kickoff-iteration`**. **Before opening or working on one, read [`iterations/CLAUDE.md`](iterations/CLAUDE.md)** — the phases, intake modes, the gate, Baseline and Status rules.
 
 ## Agent-os naming
 
@@ -175,171 +91,13 @@ All Zustand stores live in **`src/shared/store/<X>Store/`** (folder-per-unit) �
 
 **Dependency rule (one-way, importer → importee):** `app → pages → shared → core → lib`; `shared/components/ui` is a leaf that imports only `lib` and other ui primitives, and `lib` may reach only `core/types`. Pages never import from other pages. One documented exception: the core kernel (`core/http`, `core/rbac`) may import the shared runtime trio — `shared/auth`, `shared/errors`, `useAuthStore`/`useOrganizationStore` (see `agent-os/rules/fe-file-structure.mdc` → Import Rules; enforced in `eslint.config.mjs`).
 
-## Route Marker Convention (`<page>.route.tsx`)
+## Routes and page islands
 
-Every directory under `src/pages/` that corresponds to a frontend URL path **must** contain a **`<page>.route.tsx`** file (page-prefixed, lowercase-dotted). This file is the boundary between routes.
-
-**The rule in five lines (read this first):**
-
-1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/today` → `pages/organization/$organizationSlug/today/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders — except a **param-only leaf**, which owns the param in its route path instead of a `$param/` folder (`accept-invite/` owns `/accept-invite/$invitationId` flat because the parent segment has no page of its own). Exceptions: `/` is a pure resolver route (redirect only, no island), and so is the retired `/dashboard` (a redirect to `/`); app-shell routes with no feature island — `/unauthorized` and the `$` 404 splat (`UnauthorizedPage`/`NotFoundPage`) — live in `src/app/routes/`, not `src/pages/`.
-2. **Every page folder maintains the same 4 files** — `<page>.route.tsx`, `<page>.manifest.ts`, `<Page>Page.tsx` (or `Layout`), `<PAGE>.OVERVIEW.md` — plus 2 registrations: `routeTree.tsx` and `docs/reference/routes-and-ui.md`. In `$param` folders the prefix derives mechanically: strip `$`, kebab-case (`$organizationSlug/` → `organization-slug.route.tsx`, `ORGANIZATION_SLUG.OVERVIEW.md`).
-3. **Page shells live in `shared/layouts/`** — AuthLayout via the pathless `auth-shell` route; AppLayout via the `pages/organization/$organizationSlug/` layout island (the org guard boundary). No grouping directories under `pages/`.
-4. **Code used by 2+ page islands lives in `shared/`** (e.g. `shared/api/auth-api.ts`, `shared/tenancy/`).
-5. **Settings is a global hash modal, not a route space** — `#settings/<scope>/<section>` opens `shared/components/SettingsModal/` over any page (see `agent-os/rules/fe-file-structure.mdc` → Settings hash modal). Full spec: `docs/reference/routing-and-tenancy.md`.
-
-**Source of truth for what is live today:** [`src/app/routes/routeTree.tsx`](src/app/routes/routeTree.tsx) and [`docs/reference/routes-and-ui.md`](docs/reference/routes-and-ui.md). The tree below mixes **implemented** routes with **common examples** (same shapes as new features).
-
-```text
-src/pages/
-├── login/                           ← /login (AuthLayout via pathless auth-shell)
-│   ├── login.route.tsx
-│   ├── login.manifest.ts                ← manifest
-│   ├── LoginPage.tsx                ← top-level UI
-│   ├── LOGIN.OVERVIEW.md
-│   └── forms/LoginForm/             (folder-per-unit)
-├── mfa/                             ← /mfa (AuthLayout via auth-shell)
-├── callback/
-│   └── callback.route.tsx           ← /callback (one URL for every OAuth provider)
-├── onboarding/   accept-invite/
-└── organization/
-    ├── organization.route.tsx       ← /organization (picker)
-    ├── organization.manifest.ts
-    ├── OrganizationPickerPage.tsx
-    └── $organizationSlug/             ← /organization/acme — org guard boundary
-        ├── organization-slug.route.tsx     ($param folder → strip-$ kebab prefix)
-        ├── organization-slug.manifest.ts       kind: 'layout', children: [suspended, today, …]
-        ├── OrganizationLayout.tsx        mounts shared AppLayout
-        ├── ORGANIZATION_SLUG.OVERVIEW.md
-        ├── today/                   ← …/today — full island; the role home for most roles (D25)
-        ├── suspended/               ← …/suspended — status-guard target
-        └── patients/                ← (example) future islands nest directly: patients/$patientId/…
-```
-
-### Page Directory Shape (route island)
-
-Every route uses a **route island** ([`agent-os/skills/fe-route-island/SKILL.md`](agent-os/skills/fe-route-island/SKILL.md), [`docs/reference/route-island-structure.md`](docs/reference/route-island-structure.md)). Layout parents nest children **directly** as `<segment>/` (or `$param/`). **`<page>.manifest.ts`** is the layout + leaf manifest; top-level UI is `<Page>Page.tsx` / `<Page>Layout.tsx` at island root; tests are colocated next to source (sub-units use folder-per-unit).
-
-```text
-src/pages/<page>/                          ← folder = URL segment
-│
-│══ MANDATORY — every page, validator-enforced ════════════════════════════
-├── <PAGE>.OVERVIEW.md                     entry doc: purpose, files, test ids
-├── <page>.route.tsx                       lazy boundary — `Component` only; RBAC in routeTree `beforeLoad`
-├── <page>.manifest.ts                     manifest — path, title, testId, permission, kind, children
-├── <Page>Page.tsx | <Page>Layout.tsx      top-level UI (Layout + <Outlet/> when kind:'layout')
-│
-│══ OPTIONAL — the page's OWN data layer ══════════════════════════════════
-├── <page>.contracts.ts                    Zod schemas + types for THIS page's API shapes
-├── <page>.api.ts                          fetchers → shared apiClient   (PRIVATE to this page,
-│                                          even from its children — sharing goes via shared/)
-├── <page>.fixtures.ts                     optional placeholder data (REPLACE_WITH_API)
-├── <page>.search.ts                       URL search-param schema (validateSearch)
-├── <page>.constants.ts                    page-scoped constants
-├── <page>.resource.ts                     resource manifest (resource pages only)
-│
-│══ OPTIONAL — units (each: <X>.tsx + <X>.test.tsx + index.ts) ════════════
-├── components/<Widget>/                   page-only widgets
-├── forms/<Name>Form/                      page-only forms
-├── hooks/use<X>/                          page-only Query hooks (wrap <page>.api.ts)
-├── dialogs/<Name>Dialog/                  URL-driven dialogs (resource pages)
-├── store/use<X>Store/                     RARE page-local Zustand
-├── __tests__/integration/                 this page's cross-component flows
-│
-│══ OPTIONAL — FAMILY-SHARED (kind:'layout' only) ═════════════════════════
-├── shared/                                used by THIS page + its children — never other families
-│   ├── components/<X>/  hooks/use<X>/     same unit shapes as root shared
-│   └── <name>-contracts.ts · <name>-api.ts   family-scoped plain modules
-│
-│══ OPTIONAL — children (kind:'layout' only; disk mirrors URL) ════════════
-└── <child>/  ·  $param/                   full recursive copy of this exact anatomy
-                                           (`shared` & unit names are reserved — can't be routes)
-```
-
-### `<page>.route.tsx` Contract
-
-```tsx
-// Every <page>.route.tsx must export Component (required).
-// Optional exports: ErrorBoundary (only if wired in routeTree — rare).
-// Do NOT export loader() for RBAC — routeTree beforeLoad + gatewayFromManifest
-// are the single enforcement point (lazyRouteComponent loads Component only).
-
-import { DashboardPage } from './DashboardPage.tsx';
-
-export function Component() {
-  return <DashboardPage />;
-}
-```
-
-Protected routes register access in `routeTree.tsx`:
-
-```tsx
-beforeLoad: async ({ location, params, preload }) => {
-  if (preload) return;
-  await gatewayFromManifest(dashboardManifest)(toGateContext(location, params));
-},
-```
-
-### Dialog vs Full Page Decision
-
-- **Full page**: a new directory with `<page>.route.tsx`.
-- **URL-driven dialog** (Create/Edit on resource pages): a direct child `<segment>/<segment>.route.tsx` that renders `null`; the parent list page reads URL and opens the matching dialog.
-- **Action dialog** (no URL needed, e.g., delete confirm): inline `AlertDialog`, no `route.tsx`.
-- Rule: Everything between two `<page>.route.tsx` files belongs to the parent.
-
-### CRUD URL convention (resource pages)
-
-| Action | URL                     | Renders              |
-| ------ | ----------------------- | -------------------- |
-| List   | `/<resource>`           | Page                 |
-| Create | `/<resource>/create`    | Dialog over list     |
-| Show   | `/<resource>/[id]`      | Page or dialog       |
-| Edit   | `/<resource>/[id]/edit` | Dialog over list     |
-| Delete | (no URL)                | Inline `AlertDialog` |
+`src/pages/` mirrors the URL tree 1:1, and every page folder keeps the same four files — `<page>.route.tsx`, `<page>.manifest.ts`, `<Page>Page.tsx` (or `Layout`), `<PAGE>.OVERVIEW.md` — plus its registration in `routeTree.tsx` and `docs/reference/routes-and-ui.md`. The rules, the `route.tsx` contract, dialogs vs pages and the CRUD URLs: **[`src/pages/CLAUDE.md`](src/pages/CLAUDE.md)**; the page directory shape: [`docs/reference/route-island-structure.md`](docs/reference/route-island-structure.md).
 
 ## Shared Layer
 
-```text
-src/shared/
-├── components/
-│   ├── ui/                          # shadcn/ui primitives — FLAT (button.tsx, card.tsx, ...)
-│   └── <Name>/                      # cross-page components — folder-per-unit
-├── forms/<Name>/                    # cross-page forms — folder-per-unit
-├── hooks/
-│   ├── use<X>/                      # cross-page custom hooks — folder-per-unit
-│   └── useList/, useOne/, useCreate/, useUpdate/, useDelete/   # standard CRUD hooks
-├── layouts/<Name>/                  # AuthLayout, AppLayout, PublicLayout
-├── api/                             # cross-page API helpers (auth, organization, billing, mfa,
-│                                    #   passkeys, sessions, webhooks, notifications) — plain modules
-│   └── app/                         # the clinic rooms' contracts + fetchers (clinozy-be /api/v1/app/*)
-├── app/                             # the clinic rooms' shared layer (sections, tones, keys) — not src/app/;
-│                                    #   `app` is the rooms' code name everywhere (fe-file-structure.mdc)
-├── auth/                            # auth runtime (token, refresh-timer, idle-timeout, service, captcha)
-├── tenancy/                         # URL-driven org context, membership, resolver, deployment-mode
-├── icons/                           # icon registry (import from @/shared/icons, never lucide-react)
-├── analytics/  billing/  notifications/  notify/  theme/  errors/   # cross-page feature areas
-└── store/                           # global Zustand
-    ├── useAuthStore/
-    ├── useOrganizationStore/
-    ├── useThemeStore/
-    ├── useUIStore/
-    ├── useOnboardingStore/
-    ├── useConsentStore/
-    └── useLocaleStore/
-```
-
-### Promotion ladder
-
-Everything starts colocated with its page and climbs exactly one rung per force:
-
-```text
-ONE page                            → inside that page
-page + its OWN nested children      → pages/<parent>/shared/   (family-shared)
-DIFFERENT families, or any
-src/shared component needs it       → src/shared/              (root shared)
-platform-level                      → src/core/ or src/lib/
-```
-
-Family-shared is importable by the parent island and its descendants only — never by sibling families. Full rules: `agent-os/rules/fe-file-structure.mdc` → Promotion ladder.
+Code used by 2+ page islands lives in `src/shared/` (components, forms, hooks, layouts, api, auth, tenancy, the global Zustand stores); everything starts colocated and climbs one rung of the promotion ladder per force. Layout, the ladder and auth: **[`src/shared/CLAUDE.md`](src/shared/CLAUDE.md)**.
 
 ## Import Conventions
 
@@ -404,189 +162,18 @@ import { User } from './contracts';
 - **Aesthetic quality:** when building/styling/beautifying UI, apply **`agent-os/skills/frontend-design/SKILL.md`** (typography hierarchy, intentional theme, high-impact motion, composition, memorable details) — but **within** the guardrails: shadcn components, neutral semantic tokens (no raw colors), configured fonts/brand, and `web-design-guidelines` for a11y. It elevates craft; it does not override the component library, tokens, or brand.
 - **Design intelligence (advisory):** query **`agent-os/skills/ui-ux-pro-max/`** for styles, palettes, font pairings, UX/stack/chart guidance (`python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --domain <…> [--stack shadcn]`). Advisory only — never overrides neutral tokens, configured fonts/brand, or shadcn choices.
 
-## HTTP / API
+## HTTP, environment, auth, routing, deployments
 
-- Use `apiClient` from `@/core/http/fetch-client.ts` for all API calls.
-- Exception: the auth service uses raw `fetch` (`authFetch`) to avoid interceptor recursion.
-- The fetch client is the reactive auth layer: Bearer attach, single-flight 401 refresh
-  (concurrent 401s share ONE refresh) + replay. clinozy-be keeps ONE live access token per
-  session — every refresh, workspace switch or other tab's refresh retires the one before it —
-  so a 401 for a token replaced while the request was in flight is replayed with the current
-  token, no new refresh; a refresh that waited for the lock while a newer token arrived does
-  not rotate again. Only a refused refresh, or a token still rejected after two refreshes,
-  means the session is dead → `forceLogout()`. The session's one token names the organization
-  it was last switched to, so a refresh answering for **another** organization than this tab's
-  `me/context` (another tab switched) switches the tab back before any request carries it —
-  never another clinic's records under this tab's screen. A switch waits for a refresh in
-  flight. A boot that got no answer (refresh or `me/context` offline, 429, 5xx) is asked again
-  by the next guard, not settled as signed out. Writes auto-carry an `X-Idempotency-Key`
-  (minted once per logical request, reused across retries/replay). Organization context:
-  the **app URL** drives the active org — guards sync it via `/auth/switch-to-organization`,
-  which re-mints the access token with a signed `org` claim. API requests carry **no**
-  org header (`X-Organization-ID` does not exist) and no org id path segment; the backend
-  scopes from the token claim.
-
-## Environment Variables
-
-Two **deploy** environments — **development** and **production** — each configured in its
-own gitignored file, plus a **`local`** developer environment (`.env.local`, the default —
-mirroring clinozy-be's `NODE_ENV=local`). **One `.env.<environment>` file per environment.**
-`.env.example` is the **only committed** file. Deploys inject env from **GitHub
-Environments** (never from files). No shared `.env`, no `.env.staging`. `pnpm setup:local`
-scaffolds `.env.local`; `pnpm dev` loads it.
-
-The **environment identity is an env variable, not the Vite mode**: `VITE_APP_ENV` is exactly
-`local | development | production` — three environments, no `test` (an out-of-enum value fails
-loudly at load in `env.config.ts`), and the **default is `local`** — mirroring clinozy-be's
-`NODE_ENV=local` so both repos share one env vocabulary. It is decoupled from Vite's `mode`
-because **Vite 8 forbids a mode literally named `local`**; Vite's mode is a mechanism detail
-(dev → `dev-server`, build → `production`, Vitest → its default `test` mode). The dev server
-never runs in Vite's default `development` mode, where `.env.development` would load on top of
-`.env.local`: `pnpm dev` passes `--mode dev-server`, and `vite.config.ts` refuses any other
-mode. A build is mode `production`; in a terminal `pnpm build` asks which `.env.<environment>` to
-build with and reads that file alone (`--env <environment>` skips the question). Unasked —
-pipes, scripts, `pnpm health` — it reads `.env.local` alone, clinozy-be's `local` default; only
-CI (no `.env.local`) keeps Vite's default files. `pnpm build --defaults` reads no env file and
-drops the shell's `VITE_*` — the schema defaults, as CI's Build verify lane builds; the pre-push
-hook builds that way, so its bundle-size budget measures the bundle CI measures. Unlike clinozy-be,
-`.env.local` is never layered over a deploy environment's file: a build ships what it reads.
-`local` is not a deploy target (`DeployEnvironment` stays `development | production`,
-while `AppEnvironment` adds `local` for its load-time contract). A **test run is not its own
-environment** — it reports
-`local` and is marked by the **`VITE_TEST_MODE`** env variable (injected by `plugins/test-env.ts`,
-read via `platformConfig.testMode`), the single home for any test-only behavior. Vite loads
-`.env.local` in every mode, so the Vitest runner's `envDir` is pointed at an empty dir
-(`tooling/test/empty-env/`) to keep the suite hermetic.
-
-```text
-.env.example         # Reference for all env vars — the ONLY committed file
-.env.local           # Local dev file (gitignored, NODE_ENV=local — the default): flags + secrets
-.env.development     # `development` deploy-env file (gitignored): dev-tooling ON
-.env.production      # `production` deploy-env file (gitignored): dev-tooling OFF (prod-safe)
-```
-
-- `VITE_` prefix = bundled into the client (public). No prefix = build-time only.
-- Secrets go in GitHub Environments (deploy) or the gitignored `.env.local` (local) —
-  never committed. A guardrail blocks agent edits to `.env*` (apply them yourself).
-- **Behavior is env-driven, never mode-sniffed.** No `import.meta.env.DEV/PROD/MODE`
-  **and no `platformConfig.environment === '<name>'`** branching in app code — named
-  schema flags drive it: `VITE_DEBUG_LOGGING`, `VITE_DEVTOOLS`, `VITE_E2E_HOOKS`,
-  `VITE_VERSION_CHECK`, `VITE_CAPTCHA_DISABLED` → read via `platformConfig`. `environment`
-  is only ever a reported value (Sentry/PostHog tag). The three allowlisted raw readers
-  (`tooling/validate/vite-env-reads.mjs`) are the config bootstrap (`env.config.ts`),
-  `src/lib/i18n/build-env.ts`, and `src/core/version/check.ts` (only the Vite builtin
-  `BASE_URL` — a build constant, not a mode sniff).
-- **One behavior = one env variable.** Each behavior is owned by **exactly one** key, and
-  `platformConfig` reads that key **1:1** — no umbrella, alias, or `VITE_DEVTOOLS || <other>`
-  derived-from-another-flag logic. Never add a second variable that also drives a behavior
-  another key already owns: two keys for one thing means ambiguous precedence (one value
-  silently ignored) and two sources of truth. To move several flags together for a context
-  (the test runner, a given deploy), set **each one's own key** at the **env layer** —
-  `plugins/test-env.ts`, `.env.<environment>`, GitHub Environments — never by combining them
-  in code. Conditions live in env; code stays 1:1.
-- **Strict allowed values per environment.** `envProfiles.<env>.allowed` in `env-schema.ts`
-  declares the permitted value set per key; `pnpm validate:client-env` **hard-fails** on
-  a value out of range (e.g. production requires the diagnostics flags off, version-check on).
-- **Per-environment defaults.** `envProfiles.<env>.defaults` in `env-schema.ts` is the single
-  source of truth for each environment's starting values (local + development: dev-tooling on;
-  production: safe). `pnpm setup:local` writes `envProfiles.local.defaults` into `.env.local`
-  (via `injectEnvDefaults`); every default must be ⊆ that key's `allowed` (test-enforced). NOT
-  applied by the runtime — defaults reach the app through the env layer, never a mode branch.
-- **Tests are hermetic by construction — two halves, both required.** (1) The Vitest `envDir`
-  points at an empty dir (`tooling/test/empty-env/`), so the runner (in `local` mode) loads no
-  env **files** — not even `.env.local`, which Vite otherwise loads in every mode. (2)
-  `plugins/test-env.ts` **strips ambient `VITE_*` from `process.env`** in its `config()` hook,
-  because Vite's `loadEnv` copies every prefix-matching key out of `process.env` on a path
-  `envDir` does not touch — so an exported shell variable (a cloud dev container, a developer's
-  `export`) would otherwise re-point `import.meta.env` and the suite would silently stop testing
-  schema defaults. It is unconditional and has no opt-out: `VITE_X=y pnpm test` is ignored (and
-  logged), so change the schema default or the test, not the shell. Together they keep the suite
-  on schema defaults on every machine and on CI; pinned by `tests/ci/env-hermetic.policy.test.ts`.
-  Genuine test-runner env needs are injected by plugins, not app code or a manual pin:
-  `plugins/i18n-build.ts` (multi-locale) and `plugins/test-env.ts` (`VITE_TEST_MODE` on,
-  captcha off).
-- **Where to get credentials and optional env:** docs/integrations/credentials-and-env.md
-
-## Auth & Security
-
-- Access token stored in memory only (module closure in `shared/auth/token.ts`).
-- Refresh token is an HttpOnly cookie (set by backend).
-- Never store tokens in localStorage or sessionStorage.
-- **One refresh path:** `refreshAccessToken()` in `shared/auth/service.ts` is the ONLY code
-  allowed to call `/auth/refresh` — a module-level single-flight dedupes concurrent callers
-  (proactive timer, 401 interceptor) and a `navigator.locks` Web Lock (`clinozy-auth:refresh`)
-  serializes tabs. Never add a second refresh call: the backend rotates refresh sessions
-  with reuse-detection, so parallel refreshes kill the session.
-- **Ending a session is a server-side act.** `logout({ reason })` revokes (`POST /auth/logout`) and THEN clears locally; it is the ONE way to end a live session — user menu, command palette, **the idle-timeout dialog (button and deadline) and the absolute session cap**. `forceLogout()` is **local only**: used alone on a live session it signs nobody out (the HttpOnly refresh cookie survives, `/login` silently refreshes, the guest guard bounces the user back in) — it is right only when the server session is already gone. A revoke that cannot reach the server (offline on wake) is finished at the next boot via a `clinozy:logout-pending` flag; a deliberate end also suppresses auto-Google sign-in. Details: `src/shared/auth/AUTH.OVERVIEW.md`.
-- **The idle timer** (`shared/auth/idle-timeout.ts`) is deaf to activity in its own tab while the warning is up (a press on the dialog's own button IS `document` activity), measures idle time on the wall clock (sleep/throttling cannot stretch it), and shares activity across tabs.
-- `assetsInlineLimit: 0` in Vite config for CSP compliance.
-- CSP ships as a build-generated **header** (`dist/_headers`, authoritative) plus an
-  `index.html` meta fallback, both from `lib/csp-api-origin.ts`; set `VITE_CSP_REPORT_URI`
-  to collect violations. Cross-tab logout (`shared/auth/auth-channel.ts`) kills every open
-  tab when a session dies. Full model + accepted risks: **docs/reference/security-model.md**.
-
-## Routing
-
-- All routes are lazy loaded via `route.tsx` files.
-- Route config lives in `src/app/routes/routeTree.tsx`.
-- Protected routes use TanStack Router `beforeLoad` guards in `routeTree.tsx` — the `$organizationSlug` shell runs `requireAuth → requireTeamDeployment → requireProvisionedWorkspace → resolveActiveOrg` (context sync from the URL); leaf routes then run `gatewayFromManifest` (session → module → permission) followed by `requireOrgStatus`; see `src/app/guards/GUARDS.OVERVIEW.md`.
-- RBAC enforcement in `routeTree.tsx` `beforeLoad` via `gatewayFromManifest(manifest)` (+ tenancy guards).
-- **Pending policy has two phases, not a list of routes.** `BOOT_PENDING_POLICY` (pending component at once, **no** 500ms minimum) until the first navigation resolves — the pending component holds the HTML splash, so every cold URL is one continuous screen — then `IN_APP_PENDING_POLICY` (keep the current screen ≤ 3s, 500ms minimum). No route sets `pendingMs`/`pendingMinMs`. **A workspace switch is the one exception to "keep the current screen"** — `WorkspaceSwitchOverlay` covers the viewport for the hop, because the screen underneath belongs to the workspace being left and is about to be wrong, not merely stale. Ordinary navigation keeps `RouteProgressBar` and nothing else. While `/auth/refresh` is in flight, `preloadBootRoutes()` warms the destination's chunks, steered by `hasSessionHint()` — a **hint that never authorizes**.
-- **Settings lives in the hash, so two things follow.** (1) A same-route `navigate({ to: '.' })` must **state the hash** — the router resolves an omitted `hash` to none, which closes the modal (`hash: true` keeps it, `hash: ''` clears it on purpose; ESLint rejects neither). Stripe's return params are cleared through `stripeReturnCleanupNavigation()`. (2) The modal decides nothing — and canonicalizes nothing — until it has **both** answers: me/context _and_ the permission set (`useAccessResolved()`); an empty **unresolved** list is "not known yet", never "not allowed". Spec: `docs/reference/routing-and-tenancy.md` §7.
-- Every manifest-backed route sets `head: manifestHead(manifest)` (`lib/routes/page-head.ts`) — app-shell routes without a manifest (`/unauthorized`, the `$` 404 splat) use inline `composePageTitle`; the document
-  title comes from `manifest.title` as `` `<title> · <PRODUCT_NAME>` `` (`APP_TITLE = PRODUCT_NAME`); the root-mounted
-  `RouteAnnouncer` announces it to screen readers on SPA navigations.
-
-## New-deployment detection
-
-- **Plugin** `plugins/version-json.ts`: at build time sets `VITE_APP_BUILD_ID` and writes/serves `version.json` (dev: middleware; prod: `dist/version.json`). `builtAt` is UTC (ISO 8601).
-- **Runtime** `src/core/version/check.ts`: polls `/version.json` (every 5 min while visible + on tab refocus); if `buildId` differs from the app’s build, shows a persistent **“Update available”** toast with **Refresh now** (`app/version/show-update-available-toast.ts`) and **defers** `location.reload()` until it won’t lose work — never while a field is focused, immediately when the tab is hidden, otherwise once the user is idle (~60s) — at most **once per advertised buildId** (sessionStorage marker). The reload is **handed through the service worker** (pre-warmed `update()` at detection; `SKIP_WAITING` → `controllerchange` → reload, 10s deadline fallback) so it lands on the NEW precached shell — `src/sw.ts` activation is deliberately message-driven, never an unconditional `skipWaiting()`.
-- **Critical updates skip the wait.** `MINIMUM_SUPPORTED_VERSION` (`src/core/version/minimum-version.constants.ts`, `null` unless a release is critical) is written into `version.json` as `minimumVersion` — only by a build that meets it — next to `version` (`VITE_APP_VERSION`). A tab whose own version is below it (and only when it is sure: unknown or malformed → the ordinary path) shows the non-dismissible **“Update required”** notice pill (`app/version/CriticalUpdateNotice.tsx`; the root mounts only `CriticalUpdateNoticeLazy`), counts down 60 s and reloads **even over a focused field** (dirty drawers/Settings/onboarding keep the browser's leave prompt); boot splash or hidden tab → reload at once; offline at the deadline → waits for `online`. To mark a release critical set the floor to the **patch bump of the current release** in the fix PR (`docs/process/release-versioning.md` → Critical releases; `tests/ci/minimum-version.policy.test.ts` rejects anything higher). The running app never imports the constant — only the deployed `version.json` counts.
-- **Stale chunks are the second path** `src/core/version/stale-chunk-recovery.ts`: a tab open across a deploy still `import()`s the old hashed chunks, and Vite raises `vite:preloadError`. That event is **not** a stale-chunk signal by itself — offline, a flaky CDN and the cosmetic prefetches (`initDeferredIconSets`, `preloadBootRoutes`) raise it too — so the handler first asks `version.json` whether a **different `buildId`** is advertised (`isNewBuildAdvertised()`), and only then runs the same `reloadOntoLatestBuild()`: once per `buildId`, under its OWN sessionStorage key, never over a focused field. It never calls `preventDefault()` — Vite's helper is `import().catch(dispatch)`, so suppressing the rethrow would make the import **resolve with `undefined`** and the caller report a misleading `TypeError`. `netlify.toml` also answers a missing `/assets/*` with a real **404** instead of the SPA `index.html` rewrite (whose 200 surfaces as a bogus MIME-type error), but recovery does not depend on it. Both reload paths share `reload-marker.ts` and `lib/editable-focus.ts`; `pnpm build` ends with `strip-sourcemaps`, which deletes every `.map` the build emitted **after** the Sentry plugin has uploaded them — `build.sourcemap: 'hidden'` writes 145 of them and the plugin only removed `dist/assets/*` and only when `SENTRY_AUTH_TOKEN` was set, so a deploy without that secret published the lot. `pnpm build:check` independently fails on any map left anywhere under `dist/`.
-
-## PWA manifest and icons
-
-- **Source of truth:** `src/core/config/app-manifest.ts` → `public/manifest.webmanifest` (drift test: `app-manifest.test.ts`).
-- **Icons:** `public/app-icon.svg` (the product mark — `ProductMark` — on its `#18181b` tile); PNGs via `rsvg-convert`. Skill: `agent-os/skills/fe-pwa-manifest/SKILL.md`.
-- **Local perf audit:** `pnpm build && pnpm preview` — see `docs/reference/local-production-perf.md` (never Lighthouse on dev server).
-- **Service worker navigations** (`src/sw.ts`): network first; a failed fetch gets the **precached app shell**, which owns the offline UX (splash offline hold, `OfflineIndicator`) — never a blanket offline page, since DNS/TLS failures reject while online. `offline.html` is the last resort. Read precached files with `matchPrecache`, never `caches.match` (revisioned keys). Emergency removal is `selfDestroying: true` in `VitePWA`, never deleting the worker — `docs/reference/frontend-platform.md` → Service worker emergency reset.
+- **HTTP:** `apiClient` from `@/core/http/fetch-client.ts` for every API call (the auth service's raw `authFetch` is the one exception) — [`src/core/CLAUDE.md`](src/core/CLAUDE.md).
+- **Environment:** `local` (default) · `development` · `production`, `.env.example` the only committed file; behavior is env-driven, never mode-sniffed, and one behavior is one env variable — [`src/core/CLAUDE.md`](src/core/CLAUDE.md).
+- **Auth:** the access token lives in memory only (never localStorage/sessionStorage); `refreshAccessToken()` is the one refresh path; `logout({ reason })` ends a live session — [`src/shared/CLAUDE.md`](src/shared/CLAUDE.md).
+- **Routing:** lazy `route.tsx` files, guards and RBAC in `routeTree.tsx` `beforeLoad`; Settings is a hash modal — [`src/app/CLAUDE.md`](src/app/CLAUDE.md).
+- **New deployments and the PWA:** `version.json` polling, stale-chunk recovery, critical updates, the service worker and the manifest — [`src/core/CLAUDE.md`](src/core/CLAUDE.md).
 
 ## Testing
 
-**Full matrix:** [docs/reference/testing.md](docs/reference/testing.md) · [tests/README.md](tests/README.md)
-
-- **Global tests, helpers:** **`tests/`** at project root
-  - **Helpers:** `tests/utils/` — `renderWithProviders`, `e2e-hybrid`, `e2e-auth`, `axe-for-dialog`; import as `@/tests/utils/...`
-  - **Security:** `tests/security/` — Vitest security project (`*.security.test.ts`)
-  - **Performance:** `tests/performance/` (optional) — Lighthouse, bundle-size
-- **Colocated unit tests:** `src/**/*.test.{ts,tsx}` (+ `pages/**/__tests__/integration/` for cross-component flows)
-- **E2E:** `tests/e2e/*.e2e.test.ts` (Playwright) — requires **clinozy-be** on `:3000` (`global-setup.ts` fails if down). Never `.spec.ts`.
-- **Hybrid E2E selectors:** `data-testid` for actions, `getByRole`/`getByLabel` for a11y guards — `agent-os/skills/fe-playwright-e2e/SKILL.md`, `tests/utils/e2e-hybrid.ts`. A control mounted per breakpoint shares one test id, so reach it with `byTestId()` (visible + first); never `.catch()` an `isVisible()` / `isEnabled()` feature check (ESLint-enforced) — it can only hide a strict-mode violation and turn the spec into a silent skip. **Read the skipped count.**
-- **Gates:** `pnpm validate:structure` (colocation), `pnpm validate:testids` (page/form/shell testids), `pnpm validate:theme-axis`, `pnpm coverage:patch` (PR changed-lines ≥ 90%)
-- Unit/security: Vitest; E2E: Playwright (Chromium). Component tests require `vitest-axe`; portaled dialogs use `axeForDialog`.
-
-**Dev API:** In development, Vite proxies `/api` to `VITE_DEV_API_URL` (default `http://localhost:3000`). The FE always uses `apiClient` / `authFetch` against **clinozy-be**. Unit tests stub modules with `vi.mock()` — no HTTP server.
+Colocated unit tests (`src/**/*.test.{ts,tsx}`), `tests/` for helpers, security, CI policy and Playwright E2E (local-only; needs clinozy-be on `:3000`). The matrix and conventions: **[`tests/CLAUDE.md`](tests/CLAUDE.md)**.
 
 ## Git branch naming
 
-Working branches are `<type>/<short-description>`; `main` is the only long-lived branch. Enforced by [`.husky/pre-push`](.husky/pre-push) (rule: `agent-os/rules/fe-git-branch-naming.mdc`, owner: **fe-code-quality-security**).
-
-**AI web sessions start on a throwaway name.** Claude Code web assigns `claude/<platform-slug>` (e.g. `claude/session-request-wx3euu`) before the container boots. The slug is generated platform-side and is **not configurable from this repo** — no file here changes it. Rename it to a meaningful name rather than shipping it.
-
-**Name the branch before the first push.** The cloud git proxy accepts a push to _any_ branch name but **rejects every form of delete** (`git push --delete`, `git push :ref`, and `DELETE /git/refs/...` → 403, even for a ref that does not exist). A `claude/*` branch that has already been pushed therefore cannot be cleaned up from inside the session. Renaming first means the throwaway name never reaches the remote:
-
-```sh
-git branch -m docs/branch-naming-guidance      # rename in place, BEFORE any push
-git push -u origin docs/branch-naming-guidance
-```
-
-Already pushed as `claude/*`? Leave it — it disappears when the PR squash-merges. Never open a second PR just to fix a branch name.
-
-**Deriving the name** — `<type>` is the change's conventional-commit type (`feat`, `feature`, `fix`, `hotfix`, `chore`, `ci`, `docs`, `refactor`, `test`, `perf`, `build`, `style`, `revert`, matching the accepted-prefix regex in `.husky/pre-push`); `<short-description>` is kebab-case, 2–5 words, ≤ 40 chars, naming the change itself (never a ticket id or a date). Keep it aligned with the commit subject and PR title.
-
-| Change                                | Branch                                |
-| ------------------------------------- | ------------------------------------- |
-| Fix British spelling in a doc         | `docs/american-spelling-organization` |
-| Add the billing invoices route island | `feat/billing-invoice-route`          |
-| Org guard drops the slug on refresh   | `fix/org-slug-guard-refresh`          |
-| Bump Vite to 8.1                      | `chore/bump-vite-8-1`                 |
+Working branches are `<type>/<short-description>`; `main` is the only long-lived branch (`.husky/pre-push`). A web session starts on a throwaway `claude/<slug>` branch: **rename it before the first push** (`git branch -m <type>/<short-description>`), because the cloud git proxy rejects every branch delete. The full rule and deriving the name: [`.github/CLAUDE.md`](.github/CLAUDE.md).
