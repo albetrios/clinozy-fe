@@ -1,6 +1,8 @@
 ---
 name: fe-resilient-interactions
 description: The reasoning behind the always-on resilient-interaction rules. Use when applying or arguing with fe-resilient-interactions.mdc — double submits, crashes escaping a boundary, early success messages.
+trigger: "**/useAppMutation/**, **/useDeferredRowRemoval/**"
+triggerNote: Writes that can double-submit, deferred removals, error boundaries
 ---
 
 # Resilient interactions — the reasoning

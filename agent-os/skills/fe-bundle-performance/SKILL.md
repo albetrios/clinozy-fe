@@ -1,7 +1,7 @@
 ---
 name: fe-bundle-performance
 description: Keep the bundle within its size-limit budgets — heavy modules off the first-paint path, lazy islands, code-splitting. Use on a fe-bundle-size-reviewer finding or a blown size budget.
-trigger: vite.config.ts, tooling/ci/run-size-limit.mjs
+trigger: vite.config.ts, tooling/ci/run-size-limit.mjs, .size-limit.json
 triggerNote: And any size-budget change
 ---
 

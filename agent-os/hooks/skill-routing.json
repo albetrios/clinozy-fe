@@ -134,14 +134,14 @@
       "note": "Eight surfaces; regenerate the tree last"
     },
     {
-      "globs": ["vite.config.ts", "tooling/ci/run-size-limit.mjs"],
+      "globs": ["vite.config.ts", "tooling/ci/run-size-limit.mjs", ".size-limit.json"],
       "skills": ["fe-bundle-performance"],
       "note": "And any size-budget change"
     },
     {
-      "globs": ["netlify.toml"],
+      "globs": ["netlify.toml", ".husky/**", ".github/workflows/**", "eslint.config.mjs"],
       "skills": ["fe-code-quality-security"],
-      "note": "The deploy path — always netlify deploy --no-build"
+      "note": "The deploy path (always netlify deploy --no-build), the git hooks, the CI workflows and the lint config"
     },
     {
       "globs": ["**/*.contracts.ts", "**/*.constants.ts"],
@@ -154,7 +154,16 @@
       "note": "Dependencies and overrides — the lockfile in the same commit"
     },
     {
-      "globs": ["docs/**/*.md", "**/*.OVERVIEW.md", ".env.example"],
+      "globs": [
+        "docs/**/*.md",
+        "**/*.OVERVIEW.md",
+        ".env.example",
+        "README.md",
+        "CLAUDE.md",
+        "**/CLAUDE.md",
+        "agent-os/skills/**",
+        "agent-os/rules/**"
+      ],
       "skills": ["fe-documentation-maintenance"],
       "note": "Which doc to update and where it lives"
     },
@@ -175,9 +184,14 @@
       "note": "If an env key changed"
     },
     {
+      "globs": [".vscode/**"],
+      "skills": ["fe-extension-settings-recommendations"],
+      "note": "Workspace extensions and settings"
+    },
+    {
       "globs": [
         "eslint.config.mjs",
-        ".github/workflows/pr-ci.yml",
+        ".github/workflows/**",
         "netlify.toml",
         "plugins/dev-server-mode.ts",
         "plugins/build-environment.ts",
@@ -198,12 +212,17 @@
       "note": "New user-facing copy or a locale namespace"
     },
     {
+      "globs": ["eslint.config.mjs"],
+      "skills": ["fe-lint-guard"],
+      "note": "A lint config change — then fix what it flags"
+    },
+    {
       "globs": ["src/lib/i18n/format.ts", "**/useLocaleFormat/**", "**/*.constants.ts"],
       "skills": ["fe-locale-formatting"],
       "note": "And any date, number or money render; constants only when they hold dates or numbers"
     },
     {
-      "globs": ["**/useLocaleStore/**", "public/locale-init.js"],
+      "globs": ["**/useLocaleStore/**", "public/locale-init.js", "src/locales/**"],
       "skills": ["fe-locale-preferences"],
       "note": "And BUILD_I18N_MODE"
     },
@@ -225,10 +244,11 @@
         "tooling/setup/github/scaffold-env-files.mjs",
         ".github/rulesets/**",
         ".github/environments/**",
-        "tooling/setup/github/governance-mode.mjs"
+        "tooling/setup/github/governance-mode.mjs",
+        "tooling/validate/**"
       ],
       "skills": ["fe-platform-hygiene"],
-      "note": "Env schema, Vite env reads, knip; which env file each command reads; governance mode — use github:tool:governance-mode, never hand-edit review fields"
+      "note": "Env schema, Vite env reads, knip, the validators; which env file each command reads; governance mode — use github:tool:governance-mode, never hand-edit review fields"
     },
     {
       "globs": ["tests/e2e/**"],
@@ -243,6 +263,11 @@
       ],
       "skills": ["fe-pwa-manifest"],
       "note": "The PWA install surface"
+    },
+    {
+      "globs": ["**/useAppMutation/**", "**/useDeferredRowRemoval/**"],
+      "skills": ["fe-resilient-interactions"],
+      "note": "Writes that can double-submit, deferred removals, error boundaries"
     },
     {
       "globs": ["**/*.resource.ts", "**/*ListPage.tsx", "**/dialogs/**"],

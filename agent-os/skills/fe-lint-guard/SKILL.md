@@ -1,6 +1,8 @@
 ---
 name: fe-lint-guard
 description: Fix lint, type-check and code-quality issues after every implementation, without asking — ESLint, TypeScript, nested ternaries, React purity, import order, security warnings.
+trigger: eslint.config.mjs
+triggerNote: A lint config change — then fix what it flags
 ---
 
 # Lint Guard — Background Code Quality

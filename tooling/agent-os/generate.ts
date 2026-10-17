@@ -25,6 +25,7 @@ import { format, resolveConfig } from 'prettier';
 
 import {
   renderRoutingJson,
+  renderSkillCatalog,
   renderTriggerTable,
   replaceGeneratedRegion,
   routingRoutes,
@@ -378,6 +379,37 @@ if (
       report(
         "drift: agent-os/hooks/skill-routing.json differs from chains.json + the skills' trigger frontmatter — run `pnpm agent-os:generate`",
       );
+  }
+}
+
+// ── The fe-skill-registry inventory (generated region) ──
+{
+  const registryPath = join(agentOsDirectory, 'skills', 'fe-skill-registry', 'SKILL.md');
+  const registryText = readFileSync(registryPath, 'utf8');
+  const regionText = replaceGeneratedRegion(
+    registryText,
+    renderSkillCatalog(agentOsDirectory),
+  );
+  const nextRegistry =
+    regionText === undefined
+      ? undefined
+      : await format(regionText, {
+          ...(await resolveConfig(registryPath)),
+          filepath: registryPath,
+        });
+  if (nextRegistry === undefined) {
+    report(
+      'missing: the GENERATED markers in agent-os/skills/fe-skill-registry/SKILL.md',
+    );
+  } else if (writeMode) {
+    if (nextRegistry !== registryText) {
+      writeFileSync(registryPath, nextRegistry);
+      report('wrote agent-os/skills/fe-skill-registry/SKILL.md (inventory)');
+    }
+  } else if (nextRegistry !== registryText) {
+    report(
+      "drift: agent-os/skills/fe-skill-registry/SKILL.md's inventory differs from the skills' frontmatter — run `pnpm agent-os:generate`",
+    );
   }
 }
 

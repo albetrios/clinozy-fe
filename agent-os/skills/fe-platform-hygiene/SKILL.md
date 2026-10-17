@@ -1,8 +1,8 @@
 ---
 name: fe-platform-hygiene
 description: Platform config, env read paths, dead code and deploy validators (platformConfig, knip, validate:vite-env, validate:client-env). Use when touching env schema, Vite env reads, knip or platform wiring.
-trigger: src/core/config/env-schema.ts, **/platform-config.ts, **/build-env.ts, knip.jsonc, .env.example, plugins/dev-server-mode.ts, plugins/build-environment.ts, tooling/ci/build.mjs, tooling/setup/github/scaffold-env-files.mjs, .github/rulesets/**, .github/environments/**, tooling/setup/github/governance-mode.mjs
-triggerNote: Env schema, Vite env reads, knip; which env file each command reads; governance mode — use github:tool:governance-mode, never hand-edit review fields
+trigger: src/core/config/env-schema.ts, **/platform-config.ts, **/build-env.ts, knip.jsonc, .env.example, plugins/dev-server-mode.ts, plugins/build-environment.ts, tooling/ci/build.mjs, tooling/setup/github/scaffold-env-files.mjs, .github/rulesets/**, .github/environments/**, tooling/setup/github/governance-mode.mjs, tooling/validate/**
+triggerNote: Env schema, Vite env reads, knip, the validators; which env file each command reads; governance mode — use github:tool:governance-mode, never hand-edit review fields
 ---
 
 # Platform hygiene (clinozy-fe)
