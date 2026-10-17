@@ -203,13 +203,20 @@ for oauth_key in VITE_AUTH_OAUTH_GOOGLE VITE_AUTH_OAUTH_GITHUB; do
 done
 ok "[7/${TOTAL}] .env.local ready (OAuth buttons off in the cloud)"
 
-# 8) MCP default pair --------------------------------------------------------
-step "[8/${TOTAL}] MCP default pair (.mcp.json)"
+# 8) MCP default pair + the codegraph index it serves ------------------------
+step "[8/${TOTAL}] MCP default pair (.mcp.json) + codegraph index"
 pnpm mcp:setup:default >&2 || skip "mcp:setup:default failed — run it manually if MCP tools are missing"
 if [ -f .mcp.json ]; then
   ok "[8/${TOTAL}] .mcp.json written (codegraph + headroom)"
 else
   skip "[8/${TOTAL}] .mcp.json absent (non-fatal)"
+fi
+# Step 7's --only-env stops before the index phase of setup:local, so build it here.
+pnpm setup:local --only-codegraph >&2 || skip "codegraph index failed — run \`pnpm setup:local --only-codegraph\` (non-fatal)"
+if [ -f .codegraph/codegraph.db ]; then
+  ok "[8/${TOTAL}] codegraph index ready (.codegraph/)"
+else
+  skip "[8/${TOTAL}] codegraph index absent — codegraph MCP answers nothing until it is built (non-fatal)"
 fi
 
 # 9) Playwright browsers -----------------------------------------------------
