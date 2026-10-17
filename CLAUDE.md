@@ -34,7 +34,7 @@ manifests, Dependabot flow invariants) projects. Markdown is linted
 (`pr-docs-lane.yml`, outside the quality gate). CI (`.github/workflows/pr-ci.yml`) runs
 path-filtered parallel lanes — biome/eslint/prettier/tsc/vitest(+patch coverage)/security-tests/
 knip/structure+tsdoc/agent-os-gate/build+size+SBOM/gitleaks/semgrep/Trivy-IaC/deps-audit/
-dependency-review/actionlint —
+dependency-review/actionlint/SonarQube —
 behind the aggregate `Quality gate` required check (`Checks` is the second required
 context; branch protection as code:
 `.github/rulesets/`, `pnpm github:sync`; personal↔team review posture via

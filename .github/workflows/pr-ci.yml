@@ -32,6 +32,7 @@ jobs:
       pull-requests: read
     outputs:
       src-code: ${{ steps.filter.outputs.src-code }}
+      sonar-surface: ${{ steps.filter.outputs.sonar-surface }}
       e2e: ${{ steps.filter.outputs.e2e }}
       ci-config: ${{ steps.filter.outputs.ci-config }}
       agent-os: ${{ steps.filter.outputs.agent-os }}
@@ -67,6 +68,11 @@ jobs:
               - 'eslint.config.mjs'
               - '.prettierrc'
               - '.env.example'
+            sonar-surface:
+              - 'src/**'
+              - 'sonar-project.properties'
+              - 'docker-compose.sonar.yml'
+              - 'tooling/sonar/**'
             e2e:
               - 'src/**'
               - 'tests/e2e/**'
@@ -499,6 +505,26 @@ jobs:
       - name: Run actionlint
         uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
 
+  sonarqube:
+    name: SonarQube
+    needs: [changes]
+    # The SonarQube Community Build and rules the pre-push gate uses: the same
+    # docker-compose.sonar.yml server and the same `pnpm sonar:scan` (tooling/sonar/sonar-gate.mjs),
+    # which fails on any open issue or hotspot on the deployed-app surface. Free on a private
+    # repository, unlike SonarQube Cloud (~214k lines here vs its 50k free). Only when the analyzed
+    # surface changes: a scan takes ~4 min with the server start. The Elasticsearch index sits on
+    # tmpfs (docker-compose.sonar.yml), so no runner sysctl or disk headroom is needed.
+    if: needs.changes.outputs.sonar-surface == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: SonarQube gate (start the server, scan, fail on any issue)
+        run: pnpm sonar:scan
+
   quality-gate:
     name: Quality gate
     needs:
@@ -520,6 +546,7 @@ jobs:
         security-iac,
         dependency-review,
         actionlint,
+        sonarqube,
       ]
     if: always()
     runs-on: ubuntu-latest
@@ -545,6 +572,7 @@ jobs:
             security-iac=${{ needs.security-iac.result }}
             dependency-review=${{ needs.dependency-review.result }}
             actionlint=${{ needs.actionlint.result }}
+            sonarqube=${{ needs.sonarqube.result }}
         run: |
           FAILED=0
           {

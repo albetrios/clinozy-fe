@@ -2,8 +2,10 @@
 
 SonarQube runs **locally** (Docker) and is enforced as a **pre-push gate**: when you push commits
 that touch deployed-surface code (`src/` runtime), the hook scans the project and **blocks the
-push if SonarQube reports any unresolved issue or hotspot**. Everything is local — there is no
-hosted SonarQube and no CI dependency. Same setup as clinozy-be (`../clinozy-be`), ported for this repo.
+push if SonarQube reports any unresolved issue or hotspot**. PR CI runs the same gate in its
+`SonarQube` lane (inside the `Quality gate`, when `src/`, the Sonar config or the gate changes), on
+the same Community Build — no hosted SonarQube. Same setup as clinozy-be (`../clinozy-be`), ported
+for this repo.
 
 ## TL;DR
 
