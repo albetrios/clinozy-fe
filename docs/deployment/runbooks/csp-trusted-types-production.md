@@ -92,5 +92,7 @@ time. Same-origin `script-src 'self'` remains the in-repo baseline.
 
 ## Related CI / tests
 
+- `pnpm deploy:probe-live --url <deploy>` — the live check after each Netlify deploy: the served CSP
+  header (`frame-ancestors 'none'`, `object-src 'none'`, a safe script policy), HSTS and nosniff
 - `tests/security/static-security-config.security.test.ts` — CSP header shape
 - `pnpm build` → inspect `dist/_headers` and `index.html` meta fallback

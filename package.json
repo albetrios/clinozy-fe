@@ -73,6 +73,7 @@
     "sbom:generate": "npx -y @cyclonedx/cdxgen -t js --no-recurse -o sbom.cyclonedx.json .",
     "deploy:netlify": "pnpm build && netlify deploy --no-build",
     "deploy:netlify:prod": "pnpm build --env production && netlify deploy --prod --no-build",
+    "deploy:probe-live": "node tooling/ci/probe-live-site.mjs",
     "rebrand": "node tooling/identity/rebrand.mjs",
     "identity:sync": "node tooling/identity/rebrand.mjs --sync --apply",
     "iteration:new": "node tooling/iterations/new-iteration.mjs",

@@ -15,8 +15,9 @@ lens), before the review starts blocking `/fe-ship` on 2026-10-31 — so the rev
 ## Early checks
 
 Findings from the early checks — the dependency audit and the client env allowlist at commit
-(before-commit guard steps 11 and 12) and Semgrep at push (`pnpm security:semgrep:push`) — before
-they block on 2026-10-31 (`tooling/ci/early-checks.mjs`).
+(before-commit guard steps 11 and 12), Semgrep at push (`pnpm security:semgrep:push`) and the live
+CSP and HSTS check after each Netlify deploy (`pnpm deploy:probe-live`) — before they block on
+2026-10-31 (`tooling/ci/early-checks.mjs`).
 
 | Date | Check | Finding | Why it is wrong |
 | ---- | ----- | ------- | --------------- |

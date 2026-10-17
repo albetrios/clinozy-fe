@@ -234,7 +234,11 @@ On **push to `main`**, **Post-merge CI** (`.github/workflows/post-merge-ci.yml`)
    - **Every push to `main`** → GitHub environment **`development`** → **alias** deploy (`development--clinozy-fe.netlify.app`, ungated).
    - **A release** (release-please tag) → GitHub environment **`production`** → `--prod` deploy (`clinozy-fe.netlify.app`), via `release-deploy.yml` when the release is published.
    - Builds with `pnpm build`, deploys when `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, and `NETLIFY_SITE_ID` are set on that environment.
-   - Post-deploy smoke checks `version.json` and `/login`.
+   - Post-deploy smoke checks `version.json` and `/login`; then `pnpm deploy:probe-live` checks the
+     headers the deploy actually serves on `/` and `/login` — a CSP header with `frame-ancestors
+'none'`, `object-src 'none'` and a script policy without `'unsafe-inline'`/`'unsafe-eval'`,
+     HSTS of 180 days or more, nosniff (`tooling/ci/probe-live-site.mjs`; PR previews run it
+     best-effort). Warn-only until 2026-10-31, then a finding fails the deploy job.
 3. On a release: attaches the SBOM to the GitHub Release.
    Post-merge CI does **not** re-run tests — pr-ci already gated the SHA.
 

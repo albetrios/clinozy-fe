@@ -1,6 +1,7 @@
 /**
  * The warn-only window of the early checks — the dependency audit and the client env allowlist at
- * commit (`.husky/pre-commit` steps 11 and 12) and Semgrep at push (`pnpm security:semgrep:push`).
+ * commit (`.husky/pre-commit` steps 11 and 12), Semgrep at push (`pnpm security:semgrep:push`) and
+ * the live CSP and HSTS check after each Netlify deploy (`pnpm deploy:probe-live`).
  * Each starts warn-only and blocks from {@link EARLY_CHECKS_BLOCK_FROM}; a finding judged wrong in
  * the meantime goes into {@link EARLY_CHECKS_FALSE_POSITIVE_LOG}, so the rule is tuned before it
  * blocks. The same window and log as clinozy-be's `src/scripts/tooling/early-checks.util.ts`.
