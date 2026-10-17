@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.18.0](https://github.com/albetrios/clinozy-fe/compare/v1.17.0...v1.18.0) (2026-10-17)
+
+
+### Added
+
+* **app:** show an unpaid clinic's read-only state and explain a refused save ([#95](https://github.com/albetrios/clinozy-fe/issues/95)) ([dbbf387](https://github.com/albetrios/clinozy-fe/commit/dbbf38714d189d23b6e51a7ad1a2451677d70f9d))
+
+
+### Fixed
+
+* **routes:** warm the root 404 before a notFound() renders it; refresh the go / no-go ([#93](https://github.com/albetrios/clinozy-fe/issues/93)) ([7ebb5a1](https://github.com/albetrios/clinozy-fe/commit/7ebb5a14ff47960f9a6423439817cf43f19a4be5))
+
 ## [1.17.0](https://github.com/albetrios/clinozy-fe/compare/v1.16.0...v1.17.0) (2026-10-16)
 
 
