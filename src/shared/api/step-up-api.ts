@@ -17,8 +17,18 @@ import { HttpError } from '@/shared/errors/HttpError.ts';
  *   STRONG gate on destructive mutations.
  * - `POST /auth/me/mfa/verify { code }` — TOTP verification; the step-up path
  *   for MFA-enabled accounts (their password/email factors are rejected).
+ *
+ * All three answer a wrong password/code with **401** — a verdict on the
+ * credential, not on the access token — so they are sent with `skip401`.
+ * Without it the fetch client's reactive auth layer read the 401 as an expired
+ * token: it refreshed, replayed the same wrong code, refreshed again, and after
+ * the second rejection called `forceLogout()` on a perfectly live session
+ * (QA AUTH-01). The caller (`StepUpDialog`) shows the 401 inline instead.
  */
 const AUTH_API = `${API_BASE_PATH}/auth`;
+
+/** A credential check's 401 is the answer, never a cue to refresh and replay. */
+const CREDENTIAL_CHECK = { skip401: true } as const;
 
 const authMethodWire = z.object({ id: z.string(), method_type: z.string() });
 
@@ -39,17 +49,17 @@ export async function listAuthMethods(): Promise<AuthMethodSummary[]> {
 
 /** Open a step-up window by re-verifying the account password. */
 export async function stepUpWithPassword(password: string): Promise<void> {
-  await apiClient.post<unknown>(`${AUTH_API}/step-up`, { password });
+  await apiClient.post<unknown>(`${AUTH_API}/step-up`, { password }, CREDENTIAL_CHECK);
 }
 
 /** Open a bootstrap step-up window with an emailed 6-char verification code. */
 export async function stepUpWithEmailCode(code: string): Promise<void> {
-  await apiClient.post<unknown>(`${AUTH_API}/step-up`, { code });
+  await apiClient.post<unknown>(`${AUTH_API}/step-up`, { code }, CREDENTIAL_CHECK);
 }
 
 /** Open a step-up window by verifying a TOTP code (MFA-enabled accounts). */
 export async function stepUpWithTotp(code: string): Promise<void> {
-  await apiClient.post<unknown>(`${AUTH_API}/me/mfa/verify`, { code });
+  await apiClient.post<unknown>(`${AUTH_API}/me/mfa/verify`, { code }, CREDENTIAL_CHECK);
 }
 
 /**
