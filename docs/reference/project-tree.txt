@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2369 src files · ~1214 tests in src/ · 92 E2E specs · 31 shadcn UI primitives
+Stats: ~2370 src files · ~1215 tests in src/ · 92 E2E specs · 31 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -3493,6 +3493,7 @@ clinozy-fe/
 │   │   │   ├── organization-context.ts
 │   │   │   ├── organization-membership.ts
 │   │   │   ├── organization-resolver.ts
+│   │   │   ├── plan-access.ts
 │   │   │   ├── session-context.ts
 │   │   │   ├── switch.ts
 │   │   │   ├── tenancy-service.ts
@@ -3500,7 +3501,7 @@ clinozy-fe/
 │   │   │   ├── TENANCY.OVERVIEW.md
 │   │   │   ├── TENANCY.PATTERNS.md
 │   │   │   ├── TENANCY.POLICIES.md
-│   │   │   └── [16 test files]
+│   │   │   └── [17 test files]
 │   │   └── theme/
 │   │       ├── catalog-doc.ts
 │   │       ├── index.ts

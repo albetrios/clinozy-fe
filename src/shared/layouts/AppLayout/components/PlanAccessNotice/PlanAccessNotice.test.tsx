@@ -7,7 +7,7 @@ import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import type { PlanAccess } from '@/shared/tenancy/me-context.ts';
+import type { PlanAccess } from '@/shared/tenancy/plan-access.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PlanAccessNotice } from './PlanAccessNotice.tsx';
@@ -19,8 +19,12 @@ vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
 
 const GRACE_ENDS_AT = '2026-10-31T12:00:00.000Z';
 
-function givenPlanAccess(planAccess: PlanAccess) {
-  useMeContextMock.mockReturnValue({ data: { activeOrganization: { planAccess } } });
+function givenPlanAccess({ state, graceEndsAt }: PlanAccess) {
+  useMeContextMock.mockReturnValue({
+    data: {
+      activeOrganization: { planAccessWire: { state, grace_ends_at: graceEndsAt } },
+    },
+  });
 }
 
 function givenMember({

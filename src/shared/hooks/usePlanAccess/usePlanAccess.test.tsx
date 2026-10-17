@@ -14,11 +14,18 @@ const ACTIVE = { state: 'active', graceEndsAt: null };
 
 describe('usePlanAccess', () => {
   it('reads the active organization’s plan access from me/context', () => {
-    const grace = { state: 'grace', graceEndsAt: '2026-10-31T00:00:00.000Z' };
+    const graceEndsAt = '2026-10-31T00:00:00.000Z';
     useMeContextMock.mockReturnValue({
-      data: { activeOrganization: { planAccess: grace } },
+      data: {
+        activeOrganization: {
+          planAccessWire: { state: 'grace', grace_ends_at: graceEndsAt },
+        },
+      },
     });
-    expect(renderHook(() => usePlanAccess()).result.current).toEqual(grace);
+    expect(renderHook(() => usePlanAccess()).result.current).toEqual({
+      state: 'grace',
+      graceEndsAt,
+    });
   });
 
   it.each([
