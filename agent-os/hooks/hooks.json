@@ -5,7 +5,7 @@
       "id": "session-start",
       "runtime": "bash",
       "script": "session-start.sh",
-      "claude": { "event": "SessionStart" },
+      "claude": { "event": "SessionStart", "matcher": "startup|resume" },
       "codex": {
         "event": "SessionStart",
         "matcher": "startup|resume",

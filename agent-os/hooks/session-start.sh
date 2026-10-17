@@ -8,11 +8,23 @@
 #   2. Inject session context: the agent-os skill-routing map plus a short
 #      env/commands summary, as SessionStart additionalContext.
 #
+# Claude runs it on startup and resume only (hooks.json): /clear and compact
+# leave the environment as it was, and compact-resume-card.sh covers compact.
+# The 16 KB routing map goes in on startup; a resumed conversation already
+# holds it, so a resume injects only the summary.
+#
 #   stderr -> install logs / diagnostics (NOT added to context)
 set -uo pipefail
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$ROOT" || exit 0
+
+# The SessionStart payload's `source` (startup | resume | clear | compact); unknown → startup.
+session_source="startup"
+if [ ! -t 0 ] && command -v jq >/dev/null 2>&1; then
+  parsed_source="$(jq -r '.source // empty' 2>/dev/null || true)"
+  [ -n "$parsed_source" ] && session_source="$parsed_source"
+fi
 
 # --- Required Node major (from .nvmrc, fallback 24) --------------------------
 required_major="24"
@@ -93,7 +105,11 @@ node_note=""; [ "$node_ok" = "no" ] && node_note="  (switch to Node >=${required
 
 map_file="$ROOT/agent-os/docs/skill-triggers.md"
 map_section=""
-[ -f "$map_file" ] && map_section="$(cat "$map_file")"
+if [ "$session_source" = "resume" ]; then
+  map_section="(Resumed: the skill-routing map from agent-os/docs/skill-triggers.md is already earlier in this conversation.)"
+elif [ -f "$map_file" ]; then
+  map_section="$(cat "$map_file")"
+fi
 
 context="$(printf 'clinozy-fe session ready (hooks from %s) — environment provisioned: %s.\n- Node %s (need >=%s) · deps %s · gh %s · mcp %s · gitleaks %s%s\n- Dev: pnpm dev (Vite :5173) + clinozy-be on :3000. Bootstrap: pnpm setup:local. Gates: pnpm health (all phases) · pnpm tsc · pnpm lint · pnpm validate:tokens · pnpm validate:structure · pnpm validate:testids · pnpm validate:theme-axis · pnpm test\n- Skill-first: consult agent-os/skills/fe-skill-registry/SKILL.md, then the listed skill(s) for the files you change.\n\n%s' \
   "$ROOT" "$provisioned" "$node_version" "$required_major" "$deps" "$gh_cli" "$mcp_status" "$gitleaks_status" "$node_note" "$map_section")"
