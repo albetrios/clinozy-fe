@@ -82,6 +82,11 @@
       "saveForm": "Save the open form",
       "dictate": "Speak into the field you're in"
     },
+    "planAccess": {
+      "grace": "Your clinic's plan isn't active. Clinic records turn read-only on {{date}}.",
+      "readOnly": "Read-only — your clinic's plan isn't active, so records can't be changed. Choose a plan to unlock.",
+      "choosePlan": "Choose a plan"
+    },
     "emailVerify": {
       "message": "Verify your email to secure your account.",
       "resend": "Resend email",

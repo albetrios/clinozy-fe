@@ -11,6 +11,7 @@ import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useAppRoles/index.
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useAccessResolved, useCan } from '@/shared/hooks/useCan/index.ts';
 import { Eye, Info } from '@/shared/icons/index.ts';
+import { PlanAccessNotice } from '@/shared/layouts/AppLayout/components/PlanAccessNotice/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
@@ -95,7 +96,8 @@ function SetupMemberNotice() {
 
 /**
  * The section bar's bottom-centre notices (`shell.md:63`; H:554): the email
- * verification notice and, under it, the View-as pill. 72px up on desktop and
+ * verification notice, the clinic's plan notice (grace / read-only), the setup
+ * notice and, under them, the View-as pill. 72px up on desktop and
  * tablet; on a phone 14px above the tab bar, each pill publishing its height
  * (`data-slot="notice-pill"`) so a floating "New" rises above it (§3.5, D33).
  */
@@ -110,6 +112,7 @@ export function NoticeStack() {
       >
         <EmailVerificationBanner />
       </SectionErrorBoundary>
+      <PlanAccessNotice />
       <SetupMemberNotice />
       <ViewAsPill />
     </div>

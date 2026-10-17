@@ -68,7 +68,8 @@
       "seatLimitReached": "プランに空きシートがありません。設定 › 請求でシートを追加してから、もう一度招待してください。",
       "membershipAlreadyExists": "この人はすでにクリニックのメンバーです。",
       "organizationSlugExists": "このワークスペース URL はすでに使われています。別の URL を選んでください。",
-      "disposableEmail": "恒久的なメールアドレスを使ってください。使い捨てのアドレスは使用できません。"
+      "disposableEmail": "恒久的なメールアドレスを使ってください。使い捨てのアドレスは使用できません。",
+      "organizationReadOnly": "読み取り専用：このクリニックのプランが有効ではありません。変更するにはプランを選択してください。"
     }
   },
   "frontend": {

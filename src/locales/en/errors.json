@@ -68,7 +68,8 @@
       "seatLimitReached": "Your plan has no free seat. Add a seat in Settings › Billing, then invite again.",
       "membershipAlreadyExists": "This person is already in the clinic.",
       "organizationSlugExists": "That workspace URL is already taken. Choose another one.",
-      "disposableEmail": "Use a permanent email address — disposable ones aren't accepted."
+      "disposableEmail": "Use a permanent email address — disposable ones aren't accepted.",
+      "organizationReadOnly": "Read-only — this clinic's plan isn't active. Choose a plan to make changes."
     }
   },
   "frontend": {

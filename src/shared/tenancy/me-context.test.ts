@@ -175,6 +175,30 @@ describe('toMeContext', () => {
   });
 });
 
+describe('plan_access (the clinic plan’s hold on its records)', () => {
+  const withPlanAccess = (planAccess: unknown) => ({
+    ...WIRE,
+    active_organization: { ...WIRE.active_organization, plan_access: planAccess },
+  });
+
+  it('keeps plan_access unparsed for parsePlanAccess — no value of it fails me/context', () => {
+    const planAccess = { state: 'archived', grace_ends_at: 'soon' };
+    const parsed = meContextWire.safeParse(withPlanAccess(planAccess));
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(toMeContext(parsed.data).activeOrganization?.planAccessWire).toEqual(
+        planAccess,
+      );
+    }
+  });
+
+  it('leaves it absent when an older backend sends none', () => {
+    expect(
+      toMeContext(meContextWire.parse(WIRE)).activeOrganization?.planAccessWire,
+    ).toBeUndefined();
+  });
+});
+
 describe('needsOnboarding', () => {
   it('is true until onboarding_completed is set — even with an auto-provisioned org', () => {
     const ctx = toMeContext({
