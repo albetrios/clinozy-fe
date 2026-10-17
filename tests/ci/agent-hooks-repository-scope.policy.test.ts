@@ -21,10 +21,14 @@ const temporaryDirectories: string[] = [];
 
 function runHook({ script, payload }: { script: string; payload: unknown }) {
   const runtime = script.endsWith('.mjs') ? process.execPath : '/bin/bash';
+  // Each run gets its own TMPDIR: the reminders' once-per-turn record (_turn-once.sh) lives there,
+  // and a record left by an earlier run would silence the next one.
+  const turnDirectory = mkdtempSync(join(tmpdir(), 'fe-hook-scope-turn-'));
+  temporaryDirectories.push(turnDirectory);
   return spawnSync(runtime, [join(HOOKS, script)], {
     input: JSON.stringify(payload),
     encoding: 'utf8',
-    env: { ...process.env, CLAUDE_PROJECT_DIR: REPOSITORY_ROOT },
+    env: { ...process.env, CLAUDE_PROJECT_DIR: REPOSITORY_ROOT, TMPDIR: turnDirectory },
   });
 }
 
