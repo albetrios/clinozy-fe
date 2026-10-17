@@ -1,0 +1,28 @@
+name: Nightly unit suite
+
+# The full sharded Vitest suite on main every night (reusable-vitest-unit-only.yml, the same
+# workflow as the PR gate). Two jobs in one: a main that went red without a PR (a merge of two
+# green PRs, a dependency resolved differently) shows within a day, since post-merge-ci.yml does
+# not re-run the tests; and its shards save the main-branch Vitest cache that every PR's shards
+# restore — a PR-scoped cache is dropped when the PR's run ends (cleanup-cache.yml), so main's is
+# the only one that lasts. Scheduled, so a failure is a red run on the Actions tab; trigger on
+# demand with workflow_dispatch.
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # daily 02:00 UTC — before the weekly Monday jobs (03:00 onwards)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+concurrency:
+  group: scheduled-unit-nightly
+  cancel-in-progress: false
+
+jobs:
+  unit:
+    uses: ./.github/workflows/reusable-vitest-unit-only.yml

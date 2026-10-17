@@ -1,3 +1,5 @@
+import { availableParallelism } from 'node:os';
+
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vitest/config';
@@ -37,8 +39,9 @@ export default defineConfig({
     setupFiles: ['./tests/utils/setup.ts'],
     // Full-suite contention (jsdom + transform) routinely exceeds Vitest's 5s
     // default even for sync renders. Cap workers so parallel jsdom does not
-    // starve the suite, and keep a higher floor for outliers.
-    maxWorkers: 4,
+    // starve the suite, and keep a higher floor for outliers. One worker per CPU up
+    // to that cap: four workers on a 2-vCPU private runner only fight over two cores.
+    maxWorkers: Math.min(4, availableParallelism()),
     testTimeout: 30_000,
     hookTimeout: 60_000,
     exclude: ['node_modules', 'dist', 'tests/e2e'],

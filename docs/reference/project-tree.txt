@@ -67,6 +67,7 @@ clinozy-fe/
 │   │   ├── rollback-deploy.yml
 │   │   ├── scheduled-deps-audit.yml
 │   │   ├── scheduled-release-guards.yml
+│   │   ├── scheduled-unit-nightly.yml
 │   │   └── sync-drift-canary.yml
 │   ├── CODEOWNERS
 │   ├── dependabot.yml
@@ -3518,7 +3519,7 @@ clinozy-fe/
 │   └── [1 test file]
 ├── tests/
 │   ├── ci/
-│   │   └── [48 test files]
+│   │   └── [49 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/

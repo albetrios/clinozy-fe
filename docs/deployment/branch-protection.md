@@ -62,6 +62,13 @@ organization's plan; by hand:
 `gh variable set ARTIFACT_ATTESTATIONS --body disabled --repo albetrios/clinozy-fe`.
 Delete the variable after upgrading the plan.
 
+**Unit shards.** The unit suite runs in `VITEST_SHARDS` shards (repository variable, default `4`)
+whose coverage is merged before the ratchet thresholds are checked, in
+[reusable-vitest-unit-only.yml](../../.github/workflows/reusable-vitest-unit-only.yml). Four suits
+the public repository's 4-vCPU runners; set `6` once the repository is private and its runners
+have 2 vCPUs: `gh variable set VITEST_SHARDS --body 6`. Each shard restores the main-branch Vitest
+cache that [scheduled-unit-nightly.yml](../../.github/workflows/scheduled-unit-nightly.yml) saves.
+
 ### Skipped PR CI jobs on docs-only pull requests
 
 When path filters detect **docs-only markdown** (`docs-only-md`), most PR CI jobs are

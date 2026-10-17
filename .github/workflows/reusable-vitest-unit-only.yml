@@ -1,8 +1,19 @@
 name: Reusable — Vitest unit (no browser)
 
-# PR gate: runs the full unit Vitest project (colocated src suites) with coverage
-# ratchet thresholds. Intentionally NOT `vitest --changed` — the full suite is the
+# PR gate and nightly main run: the full Vitest suite (`pnpm test:ci`) with coverage ratchet
+# thresholds, in shards. Intentionally NOT `vitest --changed` — the full suite is the
 # authoritative merge gate (mirrors clinozy-be reusable-vitest-unit-only.yml).
+#
+# Shards: the repository variable VITEST_SHARDS (default 4 while the runners are the public
+# repository's 4-vCPU ones; 6 on 2-vCPU private runners). Each shard runs `--shard=<i>/<n>` with
+# coverage on and its thresholds off, and writes a blob report (.vitest/blob). `Unit + global`
+# merges them (`--merge-reports`): Vitest rebuilds one coverage report from every shard and checks
+# the thresholds once, then patch coverage runs on the merged report.
+#
+# Vitest cache (node_modules/.vite/vitest — each file's last duration and result, which Vitest
+# orders the run by): every shard restores the newest main-branch copy for its shard. Only main
+# saves one (scheduled-unit-nightly.yml): cleanup-cache.yml drops every PR-scoped cache when the
+# PR's run ends, so a PR-saved cache never reached the next run.
 
 on:
   workflow_call:
@@ -15,12 +26,92 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
 
 jobs:
-  run:
-    name: Unit + global
+  plan:
+    name: Plan shards
     runs-on: ubuntu-latest
-    # 20 → 45: the clinic launch grew the suite to ~1,080 files, and with coverage on a
-    # standard runner it was cancelled at 20 minutes while still passing.
-    timeout-minutes: 45
+    timeout-minutes: 5
+    outputs:
+      shards: ${{ steps.plan.outputs.shards }}
+      total: ${{ steps.plan.outputs.total }}
+    steps:
+      - name: Shard list from VITEST_SHARDS
+        id: plan
+        env:
+          VITEST_SHARDS: ${{ vars.VITEST_SHARDS || '4' }}
+        run: |
+          set -euo pipefail
+          case "${VITEST_SHARDS}" in
+            '' | *[!0-9]*)
+              echo "::error::VITEST_SHARDS must be a whole number from 1 to 12, got '${VITEST_SHARDS}'."
+              exit 1
+              ;;
+          esac
+          if [ "${VITEST_SHARDS}" -lt 1 ] || [ "${VITEST_SHARDS}" -gt 12 ]; then
+            echo "::error::VITEST_SHARDS must be a whole number from 1 to 12, got '${VITEST_SHARDS}'."
+            exit 1
+          fi
+          echo "total=${VITEST_SHARDS}" >> "$GITHUB_OUTPUT"
+          echo "shards=[$(seq -s, 1 "${VITEST_SHARDS}")]" >> "$GITHUB_OUTPUT"
+
+  shard:
+    name: Unit shard ${{ matrix.shard }}/${{ needs.plan.outputs.total }}
+    needs: [plan]
+    runs-on: ubuntu-latest
+    # A quarter of the suite; the unsharded run needed up to 45 minutes with coverage.
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.shards) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+
+      - name: Restore the Vitest cache (newest main-branch copy)
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.vite/vitest
+          key: vitest-unit-${{ runner.os }}-${{ matrix.shard }}-of-${{ needs.plan.outputs.total }}-${{ github.run_id }}
+          restore-keys: |
+            vitest-unit-${{ runner.os }}-${{ matrix.shard }}-of-${{ needs.plan.outputs.total }}-
+
+      - name: Run the shard with coverage (thresholds are checked after the merge)
+        env:
+          SHARD: ${{ matrix.shard }}
+          TOTAL: ${{ needs.plan.outputs.total }}
+        run: >-
+          pnpm test:ci --shard="${SHARD}/${TOTAL}" --reporter=blob --reporter=default
+          --coverage.thresholds.lines=0 --coverage.thresholds.functions=0
+          --coverage.thresholds.branches=0 --coverage.thresholds.statements=0
+
+      - name: Upload the blob report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: vitest-blob-${{ matrix.shard }}
+          path: .vitest/blob/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Save the Vitest cache (main only)
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.vite/vitest
+          key: vitest-unit-${{ runner.os }}-${{ matrix.shard }}-of-${{ needs.plan.outputs.total }}-${{ github.run_id }}
+
+  merge:
+    name: Unit + global
+    needs: [plan, shard]
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -31,16 +122,26 @@ jobs:
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup-node-pnpm
 
-      - name: Cache Vitest
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+      - name: Download the blob reports
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
-          path: node_modules/.vitest
-          key: vitest-unit-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'vitest.config.ts') }}
-          restore-keys: |
-            vitest-unit-${{ runner.os }}-
+          pattern: vitest-blob-*
+          path: .vitest/blob
+          merge-multiple: true
 
-      - name: Run unit tests with coverage
-        run: pnpm test:ci
+      - name: Every shard reported
+        env:
+          TOTAL: ${{ needs.plan.outputs.total }}
+        run: |
+          set -euo pipefail
+          found="$(find .vitest/blob -maxdepth 1 -name 'blob-*.json' | wc -l)"
+          if [ "${found}" -ne "${TOTAL}" ]; then
+            echo "::error::${found} of ${TOTAL} shard blob reports arrived; a missing shard would drop its tests from the gate."
+            exit 1
+          fi
+
+      - name: Merge the shards (tests, coverage and its thresholds)
+        run: pnpm test:ci --merge-reports .vitest/blob
 
       - name: Patch coverage (changed lines ≥ 90%)
         if: github.event_name == 'pull_request'

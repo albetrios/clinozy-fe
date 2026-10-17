@@ -28,17 +28,18 @@ a PR gate, even though both compare docs to code.
 
 ## Scheduled workflows (enforced)
 
-| Workflow                       | Cron (UTC)    | Cadence                         | Purpose                                                  | Signal on failure                       |
-| ------------------------------ | ------------- | ------------------------------- | -------------------------------------------------------- | --------------------------------------- |
-| `cleanup-cache.yml`            | `15 4 * * *`  | daily 04:15                     | GitHub Actions cache cleanup                             | none (housekeeping)                     |
-| `lighthouse.yml`               | `0 3 * * 1`   | weekly Mon 03:00                | performance budgets                                      | report (`lighthouse-results` artifact)  |
-| `cross-browser.yml`            | `0 4 * * 1`   | weekly Mon 04:00                | Chrome/Firefox/Safari smoke                              | report                                  |
-| `codeql.yml`                   | `27 4 * * 1`  | weekly Mon 04:27                | security code scanning                                   | security alert                          |
-| `mutation-test.yml`            | `0 5 * * 1`   | weekly Mon 05:00                | Stryker mutation score, pure logic (break 70)            | report                                  |
-| `scheduled-release-guards.yml` | `30 6 * * 1`  | weekly Mon 06:30                | GitHub env/ruleset drift + `RELEASE_PLEASE_TOKEN` expiry | annotations + hard fail                 |
-| `sync-drift-canary.yml`        | `0 7 * * 1`   | weekly Mon 07:00                | docs↔code drift (`sync:check` + `docs:staleness`)        | self-healing tracked `sync-drift` issue |
-| `scheduled-deps-audit.yml`     | `30 7 * * 1`  | weekly Mon 07:30                | `pnpm deps:audit` drift + expired `ignoreGhsas` entries  | hard fail (Actions tab)                 |
-| `dead-code-audit-reminder.yml` | `0 7 1 */3 *` | quarterly (1st Jan/Apr/Jul/Oct) | reminder to run the barrel-hidden dead-code audit        | tracked `dead-code-audit` issue         |
+| Workflow                       | Cron (UTC)    | Cadence                         | Purpose                                                        | Signal on failure                       |
+| ------------------------------ | ------------- | ------------------------------- | -------------------------------------------------------------- | --------------------------------------- |
+| `cleanup-cache.yml`            | `15 4 * * *`  | daily 04:15                     | GitHub Actions cache cleanup                                   | none (housekeeping)                     |
+| `scheduled-unit-nightly.yml`   | `0 2 * * *`   | daily 02:00                     | full sharded unit suite on main + the main-branch Vitest cache | hard fail (Actions tab)                 |
+| `lighthouse.yml`               | `0 3 * * 1`   | weekly Mon 03:00                | performance budgets                                            | report (`lighthouse-results` artifact)  |
+| `cross-browser.yml`            | `0 4 * * 1`   | weekly Mon 04:00                | Chrome/Firefox/Safari smoke                                    | report                                  |
+| `codeql.yml`                   | `27 4 * * 1`  | weekly Mon 04:27                | security code scanning                                         | security alert                          |
+| `mutation-test.yml`            | `0 5 * * 1`   | weekly Mon 05:00                | Stryker mutation score, pure logic (break 70)                  | report                                  |
+| `scheduled-release-guards.yml` | `30 6 * * 1`  | weekly Mon 06:30                | GitHub env/ruleset drift + `RELEASE_PLEASE_TOKEN` expiry       | annotations + hard fail                 |
+| `sync-drift-canary.yml`        | `0 7 * * 1`   | weekly Mon 07:00                | docs↔code drift (`sync:check` + `docs:staleness`)              | self-healing tracked `sync-drift` issue |
+| `scheduled-deps-audit.yml`     | `30 7 * * 1`  | weekly Mon 07:30                | `pnpm deps:audit` drift + expired `ignoreGhsas` entries        | hard fail (Actions tab)                 |
+| `dead-code-audit-reminder.yml` | `0 7 1 */3 *` | quarterly (1st Jan/Apr/Jul/Oct) | reminder to run the barrel-hidden dead-code audit              | tracked `dead-code-audit` issue         |
 
 Times are UTC (GitHub cron is always UTC). Every **weekly** job runs Monday,
 staggered across the off-peak window (03:00 → 04:00 → 04:27 → 05:00 → 06:30 →
