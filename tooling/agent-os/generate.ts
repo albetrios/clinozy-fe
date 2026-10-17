@@ -21,6 +21,15 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
+import { format, resolveConfig } from 'prettier';
+
+import {
+  renderRoutingJson,
+  renderTriggerTable,
+  replaceGeneratedRegion,
+  routingRoutes,
+} from './skill-routing.ts';
+
 const repositoryRoot = process.cwd();
 const agentOsDirectory = join(repositoryRoot, 'agent-os');
 const writeMode = process.argv.includes('--write');
@@ -326,6 +335,49 @@ if (
         'drift: agent-os/platforms/codex/config.toml differs from agent-os/mcp/mcp.default.json — run `pnpm agent-os:generate`',
       );
     }
+  }
+}
+
+// ── The skill routing map: skill-triggers.md's "By file pattern" table + skill-routing.json ──
+{
+  const routes = routingRoutes(agentOsDirectory);
+  const triggersPath = join(agentOsDirectory, 'docs', 'skill-triggers.md');
+  const triggersText = readFileSync(triggersPath, 'utf8');
+  // Formatted the way Prettier (lint-staged, format:check) leaves it, so the two never fight.
+  const regionText = replaceGeneratedRegion(triggersText, renderTriggerTable(routes));
+  const nextTriggers =
+    regionText === undefined
+      ? undefined
+      : await format(regionText, {
+          ...(await resolveConfig(triggersPath)),
+          filepath: triggersPath,
+        });
+  const routingPath = join(agentOsDirectory, 'hooks', 'skill-routing.json');
+  const nextRouting = await format(renderRoutingJson(routes), {
+    ...(await resolveConfig(routingPath)),
+    filepath: routingPath,
+  });
+  const currentRouting = existsSync(routingPath) ? readFileSync(routingPath, 'utf8') : '';
+  if (nextTriggers === undefined) {
+    report('missing: the GENERATED markers in agent-os/docs/skill-triggers.md');
+  } else if (writeMode) {
+    if (nextTriggers !== triggersText) {
+      writeFileSync(triggersPath, nextTriggers);
+      report('wrote agent-os/docs/skill-triggers.md');
+    }
+    if (nextRouting !== currentRouting) {
+      writeFileSync(routingPath, nextRouting);
+      report('wrote agent-os/hooks/skill-routing.json');
+    }
+  } else {
+    if (nextTriggers !== triggersText)
+      report(
+        "drift: agent-os/docs/skill-triggers.md differs from chains.json + the skills' trigger frontmatter — run `pnpm agent-os:generate`",
+      );
+    if (nextRouting !== currentRouting)
+      report(
+        "drift: agent-os/hooks/skill-routing.json differs from chains.json + the skills' trigger frontmatter — run `pnpm agent-os:generate`",
+      );
   }
 }
 

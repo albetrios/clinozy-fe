@@ -1,6 +1,8 @@
 ---
 name: fe-routing-tenancy
 description: Organization-scoped routing, guard chains, the security gateway, session context, the Settings hash modal and the root resolver. Use when editing routeTree guards or routes under $organizationSlug.
+trigger: src/app/routes/routeTree.tsx, src/app/guards/**, src/shared/tenancy/**
+triggerNote: Organization-scoped routes, guard chains, gatewayFromManifest, session context
 ---
 
 # Routing & tenancy (clinozy-fe)

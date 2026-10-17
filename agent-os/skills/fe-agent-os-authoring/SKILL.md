@@ -1,6 +1,8 @@
 ---
 name: fe-agent-os-authoring
 description: Add, rename or remove an agent-os skill or rule without breaking the gates (agent-os:check, triggers:strict, generate:check). Use when editing anything under agent-os/skills or agent-os/rules.
+trigger: agent-os/rules/**
+triggerNote: Eight surfaces; regenerate the tree last
 ---
 
 # Agent-os authoring (clinozy-fe)
@@ -39,8 +41,12 @@ Plus, when the skill is part of an ordered pipeline:
 
 - `agent-os/skills/chains.json` — every `steps`/`optional` entry must reference a
   real skill directory.
-- `agent-os/docs/skill-triggers.md` — the file→skill map the hooks consult
-  (by-intent table and/or file-area table).
+- File routing — give the skill a `trigger` (comma-separated globs; quote it when it starts
+  with `*`) and a `triggerNote` in its frontmatter, or a chain a `trigger` (an upstream skill
+  routes only through a chain), then `pnpm agent-os:generate`: it writes the "By file pattern"
+  table of `agent-os/docs/skill-triggers.md` and `agent-os/hooks/skill-routing.json` (the edit
+  hook's reminders). Never edit the generated table. The by-intent table there stays
+  hand-written; add a `cases/triggers.json` case for a new file route.
 
 **A new rule** (`agent-os/rules/fe-<name>.mdc`) needs frontmatter `description` plus
 `alwaysApply: true` if it should always load; reference it from the skill it

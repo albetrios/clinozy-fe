@@ -1,6 +1,8 @@
 ---
 name: fe-code-quality-security
 description: The three-layer quality and security pipeline (ESLint, pre-commit, CI). Use when adding an ESLint rule or security check, changing lint config or hooks, or asking why CI or a commit failed.
+trigger: netlify.toml
+triggerNote: The deploy path — always netlify deploy --no-build
 ---
 
 # Code Quality and Security Pipeline

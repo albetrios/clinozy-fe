@@ -1,6 +1,8 @@
 ---
 name: fe-locale-formatting
 description: Format dates, times, numbers and money through useLocaleFormat so Appearance prefs apply — never bare Intl or toLocaleString. Use when rendering any date, number or money value.
+trigger: src/lib/i18n/format.ts, **/useLocaleFormat/**, **/*.constants.ts
+triggerNote: And any date, number or money render; constants only when they hold dates or numbers
 ---
 
 # Locale formatting (clinozy-fe)

@@ -1,6 +1,8 @@
 ---
 name: fe-documentation-maintenance
 description: Which doc to update and where docs live. Use when adding or changing docs, adding routes or features that touch README or CLAUDE.md, or asking where something is documented.
+trigger: docs/**/*.md, **/*.OVERVIEW.md, .env.example
+triggerNote: Which doc to update and where it lives
 ---
 
 # Documentation Maintenance

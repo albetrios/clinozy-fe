@@ -1,6 +1,8 @@
 ---
 name: fe-locale-preferences
 description: The locale preference runtime — useLocaleStore, the race-safe document apply, the pre-paint locale-init.js and the build modes. Use when changing locale or direction preferences or the i18n build.
+trigger: "**/useLocaleStore/**, public/locale-init.js"
+triggerNote: And BUILD_I18N_MODE
 ---
 
 # Locale preferences runtime (clinozy-fe)

@@ -1,6 +1,8 @@
 ---
 name: fe-page-scaffolding
 description: Scaffold a complete page directory following the route-island spec. Use when the user asks to create a new page, route, or feature page. Always generate tests; do not ask the user for them.
+trigger: src/pages/**
+triggerNote: A new or changed page island
 ---
 
 # Page Scaffolding

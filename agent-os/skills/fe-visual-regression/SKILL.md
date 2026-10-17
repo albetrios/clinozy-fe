@@ -1,6 +1,8 @@
 ---
 name: fe-visual-regression
 description: The Playwright screenshot-baseline lane — when to add a snapshot, how to update baselines safely, the route × theme-axis matrix. Use when a visual test fails, or for snapshot and baseline work.
+trigger: tests/e2e/visual.e2e.test.ts, tests/e2e/*-snapshots/**
+triggerNote: Screenshot baselines (needs clinozy-be up; local-only lane)
 ---
 
 # Visual regression (Playwright screenshot baselines)

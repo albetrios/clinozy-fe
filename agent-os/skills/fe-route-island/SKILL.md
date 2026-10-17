@@ -1,6 +1,8 @@
 ---
 name: fe-route-island
 description: Self-contained route folders with page-prefixed role files, folder-per-unit sub-units, direct child folders for nested routes, and URL-driven CRUD dialogs.
+trigger: "**/*.route.tsx, **/*.manifest.ts, src/pages/**"
+triggerNote: Route marker, manifest or any page-island file — the page directory shape is docs/reference/route-island-structure.md
 ---
 
 # Route Island

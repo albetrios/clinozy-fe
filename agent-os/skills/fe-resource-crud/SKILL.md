@@ -1,6 +1,8 @@
 ---
 name: fe-resource-crud
 description: Scaffold backend resource pages — resource manifest, list page, URL-driven create/edit dialogs, $param folders, RBAC permissions. Use when adding a CRUD resource island (members, invoices, patients).
+trigger: "**/*.resource.ts, **/*ListPage.tsx, **/dialogs/**"
+triggerNote: Resource manifest, list page, URL-driven dialogs
 ---
 
 # Resource CRUD (clinozy-fe)

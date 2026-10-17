@@ -1,6 +1,8 @@
 ---
 name: fe-env-schema-add
 description: Add, rename or remove an env var safely — Secret vs Variable, the .env.example section, schema, validators and GitHub Environments in sync. Use when env-schema.ts or .env.example changes.
+trigger: src/core/config/env-schema.ts, .env.example, **/platform-config.ts, **/build-env.ts, knip.jsonc
+triggerNote: If an env key changed
 ---
 
 # Env schema add (clinozy-fe)

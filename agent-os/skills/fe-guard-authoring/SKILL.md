@@ -1,6 +1,8 @@
 ---
 name: fe-guard-authoring
 description: Author invariants that really enforce — prove the gate fires, wire it into PR CI, avoid the flat-config and silent-pass traps. Use when editing tooling/validate/, an ESLint restriction or a CI step.
+trigger: eslint.config.mjs, .github/workflows/pr-ci.yml, netlify.toml, plugins/dev-server-mode.ts, plugins/build-environment.ts, tooling/ci/build.mjs, tooling/setup/github/scaffold-env-files.mjs
+triggerNote: Restrictions and CI steps — probe both directions; wire into CI, not just health-check; the env-file plugins' policy tests
 ---
 
 # Guard authoring (clinozy-fe)
