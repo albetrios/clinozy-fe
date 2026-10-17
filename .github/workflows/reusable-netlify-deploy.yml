@@ -269,6 +269,64 @@ jobs:
         with:
           subject-path: clinozy-fe-dist.tgz
 
+      # Signed with cosign, which works on any plan (the GitHub attestation above needs
+      # Enterprise Cloud on a private repository): the production bundle and its CycloneDX
+      # SBOM are signed keyless with this job's GitHub OIDC identity, both signatures are
+      # verified against this workflow and the GitHub issuer, and only the verified bytes ship
+      # (dist-verified/, unpacked from the signed tarball). Keyless signing writes the
+      # repository name to the public Sigstore log; once the repository is private, sign with a
+      # key from GitHub secrets instead. Verify a release later with the same
+      # `cosign verify-blob` call on the production-signatures artifact.
+      - name: Generate the production SBOM (CycloneDX)
+        if: needs.resolve-environment.outputs.environment == 'production'
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: clinozy-fe-sbom.cyclonedx.json
+          upload-artifact: false
+
+      - name: Install cosign
+        if: needs.resolve-environment.outputs.environment == 'production'
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      - name: Sign the production bundle and its SBOM (keyless)
+        if: needs.resolve-environment.outputs.environment == 'production'
+        run: |
+          set -euo pipefail
+          for subject in clinozy-fe-dist.tgz clinozy-fe-sbom.cyclonedx.json; do
+            cosign sign-blob --yes --bundle "${subject}.sigstore.json" "${subject}"
+          done
+
+      - name: Verify both signatures, then unpack the verified bundle
+        if: needs.resolve-environment.outputs.environment == 'production'
+        env:
+          SIGNER: ^${{ github.server_url }}/${{ github.repository }}/\.github/workflows/reusable-netlify-deploy\.yml@
+        run: |
+          set -euo pipefail
+          for subject in clinozy-fe-dist.tgz clinozy-fe-sbom.cyclonedx.json; do
+            cosign verify-blob --bundle "${subject}.sigstore.json" \
+              --certificate-identity-regexp "${SIGNER}" \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+              "${subject}"
+          done
+          rm -rf dist-verified
+          mkdir dist-verified
+          tar -xzf clinozy-fe-dist.tgz -C dist-verified
+
+      - name: Upload the production signatures
+        if: needs.resolve-environment.outputs.environment == 'production'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: production-signatures
+          path: |
+            clinozy-fe-dist.tgz
+            clinozy-fe-dist.tgz.sigstore.json
+            clinozy-fe-sbom.cyclonedx.json
+            clinozy-fe-sbom.cyclonedx.json.sigstore.json
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Upload release artifact
         if: inputs.upload-release-artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
@@ -289,15 +347,18 @@ jobs:
           #   <any other>  → --alias <env-name>  (development → development--clinozy-fe.netlify.app,
           #                                        staging → staging--…, …)
           # A new GitHub Environment deploys to its own alias with zero rewiring.
+          # Production publishes dist-verified/ — the bytes whose signature was just verified.
           if [ "$GITHUB_ENVIRONMENT" = "production" ]; then
             DEPLOY_FLAGS="--prod"
+            DEPLOY_DIR="dist-verified"
           else
             DEPLOY_FLAGS="--alias $GITHUB_ENVIRONMENT"
+            DEPLOY_DIR="dist"
           fi
           # --no-build: netlify-cli builds before every deploy by default, which shipped a SECOND
           # build — not the one validated, attested and source-mapped above. Upload dist/ as is.
           # shellcheck disable=SC2086 # DEPLOY_FLAGS is two words by design
-          pnpm exec netlify deploy $DEPLOY_FLAGS --dir=dist --no-build --json > deploy-result.json
+          pnpm exec netlify deploy $DEPLOY_FLAGS --dir="$DEPLOY_DIR" --no-build --json > deploy-result.json
           DEPLOY_URL=$(node -e "const r=JSON.parse(require('fs').readFileSync('deploy-result.json','utf8')); console.log(r.url ?? r.deploy_url ?? '')")
           if [ -z "$DEPLOY_URL" ]; then
             echo "Could not read the deploy URL from netlify output:" >&2

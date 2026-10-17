@@ -62,6 +62,15 @@ organization's plan; by hand:
 `gh variable set ARTIFACT_ATTESTATIONS --body disabled --repo albetrios/clinozy-fe`.
 Delete the variable after upgrading the plan.
 
+**cosign signatures** work on any plan. A production deploy
+([reusable-netlify-deploy.yml](../../.github/workflows/reusable-netlify-deploy.yml)) signs the
+bundle (`clinozy-fe-dist.tgz`) and its CycloneDX SBOM keyless with `cosign sign-blob`, verifies
+both with `cosign verify-blob` against that workflow and the GitHub OIDC issuer, and publishes only
+the verified bytes (unpacked from the signed tarball). The four files are kept 90 days as the
+`production-signatures` artifact, for verifying a release later with the same command. Keyless
+signing writes the repository name to the public Sigstore log; once the repository is private, sign
+with a key from GitHub secrets instead.
+
 **Unit shards.** The unit suite runs in `VITEST_SHARDS` shards (repository variable, default `4`)
 whose coverage is merged before the ratchet thresholds are checked, in
 [reusable-vitest-unit-only.yml](../../.github/workflows/reusable-vitest-unit-only.yml). Four suits
