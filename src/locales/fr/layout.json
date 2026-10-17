@@ -82,6 +82,11 @@
       "saveForm": "Enregistrer le formulaire ouvert",
       "dictate": "Dicter dans le champ en cours"
     },
+    "planAccess": {
+      "grace": "Le forfait de votre clinique n'est pas actif. Les dossiers de la clinique passeront en lecture seule le {{date}}.",
+      "readOnly": "Lecture seule — le forfait de votre clinique n'est pas actif, les dossiers ne peuvent donc pas être modifiés. Choisissez un forfait pour les déverrouiller.",
+      "choosePlan": "Choisir un forfait"
+    },
     "emailVerify": {
       "message": "Vérifiez votre e-mail pour sécuriser votre compte.",
       "resend": "Renvoyer l'e-mail",

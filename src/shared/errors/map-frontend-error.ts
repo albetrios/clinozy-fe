@@ -44,6 +44,12 @@ const CODE_TO_AUTH_KEY: Record<string, string> = {
 };
 
 /**
+ * clinozy-be's `error.reason` on the `403` that refuses a clinic write while the clinic's plan
+ * is not active (`plan_access.state` `read_only`).
+ */
+export const ORGANIZATION_READ_ONLY_REASON = 'organization_read_only';
+
+/**
  * clinozy-be `error.reason` codes said in our own words (the `errors` namespace) instead of the
  * server's English `detail`.
  */
@@ -59,6 +65,9 @@ const REASON_TO_ERRORS_KEY: Record<string, string> = {
   membership_already_exists: ERRORS_KEYS.api.reasons.membershipAlreadyExists,
   organization_slug_exists: ERRORS_KEYS.api.reasons.organizationSlugExists,
   disposable_email: ERRORS_KEYS.api.reasons.disposableEmail,
+  // A clinic write refused because the clinic's plan is not active (403). Any other 403 keeps
+  // the server's detail or the generic permission message.
+  [ORGANIZATION_READ_ONLY_REASON]: ERRORS_KEYS.api.reasons.organizationReadOnly,
 };
 
 function translateKey(key: string): string {

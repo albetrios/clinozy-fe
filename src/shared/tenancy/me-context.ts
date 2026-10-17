@@ -12,6 +12,7 @@ import {
 } from './deployment-mode.ts';
 
 // ── Wire schemas (snake_case — mirror the clinozy-be serializers) ──────────────
+
 // clinozy-be #795 removed the per-org `capabilities` object. The app gates UI by
 // `my_permissions` (RBAC) + an explicit team-org guard (useCan teamOrganizationOnly).
 export const organizationWire = z.object({
@@ -22,6 +23,12 @@ export const organizationWire = z.object({
   status: z.enum(['ACTIVE', 'SUSPENDED', 'ARCHIVED']),
   logo_url: z.string().nullable(),
   brand_color: z.string().nullable().optional(),
+  /**
+   * The plan's hold on the clinic's records (me/context's active organization), kept
+   * unparsed: `parsePlanAccess` (`plan-access.ts`) reads it beside the clinic shell's notice,
+   * so first paint carries no plan schema — and no value here can fail me/context.
+   */
+  plan_access: z.unknown().optional(),
   created_at: isoDateString,
   updated_at: isoDateString,
 });
@@ -86,6 +93,8 @@ export interface OrganizationSummary {
   logoUrl: string | null;
   /** Optional per-org accent (hex/oklch) → `--color-brand` (FE-57); absent until the backend sends it. */
   brandColor?: string | null;
+  /** The wire's `plan_access`, unparsed — read it with `parsePlanAccess` (`plan-access.ts`). */
+  planAccessWire?: unknown;
   createdAt: string;
   updatedAt: string;
 }
@@ -137,6 +146,7 @@ export function toOrganization(w: z.infer<typeof organizationWire>): Organizatio
     status: w.status,
     logoUrl: w.logo_url,
     brandColor: w.brand_color ?? null,
+    planAccessWire: w.plan_access,
     createdAt: w.created_at,
     updatedAt: w.updated_at,
   };

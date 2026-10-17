@@ -68,7 +68,8 @@
       "seatLimitReached": "Seu plano não tem vagas livres. Adicione uma vaga em Configurações › Faturamento e convide novamente.",
       "membershipAlreadyExists": "Esta pessoa já está na clínica.",
       "organizationSlugExists": "Essa URL do espaço já está em uso. Escolha outra.",
-      "disposableEmail": "Use um endereço de e-mail permanente — endereços descartáveis não são aceitos."
+      "disposableEmail": "Use um endereço de e-mail permanente — endereços descartáveis não são aceitos.",
+      "organizationReadOnly": "Somente leitura — o plano desta clínica não está ativo. Escolha um plano para fazer alterações."
     }
   },
   "frontend": {

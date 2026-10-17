@@ -68,6 +68,11 @@
       "switchOrganization": "Cambiar a {{name}}",
       "currentOrganization": "{{name}} (actual)"
     },
+    "planAccess": {
+      "grace": "El plan de tu clínica no está activo. Los registros de la clínica pasarán a ser de solo lectura el {{date}}.",
+      "readOnly": "Solo lectura — el plan de tu clínica no está activo, así que los registros no se pueden modificar. Elige un plan para desbloquearlos.",
+      "choosePlan": "Elegir un plan"
+    },
     "emailVerify": {
       "message": "Verifica tu correo para proteger tu cuenta.",
       "resend": "Reenviar correo",

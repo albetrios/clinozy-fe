@@ -93,6 +93,11 @@ describe('mapFrontendError', () => {
     [403, 'system_role_fixed', "A preset role can't be renamed or deleted."],
     [403, 'role_locked', "This role's access is fixed and can't be changed."],
     [
+      403,
+      'organization_read_only',
+      "Read-only — this clinic's plan isn't active. Choose a plan to make changes.",
+    ],
+    [
       409,
       'seat_limit_reached',
       'Your plan has no free seat. Add a seat in Settings › Billing, then invite again.',

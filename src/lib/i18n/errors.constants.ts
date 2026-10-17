@@ -86,6 +86,7 @@ export const ERRORS_KEYS = {
       membershipAlreadyExists: 'api.reasons.membershipAlreadyExists',
       organizationSlugExists: 'api.reasons.organizationSlugExists',
       disposableEmail: 'api.reasons.disposableEmail',
+      organizationReadOnly: 'api.reasons.organizationReadOnly',
     },
   },
   frontend: {

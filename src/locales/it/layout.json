@@ -82,6 +82,11 @@
       "saveForm": "Salva il modulo aperto",
       "dictate": "Detta nel campo in cui ti trovi"
     },
+    "planAccess": {
+      "grace": "Il piano della tua clinica non è attivo. I dati della clinica diventeranno di sola lettura il {{date}}.",
+      "readOnly": "Sola lettura — il piano della tua clinica non è attivo, quindi i dati non possono essere modificati. Scegli un piano per sbloccarli.",
+      "choosePlan": "Scegli un piano"
+    },
     "emailVerify": {
       "message": "Verifica la tua e-mail per proteggere l'account.",
       "resend": "Reinvia e-mail",

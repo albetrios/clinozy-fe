@@ -82,6 +82,11 @@
       "saveForm": "Geöffnetes Formular speichern",
       "dictate": "Ins aktuelle Feld diktieren"
     },
+    "planAccess": {
+      "grace": "Der Tarif Ihrer Klinik ist nicht aktiv. Ab dem {{date}} sind die Klinikdaten schreibgeschützt.",
+      "readOnly": "Schreibgeschützt — der Tarif Ihrer Klinik ist nicht aktiv, daher können die Daten nicht geändert werden. Wählen Sie einen Tarif, um sie freizuschalten.",
+      "choosePlan": "Tarif wählen"
+    },
     "emailVerify": {
       "message": "Bestätigen Sie Ihre E-Mail, um Ihr Konto zu sichern.",
       "resend": "E-Mail erneut senden",

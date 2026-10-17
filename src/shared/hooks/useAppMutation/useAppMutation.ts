@@ -7,8 +7,10 @@ import {
 import { useCallback, useMemo, useRef } from 'react';
 
 import { isStepUpRequiredError } from '@/shared/api/step-up-api.ts';
-import { notifyError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
+import { ORGANIZATION_READ_ONLY_REASON } from '@/shared/errors/map-frontend-error.ts';
 import { notify, type NotifyOptions } from '@/shared/notify/index.ts';
+import { meContextQueryKey } from '@/shared/tenancy/me-context.ts';
 
 /**
  * Opt-in optimistic update: patch a cached list before the request resolves so
@@ -328,6 +330,12 @@ export function useAppMutation<
         }
       } else if (context?.kind === 'single' && optimistic) {
         queryClient.setQueryData(optimistic.queryKey, context.previous);
+      }
+      // Refused because the clinic's plan went read-only: me/context says so
+      // too by now, so read it again and the shell's plan notice shows beside
+      // the toast instead of a minute later.
+      if (apiErrorReason(error) === ORGANIZATION_READ_ONLY_REASON) {
+        void queryClient.invalidateQueries({ queryKey: meContextQueryKey });
       }
       // Step-up-required is a flow signal, not a user-facing failure — the
       // caller opens the StepUpDialog and retries, so a toast would be noise.
