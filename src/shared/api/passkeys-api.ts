@@ -26,28 +26,26 @@ const credentialWireSchema = z.object({
  */
 const registerOptionsWireSchema = z.object({
   challenge_token: z.string(),
-  options: z
-    .object({
-      challenge: z.string(),
-      rp: z.object({ id: z.string().optional(), name: z.string() }),
-      user: z.object({ id: z.string(), name: z.string(), displayName: z.string() }),
-      pubKeyCredParams: z.array(
-        z.object({ type: z.literal('public-key'), alg: z.number() }),
-      ),
-      timeout: z.number().optional(),
-      excludeCredentials: z
-        .array(
-          z.object({
-            id: z.string(),
-            type: z.literal('public-key'),
-            transports: z.array(z.string()).optional(),
-          }),
-        )
-        .optional(),
-    })
-    // attestation, authenticatorSelection, extensions, hints: handed to the
-    // browser as the server sent them — they carry no binary members.
-    .passthrough(),
+  // attestation, authenticatorSelection, extensions, hints: handed to the
+  // browser as the server sent them (loose object) — they carry no binary members.
+  options: z.looseObject({
+    challenge: z.string(),
+    rp: z.object({ id: z.string().optional(), name: z.string() }),
+    user: z.object({ id: z.string(), name: z.string(), displayName: z.string() }),
+    pubKeyCredParams: z.array(
+      z.object({ type: z.literal('public-key'), alg: z.number() }),
+    ),
+    timeout: z.number().optional(),
+    excludeCredentials: z
+      .array(
+        z.object({
+          id: z.string(),
+          type: z.literal('public-key'),
+          transports: z.array(z.string()).optional(),
+        }),
+      )
+      .optional(),
+  }),
 });
 
 function fromWire(wire: z.infer<typeof credentialWireSchema>): Passkey {
