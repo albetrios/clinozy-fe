@@ -412,8 +412,22 @@ const config = [
      * - The patient file's `room` flag and `?step=` passed to the Branches page (+20 B raw).
      * Trimmed first: the Branch drawer's step list left the route's validator for the lazy
      * drawer (`readBranchDrawerStep`, −0.04 kB). ~0.1 kB of headroom.
+     *
+     * 239.9 → 240.1 kB: a declared exemption, itemised — an unpaid clinic's read-only state
+     * (owner decision D3, 2026-10-17: 14 days of grace, then read-only; for the owner's review).
+     * +0.17 kB: main (7ebb5a1) 239.78 kB and this branch 239.95 kB, built the same way side by
+     * side (no env file, no ambient VITE_ variables):
+     * - The English copy, which ships in the entry (`en/*.json` is imported statically and the
+     *   shell draws before any lazy namespace loads): `layout` › `app.planAccess` — the grace
+     *   and read-only lines and "Choose a plan" — and `errors` › `api.reasons.organizationReadOnly`,
+     *   the message a refused save shows.
+     * - Mapping clinozy-be's `organization_read_only` reason to that message, and `useAppMutation`
+     *   re-reading me/context after it, so the notice shows beside the toast.
+     * - me/context carrying `plan_access` through unparsed (`planAccessWire`).
+     * Trimmed first: the plan-access schema and its parsing left me/context for the clinic
+     * shell's notice (`plan-access.ts`, read by `usePlanAccess`; −0.06 kB). ~0.15 kB of headroom.
      */
-    limit: '239.9 kB',
+    limit: '240.1 kB',
     gzip: true,
   },
   ...(cssPaths.length
