@@ -62,7 +62,8 @@ type BodyOption<O> = O extends { requestBody: unknown }
 
 /**
  * What a call takes besides its path: path parameters, query, body, the per-action key, and
- * `skip401` for a call whose 401 is an answer rather than an expired token (an invitation's accept).
+ * `skip401` for a call whose 401 is an answer rather than an expired token
+ * (an invitation's accept, a step-up credential check).
  */
 export type ApiInit<P extends ApiPath, M extends HttpMethod> = RequiredWhenPresent<
   'params',
