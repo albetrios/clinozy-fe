@@ -267,7 +267,7 @@ jobs:
       - name: TSDoc coverage budget
         run: node tooling/tsdoc-coverage/check-coverage.mjs
 
-      - name: Project structure tree docs
+      - name: Project structure tree generates (the file is not committed)
         run: pnpm tool:project-structure-tree:check
 
       - name: Agent-os platform wiring

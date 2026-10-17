@@ -21,7 +21,7 @@ under `set -e` — so any failing step reliably blocks the commit (the previous
 split hook/script layout let a mid-hook failure fall through). Same pattern as
 clinozy-be's `pnpm guard:pre-commit` runner.
 
-### Inside before-commit-guard.sh (steps 1–11)
+### Inside before-commit-guard.sh (steps 1–10)
 
 1. **validate:env-example** — `.env.example` documents all keys from `src/core/config/env-schema.ts` (via `pnpm tool:sync-env-example`).
 2. **validate:public** — Required public assets exist: config.js, theme-init.js, vite.svg, manifest.webmanifest, \_headers, offline.html, robots.txt.
@@ -33,7 +33,6 @@ clinozy-be's `pnpm guard:pre-commit` runner.
 8. **Env-file guard** — reject committing any `.env*` except `.env.example` (mirrors the pr-governance CI guard, locally).
 9. **Merge conflict markers** — reject staged files containing `<<<<<<< ` / `>>>>>>> ` / bare `=======` lines (anchored so doc banner lines pass).
 10. **Large staged files** — reject staged blobs > 3MB, measured with `git cat-file -s :<path>` (the staged content, not the working tree — rename/partial-stage safe). `iterations/` is exempt: it holds design-tool exports, and a prototype bundle routinely exceeds 3MB. Lives in `tooling/validate/large-staged-files.sh`, pinned by `large-staged-files.test.mjs`.
-11. **Project structure tree** — _only when the commit adds, deletes or renames files_ — regenerates `docs/reference/project-tree.txt` (`pnpm tool:project-structure-tree`, from `git ls-files`) and stages it, so CI's Static sync "Project structure tree docs" step can't fail on a stale tree. Same as clinozy-be's pre-commit guard.
 
 ## How to Fix Failures
 

@@ -61,14 +61,12 @@ Derived artifacts are computed from the tree, so they go **last**:
 pnpm agent-os:check              # frontmatter, names + fe- prefix, registry paths, groups, chains
 pnpm agent-os:triggers:strict    # routing cases still resolve
 pnpm agent-os:generate:check     # per-agent wiring in sync (.claude/.cursor/.codex)
-# 3. ONLY NOW regenerate the tree — new files changed it
-pnpm tool:project-structure-tree
-pnpm sync:check                  # all 9, including project-tree docs
+# 3. Last: the whole drift set
+pnpm sync:check                  # all 9, including that the project tree generates
 ```
 
-Running `sync:check` before the last file exists is how a stale
-`project-tree.txt` reaches CI. It happened twice while authoring this very
-bundle.
+`docs/reference/project-tree.txt` is generated and gitignored — write it locally with
+`pnpm tool:project-structure-tree` when you want the map; it is never committed.
 
 ## Reading gate failures
 
@@ -79,7 +77,7 @@ bundle.
 | claimed count mismatch | the `## Skill Inventory (N skills)` heading was not bumped |
 | skill not grouped / grouped twice | `groups.json` |
 | chain step references unknown skill | `chains.json` typo |
-| `project-tree.txt is out of date` | regenerate **after** the last file |
+| `project-tree.txt could not be generated` | the generator lost the repository listing (no tracked files, or `src/` / `tests/` / `docs/` missing) |
 | `skill "x" must start with "fe-"` (or agent / command / rule) | the item lacks the prefix — rename it `fe-x`; a vendored skill needs its `skills-lock.json` entry instead |
 
 A skill's frontmatter `name` must equal its folder, vendored skills included, and a

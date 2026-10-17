@@ -2,7 +2,7 @@
 # Deterministic docs↔code SYNC gate — the structural drift checks that a single
 # commit can break, aggregated into one command. This is the CI-safe set (no
 # network, no backend, no build): route-island structure, test-id and i18n
-# contracts, theme catalog, the committed project-tree, and agent-os platform
+# contracts, theme catalog, the project-tree generator, and agent-os platform
 # wiring. Each already runs as a discrete step in the PR lane (static-sync +
 # agent-os-gate); this aggregate is for local use (`pnpm sync:check`) and for
 # the weekly sync-drift canary, which runs it alongside the advisory
@@ -55,7 +55,7 @@ run "i18n key contracts        (validate:i18n)"      pnpm validate:i18n
 run "i18n locale parity        (validate:i18n-parity)" pnpm validate:i18n-parity
 run "theme catalog docs        (validate:theme-catalog)" pnpm validate:theme-catalog
 run "product identity          (validate:identity)"  pnpm validate:identity
-run "project-tree docs         (tool:project-structure-tree:check)" pnpm tool:project-structure-tree:check
+run "project-tree generates    (tool:project-structure-tree:check)" pnpm tool:project-structure-tree:check
 run "agent-os integrity        (agent-os:check)"     pnpm agent-os:check
 run "agent-os trigger routing  (agent-os:triggers:strict)" pnpm agent-os:triggers:strict
 run "agent-os platform wiring  (agent-os:generate:check)"  pnpm agent-os:generate:check

@@ -55,7 +55,7 @@ place it was registered:
 - `src/shared/analytics/analytics.constants.ts` (events)
 - store slices that only that surface set (`useUIStore.languageOpen`)
 - locale JSON keys + the `*.constants.ts` key paths and test ids
-- `docs/reference/project-tree.txt` and any doc describing it as live
+- any doc describing a removed file as live (`docs/reference/project-tree.txt` is generated and gitignored — regenerate it locally, never commit it)
 
 `pnpm knip` catches unreferenced exports but **not** an orphaned locale key (the
 parity gate compares locales against English, so a key unused in code survives in
@@ -100,11 +100,9 @@ grep -rnE '^(const|let|var) [^=]*= *(await )?import\(' src --include='*.ts' --in
 
 ## 5. Derived artifacts regenerated too early
 
-`project-tree.txt`, TSDoc budget and locale parity are computed from the tree. Run
-them **after** the last file is added, not before.
-
-CI caught a stale `project-tree.txt` twice on one PR because `pnpm sync:check` ran
-before two new constants files existed.
+The TSDoc budget and locale parity are computed from the tree. Run them **after** the
+last file is added, not before. (`project-tree.txt` is no longer committed, so it can no
+longer go stale in a PR.)
 
 **Rule: `pnpm sync:check` is the last thing before commit, and re-run it after any
 new file.**

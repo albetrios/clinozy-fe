@@ -632,7 +632,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 - Eight surfaces: SKILL.md, inventory count, decision tree, task matrix, inventory entry, cross-reference, `groups.json`, `fe-skill-router.mdc` (+ `chains.json` / `skill-triggers.md` when applicable)
 - Frontmatter `name` **must** equal the directory name
-- Regenerate `project-tree.txt` **after** the last file — not before
+- `project-tree.txt` is generated and gitignored — never commit it
 - `name != directory` warnings on vendored skills are expected; do not "fix" them
 
 **Related skills:** fe-documentation-maintenance, fe-guard-authoring

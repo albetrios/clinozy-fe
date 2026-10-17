@@ -33,6 +33,9 @@ lerna-debug.log*
 
 # Test artifacts (E2E: artifacts + HTML report under test-results/)
 coverage
+# The generated file tree (pnpm tool:project-structure-tree): never committed, so branches that
+# add files no longer conflict on it; CI checks the generator instead
+docs/reference/project-tree.txt
 # Vitest blob reports of a sharded run (`--reporter=blob`, merged by `--merge-reports`)
 .vitest/
 test-results

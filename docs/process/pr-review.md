@@ -114,11 +114,11 @@ Check only what the PR touches.
 
 ### Documentation
 
-| Check              | What to look for                                                                     | Typical severity |
-| ------------------ | ------------------------------------------------------------------------------------ | ---------------- |
-| Route registration | New/changed routes reflected in `docs/reference/routes-and-ui.md` + island OVERVIEW  | Major            |
-| Index              | New `docs/**/*.md` listed in [docs/README.md](../README.md)                          | Major            |
-| Generated files    | Do not hand-edit `dist/`, `docs/reference/project-tree.txt`, version/build artifacts | Blocker          |
+| Check              | What to look for                                                                                                          | Typical severity |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| Route registration | New/changed routes reflected in `docs/reference/routes-and-ui.md` + island OVERVIEW                                       | Major            |
+| Index              | New `docs/**/*.md` listed in [docs/README.md](../README.md)                                                               | Major            |
+| Generated files    | Do not hand-edit `dist/`, version/build artifacts; never commit `docs/reference/project-tree.txt` (gitignored, generated) | Blocker          |
 
 ### Dependencies
 
