@@ -76,6 +76,46 @@ export function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
+/**
+ * What a quantity's typed text reads as — the whole text, never a cleaned copy
+ * of it: stripping a point would make "0.75" 75 and "1.5" 15 (INV-001,
+ * FIN-003). `fraction` is a part typed where only whole counts are taken,
+ * `places` more decimals than the count keeps.
+ */
+export type QuantityText =
+  | { kind: 'empty' }
+  | { kind: 'figure'; value: number }
+  | { kind: 'fraction' }
+  | { kind: 'places' }
+  | { kind: 'malformed' };
+
+/** Only digits — what each side of a quantity's separator may hold. */
+const DIGITS = /^\d*$/;
+
+/**
+ * Read a typed quantity: a count of whole units, or of parts of one to
+ * `places` decimals. A lone separator in a count that takes decimals is not a
+ * figure yet (".75" is being typed); anything that is not a plain figure —
+ * a sign, a letter, a second separator — is malformed.
+ *
+ * @param text - The field's raw text.
+ * @param places - Digits the count keeps after the point; 0 for whole units.
+ * @returns What the text reads as.
+ */
+export function readQuantityText(text: string, places: number): QuantityText {
+  const typed = text.trim();
+  if (typed === '') return { kind: 'empty' };
+  // At most one separator: a point, or the comma some locales write.
+  const [whole = '', fraction, ...more] = typed.split(/[.,]/);
+  if (more.length > 0 || !DIGITS.test(whole) || !DIGITS.test(fraction ?? ''))
+    return { kind: 'malformed' };
+  if (fraction === undefined) return { kind: 'figure', value: Number(whole) };
+  if (places === 0) return { kind: 'fraction' };
+  if (whole === '' && fraction === '') return { kind: 'empty' };
+  if (fraction.length > places) return { kind: 'places' };
+  return { kind: 'figure', value: Number(`${whole || '0'}.${fraction || '0'}`) };
+}
+
 /** The characters a typed sum keeps: figures, operators, the shorthands' letters and spaces. */
 const SUM_CHARACTERS = /[^\d.+\-*/xX×÷kKlLaAcChHsS ]/g;
 

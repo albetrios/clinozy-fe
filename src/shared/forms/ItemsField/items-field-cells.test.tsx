@@ -119,7 +119,118 @@ describe('ItemsQtyCell — the 32px stepper (H:924)', () => {
     expect(box('touch-qty')).toHaveAttribute('data-touch-size', 'large');
   });
 
-  it('replaces the count as typed and brings an empty or too-small one back to min', async () => {
+  it('refuses a part of a whole count — typed or pasted — and never joins its digits (FIN-003)', async () => {
+    const formRef: FormRef = { current: null };
+    const { user } = renderCells(
+      <CellHarness formRef={formRef}>
+        {(control) => (
+          <ItemsQtyCell
+            control={control}
+            name="rows.0.qty"
+            label="Qty"
+            testId="qty"
+            max={999}
+          />
+        )}
+      </CellHarness>,
+    );
+    const qty = screen.getByRole('spinbutton', { name: 'Qty' });
+
+    // Pasted over the selected count: the figure is refused, the count stays 2.
+    await user.click(qty);
+    await user.paste('1.5');
+    expect(qty).toHaveValue('1.5');
+    expect(qty).toHaveAttribute('aria-invalid', 'true');
+    expect(qty).toHaveAccessibleDescription('Enter a whole number');
+    expect(formRef.current?.getValues('rows.0.qty')).toBe(2);
+    await user.tab();
+    expect(qty).toHaveValue('2');
+    expect(qty).toHaveAccessibleDescription('Enter a whole number');
+
+    // Typed key by key: "1" is a count, "1." and "1.5" are refused — never 15.
+    await user.click(qty);
+    await user.keyboard('1.5');
+    expect(formRef.current?.getValues('rows.0.qty')).toBe(1);
+    await user.tab();
+    expect(qty).toHaveValue('1');
+    expect(formRef.current?.getValues('rows.0.qty')).toBe(1);
+
+    for (const typed of ['0.5', '1,5']) {
+      await user.click(qty);
+      await user.paste(typed);
+      await user.tab();
+      expect(formRef.current?.getValues('rows.0.qty')).toBe(1);
+    }
+
+    // A whole count is taken again, and takes the message away.
+    await user.click(qty);
+    await user.keyboard('3');
+    expect(qty).not.toHaveAttribute('aria-invalid');
+    expect(formRef.current?.getValues('rows.0.qty')).toBe(3);
+  });
+
+  it('keeps a part of a unit to its decimals, and steps by whole units (INV-001)', async () => {
+    const formRef: FormRef = { current: null };
+    const { user } = renderCells(
+      <CellHarness formRef={formRef} initial={{ mode: null, qty: 1, batch: null }}>
+        {(control) => (
+          <ItemsQtyCell
+            control={control}
+            name="rows.0.qty"
+            label="Qty"
+            testId="qty"
+            min={0.001}
+            decimals={3}
+          />
+        )}
+      </CellHarness>,
+    );
+    const qty = screen.getByRole('spinbutton', { name: 'Qty' });
+    expect(qty).toHaveAttribute('inputMode', 'decimal');
+
+    for (const [typed, count] of [
+      ['0.75', 0.75],
+      ['1.25', 1.25],
+      ['0.001', 0.001],
+      ['1.000', 1],
+    ] as const) {
+      await user.click(qty);
+      await user.paste(typed);
+      expect(formRef.current?.getValues('rows.0.qty')).toBe(count);
+      await user.tab();
+      expect(qty).toHaveValue(String(count));
+      expect(qty).not.toHaveAttribute('aria-invalid');
+    }
+
+    await user.click(qty);
+    await user.keyboard('0.75');
+    expect(formRef.current?.getValues('rows.0.qty')).toBe(0.75);
+    await user.click(screen.getByTestId('qty-increase'));
+    expect(qty).toHaveValue('1.75');
+    await user.click(qty);
+    await user.keyboard('{ArrowDown}');
+    expect(qty).toHaveValue('0.75');
+
+    // A fourth decimal, a sign or a zero is refused; the count stays 0.75.
+    await user.tab();
+    await user.click(qty);
+    await user.paste('0.7505');
+    expect(qty).toHaveAccessibleDescription('Use up to 3 decimal places');
+    await user.tab();
+    await user.click(qty);
+    await user.paste('-1');
+    expect(qty).toHaveAccessibleDescription('Enter a number');
+    await user.tab();
+    await user.click(qty);
+    await user.paste('0');
+    expect(qty).not.toHaveAttribute('aria-invalid');
+    await user.tab();
+    expect(qty).toHaveAccessibleDescription('Enter at least 0.001');
+    expect(qty).toHaveValue('0.75');
+    expect(formRef.current?.getValues('rows.0.qty')).toBe(0.75);
+  });
+
+  it('replaces the count as typed, brings an empty one back to min and refuses a too-small one', async () => {
     const formRef: FormRef = { current: null };
     const { user } = renderCells(
       <CellHarness formRef={formRef}>
@@ -142,6 +253,7 @@ describe('ItemsQtyCell — the 32px stepper (H:924)', () => {
     expect(qty).toHaveValue('0');
     await user.tab();
     expect(qty).toHaveValue('1');
+    expect(qty).toHaveAccessibleDescription('Enter at least 1');
     expect(formRef.current?.getValues('rows.0.qty')).toBe(1);
   });
 

@@ -23,6 +23,11 @@ export const ITEMS_FIELD_KEYS = {
   notePlaceholder: 'itemsField.notePlaceholder',
   /** An empty money cell's placeholder. */
   moneyPlaceholder: 'itemsField.moneyPlaceholder',
+  /** Why the quantity stepper refused what was typed — it never changes the figure instead. */
+  qtyWhole: 'itemsField.qtyWhole',
+  qtyPlaces: 'itemsField.qtyPlaces',
+  qtyAtLeast: 'itemsField.qtyAtLeast',
+  qtyNumber: 'itemsField.qtyNumber',
 } as const;
 
 /** A row's count cap — the quantity stepper's own (H:3811); the invoice's 1–999 passes 999. */

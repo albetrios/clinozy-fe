@@ -517,7 +517,11 @@
     "increase": "Aumenta",
     "note": "Nota",
     "notePlaceholder": "Osservazioni",
-    "moneyPlaceholder": "₹ 0"
+    "moneyPlaceholder": "₹ 0",
+    "qtyWhole": "Inserisci un numero intero",
+    "qtyPlaces": "Usa al massimo {{places}} decimali",
+    "qtyAtLeast": "Inserisci almeno {{min}}",
+    "qtyNumber": "Inserisci un numero"
   },
   "roomToolbar": {
     "more": "Altro",

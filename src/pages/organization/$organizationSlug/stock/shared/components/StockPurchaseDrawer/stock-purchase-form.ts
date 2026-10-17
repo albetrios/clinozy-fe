@@ -27,6 +27,15 @@ import { fromMilli, reorderUnits, toMilli } from '../../stock-units.ts';
 /** The most lines one purchase takes (the API's `items`, 1–50). */
 export const PURCHASE_LINES_MAX = 50;
 
+/**
+ * Decimals a line's quantity keeps — clinozy-be stores stock as `numeric(12,3)`,
+ * so a part of a unit is bought as typed (0.75 of a bottle).
+ */
+export const PURCHASE_QTY_PLACES = 3;
+
+/** The least a line can buy: the API's `quantity` is above 0, to its three places. */
+export const PURCHASE_QTY_MIN = 0.001;
+
 /** An invoice number's longest text (the API's `bill_number`). */
 export const BILL_NO_MAX = 30;
 
@@ -43,7 +52,7 @@ export const PURCHASE_PAYMENT_MODES: readonly PurchasePaymentMode[] = [
 /** One line of the bill: the item, how many units and the rate (paise). */
 export interface PurchaseLineValues {
   itemId: string | null;
-  /** Units — whole on a new line; a saved line's may hold a part (4.5). */
+  /** Units, to `PURCHASE_QTY_PLACES` decimals — a part of one is bought as typed (0.75). */
   qty: number;
   /** Paise a unit — the money cell's unit. */
   rate: number;
