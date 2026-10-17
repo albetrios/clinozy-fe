@@ -2,10 +2,17 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PatientRow } from '@/shared/api/app/patients-contracts.ts';
+import { exportTableCsv } from '@/shared/components/DataTable/data-table-csv.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 import { patientRow } from '@/tests/utils/patient-doubles.ts';
 
 import { type PatientsTableInput, usePatientsTable } from './usePatientsTable.tsx';
+
+const csv = vi.hoisted(() => ({ downloadCsv: vi.fn() }));
+vi.mock('@/lib/csv.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  downloadCsv: csv.downloadCsv,
+}));
 
 /** 10:00 on 3 Oct, clinic time. */
 const NOW = new Date('2026-10-03T04:30:00Z');
@@ -21,6 +28,7 @@ const rows: PatientRow[] = [
     status: 'regular',
     conversion: 'converted',
     followUpAt: '2026-10-03T09:20:00.000Z',
+    updatedAt: '2026-10-17T14:23:49.904Z',
   }),
   patientRow({
     id: 'pat_raam00000000000000000',
@@ -31,6 +39,7 @@ const rows: PatientRow[] = [
     gender: null,
     dateOfBirth: null,
     types: [],
+    updatedAt: '2026-10-17T14:27:00.000Z',
   }),
 ];
 
@@ -58,6 +67,24 @@ afterEach(() => {
 });
 
 describe('usePatientsTable', () => {
+  it('exports absolute Updated timestamps for both rows even though they fold to nothing', () => {
+    const { result } = renderTable();
+    expect(
+      result.current.getColumn('updated')?.columnDef.meta?.foldValue?.(rows[0]),
+    ).toBeNull();
+    exportTableCsv({ table: result.current, rows, fileName: 'patients.csv' });
+    const [fileName, content] = csv.downloadCsv.mock.lastCall as [string, string];
+    expect(fileName).toBe('patients.csv');
+    const records = content.split('\n').map((line) => line.split(','));
+    const headers = records[0]!;
+    const updated = headers.indexOf('Updated');
+    expect(updated).toBeGreaterThanOrEqual(0);
+    expect(records.slice(1).map((record) => record[updated])).toEqual(
+      rows.map((row) => row.updatedAt),
+    );
+    expect(records.every((record) => record.length === headers.length)).toBe(true);
+  });
+
   it('lays out the nine columns, keyed by the URL’s sort keys, the ID locked — no Due', () => {
     const { result } = renderTable();
     const columns = result.current.getAllLeafColumns();

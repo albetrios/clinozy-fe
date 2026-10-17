@@ -1,5 +1,8 @@
+import { readFile } from 'node:fs/promises';
+
 import { expect, type Page, test } from '@playwright/test';
 
+import { API_BASE_PATH } from '@/core/config/constants.ts';
 import {
   APP_VIEWPORTS,
   type AppRoom,
@@ -90,7 +93,9 @@ test.describe('Clinic rooms write through to clinozy-be', () => {
     await expectListedAfterReload(page, 'tasks', title);
   });
 
-  test('patients: a new patient is saved and listed', async ({ page }) => {
+  test('patients: a new patient is saved, listed and exported with Updated timestamps', async ({
+    page,
+  }) => {
     // A patient needs a branch to call home: the seeded clinic has one.
     await openNewClinic(page, { seed: true });
     await openRoomFromShell(page, 'patients', 'desktop');
@@ -107,6 +112,36 @@ test.describe('Clinic rooms write through to clinozy-be', () => {
     await page.goto(page.url().replace(/\/patients\/.*$/, '/patients'));
     await expectRoomReady(page, 'patients');
     await expectListedAfterReload(page, 'patients', first);
+
+    const listRead = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === `${API_BASE_PATH}/app/patients` &&
+        response.request().method() === 'GET' &&
+        response.ok(),
+    );
+    await page.reload();
+    const { data: patients } = (await (await listRead).json()) as {
+      data: { updated_at: string }[];
+    };
+    await expectRoomReady(page, 'patients');
+    // The clinic's seeded patient and the newly saved patient both have an Updated value.
+    expect(patients).toHaveLength(2);
+    await expect(page.getByTestId('patients-table-row')).toHaveCount(2);
+    await byTestId(page, 'patients-table-select-all').click();
+    const downloaded = page.waitForEvent('download');
+    await byTestId(page, 'patients-table-bulk-export').click();
+    const download = await downloaded;
+    expect(download.suggestedFilename()).toBe('patients.csv');
+    const content = await readFile((await download.path())!, 'utf8');
+    // These fixtures have no commas or newlines; the shared CSV suite covers escaping.
+    const records = content.split('\n').map((line) => line.split(','));
+    const headers = records[0]!;
+    const updated = headers.indexOf('Updated');
+    expect(updated).toBeGreaterThanOrEqual(0);
+    expect(records.slice(1).map((record) => record[updated])).toEqual(
+      patients.map((patient) => patient.updated_at),
+    );
+    expect(records.every((record) => record.length === headers.length)).toBe(true);
   });
   test('leads: a lead for a new contact is saved and listed', async ({ page }) => {
     await openNewClinic(page, { seed: true });
