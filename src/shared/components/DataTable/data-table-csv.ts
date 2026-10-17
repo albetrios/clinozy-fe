@@ -17,7 +17,7 @@ export interface TableCsvExport<TData extends RowData> {
   cell?: (columnId: string, row: TData) => string | undefined;
 }
 
-/** A cell's text: the column's meta-line value, else its accessor value. */
+/** CSV text: an explicit export value, else folded text or the accessor value. */
 function cellText<TData extends RowData>(
   table: ReactTable<DataTableFeatures, TData>,
   columnId: string,
@@ -25,10 +25,12 @@ function cellText<TData extends RowData>(
   index: number,
 ): string {
   const column = table.getColumn(columnId);
+  const exported = column?.columnDef.meta?.exportValue?.(row);
+  if (exported !== undefined) return exported === null ? '' : String(exported);
   const fold = column?.columnDef.meta?.foldValue?.(row);
   if (typeof fold === 'string') return fold;
   if (fold) return fold.value;
-  if (fold === null) return '';
+  // Hiding a detail on a small screen must not erase its data in a download.
   const value = column?.accessorFn?.(row, index);
   return typeof value === 'string' || typeof value === 'number' ? String(value) : '';
 }
@@ -36,8 +38,9 @@ function cellText<TData extends RowData>(
 /**
  * The bulk bar's "Export" (KICKOFF §6.0; Q-P8 — a real CSV): `rows` as a CSV
  * of the table's visible columns — each header the column's label, each cell
- * what the meta line shows of it (`meta.foldValue`), else its accessor value,
- * unless `cell` answers first — downloaded as `fileName`.
+ * its explicit `meta.exportValue`, else its folded text (`meta.foldValue`) or
+ * accessor value. A null fold only hides the responsive detail. `cell` answers
+ * first when provided — downloaded as `fileName`.
  */
 export function exportTableCsv<TData extends RowData>({
   table,

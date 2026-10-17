@@ -59,6 +59,11 @@ export interface DataTableColumnMeta {
    */
   foldValue?(original: unknown): DataTableFoldValue | string | null | undefined;
   /**
+   * CSV text independent of responsive folding. `undefined` uses the folded
+   * text or accessor value; `null` or an empty string explicitly leaves a blank.
+   */
+  exportValue?(original: unknown): string | number | null | undefined;
+  /**
    * A primary column whose rows are not all people — a patient's chip beside a
    * supplier's plain name (Payments' From / to, Pending's Who): whether this
    * row's cell draws the avatar, so its meta line indents under the name as a
