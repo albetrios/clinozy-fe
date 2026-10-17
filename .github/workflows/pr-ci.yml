@@ -166,6 +166,15 @@ jobs:
         with:
           fetch-depth: 1
       - uses: ./.github/actions/setup-node-pnpm
+      # ESLint's cache (content strategy: a checkout's mtimes change, its contents do not), saved on
+      # main by scheduled-unit-nightly.yml — a PR-scoped cache dies with the PR (cleanup-cache.yml).
+      - name: Restore the main ESLint cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.cache/eslint
+          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.mjs') }}-${{ github.run_id }}
+          restore-keys: |
+            eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.mjs') }}-
       - run: pnpm lint
 
   knip:
@@ -205,6 +214,15 @@ jobs:
         with:
           fetch-depth: 1
       - uses: ./.github/actions/setup-node-pnpm
+      # type-check is incremental (tsconfig.app.json's tsBuildInfoFile; tsc compares file contents,
+      # not mtimes), with the build info saved on main by scheduled-unit-nightly.yml.
+      - name: Restore the main type-check build info
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.tmp/tsconfig.app.tsbuildinfo
+          key: tsc-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig*.json') }}-${{ github.run_id }}
+          restore-keys: |
+            tsc-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig*.json') }}-
       - run: pnpm type-check
 
   static-sync:
@@ -426,15 +444,17 @@ jobs:
     if: needs.changes.outputs.docs-only-md != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Semgrep from its own image (the version clinozy-be pins in tooling/setup/agent/tool-versions.sh),
+    # pinned by digest, instead of a pip install of whatever is newest on every run.
+    container:
+      image: semgrep/semgrep:1.179.0@sha256:93963d9295a366f59e4850127b1550400ee7b388f04fe144e4a1f6325d96e01b
+    env:
+      # The update check reaches the network on every call; the image is the pinned version.
+      SEMGREP_ENABLE_VERSION_CHECK: '0'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: '3.11'
-      - name: Install Semgrep
-        run: pip install semgrep
       - name: Semgrep SAST
         run: semgrep scan --config p/default --metrics off
 

@@ -27,6 +27,38 @@ jobs:
   unit:
     uses: ./.github/workflows/reusable-vitest-unit-only.yml
 
+  # Saves on main the caches every PR's ESLint and TypeScript jobs restore (pr-ci.yml): a PR's own
+  # cache is dropped when its run ends (cleanup-cache.yml), so main's is the only one that lasts.
+  # Not a check: a red lint or type error here is the next PR's to show.
+  main-caches:
+    name: Main ESLint and type-check caches
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: ESLint (fills its cache)
+        continue-on-error: true
+        run: pnpm lint
+      - name: Type check (writes its build info)
+        continue-on-error: true
+        run: pnpm type-check
+      - name: Save the ESLint cache
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.cache/eslint
+          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.mjs') }}-${{ github.run_id }}
+      - name: Save the type-check build info
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.tmp/tsconfig.app.tsbuildinfo
+          key: tsc-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig*.json') }}-${{ github.run_id }}
+
   resolve-success:
     name: Close ci-failure issue
     needs: [unit]

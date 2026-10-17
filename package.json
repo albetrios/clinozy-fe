@@ -15,7 +15,7 @@
     "build:check": "node tooling/ci/check-preload-graph.mjs && node tooling/ci/check-entry-routes.mjs && node tooling/ci/check-css-sources.mjs && node tooling/ci/check-no-sourcemaps.mjs",
     "preview": "vite preview",
     "preview:https": "vite preview --https",
-    "lint": "eslint .",
+    "lint": "eslint . --cache --cache-location node_modules/.cache/eslint/ --cache-strategy content",
     "lint:fix": "eslint . --fix",
     "biome:check": "biome check .",
     "biome:fix": "biome check --write .",
@@ -135,7 +135,7 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "biome check --no-errors-on-unmatched",
-      "eslint --fix --cache --cache-location node_modules/.cache/eslint/",
+      "eslint --fix --cache --cache-location node_modules/.cache/eslint/ --cache-strategy content",
       "prettier --write --cache"
     ],
     "*.{css,json,md,yaml,yml}": [
