@@ -269,7 +269,9 @@ describe('UploadTray', () => {
     expect(tray()).toHaveClass('pointer-events-auto');
 
     // jsdom applies no stylesheet, so it cannot see `pointer-events-auto` win over the
-    // modal's inline `pointer-events: none` on the body; the class is asserted above.
+    // modal's inline `pointer-events: none` on the body; the class is asserted above. At
+    // runtime `index.css` also stacks the tray beneath the modal while one is open, so the
+    // footer stays reachable — pinned by `upload-tray-css.test.ts`.
     const user = userEvent.setup({ pointerEventsCheck: 0 });
     await user.click(screen.getByTestId('upload-tray-toggle'));
     expect(screen.getByTestId('upload-tray-toggle')).toHaveAttribute(

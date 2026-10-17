@@ -144,8 +144,9 @@ function UploadTrayPanel() {
       </output>
       {rows.length > 0 ? (
         // A dismissable-layer branch, like the toasts: a press on the tray (Retry, Remove,
-        // the toggle) is never an open drawer's outside press, and the tray stays usable
-        // while a modal turns pointer events off on the body.
+        // the toggle) is never an open drawer's outside press. While a modal is open,
+        // `index.css` stacks the tray beneath the modal layer, so it never covers the
+        // drawer's or dialog's footer (QA PAT-01).
         <DismissableLayer.Branch asChild>
           <section
             aria-label={t(KEYS.label)}
@@ -210,7 +211,9 @@ function UploadTrayPanel() {
  * then a row per file — a camera or file tile, the name over a 4px bar, "<n>%" turning into
  * "✓ <size>"; a finished row leaves after 1,400ms and the tray closes when empty. A failed
  * row names the step that failed and offers Retry and Remove; the header collapses the list.
- * Above drawers (z 95, as designed) and under toasts, the top layer. Contained by a silent
+ * Above the page (z 95, as designed) and under toasts, the top layer — but beneath an open
+ * modal (`index.css`), whose footer owns the same corner: the tray waits behind the scrim with
+ * its rows intact, and Retry / Remove return when the modal closes. Contained by a silent
  * boundary (house rule 2): if the panel throws, the uploads carry on without it.
  */
 export function UploadTray() {
