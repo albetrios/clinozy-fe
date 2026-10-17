@@ -192,6 +192,45 @@ for (const file of agentFiles) {
     error('agent-frontmatter', `agents/${file} missing frontmatter \`description\``);
 }
 
+// ── Agent model routing: a model fit for the job, an effort, and only documented flags ──
+// Models are set by job (as in clinozy-be): the agents whose output is a judgment call — the
+// verifier and the production hardening review — run on Opus (or `inherit`); auditors and
+// investigators on Sonnet; mechanical scanners on Haiku. Claude Code silently ignores a
+// frontmatter field it does not recognize, so a misspelled or out-of-range value would just be
+// dropped — these are validated here.
+const judgmentAgents = new Set(['fe-verifier', 'fe-production-hardening-reviewer']);
+const agentModels = /^(inherit|opus|sonnet|haiku|fable|claude-[a-z0-9-]+)$/;
+const agentEfforts = new Set(['low', 'medium', 'high', 'xhigh', 'max']);
+for (const file of agentFiles) {
+  const text = readText(join(agentOsDirectory, 'agents', file));
+  const agentName = basename(file, '.md');
+  const model = frontmatterField(text, 'model');
+  const effort = frontmatterField(text, 'effort');
+  if (!model || !agentModels.test(model))
+    error(
+      'agent-frontmatter',
+      `agents/${file} model "${model ?? '∅'}" is not a model alias or id`,
+    );
+  else if (judgmentAgents.has(agentName) && model !== 'opus' && model !== 'inherit')
+    error(
+      'agent-frontmatter',
+      `agents/${file} pins model "${model}" but its output is a judgment call — use \`opus\` or \`inherit\``,
+    );
+  if (!effort || !agentEfforts.has(effort))
+    error(
+      'agent-frontmatter',
+      `agents/${file} effort "${effort ?? '∅'}" — set one of ${[...agentEfforts].join(', ')}`,
+    );
+  for (const flag of ['background', 'omitClaudeMd']) {
+    const value = frontmatterField(text, flag);
+    if (value !== undefined && value !== 'true')
+      error(
+        'agent-frontmatter',
+        `agents/${file} ${flag} "${value}" — only \`true\` is documented; omit it otherwise`,
+      );
+  }
+}
+
 // ── Read-only agents must enforce read-only via a tools allowlist ──
 // `readonly: true` is honoured only by Cursor; on Claude Code an agent without a
 // `tools` allowlist can still Edit/Write. Require every readonly agent to declare
@@ -217,6 +256,16 @@ for (const file of agentFiles) {
         `agents/${file} is readonly:true but its \`tools\` allowlist includes write tool(s): ${offenders.join(', ')}`,
       );
   }
+  // An explicit denylist as well, so a later `tools` edit cannot quietly hand back a write tool.
+  const disallowed = frontmatterField(text, 'disallowedTools') ?? '';
+  const missing = writeTools.filter(
+    (tool) => !new RegExp(`\\b${tool}\\b`).test(disallowed),
+  );
+  if (missing.length)
+    error(
+      'agent-readonly',
+      `agents/${file} is readonly:true but \`disallowedTools\` does not list: ${missing.join(', ')}`,
+    );
 }
 
 // ── Agent catalog ↔ disk: gate-able count matches, every agent catalogued ──

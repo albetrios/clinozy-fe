@@ -1,13 +1,20 @@
 ---
 name: fe-docs-auditor
 description: Audits docs/ for index completeness, naming, Mermaid, and cross-links. Use after large doc changes or when the user asks for a documentation review. Read-only.
-model: inherit
+model: sonnet
+effort: medium
+background: true
 tools:
   - Read
   - Grep
   - Glob
   - Bash
 readonly: true
+disallowedTools:
+  - Edit
+  - Write
+  - MultiEdit
+  - NotebookEdit
 ---
 
 Audit `docs/` and return a structured issues list. Read-only — never edit files.
