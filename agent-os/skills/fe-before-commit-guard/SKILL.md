@@ -23,11 +23,20 @@ clinozy-be's `pnpm guard:pre-commit` runner.
 
 ### Inside before-commit-guard.sh (steps 1–10)
 
+**Order:** step 3 (lint-staged) runs first, because it rewrites and restages files. The other nine
+only read, so they run **in parallel**, each into its own log, printed afterwards in step order under
+its own heading; the guard fails if any of them failed. If the parallel runner itself breaks (no
+temporary directory, a step that left no exit code), it says so and runs the nine one by one. ESLint
+and Prettier keep caches under `node_modules/.cache`, and `type-check` is incremental
+(`tsconfig.app.json`'s `tsBuildInfoFile`), so a commit with nothing new to check takes about 9 s
+(67–78 s before, almost all of it a full `tsc`); the first run after a fresh install still builds the
+cache (about 60 s).
+
 1. **validate:env-example** — `.env.example` documents all keys from `src/core/config/env-schema.ts` (via `pnpm tool:sync-env-example`).
 2. **validate:public** — Required public assets exist: config.js, theme-init.js, vite.svg, manifest.webmanifest, \_headers, offline.html, robots.txt.
-3. **lint-staged** — ESLint --fix + Prettier on staged `.ts`, `.tsx`, `.css`, `.json`, `.md`, `.yaml`, `.yml`.
+3. **lint-staged** — ESLint --fix + Prettier (both `--cache`) on staged `.ts`, `.tsx`, `.css`, `.json`, `.md`, `.yaml`, `.yml`.
 4. **validate:vite-env** — env/mode-sniffing gate: no `import.meta.env.DEV/PROD/MODE` or `platformConfig.environment === '<name>'` / `.MODE ===` outside the config-kernel allowlist. Behavior must be driven by named `platformConfig` flags.
-5. **type-check** — `tsc --noEmit` for full project.
+5. **type-check** — `tsc --noEmit --incremental` for the full project (only what changed since the last run is rechecked).
 6. **validate:lockfile** — _only when the commit stages `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml`_ — runs `pnpm install --frozen-lockfile` (the exact check CI runs) to prove the lockfile is in sync. Catches a dependency or `overrides` change that forgot to regenerate the lockfile before it can reach main.
 7. **Gitleaks** — `gitleaks protect --staged` secret/API-key scan. Mandatory: without gitleaks the commit fails and names the install command (`bash tooling/setup/agent/install-gitleaks.sh` on Linux, `brew install gitleaks` on macOS).
 8. **Env-file guard** — reject committing any `.env*` except `.env.example` (mirrors the pr-governance CI guard, locally).

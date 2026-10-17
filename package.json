@@ -21,7 +21,7 @@
     "biome:fix": "biome check --write .",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\"",
-    "type-check": "tsc --noEmit -p tsconfig.app.json",
+    "type-check": "tsc --noEmit --incremental -p tsconfig.app.json",
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:security": "vitest run --project security",
@@ -135,11 +135,11 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "biome check --no-errors-on-unmatched",
-      "eslint --fix",
-      "prettier --write"
+      "eslint --fix --cache --cache-location node_modules/.cache/eslint/",
+      "prettier --write --cache"
     ],
     "*.{css,json,md,yaml,yml}": [
-      "prettier --write"
+      "prettier --write --cache"
     ]
   },
   "dependencies": {

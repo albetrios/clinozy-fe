@@ -18,7 +18,7 @@ const sonarCompose = readFileSync('docker-compose.sonar.yml', 'utf8');
 const sonarGate = readFileSync('tooling/sonar/sonar-gate.mjs', 'utf8');
 const sessionStart = readFileSync('agent-os/hooks/session-start.sh', 'utf8');
 
-/** The guard's step 7, the staged secrets scan, as a script of its own. */
+/** The guard's step 7, the staged secrets scan (the `step_7` function), as a script of its own. */
 const secretsStep = guard.slice(
   guard.indexOf('# ── 7. Gitleaks secret scan'),
   guard.indexOf('# ── 8.'),
@@ -29,7 +29,7 @@ describe('git-hook gate tools', () => {
     // A PATH with only the base system directories: no gitleaks there.
     const result = spawnSync(
       '/bin/bash',
-      ['-c', `set -e\n${secretsStep}\necho scanned`],
+      ['-c', `set -e\n${secretsStep}\nstep_7\necho scanned`],
       {
         encoding: 'utf8',
         env: { PATH: '/usr/bin:/bin' },
