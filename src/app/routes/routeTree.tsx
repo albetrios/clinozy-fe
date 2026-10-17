@@ -499,7 +499,10 @@ const rootRoute = createRootRoute({
       <AppSplashSlotLazy />
     </>
   ),
-  notFoundComponent: () => <NotFoundPage />,
+  // The lazy page itself, never wrapped in an arrow: the router warms a notFoundComponent's
+  // chunk through its `preload` before a notFound() renders it. Wrapped, a guard's notFound()
+  // (an unknown or inaccessible clinic slug) rendered it cold, suspending through `use()`.
+  notFoundComponent: NotFoundPage,
   errorComponent: ({ error }) => <ErrorBoundary error={error} />,
 });
 

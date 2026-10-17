@@ -192,6 +192,15 @@ describe('router configuration', () => {
     for (const key of keys) expect(shellLoads[key]).toHaveBeenCalledOnce();
   });
 
+  it('hands the root its lazy 404 page itself, so the router warms it before a notFound() renders', () => {
+    // A guard's notFound() (an unknown or inaccessible clinic slug) renders the root's
+    // notFoundComponent. The router loads that chunk through its `preload` first; an inline
+    // `() => <NotFoundPage />` has none, so the page suspended cold through `use()`.
+    const notFoundComponent = router.routesById.__root__.options.notFoundComponent as
+      { preload?: unknown } | undefined;
+    expect(notFoundComponent?.preload).toBeTypeOf('function');
+  });
+
   it('marks the URL-driven dialog routes — and no page — so the page holds still under them', () => {
     const SLUG = '/organization/$organizationSlug';
     const dialogs = (

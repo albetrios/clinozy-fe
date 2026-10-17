@@ -1,7 +1,10 @@
 # Production readiness — go / no-go
 
-**Status (2026-06):** The frontend **always calls HTTP** (Vite proxies `/api` → **clinozy-be** on `:3000`).
-There is **no alternate API path** — one backend, one contract.
+**Status (2026-10-17): No-go for paying clinics.** The app runs in production
+(`clinozy-fe.netlify.app`, deployed by GitHub Actions on a release), and every clinic room is
+wired to clinozy-be — except the messaging column, which still reads in-memory sample data.
+The backend's side of the same list lives in clinozy-be's
+`docs/deployment/launch-checklist.md`.
 
 This is the single source of truth for "can we ship?". It complements the
 step-by-step [pre-launch checklist](deployment-and-pre-launch.md#pre-launch-checklist)
@@ -25,21 +28,27 @@ The frontend **shell** is solid:
 
 ## Blockers — work to do before launch
 
-### A. Backend & infrastructure (owned by your team — not fixable in this repo)
+### A. Backend & infrastructure
 
-- [ ] **Deploy clinozy-be** (or API with the same contract) and replace any remaining
-      placeholder data (the clinic rooms' `*.fixtures.ts`) with live endpoints.
-      `pnpm contracts:drift` checks the committed route catalog — re-verify against the
-      running server.
-- [ ] **Confirm the auth contract:** HttpOnly refresh cookie (`SameSite=Lax`+), refresh-session
-      rotation with reuse-detection, `X-Requested-With` rejection, CORS for the frontend origin.
-- [ ] **Set production env / secrets** — `VITE_API_BASE_URL` (HTTPS),
+- [x] **clinozy-be deployed** — Railway, production released from a tagged release with a manual
+      approval (clinozy-be `release-deploy.yml`).
+- [ ] **Messaging off sample data.** `src/shared/api/app/messages-api.ts` and
+      `contact-threads-api.ts` read the in-memory world in
+      `src/shared/api/app/fixtures/world.fixtures.ts`, so the chat column in Leads, Tasks, the
+      patient file and Medical reminders shows prototype threads, and nothing is sent. Needs
+      clinozy-be's WhatsApp Cloud API client first. `REPLACE_WITH_API` marks the remaining
+      spots (37 in 18 files under `src/shared/api/app`, plus `PurchaseOrderPrint`).
+- [ ] **Settle the open backend requests** — clinozy-be issue #34 (120 requests: 79 covered,
+      40 partial, 1 conflict — the Tasks "Everyone" view).
+- [ ] **Confirm the auth contract** (not re-verified 2026-10-17): HttpOnly refresh cookie
+      (`SameSite=Lax`+), refresh-session rotation with reuse-detection, `X-Requested-With`
+      rejection, CORS for the frontend origin.
+- [ ] **Production env / secrets** (not re-verified 2026-10-17) — `VITE_API_BASE_URL` (HTTPS),
       `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`/`HOST`, `VITE_CSP_REPORT_URI`,
       `VITE_PRIVACY_POLICY_URL`, and `config.js` runtime injection per environment.
-- [ ] **Create the git remote + push** if not done — activates CI/CD, CodeQL, Dependabot,
-      branch-protection rulesets (`pnpm github:sync`).
-- [ ] **DNS / TLS / host.** Netlify config exists (`netlify.toml`, `_headers`);
-      confirm HTTPS, security headers, and multi-tenant subdomains (if used).
+- [x] **Git remote + CI/CD** — `albetrios/clinozy-fe`; rulesets as code (`pnpm github:sync`).
+- [ ] **Custom domain, DNS / TLS.** Only `*.netlify.app` is configured; `netlify.toml` and
+      `_headers` carry the security headers.
 - [ ] **SRI for `config.js`** — deploy entrypoint must hash the generated file and inject
       `integrity` (see security-model.md accepted-risk #3).
 
@@ -47,26 +56,39 @@ The frontend **shell** is solid:
 
 - [ ] Staging smoke against deployed clinozy-be + Netlify preview/production.
 - [ ] Lighthouse budgets against real endpoints.
-- [ ] Cross-browser E2E — suite is Chromium-only; validate Safari/Firefox if required.
+- [ ] Cross-browser E2E — the main suite is Chromium-only (2 cross-browser specs exist);
+      validate Safari/Firefox on the screens clinics use most.
 - [ ] Real-failure observability: Sentry errors (PII scrubbed) and PostHog **after consent**.
+      Product analytics track sign-in and setup (26 events) but no clinic action yet
+      (booking, invoice, payment).
 
 ### C. Legal / compliance / product
 
-- [ ] **Privacy policy + terms** (`VITE_PRIVACY_POLICY_URL`; consent banner links when set).
-- [ ] Confirm consent model fits your jurisdiction.
+- [ ] **Privacy policy + terms.** Privacy is an external link (`VITE_PRIVACY_POLICY_URL`);
+      there is no terms page.
+- [ ] **India's DPDP Act** — core duties (notice, consent, security safeguards, breach
+      notification, retention) apply from 2027-05-13. Patient consent fields exist; the
+      notices and the clinic data-processing agreement do not.
+- [ ] **Billing in ₹.** The billing settings are Stripe-based and the plans are priced in USD;
+      the owner chose Razorpay in ₹ (2026-10-17), so these screens change with the backend.
+- [ ] **Printed invoices and prescriptions** are English-only (Standing deviation of the
+      launch iteration).
 
-### D. In-repo gaps closed in prior waves
+### D. In-repo gaps closed
 
 - [x] **Cookie consent** — PostHog and Sentry replay / profiling gated behind `ConsentBanner` + `useConsentStore` (claude.com's model: Customize · Reject all · Accept all, Necessary / Analytics); the answer is this browser's, kept in a one-year first-party cookie with its policy version, never cleared by signing out, Global Privacy Control honored, changed from "Privacy choices" or Settings › Account › Privacy; signed-in answers go to the account as a receipt.
-- [x] **robots.txt** — `Disallow: /` (auth-gated admin app).
+- [x] **robots.txt** — `Disallow: /` (auth-gated admin app). A marketing site needs its own host.
 - [x] **HTTP-only frontend** — always `apiClient` / `authFetch` → clinozy-be.
+- [x] **404 without a console error** (2026-10-17) — the root route hands the router its lazy
+      `NotFoundPage` itself, so an unknown or inaccessible clinic slug no longer suspends it
+      cold through `use()`.
 - [x] This document.
 
 ## Go / no-go
 
 **No-go** until **Section A** is complete and **Section B** has been run green
-against a deployed API. Sections C/D are launch-quality items; C is your
-product/legal call.
+against a deployed API. Section C is required before charging clinics: the legal items are
+your product/legal call, and billing in ₹ needs the backend change first.
 
 When A + B are green, run the [path-to-production gate](path-to-production.md):
 runbook → pre-launch checklist → release.
