@@ -3,13 +3,15 @@
 //
 // BLOCK (deny): reading or writing secret files (.env*, not .env.example), secret content,
 //   destructive shell commands, skipping the git hooks (--no-verify, `git commit -n`, HUSKY=0).
-// ASK: `gh pr create` — a PR only when the user asked (no-unrequested-pr.sh covers the MCP tool).
+// ASK: `gh pr create` — a PR only when the user asked (no-unrequested-pr.sh covers the MCP tool),
+//   except in a turn the user started with /fe-ship or /fe-open-pr (prompt-skill-router.sh marks it).
 // WARN (systemMessage): edits to protected/vendored paths.
 //
 // Reads the PreToolUse payload on stdin. Fail-open by design: any parse/read
 // error allows the tool (exit 0) so a guardrail bug can never brick the agent.
-import { readFileSync } from 'node:fs';
-import { dirname, isAbsolute, resolve } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 let raw = '';
@@ -132,7 +134,16 @@ if (tool === 'Bash' && command) {
       `Blocked by clinozy-fe guardrail: ${why}. Command: "${command.slice(0, 160)}". If you truly intend this, run it yourself in a terminal.`,
     );
   }
-  if (/\bgh\s+pr\s+create\b/.test(scan)) {
+  // The marker _turn-once.sh's turn_mark writes for a /fe-ship or /fe-open-pr turn.
+  const prRequested = existsSync(
+    join(
+      tmpdir(),
+      'clinozy-fe-hooks',
+      payload.session_id || 'unknown-session',
+      'mark.pr-requested',
+    ),
+  );
+  if (/\bgh\s+pr\s+create\b/.test(scan) && !prRequested) {
     ask(
       'clinozy-fe policy: open a PR only when the user explicitly asked for one (Bash(gh pr*) is allowlisted, so this hook is the check). Confirm this was requested before proceeding.',
     );

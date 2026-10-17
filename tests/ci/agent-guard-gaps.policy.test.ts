@@ -114,6 +114,56 @@ describe('agent-os guard gaps', () => {
     expect(guardDecision('Bash', { command: 'gh pr view 12' })).toBe('silent');
   });
 
+  it.skipIf(!HAS_JQ)(
+    'a turn the user started with /fe-ship or /fe-open-pr is the PR request; the next prompt is not',
+    () => {
+      const prompt = (session_id: string, text: string) =>
+        runHook('prompt-skill-router.sh', {
+          session_id,
+          hook_event_name: 'UserPromptSubmit',
+          prompt: text,
+        });
+      const decisions = (session_id: string) => {
+        const decision = (stdout: string) =>
+          stdout.trim()
+            ? (
+                JSON.parse(stdout) as {
+                  hookSpecificOutput: { permissionDecision: string };
+                }
+              ).hookSpecificOutput.permissionDecision
+            : 'silent';
+        return [
+          decision(
+            runHook('guardrails.mjs', {
+              session_id,
+              tool_name: 'Bash',
+              tool_input: { command: 'gh pr create --title x --body y' },
+            }).stdout,
+          ),
+          decision(
+            runHook('no-unrequested-pr.sh', {
+              session_id,
+              tool_name: 'mcp__github__create_pull_request',
+              tool_input: { title: 'feat: x' },
+            }).stdout,
+          ),
+        ];
+      };
+
+      prompt('ship-session', '/fe-ship feat: billing invoices');
+      expect(decisions('ship-session')).toEqual(['silent', 'silent']);
+      prompt('ship-session', 'now tidy the docs');
+      expect(decisions('ship-session')).toEqual(['ask', 'ask']);
+
+      prompt('open-session', '  /fe-open-pr');
+      expect(decisions('open-session')).toEqual(['silent', 'silent']);
+
+      prompt('look-alike-session', '/fe-shipping-notes then /fe-ship');
+      expect(decisions('look-alike-session')).toEqual(['ask', 'ask']);
+      expect(decisions('never-prompted-session')).toEqual(['ask', 'ask']);
+    },
+  );
+
   it.skipIf(!HAS_JQ)('a skill reminder reaches the model once per turn', () => {
     const edit = {
       session_id: 'policy-session',

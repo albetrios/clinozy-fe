@@ -23,6 +23,21 @@ turn_once() {
   return 0
 }
 
+# turn_mark SESSION_ID KEY — records KEY (lowercase letters and dashes) for the rest of this turn,
+# e.g. the user ran /fe-ship. The marker is `mark.<KEY>` by name, so guardrails.mjs (Node) reads it
+# too.
+turn_mark() {
+  local directory
+  directory="$(turn_state_dir "$1")"
+  mkdir -p "${directory}" 2>/dev/null || return 0
+  : >"${directory}/mark.$2" 2>/dev/null || true
+}
+
+# turn_marked SESSION_ID KEY — succeeds when KEY was recorded in this turn.
+turn_marked() {
+  [ -e "$(turn_state_dir "$1")/mark.$2" ]
+}
+
 # turn_reset SESSION_ID — a new prompt starts a new turn.
 turn_reset() {
   local directory
