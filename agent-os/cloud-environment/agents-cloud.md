@@ -53,7 +53,9 @@ Ten steps, in order:
    install time rather than hardcoded — either way the pin stays authoritative.
 2. **Distro CLI tools** — `jq`, `ripgrep`, `shellcheck`, `rsvg-convert`, `xz`.
 3. **GitHub CLI** (`gh`) from the official `cli/cli` release.
-4. **gitleaks** — without it `.husky/pre-commit` silently skips the secret scan.
+4. **Gate tools** — **gitleaks** (the `.husky/pre-commit` secret scan is mandatory: a commit
+   without gitleaks fails) and **Docker** with the SonarQube images the pre-push gate runs
+   (`install-docker-images.sh`: the `mirror.gcr.io` Docker Hub mirror, `dockerd`, pre-pull).
 5. **`uv`/`uvx`** — the prerequisite for the `headroom` MCP server.
 6. `corepack enable` + `pnpm install --frozen-lockfile`.
 7. `pnpm setup:local --only-env` — scaffolds `.env.local` (schema defaults; no

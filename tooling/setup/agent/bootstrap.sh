@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One-shot cloud-session bring-up for clinozy-fe cloud agents.
 #
-# Runs every agent setup helper in order — Node, distro CLI tools, gh, gitleaks,
+# Runs every agent setup helper in order — Node, distro CLI tools, gh, gitleaks and Docker,
 # headroom/uv — installs dependencies, scaffolds a self-contained `.env.local`
 # (`pnpm setup:local --only-env`) and the default MCP pair, provisions Playwright
 # browsers, then verifies the Vite dev server actually serves the app shell. A
@@ -162,13 +162,25 @@ else
   skip "[3/${TOTAL}] gh unavailable (non-fatal — MCP GitHub tools still work)"
 fi
 
-# 4) gitleaks (pre-commit secret scan) --------------------------------------
-step "[4/${TOTAL}] gitleaks (secret scan)"
+# 4) The git hooks' gate tools: gitleaks + Docker with the SonarQube images --
+# The pre-commit secret scan is mandatory and the pre-push SonarQube gate runs in Docker, so both
+# are provisioned here, in the cached Setup script, once per container.
+step "[4/${TOTAL}] Gate tools (gitleaks secret scan, Docker + SonarQube images)"
 bash "${AGENT_DIR}/install-gitleaks.sh" || true
 if command -v gitleaks >/dev/null 2>&1; then
   ok "[4/${TOTAL}] gitleaks $(gitleaks version 2>/dev/null)"
 else
-  skip "[4/${TOTAL}] gitleaks unavailable — .husky/pre-commit will SKIP the secret scan (non-fatal)"
+  skip "[4/${TOTAL}] gitleaks unavailable — commits fail until it is installed (bash ${AGENT_DIR}/install-gitleaks.sh)"
+fi
+if command -v docker >/dev/null 2>&1; then
+  bash "${AGENT_DIR}/install-docker-images.sh" || true
+  if docker info >/dev/null 2>&1; then
+    ok "[4/${TOTAL}] Docker running (SonarQube images pre-pulled when reachable)"
+  else
+    skip "[4/${TOTAL}] Docker not reachable — the pre-push SonarQube gate starts it on demand"
+  fi
+else
+  skip "[4/${TOTAL}] Docker CLI absent — the pre-push SonarQube gate needs Docker"
 fi
 
 # 5) headroom / uv (MCP context compression) ---------------------------------

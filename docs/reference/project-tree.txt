@@ -3518,7 +3518,7 @@ clinozy-fe/
 │   └── [1 test file]
 ├── tests/
 │   ├── ci/
-│   │   └── [45 test files]
+│   │   └── [46 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
@@ -3691,8 +3691,10 @@ clinozy-fe/
 │   ├── setup/
 │   │   ├── agent/
 │   │   │   ├── bootstrap.sh
+│   │   │   ├── ensure-docker-daemon.sh
 │   │   │   ├── healthcheck.sh
 │   │   │   ├── install-apt-tools.sh
+│   │   │   ├── install-docker-images.sh
 │   │   │   ├── install-gh.sh
 │   │   │   ├── install-gitleaks.sh
 │   │   │   ├── install-headroom.sh

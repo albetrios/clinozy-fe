@@ -47,15 +47,17 @@ if [ -n "$STAGED_DEPS" ]; then
   pnpm run validate:lockfile
 fi
 
-# ── 7. Gitleaks secret scan on staged files (if installed) ──
+# ── 7. Gitleaks secret scan on staged files (mandatory) ──
+# A commit without the scan could carry a secret into history, so a missing gitleaks stops the
+# commit (as in clinozy-be). Cloud sessions install it in setup and self-heal it at session start.
 echo ""
 echo "7. Staged secrets scan..."
-if command -v gitleaks >/dev/null 2>&1; then
-  gitleaks protect --staged --config .gitleaks.toml --verbose
-else
-  echo "NOTICE: gitleaks not installed. Skipping secret scan."
-  echo "Install with: brew install gitleaks"
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "ERROR: gitleaks is not installed, and the staged secrets scan is mandatory."
+  echo "Install it: bash tooling/setup/agent/install-gitleaks.sh (Linux, cloud) or brew install gitleaks (macOS)."
+  exit 1
 fi
+gitleaks protect --staged --config .gitleaks.toml --verbose
 
 # ── 8. Reject committing gitignored env files (only .env.example is tracked) ──
 # Two environments, one committed template: every other .env* is gitignored and

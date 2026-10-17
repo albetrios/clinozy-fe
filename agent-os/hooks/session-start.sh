@@ -99,7 +99,21 @@ node_version="$(node -v 2>/dev/null || echo unknown)"
 deps="missing"; [ -x node_modules/.bin/vite ] && deps="installed"
 gh_cli="absent"; command -v gh >/dev/null 2>&1 && gh_cli="$(gh --version 2>/dev/null | head -1 | awk '{print $3}')"
 [ -n "$gh_cli" ] || gh_cli="absent"
-gitleaks_status="absent"; command -v gitleaks >/dev/null 2>&1 && gitleaks_status="present"
+# The pre-commit secret scan is mandatory, so a web session without gitleaks could not commit.
+# The cached Setup script installs it (bootstrap.sh step 4), but an older cached image can predate
+# that: install on demand when absent. A plain `command -v` when present (the common case).
+gitleaks_status="absent"
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks_status="present"
+elif [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] && [ -f tooling/setup/agent/install-gitleaks.sh ]; then
+  echo "session-start: gitleaks missing — installing for the pre-commit secret scan (best-effort)…" >&2
+  bash tooling/setup/agent/install-gitleaks.sh >&2 || true
+  if command -v gitleaks >/dev/null 2>&1; then
+    gitleaks_status="installed"
+  else
+    gitleaks_status="install-failed (run: bash tooling/setup/agent/install-gitleaks.sh)"
+  fi
+fi
 provisioned="no"; { [ "$node_ok" = "yes" ] && [ "$deps" = "installed" ]; } && provisioned="yes"
 node_note=""; [ "$node_ok" = "no" ] && node_note="  (switch to Node >=${required_major} from .nvmrc, then pnpm install)"
 

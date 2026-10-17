@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# Make the SonarQube gate's Docker images pullable in Claude Code on the web (cloud agent)
+# sessions, where Docker Hub's blob CDN is blocked. Mirrors clinozy-be's
+# tooling/setup/agent/install-docker-images.sh, without its Postgres/Redis images (clinozy-fe
+# runs no database).
+#
+# On the cloud image the Docker registry *manifest* host (registry-1.docker.io) is reachable,
+# but the layer *blobs* come from Docker Hub's CDN (production.cloudfront.docker.com), which is
+# not on the default network allowlist, so every pull dies with `403 Forbidden`. Google's Docker
+# Hub pull-through mirror (https://mirror.gcr.io) is reachable and serves byte-identical images
+# (same content digests), so docker-compose.sonar.yml needs no change.
+#
+# It (a) writes the registry mirror into /etc/docker/daemon.json, (b) starts dockerd
+# (ensure-docker-daemon.sh) and (c) best-effort pre-pulls the SonarQube server and scanner the
+# pre-push gate runs, so the cached Setup filesystem (including /var/lib/docker) already holds them.
+# Run by bootstrap.sh step 4.
+#
+# Idempotent and best-effort: never hard-fails the setup chain. Diagnostics → stderr.
+set -uo pipefail
+
+readonly MIRROR_URL="https://mirror.gcr.io"
+readonly DAEMON_JSON="/etc/docker/daemon.json"
+
+repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+agent_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Wait up to ~30s for the Docker socket to become responsive.
+wait_for_docker() {
+  for _ in $(seq 1 30); do
+    docker info >/dev/null 2>&1 && return 0
+    sleep 1
+  done
+  return 1
+}
+
+# Start (or restart) the Docker daemon so a freshly written daemon.json applies.
+start_docker() {
+  service docker start >/dev/null 2>&1 || (dockerd >/tmp/dockerd-setup.log 2>&1 &)
+  wait_for_docker
+}
+
+# Steps 1–2 are for the Linux cloud image, whose Docker Hub blob CDN is blocked. Docker Desktop
+# and OrbStack on a developer machine pull straight from Docker Hub and own their daemon (there
+# is no /etc/docker or dockerd to restart), so only the pre-pull in step 3 applies there.
+if [ "$(uname -s)" = "Linux" ]; then
+  # 1) Configure the registry mirror (merge-safe; preserve any existing config).
+  mkdir -p /etc/docker 2>/dev/null || true
+  if [ -f "${DAEMON_JSON}" ] && grep -q 'mirror.gcr.io' "${DAEMON_JSON}" 2>/dev/null; then
+    echo "install-docker-images: registry mirror already present in ${DAEMON_JSON}." >&2
+  elif command -v jq >/dev/null 2>&1 && [ -f "${DAEMON_JSON}" ]; then
+    tmp="$(mktemp)"
+    if jq --arg m "${MIRROR_URL}" \
+         '."registry-mirrors" = ((."registry-mirrors" // []) + [$m] | unique)' \
+         "${DAEMON_JSON}" > "${tmp}" 2>/dev/null && mv "${tmp}" "${DAEMON_JSON}" 2>/dev/null; then
+      echo "install-docker-images: merged registry mirror into existing ${DAEMON_JSON}." >&2
+    else
+      rm -f "${tmp}"
+      echo "install-docker-images: could not merge ${DAEMON_JSON} — leaving it untouched." >&2
+    fi
+  elif printf '{\n  "registry-mirrors": ["%s"]\n}\n' "${MIRROR_URL}" > "${DAEMON_JSON}" 2>/dev/null; then
+    echo "install-docker-images: wrote ${DAEMON_JSON} with registry mirror ${MIRROR_URL}." >&2
+  else
+    echo "install-docker-images: cannot write ${DAEMON_JSON} (needs root — run in the Setup script) — pulls go straight to Docker Hub." >&2
+  fi
+
+  # 2) Ensure dockerd is running and has actually picked up the mirror.
+  if ! docker info >/dev/null 2>&1; then
+    echo "install-docker-images: starting dockerd…" >&2
+    bash "${agent_dir}/ensure-docker-daemon.sh" || start_docker || true
+  fi
+
+  if ! docker info >/dev/null 2>&1; then
+    echo "install-docker-images: dockerd not reachable during setup — the mirror is written and will apply when dockerd next starts in-session." >&2
+    exit 0
+  fi
+
+  if grep -q 'mirror.gcr.io' "${DAEMON_JSON}" 2>/dev/null && ! docker info 2>/dev/null | grep -q 'mirror.gcr.io'; then
+    echo "install-docker-images: restarting dockerd to apply the mirror…" >&2
+    if ! service docker restart >/dev/null 2>&1; then
+      pkill -TERM dockerd 2>/dev/null || true
+      for _ in $(seq 1 20); do docker info >/dev/null 2>&1 || break; sleep 1; done
+      start_docker || true
+    fi
+  fi
+else
+  echo "install-docker-images: $(uname -s) Docker pulls from Docker Hub directly — no mirror needed." >&2
+fi
+
+# 3) The SonarQube server + scanner the pre-push gate runs (~1 GB): pulled here, in the cached
+# Setup script, so the first push that touches src/ does not wait on the download.
+if [ -f "${repository_root}/docker-compose.sonar.yml" ] && docker info >/dev/null 2>&1; then
+  echo "install-docker-images: pre-pulling the SonarQube gate images…" >&2
+  ( cd "${repository_root}" && docker compose -f docker-compose.sonar.yml pull sonarqube scanner ) >&2 2>&1 \
+    || echo "install-docker-images: SonarQube pre-pull failed (non-fatal) — the gate pulls on first use." >&2
+fi
+
+echo "install-docker-images: done." >&2
+exit 0

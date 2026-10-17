@@ -322,7 +322,7 @@ Download the Windows binary from [github.com/gitleaks/gitleaks/releases](https:/
 gitleaks version
 ```
 
-> **Note:** If Gitleaks is not installed, the pre-commit hook skips the secret scan gracefully and prints a notice. Strongly recommended but not required to run the app.
+> **Note:** The pre-commit secret scan is mandatory: without Gitleaks a commit fails and names the install command. It is not needed to run the app.
 
 ---
 
