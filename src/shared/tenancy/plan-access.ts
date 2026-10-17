@@ -7,9 +7,9 @@ import { isoDateString } from '@/core/types/wire.ts';
  * enforcement off), `grace` (no paid plan — records turn read-only at `grace_ends_at`) or
  * `read_only` (every write to `/api/v1/app/*` answers `403 organization_read_only`).
  */
-export const PLAN_ACCESS_STATES = ['active', 'grace', 'read_only'] as const;
+const PLAN_ACCESS_STATES = ['active', 'grace', 'read_only'] as const;
 /** One of {@link PLAN_ACCESS_STATES}. */
-export type PlanAccessState = (typeof PLAN_ACCESS_STATES)[number];
+type PlanAccessState = (typeof PLAN_ACCESS_STATES)[number];
 
 const planAccessWire = z.object({
   state: z.enum(PLAN_ACCESS_STATES),
