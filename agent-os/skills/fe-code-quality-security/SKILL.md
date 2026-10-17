@@ -196,7 +196,7 @@ Runs on every PR to `main`. Multiple parallel jobs across several workflows.
 
 ### "gitleaks: command not found" on commit
 
-Gitleaks is optional locally. Install with `brew install gitleaks`. The pre-commit hook skips the check gracefully if not installed. CI always runs it.
+Gitleaks is required locally: the before-commit guard fails a commit when it is missing. Install with `brew install gitleaks` (macOS) or `bash tooling/setup/agent/install-gitleaks.sh` (Linux; cloud sessions install it in setup). CI always runs it too.
 
 ### Semgrep timeout in CI
 

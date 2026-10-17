@@ -29,7 +29,7 @@ clinozy-be's `pnpm guard:pre-commit` runner.
 4. **validate:vite-env** — env/mode-sniffing gate: no `import.meta.env.DEV/PROD/MODE` or `platformConfig.environment === '<name>'` / `.MODE ===` outside the config-kernel allowlist. Behavior must be driven by named `platformConfig` flags.
 5. **type-check** — `tsc --noEmit` for full project.
 6. **validate:lockfile** — _only when the commit stages `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml`_ — runs `pnpm install --frozen-lockfile` (the exact check CI runs) to prove the lockfile is in sync. Catches a dependency or `overrides` change that forgot to regenerate the lockfile before it can reach main.
-7. **Gitleaks** — `gitleaks protect --staged` secret/API-key scan (notice + skip when not installed).
+7. **Gitleaks** — `gitleaks protect --staged` secret/API-key scan. Mandatory: without gitleaks the commit fails and names the install command (`bash tooling/setup/agent/install-gitleaks.sh` on Linux, `brew install gitleaks` on macOS).
 8. **Env-file guard** — reject committing any `.env*` except `.env.example` (mirrors the pr-governance CI guard, locally).
 9. **Merge conflict markers** — reject staged files containing `<<<<<<< ` / `>>>>>>> ` / bare `=======` lines (anchored so doc banner lines pass).
 10. **Large staged files** — reject staged blobs > 3MB, measured with `git cat-file -s :<path>` (the staged content, not the working tree — rename/partial-stage safe). `iterations/` is exempt: it holds design-tool exports, and a prototype bundle routinely exceeds 3MB. Lives in `tooling/validate/large-staged-files.sh`, pinned by `large-staged-files.test.mjs`.

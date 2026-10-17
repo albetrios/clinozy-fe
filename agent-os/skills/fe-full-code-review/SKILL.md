@@ -52,7 +52,7 @@ When the user asks the AI to generate the report:
 
 | Dimension           | What the script checks                                                                                                              |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| **Security**        | Token storage (memory only), auth flow, open redirect, sanitization, CSP, env, RBAC, dangerous patterns (grep), gitleaks (optional) |
+| **Security**        | Token storage (memory only), auth flow, open redirect, sanitization, CSP, env, RBAC, dangerous patterns (grep), gitleaks |
 | **Performance**     | Bundle size, lazy loading, TanStack Query, HTTP config, assets, build warnings                                                      |
 | **Code quality**    | Lint, type-check, format, architecture (grep), API client usage, TypeScript, ESLint security                                        |
 | **Readability**     | Naming, file length, imports, comments, structure                                                                                   |
