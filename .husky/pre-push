@@ -28,9 +28,10 @@ fi
 pnpm biome:check
 pnpm type-check
 # Dead code and the bundle-size budget: CI's Knip and Build lanes, which every recent red PR CI
-# run failed on.
+# run failed on. The build reads no env file (--defaults), as CI's Build verify lane builds: the
+# size budget is measured on that build, and a .env.local build carries ~11 kB more first-paint JS.
 pnpm knip
-pnpm build
+pnpm build --defaults
 pnpm build:check
 pnpm size
 

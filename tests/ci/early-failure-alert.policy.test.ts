@@ -80,7 +80,7 @@ describe('PR CI early failure alert', () => {
   it('pre-push runs Knip and the size budget, after the build it measures', () => {
     expect(prePush).toMatch(/^pnpm knip$/m);
     expect(prePush).toMatch(/^pnpm size$/m);
-    expect(prePush.indexOf('\npnpm build\n')).toBeLessThan(
+    expect(prePush.indexOf('\npnpm build --defaults\n')).toBeLessThan(
       prePush.indexOf('\npnpm size\n'),
     );
   });
