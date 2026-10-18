@@ -13,7 +13,8 @@
  * - **The changed test itself.**
  *
  * Any changed source under `src/` also runs the always-run set: the security project
- * (`tests/security/`) and every test that imports nothing from the repository (a scanner). The
+ * (`tests/security/`), every test that imports nothing from the repository (a scanner) and every
+ * test no single change selects ({@link findUnreachableTests}). The
  * escalation list runs everything: dependencies, the Vitest and Vite config and the plugins they
  * load, `tsconfig`, the locales the test setup loads, and the test setup with everything it
  * imports — every test runs through it. It fails closed: a path outside the known roots, a deleted
@@ -118,6 +119,9 @@ const LITERAL = /(['"`])([^'"`\n$]+)\1/g;
  * @property {string[]} tests the Vitest files among them
  * @property {Map<string, Set<string>>} imports file → the repository files it imports
  * @property {Map<string, Set<string>>} importers file → the repository files that import it
+ * @property {Map<string, { source: string, named: string[] }>} [texts] test texts, read once
+ * @property {{ setup: Set<string>, sharedNames: Set<string>, unreachable: Set<string> }} [analysis]
+ *   what every selection shares ({@link analyzeGraph})
  */
 
 /**
@@ -286,6 +290,85 @@ export function setupClosure(graph) {
   return seen;
 }
 
+/** The file names more than one graph file has. */
+function namesHeldTwice(graph) {
+  const seen = new Set();
+  const twice = new Set();
+  for (const file of graph.files) {
+    const name = posix.basename(file);
+    if (seen.has(name)) twice.add(name);
+    seen.add(name);
+  }
+  return twice;
+}
+
+/**
+ * A test's text and the paths it names, read once per graph.
+ *
+ * @param {{ graph: ImportGraph, repositoryRoot: string, test: string }} options
+ * @returns {{ source: string, named: string[] }}
+ */
+function testTextOf({ graph, repositoryRoot, test }) {
+  graph.texts ??= new Map();
+  let entry = graph.texts.get(test);
+  if (!entry) {
+    const source = readFileSync(join(repositoryRoot, test), 'utf8');
+    entry = { source, named: namedPaths({ test, source }) };
+    graph.texts.set(test, entry);
+  }
+  return entry;
+}
+
+/** True when `path` names something in the repository: a file, a folder, or a glob that matches. */
+function namesRepositoryPath({ repositoryRoot, path }) {
+  if (path.startsWith('../')) return false;
+  try {
+    return path.includes('*')
+      ? globSync(path, { cwd: repositoryRoot }).length > 0
+      : existsSync(join(repositoryRoot, path));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The tests no single change selects: they import nothing from the repository and name no path in
+ * it, so neither an import nor a mention reaches them (a test that builds its paths at run time).
+ * They stay on the always-run list. A test whose code is all on the escalation list is not one:
+ * any change to that code runs everything.
+ *
+ * @param {{ graph: ImportGraph, repositoryRoot: string }} options
+ * @returns {Set<string>}
+ */
+export function findUnreachableTests({ graph, repositoryRoot }) {
+  const unreachable = new Set();
+  for (const test of graph.tests) {
+    if (matchesAny({ path: test, globs: ALWAYS_RUN_GLOBS })) continue;
+    if ([...(graph.imports.get(test) ?? [])].some((target) => !isTestFile(target)))
+      continue;
+    const { named } = testTextOf({ graph, repositoryRoot, test });
+    if (!named.some((path) => namesRepositoryPath({ repositoryRoot, path })))
+      unreachable.add(test);
+  }
+  return unreachable;
+}
+
+/**
+ * What every selection on a graph shares, computed once and kept on the graph: the setup closure,
+ * the file names more than one file has, and the unreachable tests.
+ *
+ * @param {{ graph: ImportGraph, repositoryRoot: string }} options
+ * @returns {{ setup: Set<string>, sharedNames: Set<string>, unreachable: Set<string> }}
+ */
+export function analyzeGraph({ graph, repositoryRoot }) {
+  graph.analysis ??= {
+    setup: setupClosure(graph),
+    sharedNames: namesHeldTwice(graph),
+    unreachable: findUnreachableTests({ graph, repositoryRoot }),
+  };
+  return graph.analysis;
+}
+
 /** The path-like strings a test names: each literal, and each comma-separated run joined by `/`. */
 function namedPaths({ test, source }) {
   const paths = new Set();
@@ -305,11 +388,21 @@ function namedPaths({ test, source }) {
   return resolved;
 }
 
-/** True when a test names `changed`: the path, its file name, a folder above it, or a glob over it. */
-function mentions({ changed, source, named }) {
+/**
+ * True when a test names `changed`: the path, its file name (when no other file has it — two
+ * islands may both hold a `PurchasesPage.tsx`), a folder above it, or a glob over it.
+ */
+function mentions({ changed, source, named, sharedNames }) {
   const name = posix.basename(changed);
   if (source.includes(changed)) return true;
-  if (!/^index\.tsx?$/.test(name) && source.includes(name)) return true;
+  // The file name on its own, not inside a longer one (`AppointmentPage.tsx` in `NewAppointmentPage.tsx`).
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (
+    !/^index\.tsx?$/.test(name) &&
+    !sharedNames.has(name) &&
+    new RegExp(`(?:^|[^\\w$-])${escaped}`).test(source)
+  )
+    return true;
   return named.some((path) =>
     path.includes('*')
       ? matchesGlob(changed, path)
@@ -420,17 +513,8 @@ function selectTestsOrThrow({
   }
 
   const graph = given ?? buildImportGraph(repositoryRoot);
-  const setup = setupClosure(graph);
-  const texts = new Map();
-  const testText = (test) => {
-    let entry = texts.get(test);
-    if (!entry) {
-      const source = readFileSync(join(repositoryRoot, test), 'utf8');
-      entry = { source, named: namedPaths({ test, source }) };
-      texts.set(test, entry);
-    }
-    return entry;
-  };
+  const { setup, sharedNames, unreachable } = analyzeGraph({ graph, repositoryRoot });
+  const testText = (test) => testTextOf({ graph, repositoryRoot, test });
   const why = new Map();
   const select = (test, reason) => {
     const reasons = why.get(test) ?? new Set();
@@ -459,7 +543,8 @@ function selectTestsOrThrow({
 
     for (const test of graph.tests) {
       const { source, named } = testText(test);
-      if (mentions({ changed, source, named })) select(test, `mentions ${changed}`);
+      if (mentions({ changed, source, named, sharedNames }))
+        select(test, `mentions ${changed}`);
     }
   }
 
@@ -472,6 +557,8 @@ function selectTestsOrThrow({
       );
       if (!reachesRepository)
         select(test, `${ALWAYS_RUN_REASON} (imports nothing from the repository)`);
+      if (unreachable.has(test))
+        select(test, `${ALWAYS_RUN_REASON} (no single change selects it)`);
     }
 
   const projects = {};

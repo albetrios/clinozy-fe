@@ -16,6 +16,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 
+import { checkSelectorFixtures } from '../../tooling/ci/selector-fixtures.check.mjs';
+
 const repositoryRoot = process.cwd();
 const agentOsDirectory = join(repositoryRoot, 'agent-os');
 const reportMode = process.argv.includes('--report');
@@ -679,6 +681,14 @@ if (existsSync(pluginManifestFile)) {
 const errors = findings.filter((finding) => finding.level === 'error');
 const warnings = findings.filter((finding) => finding.level === 'warn');
 
+// ── The test selection (pnpm test:select) holds its fixtures ──
+// One generated fixture per page island (its main file selects its own test and no test in
+// another section), the escalation list running everything, the misses recorded in
+// tooling/ci/selector-fixtures.json, and the unreachable tests (no single change selects them)
+// always run.
+const selectorFixtures = checkSelectorFixtures(repositoryRoot);
+for (const problem of selectorFixtures.problems) error('selector-fixtures', problem);
+
 const checkLabels: Record<string, string> = {
   'skill-frontmatter': 'Skill frontmatter & names',
   'skill-stub': 'Skill stub directories',
@@ -702,11 +712,12 @@ const checkLabels: Record<string, string> = {
   'requirement-form': 'Requirement intake doc',
   'plugin-refs': 'Plugin manifest references',
   'name-prefix': 'Repo name prefix (fe-)',
+  'selector-fixtures': 'Test selection fixtures',
 };
 
 console.log('\nagent-os integrity evals (Tier 1 — clinozy-fe)\n');
 console.log(
-  `  skills (SKILL.md): ${skillsWithManifest.length}   skill dirs: ${skillDirectoryNames.length}   agents: ${agentFiles.length}\n`,
+  `  skills (SKILL.md): ${skillsWithManifest.length}   skill dirs: ${skillDirectoryNames.length}   agents: ${agentFiles.length}   selector fixtures: ${selectorFixtures.fixtures} (${selectorFixtures.unreachable} unreachable tests always run)\n`,
 );
 
 const group = (level: Level) => {

@@ -169,8 +169,10 @@ Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes
 since the merge base with `origin/main` plus the working tree, or `--files a,b`). A test is selected
 when its imports reach a changed file (static and dynamic `import`, `vi.mock`, `import.meta.glob`),
 when it mentions the changed path (the `tests/ci` policy tests that read files), or when it is the
-changed test itself. Pages never import pages, so a page change stays inside its island. Any `src/`
-change also runs `tests/security/` and every test that imports nothing from the repository.
+changed test itself. Pages never import pages, so a page change stays inside its section. A file
+name alone counts as a mention only when no other file has it and it is not part of a longer name.
+Any `src/` change also runs `tests/security/`, every test that imports nothing from the repository,
+and every test no single change selects (it builds its paths at run time — 2 today).
 
 It runs everything for the escalation list — dependencies, `tsconfig`, the Vitest and Vite config
 and the plugins they load, `src/locales/`, and the test setup (`tests/utils/setup.ts`) with
@@ -181,6 +183,13 @@ test` when everything is selected), `--changed-only` drops the always-run set, `
 leaves tests out. The pre-push hook still runs the whole suite; the selector feeds the faster
 signals built on it. Its rules are pinned by `tooling/ci/test-selection.test.mjs` (`pnpm
 test:github-scripts`), which also pins its project list to `vitest.config.ts`.
+
+**Fixtures.** `pnpm agent-os:check` holds the selector to its fixtures
+(`tooling/ci/selector-fixtures.check.mjs`): one generated per route island — a change to its main
+file selects its own test and no test in another section (a top-level page, or an organization
+room; a layout wires its own children, so siblings inside a section may reach each other) — 105
+today; one file of each escalating kind running everything; the misses recorded in
+`tooling/ci/selector-fixtures.json`; and the unreachable tests always run.
 
 **Selector misses.** When a PR's merged unit shards fail, the `Unit + global` job's `Selector miss
 check` step (not a gate) lists every failed file `pnpm test:select` would have skipped for the PR's
