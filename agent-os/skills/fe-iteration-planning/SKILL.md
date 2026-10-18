@@ -102,7 +102,13 @@ pnpm iteration:intake <iteration> --check --baseline <baseline>   # a Baseline t
 else; print the command's output and end the turn. A failing gate goes back to whoever placed the
 drop; the plan never works around a missing or edited file.
 
-### Step 1 — Read everything, coverage matrix. Stop.
+### Steps 1–3 — Read the drop: coverage matrix, delta, reconcile — then one stop
+
+The three run back to back and end with **one** step review: they read the drop and write the
+same plan files, and nothing in them needs the user's answer before the next part (questions wait
+for Step 4).
+
+#### Step 1 — Read everything, coverage matrix
 
 The gate passed, so the snapshot is complete and unedited. The intake warnings (extras, screen
 files not in `_index.md`) are findings.
@@ -127,10 +133,10 @@ Cross-check, and treat every mismatch as a finding:
 - Every prototype screen/state appears in some spec; a prototype surface with no
   md is a finding, not a skip.
 
-Report the matrix and what you found — tokens, shell, screens, interaction
-shapes, step sequences, exact timings, states. **Stop.**
+Keep the matrix and what you found — tokens, shell, screens, interaction shapes, step sequences,
+exact timings, states — for the step review at the end of Step 3.
 
-### Step 2 — Delta (MODE incremental only). Stop.
+#### Step 2 — Delta (MODE incremental only)
 
 MODE initial (from scratch, the default): write `n/a — initial` and go on — for a brief from
 scratch, `BRIEF.md` is the whole change list, read against the current code of the parts it
@@ -170,10 +176,10 @@ silently. The reconciled delta (or the brief) is the work list; classify every c
 **Preset or layout changed?** That re-tones or re-frames the whole app. Write a
 scoped section for KICKOFF.md first — the exact value moves (type, colour, bg,
 spacing, radius) read from the prototype CSS, light and dark; for a layout, the
-routes the shell owns and the make-it-live contract — and **stop**. Screens
-outside the delta are not re-read. **Stop.**
+routes the shell owns and the make-it-live contract — and stop reading there: screens outside the
+delta are not re-read.
 
-### Step 3 — Reconcile md ↔ prototype (evidence or it didn't happen). Stop.
+#### Step 3 — Reconcile md ↔ prototype (evidence or it didn't happen)
 
 When a prototype exists it **outranks the md for behaviour** — a spec is
 someone's reading of it. Every verdict carries evidence; a verdict without a
@@ -207,7 +213,9 @@ Mandatory coverage — each is a row, never a blank:
 MODE incremental: reconcile the changed screens and whatever they touch.
 **Brief mode:** there is no new design source — reconcile `BRIEF.md` against the current screens'
 specs (the carried-forward intake) and the current code, every verdict with file:line evidence.
-**Stop.**
+
+**Stop** — one step review for Steps 1–3: the coverage matrix and its findings, the delta, the
+reconciliation rows and the questions they raise for Step 4.
 
 ### Step 4 — Blocking questions (the RED gate). Stop.
 

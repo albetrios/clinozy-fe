@@ -209,11 +209,13 @@ Anything else is refused: no skipping steps, and nothing leaves frozen.
  │                       always: the Baseline's Standing deviations and the current code
  │                         → plan from what was BUILT; KICKOFF §7 lists the ones it touches
  │                       classify every change: token · copy · styling · structural · new screen
- │                       preset or layout changed → scoped section with exact value moves, STOP
+ │                       preset or layout changed → scoped section with exact value moves; the
+ │                         screens outside the delta are not re-read
  │
  ├─ Step 3  RECONCILE ── md ↔ prototype, every verdict with file:line evidence
  │                       prototype wins on behaviour · dead CSS flagged · md-only → deviation
  │                       brief: BRIEF.md ↔ the current screens' specs and code
+ │                       Steps 1–3 run back to back → ONE step review, one stop
  │
  ├─ Step 4  RED GATE ─── RED: popup shape · mobile · step sequence · table-vs-card · surface home
  │                       → AskUserQuestion (≤4 per call, one recommendation, quoted evidence)

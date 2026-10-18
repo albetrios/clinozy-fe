@@ -12,7 +12,7 @@ A design change from Claude Design is an **iteration**: `iterations/<type>-<topi
    README; `pnpm iteration:intake <iteration> <source> [--mode full|overlay|brief] [--both]` stores
    **what arrived** in `intake-files/` (exactly as delivered) and checks the required set on the
    snapshot it resolves to. "plan iteration <name>" runs **`fe-iteration-planning`** (Steps 0–6, stopping after
-   each) → `KICKOFF.md` with its ordered ledger and `plans/decisions.md` → Status `ready-for-approval`.
+   each; Steps 1–3 run back to back with one stop) → `KICKOFF.md` with its ordered ledger and `plans/decisions.md` → Status `ready-for-approval`.
    The user's approval → `approved`, which locks `intake-files/` and freezes `KICKOFF.md`.
 2. **Kickoff — build.** "kickoff iteration <name>" runs **`fe-kickoff-iteration`**: one ledger row at a
    time through its skill (screens through **`fe-design-ditto`**), verified by Intake mode (side by side
