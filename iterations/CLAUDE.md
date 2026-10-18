@@ -18,7 +18,10 @@ A design change from Claude Design is an **iteration**: `iterations/<type>-<topi
 2. **Kickoff — build.** "kickoff iteration <name>" runs **`fe-kickoff-iteration`**: one ledger row at a
    time through its skill (screens through **`fe-design-ditto`**), verified by Intake mode (side by side
    at 375px and 1440px, or the `BRIEF.md` acceptance criteria), recorded in `AS-BUILT.md`; a scope change
-   stops for the user. The user's review of each row is its review of record (its `Reviewed` cell
+   stops for the user. At kickoff the skill also offers a `/goal` line whose condition is the
+   iteration's Close: set it to let the rows run on (each ends with a one-line report, open
+   decisions are logged AMBER, the rows are reviewed at Close — a scope change or a RED question
+   still stops). The user's review of each row is its review of record (its `Reviewed` cell
    in `AS-BUILT.md`); the PR's review covers only what changed after it. Then `done` — `AS-BUILT.md` closes with its **Standing deviations**, the complete
    list of where the code differs from the design — and `frozen` in the last commit before the merge. A
    frozen iteration is never edited; a correction is a new `fix`.

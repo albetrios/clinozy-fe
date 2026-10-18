@@ -50,6 +50,24 @@ from `planning`), and create `AS-BUILT.md` from
 the skeleton below, dated today, with the Baseline's Standing deviations copied in as the starting
 list (empty for an iteration from scratch).
 
+**Offer the goal.** Show the user one `/goal` line they can set to let the build run on without a
+stop after every row (Claude Code keeps working until its condition holds). Its condition is this
+iteration's Close, named concretely:
+
+```text
+/goal iteration <iteration> is done: every KICKOFF.md ledger row done (or deferred with my OK) with
+its AS-BUILT.md row; pnpm validate:tokens, validate:theme-axis, validate:structure,
+validate:testids, type-check and lint green; the colocated tests and the full visual baseline set
+green; AS-BUILT.md Summary and Standing deviations written; Status done. Stop and ask on a scope
+change or a RED question.
+```
+
+Setting it is the user's choice — never set it yourself. Under a goal: a row ends with its
+`AS-BUILT.md` row and a one-line report instead of a stop, its `Reviewed` cell stays `—` until
+Close; a decision the plan left open is taken as the recommendation and logged in
+`plans/decisions.md` as AMBER, sourced `user /goal <date>`; a scope change or a RED question still
+stops and asks — a goal never widens the scope.
+
 ## Step 1 — Read the approved plan. Stop.
 
 Read `KICKOFF.md` in full, `plans/decisions.md` and the README. For each row
@@ -96,7 +114,7 @@ Follow the ledger in its order (respecting Depends on). For each row:
      upcoming rows (the revised row text), and mark the KICKOFF ledger row
      `revised → AS-BUILT #n` — the only edit KICKOFF.md gets besides Status.
 5. **Stop for the user's review** — show the comparison and the entry, and wait
-   before the next row. **This review is the row's review of record:** on the user's OK, fill the
+   before the next row (under a `/goal`, a one-line report instead — Step 0). **This review is the row's review of record:** on the user's OK, fill the
    row's `Reviewed` cell (date · who · the commit reviewed). A change they ask for is made,
    verified and shown again before the cell is filled.
 
@@ -108,6 +126,10 @@ Follow the ledger in its order (respecting Depends on). For each row:
   (`fe-visual-regression`).
 - **The ledger is closed:** every row `done`, or `deferred` with the user's OK
   recorded. An open row means not done — say so and keep going.
+- **The goal's condition.** When a `/goal` was set, check each of its criteria now, one line each
+  with its evidence (the command and its result, or the file and section), before
+  `pnpm iteration:status <iteration> done`. A criterion not met is work to finish, not a note; the
+  goal is met only when every line is. The rows built under it are reviewed now (next item).
 - **The per-row reviews are the review of record.** Every `AS-BUILT.md` row has its `Reviewed`
   cell; a row without one is reviewed now, before close. The PR's human review then covers what
   changed after each row's reviewed commit (and the close), not the rows again.
