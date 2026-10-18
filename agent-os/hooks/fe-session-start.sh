@@ -9,7 +9,7 @@
 #      env/commands summary, as SessionStart additionalContext.
 #
 # Claude runs it on startup and resume only (hooks.json): /clear and compact
-# leave the environment as it was, and compact-resume-card.sh covers compact.
+# leave the environment as it was, and fe-compact-resume-card.sh covers compact.
 # The 16 KB routing map goes in on startup; a resumed conversation already
 # holds it, so a resume injects only the summary.
 #
@@ -130,9 +130,9 @@ context="$(printf 'clinozy-fe session ready (hooks from %s) — environment prov
 
 # Canary: the first context line names the root these hooks ran from, and each run appends a
 # row to the gitignored agent-os/hooks/.telemetry.log in clinozy-be's telemetry format, so
-# `grep session-start agent-os/hooks/.telemetry.log` shows the hook ran — including in a
+# `grep fe-session-start agent-os/hooks/.telemetry.log` shows the hook ran — including in a
 # session that holds several repositories (tooling/agent-os/session-hooks.ts).
-printf '%s,session-start,SessionStart,fired\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '?')" \
+printf '%s,fe-session-start,SessionStart,fired\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo '?')" \
   >>"$ROOT/agent-os/hooks/.telemetry.log" 2>/dev/null || true
 
 # Prefer the structured additionalContext envelope; fall back to plain stdout

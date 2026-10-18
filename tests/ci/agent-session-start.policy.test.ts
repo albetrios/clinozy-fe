@@ -5,10 +5,10 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-// session-start.sh runs on startup and resume only, and puts the 16 KB skill-routing map
+// fe-session-start.sh runs on startup and resume only, and puts the 16 KB skill-routing map
 // in on startup: a resumed conversation already holds it.
 
-const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'session-start.sh');
+const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'fe-session-start.sh');
 const MAP = join(process.cwd(), 'agent-os', 'docs', 'skill-triggers.md');
 const HAS_JQ = spawnSync('/bin/bash', ['-c', 'command -v jq']).status === 0;
 
@@ -16,7 +16,7 @@ interface HookManifest {
   hooks: Array<{ script: string; claude?: { event: string; matcher?: string } }>;
 }
 
-describe('agent-os/hooks/session-start.sh', () => {
+describe('agent-os/hooks/fe-session-start.sh', () => {
   let root = '';
 
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe('agent-os/hooks/session-start.sh', () => {
     const manifest = JSON.parse(
       readFileSync(join(process.cwd(), 'agent-os', 'hooks', 'hooks.json'), 'utf8'),
     ) as HookManifest;
-    const entry = manifest.hooks.find((hook) => hook.script === 'session-start.sh');
+    const entry = manifest.hooks.find((hook) => hook.script === 'fe-session-start.sh');
     expect(entry?.claude).toEqual({ event: 'SessionStart', matcher: 'startup|resume' });
   });
 

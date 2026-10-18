@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
-# Once-per-turn record for the reminder hooks (subagent-verify.sh; edit-hooks.mjs keeps its own
+# Once-per-turn record for the reminder hooks (subagent-verify.sh; fe-edit-hooks.mjs keeps its own
 # markers in the same directory): a reminder reaches the model through PostToolUse additionalContext the
 # first time it applies in a turn, and not again on every later edit of that turn.
-# prompt-skill-router.sh (UserPromptSubmit) starts each turn by clearing the record.
+# fe-prompt-skill-router.sh (UserPromptSubmit) starts each turn by clearing the record.
 #
 # The record is one empty file per reminder under $TMPDIR/clinozy-fe-hooks/<session_id>/.
 # Fail-open: when the directory cannot be written, every reminder counts as new.
@@ -24,7 +24,7 @@ turn_once() {
 }
 
 # turn_mark SESSION_ID KEY — records KEY (lowercase letters and dashes) for the rest of this turn,
-# e.g. the user ran /fe-ship. The marker is `mark.<KEY>` by name, so guardrails.mjs (Node) reads it
+# e.g. the user ran /fe-ship. The marker is `mark.<KEY>` by name, so fe-guardrails.mjs (Node) reads it
 # too.
 turn_mark() {
   local directory

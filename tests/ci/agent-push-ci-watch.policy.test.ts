@@ -13,11 +13,11 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-// The push CI watch (agent-os/hooks/push-ci-watch.mjs, clinozy-be's): a failed run of the pushed
+// The push CI watch (agent-os/hooks/fe-push-ci-watch.mjs, clinozy-be's): a failed run of the pushed
 // commit exits 2 (asyncRewake wakes the model) and asks for fe-ci-investigator; a green commit, no
 // authenticated gh, or a push in another repository exits 0.
 
-const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'push-ci-watch.mjs');
+const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'fe-push-ci-watch.mjs');
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
@@ -89,7 +89,7 @@ const run = (name: string, conclusion: string) => ({
   url: `https://github.example/runs/${name}`,
 });
 
-describe('push-ci-watch.mjs', () => {
+describe('fe-push-ci-watch.mjs', () => {
   it('wakes the model with each failed run of the pushed commit', () => {
     const watched = fixture({
       runs: [run('PR CI', 'failure'), run('Docs lane', 'success')],
@@ -144,7 +144,7 @@ describe('push-ci-watch.mjs', () => {
       readFileSync('agent-os/platforms/claude/settings.json', 'utf8'),
     ) as { hooks: Record<string, unknown[]> };
     expect(JSON.stringify(settings.hooks.PostToolUse)).toContain(
-      '"command":"node \\"$CLAUDE_PROJECT_DIR/agent-os/hooks/push-ci-watch.mjs\\"","if":"Bash(git push*)","asyncRewake":true,"timeout":2700',
+      '"command":"node \\"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-push-ci-watch.mjs\\"","if":"Bash(git push*)","asyncRewake":true,"timeout":2700',
     );
   });
 });

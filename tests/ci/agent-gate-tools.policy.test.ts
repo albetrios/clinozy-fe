@@ -16,7 +16,7 @@ const installImages = readFileSync(
 );
 const sonarCompose = readFileSync('docker-compose.sonar.yml', 'utf8');
 const sonarGate = readFileSync('tooling/sonar/sonar-gate.mjs', 'utf8');
-const sessionStart = readFileSync('agent-os/hooks/session-start.sh', 'utf8');
+const sessionStart = readFileSync('agent-os/hooks/fe-session-start.sh', 'utf8');
 
 /** The guard's step 7, the staged secrets scan (the `step_7` function), as a script of its own. */
 const secretsStep = guard.slice(

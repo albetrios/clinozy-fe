@@ -77,7 +77,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/session-start.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-start.sh\""
           }
         ]
       },
@@ -86,7 +86,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/compact-resume-card.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-compact-resume-card.sh\""
           }
         ]
       }
@@ -96,7 +96,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/prompt-skill-router.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-prompt-skill-router.sh\""
           }
         ]
       }
@@ -107,7 +107,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/guard-edits.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-guard-edits.sh\""
           }
         ]
       },
@@ -116,7 +116,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/guardrails.mjs\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-guardrails.mjs\""
           }
         ]
       },
@@ -125,7 +125,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/no-unrequested-pr.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-no-unrequested-pr.sh\""
           }
         ]
       }
@@ -136,12 +136,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/edit-hooks.mjs\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-edit-hooks.mjs\"",
             "if": "Edit(**)"
           },
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/edit-hooks.mjs\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-edit-hooks.mjs\"",
             "if": "Write(**)"
           }
         ]
@@ -151,7 +151,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/push-ci-watch.mjs\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-push-ci-watch.mjs\"",
             "if": "Bash(git push*)",
             "asyncRewake": true,
             "timeout": 2700
@@ -164,7 +164,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/edit-hooks.mjs\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-edit-hooks.mjs\""
           }
         ]
       },
@@ -172,7 +172,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/turn-end-tests.mjs\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-turn-end-tests.mjs\"",
             "asyncRewake": true,
             "timeout": 120
           }
@@ -185,7 +185,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/gate-failure-hint.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-gate-failure-hint.sh\""
           }
         ]
       }
@@ -195,7 +195,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/session-end.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-end.sh\""
           }
         ]
       }

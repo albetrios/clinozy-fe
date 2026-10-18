@@ -3,8 +3,8 @@
 //
 // BLOCK (deny): reading or writing secret files (.env*, not .env.example), secret content,
 //   destructive shell commands, skipping the git hooks (--no-verify, `git commit -n`, HUSKY=0).
-// ASK: `gh pr create` — a PR only when the user asked (no-unrequested-pr.sh covers the MCP tool),
-//   except in a turn the user started with /fe-ship or /fe-open-pr (prompt-skill-router.sh marks it);
+// ASK: `gh pr create` — a PR only when the user asked (fe-no-unrequested-pr.sh covers the MCP tool),
+//   except in a turn the user started with /fe-ship or /fe-open-pr (fe-prompt-skill-router.sh marks it);
 //   `git push` of auth, token, CSP, routeTree or guard changes with no clean /fe-pre-merge-review
 //   recorded for HEAD (`pnpm agent-os:review-clean` records it).
 // WARN (systemMessage): edits to protected/vendored paths.
@@ -16,7 +16,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isInRepository, pushDirectory } from './_push-target.mjs';
+import { isInRepository, pushDirectory } from './_fe-push-target.mjs';
 
 let raw = '';
 try {
@@ -193,7 +193,7 @@ if (tool === 'Bash' && command) {
       `Blocked by clinozy-fe guardrail: ${why}. Command: "${command.slice(0, 160)}". If you truly intend this, run it yourself in a terminal.`,
     );
   }
-  // The marker _turn-once.sh's turn_mark writes for a /fe-ship or /fe-open-pr turn.
+  // The marker _fe-turn-once.sh's turn_mark writes for a /fe-ship or /fe-open-pr turn.
   const prRequested = existsSync(
     join(
       tmpdir(),

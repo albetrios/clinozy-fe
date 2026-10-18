@@ -13,13 +13,13 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-// The turn-end test hook (agent-os/hooks/turn-end-tests.mjs, clinozy-be's): off by switch, it runs
+// The turn-end test hook (agent-os/hooks/fe-turn-end-tests.mjs, clinozy-be's): off by switch, it runs
 // only the tests the selection picks for the change itself (not the always-run set), a failure
 // exits 2 (asyncRewake wakes the model with the failing tests), a selection of everything wakes it
 // once per reason with a heads-up, a passed tree is not run again, and a live run's lock makes the
 // next one skip.
 
-const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'turn-end-tests.mjs');
+const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'fe-turn-end-tests.mjs');
 /** The hook's state folder under TMPDIR, as the hook names it. */
 const HOOK_STATE = /join\(process\.env\.TMPDIR \|\| '\/tmp', '([a-z-]+)'\)/.exec(
   readFileSync(HOOK, 'utf8'),
@@ -110,7 +110,7 @@ function runCount(runs: string): number {
   return existsSync(runs) ? readFileSync(runs, 'utf8').trim().split('\n').length : 0;
 }
 
-describe('turn-end-tests.mjs', () => {
+describe('fe-turn-end-tests.mjs', () => {
   it('does nothing when switched off', () => {
     const { root, state, runs } = repository();
     expect(runHook({ root, state, switchValue: '0', exitCode: 1 }).status).toBe(0);
@@ -169,7 +169,7 @@ describe('turn-end-tests.mjs', () => {
     const { root, state, runs } = repository();
     expect(HOOK_STATE).toMatch(/-hooks$/);
     mkdirSync(join(state, HOOK_STATE), { recursive: true });
-    writeFileSync(join(state, HOOK_STATE, 'turn-end-tests.lock'), String(process.pid));
+    writeFileSync(join(state, HOOK_STATE, 'fe-turn-end-tests.lock'), String(process.pid));
     expect(runHook({ root, state, exitCode: 1 }).status).toBe(0);
     expect(runCount(runs)).toBe(0);
   });
@@ -179,7 +179,7 @@ describe('turn-end-tests.mjs', () => {
     const stop = (JSON.parse(settings) as { hooks: Record<string, unknown[]> }).hooks
       .Stop;
     expect(JSON.stringify(stop)).toContain(
-      '"command":"node \\"$CLAUDE_PROJECT_DIR/agent-os/hooks/turn-end-tests.mjs\\"","asyncRewake":true,"timeout":120',
+      '"command":"node \\"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-turn-end-tests.mjs\\"","asyncRewake":true,"timeout":120',
     );
   });
 });

@@ -3,14 +3,14 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-// Agents never skip the git hooks: guardrails.mjs (Claude PreToolUse) and cursor-shell-guard.mjs
+// Agents never skip the git hooks: fe-guardrails.mjs (Claude PreToolUse) and fe-cursor-shell-guard.mjs
 // (Cursor beforeShellExecution) deny `--no-verify` on commit or push, `git commit -n` and
 // HUSKY=0. The same cases as clinozy-be's agent-os/evals/guard-eval.ts.
 
 const HOOKS = join(process.cwd(), 'agent-os', 'hooks');
 
 function claudeDecision(command: string): string {
-  const result = spawnSync(process.execPath, [join(HOOKS, 'guardrails.mjs')], {
+  const result = spawnSync(process.execPath, [join(HOOKS, 'fe-guardrails.mjs')], {
     input: JSON.stringify({ tool_name: 'Bash', tool_input: { command } }),
     encoding: 'utf8',
     env: { ...process.env, CLAUDE_PROJECT_DIR: process.cwd() },
@@ -24,7 +24,7 @@ function claudeDecision(command: string): string {
 }
 
 function cursorDecision(command: string): string {
-  const result = spawnSync(process.execPath, [join(HOOKS, 'cursor-shell-guard.mjs')], {
+  const result = spawnSync(process.execPath, [join(HOOKS, 'fe-cursor-shell-guard.mjs')], {
     input: JSON.stringify({ command }),
     encoding: 'utf8',
   });

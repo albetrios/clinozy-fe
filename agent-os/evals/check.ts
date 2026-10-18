@@ -613,7 +613,7 @@ if (existsSync(commandsDirectory)) {
 
 // ── Repo name prefix: every agent-os item this repo owns starts with `fe-` ──
 // clinozy-fe and clinozy-be (`be-`) are often loaded in one session, where a shared name lets
-// one repo's skill, agent, command or rule hide the other's. Vendored skills keep their
+// one repo's skill, agent, command, rule or hook hide the other's. Vendored skills keep their
 // upstream names: every skills-lock.json entry, plus the Vercel skills installed outside it.
 const repositoryPrefix = 'fe-';
 const vendoredSkills = new Set<string>([
@@ -647,6 +647,30 @@ if (existsSync(commandsDirectory))
     requirePrefix('command', basename(file, '.md'));
 for (const file of listFilesWithExtension(join(agentOsDirectory, 'rules'), '.mdc'))
   requirePrefix('rule', basename(file, '.mdc'));
+// Hook scripts and their manifest ids too, so a block message, a telemetry row or a session-root
+// settings entry always names its repository. A helper the hooks import (never registered
+// itself) keeps its leading `_` before the prefix: `_fe-turn-once.sh`.
+const hooksDirectory = join(agentOsDirectory, 'hooks');
+for (const file of [
+  ...listFilesWithExtension(hooksDirectory, '.sh'),
+  ...listFilesWithExtension(hooksDirectory, '.mjs'),
+])
+  if (!file.replace(/^_/, '').startsWith(repositoryPrefix))
+    error(
+      'name-prefix',
+      `hook "${file}" must start with "${repositoryPrefix}" (a helper with "_${repositoryPrefix}")`,
+    );
+if (existsSync(hooksManifestFile)) {
+  try {
+    const manifest = JSON.parse(readText(hooksManifestFile)) as {
+      hooks?: Array<{ id?: string }>;
+    };
+    for (const entry of manifest.hooks ?? [])
+      if (entry.id) requirePrefix('hook id', entry.id);
+  } catch {
+    // The hook manifest check above reports invalid JSON.
+  }
+}
 
 // ── Plugin manifest references resolve to real paths ──
 // agent-os/.claude-plugin/plugin.json makes agent-os/ itself the installable

@@ -2,7 +2,7 @@
 // Cursor `beforeShellExecution` guardrail for clinozy-fe (Cursor agent hooks, beta).
 //
 // Blocks the same destructive shell commands, and the same git-hook skips, as the Claude PreToolUse guardrail
-// (guardrails.mjs). Cursor cannot block file writes, so secret/protected-path
+// (fe-guardrails.mjs). Cursor cannot block file writes, so secret/protected-path
 // rules are advisory in agent-os/rules/. Self-contained — no other repo.
 //
 // Reads the hook payload on stdin; prints { "permission": "allow" | "deny", … }.

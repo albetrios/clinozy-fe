@@ -5,7 +5,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-// The guard gaps clinozy-be closed in agent-os/evals/guard-eval.ts, closed here too: guardrails.mjs
+// The guard gaps clinozy-be closed in agent-os/evals/guard-eval.ts, closed here too: fe-guardrails.mjs
 // sees Read, Grep and MultiEdit (its matcher used to route only Bash|Edit|Write), denies reading
 // the gitignored env files, asks before `gh pr create`, and the reminders reach the model as
 // PostToolUse additionalContext once per turn instead of plain Stop output.
@@ -50,7 +50,7 @@ function runHook(script: string, payload: unknown) {
 }
 
 function guardDecision(tool: string, toolInput: Record<string, unknown>): string {
-  const stdout = runHook('guardrails.mjs', {
+  const stdout = runHook('fe-guardrails.mjs', {
     tool_name: tool,
     tool_input: toolInput,
   }).stdout.trim();
@@ -62,19 +62,19 @@ function guardDecision(tool: string, toolInput: Record<string, unknown>): string
 }
 
 describe('agent-os guard gaps', () => {
-  it('routes Read, Grep and MultiEdit to guardrails.mjs and the reminders', () => {
-    expect(entry('guardrails.mjs')?.claude?.matcher?.split('|')).toEqual(
+  it('routes Read, Grep and MultiEdit to fe-guardrails.mjs and the reminders', () => {
+    expect(entry('fe-guardrails.mjs')?.claude?.matcher?.split('|')).toEqual(
       expect.arrayContaining(['Bash', 'Read', 'Grep', 'Edit', 'Write', 'MultiEdit']),
     );
     // One edit hook (formatter + skill and gate reminders), spawned only for an Edit or Write call.
-    expect(byId('edit-hooks')?.claude).toEqual({
+    expect(byId('fe-edit-hooks')?.claude).toEqual({
       event: 'PostToolUse',
       matcher: 'Edit|Write',
       if: ['Edit(**)', 'Write(**)'],
     });
-    expect(byId('edit-hooks-stop')?.claude?.event).toBe('Stop');
-    expect(byId('edit-hooks-stop')?.codex?.event).toBe('Stop');
-    expect(byId('edit-hooks-stop')?.script).toBe('edit-hooks.mjs');
+    expect(byId('fe-edit-hooks-stop')?.claude?.event).toBe('Stop');
+    expect(byId('fe-edit-hooks-stop')?.codex?.event).toBe('Stop');
+    expect(byId('fe-edit-hooks-stop')?.script).toBe('fe-edit-hooks.mjs');
   });
 
   it.each([
@@ -118,7 +118,7 @@ describe('agent-os guard gaps', () => {
     'a turn the user started with /fe-ship or /fe-open-pr is the PR request; the next prompt is not',
     () => {
       const prompt = (session_id: string, text: string) =>
-        runHook('prompt-skill-router.sh', {
+        runHook('fe-prompt-skill-router.sh', {
           session_id,
           hook_event_name: 'UserPromptSubmit',
           prompt: text,
@@ -134,14 +134,14 @@ describe('agent-os guard gaps', () => {
             : 'silent';
         return [
           decision(
-            runHook('guardrails.mjs', {
+            runHook('fe-guardrails.mjs', {
               session_id,
               tool_name: 'Bash',
               tool_input: { command: 'gh pr create --title x --body y' },
             }).stdout,
           ),
           decision(
-            runHook('no-unrequested-pr.sh', {
+            runHook('fe-no-unrequested-pr.sh', {
               session_id,
               tool_name: 'mcp__github__create_pull_request',
               tool_input: { title: 'feat: x' },
@@ -171,15 +171,18 @@ describe('agent-os guard gaps', () => {
       tool_name: 'Edit',
       tool_input: { file_path: 'src/pages/today/today.route.tsx' },
     };
-    const first = JSON.parse(runHook('edit-hooks.mjs', edit).stdout) as {
+    const first = JSON.parse(runHook('fe-edit-hooks.mjs', edit).stdout) as {
       hookSpecificOutput: { hookEventName: string; additionalContext: string };
     };
     expect(first.hookSpecificOutput.hookEventName).toBe('PostToolUse');
     expect(first.hookSpecificOutput.additionalContext).toContain('fe-route-island');
 
-    expect(runHook('edit-hooks.mjs', edit).stdout.trim()).toBe('');
+    expect(runHook('fe-edit-hooks.mjs', edit).stdout.trim()).toBe('');
 
-    runHook('prompt-skill-router.sh', { session_id: 'policy-session', prompt: 'next' });
-    expect(runHook('edit-hooks.mjs', edit).stdout).toContain('fe-route-island');
+    runHook('fe-prompt-skill-router.sh', {
+      session_id: 'policy-session',
+      prompt: 'next',
+    });
+    expect(runHook('fe-edit-hooks.mjs', edit).stdout).toContain('fe-route-island');
   });
 });

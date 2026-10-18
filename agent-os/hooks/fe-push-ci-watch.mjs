@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Claude Code PostToolUse hook for clinozy-fe (Bash `git push*`, registered with `asyncRewake`;
-// clinozy-be's push-ci-watch.mjs): after a push from the CLI it watches the pushed commit's GitHub
+// clinozy-be's fe-push-ci-watch.mjs): after a push from the CLI it watches the pushed commit's GitHub
 // Actions runs in the background and wakes the model when one fails, so a red CI is triaged at once
 // and nobody polls. It needs an authenticated `gh` (a local CLI session); without one, or on any
 // error, it exits 0 silently.
@@ -14,9 +14,9 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isInRepository, pushDirectory } from './_push-target.mjs';
+import { isInRepository, pushDirectory } from './_fe-push-target.mjs';
 
-const HOOK_ID = 'push-ci-watch';
+const HOOK_ID = 'fe-push-ci-watch';
 const POLL_MILLISECONDS = Number(process.env.PUSH_CI_WATCH_POLL_MILLISECONDS || 30_000);
 const APPEAR_WITHIN_MILLISECONDS = 5 * 60_000;
 const FINISH_WITHIN_MILLISECONDS = 40 * 60_000;

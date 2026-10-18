@@ -30,7 +30,7 @@ function runHook({
 }) {
   const runtime = script.endsWith('.mjs') ? process.execPath : '/bin/bash';
   // Each run gets its own TMPDIR unless one is passed: the reminders' once-per-turn record
-  // (_turn-once.sh) and the format queue live there, and an earlier run's record would silence
+  // (_fe-turn-once.sh) and the format queue live there, and an earlier run's record would silence
   // the next one.
   temporaryDirectories.push(turnDirectory);
   return spawnSync(runtime, [join(HOOKS, script)], {
@@ -62,11 +62,11 @@ afterEach(() => {
 describe.runIf(process.platform !== 'win32')(
   'agent-os hooks act on this repository only',
   () => {
-    it('guard-edits.sh judges this repository and leaves another one alone', () => {
+    it('fe-guard-edits.sh judges this repository and leaves another one alone', () => {
       const edit = (filePath: string) =>
         decisionOf(
           runHook({
-            script: 'guard-edits.sh',
+            script: 'fe-guard-edits.sh',
             payload: {
               tool_input: {
                 file_path: filePath,
@@ -85,11 +85,11 @@ describe.runIf(process.platform !== 'win32')(
       );
     });
 
-    it('guardrails.mjs warns only for this repository but blocks secrets everywhere', () => {
+    it('fe-guardrails.mjs warns only for this repository but blocks secrets everywhere', () => {
       const write = ({ filePath, content }: { filePath: string; content: string }) =>
         decisionOf(
           runHook({
-            script: 'guardrails.mjs',
+            script: 'fe-guardrails.mjs',
             payload: {
               tool_name: 'Edit',
               tool_input: { file_path: filePath, new_string: content },
@@ -111,7 +111,7 @@ describe.runIf(process.platform !== 'win32')(
       ).toBe('deny');
     });
 
-    it("edit-hooks.mjs never queues or formats another repository's file", () => {
+    it("fe-edit-hooks.mjs never queues or formats another repository's file", () => {
       const directory = mkdtempSync(join(tmpdir(), 'hooks-scope-'));
       temporaryDirectories.push(directory);
       const file = join(directory, 'unformatted.ts');
@@ -120,7 +120,7 @@ describe.runIf(process.platform !== 'win32')(
       const turnDirectory = mkdtempSync(join(tmpdir(), 'fe-hook-scope-turn-'));
       const session = { session_id: 'scope-format' };
       const edited = runHook({
-        script: 'edit-hooks.mjs',
+        script: 'fe-edit-hooks.mjs',
         payload: {
           ...session,
           hook_event_name: 'PostToolUse',
@@ -129,7 +129,7 @@ describe.runIf(process.platform !== 'win32')(
         turnDirectory,
       });
       const stopped = runHook({
-        script: 'edit-hooks.mjs',
+        script: 'fe-edit-hooks.mjs',
         payload: { ...session, hook_event_name: 'Stop' },
         turnDirectory,
       });
@@ -139,10 +139,10 @@ describe.runIf(process.platform !== 'win32')(
       expect(readFileSync(file, 'utf8')).toBe(unformatted);
     });
 
-    it('edit-hooks.mjs reminds only for this repository', () => {
+    it('fe-edit-hooks.mjs reminds only for this repository', () => {
       const remind = (filePath: string) =>
         runHook({
-          script: 'edit-hooks.mjs',
+          script: 'fe-edit-hooks.mjs',
           payload: {
             hook_event_name: 'PostToolUse',
             tool_input: { file_path: filePath },

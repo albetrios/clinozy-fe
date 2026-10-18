@@ -47,9 +47,9 @@ A design change from Claude Design is an **iteration**: `iterations/<type>-<topi
 
 ## Agent-os naming
 
-Every agent-os item this repo owns (skill folder, agent file, command file, rule file) starts
-with `fe-`, so names stay unique when clinozy-fe and clinozy-be (whose items start with `be-`) are
-loaded in one session. Skills installed from upstream keep their upstream names: every
+Every agent-os item this repo owns (skill folder, agent file, command file, rule file, hook
+script and hook id) starts with `fe-`, and a hook helper with `_fe-`, so names stay unique when
+clinozy-fe and clinozy-be (whose items start with `be-`) are loaded in one session. Skills installed from upstream keep their upstream names: every
 `agent-os/skills-lock.json` entry, plus the three Vercel skills (`composition-patterns`,
 `react-best-practices`, `web-design-guidelines`). A skill's frontmatter `name` always equals its
 folder name. `pnpm agent-os:check` enforces both.

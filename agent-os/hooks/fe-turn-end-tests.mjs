@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Claude Code Stop hook for clinozy-fe, registered with `asyncRewake` (clinozy-be's
-// turn-end-tests.mjs): at turn end, in the background, it runs the tests the uncommitted changes
+// fe-turn-end-tests.mjs): at turn end, in the background, it runs the tests the uncommitted changes
 // affect — `pnpm test:select`, the tests it picks for the change itself (`--changed-only`: the
 // always-run security and scanner sets stay with the push, a page change's full selection takes
 // over a minute) — within a 60-second budget, one run at a time. A failure exits 2, which wakes
@@ -28,7 +28,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { stripVTControlCharacters } from 'node:util';
 
-const HOOK_ID = 'turn-end-tests';
+const HOOK_ID = 'fe-turn-end-tests';
 /** The first day (Asia/Calcutta) the hook runs without AGENT_TURN_END_TESTS=1. */
 const ON_BY_DEFAULT_FROM = '2026-10-24';
 const TEST_BUDGET_MILLISECONDS = 60_000;

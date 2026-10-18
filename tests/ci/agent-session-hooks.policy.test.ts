@@ -77,7 +77,7 @@ const OTHER_SETTINGS = JSON.stringify({
         hooks: [
           {
             type: 'command',
-            command: 'bash "$CLAUDE_PROJECT_DIR/agent-os/hooks/session-start.sh"',
+            command: 'bash "$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-start.sh"',
           },
         ],
       },
@@ -88,7 +88,7 @@ const OTHER_SETTINGS = JSON.stringify({
         hooks: [
           {
             type: 'command',
-            command: 'node "$CLAUDE_PROJECT_DIR/agent-os/hooks/guardrails.mjs"',
+            command: 'node "$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-guardrails.mjs"',
           },
         ],
       },

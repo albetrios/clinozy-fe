@@ -2,9 +2,9 @@
   "description": "Single source of truth for clinozy-fe agent hook wiring. tooling/agent-os/generate.ts derives agent-os/platforms/claude/settings.json (hooks block), agent-os/platforms/cursor/hooks.json, and agent-os/platforms/codex/hooks.json from this manifest + agent-os/platforms/targets.json. Tool dirs (.claude/, .cursor/, .codex/) symlink into agent-os/platforms/ — edit here only. All hooks FAIL OPEN.",
   "hooks": [
     {
-      "id": "session-start",
+      "id": "fe-session-start",
       "runtime": "bash",
-      "script": "session-start.sh",
+      "script": "fe-session-start.sh",
       "claude": {
         "event": "SessionStart",
         "matcher": "startup|resume"
@@ -16,9 +16,9 @@
       }
     },
     {
-      "id": "prompt-skill-router",
+      "id": "fe-prompt-skill-router",
       "runtime": "bash",
-      "script": "prompt-skill-router.sh",
+      "script": "fe-prompt-skill-router.sh",
       "claude": {
         "event": "UserPromptSubmit"
       },
@@ -28,18 +28,18 @@
       }
     },
     {
-      "id": "guard-edits",
+      "id": "fe-guard-edits",
       "runtime": "bash",
-      "script": "guard-edits.sh",
+      "script": "fe-guard-edits.sh",
       "claude": {
         "event": "PreToolUse",
         "matcher": "Edit|Write|MultiEdit"
       }
     },
     {
-      "id": "guardrails",
+      "id": "fe-guardrails",
       "runtime": "node",
-      "script": "guardrails.mjs",
+      "script": "fe-guardrails.mjs",
       "claude": {
         "event": "PreToolUse",
         "matcher": "Bash|Read|Grep|Edit|Write|MultiEdit"
@@ -51,18 +51,18 @@
       }
     },
     {
-      "id": "no-unrequested-pr",
+      "id": "fe-no-unrequested-pr",
       "runtime": "bash",
-      "script": "no-unrequested-pr.sh",
+      "script": "fe-no-unrequested-pr.sh",
       "claude": {
         "event": "PreToolUse",
         "matcher": "mcp__github__create_pull_request"
       }
     },
     {
-      "id": "edit-hooks",
+      "id": "fe-edit-hooks",
       "runtime": "node",
-      "script": "edit-hooks.mjs",
+      "script": "fe-edit-hooks.mjs",
       "claude": {
         "event": "PostToolUse",
         "matcher": "Edit|Write",
@@ -70,9 +70,9 @@
       }
     },
     {
-      "id": "edit-hooks-stop",
+      "id": "fe-edit-hooks-stop",
       "runtime": "node",
-      "script": "edit-hooks.mjs",
+      "script": "fe-edit-hooks.mjs",
       "claude": {
         "event": "Stop"
       },
@@ -82,9 +82,9 @@
       }
     },
     {
-      "id": "turn-end-tests",
+      "id": "fe-turn-end-tests",
       "runtime": "node",
-      "script": "turn-end-tests.mjs",
+      "script": "fe-turn-end-tests.mjs",
       "claude": {
         "event": "Stop",
         "asyncRewake": true,
@@ -92,9 +92,9 @@
       }
     },
     {
-      "id": "push-ci-watch",
+      "id": "fe-push-ci-watch",
       "runtime": "node",
-      "script": "push-ci-watch.mjs",
+      "script": "fe-push-ci-watch.mjs",
       "claude": {
         "event": "PostToolUse",
         "matcher": "Bash",
@@ -104,35 +104,35 @@
       }
     },
     {
-      "id": "gate-failure-hint",
+      "id": "fe-gate-failure-hint",
       "runtime": "bash",
-      "script": "gate-failure-hint.sh",
+      "script": "fe-gate-failure-hint.sh",
       "claude": {
         "event": "PostToolUseFailure",
         "matcher": "Bash"
       }
     },
     {
-      "id": "compact-resume-card",
+      "id": "fe-compact-resume-card",
       "runtime": "bash",
-      "script": "compact-resume-card.sh",
+      "script": "fe-compact-resume-card.sh",
       "claude": {
         "event": "SessionStart",
         "matcher": "compact"
       }
     },
     {
-      "id": "session-end",
+      "id": "fe-session-end",
       "runtime": "bash",
-      "script": "session-end.sh",
+      "script": "fe-session-end.sh",
       "claude": {
         "event": "SessionEnd"
       }
     },
     {
-      "id": "cursor-shell-guard",
+      "id": "fe-cursor-shell-guard",
       "runtime": "node",
-      "script": "cursor-shell-guard.mjs",
+      "script": "fe-cursor-shell-guard.mjs",
       "cursor": {
         "event": "beforeShellExecution"
       }

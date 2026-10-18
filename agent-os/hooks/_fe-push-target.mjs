@@ -1,4 +1,4 @@
-// Shared by guardrails.mjs (the push review gate) and push-ci-watch.mjs: the directory a
+// Shared by fe-guardrails.mjs (the push review gate) and fe-push-ci-watch.mjs: the directory a
 // `git push` command runs in — its `git -C <dir>`, else its last `cd <dir>`, else the session's
 // working directory — so a hook judges only pushes in its own repository (clinozy-be's).
 import { resolve } from 'node:path';

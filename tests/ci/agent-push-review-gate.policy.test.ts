@@ -5,12 +5,12 @@ import { dirname, join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-// The push review gate (agent-os/hooks/guardrails.mjs, clinozy-be's): an agent push of auth,
+// The push review gate (agent-os/hooks/fe-guardrails.mjs, clinozy-be's): an agent push of auth,
 // token, CSP, routeTree or guard changes asks the user first until /fe-pre-merge-review records a
 // clean result for HEAD (`pnpm agent-os:review-clean`); other pushes, and pushes in another
 // repository, go through.
 
-const GUARDRAILS = join(process.cwd(), 'agent-os', 'hooks', 'guardrails.mjs');
+const GUARDRAILS = join(process.cwd(), 'agent-os', 'hooks', 'fe-guardrails.mjs');
 const REVIEW_MARKER = join(process.cwd(), 'tooling', 'agent-os', 'review-marker.mjs');
 const temporaryDirectories: string[] = [];
 
@@ -59,7 +59,7 @@ function decision(options: { root: string; command: string }): string {
     .hookSpecificOutput.permissionDecision;
 }
 
-describe('guardrails.mjs push review gate', () => {
+describe('fe-guardrails.mjs push review gate', () => {
   it('asks before pushing an unreviewed auth change, not after a clean review of HEAD', () => {
     const root = repository('src/shared/auth/service.ts');
     expect(decision({ root, command: 'git push -u origin feat/change' })).toBe('ask');

@@ -95,7 +95,7 @@ bash "${AGENT_DIR}/install-node.sh" >&2 || skip "install-node best-effort (using
 # a child process and so cannot change THIS shell's PATH. Activate it here so
 # every pnpm step below runs on the pinned Node; otherwise the image default
 # (e.g. Node 22) trips pnpm's engine-strict gate at the install step. The
-# SessionStart hook (agent-os/hooks/session-start.sh) does the same switch for
+# SessionStart hook (agent-os/hooks/fe-session-start.sh) does the same switch for
 # interactive sessions, but does not run when bootstrap.sh is the Setup script.
 #
 # `cut -d. -f1` is load-bearing: .nvmrc pins `24.21.0`, so stripping the dots would

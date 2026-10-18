@@ -133,7 +133,7 @@ export function renderTriggerTable(routes: readonly RoutingRoute[]): string {
   ].join('\n');
 }
 
-/** The same rows as JSON, for the edit hook (`agent-os/hooks/edit-hooks.mjs`). */
+/** The same rows as JSON, for the edit hook (`agent-os/hooks/fe-edit-hooks.mjs`). */
 export function renderRoutingJson(routes: readonly RoutingRoute[]): string {
   return `${JSON.stringify(
     {

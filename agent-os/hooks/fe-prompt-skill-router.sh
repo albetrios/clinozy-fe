@@ -4,7 +4,7 @@
 # When a prompt describes a build/change task, inject the relevant skill chain —
 # plus the "consult fe-skill-registry FIRST" rule — as additionalContext. This
 # operationalizes CLAUDE.md's skill-first workflow at PROMPT time; the PostToolUse
-# the skill reminders ([`edit-hooks.mjs`](edit-hooks.mjs)) only fire reactively,
+# the skill reminders ([`fe-edit-hooks.mjs`](fe-edit-hooks.mjs)) only fire reactively,
 # AFTER an edit. The keyword→skill map mirrors
 # [`agent-os/docs/skill-triggers.md`](../docs/skill-triggers.md).
 #
@@ -16,15 +16,15 @@ set -uo pipefail
 command -v jq >/dev/null 2>&1 || exit 0
 
 INPUT=$(cat)
-# A new prompt is a new turn: the reminder hooks may speak once more (_turn-once.sh).
-source "$(dirname "${BASH_SOURCE[0]}")/_turn-once.sh"
+# A new prompt is a new turn: the reminder hooks may speak once more (_fe-turn-once.sh).
+source "$(dirname "${BASH_SOURCE[0]}")/_fe-turn-once.sh"
 SESSION=$(printf '%s' "$INPUT" | jq -r '.session_id // empty' 2>/dev/null || echo "")
 turn_reset "$SESSION"
 PROMPT=$(printf '%s' "$INPUT" | jq -r '.prompt // empty' 2>/dev/null || echo "")
 [[ -z "$PROMPT" ]] && exit 0
 
-# /fe-ship and /fe-open-pr are the user asking for a PR in so many words: no-unrequested-pr.sh and
-# guardrails.mjs let this turn's PR creation through without a second confirmation. (The hook sees
+# /fe-ship and /fe-open-pr are the user asking for a PR in so many words: fe-no-unrequested-pr.sh and
+# fe-guardrails.mjs let this turn's PR creation through without a second confirmation. (The hook sees
 # the prompt as typed — `/fe-ship <title>` — checked on Claude Code 2.1.302.)
 if printf '%s' "$PROMPT" | grep -Eq '^[[:space:]]*/fe-(ship|open-pr)([[:space:]]|$)'; then
   turn_mark "$SESSION" "pr-requested"
