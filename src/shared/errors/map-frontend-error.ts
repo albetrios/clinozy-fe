@@ -26,6 +26,8 @@ const CODE_TO_AUTH_KEY: Record<string, string> = {
   invalid_credentials: AUTH_KEYS.login.errors.invalidCredentials,
   [FRONTEND_ERROR_CODES.AUTH_MFA_UNSUPPORTED]: AUTH_KEYS.apiErrors.mfaUnsupported,
   [FRONTEND_ERROR_CODES.AUTH_OAUTH_NO_REDIRECT]: AUTH_KEYS.apiErrors.oauthNoRedirect,
+  [FRONTEND_ERROR_CODES.AUTH_PASSKEY_ALREADY_REGISTERED]:
+    AUTH_KEYS.apiErrors.passkeyAlreadyRegistered,
   [FRONTEND_ERROR_CODES.AUTH_PASSKEY_CANCELLED]: AUTH_KEYS.apiErrors.passkeyCancelled,
   [FRONTEND_ERROR_CODES.AUTH_PASSKEY_UNAVAILABLE]: AUTH_KEYS.auth.errors.passkeyBackend,
   [FRONTEND_ERROR_CODES.INVITE_INVALID_OR_EXPIRED]:

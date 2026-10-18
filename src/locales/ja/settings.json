@@ -61,11 +61,9 @@
       "add": "パスキーを追加",
       "empty": "パスキーはまだありません。パスワードなしでサインインするには追加してください。",
       "removeAria": "{{name}} を削除",
-      "addTitle": "パスキーを追加",
-      "addDescription": "後で識別できる名前を付けてください。デバイスがパスキー作成を促します。",
-      "nameLabel": "名前",
-      "namePlaceholder": "MacBook Touch ID",
-      "submit": "パスキーを追加"
+      "synced": "同期済みパスキー",
+      "singleDevice": "単一デバイスのパスキー",
+      "added": "{{date}} に追加"
     },
     "overview": {
       "title": "アカウント保護",

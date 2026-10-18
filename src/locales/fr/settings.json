@@ -63,11 +63,9 @@
       "add": "Ajouter une clé d'accès",
       "empty": "Aucune clé d'accès pour l'instant. Ajoutez-en une pour vous connecter sans mot de passe.",
       "removeAria": "Supprimer {{name}}",
-      "addTitle": "Ajouter une clé d'accès",
-      "addDescription": "Donnez-lui un nom pour la reconnaître plus tard. Votre appareil vous demandera de créer la clé.",
-      "nameLabel": "Nom",
-      "namePlaceholder": "MacBook Touch ID",
-      "submit": "Ajouter la clé d'accès"
+      "synced": "Clé d'accès synchronisée",
+      "singleDevice": "Clé d'accès sur un seul appareil",
+      "added": "Ajoutée le {{date}}"
     },
     "overview": {
       "title": "Protection du compte",
