@@ -56,7 +56,9 @@ no `ready-for-approval` or `approved`, and no drop needed.
   excepted); `pnpm iteration:list` is the index.
 - **One shared plan under `--both`.** clinozy-be's `plans/` own the contract (`routes-final.md`,
   routes, tables, background work); the frontend's plan links to them and adds only its screens. A
-  contract change the frontend needs is a request decided there.
+  contract change the frontend needs is a request decided there. The frontend kicks off as soon as
+  clinozy-be's `plans/routes-final.md` carries its **Route review final** line (every sub-domain
+  confirmed), without waiting for the backend's plan approval.
 - **Both repos.** clinozy-be uses the same names, commands and README template (`--both` opens and
   fills the same-named folder there, in the same Intake mode, from scratch too unless the user names a
   Baseline there; `PRD.md` and `schema-routes.md` — and `BRIEF.md` in brief mode — stay

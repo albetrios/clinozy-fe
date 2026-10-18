@@ -24,7 +24,12 @@ Eligible = Status `approved` (not yet `implementing`), and Baseline `none` (from
 scratch, the default) or an iteration the user named that is `done` or `frozen` —
 a build never starts on an unbuilt Baseline. A **lite** fix (README Process `lite`) is
 eligible in `planning` once the user gave the go on its `KICKOFF.md` (fe-iteration-planning ›
-Lite mode). Recommend the earliest-opened eligible
+Lite mode). **Under `--both`** (the same-named iteration exists in clinozy-be) it is eligible only
+once clinozy-be's `plans/routes-final.md` carries its `**Route review final — <date>.**` line
+under the title: every sub-domain is confirmed, so the frontend builds on final routes — without
+waiting for the backend's plan approval or build. No line yet → not eligible (Why: "route review
+not final"). If the line disappears during the build (a sub-domain reopened), stop before the next
+row that uses those routes and ask. Recommend the earliest-opened eligible
 iteration (the launch always comes first). If the user named one, check it against
 the rule. Confirm the iteration with **AskUserQuestion** — never pick silently —
 and never ask about or suggest a Baseline: it is whatever planning recorded.
