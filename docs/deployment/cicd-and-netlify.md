@@ -262,7 +262,10 @@ Both run `pnpm build` then `netlify deploy --no-build` (with or without `--prod`
 
 **Build runs only on GitHub.** Netlify never runs a build; it only serves the uploaded `dist/` (every `main` src push → development alias via post-merge CI; a published release → production via `release-deploy.yml`, pinned to the tag). Netlify is the current deploy target of record.
 
-**CI never boots clinozy-be.** Playwright E2E is local-only (`pnpm test:e2e` against a live clinozy-be on `:3000`); CI and CD need only the deployed backend URL (`VITE_API_BASE_URL` secret per environment) — never a full backend.
+**Only the E2E workflow boots clinozy-be.** `e2e-backend.yml` runs Playwright against the
+backend's latest GHCR image (the @smoke set on `main`, the full suite nightly; see
+`docs/reference/testing.md`). Every other CI and CD job needs only the deployed backend URL
+(`VITE_API_BASE_URL` secret per environment) — never a full backend.
 
 ### Change detection and the aggregate gate
 
@@ -297,12 +300,12 @@ Single trunk (`main`) drives both GitHub Environments by **purpose**, not by bra
 
 ## Summary
 
-| Item                | Where / How                                                                                                              |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Production API**  | `https://your-api-domain.com` (path `/api/v1` in app).                                                                   |
-| **Frontend host**   | Netlify (static host only; no build on Netlify).                                                                         |
-| **Build**           | GitHub Actions only (Deploy workflow on push to `main`; Release workflow when release created). Env from GitHub secrets. |
-| **Env vars**        | GitHub secrets: `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.                            |
-| **Deploy (GitHub)** | Deploy workflow: push to `main` → build → upload `dist/` to Netlify.                                                     |
-| **Deploy (CLI)**    | `pnpm run deploy:netlify` (draft), `pnpm run deploy:netlify:prod` (production); build runs locally.                      |
-| **CI**              | GitHub Actions: lint, type-check, unit + security tests, build (smoke) on push/PR. E2E is local-only.                    |
+| Item                | Where / How                                                                                                                                           |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Production API**  | `https://your-api-domain.com` (path `/api/v1` in app).                                                                                                |
+| **Frontend host**   | Netlify (static host only; no build on Netlify).                                                                                                      |
+| **Build**           | GitHub Actions only (Deploy workflow on push to `main`; Release workflow when release created). Env from GitHub secrets.                              |
+| **Env vars**        | GitHub secrets: `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.                                                         |
+| **Deploy (GitHub)** | Deploy workflow: push to `main` → build → upload `dist/` to Netlify.                                                                                  |
+| **Deploy (CLI)**    | `pnpm run deploy:netlify` (draft), `pnpm run deploy:netlify:prod` (production); build runs locally.                                                   |
+| **CI**              | GitHub Actions: lint, type-check, unit + security tests, build (smoke) on push/PR. E2E: `e2e-backend.yml` against the backend image (main + nightly). |

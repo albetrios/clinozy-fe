@@ -24,8 +24,9 @@ dependency-review/actionlint/zizmor (workflow injection + action pins)/SonarQube
 behind the aggregate `Quality gate` required check (`Checks` is the second required
 context; branch protection as code:
 `.github/rulesets/`, `pnpm github:sync`; personal↔team review posture via
-`pnpm github:tool:governance-mode` — see docs/reference/branch-governance.md). Playwright E2E is local-only (needs
-clinozy-be on `:3000` — CI never boots the backend). CodeQL, Stryker mutation tests, Lighthouse
+`pnpm github:tool:governance-mode` — see docs/reference/branch-governance.md). Playwright E2E needs clinozy-be on
+`:3000`: locally a running backend; in CI `e2e-backend.yml` boots the backend's latest GHCR image
+(the @smoke set on main, the full suite nightly) — no PR lane. CodeQL, Stryker mutation tests, Lighthouse
 budgets, cache cleanup, release-flow guards (environment-drift canary),
 the sync-drift canary (weekly docs↔code drift → tracked issue),
 and Dependabot CI triage + approval-gated auto-merge (low-risk `npm-non-major` group only)

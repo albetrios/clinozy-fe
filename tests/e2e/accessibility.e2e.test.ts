@@ -33,21 +33,25 @@ async function settleAnimations(page: Page) {
 }
 
 test.describe('Accessibility', () => {
-  test('login page has no critical a11y violations', async ({ page }) => {
-    await gotoApp(page, '/login');
-    await expectAuthScreenReady(page);
-    await settleAnimations(page);
+  test(
+    'login page has no critical a11y violations',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      await gotoApp(page, '/login');
+      await expectAuthScreenReady(page);
+      await settleAnimations(page);
 
-    const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze();
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze();
 
-    const critical = results.violations.filter(
-      (v) => v.impact === 'critical' || v.impact === 'serious',
-    );
+      const critical = results.violations.filter(
+        (v) => v.impact === 'critical' || v.impact === 'serious',
+      );
 
-    expect(critical).toEqual([]);
-  });
+      expect(critical).toEqual([]);
+    },
+  );
 
   // Auth-light utility/error pages — reachable without a session, so they run
   // fast and deterministically. Each must be axe-clean at critical/serious.
@@ -75,26 +79,30 @@ test.describe('Accessibility', () => {
     });
   }
 
-  test('Today — the clinic home — has no critical a11y violations', async ({ page }) => {
-    await registerNewUserAndGoToToday(page);
-    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
-    // Scan the loaded floor, not the first load's in-place skeleton.
-    await expect(page.getByTestId('today-page')).not.toHaveAttribute('aria-busy', {
-      timeout: 15000,
-    });
-    await settleAnimations(page);
+  test(
+    'Today — the clinic home — has no critical a11y violations',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      await registerNewUserAndGoToToday(page);
+      await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+      // Scan the loaded floor, not the first load's in-place skeleton.
+      await expect(page.getByTestId('today-page')).not.toHaveAttribute('aria-busy', {
+        timeout: 15000,
+      });
+      await settleAnimations(page);
 
-    const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .exclude('[data-slot="select-trigger"]')
-      .analyze();
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .exclude('[data-slot="select-trigger"]')
+        .analyze();
 
-    const critical = results.violations.filter(
-      (v) => v.impact === 'critical' || v.impact === 'serious',
-    );
+      const critical = results.violations.filter(
+        (v) => v.impact === 'critical' || v.impact === 'serious',
+      );
 
-    expect(critical).toEqual([]);
-  });
+      expect(critical).toEqual([]);
+    },
+  );
 
   // An owner dims no lane, so the Today case above never meets a tile out of
   // focus. "Preview as" (Users › Roles) narrows the app to a role the way it
@@ -146,55 +154,61 @@ test.describe('Accessibility', () => {
     expect(critical).toEqual([]);
   });
 
-  test('accept-invite error state has no critical a11y violations', async ({ page }) => {
-    // The error card is a SIGNED-IN state: the route is auth-required (INV-4), so a
-    // guest is redirected to sign-in before this page ever renders.
-    test.skip(
-      !(await verifyDatabaseConnection()),
-      'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
-    );
-    await registerNewUserAndGoToToday(page);
-    await navigateInApp(page, '/accept-invite/inv_expired');
-    await expect(page.getByTestId('accept-invite-error')).toBeVisible({
-      timeout: 10000,
-    });
-    await settleAnimations(page);
+  test(
+    'accept-invite error state has no critical a11y violations',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      // The error card is a SIGNED-IN state: the route is auth-required (INV-4), so a
+      // guest is redirected to sign-in before this page ever renders.
+      test.skip(
+        !(await verifyDatabaseConnection()),
+        'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
+      );
+      await registerNewUserAndGoToToday(page);
+      await navigateInApp(page, '/accept-invite/inv_expired');
+      await expect(page.getByTestId('accept-invite-error')).toBeVisible({
+        timeout: 10000,
+      });
+      await settleAnimations(page);
 
-    const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze();
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze();
 
-    const critical = results.violations.filter(
-      (v) => v.impact === 'critical' || v.impact === 'serious',
-    );
+      const critical = results.violations.filter(
+        (v) => v.impact === 'critical' || v.impact === 'serious',
+      );
 
-    expect(critical).toEqual([]);
-  });
+      expect(critical).toEqual([]);
+    },
+  );
 
-  test('settings modal (account profile) has no critical a11y violations', async ({
-    page,
-  }) => {
-    await registerNewUserAndGoToToday(page);
-    await openSettingsHash(page, 'account', 'profile');
-    await expect(page.getByTestId('settings-section-profile')).toBeVisible({
-      timeout: 10000,
-    });
-    await settleAnimations(page);
+  test(
+    'settings modal (account profile) has no critical a11y violations',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      await registerNewUserAndGoToToday(page);
+      await openSettingsHash(page, 'account', 'profile');
+      await expect(page.getByTestId('settings-section-profile')).toBeVisible({
+        timeout: 10000,
+      });
+      await settleAnimations(page);
 
-    // Scope to the dialog: the dimmed page behind the overlay legitimately
-    // fails contrast checks and is not what this test certifies.
-    const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .include('[role="dialog"]')
-      .exclude('[data-slot="select-trigger"]')
-      .analyze();
+      // Scope to the dialog: the dimmed page behind the overlay legitimately
+      // fails contrast checks and is not what this test certifies.
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .include('[role="dialog"]')
+        .exclude('[data-slot="select-trigger"]')
+        .analyze();
 
-    const critical = results.violations.filter(
-      (v) => v.impact === 'critical' || v.impact === 'serious',
-    );
+      const critical = results.violations.filter(
+        (v) => v.impact === 'critical' || v.impact === 'serious',
+      );
 
-    expect(critical).toEqual([]);
-  });
+      expect(critical).toEqual([]);
+    },
+  );
 });
 
 /**
@@ -298,21 +312,23 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(await seriousViolations(page)).toEqual([]);
     });
 
-    test('the patient file (timeline) has no critical a11y violations', async ({
-      page,
-    }) => {
-      await openSeededClinic(page);
-      await openRoomFromShell(page, 'patients', 'desktop');
-      await expectRoomLoaded(page, 'patients');
-      await openFirstRow(page.getByTestId('patients-table-row'));
-      const file = page.getByTestId('patient-file-layout');
-      await expect(file).toBeVisible({ timeout: 15_000 });
-      await expect(file.locator('[data-slot="skeleton"]')).toHaveCount(0, {
-        timeout: 15_000,
-      });
-      await settleAnimations(page);
-      expect(await seriousViolations(page)).toEqual([]);
-    });
+    test(
+      'the patient file (timeline) has no critical a11y violations',
+      { tag: '@smoke' },
+      async ({ page }) => {
+        await openSeededClinic(page);
+        await openRoomFromShell(page, 'patients', 'desktop');
+        await expectRoomLoaded(page, 'patients');
+        await openFirstRow(page.getByTestId('patients-table-row'));
+        const file = page.getByTestId('patient-file-layout');
+        await expect(file).toBeVisible({ timeout: 15_000 });
+        await expect(file.locator('[data-slot="skeleton"]')).toHaveCount(0, {
+          timeout: 15_000,
+        });
+        await settleAnimations(page);
+        expect(await seriousViolations(page)).toEqual([]);
+      },
+    );
 
     for (const room of APP_ROOMS.filter((name) => name !== 'today')) {
       const drawer = ROOM_DRAWERS[room];

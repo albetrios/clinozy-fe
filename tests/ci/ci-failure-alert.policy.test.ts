@@ -44,10 +44,11 @@ function jobBlocks(source: string): Array<[string, string]> {
 }
 
 describe('ci-failure alert on every scheduled check', () => {
-  it('covers the seven scheduled checks and post-merge CI', () => {
+  it('covers the eight scheduled checks and post-merge CI', () => {
     expect(alerted.sort()).toEqual(
       [
         'codeql.yml',
+        'e2e-backend.yml',
         'cross-browser.yml',
         'lighthouse.yml',
         'mutation-test.yml',

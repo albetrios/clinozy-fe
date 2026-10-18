@@ -3,7 +3,7 @@ name: PR CI
 # Fast merge gate (~3–5 min target). Mirrors clinozy-be pr-ci.yml shape: path-filtered
 # parallel lanes, a reusable Vitest workflow, security scans, and a single
 # aggregate `quality-gate` required check (branch protection: .github/rulesets/).
-# Playwright E2E runs locally only (needs a live clinozy-be on :3000) — no CI lane.
+# Playwright E2E needs a live clinozy-be: no PR lane — e2e-backend.yml runs it on main and nightly.
 #
 # Frontend-specific lanes replace clinozy-be's domain/OpenAPI/Postgres/RLS/Docker gates.
 # Post-merge deploy/release/SBOM: post-merge-ci.yml (Netlify, not Railway).

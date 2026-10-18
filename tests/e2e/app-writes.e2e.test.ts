@@ -90,24 +90,30 @@ test.describe('Clinic rooms write through to clinozy-be', () => {
     await expectListedAfterReload(page, 'tasks', title);
   });
 
-  test('patients: a new patient is saved and listed', async ({ page }) => {
-    // A patient needs a branch to call home: the seeded clinic has one.
-    await openNewClinic(page, { seed: true });
-    await openRoomFromShell(page, 'patients', 'desktop');
-    const first = uniqueName('Priya').replace(' ', '');
-    await byTestId(page, 'patients-new').click();
-    await expectDrawer(page, 'patient-drawer');
-    await page.getByTestId('patient-drawer-first-name').fill(first);
-    // Ten digits, unique per run so the duplicate-number check finds no one.
-    const mobile = `9${Date.now().toString().slice(-9)}`;
-    await page.getByTestId('patient-drawer-mobile').fill(mobile);
-    await page.getByTestId('patient-drawer-save').click();
-    await expect(page.getByTestId('patient-drawer')).toHaveCount(0, { timeout: 15_000 });
-    // The new file may open over the room; the room lists her either way.
-    await page.goto(page.url().replace(/\/patients\/.*$/, '/patients'));
-    await expectRoomReady(page, 'patients');
-    await expectListedAfterReload(page, 'patients', first);
-  });
+  test(
+    'patients: a new patient is saved and listed',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      // A patient needs a branch to call home: the seeded clinic has one.
+      await openNewClinic(page, { seed: true });
+      await openRoomFromShell(page, 'patients', 'desktop');
+      const first = uniqueName('Priya').replace(' ', '');
+      await byTestId(page, 'patients-new').click();
+      await expectDrawer(page, 'patient-drawer');
+      await page.getByTestId('patient-drawer-first-name').fill(first);
+      // Ten digits, unique per run so the duplicate-number check finds no one.
+      const mobile = `9${Date.now().toString().slice(-9)}`;
+      await page.getByTestId('patient-drawer-mobile').fill(mobile);
+      await page.getByTestId('patient-drawer-save').click();
+      await expect(page.getByTestId('patient-drawer')).toHaveCount(0, {
+        timeout: 15_000,
+      });
+      // The new file may open over the room; the room lists her either way.
+      await page.goto(page.url().replace(/\/patients\/.*$/, '/patients'));
+      await expectRoomReady(page, 'patients');
+      await expectListedAfterReload(page, 'patients', first);
+    },
+  );
   test('leads: a lead for a new contact is saved and listed', async ({ page }) => {
     await openNewClinic(page, { seed: true });
     await openRoomFromShell(page, 'leads', 'desktop');

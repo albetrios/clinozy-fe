@@ -173,7 +173,7 @@ import { User } from './contracts';
 
 ## Testing
 
-Colocated unit tests (`src/**/*.test.{ts,tsx}`), `tests/` for helpers, security, CI policy and Playwright E2E (local-only; needs clinozy-be on `:3000`). The matrix and conventions: **[`tests/CLAUDE.md`](tests/CLAUDE.md)**.
+Colocated unit tests (`src/**/*.test.{ts,tsx}`), `tests/` for helpers, security, CI policy and Playwright E2E (needs clinozy-be on `:3000`; CI runs it against the backend's image in `e2e-backend.yml`). The matrix and conventions: **[`tests/CLAUDE.md`](tests/CLAUDE.md)**.
 
 ## Git branch naming
 

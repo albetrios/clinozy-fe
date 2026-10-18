@@ -27,27 +27,29 @@ test.describe('Account settings', () => {
     await registerNewUserAndGoToToday(page);
   });
 
-  test('profile section renders the form and saves through the confirm dialog', async ({
-    page,
-  }) => {
-    await openSettingsHash(page, 'account', 'profile');
-    await expect(page.getByTestId('settings-section-profile')).toBeVisible({
-      timeout: 15000,
-    });
-    await expect(page.getByTestId('profile-form')).toBeVisible();
-    // a11y guard: the name field is labelled.
-    await expect(page.getByLabel('Name')).toBeVisible();
+  test(
+    'profile section renders the form and saves through the confirm dialog',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      await openSettingsHash(page, 'account', 'profile');
+      await expect(page.getByTestId('settings-section-profile')).toBeVisible({
+        timeout: 15000,
+      });
+      await expect(page.getByTestId('profile-form')).toBeVisible();
+      // a11y guard: the name field is labelled.
+      await expect(page.getByLabel('Name')).toBeVisible();
 
-    // Editing makes the form dirty; submit opens the confirm dialog.
-    await page.getByTestId('profile-name').fill('Ada Lovelace');
-    await page.getByTestId('profile-submit').click();
-    await expect(page.getByTestId('profile-confirm-save')).toBeVisible();
+      // Editing makes the form dirty; submit opens the confirm dialog.
+      await page.getByTestId('profile-name').fill('Ada Lovelace');
+      await page.getByTestId('profile-submit').click();
+      await expect(page.getByTestId('profile-confirm-save')).toBeVisible();
 
-    await page.getByTestId('profile-confirm-save').click();
-    // Dialog closes and the form remains usable (no crash).
-    await expect(page.getByTestId('profile-confirm-save')).toHaveCount(0);
-    await expect(page.getByTestId('profile-form')).toBeVisible();
-  });
+      await page.getByTestId('profile-confirm-save').click();
+      // Dialog closes and the form remains usable (no crash).
+      await expect(page.getByTestId('profile-confirm-save')).toHaveCount(0);
+      await expect(page.getByTestId('profile-form')).toBeVisible();
+    },
+  );
 
   test('profile edit can be cancelled at the confirm step', async ({ page }) => {
     await openSettingsHash(page, 'account', 'profile');
