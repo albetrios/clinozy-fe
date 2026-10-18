@@ -67,6 +67,7 @@ const MERGE_GATING_LANES = [
   'dependency-review',
   'actionlint',
   'workflow-security',
+  'iteration-freeze',
   'sonarqube',
 ];
 

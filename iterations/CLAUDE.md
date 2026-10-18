@@ -52,7 +52,8 @@ no `ready-for-approval` or `approved`, and no drop needed.
 - **Status** moves `planning → ready-for-approval → approved → implementing → done → frozen` (a
   lite fix: `planning → implementing → done → frozen`) only through `pnpm iteration:status` (back to
   `planning` with `--reason`); it and `iteration:baseline`
-  append the README's History. Never edit `intake-files/` or a README's values by hand (Summary
+  append the README's History; PR CI's Iteration freeze lane (`pnpm iteration:freeze-check`) fails a
+  PR that changes an iteration not `frozen`, or edits a merged frozen one (a `--compact` excepted). Never edit `intake-files/` or a README's values by hand (Summary
   excepted); `pnpm iteration:list` is the index.
 - **One shared plan under `--both`.** clinozy-be's `plans/` own the contract (`routes-final.md`,
   routes, tables, background work); the frontend's plan links to them and adds only its screens. A

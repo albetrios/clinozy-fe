@@ -84,6 +84,7 @@
     "iteration:baseline": "node tooling/iterations/set-iteration-baseline.mjs",
     "iteration:status": "node tooling/iterations/set-iteration-status.mjs",
     "iteration:list": "node tooling/iterations/list-iterations.mjs",
+    "iteration:freeze-check": "node tooling/iterations/check-iteration-freeze.mjs",
     "setup:local": "tsx tooling/dev/setup-local.ts",
     "setup:mac-tools": "bash tooling/dev/setup-mac-tools.sh",
     "mcp:setup": "tsx tooling/dev/setup-mcp.ts",

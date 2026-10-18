@@ -38,6 +38,7 @@ jobs:
       agent-os: ${{ steps.filter.outputs.agent-os }}
       deps: ${{ steps.filter.outputs.deps }}
       iac: ${{ steps.filter.outputs.iac }}
+      iterations: ${{ steps.filter.outputs.iterations }}
       root-config: ${{ steps.every.outputs.root-config }}
       # Docs only = every changed file is Markdown or under docs/. A file no filter lists (a root
       # config such as knip.jsonc) next to a README used to count as docs-only and skip Knip and
@@ -106,6 +107,9 @@ jobs:
               - 'catalog-info.yaml'
               - '**/Dockerfile'
               - '**/*.tf'
+            iterations:
+              - 'iterations/**'
+              - 'tooling/iterations/**'
             docs-only-md:
               - '**/*.md'
               - 'docs/**'
@@ -572,6 +576,27 @@ jobs:
       - name: Scan workflows and actions
         run: zizmor --offline --min-severity high --format github .github/
 
+  iteration-freeze:
+    name: Iteration freeze
+    # Merge-time half of the iteration lifecycle (clinozy-be's lane): every iteration this PR changes
+    # merges frozen, and a merged frozen iteration takes no edit but a hash-keeping --compact
+    # (tooling/iterations/iteration-freeze.mjs). Skipped — a pass — when no iteration changed; an
+    # iteration-only PR counts as docs-only, and this lane runs anyway.
+    needs: [changes]
+    if: needs.changes.outputs.iterations == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: Every changed iteration merges frozen
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: pnpm iteration:freeze-check --base "$BASE_SHA"
+
   sonarqube:
     name: SonarQube
     needs: [changes]
@@ -638,6 +663,7 @@ jobs:
         dependency-review,
         actionlint,
         workflow-security,
+        iteration-freeze,
         sonarqube,
       ]
     if: always()
@@ -665,6 +691,7 @@ jobs:
             dependency-review=${{ needs.dependency-review.result }}
             actionlint=${{ needs.actionlint.result }}
             workflow-security=${{ needs.workflow-security.result }}
+            iteration-freeze=${{ needs.iteration-freeze.result }}
             sonarqube=${{ needs.sonarqube.result }}
         run: |
           FAILED=0

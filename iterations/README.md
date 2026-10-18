@@ -167,7 +167,9 @@ Status moves one step at a time with `pnpm iteration:status <iteration> <status>
 
 `ready-for-approval`, `approved` or `implementing` may go back to `planning` with
 `--reason "<why>"`; nothing else is allowed. Never edit a frozen iteration — a correction is a new
-`fix` iteration.
+`fix` iteration. PR CI's **Iteration freeze** lane (`pnpm iteration:freeze-check`, in the Quality
+gate) checks both at merge time: every iteration a PR changes must be `frozen`, and a merged frozen
+iteration may change only by a hash-keeping `pnpm iteration:intake <iteration> --compact`.
 
 A **lite** fix (Process `lite`, opened with `pnpm iteration:new fix <topic> --lite`) moves
 `planning → implementing → done → frozen`: fe-iteration-planning plans it in one step — `KICKOFF.md`
@@ -189,6 +191,7 @@ pnpm iteration:baseline <iteration> <baseline|none>                # record the 
 pnpm iteration:diff <baseline> <iteration> [--json]                # the delta: the two resolved intakes only
 pnpm iteration:status <iteration> <status> [--reason "<text>"]
 pnpm iteration:list   # Name · Type · Owner · Opened · Baseline · Status · Intake mode · Schema-routes · Intake hash · Drop placed
+pnpm iteration:freeze-check [--base <ref>]  # every iteration the branch changes merges frozen (PR CI's Iteration freeze lane)
 ```
 
 Every command takes `--help`. `iteration:new` and `iteration:intake` take `--dry-run`; `--both` works
