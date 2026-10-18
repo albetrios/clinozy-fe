@@ -48,11 +48,13 @@ else
 fi
 
 # Unit tests (matches the CI unit lane).
-# Run only when pushed commits include unit-relevant files.
+# Run only when pushed commits include unit-relevant files. `pnpm test:pre-push` runs the whole
+# suite; PRE_PUSH_SELECTED_TESTS=1 runs only the files `pnpm test:select` picks (off until the
+# selector miss check has shown no miss for two weeks; an escalating change still runs everything).
 PUSHED_UNIT_RELEVANT=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E \
   '^(src/|tests/utils/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)' || true)
 if [ -n "$PUSHED_UNIT_RELEVANT" ]; then
-  pnpm test
+  pnpm test:pre-push --base "$PUSH_BASE"
 else
   echo "Skipping unit tests on pre-push (no unit-relevant changes)."
 fi

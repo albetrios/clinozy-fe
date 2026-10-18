@@ -47,13 +47,16 @@ describe('test:affected mirrors .husky/pre-push', () => {
     const runs = (command) => steps.find((step) => step.command === command)?.runs;
     assert.equal(runs('pnpm security:semgrep:push'), true);
     assert.equal(runs('pnpm sonar:scan'), true);
-    assert.equal(runs('pnpm test'), true);
+    assert.equal(runs('pnpm test:pre-push'), true);
     assert.equal(
       steps.find((step) => step.command === 'pnpm docs:lint:changed')?.why,
       'pushed Markdown',
     );
     const docsOnly = pushSteps(['docs/x.md']);
-    assert.equal(docsOnly.find((step) => step.command === 'pnpm test')?.runs, false);
+    assert.equal(
+      docsOnly.find((step) => step.command === 'pnpm test:pre-push')?.runs,
+      false,
+    );
     assert.equal(
       docsOnly.find((step) => step.command === 'pnpm sonar:scan')?.runs,
       false,
