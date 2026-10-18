@@ -71,6 +71,16 @@ When the README's Process is `lite` (a `fix` opened with `pnpm iteration:new fix
    `planning → implementing` and builds the rows. If the fix turns out bigger than a fix (a new
    screen, a new route), stop and say so — it becomes a `change` with the full procedure.
 
+## Under `--both`: one shared plan, clinozy-be owns the contract
+
+When the iteration exists in both repositories (opened with `--both`), there is one plan of the
+contract, and it is clinozy-be's: its `plans/routes-final.md`, `route-changes.md`,
+`db-changes.md`, `worker-changes.md` and the decisions behind them. This plan links to them and
+adds only the frontend's part — screens, states, copy, stores, islands — never a second copy of a
+route, a field or a rule. A contract change the frontend needs (a field, a filter, an error state)
+is a request to that plan — a Step 4 question there or a decision row there — and this plan builds
+against what is decided there, so the two plans can never disagree on a route.
+
 ## Procedure — stop after every step and wait
 
 ### Step 0 — Confirm the iteration. Stop until confirmed.
@@ -372,7 +382,8 @@ the rules a plan most often gets wrong:
   modal — never a route.
 - **HTTP.** `apiClient` from `core/http`; org context comes from the URL/token,
   never a header; **never infer an API contract** — read clinozy-be's routes and
-  serializers, or plan fixtures-first with `REPLACE_WITH_API` markers.
+  serializers (under `--both`, its plan of the same iteration — linked, never copied), or plan
+  fixtures-first with `REPLACE_WITH_API` markers.
 
 ## Skill routing — the plan names the skill per ledger row
 
