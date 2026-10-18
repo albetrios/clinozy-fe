@@ -149,17 +149,18 @@ Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`.
 
 ## Commands
 
-| Command                                   | What runs                                              |
-| ----------------------------------------- | ------------------------------------------------------ |
-| `pnpm test`                               | Vitest all projects — unit + security + ci-policy      |
-| `pnpm test:unit`                          | Colocated `src/**/*.test.*` only                       |
-| `pnpm test:security`                      | `tests/security/`                                      |
-| `pnpm test:e2e`                           | All Playwright specs in `tests/e2e/`                   |
-| `pnpm test:e2e:integration`               | Routes integration + org-switching only                |
-| `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be) |
-| `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)           |
-| `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                            |
-| `pnpm test:select [--why\|--run]`         | The Vitest files a change can affect, and why          |
+| Command                                   | What runs                                               |
+| ----------------------------------------- | ------------------------------------------------------- |
+| `pnpm test`                               | Vitest all projects — unit + security + ci-policy       |
+| `pnpm test:unit`                          | Colocated `src/**/*.test.*` only                        |
+| `pnpm test:security`                      | `tests/security/`                                       |
+| `pnpm test:e2e`                           | All Playwright specs in `tests/e2e/`                    |
+| `pnpm test:e2e:integration`               | Routes integration + org-switching only                 |
+| `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be)  |
+| `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)            |
+| `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                             |
+| `pnpm test:select [--why\|--run]`         | The Vitest files a change can affect, and why           |
+| `pnpm test:affected [--base <ref>]`       | What `git push` will run, and the tests picked, and why |
 
 Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes.txt`.
 

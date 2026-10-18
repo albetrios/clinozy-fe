@@ -27,6 +27,7 @@
     "test:security": "vitest run --project security",
     "test:ci-policy": "vitest run --project ci-policy",
     "test:select": "node tooling/ci/select-tests.mjs",
+    "test:affected": "node tooling/ci/affected.mjs",
     "test:selector-misses": "node tooling/ci/selector-misses.mjs",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

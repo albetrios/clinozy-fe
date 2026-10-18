@@ -32,11 +32,11 @@ Granular procedures live in **skills** (invoked by name); these commands are **w
 
 **Core gates**
 
-| Command           | Purpose                                                                                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/fe-validate`    | Run `pnpm lint`, `pnpm type-check`, `pnpm validate:structure`, `pnpm validate:tokens`, `pnpm validate:testids`, `pnpm validate:theme-axis`; fix introduced issues. |
-| `/fe-ci-local`    | Run `pnpm health` (local PR gate) and map failures to `.github/workflows/pr-ci.yml` lanes.                                                                         |
-| `/fe-routes-sync` | Re-sync `routeTree.tsx`, RBAC, and `docs/reference/routes-and-ui.md` after route changes.                                                                          |
+| Command                     | Purpose                                                                                                                                                                                                                                                                                             |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/fe-validate [--affected]` | Run `pnpm lint`, `pnpm type-check`, `pnpm validate:structure`, `pnpm validate:tokens`, `pnpm validate:testids`, `pnpm validate:theme-axis`; fix introduced issues. `--affected`: `pnpm test:affected` — what `git push` will run and the tests the selection picks, each with why; changes nothing. |
+| `/fe-ci-local`              | Run `pnpm health` (local PR gate) and map failures to `.github/workflows/pr-ci.yml` lanes.                                                                                                                                                                                                          |
+| `/fe-routes-sync`           | Re-sync `routeTree.tsx`, RBAC, and `docs/reference/routes-and-ui.md` after route changes.                                                                                                                                                                                                           |
 
 **Autonomous build**
 
