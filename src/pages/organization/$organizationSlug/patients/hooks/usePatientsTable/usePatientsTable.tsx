@@ -232,7 +232,12 @@ function usePatientColumns(
       cell: ({ row }) => <PatientUpdatedCell patient={row.original} />,
       // No people pill: the API does not say who saved the file (G4), so the
       // cell is the time alone. It folds to nothing (H:4115).
-      meta: { track: 'minmax(130px,1fr)', foldValue: () => null },
+      meta: {
+        track: 'minmax(130px,1fr)',
+        foldValue: () => null,
+        // Keep the absolute API instant, including its zone, useful after today.
+        exportValue: (original) => rowOf(original).updatedAt,
+      },
     },
   ];
 }

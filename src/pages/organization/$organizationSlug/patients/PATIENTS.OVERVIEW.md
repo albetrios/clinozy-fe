@@ -25,6 +25,11 @@ scroll over cursor pages, "All patients loaded". In clinic today, With dues, the
 the other sorts, the Due column, the row's "Collect ₹…" and who saved the record go — the API
 has no read for them per row (G4, Q22, G-P8).
 
+CSV exports keep Updated as the absolute API timestamp (ISO 8601 with its timezone),
+even though that detail folds to nothing on smaller screens. Columns can provide
+`meta.exportValue` independently of `meta.foldValue`; a null fold falls back to the
+accessor for export, while a null export value explicitly leaves the CSV cell blank.
+
 The view, search, filters and sort live in the URL (`patients.search.ts`); the list read
 follows them — a view or sort change keeps the rows until the new page arrives, a search
 or "Apply filter" shows the skeleton over the rows. A failed read keeps the last copy and
