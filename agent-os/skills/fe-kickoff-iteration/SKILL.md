@@ -67,7 +67,9 @@ Follow the ledger in its order (respecting Depends on). For each row:
    motion. A foundation row runs the skill it names (`fe-theme-axis-audit` for
    the preset, the shell replacing the old design, `fe-route-island` /
    `fe-page-scaffolding` for islands, and so on).
-2. **Verify** — the row's Acceptance, by the README's Intake mode:
+2. **Verify** — the row's tests first: `pnpm test:select --run` (the tests the row's changes
+   reach, with why — `pnpm test:select --why`; a change on the escalation list runs the whole
+   suite), green before the comparison. Then the row's Acceptance, by the README's Intake mode:
    - **`full` / `overlay`** — a screen gets a **side-by-side comparison against
      the source at 375px and 1440px, per state** — the prototype open in the
      browser pane beside the app, or the md walked field by field — and the
@@ -80,7 +82,8 @@ Follow the ledger in its order (respecting Depends on). For each row:
    full baseline set; an unexpected diff on an untouched screen is a finding,
    not a baseline to bless.
 3. **Record** — add the row's `AS-BUILT.md` entry: planned · actually built ·
-   difference · why · decision link · commit. Set the ledger row's Status. Where
+   difference · why · decision link · commit — and the test run (files and result) in its
+   Actually built cell. Set the ledger row's Status. Where
    the build now differs from the design on purpose, add a **Standing
    deviation** (item · design says · built as · since iteration · decision);
    where this row resolves one, remove it.

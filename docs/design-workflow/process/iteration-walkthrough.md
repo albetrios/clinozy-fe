@@ -248,7 +248,8 @@ Anything else is refused: no skipping steps, and nothing leaves frozen.
  ┌──► (1) DO ─────── screen row → fe-design-ditto: interaction shell → flow skeleton →
  │                   regions (desktop + mobile together) → content → states → motion
  │                   other rows → the skill the row names (fe-route-island, fe-i18n-constants, …)
- │    (2) VERIFY ─── the row's Acceptance, by Intake mode:
+ │    (2) VERIFY ─── pnpm test:select --run first (the tests the row's changes reach), green;
+ │                   then the row's Acceptance, by Intake mode:
  │                   full / overlay → a screen side by side at 375px and 1440px, per state
  │                   brief          → the BRIEF.md acceptance criteria the row covers
  │                   incremental    → plus the FULL visual baseline set (catches ripple)
