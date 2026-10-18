@@ -509,7 +509,11 @@
     "increase": "增加",
     "note": "备注",
     "notePlaceholder": "说明",
-    "moneyPlaceholder": "₹ 0"
+    "moneyPlaceholder": "₹ 0",
+    "qtyWhole": "请输入整数",
+    "qtyPlaces": "最多保留 {{places}} 位小数",
+    "qtyAtLeast": "请输入至少 {{min}}",
+    "qtyNumber": "请输入数字"
   },
   "roomToolbar": {
     "more": "更多",

@@ -141,6 +141,7 @@ export const AUTH_KEYS = {
     mfaUnsupported: 'apiErrors.mfaUnsupported',
     oauthNoRedirect: 'apiErrors.oauthNoRedirect',
     passkeyCancelled: 'apiErrors.passkeyCancelled',
+    passkeyAlreadyRegistered: 'apiErrors.passkeyAlreadyRegistered',
   },
 } as const;
 

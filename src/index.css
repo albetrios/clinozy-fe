@@ -1666,6 +1666,26 @@
   display: none;
 }
 
+/* The upload tray is drawn above the page at z 95 (as designed), in the same
+   bottom-end corner where every drawer and dialog puts its footer — so a
+   pending or failed upload sat over "Save" and took its clicks, expanded or
+   collapsed (QA PAT-01). While a MODAL surface is open the modal owns the
+   screen: the tray steps beneath the modal layer (overlays and panels are
+   z 50), dimmed by the scrim with its rows intact. Uploads carry on, the
+   tray's live status still announces, and Retry / Remove are back the moment
+   the modal closes. Keyed on the overlay, like the trigger above, so a popover
+   or a menu leaves the tray on top. Unlayered, so it outranks the `z-[95]`
+   utility. */
+:root:has(
+    [data-slot='dialog-overlay'],
+    [data-slot='alert-dialog-overlay'],
+    [data-slot='sheet-overlay'],
+    [data-slot='drawer-overlay']
+  )
+  [data-slot='upload-tray'] {
+  z-index: 40;
+}
+
 /* ── Print documents (invoice, sale and prescription sheets — KICKOFF §3.5, L-22) ──
    `printDocument()` (shared/components/PrintTemplate) renders one A4 sheet into
    a `[data-print-root]` host at the end of <body> and sets `data-printing` on

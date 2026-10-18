@@ -529,7 +529,11 @@
     "increase": "زيادة",
     "note": "ملاحظة",
     "notePlaceholder": "ملاحظات",
-    "moneyPlaceholder": "₹ 0"
+    "moneyPlaceholder": "₹ 0",
+    "qtyWhole": "أدخل عددًا صحيحًا",
+    "qtyPlaces": "استخدم {{places}} منازل عشرية كحد أقصى",
+    "qtyAtLeast": "أدخل {{min}} على الأقل",
+    "qtyNumber": "أدخل رقمًا"
   },
   "roomToolbar": {
     "more": "المزيد",

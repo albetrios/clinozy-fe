@@ -38,17 +38,25 @@ describe('step-up-api', () => {
   it('steps up with a password via POST /auth/step-up', async () => {
     postMock.mockResolvedValue({ data: null });
     await stepUpWithPassword('hunter2');
-    expect(postMock).toHaveBeenCalledWith(expect.stringContaining('/auth/step-up'), {
-      password: 'hunter2',
-    });
+    expect(postMock).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/step-up'),
+      {
+        password: 'hunter2',
+      },
+      { skip401: true },
+    );
   });
 
   it('steps up with a bootstrap email code via POST /auth/step-up', async () => {
     postMock.mockResolvedValue({ data: null });
     await stepUpWithEmailCode('A1B2C3');
-    expect(postMock).toHaveBeenCalledWith(expect.stringContaining('/auth/step-up'), {
-      code: 'A1B2C3',
-    });
+    expect(postMock).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/step-up'),
+      {
+        code: 'A1B2C3',
+      },
+      { skip401: true },
+    );
   });
 
   it('steps up with TOTP via POST /auth/me/mfa/verify', async () => {
@@ -59,6 +67,7 @@ describe('step-up-api', () => {
       {
         code: '123456',
       },
+      { skip401: true },
     );
   });
 });

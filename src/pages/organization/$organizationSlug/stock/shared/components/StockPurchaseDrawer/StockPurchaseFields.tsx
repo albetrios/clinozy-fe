@@ -45,6 +45,8 @@ import {
   linesTotal,
   PURCHASE_LINES_MAX,
   PURCHASE_PAYMENT_MODES,
+  PURCHASE_QTY_MIN,
+  PURCHASE_QTY_PLACES,
   type StockPurchaseFormValues,
 } from './stock-purchase-form.ts';
 import { usePurchaseQuickLine } from './use-purchase-quick-line.ts';
@@ -195,7 +197,12 @@ function useLineColumns({
       track: '88px',
       align: 'end',
       cell: (row) => (
-        <ItemsQtyCell {...row.bind('qty')} min={1} readOnly={!row.editable} />
+        <ItemsQtyCell
+          {...row.bind('qty')}
+          min={PURCHASE_QTY_MIN}
+          decimals={PURCHASE_QTY_PLACES}
+          readOnly={!row.editable}
+        />
       ),
     },
     {

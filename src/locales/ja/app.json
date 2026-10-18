@@ -509,7 +509,11 @@
     "increase": "増やす",
     "note": "メモ",
     "notePlaceholder": "備考",
-    "moneyPlaceholder": "₹ 0"
+    "moneyPlaceholder": "₹ 0",
+    "qtyWhole": "整数を入力してください",
+    "qtyPlaces": "小数点以下は{{places}}桁までです",
+    "qtyAtLeast": "{{min}}以上を入力してください",
+    "qtyNumber": "数値を入力してください"
   },
   "roomToolbar": {
     "more": "その他",

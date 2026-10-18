@@ -158,7 +158,11 @@ on its surface, in both modes.
     mirrors under RTL) — see `ConsentBanner`. The clinic bottom stack is the
     designed exception: a floating "New" (phone) and the upload tray (every
     width) claim the bottom-end corner while they show, and the trigger steps
-    aside for them in `index.css`.
+    aside for them in `index.css`. That corner is also where every drawer and
+    dialog puts its footer, so while a modal is open the upload tray steps
+    _beneath_ the modal layer (keyed on the overlay, like the trigger) — it never
+    covers or takes the clicks of a footer's Save; its rows and Retry wait for
+    the modal to close.
 
 - **Not Claude-width by default.** Chat products cap ~720–768px for long answers.
   This product is a control surface — width is for tables and panels; constrain
