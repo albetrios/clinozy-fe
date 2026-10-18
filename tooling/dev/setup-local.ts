@@ -438,7 +438,12 @@ function ensureFullMcpConfig(reports: StepReport[], options: BootstrapOptions): 
   try {
     const result = ensureMcpServers({ keys: 'all' });
     const detail = result.changed
-      ? `declared ${result.added.join(', ')}`
+      ? [
+          result.renamed.length > 0 ? `renamed ${result.renamed.join(', ')}` : '',
+          result.added.length > 0 ? `declared ${result.added.join(', ')}` : '',
+        ]
+          .filter(Boolean)
+          .join('; ')
       : 'all template servers already declared';
     reportStep(reports, '.mcp.json (full set)', 'done', startedAt, detail);
   } catch (error) {

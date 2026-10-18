@@ -62,8 +62,8 @@ Ten steps, in order:
    secrets). The `--only-env` flag is required: a bare `pnpm setup:local` runs
    through to phase 5/5 and spawns a long-lived `pnpm dev`, which would hang
    this script.
-8. `pnpm mcp:setup:default` — writes the default MCP pair (codegraph + headroom)
-   to `.mcp.json`; then `pnpm setup:local --only-codegraph` builds the codegraph
+8. `pnpm mcp:setup:default` — writes the default MCP pair (fe-codegraph +
+   fe-headroom) to `.mcp.json`; then `pnpm setup:local --only-codegraph` builds the codegraph
    index the MCP server answers from (step 7's `--only-env` stops before it). The
    first build takes about 2–3 minutes and ~250 MB in `.codegraph/`; later runs
    only `sync` it. Last, `pnpm agent-os:session-hooks` registers the hooks: a

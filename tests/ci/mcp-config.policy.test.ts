@@ -2,7 +2,7 @@
  * Policy: the committed MCP templates stay consistent (no drift between the files).
  *
  * - `.mcp.example.json` is the full agent set; `.mcp.default.json` is the default
- *   auto-start pair (codegraph + headroom). The pair must mirror its entries in the
+ *   auto-start pair (fe-codegraph + fe-headroom). The pair must mirror its entries in the
  *   full set exactly, so deriving the default from a separate committed file cannot
  *   drift.
  * - Both templates are mirrored under `agent-os/mcp/` (the agent-os source of truth);
@@ -25,7 +25,7 @@ function readMcpServers(relativePath: string): McpServers {
   return parsed.mcpServers ?? {};
 }
 
-const EXPECTED_DEFAULT_KEYS = ['codegraph', 'headroom'];
+const EXPECTED_DEFAULT_KEYS = ['fe-codegraph', 'fe-headroom'];
 
 describe('MCP template consistency', () => {
   const fullSet = readMcpServers('.mcp.example.json');
@@ -39,7 +39,7 @@ describe('MCP template consistency', () => {
     expect(readMcpServers('agent-os/mcp/mcp.default.json')).toEqual(defaultPair);
   });
 
-  it('default pair is exactly codegraph + headroom', () => {
+  it('default pair is exactly fe-codegraph + fe-headroom', () => {
     expect(Object.keys(defaultPair).sort()).toEqual([...EXPECTED_DEFAULT_KEYS].sort());
   });
 

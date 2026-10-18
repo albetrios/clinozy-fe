@@ -219,7 +219,7 @@ ok "[7/${TOTAL}] .env.local ready (OAuth buttons off in the cloud)"
 step "[8/${TOTAL}] MCP default pair (.mcp.json) + codegraph index + session hooks"
 pnpm mcp:setup:default >&2 || skip "mcp:setup:default failed — run it manually if MCP tools are missing"
 if [ -f .mcp.json ]; then
-  ok "[8/${TOTAL}] .mcp.json written (codegraph + headroom)"
+  ok "[8/${TOTAL}] .mcp.json written (fe-codegraph + fe-headroom)"
 else
   skip "[8/${TOTAL}] .mcp.json absent (non-fatal)"
 fi

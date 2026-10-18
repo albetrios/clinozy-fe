@@ -61,6 +61,8 @@ describe('Claude Code permission rules', () => {
       'Bash(git push *)',
       'Bash(git switch *)',
       'Bash(gh run *)',
+      // The project's own server (`.mcp.json`) and the one a web environment's MCP settings name.
+      'mcp__fe-headroom__*',
       'mcp__headroom__*',
     ]) {
       expect(permissions.allow).toContain(rule);
