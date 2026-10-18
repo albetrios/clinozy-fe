@@ -103,7 +103,9 @@ function main() {
   }
   process.exitCode = reportEarlyCheck({
     check: 'Semgrep at push',
-    findings: [`semgrep reported new findings in ${targets.length} file(s) — see above`],
+    findings: [
+      `semgrep reported new findings in the ${targets.length} scanned file(s) — see above`,
+    ],
   });
 }
 
