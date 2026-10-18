@@ -9,6 +9,8 @@ import {
   clampNumber,
   MONEY_SCALE,
   numberFromText,
+  type QuantityText,
+  readQuantityText,
   readTypedNumber,
   textFromNumber,
 } from '@/lib/number-text.ts';
@@ -322,6 +324,24 @@ export function ItemsTextCell<TForm extends FieldValues>({
   );
 }
 
+/** Why a typed quantity that is not a figure is refused; an empty one is not. */
+const refusalKey: Record<Exclude<QuantityText['kind'], 'figure'>, string | null> = {
+  empty: null,
+  fraction: ITEMS_FIELD_KEYS.qtyWhole,
+  places: ITEMS_FIELD_KEYS.qtyPlaces,
+  malformed: ITEMS_FIELD_KEYS.qtyNumber,
+};
+
+/**
+ * The stepper input's keyboard and length: a whole count's figures, then room
+ * for the point and its decimals.
+ */
+function qtyInputShape(max: number, decimals: number) {
+  return decimals > 0
+    ? { inputMode: 'decimal' as const, maxLength: String(max).length + decimals + 1 }
+    : { inputMode: 'numeric' as const, maxLength: String(max).length };
+}
+
 /** Props of {@link ItemsQtyCell}. */
 export interface ItemsQtyCellProps<
   TForm extends FieldValues,
@@ -330,6 +350,11 @@ export interface ItemsQtyCellProps<
   min?: number;
   /** `ITEMS_QTY_MAX` (9,999) by default (H:3811); the invoice's 1–999 passes 999. */
   max?: number;
+  /**
+   * Digits the count keeps after the point — 0 (whole units) by default: a
+   * clinic item bought by the part (0.75 of a bottle) passes 3.
+   */
+  decimals?: number;
   /** A message of the screen's own, over the field's validation. */
   error?: string;
   readOnly?: boolean;
@@ -344,9 +369,13 @@ export interface ItemsQtyCellProps<
 /**
  * The quantity stepper of a row (H:924 `qty`): one 32px box of "−" · the
  * count · "+", the buttons on `canvas` — 44px on touch with `largeOnTouch`.
- * It is a spin button — ↑ / ↓ step it, typing replaces the count (selected
- * on focus), and a count left empty or below `min` returns to `min` on blur —
- * so its two buttons stay out of the tab order.
+ * It is a spin button — ↑ / ↓ step it by one unit, typing replaces the count
+ * (selected on focus), and a count left empty returns to `min` on blur — so
+ * its two buttons stay out of the tab order. The typed text is read whole,
+ * never cleaned up: a part where only whole units are taken ("1.5"), more
+ * decimals than `decimals`, or anything that is not a figure is refused with
+ * its message and leaves the count as it was — so is a figure below `min`,
+ * once the cell is left.
  */
 export function ItemsQtyCell<TForm extends FieldValues>({
   control,
@@ -355,6 +384,7 @@ export function ItemsQtyCell<TForm extends FieldValues>({
   testId,
   min = 1,
   max = ITEMS_QTY_MAX,
+  decimals = 0,
   error,
   readOnly = false,
   largeOnTouch = false,
@@ -366,30 +396,40 @@ export function ItemsQtyCell<TForm extends FieldValues>({
   } = useController({ control, name });
   const errorId = useId();
   const [draft, setDraft] = useState<string | null>(null);
+  // Why the last thing typed was refused — until the count is typed or stepped again.
+  const [refused, setRefused] = useState<string | null>(null);
   const value = cellNumber(stored);
   const storedError = useCellError(fieldState.error);
-  const message = error ?? storedError.message;
+  const message = error ?? refused ?? storedError.message;
 
   const step = (next: number) => {
     storedError.edit();
     setDraft(null);
-    onChange(clampNumber(next, min, max));
+    setRefused(null);
+    onChange(clampNumber(Number(next.toFixed(decimals)), min, max));
   };
 
   const type = (typed: string) => {
     storedError.edit();
-    const text = typed.replace(/\D/g, '');
-    if (text === '') {
-      setDraft('');
+    const read = readQuantityText(typed, decimals);
+    setDraft(typed);
+    if (read.kind === 'figure') {
+      setRefused(null);
+      const count = Math.min(read.value, max);
+      if (count < read.value) setDraft(String(max));
+      // Below `min` is only refused on blur: "0" is where "0.75" starts.
+      if (count >= min) onChange(count);
       return;
     }
-    const count = Math.min(Number(text), max);
-    setDraft(String(count));
-    if (count >= min) onChange(count);
+    const refusal = refusalKey[read.kind];
+    setRefused(refusal ? t(refusal, { places: decimals }) : null);
   };
 
   const leave = () => {
-    if (draft !== null && (draft === '' || Number(draft) < min)) onChange(min);
+    const read = draft === null ? null : readQuantityText(draft, decimals);
+    if (read?.kind === 'empty') onChange(min);
+    else if (read?.kind === 'figure' && read.value < min)
+      setRefused(t(ITEMS_FIELD_KEYS.qtyAtLeast, { min }));
     setDraft(null);
     onBlur();
   };
@@ -418,9 +458,8 @@ export function ItemsQtyCell<TForm extends FieldValues>({
             name={name}
             type="text"
             role="spinbutton"
-            inputMode="numeric"
+            {...qtyInputShape(max, decimals)}
             autoComplete="off"
-            maxLength={String(max).length}
             value={draft ?? String(value)}
             readOnly={readOnly}
             aria-label={label}

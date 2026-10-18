@@ -513,7 +513,11 @@
     "increase": "Increase",
     "note": "Note",
     "notePlaceholder": "Remarks",
-    "moneyPlaceholder": "₹ 0"
+    "moneyPlaceholder": "₹ 0",
+    "qtyWhole": "Enter a whole number",
+    "qtyPlaces": "Use up to {{places}} decimal places",
+    "qtyAtLeast": "Enter at least {{min}}",
+    "qtyNumber": "Enter a number"
   },
   "roomToolbar": {
     "more": "More",

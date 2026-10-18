@@ -513,7 +513,11 @@
     "increase": "बढ़ाएँ",
     "note": "नोट",
     "notePlaceholder": "टिप्पणियाँ",
-    "moneyPlaceholder": "₹ 0"
+    "moneyPlaceholder": "₹ 0",
+    "qtyWhole": "पूर्ण संख्या दर्ज करें",
+    "qtyPlaces": "अधिकतम {{places}} दशमलव स्थान रखें",
+    "qtyAtLeast": "कम से कम {{min}} दर्ज करें",
+    "qtyNumber": "एक संख्या दर्ज करें"
   },
   "roomToolbar": {
     "more": "और",

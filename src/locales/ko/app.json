@@ -509,7 +509,11 @@
     "increase": "늘리기",
     "note": "메모",
     "notePlaceholder": "비고",
-    "moneyPlaceholder": "₹ 0"
+    "moneyPlaceholder": "₹ 0",
+    "qtyWhole": "정수를 입력하세요",
+    "qtyPlaces": "소수점 이하 {{places}}자리까지 입력하세요",
+    "qtyAtLeast": "{{min}} 이상을 입력하세요",
+    "qtyNumber": "숫자를 입력하세요"
   },
   "roomToolbar": {
     "more": "더보기",

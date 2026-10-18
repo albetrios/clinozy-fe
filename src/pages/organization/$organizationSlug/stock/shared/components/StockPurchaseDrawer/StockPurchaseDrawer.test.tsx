@@ -310,6 +310,32 @@ describe('StockPurchaseDrawer (clinic-stock.md:142–157, 247–259)', () => {
     expect(vi.mocked(createStockPurchase).mock.calls[0]?.[0].input.payment).toBeNull();
   });
 
+  it('buys a part of a unit as typed: 0.75 @ ₹100 is ₹75, never 75 units (INV-001)', async () => {
+    const user = setup();
+    const onClose = vi.fn();
+    renderStockDrawer(<StockPurchaseDrawer mode="create" open onClose={onClose} />);
+    const drawer = await screen.findByTestId(D);
+    await pickAnkur(user, drawer);
+    await user.click(within(drawer).getByTestId(`${D}-step-items-trigger`));
+    await user.type(
+      await within(drawer).findByTestId(`${D}-quick-line-input`),
+      'gauze 1 @100',
+    );
+    await user.keyboard('{Enter}');
+    const qty = await within(drawer).findByTestId(`${D}-lines-qty`);
+    await user.click(qty);
+    await user.keyboard('0.75');
+    await user.tab();
+    expect(qty).toHaveValue('0.75');
+    expect(badges(drawer)).toHaveTextContent('Bill ₹75');
+
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(vi.mocked(createStockPurchase).mock.calls[0]?.[0].input.lines).toEqual([
+      { itemId: GAUZE, qtyMilli: 750, rate: 100 },
+    ]);
+  });
+
   it('a Paid above the bill (409 more_than_due) and a field the API names land on their fields', async () => {
     const user = setup();
     vi.mocked(createStockPurchase)

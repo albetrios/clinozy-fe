@@ -6,6 +6,7 @@ import {
   MONEY_SCALE,
   numberFromText,
   paiseOfRupees,
+  readQuantityText,
   readTypedNumber,
   rupeesOfPaise,
   sanitizeNumberText,
@@ -126,5 +127,36 @@ describe('readTypedNumber — a figure, or a sum and its result (feat-write-less
       result: null,
     });
     expect(readTypedNumber('100-300', 2)).toMatchObject({ result: null });
+  });
+});
+
+describe('readQuantityText — the whole typed quantity, never a cleaned copy (INV-001)', () => {
+  it('reads whole counts, and parts of one to the places it keeps', () => {
+    expect(readQuantityText('12', 0)).toEqual({ kind: 'figure', value: 12 });
+    expect(readQuantityText(' 7 ', 0)).toEqual({ kind: 'figure', value: 7 });
+    expect(readQuantityText('0.75', 3)).toEqual({ kind: 'figure', value: 0.75 });
+    expect(readQuantityText('1.25', 3)).toEqual({ kind: 'figure', value: 1.25 });
+    expect(readQuantityText('0.001', 3)).toEqual({ kind: 'figure', value: 0.001 });
+    expect(readQuantityText('1.000', 3)).toEqual({ kind: 'figure', value: 1 });
+    expect(readQuantityText('.5', 3)).toEqual({ kind: 'figure', value: 0.5 });
+    expect(readQuantityText('2.', 3)).toEqual({ kind: 'figure', value: 2 });
+    expect(readQuantityText('1,5', 3)).toEqual({ kind: 'figure', value: 1.5 });
+  });
+
+  it('never joins a part to the whole: 1.5, 0.5 and 1,5 are parts where only whole units go', () => {
+    for (const typed of ['1.5', '0.5', '1,5', '0.75', '1.', '.'])
+      expect(readQuantityText(typed, 0)).toEqual({ kind: 'fraction' });
+  });
+
+  it('refuses more places than kept, and anything that is not a figure', () => {
+    expect(readQuantityText('0.0005', 3)).toEqual({ kind: 'places' });
+    for (const typed of ['-1', '1.2.3', '1e3', '₹5', 'abc', '1 2'])
+      expect(readQuantityText(typed, 3)).toEqual({ kind: 'malformed' });
+  });
+
+  it('reads nothing typed — or only the point that starts ".75" — as empty', () => {
+    expect(readQuantityText('', 0)).toEqual({ kind: 'empty' });
+    expect(readQuantityText('  ', 3)).toEqual({ kind: 'empty' });
+    expect(readQuantityText('.', 3)).toEqual({ kind: 'empty' });
   });
 });
