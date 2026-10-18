@@ -55,7 +55,7 @@ Read in order; **project guardrails always win** over skill suggestions.
 | extract constants / copy / locale namespace                                  | `fe-i18n-constants` → `fe-code-structure`                                     |
 | PWA manifest / app icon / favicon                                            | `fe-pwa-manifest`                                                             |
 | where does this code go?                                                     | `fe-code-structure` / `fe-component-promotion`                                |
-| lint / quality cleanup                                                       | `fe-lint-guard` / `fe-code-smells-best-practices`                             |
+| lint / quality cleanup                                                       | `fe-lint-guard` (lint, types, conventions)                                    |
 | debug a bug / test failure (before any fix)                                  | `systematic-debugging` (root cause first; then the fixing skill)              |
 | full project check                                                           | `fe-project-health-check` (`pnpm health`)                                     |
 

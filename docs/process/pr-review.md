@@ -187,7 +187,7 @@ Use when reviewing as a Cursor/Claude agent or via `/fe-pre-merge-review`. Read 
 
 - **fe-full-code-review** — full report across security/perf/quality when asked.
 - **fe-ci-investigator** — one failing check diagnosis.
-- **fe-code-smells-best-practices** — fix lint/idiom issues in touched files.
+- **fe-lint-guard** — fix lint, type and convention issues in touched files.
 - **fe-lint-guard** — background lint/type fixes after implementation.
 
 ---

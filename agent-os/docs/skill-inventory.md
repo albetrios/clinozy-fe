@@ -78,20 +78,10 @@ skills' own files do not: install sources, safety notes, project usage and a bro
 
 ---
 
-### 0e. fe-code-smells-best-practices (Live Code Only)
+### 0e. (merged) fe-code-smells-best-practices
 
-**Path:** `agent-os/skills/fe-code-smells-best-practices/SKILL.md`
-**Purpose:** When any code is added or changed, check only the **modified/live code** for code smells and best-practice violations and fix them in the same change set. Ensures architecture (app not importing from pages), import conventions, no inline styles, no `any`, apiClient from fetch-client, and form-error testid consistency.
-
-**Trigger keywords:** (Auto-invoked when code is added or changed); "fix code smells", "check best practices", "review my changes", "clean up this code"
-
-**Key behaviors:**
-
-- Scope: only files added or modified in the current change (no full codebase audit unless asked)
-- Fix: dependency violations (app → core instead of app → pages), import spacing and apiClient path, replace inline styles with CSS/Tailwind, type tests properly (no any), align form-error testid
-- Runs without asking; fixes applied in the same turn
-
-**Related skills:** fe-lint-guard (runs after; handles ESLint/TS), fe-code-structure (placement rules), fe-auto-implement (may chain this)
+Merged into **fe-lint-guard** on 18 Oct 2026: its checklist is fe-lint-guard's "Conventions and
+smells — the changed code only" pass (same trigger, same job, changed code only).
 
 ---
 
@@ -984,7 +974,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 - Does not stop until every check passes; outputs pass/fail table
 - CLI counterpart: `pnpm health` (report only), `pnpm health:fix` (auto-fix format + lint, then check)
 
-**Related skills:** fe-documentation-maintenance (Phase 1), fe-lint-guard (Phase 3), fe-test-generation (Phase 2), fe-code-smells-best-practices (optional on modified files)
+**Related skills:** fe-documentation-maintenance (Phase 1), fe-lint-guard (Phase 3), fe-test-generation (Phase 2), fe-lint-guard conventions pass (optional on modified files)
 
 ---
 
@@ -1037,7 +1027,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 | Area of Codebase                                            | Relevant Skill(s)                                                                                                                                                        |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Any new feature / requirement                               | **fe-auto-implement** (master), fe-code-structure, fe-test-generation, fe-code-smells-best-practices, fe-lint-guard (all auto)                                           |
+| Any new feature / requirement                               | **fe-auto-implement** (master), fe-code-structure, fe-test-generation, fe-lint-guard (all auto)                                                                          |
 | `src/pages/`                                                | fe-auto-implement, fe-code-structure, fe-page-scaffolding, **fe-route-island**, **fe-routing-tenancy**, **fe-resource-crud**, fe-component-promotion, fe-test-generation |
 | `src/app/routes/routeTree.tsx`, `src/app/guards/`           | **fe-routing-tenancy**, fe-test-generation                                                                                                                               |
 | `src/shared/tenancy/`                                       | **fe-routing-tenancy**, fe-test-generation                                                                                                                               |

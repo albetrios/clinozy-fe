@@ -44,7 +44,7 @@ When a task matches a pattern below, read the corresponding SKILL.md **before** 
 | Adding, renaming or removing an agent-os skill or rule | fe-agent-os-authoring | `agent-os/skills/fe-agent-os-authoring/SKILL.md` |
 | Addressing a review report or PR review threads | fe-review-response | `agent-os/skills/fe-review-response/SKILL.md` |
 | Lint/type-check failures after implementation | fe-lint-guard | `agent-os/skills/fe-lint-guard/SKILL.md` |
-| Code smells, best practices, live-code review when code added/changed | fe-code-smells-best-practices | `agent-os/skills/fe-code-smells-best-practices/SKILL.md` |
+| Code smells, best practices, live-code review when code added/changed | fe-lint-guard (conventions pass) | `agent-os/skills/fe-lint-guard/SKILL.md` |
 | New test, add test, test coverage, missing tests | fe-test-generation | `agent-os/skills/fe-test-generation/SKILL.md` |
 | E2E selectors, data-testid, test ids for Playwright, audit test hooks | fe-e2e-testids | `agent-os/skills/fe-e2e-testids/SKILL.md` |
 | Write/refactor Playwright E2E specs (hybrid selectors) | fe-playwright-e2e | `agent-os/skills/fe-playwright-e2e/SKILL.md` |
@@ -111,7 +111,7 @@ When a task matches a pattern below, read the corresponding SKILL.md **before** 
 
 7. **Lint Guard**: After every implementation that adds or changes source files, invoke the `fe-lint-guard` skill to fix all ESLint and TypeScript errors before responding. Do not announce this step — just ensure zero errors.
 
-8. **Code Smells / Best Practices**: When any code is added or changed under `src/`, invoke the `fe-code-smells-best-practices` skill on the **modified/live code only**. Check dependency rules (app not importing from pages), import formatting, no inline styles, no `any`, apiClient from fetch-client, form-error testid consistency. Fix issues in the same change set without asking.
+8. **Code Smells / Best Practices**: When any code is added or changed under `src/`, run the conventions pass of the `fe-lint-guard` skill on the **modified/live code only**. Check dependency rules (app not importing from pages), import formatting, no inline styles, no `any`, apiClient from fetch-client, form-error testid consistency. Fix issues in the same change set without asking.
 
 9. **Requirement Format**: When the user's request is vague or feature-sized (e.g. "we need notifications", "add the billing feature") and they have **not** provided a requirement doc in the standard format (What, Where, Acceptance criteria), invoke the `fe-requirement-format` skill: ask them to fill the template from `docs/getting-started/requirement-format.md` (or paste it) and point to `docs/getting-started/requirements/sample-requirement.md`. Full intake (types, skills, rules): **docs/getting-started/requirement-intake.md**. When they **do** provide a requirement in that format, parse it and implement fully (fe-code-structure + fe-page-scaffolding + tests + route + RBAC) without asking.
 

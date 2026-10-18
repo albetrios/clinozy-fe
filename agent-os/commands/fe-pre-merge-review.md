@@ -31,7 +31,7 @@ reviewer in this pipeline uses. Then run the **`pre-merge-review`** pipeline ove
 
 Each finding names the procedural skill that fixes it (`handoff`: agent finds, skill fixes —
 `fe-verifier → fe-test-generation`, `fe-docs-auditor → fe-documentation-maintenance`). Skill lenses
-that are not agents (`fe-code-smells-best-practices`, `web-design-guidelines`, `fe-lint-guard`) still
+that are not agents (`web-design-guidelines`, `fe-lint-guard`) still
 apply via their own file-pattern routing in `agent-os/docs/skill-triggers.md`. This is review-only:
 do not edit files.
 

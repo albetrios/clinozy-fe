@@ -37,7 +37,7 @@ if printf '%s' "$lower" | grep -Eq 'pnpm tsc|tsc -b|tsc --noemit|type-check|type
 fi
 # eslint / biome lint
 if printf '%s' "$lower" | grep -Eq '\blint\b|biome[: ]check|eslint'; then
-  HINTS+=("lint → pnpm lint:fix for autofixable; warnings via fe-lint-guard / fe-code-smells-best-practices")
+  HINTS+=("lint → pnpm lint:fix for autofixable; warnings via fe-lint-guard")
 fi
 # prettier / format
 if printf '%s' "$lower" | grep -Eq 'format|prettier'; then
