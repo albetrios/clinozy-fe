@@ -677,10 +677,6 @@ if (existsSync(pluginManifestFile)) {
   }
 }
 
-// ── Report ──
-const errors = findings.filter((finding) => finding.level === 'error');
-const warnings = findings.filter((finding) => finding.level === 'warn');
-
 // ── The test selection (pnpm test:select) holds its fixtures ──
 // One generated fixture per page island (its main file selects its own test and no test in
 // another section), the escalation list running everything, the misses recorded in
@@ -688,6 +684,10 @@ const warnings = findings.filter((finding) => finding.level === 'warn');
 // always run.
 const selectorFixtures = checkSelectorFixtures(repositoryRoot);
 for (const problem of selectorFixtures.problems) error('selector-fixtures', problem);
+
+// ── Report ──
+const errors = findings.filter((finding) => finding.level === 'error');
+const warnings = findings.filter((finding) => finding.level === 'warn');
 
 const checkLabels: Record<string, string> = {
   'skill-frontmatter': 'Skill frontmatter & names',
