@@ -154,19 +154,19 @@ Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`.
 
 ## Commands
 
-| Command                                   | What runs                                                           |
-| ----------------------------------------- | ------------------------------------------------------------------- |
-| `pnpm test`                               | Vitest all projects — unit + security + ci-policy                   |
-| `pnpm test:unit`                          | Colocated `src/**/*.test.*` only                                    |
-| `pnpm test:security`                      | `tests/security/`                                                   |
-| `pnpm test:e2e`                           | All Playwright specs in `tests/e2e/`                                |
-| `pnpm test:e2e:integration`               | Routes integration + org-switching only                             |
-| `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be)              |
-| `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)                        |
-| `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                                         |
-| `pnpm test:select [--why\|--run]`         | The Vitest files a change can affect, and why                       |
-| `pnpm test:affected [--base <ref>]`       | What `git push` will run, and the tests picked, and why             |
-| `pnpm test:pre-push [--base <ref>]`       | Pre-push's Vitest step (`PRE_PUSH_SELECTED_TESTS=1`: the selection) |
+| Command                                   | What runs                                                  |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| `pnpm test`                               | Vitest all projects — unit + security + ci-policy          |
+| `pnpm test:unit`                          | Colocated `src/**/*.test.*` only                           |
+| `pnpm test:security`                      | `tests/security/`                                          |
+| `pnpm test:e2e`                           | All Playwright specs in `tests/e2e/`                       |
+| `pnpm test:e2e:integration`               | Routes integration + org-switching only                    |
+| `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be)     |
+| `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)               |
+| `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                                |
+| `pnpm test:select [--why\|--run]`         | The Vitest files a change can affect, and why              |
+| `pnpm test:affected [--base <ref>]`       | What `git push` will run, and the tests picked, and why    |
+| `pnpm test:pre-push [--base <ref>]`       | Pre-push's Vitest step: the files `pnpm test:select` picks |
 
 Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes.txt`.
 
@@ -187,8 +187,8 @@ everything it imports (i18n, `shared/api`, auth, the stores: every test runs thr
 closed: a path outside the known roots, a deleted file nothing imports, or any error selects
 everything. `--why` lists each test's reason, `--json` the whole selection, `--run` runs it (`pnpm
 test` when everything is selected), `--changed-only` drops the always-run set, `--exclude <glob>`
-leaves tests out. The pre-push hook runs the whole suite by default (see **Selected tests at
-push** below); the selector feeds the faster signals built on it. Its rules are pinned by `tooling/ci/test-selection.test.mjs` (`pnpm
+leaves tests out. The pre-push hook runs its selection (see **Selected tests at push** below), and
+the selector feeds the other fast signals built on it. Its rules are pinned by `tooling/ci/test-selection.test.mjs` (`pnpm
 test:github-scripts`), which also pins its project list to `vitest.config.ts`.
 
 **Fixtures.** `pnpm agent-os:check` holds the selector to its fixtures
@@ -199,12 +199,17 @@ today; one file of each escalating kind running everything; the misses recorded 
 `tooling/ci/selector-fixtures.json`; and the unreachable tests always run.
 
 **Selected tests at push.** `.husky/pre-push` runs its Vitest step through `pnpm test:pre-push`
-(`tooling/ci/pre-push-tests.mjs`). By default that is `pnpm test`, the whole suite. With
-`PRE_PUSH_SELECTED_TESTS=1` it runs only the files the selection picks for the pushed commits,
-always-run files included, in one Vitest process. An escalating change still runs the whole suite,
-as does a selection that cannot be built. The switch stays off by default until the selector miss
-check has reported no miss for two weeks; then the default flips to on, in `pre-push-tests.mjs`.
-`pnpm test:affected` previews either way.
+(`tooling/ci/pre-push-tests.mjs`): only the files the selection picks for the pushed commits,
+always-run files included, in one Vitest process. An escalating change runs the whole suite
+(`pnpm test`), as does a selection that cannot be built. CI still runs every suite.
+`pnpm test:affected` previews it.
+
+Proven before it became the default (18 Oct): eleven planted breaks, one at a time, each against
+the whole suite — top-level throws in a page, a layout, a component, `src/lib`, `src/core` (twice),
+the shared button and the turn-end hook, a weakened password blocklist, a workflow without
+`VITE_E2E_HOOKS`, and a row dropped from `scheduled-jobs.md`. The button plant found 5 misses (the
+walk skipped every folder named `reports`, so the patient reports page was not in the graph); with
+that fixed, every failing test was in the selection (0 misses).
 
 **Selector misses.** When a PR's merged unit shards fail, the `Unit + global` job's `Selector miss
 check` step (not a gate) lists every failed file `pnpm test:select` would have skipped for the PR's

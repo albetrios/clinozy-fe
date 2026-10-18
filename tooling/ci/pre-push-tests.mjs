@@ -3,34 +3,29 @@
  * `pnpm test:pre-push [--base <ref>]` — the Vitest run `.husky/pre-push` makes for the pushed
  * commits (clinozy-be's `tooling/vitest/pre-push-tests.ts`, on this repository's shape).
  *
- * Off (the default): `pnpm test`, the whole suite, as before. With `PRE_PUSH_SELECTED_TESTS=1`:
- * only the test files `pnpm test:select` picks for the pushed changes, always-run files included,
- * in one Vitest process. A change on the escalation list (dependencies, configs, plugins, locales,
- * the test setup closure) selects everything, and then the whole suite runs; so does a selection
- * that cannot be built. It stays off by default until the PR suite's `Selector miss check` has
- * reported no miss for two weeks (docs/reference/testing.md → Selected tests at push).
+ * The test files `pnpm test:select` picks for the pushed changes, always-run files included, in one
+ * Vitest process. A change on the escalation list (dependencies, configs, plugins, locales, the
+ * test setup closure) selects everything, and then the whole suite runs (`pnpm test`); so does a
+ * selection that cannot be built. CI still runs every suite.
+ *
+ * Proven before it became the default (18 Oct 2026): eleven planted breaks, one at a time, each
+ * against the whole suite — every failing test was in the selection (0 misses;
+ * docs/reference/testing.md → Selected tests at push).
  */
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { selectTests } from './test-selection.mjs';
 
-/** The switch: `1` runs the selected tests at push; anything else, the whole suite. */
-export const SELECTED_TESTS_SWITCH = 'PRE_PUSH_SELECTED_TESTS';
-
 /**
- * What pre-push runs for a change: the whole suite (`all`), nothing (`none`), or these files.
- * `select` is called only when the switch is on; a selection that throws runs everything.
+ * What pre-push runs for a change: the whole suite (`all`), nothing (`none`), or these files. A
+ * selection that throws runs everything.
  *
- * @param {{ switchedOn: boolean, select: () => import('./test-selection.mjs').TestSelection }} options
+ * @param {{ select: () => import('./test-selection.mjs').TestSelection }} options
  * @returns {{ run: 'all' | 'none' | 'selected', files: string[], reason: string }}
  */
-export function prePushTests({ switchedOn, select }) {
+export function prePushTests({ select }) {
   const all = (reason) => ({ run: 'all', files: [], reason });
-  if (!switchedOn)
-    return all(
-      `selected tests at push are off — ${SELECTED_TESTS_SWITCH}=1 turns them on`,
-    );
   let selection;
   try {
     selection = select();
@@ -67,7 +62,6 @@ function main() {
   const base =
     (baseIndex === -1 ? undefined : process.argv[baseIndex + 1]) ?? 'origin/main';
   const plan = prePushTests({
-    switchedOn: process.env[SELECTED_TESTS_SWITCH]?.trim() === '1',
     select: () => selectTests({ changedFiles: changedFiles(base), repositoryRoot }),
   });
   console.log(`Pre-push tests: ${plan.run} — ${plan.reason}`);

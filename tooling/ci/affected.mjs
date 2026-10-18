@@ -4,15 +4,13 @@
  * what `git push` will run for the commits it pushes (the steps of `.husky/pre-push`, each with why
  * it runs or not), then the tests `pnpm test:select` picks for them, with why each was picked.
  *
- * Pre-push runs the whole Vitest suite by default; the selected set is what it runs with
- * `PRE_PUSH_SELECTED_TESTS=1` (`pre-push-tests.mjs`, off until the selector miss check has shown no
- * miss for two weeks). The steps mirror `.husky/pre-push` (`tests/ci/affected.policy.test.ts` keeps
- * the two in step). It changes nothing.
+ * Pre-push runs that selection (`pre-push-tests.mjs`), or the whole Vitest suite when it escalates.
+ * The steps mirror `.husky/pre-push` (`tests/ci/affected.policy.test.ts` keeps the two in step). It
+ * changes nothing.
  */
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SELECTED_TESTS_SWITCH } from './pre-push-tests.mjs';
 import { pushSemgrepTargets } from './push-semgrep.mjs';
 import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
@@ -26,14 +24,12 @@ export const SONAR_EXCLUDED =
   /(__tests__\/|\.test\.tsx?$|\.spec\.tsx?$|\.fixtures\.ts$|\/mock-[^/]*\.ts$|\.d\.ts$)/;
 
 /**
- * The steps of `.husky/pre-push` for the pushed files, in its order; `selectedTestsOn` is the
- * `PRE_PUSH_SELECTED_TESTS` switch of its Vitest step.
+ * The steps of `.husky/pre-push` for the pushed files, in its order.
  *
  * @param {readonly string[]} changedFiles
- * @param {boolean} [selectedTestsOn]
  * @returns {{ command: string, runs: boolean, why: string }[]}
  */
-export function pushSteps(changedFiles, selectedTestsOn = false) {
+export function pushSteps(changedFiles) {
   const markdown = changedFiles.some((file) => file.endsWith('.md'));
   const unitRelevant = changedFiles.some((file) => UNIT_RELEVANT.test(file));
   const semgrep = pushSemgrepTargets(changedFiles);
@@ -58,7 +54,7 @@ export function pushSteps(changedFiles, selectedTestsOn = false) {
       command: 'pnpm test:pre-push',
       runs: unitRelevant,
       why: unitRelevant
-        ? `pushed unit-relevant files — ${selectedTestsOn ? 'the selected files below (PRE_PUSH_SELECTED_TESTS=1)' : 'the whole Vitest suite (PRE_PUSH_SELECTED_TESTS=1 runs the selected files below)'}`
+        ? 'pushed unit-relevant files — the files selected below (all of them when the selection escalates)'
         : 'nothing unit-relevant pushed',
     },
     {
@@ -136,13 +132,13 @@ function main() {
     '',
     '| Step | Runs | Why |',
     '| --- | --- | --- |',
-    ...pushSteps(changedFiles, process.env[SELECTED_TESTS_SWITCH]?.trim() === '1').map(
+    ...pushSteps(changedFiles).map(
       (step) => `| \`${step.command}\` | ${step.runs ? 'yes' : 'no'} | ${step.why} |`,
     ),
     '',
     '## The tests pnpm test:select picks',
     '',
-    'Pre-push runs the whole Vitest suite by default; with PRE_PUSH_SELECTED_TESTS=1 it runs this selection. CI runs everything.',
+    'Pre-push runs this selection (the whole Vitest suite when it escalates). CI runs everything.',
     '',
     ...selectionTable(selectTests({ changedFiles, repositoryRoot })),
   ];
