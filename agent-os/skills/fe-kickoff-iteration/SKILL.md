@@ -88,7 +88,9 @@ Follow the ledger in its order (respecting Depends on). For each row:
      upcoming rows (the revised row text), and mark the KICKOFF ledger row
      `revised → AS-BUILT #n` — the only edit KICKOFF.md gets besides Status.
 5. **Stop for the user's review** — show the comparison and the entry, and wait
-   before the next row.
+   before the next row. **This review is the row's review of record:** on the user's OK, fill the
+   row's `Reviewed` cell (date · who · the commit reviewed). A change they ask for is made,
+   verified and shown again before the cell is filled.
 
 ## Close
 
@@ -98,6 +100,9 @@ Follow the ledger in its order (respecting Depends on). For each row:
   (`fe-visual-regression`).
 - **The ledger is closed:** every row `done`, or `deferred` with the user's OK
   recorded. An open row means not done — say so and keep going.
+- **The per-row reviews are the review of record.** Every `AS-BUILT.md` row has its `Reviewed`
+  cell; a row without one is reviewed now, before close. The PR's human review then covers what
+  changed after each row's reviewed commit (and the close), not the rows again.
 - **`AS-BUILT.md` › Summary:** planned but not built (deferred, user OK), built
   but not planned, follow-ups for the next iteration.
 - **`AS-BUILT.md` › Standing deviations:** the complete list of where the code
@@ -119,8 +124,8 @@ What was actually built, ledger row by ledger row, against the approved plan in
 
 ## Rows
 
-| # | Ledger row | Planned | Actually built | Difference | Why | Decision | Commit |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| # | Ledger row | Planned | Actually built | Difference | Why | Decision | Commit | Reviewed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
 ## Revisions to upcoming rows
 

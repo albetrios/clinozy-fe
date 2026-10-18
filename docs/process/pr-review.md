@@ -23,6 +23,11 @@ flowchart LR
   Merge --> PostMerge[Post-merge CI deploys development alias]
 ```
 
+**An iteration's PR** (`iterations/<iteration>/` in the diff) was reviewed as it was built: each
+ledger row's review is its review of record — the `Reviewed` cell of its `AS-BUILT.md` row (date ·
+who · commit). Check that every row has one, then review only what changed after each row's
+reviewed commit and the close; do not re-review a reviewed row.
+
 ---
 
 ## Severity legend

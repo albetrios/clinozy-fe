@@ -13,11 +13,13 @@ A design change from Claude Design is an **iteration**: `iterations/<type>-<topi
    **what arrived** in `intake-files/` (exactly as delivered) and checks the required set on the
    snapshot it resolves to. "plan iteration <name>" runs **`fe-iteration-planning`** (Steps 0–6, stopping after
    each; Steps 1–3 run back to back with one stop) → `KICKOFF.md` with its ordered ledger and `plans/decisions.md` → Status `ready-for-approval`.
-   The user's approval → `approved`, which locks `intake-files/` and freezes `KICKOFF.md`.
+   The user's approval → `approved`, which locks `intake-files/` and freezes `KICKOFF.md`; the step
+   reviews are the plan's review of record, so the approval confirms them, not a second full read.
 2. **Kickoff — build.** "kickoff iteration <name>" runs **`fe-kickoff-iteration`**: one ledger row at a
    time through its skill (screens through **`fe-design-ditto`**), verified by Intake mode (side by side
    at 375px and 1440px, or the `BRIEF.md` acceptance criteria), recorded in `AS-BUILT.md`; a scope change
-   stops for the user. Then `done` — `AS-BUILT.md` closes with its **Standing deviations**, the complete
+   stops for the user. The user's review of each row is its review of record (its `Reviewed` cell
+   in `AS-BUILT.md`); the PR's review covers only what changed after it. Then `done` — `AS-BUILT.md` closes with its **Standing deviations**, the complete
    list of where the code differs from the design — and `frozen` in the last commit before the merge. A
    frozen iteration is never edited; a correction is a new `fix`.
 

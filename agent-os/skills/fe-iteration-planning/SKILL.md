@@ -333,6 +333,10 @@ Then `pnpm iteration:status <iteration> ready-for-approval` and present the
 coverage matrix, the delta (incremental), the reconciliation table, the RED and
 AMBER verdicts, KICKOFF.md and the ledger. **Stop.**
 
+**The step reviews are the plan's review of record:** the approval (`ready-for-approval →
+approved`) confirms what they already accepted and what changed after the last one — it does not
+ask for a second full read of `KICKOFF.md` and `plans/`.
+
 On the user's go-ahead: `pnpm iteration:status <iteration> approved` — that
 locks `intake-files/` — and hand off to `fe-kickoff-iteration`. A change of
 scope after that goes back first:
