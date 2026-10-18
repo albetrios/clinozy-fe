@@ -1,8 +1,7 @@
 ---
 name: fe-perf-auditor
 description: Audits clinozy-fe runtime performance on the local production build — captures a Chrome DevTools performance trace of the preview server, extracts Core Web Vitals insights (LCP, CLS, render-blocking, thirdparties), and reports against the size-limit and Lighthouse budgets. Read-only; reports findings and never edits config or source.
-model: sonnet
-effort: medium
+model: inherit
 background: true
 tools:
   - Read

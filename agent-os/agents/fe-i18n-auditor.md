@@ -1,8 +1,7 @@
 ---
 name: fe-i18n-auditor
 description: Audits clinozy-fe internationalization — hardcoded user-facing strings that bypass react-i18next, missing/orphaned translation keys across src/locales/*, and locale-namespace wiring drift. Read-only; returns a prioritized findings report and never edits source or locale files.
-model: sonnet
-effort: medium
+model: inherit
 background: true
 tools:
   - Read

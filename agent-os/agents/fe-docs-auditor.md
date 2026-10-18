@@ -1,8 +1,7 @@
 ---
 name: fe-docs-auditor
 description: Audits docs/ for index completeness, naming, Mermaid, and cross-links. Use after large doc changes or when the user asks for a documentation review. Read-only.
-model: sonnet
-effort: medium
+model: inherit
 background: true
 tools:
   - Read

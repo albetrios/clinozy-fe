@@ -37,13 +37,13 @@ symlinks. Agents are read-only validators/investigators — for task instruction
 
 ## Conventions
 
-- Each agent is a Markdown file with frontmatter (`name`, `description`, `model`, `effort`,
+- Each agent is a Markdown file with frontmatter (`name`, `description`, `model`,
   optional `background`, `omitClaudeMd`, `tools`, `readonly`, `disallowedTools`). Shape and
   discovery rules: [`agent-os/agents/README.md`](../agents/README.md).
-- Models are set by job: `fe-verifier` and `fe-production-hardening-reviewer` (judgment calls) on
-  Opus with high effort; the auditors and `fe-ci-investigator` on Sonnet, medium;
-  `fe-changelog-reviewer` on Haiku, low. Report agents run in the background; the dependency,
-  TSDoc and changelog reviewers skip CLAUDE.md (`omitClaudeMd`). `check.ts` validates every field.
+- Every agent is `model: inherit` with no `effort` (for now, since 18 Oct 2026): it runs on the
+  model and effort of the session that starts it. Per-job routing (Opus, Sonnet or Haiku by job)
+  is set aside. Report agents run in the background; the dependency, TSDoc and changelog
+  reviewers skip CLAUDE.md (`omitClaudeMd`). `check.ts` validates every field.
 - All are `readonly: true` — they investigate and report; they do not
   modify the working tree. `check.ts` enforces this: a `readonly` agent must
   declare a `tools` allowlist that excludes every write tool, and list every write tool in

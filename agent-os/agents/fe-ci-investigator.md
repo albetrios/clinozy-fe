@@ -1,8 +1,7 @@
 ---
 name: fe-ci-investigator
 description: Diagnoses a single failing clinozy-fe PR CI check and returns a short root-cause summary with a fix plan. Use when the user asks why CI failed or to diagnose a specific GitHub Actions job.
-model: sonnet
-effort: medium
+model: inherit
 tools:
   - Read
   - Grep

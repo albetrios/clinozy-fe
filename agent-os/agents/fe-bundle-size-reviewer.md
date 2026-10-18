@@ -1,8 +1,7 @@
 ---
 name: fe-bundle-size-reviewer
 description: Reviews clinozy-fe build output for bundle-size regressions, code-splitting breakage, and heavy/static imports that land on the first-paint path. Read-only; reports against the size-limit budgets and never edits config or source.
-model: sonnet
-effort: medium
+model: inherit
 background: true
 tools:
   - Read

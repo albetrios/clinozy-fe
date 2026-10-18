@@ -1,8 +1,7 @@
 ---
 name: fe-production-hardening-reviewer
 description: Sweeps the clinozy-fe production-security surface for hardening gaps — CSP header/meta parity, token-in-memory storage discipline, the single refresh path, cross-tab logout, env allowlist (diagnostics off in production), and asset-inlining/CSP build constraints. Returns a prioritized gap list. Read-only; produces a report for the user to act on, never edits files.
-model: opus
-effort: high
+model: inherit
 background: true
 tools:
   - Read

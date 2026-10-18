@@ -1,8 +1,7 @@
 ---
 name: fe-a11y-auditor
 description: Audits clinozy-fe accessibility across whole pages — runs the axe-core Playwright lane (tests/e2e/accessibility.e2e.test.ts) when clinozy-be is up, otherwise sweeps components statically for ARIA/focus/label violations per web-design-guidelines. Read-only; reports violations grouped by route and severity, never edits source.
-model: sonnet
-effort: medium
+model: inherit
 background: true
 tools:
   - Read

@@ -5,7 +5,7 @@ Agent definitions shared across Cursor and Claude Code via the `.cursor/agents/`
 ## When to put a file here
 
 - A **Cursor agent** definition (custom agent with tools/system prompt) that should also be available to Claude Code subagents.
-- A **Claude Code subagent** definition (Markdown with frontmatter: `name`, `description`, `model`, `effort`, optional `background`, `omitClaudeMd`, `tools`, `disallowedTools`) that should also be visible to Cursor.
+- A **Claude Code subagent** definition (Markdown with frontmatter: `name`, `description`, `model: inherit`, optional `background`, `omitClaudeMd`, `tools`, `disallowedTools`) that should also be visible to Cursor.
 
 Both tools read the same files via their respective symlinks — author once, both pick it up.
 

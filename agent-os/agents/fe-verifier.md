@@ -1,8 +1,7 @@
 ---
 name: fe-verifier
 description: Skeptical independent validator for clinozy-fe. Use after a task is marked done to confirm the implementation works — runs health/tests, checks edge cases, and reports pass vs incomplete. Use before claiming a feature complete.
-model: opus
-effort: high
+model: inherit
 tools:
   - Read
   - Grep

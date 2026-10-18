@@ -1,8 +1,7 @@
 ---
 name: fe-dependency-auditor
 description: Runs pnpm audit + lockfile/license/bundle-impact analysis for clinozy-fe and returns a prioritized fix plan — severity, affected package, recommended action (patch/update/replace/accept). Read-only; produces a report for the user to act on, never edits package.json or the lockfile.
-model: sonnet
-effort: medium
+model: inherit
 background: true
 omitClaudeMd: true
 tools:
