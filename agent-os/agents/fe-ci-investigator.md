@@ -21,6 +21,11 @@ You diagnose **one** failing CI check and return a short, actionable root-cause 
 ## Procedure
 
 1. `gh pr checks` then `gh run view <run-id> --log-failed` for the first failing step.
+   A scheduled or post-merge failure has a `ci-failure` issue. Once the shared action
+   (clinozy-be's `.github/actions/ci-failure-issue`) is pinned at a commit that carries
+   `fix-plan.mjs`, the issue holds a **Fix plan**: the failed jobs and steps, the log tail up to the
+   last error, the owning page and the skills `agent-os/hooks/skill-routing.json` names for the
+   files in it. Start from it, then confirm against the log — it reads paths, not causes.
 2. Map the job to a local command:
 
 | CI lane        | Local repro                      |

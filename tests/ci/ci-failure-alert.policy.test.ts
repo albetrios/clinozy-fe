@@ -91,6 +91,18 @@ describe('ci-failure alert on every scheduled check', () => {
     },
   );
 
+  // The shared action adds a fix plan to the issue (the failed steps, their log tail, the owning
+  // page and the skill that fixes it); reading the run's jobs and logs needs `actions: read`.
+  it.each(alerted)(
+    '%s lets the issue-opening job read the run, for the fix plan',
+    (name) => {
+      for (const [job, block] of jobBlocks(text(name))) {
+        if (!/mode: open\n/.test(block)) continue;
+        expect(block, `${name} → ${job}`).toMatch(/^ {6}actions: read\b/m);
+      }
+    },
+  );
+
   it('no workflow keeps its own ci-failure issue code', () => {
     const inline = files.filter((name) =>
       /labels: \['ci-failure'\]|--label ci-failure/.test(text(name)),

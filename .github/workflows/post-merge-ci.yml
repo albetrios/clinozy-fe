@@ -378,6 +378,7 @@ jobs:
     # `issues: write` to open/update the tracked `ci-failure` issue; the
     # workflow default is `contents: read`, so widen it here only.
     permissions:
+      actions: read # the fix plan reads the failed jobs and their logs
       contents: read
       issues: write
     steps:
