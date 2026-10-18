@@ -140,8 +140,23 @@ jobs:
             exit 1
           fi
 
+      # The JSON report is read by the selector miss check below.
       - name: Merge the shards (tests, coverage and its thresholds)
-        run: pnpm test:ci --merge-reports .vitest/blob
+        run: >-
+          pnpm test:ci --merge-reports .vitest/blob --reporter=default --reporter=json
+          --outputFile.json=test-results/unit.json
+
+      # Not a gate: when the merged suite fails on a PR, the failed test files pnpm test:select
+      # would have skipped for its changes — each a selector miss (or a flake); its fixture line
+      # goes into tooling/ci/selector-fixtures.json so the selection includes it next time.
+      - name: Selector miss check
+        if: failure() && github.event_name == 'pull_request' && hashFiles('test-results/unit.json') != ''
+        continue-on-error: true
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch origin "$BASE_REF" --quiet
+          pnpm test:selector-misses --base "origin/$BASE_REF" --results test-results
 
       - name: Patch coverage (changed lines ≥ 90%)
         if: github.event_name == 'pull_request'

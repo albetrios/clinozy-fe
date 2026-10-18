@@ -182,6 +182,12 @@ leaves tests out. The pre-push hook still runs the whole suite; the selector fee
 signals built on it. Its rules are pinned by `tooling/ci/test-selection.test.mjs` (`pnpm
 test:github-scripts`), which also pins its project list to `vitest.config.ts`.
 
+**Selector misses.** When a PR's merged unit shards fail, the `Unit + global` job's `Selector miss
+check` step (not a gate) lists every failed file `pnpm test:select` would have skipped for the PR's
+changes — a selector miss, or a flake — as a warning, in the job summary, and as a fixture line for
+`tooling/ci/selector-fixtures.json`, which the selection must satisfy from then on. `pnpm
+test:selector-misses --base <ref> --results <dir of Vitest JSON reports>` runs it locally.
+
 ## Mutation testing (Stryker, weekly)
 
 Stryker mutates the pure runtime logic and checks that its tests notice. CI:
