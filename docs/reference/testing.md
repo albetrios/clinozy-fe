@@ -194,7 +194,7 @@ test:github-scripts`), which also pins its project list to `vitest.config.ts`.
 **Fixtures.** `pnpm agent-os:check` holds the selector to its fixtures
 (`tooling/ci/selector-fixtures.check.mjs`): one generated per route island — a change to its main
 file selects its own test and no test in another section (a top-level page, or an organization
-room; a layout wires its own children, so siblings inside a section may reach each other) — 105
+room; a layout wires its own children, so siblings inside a section may reach each other) — 108
 today; one file of each escalating kind running everything; the misses recorded in
 `tooling/ci/selector-fixtures.json`; and the unreachable tests always run.
 

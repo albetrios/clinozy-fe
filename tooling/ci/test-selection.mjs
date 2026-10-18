@@ -91,11 +91,15 @@ export const ALWAYS_RUN_REASON = 'always run';
 
 const GRAPH_ROOTS = ['src', 'tests', 'plugins', 'tooling'];
 const CODE_EXTENSIONS = ['.ts', '.tsx', '.mts', '.mjs', '.js', '.cjs'];
+/**
+ * Directories the walk never enters: names `.gitignore` ignores at any depth, so they are never
+ * code. Not `reports` — the generated reports live in the root `reports/`, outside the walked
+ * roots, while `reports` inside them is code (the patient reports page, `tooling/reports/`).
+ */
 const SKIPPED_DIRECTORIES = new Set([
   'node_modules',
   'dist',
   'coverage',
-  'reports',
   'test-results',
   '.git',
 ]);

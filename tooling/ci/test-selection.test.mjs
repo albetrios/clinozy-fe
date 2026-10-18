@@ -99,6 +99,23 @@ describe('selectTests', () => {
     assert.equal(select(root, ['docs/other.md']).mode, 'none');
   });
 
+  test('walks a folder named like a build output (a reports page) — the button proof miss', () => {
+    const root = fixture({
+      'src/shared/ui/button.tsx': 'export const Button = 1;\n',
+      'src/pages/patients/reports/ReportsPage.tsx':
+        "import { Button } from '@/shared/ui/button.tsx';\n",
+      'src/pages/patients/reports/__tests__/reports-router.tsx':
+        "import { ReportsPage } from '../ReportsPage.tsx';\n",
+      'src/pages/patients/reports/ReportsPage.test.tsx':
+        "import { render } from './__tests__/reports-router.tsx';\n",
+    });
+    assert.ok(
+      selectedFiles(select(root, ['src/shared/ui/button.tsx'])).includes(
+        'src/pages/patients/reports/ReportsPage.test.tsx',
+      ),
+    );
+  });
+
   test('follows import.meta.glob to the files it matches', () => {
     const root = fixture();
     const selection = select(root, ['src/shared/pins/data/pin-north.json']);
