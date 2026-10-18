@@ -169,7 +169,10 @@ suite that mocks the timer cannot see bug 1 — it lived _between_ the two modul
 
 - `core/http/fetch-client` — reads the token on every request; on 401 it replays with the
   current token when it was replaced in flight, else awaits the shared `refreshAccessToken()`,
-  and calls `forceLogout()` for dead sessions
+  and calls `forceLogout()` for dead sessions. A call whose 401 is a verdict on a credential,
+  not on the token (the step-up password/email-code/TOTP checks in `shared/api/step-up-api.ts`,
+  an invitation's accept), passes `skip401` — otherwise a wrong code is refreshed, replayed and
+  ends a live session
 - `shared/components/SessionTimeoutDialog` — reads auth state, runs the idle timer + the
   absolute cap, and ends the session through `logout()` (never `forceLogout()` alone);
   the warning sits in the confirm frame every confirm shares (`ConfirmPanel`: the end
