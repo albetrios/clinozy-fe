@@ -82,6 +82,16 @@
       }
     },
     {
+      "id": "turn-end-tests",
+      "runtime": "node",
+      "script": "turn-end-tests.mjs",
+      "claude": {
+        "event": "Stop",
+        "asyncRewake": true,
+        "timeout": 120
+      }
+    },
+    {
       "id": "gate-failure-hint",
       "runtime": "bash",
       "script": "gate-failure-hint.sh",

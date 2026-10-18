@@ -43,8 +43,16 @@ interface HookManifestEntry {
    * `if`: permission rules (`Edit(**)`, `Write(**)`), one handler each — Claude Code spawns the
    * hook only for a tool call that matches one. An `Edit(…)` rule matches Edit calls only, a
    * `Write(…)` rule Write calls only (checked on Claude Code 2.1.302, as in clinozy-be).
+   * `asyncRewake`: the hook runs in the background and wakes the model when it exits 2;
+   * `timeout`: seconds before Claude Code stops it.
    */
-  claude?: { event: string; matcher?: string; if?: string[] };
+  claude?: {
+    event: string;
+    matcher?: string;
+    if?: string[];
+    asyncRewake?: boolean;
+    timeout?: number;
+  };
   cursor?: { event: string; matcher?: string };
   codex?: { event: string; matcher?: string; statusMessage?: string };
 }
@@ -94,6 +102,17 @@ const claudeIfEvents = new Set([
   'PermissionDenied',
 ]);
 
+/** A Claude handler's `asyncRewake` and `timeout`, when the manifest entry sets them. */
+function claudeHandlerOptions(claude: NonNullable<HookManifestEntry['claude']>): {
+  asyncRewake?: true;
+  timeout?: number;
+} {
+  return {
+    ...(claude.asyncRewake ? { asyncRewake: true } : {}),
+    ...(claude.timeout === undefined ? {} : { timeout: claude.timeout }),
+  };
+}
+
 function buildClaudeHooks(): Record<string, unknown[]> {
   const supported = new Set(claudeTarget?.capabilities.hookEvents ?? []);
   // Null-prototype accumulator: the keys below come from the hooks/agent manifests, so a
@@ -116,10 +135,11 @@ function buildClaudeHooks(): Record<string, unknown[]> {
       continue;
     }
     const command = claudeCommand(entry);
+    const options = claudeHandlerOptions(entry.claude);
     const handlers =
       rules.length > 0
-        ? rules.map((rule) => ({ type: 'command', command, if: rule }))
-        : [{ type: 'command', command }];
+        ? rules.map((rule) => ({ type: 'command', command, if: rule, ...options }))
+        : [{ type: 'command', command, ...options }];
     const hookEntry = entry.claude.matcher
       ? { matcher: entry.claude.matcher, hooks: handlers }
       : { hooks: handlers };
