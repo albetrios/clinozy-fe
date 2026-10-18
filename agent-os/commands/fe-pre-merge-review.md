@@ -35,6 +35,12 @@ that are not agents (`fe-code-smells-best-practices`, `web-design-guidelines`, `
 apply via their own file-pattern routing in `agent-os/docs/skill-triggers.md`. This is review-only:
 do not edit files.
 
+**Record a clean result.** When the aggregated report has no `critical` or `major` finding and the
+verifier passed, run `pnpm agent-os:review-clean --note "<one line>"`: it records the review for
+HEAD, and the push review gate (`agent-os/hooks/guardrails.mjs`) then lets a push of auth, token,
+CSP, routeTree or guard changes through without asking. Never record it while such a finding
+remains; a new commit needs a new review.
+
 **Blocking, from 2026-10-31.** Until then the review only warns — `/fe-ship` reports the findings
 and still pushes. When the user says a finding is a false positive, add a row to
 `agent-os/evals/warn-only-false-positives.md` (date, reviewer, `file:line` · check, why it is wrong),

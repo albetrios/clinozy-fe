@@ -4,11 +4,14 @@
 // BLOCK (deny): reading or writing secret files (.env*, not .env.example), secret content,
 //   destructive shell commands, skipping the git hooks (--no-verify, `git commit -n`, HUSKY=0).
 // ASK: `gh pr create` — a PR only when the user asked (no-unrequested-pr.sh covers the MCP tool),
-//   except in a turn the user started with /fe-ship or /fe-open-pr (prompt-skill-router.sh marks it).
+//   except in a turn the user started with /fe-ship or /fe-open-pr (prompt-skill-router.sh marks it);
+//   `git push` of auth, token, CSP, routeTree or guard changes with no clean /fe-pre-merge-review
+//   recorded for HEAD (`pnpm agent-os:review-clean` records it).
 // WARN (systemMessage): edits to protected/vendored paths.
 //
 // Reads the PreToolUse payload on stdin. Fail-open by design: any parse/read
 // error allows the tool (exit 0) so a guardrail bug can never brick the agent.
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
@@ -99,6 +102,73 @@ if (tool === 'Bash' && command) {
   if (touchesSecret) deny(SECRET_READ_DENIAL);
 }
 
+/** Pushed paths where a missed check leaks a session, a token or another clinic's data. */
+const REVIEWED_PUSH_PATHS = [
+  /^src\/shared\/auth\//,
+  /^src\/core\/http\//,
+  /^src\/core\/rbac\//,
+  /^src\/app\/guards\//,
+  /^src\/app\/routes\/routeTree\.tsx$/,
+  /^src\/lib\/csp-api-origin\.ts$/,
+  /^plugins\/csp-api-origin\.ts$/,
+  /^index\.html$/,
+  /^public\/_headers$/,
+  /^netlify\.toml$/,
+];
+
+function gitIn(directory, args) {
+  const result = spawnSync('git', args, { cwd: directory, encoding: 'utf8' });
+  return result.status === 0 ? result.stdout.trim() : '';
+}
+
+/** The directory a `git push` runs in: its `git -C <dir>`, else its last `cd <dir>`, else the session's. */
+function pushDirectory(scan) {
+  const base = payload.cwd || repositoryRoot;
+  const flag = /\bgit\s+-C\s+(\S+)[^;&|]*\bpush\b/.exec(scan)?.[1];
+  const changes = [...scan.matchAll(/(?:^|[;&|]\s*)cd\s+(\S+)/g)].map(
+    (match) => match[1],
+  );
+  const target = flag ?? changes.pop();
+  return target ? resolve(base, target) : base;
+}
+
+/**
+ * Why a push needs the user's yes: it changes auth, tokens, CSP, routeTree or the guards and no
+ * clean /fe-pre-merge-review is recorded for HEAD — or '' when it does not. Fails open.
+ */
+function unreviewedSensitivePush(scan) {
+  const directory = pushDirectory(scan);
+  if (!(directory === repositoryRoot || directory.startsWith(`${repositoryRoot}/`)))
+    return '';
+  const head = gitIn(repositoryRoot, ['rev-parse', 'HEAD']);
+  const gitDirectory = gitIn(repositoryRoot, ['rev-parse', '--absolute-git-dir']);
+  if (!(head && gitDirectory)) return '';
+  if (existsSync(join(gitDirectory, 'fe-pre-merge-review', `${head}.clean`))) return '';
+  const upstream = gitIn(repositoryRoot, [
+    'rev-parse',
+    '--abbrev-ref',
+    '--symbolic-full-name',
+    '@{u}',
+  ]);
+  const base = [upstream, 'origin/main', 'main'].find(
+    (ref) => ref && gitIn(repositoryRoot, ['merge-base', 'HEAD', ref]),
+  );
+  if (!base) return '';
+  const changed = gitIn(repositoryRoot, ['diff', '--name-only', `${base}...HEAD`])
+    .split('\n')
+    .filter(Boolean);
+  const sensitive = changed.filter((path) =>
+    REVIEWED_PUSH_PATHS.some((pattern) => pattern.test(path)),
+  );
+  if (sensitive.length === 0) return '';
+  const examples = sensitive.slice(0, 3).join(', ');
+  return (
+    `clinozy-fe review gate: this push changes auth, tokens, CSP, routeTree or the guards (${sensitive.length} file(s): ${examples}` +
+    `${sensitive.length > 3 ? ', …' : ''}) and /fe-pre-merge-review has no clean result for HEAD ${head.slice(0, 7)}. ` +
+    'Run /fe-pre-merge-review first (a clean review records itself with pnpm agent-os:review-clean), or confirm to push anyway.'
+  );
+}
+
 // --- BLOCK: destructive shell ------------------------------------------------
 if (tool === 'Bash' && command) {
   // Scan with quoted strings + heredoc bodies removed, so a destructive pattern
@@ -147,6 +217,15 @@ if (tool === 'Bash' && command) {
     ask(
       'clinozy-fe policy: open a PR only when the user explicitly asked for one (Bash(gh pr*) is allowlisted, so this hook is the check). Confirm this was requested before proceeding.',
     );
+  }
+  if (/\bgit\s+(?:-C\s+\S+\s+)?push\b/i.test(scan)) {
+    let reason = '';
+    try {
+      reason = unreviewedSensitivePush(scan);
+    } catch {
+      /* fail-open */
+    }
+    if (reason) ask(reason);
   }
   if (/\bgit\s+reset\s+--hard\b/i.test(scan) || /\bgit\s+clean\s+-[a-z]*f/i.test(scan)) {
     warnings.push(
