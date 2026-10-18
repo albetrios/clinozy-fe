@@ -92,6 +92,18 @@
       }
     },
     {
+      "id": "push-ci-watch",
+      "runtime": "node",
+      "script": "push-ci-watch.mjs",
+      "claude": {
+        "event": "PostToolUse",
+        "matcher": "Bash",
+        "if": ["Bash(git push*)"],
+        "asyncRewake": true,
+        "timeout": 2700
+      }
+    },
+    {
       "id": "gate-failure-hint",
       "runtime": "bash",
       "script": "gate-failure-hint.sh",
