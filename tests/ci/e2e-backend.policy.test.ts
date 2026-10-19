@@ -43,6 +43,9 @@ describe('E2E against the backend image', () => {
     expect(WORKFLOW).not.toMatch(/DEVELOPMENT_API_URL|VITE_API_BASE_URL/);
     // The suite signs in through the app's Playwright hooks, which only this flag installs.
     expect(WORKFLOW).toContain("VITE_E2E_HOOKS: 'true'");
+    // One API and no worker: without a count the backend's connection budget assumes both,
+    // which the default Postgres here cannot hold, and the API exits before it listens.
+    expect(WORKFLOW).toContain('-e DEPLOYMENT_TOTAL_REPLICA_COUNT=1');
   });
 
   it('tags the smoke set: sign-in, Today, one create, one edit and axe on five pages', () => {

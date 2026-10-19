@@ -84,7 +84,7 @@ jobs:
       # The backend's own CI fixtures (fake JWT keypair, retention, secrets key), so the image
       # boots exactly as in its own pipeline; the app's dev server is the one allowed origin.
       - name: Export the backend's CI test env
-        uses: albetrios/clinozy-be/.github/actions/test-env@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/test-env@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
         with:
           allowed-origins: http://localhost:5180
 
@@ -121,10 +121,13 @@ jobs:
           # own container boot; the email fixtures let /auth/email/send-code answer (no worker
           # runs, so nothing is sent — the codes land in the outbox the suite reads); the relaxed
           # caps keep one runner IP from being rate limited on the auth forms.
+          # The backend still checks its connection budget with that flag off, assuming one API plus
+          # one worker — more than this default Postgres allows. One API runs here, so it says so.
           docker run -d --name backend --network host "${backend_env[@]}" \
             -e HOST=0.0.0.0 -e PORT=3000 \
             -e DATABASE_TLS_ENFORCED=false -e DATABASE_RLS_SAFETY_ENFORCED=false \
-            -e DATABASE_CONNECTION_BUDGET_ENFORCED=false -e REDIS_TLS_ENFORCED=false \
+            -e DATABASE_CONNECTION_BUDGET_ENFORCED=false -e DEPLOYMENT_TOTAL_REPLICA_COUNT=1 \
+            -e REDIS_TLS_ENFORCED=false \
             -e TRUST_PROXY_REQUIRED=false -e RATE_LIMIT_RELAXED_CAPS=true \
             -e RESEND_API_KEY=re_test_contract_fixture_key -e EMAIL_FROM_ADDRESS=noreply@example.com \
             "$BACKEND_IMAGE"
@@ -179,7 +182,7 @@ jobs:
       issues: write
     steps:
       - name: Close the open ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
         with:
           mode: close
           title: E2E against the backend image failing
@@ -197,7 +200,7 @@ jobs:
       issues: write
     steps:
       - name: Open or update ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
         with:
           mode: open
           title: E2E against the backend image failing
