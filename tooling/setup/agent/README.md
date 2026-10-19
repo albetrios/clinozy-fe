@@ -22,6 +22,7 @@ and a dev server that serves the app shell.
 | -------------------------- | ----------------------------------------------------------------------------------------------- |
 | `bootstrap.sh`             | Orchestrator — runs all 10 steps, logs progress, enforces the hard gates                        |
 | `lib.sh`                   | Shared helpers (logging, arch detection, apt, download, PATH persistence)                       |
+| `tool-versions.sh`         | The pinned tool versions and checksums (gitleaks, semgrep), read by the installers and CI       |
 | `install-node.sh`          | Pinned Node from `.nvmrc` into `/opt/node<major>`, linked into `~/.local/bin`                   |
 | `install-apt-tools.sh`     | `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`                                       |
 | `install-gh.sh`            | GitHub CLI from the official `cli/cli` release                                                  |
@@ -52,12 +53,12 @@ you a whole session over an optional linter.
 
 ## Environment variables
 
-| Variable              | Effect                                                    |
-| --------------------- | --------------------------------------------------------- |
-| `NODE_INSTALL_PREFIX` | Parent dir for `node<major>` (default `/opt`)             |
-| `GH_VERSION`          | Pin the `gh` release instead of resolving latest          |
-| `GITLEAKS_VERSION`    | Pin the gitleaks release instead of resolving latest      |
-| `HEALTHCHECK_URL`     | Override the probe URL (default `http://localhost:5173/`) |
+| Variable              | Effect                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------- |
+| `NODE_INSTALL_PREFIX` | Parent dir for `node<major>` (default `/opt`)                                         |
+| `GH_VERSION`          | Pin the `gh` release instead of resolving latest                                      |
+| `GITLEAKS_VERSION`    | Trial another gitleaks than `tool-versions.sh` pins (set its `GITLEAKS_SHA256_*` too) |
+| `HEALTHCHECK_URL`     | Override the probe URL (default `http://localhost:5173/`)                             |
 
 ## The session's `.env.local`
 

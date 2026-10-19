@@ -421,22 +421,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      # One pin for CI and cloud sessions: tooling/setup/agent/tool-versions.sh.
+      - name: Load pinned tool versions
+        run: grep -E '^[A-Z][A-Z0-9_]*=' tooling/setup/agent/tool-versions.sh >> "$GITHUB_ENV"
+
       - name: Cache gitleaks binary
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
         with:
           path: /usr/local/bin/gitleaks
-          key: gitleaks-8.30.1-${{ runner.os }}
+          key: gitleaks-${{ env.GITLEAKS_VERSION }}-${{ runner.os }}
 
+      # The cloud installer: the pinned release, SHA-256-verified; a no-op on a cache hit.
       - name: Install gitleaks
-        env:
-          GITLEAKS_VERSION: 8.30.1
         run: |
           set -euo pipefail
-          if [ ! -x /usr/local/bin/gitleaks ]; then
-            curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
-              | sudo tar -xz -C /usr/local/bin gitleaks
-            sudo chmod +x /usr/local/bin/gitleaks
-          fi
+          sudo --preserve-env=GITLEAKS_VERSION,GITLEAKS_SHA256_LINUX_X64,GITLEAKS_SHA256_LINUX_ARM64 \
+            bash tooling/setup/agent/install-gitleaks.sh
           gitleaks version
 
       - name: Gitleaks (secret detection)
@@ -448,8 +448,8 @@ jobs:
     if: needs.changes.outputs.docs-only-md != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Semgrep from its own image (the version clinozy-be pins in tooling/setup/agent/tool-versions.sh),
-    # pinned by digest, instead of a pip install of whatever is newest on every run.
+    # Semgrep from its own image, pinned by digest: the tag is SEMGREP_VERSION in
+    # tooling/setup/agent/tool-versions.sh (tests/ci/agent-tool-versions.policy.test.ts holds them equal).
     container:
       image: semgrep/semgrep:1.179.0@sha256:93963d9295a366f59e4850127b1550400ee7b388f04fe144e4a1f6325d96e01b
     env:
