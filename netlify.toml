@@ -13,9 +13,6 @@
   command = "echo 'clinozy-fe does not build on Netlify: run pnpm build, then netlify deploy --no-build (docs/deployment/cicd-and-netlify.md).' >&2; exit 1"
   publish = "dist"
 
-[build.environment]
-  NODE_VERSION = "24"
-
 # A MISSING content-hashed asset is a stale chunk from a superseded deploy — never
 # a client route. Without this rule the SPA catch-all below rewrites it to
 # index.html with a 200 and the browser reports "Expected a JavaScript-or-Wasm

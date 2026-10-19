@@ -53,7 +53,7 @@ Steps 11 and 12 are **early checks** (`tooling/ci/early-checks.mjs`, as is Semgr
 
 ### validate:env-example fails
 
-**Error:** "`.env.example` is missing required var(s): NODE_VERSION"
+**Error:** "`.env.example` is missing required var(s): NETLIFY_SITE_ID"
 
 **Fix:** Add the missing key to `.env.example` (or run `pnpm tool:sync-env-example --fix`). See `agent-os/skills/fe-env-schema-add/SKILL.md`.
 

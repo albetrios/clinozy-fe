@@ -49,7 +49,7 @@ jobs:
       issues: write
     steps:
       - name: Close the open ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
         with:
           mode: close
           title: Weekly dependency audit failing
@@ -69,7 +69,7 @@ jobs:
         # A red scheduled run is invisible unless someone opens the Actions tab; one issue per
         # check sends a real notification, collects repeats as comments, and closes on the next
         # green run (clinozy-be's shared ci-failure-issue action).
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
         with:
           mode: open
           title: Weekly dependency audit failing

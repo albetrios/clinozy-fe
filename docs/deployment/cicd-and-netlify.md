@@ -59,7 +59,7 @@ flowchart LR
 ```mermaid
 flowchart TB
   subgraph env_sources["Env sources"]
-    GitHubSecrets["GitHub Secrets: VITE_API_BASE_URL, NODE_VERSION, NETLIFY_AUTH_TOKEN, NETLIFY_SITE_ID"]
+    GitHubSecrets["GitHub Secrets: VITE_API_BASE_URL, NETLIFY_AUTH_TOKEN, NETLIFY_SITE_ID"]
   end
 
   subgraph build_time["Build time"]
@@ -143,8 +143,8 @@ sequenceDiagram
 
 | What                   | Where                                               | Notes                                                                                                                                                                                                                                                                        |
 | ---------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Env vars for build** | **GitHub Secrets**                                  | Put `VITE_API_BASE_URL`, `NODE_VERSION` in GitHub → Settings → Secrets and variables → Actions. Build runs on GitHub; these are injected at build time. No build on Netlify.                                                                                                 |
-| **GitHub secrets**     | GitHub → Settings → Secrets and variables → Actions | **Required for deploy:** `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN` (Netlify → User settings → Applications → Personal access tokens), `NETLIFY_SITE_ID` (Netlify → Site settings → General → Site information).                                              |
+| **Env vars for build** | **GitHub Secrets**                                  | Put `VITE_API_BASE_URL` in GitHub → Settings → Secrets and variables → Actions. Build runs on GitHub (Node from `.nvmrc`); it is injected at build time. No build on Netlify.                                                                                                |
+| **GitHub secrets**     | GitHub → Settings → Secrets and variables → Actions | **Required for deploy:** `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN` (Netlify → User settings → Applications → Personal access tokens), `NETLIFY_SITE_ID` (Netlify → Site settings → General → Site information).                                                              |
 | **Netlify: no build**  | `netlify.toml` (enforced)                           | Nothing builds on Netlify: `ignore = "exit 0"` cancels Git-triggered builds and the `command` fails any other build. Deploys upload the pre-built `dist/` with `netlify deploy --no-build`. Disconnecting the build in the Netlify UI is still tidy, but no longer required. |
 | **Backend CORS**       | Your API server                                     | Allow your Netlify site origin (or custom domain) so the browser can call the production API.                                                                                                                                                                                |
 

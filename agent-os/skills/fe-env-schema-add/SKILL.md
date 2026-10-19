@@ -55,7 +55,7 @@ Every key sits under exactly one half. Sub-sections (`# --- Title ---`) group re
 
 1. **Credential or signing material?** → **Secret** (`*_TOKEN`, `*_AUTH_TOKEN`, `SENTRY_AUTH_TOKEN`, …).
 2. **Leak would grant unauthorized access?** → **Secret**.
-3. **Public identifier or operational knob?** → **Variable** (`VITE_*` client flags, `NODE_VERSION`, `NETLIFY_SITE_ID`, public DSN/site keys).
+3. **Public identifier or operational knob?** → **Variable** (`VITE_*` client flags, `NETLIFY_SITE_ID`, public DSN/site keys).
 4. **Still unsure?** → default **Secret**.
 
 ## FE-specific prefixes

@@ -141,7 +141,7 @@ git --version
 
 ## Step 2 — Install Node.js (24 LTS)
 
-The project pins **Node.js 24.21.0** (the latest release on the 24 Active LTS line, "Krypton") in `.nvmrc` and `.node-version`; `package.json` `engines` requires `>=24.15`.
+The project pins **Node.js 24.21.0** (the latest release on the 24 Active LTS line, "Krypton") in `.nvmrc` (the one Node pin); `package.json` `engines` requires `>=24.15`.
 
 <details>
 <summary><strong>macOS</strong></summary>

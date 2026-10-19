@@ -84,7 +84,7 @@ jobs:
       # The backend's own CI fixtures (fake JWT keypair, retention, secrets key), so the image
       # boots exactly as in its own pipeline; the app's dev server is the one allowed origin.
       - name: Export the backend's CI test env
-        uses: albetrios/clinozy-be/.github/actions/test-env@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/test-env@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
         with:
           allowed-origins: http://localhost:5180
 
@@ -105,12 +105,18 @@ jobs:
             -e AUDIT_RETENTION_DAYS -e AUTH_SESSION_RETENTION_DAYS -e METRICS_SCRAPE_TOKEN
             -e SECRETS_ENCRYPTION_KEY -e GLOBAL_ADMIN_EMAILS
           )
-          docker run --rm --network host "${backend_env[@]}" "$BACKEND_IMAGE" \
-            node dist/src/infrastructure/database/migration/migrate.js
-          # Permissions and plans — what clinic provisioning needs; the suite creates its own
-          # clinics and users. (The full demo seed needs dev dependencies the image does not have.)
-          docker run --rm --network host "${backend_env[@]}" "$BACKEND_IMAGE" \
-            node dist/src/scripts/seed/minimal.js
+          # The backend's one database step, compiled: create if missing, migrate, then permissions
+          # and plans — what clinic provisioning needs; the suite creates its own clinics and users.
+          # (The full demo seed needs dev dependencies the image does not have.) An image built
+          # before clinozy-be's db-prepare.js (albetrios/clinozy-be#98) runs its migration runner
+          # and minimal seed instead — drop that branch once the latest image carries it.
+          docker run --rm --network host "${backend_env[@]}" "$BACKEND_IMAGE" sh -c '
+            if [ -f dist/src/scripts/ops/db-prepare.js ]; then
+              node dist/src/scripts/ops/db-prepare.js --seed minimal
+            else
+              node dist/src/infrastructure/database/migration/migrate.js &&
+                node dist/src/scripts/seed/minimal.js
+            fi'
           # Boot-time safety checks are relaxed for the plaintext CI services, as in the backend's
           # own container boot; the email fixtures let /auth/email/send-code answer (no worker
           # runs, so nothing is sent — the codes land in the outbox the suite reads); the relaxed
@@ -173,7 +179,7 @@ jobs:
       issues: write
     steps:
       - name: Close the open ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
         with:
           mode: close
           title: E2E against the backend image failing
@@ -191,7 +197,7 @@ jobs:
       issues: write
     steps:
       - name: Open or update ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
         with:
           mode: open
           title: E2E against the backend image failing

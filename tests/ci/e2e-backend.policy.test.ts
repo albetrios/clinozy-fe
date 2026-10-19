@@ -36,10 +36,8 @@ describe('E2E against the backend image', () => {
   it("boots the backend's latest image, never the shared development environment", () => {
     expect(WORKFLOW).toMatch(/BACKEND_IMAGE: ghcr\.io\/.+-api:latest/);
     expect(WORKFLOW).toContain('packages: read');
-    expect(WORKFLOW).toContain(
-      'node dist/src/infrastructure/database/migration/migrate.js',
-    );
-    expect(WORKFLOW).toContain('node dist/src/scripts/seed/minimal.js');
+    // clinozy-be's one database step, compiled (create, migrate, permissions and plans).
+    expect(WORKFLOW).toContain('node dist/src/scripts/ops/db-prepare.js --seed minimal');
     expect(WORKFLOW).toContain('postgres:');
     expect(WORKFLOW).toContain('redis:');
     expect(WORKFLOW).not.toMatch(/DEVELOPMENT_API_URL|VITE_API_BASE_URL/);

@@ -395,7 +395,7 @@ jobs:
       # broken release/deploy visible until it is fixed: repeats become comments, and the next
       # green post-merge run closes it (clinozy-be's shared ci-failure-issue action).
       - name: Open or update the ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
         with:
           mode: open
           title: Post-merge CI failing
@@ -421,7 +421,7 @@ jobs:
       issues: write
     steps:
       - name: Close the open ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@91b4724304d623dd70fcabe2992cb9393457f223 # clinozy-be chore/agent-ci-hardening — repin to its main once merged
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@1980ab5329f372b8e6cbf9764daaa7b5d4818447 # clinozy-be chore/agent-ci-all-waves — repin to its main once merged
         with:
           mode: close
           title: Post-merge CI failing

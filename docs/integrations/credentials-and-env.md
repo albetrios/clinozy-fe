@@ -88,7 +88,7 @@ Full reference: [environment-variables runbook](../deployment/runbooks/environme
 
 ## Optional: GitHub Secrets (CI/CD)
 
-For deploy via GitHub Actions, set `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID` in GitHub → Settings → Secrets and variables → Actions. Run `pnpm github:sync` to push them from the gitignored `.env.<environment>`. See [cicd-and-netlify.md](../deployment/cicd-and-netlify.md).
+For deploy via GitHub Actions, set `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID` in GitHub → Settings → Secrets and variables → Actions. Run `pnpm github:sync` to push them from the gitignored `.env.<environment>`. See [cicd-and-netlify.md](../deployment/cicd-and-netlify.md).
 
 ---
 

@@ -37,9 +37,6 @@
 # pinned version is present (Setup scripts re-run on cache rebuilds).
 set -euo pipefail
 
-# Fallback only — used when .nvmrc is missing or the dist index is unreachable.
-# Must satisfy engines.node in package.json.
-readonly FALLBACK_VERSION="24.21.0"
 readonly DIST_INDEX="https://nodejs.org/dist/index.json"
 readonly INSTALL_PREFIX="${NODE_INSTALL_PREFIX:-/opt}"
 
@@ -56,7 +53,10 @@ requested=""
 if [ -f "${repository_root}/.nvmrc" ]; then
   requested="$(tr -dc '0-9.' <"${repository_root}/.nvmrc")"
 fi
-requested="${requested:-${FALLBACK_VERSION}}"
+if [ -z "${requested}" ]; then
+  log "ERROR: no Node version in .nvmrc — it is the one Node pin."
+  exit 1
+fi
 
 # Resolve `requested` to an exact x.y.z. The index is ordered newest-first, so
 # the first match for the prefix is the newest release in that line.
@@ -77,8 +77,8 @@ case "${requested}" in
     log "resolving newest Node ${requested}.x from ${DIST_INDEX}"
     version="$(resolve_version "${requested}" || true)"
     if [ -z "${version}" ]; then
-      log "WARNING: could not resolve ${requested}.x (nodejs.org unreachable?) — falling back to v${FALLBACK_VERSION}"
-      version="${FALLBACK_VERSION}"
+      log "ERROR: could not resolve ${requested}.x (nodejs.org unreachable?) — pin an exact x.y.z in .nvmrc."
+      exit 1
     fi
     ;;
 esac

@@ -65,10 +65,10 @@ describe('Netlify never builds', () => {
 
   it('netlify.toml cancels Git builds and fails any other build', () => {
     const toml = read('netlify.toml');
-    const build = toml.slice(
-      toml.indexOf('[build]'),
-      toml.indexOf('[build.environment]'),
-    );
+    // The [build] table: from its header to the next table header.
+    const start = toml.indexOf('[build]');
+    const next = toml.indexOf('\n[', start + 1);
+    const build = toml.slice(start, next === -1 ? undefined : next);
     const lines = build.split('\n').map((line) => line.trim());
     expect(lines).toContain('ignore = "exit 0"');
     const command = lines.filter((line) => line.startsWith('command = '));

@@ -56,8 +56,15 @@ describe('dependabot CI triage policy', () => {
   it('listens for PR CI completion and never merges anything', () => {
     expect(triage).toContain('workflow_run:');
     expect(triage).toContain("workflows: ['PR CI']");
-    expect(triage).toContain('dependabot-ci-failed-pr:');
     expect(triage).not.toContain('gh pr merge');
+  });
+
+  it('opens its issue through the shared action, linked to the failed run, and closes it when green', () => {
+    expect(triage).not.toContain('gh issue create');
+    expect(triage).toMatch(
+      /mode: open[\s\S]*run-id: \$\{\{ github\.event\.workflow_run\.id \}\}/,
+    );
+    expect(triage).toMatch(/mode: close\n\s+title: 'Dependabot PR blocked by CI: PR #/);
   });
 });
 
