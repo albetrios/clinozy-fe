@@ -295,7 +295,11 @@ jobs:
       - name: Agent-os platform wiring
         run: pnpm agent-os:generate:check
 
+      # The unit shards run every Vitest project, the tooling one included, and they run on any
+      # src-code (tooling/** among it) or ci-config change; this step covers the changes they skip,
+      # such as agent-os/** alone, so the tooling tests run once either way.
       - name: Tooling script tests
+        if: needs.changes.outputs.src-code != 'true' && needs.changes.outputs.ci-config != 'true'
         run: pnpm test:github-scripts
 
   unit-tests:

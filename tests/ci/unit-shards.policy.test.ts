@@ -9,6 +9,7 @@ import { jobBlock } from '@/tests/utils/workflow-jobs.ts';
 // workers follow the CPU count.
 
 const reusable = readFileSync('.github/workflows/reusable-vitest-unit-only.yml', 'utf8');
+const prCi = readFileSync('.github/workflows/pr-ci.yml', 'utf8');
 const nightly = readFileSync('.github/workflows/scheduled-unit-nightly.yml', 'utf8');
 const vitestConfig = readFileSync('vitest.config.ts', 'utf8');
 const gitignore = readFileSync('.gitignore', 'utf8');
@@ -21,6 +22,22 @@ describe('sharded unit suite', () => {
     expect(job('plan')).toContain("VITEST_SHARDS: ${{ vars.VITEST_SHARDS || '4' }}");
     expect(job('plan')).toContain('must be a whole number from 1 to 12');
     expect(job('shard')).toContain('shard: ${{ fromJSON(needs.plan.outputs.shards) }}');
+  });
+
+  it('the tooling tests run once: in the shards when they run, else in Static sync', () => {
+    // The shards run `pnpm test:ci`, every project; the tooling project is one of them.
+    expect(readFileSync('package.json', 'utf8')).toContain(
+      '"test:ci": "vitest run --coverage"',
+    );
+    expect(vitestConfig).toContain("name: 'tooling'");
+    const shardsRun =
+      "(needs.changes.outputs.src-code == 'true' || needs.changes.outputs.ci-config == 'true')";
+    expect(jobBlock(prCi, 'unit-tests')).toContain(shardsRun);
+    const step =
+      jobBlock(prCi, 'static-sync').split('- name: Tooling script tests')[1] ?? '';
+    expect(step.split('- name:')[0]).toContain(
+      "if: needs.changes.outputs.src-code != 'true' && needs.changes.outputs.ci-config != 'true'",
+    );
   });
 
   it('each shard runs the CI script with its coverage thresholds off and writes a blob', () => {
