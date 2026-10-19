@@ -107,12 +107,18 @@ export function tryGit(args, { cwd } = {}) {
  * it has one, else `origin/<trunk>` — the trunk read from `git.defaultBranch` in
  * `tooling/setup/setup.config.json`, never hardcoded.
  *
- * @param {{ base?: string, cwd?: string }} [options]
+ * `from: 'trunk'` skips the upstream: the local copies of a pull-request check (patch coverage,
+ * the iteration freeze check, the selector misses) measure what the pull request will, the whole
+ * branch against the trunk — on a pushed branch with nothing new, the upstream would leave an
+ * empty diff that passes.
+ *
+ * @param {{ base?: string, cwd?: string, from?: 'upstream' | 'trunk' }} [options]
  * @returns {string}
  * @throws {Error} when no `base` is given, there is no upstream and the config names no trunk
  */
-export function resolveBase({ base, cwd } = {}) {
+export function resolveBase({ base, cwd, from = 'upstream' } = {}) {
   if (base) return base;
+  if (from === 'trunk') return `origin/${configuredBaseBranch()}`;
   const upstream = tryGit(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], {
     cwd,
   });

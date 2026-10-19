@@ -62,7 +62,10 @@ function main() {
     options: { base: { type: 'string' }, results: { type: 'string' } },
   });
   const resultsDirectory = values.results ?? 'test-results';
-  const base = git(['merge-base', 'HEAD', resolveBase({ base: values.base, ...at })], at);
+  const base = git(
+    ['merge-base', 'HEAD', resolveBase({ base: values.base, from: 'trunk', ...at })],
+    at,
+  );
   const changedFiles = git(['diff', '--name-only', '--no-renames', `${base}...HEAD`], at)
     .split('\n')
     .filter(Boolean);

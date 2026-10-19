@@ -211,5 +211,18 @@ describe('git hook environment — git, tryGit and resolveBase', () => {
     git(['config', 'branch.work.merge', 'refs/heads/other'], { cwd });
     expect(resolveBase({ cwd })).toBe('other');
     expect(resolveBase({ base: 'given-ref', cwd })).toBe('given-ref');
+    // A local copy of a pull-request check skips the upstream, as the pull request does.
+    expect(resolveBase({ from: 'trunk', cwd })).toBe(`origin/${trunk}`);
+    expect(resolveBase({ base: 'given-ref', from: 'trunk', cwd })).toBe('given-ref');
+  });
+
+  it('measures the local copies of a pull-request check from the trunk', () => {
+    for (const path of [
+      'tooling/ci/check-patch-coverage.mjs',
+      'tooling/ci/selector-misses.mjs',
+      'tooling/iterations/check-iteration-freeze.mjs',
+    ]) {
+      expect(readFileSync(join(ROOT, path), 'utf8'), path).toContain("from: 'trunk'");
+    }
   });
 });

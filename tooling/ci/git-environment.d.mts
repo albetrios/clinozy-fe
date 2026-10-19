@@ -29,5 +29,12 @@ export declare function tryGit(
   options?: GitOptions,
 ): { ok: boolean; output: string };
 
-/** `base` when given, else the upstream (`@{u}`), else `origin/<trunk>` from the setup config. */
-export declare function resolveBase(options?: { base?: string; cwd?: string }): string;
+/**
+ * `base` when given, else the upstream (`@{u}`), else `origin/<trunk>` from the setup config;
+ * `from: 'trunk'` skips the upstream (the local copies of a pull-request check).
+ */
+export declare function resolveBase(options?: {
+  base?: string;
+  cwd?: string;
+  from?: 'upstream' | 'trunk';
+}): string;

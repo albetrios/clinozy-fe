@@ -187,12 +187,10 @@ function main() {
   );
 
   const coverage = JSON.parse(readFileSync(resolve(process.cwd(), coveragePath), 'utf8'));
-  const diffText = git([
-    'diff',
-    '--unified=0',
-    '--no-color',
-    `${resolveBase({ base })}...HEAD`,
-  ]);
+  // Measured as the pull request is: the whole branch against the trunk (or --base).
+  const measuredFrom = resolveBase({ base, from: 'trunk' });
+  console.log(`Patch coverage measured against ${measuredFrom}.`);
+  const diffText = git(['diff', '--unified=0', '--no-color', `${measuredFrom}...HEAD`]);
   const addedLines = parseAddedLines(diffText);
   const { overallPct, totalCovered, totalCoverable, perFile, uncoveredFiles } =
     computePatchCoverage(coverage, addedLines);
