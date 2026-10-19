@@ -28,7 +28,7 @@ const TOOLS = {
   gitleaks: {
     versionArguments: ['version'],
     install:
-      'bash tooling/setup/agent/install-gitleaks.sh (pins: tooling/setup/agent/tool-versions.sh)',
+      'bash tooling/setup/agent/install-gitleaks.sh (pins: tooling/setup/agent/tool-versions.sh; macOS: brew install gitleaks)',
   },
   semgrep: {
     versionArguments: ['--version'],

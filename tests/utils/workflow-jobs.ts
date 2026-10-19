@@ -22,7 +22,7 @@ export function jobBlocks(workflow: string): Array<[string, string]> {
   const start = workflow.indexOf('\njobs:\n');
   if (start === -1) return [];
   const jobs = workflow.slice(start);
-  return [...jobs.matchAll(/^ {2}([a-z][a-z-]*):$/gm)].map((match) => {
+  return [...jobs.matchAll(/^ {2}([a-z][a-z0-9_-]*):$/gm)].map((match) => {
     const name = match[1] ?? '';
     return [name, jobBlock(jobs, name)];
   });

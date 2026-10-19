@@ -18,7 +18,7 @@ import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
 /** The pushed files that make pre-push run the Vitest suite (`pnpm test:pre-push`). */
 export const UNIT_RELEVANT =
-  /^(src\/|tests\/utils\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
+  /^(src\/|tests\/utils\/|tooling\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
 
 /** The pushed files the SonarQube gate analyzes (`pnpm sonar:scan`): src/ runtime, without these. */
 export const SONAR_RUNTIME = /^src\/.*\.(ts|tsx)$/;

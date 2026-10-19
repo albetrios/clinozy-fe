@@ -54,9 +54,10 @@ describe('test:affected mirrors .husky/pre-push', () => {
       'package.json',
       'pnpm-lock.yaml',
       'pnpm-workspace.yaml',
+      'tooling/ci/a.mjs',
     ])
       expect(answer('pnpm test:pre-push', [file]), file).toBe('yes');
-    for (const file of ['docs/a.md', 'tests/ci/a.policy.test.ts', 'tooling/ci/a.mjs'])
+    for (const file of ['docs/a.md', 'tests/ci/a.policy.test.ts'])
       expect(answer('pnpm test:pre-push', [file]), file).toBe('no');
     expect(answer('pnpm sonar:scan', ['src/app/a.tsx'])).toBe('yes');
     for (const file of [

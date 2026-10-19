@@ -57,10 +57,13 @@ export function gitEnvironmentWithoutInheritedRepository() {
  * @param {Record<string, string>} [environment]
  */
 function runGit(args, cwd, environment = {}) {
+  const env = { ...gitEnvironmentWithoutInheritedRepository(), ...environment };
+  // Stripped after the merge too, so `environment` cannot bring them back.
+  for (const variable of INHERITED_GIT_REPOSITORY_VARIABLES) delete env[variable];
   return spawnSync('git', args, {
     cwd,
     encoding: 'utf8',
-    env: { ...gitEnvironmentWithoutInheritedRepository(), ...environment },
+    env,
     maxBuffer: GIT_OUTPUT_LIMIT,
     stdio: ['ignore', 'pipe', 'pipe'],
   });
