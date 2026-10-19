@@ -54,6 +54,10 @@ clinozy-fe and clinozy-be (whose items start with `be-`) are loaded in one sessi
 `react-best-practices`, `web-design-guidelines`). A skill's frontmatter `name` always equals its
 folder name. `pnpm agent-os:check` enforces both.
 
+## Same task, same pattern in both repositories
+
+clinozy-fe and clinozy-be share many tasks: CI actions, pre-push test selection, session hooks, agent-os tooling, failure issues. A task both repositories have uses **the same pattern in both**: the same rule shape, comment wording, test shape and PR title. The two differ only where a repository needs a different step (its own paths, language or file layout), and the PR says what differs and why. Before finishing a change here, check whether clinozy-be has the same task; if it does, make the same change there in a sibling PR. The files kept byte-identical in both are listed in [`tests/ci/mirrored-files.policy.test.ts`](tests/ci/mirrored-files.policy.test.ts); everything else that shares a shape is a parallel implementation that follows this rule.
+
 ## Architecture Overview
 
 ```text
