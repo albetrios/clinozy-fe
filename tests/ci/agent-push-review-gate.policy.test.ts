@@ -5,6 +5,8 @@ import { dirname, join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-environment.mjs';
+
 // The push review gate (agent-os/hooks/fe-guardrails.mjs, clinozy-be's): an agent push of auth,
 // token, CSP, routeTree or guard changes asks the user first until /fe-pre-merge-review records a
 // clean result for HEAD (`pnpm agent-os:review-clean`); other pushes, and pushes in another
@@ -24,9 +26,15 @@ afterEach(() => {
 function repository(changedFile: string): string {
   const root = mkdtempSync(join(tmpdir(), 'push-review-gate-'));
   temporaryDirectories.push(root);
+  // Run from a git hook (pre-push), the inherited GIT_DIR would outrank `cwd` and these calls
+  // would rewrite the hook's own repository — its config, refs and checked-out branch.
   const git = (...args: string[]) =>
     // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-    spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+    spawnSync('git', args, {
+      cwd: root,
+      encoding: 'utf8',
+      env: gitEnvironmentWithoutInheritedRepository(),
+    });
   git('init', '--quiet', '--initial-branch', 'main');
   git('config', 'user.email', 'gate@example.com');
   git('config', 'user.name', 'gate');
@@ -51,7 +59,10 @@ function decision(options: { root: string; command: string }): string {
       cwd: options.root,
     }),
     encoding: 'utf8',
-    env: { ...process.env, CLAUDE_PROJECT_DIR: options.root },
+    env: {
+      ...gitEnvironmentWithoutInheritedRepository(),
+      CLAUDE_PROJECT_DIR: options.root,
+    },
   });
   const output = result.stdout.trim();
   if (!output.startsWith('{"hookSpecificOutput"')) return '';
@@ -66,6 +77,7 @@ describe('fe-guardrails.mjs push review gate', () => {
     const recorded = spawnSync(process.execPath, [REVIEW_MARKER, '--note', 'clean'], {
       cwd: root,
       encoding: 'utf8',
+      env: gitEnvironmentWithoutInheritedRepository(),
     });
     expect(recorded.status).toBe(0);
     expect(decision({ root, command: 'git push -u origin feat/change' })).toBe('');

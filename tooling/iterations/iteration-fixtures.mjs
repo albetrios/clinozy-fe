@@ -7,7 +7,8 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { EMPTY_FIELD, gitEnvironment, intakeHash } from './iterations.mjs';
+import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
+import { EMPTY_FIELD, intakeHash } from './iterations.mjs';
 import { configuredBaseBranch, renderIterationReadme } from './new-iteration.mjs';
 
 export const BASE_BRANCH = configuredBaseBranch();
@@ -50,7 +51,7 @@ export function git(repositoryRoot, gitArguments, commitTime) {
   return execFileSync('git', gitArguments, {
     cwd: repositoryRoot,
     encoding: 'utf-8',
-    env: { ...gitEnvironment(), ...dates },
+    env: { ...gitEnvironmentWithoutInheritedRepository(), ...dates },
     stdio: ['ignore', 'pipe', 'pipe'],
   }).trim();
 }

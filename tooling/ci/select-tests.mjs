@@ -20,6 +20,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gitEnvironmentWithoutInheritedRepository } from './git-environment.mjs';
 import { changedOnly, selectTests, withoutTests } from './test-selection.mjs';
 
 const REPOSITORY_ROOT = resolve(import.meta.dirname, '../..');
@@ -51,14 +52,10 @@ export function parseSelectArguments(argv) {
 
 function git(args) {
   // From a git hook, git's own GIT_DIR would outrank `cwd`.
-  const environment = { ...process.env };
-  delete environment.GIT_DIR;
-  delete environment.GIT_WORK_TREE;
-  delete environment.GIT_INDEX_FILE;
   const result = spawnSync('git', args, {
     cwd: REPOSITORY_ROOT,
     encoding: 'utf8',
-    env: environment,
+    env: gitEnvironmentWithoutInheritedRepository(),
   });
   if (result.status !== 0)
     throw new Error(`git ${args.join(' ')}: ${result.stderr.trim()}`);

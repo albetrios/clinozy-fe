@@ -13,6 +13,8 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-environment.mjs';
+
 // The turn-end test hook (agent-os/hooks/fe-turn-end-tests.mjs, clinozy-be's): off by switch, it runs
 // only the tests the selection picks for the change itself (not the always-run set), a failure
 // exits 2 (asyncRewake wakes the model with the failing tests), a selection of everything wakes it
@@ -53,9 +55,15 @@ function repository(): { root: string; state: string; runs: string } {
   const root = mkdtempSync(join(tmpdir(), 'turn-end-tests-'));
   const state = mkdtempSync(join(tmpdir(), 'turn-end-tests-state-'));
   temporaryDirectories.push(root, state);
+  // Run from a git hook (pre-push), the inherited GIT_DIR would outrank `cwd` and these calls
+  // would rewrite the hook's own repository — its config, refs and checked-out branch.
   const git = (...args: string[]) =>
     // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-    spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+    spawnSync('git', args, {
+      cwd: root,
+      encoding: 'utf8',
+      env: gitEnvironmentWithoutInheritedRepository(),
+    });
   git('init', '--quiet');
   git('config', 'user.email', 'hook@example.com');
   git('config', 'user.name', 'hook');
@@ -96,7 +104,7 @@ function runHook(options: {
     }),
     encoding: 'utf8',
     env: {
-      ...process.env,
+      ...gitEnvironmentWithoutInheritedRepository(),
       CLAUDE_PROJECT_DIR: options.root,
       TMPDIR: options.state,
       AGENT_TURN_END_TESTS: options.switchValue ?? '1',

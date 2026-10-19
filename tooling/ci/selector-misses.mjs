@@ -12,6 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gitEnvironmentWithoutInheritedRepository } from './git-environment.mjs';
 import { selectTests } from './test-selection.mjs';
 
 /**
@@ -61,10 +62,10 @@ function option(name) {
 }
 
 function git(args) {
-  const environment = { ...process.env };
-  delete environment.GIT_DIR;
-  delete environment.GIT_WORK_TREE;
-  const result = spawnSync('git', args, { encoding: 'utf8', env: environment });
+  const result = spawnSync('git', args, {
+    encoding: 'utf8',
+    env: gitEnvironmentWithoutInheritedRepository(),
+  });
   if (result.status !== 0)
     throw new Error(`git ${args.join(' ')}: ${result.stderr.trim()}`);
   return result.stdout;

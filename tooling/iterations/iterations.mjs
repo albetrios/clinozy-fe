@@ -10,6 +10,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
+import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
 
 /** The four iteration types, in the order the docs list them. */
 export const ITERATION_TYPES = ['launch', 'feat', 'change', 'fix'];
@@ -175,21 +176,6 @@ const LITE_BACK_TO_PLANNING = new Set(['implementing', 'done']);
 export function recordedProcess(fields) {
   return fields.get('Process') === 'lite' ? 'lite' : DEFAULT_ITERATION_PROCESS;
 }
-
-/**
- * Variables git exports into the hooks it runs. They take precedence over `cwd`, so a child
- * `git` launched from inside a hook would read the hook's repository instead of the one it was
- * pointed at; every git call here drops them.
- */
-const INHERITED_GIT_REPOSITORY_VARIABLES = [
-  'GIT_DIR',
-  'GIT_INDEX_FILE',
-  'GIT_WORK_TREE',
-  'GIT_PREFIX',
-  'GIT_OBJECT_DIRECTORY',
-  'GIT_COMMON_DIR',
-  'GIT_NAMESPACE',
-];
 
 // ── names ────────────────────────────────────────────────────────────────────
 
@@ -364,13 +350,6 @@ export function readAllIterationReadmes(repositoryRoot) {
 
 // ── git ──────────────────────────────────────────────────────────────────────
 
-/** `process.env` without the variables that would pin a child `git` to another repository. */
-export function gitEnvironment() {
-  const environment = { ...process.env };
-  for (const variable of INHERITED_GIT_REPOSITORY_VARIABLES) delete environment[variable];
-  return environment;
-}
-
 /**
  * Runs a read-only git command and returns its trimmed output, or `undefined` when it fails.
  *
@@ -382,7 +361,7 @@ export function tryGit(repositoryRoot, gitArguments) {
     return execFileSync('git', gitArguments, {
       cwd: repositoryRoot,
       encoding: 'utf-8',
-      env: gitEnvironment(),
+      env: gitEnvironmentWithoutInheritedRepository(),
       stdio: ['ignore', 'pipe', 'pipe'],
     }).trim();
   } catch {

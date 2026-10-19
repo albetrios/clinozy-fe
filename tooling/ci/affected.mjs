@@ -11,6 +11,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gitEnvironmentWithoutInheritedRepository } from './git-environment.mjs';
 import { pushSemgrepTargets } from './push-semgrep.mjs';
 import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
@@ -106,10 +107,10 @@ export function selectionTable(selection) {
 }
 
 function git(args) {
-  const environment = { ...process.env };
-  delete environment.GIT_DIR;
-  delete environment.GIT_WORK_TREE;
-  const result = spawnSync('git', args, { encoding: 'utf8', env: environment });
+  const result = spawnSync('git', args, {
+    encoding: 'utf8',
+    env: gitEnvironmentWithoutInheritedRepository(),
+  });
   return { ok: result.status === 0, output: (result.stdout ?? '').trim() };
 }
 

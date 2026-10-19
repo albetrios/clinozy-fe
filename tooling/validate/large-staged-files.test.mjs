@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GATE = join(ROOT, 'tooling/validate/large-staged-files.sh');
@@ -21,14 +22,17 @@ const LIMIT_BYTES = 3 * 1024 * 1024;
 function runGateWith(files) {
   const repo = mkdtempSync(join(tmpdir(), 'large-staged-files-'));
   try {
-    execFileSync('git', ['init', '--quiet'], { cwd: repo });
+    // From a git hook the inherited GIT_DIR / GIT_INDEX_FILE would outrank `cwd`: `git init` and
+    // `git add` would then re-initialise and stage into the hook's own repository.
+    const env = gitEnvironmentWithoutInheritedRepository();
+    execFileSync('git', ['init', '--quiet'], { cwd: repo, env });
     for (const [path, size] of Object.entries(files)) {
       const file = join(repo, path);
       mkdirSync(dirname(file), { recursive: true });
       writeFileSync(file, Buffer.alloc(size, 'a'));
     }
-    execFileSync('git', ['add', '--all'], { cwd: repo });
-    const result = spawnSync('sh', [GATE], { cwd: repo, encoding: 'utf8' });
+    execFileSync('git', ['add', '--all'], { cwd: repo, env });
+    const result = spawnSync('sh', [GATE], { cwd: repo, encoding: 'utf8', env });
     return { status: result.status, output: `${result.stdout}${result.stderr}` };
   } finally {
     rmSync(repo, { recursive: true, force: true });

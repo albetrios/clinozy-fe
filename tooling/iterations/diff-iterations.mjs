@@ -24,9 +24,9 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
 import {
   EMPTY_FIELD,
-  gitEnvironment,
   INTAKE_DIRECTORY,
   indexSlugs,
   intakeFolder,
@@ -288,7 +288,7 @@ export function rawIntakeDiff({ repositoryRoot, baseline, current }) {
       {
         cwd: workspace,
         encoding: 'utf-8',
-        env: gitEnvironment(),
+        env: gitEnvironmentWithoutInheritedRepository(),
         maxBuffer: 256 * 1024 * 1024,
       },
     );

@@ -15,6 +15,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gitEnvironmentWithoutInheritedRepository } from './git-environment.mjs';
 import { selectTests } from './test-selection.mjs';
 
 /**
@@ -40,15 +41,12 @@ export function prePushTests({ select }) {
 }
 
 function changedFiles(base) {
-  const environment = { ...process.env };
-  delete environment.GIT_DIR;
-  delete environment.GIT_WORK_TREE;
   const result = spawnSync(
     'git',
     ['diff', '--name-only', '--no-renames', `${base}...HEAD`],
     {
       encoding: 'utf8',
-      env: environment,
+      env: gitEnvironmentWithoutInheritedRepository(),
     },
   );
   if (result.status !== 0)

@@ -48,13 +48,13 @@ import {
 import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
 import {
   BRIEF_FILE,
   checkIntakeSet,
   DEFAULT_INTAKE_MODE,
   EMPTY_FIELD,
   flatFileNames,
-  gitEnvironment,
   INTAKE_DIRECTORY,
   INTAKE_MODES,
   intakeFolder,
@@ -189,7 +189,7 @@ export function displaySourcePath({ repositoryRoot, source }) {
 export function fileDiff({ before, after }) {
   const result = spawnSync('git', ['diff', '--no-index', '--', before, after], {
     encoding: 'utf-8',
-    env: gitEnvironment(),
+    env: gitEnvironmentWithoutInheritedRepository(),
   });
   const lines = (result.stdout ?? '').split('\n');
   return lines.length > DIFF_PREVIEW_LINES

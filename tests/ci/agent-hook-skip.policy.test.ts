@@ -5,6 +5,8 @@ import { join } from 'node:path';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
+import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-environment.mjs';
+
 // Agents never skip the git hooks: fe-guardrails.mjs (Claude PreToolUse) and fe-cursor-shell-guard.mjs
 // (Cursor beforeShellExecution) deny `--no-verify` on commit or push, `git commit -n` and
 // HUSKY=0. The same cases as clinozy-be's agent-os/evals/guard-eval.ts.
@@ -16,8 +18,14 @@ const HOOKS = join(process.cwd(), 'agent-os', 'hooks');
 // main does). The cases run in a throwaway repository with one empty commit instead.
 const REPOSITORY = mkdtempSync(join(tmpdir(), 'fe-hook-skip-'));
 function git(args: string[]): void {
+  // From a git hook (pre-push) the inherited GIT_DIR would outrank `cwd` and turn this into the
+  // hook's own repository.
   // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-  spawnSync('git', args, { cwd: REPOSITORY, encoding: 'utf8' });
+  spawnSync('git', args, {
+    cwd: REPOSITORY,
+    encoding: 'utf8',
+    env: gitEnvironmentWithoutInheritedRepository(),
+  });
 }
 git(['init', '-q']);
 git([
@@ -38,7 +46,10 @@ function claudeDecision(command: string): string {
     input: JSON.stringify({ tool_name: 'Bash', tool_input: { command } }),
     cwd: REPOSITORY,
     encoding: 'utf8',
-    env: { ...process.env, CLAUDE_PROJECT_DIR: REPOSITORY },
+    env: {
+      ...gitEnvironmentWithoutInheritedRepository(),
+      CLAUDE_PROJECT_DIR: REPOSITORY,
+    },
   });
   const stdout = result.stdout.trim();
   if (!stdout) return 'silent';

@@ -13,6 +13,8 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-environment.mjs';
+
 // The push CI watch (agent-os/hooks/fe-push-ci-watch.mjs, clinozy-be's): a failed run of the pushed
 // commit exits 2 (asyncRewake wakes the model) and asks for fe-ci-investigator; a green commit, no
 // authenticated gh, or a push in another repository exits 0.
@@ -31,9 +33,15 @@ function fixture(options: { runs: object[]; authenticated?: boolean }) {
   const root = mkdtempSync(join(tmpdir(), 'push-ci-watch-'));
   const state = mkdtempSync(join(tmpdir(), 'push-ci-watch-state-'));
   temporaryDirectories.push(root, state);
+  // Run from a git hook (pre-push), the inherited GIT_DIR would outrank `cwd` and these calls
+  // would rewrite the hook's own repository — its config, refs and checked-out branch.
   const git = (...args: string[]) =>
     // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-    spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+    spawnSync('git', args, {
+      cwd: root,
+      encoding: 'utf8',
+      env: gitEnvironmentWithoutInheritedRepository(),
+    });
   git('init', '--quiet');
   git('config', 'user.email', 'watch@example.com');
   git('config', 'user.name', 'watch');
@@ -72,7 +80,7 @@ function runHook(options: {
     }),
     encoding: 'utf8',
     env: {
-      ...process.env,
+      ...gitEnvironmentWithoutInheritedRepository(),
       CLAUDE_PROJECT_DIR: options.root,
       TMPDIR: options.state,
       PATH: `${options.bin}:${process.env.PATH ?? ''}`,
@@ -118,7 +126,7 @@ describe('fe-push-ci-watch.mjs', () => {
       input: JSON.stringify({ tool_input: { command: 'git push' }, cwd: off.root }),
       encoding: 'utf8',
       env: {
-        ...process.env,
+        ...gitEnvironmentWithoutInheritedRepository(),
         CLAUDE_PROJECT_DIR: off.root,
         TMPDIR: off.state,
         PATH: `${off.bin}:${process.env.PATH ?? ''}`,

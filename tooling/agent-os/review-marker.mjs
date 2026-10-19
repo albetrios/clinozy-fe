@@ -11,16 +11,17 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
 
 /** The record's folder under the git directory, read by the push review gate. */
 const REVIEW_RECORD_DIRECTORY = 'fe-pre-merge-review';
 
 function git(args) {
   // From a git hook, git's own GIT_DIR would outrank the working directory.
-  const environment = { ...process.env };
-  delete environment.GIT_DIR;
-  delete environment.GIT_WORK_TREE;
-  const result = spawnSync('git', args, { encoding: 'utf8', env: environment });
+  const result = spawnSync('git', args, {
+    encoding: 'utf8',
+    env: gitEnvironmentWithoutInheritedRepository(),
+  });
   if (result.status !== 0)
     throw new Error(`git ${args.join(' ')}: ${result.stderr.trim()}`);
   return result.stdout.trim();
