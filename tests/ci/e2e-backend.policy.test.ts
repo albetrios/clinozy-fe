@@ -34,7 +34,11 @@ describe('E2E against the backend image', () => {
   });
 
   it("boots the backend's latest image, never the shared development environment", () => {
-    expect(WORKFLOW).toMatch(/BACKEND_IMAGE: ghcr\.io\/.+-api:latest/);
+    // The name clinozy-be pushes: ghcr.io/<owner>/<repository>/<image>. Without the repository
+    // segment the pull fails with "manifest unknown" before the backend boots.
+    expect(WORKFLOW).toContain(
+      'BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api:latest',
+    );
     expect(WORKFLOW).toContain('packages: read');
     // clinozy-be's one database step, compiled (create, migrate, permissions and plans).
     expect(WORKFLOW).toContain('node dist/src/scripts/ops/db-prepare.js --seed minimal');

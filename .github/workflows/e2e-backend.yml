@@ -44,7 +44,9 @@ jobs:
       contents: read
       packages: read
     env:
-      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be-api:latest
+      # clinozy-be pushes ghcr.io/<owner>/<repository>/<image> (reusable-docker-build-trivy.yml:
+      # "ghcr.io/${repository_lowercase}/${API_IMAGE}"), so the repository is part of the name.
+      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api:latest
       SUITE: ${{ github.event_name == 'schedule' && 'full' || inputs.suite || 'smoke' }}
       # The services below, for the backend container and the suite's email-code helpers (they
       # read the verification codes from auth.mail_outbox).
