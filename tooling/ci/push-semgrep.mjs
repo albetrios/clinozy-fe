@@ -5,7 +5,7 @@
  * everything (clinozy-be's `pnpm security:semgrep:push`, on this repository's surface).
  *
  * Usage:
- *   pnpm security:semgrep:push                # files changed since the upstream (or origin/main)
+ *   pnpm security:semgrep:push                # files changed since the upstream (or origin/<trunk>)
  *   pnpm security:semgrep:push --base <ref>   # files changed since <ref>
  *
  * Same rules as CI (`--config p/default`), only findings new since the base. Semgrep missing, or a
@@ -16,6 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { reportEarlyCheck } from './early-checks.mjs';
+import { resolveBase, tryGit } from './git-environment.mjs';
 
 /** The code Semgrep scans at push: the auth runtime, the HTTP client, the CSP builders. */
 export const PUSH_SEMGREP_PATTERNS = [
@@ -39,25 +40,19 @@ export function pushSemgrepTargets(changedFiles) {
   );
 }
 
-function git(args) {
-  const result = spawnSync('git', args, { encoding: 'utf8' });
-  return { ok: result.status === 0, output: (result.stdout ?? '').trim() };
-}
-
 function main() {
   const baseIndex = process.argv.indexOf('--base');
-  const upstream = git(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']);
-  const base =
-    (baseIndex === -1 ? undefined : process.argv[baseIndex + 1]) ??
-    (upstream.ok ? upstream.output : 'origin/main');
-  const mergeBase = git(['merge-base', 'HEAD', base]);
+  const base = resolveBase({
+    base: baseIndex === -1 ? undefined : process.argv[baseIndex + 1],
+  });
+  const mergeBase = tryGit(['merge-base', 'HEAD', base]);
   if (!mergeBase.ok) {
     console.warn(
       `⚠ Semgrep at push: cannot find the merge base with ${base}; skipped (CI scans)`,
     );
     return;
   }
-  const changed = git([
+  const changed = tryGit([
     'diff',
     '--name-only',
     '--diff-filter=ACMR',

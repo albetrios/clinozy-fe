@@ -122,6 +122,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     console.error('Usage: node tooling/ci/early-checks.mjs <audit|client-env>');
     process.exitCode = 2;
   } else {
+    // Not tryGit: the staged files live in the hook's own index (GIT_INDEX_FILE), so this keeps it.
     const staged = spawnSync(
       'git',
       ['diff', '--cached', '--name-only', '--diff-filter=d'],

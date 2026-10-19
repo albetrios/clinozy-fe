@@ -16,9 +16,11 @@
  *   pnpm test:ci   # produces coverage/coverage-final.json first
  *   node tooling/ci/check-patch-coverage.mjs \
  *     --coverage coverage/coverage-final.json \
- *     [--base origin/main] \
+ *     [--base <ref>] \
  *     [--threshold 90] \
  *     [--report-only]
+ *
+ * `--base` defaults to the upstream, else origin/<trunk> (`resolveBase`); PR CI passes the PR's base.
  *
  * A changed line is "coverable" only if the coverage map has a statement
  * starting on that line. Comments, blank lines, type-only lines, and import
@@ -30,18 +32,17 @@
  * Keeping this in lock step with the global coverage scope is what makes the
  * metric honest.
  */
-import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { git, resolveBase } from './git-environment.mjs';
 
 const DEFAULT_THRESHOLD = 90;
-const DEFAULT_BASE = 'origin/main';
 
 function parseArguments(argv) {
   let coveragePath = null;
-  let base = DEFAULT_BASE;
+  let base;
   let threshold = DEFAULT_THRESHOLD;
   let reportOnly = false;
   for (let index = 0; index < argv.length; index += 1) {
@@ -196,14 +197,12 @@ function main() {
   );
 
   const coverage = JSON.parse(readFileSync(resolve(process.cwd(), coveragePath), 'utf8'));
-  const diffText = execFileSync(
-    'git',
-    ['diff', '--unified=0', '--no-color', `${base}...HEAD`],
-    {
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-    },
-  );
+  const diffText = git([
+    'diff',
+    '--unified=0',
+    '--no-color',
+    `${resolveBase({ base })}...HEAD`,
+  ]);
   const addedLines = parseAddedLines(diffText);
   const { overallPct, totalCovered, totalCoverable, perFile, uncoveredFiles } =
     computePatchCoverage(coverage, addedLines);

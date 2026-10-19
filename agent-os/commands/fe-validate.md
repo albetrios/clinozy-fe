@@ -4,7 +4,7 @@ argument-hint: '[--affected] — show what git push will run and which tests the
 allowed-tools: Bash(pnpm lint*), Bash(pnpm type-check*), Bash(pnpm validate*), Bash(pnpm biome*), Bash(pnpm test:affected*)
 ---
 
-With `--affected`: run `pnpm test:affected` (the base is the upstream, else `origin/main`; pass
+With `--affected`: run `pnpm test:affected` (the base is the upstream, else `origin/<trunk>`; pass
 `--base <ref>` for another) and show its two tables as they are — the steps `.husky/pre-push` will
 run for the pushed commits, each with why it runs or not, and the tests `pnpm test:select` picks,
 each with why. Change nothing, then stop.

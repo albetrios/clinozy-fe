@@ -8,8 +8,9 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
+import { configuredBaseBranch } from '../setup/github/setup-config.mjs';
 import { EMPTY_FIELD, intakeHash } from './iterations.mjs';
-import { configuredBaseBranch, renderIterationReadme } from './new-iteration.mjs';
+import { renderIterationReadme } from './new-iteration.mjs';
 
 export const BASE_BRANCH = configuredBaseBranch();
 export const WORK_BRANCH = 'feat/iteration-work';

@@ -19,12 +19,11 @@
  *
  * clinozy-be's `tooling/iterations/iteration-diff.util.ts` prints the same summary and JSON shape.
  */
-import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
+import { tryGit } from '../ci/git-environment.mjs';
 import {
   EMPTY_FIELD,
   INTAKE_DIRECTORY,
@@ -276,8 +275,8 @@ export function rawIntakeDiff({ repositoryRoot, baseline, current }) {
         .files)
         copyFileSync(path, join(folder, name));
     }
-    const result = spawnSync(
-      'git',
+    // `git diff --no-index` exits 1 when the snapshots differ, so its output is read either way.
+    return tryGit(
       [
         'diff',
         '--no-index',
@@ -285,14 +284,8 @@ export function rawIntakeDiff({ repositoryRoot, baseline, current }) {
         join(ITERATIONS_DIRECTORY, baseline, INTAKE_DIRECTORY),
         join(ITERATIONS_DIRECTORY, current, INTAKE_DIRECTORY),
       ],
-      {
-        cwd: workspace,
-        encoding: 'utf-8',
-        env: gitEnvironmentWithoutInheritedRepository(),
-        maxBuffer: 256 * 1024 * 1024,
-      },
-    );
-    return result.stdout ?? '';
+      { cwd: workspace },
+    ).output;
   } finally {
     rmSync(workspace, { recursive: true, force: true });
   }

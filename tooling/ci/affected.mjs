@@ -8,10 +8,9 @@
  * The steps mirror `.husky/pre-push` (`tests/ci/affected.policy.test.ts` keeps the two in step). It
  * changes nothing.
  */
-import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gitEnvironmentWithoutInheritedRepository } from './git-environment.mjs';
+import { resolveBase, tryGit } from './git-environment.mjs';
 import { pushSemgrepTargets } from './push-semgrep.mjs';
 import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
@@ -106,22 +105,16 @@ export function selectionTable(selection) {
   return lines;
 }
 
-function git(args) {
-  const result = spawnSync('git', args, {
-    encoding: 'utf8',
-    env: gitEnvironmentWithoutInheritedRepository(),
-  });
-  return { ok: result.status === 0, output: (result.stdout ?? '').trim() };
-}
-
 function main() {
   const repositoryRoot = resolve(import.meta.dirname, '../..');
   const baseIndex = process.argv.indexOf('--base');
-  const upstream = git(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}']);
-  const base =
-    (baseIndex === -1 ? undefined : process.argv[baseIndex + 1]) ??
-    (upstream.ok ? upstream.output : 'origin/main');
-  const changed = git(['diff', '--name-only', '--no-renames', `${base}...HEAD`]);
+  const base = resolveBase({
+    base: baseIndex === -1 ? undefined : process.argv[baseIndex + 1],
+    cwd: repositoryRoot,
+  });
+  const changed = tryGit(['diff', '--name-only', '--no-renames', `${base}...HEAD`], {
+    cwd: repositoryRoot,
+  });
   if (!changed.ok) {
     console.error(`Cannot diff against ${base} — pass --base <ref>.`);
     process.exitCode = 1;

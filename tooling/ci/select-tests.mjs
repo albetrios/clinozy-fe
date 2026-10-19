@@ -4,7 +4,8 @@
  * `tooling/ci/test-selection.mjs`).
  *
  * Usage:
- *   pnpm test:select                    # changes since the merge base with origin/main + the working tree
+ *   pnpm test:select                    # changes since the merge base with the upstream (or
+ *                                       # origin/<trunk>) + the working tree
  *   pnpm test:select --base <ref>       # another base
  *   pnpm test:select --files a.ts,b.md  # these files instead of git
  *   pnpm test:select --why              # every selected test and why it was selected
@@ -20,7 +21,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gitEnvironmentWithoutInheritedRepository } from './git-environment.mjs';
+import { git, resolveBase } from './git-environment.mjs';
 import { changedOnly, selectTests, withoutTests } from './test-selection.mjs';
 
 const REPOSITORY_ROOT = resolve(import.meta.dirname, '../..');
@@ -29,7 +30,7 @@ const REPOSITORY_ROOT = resolve(import.meta.dirname, '../..');
  * Parses the command line.
  *
  * @param {readonly string[]} argv
- * @returns {{ base: string, files: string[] | undefined, why: boolean, json: boolean, run: boolean, changedOnly: boolean, exclude: string[] }}
+ * @returns {{ base: string | undefined, files: string[] | undefined, why: boolean, json: boolean, run: boolean, changedOnly: boolean, exclude: string[] }}
  */
 export function parseSelectArguments(argv) {
   const value = (name) => {
@@ -38,7 +39,7 @@ export function parseSelectArguments(argv) {
   };
   const files = value('--files');
   return {
-    base: value('--base') ?? 'origin/main',
+    base: value('--base'),
     files: files === undefined ? undefined : files.split(',').filter(Boolean),
     why: argv.includes('--why'),
     json: argv.includes('--json'),
@@ -50,24 +51,13 @@ export function parseSelectArguments(argv) {
   };
 }
 
-function git(args) {
-  // From a git hook, git's own GIT_DIR would outrank `cwd`.
-  const result = spawnSync('git', args, {
-    cwd: REPOSITORY_ROOT,
-    encoding: 'utf8',
-    env: gitEnvironmentWithoutInheritedRepository(),
-  });
-  if (result.status !== 0)
-    throw new Error(`git ${args.join(' ')}: ${result.stderr.trim()}`);
-  return result.stdout;
-}
-
-/** Everything since the merge base with `base`, the working tree and the untracked files. */
-function changedFiles(base) {
-  const mergeBase = git(['merge-base', 'HEAD', base]).trim();
+/** Everything since the merge base with the base (`resolveBase`), the working tree, untracked files. */
+function changedFiles(given) {
+  const at = { cwd: REPOSITORY_ROOT };
+  const mergeBase = git(['merge-base', 'HEAD', resolveBase({ base: given, ...at })], at);
   const lines = [
-    ...git(['diff', '--name-only', mergeBase]).split('\n'),
-    ...git(['ls-files', '--others', '--exclude-standard']).split('\n'),
+    ...git(['diff', '--name-only', mergeBase], at).split('\n'),
+    ...git(['ls-files', '--others', '--exclude-standard'], at).split('\n'),
   ];
   return [...new Set(lines.map((line) => line.trim()).filter(Boolean))];
 }

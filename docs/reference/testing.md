@@ -173,7 +173,8 @@ Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes
 ## Test selection (`pnpm test:select`)
 
 `tooling/ci/test-selection.mjs` names the Vitest files a set of changed files can affect (changes
-since the merge base with `origin/main` plus the working tree, or `--files a,b`). A test is selected
+since the merge base with the upstream, else `origin/<trunk>` — `resolveBase` in
+`tooling/ci/git-environment.mjs` — plus the working tree, or `--files a,b`). A test is selected
 when its imports reach a changed file (static and dynamic `import`, `vi.mock`, `import.meta.glob`),
 when it mentions the changed path (the `tests/ci` policy tests that read files), or when it is the
 changed test itself. Pages never import pages, so a page change stays inside its section. A file

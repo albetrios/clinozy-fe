@@ -1,11 +1,15 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  git,
   gitEnvironmentWithoutInheritedRepository,
   INHERITED_GIT_REPOSITORY_VARIABLES,
+  resolveBase,
+  tryGit,
 } from '../../tooling/ci/git-environment.mjs';
 
 // Git exports GIT_DIR and friends into every hook it runs, and they outrank `cwd`. A test or
@@ -24,9 +28,35 @@ const BUILDS_REPOSITORY = /(?:\bgit\(|['"]git['"],)[^\n]*['"]init['"]/;
 const KNOWN_REPOSITORY_BUILDERS = [
   'tests/ci/agent-hook-skip.policy.test.ts',
   'tests/ci/agent-push-review-gate.policy.test.ts',
+  'tests/ci/git-hook-environment.policy.test.ts',
   'tooling/iterations/iteration-fixtures.mjs',
   'tooling/validate/large-staged-files.test.mjs',
 ];
+
+/** A `git` child process started by hand: `spawnSync('git'`, `execFileSync(\n 'git'`, `execSync('git …`. */
+const STARTS_GIT =
+  /\b(?:spawnSync|spawn|execFileSync|execFile|execSync|exec)\(\s*['"`]git\b/;
+/**
+ * The `tooling/` files that may start `git` themselves instead of through `git` / `tryGit` (tests
+ * build their throwaway repositories as they need; they are not scanned).
+ */
+const OWN_GIT_ALLOWED = new Map([
+  ['tooling/ci/early-checks.mjs', "reads the staged files from the hook's own index"],
+  ['tooling/iterations/iteration-fixtures.mjs', 'test fixture: commits at fixed dates'],
+]);
+
+function toolingFilesStartingGit(): string[] {
+  return sourceFiles(join(ROOT, 'tooling'))
+    .map((path) => relative(ROOT, path))
+    .filter((file) => file !== HELPER_FILE && !/\.test\.[cm]?[jt]s$/.test(file))
+    .filter((file) => {
+      const code = readFileSync(join(ROOT, file), 'utf8')
+        .split('\n')
+        .map((line) => (/^\s*(?:\/\/|\*)/.test(line) ? '' : line))
+        .join('\n');
+      return STARTS_GIT.test(code);
+    });
+}
 
 function sourceFiles(directory: string, found: string[] = []): string[] {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -105,5 +135,77 @@ describe('git hook environment — inherited repository variables', () => {
     // Anti-vacuity: an empty scan would satisfy the assertion below for free.
     expect(builders).toEqual(expect.arrayContaining(KNOWN_REPOSITORY_BUILDERS));
     expect(unguarded).toEqual([]);
+  });
+});
+
+describe('git hook environment — one way to run git in tooling', () => {
+  it('starts git only through git / tryGit, outside the allowlisted exceptions', () => {
+    const starting = toolingFilesStartingGit();
+    // Anti-vacuity: every allowlisted file still starts git itself, so the scan sees them.
+    expect(starting).toEqual(expect.arrayContaining([...OWN_GIT_ALLOWED.keys()]));
+    expect(starting.filter((file) => !OWN_GIT_ALLOWED.has(file))).toEqual([]);
+  });
+
+  it('flags a hand-started git call, on one line or split across two', () => {
+    expect(STARTS_GIT.test("spawnSync('git', ['status'])")).toBe(true);
+    expect(STARTS_GIT.test("execFileSync(\n  'git',\n  ['diff'],\n)")).toBe(true);
+    expect(STARTS_GIT.test('execSync(`git remote get-url origin`)')).toBe(true);
+    expect(STARTS_GIT.test("spawnSync('gitleaks', ['detect'])")).toBe(false);
+    expect(STARTS_GIT.test("tryGit(['status'])")).toBe(false);
+  });
+});
+
+describe('git hook environment — git, tryGit and resolveBase', () => {
+  const folders: string[] = [];
+  afterEach(() => {
+    for (const folder of folders.splice(0))
+      rmSync(folder, { recursive: true, force: true });
+  });
+
+  /** A throwaway repository on branch `work` with one commit and a second branch `other`. */
+  function repository(): string {
+    const cwd = mkdtempSync(join(tmpdir(), 'git-environment-'));
+    folders.push(cwd);
+    git(['init', '-q', '-b', 'work'], { cwd });
+    git(['config', 'user.name', 'Test Owner'], { cwd });
+    git(['config', 'user.email', 'owner@example.test'], { cwd });
+    git(['config', 'commit.gpgsign', 'false'], { cwd });
+    git(['commit', '-q', '--allow-empty', '-m', 'initial'], { cwd });
+    git(['branch', 'other'], { cwd });
+    return cwd;
+  }
+
+  it('git returns the trimmed output in cwd and throws naming the command', () => {
+    const cwd = repository();
+    expect(git(['branch', '--show-current'], { cwd })).toBe('work');
+    expect(() => git(['rev-parse', '--verify', 'missing-ref'], { cwd })).toThrow(
+      /^git rev-parse --verify missing-ref: /,
+    );
+  });
+
+  it('tryGit reports success and failure without throwing', () => {
+    const cwd = repository();
+    expect(tryGit(['branch', '--show-current'], { cwd })).toEqual({
+      ok: true,
+      output: 'work',
+    });
+    expect(tryGit(['rev-parse', '--verify', '--quiet', 'missing-ref'], { cwd })).toEqual({
+      ok: false,
+      output: '',
+    });
+  });
+
+  it('resolveBase: the given base, else the upstream, else origin/<trunk> from the config', () => {
+    const cwd = repository();
+    const trunk = (
+      JSON.parse(readFileSync(join(ROOT, 'tooling/setup/setup.config.json'), 'utf8')) as {
+        git: { defaultBranch: string };
+      }
+    ).git.defaultBranch;
+    expect(resolveBase({ cwd })).toBe(`origin/${trunk}`);
+    git(['config', 'branch.work.remote', '.'], { cwd });
+    git(['config', 'branch.work.merge', 'refs/heads/other'], { cwd });
+    expect(resolveBase({ cwd })).toBe('other');
+    expect(resolveBase({ base: 'given-ref', cwd })).toBe('given-ref');
   });
 });

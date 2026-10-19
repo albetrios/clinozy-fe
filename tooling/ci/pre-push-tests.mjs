@@ -15,7 +15,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gitEnvironmentWithoutInheritedRepository } from './git-environment.mjs';
+import { git, resolveBase } from './git-environment.mjs';
 import { selectTests } from './test-selection.mjs';
 
 /**
@@ -40,27 +40,26 @@ export function prePushTests({ select }) {
   return { run: 'selected', files, reason: `${files.length} test file(s) selected` };
 }
 
-function changedFiles(base) {
-  const result = spawnSync(
-    'git',
-    ['diff', '--name-only', '--no-renames', `${base}...HEAD`],
-    {
-      encoding: 'utf8',
-      env: gitEnvironmentWithoutInheritedRepository(),
-    },
-  );
-  if (result.status !== 0)
-    throw new Error(`git diff against ${base}: ${(result.stderr ?? '').trim()}`);
-  return result.stdout.split('\n').filter(Boolean);
+function changedFiles({ base, repositoryRoot }) {
+  return git(['diff', '--name-only', '--no-renames', `${base}...HEAD`], {
+    cwd: repositoryRoot,
+  })
+    .split('\n')
+    .filter(Boolean);
 }
 
 function main() {
   const repositoryRoot = resolve(import.meta.dirname, '../..');
   const baseIndex = process.argv.indexOf('--base');
-  const base =
-    (baseIndex === -1 ? undefined : process.argv[baseIndex + 1]) ?? 'origin/main';
+  const given = baseIndex === -1 ? undefined : process.argv[baseIndex + 1];
   const plan = prePushTests({
-    select: () => selectTests({ changedFiles: changedFiles(base), repositoryRoot }),
+    select: () => {
+      const base = resolveBase({ base: given, cwd: repositoryRoot });
+      return selectTests({
+        changedFiles: changedFiles({ base, repositoryRoot }),
+        repositoryRoot,
+      });
+    },
   });
   console.log(`Pre-push tests: ${plan.run} — ${plan.reason}`);
   if (plan.run === 'none') return;

@@ -224,7 +224,7 @@ describe('pnpm test:select', () => {
         '--changed-only',
       ]),
       {
-        base: 'origin/main',
+        base: undefined,
         files: ['a.ts', 'b.md'],
         why: true,
         json: false,

@@ -8,11 +8,10 @@
  * `<dir>` holds Vitest JSON reports (`--reporter=json`). It reports only: annotations, the job
  * summary, a fixture line per miss — and exits 0.
  */
-import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gitEnvironmentWithoutInheritedRepository } from './git-environment.mjs';
+import { git, resolveBase } from './git-environment.mjs';
 import { selectTests } from './test-selection.mjs';
 
 /**
@@ -61,21 +60,15 @@ function option(name) {
   return index === -1 ? undefined : process.argv[index + 1];
 }
 
-function git(args) {
-  const result = spawnSync('git', args, {
-    encoding: 'utf8',
-    env: gitEnvironmentWithoutInheritedRepository(),
-  });
-  if (result.status !== 0)
-    throw new Error(`git ${args.join(' ')}: ${result.stderr.trim()}`);
-  return result.stdout;
-}
-
 function main() {
   const repositoryRoot = resolve(import.meta.dirname, '../..');
+  const at = { cwd: repositoryRoot };
   const resultsDirectory = option('--results') ?? 'test-results';
-  const base = git(['merge-base', 'HEAD', option('--base') ?? 'origin/main']).trim();
-  const changedFiles = git(['diff', '--name-only', '--no-renames', `${base}...HEAD`])
+  const base = git(
+    ['merge-base', 'HEAD', resolveBase({ base: option('--base'), ...at })],
+    at,
+  );
+  const changedFiles = git(['diff', '--name-only', '--no-renames', `${base}...HEAD`], at)
     .split('\n')
     .filter(Boolean);
   const failed = existsSync(resultsDirectory)

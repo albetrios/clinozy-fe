@@ -17,7 +17,8 @@ import { randomInt } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadSetupConfig } from '../setup/github/setup-config.mjs';
+import { tryGit } from '../ci/git-environment.mjs';
+import { configuredBaseBranch } from '../setup/github/setup-config.mjs';
 import {
   DEFAULT_ITERATION_PROCESS,
   EMPTY_FIELD,
@@ -30,7 +31,6 @@ import {
   parseIterationName,
   resolveSiblingRoot,
   gitUserName,
-  tryGit,
   workingTreeIterationNames,
 } from './iterations.mjs';
 
@@ -157,32 +157,16 @@ export function renderIterationReadme({ name, fields }) {
 }
 
 /**
- * The trunk iterations merge into, from `git.defaultBranch` in `tooling/setup/setup.config.json`.
- *
- * @throws when the config has no default branch
- */
-export function configuredBaseBranch() {
-  const { defaultBranch } = loadSetupConfig();
-  if (!defaultBranch)
-    throw new Error('tooling/setup/setup.config.json has no git.defaultBranch.');
-  return defaultBranch;
-}
-
-/**
  * Iteration folder names committed on `baseBranch`; empty when the branch does not exist.
  *
  * @param {{ repositoryRoot: string, baseBranch: string }} location
  * @returns {string[]}
  */
 export function baseBranchIterationNames({ repositoryRoot, baseBranch }) {
-  const listing = tryGit(repositoryRoot, [
-    'ls-tree',
-    '-d',
-    '--name-only',
-    baseBranch,
-    '--',
-    `${ITERATIONS_DIRECTORY}/`,
-  ]);
+  const { output: listing } = tryGit(
+    ['ls-tree', '-d', '--name-only', baseBranch, '--', `${ITERATIONS_DIRECTORY}/`],
+    { cwd: repositoryRoot },
+  );
   if (!listing) return [];
   return listing
     .split('\n')
@@ -253,7 +237,7 @@ export function planNewIteration(request) {
     nextId: request.nextId ?? randomIterationId,
   });
   const owner = gitUserName(repositoryRoot);
-  const branch = tryGit(repositoryRoot, ['branch', '--show-current']) ?? '';
+  const branch = tryGit(['branch', '--show-current'], { cwd: repositoryRoot }).output;
   if (branch === '')
     throw new Error(
       'HEAD is detached — check out the branch this iteration will be built on.',

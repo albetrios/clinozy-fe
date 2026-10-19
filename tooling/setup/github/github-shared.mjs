@@ -2,6 +2,7 @@
  * Shared GitHub CLI helpers for tooling/setup/github/*.
  */
 import { execFileSync, execSync } from 'node:child_process';
+import { tryGit } from '../../ci/git-environment.mjs';
 
 export class GitHubApiError extends Error {
   /**
@@ -15,21 +16,14 @@ export class GitHubApiError extends Error {
 }
 
 export function repositoryFromGitRemote() {
-  try {
-    const remoteUrl = execSync('git remote get-url origin', {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-      timeout: 5_000,
-    }).trim();
+  const remote = tryGit(['remote', 'get-url', 'origin']);
+  if (!remote.ok) return undefined;
 
-    const sshMatch = remoteUrl.match(/git@github\.com:([^/]+\/[^/.]+?)(?:\.git)?$/);
-    if (sshMatch?.[1]) return sshMatch[1];
+  const sshMatch = remote.output.match(/git@github\.com:([^/]+\/[^/.]+?)(?:\.git)?$/);
+  if (sshMatch?.[1]) return sshMatch[1];
 
-    const httpsMatch = remoteUrl.match(/github\.com\/([^/]+\/[^/.]+?)(?:\.git)?$/);
-    if (httpsMatch?.[1]) return httpsMatch[1];
-  } catch {
-    // fall through
-  }
+  const httpsMatch = remote.output.match(/github\.com\/([^/]+\/[^/.]+?)(?:\.git)?$/);
+  if (httpsMatch?.[1]) return httpsMatch[1];
   return undefined;
 }
 

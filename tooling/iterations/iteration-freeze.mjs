@@ -9,6 +9,7 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { tryGit } from '../ci/git-environment.mjs';
 import {
   INTAKE_DIRECTORY,
   ITERATIONS_DIRECTORY,
@@ -16,7 +17,6 @@ import {
   parseIterationReadme,
   resolvedIntakeHash,
   resolveIntakeSnapshot,
-  tryGit,
 } from './iterations.mjs';
 
 /** The Status every iteration a branch changes has when it merges. */
@@ -110,13 +110,13 @@ export function judgeIteration({ repositoryRoot, iteration, changes, baseStatus 
 
 /** An iteration's Status on `revision`, undefined when it has no README there. */
 function statusAt({ repositoryRoot, revision, iteration }) {
-  const readme = tryGit(repositoryRoot, [
-    'show',
-    `${revision}:${ITERATIONS_DIRECTORY}/${iteration}/README.md`,
-  ]);
-  return readme === undefined
-    ? undefined
-    : (parseIterationReadme(readme).get('Status') ?? '—');
+  const readme = tryGit(
+    ['show', `${revision}:${ITERATIONS_DIRECTORY}/${iteration}/README.md`],
+    { cwd: repositoryRoot },
+  );
+  return readme.ok
+    ? (parseIterationReadme(readme.output).get('Status') ?? '—')
+    : undefined;
 }
 
 /**
@@ -128,11 +128,11 @@ function statusAt({ repositoryRoot, revision, iteration }) {
  * @returns {{ touched: string[], problems: string[] }}
  */
 export function checkIterationFreeze({ repositoryRoot, base }) {
-  const mergeBase = tryGit(repositoryRoot, ['merge-base', 'HEAD', base]);
-  const listing =
-    mergeBase === undefined
-      ? undefined
-      : tryGit(repositoryRoot, [
+  const found = tryGit(['merge-base', 'HEAD', base], { cwd: repositoryRoot });
+  const mergeBase = found.output;
+  const diff = found.ok
+    ? tryGit(
+        [
           'diff',
           '--name-status',
           '--no-renames',
@@ -140,8 +140,12 @@ export function checkIterationFreeze({ repositoryRoot, base }) {
           'HEAD',
           '--',
           `${ITERATIONS_DIRECTORY}/`,
-        ]);
-  if (mergeBase === undefined || listing === undefined)
+        ],
+        { cwd: repositoryRoot },
+      )
+    : undefined;
+  const listing = diff?.output ?? '';
+  if (!found.ok || !diff?.ok)
     return {
       touched: [],
       problems: [

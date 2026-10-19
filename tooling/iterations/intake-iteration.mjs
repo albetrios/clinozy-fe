@@ -34,7 +34,6 @@
  * resolved snapshot and its Intake hash do not change, so it works at any Status and never writes
  * the README. The model: iterations/README.md.
  */
-import { spawnSync } from 'node:child_process';
 import {
   copyFileSync,
   existsSync,
@@ -48,7 +47,7 @@ import {
 import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
+import { tryGit } from '../ci/git-environment.mjs';
 import {
   BRIEF_FILE,
   checkIntakeSet,
@@ -77,7 +76,6 @@ import {
   schemaRoutesHash,
   setReadmeField,
   snapshotFingerprint,
-  tryGit,
 } from './iterations.mjs';
 
 /** Files `--both` sends to the sibling repository's same-named iteration (plus `BRIEF.md` in brief mode). */
@@ -187,11 +185,8 @@ export function displaySourcePath({ repositoryRoot, source }) {
  * @param {{ before: string, after: string }} files
  */
 export function fileDiff({ before, after }) {
-  const result = spawnSync('git', ['diff', '--no-index', '--', before, after], {
-    encoding: 'utf-8',
-    env: gitEnvironmentWithoutInheritedRepository(),
-  });
-  const lines = (result.stdout ?? '').split('\n');
+  // `git diff --no-index` exits 1 when the files differ, so its output is read either way.
+  const lines = tryGit(['diff', '--no-index', '--', before, after]).output.split('\n');
   return lines.length > DIFF_PREVIEW_LINES
     ? [
         ...lines.slice(0, DIFF_PREVIEW_LINES),
@@ -278,26 +273,25 @@ function changeKind(code) {
  */
 function gitIntakeChanges({ repositoryRoot, iteration }) {
   const path = relativeIntakeFolder(iteration);
-  if (!tryGit(repositoryRoot, ['ls-files', '--', path])) {
+  if (!tryGit(['ls-files', '--', path], { cwd: repositoryRoot }).output) {
     return {
       details: [`${path} is not committed yet, so git cannot name the changed file.`],
       restore: '',
     };
   }
-  const tracked = (
-    tryGit(repositoryRoot, ['diff', '--name-status', 'HEAD', '--', path]) ?? ''
-  )
-    .split('\n')
+  const tracked = tryGit(['diff', '--name-status', 'HEAD', '--', path], {
+    cwd: repositoryRoot,
+  })
+    .output.split('\n')
     .filter(Boolean)
     .map((line) => {
       const [code, ...paths] = line.split('\t');
       return `${changeKind(code)} ${basename(paths[0] ?? '')}`;
     });
-  const untracked = (
-    tryGit(repositoryRoot, ['ls-files', '--others', '--exclude-standard', '--', path]) ??
-    ''
-  )
-    .split('\n')
+  const untracked = tryGit(['ls-files', '--others', '--exclude-standard', '--', path], {
+    cwd: repositoryRoot,
+  })
+    .output.split('\n')
     .filter(Boolean)
     .map((file) => `added ${basename(file)}`);
   const changes = [...tracked, ...untracked];

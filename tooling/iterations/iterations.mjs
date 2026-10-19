@@ -6,11 +6,10 @@
  * clinozy-be's `tooling/iterations/iteration.util.ts` implements the same rules, and the README
  * template is byte-identical to its own, so an iteration reads the same in both repositories.
  */
-import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
-import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
+import { tryGit } from '../ci/git-environment.mjs';
 
 /** The four iteration types, in the order the docs list them. */
 export const ITERATION_TYPES = ['launch', 'feat', 'change', 'fix'];
@@ -351,32 +350,13 @@ export function readAllIterationReadmes(repositoryRoot) {
 // ── git ──────────────────────────────────────────────────────────────────────
 
 /**
- * Runs a read-only git command and returns its trimmed output, or `undefined` when it fails.
- *
- * @param {string} repositoryRoot
- * @param {readonly string[]} gitArguments
- */
-export function tryGit(repositoryRoot, gitArguments) {
-  try {
-    return execFileSync('git', gitArguments, {
-      cwd: repositoryRoot,
-      encoding: 'utf-8',
-      env: gitEnvironmentWithoutInheritedRepository(),
-      stdio: ['ignore', 'pipe', 'pipe'],
-    }).trim();
-  } catch {
-    return undefined;
-  }
-}
-
-/**
  * `git config user.name` — who owns new iterations and signs History lines.
  *
  * @param {string} repositoryRoot
  * @throws when it is not set
  */
 export function gitUserName(repositoryRoot) {
-  const owner = tryGit(repositoryRoot, ['config', 'user.name']) ?? '';
+  const owner = tryGit(['config', 'user.name'], { cwd: repositoryRoot }).output;
   if (owner === '')
     throw new Error('git config user.name is not set — it signs the README.');
   return owner;

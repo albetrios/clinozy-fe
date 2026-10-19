@@ -33,10 +33,10 @@
  *   pnpm docs:staleness           human-readable report; exit 1 on findings
  *   node …/check-doc-staleness.mjs --json    machine-readable findings array
  */
-import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { git } from './git-environment.mjs';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '../..');
 const ALLOWLIST_FILE = join(ROOT, 'tooling/ci/doc-staleness-allowlist.json');
@@ -285,11 +285,7 @@ const PATH_TOKEN = new RegExp(`(?:^|[\\s(])((?:${ROOT_ALT})/[A-Za-z0-9._$*/-]+)`
  */
 function loadTrackedPaths() {
   try {
-    const out = execFileSync('git', ['ls-files', '-z'], {
-      cwd: ROOT,
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-    });
+    const out = git(['ls-files', '-z'], { cwd: ROOT });
     const set = new Set();
     for (const file of out.split('\0')) {
       if (!file) continue;
