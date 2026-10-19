@@ -70,6 +70,9 @@ To change wiring, edit `hooks.json` then run `pnpm agent-os:generate`.
   edit, so `fe-guard-edits.sh`, `fe-edit-hooks.mjs` and the `fe-guardrails.mjs`
   warnings act only on files under `$CLAUDE_PROJECT_DIR`. The secret and destructive-shell blocks
   cover every path. Pinned by `tests/ci/agent-hooks-repository-scope.policy.test.ts`.
+- **One rule set.** The destructive-shell patterns and the secret env paths live once, in
+  `_fe-guard-rules.mjs`; the Claude guardrail (`fe-guardrails.mjs`) and its Cursor mirror
+  (`fe-cursor-shell-guard.mjs`) import it, so the two platforms cannot drift apart.
 - **Reach the model.** Plain stdout from PostToolUse or Stop never reaches it; a reminder goes
   out as `hookSpecificOutput.additionalContext` from PostToolUse, once per turn through
   `_fe-turn-once.sh` (reset by `fe-prompt-skill-router.sh`), so no Stop hook forces another turn.
