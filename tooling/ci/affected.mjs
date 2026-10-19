@@ -17,9 +17,12 @@ import { pushSemgrepTargets } from './push-semgrep.mjs';
 import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
 /**
- * The pushed files that make pre-push run the Vitest suite (`pnpm test:pre-push`). All of `tests/`
- * and `.github/` count: a changed test selects itself, and the `tests/ci` policy tests read the
- * workflows and actions, so a push that changes only those runs the tests that name them.
+ * The pushed files that make pre-push run the selected tests (`pnpm test:pre-push`): source and
+ * tests, tooling, the workflows, and the dependency and Vitest config. `.github/` counts because
+ * the CI policy tests (`tests/ci`) read the workflows and actions, so a push that changes only a
+ * workflow runs the ones that name it; a changed test selects itself. The same rule as
+ * clinozy-be's `tooling/validate/pre-push-steps.ts`, on this repository's paths (its tests live
+ * under `src/` and `tests/`).
  */
 export const UNIT_RELEVANT =
   /^(src\/|tests\/|tooling\/|\.github\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
