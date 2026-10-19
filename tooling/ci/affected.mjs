@@ -16,9 +16,13 @@ import { isMain, parseCommandLine } from './script.mjs';
 import { pushSemgrepTargets } from './push-semgrep.mjs';
 import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
-/** The pushed files that make pre-push run the Vitest suite (`pnpm test:pre-push`). */
+/**
+ * The pushed files that make pre-push run the Vitest suite (`pnpm test:pre-push`). All of `tests/`
+ * and `.github/` count: a changed test selects itself, and the `tests/ci` policy tests read the
+ * workflows and actions, so a push that changes only those runs the tests that name them.
+ */
 export const UNIT_RELEVANT =
-  /^(src\/|tests\/utils\/|tooling\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
+  /^(src\/|tests\/|tooling\/|\.github\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
 
 /** The pushed files the SonarQube gate analyzes (`pnpm sonar:scan`): src/ runtime, without these. */
 export const SONAR_RUNTIME = /^src\/.*\.(ts|tsx)$/;

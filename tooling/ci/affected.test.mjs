@@ -55,9 +55,12 @@ describe('test:affected mirrors .husky/pre-push', () => {
       'pnpm-lock.yaml',
       'pnpm-workspace.yaml',
       'tooling/ci/a.mjs',
+      // A changed policy test selects itself; the policy tests read the workflows.
+      'tests/ci/a.policy.test.ts',
+      '.github/workflows/pr-ci.yml',
     ])
       expect(answer('pnpm test:pre-push', [file]), file).toBe('yes');
-    for (const file of ['docs/a.md', 'tests/ci/a.policy.test.ts'])
+    for (const file of ['docs/a.md'])
       expect(answer('pnpm test:pre-push', [file]), file).toBe('no');
     expect(answer('pnpm sonar:scan', ['src/app/a.tsx'])).toBe('yes');
     for (const file of [
