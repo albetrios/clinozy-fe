@@ -76,10 +76,10 @@ describe('post-merge CI policy (single trunk)', () => {
   it('persists a tracked ci-failure issue on post-merge failure (not just a run ::error)', () => {
     const notifyBlock = jobBlock(workflow, 'notify-failure');
     expect(notifyBlock).not.toBe('');
-    // widened perms + clinozy-be's shared action: one labelled issue per title, repeats as
-    // comments, and the next green run closes it.
+    // widened perms + the ci-failure-issue action (a true copy of clinozy-be's): one labelled
+    // issue per title, repeats as comments, and the next green run closes it.
     expect(notifyBlock).toContain('issues: write');
-    expect(notifyBlock).toContain('/.github/actions/ci-failure-issue@');
+    expect(notifyBlock).toContain('uses: ./.github/actions/ci-failure-issue');
     expect(notifyBlock).toMatch(/mode: open\n\s+title: Post-merge CI failing/);
     const resolveBlock = jobBlock(workflow, 'resolve-success');
     expect(resolveBlock).toContain('issues: write');
