@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parseEnv } from 'node:util';
 
+import { parse } from 'dotenv';
 import type { ConfigEnv } from 'vite';
 
 /**
@@ -96,7 +96,7 @@ export function applyBuildEnvironment({
       `${BUILD_ENVIRONMENT_VARIABLE}=${environment}, but there is no .env.${environment} to build with.`,
     );
   }
-  for (const [key, value] of Object.entries(parseEnv(readFileSync(file, 'utf8')))) {
+  for (const [key, value] of Object.entries(parse(readFileSync(file, 'utf8')))) {
     if (processEnv[key] === undefined) processEnv[key] = value;
   }
   // The bundle reports the environment it was built for — as the deploy workflow derives

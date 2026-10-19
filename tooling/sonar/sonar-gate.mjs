@@ -14,6 +14,7 @@ import { spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { parse } from 'dotenv';
 
 const PROJECT_KEY = 'clinozy-fe';
 const COMPOSE_FILE = 'docker-compose.sonar.yml';
@@ -46,16 +47,9 @@ function die(message) {
   process.exit(1);
 }
 
-/** Parses `.env.local` into a key→value map (quotes stripped); returns {} when absent. */
+/** Parses `.env.local` into a key→value map (dotenv, as Vite reads it); {} when absent. */
 function readEnvLocal() {
-  if (!existsSync(ENV_LOCAL)) return {};
-  /** @type {Record<string, string>} */
-  const out = {};
-  for (const rawLine of readFileSync(ENV_LOCAL, 'utf8').split('\n')) {
-    const match = /^([A-Z0-9_]+)=(.*)$/.exec(rawLine.trim());
-    if (match?.[1]) out[match[1]] = (match[2] ?? '').replace(/^["']|["']$/g, '');
-  }
-  return out;
+  return existsSync(ENV_LOCAL) ? parse(readFileSync(ENV_LOCAL)) : {};
 }
 
 /**

@@ -13,7 +13,7 @@
  * reported as missing, for the developer to fill by hand. Values are never logged — callers
  * get the key names and where each came from.
  */
-import { parseEnv } from 'node:util';
+import { parse } from 'dotenv';
 
 /** Set `key=value` in env-file content: replace its line if present, else append one. */
 export function upsertEnvAssignment(content: string, key: string, value: string): string {
@@ -47,8 +47,8 @@ export function fillExternalCredentials(
   keys: readonly string[],
   environment: Readonly<Record<string, string | undefined>> = {},
 ): ExternalCredentialsResult {
-  const local = parseEnv(localContent);
-  const development = parseEnv(developmentContent);
+  const local = parse(localContent);
+  const development = parse(developmentContent);
   let content = localContent;
   const filled: ExternalCredentialsResult['filled'] = [];
   const missing: string[] = [];

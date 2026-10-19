@@ -21,8 +21,11 @@
  *   node tooling/setup/github/sync-env-secrets.mjs production --dry-run
  */
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { parse } from 'dotenv';
 
 import {
   deleteGitHubSecret,
@@ -39,7 +42,6 @@ import {
   planEnvironmentSyncPreview,
   splitManagedEntries,
 } from './env-sync-plan.mjs';
-import { parseEnvFile } from './parse-env-file.mjs';
 import {
   getConfiguredEnvironmentNames,
   getDeployVariableNames,
@@ -98,10 +100,11 @@ function loadManagedState(environmentName) {
   const config = getEnvironmentConfig(environmentName);
   const secretKeys = new Set(config.deploySecrets ?? []);
   const variableKeys = new Set(getDeployVariableNames(environmentName));
-  const parsed = parseEnvFile(resolve(PROJECT_ROOT, `.env.${environmentName}`));
+  const file = resolve(PROJECT_ROOT, `.env.${environmentName}`);
+  const parsed = existsSync(file) ? parse(readFileSync(file)) : {};
   /** @type {{ name: string, value: string }[]} */
   const declared = [];
-  for (const [name, value] of parsed) {
+  for (const [name, value] of Object.entries(parsed)) {
     if (secretKeys.has(name) || variableKeys.has(name)) declared.push({ name, value });
   }
   return { declared, secretKeys, variableKeys };
