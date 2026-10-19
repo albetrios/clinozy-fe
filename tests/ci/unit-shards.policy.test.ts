@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
+import { jobBlock } from '@/tests/utils/workflow-jobs.ts';
+
 // The unit suite runs in shards whose coverage is merged before the ratchet thresholds are
 // checked, the shard count is a repository variable, a main-branch Vitest cache lasts, and the
 // workers follow the CPU count.
@@ -12,11 +14,7 @@ const vitestConfig = readFileSync('vitest.config.ts', 'utf8');
 const gitignore = readFileSync('.gitignore', 'utf8');
 
 /** One top-level job of the reusable workflow. */
-function job(name: string): string {
-  const start = reusable.indexOf(`\n  ${name}:\n`);
-  const next = reusable.slice(start + 1).search(/\n {2}[a-z-]+:\n/);
-  return next < 0 ? reusable.slice(start) : reusable.slice(start, start + 1 + next);
-}
+const job = (name: string): string => jobBlock(reusable, name);
 
 describe('sharded unit suite', () => {
   it('takes the shard count from VITEST_SHARDS, 4 by default, and rejects anything else', () => {

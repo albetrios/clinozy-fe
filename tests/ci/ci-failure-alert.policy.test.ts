@@ -3,6 +3,8 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { jobBlocks } from '@/tests/utils/workflow-jobs.ts';
+
 // Every scheduled check, and post-merge CI, opens (or comments on) one `ci-failure` issue per
 // check when it fails and closes it on the next green run, through clinozy-be's shared
 // `.github/actions/ci-failure-issue` action — so an open issue means the check is red right now.
@@ -30,18 +32,6 @@ const titles = (source: string, mode: 'open' | 'close') =>
   [...source.matchAll(new RegExp(`mode: ${mode}\\n\\s+title: (.+)`, 'g'))].map(
     (match) => match[1] ?? '',
   );
-
-/** The top-level jobs of a workflow, as `[name, block]`. */
-function jobBlocks(source: string): Array<[string, string]> {
-  const parts = source
-    .slice(source.indexOf('\njobs:\n'))
-    .split(/^ {2}([a-z][a-z-]*):\n/m);
-  const blocks: Array<[string, string]> = [];
-  for (let index = 1; index + 1 < parts.length; index += 2) {
-    blocks.push([parts[index] ?? '', parts[index + 1] ?? '']);
-  }
-  return blocks;
-}
 
 describe('ci-failure alert on every scheduled check', () => {
   it('covers the eight scheduled checks and post-merge CI', () => {

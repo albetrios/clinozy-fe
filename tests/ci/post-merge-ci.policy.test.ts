@@ -3,25 +3,13 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { jobBlock } from '@/tests/utils/workflow-jobs.ts';
+
 const POST_MERGE_WORKFLOW = join(process.cwd(), '.github/workflows/post-merge-ci.yml');
 
 // Locks the single-trunk post-merge wiring:
 // one channel, ungated release-please, deploy split, and NO redundant re-testing
 // of what pr-ci.yml already gated.
-// Slice a top-level job block by name without a backtracking regex: from the
-// `  <name>:` header to the next 2-space-indented job key.
-function jobBlock(workflow: string, name: string): string {
-  const start = workflow.indexOf(`\n  ${name}:\n`);
-  if (start === -1) return '';
-  const lines = workflow.slice(start + 1).split('\n');
-  const out: string[] = [lines[0] ?? ''];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i] ?? '';
-    if (/^ {2}\S/.test(line)) break;
-    out.push(line);
-  }
-  return out.join('\n');
-}
 
 describe('post-merge CI policy (single trunk)', () => {
   const workflow = readFileSync(POST_MERGE_WORKFLOW, 'utf8');

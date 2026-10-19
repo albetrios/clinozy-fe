@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
+import { jobBlock } from '@/tests/utils/workflow-jobs.ts';
+
 // The PR's ESLint and TypeScript lanes restore caches that the nightly saves on main (a PR-scoped
 // cache dies with the PR, cleanup-cache.yml), and Semgrep runs from its pinned image.
 
@@ -11,19 +13,6 @@ const scripts = (
   JSON.parse(readFileSync('package.json', 'utf8')) as { scripts: Record<string, string> }
 ).scripts;
 const tsconfigApp = readFileSync('tsconfig.app.json', 'utf8');
-
-/** A top-level job block, from its `  <name>:` header to the next job key. */
-function jobBlock(workflow: string, name: string): string {
-  const start = workflow.indexOf(`\n  ${name}:\n`);
-  if (start === -1) return '';
-  const lines = workflow.slice(start + 1).split('\n');
-  const out: string[] = [lines[0] ?? ''];
-  for (const line of lines.slice(1)) {
-    if (/^ {2}\S/.test(line)) break;
-    out.push(line);
-  }
-  return out.join('\n');
-}
 
 const ESLINT_KEY =
   "eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.mjs') }}-";
