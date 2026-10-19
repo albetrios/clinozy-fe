@@ -12,10 +12,10 @@
  *   tsx agent-os/evals/check.ts            # gate: exits 1 on any ERROR
  *   tsx agent-os/evals/check.ts --report   # verbose: list every check + WARNs
  */
-import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 
+import { skillFileHash } from '../../tooling/agent-os/lock.ts';
 import { checkSelectorFixtures } from '../../tooling/ci/selector-fixtures.check.mjs';
 
 const repositoryRoot = process.cwd();
@@ -157,15 +157,20 @@ if (existsSync(registryFile)) {
 
 // ── Vendored skills: skills-lock.json hashes match the committed files ──
 // skills-lock.json records the sha256 of every ecosystem skill installed via the
-// skills CLI. Recompute each and fail on mismatch so an unintended edit to a
-// vendored skill (or a stale lock) is caught, not silently accepted.
+// skills CLI. Recompute each with the lock tool's own hash (`pnpm agent-os:lock`,
+// tooling/agent-os/lock.ts) and fail on mismatch so an unintended edit to a
+// vendored skill (or a stale lock) is caught, not silently accepted. The one check
+// of the lock: the ci-policy lane no longer repeats it.
 const skillsLockFile = join(agentOsDirectory, 'skills-lock.json');
 if (existsSync(skillsLockFile)) {
   try {
     const lock = JSON.parse(readText(skillsLockFile)) as {
       skills?: Record<string, { skillPath?: string; computedHash?: string }>;
     };
-    for (const [name, entry] of Object.entries(lock.skills ?? {})) {
+    const lockEntries = Object.entries(lock.skills ?? {});
+    if (lockEntries.length === 0)
+      error('skills-lock', 'agent-os/skills-lock.json records no vendored skill');
+    for (const [name, entry] of lockEntries) {
       if (!entry.skillPath) {
         error('skills-lock', `skills-lock entry "${name}" has no skillPath`);
         continue;
@@ -178,7 +183,7 @@ if (existsSync(skillsLockFile)) {
         );
         continue;
       }
-      const actual = createHash('sha256').update(readFileSync(absolute)).digest('hex');
+      const actual = skillFileHash(absolute);
       if (entry.computedHash !== actual)
         error(
           'skills-lock',

@@ -123,7 +123,7 @@ Two surfaces are **not** in that list, because the brand was moved out of them e
 pnpm install && pnpm agent-os:lock && pnpm health && pnpm validate:identity
 ```
 
-`pnpm agent-os:lock` is required, not optional: the prose sweep edits files under `agent-os/skills/`, so the skills-lock hashes go stale and `agent-os-lock.policy.test.ts` fails until they are regenerated.
+`pnpm agent-os:lock` is required, not optional: the prose sweep edits files under `agent-os/skills/`, so the skills-lock hashes go stale and `pnpm agent-os:check` fails until they are regenerated.
 
 `pnpm validate:identity` is the durable half of this system. It runs in `pnpm health`, in `pnpm sync:check`, and as its own PR CI step, and it fails on two things:
 

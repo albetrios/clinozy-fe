@@ -473,8 +473,8 @@ See docs/getting-started/new-project.md.`);
      encoding the previous logo. \`pnpm test:visual\` fails until you regenerate them:
        pnpm test:visual:update      ${DIM}(needs the backend running)${RESET}
   5. ${BOLD}Re-lock agent-os + reinstall${RESET} — the prose sweep edited skill files, so the
-     agent-os skills-lock hashes are stale (agent-os-lock.policy.test.ts fails until
-     you regenerate them). The package name changed too:
+     agent-os skills-lock hashes are stale (pnpm agent-os:check fails until you
+     regenerate them). The package name changed too:
        pnpm install && pnpm agent-os:lock && pnpm health && pnpm validate:identity
 
   ${DIM}"${current.name}" and "${current.backendName}" are recorded in previousNames, so
