@@ -145,7 +145,7 @@ export function checkIterationFreeze({ repositoryRoot, base }) {
       )
     : undefined;
   const listing = diff?.output ?? '';
-  if (!found.ok || !diff?.ok)
+  if (!(found.ok && diff?.ok))
     return {
       touched: [],
       problems: [
