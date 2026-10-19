@@ -1,5 +1,4 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
@@ -11,27 +10,27 @@ import {
   resolveBase,
   tryGit,
 } from '../../tooling/ci/git-environment.mjs';
+import {
+  createThrowawayRepository,
+  removeThrowawayRepositories,
+} from '../../tooling/ci/throwaway-repository.mjs';
 
 // Git exports GIT_DIR and friends into every hook it runs, and they outrank `cwd`. A test or
 // fixture that builds a throwaway repository runs inside the pre-push hook too, and there its
 // `git init` / `git config` / `git update-ref` rewrite the developer's own repository (clinozy-be,
 // 19 Oct 2026: a linked worktree's pre-push set core.bare, an identity and origin/main on the
-// shared repository). Every file under tooling/ and tests/ that runs `git init` strips them.
+// shared repository). Every throwaway repository under tooling/ and tests/ is built by one
+// fixture, tooling/ci/throwaway-repository.mjs, whose git calls strip them.
 
 const ROOT = process.cwd();
 const SCANNED_DIRECTORIES = ['tooling', 'tests'];
 const HELPER_FILE = 'tooling/ci/git-environment.mjs';
-const HELPER_NAME = 'gitEnvironmentWithoutInheritedRepository';
+/** The one file that may run `git init`: the throwaway-repository fixture. */
+const REPOSITORY_FIXTURE = 'tooling/ci/throwaway-repository.mjs';
+/** This file: its `init` lines are samples for the scan pattern, not a repository it builds. */
+const THIS_FILE = 'tests/ci/git-hook-environment.policy.test.ts';
 /** A `git init` handed to a child process: `git('init'`, `git(root, ['init'`, `'git', ['init'`. */
 const BUILDS_REPOSITORY = /(?:\bgit\(|['"]git['"],)[^\n]*['"]init['"]/;
-/** Files known to build a repository — pins the scan against a pattern that quietly stops matching. */
-const KNOWN_REPOSITORY_BUILDERS = [
-  'tests/ci/agent-hook-skip.policy.test.ts',
-  'tests/ci/agent-push-review-gate.policy.test.ts',
-  'tests/ci/git-hook-environment.policy.test.ts',
-  'tooling/iterations/iteration-fixtures.mjs',
-  'tooling/validate/large-staged-files.test.mjs',
-];
 
 /** A `git` child process started by hand: `spawnSync('git'`, `execFileSync(\n 'git'`, `execSync('git …`. */
 const STARTS_GIT =
@@ -42,7 +41,6 @@ const STARTS_GIT =
  */
 const OWN_GIT_ALLOWED = new Map([
   ['tooling/ci/early-checks.mjs', "reads the staged files from the hook's own index"],
-  ['tooling/iterations/iteration-fixtures.mjs', 'test fixture: commits at fixed dates'],
 ]);
 
 function toolingFilesStartingGit(): string[] {
@@ -68,23 +66,16 @@ function sourceFiles(directory: string, found: string[] = []): string[] {
   return found;
 }
 
-function repositoryBuilders(): { builders: string[]; unguarded: string[] } {
-  const builders: string[] = [];
-  const unguarded: string[] = [];
-  for (const path of SCANNED_DIRECTORIES.flatMap((directory) =>
-    sourceFiles(join(ROOT, directory)),
-  )) {
-    const file = relative(ROOT, path);
-    if (file === HELPER_FILE) continue;
-    const content = readFileSync(path, 'utf8');
-    const builds = content
-      .split('\n')
-      .some((line) => BUILDS_REPOSITORY.test(line.split('//')[0] ?? ''));
-    if (!builds) continue;
-    builders.push(file);
-    if (!content.includes(HELPER_NAME)) unguarded.push(file);
-  }
-  return { builders, unguarded };
+/** The files that run `git init` themselves. */
+function repositoryBuilders(): string[] {
+  return SCANNED_DIRECTORIES.flatMap((directory) => sourceFiles(join(ROOT, directory)))
+    .map((path) => relative(ROOT, path))
+    .filter((file) => file !== HELPER_FILE && file !== THIS_FILE)
+    .filter((file) =>
+      readFileSync(join(ROOT, file), 'utf8')
+        .split('\n')
+        .some((line) => BUILDS_REPOSITORY.test(line.split('//')[0] ?? '')),
+    );
 }
 
 describe('git hook environment — inherited repository variables', () => {
@@ -130,11 +121,31 @@ describe('git hook environment — inherited repository variables', () => {
     }
   });
 
-  it('strips them in every tooling and test file that builds a repository', () => {
-    const { builders, unguarded } = repositoryBuilders();
-    // Anti-vacuity: an empty scan would satisfy the assertion below for free.
-    expect(builders).toEqual(expect.arrayContaining(KNOWN_REPOSITORY_BUILDERS));
-    expect(unguarded).toEqual([]);
+  it('builds every throwaway repository through the one fixture, which strips them', () => {
+    // The scan finds the fixture itself (anti-vacuity: a pattern that quietly stopped matching
+    // would find nothing) and nothing else.
+    expect(repositoryBuilders()).toEqual([REPOSITORY_FIXTURE]);
+    expect(BUILDS_REPOSITORY.test("git(['init', '-q'], { cwd })")).toBe(true);
+    expect(BUILDS_REPOSITORY.test("spawnSync('git', ['init'])")).toBe(true);
+
+    // Run as if from a hook pinned to another repository: the fixture still builds its own.
+    const pinned = createThrowawayRepository({ prefix: 'git-environment-pinned-' });
+    const saved = new Map(
+      ['GIT_DIR', 'GIT_WORK_TREE'].map((variable) => [variable, process.env[variable]]),
+    );
+    try {
+      process.env.GIT_DIR = join(pinned.root, '.git');
+      process.env.GIT_WORK_TREE = pinned.root;
+      const fresh = createThrowawayRepository({ prefix: 'git-environment-fresh-' });
+      expect(fresh.git(['rev-parse', '--show-toplevel'])).toBe(fresh.root);
+      expect(fresh.git(['rev-list', '--count', 'HEAD'])).toBe('1');
+    } finally {
+      for (const [variable, value] of saved) {
+        if (value === undefined) Reflect.deleteProperty(process.env, variable);
+        else process.env[variable] = value;
+      }
+    }
+    expect(pinned.git(['rev-list', '--count', 'HEAD'])).toBe('1');
   });
 });
 
@@ -155,24 +166,17 @@ describe('git hook environment — one way to run git in tooling', () => {
   });
 });
 
-describe('git hook environment — git, tryGit and resolveBase', () => {
-  const folders: string[] = [];
-  afterEach(() => {
-    for (const folder of folders.splice(0))
-      rmSync(folder, { recursive: true, force: true });
-  });
+afterEach(removeThrowawayRepositories);
 
+describe('git hook environment — git, tryGit and resolveBase', () => {
   /** A throwaway repository on branch `work` with one commit and a second branch `other`. */
   function repository(): string {
-    const cwd = mkdtempSync(join(tmpdir(), 'git-environment-'));
-    folders.push(cwd);
-    git(['init', '-q', '-b', 'work'], { cwd });
-    git(['config', 'user.name', 'Test Owner'], { cwd });
-    git(['config', 'user.email', 'owner@example.test'], { cwd });
-    git(['config', 'commit.gpgsign', 'false'], { cwd });
-    git(['commit', '-q', '--allow-empty', '-m', 'initial'], { cwd });
-    git(['branch', 'other'], { cwd });
-    return cwd;
+    const { root } = createThrowawayRepository({
+      prefix: 'git-environment-',
+      branch: 'work',
+    });
+    git(['branch', 'other'], { cwd: root });
+    return root;
   }
 
   it('git returns the trimmed output in cwd and throws naming the command', () => {

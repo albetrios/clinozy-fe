@@ -1,11 +1,15 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-environment.mjs';
+import {
+  createThrowawayRepository,
+  removeThrowawayRepositories,
+} from '../../tooling/ci/throwaway-repository.mjs';
 
 // The push review gate (agent-os/hooks/fe-guardrails.mjs, clinozy-be's): an agent push of auth,
 // token, CSP, routeTree or guard changes asks the user first until /fe-pre-merge-review records a
@@ -17,6 +21,7 @@ const REVIEW_MARKER = join(process.cwd(), 'tooling', 'agent-os', 'review-marker.
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
+  removeThrowawayRepositories();
   for (const directory of temporaryDirectories.splice(0)) {
     rmSync(directory, { recursive: true, force: true });
   }
@@ -24,30 +29,16 @@ afterEach(() => {
 
 /** A repository whose branch commits `changedFile` on top of `origin/main`. */
 function repository(changedFile: string): string {
-  const root = mkdtempSync(join(tmpdir(), 'push-review-gate-'));
-  temporaryDirectories.push(root);
-  // Run from a git hook (pre-push), the inherited GIT_DIR would outrank `cwd` and these calls
-  // would rewrite the hook's own repository — its config, refs and checked-out branch.
-  const git = (...args: string[]) =>
-    // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-    spawnSync('git', args, {
-      cwd: root,
-      encoding: 'utf8',
-      env: gitEnvironmentWithoutInheritedRepository(),
-    });
-  git('init', '--quiet', '--initial-branch', 'main');
-  git('config', 'user.email', 'gate@example.com');
-  git('config', 'user.name', 'gate');
-  writeFileSync(join(root, 'README.md'), '# fixture\n');
-  git('add', '.');
-  git('commit', '--quiet', '-m', 'init');
-  git('update-ref', 'refs/remotes/origin/main', 'HEAD');
-  git('switch', '--quiet', '-c', 'feat/change');
-  mkdirSync(dirname(join(root, changedFile)), { recursive: true });
-  writeFileSync(join(root, changedFile), 'export const changed = true;\n');
-  git('add', '.');
-  git('commit', '--quiet', '-m', 'change');
-  return root;
+  const repository = createThrowawayRepository({
+    prefix: 'push-review-gate-',
+    branch: 'main',
+    files: { 'README.md': '# fixture\n' },
+  });
+  repository.git(['update-ref', 'refs/remotes/origin/main', 'HEAD']);
+  repository.git(['switch', '--quiet', '-c', 'feat/change']);
+  repository.writeFiles({ [changedFile]: 'export const changed = true;\n' });
+  repository.commitAll({ message: 'change' });
+  return repository.root;
 }
 
 /** The guardrail's decision for `command` run in `root`: `ask`, or '' when it lets it through. */

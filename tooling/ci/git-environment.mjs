@@ -8,8 +8,9 @@
  * hook's repository instead: a throwaway repository's `git init`, `git config` or `git update-ref`
  * rewrites the developer's own repository (19 Oct 2026: a linked worktree's pre-push set
  * `core.bare`, an identity and `origin/main` on clinozy-be's shared repository).
- * `tests/ci/git-hook-environment.policy.test.ts` holds every file that builds a repository to this
- * helper, and every `git` child process under `tooling/` to {@link git} / {@link tryGit}.
+ * `tests/ci/git-hook-environment.policy.test.ts` holds every throwaway repository to the one
+ * fixture built on {@link git} (`throwaway-repository.mjs`), and every `git` child process under
+ * `tooling/` to {@link git} / {@link tryGit}.
  *
  * The one exception: pre-commit code that reads the hook's own index (`git diff --cached` in
  * `early-checks.mjs`) keeps the inherited `GIT_INDEX_FILE` on purpose — a partial commit stages
@@ -53,12 +54,13 @@ export function gitEnvironmentWithoutInheritedRepository() {
 /**
  * @param {readonly string[]} args
  * @param {string | undefined} cwd
+ * @param {Record<string, string>} [environment]
  */
-function runGit(args, cwd) {
+function runGit(args, cwd, environment = {}) {
   return spawnSync('git', args, {
     cwd,
     encoding: 'utf8',
-    env: gitEnvironmentWithoutInheritedRepository(),
+    env: { ...gitEnvironmentWithoutInheritedRepository(), ...environment },
     maxBuffer: GIT_OUTPUT_LIMIT,
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -66,14 +68,16 @@ function runGit(args, cwd) {
 
 /**
  * Runs `git <args>` in `cwd` (default: the current directory) and returns its trimmed stdout.
+ * `environment` adds variables for this one call — a fixture's fixed commit dates — on top of the
+ * detached environment; it cannot bring the inherited repository variables back.
  *
  * @param {readonly string[]} args
- * @param {{ cwd?: string }} [options]
+ * @param {{ cwd?: string, environment?: Record<string, string> }} [options]
  * @returns {string}
  * @throws {Error} naming the command and git's stderr when git exits non-zero or cannot start
  */
-export function git(args, { cwd } = {}) {
-  const result = runGit(args, cwd);
+export function git(args, { cwd, environment } = {}) {
+  const result = runGit(args, cwd, environment);
   if (result.status !== 0) {
     const detail =
       (result.stderr ?? '').trim() ||

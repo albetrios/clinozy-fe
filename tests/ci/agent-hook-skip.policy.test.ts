@@ -1,11 +1,13 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
 import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-environment.mjs';
+import {
+  createThrowawayRepository,
+  removeThrowawayRepositories,
+} from '../../tooling/ci/throwaway-repository.mjs';
 
 // Agents never skip the git hooks: fe-guardrails.mjs (Claude PreToolUse) and fe-cursor-shell-guard.mjs
 // (Cursor beforeShellExecution) deny `--no-verify` on commit or push, `git commit -n` and
@@ -16,30 +18,8 @@ const HOOKS = join(process.cwd(), 'agent-os', 'hooks');
 // The guard's push review gate reads the repository's unpushed diff, so a look-alike `git push`
 // would turn into an ask whenever this checkout holds unpushed auth or guard changes (a merge of
 // main does). The cases run in a throwaway repository with one empty commit instead.
-const REPOSITORY = mkdtempSync(join(tmpdir(), 'fe-hook-skip-'));
-function git(args: string[]): void {
-  // From a git hook (pre-push) the inherited GIT_DIR would outrank `cwd` and turn this into the
-  // hook's own repository.
-  // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-  spawnSync('git', args, {
-    cwd: REPOSITORY,
-    encoding: 'utf8',
-    env: gitEnvironmentWithoutInheritedRepository(),
-  });
-}
-git(['init', '-q']);
-git([
-  '-c',
-  'user.name=test',
-  '-c',
-  'user.email=test@example.com',
-  'commit',
-  '-q',
-  '--allow-empty',
-  '-m',
-  'init',
-]);
-afterAll(() => rmSync(REPOSITORY, { recursive: true, force: true }));
+const REPOSITORY = createThrowawayRepository({ prefix: 'fe-hook-skip-' }).root;
+afterAll(removeThrowawayRepositories);
 
 function claudeDecision(command: string): string {
   const result = spawnSync(process.execPath, [join(HOOKS, 'fe-guardrails.mjs')], {

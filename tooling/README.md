@@ -35,6 +35,11 @@ One way for each job a script does, each pinned by a `tests/ci` policy:
 - **`.ts` tooling** — run with `tsx <file>`.
 - **Tests** — beside the script (`<script>.test.mjs`), on Vitest: `describe` / `it` / `expect`
   from `vitest`, run by the `tooling` project of `vitest.config.ts` (`pnpm test:github-scripts`).
+- **A throwaway git repository in a test** (here or under `tests/`) —
+  `createThrowawayRepository({ prefix, branch, files })` from `ci/throwaway-repository.mjs`, with
+  `afterEach(removeThrowawayRepositories)`; never a hand-built `git init`. Its git calls strip the
+  variables git exports into a hook, so a test run from the pre-push hook cannot rewrite the
+  hook's own repository (`tests/ci/git-hook-environment.policy.test.ts`).
 
 ## Common commands
 

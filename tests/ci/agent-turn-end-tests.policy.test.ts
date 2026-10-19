@@ -14,6 +14,10 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-environment.mjs';
+import {
+  createThrowawayRepository,
+  removeThrowawayRepositories,
+} from '../../tooling/ci/throwaway-repository.mjs';
 
 // The turn-end test hook (agent-os/hooks/fe-turn-end-tests.mjs, clinozy-be's): off by switch, it runs
 // only the tests the selection picks for the change itself (not the always-run set), a failure
@@ -29,6 +33,7 @@ const HOOK_STATE = /join\(process\.env\.TMPDIR \|\| '\/tmp', '([a-z-]+)'\)/.exec
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
+  removeThrowawayRepositories();
   for (const directory of temporaryDirectories.splice(0)) {
     rmSync(directory, { recursive: true, force: true });
   }
@@ -52,25 +57,12 @@ const SELECTED = {
  * stub `vitest` (exits with `VITEST_STUB_EXIT`, records its arguments) — the hook's whole world.
  */
 function repository(): { root: string; state: string; runs: string } {
-  const root = mkdtempSync(join(tmpdir(), 'turn-end-tests-'));
+  const { root } = createThrowawayRepository({
+    prefix: 'turn-end-tests-',
+    files: { 'src/a.ts': 'export const a = 1;\n' },
+  });
   const state = mkdtempSync(join(tmpdir(), 'turn-end-tests-state-'));
-  temporaryDirectories.push(root, state);
-  // Run from a git hook (pre-push), the inherited GIT_DIR would outrank `cwd` and these calls
-  // would rewrite the hook's own repository — its config, refs and checked-out branch.
-  const git = (...args: string[]) =>
-    // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-    spawnSync('git', args, {
-      cwd: root,
-      encoding: 'utf8',
-      env: gitEnvironmentWithoutInheritedRepository(),
-    });
-  git('init', '--quiet');
-  git('config', 'user.email', 'hook@example.com');
-  git('config', 'user.name', 'hook');
-  mkdirSync(join(root, 'src'), { recursive: true });
-  writeFileSync(join(root, 'src', 'a.ts'), 'export const a = 1;\n');
-  git('add', '.');
-  git('commit', '--quiet', '-m', 'init');
+  temporaryDirectories.push(state);
   writeFileSync(join(root, 'src', 'a.ts'), 'export const a = 2;\n');
 
   mkdirSync(join(root, 'tooling', 'ci'), { recursive: true });

@@ -15,8 +15,13 @@ export interface GitOptions {
   cwd?: string;
 }
 
+/** `git`'s options: `GitOptions` plus extra variables for the one call (fixed commit dates). */
+export interface GitRunOptions extends GitOptions {
+  environment?: Record<string, string>;
+}
+
 /** `git <args>` → trimmed stdout; throws an Error naming the command on a non-zero exit. */
-export declare function git(args: readonly string[], options?: GitOptions): string;
+export declare function git(args: readonly string[], options?: GitRunOptions): string;
 
 /** `git <args>` → whether it exited 0 and its trimmed stdout; never throws. */
 export declare function tryGit(

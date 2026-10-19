@@ -1,10 +1,12 @@
-import { expect, it } from 'vitest';
-import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { afterEach, expect, it } from 'vitest';
+import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
+import {
+  createThrowawayRepository,
+  removeThrowawayRepositories,
+} from '../ci/throwaway-repository.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GATE = join(ROOT, 'tooling/validate/large-staged-files.sh');
@@ -19,24 +21,24 @@ const LIMIT_BYTES = 3 * 1024 * 1024;
  * runs in, so every case gets its own repo instead of staging into the real one.
  */
 function runGateWith(files) {
-  const repo = mkdtempSync(join(tmpdir(), 'large-staged-files-'));
-  try {
-    // From a git hook the inherited GIT_DIR / GIT_INDEX_FILE would outrank `cwd`: `git init` and
-    // `git add` would then re-initialise and stage into the hook's own repository.
-    const env = gitEnvironmentWithoutInheritedRepository();
-    execFileSync('git', ['init', '--quiet'], { cwd: repo, env });
-    for (const [path, size] of Object.entries(files)) {
-      const file = join(repo, path);
-      mkdirSync(dirname(file), { recursive: true });
-      writeFileSync(file, Buffer.alloc(size, 'a'));
-    }
-    execFileSync('git', ['add', '--all'], { cwd: repo, env });
-    const result = spawnSync('sh', [GATE], { cwd: repo, encoding: 'utf8', env });
-    return { status: result.status, output: `${result.stdout}${result.stderr}` };
-  } finally {
-    rmSync(repo, { recursive: true, force: true });
-  }
+  const repository = createThrowawayRepository({ prefix: 'large-staged-files-' });
+  repository.writeFiles(
+    Object.fromEntries(
+      Object.entries(files).map(([path, size]) => [path, Buffer.alloc(size, 'a')]),
+    ),
+  );
+  repository.git(['add', '--all']);
+  // From a git hook the inherited GIT_DIR / GIT_INDEX_FILE would outrank `cwd`: the gate would
+  // then read the hook's own index.
+  const result = spawnSync('sh', [GATE], {
+    cwd: repository.root,
+    encoding: 'utf8',
+    env: gitEnvironmentWithoutInheritedRepository(),
+  });
+  return { status: result.status, output: `${result.stdout}${result.stderr}` };
 }
+
+afterEach(removeThrowawayRepositories);
 
 it('rejects a staged file over the limit', () => {
   const { status, output } = runGateWith({ 'src/big.bin': LIMIT_BYTES + 1 });

@@ -14,6 +14,10 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-environment.mjs';
+import {
+  createThrowawayRepository,
+  removeThrowawayRepositories,
+} from '../../tooling/ci/throwaway-repository.mjs';
 
 // The push CI watch (agent-os/hooks/fe-push-ci-watch.mjs, clinozy-be's): a failed run of the pushed
 // commit exits 2 (asyncRewake wakes the model) and asks for fe-ci-investigator; a green commit, no
@@ -23,6 +27,7 @@ const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'fe-push-ci-watch.mjs');
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
+  removeThrowawayRepositories();
   for (const directory of temporaryDirectories.splice(0)) {
     rmSync(directory, { recursive: true, force: true });
   }
@@ -30,24 +35,12 @@ afterEach(() => {
 
 /** A repository with one commit, and a stub `gh` that answers `run list` with `runs`. */
 function fixture(options: { runs: object[]; authenticated?: boolean }) {
-  const root = mkdtempSync(join(tmpdir(), 'push-ci-watch-'));
+  const { root } = createThrowawayRepository({
+    prefix: 'push-ci-watch-',
+    files: { 'README.md': '# fixture\n' },
+  });
   const state = mkdtempSync(join(tmpdir(), 'push-ci-watch-state-'));
-  temporaryDirectories.push(root, state);
-  // Run from a git hook (pre-push), the inherited GIT_DIR would outrank `cwd` and these calls
-  // would rewrite the hook's own repository — its config, refs and checked-out branch.
-  const git = (...args: string[]) =>
-    // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-    spawnSync('git', args, {
-      cwd: root,
-      encoding: 'utf8',
-      env: gitEnvironmentWithoutInheritedRepository(),
-    });
-  git('init', '--quiet');
-  git('config', 'user.email', 'watch@example.com');
-  git('config', 'user.name', 'watch');
-  writeFileSync(join(root, 'README.md'), '# fixture\n');
-  git('add', '.');
-  git('commit', '--quiet', '-m', 'init');
+  temporaryDirectories.push(state);
   const bin = join(state, 'bin');
   mkdirSync(bin);
   const calls = join(state, 'gh-calls');
