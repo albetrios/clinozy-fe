@@ -5,8 +5,10 @@
  * it runs or not), then the tests `pnpm test:select` picks for them, with why each was picked.
  *
  * Pre-push runs that selection (`pre-push-tests.mjs`), or the whole Vitest suite when it escalates.
- * The steps mirror `.husky/pre-push` (`tests/ci/affected.policy.test.ts` keeps the two in step). It
- * changes nothing.
+ * {@link pushSteps} is the one rule for which pushed files make a conditional step run: the hook
+ * asks it (`node tooling/ci/affected.mjs --base <ref> --runs '<step>'` prints `yes` or `no`) instead
+ * of matching the files itself, so the preview and the push cannot disagree. The step order is
+ * pinned to `.husky/pre-push` by `affected.test.mjs`. It changes nothing.
  */
 import { resolve } from 'node:path';
 import { resolveBase, tryGit } from './git-environment.mjs';
@@ -14,11 +16,11 @@ import { isMain, parseCommandLine } from './script.mjs';
 import { pushSemgrepTargets } from './push-semgrep.mjs';
 import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
-/** The files that make pre-push run the Vitest suite (its `PUSHED_UNIT_RELEVANT` pattern). */
+/** The pushed files that make pre-push run the Vitest suite (`pnpm test:pre-push`). */
 export const UNIT_RELEVANT =
   /^(src\/|tests\/utils\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
 
-/** The files the SonarQube gate analyzes at push (its `PUSHED_RUNTIME` patterns). */
+/** The pushed files the SonarQube gate analyzes (`pnpm sonar:scan`): src/ runtime, without these. */
 export const SONAR_RUNTIME = /^src\/.*\.(ts|tsx)$/;
 export const SONAR_EXCLUDED =
   /(__tests__\/|\.test\.tsx?$|\.spec\.tsx?$|\.fixtures\.ts$|\/mock-[^/]*\.ts$|\.d\.ts$)/;
@@ -105,10 +107,23 @@ export function selectionTable(selection) {
   return lines;
 }
 
+/**
+ * Whether pre-push runs the conditional step `command` for the pushed files: `yes` or `no`, or
+ * `undefined` when `command` is not one of its steps.
+ *
+ * @param {{ changedFiles: readonly string[], command: string }} options
+ * @returns {'yes' | 'no' | undefined}
+ */
+export function stepRunsAnswer({ changedFiles, command }) {
+  const step = pushSteps(changedFiles).find((candidate) => candidate.command === command);
+  if (!step) return undefined;
+  return step.runs ? 'yes' : 'no';
+}
+
 function main() {
   const repositoryRoot = resolve(import.meta.dirname, '../..');
   const { values } = parseCommandLine(process.argv.slice(2), {
-    options: { base: { type: 'string' } },
+    options: { base: { type: 'string' }, runs: { type: 'string' } },
   });
   const base = resolveBase({ base: values.base, cwd: repositoryRoot });
   const changed = tryGit(['diff', '--name-only', '--no-renames', `${base}...HEAD`], {
@@ -120,6 +135,16 @@ function main() {
     return;
   }
   const changedFiles = changed.output.split('\n').filter(Boolean);
+  if (values.runs !== undefined) {
+    const answer = stepRunsAnswer({ changedFiles, command: values.runs });
+    if (answer === undefined) {
+      console.error(`"${values.runs}" is not a .husky/pre-push step (see pushSteps).`);
+      process.exitCode = 1;
+      return;
+    }
+    console.log(answer);
+    return;
+  }
   const lines = [
     `## What git push will run (${changedFiles.length} file(s) since ${base})`,
     '',

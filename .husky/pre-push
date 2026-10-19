@@ -43,22 +43,26 @@ PUSH_BASE=$(node tooling/ci/git-environment.mjs base) || {
   exit 1
 }
 
+# Which pushed files make a step below run is one rule, pushSteps in tooling/ci/affected.mjs (the
+# `pnpm test:affected` preview prints the same answers). It answers yes or no; anything else (it
+# could not run) runs the step, so a broken answer never skips a gate.
+step_runs() {
+  [ "$(node tooling/ci/affected.mjs --base "$PUSH_BASE" --runs "$1")" != "no" ]
+}
+
 # Markdown lint on the pushed diff (mirrors the Docs lint CI lane). lint-staged
 # only formats staged markdown; this lints every changed file in the push.
-PUSHED_MD=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E '\.md$' || true)
-if [ -n "$PUSHED_MD" ]; then
+if step_runs 'pnpm docs:lint:changed'; then
   pnpm docs:lint:changed --base "$PUSH_BASE"
 else
   echo "Skipping changed-markdown lint on pre-push (no markdown changes)."
 fi
 
 # Unit tests (matches the CI unit lane).
-# Run only when pushed commits include unit-relevant files. `pnpm test:pre-push` runs the files
-# `pnpm test:select` picks for them (an escalating change, or a selection that cannot be built,
-# runs the whole suite; CI runs every suite).
-PUSHED_UNIT_RELEVANT=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E \
-  '^(src/|tests/utils/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)' || true)
-if [ -n "$PUSHED_UNIT_RELEVANT" ]; then
+# Run only when pushed commits include unit-relevant files (UNIT_RELEVANT in affected.mjs).
+# `pnpm test:pre-push` runs the files `pnpm test:select` picks for them (an escalating change, or a
+# selection that cannot be built, runs the whole suite; CI runs every suite).
+if step_runs 'pnpm test:pre-push'; then
   pnpm test:pre-push --base "$PUSH_BASE"
 else
   echo "Skipping unit tests on pre-push (no unit-relevant changes)."
@@ -82,9 +86,8 @@ pnpm api:types:check
 # (src/ runtime — the only thing Sonar analyzes; tests/mocks/fixtures/scripts are excluded). The
 # gate auto-starts the server on first use (first boot ~2 min) and provisions a token in
 # .env.local. There is no per-gate skip: a red Sonar gate must be fixed, not bypassed.
-PUSHED_RUNTIME=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E '^src/.*\.(ts|tsx)$' | \
-  grep -Ev '(__tests__/|\.test\.tsx?$|\.spec\.tsx?$|\.fixtures\.ts$|/mock-[^/]*\.ts$|\.d\.ts$)' || true)
-if [ -n "$PUSHED_RUNTIME" ]; then
+# The files are SONAR_RUNTIME without SONAR_EXCLUDED, in affected.mjs.
+if step_runs 'pnpm sonar:scan'; then
   pnpm sonar:scan
 else
   echo "Skipping SonarQube gate on pre-push (no deployed-surface code changes)."
