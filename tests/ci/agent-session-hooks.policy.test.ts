@@ -45,18 +45,12 @@ function makeSessionRoot(repositories: Record<string, string>): string {
 function runScript({
   sessionRoot,
   options = [],
-  environment = {},
 }: {
   sessionRoot: string;
   options?: string[];
-  environment?: Record<string, string>;
 }) {
-  const inherited = Object.fromEntries(
-    Object.entries(process.env).filter(([key]) => key !== 'AGENT_SESSION_HOOKS'),
-  );
   return spawnSync(TSX, [SCRIPT, '--session-root', sessionRoot, ...options], {
     encoding: 'utf8',
-    env: { ...inherited, ...environment },
   });
 }
 
@@ -206,20 +200,12 @@ describe('tooling/agent-os/session-hooks.ts', () => {
     );
   });
 
-  it.each([
-    ['a single repository', { own: REAL_SETTINGS }, {}, 'holds 1 agent-os repository'],
-    [
-      'AGENT_SESSION_HOOKS=0',
-      { own: REAL_SETTINGS, other: OTHER_SETTINGS },
-      { AGENT_SESSION_HOOKS: '0' },
-      'AGENT_SESSION_HOOKS=0',
-    ],
-  ])('writes nothing for %s', (_case, repositories, environment, reason) => {
-    const sessionRoot = makeSessionRoot(repositories);
-    const result = runScript({ sessionRoot, environment });
+  it('writes nothing for a single repository', () => {
+    const sessionRoot = makeSessionRoot({ own: REAL_SETTINGS });
+    const result = runScript({ sessionRoot });
 
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain(reason);
+    expect(result.stdout).toContain('holds 1 agent-os repository');
     expect(existsSync(sessionSettingsPath(sessionRoot))).toBe(false);
   });
 

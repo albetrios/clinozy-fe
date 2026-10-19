@@ -92,7 +92,6 @@ function repository(): { root: string; state: string; runs: string } {
 function runHook(options: {
   root: string;
   state: string;
-  switchValue?: string;
   exitCode?: number;
   selection?: unknown;
   session?: string;
@@ -107,7 +106,6 @@ function runHook(options: {
       ...gitEnvironmentWithoutInheritedRepository(),
       CLAUDE_PROJECT_DIR: options.root,
       TMPDIR: options.state,
-      AGENT_TURN_END_TESTS: options.switchValue ?? '1',
       VITEST_STUB_EXIT: String(options.exitCode ?? 0),
       SELECTION_STUB: JSON.stringify(options.selection ?? SELECTED),
     },
@@ -119,12 +117,6 @@ function runCount(runs: string): number {
 }
 
 describe('fe-turn-end-tests.mjs', () => {
-  it('does nothing when switched off', () => {
-    const { root, state, runs } = repository();
-    expect(runHook({ root, state, switchValue: '0', exitCode: 1 }).status).toBe(0);
-    expect(runCount(runs)).toBe(0);
-  });
-
   it("runs the change's own tests, not the always-run set, and wakes the model on a failure", () => {
     const { root, state, runs } = repository();
     const result = runHook({ root, state, exitCode: 1 });

@@ -21,7 +21,7 @@
  * Before a change, the previous file is copied to `settings.json.bak`. Running it from either
  * repository gives the same file.
  *
- * Writes nothing, and says why, when `AGENT_SESSION_HOOKS=0`, when the parent directory sits
+ * Writes nothing, and says why, when the parent directory sits
  * inside a git checkout, or when it holds fewer than two agent-os repositories (a
  * single-repository session loads that repository's settings directly).
  *
@@ -233,10 +233,6 @@ function main(): void {
   }
   const sessionRoot = resolve(sessionRootOption ?? dirname(process.cwd()));
 
-  if (process.env.AGENT_SESSION_HOOKS === '0') {
-    log('skipped (AGENT_SESSION_HOOKS=0).');
-    return;
-  }
   if (isInsideGitCheckout(sessionRoot)) {
     log(
       `skipped: ${sessionRoot} is inside a git checkout, so it is no multi-repository session root.`,

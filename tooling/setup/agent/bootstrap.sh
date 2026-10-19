@@ -18,17 +18,11 @@
 # Steps 1-5 (tool installs) and 8-9 (MCP, browsers) are BEST-EFFORT and log
 # ✓/skip without aborting; dependencies, the env scaffold, and the healthcheck
 # are HARD gates (non-zero exit on failure). The dev server is started only
-# transiently for the healthcheck and then stopped — set KEEP_APP=1 to leave
-# `pnpm dev` up.
+# transiently for the healthcheck (on :5173, which must be free — --strictPort)
+# and then stopped.
 #
 # Env:
-#   KEEP_APP=1                 leave `pnpm dev` running after the healthcheck
-#   AGENT_SKIP_HEALTHCHECK=1   skip step 10 entirely (no dev server started)
-#   AGENT_SKIP_PLAYWRIGHT=1    skip browser provisioning
-#   AGENT_SKIP_MCP_WARM=1      install uv but do not pre-warm headroom
 #   NODE_INSTALL_PREFIX        parent dir for node<major> (default /opt)
-#   HEALTHCHECK_PORT           port for the transient dev server (default 5173; it
-#                              must be free — the check uses --strictPort)
 set -uo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../../.." || exit 1
@@ -246,35 +240,26 @@ else
 fi
 
 # 10) App health (dev server serves the app shell) ---------------------------
-if [ "${AGENT_SKIP_HEALTHCHECK:-0}" = "1" ]; then
-  step "[10/${TOTAL}] App health — skipped (AGENT_SKIP_HEALTHCHECK=1)"
+step "[10/${TOTAL}] App health (Vite dev server serves the app shell)"
+app_log="$(mktemp)"
+# --strictPort: a port already in use fails at once with Vite's own message,
+# instead of Vite drifting to the next port while the probe waits 90s on this one.
+health_port=5173
+pnpm dev --port "${health_port}" --strictPort >"${app_log}" 2>&1 &
+dev_pid=$!
+if HEALTHCHECK_URL="${HEALTHCHECK_URL:-http://localhost:${health_port}/}" bash "${AGENT_DIR}/healthcheck.sh"; then
+  ok "[10/${TOTAL}] app shell served"
   app_ok=1
 else
-  step "[10/${TOTAL}] App health (Vite dev server serves the app shell)"
-  app_log="$(mktemp)"
-  # --strictPort: a port already in use fails at once with Vite's own message,
-  # instead of Vite drifting to the next port while the probe waits 90s on this one.
-  health_port="${HEALTHCHECK_PORT:-5173}"
-  pnpm dev --port "${health_port}" --strictPort >"${app_log}" 2>&1 &
-  dev_pid=$!
-  if HEALTHCHECK_URL="${HEALTHCHECK_URL:-http://localhost:${health_port}/}" bash "${AGENT_DIR}/healthcheck.sh"; then
-    ok "[10/${TOTAL}] app shell served"
-    app_ok=1
-  else
-    echo "---- pnpm dev log (tail) ----" >&2
-    tail -20 "${app_log}" >&2
-    app_ok=0
-  fi
-
-  if [ "${KEEP_APP:-0}" = "1" ] && [ "${app_ok}" = "1" ]; then
-    echo "  KEEP_APP=1 — leaving \`pnpm dev\` running on :5173 (pid ${dev_pid})." >&2
-  else
-    kill_tree "${dev_pid}"
-    echo "  stopped the transient dev server." >&2
-  fi
-  rm -f "${app_log}"
-  [ "${app_ok}" = "1" ] || die "healthcheck failed"
+  echo "---- pnpm dev log (tail) ----" >&2
+  tail -20 "${app_log}" >&2
+  app_ok=0
 fi
+
+kill_tree "${dev_pid}"
+echo "  stopped the transient dev server." >&2
+rm -f "${app_log}"
+[ "${app_ok}" = "1" ] || die "healthcheck failed"
 
 echo ""
 echo "✓ bring-up complete in $(($(date +%s) - start_ts))s — session matches local."

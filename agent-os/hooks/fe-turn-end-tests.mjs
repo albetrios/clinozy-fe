@@ -8,9 +8,7 @@
 // nothing. When the selection is everything, the next push runs the whole suite: it says so,
 // once per reason in a session — an exit 2 that is a heads-up, not a failure.
 //
-// Switch: AGENT_TURN_END_TESTS=1 runs it, =0 never; unset, it is off until 2026-10-24
-// (Asia/Calcutta) and on from then. It skips a tree it already passed (same changes) and a change
-// no test reaches.
+// It skips a tree it already passed (same changes) and a change no test reaches.
 //
 // Only this repository is judged: a session that holds several repositories runs every
 // repository's hooks, each with its own CLAUDE_PROJECT_DIR (tooling/agent-os/session-hooks.ts).
@@ -29,8 +27,6 @@ import { fileURLToPath } from 'node:url';
 import { stripVTControlCharacters } from 'node:util';
 
 const HOOK_ID = 'fe-turn-end-tests';
-/** The first day (Asia/Calcutta) the hook runs without AGENT_TURN_END_TESTS=1. */
-const ON_BY_DEFAULT_FROM = '2026-10-24';
 const TEST_BUDGET_MILLISECONDS = 60_000;
 const SELECTION_BUDGET_MILLISECONDS = 20_000;
 const FAILURE_LINES = 40;
@@ -43,16 +39,6 @@ const repositoryRoot =
 const stateRoot = join(process.env.TMPDIR || '/tmp', 'clinozy-fe-hooks');
 const lockPath = join(stateRoot, `${HOOK_ID}.lock`);
 const passedPath = join(stateRoot, `${HOOK_ID}.passed`);
-
-function isSwitchedOn() {
-  const value = process.env.AGENT_TURN_END_TESTS?.trim();
-  if (value === '1') return true;
-  if (value === '0') return false;
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(
-    new Date(),
-  );
-  return today >= ON_BY_DEFAULT_FROM;
-}
 
 /** The Stop payload's session id, or `unknown-session`. */
 function sessionId() {
@@ -145,7 +131,6 @@ function warnFullPush({ session, reasons }) {
 }
 
 function run(session) {
-  if (!isSwitchedOn()) return 'off';
   if (!takeLock()) return 'busy';
   try {
     const files = changedFiles();

@@ -47,27 +47,17 @@ Each `install-*.sh` runs standalone as well as under `bootstrap.sh`.
 
 ¹ The install itself is best-effort — a session Node of the right major is fine.
 Missing Node entirely is fatal.
-² Skippable with `AGENT_SKIP_HEALTHCHECK=1`.
-
 Best-effort steps log `•` and continue: a locked-down network should not cost
 you a whole session over an optional linter.
 
 ## Environment variables
 
-| Variable                     | Effect                                                                                         |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- |
-| `KEEP_APP=1`                 | Leave `pnpm dev` running after the healthcheck                                                 |
-| `AGENT_SKIP_HEALTHCHECK=1`   | Skip step 10; no dev server is started                                                         |
-| `AGENT_SKIP_PLAYWRIGHT=1`    | Skip browser provisioning                                                                      |
-| `AGENT_SKIP_MCP_WARM=1`      | Install `uv` but skip the headroom pre-warm                                                    |
-| `AGENT_SESSION_HOOKS=0`      | Do not write the session root's hooks (step 8, `pnpm agent-os:session-hooks`)                  |
-| `AGENT_PLAYWRIGHT_BROWSERS`  | Browsers to install (default `chromium`)                                                       |
-| `AGENT_PLAYWRIGHT_WITH_DEPS` | Also install browser OS deps (needs root)                                                      |
-| `NODE_INSTALL_PREFIX`        | Parent dir for `node<major>` (default `/opt`)                                                  |
-| `GH_VERSION`                 | Pin the `gh` release instead of resolving latest                                               |
-| `GITLEAKS_VERSION`           | Pin the gitleaks release instead of resolving latest                                           |
-| `HEALTHCHECK_URL`            | Override the probe URL (default `http://localhost:<HEALTHCHECK_PORT>/`)                        |
-| `HEALTHCHECK_PORT`           | Port for the transient dev server (default `5173`; must be free — started with `--strictPort`) |
+| Variable              | Effect                                                    |
+| --------------------- | --------------------------------------------------------- |
+| `NODE_INSTALL_PREFIX` | Parent dir for `node<major>` (default `/opt`)             |
+| `GH_VERSION`          | Pin the `gh` release instead of resolving latest          |
+| `GITLEAKS_VERSION`    | Pin the gitleaks release instead of resolving latest      |
+| `HEALTHCHECK_URL`     | Override the probe URL (default `http://localhost:5173/`) |
 
 ## The session's `.env.local`
 

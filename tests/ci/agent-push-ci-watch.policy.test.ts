@@ -113,7 +113,7 @@ describe('fe-push-ci-watch.mjs', () => {
     expect(runHook(fixture({ runs: [run('PR CI', 'cancelled')] })).status).toBe(2);
   });
 
-  it('stays silent on a green commit, without an authenticated gh, and when switched off', () => {
+  it('stays silent on a green commit and without an authenticated gh', () => {
     expect(runHook(fixture({ runs: [run('PR CI', 'success')] })).status).toBe(0);
     const unauthenticated = fixture({
       runs: [run('PR CI', 'failure')],
@@ -121,20 +121,6 @@ describe('fe-push-ci-watch.mjs', () => {
     });
     expect(runHook(unauthenticated).status).toBe(0);
     expect(readFileSync(unauthenticated.calls, 'utf8')).not.toContain('run list');
-    const off = fixture({ runs: [run('PR CI', 'failure')] });
-    const result = spawnSync(process.execPath, [HOOK], {
-      input: JSON.stringify({ tool_input: { command: 'git push' }, cwd: off.root }),
-      encoding: 'utf8',
-      env: {
-        ...gitEnvironmentWithoutInheritedRepository(),
-        CLAUDE_PROJECT_DIR: off.root,
-        TMPDIR: off.state,
-        PATH: `${off.bin}:${process.env.PATH ?? ''}`,
-        AGENT_PUSH_CI_WATCH: '0',
-      },
-    });
-    expect(result.status).toBe(0);
-    expect(existsSync(off.calls)).toBe(false);
   });
 
   it('judges only pushes in its own repository', () => {

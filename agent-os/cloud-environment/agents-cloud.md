@@ -69,8 +69,7 @@ Ten steps, in order:
    only `sync` it. Last, `pnpm agent-os:session-hooks` registers the hooks: a
    session that holds both repos takes them only from `/home/user/.claude/settings.json`,
    so it writes both repos' hooks there, each with absolute paths and its own
-   `CLAUDE_PROJECT_DIR` (a no-op with one repo; `AGENT_SESSION_HOOKS=0` turns it
-   off). Each repo's file hooks then act only on its own files. To check it in a
+   `CLAUDE_PROJECT_DIR` (a no-op with one repo). Each repo's file hooks then act only on its own files. To check it in a
    new session, look for one "session ready (hooks from …)" line per repo in the
    session context.
 9. **Playwright browsers** — skipped when the image already ships them.
@@ -79,7 +78,7 @@ Ten steps, in order:
 
 Steps 2–5 and 8–9 are best-effort and log `•` without aborting; Node, the
 dependency install, the env scaffold, and the healthcheck are hard gates. No
-service is left running unless you set `KEEP_APP=1`.
+service is left running.
 
 Full reference — every step, env var, and network host:
 [`tooling/setup/agent/README.md`](../../tooling/setup/agent/README.md).
