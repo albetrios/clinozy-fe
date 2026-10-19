@@ -100,8 +100,15 @@ function runHook(options: {
       TMPDIR: options.state,
       VITEST_STUB_EXIT: String(options.exitCode ?? 0),
       SELECTION_STUB: JSON.stringify(options.selection ?? SELECTED),
+      HOOK_TELEMETRY_LOG: join(options.state, 'telemetry.log'),
     },
   });
+}
+
+/** The last telemetry row's status and detail columns (`fired,failed`), as the readers see them. */
+function lastTelemetry(state: string): string {
+  const rows = readFileSync(join(state, 'telemetry.log'), 'utf8').trim();
+  return rows.split('\n').at(-1)?.split(',').slice(2).join(',') ?? '';
 }
 
 function runCount(runs: string): number {
@@ -155,6 +162,16 @@ describe('fe-turn-end-tests.mjs', () => {
     expect(runHook({ root, state, selection: alwaysOnly, exitCode: 1 }).status).toBe(0);
     expect(runHook({ root, state, selection: 'not json', exitCode: 1 }).status).toBe(0);
     expect(runCount(runs)).toBe(0);
+  });
+
+  it('records fired when it wakes the model, else silent with why, for the hooks report', () => {
+    const { root, state } = repository();
+    runHook({ root, state, exitCode: 1 });
+    expect(lastTelemetry(state)).toBe('Stop,fired,failed');
+    runHook({ root, state });
+    expect(lastTelemetry(state)).toBe('Stop,silent,passed');
+    runHook({ root, state });
+    expect(lastTelemetry(state)).toBe('Stop,silent,already-passed');
   });
 
   it('skips while another run holds the lock', () => {

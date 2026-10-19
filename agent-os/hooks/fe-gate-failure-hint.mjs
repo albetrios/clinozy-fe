@@ -8,6 +8,7 @@
 // Adds context via hookSpecificOutput.additionalContext (PostToolUseFailure cannot block — the
 // command already ran). Fails OPEN.
 import { addModelContext, readHookPayload } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 
 /** The fix hint each failed gate implies, matched on the lowercased command, in order. */
 const GATE_HINTS = [
@@ -68,4 +69,9 @@ if (hints.length > 0) {
     ].join('\n'),
   });
 }
+recordTelemetry(
+  'fe-gate-failure-hint',
+  'PostToolUseFailure',
+  hints.length > 0 ? 'fired' : 'silent',
+);
 process.exit(0);

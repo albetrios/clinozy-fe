@@ -13,6 +13,7 @@
 // (questions, "run the tests", "explain this") produce nothing and never nag. Fails OPEN: an
 // unreadable payload, no prompt, or no match exits 0 silently.
 import { addModelContext, readHookPayload } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 import { markTurn, resetTurn } from './_fe-turn-once.mjs';
 
 // The matches run line by line (whitespace other than a line break), as the grep that used to
@@ -85,4 +86,9 @@ if (hints.length > 0) {
     ].join('\n'),
   });
 }
+recordTelemetry(
+  'fe-prompt-skill-router',
+  'UserPromptSubmit',
+  hints.length > 0 ? 'fired' : 'silent',
+);
 process.exit(0);

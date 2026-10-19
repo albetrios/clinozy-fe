@@ -28,10 +28,21 @@ import {
   showSystemMessage,
 } from './_fe-hook.mjs';
 import { pushDirectory } from './_fe-push-target.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 import { isTurnMarked } from './_fe-turn-once.mjs';
 
 const payload = readHookPayload();
 if (!payload) process.exit(0);
+
+/** Ends the hook with a block or an ask, recorded as fired (clinozy-be's `decide`). */
+function deny(reason) {
+  recordTelemetry('fe-guardrails', 'PreToolUse', 'fired', 'deny');
+  denyToolCall(reason);
+}
+function ask(reason) {
+  recordTelemetry('fe-guardrails', 'PreToolUse', 'fired', 'ask');
+  askBeforeToolCall(reason);
+}
 
 const tool = payload.tool_name || '';
 const input = payload.tool_input || {};
@@ -57,14 +68,14 @@ const SECRET_READ_DENIAL =
 
 // --- BLOCK: agent reading secret env files ----------------------------------
 if ((tool === 'Read' || tool === 'Grep') && isSecretEnvPath(filePath)) {
-  denyToolCall(SECRET_READ_DENIAL);
+  deny(SECRET_READ_DENIAL);
 }
 if (tool === 'Bash' && command) {
   // Any token that resolves to a secret env file (cat/grep/cp/source/< redirection, …).
   const touchesSecret = command
     .split(/[\s;|&><()'"`]+/)
     .some((token) => isSecretEnvPath(token));
-  if (touchesSecret) denyToolCall(SECRET_READ_DENIAL);
+  if (touchesSecret) deny(SECRET_READ_DENIAL);
 }
 
 /** Pushed paths where a missed check leaks a session, a token or another clinic's data. */
@@ -129,14 +140,14 @@ if (tool === 'Bash' && command) {
   const scan = withoutQuotedText(command);
   const why = destructiveShellReason(command);
   if (why) {
-    denyToolCall(
+    deny(
       `Blocked by clinozy-fe guardrail: ${why}. Command: "${command.slice(0, 160)}". If you truly intend this, run it yourself in a terminal.`,
     );
   }
   // The mark fe-prompt-skill-router.mjs records for a /fe-ship or /fe-open-pr turn.
   const prRequested = isTurnMarked({ session: payload.session_id, mark: 'pr-requested' });
   if (/\bgh\s+pr\s+create\b/.test(scan) && !prRequested) {
-    askBeforeToolCall(
+    ask(
       'clinozy-fe policy: open a PR only when the user explicitly asked for one (Bash(gh pr*) is allowlisted, so this hook is the check). Confirm this was requested before proceeding.',
     );
   }
@@ -147,7 +158,7 @@ if (tool === 'Bash' && command) {
     } catch {
       /* fail-open */
     }
-    if (reason) askBeforeToolCall(reason);
+    if (reason) ask(reason);
   }
   if (/\bgit\s+reset\s+--hard\b/i.test(scan) || /\bgit\s+clean\s+-[a-z]*f/i.test(scan)) {
     warnings.push(
@@ -158,7 +169,7 @@ if (tool === 'Bash' && command) {
 
 // --- BLOCK: secrets ----------------------------------------------------------
 if (isWrite && isSecretEnvPath(filePath)) {
-  denyToolCall(
+  deny(
     `Blocked by clinozy-fe guardrail: "${filePath}" is a gitignored secrets file. Put template keys in .env.example (VITE_ prefix = public) and provide real values via the environment, not source control.`,
   );
 }
@@ -170,7 +181,7 @@ const secretPatterns = [
   /\bxox[baprs]-[A-Za-z0-9-]{10,}/,
 ];
 if (isWrite && content && secretPatterns.some((re) => re.test(content))) {
-  denyToolCall(
+  deny(
     'Blocked by clinozy-fe guardrail: the content looks like a private key or live credential. Use environment variables / a secret manager instead of committing secrets.',
   );
 }
@@ -197,4 +208,10 @@ if (isWrite && filePath && inRepository) {
 if (warnings.length) {
   showSystemMessage('⚠️ clinozy-fe guardrail:\n- ' + warnings.join('\n- '));
 }
+recordTelemetry(
+  'fe-guardrails',
+  'PreToolUse',
+  warnings.length ? 'fired' : 'silent',
+  warnings.length ? 'warn' : '',
+);
 process.exit(0);
