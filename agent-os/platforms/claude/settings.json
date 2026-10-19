@@ -33,6 +33,7 @@
       "Bash(pnpm deps:check*)",
       "Bash(pnpm deps:audit*)",
       "Bash(pnpm tool:project-structure-tree*)",
+      "Bash(pnpm exec *)",
       "Bash(git status)",
       "Bash(git diff*)",
       "Bash(git log*)",
@@ -59,12 +60,7 @@
       "mcp__github__actions_get",
       "mcp__github__actions_list"
     ],
-    "ask": [
-      "Bash(gh pr create *)",
-      "Bash(pnpm dlx *)",
-      "Bash(pnpm add *)",
-      "Bash(pnpm exec *)"
-    ],
+    "ask": ["Bash(gh pr create *)", "Bash(pnpm dlx *)", "Bash(pnpm add *)"],
     "deny": [
       "Bash(git push --force *)",
       "Bash(git push -f *)",

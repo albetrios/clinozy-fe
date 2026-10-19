@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-// The agent permission rules: named scripts and the chain's git commands run without a prompt,
-// a new dependency or a downloaded tool asks, GitHub stays read-only without one, and the
+// The agent permission rules: named scripts, `pnpm exec` (a binary already installed) and the
+// chain's git commands run without a prompt, a new dependency or a downloaded tool asks, GitHub stays read-only without one, and the
 // destructive commands are denied outright. clinozy-be pins its own in
 // src/tests/unit/tooling/agent-permissions.policy.unit.test.ts.
 
@@ -19,8 +19,10 @@ describe('Claude Code permission rules', () => {
     for (const rule of permissions.allow.filter((entry) =>
       entry.startsWith('Bash(pnpm '),
     )) {
-      // `pnpm <script>…` or the exact no-argument install, never a bare wildcard.
-      expect(rule).toMatch(/^Bash\(pnpm (?:[a-z][a-z:-]*\*|install(?: --[a-z-]+)?)\)$/);
+      // `pnpm <script>…`, `pnpm exec *` or the exact no-argument install, never a bare wildcard.
+      expect(rule).toMatch(
+        /^Bash\(pnpm (?:[a-z][a-z:-]*\*|exec \*|install(?: --[a-z-]+)?)\)$/,
+      );
     }
     for (const rule of [
       'Bash(pnpm test*)',
@@ -31,7 +33,7 @@ describe('Claude Code permission rules', () => {
     }
   });
 
-  it('no allowed pnpm rule also covers dlx, add, exec or an install with a package', () => {
+  it('no allowed pnpm rule also covers dlx, add or an install with a package', () => {
     const covered = (command: string) =>
       permissions.allow.some((rule) => {
         const body = rule.slice('Bash('.length, -1);
@@ -42,16 +44,18 @@ describe('Claude Code permission rules', () => {
     for (const command of [
       'pnpm dlx shadcn@latest add button',
       'pnpm add left-pad',
-      'pnpm exec tsx x.ts',
       'pnpm install left-pad',
       'pnpm deploy',
       'pnpm rebrand Acme',
     ]) {
       expect(covered(command), command).toBe(false);
     }
-    for (const rule of ['Bash(pnpm dlx *)', 'Bash(pnpm add *)', 'Bash(pnpm exec *)']) {
-      expect(permissions.ask).toContain(rule);
-    }
+    // One policy for both repositories (clinozy-be pins the same three asks): a session that
+    // holds both merges their rules, and an ask outranks every allow.
+    expect([...permissions.ask].sort()).toEqual(
+      ['Bash(gh pr create *)', 'Bash(pnpm add *)', 'Bash(pnpm dlx *)'].sort(),
+    );
+    expect(covered('pnpm exec tsx x.ts')).toBe(true);
   });
 
   it('git writes and gh run run without a prompt', () => {
