@@ -58,7 +58,7 @@ Granular procedures live in **skills** (invoked by name); these commands are **w
 | `/fe-open-pr [title]` | Push the branch + open a PR to **`main`** (explicit PR opt-in).                                                                                                                       |
 | `/fe-watch-pr <n>`    | Triage CI + review comments until both required contexts — **`Quality gate`** + **`Checks`** — are green; then /fe-merge-pr.                                                          |
 | `/fe-merge-pr <n>`    | Turn on GitHub auto-merge (`gh pr merge --auto --squash`): GitHub merges when every required check passes; never around a red one.                                                    |
-| `/fe-ship [title]`    | Full flow: pre-merge-review (warn-only until 2026-10-31, then a critical or major finding stops the push) → open-pr → merge-pr (auto-merge on) → watch-pr.                            |
+| `/fe-ship [title]`    | Full flow: pre-merge-review (a critical or major finding stops the push) → open-pr → merge-pr (auto-merge on) → watch-pr.                                                             |
 | _Release_             | Trunk-based (single `main`): merge the standing release-please **Release PR** to ship → tag + prod deploy. See [trunk-based-workflow.md](../../docs/process/trunk-based-workflow.md). |
 
 **Maintenance**

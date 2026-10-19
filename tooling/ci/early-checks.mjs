@@ -1,10 +1,10 @@
 /**
- * The warn-only window of the early checks — the dependency audit and the client env allowlist at
- * commit (`.husky/pre-commit` steps 11 and 12), Semgrep at push (`pnpm security:semgrep:push`) and
- * the live CSP and HSTS check after each Netlify deploy (`pnpm deploy:probe-live`).
- * Each starts warn-only and blocks from {@link EARLY_CHECKS_BLOCK_FROM}; a finding judged wrong in
- * the meantime goes into {@link EARLY_CHECKS_FALSE_POSITIVE_LOG}, so the rule is tuned before it
- * blocks. The same window and log as clinozy-be's `src/scripts/tooling/early-checks.util.ts`.
+ * The early checks — the dependency audit and the client env allowlist at commit
+ * (`.husky/pre-commit` steps 11 and 12), Semgrep at push (`pnpm security:semgrep:push`) and the
+ * live CSP and HSTS check after each Netlify deploy (`pnpm deploy:probe-live`) — report their
+ * findings one way, and a finding blocks. A finding the user judges wrong goes into
+ * {@link EARLY_CHECKS_FALSE_POSITIVE_LOG}, so the rule gets fixed rather than worked around. The
+ * same rule and log as clinozy-be's `src/scripts/tooling/early-checks.util.ts`.
  *
  * Usage (the commit checks, from `tooling/validate/before-commit-guard.sh`):
  *   node tooling/ci/early-checks.mjs audit        # pnpm deps:audit:prod on a staged lockfile
@@ -14,12 +14,8 @@ import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-/** The first day (Asia/Calcutta) the early checks block instead of warning. */
-export const EARLY_CHECKS_BLOCK_FROM = '2026-10-31';
-
 /** Where a finding the user judges wrong is recorded, one row each. */
-export const EARLY_CHECKS_FALSE_POSITIVE_LOG =
-  'agent-os/evals/warn-only-false-positives.md';
+export const EARLY_CHECKS_FALSE_POSITIVE_LOG = 'agent-os/evals/false-positives.md';
 
 /** The staged files that make the client env allowlist run at commit. */
 export const CLIENT_ENV_TRIGGERS = [
@@ -35,43 +31,24 @@ export const DEPLOY_ENVIRONMENTS = ['development', 'production'];
 export const AUDIT_UNREACHABLE =
   /ERR_PNPM_AUDIT_(?:BAD_RESPONSE|NO_RESPONSE)|ENOTFOUND|ECONNREFUSED|ECONNRESET|ETIMEDOUT|EAI_AGAIN|fetch failed|socket hang up/i;
 
-/** Today's date in Asia/Calcutta, `YYYY-MM-DD`. */
-const todayInCalcutta = (now) =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(now);
-
 /**
- * True while the early checks only warn (before {@link EARLY_CHECKS_BLOCK_FROM}, Asia/Calcutta).
+ * Prints an early check's findings and returns its exit code: 0 with no finding, 1 with any. The
+ * message names the false-positive log.
  *
- * @param {Date} [now]
- * @returns {boolean}
- */
-export function isEarlyCheckWarnOnly(now = new Date()) {
-  return todayInCalcutta(now) < EARLY_CHECKS_BLOCK_FROM;
-}
-
-/**
- * Prints an early check's findings and returns its exit code: 0 with no finding or while
- * warn-only, 1 once it blocks. The message names the false-positive log either way.
- *
- * @param {{ check: string, findings: readonly string[], now?: Date }} options
+ * @param {{ check: string, findings: readonly string[] }} options
  * @returns {number}
  */
-export function reportEarlyCheck({ check, findings, now }) {
+export function reportEarlyCheck({ check, findings }) {
   if (findings.length === 0) {
     console.log(`✓ ${check}: no findings`);
     return 0;
   }
-  const warnOnly = isEarlyCheckWarnOnly(now);
-  console.error(
-    warnOnly
-      ? `⚠ ${check}: ${findings.length} finding(s) — warn-only until ${EARLY_CHECKS_BLOCK_FROM}, then they block`
-      : `✗ ${check}: ${findings.length} finding(s)`,
-  );
+  console.error(`✗ ${check}: ${findings.length} finding(s)`);
   for (const finding of findings) console.error(`  - ${finding}`);
   console.error(
     `  A finding that is wrong: add a row to ${EARLY_CHECKS_FALSE_POSITIVE_LOG}.`,
   );
-  return warnOnly ? 0 : 1;
+  return 1;
 }
 
 /**
@@ -86,17 +63,17 @@ export function shouldRunCommitCheck({ check, stagedFiles }) {
 }
 
 /**
- * `pnpm deps:audit:prod` on a staged lockfile: advisories warn until the early checks block; an
- * unreachable registry warns and passes (the PR's dependency audit lane runs it).
+ * `pnpm deps:audit:prod` on a staged lockfile: an advisory blocks; an unreachable registry warns
+ * and passes (the PR's dependency audit lane runs it).
  *
- * @param {{ run?: typeof spawnSync, now?: Date }} [options]
+ * @param {{ run?: typeof spawnSync }} [options]
  * @returns {number}
  */
-export function runLockfileAudit({ run = spawnSync, now } = {}) {
+export function runLockfileAudit({ run = spawnSync } = {}) {
   const result = run('pnpm', ['deps:audit:prod'], { encoding: 'utf8' });
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
   if (result.status === 0)
-    return reportEarlyCheck({ check: 'Dependency audit', findings: [], now });
+    return reportEarlyCheck({ check: 'Dependency audit', findings: [] });
   process.stderr.write(output);
   if (AUDIT_UNREACHABLE.test(output)) {
     console.warn(
@@ -107,18 +84,17 @@ export function runLockfileAudit({ run = spawnSync, now } = {}) {
   return reportEarlyCheck({
     check: 'Dependency audit (lockfile staged)',
     findings: ['pnpm deps:audit:prod reported high advisories — see above'],
-    now,
   });
 }
 
 /**
  * `pnpm validate:client-env --env <environment>` for each deploy environment, when the env schema
- * changed: an out-of-range value in a profile warns until the early checks block.
+ * changed: an out-of-range value in a profile blocks.
  *
- * @param {{ run?: typeof spawnSync, now?: Date }} [options]
+ * @param {{ run?: typeof spawnSync }} [options]
  * @returns {number}
  */
-export function runClientEnv({ run = spawnSync, now } = {}) {
+export function runClientEnv({ run = spawnSync } = {}) {
   const findings = [];
   for (const environment of DEPLOY_ENVIRONMENTS) {
     const result = run('pnpm', ['validate:client-env', '--env', environment], {
@@ -131,7 +107,6 @@ export function runClientEnv({ run = spawnSync, now } = {}) {
   return reportEarlyCheck({
     check: 'Client env allowlist (env schema staged)',
     findings,
-    now,
   });
 }
 

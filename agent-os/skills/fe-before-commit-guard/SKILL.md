@@ -46,9 +46,8 @@ cache (about 60 s).
 12. **Client env allowlist** — _only when `src/core/config/env-schema.ts`, `.env.example` or `tooling/validate/client-env.ts` is staged_ — `pnpm validate:client-env --env development` and `--env production` (the deploy workflows' check, at commit).
 
 Steps 11 and 12 are **early checks** (`tooling/ci/early-checks.mjs`, as is Semgrep at push in
-`.husky/pre-push`): warn-only until 2026-10-31 (Asia/Calcutta), then a finding blocks. A finding the
-user judges wrong goes into `agent-os/evals/warn-only-false-positives.md`, so the rule is tuned
-before it blocks.
+`.husky/pre-push`): a finding blocks. A finding the user judges wrong goes into
+`agent-os/evals/false-positives.md`, so the rule gets fixed.
 
 ## How to Fix Failures
 

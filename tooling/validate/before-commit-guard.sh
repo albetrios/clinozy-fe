@@ -91,11 +91,11 @@ step_9() {
 step_10() { ./tooling/validate/large-staged-files.sh; }
 
 # ── 11. Dependency audit when pnpm-lock.yaml is staged (an early check) ──
-# Warn-only until 2026-10-31, then it blocks; an unreachable registry passes (the PR audits).
+# An advisory blocks; an unreachable registry passes (the PR audits).
 step_11() { node tooling/ci/early-checks.mjs audit; }
 
 # ── 12. Client env allowlist when the env schema is staged (an early check) ──
-# validate:client-env for development and production; warn-only until 2026-10-31.
+# validate:client-env for development and production; a finding blocks.
 step_12() { node tooling/ci/early-checks.mjs client-env; }
 
 step_label() {

@@ -390,8 +390,8 @@ jobs:
           echo "Smoke OK — buildId $BUILD_ID live."
 
       # The headers the deploy actually serves: CSP (frame-ancestors, object-src, a safe script
-      # policy), HSTS of 180 days or more, nosniff (tooling/ci/probe-live-site.mjs). Warn-only until
-      # 2026-10-31, then a finding fails the deploy job.
+      # policy), HSTS of 180 days or more, nosniff (tooling/ci/probe-live-site.mjs). A finding fails
+      # the deploy job.
       - name: Probe live CSP and HSTS
         if: steps.deploy.outputs.url != ''
         env:

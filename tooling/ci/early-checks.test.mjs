@@ -1,24 +1,18 @@
 /**
- * The early checks (`early-checks.mjs`, `push-semgrep.mjs`): the warn-only window on both sides of
- * its date, when each commit check runs, how each reads its command's result, and which pushed
+ * The early checks (`early-checks.mjs`, `push-semgrep.mjs`): a finding blocks, when each commit
+ * check runs, how each reads its command's result, and which pushed
  * files Semgrep scans.
  */
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import {
-  EARLY_CHECKS_BLOCK_FROM,
   EARLY_CHECKS_FALSE_POSITIVE_LOG,
-  isEarlyCheckWarnOnly,
   reportEarlyCheck,
   runClientEnv,
   runLockfileAudit,
   shouldRunCommitCheck,
 } from './early-checks.mjs';
 import { pushSemgrepTargets } from './push-semgrep.mjs';
-
-/** 23:59 on the day before the switch, and 00:00 on it — both Asia/Calcutta (UTC+5:30). */
-const LAST_WARN_ONLY = new Date('2026-10-30T18:29:00Z');
-const FIRST_BLOCKING = new Date('2026-10-30T18:30:00Z');
 
 /** A spawnSync stand-in that answers each call from `answers` in order and records the calls. */
 function stub(answers) {
@@ -42,34 +36,20 @@ function quietly(body) {
   }
 }
 
-describe('the warn-only window', () => {
-  test('warns through the day before the switch in Asia/Calcutta, blocks from it', () => {
-    assert.equal(EARLY_CHECKS_BLOCK_FROM, '2026-10-31');
-    assert.equal(isEarlyCheckWarnOnly(LAST_WARN_ONLY), true);
-    assert.equal(isEarlyCheckWarnOnly(FIRST_BLOCKING), false);
-  });
-
-  test('a finding passes while warn-only and fails after; no finding always passes', () => {
-    const findings = ['a finding'];
+describe('a finding blocks', () => {
+  test('a finding fails; no finding passes', () => {
     assert.equal(
-      quietly(() => reportEarlyCheck({ check: 'x', findings, now: LAST_WARN_ONLY })),
-      0,
-    );
-    assert.equal(
-      quietly(() => reportEarlyCheck({ check: 'x', findings, now: FIRST_BLOCKING })),
+      quietly(() => reportEarlyCheck({ check: 'x', findings: ['a finding'] })),
       1,
     );
     assert.equal(
-      quietly(() => reportEarlyCheck({ check: 'x', findings: [], now: FIRST_BLOCKING })),
+      quietly(() => reportEarlyCheck({ check: 'x', findings: [] })),
       0,
     );
   });
 
   test('names the false-positive log, the one clinozy-be keeps', () => {
-    assert.equal(
-      EARLY_CHECKS_FALSE_POSITIVE_LOG,
-      'agent-os/evals/warn-only-false-positives.md',
-    );
+    assert.equal(EARLY_CHECKS_FALSE_POSITIVE_LOG, 'agent-os/evals/false-positives.md');
   });
 });
 
@@ -97,7 +77,7 @@ describe('the commit checks', () => {
     );
   });
 
-  test('the audit: clean passes, an unreachable registry passes, advisories follow the window', () => {
+  test('the audit: clean passes, an unreachable registry passes, an advisory blocks', () => {
     assert.equal(
       quietly(() => runLockfileAudit({ run: stub([{ status: 0 }]).run })),
       0,
@@ -106,17 +86,13 @@ describe('the commit checks', () => {
       { status: 1, stdout: '', stderr: 'ERR_PNPM_AUDIT_NO_RESPONSE' },
     ]);
     assert.equal(
-      quietly(() => runLockfileAudit({ run: offline.run, now: FIRST_BLOCKING })),
+      quietly(() => runLockfileAudit({ run: offline.run })),
       0,
     );
     assert.deepEqual(offline.calls, [['pnpm', 'deps:audit:prod']]);
     const advisory = () => stub([{ status: 1, stdout: '1 high', stderr: '' }]).run;
     assert.equal(
-      quietly(() => runLockfileAudit({ run: advisory(), now: LAST_WARN_ONLY })),
-      0,
-    );
-    assert.equal(
-      quietly(() => runLockfileAudit({ run: advisory(), now: FIRST_BLOCKING })),
+      quietly(() => runLockfileAudit({ run: advisory() })),
       1,
     );
   });
@@ -124,7 +100,7 @@ describe('the commit checks', () => {
   test('the allowlist checks both deploy environments and fails on either', () => {
     const clean = stub([]);
     assert.equal(
-      quietly(() => runClientEnv({ run: clean.run, now: FIRST_BLOCKING })),
+      quietly(() => runClientEnv({ run: clean.run })),
       0,
     );
     assert.deepEqual(clean.calls, [
@@ -133,7 +109,7 @@ describe('the commit checks', () => {
     ]);
     const production = stub([{ status: 0 }, { status: 1, stdout: 'out of range' }]);
     assert.equal(
-      quietly(() => runClientEnv({ run: production.run, now: FIRST_BLOCKING })),
+      quietly(() => runClientEnv({ run: production.run })),
       1,
     );
   });

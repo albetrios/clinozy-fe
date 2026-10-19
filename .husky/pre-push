@@ -60,7 +60,7 @@ else
 fi
 
 # Semgrep on the pushed auth, HTTP client and CSP code (the PR's Semgrep lane scans everything) —
-# an early check, warn-only until 2026-10-31; no semgrep → a warning.
+# an early check: a finding blocks; no semgrep → a warning.
 pnpm security:semgrep:push --base "$PUSH_BASE"
 
 # API contract drift — every endpoint this app references must exist in

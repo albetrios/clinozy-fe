@@ -9,8 +9,8 @@
  *   pnpm security:semgrep:push --base <ref>   # files changed since <ref>
  *
  * Same rules as CI (`--config p/default`), only findings new since the base. Semgrep missing, or a
- * Semgrep error (no network for the registry rules), warns and passes — CI still scans. Warn-only
- * until `EARLY_CHECKS_BLOCK_FROM` (`tooling/ci/early-checks.mjs`).
+ * Semgrep error (no network for the registry rules), warns and passes — CI still scans. A finding
+ * blocks (`tooling/ci/early-checks.mjs`).
  */
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';

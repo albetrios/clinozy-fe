@@ -238,7 +238,7 @@ On **push to `main`**, **Post-merge CI** (`.github/workflows/post-merge-ci.yml`)
      headers the deploy actually serves on `/` and `/login` — a CSP header with `frame-ancestors
 'none'`, `object-src 'none'` and a script policy without `'unsafe-inline'`/`'unsafe-eval'`,
      HSTS of 180 days or more, nosniff (`tooling/ci/probe-live-site.mjs`; PR previews run it
-     best-effort). Warn-only until 2026-10-31, then a finding fails the deploy job.
+     best-effort). A finding fails the deploy job.
 3. On a release: attaches the SBOM to the GitHub Release.
    Post-merge CI does **not** re-run tests — pr-ci already gated the SHA.
 

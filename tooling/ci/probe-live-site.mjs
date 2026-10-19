@@ -3,8 +3,8 @@
  * The live CSP and HSTS check of a Netlify deploy, from outside (clinozy-be's
  * `pnpm ops:probe-live-api`, on this repository's surface): the headers the deployed site actually
  * serves on `/` and `/login`, not the ones the build meant to write. Runs after every deploy
- * (reusable-netlify-deploy.yml, preview.yml); warn-only until `EARLY_CHECKS_BLOCK_FROM`
- * (`tooling/ci/early-checks.mjs`), then a finding fails the step.
+ * (reusable-netlify-deploy.yml, preview.yml); a finding fails the step
+ * (`tooling/ci/early-checks.mjs`).
  *
  * Usage:
  *   pnpm deploy:probe-live --url https://<deploy>.netlify.app

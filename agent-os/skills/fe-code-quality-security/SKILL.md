@@ -96,7 +96,7 @@ See **fe-before-commit-guard** skill (`agent-os/skills/fe-before-commit-guard/SK
 | `.husky/pre-commit`                       | Pre-commit hook — one-liner invoking the guard (all steps live inside it, clinozy-be pattern)                          |
 | `tooling/validate/before-commit-guard.sh` | Guard script: env, public, lint-staged, vite-env, type-check, lockfile, gitleaks, env-files, conflicts, large files |
 | `tooling/validate/large-staged-files.sh`  | Guard step 10: rejects staged blobs > 3MB (`iterations/` exempt), pinned by `large-staged-files.test.mjs`               |
-| `tooling/ci/early-checks.mjs` | Guard steps 11–12 (lockfile audit, client env allowlist) and the warn-only window until 2026-10-31; Semgrep at push is `tooling/ci/push-semgrep.mjs` (auth, HTTP client, CSP) |
+| `tooling/ci/early-checks.mjs` | Guard steps 11–12 (lockfile audit, client env allowlist): a finding blocks; Semgrep at push is `tooling/ci/push-semgrep.mjs` (auth, HTTP client, CSP) |
 | `.husky/commit-msg`                       | Commit message validation hook                                                                                      |
 | `.commitlintrc.json`                      | Conventional commit config                                                                                          |
 | `.gitleaks.toml`                          | Gitleaks secret scan allowlist                                                                                      |
