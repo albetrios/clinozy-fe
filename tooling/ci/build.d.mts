@@ -7,15 +7,20 @@
 /** The environments a build can read, one `.env.<environment>` file each. */
 export declare const ENVIRONMENTS: readonly string[];
 
-/** Reads `--env <environment>` / `--env=<environment>` and `--sentry`; throws on anything else. */
+/** Mirrors `BUILD_DEFAULTS_VARIABLE` in plugins/build-environment.ts. */
+export declare const DEFAULTS_VARIABLE: string;
+
+/** Reads `--env <environment>` / `--env=<environment>`, `--defaults` and `--sentry`; throws on anything else. */
 export declare function parseBuildArguments(argv: readonly string[]): {
   environment?: string;
+  defaults?: true;
   sentry?: true;
 };
 
-/** The build chain's env: `BUILD_ENVIRONMENT`, and `SENTRY_UPLOAD_SOURCEMAPS=true` for `--sentry`. */
+/** The build chain's env: `BUILD_ENVIRONMENT`, `BUILD_SCHEMA_DEFAULTS=true` (no shell `VITE_*`) for `--defaults`, and `SENTRY_UPLOAD_SOURCEMAPS=true` for `--sentry`. */
 export declare function childEnvironment(options: {
   environment?: string;
+  defaults?: boolean;
   sentry?: boolean;
   env: NodeJS.ProcessEnv;
 }): NodeJS.ProcessEnv;

@@ -4,12 +4,13 @@
  *
  *   pnpm mcp:setup              # all servers (on-demand integrations)
  *   pnpm mcp:setup <name>...    # only the named servers
- *   pnpm mcp:setup:default      # only codegraph + headroom (auto-start pair)
+ *   pnpm mcp:setup:default      # only fe-codegraph + fe-headroom (auto-start pair)
  *   pnpm mcp:setup --check      # dry run
  *   pnpm mcp:setup --list       # list template servers + status
  *
  * Existing entries are never overwritten. See `agent-os/docs/cursor-mcp-setup.md`.
  */
+import { parseCommandLine } from '../ci/script.mjs';
 import {
   ensureDefaultMcpServers,
   ensureMcpServers,
@@ -32,7 +33,7 @@ function printHelp(): void {
     `${ANSI.bold}pnpm mcp:setup${ANSI.reset} — scaffold .mcp.json from .mcp.example.json\n\n` +
       `  pnpm mcp:setup            scaffold ALL template servers (on-demand integrations)\n` +
       `  pnpm mcp:setup <name>...  scaffold only the named servers (e.g. stripe sentry)\n` +
-      `  pnpm mcp:setup:default    scaffold only codegraph + headroom (auto-start pair)\n` +
+      `  pnpm mcp:setup:default    scaffold only fe-codegraph + fe-headroom (auto-start pair)\n` +
       `  pnpm mcp:setup --default  same as mcp:setup:default\n` +
       `  pnpm mcp:setup --check    dry run: report what would change, no write\n` +
       `  pnpm mcp:setup --list     list template servers and .mcp.json status\n` +
@@ -52,7 +53,7 @@ function printList(): void {
     process.stdout.write(`  ${mark}  ${key}${tag}\n`);
   }
   process.stdout.write(
-    `\n${ANSI.gray}default = auto-start pair (codegraph + headroom)${ANSI.reset}\n`,
+    `\n${ANSI.gray}default = auto-start pair (fe-codegraph + fe-headroom)${ANSI.reset}\n`,
   );
 }
 
@@ -73,31 +74,43 @@ function reportResult(result: EnsureResult, dryRun: boolean): void {
     );
     return;
   }
-  const verb = dryRun ? 'would add' : 'added';
-  process.stdout.write(
-    `${ANSI.green}✓${ANSI.reset} ${verb}: ${result.added.join(', ')}\n`,
-  );
+  if (result.renamed.length > 0)
+    process.stdout.write(
+      `${ANSI.green}✓${ANSI.reset} ${dryRun ? 'would rename' : 'renamed'}: ${result.renamed.join(', ')}\n`,
+    );
+  if (result.added.length > 0)
+    process.stdout.write(
+      `${ANSI.green}✓${ANSI.reset} ${dryRun ? 'would add' : 'added'}: ${result.added.join(', ')}\n`,
+    );
   if (!dryRun)
     process.stdout.write(`${ANSI.gray}wrote ${MCP_CONFIG_PATH}${ANSI.reset}\n`);
 }
 
 function main(): void {
-  const argv = process.argv.slice(2);
-  if (argv.includes('--help') || argv.includes('-h')) {
+  const { values, positionals: names } = parseCommandLine(process.argv.slice(2), {
+    options: {
+      help: { type: 'boolean', short: 'h' },
+      list: { type: 'boolean' },
+      check: { type: 'boolean' },
+      'dry-run': { type: 'boolean' },
+      default: { type: 'boolean' },
+    },
+    maxPositionals: Number.POSITIVE_INFINITY,
+  });
+  if (values.help === true) {
     printHelp();
     return;
   }
-  if (argv.includes('--list')) {
+  if (values.list === true) {
     printList();
     return;
   }
-  const dryRun = argv.includes('--check') || argv.includes('--dry-run');
-  const names = argv.filter((arg) => !arg.startsWith('-'));
-  const defaultOnly = names.length === 0 && argv.includes('--default');
+  const dryRun = values.check === true || values['dry-run'] === true;
+  const defaultOnly = names.length === 0 && values.default === true;
 
   let scope = 'full set';
   if (names.length > 0) scope = `selected: ${names.join(', ')}`;
-  else if (defaultOnly) scope = 'default pair (codegraph + headroom)';
+  else if (defaultOnly) scope = 'default pair (fe-codegraph + fe-headroom)';
 
   process.stdout.write(
     `${ANSI.bold}Scaffolding .mcp.json — ${scope}${dryRun ? ' (dry run)' : ''}${ANSI.reset}\n`,

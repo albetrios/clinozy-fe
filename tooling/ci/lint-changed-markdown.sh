@@ -6,15 +6,18 @@
 # (.husky/pre-push) calls this script when the push contains markdown changes.
 #
 # Usage:
-#   tooling/ci/lint-changed-markdown.sh                 # vs origin/main (default)
-#   LINT_BASE=<ref> tooling/ci/lint-changed-markdown.sh
+#   pnpm docs:lint:changed                 # vs the upstream, else origin/<trunk>
+#   pnpm docs:lint:changed --base <ref>    # vs <ref> (.husky/pre-push passes its push base)
 #
 # Exits 0 when no markdown files changed or all changed files lint clean.
 # Compatible with bash 3.2 (default macOS shell).
 
 set -eu
 
-target="${LINT_BASE:-origin/main}"
+target=""
+if [ "${1:-}" = "--base" ]; then target="${2:-}"; fi
+# The base comes from resolveBase (tooling/ci/git-environment.mjs) unless --base names one.
+target="${target:-$(node tooling/ci/git-environment.mjs base)}"
 base_ref="${target#origin/}"
 
 if ! git rev-parse --verify --quiet "${target}" >/dev/null; then

@@ -4,7 +4,7 @@
  *
  * Usage:
  *   pnpm iteration:new launch
- *   pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--dry-run]
+ *   pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--lite] [--dry-run]
  *
  * Creates `iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/README.md` — Owner, Opened, Branch,
  * Baseline `none` and Status `planning` filled in. Every iteration starts from scratch: nothing
@@ -16,20 +16,22 @@
 import { randomInt } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { loadSetupConfig } from '../setup/github/setup-config.mjs';
+import { tryGit } from '../ci/git-environment.mjs';
+import { isMain, parseCommandLine } from '../ci/script.mjs';
+import { configuredBaseBranch } from '../setup/github/setup-config.mjs';
 import {
+  DEFAULT_ITERATION_PROCESS,
   EMPTY_FIELD,
   INITIAL_ITERATION_STATUS,
   ITERATION_TYPES,
   ITERATIONS_DIRECTORY,
   localDate,
   NO_BASELINE,
-  parseCommandLine,
   parseIterationName,
   resolveSiblingRoot,
+  SIBLING_MESSAGES,
+  SIBLING_OPTIONS,
   gitUserName,
-  tryGit,
   workingTreeIterationNames,
 } from './iterations.mjs';
 
@@ -46,31 +48,40 @@ const TEMPLATE_PLACEHOLDER = /\{\{(\w+)\}\}/g;
 
 const USAGE = `Usage:
   pnpm iteration:new launch
-  pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--dry-run]
+  pnpm iteration:new <feat|change|fix> <topic> [--both] [--sibling <path>] [--lite] [--dry-run]
 
   --both            also open the folder in the sibling repository (clinozy-be)
   --sibling <path>  sibling repository path (default: ../<package name with -fe → -be>)
+  --lite            a fix only: planned in one step, Process lite (planning → implementing → done → frozen)
   --dry-run         print what would be created; write nothing`;
 
 /**
- * Parses `<type> [topic] [--both] [--sibling <path>] [--dry-run]`. `--sibling` implies `--both`.
+ * Parses `<type> [topic] [--both] [--sibling <path>] [--lite] [--dry-run]`. `--sibling` implies
+ * `--both`.
  *
  * @param {readonly string[]} commandLine
- * @returns {{ type: string | undefined, topic: string | undefined, createInSibling: boolean, siblingPath: string | undefined, dryRun: boolean, help: boolean }}
+ * @returns {{ type: string | undefined, topic: string | undefined, createInSibling: boolean, siblingPath: string | undefined, lite: boolean, dryRun: boolean, help: boolean }}
  */
 export function parseNewIterationArguments(commandLine) {
-  const parsed = parseCommandLine(commandLine, {
-    flags: ['--both', '--dry-run'],
+  const { values, positionals } = parseCommandLine(commandLine, {
+    options: {
+      ...SIBLING_OPTIONS,
+      lite: { type: 'boolean' },
+      'dry-run': { type: 'boolean' },
+      help: { type: 'boolean', short: 'h' },
+    },
     maxPositionals: 2,
     usage: 'expected <type> [topic].',
+    messages: SIBLING_MESSAGES,
   });
   return {
-    type: parsed.positionals[0],
-    topic: parsed.positionals[1],
-    createInSibling: parsed.createInSibling,
-    siblingPath: parsed.siblingPath,
-    dryRun: parsed.flags.has('--dry-run'),
-    help: parsed.help,
+    type: positionals[0],
+    topic: positionals[1],
+    createInSibling: values.both === true || values.sibling !== undefined,
+    siblingPath: values.sibling,
+    lite: values.lite === true,
+    dryRun: values['dry-run'] === true,
+    help: values.help === true,
   };
 }
 
@@ -153,32 +164,16 @@ export function renderIterationReadme({ name, fields }) {
 }
 
 /**
- * The trunk iterations merge into, from `git.defaultBranch` in `tooling/setup/setup.config.json`.
- *
- * @throws when the config has no default branch
- */
-export function configuredBaseBranch() {
-  const { defaultBranch } = loadSetupConfig();
-  if (!defaultBranch)
-    throw new Error('tooling/setup/setup.config.json has no git.defaultBranch.');
-  return defaultBranch;
-}
-
-/**
  * Iteration folder names committed on `baseBranch`; empty when the branch does not exist.
  *
  * @param {{ repositoryRoot: string, baseBranch: string }} location
  * @returns {string[]}
  */
 export function baseBranchIterationNames({ repositoryRoot, baseBranch }) {
-  const listing = tryGit(repositoryRoot, [
-    'ls-tree',
-    '-d',
-    '--name-only',
-    baseBranch,
-    '--',
-    `${ITERATIONS_DIRECTORY}/`,
-  ]);
+  const { output: listing } = tryGit(
+    ['ls-tree', '-d', '--name-only', baseBranch, '--', `${ITERATIONS_DIRECTORY}/`],
+    { cwd: repositoryRoot },
+  );
   if (!listing) return [];
   return listing
     .split('\n')
@@ -211,6 +206,11 @@ function pickUniqueName({ type, topic, opened, takenNames, folderExists, nextId 
 export function planNewIteration(request) {
   const { repositoryRoot, baseBranch, siblingRoot } = request;
   const { type, topic } = validateTypeAndTopic(request);
+  if (request.lite === true && type !== 'fix') {
+    throw new Error(
+      `--lite is for a fix only; a ${type} runs the full planning procedure.`,
+    );
+  }
   const localNames = workingTreeIterationNames(repositoryRoot);
   const baseNames = baseBranchIterationNames({ repositoryRoot, baseBranch });
   const siblingNames =
@@ -244,7 +244,7 @@ export function planNewIteration(request) {
     nextId: request.nextId ?? randomIterationId,
   });
   const owner = gitUserName(repositoryRoot);
-  const branch = tryGit(repositoryRoot, ['branch', '--show-current']) ?? '';
+  const branch = tryGit(['branch', '--show-current'], { cwd: repositoryRoot }).output;
   if (branch === '')
     throw new Error(
       'HEAD is detached — check out the branch this iteration will be built on.',
@@ -252,6 +252,7 @@ export function planNewIteration(request) {
 
   const fields = {
     type,
+    process: request.lite === true ? 'lite' : DEFAULT_ITERATION_PROCESS,
     topic: topic ?? EMPTY_FIELD,
     owner,
     opened,
@@ -344,6 +345,13 @@ function describePlan(plan, repositoryRoot) {
 }
 
 function nextSteps(plan) {
+  if (plan.fields.process === 'lite')
+    return [
+      'Next (a lite fix):',
+      `  1. Write the Summary line in ${ITERATIONS_DIRECTORY}/${plan.name}/README.md.`,
+      `  2. Plan it in one step: "plan iteration ${plan.name}" (fe-iteration-planning, lite: KICKOFF.md and plans/decisions.md, one stop for the user's go).`,
+      `  3. On the go: pnpm iteration:status ${plan.name} implementing, then "kickoff iteration ${plan.name}".`,
+    ];
   const both = plan.siblingRoot === undefined ? '' : ' --both';
   const modes =
     plan.fields.type === 'launch'
@@ -383,6 +391,7 @@ export function runNewIteration(commandLine, context = {}) {
       : undefined,
     today: context.today,
     nextId: context.nextId,
+    lite: options.lite,
   });
   if (options.dryRun)
     return {
@@ -396,7 +405,7 @@ export function runNewIteration(commandLine, context = {}) {
   };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   try {
     const { exitCode, lines } = runNewIteration(process.argv.slice(2));
     console.log(lines.join('\n'));

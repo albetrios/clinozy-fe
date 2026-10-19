@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import test from 'node:test';
+import { expect, it } from 'vitest';
 
 import { selectOnlyEntries } from './sync-env-secrets.mjs';
 
@@ -12,19 +11,15 @@ const declared = [
   { name: 'VITE_CSP_REPORT_URI', value: '' },
 ];
 
-test('selectOnlyEntries selects exactly the requested keys', () => {
+it('selectOnlyEntries selects exactly the requested keys', () => {
   const { entries, missing } = selectOnlyEntries(declared, ['VITE_API_BASE_URL']);
-  assert.deepEqual(
-    entries.map((entry) => entry.name),
-    ['VITE_API_BASE_URL'],
-  );
-  assert.deepEqual(missing, []);
+  expect(entries.map((entry) => entry.name)).toStrictEqual(['VITE_API_BASE_URL']);
+  expect(missing).toStrictEqual([]);
 });
 
-test('selectOnlyEntries reports a requested key that is absent or blank locally', () => {
-  assert.deepEqual(
+it('selectOnlyEntries reports a requested key that is absent or blank locally', () => {
+  expect(
     selectOnlyEntries(declared, ['VITE_API_BASE_URL', 'NOPE', 'VITE_CSP_REPORT_URI'])
       .missing,
-    ['NOPE', 'VITE_CSP_REPORT_URI'],
-  );
+  ).toStrictEqual(['NOPE', 'VITE_CSP_REPORT_URI']);
 });

@@ -44,7 +44,8 @@
  */
 import { readFileSync, readdirSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { isMain, parseCommandLine } from '../ci/script.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -329,23 +330,19 @@ export async function formatPart(part, fileName) {
 
 /** `<csv> [--out <directory>]` → their values; throws on anything else. */
 export function parseArguments(argv) {
-  let csvPath;
-  let outDirectory = DEFAULT_OUT_DIRECTORY;
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index];
-    if (argument === '--out') {
-      const value = argv[index + 1];
-      if (!value) throw new Error('build-pin-directory: --out needs a directory');
-      outDirectory = resolve(value);
-      index += 1;
-    } else if (argument.startsWith('--out=')) {
-      outDirectory = resolve(argument.slice('--out='.length));
-    } else if (!argument.startsWith('-') && csvPath === undefined) {
-      csvPath = resolve(argument);
-    } else {
-      throw new Error(`build-pin-directory: unexpected argument ${argument}`);
-    }
-  }
+  const unexpected = (argument) => `build-pin-directory: unexpected argument ${argument}`;
+  const { values, positionals } = parseCommandLine(argv, {
+    options: { out: { type: 'string' } },
+    maxPositionals: Number.POSITIVE_INFINITY,
+    messages: {
+      unknownOption: unexpected,
+      needsValue: () => 'build-pin-directory: --out needs a directory',
+    },
+  });
+  if (positionals.length > 1) throw new Error(unexpected(positionals[1]));
+  const csvPath = positionals[0] === undefined ? undefined : resolve(positionals[0]);
+  const outDirectory =
+    values.out === undefined ? DEFAULT_OUT_DIRECTORY : resolve(values.out);
   if (!csvPath) {
     throw new Error(
       'build-pin-directory: pass the CSV path — node tooling/data/build-pin-directory.mjs <pincode.csv> [--out <directory>]',
@@ -380,7 +377,7 @@ async function main() {
   );
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+if (isMain(import.meta.url)) {
   main().catch((error) => {
     console.error(error instanceof Error ? error.message : error);
     process.exit(1);

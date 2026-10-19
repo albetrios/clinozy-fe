@@ -1,8 +1,8 @@
 /**
  * Ensure GitHub Environment shells exist (protection is drift-checked separately).
  */
-import { fileURLToPath } from 'node:url';
 
+import { isMain, parseCommandLine } from '../../ci/script.mjs';
 import { loadGitHubEnvironmentConfigs } from './environments-util.mjs';
 import {
   createEnvironment,
@@ -55,11 +55,11 @@ export function ensureGitHubEnvironments(mode) {
 }
 
 function main() {
-  const mode = process.argv.includes('--check')
-    ? 'check'
-    : process.argv.includes('--dry-run')
-      ? 'dry-run'
-      : 'sync';
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { check: { type: 'boolean' }, 'dry-run': { type: 'boolean' } },
+  });
+  const mode =
+    values.check === true ? 'check' : values['dry-run'] === true ? 'dry-run' : 'sync';
 
   console.log(`Ensuring GitHub environments (mode: ${mode})`);
   const result = ensureGitHubEnvironments(mode);
@@ -74,6 +74,6 @@ function main() {
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   main();
 }

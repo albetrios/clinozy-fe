@@ -12,6 +12,7 @@
  *   pnpm build --env production             no question: .env.production alone
  *   BUILD_ENVIRONMENT=local pnpm build      the same, from the shell
  *   pnpm build --env production --sentry    also upload source maps to Sentry
+ *   pnpm build --defaults                   no env file: the schema defaults, as CI builds
  *
  * Source maps go to Sentry only on request — `--sentry` here, or
  * `SENTRY_UPLOAD_SOURCEMAPS=true` as the deploy workflow sets it. A local build is a test
@@ -26,40 +27,47 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
-import { pathToFileURL } from 'node:url';
+import { isMain, parseCommandLine } from './script.mjs';
 
 /** Mirrors `BUILD_ENVIRONMENTS` in plugins/build-environment.ts (pinned equal by a test). */
 export const ENVIRONMENTS = ['local', 'development', 'production'];
 
 const VARIABLE = 'BUILD_ENVIRONMENT';
 const SENTRY_VARIABLE = 'SENTRY_UPLOAD_SOURCEMAPS';
+/** Mirrors `BUILD_DEFAULTS_VARIABLE` in plugins/build-environment.ts (pinned equal by a test). */
+export const DEFAULTS_VARIABLE = 'BUILD_SCHEMA_DEFAULTS';
 
 /**
- * Reads `--env <environment>` / `--env=<environment>` and `--sentry` from the arguments.
+ * Reads `--env <environment>` / `--env=<environment>`, `--defaults` and `--sentry` from the
+ * arguments. `--defaults` builds from no env file (the schema defaults, as CI builds), so it
+ * cannot name an environment too.
  *
  * @param {string[]} argv
- * @returns {{ environment?: string, sentry?: true }}
+ * @returns {{ environment?: string, defaults?: true, sentry?: true }}
  */
 export function parseBuildArguments(argv) {
-  let environment;
-  let sentry = false;
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index];
-    if (argument === '--env') {
-      environment = argv[index + 1];
-      index += 1;
-      if (environment === undefined || environment.startsWith('--')) {
-        throw new Error(`--env needs an environment: ${ENVIRONMENTS.join(', ')}.`);
-      }
-    } else if (argument.startsWith('--env=')) {
-      environment = argument.slice('--env='.length);
-    } else if (argument === '--sentry') {
-      sentry = true;
-    } else {
-      throw new Error(
-        `Unknown argument "${argument}" — pnpm build takes --env <environment> and --sentry.`,
-      );
-    }
+  const unknown = (argument) =>
+    `Unknown argument "${argument}" — pnpm build takes --env <environment>, --defaults and --sentry.`;
+  const { values, positionals } = parseCommandLine(argv, {
+    options: {
+      env: { type: 'string' },
+      defaults: { type: 'boolean' },
+      sentry: { type: 'boolean' },
+    },
+    maxPositionals: Number.POSITIVE_INFINITY,
+    messages: {
+      unknownOption: unknown,
+      needsValue: () => `--env needs an environment: ${ENVIRONMENTS.join(', ')}.`,
+    },
+  });
+  if (positionals.length > 0) throw new Error(unknown(positionals[0]));
+  const environment = values.env;
+  const defaults = values.defaults === true;
+  const sentry = values.sentry === true;
+  if (defaults && environment !== undefined) {
+    throw new Error(
+      '--defaults builds from no env file; it cannot be combined with --env.',
+    );
   }
   if (environment !== undefined && !ENVIRONMENTS.includes(environment)) {
     throw new Error(
@@ -68,6 +76,7 @@ export function parseBuildArguments(argv) {
   }
   return {
     ...(environment === undefined ? {} : { environment }),
+    ...(defaults ? { defaults: true } : {}),
     ...(sentry ? { sentry: true } : {}),
   };
 }
@@ -75,14 +84,25 @@ export function parseBuildArguments(argv) {
 /**
  * The env the build chain runs with: the chosen environment as `BUILD_ENVIRONMENT`, and
  * `SENTRY_UPLOAD_SOURCEMAPS=true` only for `--sentry` (a value already in the shell is kept).
+ * For `--defaults`, `BUILD_SCHEMA_DEFAULTS=true` and no `VITE_*` from the shell either — a
+ * shell value beats every env file, so a cloud container's exported keys would otherwise reach
+ * the bundle that CI builds without them.
  *
- * @param {{ environment?: string, sentry?: boolean, env: NodeJS.ProcessEnv }} options
+ * @param {{ environment?: string, defaults?: boolean, sentry?: boolean, env: NodeJS.ProcessEnv }} options
  * @returns {NodeJS.ProcessEnv}
  */
-export function childEnvironment({ environment, sentry, env }) {
+export function childEnvironment({ environment, defaults, sentry, env }) {
+  const base = defaults
+    ? Object.fromEntries(
+        Object.entries(env).filter(
+          ([key]) => !key.startsWith('VITE_') && key !== VARIABLE,
+        ),
+      )
+    : env;
   return {
-    ...env,
+    ...base,
     ...(environment === undefined ? {} : { [VARIABLE]: environment }),
+    ...(defaults ? { [DEFAULTS_VARIABLE]: 'true' } : {}),
     ...(sentry ? { [SENTRY_VARIABLE]: 'true' } : {}),
   };
 }
@@ -126,7 +146,9 @@ export function resolveAnswer(answer, available) {
  * @returns {Promise<string | undefined>}
  */
 export async function chooseEnvironment({ argv, env, root, interactive, ask }) {
-  const chosen = parseBuildArguments(argv).environment ?? (env[VARIABLE] || undefined);
+  const parsed = parseBuildArguments(argv);
+  if (parsed.defaults) return undefined;
+  const chosen = parsed.environment ?? (env[VARIABLE] || undefined);
   const available = availableEnvironments(root);
   if (chosen !== undefined) {
     if (!available.includes(chosen)) {
@@ -171,10 +193,13 @@ async function askInTerminal(available) {
 async function main() {
   const argv = process.argv.slice(2);
   let environment;
+  let defaults = false;
   let sentry = false;
   let asked = false;
   try {
-    sentry = parseBuildArguments(argv).sentry === true;
+    const parsed = parseBuildArguments(argv);
+    defaults = parsed.defaults === true;
+    sentry = parsed.sentry === true;
     environment = await chooseEnvironment({
       argv,
       env: process.env,
@@ -192,7 +217,11 @@ async function main() {
     process.exit(1);
   }
 
-  if (environment !== undefined) {
+  if (defaults) {
+    console.log(
+      "pnpm build: building with no env file (--defaults) — the schema defaults, as CI's Build verify lane builds.",
+    );
+  } else if (environment !== undefined) {
     const hint = asked
       ? ` (next time without asking: pnpm build --env ${environment}${sentry ? ' --sentry' : ''})`
       : '';
@@ -206,11 +235,11 @@ async function main() {
   if (sentry) console.log('pnpm build: uploading source maps to Sentry (--sentry).');
   const result = spawnSync('pnpm', ['run', 'build:bundle'], {
     stdio: 'inherit',
-    env: childEnvironment({ environment, sentry, env: process.env }),
+    env: childEnvironment({ environment, defaults, sentry, env: process.env }),
   });
   process.exit(result.status ?? 1);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+if (isMain(import.meta.url)) {
   await main();
 }

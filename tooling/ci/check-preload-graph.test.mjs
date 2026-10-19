@@ -1,9 +1,8 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -45,32 +44,32 @@ function run({ entry = 'export const a = 1;\n', html = HTML, files = {} } = {}) 
   }
 }
 
-test('passes when the deferred libraries stay in lazy chunks', () => {
+it('passes when the deferred libraries stay in lazy chunks', () => {
   const { status, output } = run();
-  assert.equal(status, 0, output);
-  assert.match(output, /build:check OK/);
+  expect(status, output).toBe(0);
+  expect(output).toMatch(/build:check OK/);
 });
 
-test('fails on a deferred chunk in the modulepreload list', () => {
+it('fails on a deferred chunk in the modulepreload list', () => {
   const { status, output } = run({
     html: `${HTML}\n<link rel="modulepreload" crossorigin href="/assets/sentry-jkl.js">`,
     files: { 'dist/assets/sentry-jkl.js': 'export const s = 1;\n' },
   });
-  assert.equal(status, 1, output);
-  assert.match(output, /deferred chunk\(s\) back on the first-paint path: sentry/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/deferred chunk\(s\) back on the first-paint path: sentry/);
 });
 
-test('fails on a deferred library folded into the entry chunk', () => {
+it('fails on a deferred library folded into the entry chunk', () => {
   // No chunk of its own to spot by name: the library's code is in the entry.
   const { status, output } = run({ entry: 'const r={"cmdk-root":""};export{r};\n' });
-  assert.equal(status, 1, output);
-  assert.match(output, /cmdk \(its code, in assets\/index-abc\.js\)/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/cmdk \(its code, in assets\/index-abc\.js\)/);
 });
 
-test('reads every first-paint chunk, not only the entry', () => {
+it('reads every first-paint chunk, not only the entry', () => {
   const { status, output } = run({
     files: { 'dist/assets/vendor-def.js': 'var g=globalThis.__SENTRY__;\n' },
   });
-  assert.equal(status, 1, output);
-  assert.match(output, /sentry \(its code, in assets\/vendor-def\.js\)/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/sentry \(its code, in assets\/vendor-def\.js\)/);
 });

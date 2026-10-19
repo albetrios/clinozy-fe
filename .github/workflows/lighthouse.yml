@@ -67,3 +67,42 @@ jobs:
           path: .lighthouseci/
           include-hidden-files: true
           retention-days: 30
+
+  resolve-success:
+    name: Close ci-failure issue
+    needs: [lighthouse]
+    if: always() && needs.lighthouse.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close the open ci-failure issue
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          mode: close
+          title: Weekly Lighthouse budgets failing
+
+  notify-failure:
+    name: Notify failure
+    needs: [lighthouse]
+    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read # the fix plan reads the failed jobs and their logs
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update ci-failure issue
+        # A red scheduled run is invisible unless someone opens the Actions tab; one issue per
+        # check sends a real notification, collects repeats as comments, and closes on the next
+        # green run (clinozy-be's shared ci-failure-issue action).
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          mode: open
+          title: Weekly Lighthouse budgets failing
+          body: |
+            A Lighthouse performance budget failed on the public routes. The lighthouse-results artifact
+            holds the reports. The next green run closes this issue.

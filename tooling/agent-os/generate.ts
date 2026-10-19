@@ -21,15 +21,43 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
+import { format, resolveConfig } from 'prettier';
+
+import { parseCommandLine } from '../ci/script.mjs';
+import {
+  renderRoutingJson,
+  renderSkillCatalog,
+  renderTriggerTable,
+  replaceGeneratedRegion,
+  routingRoutes,
+} from './skill-routing.ts';
+
 const repositoryRoot = process.cwd();
 const agentOsDirectory = join(repositoryRoot, 'agent-os');
-const writeMode = process.argv.includes('--write');
+// --check is the default; --write writes the derived artifacts instead.
+const writeMode =
+  parseCommandLine(process.argv.slice(2), {
+    options: { write: { type: 'boolean' }, check: { type: 'boolean' } },
+  }).values.write === true;
 
 interface HookManifestEntry {
   id: string;
-  runtime: 'bash' | 'node';
+  /** A Node script under agent-os/hooks/ — every hook runs on `node`, no other runtime. */
   script: string;
-  claude?: { event: string; matcher?: string };
+  /**
+   * `if`: permission rules (`Edit(**)`, `Write(**)`), one handler each — Claude Code spawns the
+   * hook only for a tool call that matches one. An `Edit(…)` rule matches Edit calls only, a
+   * `Write(…)` rule Write calls only (checked on Claude Code 2.1.302, as in clinozy-be).
+   * `asyncRewake`: the hook runs in the background and wakes the model when it exits 2;
+   * `timeout`: seconds before Claude Code stops it.
+   */
+  claude?: {
+    event: string;
+    matcher?: string;
+    if?: string[];
+    asyncRewake?: boolean;
+    timeout?: number;
+  };
   cursor?: { event: string; matcher?: string };
   codex?: { event: string; matcher?: string; statusMessage?: string };
 }
@@ -61,11 +89,34 @@ const cursorTarget = targets.agents.cursor;
 const codexTarget = targets.agents.codex;
 
 const claudeCommand = (entry: HookManifestEntry): string =>
-  `${entry.runtime} "$CLAUDE_PROJECT_DIR/agent-os/hooks/${entry.script}"`;
+  `node "$CLAUDE_PROJECT_DIR/agent-os/hooks/${entry.script}"`;
 const cursorCommand = (entry: HookManifestEntry): string =>
-  `${entry.runtime} ../agent-os/hooks/${entry.script}`;
+  `node ../agent-os/hooks/${entry.script}`;
 const codexCommand = (entry: HookManifestEntry): string =>
-  `CLAUDE_PROJECT_DIR="$(git rev-parse --show-toplevel)" ${entry.runtime} "$(git rev-parse --show-toplevel)/agent-os/hooks/${entry.script}"`;
+  `CLAUDE_PROJECT_DIR="$(git rev-parse --show-toplevel)" node "$(git rev-parse --show-toplevel)/agent-os/hooks/${entry.script}"`;
+
+/**
+ * The events whose handlers may carry an `if` rule; on any other event Claude Code never runs a
+ * handler that has one (code.claude.com/docs/en/hooks, Common fields).
+ */
+const claudeIfEvents = new Set([
+  'PreToolUse',
+  'PostToolUse',
+  'PostToolUseFailure',
+  'PermissionRequest',
+  'PermissionDenied',
+]);
+
+/** A Claude handler's `asyncRewake` and `timeout`, when the manifest entry sets them. */
+function claudeHandlerOptions(claude: NonNullable<HookManifestEntry['claude']>): {
+  asyncRewake?: true;
+  timeout?: number;
+} {
+  return {
+    ...(claude.asyncRewake ? { asyncRewake: true } : {}),
+    ...(claude.timeout === undefined ? {} : { timeout: claude.timeout }),
+  };
+}
 
 function buildClaudeHooks(): Record<string, unknown[]> {
   const supported = new Set(claudeTarget?.capabilities.hookEvents ?? []);
@@ -81,10 +132,22 @@ function buildClaudeHooks(): Record<string, unknown[]> {
       );
       continue;
     }
+    const rules = entry.claude.if ?? [];
+    if (rules.length > 0 && !claudeIfEvents.has(entry.claude.event)) {
+      report(
+        `claude: hook "${entry.id}" sets if on ${entry.claude.event}, where a handler with if never runs — skipped`,
+      );
+      continue;
+    }
     const command = claudeCommand(entry);
+    const options = claudeHandlerOptions(entry.claude);
+    const handlers =
+      rules.length > 0
+        ? rules.map((rule) => ({ type: 'command', command, if: rule, ...options }))
+        : [{ type: 'command', command, ...options }];
     const hookEntry = entry.claude.matcher
-      ? { matcher: entry.claude.matcher, hooks: [{ type: 'command', command }] }
-      : { hooks: [{ type: 'command', command }] };
+      ? { matcher: entry.claude.matcher, hooks: handlers }
+      : { hooks: handlers };
     const event = entry.claude.event;
     grouped[event] = [...(grouped[event] ?? []), hookEntry];
   }
@@ -298,6 +361,80 @@ if (
         'drift: agent-os/platforms/codex/config.toml differs from agent-os/mcp/mcp.default.json — run `pnpm agent-os:generate`',
       );
     }
+  }
+}
+
+// ── The skill routing map: skill-triggers.md's "By file pattern" table + skill-routing.json ──
+{
+  const routes = routingRoutes(agentOsDirectory);
+  const triggersPath = join(agentOsDirectory, 'docs', 'skill-triggers.md');
+  const triggersText = readFileSync(triggersPath, 'utf8');
+  // Formatted the way Prettier (lint-staged, format:check) leaves it, so the two never fight.
+  const regionText = replaceGeneratedRegion(triggersText, renderTriggerTable(routes));
+  const nextTriggers =
+    regionText === undefined
+      ? undefined
+      : await format(regionText, {
+          ...(await resolveConfig(triggersPath)),
+          filepath: triggersPath,
+        });
+  const routingPath = join(agentOsDirectory, 'hooks', 'skill-routing.json');
+  const nextRouting = await format(renderRoutingJson(routes), {
+    ...(await resolveConfig(routingPath)),
+    filepath: routingPath,
+  });
+  const currentRouting = existsSync(routingPath) ? readFileSync(routingPath, 'utf8') : '';
+  if (nextTriggers === undefined) {
+    report('missing: the GENERATED markers in agent-os/docs/skill-triggers.md');
+  } else if (writeMode) {
+    if (nextTriggers !== triggersText) {
+      writeFileSync(triggersPath, nextTriggers);
+      report('wrote agent-os/docs/skill-triggers.md');
+    }
+    if (nextRouting !== currentRouting) {
+      writeFileSync(routingPath, nextRouting);
+      report('wrote agent-os/hooks/skill-routing.json');
+    }
+  } else {
+    if (nextTriggers !== triggersText)
+      report(
+        "drift: agent-os/docs/skill-triggers.md differs from chains.json + the skills' trigger frontmatter — run `pnpm agent-os:generate`",
+      );
+    if (nextRouting !== currentRouting)
+      report(
+        "drift: agent-os/hooks/skill-routing.json differs from chains.json + the skills' trigger frontmatter — run `pnpm agent-os:generate`",
+      );
+  }
+}
+
+// ── The fe-skill-registry inventory (generated region) ──
+{
+  const registryPath = join(agentOsDirectory, 'skills', 'fe-skill-registry', 'SKILL.md');
+  const registryText = readFileSync(registryPath, 'utf8');
+  const regionText = replaceGeneratedRegion(
+    registryText,
+    renderSkillCatalog(agentOsDirectory),
+  );
+  const nextRegistry =
+    regionText === undefined
+      ? undefined
+      : await format(regionText, {
+          ...(await resolveConfig(registryPath)),
+          filepath: registryPath,
+        });
+  if (nextRegistry === undefined) {
+    report(
+      'missing: the GENERATED markers in agent-os/skills/fe-skill-registry/SKILL.md',
+    );
+  } else if (writeMode) {
+    if (nextRegistry !== registryText) {
+      writeFileSync(registryPath, nextRegistry);
+      report('wrote agent-os/skills/fe-skill-registry/SKILL.md (inventory)');
+    }
+  } else if (nextRegistry !== registryText) {
+    report(
+      "drift: agent-os/skills/fe-skill-registry/SKILL.md's inventory differs from the skills' frontmatter — run `pnpm agent-os:generate`",
+    );
   }
 }
 

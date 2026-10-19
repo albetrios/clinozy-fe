@@ -1,9 +1,8 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -41,7 +40,7 @@ function run(files) {
   }
 }
 
-test('removes maps from dist/assets and the dist root, keeping the code', () => {
+it('removes maps from dist/assets and the dist root, keeping the code', () => {
   const { status, output, survived } = run({
     'dist/assets/index-abc123.js': 'export const a = 1;\n',
     'dist/assets/index-abc123.js.map': '{"version":3}\n',
@@ -49,26 +48,26 @@ test('removes maps from dist/assets and the dist root, keeping the code', () => 
     'dist/sw.js': 'self.addEventListener("fetch", () => {});\n',
     'dist/sw.js.map': '{"version":3}\n',
   });
-  assert.equal(status, 0, output);
-  assert.match(output, /removed 3 source maps/);
-  assert.equal(survived('dist/assets/index-abc123.js.map'), false);
-  assert.equal(survived('dist/assets/vendor-def456.js.map'), false);
-  assert.equal(survived('dist/sw.js.map'), false);
+  expect(status, output).toBe(0);
+  expect(output).toMatch(/removed 3 source maps/);
+  expect(survived('dist/assets/index-abc123.js.map')).toBe(false);
+  expect(survived('dist/assets/vendor-def456.js.map')).toBe(false);
+  expect(survived('dist/sw.js.map')).toBe(false);
   // The shipped code itself is untouched.
-  assert.equal(survived('dist/assets/index-abc123.js'), true);
-  assert.equal(survived('dist/sw.js'), true);
+  expect(survived('dist/assets/index-abc123.js')).toBe(true);
+  expect(survived('dist/sw.js')).toBe(true);
 });
 
-test('is a no-op when the build emitted none', () => {
+it('is a no-op when the build emitted none', () => {
   const { status, output } = run({
     'dist/assets/index-abc123.js': 'export const a = 1;\n',
   });
-  assert.equal(status, 0, output);
-  assert.match(output, /nothing to remove/);
+  expect(status, output).toBe(0);
+  expect(output).toMatch(/nothing to remove/);
 });
 
-test('fails when the build has not run', () => {
+it('fails when the build has not run', () => {
   const { status, output } = run(null);
-  assert.equal(status, 1, output);
-  assert.match(output, /run the build first/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/run the build first/);
 });

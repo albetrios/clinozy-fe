@@ -1,6 +1,6 @@
 ---
 name: fe-design-ditto
-description: Build faithfully ("ditto") from the markdown specs in an iterations/<iteration>/ folder — a preset/theme spec plus one spec per screen, optionally alongside a prototype HTML/JS. Reads every spec first, reconciles against any prototype (prototype wins), gates on four rebuild-forcing unknowns, then verifies side-by-side at 375px and 1440px. Use when the user says ditto, "same as the html", "like the legacy", "ditto from legacy", "match the design exactly", or drops specs into iterations/. The per-screen build skill fe-kickoff-iteration drives for each row of an approved iterations/<iteration>/KICKOFF.md.
+description: Build a screen faithfully (ditto) from an iteration's markdown specs and prototype, then verify side by side at 375px and 1440px. Use for ditto, 'same as the html' or 'match the design exactly'.
 ---
 
 # Design ditto (build faithfully from `iterations/<iteration>/intake-files/`)

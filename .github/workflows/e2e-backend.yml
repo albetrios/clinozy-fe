@@ -1,0 +1,211 @@
+name: E2E against the backend image
+
+# The Playwright suite against the backend's latest image (GHCR), never the shared development
+# environment: the job boots Postgres and Redis as services, migrates and seeds the reference data
+# with the image's own scripts, starts the API, and runs the app's dev server against it (the same
+# setup as a local `pnpm test:e2e`). A merge to main runs the @smoke set — sign-in, Today, one
+# create and one edit, axe on five key pages; the nightly run is the full suite. One retry, then a
+# red run opens (or comments on) one ci-failure issue; the next green run closes it.
+#
+# Pulling the image needs read access for this repository on the backend's GHCR package (package
+# settings → Manage Actions access) while that package is private.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '30 1 * * *' # Daily 01:30 UTC (07:00 IST): the full suite
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: The @smoke set, or the full suite
+        required: true
+        type: choice
+        options:
+          - smoke
+          - full
+        default: smoke
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-backend-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+jobs:
+  e2e:
+    name: Playwright against the backend image
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: read
+    env:
+      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be-api:latest
+      SUITE: ${{ github.event_name == 'schedule' && 'full' || inputs.suite || 'smoke' }}
+      # The services below, for the backend container and the suite's email-code helpers (they
+      # read the verification codes from auth.mail_outbox).
+      DATABASE_URL: postgresql://clinozy:clinozy@localhost:5432/clinozy
+      DATABASE_MAINTENANCE_URL: postgresql://clinozy:clinozy@localhost:5432/clinozy
+      REDIS_URL: redis://localhost:6379
+      E2E_BASE_URL: http://localhost:5180
+    services:
+      postgres:
+        image: postgres:17.10-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: clinozy
+          POSTGRES_PASSWORD: clinozy
+          POSTGRES_DB: clinozy
+        options: >-
+          --health-cmd="pg_isready -U clinozy -d clinozy"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+      redis:
+        image: redis:8.6.3-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+
+      # The backend's own CI fixtures (fake JWT keypair, retention, secrets key), so the image
+      # boots exactly as in its own pipeline; the app's dev server is the one allowed origin.
+      - name: Export the backend's CI test env
+        uses: albetrios/clinozy-be/.github/actions/test-env@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          allowed-origins: http://localhost:5180
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Migrate, seed the reference data and boot the backend
+        run: |
+          set -euo pipefail
+          docker pull "$BACKEND_IMAGE"
+          backend_env=(
+            -e NODE_ENV=development -e DATABASE_URL -e DATABASE_MAINTENANCE_URL -e REDIS_URL
+            -e DATABASE_SSL_ENABLED -e JWT_PRIVATE_KEY -e JWT_PUBLIC_KEY -e ALLOWED_ORIGINS
+            -e AUDIT_RETENTION_DAYS -e AUTH_SESSION_RETENTION_DAYS -e METRICS_SCRAPE_TOKEN
+            -e SECRETS_ENCRYPTION_KEY -e GLOBAL_ADMIN_EMAILS
+          )
+          # The backend's one database step, compiled: create if missing, migrate, then permissions
+          # and plans — what clinic provisioning needs; the suite creates its own clinics and users.
+          # (The full demo seed needs dev dependencies the image does not have.) An image built
+          # before clinozy-be's db-prepare.js (albetrios/clinozy-be#98) runs its migration runner
+          # and minimal seed instead — drop that branch once the latest image carries it.
+          docker run --rm --network host "${backend_env[@]}" "$BACKEND_IMAGE" sh -c '
+            if [ -f dist/src/scripts/ops/db-prepare.js ]; then
+              node dist/src/scripts/ops/db-prepare.js --seed minimal
+            else
+              node dist/src/infrastructure/database/migration/migrate.js &&
+                node dist/src/scripts/seed/minimal.js
+            fi'
+          # Boot-time safety checks are relaxed for the plaintext CI services, as in the backend's
+          # own container boot; the email fixtures let /auth/email/send-code answer (no worker
+          # runs, so nothing is sent — the codes land in the outbox the suite reads); the relaxed
+          # caps keep one runner IP from being rate limited on the auth forms.
+          # The backend still checks its connection budget with that flag off, assuming one API plus
+          # one worker — more than this default Postgres allows. One API runs here, so it says so.
+          docker run -d --name backend --network host "${backend_env[@]}" \
+            -e HOST=0.0.0.0 -e PORT=3000 \
+            -e DATABASE_TLS_ENFORCED=false -e DATABASE_RLS_SAFETY_ENFORCED=false \
+            -e DATABASE_CONNECTION_BUDGET_ENFORCED=false -e DEPLOYMENT_TOTAL_REPLICA_COUNT=1 \
+            -e REDIS_TLS_ENFORCED=false \
+            -e TRUST_PROXY_REQUIRED=false -e RATE_LIMIT_RELAXED_CAPS=true \
+            -e RESEND_API_KEY=re_test_contract_fixture_key -e EMAIL_FROM_ADDRESS=noreply@example.com \
+            "$BACKEND_IMAGE"
+          if ! timeout 90 bash -c 'until curl -sf http://localhost:3000/readyz >/dev/null; do sleep 2; done'; then
+            docker logs backend --tail 200 || true
+            exit 1
+          fi
+
+      - name: Install the Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Start the app's dev server
+        env:
+          # The Playwright hooks the suite signs in through (navigateInApp, establishSession);
+          # on in a developer's .env.local, off in every deployed build.
+          VITE_E2E_HOOKS: 'true'
+        run: |
+          set -euo pipefail
+          nohup pnpm dev --port 5180 --strictPort > dev-server.log 2>&1 &
+          timeout 120 bash -c 'until curl -sf http://localhost:5180/ >/dev/null; do sleep 2; done'
+
+      - name: Run the ${{ env.SUITE }} suite (one retry)
+        run: |
+          if [ "$SUITE" = full ]; then
+            pnpm exec playwright test --retries=1
+          else
+            pnpm exec playwright test --grep @smoke --retries=1
+          fi
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: e2e-backend-${{ env.SUITE }}-report
+          path: test-results/
+          retention-days: 14
+
+      - name: Stop the backend
+        if: always()
+        run: |
+          docker logs backend --tail 100 || true
+          docker rm -f backend || true
+
+  close-failure-issue:
+    name: Close ci-failure issue
+    needs: [e2e]
+    if: success()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close the open ci-failure issue
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          mode: close
+          title: E2E against the backend image failing
+          close-comment: The E2E run against the backend image is green again — closing automatically.
+
+  notify-failure:
+    name: Notify failure
+    needs: [e2e]
+    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read # the fix plan reads the failed jobs and their logs
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update ci-failure issue
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          mode: open
+          title: E2E against the backend image failing
+          body: |
+            The Playwright suite failed against the backend's latest image (after one retry). The
+            report is the run's `e2e-backend-*-report` artifact. Reproduce locally: start
+            clinozy-be (`pnpm dev` with Postgres and Redis), then `pnpm test:e2e --grep @smoke` (or
+            the whole `pnpm test:e2e`). The next green run closes this issue.

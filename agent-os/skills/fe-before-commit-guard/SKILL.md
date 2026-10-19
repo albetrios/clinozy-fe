@@ -1,6 +1,6 @@
 ---
 name: fe-before-commit-guard
-description: Pre-commit gate that runs on every git commit. Ensures env docs, public assets, format, lint, and types pass before code is committed. Use when user asks about commit checks, pre-commit, path-to-production gates, or fixing commit failures.
+description: The pre-commit gate on every git commit (env docs, public assets, lint-staged, types, lockfile, gitleaks). Use when asked what runs on commit, or when a commit fails.
 ---
 
 # Before-Commit Guard — Path-to-Production Gate
@@ -21,25 +21,39 @@ under `set -e` — so any failing step reliably blocks the commit (the previous
 split hook/script layout let a mid-hook failure fall through). Same pattern as
 clinozy-be's `pnpm guard:pre-commit` runner.
 
-### Inside before-commit-guard.sh (steps 1–11)
+### Inside before-commit-guard.sh (steps 1–10)
+
+**Order:** step 3 (lint-staged) runs first, because it rewrites and restages files. The other eleven
+only read, so they run **in parallel**, each into its own log, printed afterwards in step order under
+its own heading; the guard fails if any of them failed. If the parallel runner itself breaks (no
+temporary directory, a step that left no exit code), it says so and runs the eleven one by one. ESLint
+and Prettier keep caches under `node_modules/.cache`, and `type-check` is incremental
+(`tsconfig.app.json`'s `tsBuildInfoFile`), so a commit with nothing new to check takes about 9 s
+(67–78 s before, almost all of it a full `tsc`); the first run after a fresh install still builds the
+cache (about 60 s).
 
 1. **validate:env-example** — `.env.example` documents all keys from `src/core/config/env-schema.ts` (via `pnpm tool:sync-env-example`).
 2. **validate:public** — Required public assets exist: config.js, theme-init.js, vite.svg, manifest.webmanifest, \_headers, offline.html, robots.txt.
-3. **lint-staged** — ESLint --fix + Prettier on staged `.ts`, `.tsx`, `.css`, `.json`, `.md`, `.yaml`, `.yml`.
+3. **lint-staged** — ESLint --fix + Prettier (both `--cache`) on staged `.ts`, `.tsx`, `.css`, `.json`, `.md`, `.yaml`, `.yml`.
 4. **validate:vite-env** — env/mode-sniffing gate: no `import.meta.env.DEV/PROD/MODE` or `platformConfig.environment === '<name>'` / `.MODE ===` outside the config-kernel allowlist. Behavior must be driven by named `platformConfig` flags.
-5. **type-check** — `tsc --noEmit` for full project.
+5. **type-check** — `tsc --noEmit --incremental` for the full project (only what changed since the last run is rechecked).
 6. **validate:lockfile** — _only when the commit stages `package.json`, `pnpm-lock.yaml` or `pnpm-workspace.yaml`_ — runs `pnpm install --frozen-lockfile` (the exact check CI runs) to prove the lockfile is in sync. Catches a dependency or `overrides` change that forgot to regenerate the lockfile before it can reach main.
-7. **Gitleaks** — `gitleaks protect --staged` secret/API-key scan (notice + skip when not installed).
-8. **Env-file guard** — reject committing any `.env*` except `.env.example` (mirrors the pr-governance CI guard, locally).
+7. **Gitleaks** — `gitleaks protect --staged --redact --verbose --config .gitleaks.toml` secret/API-key scan (clinozy-be's flags, exactly; `--redact` keeps a found secret out of the log). Mandatory: without gitleaks the commit fails through the shared tool check (`tooling/ci/require-tool.mjs`), which names the installer — `bash tooling/setup/agent/install-gitleaks.sh`, the pinned version from `tooling/setup/agent/tool-versions.sh` (on macOS it says `brew install gitleaks`).
+8. **Secret and state files guard** — reject committing a gitignored file that holds secrets or machine state: any `.env*` except `.env.example`, `.sentryclirc` (the Sentry CLI token), `tests/e2e/.e2e-auth-headers.json` and `.netlify/state.json`. The one list is `tooling/validate/never-committed.mjs`, which the pr-governance CI guard reads too (pinned by `never-committed.test.mjs`).
 9. **Merge conflict markers** — reject staged files containing `<<<<<<< ` / `>>>>>>> ` / bare `=======` lines (anchored so doc banner lines pass).
 10. **Large staged files** — reject staged blobs > 3MB, measured with `git cat-file -s :<path>` (the staged content, not the working tree — rename/partial-stage safe). `iterations/` is exempt: it holds design-tool exports, and a prototype bundle routinely exceeds 3MB. Lives in `tooling/validate/large-staged-files.sh`, pinned by `large-staged-files.test.mjs`.
-11. **Project structure tree** — _only when the commit adds, deletes or renames files_ — regenerates `docs/reference/project-tree.txt` (`pnpm tool:project-structure-tree`, from `git ls-files`) and stages it, so CI's Static sync "Project structure tree docs" step can't fail on a stale tree. Same as clinozy-be's pre-commit guard.
+11. **Dependency audit** — _only when `pnpm-lock.yaml` is staged_ — `pnpm deps:audit:prod` (high and above). An unreachable registry warns and passes (the PR's audit lane runs it).
+12. **Client env allowlist** — _only when `src/core/config/env-schema.ts`, `.env.example` or `tooling/validate/client-env.ts` is staged_ — `pnpm validate:client-env --env development` and `--env production` (the deploy workflows' check, at commit).
+
+Steps 11 and 12 are **early checks** (`tooling/ci/early-checks.mjs`, as is Semgrep at push in
+`.husky/pre-push`): a finding blocks. A finding the user judges wrong goes into
+`agent-os/evals/false-positives.md`, so the rule gets fixed.
 
 ## How to Fix Failures
 
 ### validate:env-example fails
 
-**Error:** "`.env.example` is missing required var(s): NODE_VERSION"
+**Error:** "`.env.example` is missing required var(s): NETLIFY_SITE_ID"
 
 **Fix:** Add the missing key to `.env.example` (or run `pnpm tool:sync-env-example --fix`). See `agent-os/skills/fe-env-schema-add/SKILL.md`.
 

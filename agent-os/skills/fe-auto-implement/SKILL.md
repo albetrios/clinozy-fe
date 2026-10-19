@@ -1,6 +1,6 @@
 ---
 name: fe-auto-implement
-description: Master orchestrator skill. The user provides a requirement — everything else (parsing, implementation, tests, lint, type-check, route registration, RBAC, docs, data-testid) happens automatically in the background. The user never needs to ask for any dependent task.
+description: Master orchestrator — the user gives a requirement and it carries everything else (implementation, tests, lint, types, route registration, RBAC, docs, data-testid). Use when a requirement arrives.
 ---
 
 # Auto-Implement — Full Pipeline from Requirement to Production

@@ -19,11 +19,15 @@ test.describe('Clinic home', () => {
     await registerNewUserAndGoToToday(page);
   });
 
-  test('lands on Today, greeted as the page heading', async ({ page }) => {
-    // Its URL, its page root and — the a11y guard — the greeting as its h1.
-    await expectRoomReady(page, 'today');
-    await expect(page.getByTestId('today-greeting')).toBeVisible();
-  });
+  test(
+    'lands on Today, greeted as the page heading',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      // Its URL, its page root and — the a11y guard — the greeting as its h1.
+      await expectRoomReady(page, 'today');
+      await expect(page.getByTestId('today-greeting')).toBeVisible();
+    },
+  );
 
   test('header elements are visible (hybrid)', async ({ page }) => {
     await expectAppHeaderReady(page);

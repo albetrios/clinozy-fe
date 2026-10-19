@@ -101,10 +101,11 @@ fi
 
 echo ""
 echo "Phase 7: Build"
-if pnpm build >/dev/null 2>&1; then
-  echo "  $PASS  pnpm build"
+# No env file (--defaults), as pre-push and CI build: the size budgets are set for that build.
+if pnpm build --defaults >/dev/null 2>&1; then
+  echo "  $PASS  pnpm build --defaults"
 else
-  echo "  $FAIL  pnpm build"
+  echo "  $FAIL  pnpm build --defaults"
   TOTAL_FAILS=$((TOTAL_FAILS + 1))
 fi
 

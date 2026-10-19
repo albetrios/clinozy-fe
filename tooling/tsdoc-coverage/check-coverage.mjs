@@ -32,6 +32,8 @@
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
+import { parseCommandLine } from '../ci/script.mjs';
+
 const REPO_ROOT = resolve(process.cwd());
 const SRC_ROOT = resolve(REPO_ROOT, 'src');
 const BUDGET_FILE = resolve(REPO_ROOT, 'tooling/tsdoc-coverage/budget.json');
@@ -259,9 +261,11 @@ function summariseCounts(missing) {
 }
 
 function main() {
-  const argv = process.argv.slice(2);
-  const isRefresh = argv.includes('--refresh-budget');
-  const isReport = argv.includes('--report');
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { 'refresh-budget': { type: 'boolean' }, report: { type: 'boolean' } },
+  });
+  const isRefresh = values['refresh-budget'] === true;
+  const isReport = values.report === true;
 
   const missing = collectMissing();
   const counts = summariseCounts(missing);

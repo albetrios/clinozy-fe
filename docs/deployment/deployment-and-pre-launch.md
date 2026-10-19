@@ -55,7 +55,7 @@ Single trunk (`main`) drives both GitHub environments by **purpose**, not by bra
 - **After merge to `main`**
   - **Post-merge CI** (`.github/workflows/post-merge-ci.yml`) runs on push to `main`:
     - Every push → GitHub environment **`development`** → Netlify **alias** deploy (`development--clinozy-fe.netlify.app`, ungated).
-    - Runs single-channel **release-please**, keeping one standing `chore: release X.Y.Z` Release PR up to date.
+    - Runs single-channel **release-please** on demand — when a Release PR merges, or when dispatched with `gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true` to open or refresh the one standing `chore(main): release X.Y.Z` Release PR (an ordinary merge no longer refreshes it).
     - Does **not** re-run tests — pr-ci already gated the SHA.
 
 - **Shipping to production (a release)**
@@ -229,12 +229,16 @@ On **push to `main`**, **Post-merge CI** (`.github/workflows/post-merge-ci.yml`)
 
 1. Runs single-channel **release-please** (`release-please` job):
    - `.github/release-please/config.json` + `manifest.json` → stable releases (`CHANGELOG.md`).
-   - Calculates the next version from conventional commits and keeps one standing `chore: release X.Y.Z` Release PR up to date; merging it by hand (squash) creates a tag + GitHub Release. Release PRs are **not** auto-merged (release on cadence).
+   - Calculates the next version from conventional commits into one standing `chore(main): release X.Y.Z` Release PR, opened or refreshed on demand (`gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true`); merging it by hand (squash) creates a tag + GitHub Release. Release PRs are **not** auto-merged (release on cadence).
 2. Deploys via the reusable Netlify workflow, split by purpose:
    - **Every push to `main`** → GitHub environment **`development`** → **alias** deploy (`development--clinozy-fe.netlify.app`, ungated).
    - **A release** (release-please tag) → GitHub environment **`production`** → `--prod` deploy (`clinozy-fe.netlify.app`), via `release-deploy.yml` when the release is published.
    - Builds with `pnpm build`, deploys when `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, and `NETLIFY_SITE_ID` are set on that environment.
-   - Post-deploy smoke checks `version.json` and `/login`.
+   - Post-deploy smoke checks `version.json` and `/login`; then `pnpm deploy:probe-live` checks the
+     headers the deploy actually serves on `/` and `/login` — a CSP header with `frame-ancestors
+'none'`, `object-src 'none'` and a script policy without `'unsafe-inline'`/`'unsafe-eval'`,
+     HSTS of 180 days or more, nosniff (`tooling/ci/probe-live-site.mjs`; PR previews run it
+     best-effort). A finding fails the deploy job.
 3. On a release: attaches the SBOM to the GitHub Release.
    Post-merge CI does **not** re-run tests — pr-ci already gated the SHA.
 

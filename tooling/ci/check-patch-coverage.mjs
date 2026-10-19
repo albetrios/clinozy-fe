@@ -16,9 +16,11 @@
  *   pnpm test:ci   # produces coverage/coverage-final.json first
  *   node tooling/ci/check-patch-coverage.mjs \
  *     --coverage coverage/coverage-final.json \
- *     [--base origin/main] \
+ *     [--base <ref>] \
  *     [--threshold 90] \
  *     [--report-only]
+ *
+ * `--base` defaults to the upstream, else origin/<trunk> (`resolveBase`); PR CI passes the PR's base.
  *
  * A changed line is "coverable" only if the coverage map has a statement
  * starting on that line. Comments, blank lines, type-only lines, and import
@@ -30,44 +32,33 @@
  * Keeping this in lock step with the global coverage scope is what makes the
  * metric honest.
  */
-import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
+import { git, resolveBase } from './git-environment.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 
 const DEFAULT_THRESHOLD = 90;
-const DEFAULT_BASE = 'origin/main';
 
 function parseArguments(argv) {
-  let coveragePath = null;
-  let base = DEFAULT_BASE;
-  let threshold = DEFAULT_THRESHOLD;
-  let reportOnly = false;
-  for (let index = 0; index < argv.length; index += 1) {
-    const token = argv[index];
-    if (token === '') continue;
-    if (token === '--coverage') {
-      coveragePath = argv[index + 1];
-      index += 1;
-      continue;
-    }
-    if (token === '--base') {
-      base = argv[index + 1];
-      index += 1;
-      continue;
-    }
-    if (token === '--threshold') {
-      threshold = Number(argv[index + 1]);
-      index += 1;
-      continue;
-    }
-    if (token === '--report-only') {
-      reportOnly = true;
-      continue;
-    }
-    throw new Error(`Unknown flag: ${token}`);
-  }
+  const { values, positionals } = parseCommandLine(argv, {
+    options: {
+      coverage: { type: 'string' },
+      base: { type: 'string' },
+      threshold: { type: 'string' },
+      'report-only': { type: 'boolean' },
+    },
+    // An empty argument (a CI step's unset optional flag) is skipped; anything else is unknown.
+    maxPositionals: Number.POSITIVE_INFINITY,
+    messages: { unknownOption: (option) => `Unknown flag: ${option}` },
+  });
+  const stray = positionals.find((positional) => positional !== '');
+  if (stray !== undefined) throw new Error(`Unknown flag: ${stray}`);
+  const coveragePath = values.coverage;
+  const base = values.base;
+  const threshold =
+    values.threshold === undefined ? DEFAULT_THRESHOLD : Number(values.threshold);
+  const reportOnly = values['report-only'] === true;
   if (!coveragePath) throw new Error('Missing --coverage <coverage-final.json>');
   if (!Number.isFinite(threshold)) throw new Error('--threshold must be a number');
   return { coveragePath, base, threshold, reportOnly };
@@ -196,14 +187,10 @@ function main() {
   );
 
   const coverage = JSON.parse(readFileSync(resolve(process.cwd(), coveragePath), 'utf8'));
-  const diffText = execFileSync(
-    'git',
-    ['diff', '--unified=0', '--no-color', `${base}...HEAD`],
-    {
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-    },
-  );
+  // Measured as the pull request is: the whole branch against the trunk (or --base).
+  const measuredFrom = resolveBase({ base, from: 'trunk' });
+  console.log(`Patch coverage measured against ${measuredFrom}.`);
+  const diffText = git(['diff', '--unified=0', '--no-color', `${measuredFrom}...HEAD`]);
   const addedLines = parseAddedLines(diffText);
   const { overallPct, totalCovered, totalCoverable, perFile, uncoveredFiles } =
     computePatchCoverage(coverage, addedLines);
@@ -247,9 +234,7 @@ export {
 };
 
 // Run as CLI only when invoked directly (not when imported by tests).
-const invokedDirectly =
-  process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (invokedDirectly) {
+if (isMain(import.meta.url)) {
   try {
     main();
   } catch (error) {

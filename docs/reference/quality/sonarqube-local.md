@@ -2,8 +2,10 @@
 
 SonarQube runs **locally** (Docker) and is enforced as a **pre-push gate**: when you push commits
 that touch deployed-surface code (`src/` runtime), the hook scans the project and **blocks the
-push if SonarQube reports any unresolved issue or hotspot**. Everything is local — there is no
-hosted SonarQube and no CI dependency. Same setup as clinozy-be (`../clinozy-be`), ported for this repo.
+push if SonarQube reports any unresolved issue or hotspot**. PR CI runs the same gate in its
+`SonarQube` lane (inside the `Quality gate`, when `src/`, the Sonar config or the gate changes), on
+the same Community Build — no hosted SonarQube. Same setup as clinozy-be (`../clinozy-be`), ported
+for this repo.
 
 ## TL;DR
 
@@ -79,7 +81,12 @@ So a clean gate means **zero issues in the code that ships to production**.
 
 ## Troubleshooting
 
-- **"failed to start SonarQube (is Docker running?)"** — start Docker Desktop, then retry.
+- **"failed to start SonarQube (is Docker running?)"** — start Docker Desktop, then retry. On Linux
+  (a cloud session) the gate starts a stopped daemon itself (`tooling/setup/agent/ensure-docker-daemon.sh`),
+  and the cached Setup script pre-pulls the images through the `mirror.gcr.io` Docker Hub mirror.
+- **SonarQube stops during start-up on a nearly full disk** — Elasticsearch refuses an index on a
+  disk under 10% free, so `docker-compose.sonar.yml` keeps the index on a 2 GB tmpfs; it is rebuilt
+  from the database at every start.
 - **"admin password is unknown"** — the instance was provisioned outside this flow (e.g. it is
   clinozy-be's server). Copy `SONAR_ADMIN_PASSWORD` from `clinozy-be/.env.local`, or run
   `pnpm sonar:reset` to start fresh.

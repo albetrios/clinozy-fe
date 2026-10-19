@@ -1,6 +1,6 @@
 ---
 name: fe-iteration-planning
-description: Plan a design iteration under iterations/<iteration>/ — NO CODE. Confirm the iteration (it starts from scratch, Baseline none — never ask for or suggest a Baseline; use one only when the user names it), pass the intake gate (iteration:intake --check — stop on failure), read the resolved snapshot (coverage matrix), establish the change (from scratch: the drop or BRIEF.md plus the current code; with a named Baseline, by Intake mode — full/overlay: iteration:diff + the designer's "What changed"; brief: BRIEF.md — and the Baseline's Standing deviations), reconcile md ↔ prototype with file:line evidence, gate on blocking questions, then write KICKOFF.md with an ordered ledger and stop for approval. Use when the user says "plan iteration <name>", "iteration planning", "plan the next iteration", "plan from legacy", or asks to plan the build of a design drop. Next step after approval: fe-kickoff-iteration.
+description: Plan a design iteration under iterations/<iteration>/ with no code — gate, delta, reconcile, blocking questions, then KICKOFF.md and its ledger for approval. Use for 'plan iteration <name>'.
 ---
 
 # Iteration planning (plan from `iterations/<iteration>/intake-files/`)
@@ -56,6 +56,31 @@ iterations/<type>-<topic>-<YYYY-MM-DD>-<id>/
 - The README's Status and Baseline change only through `pnpm iteration:status`
   and `pnpm iteration:baseline`, which also append its History line.
 
+## Lite mode — a fix planned in one step
+
+When the README's Process is `lite` (a `fix` opened with `pnpm iteration:new fix <topic> --lite`):
+
+1. **Step 0** as below — confirm the iteration (Baseline `none` unless the user names one); run the
+   gate only when a drop was placed (Drop placed is not `—`).
+2. **One step, then one stop:** read the current code the fix touches, then write `KICKOFF.md` —
+   Header, Locked decisions, the ledger rows (each naming its skill) and **what proves the fix** (a
+   failing test turned green, at least; the 375px / 1440px check when a screen changes), every other
+   section `n/a — a lite fix` — and `plans/decisions.md` (what is decided and why). Show both in one
+   step review and ask the user's go with **AskUserQuestion**.
+3. No `ready-for-approval` and no `approved`: on the go, fe-kickoff-iteration moves it
+   `planning → implementing` and builds the rows. If the fix turns out bigger than a fix (a new
+   screen, a new route), stop and say so — it becomes a `change` with the full procedure.
+
+## Under `--both`: one shared plan, clinozy-be owns the contract
+
+When the iteration exists in both repositories (opened with `--both`), there is one plan of the
+contract, and it is clinozy-be's: its `plans/routes-final.md`, `route-changes.md`,
+`db-changes.md`, `worker-changes.md` and the decisions behind them. This plan links to them and
+adds only the frontend's part — screens, states, copy, stores, islands — never a second copy of a
+route, a field or a rule. A contract change the frontend needs (a field, a filter, an error state)
+is a request to that plan — a Step 4 question there or a decision row there — and this plan builds
+against what is decided there, so the two plans can never disagree on a route.
+
 ## Procedure — stop after every step and wait
 
 ### Step 0 — Confirm the iteration. Stop until confirmed.
@@ -87,7 +112,13 @@ pnpm iteration:intake <iteration> --check --baseline <baseline>   # a Baseline t
 else; print the command's output and end the turn. A failing gate goes back to whoever placed the
 drop; the plan never works around a missing or edited file.
 
-### Step 1 — Read everything, coverage matrix. Stop.
+### Steps 1–3 — Read the drop: coverage matrix, delta, reconcile — then one stop
+
+The three run back to back and end with **one** step review: they read the drop and write the
+same plan files, and nothing in them needs the user's answer before the next part (questions wait
+for Step 4).
+
+#### Step 1 — Read everything, coverage matrix
 
 The gate passed, so the snapshot is complete and unedited. The intake warnings (extras, screen
 files not in `_index.md`) are findings.
@@ -112,10 +143,10 @@ Cross-check, and treat every mismatch as a finding:
 - Every prototype screen/state appears in some spec; a prototype surface with no
   md is a finding, not a skip.
 
-Report the matrix and what you found — tokens, shell, screens, interaction
-shapes, step sequences, exact timings, states. **Stop.**
+Keep the matrix and what you found — tokens, shell, screens, interaction shapes, step sequences,
+exact timings, states — for the step review at the end of Step 3.
 
-### Step 2 — Delta (MODE incremental only). Stop.
+#### Step 2 — Delta (MODE incremental only)
 
 MODE initial (from scratch, the default): write `n/a — initial` and go on — for a brief from
 scratch, `BRIEF.md` is the whole change list, read against the current code of the parts it
@@ -155,10 +186,10 @@ silently. The reconciled delta (or the brief) is the work list; classify every c
 **Preset or layout changed?** That re-tones or re-frames the whole app. Write a
 scoped section for KICKOFF.md first — the exact value moves (type, colour, bg,
 spacing, radius) read from the prototype CSS, light and dark; for a layout, the
-routes the shell owns and the make-it-live contract — and **stop**. Screens
-outside the delta are not re-read. **Stop.**
+routes the shell owns and the make-it-live contract — and stop reading there: screens outside the
+delta are not re-read.
 
-### Step 3 — Reconcile md ↔ prototype (evidence or it didn't happen). Stop.
+#### Step 3 — Reconcile md ↔ prototype (evidence or it didn't happen)
 
 When a prototype exists it **outranks the md for behaviour** — a spec is
 someone's reading of it. Every verdict carries evidence; a verdict without a
@@ -192,7 +223,9 @@ Mandatory coverage — each is a row, never a blank:
 MODE incremental: reconcile the changed screens and whatever they touch.
 **Brief mode:** there is no new design source — reconcile `BRIEF.md` against the current screens'
 specs (the carried-forward intake) and the current code, every verdict with file:line evidence.
-**Stop.**
+
+**Stop** — one step review for Steps 1–3: the coverage matrix and its findings, the delta, the
+reconciliation rows and the questions they raise for Step 4.
 
 ### Step 4 — Blocking questions (the RED gate). Stop.
 
@@ -310,6 +343,10 @@ Then `pnpm iteration:status <iteration> ready-for-approval` and present the
 coverage matrix, the delta (incremental), the reconciliation table, the RED and
 AMBER verdicts, KICKOFF.md and the ledger. **Stop.**
 
+**The step reviews are the plan's review of record:** the approval (`ready-for-approval →
+approved`) confirms what they already accepted and what changed after the last one — it does not
+ask for a second full read of `KICKOFF.md` and `plans/`.
+
 On the user's go-ahead: `pnpm iteration:status <iteration> approved` — that
 locks `intake-files/` — and hand off to `fe-kickoff-iteration`. A change of
 scope after that goes back first:
@@ -345,7 +382,8 @@ the rules a plan most often gets wrong:
   modal — never a route.
 - **HTTP.** `apiClient` from `core/http`; org context comes from the URL/token,
   never a header; **never infer an API contract** — read clinozy-be's routes and
-  serializers, or plan fixtures-first with `REPLACE_WITH_API` markers.
+  serializers (under `--both`, its plan of the same iteration — linked, never copied), or plan
+  fixtures-first with `REPLACE_WITH_API` markers.
 
 ## Skill routing — the plan names the skill per ledger row
 

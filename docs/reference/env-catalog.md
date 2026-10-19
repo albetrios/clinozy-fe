@@ -19,7 +19,6 @@ build-time or local-only, never synced to a GitHub Environment.
 | `CONTEXT7_API_KEY` | build·local | — | — | — | Context7 docs-MCP API key; consumed by .mcp.json for the docs MCP (local tooling). |
 | `NETLIFY_AUTH_TOKEN` | secret | — | — | — | Netlify CLI deploy token (CI only). |
 | `NETLIFY_SITE_ID` | secret | — | — | — | Netlify site ID (deploy target). |
-| `NODE_VERSION` | build·local | — | — | — | Node version for CI/build; keep in lock step with .nvmrc. |
 | `RELEASE_PLEASE_TOKEN` | secret | — | — | — | GitHub Actions PAT (environment secret on `development`) for release-please, dependabot-auto-merge, and the weekly PAT canary — all three jobs select `environment: development` to read it. Managed deploy secret on `development`: clinozy-infra (`pnpm setup:infra`) writes it into `.env.development` and `pnpm github:sync` pushes it; CI only — never bundled or read locally. |
 | `SENTRY_AUTH_TOKEN` | secret | — | — | — | Sentry source-map upload token (CI only); see docs/integrations/sentry-sourcemaps.md. |
 | `SENTRY_ORG` | secret | — | — | — | Sentry organization slug (source-map upload). |

@@ -1,6 +1,6 @@
 /**
  * Security invariant: the access token lives in a module closure only.
- * CLAUDE.md → Auth & Security: "Never store tokens in localStorage or
+ * src/shared/CLAUDE.md → Auth & Security: "Never store tokens in localStorage or
  * sessionStorage." A regression here turns an XSS bug into stolen sessions.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';

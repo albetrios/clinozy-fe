@@ -1,6 +1,8 @@
 ---
 name: fe-route-island
 description: Self-contained route folders with page-prefixed role files, folder-per-unit sub-units, direct child folders for nested routes, and URL-driven CRUD dialogs.
+trigger: "**/*.route.tsx, **/*.manifest.ts, src/pages/**"
+triggerNote: Route marker, manifest or any page-island file — the page directory shape is docs/reference/route-island-structure.md
 ---
 
 # Route Island
@@ -13,41 +15,7 @@ Platform: `@/core/*`, `@/shared/*`, `@/lib/*`, `src/app/routes/routeTree.tsx` on
 
 ## Canonical tree
 
-```text
-src/pages/<page>/                          ← folder = URL segment
-│
-│══ MANDATORY — every page, validator-enforced ════════════════════════════
-├── <PAGE>.OVERVIEW.md                     entry doc: purpose, files, test ids
-├── <page>.route.tsx                       lazy boundary — exports `Component` only; RBAC in routeTree
-├── <page>.manifest.ts                     manifest — path, title, testId, permission, kind, children
-├── <Page>Page.tsx | <Page>Layout.tsx      top-level UI (Layout + <Outlet/> when kind:'layout')
-│
-│══ OPTIONAL — the page's OWN data layer ══════════════════════════════════
-├── <page>.contracts.ts                    Zod schemas + types for THIS page's API shapes
-├── <page>.api.ts                          fetchers → shared apiClient   (PRIVATE to this page,
-│                                          even from its children — sharing goes via shared/)
-├── <page>.fixtures.ts                     optional placeholder data (REPLACE_WITH_API)
-├── <page>.search.ts                       URL search-param schema (validateSearch)
-├── <page>.constants.ts                    page-scoped constants
-├── <page>.resource.ts                     resource manifest (resource pages only)
-│
-│══ OPTIONAL — units (each: <X>.tsx + <X>.test.tsx + index.ts) ════════════
-├── components/<Widget>/                   page-only widgets
-├── forms/<Name>Form/                      page-only forms
-├── hooks/use<X>/                          page-only Query hooks (wrap <page>.api.ts)
-├── dialogs/<Name>Dialog/                  URL-driven dialogs (resource pages)
-├── store/use<X>Store/                     RARE page-local Zustand
-├── __tests__/integration/                 this page's cross-component flows
-│
-│══ OPTIONAL — FAMILY-SHARED (kind:'layout' only) ═════════════════════════
-├── shared/                                used by THIS page + its children — never other families
-│   ├── components/<X>/  hooks/use<X>/     same unit shapes as root shared
-│   └── <name>-contracts.ts · <name>-api.ts   family-scoped plain modules
-│
-│══ OPTIONAL — children (kind:'layout' only; disk mirrors URL) ════════════
-└── <child>/  ·  $param/                   full recursive copy of this exact anatomy
-                                           (`shared` & unit names are reserved — can't be routes)
-```
+The canonical tree — every mandatory and optional file and folder of an island, with what each holds — is in one place: **[`docs/reference/route-island-structure.md`](../../../docs/reference/route-island-structure.md)**. Read it before adding or reshaping a page; this skill is the procedure.
 
 **No child route folders** when `kind: 'leaf'` and `children: []`.
 

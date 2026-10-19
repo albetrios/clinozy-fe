@@ -10,7 +10,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { isMain, parseCommandLine } from '../ci/script.mjs';
 import {
   EMPTY_FIELD,
   parseIterationReadme,
@@ -101,8 +101,11 @@ export function formatIterationTable(listings) {
   return [line(LIST_COLUMNS), separator, ...rows.map(line)].join('\n');
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+if (isMain(import.meta.url)) {
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { help: { type: 'boolean', short: 'h' } },
+  });
+  if (values.help === true) {
     console.log('Usage:\n  pnpm iteration:list');
   } else {
     const listings = readIterationListings(resolve(import.meta.dirname, '../..'));

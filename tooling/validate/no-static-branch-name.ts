@@ -10,11 +10,13 @@
  * app code should never embed a branch name, but the branch→env map and its
  * tests legitimately name branches.
  *
- * Usage: node --import tsx tooling/validate/no-static-branch-name.ts
+ * Usage: tsx tooling/validate/no-static-branch-name.ts
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { isMain } from '../ci/script.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -99,7 +101,7 @@ export function findViolations(root = ROOT): {
 }
 
 // CLI
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (isMain(import.meta.url)) {
   const { branchNames, violations } = findViolations();
   if (violations.length > 0) {
     console.error(

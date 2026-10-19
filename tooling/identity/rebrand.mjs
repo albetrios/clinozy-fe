@@ -43,6 +43,7 @@ import {
   staleBaselines,
   ROOT,
 } from './identity.mjs';
+import { parseCommandLine } from '../ci/script.mjs';
 
 const BOLD = '\u001B[1m';
 const DIM = '\u001B[2m';
@@ -50,27 +51,17 @@ const GREEN = '\u001B[32m';
 const YELLOW = '\u001B[33m';
 const RESET = '\u001B[0m';
 
-/** Parse `--flag value` pairs and bare `--flag` switches. */
-function parseArgs(argv) {
-  const positional = [];
-  const flags = {};
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    if (!arg.startsWith('--')) {
-      positional.push(arg);
-      continue;
-    }
-    const key = arg.slice(2);
-    const next = argv[i + 1];
-    if (next && !next.startsWith('--')) {
-      flags[key] = next;
-      i += 1;
-    } else {
-      flags[key] = true;
-    }
-  }
-  return { positional, flags };
-}
+/** The options `pnpm rebrand` takes, besides the product name. */
+const REBRAND_OPTIONS = {
+  sync: { type: 'boolean' },
+  apply: { type: 'boolean' },
+  name: { type: 'string' },
+  repo: { type: 'string' },
+  owner: { type: 'string' },
+  description: { type: 'string' },
+  backend: { type: 'string' },
+  namespace: { type: 'string' },
+};
 
 /** "Acme Portal" → "acme-portal" */
 const kebab = (value) =>
@@ -103,7 +94,14 @@ function previewChange(before, after) {
 }
 
 function main() {
-  const { positional, flags } = parseArgs(process.argv.slice(2));
+  const { values: flags, positionals: positional } = parseCommandLine(
+    process.argv.slice(2),
+    {
+      options: REBRAND_OPTIONS,
+      maxPositionals: 1,
+      usage: 'expected one "<Product Name>".',
+    },
+  );
   const sync = Boolean(flags.sync);
   const apply = Boolean(flags.apply);
   const current = loadIdentity();
@@ -473,8 +471,8 @@ See docs/getting-started/new-project.md.`);
      encoding the previous logo. \`pnpm test:visual\` fails until you regenerate them:
        pnpm test:visual:update      ${DIM}(needs the backend running)${RESET}
   5. ${BOLD}Re-lock agent-os + reinstall${RESET} — the prose sweep edited skill files, so the
-     agent-os skills-lock hashes are stale (agent-os-lock.policy.test.ts fails until
-     you regenerate them). The package name changed too:
+     agent-os skills-lock hashes are stale (pnpm agent-os:check fails until you
+     regenerate them). The package name changed too:
        pnpm install && pnpm agent-os:lock && pnpm health && pnpm validate:identity
 
   ${DIM}"${current.name}" and "${current.backendName}" are recorded in previousNames, so

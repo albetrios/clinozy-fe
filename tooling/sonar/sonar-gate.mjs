@@ -14,9 +14,13 @@ import { spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as sleep } from 'node:timers/promises';
+import { parse } from 'dotenv';
+
+import { requireTool } from '../ci/require-tool.mjs';
 
 const PROJECT_KEY = 'clinozy-fe';
 const COMPOSE_FILE = 'docker-compose.sonar.yml';
+const DOCKER_DAEMON_SCRIPT = 'tooling/setup/agent/ensure-docker-daemon.sh';
 // The single gitignored local env file (`.env.local`, mirroring clinozy-be) — holds
 // behavior flags and machine secrets (SONAR_* are auto-managed here and skipped by
 // the client-env forbidden guard).
@@ -29,9 +33,7 @@ const POLL_INTERVAL_MS = 4_000;
 // Match docker-compose.sonar.yml host port (9001). Override via SONAR_HOST_URL
 // when reusing clinozy-be's server on :9000.
 const SONAR_URL =
-  process.env.SONAR_HOST_URL ??
-  readEnvLocal().SONAR_HOST_URL ??
-  'http://localhost:9001';
+  process.env.SONAR_HOST_URL ?? readEnvLocal().SONAR_HOST_URL ?? 'http://localhost:9001';
 
 /** @param {string} message */
 function log(message) {
@@ -47,16 +49,9 @@ function die(message) {
   process.exit(1);
 }
 
-/** Parses `.env.local` into a key→value map (quotes stripped); returns {} when absent. */
+/** Parses `.env.local` into a key→value map (dotenv, as Vite reads it); {} when absent. */
 function readEnvLocal() {
-  if (!existsSync(ENV_LOCAL)) return {};
-  /** @type {Record<string, string>} */
-  const out = {};
-  for (const rawLine of readFileSync(ENV_LOCAL, 'utf8').split('\n')) {
-    const match = /^([A-Z0-9_]+)=(.*)$/.exec(rawLine.trim());
-    if (match?.[1]) out[match[1]] = (match[2] ?? '').replace(/^["']|["']$/g, '');
-  }
-  return out;
+  return existsSync(ENV_LOCAL) ? parse(readFileSync(ENV_LOCAL)) : {};
 }
 
 /**
@@ -115,6 +110,24 @@ function dockerCompose(args, extraEnv = {}) {
   return result.status ?? 1;
 }
 
+/**
+ * Starts the Docker daemon when it is not reachable, so the pre-push gate never stops on "is
+ * Docker running?" in a cloud session that has not started it yet. Linux only, through
+ * `tooling/setup/agent/ensure-docker-daemon.sh` (passwordless sudo, restricted-network fallback;
+ * the same script as clinozy-be). Elsewhere Docker Desktop or OrbStack owns the daemon.
+ */
+function ensureDockerDaemon() {
+  if (!requireTool({ name: 'docker', mode: 'block', purpose: 'the SonarQube gate' })) {
+    throw new Error('Docker is required for the SonarQube gate.');
+  }
+  if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status === 0) return;
+  if (process.platform !== 'linux' || !existsSync(DOCKER_DAEMON_SCRIPT)) return;
+  log(
+    'Docker daemon not reachable — starting it (tooling/setup/agent/ensure-docker-daemon.sh)…',
+  );
+  spawnSync('/bin/bash', [DOCKER_DAEMON_SCRIPT], { stdio: 'inherit' });
+}
+
 /** Starts the SonarQube container if it is not already accepting requests, then waits for UP. */
 async function ensureServerUp() {
   const status = await sonarApi('/api/system/status');
@@ -124,6 +137,7 @@ async function ensureServerUp() {
   }
 
   log('SonarQube not ready — starting it (first boot can take ~2 min)…');
+  ensureDockerDaemon();
   if (dockerCompose(['up', '-d', 'sonarqube']) !== 0) {
     die('failed to start SonarQube (is Docker running?). Start it with `pnpm sonar:up`.');
   }

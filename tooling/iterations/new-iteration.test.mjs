@@ -3,10 +3,9 @@
  * each repository (every iteration starts from scratch; nothing is suggested), the README-only folder, the `--both` sibling README, and the id
  * retry on a collision. The same behaviour as clinozy-be's generator.
  */
-import assert from 'node:assert/strict';
+import { afterEach, describe, expect, it } from 'vitest';
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { afterEach, describe, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
   BASE_BRANCH,
@@ -58,55 +57,55 @@ function idSequence(ids) {
 }
 
 describe('arguments and names', () => {
-  test('reads the type, topic and flags; --sibling implies --both', () => {
-    assert.deepEqual(
+  it('reads the type, topic and flags; --sibling implies --both', () => {
+    expect(
       parseNewIterationArguments(['feat', 'pharmacy-returns', '--both', '--dry-run']),
-      {
-        type: 'feat',
-        topic: 'pharmacy-returns',
-        createInSibling: true,
-        siblingPath: undefined,
-        dryRun: true,
-        help: false,
-      },
-    );
-    assert.equal(
+    ).toStrictEqual({
+      type: 'feat',
+      topic: 'pharmacy-returns',
+      createInSibling: true,
+      siblingPath: undefined,
+      lite: false,
+      dryRun: true,
+      help: false,
+    });
+    expect(parseNewIterationArguments(['fix', 'rounding', '--lite']).lite).toBe(true);
+    expect(
       parseNewIterationArguments(['fix', 'x', '--sibling', '../other-be']).siblingPath,
-      '../other-be',
-    );
-    assert.throws(
-      () => parseNewIterationArguments(['feat', 'x', '--sibling']),
+    ).toBe('../other-be');
+    expect(
+      parseNewIterationArguments(['fix', 'x', '--sibling', '../other-be'])
+        .createInSibling,
+    ).toBe(true);
+    expect(() => parseNewIterationArguments(['feat', 'x', '--sibling'])).toThrow(
       /needs a path/,
     );
-    assert.throws(
-      () => parseNewIterationArguments(['feat', 'x', '--force']),
+    expect(() => parseNewIterationArguments(['feat', 'x', '--force'])).toThrow(
       /Unknown option/,
     );
-    assert.throws(
-      () => parseNewIterationArguments(['feat', 'x', 'y']),
+    expect(() => parseNewIterationArguments(['feat', 'x', 'y'])).toThrow(
       /Too many arguments/,
     );
   });
 
-  test('accepts a launch without a topic and a feat with a kebab-case topic', () => {
-    assert.deepEqual(validateTypeAndTopic({ type: 'launch', topic: undefined }), {
+  it('accepts a launch without a topic and a feat with a kebab-case topic', () => {
+    expect(validateTypeAndTopic({ type: 'launch', topic: undefined })).toStrictEqual({
       type: 'launch',
       topic: undefined,
     });
-    assert.deepEqual(validateTypeAndTopic({ type: 'change', topic: 'patient-consent' }), {
+    expect(
+      validateTypeAndTopic({ type: 'change', topic: 'patient-consent' }),
+    ).toStrictEqual({
       type: 'change',
       topic: 'patient-consent',
     });
-    assert.throws(
-      () => validateTypeAndTopic({ type: 'release', topic: 'x' }),
+    expect(() => validateTypeAndTopic({ type: 'release', topic: 'x' })).toThrow(
       /Unknown type/,
     );
-    assert.throws(
-      () => validateTypeAndTopic({ type: 'launch', topic: 'clinic' }),
+    expect(() => validateTypeAndTopic({ type: 'launch', topic: 'clinic' })).toThrow(
       /no topic/,
     );
-    assert.throws(
-      () => validateTypeAndTopic({ type: 'fix', topic: undefined }),
+    expect(() => validateTypeAndTopic({ type: 'fix', topic: undefined })).toThrow(
       /needs a topic/,
     );
   });
@@ -120,42 +119,41 @@ describe('arguments and names', () => {
     'returns-',
     'pharmacy--returns',
   ]) {
-    test(`rejects the topic "${topic}"`, () => {
-      assert.throws(() => validateTypeAndTopic({ type: 'feat', topic }), /no digits/);
+    it(`rejects the topic "${topic}"`, () => {
+      expect(() => validateTypeAndTopic({ type: 'feat', topic })).toThrow(/no digits/);
     });
   }
 
-  test('builds names and draws four lowercase letters', () => {
-    assert.equal(
+  it('builds names and draws four lowercase letters', () => {
+    expect(
       buildIterationName({
         type: 'launch',
         topic: undefined,
         opened: '2026-09-30',
         id: 'jxmr',
       }),
-      'launch-2026-09-30-jxmr',
-    );
-    assert.equal(
+    ).toBe('launch-2026-09-30-jxmr');
+    expect(
       buildIterationName({
         type: 'feat',
         topic: 'pharmacy-returns',
         opened: '2026-10-06',
         id: 'kqzx',
       }),
-      'feat-pharmacy-returns-2026-10-06-kqzx',
-    );
+    ).toBe('feat-pharmacy-returns-2026-10-06-kqzx');
     for (let draw = 0; draw < 50; draw += 1)
-      assert.match(randomIterationId(), /^[a-z]{4}$/);
+      expect(randomIterationId()).toMatch(/^[a-z]{4}$/);
   });
 });
 
 describe('the README template', () => {
-  test('lists exactly the README fields, in order, and refuses an unknown placeholder', () => {
+  it('lists exactly the README fields, in order, and refuses an unknown placeholder', () => {
     const rendered = renderIterationReadme({
       name: 'feat-x-2026-10-06-abcd',
       fields: Object.fromEntries(
         [
           'type',
+          'process',
           'topic',
           'owner',
           'opened',
@@ -172,47 +170,48 @@ describe('the README template', () => {
         ].map((key) => [key, key]),
       ),
     });
-    assert.ok(rendered.startsWith('# feat-x-2026-10-06-abcd\n'));
-    assert.deepEqual([...parseIterationReadme(rendered).keys()], README_FIELD_LABELS);
-    assert.throws(
-      () => renderTemplate({ template: 'Hello {{who}}', values: {} }),
+    expect(rendered.startsWith('# feat-x-2026-10-06-abcd\n')).toBeTruthy();
+    expect([...parseIterationReadme(rendered).keys()]).toStrictEqual(README_FIELD_LABELS);
+    expect(() => renderTemplate({ template: 'Hello {{who}}', values: {} })).toThrow(
       /\{\{who\}\}/,
     );
   });
 
-  test('every iteration README in this repository carries all the fields', () => {
+  it('every iteration README in this repository carries all the fields (Process optional: none is full)', () => {
     for (const name of readdirSync(join(ROOT, 'iterations')).filter(
       (entry) => !entry.includes('.'),
     )) {
       const readme = readFileSync(join(ROOT, 'iterations', name, 'README.md'), 'utf-8');
-      assert.deepEqual(
-        [...parseIterationReadme(readme).keys()],
-        README_FIELD_LABELS,
-        name,
+      const keys = [...parseIterationReadme(readme).keys()];
+      expect(keys, name).toStrictEqual(
+        README_FIELD_LABELS.filter(
+          (label) => label !== 'Process' || keys.includes('Process'),
+        ),
       );
-      assert.ok(
+      expect(
         readme.startsWith(readReadmeTemplate().split('\n')[0].replace('{{name}}', name)),
         name,
-      );
+      ).toBeTruthy();
     }
   });
 });
 
 describe('planNewIteration', () => {
-  test('refuses anything but a launch while no iteration exists', () => {
-    assert.throws(() => plan(createRepository()), /open the launch first/);
+  it('refuses anything but a launch while no iteration exists', () => {
+    expect(() => plan(createRepository())).toThrow(/open the launch first/);
   });
 
-  test('plans a launch — README only, Baseline none, empty drop rows — and writes it only when asked', () => {
+  it('plans a launch — README only, Baseline none, empty drop rows — and writes it only when asked', () => {
     const repositoryRoot = createRepository();
     const launch = plan(repositoryRoot, {
       type: 'launch',
       topic: undefined,
       nextId: () => 'jxmr',
     });
-    assert.equal(launch.name, `launch-${TODAY}-jxmr`);
-    assert.deepEqual(launch.fields, {
+    expect(launch.name).toBe(`launch-${TODAY}-jxmr`);
+    expect(launch.fields).toStrictEqual({
       type: 'launch',
+      process: 'full',
       topic: '—',
       owner: OWNER,
       opened: TODAY,
@@ -227,21 +226,19 @@ describe('planNewIteration', () => {
       schemaRoutes: '—',
       intakeHash: '—',
     });
-    assert.deepEqual(
-      launch.files.map((file) => file.path),
-      [join(launch.localFolder, 'README.md')],
-    );
-    assert.equal(existsSync(launch.localFolder), false);
+    expect(launch.files.map((file) => file.path)).toStrictEqual([
+      join(launch.localFolder, 'README.md'),
+    ]);
+    expect(existsSync(launch.localFolder)).toBe(false);
     writeIterationPlan(launch);
-    assert.deepEqual(readdirSync(launch.localFolder), ['README.md']);
-    assert.throws(() => writeIterationPlan(launch), /already exists/);
+    expect(readdirSync(launch.localFolder)).toStrictEqual(['README.md']);
+    expect(() => writeIterationPlan(launch)).toThrow(/already exists/);
   });
 
-  test('refuses a second launch — here, on the base branch, or in the sibling', () => {
+  it('refuses a second launch — here, on the base branch, or in the sibling', () => {
     const repositoryRoot = createRepository();
     writeIteration({ repositoryRoot, name: 'launch-2026-09-30-jxmr' });
-    assert.throws(
-      () => plan(repositoryRoot, { type: 'launch', topic: undefined }),
+    expect(() => plan(repositoryRoot, { type: 'launch', topic: undefined })).toThrow(
       /only ever one launch/,
     );
 
@@ -251,13 +248,12 @@ describe('planNewIteration', () => {
       parent: dirname(fresh),
     });
     writeIteration({ repositoryRoot: siblingRoot, name: 'launch-2026-09-30-jxmr' });
-    assert.throws(
-      () => plan(fresh, { type: 'launch', topic: undefined, siblingRoot }),
+    expect(() => plan(fresh, { type: 'launch', topic: undefined, siblingRoot })).toThrow(
       /only ever one launch/,
     );
   });
 
-  test('starts every iteration from scratch — Baseline none, even beside a finished one — and records the branch', () => {
+  it('starts every iteration from scratch — Baseline none, even beside a finished one — and records the branch', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
@@ -268,8 +264,8 @@ describe('planNewIteration', () => {
     });
     git(repositoryRoot, ['switch', '-q', '-c', WORK_BRANCH]);
     const early = plan(repositoryRoot);
-    assert.equal(early.fields.baseline, 'none');
-    assert.equal(early.fields.branch, WORK_BRANCH);
+    expect(early.fields.baseline).toBe('none');
+    expect(early.fields.branch).toBe(WORK_BRANCH);
 
     writeIteration({
       repositoryRoot,
@@ -278,25 +274,23 @@ describe('planNewIteration', () => {
       history: DONE,
       intake: completeDrop(),
     });
-    assert.equal(
-      plan(repositoryRoot, { type: 'fix', topic: 'rounding' }).fields.baseline,
+    expect(plan(repositoryRoot, { type: 'fix', topic: 'rounding' }).fields.baseline).toBe(
       'none',
     );
   });
 
-  test('a non-launch may open while the launch exists only on the base branch', () => {
+  it('a non-launch may open while the launch exists only on the base branch', () => {
     const repositoryRoot = createRepository();
     writeIteration({ repositoryRoot, name: 'launch-2026-09-30-jxmr', commitTime: 2_000 });
     git(repositoryRoot, ['switch', '-q', '-c', WORK_BRANCH]);
     git(repositoryRoot, ['rm', '-rq', 'iterations']);
     commitAll(repositoryRoot, 'drop the folder on this branch', 3_000);
-    assert.match(
-      plan(repositoryRoot).name,
+    expect(plan(repositoryRoot).name).toMatch(
       new RegExp(`^feat-returns-${TODAY}-[a-z]{4}$`),
     );
   });
 
-  test('draws a new id while the name is taken here or in the sibling, then gives up', () => {
+  it('draws a new id while the name is taken here or in the sibling, then gives up', () => {
     const repositoryRoot = createRepository();
     const siblingRoot = createRepository({
       packageName: 'demo-be',
@@ -305,18 +299,16 @@ describe('planNewIteration', () => {
     writeIteration({ repositoryRoot, name: 'launch-2026-09-30-jxmr' });
     writeIteration({ repositoryRoot, name: `feat-returns-${TODAY}-aaaa` });
     writeIteration({ repositoryRoot: siblingRoot, name: `feat-returns-${TODAY}-bbbb` });
-    assert.equal(
+    expect(
       plan(repositoryRoot, { siblingRoot, nextId: idSequence(['aaaa', 'bbbb', 'cccc']) })
         .name,
-      `feat-returns-${TODAY}-cccc`,
-    );
-    assert.throws(
-      () => plan(repositoryRoot, { nextId: () => 'aaaa' }),
+    ).toBe(`feat-returns-${TODAY}-cccc`);
+    expect(() => plan(repositoryRoot, { nextId: () => 'aaaa' })).toThrow(
       new RegExp(`after ${MAXIMUM_NAME_ATTEMPTS} attempts`),
     );
   });
 
-  test('--both writes the sibling README, from scratch too, and warns on template drift', () => {
+  it('--both writes the sibling README, from scratch too, and warns on template drift', () => {
     const repositoryRoot = createRepository();
     const siblingRoot = createRepository({
       packageName: 'demo-be',
@@ -336,37 +328,66 @@ describe('planNewIteration', () => {
     });
 
     const both = plan(repositoryRoot, { siblingRoot });
-    assert.equal(both.fields.baseline, 'none');
-    assert.equal(both.siblingBaseline, 'none');
+    expect(both.fields.baseline).toBe('none');
+    expect(both.siblingBaseline).toBe('none');
     const siblingReadme = both.files.find(
       (file) => file.path === join(siblingRoot, 'iterations', both.name, 'README.md'),
     );
-    assert.equal(parseIterationReadme(siblingReadme.content).get('Baseline'), 'none');
-    assert.deepEqual(both.warnings, []);
+    expect(parseIterationReadme(siblingReadme.content).get('Baseline')).toBe('none');
+    expect(both.warnings).toStrictEqual([]);
 
     mkdirSync(join(siblingRoot, 'tooling/iterations/templates'), { recursive: true });
     writeFileSync(
       join(siblingRoot, 'tooling/iterations/templates/README.md'),
       '# {{name}}\n',
     );
-    assert.match(plan(repositoryRoot, { siblingRoot }).warnings[0], /byte-identical/);
+    expect(plan(repositoryRoot, { siblingRoot }).warnings[0]).toMatch(/byte-identical/);
   });
 
-  test('refuses a detached HEAD and a missing user.name', () => {
+  it('refuses a detached HEAD and a missing user.name', () => {
     const detached = createRepository();
     git(detached, ['checkout', '-q', '--detach']);
-    assert.throws(() => plan(detached, { type: 'launch', topic: undefined }), /detached/);
+    expect(() => plan(detached, { type: 'launch', topic: undefined })).toThrow(
+      /detached/,
+    );
     const anonymous = createRepository();
     git(anonymous, ['config', 'user.name', '']);
-    assert.throws(
-      () => plan(anonymous, { type: 'launch', topic: undefined }),
+    expect(() => plan(anonymous, { type: 'launch', topic: undefined })).toThrow(
       /user\.name/,
     );
+  });
+
+  it('opens a lite fix with Process lite, and refuses --lite on anything but a fix', () => {
+    const repositoryRoot = createRepository();
+    writeIteration({ repositoryRoot, name: 'launch-2026-09-30-jxmr' });
+    const lite = plan(repositoryRoot, { type: 'fix', topic: 'rounding', lite: true });
+    expect(lite.fields.process).toBe('lite');
+    expect(parseIterationReadme(lite.files[0].content).get('Process')).toBe('lite');
+    expect(plan(repositoryRoot, { type: 'fix', topic: 'rounding' }).fields.process).toBe(
+      'full',
+    );
+    expect(() =>
+      plan(repositoryRoot, { type: 'feat', topic: 'returns', lite: true }),
+    ).toThrow(/--lite is for a fix only/);
   });
 });
 
 describe('runNewIteration', () => {
-  test('a dry run prints the plan and writes nothing; a real run writes the README and the next steps', () => {
+  it('a lite fix is told to plan in one step — no drop to place', () => {
+    const repositoryRoot = createRepository();
+    writeIteration({ repositoryRoot, name: 'launch-2026-09-30-jxmr' });
+    const real = runNewIteration(['fix', 'rounding', '--lite'], {
+      repositoryRoot,
+      baseBranch: BASE_BRANCH,
+      today: TODAY,
+      nextId: () => 'kqzx',
+    });
+    expect(real.lines.includes('Next (a lite fix):')).toBeTruthy();
+    expect(real.lines.some((line) => line.includes('Plan it in one step'))).toBeTruthy();
+    expect(real.lines.some((line) => line.includes('pnpm iteration:intake'))).toBe(false);
+  });
+
+  it('a dry run prints the plan and writes nothing; a real run writes the README and the next steps', () => {
     const repositoryRoot = createRepository();
     const dry = runNewIteration(['launch', '--dry-run'], {
       repositoryRoot,
@@ -374,10 +395,10 @@ describe('runNewIteration', () => {
       today: TODAY,
       nextId: () => 'jxmr',
     });
-    assert.equal(dry.exitCode, 0);
-    assert.equal(dry.lines[0], 'Dry run — nothing written.');
-    assert.ok(dry.lines.includes(`Iteration: launch-${TODAY}-jxmr`));
-    assert.equal(existsSync(join(repositoryRoot, 'iterations')), false);
+    expect(dry.exitCode).toBe(0);
+    expect(dry.lines[0]).toBe('Dry run — nothing written.');
+    expect(dry.lines.includes(`Iteration: launch-${TODAY}-jxmr`)).toBeTruthy();
+    expect(existsSync(join(repositoryRoot, 'iterations'))).toBe(false);
 
     const real = runNewIteration(['launch'], {
       repositoryRoot,
@@ -385,16 +406,16 @@ describe('runNewIteration', () => {
       today: TODAY,
       nextId: () => 'jxmr',
     });
-    assert.equal(real.lines[0], 'Created.');
-    assert.ok(
+    expect(real.lines[0]).toBe('Created.');
+    expect(
       real.lines.some((line) =>
         line.includes(`pnpm iteration:intake launch-${TODAY}-jxmr <drop-folder>`),
       ),
-    );
-    assert.ok(
+    ).toBeTruthy();
+    expect(
       existsSync(join(repositoryRoot, 'iterations', `launch-${TODAY}-jxmr`, 'README.md')),
-    );
-    assert.ok(!real.lines.some((line) => line.includes('--mode overlay')));
+    ).toBeTruthy();
+    expect(!real.lines.some((line) => line.includes('--mode overlay'))).toBeTruthy();
 
     const feature = runNewIteration(['feat', 'returns'], {
       repositoryRoot,
@@ -402,16 +423,16 @@ describe('runNewIteration', () => {
       today: TODAY,
       nextId: () => 'kqzx',
     });
-    assert.ok(
+    expect(
       feature.lines.some(
         (line) =>
           line.includes('--mode overlay') &&
           line.includes('--mode brief') &&
           line.includes(`pnpm iteration:baseline feat-returns-${TODAY}-kqzx <baseline>`),
       ),
-    );
+    ).toBeTruthy();
 
-    assert.equal(runNewIteration([], { repositoryRoot }).exitCode, 1);
-    assert.equal(runNewIteration(['--help'], { repositoryRoot }).exitCode, 0);
+    expect(runNewIteration([], { repositoryRoot }).exitCode).toBe(1);
+    expect(runNewIteration(['--help'], { repositoryRoot }).exitCode).toBe(0);
   });
 });

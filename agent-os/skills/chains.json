@@ -1,5 +1,5 @@
 {
-  "description": "Declarative skill chains — ordered, named pipelines that capture the fe-skill-registry 'multi-skill scenarios' as runnable sequences. Single source for: workflow commands, the routing reminder hooks, and the eventual skill planner. agent-os/evals/check.ts asserts every step (and optional step) references a real skill directory; triggers are kept consistent with agent-os/docs/skill-triggers.md. Steps run in order; each step is an existing skill invoked by name.",
+  "description": "Declarative skill chains — ordered, named pipelines that capture the fe-skill-registry 'multi-skill scenarios' as runnable sequences. Single source for: workflow commands, the routing reminder hooks, and the eventual skill planner. agent-os/evals/check.ts asserts every step (and optional step) references a real skill directory; each chain with a trigger is a row of the generated agent-os/docs/skill-triggers.md table (pnpm agent-os:generate). Steps run in order; each step is an existing skill invoked by name.",
   "chains": {
     "page-change": {
       "description": "Adding or changing a page / route island end-to-end.",
@@ -34,14 +34,14 @@
       ]
     },
     "ui-review": {
-      "description": "Building or restyling UI — craft, accessibility, and motion review.",
+      "description": "Building or restyling UI — craft, accessibility, and motion review. review-animations is manual-only (disable-model-invocation, /review-animations) and reviews motion code only, so it is optional — run it on a diff that animates.",
       "trigger": "src/**/components/**/*.tsx",
       "steps": [
         "frontend-design",
-        "web-design-guidelines",
-        "review-animations"
+        "web-design-guidelines"
       ],
       "optional": [
+        "review-animations",
         "fe-theme-axis-audit",
         "fe-visual-regression"
       ]
@@ -57,7 +57,7 @@
     },
     "data-hook": {
       "description": "Adding a TanStack Query hook / data layer over the fetch client.",
-      "trigger": "src/**/*.api.ts",
+      "trigger": "**/*.api.ts, **/hooks/use*/**",
       "steps": [
         "react-best-practices",
         "fe-test-generation"
@@ -65,7 +65,7 @@
     },
     "styling": {
       "description": "Styling / theming with semantic tokens and Tailwind.",
-      "trigger": "src/index.css",
+      "trigger": "src/index.css, **/*.css",
       "steps": [
         "frontend-design",
         "web-design-guidelines"
@@ -150,6 +150,34 @@
         "fe-page-scaffolding",
         "fe-theme-axis-audit",
         "fe-visual-regression"
+      ]
+    },
+    "vendored-ui": {
+      "description": "Changing a vendored shadcn primitive — through the shadcn CLI, never by hand.",
+      "trigger": "**/components/ui/*",
+      "steps": [
+        "shadcn"
+      ]
+    },
+    "component-change": {
+      "description": "Adding or changing a component or form — shadcn first, then composition, craft and a colocated test.",
+      "trigger": "**/components/**/*.tsx, **/forms/**",
+      "steps": [
+        "shadcn",
+        "composition-patterns",
+        "frontend-design",
+        "fe-test-generation"
+      ]
+    },
+    "motion": {
+      "description": "Animation hooks (useOnboardingStepMotion and the like) — implement with Anime.js, held to the motion craft bar.",
+      "trigger": "**/useOnboardingStepMotion.ts, **/*Motion.ts",
+      "steps": [
+        "animejs",
+        "emil-design-eng"
+      ],
+      "optional": [
+        "review-animations"
       ]
     }
   }

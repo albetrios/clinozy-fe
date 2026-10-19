@@ -1,0 +1,16 @@
+{
+  "$comment": "pnpm test:select fixtures: for each entry, the selection for `changed` must include every file in `mustSelect`. A failed test the selection would have skipped (pnpm test:selector-misses, after a PR's merged unit shards) becomes an entry here.",
+  "fixtures": [
+    {
+      "name": "miss: the patient reports tests, for a shared button change (18 Oct selector proof)",
+      "changed": ["src/shared/components/ui/button.tsx"],
+      "mustSelect": [
+        "src/pages/organization/$organizationSlug/patients/$patientId/reports/PatientReportsPage.test.tsx",
+        "src/pages/organization/$organizationSlug/patients/$patientId/reports/components/ReportDeleteConfirm/ReportDeleteConfirm.test.tsx",
+        "src/pages/organization/$organizationSlug/patients/$patientId/reports/components/ReportDrawer/ReportDrawer.test.tsx",
+        "src/pages/organization/$organizationSlug/patients/$patientId/reports/components/ReportView/ReportView.test.tsx",
+        "src/pages/organization/$organizationSlug/patients/$patientId/reports/hooks/useReportsTable/useReportsTable.test.tsx"
+      ]
+    }
+  ]
+}

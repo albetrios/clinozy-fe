@@ -1,9 +1,8 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -34,14 +33,13 @@ function runGateOn(source, relativePath = 'src/shared/components/Probe/Probe.tsx
   }
 }
 
-test('validate:theme-axis passes on the current tree', () => {
+it('validate:theme-axis passes on the current tree', () => {
   const result = spawnSync('sh', [GATE], { cwd: ROOT, encoding: 'utf8' });
-  assert.equal(
+  expect(
     result.status,
-    0,
     `expected exit 0\nstdout: ${result.stdout}\nstderr: ${result.stderr}`,
-  );
-  assert.match(result.stdout, /Theme axis OK/);
+  ).toBe(0);
+  expect(result.stdout).toMatch(/Theme axis OK/);
 });
 
 // ── Check 5: off-scale corner radius ────────────────────────────────────────
@@ -58,11 +56,11 @@ const OFF_SCALE = [
 ];
 
 for (const [label, source] of OFF_SCALE) {
-  test(`flags ${label}`, () => {
+  it(`flags ${label}`, () => {
     const { status, output } = runGateOn(`export const probe = ${source};`);
-    assert.equal(status, 1, output);
-    assert.match(output, /off-scale radius/);
-    assert.match(output, /Probe\.tsx/);
+    expect(status, output).toBe(1);
+    expect(output).toMatch(/off-scale radius/);
+    expect(output).toMatch(/Probe\.tsx/);
   });
 }
 
@@ -93,13 +91,13 @@ const ON_SCALE = [
 ];
 
 for (const [label, source] of ON_SCALE) {
-  test(`allows ${label}`, () => {
+  it(`allows ${label}`, () => {
     const { status, output } = runGateOn(`export const probe = ${source};`);
-    assert.equal(status, 0, output);
+    expect(status, output).toBe(0);
   });
 }
 
-test('does not read prose as a class — comments say "rounded" too', () => {
+it('does not read prose as a class — comments say "rounded" too', () => {
   const source = [
     '// the corners are rounded here; a bare `rounded` is described, not used',
     '/* rounded grouped bars */',
@@ -115,10 +113,10 @@ test('does not read prose as a class — comments say "rounded" too', () => {
   ].join('\n');
 
   const { status, output } = runGateOn(source);
-  assert.equal(status, 0, output);
+  expect(status, output).toBe(0);
 });
 
-test('exempts vendored ui/, tests and fixtures — like every other check in the gate', () => {
+it('exempts vendored ui/, tests and fixtures — like every other check in the gate', () => {
   const violation = 'export const probe = <div className="rounded-[2px] rounded" />;';
 
   for (const path of [
@@ -127,7 +125,7 @@ test('exempts vendored ui/, tests and fixtures — like every other check in the
     'src/pages/probe/probe.fixtures.ts',
   ]) {
     const { status, output } = runGateOn(violation, path);
-    assert.equal(status, 0, `${path}\n${output}`);
+    expect(status, `${path}\n${output}`).toBe(0);
   }
 });
 
@@ -156,11 +154,11 @@ const UNREACHABLE = [
 ];
 
 for (const [label, source] of UNREACHABLE) {
-  test(`flags ${label}`, () => {
+  it(`flags ${label}`, () => {
     const { status, output } = runGateOn(`export const probe = ${source};`);
-    assert.equal(status, 1, output);
-    assert.match(output, /Sharp shape cannot square/);
-    assert.match(output, /Probe\.tsx/);
+    expect(status, output).toBe(1);
+    expect(output).toMatch(/Sharp shape cannot square/);
+    expect(output).toMatch(/Probe\.tsx/);
   });
 }
 
@@ -213,13 +211,13 @@ const REACHABLE = [
 ];
 
 for (const [label, source] of REACHABLE) {
-  test(`allows ${label}`, () => {
+  it(`allows ${label}`, () => {
     const { status, output } = runGateOn(`export const probe = ${source};`);
-    assert.equal(status, 0, output);
+    expect(status, output).toBe(0);
   });
 }
 
-test('a slot six lines up is out of reach — the window is the element, not the file', () => {
+it('a slot six lines up is out of reach — the window is the element, not the file', () => {
   const source = [
     'export const probe = (',
     '  <div data-slot="card">',
@@ -234,23 +232,23 @@ test('a slot six lines up is out of reach — the window is the element, not the
   ].join('\n');
 
   const { status, output } = runGateOn(source);
-  assert.equal(status, 1, output);
-  assert.match(output, /Sharp shape cannot square/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/Sharp shape cannot square/);
 });
 
-test('an allowlisted fragment exempts its line and nothing else in the file', () => {
+it('an allowlisted fragment exempts its line and nothing else in the file', () => {
   // The class-constant exceptions are FRAGMENTS for this reason: a file name in
   // the allowlist would switch off every check for the whole file.
   const allowed =
     "const base = 'flex size-7 items-center justify-center rounded-full text-xs transition-all';";
-  assert.equal(runGateOn(allowed).status, 0);
+  expect(runGateOn(allowed).status).toBe(0);
 
   const { status, output } = runGateOn(
     `${allowed}\nexport const probe = <span className="bg-muted rounded-full px-2" />;`,
   );
-  assert.equal(status, 1, output);
-  assert.match(output, /Probe\.tsx:2:/);
-  assert.doesNotMatch(output, /Probe\.tsx:1:/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/Probe\.tsx:2:/);
+  expect(output).not.toMatch(/Probe\.tsx:1:/);
 });
 
 // ── Check 7: spacing that ignores the Density axis ──────────────────────────
@@ -266,10 +264,10 @@ const FIXED_SPACING = [
 ];
 
 for (const [label, source] of FIXED_SPACING) {
-  test(`flags ${label}`, () => {
+  it(`flags ${label}`, () => {
     const { status, output } = runGateOn(`export const probe = ${source};`);
-    assert.equal(status, 1, output);
-    assert.match(output, /ignores the Density axis/);
+    expect(status, output).toBe(1);
+    expect(output).toMatch(/ignores the Density axis/);
   });
 }
 
@@ -286,23 +284,23 @@ const SCALED_SPACING = [
 ];
 
 for (const [label, source] of SCALED_SPACING) {
-  test(`allows ${label}`, () => {
+  it(`allows ${label}`, () => {
     const { status, output } = runGateOn(`export const probe = ${source};`);
-    assert.equal(status, 0, output);
+    expect(status, output).toBe(0);
   });
 }
 
 // ── Check 4: card / popover shells need a slot ──────────────────────────────
 
-test('flags a bg-card shell with no data-slot (check 4)', () => {
+it('flags a bg-card shell with no data-slot (check 4)', () => {
   const { status, output } = runGateOn(
     'export const probe = <div className="bg-card border p-4" />;',
   );
-  assert.equal(status, 1, output);
-  assert.match(output, /bg-card\/bg-popover without data-slot/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/bg-card\/bg-popover without data-slot/);
 });
 
-test('allows a bg-popover shell whose data-slot sits within four lines above', () => {
+it('allows a bg-popover shell whose data-slot sits within four lines above', () => {
   const source = [
     'export const probe = (',
     '  <div',
@@ -313,10 +311,10 @@ test('allows a bg-popover shell whose data-slot sits within four lines above', (
     ');',
   ].join('\n');
 
-  assert.equal(runGateOn(source).status, 0);
+  expect(runGateOn(source).status).toBe(0);
 });
 
-test('allows a bg-card on a <Button>, which brings data-slot="button", however far its tag', () => {
+it('allows a bg-card on a <Button>, which brings data-slot="button", however far its tag', () => {
   const source = [
     'export const probe = (',
     '  <Button',
@@ -332,10 +330,10 @@ test('allows a bg-card on a <Button>, which brings data-slot="button", however f
   ].join('\n');
 
   const { status, output } = runGateOn(source);
-  assert.equal(status, 0, output);
+  expect(status, output).toBe(0);
 });
 
-test('still flags a bg-card shell that only follows a <Button> — the nearest tag owns the class', () => {
+it('still flags a bg-card shell that only follows a <Button> — the nearest tag owns the class', () => {
   const source = [
     'export const probe = (',
     '  <>',
@@ -351,31 +349,31 @@ test('still flags a bg-card shell that only follows a <Button> — the nearest t
   ].join('\n');
 
   const { status, output } = runGateOn(source);
-  assert.equal(status, 1, output);
-  assert.match(output, /bg-card\/bg-popover without data-slot/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/bg-card\/bg-popover without data-slot/);
 });
 
 // ── The older checks still fire through the injected root ───────────────────
 
-test('still flags a hardcoded shadow (check 1)', () => {
+it('still flags a hardcoded shadow (check 1)', () => {
   const { status, output } = runGateOn(
     'export const probe = <div className="shadow-lg" />;',
   );
-  assert.equal(status, 1, output);
-  assert.match(output, /hardcoded shadow/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/hardcoded shadow/);
 });
 
-test('still flags a direct lucide-react import (check 3)', () => {
+it('still flags a direct lucide-react import (check 3)', () => {
   const { status, output } = runGateOn("import { X } from 'lucide-react';");
-  assert.equal(status, 1, output);
-  assert.match(output, /lucide-react/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/lucide-react/);
 });
 
-test('fails closed when the injected root has no tree to scan', () => {
+it('fails closed when the injected root has no tree to scan', () => {
   const result = spawnSync('sh', [GATE], {
     cwd: ROOT,
     encoding: 'utf8',
     env: { ...process.env, THEME_AXIS_ROOT: join(tmpdir(), 'theme-axis-does-not-exist') },
   });
-  assert.notEqual(result.status, 0);
+  expect(result.status).not.toBe(0);
 });

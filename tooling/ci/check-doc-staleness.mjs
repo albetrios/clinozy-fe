@@ -33,20 +33,34 @@
  *   pnpm docs:staleness           human-readable report; exit 1 on findings
  *   node …/check-doc-staleness.mjs --json    machine-readable findings array
  */
-import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { git } from './git-environment.mjs';
+import { parseCommandLine } from './script.mjs';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '../..');
 const ALLOWLIST_FILE = join(ROOT, 'tooling/ci/doc-staleness-allowlist.json');
 const SKILLS_LOCK = join(ROOT, 'agent-os/skills-lock.json');
-const JSON_MODE = process.argv.includes('--json');
+const JSON_MODE =
+  parseCommandLine(process.argv.slice(2), { options: { json: { type: 'boolean' } } })
+    .values.json === true;
 
 // ── What to scan ────────────────────────────────────────────────────────────
 // The doc trees plus the root guidance files that reference code paths.
 const SCAN_DIRS = ['docs', 'agent-os'];
 const SCAN_ROOT_FILES = ['CLAUDE.md', 'AGENTS.md', 'README.md', 'CONTRIBUTING.md'];
+// The nested CLAUDE.md files that hold sections moved out of the root one (Claude Code loads each
+// when it works in that folder).
+const SCAN_NESTED_GUIDES = [
+  'src/pages/CLAUDE.md',
+  'src/shared/CLAUDE.md',
+  'src/core/CLAUDE.md',
+  'src/app/CLAUDE.md',
+  'iterations/CLAUDE.md',
+  '.github/CLAUDE.md',
+  'tests/CLAUDE.md',
+];
 const SCAN_EXTS = /\.(md|mdc)$/;
 const IGNORE_DIRS = new Set(['node_modules', '.git', 'dist', 'coverage', 'test-results']);
 
@@ -196,7 +210,7 @@ function docFiles() {
   };
   const files = [];
   for (const d of SCAN_DIRS) files.push(...walk(join(ROOT, d), (n) => SCAN_EXTS.test(n)));
-  for (const f of SCAN_ROOT_FILES) {
+  for (const f of [...SCAN_ROOT_FILES, ...SCAN_NESTED_GUIDES]) {
     const full = join(ROOT, f);
     if (existsSync(full)) files.push(full);
   }
@@ -274,11 +288,7 @@ const PATH_TOKEN = new RegExp(`(?:^|[\\s(])((?:${ROOT_ALT})/[A-Za-z0-9._$*/-]+)`
  */
 function loadTrackedPaths() {
   try {
-    const out = execFileSync('git', ['ls-files', '-z'], {
-      cwd: ROOT,
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-    });
+    const out = git(['ls-files', '-z'], { cwd: ROOT });
     const set = new Set();
     for (const file of out.split('\0')) {
       if (!file) continue;

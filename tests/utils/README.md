@@ -142,6 +142,18 @@ expect(row).toHaveTextContent(`Patient ${fsi('#3508')} · last visit`);
 expect(withoutBidiMarks(chip.textContent)).toBe('Appointment #2740 · Peel');
 ```
 
+### `workflow-jobs.ts` (CI policy tests)
+
+The one way a `tests/ci` policy slices a GitHub Actions workflow into its top-level jobs, line by
+line: `jobBlock(workflow, name)` is one job (`''` when absent), `jobBlocks(workflow)` every job as
+`[name, block]`:
+
+```ts
+import { jobBlock } from '@/tests/utils/workflow-jobs.ts';
+
+expect(jobBlock(workflow, 'release-please')).toContain('release-please-action');
+```
+
 ## Test fixtures (`tests/fixtures/`)
 
 Static shapes for unit tests only — never imported from `src/`.

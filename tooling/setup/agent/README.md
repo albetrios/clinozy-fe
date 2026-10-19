@@ -18,53 +18,48 @@ and a dev server that serves the app shell.
 
 ## Files
 
-| File                    | Role                                                                          |
-| ----------------------- | ----------------------------------------------------------------------------- |
-| `bootstrap.sh`          | Orchestrator — runs all 10 steps, logs progress, enforces the hard gates      |
-| `lib.sh`                | Shared helpers (logging, arch detection, apt, download, PATH persistence)     |
-| `install-node.sh`       | Pinned Node from `.nvmrc` into `/opt/node<major>`, linked into `~/.local/bin` |
-| `install-apt-tools.sh`  | `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`                     |
-| `install-gh.sh`         | GitHub CLI from the official `cli/cli` release                                |
-| `install-gitleaks.sh`   | Secret scanner used by `.husky/pre-commit` and the CI gitleaks lane           |
-| `install-headroom.sh`   | `uv`/`uvx` — the prerequisite for the `headroom` MCP server                   |
-| `install-playwright.sh` | E2E browsers; detects a pre-installed set instead of re-downloading           |
-| `healthcheck.sh`        | Probes the dev server for the real app shell                                  |
+| File                       | Role                                                                                            |
+| -------------------------- | ----------------------------------------------------------------------------------------------- |
+| `bootstrap.sh`             | Orchestrator — runs all 10 steps, logs progress, enforces the hard gates                        |
+| `lib.sh`                   | Shared helpers (logging, arch detection, apt, download, PATH persistence)                       |
+| `tool-versions.sh`         | The pinned tool versions and checksums (gitleaks, semgrep), read by the installers and CI       |
+| `install-node.sh`          | Pinned Node from `.nvmrc` into `/opt/node<major>`, linked into `~/.local/bin`                   |
+| `install-apt-tools.sh`     | `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`                                       |
+| `install-gh.sh`            | GitHub CLI from the official `cli/cli` release                                                  |
+| `install-semgrep.sh`       | Semgrep at the pin, for `pnpm security:semgrep:push` (a warning when missing)                   |
+| `install-gitleaks.sh`      | Secret scanner used by `.husky/pre-commit` (mandatory there) and the CI gitleaks lane           |
+| `install-docker-images.sh` | Docker Hub mirror (`mirror.gcr.io`) + pre-pull of the SonarQube gate images                     |
+| `ensure-docker-daemon.sh`  | Starts `dockerd` when stopped (same script as clinozy-be); used by step 4 and `pnpm sonar:scan` |
+| `install-headroom.sh`      | `uv`/`uvx` — the prerequisite for the `headroom` MCP server                                     |
+| `install-playwright.sh`    | E2E browsers; detects a pre-installed set instead of re-downloading                             |
+| `healthcheck.sh`           | Probes the dev server for the real app shell                                                    |
 
 Each `install-*.sh` runs standalone as well as under `bootstrap.sh`.
 
 ## Steps and which ones can fail
 
-| #   | Step                                                    | Gate        |
-| --- | ------------------------------------------------------- | ----------- |
-| 1   | Node runtime (pinned major) + corepack                  | **hard**¹   |
-| 2–5 | Distro tools, `gh`, gitleaks, `uv`                      | best-effort |
-| 6   | `pnpm install --frozen-lockfile`                        | **hard**    |
-| 7   | `.env.local` (`setup:local --only-env`)                 | **hard**    |
-| 8–9 | MCP default pair + codegraph index, Playwright browsers | best-effort |
-| 10  | Dev server serves the app shell                         | **hard**²   |
+| #   | Step                                                                  | Gate        |
+| --- | --------------------------------------------------------------------- | ----------- |
+| 1   | Node runtime (pinned major) + corepack                                | **hard**¹   |
+| 2–5 | Distro tools, `gh`, gitleaks + Docker with the SonarQube images, `uv` | best-effort |
+| 6   | `pnpm install --frozen-lockfile`                                      | **hard**    |
+| 7   | `.env.local` (`setup:local --only-env`)                               | **hard**    |
+| 8–9 | MCP pair + codegraph index + session hooks, Playwright                | best-effort |
+| 10  | Dev server serves the app shell                                       | **hard**²   |
 
 ¹ The install itself is best-effort — a session Node of the right major is fine.
 Missing Node entirely is fatal.
-² Skippable with `AGENT_SKIP_HEALTHCHECK=1`.
-
 Best-effort steps log `•` and continue: a locked-down network should not cost
 you a whole session over an optional linter.
 
 ## Environment variables
 
-| Variable                     | Effect                                                                                         |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- |
-| `KEEP_APP=1`                 | Leave `pnpm dev` running after the healthcheck                                                 |
-| `AGENT_SKIP_HEALTHCHECK=1`   | Skip step 10; no dev server is started                                                         |
-| `AGENT_SKIP_PLAYWRIGHT=1`    | Skip browser provisioning                                                                      |
-| `AGENT_SKIP_MCP_WARM=1`      | Install `uv` but skip the headroom pre-warm                                                    |
-| `AGENT_PLAYWRIGHT_BROWSERS`  | Browsers to install (default `chromium`)                                                       |
-| `AGENT_PLAYWRIGHT_WITH_DEPS` | Also install browser OS deps (needs root)                                                      |
-| `NODE_INSTALL_PREFIX`        | Parent dir for `node<major>` (default `/opt`)                                                  |
-| `GH_VERSION`                 | Pin the `gh` release instead of resolving latest                                               |
-| `GITLEAKS_VERSION`           | Pin the gitleaks release instead of resolving latest                                           |
-| `HEALTHCHECK_URL`            | Override the probe URL (default `http://localhost:<HEALTHCHECK_PORT>/`)                        |
-| `HEALTHCHECK_PORT`           | Port for the transient dev server (default `5173`; must be free — started with `--strictPort`) |
+| Variable              | Effect                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------- |
+| `NODE_INSTALL_PREFIX` | Parent dir for `node<major>` (default `/opt`)                                         |
+| `GH_VERSION`          | Pin the `gh` release instead of resolving latest                                      |
+| `GITLEAKS_VERSION`    | Trial another gitleaks than `tool-versions.sh` pins (set its `GITLEAKS_SHA256_*` too) |
+| `HEALTHCHECK_URL`     | Override the probe URL (default `http://localhost:5173/`)                             |
 
 ## The session's `.env.local`
 
@@ -133,7 +128,7 @@ Two deliberate divergences from the Mac list:
 | `pnpm setup:local`                      | Developer on macOS/Linux     | 5 phases, ends by starting `pnpm dev`               |
 | `tooling/setup/agent/bootstrap.sh`      | Cloud agent session          | This directory — terminates, never leaves a server  |
 | `agent-os/cloud-environment/install.sh` | Environment **Setup script** | Thin wrapper that calls `bootstrap.sh`              |
-| `agent-os/hooks/session-start.sh`       | Every interactive session    | Fast path — switches Node, installs deps if missing |
+| `agent-os/hooks/fe-session-start.mjs`   | Every interactive session    | Fast path — switches Node, installs deps if missing |
 
 A cached **Setup script** must terminate, which is why `bootstrap.sh` passes
 `--only-env` to `setup:local` and stops the dev server it started for the

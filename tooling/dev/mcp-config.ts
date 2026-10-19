@@ -4,7 +4,7 @@
  *
  * Two committed templates, two tiers (see `agent-os/docs/cursor-mcp-setup.md`):
  *   - **Default auto-start pair** — [`.mcp.default.json`](../../.mcp.default.json):
- *     `codegraph` + `headroom`, two zero-config, agent-only servers. Declared by
+ *     `fe-codegraph` + `fe-headroom`, two zero-config, agent-only servers. Declared by
  *     `pnpm setup:local`, the session-start hook, and the cloud bootstrap so they are
  *     present before the first prompt.
  *   - **On-demand set** — [`.mcp.example.json`](../../.mcp.example.json): the full set
@@ -37,7 +37,7 @@ export const MCP_CONFIG_PATH = resolve(REPOSITORY_ROOT, '.mcp.json');
 /** Absolute path to the committed full-set MCP template (the pair + hosted integrations). */
 export const MCP_TEMPLATE_PATH = resolve(REPOSITORY_ROOT, '.mcp.example.json');
 
-/** Absolute path to the committed default-pair template (codegraph + headroom). */
+/** Absolute path to the committed default-pair template (fe-codegraph + fe-headroom). */
 export const MCP_DEFAULT_TEMPLATE_PATH = resolve(REPOSITORY_ROOT, '.mcp.default.json');
 
 type McpServerDefinition = Record<string, unknown>;
@@ -46,10 +46,51 @@ interface McpConfig {
   mcpServers: Record<string, McpServerDefinition>;
 }
 
+/**
+ * Server keys this repository used before the `fe-` prefix (18 Oct 2026), by their current key.
+ * clinozy-be declares servers of the same names with other launchers, so a client that loads
+ * both repositories' configs would otherwise run one repository's server for the other.
+ */
+const PREVIOUS_SERVER_KEYS: ReadonlyMap<string, string> = new Map([
+  ['codegraph', 'fe-codegraph'],
+  ['context7', 'fe-context7'],
+  ['headroom', 'fe-headroom'],
+  ['semgrep', 'fe-semgrep'],
+  ['sonarqube', 'fe-sonarqube'],
+]);
+
+/**
+ * Renames the servers a `.mcp.json` scaffolded before the prefix still declares, keeping each
+ * definition (and any credential filled into it). When both keys are present, the current one
+ * wins and the previous one is dropped, so no server is declared twice.
+ *
+ * @param servers - The `mcpServers` map read from `.mcp.json`.
+ * @returns The map with every previous key renamed, and the renames as `previous → current`.
+ */
+export function renamePreviousServerKeys(servers: Record<string, McpServerDefinition>): {
+  servers: Record<string, McpServerDefinition>;
+  renamed: string[];
+} {
+  const renamed: string[] = [];
+  const next: Record<string, McpServerDefinition> = Object.create(null);
+  for (const [key, definition] of Object.entries(servers)) {
+    const current = PREVIOUS_SERVER_KEYS.get(key);
+    if (current === undefined) {
+      next[key] = definition;
+      continue;
+    }
+    if (!(current in servers)) next[current] = definition;
+    renamed.push(`${key} → ${current}`);
+  }
+  return { servers: next, renamed };
+}
+
 /** Outcome of an {@link ensureMcpServers} / {@link ensureDefaultMcpServers} run. */
 export interface EnsureResult {
   /** Servers newly written into `.mcp.json`. */
   added: string[];
+  /** Servers renamed from a key used before the `fe-` prefix, as `previous → current`. */
+  renamed: string[];
   /** Servers already declared in `.mcp.json` (left untouched). */
   alreadyPresent: string[];
   /** Requested keys absent from the source template (ignored). */
@@ -99,6 +140,8 @@ function applyServers(options: {
   const { source } = options;
   const requested = options.keys === 'all' ? Object.keys(source) : [...options.keys];
   const config = readConfig(MCP_CONFIG_PATH);
+  const { servers, renamed } = renamePreviousServerKeys(config.mcpServers);
+  config.mcpServers = servers;
 
   const added: string[] = [];
   const alreadyPresent: string[] = [];
@@ -117,11 +160,11 @@ function applyServers(options: {
     added.push(key);
   }
 
-  const changed = added.length > 0;
+  const changed = added.length > 0 || renamed.length > 0;
   if (changed && !options.dryRun) {
     writeFileSync(MCP_CONFIG_PATH, `${JSON.stringify(config, null, 2)}\n`);
   }
-  return { added, alreadyPresent, missingFromTemplate, changed };
+  return { added, renamed, alreadyPresent, missingFromTemplate, changed };
 }
 
 /**
@@ -142,7 +185,7 @@ export function ensureMcpServers(options: {
   });
 }
 
-/** Ensure the default auto-start pair (`.mcp.default.json`: codegraph + headroom) is declared. */
+/** Ensure the default auto-start pair (`.mcp.default.json`: fe-codegraph + fe-headroom) is declared. */
 export function ensureDefaultMcpServers(options?: { dryRun?: boolean }): EnsureResult {
   return applyServers({
     source: readDefaultTemplateServers(),

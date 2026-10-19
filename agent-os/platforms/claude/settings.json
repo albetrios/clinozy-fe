@@ -2,26 +2,80 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-      "Bash(pnpm *)",
+      "Bash(pnpm validate*)",
+      "Bash(pnpm test*)",
+      "Bash(pnpm lint*)",
+      "Bash(pnpm type-check*)",
+      "Bash(pnpm biome*)",
+      "Bash(pnpm format*)",
+      "Bash(pnpm health*)",
+      "Bash(pnpm quality*)",
+      "Bash(pnpm ci*)",
+      "Bash(pnpm docs*)",
+      "Bash(pnpm tsdoc*)",
+      "Bash(pnpm agent-os*)",
+      "Bash(pnpm iteration*)",
+      "Bash(pnpm sync*)",
+      "Bash(pnpm knip*)",
+      "Bash(pnpm size*)",
+      "Bash(pnpm coverage*)",
+      "Bash(pnpm build*)",
+      "Bash(pnpm sonar*)",
+      "Bash(pnpm api*)",
+      "Bash(pnpm app*)",
+      "Bash(pnpm contracts*)",
+      "Bash(pnpm dev*)",
+      "Bash(pnpm preview*)",
+      "Bash(pnpm install)",
+      "Bash(pnpm install --frozen-lockfile)",
+      "Bash(pnpm install --prefer-offline)",
+      "Bash(pnpm security*)",
+      "Bash(pnpm deps:check*)",
+      "Bash(pnpm deps:audit*)",
+      "Bash(pnpm tool:project-structure-tree*)",
+      "Bash(pnpm exec *)",
       "Bash(git status)",
       "Bash(git diff*)",
       "Bash(git log*)",
       "Bash(git branch*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git switch *)",
       "Bash(gh pr*)",
       "Bash(gh issue*)",
-      "mcp__context7__*",
+      "Bash(gh run *)",
+      "mcp__fe-context7__*",
       "mcp__shadcn__*",
       "mcp__tailwindcss__*",
-      "mcp__codegraph__*"
+      "mcp__codegraph__*",
+      "mcp__headroom__*",
+      "mcp__fe-codegraph__*",
+      "mcp__fe-headroom__*",
+      "mcp__github__get_*",
+      "mcp__github__list_*",
+      "mcp__github__search_*",
+      "mcp__github__pull_request_read",
+      "mcp__github__issue_read",
+      "mcp__github__actions_get",
+      "mcp__github__actions_list"
+    ],
+    "ask": ["Bash(gh pr create *)", "Bash(pnpm dlx *)", "Bash(pnpm add *)"],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(rm -rf *)",
+      "mcp__github__delete_file"
     ]
   },
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup|resume",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/session-start.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-start.mjs\""
           }
         ]
       },
@@ -30,7 +84,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/compact-resume-card.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-compact-resume-card.mjs\""
           }
         ]
       }
@@ -40,7 +94,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/prompt-skill-router.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-prompt-skill-router.mjs\""
           }
         ]
       }
@@ -51,16 +105,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/guard-edits.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-guard-edits.mjs\""
           }
         ]
       },
       {
-        "matcher": "Bash|Edit|Write",
+        "matcher": "Bash|Read|Grep|Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/guardrails.mjs\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-guardrails.mjs\""
           }
         ]
       },
@@ -69,7 +123,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/no-unrequested-pr.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-no-unrequested-pr.mjs\""
           }
         ]
       }
@@ -80,16 +134,45 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/format-edits.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-edit-hooks.mjs\"",
+            "if": "Edit(**)"
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-edit-hooks.mjs\"",
+            "if": "Write(**)"
           }
         ]
       },
       {
-        "matcher": "Edit|Write",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/skill-reminder.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-push-ci-watch.mjs\"",
+            "if": "Bash(git push*)",
+            "asyncRewake": true,
+            "timeout": 2700
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-edit-hooks.mjs\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-turn-end-tests.mjs\"",
+            "asyncRewake": true,
+            "timeout": 120
           }
         ]
       }
@@ -100,17 +183,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/gate-failure-hint.sh\""
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/stop-gate-reminder.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-gate-failure-hint.mjs\""
           }
         ]
       }
@@ -120,7 +193,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/session-end.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-end.mjs\""
           }
         ]
       }

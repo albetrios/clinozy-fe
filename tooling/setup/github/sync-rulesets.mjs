@@ -37,8 +37,8 @@
 import { execFileSync, execSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
+import { isMain, parseCommandLine } from '../../ci/script.mjs';
 import { GitHubApiError, getRepositoryIdentifier, runGhJson } from './github-shared.mjs';
 
 const RULESETS_DIRECTORY = resolve(import.meta.dirname, '../../../.github/rulesets');
@@ -254,9 +254,20 @@ function syncRulesets({
 }
 
 function parseArguments() {
-  const argumentsList = process.argv.slice(2);
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: {
+      help: { type: 'boolean', short: 'h' },
+      check: { type: 'boolean' },
+      'dry-run': { type: 'boolean' },
+      prune: { type: 'boolean' },
+      yes: { type: 'boolean', short: 'y' },
+    },
+    messages: {
+      unknownOption: (option) => `Unknown argument "${option}". Use --help for options.`,
+    },
+  });
 
-  if (argumentsList.includes('--help') || argumentsList.includes('-h')) {
+  if (values.help === true) {
     console.log(
       'Usage: node tooling/setup/github/sync-rulesets.mjs [--check | --dry-run] [--prune] [--yes]',
     );
@@ -280,24 +291,18 @@ function parseArguments() {
     process.exit(0);
   }
 
-  const allowed = new Set(['--check', '--dry-run', '--prune', '--yes', '-y']);
-  for (const argument of argumentsList) {
-    if (!allowed.has(argument)) {
-      throw new Error(`Unknown argument "${argument}". Use --help for options.`);
-    }
-  }
-  if (argumentsList.includes('--check') && argumentsList.includes('--dry-run')) {
+  if (values.check === true && values['dry-run'] === true) {
     throw new Error('Use either --check or --dry-run, not both.');
   }
 
-  const mode = argumentsList.includes('--check')
-    ? /** @type {const} */ ('check')
-    : argumentsList.includes('--dry-run')
-      ? /** @type {const} */ ('dry-run')
-      : /** @type {const} */ ('sync');
-  const prune = argumentsList.includes('--prune');
-  const skipConfirmation =
-    argumentsList.includes('--yes') || argumentsList.includes('-y');
+  const mode =
+    values.check === true
+      ? /** @type {const} */ ('check')
+      : values['dry-run'] === true
+        ? /** @type {const} */ ('dry-run')
+        : /** @type {const} */ ('sync');
+  const prune = values.prune === true;
+  const skipConfirmation = values.yes === true;
 
   return { mode, prune, skipConfirmation };
 }
@@ -353,7 +358,6 @@ function main() {
 
 // Only run when executed directly (node …/sync-rulesets.mjs). Importing the
 // module (e.g. from tests or sync.mjs) must NOT trigger a live gh sync.
-const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
-if (isMainModule) {
+if (isMain(import.meta.url)) {
   main();
 }

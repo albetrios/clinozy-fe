@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 import {
   classifyManagedKey,
@@ -22,15 +21,15 @@ const schemaDefaults = new Map([
 const sets = { secretKeys, variableKeys };
 
 describe('classifyManagedKey', () => {
-  test('classifies by allowlist membership; unmanaged otherwise', () => {
-    assert.equal(classifyManagedKey('NETLIFY_AUTH_TOKEN', sets), 'secret');
-    assert.equal(classifyManagedKey('VITE_DEBUG_LOGGING', sets), 'variable');
-    assert.equal(classifyManagedKey('SONAR_TOKEN', sets), 'unmanaged');
+  it('classifies by allowlist membership; unmanaged otherwise', () => {
+    expect(classifyManagedKey('NETLIFY_AUTH_TOKEN', sets)).toBe('secret');
+    expect(classifyManagedKey('VITE_DEBUG_LOGGING', sets)).toBe('variable');
+    expect(classifyManagedKey('SONAR_TOKEN', sets)).toBe('unmanaged');
   });
 
-  test('secret wins when a key is in both lists (never leak a secret as a variable)', () => {
+  it('secret wins when a key is in both lists (never leak a secret as a variable)', () => {
     const both = { secretKeys: new Set(['X']), variableKeys: new Set(['X']) };
-    assert.equal(classifyManagedKey('X', both), 'secret');
+    expect(classifyManagedKey('X', both)).toBe('secret');
   });
 });
 
@@ -43,42 +42,30 @@ describe('splitManagedEntries', () => {
     { name: 'SONAR_TOKEN', value: 'x' }, // unmanaged → dropped
   ];
 
-  test('buckets secrets, variables, blanks, and schema-defaults; drops unmanaged', () => {
+  it('buckets secrets, variables, blanks, and schema-defaults; drops unmanaged', () => {
     const { secrets, variables, blank, schemaDefault } = splitManagedEntries(declared, {
       secretKeys,
       variableKeys,
       schemaDefaults,
     });
-    assert.deepEqual(
-      secrets.map((e) => e.name),
-      ['NETLIFY_AUTH_TOKEN'],
-    );
-    assert.deepEqual(
-      variables.map((e) => e.name),
-      ['VITE_VERSION_CHECK'],
-    );
-    assert.deepEqual(
-      blank.map((e) => e.name),
-      ['VITE_API_BASE_URL'],
-    );
-    assert.deepEqual(
-      schemaDefault.map((e) => e.name),
-      ['VITE_DEBUG_LOGGING'],
-    );
+    expect(secrets.map((e) => e.name)).toStrictEqual(['NETLIFY_AUTH_TOKEN']);
+    expect(variables.map((e) => e.name)).toStrictEqual(['VITE_VERSION_CHECK']);
+    expect(blank.map((e) => e.name)).toStrictEqual(['VITE_API_BASE_URL']);
+    expect(schemaDefault.map((e) => e.name)).toStrictEqual(['VITE_DEBUG_LOGGING']);
   });
 
-  test('keepSchemaDefaults routes a default-valued variable back to pushable', () => {
+  it('keepSchemaDefaults routes a default-valued variable back to pushable', () => {
     const { variables, schemaDefault } = splitManagedEntries(declared, {
       secretKeys,
       variableKeys,
       schemaDefaults,
       keepSchemaDefaults: true,
     });
-    assert.equal(schemaDefault.length, 0);
-    assert.ok(variables.some((e) => e.name === 'VITE_DEBUG_LOGGING'));
+    expect(schemaDefault.length).toBe(0);
+    expect(variables.some((e) => e.name === 'VITE_DEBUG_LOGGING')).toBeTruthy();
   });
 
-  test('a secret is never treated as schema-default even if its value matches', () => {
+  it('a secret is never treated as schema-default even if its value matches', () => {
     const { secrets, schemaDefault } = splitManagedEntries(
       [{ name: 'NETLIFY_AUTH_TOKEN', value: 'false' }],
       {
@@ -87,29 +74,26 @@ describe('splitManagedEntries', () => {
         schemaDefaults: new Map([['NETLIFY_AUTH_TOKEN', 'false']]),
       },
     );
-    assert.deepEqual(
-      secrets.map((e) => e.name),
-      ['NETLIFY_AUTH_TOKEN'],
-    );
-    assert.equal(schemaDefault.length, 0);
+    expect(secrets.map((e) => e.name)).toStrictEqual(['NETLIFY_AUTH_TOKEN']);
+    expect(schemaDefault.length).toBe(0);
   });
 });
 
 describe('findStaleManaged', () => {
   const managedNames = new Set([...secretKeys, ...variableKeys]);
 
-  test('flags a managed remote key with no local declaration; leaves unmanaged alone', () => {
+  it('flags a managed remote key with no local declaration; leaves unmanaged alone', () => {
     const stale = findStaleManaged({
       remoteKeys: ['VITE_DEBUG_LOGGING', 'VITE_VERSION_CHECK', 'HAND_MADE_VAR'],
       declaredNames: new Set(['VITE_VERSION_CHECK']),
       managedNames,
     });
-    assert.deepEqual(stale, ['VITE_DEBUG_LOGGING']); // HAND_MADE_VAR unmanaged → not pruned
+    expect(stale).toStrictEqual(['VITE_DEBUG_LOGGING']); // HAND_MADE_VAR unmanaged → not pruned
   });
 });
 
 describe('planEnvironmentSyncPreview', () => {
-  test('computes the right decision per key', () => {
+  it('computes the right decision per key', () => {
     const rows = planEnvironmentSyncPreview({
       declared: [
         { name: 'NETLIFY_AUTH_TOKEN', value: 'tok' }, // secret, on remote → secret
@@ -131,17 +115,17 @@ describe('planEnvironmentSyncPreview', () => {
       schemaDefaults,
     });
     const byName = new Map(rows.map((r) => [r.name, r.decision]));
-    assert.equal(byName.get('NETLIFY_AUTH_TOKEN'), 'secret');
-    assert.equal(byName.get('VITE_API_BASE_URL'), 'secret-create');
-    assert.equal(byName.get('VITE_DEBUG_LOGGING'), 'skip+prune');
-    assert.equal(byName.get('VITE_VERSION_CHECK'), 'update');
-    assert.equal(byName.get('VITE_CAPTCHA_DISABLED'), 'create');
-    assert.equal(byName.has('SONAR_TOKEN'), false); // unmanaged omitted
-    assert.equal(byName.get('VITE_DEVTOOLS'), 'prune-stale'); // managed remote, no local line
-    assert.equal(byName.has('STALE_VAR'), false); // unmanaged remote never pruned
+    expect(byName.get('NETLIFY_AUTH_TOKEN')).toBe('secret');
+    expect(byName.get('VITE_API_BASE_URL')).toBe('secret-create');
+    expect(byName.get('VITE_DEBUG_LOGGING')).toBe('skip+prune');
+    expect(byName.get('VITE_VERSION_CHECK')).toBe('update');
+    expect(byName.get('VITE_CAPTCHA_DISABLED')).toBe('create');
+    expect(byName.has('SONAR_TOKEN')).toBe(false); // unmanaged omitted
+    expect(byName.get('VITE_DEVTOOLS')).toBe('prune-stale'); // managed remote, no local line
+    expect(byName.has('STALE_VAR')).toBe(false); // unmanaged remote never pruned
   });
 
-  test('masks secret values in both local and remote columns', () => {
+  it('masks secret values in both local and remote columns', () => {
     const rows = planEnvironmentSyncPreview({
       declared: [{ name: 'NETLIFY_AUTH_TOKEN', value: 'super-secret' }],
       remoteVariables: new Map(),
@@ -150,14 +134,14 @@ describe('planEnvironmentSyncPreview', () => {
       variableKeys,
     });
     const row = rows.find((r) => r.name === 'NETLIFY_AUTH_TOKEN');
-    assert.ok(row);
-    assert.equal(row.local.includes('super-secret'), false);
-    assert.equal(row.remote.includes('super-secret'), false);
+    expect(row).toBeTruthy();
+    expect(row.local.includes('super-secret')).toBe(false);
+    expect(row.remote.includes('super-secret')).toBe(false);
   });
 });
 
 describe('formatSyncPreviewTable', () => {
-  test('renders headers, rows, and a per-decision summary', () => {
+  it('renders headers, rows, and a per-decision summary', () => {
     const rows = planEnvironmentSyncPreview({
       declared: [{ name: 'VITE_CAPTCHA_DISABLED', value: 'true' }],
       remoteVariables: new Map(),
@@ -166,8 +150,8 @@ describe('formatSyncPreviewTable', () => {
       variableKeys,
     });
     const table = formatSyncPreviewTable({ rows, environment: 'production' });
-    assert.match(table, /github:sync production — preview/);
-    assert.match(table, /VARIABLE\s+KIND\s+DEFAULT\s+LOCAL\s+REMOTE\s+DECISION/);
-    assert.match(table, /create=1/);
+    expect(table).toMatch(/github:sync production — preview/);
+    expect(table).toMatch(/VARIABLE\s+KIND\s+DEFAULT\s+LOCAL\s+REMOTE\s+DECISION/);
+    expect(table).toMatch(/create=1/);
   });
 });

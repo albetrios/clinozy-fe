@@ -1,6 +1,8 @@
 ---
 name: fe-env-schema-add
-description: Walk through adding, renaming, or removing an env var safely in clinozy-fe. Decides Secret vs Variable, picks the correct .env.example sub-section, keeps schema, template, validators, and GitHub Environments in sync. Use when src/core/config/env-schema.ts or .env.example changes.
+description: Add, rename or remove an env var safely — Secret vs Variable, the .env.example section, schema, validators and GitHub Environments in sync. Use when env-schema.ts or .env.example changes.
+trigger: src/core/config/env-schema.ts, .env.example, **/platform-config.ts, **/build-env.ts, knip.jsonc
+triggerNote: If an env key changed
 ---
 
 # Env schema add (clinozy-fe)
@@ -53,7 +55,7 @@ Every key sits under exactly one half. Sub-sections (`# --- Title ---`) group re
 
 1. **Credential or signing material?** → **Secret** (`*_TOKEN`, `*_AUTH_TOKEN`, `SENTRY_AUTH_TOKEN`, …).
 2. **Leak would grant unauthorized access?** → **Secret**.
-3. **Public identifier or operational knob?** → **Variable** (`VITE_*` client flags, `NODE_VERSION`, `NETLIFY_SITE_ID`, public DSN/site keys).
+3. **Public identifier or operational knob?** → **Variable** (`VITE_*` client flags, `NETLIFY_SITE_ID`, public DSN/site keys).
 4. **Still unsure?** → default **Secret**.
 
 ## FE-specific prefixes

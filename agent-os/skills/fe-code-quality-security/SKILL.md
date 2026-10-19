@@ -1,6 +1,8 @@
 ---
 name: fe-code-quality-security
-description: Three-layer code quality and security pipeline. Use when adding ESLint rules, configuring pre-commit hooks, debugging CI failures, adding security checks, updating lint config, or reviewing the quality pipeline. Triggers on "add eslint rule", "configure pre-commit", "why is CI failing", "add security check", "update lint config", "what checks run on commit".
+description: The three-layer quality and security pipeline (ESLint, pre-commit, CI). Use when adding an ESLint rule or security check, changing lint config or hooks, or asking why CI or a commit failed.
+trigger: netlify.toml, .husky/**, .github/workflows/**, eslint.config.mjs
+triggerNote: The deploy path (always netlify deploy --no-build), the git hooks, the CI workflows and the lint config
 ---
 
 # Code Quality and Security Pipeline
@@ -79,8 +81,8 @@ Checks run on every `git commit` via `.husky/pre-commit` and `.husky/commit-msg`
 | #    | Check                   | What it does                                                                                                                | Blocks commit?     |
 | ---- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------ |
 | 1    | **fe-before-commit-guard** | `./tooling/validate/before-commit-guard.sh` — ALL pre-commit steps (1–11) under `set -e`; see the fe-before-commit-guard skill | Yes                |
-| 1.7  | ↳ Gitleaks              | Scans staged files for secrets/API keys (step 7)                                                                            | Yes (if installed) |
-| 1.8  | ↳ Env-file guard        | Rejects any staged `.env*` except `.env.example` (step 8)                                                                   | Yes                |
+| 1.7  | ↳ Gitleaks              | Scans staged files for secrets/API keys (step 7; mandatory — a missing gitleaks blocks the commit)                          | Yes                |
+| 1.8  | ↳ Secret/state files    | Rejects a staged secret or state file — `.env*` but `.env.example`, `.sentryclirc`, … (step 8; `tooling/validate/never-committed.mjs`) | Yes                |
 | 1.9  | ↳ Conflict markers      | Rejects files containing `<<<<<<<` or `>>>>>>>` (step 9)                                                                    | Yes                |
 | 1.10 | ↳ Large file check      | Rejects staged blobs > 3MB via `git cat-file -s` (step 10); `iterations/` design exports exempt                                 | Yes                |
 | 2    | `commitlint`            | Enforces conventional commit format (`feat:`, `fix:`, etc.) via `.husky/commit-msg`                                         | Yes                |
@@ -94,6 +96,7 @@ See **fe-before-commit-guard** skill (`agent-os/skills/fe-before-commit-guard/SK
 | `.husky/pre-commit`                       | Pre-commit hook — one-liner invoking the guard (all steps live inside it, clinozy-be pattern)                          |
 | `tooling/validate/before-commit-guard.sh` | Guard script: env, public, lint-staged, vite-env, type-check, lockfile, gitleaks, env-files, conflicts, large files |
 | `tooling/validate/large-staged-files.sh`  | Guard step 10: rejects staged blobs > 3MB (`iterations/` exempt), pinned by `large-staged-files.test.mjs`               |
+| `tooling/ci/early-checks.mjs` | Guard steps 11–12 (lockfile audit, client env allowlist): a finding blocks; Semgrep at push is `tooling/ci/push-semgrep.mjs` (auth, HTTP client, CSP) |
 | `.husky/commit-msg`                       | Commit message validation hook                                                                                      |
 | `.commitlintrc.json`                      | Conventional commit config                                                                                          |
 | `.gitleaks.toml`                          | Gitleaks secret scan allowlist                                                                                      |
@@ -196,7 +199,7 @@ Runs on every PR to `main`. Multiple parallel jobs across several workflows.
 
 ### "gitleaks: command not found" on commit
 
-Gitleaks is optional locally. Install with `brew install gitleaks`. The pre-commit hook skips the check gracefully if not installed. CI always runs it.
+Gitleaks is required locally: the before-commit guard fails a commit when it is missing. Install with `brew install gitleaks` (macOS) or `bash tooling/setup/agent/install-gitleaks.sh` (Linux; cloud sessions install it in setup). CI always runs it too.
 
 ### Semgrep timeout in CI
 

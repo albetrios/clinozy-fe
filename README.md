@@ -40,7 +40,7 @@ pnpm dev
 ```
 
 The app runs at **http://localhost:5173**.  
-**Prerequisites:** Node.js **24.x** (Active LTS) or newer LTS, and **pnpm** ≥ 12.8.1 (`corepack enable` picks up the `packageManager` pin). Use `.nvmrc` / `.node-version` for the pinned version (`24.21.0`). On **macOS**, `pnpm setup:mac-tools` installs the external CLI tools (gitleaks, gh, jq, uv, a headless Docker runtime, …) — and `pnpm setup:local` runs it automatically.  
+**Prerequisites:** Node.js **24.x** (Active LTS) or newer LTS, and **pnpm** ≥ 12.8.1 (`corepack enable` picks up the `packageManager` pin). Use `.nvmrc`, the one Node pin, for the exact version. On **macOS**, `pnpm setup:mac-tools` installs the external CLI tools (gitleaks, gh, jq, uv, a headless Docker runtime, …) — and `pnpm setup:local` runs it automatically.  
 **Full local setup:** [docs/getting-started/setup.md](docs/getting-started/setup.md).
 
 ---
@@ -142,7 +142,7 @@ Trunk-based development on a single branch:
 
 - **One long-lived branch:** `main` (default + trunk). Every push to `main` deploys the `development` alias; a release deploys `production`. Unfinished work ships behind a feature flag, not a branch.
 - **Short-lived branches:** `feat/...`, `fix/...`, `refactor/...`, `docs/...`, `test/...`, `chore/...` (created from `main`). Hotfixes are fix-forward on `main`.
-- **PR flow:** feat/fix → `main` (squash-merge, branch auto-deletes). CI runs on PRs to `main`. Ship by merging the standing release-please Release PR.
+- **PR flow:** feat/fix → `main` (squash-merge, branch auto-deletes). CI runs on PRs to `main`. Ship by merging the standing release-please Release PR (opened or refreshed on demand: `gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true`).
 
 See **[docs/process/trunk-based-workflow.md](docs/process/trunk-based-workflow.md)** for the full workflow: branch naming, step-by-step PR flow, conventional commits, and hotfix process.
 

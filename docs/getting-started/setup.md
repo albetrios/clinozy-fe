@@ -36,7 +36,7 @@ Useful flags:
 | `--only-env`        | Scaffold `.env.example` → `.env.local` and exit |
 | `--force-env-local` | Rewrite `.env.local` from `.env.example`        |
 
-`pnpm setup:local` also scaffolds the **full MCP template set** into `.mcp.json` (context7, shadcn, tailwindcss, clinozy-be-api, semgrep, sonarqube, codegraph, headroom). Set `CONTEXT7_API_KEY` in `.env.local` and reload Cursor.
+`pnpm setup:local` also scaffolds the **full MCP template set** into `.mcp.json` (fe-context7, shadcn, tailwindcss, clinozy-be-api, fe-semgrep, fe-sonarqube, fe-codegraph, fe-headroom). Set `CONTEXT7_API_KEY` in `.env.local` and reload Cursor.
 
 ---
 

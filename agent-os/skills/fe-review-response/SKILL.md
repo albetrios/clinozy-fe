@@ -1,6 +1,6 @@
 ---
 name: fe-review-response
-description: Work a code-review document to completion — build a resolution matrix, and verify every finding against the code rather than trusting the review's own status labels. Use when handed a review report, a PR review thread, or a list of findings to address.
+description: Work a code review to completion — a resolution matrix, every finding verified against the code, not the review's own labels. Use with a review report, a PR review thread or a list of findings.
 ---
 
 # Review response (clinozy-fe)

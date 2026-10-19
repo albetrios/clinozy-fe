@@ -12,13 +12,18 @@
  *   tsx agent-os/evals/check.ts            # gate: exits 1 on any ERROR
  *   tsx agent-os/evals/check.ts --report   # verbose: list every check + WARNs
  */
-import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 
+import { skillFileHash } from '../../tooling/agent-os/lock.ts';
+import { parseCommandLine } from '../../tooling/ci/script.mjs';
+import { checkSelectorFixtures } from '../../tooling/ci/selector-fixtures.check.mjs';
+
 const repositoryRoot = process.cwd();
 const agentOsDirectory = join(repositoryRoot, 'agent-os');
-const reportMode = process.argv.includes('--report');
+const reportMode =
+  parseCommandLine(process.argv.slice(2), { options: { report: { type: 'boolean' } } })
+    .values.report === true;
 
 type Level = 'error' | 'warn';
 interface Finding {
@@ -48,6 +53,9 @@ const listFilesWithExtension = (absoluteDirectory: string, extension: string): s
     .sort();
 
 /** Extract a single frontmatter field, tolerating folded (`>`) / literal (`|`) scalars. */
+/** The longest description one of this repository's skills may have (the skill listing's budget). */
+const MAX_OWN_DESCRIPTION = 200;
+
 function frontmatterField(text: string, key: string): string | undefined {
   const block = text.match(/^---\n([\s\S]*?)\n---/)?.[1];
   if (!block) return undefined;
@@ -103,6 +111,14 @@ for (const skill of skillDirectoryNames) {
       'skill-description',
       `skills/${skill}: description is ${description.length} chars — thin for auto-trigger`,
     );
+  // Claude Code lists every skill's description in one budget (1% of the context window); over it,
+  // every description is shortened, and in a session of both repositories the long ones showed
+  // blank. This repository's own skills stay at 200 characters or fewer.
+  else if (skill.startsWith('fe-') && description.length > MAX_OWN_DESCRIPTION)
+    error(
+      'skill-description',
+      `skills/${skill}: description is ${description.length} chars — at most ${MAX_OWN_DESCRIPTION} for this repository's skills`,
+    );
 }
 
 // ── Skill-registry ↔ disk: paths resolve, every skill referenced, count matches ──
@@ -144,15 +160,20 @@ if (existsSync(registryFile)) {
 
 // ── Vendored skills: skills-lock.json hashes match the committed files ──
 // skills-lock.json records the sha256 of every ecosystem skill installed via the
-// skills CLI. Recompute each and fail on mismatch so an unintended edit to a
-// vendored skill (or a stale lock) is caught, not silently accepted.
+// skills CLI. Recompute each with the lock tool's own hash (`pnpm agent-os:lock`,
+// tooling/agent-os/lock.ts) and fail on mismatch so an unintended edit to a
+// vendored skill (or a stale lock) is caught, not silently accepted. The one check
+// of the lock: the ci-policy lane no longer repeats it.
 const skillsLockFile = join(agentOsDirectory, 'skills-lock.json');
 if (existsSync(skillsLockFile)) {
   try {
     const lock = JSON.parse(readText(skillsLockFile)) as {
       skills?: Record<string, { skillPath?: string; computedHash?: string }>;
     };
-    for (const [name, entry] of Object.entries(lock.skills ?? {})) {
+    const lockEntries = Object.entries(lock.skills ?? {});
+    if (lockEntries.length === 0)
+      error('skills-lock', 'agent-os/skills-lock.json records no vendored skill');
+    for (const [name, entry] of lockEntries) {
       if (!entry.skillPath) {
         error('skills-lock', `skills-lock entry "${name}" has no skillPath`);
         continue;
@@ -165,7 +186,7 @@ if (existsSync(skillsLockFile)) {
         );
         continue;
       }
-      const actual = createHash('sha256').update(readFileSync(absolute)).digest('hex');
+      const actual = skillFileHash(absolute);
       if (entry.computedHash !== actual)
         error(
           'skills-lock',
@@ -190,6 +211,34 @@ for (const file of agentFiles) {
     error('agent-frontmatter', `agents/${file} name "${name ?? '∅'}" != "${agentName}"`);
   if (!description)
     error('agent-frontmatter', `agents/${file} missing frontmatter \`description\``);
+}
+
+// ── Agent model: every agent on the session's model and effort, and only documented flags ──
+// Per-job routing (Opus for judgment calls, Sonnet for the auditors, Haiku for the scanners) is
+// set aside for now (18 Oct 2026): every agent is `model: inherit` and sets no `effort`, so it
+// runs on the model and effort of the session that starts it, as in clinozy-be. Claude Code
+// silently ignores a frontmatter field it does not recognize, so these are validated here.
+for (const file of agentFiles) {
+  const text = readText(join(agentOsDirectory, 'agents', file));
+  const model = frontmatterField(text, 'model');
+  if (model !== 'inherit')
+    error(
+      'agent-frontmatter',
+      `agents/${file} model "${model ?? '∅'}" — every agent uses \`model: inherit\` (the session's model), for now`,
+    );
+  if (frontmatterField(text, 'effort') !== undefined)
+    error(
+      'agent-frontmatter',
+      `agents/${file} sets \`effort\` — every agent runs at the session's effort, for now`,
+    );
+  for (const flag of ['background', 'omitClaudeMd']) {
+    const value = frontmatterField(text, flag);
+    if (value !== undefined && value !== 'true')
+      error(
+        'agent-frontmatter',
+        `agents/${file} ${flag} "${value}" — only \`true\` is documented; omit it otherwise`,
+      );
+  }
 }
 
 // ── Read-only agents must enforce read-only via a tools allowlist ──
@@ -217,6 +266,16 @@ for (const file of agentFiles) {
         `agents/${file} is readonly:true but its \`tools\` allowlist includes write tool(s): ${offenders.join(', ')}`,
       );
   }
+  // An explicit denylist as well, so a later `tools` edit cannot quietly hand back a write tool.
+  const disallowed = frontmatterField(text, 'disallowedTools') ?? '';
+  const missing = writeTools.filter(
+    (tool) => !new RegExp(`\\b${tool}\\b`).test(disallowed),
+  );
+  if (missing.length)
+    error(
+      'agent-readonly',
+      `agents/${file} is readonly:true but \`disallowedTools\` does not list: ${missing.join(', ')}`,
+    );
 }
 
 // ── Agent catalog ↔ disk: gate-able count matches, every agent catalogued ──
@@ -426,19 +485,33 @@ if (existsSync(chainsFile)) {
           chains?: Record<string, { steps?: string[]; optional?: string[] }>;
         }
       ).chains ?? {};
-    for (const [chain, definition] of Object.entries(chains))
+    for (const [chain, definition] of Object.entries(chains)) {
       for (const step of [...(definition.steps ?? []), ...(definition.optional ?? [])])
         if (!skillDirectoryNames.includes(step))
           error(
             'skill-chains',
             `chains.json chain "${chain}" references "${step}" which has no skill directory`,
           );
+      // A required step the model cannot invoke (disable-model-invocation) stalls the chain; a
+      // manual-only skill belongs in `optional`, with a note on when to run it.
+      for (const step of definition.steps ?? []) {
+        const stepFile = join(agentOsDirectory, 'skills', step, 'SKILL.md');
+        if (
+          existsSync(stepFile) &&
+          frontmatterField(readText(stepFile), 'disable-model-invocation') === 'true'
+        )
+          error(
+            'skill-chains',
+            `chains.json chain "${chain}" requires "${step}", a manual-only skill (disable-model-invocation) — move it to optional`,
+          );
+      }
+    }
   } catch {
     error('skill-chains', 'agent-os/skills/chains.json is not valid JSON');
   }
 }
 
-// ── Agent pipelines ↔ disk: steps are real agents; handoffs are real skills ──
+// ── Agent pipelines ↔ disk: steps are real agents; handoffs and lenses are real skills ──
 const pipelinesFile = join(agentOsDirectory, 'agents', 'pipelines.json');
 if (existsSync(pipelinesFile)) {
   const agentNames = new Set(agentFiles.map((file) => basename(file, '.md')));
@@ -448,7 +521,12 @@ if (existsSync(pipelinesFile)) {
         JSON.parse(readText(pipelinesFile)) as {
           pipelines?: Record<
             string,
-            { steps?: string[]; handoff?: Record<string, string> }
+            {
+              steps?: string[];
+              handoff?: Record<string, string>;
+              when?: Record<string, string>;
+              lenses?: Record<string, string>;
+            }
           >;
         }
       ).pipelines ?? {};
@@ -459,6 +537,22 @@ if (existsSync(pipelinesFile)) {
             'agent-pipelines',
             `pipelines.json pipeline "${pipeline}" references agent "${step}" which has no agent file`,
           );
+      // `when` says which diffs need a step: its keys are steps, and a pipeline that has it scopes
+      // every step (`always` for one that always runs).
+      if (definition.when) {
+        for (const step of Object.keys(definition.when))
+          if (!(definition.steps ?? []).includes(step))
+            error(
+              'agent-pipelines',
+              `pipelines.json pipeline "${pipeline}" when key "${step}" is not one of its steps`,
+            );
+        for (const step of definition.steps ?? [])
+          if (!definition.when[step])
+            error(
+              'agent-pipelines',
+              `pipelines.json pipeline "${pipeline}" step "${step}" has no when (use "always")`,
+            );
+      }
       for (const [step, skill] of Object.entries(definition.handoff ?? {})) {
         if (!agentNames.has(step))
           error(
@@ -471,6 +565,13 @@ if (existsSync(pipelinesFile)) {
             `pipelines.json pipeline "${pipeline}" handoff "${step}" → "${skill}" has no skill directory`,
           );
       }
+      // `lenses` are skills a general-purpose agent applies to the same diff (not agents).
+      for (const lens of Object.keys(definition.lenses ?? {}))
+        if (!skillDirectoryNames.includes(lens))
+          error(
+            'agent-pipelines',
+            `pipelines.json pipeline "${pipeline}" lens "${lens}" has no skill directory`,
+          );
     }
   } catch {
     error('agent-pipelines', 'agent-os/agents/pipelines.json is not valid JSON');
@@ -509,7 +610,7 @@ if (existsSync(commandsDirectory)) {
 
 // ── Repo name prefix: every agent-os item this repo owns starts with `fe-` ──
 // clinozy-fe and clinozy-be (`be-`) are often loaded in one session, where a shared name lets
-// one repo's skill, agent, command or rule hide the other's. Vendored skills keep their
+// one repo's skill, agent, command, rule or hook hide the other's. Vendored skills keep their
 // upstream names: every skills-lock.json entry, plus the Vercel skills installed outside it.
 const repositoryPrefix = 'fe-';
 const vendoredSkills = new Set<string>([
@@ -543,6 +644,28 @@ if (existsSync(commandsDirectory))
     requirePrefix('command', basename(file, '.md'));
 for (const file of listFilesWithExtension(join(agentOsDirectory, 'rules'), '.mdc'))
   requirePrefix('rule', basename(file, '.mdc'));
+// Hook scripts and their manifest ids too, so a block message, a telemetry row or a session-root
+// settings entry always names its repository. A helper the hooks import (never registered
+// itself) keeps its leading `_` before the prefix: `_fe-hook.mjs`. Every hook is a Node script
+// (tests/ci/agent-hook-runtime.policy.test.ts), so `.mjs` is the one extension to scan.
+const hooksDirectory = join(agentOsDirectory, 'hooks');
+for (const file of listFilesWithExtension(hooksDirectory, '.mjs'))
+  if (!file.replace(/^_/, '').startsWith(repositoryPrefix))
+    error(
+      'name-prefix',
+      `hook "${file}" must start with "${repositoryPrefix}" (a helper with "_${repositoryPrefix}")`,
+    );
+if (existsSync(hooksManifestFile)) {
+  try {
+    const manifest = JSON.parse(readText(hooksManifestFile)) as {
+      hooks?: Array<{ id?: string }>;
+    };
+    for (const entry of manifest.hooks ?? [])
+      if (entry.id) requirePrefix('hook id', entry.id);
+  } catch {
+    // The hook manifest check above reports invalid JSON.
+  }
+}
 
 // ── Plugin manifest references resolve to real paths ──
 // agent-os/.claude-plugin/plugin.json makes agent-os/ itself the installable
@@ -573,6 +696,14 @@ if (existsSync(pluginManifestFile)) {
   }
 }
 
+// ── The test selection (pnpm test:select) holds its fixtures ──
+// One generated fixture per page island (its main file selects its own test and no test in
+// another section), the escalation list running everything, the misses recorded in
+// tooling/ci/selector-fixtures.json, and the unreachable tests (no single change selects them)
+// always run.
+const selectorFixtures = checkSelectorFixtures(repositoryRoot);
+for (const problem of selectorFixtures.problems) error('selector-fixtures', problem);
+
 // ── Report ──
 const errors = findings.filter((finding) => finding.level === 'error');
 const warnings = findings.filter((finding) => finding.level === 'warn');
@@ -600,11 +731,12 @@ const checkLabels: Record<string, string> = {
   'requirement-form': 'Requirement intake doc',
   'plugin-refs': 'Plugin manifest references',
   'name-prefix': 'Repo name prefix (fe-)',
+  'selector-fixtures': 'Test selection fixtures',
 };
 
 console.log('\nagent-os integrity evals (Tier 1 — clinozy-fe)\n');
 console.log(
-  `  skills (SKILL.md): ${skillsWithManifest.length}   skill dirs: ${skillDirectoryNames.length}   agents: ${agentFiles.length}\n`,
+  `  skills (SKILL.md): ${skillsWithManifest.length}   skill dirs: ${skillDirectoryNames.length}   agents: ${agentFiles.length}   selector fixtures: ${selectorFixtures.fixtures} (${selectorFixtures.unreachable} unreachable tests always run)\n`,
 );
 
 const group = (level: Level) => {

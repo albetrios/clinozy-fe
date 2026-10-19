@@ -1,6 +1,6 @@
 ---
 name: fe-full-code-review
-description: Generate a full code review report across security, performance, code quality, readability, maintainability, and scalability. Use when the user asks to "run code review", "generate code review report", or "full code review".
+description: A full code review report — security, performance, quality, readability, maintainability, scalability. Use when asked to run code review, generate a code review report or do a full code review.
 ---
 
 # Full Code Review — Report Generation
@@ -48,11 +48,19 @@ When the user asks the AI to generate the report:
 
 ---
 
+## Diff mode — the code pass of `/fe-pre-merge-review`
+
+When the caller gives a diff range (the `pre-merge-review` pipeline's `lenses` entry does, when auth,
+tokens, CSP or tenancy change), skip the script and the full report: read only the changed files and
+the code they call, through the dimensions below — security first, then performance, quality,
+readability, maintainability, scalability. Return each finding in `REVIEW.md` → Findings format
+(severity · `file:line` · check — failure scenario → fix), nothing else; no report file is written.
+
 ## Report Dimensions (from Plan)
 
 | Dimension           | What the script checks                                                                                                              |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| **Security**        | Token storage (memory only), auth flow, open redirect, sanitization, CSP, env, RBAC, dangerous patterns (grep), gitleaks (optional) |
+| **Security**        | Token storage (memory only), auth flow, open redirect, sanitization, CSP, env, RBAC, dangerous patterns (grep), gitleaks |
 | **Performance**     | Bundle size, lazy loading, TanStack Query, HTTP config, assets, build warnings                                                      |
 | **Code quality**    | Lint, type-check, format, architecture (grep), API client usage, TypeScript, ESLint security                                        |
 | **Readability**     | Naming, file length, imports, comments, structure                                                                                   |

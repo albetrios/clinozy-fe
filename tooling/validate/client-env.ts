@@ -26,7 +26,6 @@
  */
 import '../load-env-files.mjs';
 
-import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -37,29 +36,20 @@ import {
   environmentForBranch,
   envProfiles,
 } from '../../src/core/config/env-schema.ts';
+import { tryGit } from '../ci/git-environment.mjs';
+import { parseCommandLine } from '../ci/script.mjs';
 
 const projectRoot = resolve(import.meta.dirname, '../..');
 
-function argValue(flag: string): string | undefined {
-  const index = process.argv.indexOf(flag);
-  if (index !== -1 && index + 1 < process.argv.length) return process.argv[index + 1];
-  return undefined;
-}
+const { values: commandLine } = parseCommandLine(process.argv.slice(2), {
+  options: { env: { type: 'string' }, production: { type: 'boolean' } },
+});
 
 function currentBranch(): string | undefined {
   const fromCi = process.env.GITHUB_REF_NAME;
   if (fromCi) return fromCi;
-  try {
-    // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-    return execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
-      cwd: projectRoot,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    })
-      .toString()
-      .trim();
-  } catch {
-    return undefined;
-  }
+  const branch = tryGit(['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: projectRoot });
+  return branch.ok ? branch.output : undefined;
 }
 
 function isAppEnvironment(value: string | undefined): value is AppEnvironment {
@@ -67,7 +57,7 @@ function isAppEnvironment(value: string | undefined): value is AppEnvironment {
 }
 
 function resolveEnvironment(): AppEnvironment | undefined {
-  const explicit = argValue('--env');
+  const explicit = commandLine.env;
   if (explicit) {
     if (!isAppEnvironment(explicit)) {
       console.error(
@@ -82,7 +72,7 @@ function resolveEnvironment(): AppEnvironment | undefined {
   if (fromBranch) return fromBranch;
 
   // Legacy `--production` CLI flag only — no NODE_ENV/VITE_MODE env checks.
-  if (process.argv.includes('--production')) return 'production';
+  if (commandLine.production === true) return 'production';
 
   return undefined;
 }
@@ -95,16 +85,7 @@ function runtimeGet(key: string): string | undefined {
 
 /** True when `relPath` is gitignored (`git check-ignore` exits 0). */
 function isGitIgnored(relPath: string): boolean {
-  try {
-    // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'git' binary, no user input
-    execFileSync('git', ['check-ignore', '-q', relPath], {
-      cwd: projectRoot,
-      stdio: 'ignore',
-    });
-    return true;
-  } catch {
-    return false;
-  }
+  return tryGit(['check-ignore', '-q', relPath], { cwd: projectRoot }).ok;
 }
 
 /**

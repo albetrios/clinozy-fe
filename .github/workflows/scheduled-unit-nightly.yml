@@ -1,0 +1,100 @@
+name: Nightly unit suite
+
+# The full sharded Vitest suite on main every night (reusable-vitest-unit-only.yml, the same
+# workflow as the PR gate). Two jobs in one: a main that went red without a PR (a merge of two
+# green PRs, a dependency resolved differently) shows within a day, since post-merge-ci.yml does
+# not re-run the tests; and its shards save the main-branch Vitest cache that every PR's shards
+# restore — a PR-scoped cache is dropped when the PR's run ends (cleanup-cache.yml), so main's is
+# the only one that lasts. Scheduled, so a failure is a red run on the Actions tab; trigger on
+# demand with workflow_dispatch.
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # daily 02:00 UTC — before the weekly Monday jobs (03:00 onwards)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+
+concurrency:
+  group: scheduled-unit-nightly
+  cancel-in-progress: false
+
+jobs:
+  unit:
+    uses: ./.github/workflows/reusable-vitest-unit-only.yml
+
+  # Saves on main the caches every PR's ESLint and TypeScript jobs restore (pr-ci.yml): a PR's own
+  # cache is dropped when its run ends (cleanup-cache.yml), so main's is the only one that lasts.
+  # Not a check: a red lint or type error here is the next PR's to show.
+  main-caches:
+    name: Main ESLint and type-check caches
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: ESLint (fills its cache)
+        continue-on-error: true
+        run: pnpm lint
+      - name: Type check (writes its build info)
+        continue-on-error: true
+        run: pnpm type-check
+      - name: Save the ESLint cache
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.cache/eslint
+          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.mjs') }}-${{ github.run_id }}
+      - name: Save the type-check build info
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
+        with:
+          path: node_modules/.tmp/tsconfig.app.tsbuildinfo
+          key: tsc-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig*.json') }}-${{ github.run_id }}
+
+  resolve-success:
+    name: Close ci-failure issue
+    needs: [unit]
+    if: always() && needs.unit.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close the open ci-failure issue
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          mode: close
+          title: Nightly unit suite failing
+
+  notify-failure:
+    name: Notify failure
+    needs: [unit]
+    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read # the fix plan reads the failed jobs and their logs
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update ci-failure issue
+        # A red scheduled run is invisible unless someone opens the Actions tab; one issue per
+        # check sends a real notification, collects repeats as comments, and closes on the next
+        # green run (clinozy-be's shared ci-failure-issue action).
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          mode: open
+          title: Nightly unit suite failing
+          body: |
+            The nightly sharded unit suite on main failed — main is red without a PR (two green PRs that
+            conflict, or a dependency resolved differently). Read the failed shard. The next green night
+            closes this issue.

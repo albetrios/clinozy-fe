@@ -1,9 +1,17 @@
+import { availableParallelism } from 'node:os';
+
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vitest/config';
 
 import { i18nBuild } from './plugins/i18n-build.ts';
 import { clinozyFeTestEnv } from './plugins/test-env.ts';
+
+/** The app's projects (unit, security, ci-policy) run in jsdom through the one setup file. */
+const APP_TEST_SETUP = {
+  environment: 'jsdom',
+  setupFiles: ['./tests/utils/setup.ts'],
+};
 
 export default defineConfig({
   // Deliberately NO react-compiler here (vite.config.ts has it): coverage must
@@ -33,12 +41,11 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./tests/utils/setup.ts'],
     // Full-suite contention (jsdom + transform) routinely exceeds Vitest's 5s
     // default even for sync renders. Cap workers so parallel jsdom does not
-    // starve the suite, and keep a higher floor for outliers.
-    maxWorkers: 4,
+    // starve the suite, and keep a higher floor for outliers. One worker per CPU up
+    // to that cap: four workers on a 2-vCPU private runner only fight over two cores.
+    maxWorkers: Math.min(4, availableParallelism()),
     testTimeout: 30_000,
     hookTimeout: 60_000,
     exclude: ['node_modules', 'dist', 'tests/e2e'],
@@ -51,12 +58,14 @@ export default defineConfig({
     // are injected by the i18n-build plugin's `test.env` (see plugins/i18n-build.ts).
     // Projects (clinozy-be pattern): `unit` = colocated src suites; `security` =
     // cross-cutting invariants under tests/security (token storage, redirect
-    // safety, header tripwires). `pnpm test` runs all;
-    // `pnpm test:unit` / `pnpm test:security` target one project.
+    // safety, header tripwires); `tooling` = the tooling scripts' own tests. `pnpm test`
+    // runs all; `pnpm test:unit` / `pnpm test:security` / `pnpm test:github-scripts`
+    // target one project.
     projects: [
       {
         extends: true,
         test: {
+          ...APP_TEST_SETUP,
           name: 'unit',
           include: ['src/**/*.test.{ts,tsx}', 'src/**/__tests__/**/*.test.{ts,tsx}'],
         },
@@ -64,6 +73,7 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          ...APP_TEST_SETUP,
           name: 'security',
           include: ['tests/security/**/*.test.ts'],
         },
@@ -71,12 +81,25 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          ...APP_TEST_SETUP,
           name: 'ci-policy',
           // Release/CI-flow invariants (clinozy-be src/tests/unit/ci pattern):
           // workflow YAML wiring, release-please manifest shape, Dependabot
           // flow rules. Guards against silent drift like a renamed workflow
           // killing a workflow_run trigger.
           include: ['tests/ci/**/*.test.ts'],
+        },
+      },
+      {
+        // The tooling scripts' tests, beside each script under tooling/. Plain Node — no jsdom
+        // and not the app's setup file: they read files, spawn the scripts and build throwaway
+        // git repositories.
+        test: {
+          name: 'tooling',
+          include: ['tooling/**/*.test.{mjs,ts}'],
+          environment: 'node',
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
         },
       },
     ],

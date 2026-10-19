@@ -6,14 +6,13 @@
  * and clinozy-be, whose scaffolded `.env.<env>` carries `NODE_ENV=<env>`. An existing file is
  * never touched.
  */
-import { execFileSync } from 'node:child_process';
 import { existsSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { envRegistryJson } from './github-shared.mjs';
 import { loadSetupConfig } from './setup-config.mjs';
 
 const PROJECT_ROOT = resolve(import.meta.dirname, '../../..');
-const ENV_REGISTRY = resolve(PROJECT_ROOT, 'tooling/env-registry/env-registry.ts');
 
 /**
  * `envProfiles.<environment>.defaults`, read through the tsx `env-registry` bridge.
@@ -22,12 +21,7 @@ const ENV_REGISTRY = resolve(PROJECT_ROOT, 'tooling/env-registry/env-registry.ts
  * @returns {Record<string, string>}
  */
 function loadProfileDefaults(environment) {
-  const output = execFileSync(
-    'node',
-    ['--import', 'tsx', ENV_REGISTRY, '--profile-defaults', environment],
-    { encoding: 'utf-8', timeout: 30_000 },
-  );
-  return JSON.parse(output);
+  return envRegistryJson(['--profile-defaults', environment]);
 }
 
 /**

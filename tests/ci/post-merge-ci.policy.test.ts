@@ -3,25 +3,13 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { jobBlock } from '@/tests/utils/workflow-jobs.ts';
+
 const POST_MERGE_WORKFLOW = join(process.cwd(), '.github/workflows/post-merge-ci.yml');
 
 // Locks the single-trunk post-merge wiring:
 // one channel, ungated release-please, deploy split, and NO redundant re-testing
 // of what pr-ci.yml already gated.
-// Slice a top-level job block by name without a backtracking regex: from the
-// `  <name>:` header to the next 2-space-indented job key.
-function jobBlock(workflow: string, name: string): string {
-  const start = workflow.indexOf(`\n  ${name}:\n`);
-  if (start === -1) return '';
-  const lines = workflow.slice(start + 1).split('\n');
-  const out: string[] = [lines[0] ?? ''];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i] ?? '';
-    if (/^ {2}\S/.test(line)) break;
-    out.push(line);
-  }
-  return out.join('\n');
-}
 
 describe('post-merge CI policy (single trunk)', () => {
   const workflow = readFileSync(POST_MERGE_WORKFLOW, 'utf8');
@@ -88,11 +76,29 @@ describe('post-merge CI policy (single trunk)', () => {
   it('persists a tracked ci-failure issue on post-merge failure (not just a run ::error)', () => {
     const notifyBlock = jobBlock(workflow, 'notify-failure');
     expect(notifyBlock).not.toBe('');
-    // widened perms + github-script upsert of a labelled, marker-deduped issue.
+    // widened perms + clinozy-be's shared action: one labelled issue per title, repeats as
+    // comments, and the next green run closes it.
     expect(notifyBlock).toContain('issues: write');
-    expect(notifyBlock).toContain('actions/github-script@');
-    expect(notifyBlock).toContain("labels: ['ci-failure']");
-    expect(notifyBlock).toContain('post-merge-ci-failure');
+    expect(notifyBlock).toContain('/.github/actions/ci-failure-issue@');
+    expect(notifyBlock).toMatch(/mode: open\n\s+title: Post-merge CI failing/);
+    const resolveBlock = jobBlock(workflow, 'resolve-success');
+    expect(resolveBlock).toContain('issues: write');
+    expect(resolveBlock).toMatch(/mode: close\n\s+title: Post-merge CI failing/);
+  });
+
+  it('runs release-please on demand: a merged Release PR, or a dispatch with release_pr', () => {
+    // An ordinary merge no longer refreshes the Release PR (each refresh re-ran its PR CI).
+    const releaseBlock = jobBlock(workflow, 'release-please');
+    expect(releaseBlock).toContain(
+      "(github.event_name == 'workflow_dispatch' && inputs.release_pr)",
+    );
+    expect(releaseBlock).toContain(
+      "startsWith(github.event.head_commit.message, 'chore(main): release ')",
+    );
+    expect(workflow).toMatch(
+      /release_pr:\n\s+description: Open or refresh the Release PR/,
+    );
+    expect(workflow).not.toContain('skip_release');
   });
 
   it('does NOT auto-merge release PRs — release on cadence (manual merge is the ship button)', () => {

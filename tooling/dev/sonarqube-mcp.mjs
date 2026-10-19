@@ -1,5 +1,5 @@
 /**
- * Launcher for the sonarqube MCP server (`.mcp.json` → `sonarqube`).
+ * Launcher for the sonarqube MCP server (`.mcp.json` → `fe-sonarqube`).
  *
  * The `mcp/sonarqube` image reads SONARQUBE_TOKEN and SONARQUBE_URL, but neither is in an
  * agent's environment: the local quality gate keeps its token in `.env.local` as SONAR_TOKEN

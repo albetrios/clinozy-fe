@@ -118,3 +118,42 @@ jobs:
           else
             echo "PAT valid; expiry header present but unparseable: ${exp}"
           fi
+
+  resolve-success:
+    name: Close ci-failure issue
+    needs: [environment-drift, pat-canary]
+    if: always() && needs.environment-drift.result == 'success' && needs.pat-canary.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close the open ci-failure issue
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          mode: close
+          title: Release-flow guard failing
+
+  notify-failure:
+    name: Notify failure
+    needs: [environment-drift, pat-canary]
+    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read # the fix plan reads the failed jobs and their logs
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update ci-failure issue
+        # A red scheduled run is invisible unless someone opens the Actions tab; one issue per
+        # check sends a real notification, collects repeats as comments, and closes on the next
+        # green run (clinozy-be's shared ci-failure-issue action).
+        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        with:
+          mode: open
+          title: Release-flow guard failing
+          body: |
+            A release-flow guard failed: GitHub environment or ruleset drift, or the RELEASE_PLEASE_TOKEN
+            canary. Read the failed job's annotations. The next all-green run closes this issue.

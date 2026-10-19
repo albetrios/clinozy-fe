@@ -1,6 +1,6 @@
 ---
 name: fe-project-health-check
-description: Full project health audit after major code changes. Verifies docs, creates missing tests, fixes lint/type/format errors, ensures build and bundle size pass, and reports a summary. Use when the user asks to "check everything", "verify the project", or after large changes.
+description: A full project health audit after large changes — docs, missing tests, lint, types, format, build and bundle size, with a summary. Use for 'check everything' or 'verify the project'.
 ---
 
 # Project Health Check — Full Audit
@@ -32,18 +32,12 @@ Use this skill when the user asks to **run a full project health check**, **veri
 
 **Goal:** All internal doc links resolve; docs match code.
 
-1. **Fix broken links**
-   - In `CONTRIBUTING.md`: ensure links to requirement format and sample use `docs/getting-started/requirement-format.md` and `docs/getting-started/requirements/sample-requirement.md`.
-   - In `README.md`, `CLAUDE.md`, `docs/README.md`: verify every internal link points to an existing file.
-
-2. **Cross-check key docs**
-   - **`docs/reference/routes-and-ui.md`**: List all routes from `src/app/routes/routeTree.tsx` and all `route.tsx` under `src/pages/`. Add missing routes, remove stale ones.
-   - **`docs/reference/tools-and-usage.md`**: List every dependency in `package.json` (dependencies + devDependencies). Add missing packages, remove ones no longer installed.
-   - **`tests/README.md`**: Ensure documented test commands match `package.json` scripts and the actual `tests/` directory layout.
-   - **`docs/getting-started/setup-detailed.md`**: Ensure platform-specific setup steps reference scripts/commands that exist in `package.json` or `Makefile`.
-
-3. **Skill file paths**
-   - Under `agent-os/skills/`, ensure any file paths or command references in SKILL.md files point to files that exist.
+1. **Run the docs audit checklist** — the one copy is the **Checklist** in
+   `agent-os/agents/fe-docs-auditor.md` (index, naming, links, routes, tools, test and setup
+   commands, skill paths, Mermaid). Run it through the `fe-docs-auditor` agent, or walk it here.
+2. **Fix every finding** — the agent only reports; this phase fixes, through
+   **fe-documentation-maintenance** (add missing routes and packages, remove stale ones, repair
+   links).
 
 **Acceptance:** No broken internal links; routes and tools docs match the codebase.
 
@@ -164,7 +158,7 @@ If **any** check fails, fix it and re-run until all pass. Do not report "done" u
 | **fe-documentation-maintenance**  | Phase 1 — doc structure, cross-references              |
 | **fe-lint-guard**                 | Phase 3 — ESLint/TypeScript fix patterns               |
 | **fe-test-generation**            | Phase 2 — test templates, data-testid, axe             |
-| **fe-code-smells-best-practices** | Optional — apply to any files you modify in Phases 2–4 |
+| **fe-lint-guard** (conventions pass) | Optional — apply to any files you modify in Phases 2–4 |
 
 ---
 

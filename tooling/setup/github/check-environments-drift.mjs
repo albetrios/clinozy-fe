@@ -7,8 +7,8 @@
  *   SKIP_GITHUB_ENV=1 node tooling/setup/github/check-environments-drift.mjs
  */
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
+import { isMain, parseCommandLine } from '../../ci/script.mjs';
 import {
   compareGitHubEnvironmentToConfig,
   driftResultsHaveIssues,
@@ -129,9 +129,11 @@ export function validateGitHubEnvironmentsDrift(options = {}) {
 }
 
 function main() {
-  const argumentsList = process.argv.slice(2);
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { help: { type: 'boolean', short: 'h' }, check: { type: 'boolean' } },
+  });
 
-  if (argumentsList.includes('--help') || argumentsList.includes('-h')) {
+  if (values.help === true) {
     console.log(
       'Usage: node tooling/setup/github/check-environments-drift.mjs [--check]  (or `pnpm github:sync --check`)',
     );
@@ -169,6 +171,6 @@ function main() {
   process.exit(1);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   main();
 }

@@ -5,7 +5,7 @@
 # that Homebrew installs on a developer's Mac and that apt provides on the Linux
 # cloud image. Keep the two lists in step — see this directory's README.
 #
-#   - jq            JSON in shell/CI scripts + the session-start hook's MCP count
+#   - jq            JSON in shell/CI scripts (no agent hook needs it — they are Node)
 #   - ripgrep       fast search used by the code-review report tooling
 #   - shellcheck    shell lint — parity with the CI shellcheck/actionlint lanes
 #   - librsvg2-bin  rsvg-convert — regenerate PWA icon PNGs from public/app-icon.svg
@@ -15,7 +15,6 @@
 # the `shellcheck` line as a directive.)
 #
 # Usage:  bash tooling/setup/agent/install-apt-tools.sh
-# Env:    AGENT_APT_PACKAGES — override the package list (space-separated)
 #
 # BEST-EFFORT: a missing package or a blocked apt mirror is logged, never fatal.
 # Exits non-zero only when nothing at all could be installed AND something was
@@ -31,7 +30,7 @@ readonly DEFAULT_PACKAGES="jq:jq ripgrep:rg shellcheck:shellcheck librsvg2-bin:r
 
 missing=""
 present=""
-for entry in ${AGENT_APT_PACKAGES:-${DEFAULT_PACKAGES}}; do
+for entry in ${DEFAULT_PACKAGES}; do
   pkg="${entry%%:*}"
   bin="${entry##*:}"
   if have "${bin}"; then
@@ -59,7 +58,7 @@ fi
 apt_install ${missing} || log "batch install reported an error — checking what landed anyway."
 
 still_missing=""
-for entry in ${AGENT_APT_PACKAGES:-${DEFAULT_PACKAGES}}; do
+for entry in ${DEFAULT_PACKAGES}; do
   bin="${entry##*:}"
   have "${bin}" || still_missing="${still_missing} ${bin}"
 done

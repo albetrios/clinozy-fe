@@ -3,17 +3,23 @@
  * folder, iterations with READMEs rendered from the real template, and a complete frontend drop
  * that a test can break one file at a time. Never touches this checkout.
  */
-import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { EMPTY_FIELD, gitEnvironment, intakeHash } from './iterations.mjs';
-import { configuredBaseBranch, renderIterationReadme } from './new-iteration.mjs';
+import { git as runGit } from '../ci/git-environment.mjs';
+import {
+  createThrowawayRepository,
+  fixedCommitDates,
+  THROWAWAY_IDENTITY,
+} from '../ci/throwaway-repository.mjs';
+import { configuredBaseBranch } from '../setup/github/setup-config.mjs';
+import { EMPTY_FIELD, intakeHash } from './iterations.mjs';
+import { renderIterationReadme } from './new-iteration.mjs';
 
 export const BASE_BRANCH = configuredBaseBranch();
 export const WORK_BRANCH = 'feat/iteration-work';
 export const TODAY = '2026-10-01';
-export const OWNER = 'Test Owner';
+export const OWNER = THROWAWAY_IDENTITY.name;
 /** Commit times in these tests are offsets (seconds) from this Unix time. */
 const COMMIT_EPOCH = 1_790_000_000;
 
@@ -40,40 +46,26 @@ export function scratchFolder() {
  * @param {number} [commitTime]
  */
 export function git(repositoryRoot, gitArguments, commitTime) {
-  const dates =
-    commitTime === undefined
-      ? {}
-      : {
-          GIT_AUTHOR_DATE: `@${COMMIT_EPOCH + commitTime} +0000`,
-          GIT_COMMITTER_DATE: `@${COMMIT_EPOCH + commitTime} +0000`,
-        };
-  return execFileSync('git', gitArguments, {
+  return runGit(gitArguments, {
     cwd: repositoryRoot,
-    encoding: 'utf-8',
-    env: { ...gitEnvironment(), ...dates },
-    stdio: ['ignore', 'pipe', 'pipe'],
-  }).trim();
+    environment:
+      commitTime === undefined ? {} : fixedCommitDates(COMMIT_EPOCH + commitTime),
+  });
 }
 
 /**
- * A repository on the base branch with one commit; `parent` keeps siblings side by side.
+ * A repository on the base branch with one commit (the throwaway-repository fixture); `parent`
+ * keeps siblings side by side.
  *
  * @param {{ packageName?: string, parent?: string }} [options]
  */
 export function createRepository({ packageName = 'demo-fe', parent } = {}) {
-  const repositoryRoot = join(parent ?? scratchFolder(), packageName);
-  mkdirSync(repositoryRoot);
-  git(repositoryRoot, ['init', '-q', '-b', BASE_BRANCH]);
-  git(repositoryRoot, ['config', 'user.name', OWNER]);
-  git(repositoryRoot, ['config', 'user.email', 'owner@example.test']);
-  git(repositoryRoot, ['config', 'commit.gpgsign', 'false']);
-  writeFileSync(
-    join(repositoryRoot, 'package.json'),
-    JSON.stringify({ name: packageName }),
-  );
-  git(repositoryRoot, ['add', '-A']);
-  git(repositoryRoot, ['commit', '-q', '-m', 'initial'], 1_000);
-  return repositoryRoot;
+  return createThrowawayRepository({
+    directory: join(parent ?? scratchFolder(), packageName),
+    branch: BASE_BRANCH,
+    files: { 'package.json': JSON.stringify({ name: packageName }) },
+    commitTime: COMMIT_EPOCH + 1_000,
+  }).root;
 }
 
 /** Commits everything in a fixture repository. */
@@ -217,6 +209,7 @@ export function writeIteration({
     name,
     fields: {
       type: name.split('-')[0],
+      process: 'full',
       topic: EMPTY_FIELD,
       owner: OWNER,
       opened: /\d{4}-\d{2}-\d{2}/.exec(name)?.[0] ?? TODAY,

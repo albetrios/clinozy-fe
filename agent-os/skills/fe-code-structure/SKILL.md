@@ -1,6 +1,8 @@
 ---
 name: fe-code-structure
 description: Canonical code placement rules. Use when implementing a feature, adding a route/component/API, or deciding where to put code. Always apply this structure and auto-generate tests without asking.
+trigger: "**/*.contracts.ts, **/*.constants.ts"
+triggerNote: Where the code goes — contracts, constants, the promotion ladder
 ---
 
 # Code Structure — Where to Put What

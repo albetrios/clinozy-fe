@@ -35,7 +35,18 @@ describe('Netlify never builds', () => {
     expect(commands.length).toBeGreaterThanOrEqual(2);
     for (const [name, line] of commands) {
       expect(line, name).toContain('--no-build');
-      expect(line, name).toContain('--dir=dist');
+      if (line.includes('--dir="$DEPLOY_DIR"')) {
+        // Production deploys dist-verified/: dist/ unpacked from its cosign-verified tarball.
+        const source = workflows.find(([file]) => file === name)?.[1] ?? '';
+        const directories = [...source.matchAll(/DEPLOY_DIR="([^"]+)"/g)].map(
+          (match) => match[1],
+        );
+        expect(directories.length, name).toBeGreaterThan(0);
+        for (const directory of directories)
+          expect(['dist', 'dist-verified'], name).toContain(directory);
+      } else {
+        expect(line, name).toContain('--dir=dist');
+      }
     }
   });
 
@@ -54,10 +65,10 @@ describe('Netlify never builds', () => {
 
   it('netlify.toml cancels Git builds and fails any other build', () => {
     const toml = read('netlify.toml');
-    const build = toml.slice(
-      toml.indexOf('[build]'),
-      toml.indexOf('[build.environment]'),
-    );
+    // The [build] table: from its header to the next table header.
+    const start = toml.indexOf('[build]');
+    const next = toml.indexOf('\n[', start + 1);
+    const build = toml.slice(start, next === -1 ? undefined : next);
     const lines = build.split('\n').map((line) => line.trim());
     expect(lines).toContain('ignore = "exit 0"');
     const command = lines.filter((line) => line.startsWith('command = '));

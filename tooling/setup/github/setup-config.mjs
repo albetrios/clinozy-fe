@@ -25,6 +25,20 @@ export function loadSetupConfig() {
   };
 }
 
+/**
+ * The trunk, from `git.defaultBranch` in `tooling/setup/setup.config.json` — the one reader of it
+ * (`resolveBase` in `tooling/ci/git-environment.mjs`, `.husky/pre-push`, the iteration tooling).
+ *
+ * @returns {string}
+ * @throws when the config has no default branch
+ */
+export function configuredBaseBranch() {
+  const { defaultBranch } = loadSetupConfig();
+  if (!defaultBranch)
+    throw new Error('tooling/setup/setup.config.json has no git.defaultBranch.');
+  return defaultBranch;
+}
+
 /** @returns {string[]} */
 export function getConfiguredEnvironmentNames() {
   return loadSetupConfig()

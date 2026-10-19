@@ -13,8 +13,12 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { parseCommandLine } from '../../tooling/ci/script.mjs';
+
 const repositoryRoot = process.cwd();
-const strict = process.argv.includes('--strict');
+const strict =
+  parseCommandLine(process.argv.slice(2), { options: { strict: { type: 'boolean' } } })
+    .values.strict === true;
 
 const skillNames = new Set(
   readdirSync(join(repositoryRoot, 'agent-os', 'skills'), { withFileTypes: true })

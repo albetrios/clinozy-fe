@@ -189,6 +189,15 @@ jobs:
           echo "build_id=${build_id}" >> "$GITHUB_OUTPUT"
           echo "Preview smoke OK — buildId ${build_id}."
 
+      # The same live CSP and HSTS check as every governed deploy (tooling/ci/probe-live-site.mjs);
+      # best-effort here, like the smoke.
+      - name: Probe live CSP and HSTS (best-effort)
+        if: env.HAS_NETLIFY == 'true' && steps.deploy.outputs.url != ''
+        continue-on-error: true
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: pnpm deploy:probe-live --url "$DEPLOY_URL"
+
       - name: Upsert preview comment
         if: env.HAS_NETLIFY == 'true' && steps.deploy.outputs.url != ''
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9

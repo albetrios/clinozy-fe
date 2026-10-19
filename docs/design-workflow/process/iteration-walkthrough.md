@@ -40,6 +40,11 @@ PHASE 2 · KICKOFF  (the approved plan, built one ledger row at a time)
  │
  └─ 8 FROZEN      the last commit before the merge → iteration:status frozen
                   → never edited again; a correction is a new fix           [frozen]
+
+A LITE FIX  (pnpm iteration:new fix <topic> --lite — README Process lite)
+ new → "plan iteration <it>": KICKOFF.md + plans/decisions.md in ONE step, one stop for your go
+     → kickoff: planning → implementing (no ready-for-approval, no approved; no drop needed)
+     → done → frozen
 ```
 
 ## What is inside an iteration folder
@@ -204,11 +209,13 @@ Anything else is refused: no skipping steps, and nothing leaves frozen.
  │                       always: the Baseline's Standing deviations and the current code
  │                         → plan from what was BUILT; KICKOFF §7 lists the ones it touches
  │                       classify every change: token · copy · styling · structural · new screen
- │                       preset or layout changed → scoped section with exact value moves, STOP
+ │                       preset or layout changed → scoped section with exact value moves; the
+ │                         screens outside the delta are not re-read
  │
  ├─ Step 3  RECONCILE ── md ↔ prototype, every verdict with file:line evidence
  │                       prototype wins on behaviour · dead CSS flagged · md-only → deviation
  │                       brief: BRIEF.md ↔ the current screens' specs and code
+ │                       Steps 1–3 run back to back → ONE step review, one stop
  │
  ├─ Step 4  RED GATE ─── RED: popup shape · mobile · step sequence · table-vs-card · surface home
  │                       → AskUserQuestion (≤4 per call, one recommendation, quoted evidence)
@@ -241,7 +248,8 @@ Anything else is refused: no skipping steps, and nothing leaves frozen.
  ┌──► (1) DO ─────── screen row → fe-design-ditto: interaction shell → flow skeleton →
  │                   regions (desktop + mobile together) → content → states → motion
  │                   other rows → the skill the row names (fe-route-island, fe-i18n-constants, …)
- │    (2) VERIFY ─── the row's Acceptance, by Intake mode:
+ │    (2) VERIFY ─── pnpm test:select --run first (the tests the row's changes reach), green;
+ │                   then the row's Acceptance, by Intake mode:
  │                   full / overlay → a screen side by side at 375px and 1440px, per state
  │                   brief          → the BRIEF.md acceptance criteria the row covers
  │                   incremental    → plus the FULL visual baseline set (catches ripple)

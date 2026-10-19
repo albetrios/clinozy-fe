@@ -1,6 +1,8 @@
 ---
 name: fe-test-generation
 description: Generate colocated Vitest and Testing Library tests for new source files under src/. Auto-invoked when components, hooks, stores, or services are created — never ask the user first.
+trigger: "**/*.test.ts, **/*.test.tsx"
+triggerNote: Tests — colocated, with the coverage ratchet
 ---
 
 # Test Generation Skill

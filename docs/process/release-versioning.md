@@ -27,9 +27,11 @@ One config, one manifest, one changelog — all on `main`:
 
 ## How a release happens (cadence)
 
-1. Every push to `main` runs [post-merge-ci.yml](../../.github/workflows/post-merge-ci.yml):
-   release-please recomputes the next version + changelog and keeps **one standing
-   Release PR** open — `chore: release X.Y.Z`. It is **not** auto-merged.
+1. **Open or refresh the Release PR when you mean to ship** — an ordinary merge to `main` no
+   longer does (each refresh re-ran the Release PR's CI):
+   `gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true`. release-please
+   recomputes the next version + changelog from every unreleased commit and keeps **one
+   standing Release PR** — `chore(main): release X.Y.Z`. It is **not** auto-merged.
 2. **Merging that Release PR (squash, by hand) is the ship button** → it re-triggers
    post-merge CI, which cuts the tag `vX.Y.Z` + GitHub Release and attaches the SBOM.
    Publishing the Release then fires
