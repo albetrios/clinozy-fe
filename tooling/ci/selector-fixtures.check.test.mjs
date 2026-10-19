@@ -4,11 +4,10 @@
  * recorded miss the selection still skips, and an unreachable test fail it. Also the boundary
  * fixes in the selection's mention rule.
  */
-import assert from 'node:assert/strict';
+import { afterEach, describe, expect, it } from 'vitest';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { afterEach, describe, test } from 'node:test';
 import { checkSelectorFixtures, sectionOf } from './selector-fixtures.check.mjs';
 import { selectTests } from './test-selection.mjs';
 
@@ -54,27 +53,26 @@ function repository(extra = {}) {
 }
 
 describe('checkSelectorFixtures', () => {
-  test('a clean page tree passes, one fixture per route island', () => {
+  it('a clean page tree passes, one fixture per route island', () => {
     const result = checkSelectorFixtures(repository());
-    assert.deepEqual(result.problems, []);
-    assert.equal(result.fixtures, 6);
-    assert.equal(result.unreachable, 0);
+    expect(result.problems).toStrictEqual([]);
+    expect(result.fixtures).toBe(6);
+    expect(result.unreachable).toBe(0);
   });
 
-  test('a page that imports another section fails it', () => {
+  it('a page that imports another section fails it', () => {
     const root = repository({
       [`${ROOM}/stock/StockPage.test.tsx`]:
         "import './StockPage.tsx';\nimport '../patients/PatientsPage.tsx';\n",
     });
     const { problems } = checkSelectorFixtures(root);
-    assert.equal(problems.length, 1);
-    assert.match(
-      problems[0],
+    expect(problems.length).toBe(1);
+    expect(problems[0]).toMatch(
       /patients .*another section, e\.g\. .*stock\/StockPage\.test\.tsx/,
     );
   });
 
-  test('a recorded miss the selection still skips fails it', () => {
+  it('a recorded miss the selection still skips fails it', () => {
     const root = repository({
       'tooling/ci/selector-fixtures.json': JSON.stringify({
         fixtures: [
@@ -87,41 +85,40 @@ describe('checkSelectorFixtures', () => {
       }),
     });
     const { problems, fixtures } = checkSelectorFixtures(root);
-    assert.equal(fixtures, 7);
-    assert.match(problems[0], /miss: login: .* does not select 1 test/);
+    expect(fixtures).toBe(7);
+    expect(problems[0]).toMatch(/miss: login: .* does not select 1 test/);
   });
 
-  test('an unreachable test is counted and run by every source change', () => {
+  it('an unreachable test is counted and run by every source change', () => {
     const root = repository({
       'src/shared/css/runtime-paths.test.ts':
         'const file = join(import.meta.dirname, name);\nexpect(file).toBeTruthy();\n',
     });
     const result = checkSelectorFixtures(root);
-    assert.equal(result.unreachable, 1);
-    assert.deepEqual(result.problems, []);
+    expect(result.unreachable).toBe(1);
+    expect(result.problems).toStrictEqual([]);
     const selection = selectTests({
       changedFiles: ['src/pages/login/LoginPage.tsx'],
       repositoryRoot: root,
     });
-    assert.ok(
+    expect(
       selection.why['src/shared/css/runtime-paths.test.ts'].includes(
         'always run (no single change selects it)',
       ),
-    );
+    ).toBeTruthy();
   });
 });
 
 describe('sections and mentions', () => {
-  test('a section is a top-level page or an organization room', () => {
-    assert.equal(
-      sectionOf('src/pages/login/forms/LoginForm/LoginForm.tsx'),
+  it('a section is a top-level page or an organization room', () => {
+    expect(sectionOf('src/pages/login/forms/LoginForm/LoginForm.tsx')).toBe(
       'src/pages/login',
     );
-    assert.equal(sectionOf(`${ROOM}/stock/purchases/PurchasesPage.tsx`), `${ROOM}/stock`);
-    assert.equal(sectionOf(`${ROOM}/OrganizationLayout.tsx`), ROOM);
+    expect(sectionOf(`${ROOM}/stock/purchases/PurchasesPage.tsx`)).toBe(`${ROOM}/stock`);
+    expect(sectionOf(`${ROOM}/OrganizationLayout.tsx`)).toBe(ROOM);
   });
 
-  test('a file name held twice, or inside a longer name, is no mention', () => {
+  it('a file name held twice, or inside a longer name, is no mention', () => {
     const root = repository({
       [`${ROOM}/patients/NewPatientsPage.test.tsx`]:
         "it('NewPatientsPage.tsx renders');\n",
@@ -130,8 +127,7 @@ describe('sections and mentions', () => {
       changedFiles: [`${ROOM}/stock/purchases/PurchasesPage.tsx`],
       repositoryRoot: root,
     });
-    assert.equal(
-      stockPurchases.why[`${ROOM}/medical/purchases/PurchasesPage.test.tsx`],
+    expect(stockPurchases.why[`${ROOM}/medical/purchases/PurchasesPage.test.tsx`]).toBe(
       undefined,
     );
     const patients = selectTests({
@@ -139,9 +135,9 @@ describe('sections and mentions', () => {
       repositoryRoot: root,
     });
     const reasons = patients.why[`${ROOM}/patients/NewPatientsPage.test.tsx`] ?? [];
-    assert.ok(
+    expect(
       !reasons.some((reason) => reason.startsWith('mentions')),
       reasons.join('; '),
-    );
+    ).toBeTruthy();
   });
 });

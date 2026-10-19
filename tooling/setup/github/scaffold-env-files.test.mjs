@@ -1,9 +1,8 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { envFileContent, scaffoldGithubEnvFiles } from './scaffold-env-files.mjs';
@@ -29,53 +28,53 @@ async function inTempRoot(body) {
   }
 }
 
-test('a new .env.<environment> carries its blank secrets and its profile defaults', async () => {
+it('a new .env.<environment> carries its blank secrets and its profile defaults', async () => {
   await inTempRoot((root) => {
     const { created } = scaffoldGithubEnvFiles({
       root,
       environments: ENVIRONMENTS,
       profileDefaults: (environment) => DEFAULTS[environment],
     });
-    assert.deepEqual(created, ['.env.development', '.env.production']);
+    expect(created).toStrictEqual(['.env.development', '.env.production']);
     const development = readFileSync(join(root, '.env.development'), 'utf8');
-    assert.match(development, /^VITE_API_BASE_URL=$/m);
-    assert.match(development, /^NETLIFY_AUTH_TOKEN=$/m);
-    assert.match(development, /^VITE_APP_ENV=development$/m);
-    assert.match(development, /^VITE_DEVTOOLS=true$/m);
+    expect(development).toMatch(/^VITE_API_BASE_URL=$/m);
+    expect(development).toMatch(/^NETLIFY_AUTH_TOKEN=$/m);
+    expect(development).toMatch(/^VITE_APP_ENV=development$/m);
+    expect(development).toMatch(/^VITE_DEVTOOLS=true$/m);
     const production = readFileSync(join(root, '.env.production'), 'utf8');
-    assert.match(production, /^VITE_APP_ENV=production$/m);
-    assert.match(production, /^VITE_DEVTOOLS=false$/m);
+    expect(production).toMatch(/^VITE_APP_ENV=production$/m);
+    expect(production).toMatch(/^VITE_DEVTOOLS=false$/m);
   });
 });
 
-test('an existing file is never touched, and a dry run writes nothing', async () => {
+it('an existing file is never touched, and a dry run writes nothing', async () => {
   await inTempRoot((root) => {
     writeFileSync(join(root, '.env.production'), 'KEEP=me\n');
     const dry = scaffoldGithubEnvFiles({
       root,
       environments: ENVIRONMENTS,
       dryRun: true,
-      profileDefaults: () => assert.fail('a dry run must not read defaults'),
+      profileDefaults: () => expect.fail('a dry run must not read defaults'),
     });
-    assert.deepEqual(dry.created, ['.env.development']);
-    assert.equal(existsSync(join(root, '.env.development')), false);
+    expect(dry.created).toStrictEqual(['.env.development']);
+    expect(existsSync(join(root, '.env.development'))).toBe(false);
 
     scaffoldGithubEnvFiles({
       root,
       environments: ENVIRONMENTS,
       profileDefaults: (environment) => DEFAULTS[environment],
     });
-    assert.equal(readFileSync(join(root, '.env.production'), 'utf8'), 'KEEP=me\n');
+    expect(readFileSync(join(root, '.env.production'), 'utf8')).toBe('KEEP=me\n');
   });
 });
 
-test('envFileContent writes one KEY=value line per default, after the secrets', () => {
+it('envFileContent writes one KEY=value line per default, after the secrets', () => {
   const content = envFileContent('production', ['A'], { VITE_APP_ENV: 'production' });
-  assert.ok(content.indexOf('A=') < content.indexOf('VITE_APP_ENV=production'));
-  assert.ok(content.endsWith('\n'));
+  expect(content.indexOf('A=') < content.indexOf('VITE_APP_ENV=production')).toBeTruthy();
+  expect(content.endsWith('\n')).toBeTruthy();
 });
 
-test('the env-registry bridge emits each profile’s defaults, identity included', () => {
+it('the env-registry bridge emits each profile’s defaults, identity included', () => {
   for (const environment of ['development', 'production']) {
     const output = execFileSync(
       TSX,
@@ -86,19 +85,18 @@ test('the env-registry bridge emits each profile’s defaults, identity included
       ],
       { encoding: 'utf8' },
     );
-    assert.equal(JSON.parse(output).VITE_APP_ENV, environment);
+    expect(JSON.parse(output).VITE_APP_ENV).toBe(environment);
   }
 });
 
-test('the env-registry bridge refuses an unknown environment', () => {
+it('the env-registry bridge refuses an unknown environment', () => {
   const result = spawnSync(
     TSX,
     [join(ROOT, 'tooling/env-registry/env-registry.ts'), '--profile-defaults', 'staging'],
     { encoding: 'utf8' },
   );
-  assert.equal(result.status, 1);
-  assert.match(
-    result.stderr,
+  expect(result.status).toBe(1);
+  expect(result.stderr).toMatch(
     /--profile-defaults needs an environment: local, development, production/,
   );
 });

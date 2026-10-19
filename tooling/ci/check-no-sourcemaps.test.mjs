@@ -1,9 +1,8 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -40,26 +39,26 @@ function run(files) {
   }
 }
 
-test('passes on a bundle with no source-map artifacts', () => {
+it('passes on a bundle with no source-map artifacts', () => {
   const { status, output } = run({
     'dist/assets/index-abc123.js': 'export const a = 1;\n',
     'dist/assets/index-abc123.css': '.a{color:red}\n',
   });
-  assert.equal(status, 0, output);
-  assert.match(output, /build:check OK/);
+  expect(status, output).toBe(0);
+  expect(output).toMatch(/build:check OK/);
 });
 
-test('fails on a published .map file', () => {
+it('fails on a published .map file', () => {
   const { status, output } = run({
     'dist/assets/index-abc123.js': 'export const a = 1;\n',
     'dist/assets/index-abc123.js.map': '{"version":3}\n',
   });
-  assert.equal(status, 1, output);
-  assert.match(output, /build:check FAILED/);
-  assert.match(output, /index-abc123\.js\.map/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/build:check FAILED/);
+  expect(output).toMatch(/index-abc123\.js\.map/);
 });
 
-test('fails on a .map outside dist/assets (the service worker)', () => {
+it('fails on a .map outside dist/assets (the service worker)', () => {
   // The regression this guard was widened for: the SW's own Vite pass writes
   // dist/sw.js.map at the output ROOT, which an assets-only scan walks past.
   const { status, output } = run({
@@ -67,22 +66,22 @@ test('fails on a .map outside dist/assets (the service worker)', () => {
     'dist/sw.js': 'self.addEventListener("fetch", () => {});\n',
     'dist/sw.js.map': '{"version":3,"sourcesContent":["export {}"]}\n',
   });
-  assert.equal(status, 1, output);
-  assert.match(output, /build:check FAILED/);
-  assert.match(output, /dist\/sw\.js\.map/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/build:check FAILED/);
+  expect(output).toMatch(/dist\/sw\.js\.map/);
 });
 
-test('fails on a sourceMappingURL comment in shipped JS', () => {
+it('fails on a sourceMappingURL comment in shipped JS', () => {
   const { status, output } = run({
     'dist/assets/index-abc123.js': `export const a = 1;\n${MAPPING_COMMENT}\n`,
   });
-  assert.equal(status, 1, output);
-  assert.match(output, /build:check FAILED/);
-  assert.match(output, /index-abc123\.js/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/build:check FAILED/);
+  expect(output).toMatch(/index-abc123\.js/);
 });
 
-test('fails when the build has not run', () => {
+it('fails when the build has not run', () => {
   const { status, output } = run(null);
-  assert.equal(status, 1, output);
-  assert.match(output, /Run `pnpm build` first/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/Run `pnpm build` first/);
 });

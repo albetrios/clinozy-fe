@@ -3,10 +3,9 @@
  * check every FE tooling script uses — and that each script reads its command line through it
  * before doing anything: an unknown option stops it, named, with a non-zero exit.
  */
-import assert from 'node:assert/strict';
+import { describe, expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
-import { describe, test } from 'node:test';
 import { pathToFileURL } from 'node:url';
 import { isMain, parseCommandLine } from './script.mjs';
 
@@ -25,37 +24,39 @@ describe('parseCommandLine', () => {
     usage: 'expected <a> <b>.',
   };
 
-  test('reads flags, --name value and --name=value options, and --sibling', () => {
+  it('reads flags, --name value and --name=value options, and --sibling', () => {
     const parsed = parseCommandLine(
       ['x', '--mode', 'overlay', 'y', '--check', '--sibling', '../b'],
       shape,
     );
-    assert.deepEqual(parsed.positionals, ['x', 'y']);
-    assert.deepEqual(parsed.values, { mode: 'overlay', check: true, sibling: '../b' });
-    assert.equal(parseCommandLine(['--mode=brief'], shape).values.mode, 'brief');
+    expect(parsed.positionals).toStrictEqual(['x', 'y']);
+    expect(parsed.values).toStrictEqual({
+      mode: 'overlay',
+      check: true,
+      sibling: '../b',
+    });
+    expect(parseCommandLine(['--mode=brief'], shape).values.mode).toBe('brief');
   });
 
-  test('refuses a value option without its value, an unknown option and extra positionals', () => {
-    assert.throws(() => parseCommandLine(['--mode'], shape), /--mode needs a value/);
-    assert.throws(() => parseCommandLine(['--mode', '--check'], shape), /needs a value/);
-    assert.throws(() => parseCommandLine(['--mode='], shape), /needs a value/);
-    assert.throws(() => parseCommandLine(['--nope'], shape), /Unknown option "--nope"/);
-    assert.throws(() => parseCommandLine(['a', 'b', 'c'], shape), /Too many arguments/);
+  it('refuses a value option without its value, an unknown option and extra positionals', () => {
+    expect(() => parseCommandLine(['--mode'], shape)).toThrow(/--mode needs a value/);
+    expect(() => parseCommandLine(['--mode', '--check'], shape)).toThrow(/needs a value/);
+    expect(() => parseCommandLine(['--mode='], shape)).toThrow(/needs a value/);
+    expect(() => parseCommandLine(['--nope'], shape)).toThrow(/Unknown option "--nope"/);
+    expect(() => parseCommandLine(['a', 'b', 'c'], shape)).toThrow(/Too many arguments/);
   });
 
-  test('appends the usage to a value or count error, and takes none by default', () => {
-    assert.throws(
-      () => parseCommandLine(['--mode'], shape),
-      /^Error: --mode needs a value — expected <a> <b>\.$/,
+  it('appends the usage to a value or count error, and takes none by default', () => {
+    expect(() => parseCommandLine(['--mode'], shape)).toThrow(
+      /^--mode needs a value — expected <a> <b>\.$/,
     );
-    assert.throws(() => parseCommandLine(['a'], {}), /^Error: Too many arguments: a\.$/);
-    assert.throws(
-      () => parseCommandLine(['--check=yes'], shape),
+    expect(() => parseCommandLine(['a'], {})).toThrow(/^Too many arguments: a\.$/);
+    expect(() => parseCommandLine(['--check=yes'], shape)).toThrow(
       /Unknown option "--check=yes"/,
     );
   });
 
-  test('reads short options, repeated options, and positionals after --', () => {
+  it('reads short options, repeated options, and positionals after --', () => {
     const parsed = parseCommandLine(['-h', '--tag', 'a', '--tag=b', '--', '--literal'], {
       options: {
         help: { type: 'boolean', short: 'h' },
@@ -63,42 +64,39 @@ describe('parseCommandLine', () => {
       },
       maxPositionals: 1,
     });
-    assert.deepEqual(parsed, {
+    expect(parsed).toStrictEqual({
       values: { help: true, tag: ['a', 'b'] },
       positionals: ['--literal'],
     });
   });
 
-  test("words its errors the script's own way, falling back to the default", () => {
+  it("words its errors the script's own way, falling back to the default", () => {
     const messages = {
       unknownOption: (option) => `no such flag ${option}`,
       needsValue: (option) =>
         option === '--sibling' ? 'give --sibling a path' : undefined,
     };
-    assert.throws(
-      () => parseCommandLine(['--x'], { ...shape, messages }),
-      /^Error: no such flag --x$/,
+    expect(() => parseCommandLine(['--x'], { ...shape, messages })).toThrow(
+      /^no such flag --x$/,
     );
-    assert.throws(
-      () => parseCommandLine(['--sibling'], { ...shape, messages }),
-      /^Error: give --sibling a path$/,
+    expect(() => parseCommandLine(['--sibling'], { ...shape, messages })).toThrow(
+      /^give --sibling a path$/,
     );
-    assert.throws(
-      () => parseCommandLine(['--mode'], { ...shape, messages }),
-      /^Error: --mode needs a value — expected <a> <b>\.$/,
+    expect(() => parseCommandLine(['--mode'], { ...shape, messages })).toThrow(
+      /^--mode needs a value — expected <a> <b>\.$/,
     );
   });
 });
 
 describe('isMain', () => {
-  test('is true only for the script node was started with', () => {
+  it('is true only for the script node was started with', () => {
     const entry = process.argv[1];
     try {
       process.argv[1] = join(ROOT, 'tooling/ci/script.mjs');
-      assert.equal(isMain(pathToFileURL(join(ROOT, 'tooling/ci/script.mjs')).href), true);
-      assert.equal(isMain(import.meta.url), false);
+      expect(isMain(pathToFileURL(join(ROOT, 'tooling/ci/script.mjs')).href)).toBe(true);
+      expect(isMain(import.meta.url)).toBe(false);
       process.argv[1] = undefined;
-      assert.equal(isMain(import.meta.url), false);
+      expect(isMain(import.meta.url)).toBe(false);
     } finally {
       process.argv[1] = entry;
     }
@@ -158,7 +156,7 @@ const SCRIPTS = [
 
 describe('every script reads its command line with parseCommandLine', () => {
   for (const script of SCRIPTS) {
-    test(`${script} stops on an unknown option and names it`, () => {
+    it(`${script} stops on an unknown option and names it`, () => {
       const [command, args] = script.endsWith('.ts')
         ? [TSX, [script]]
         : [process.execPath, [script]];
@@ -168,8 +166,8 @@ describe('every script reads its command line with parseCommandLine', () => {
         env: { ...process.env, CI: 'true', GITHUB_TOKEN: '' },
         timeout: 60_000,
       });
-      assert.notEqual(result.status, 0, `${script} exited 0`);
-      assert.match(`${result.stdout}${result.stderr}`, /--not-an-option/, script);
+      expect(result.status, `${script} exited 0`).not.toBe(0);
+      expect(`${result.stdout}${result.stderr}`, script).toMatch(/--not-an-option/);
     });
   }
 });

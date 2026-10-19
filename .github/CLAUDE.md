@@ -14,8 +14,9 @@ the **TSDoc budget** (`pnpm tsdoc:check`, `tooling/tsdoc-coverage/budget.json`) 
 coverage** (changed lines ≥ 90% — PR CI runs `tooling/ci/check-patch-coverage.mjs`; local
 mirror: `pnpm coverage:patch`). Vitest is split into
 `unit` (colocated src suites), `security` (tests/security — token storage, redirect
-safety, header tripwires), and `ci-policy` (tests/ci — workflow wiring, release-please
-manifests, Dependabot flow invariants) projects. Markdown is linted
+safety, header tripwires), `ci-policy` (tests/ci — workflow wiring, release-please
+manifests, Dependabot flow invariants) and `tooling` (the tooling scripts' own tests, in Node —
+`pnpm test:github-scripts`) projects. Markdown is linted
 (`pnpm docs:lint`; emphasis style follows Prettier) in its own path-filtered workflow
 (`pr-docs-lane.yml`, outside the quality gate). CI (`.github/workflows/pr-ci.yml`) runs
 path-filtered parallel lanes — biome/eslint/prettier/tsc/vitest(+patch coverage)/security-tests/

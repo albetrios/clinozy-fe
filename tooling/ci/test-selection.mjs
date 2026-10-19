@@ -31,6 +31,7 @@ export const VITEST_PROJECTS = [
   },
   { name: 'security', include: ['tests/security/**/*.test.ts'] },
   { name: 'ci-policy', include: ['tests/ci/**/*.test.ts'] },
+  { name: 'tooling', include: ['tooling/**/*.test.{mjs,ts}'] },
 ];
 
 /** `vitest.config.ts` → `setupFiles`: every test runs through them. */
@@ -141,8 +142,7 @@ const toPosix = (path) => path.split('\\').join('/');
 const matchesAny = ({ path, globs }) => globs.some((glob) => matchesGlob(path, glob));
 
 /**
- * The Vitest project a file belongs to, or null when no project runs it (a Playwright spec, a
- * `node:test` file under `tooling/`).
+ * The Vitest project a file belongs to, or null when no project runs it (a Playwright spec).
  *
  * @param {string} file
  * @returns {string | null}

@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import test from 'node:test';
+import { expect, it } from 'vitest';
 
 import {
   compareGitHubEnvironmentToConfig,
@@ -8,7 +7,7 @@ import {
 } from './environments-util.mjs';
 import { getRuntimeSecretNames, validateDeploySecrets } from './validate-github-env.mjs';
 
-test('parseGitHubEnvironmentApiResponse extracts reviewers and branch policy', () => {
+it('parseGitHubEnvironmentApiResponse extracts reviewers and branch policy', () => {
   const live = parseGitHubEnvironmentApiResponse({
     protection_rules: [
       {
@@ -23,11 +22,11 @@ test('parseGitHubEnvironmentApiResponse extracts reviewers and branch policy', (
     },
   });
 
-  assert.deepEqual(live.reviewers.users, ['nikunjmavani']);
-  assert.equal(live.deploymentBranchPolicy?.protectedBranches, true);
+  expect(live.reviewers.users).toStrictEqual(['nikunjmavani']);
+  expect(live.deploymentBranchPolicy?.protectedBranches).toBe(true);
 });
 
-test('compareGitHubEnvironmentToConfig detects reviewer drift', () => {
+it('compareGitHubEnvironmentToConfig detects reviewer drift', () => {
   const config = {
     name: 'production',
     protection: {
@@ -38,47 +37,42 @@ test('compareGitHubEnvironmentToConfig detects reviewer drift', () => {
   const live = parseGitHubEnvironmentApiResponse({ protection_rules: [] });
 
   const issues = compareGitHubEnvironmentToConfig(config, live);
-  assert.ok(issues.some((issue) => issue.kind === 'missing_in_github'));
+  expect(issues.some((issue) => issue.kind === 'missing_in_github')).toBeTruthy();
 });
 
 // GitHub enforces required reviewers on a private repository's environments only on Enterprise,
 // so on Team they can never match the committed config and `github:sync --check` failed forever.
-test('requiredReviewersSupport: public anywhere, private only on Enterprise, unknown without the plan', () => {
-  assert.equal(
+it('requiredReviewersSupport: public anywhere, private only on Enterprise, unknown without the plan', () => {
+  expect(
     requiredReviewersSupport({
       isPrivate: false,
       ownerType: 'Organization',
       ownerPlan: 'free',
     }),
-    'supported',
-  );
-  assert.equal(
+  ).toBe('supported');
+  expect(
     requiredReviewersSupport({
       isPrivate: true,
       ownerType: 'Organization',
       ownerPlan: 'enterprise',
     }),
-    'supported',
-  );
-  assert.equal(
+  ).toBe('supported');
+  expect(
     requiredReviewersSupport({
       isPrivate: true,
       ownerType: 'Organization',
       ownerPlan: 'team',
     }),
+  ).toBe('unsupported');
+  expect(requiredReviewersSupport({ isPrivate: true, ownerType: 'User' })).toBe(
     'unsupported',
   );
-  assert.equal(
-    requiredReviewersSupport({ isPrivate: true, ownerType: 'User' }),
-    'unsupported',
-  );
-  assert.equal(
-    requiredReviewersSupport({ isPrivate: true, ownerType: 'Organization' }),
+  expect(requiredReviewersSupport({ isPrivate: true, ownerType: 'Organization' })).toBe(
     'unknown',
   );
 });
 
-test('compareGitHubEnvironmentToConfig skips reviewers it was told not to check, but not the branch policy', () => {
+it('compareGitHubEnvironmentToConfig skips reviewers it was told not to check, but not the branch policy', () => {
   const config = {
     name: 'production',
     protection: {
@@ -90,31 +84,32 @@ test('compareGitHubEnvironmentToConfig skips reviewers it was told not to check,
     protection_rules: [{ type: 'branch_policy' }],
     deployment_branch_policy: { protected_branches: true, custom_branch_policies: false },
   });
-  assert.deepEqual(
+  expect(
     compareGitHubEnvironmentToConfig(config, branchPolicyApplied, {
       checkReviewers: false,
     }),
-    [],
-  );
+  ).toStrictEqual([]);
 
   const noBranchPolicy = parseGitHubEnvironmentApiResponse({ protection_rules: [] });
   const issues = compareGitHubEnvironmentToConfig(config, noBranchPolicy, {
     checkReviewers: false,
   });
-  assert.ok(issues.every((issue) => issue.detail.startsWith('deploymentBranchPolicy.')));
-  assert.ok(issues.length > 0);
+  expect(
+    issues.every((issue) => issue.detail.startsWith('deploymentBranchPolicy.')),
+  ).toBeTruthy();
+  expect(issues.length > 0).toBeTruthy();
 });
 
-test('validateDeploySecrets fails on missing required keys only', () => {
+it('validateDeploySecrets fails on missing required keys only', () => {
   const result = validateDeploySecrets('development', [
     'VITE_API_BASE_URL',
     'NETLIFY_AUTH_TOKEN',
   ]);
-  assert.deepEqual(result.missingRequired, ['NETLIFY_SITE_ID']);
-  assert.ok(result.missingOptional.length > 0);
+  expect(result.missingRequired).toStrictEqual(['NETLIFY_SITE_ID']);
+  expect(result.missingOptional.length > 0).toBeTruthy();
 });
 
-test('getRuntimeSecretNames ignores empty values', () => {
+it('getRuntimeSecretNames ignores empty values', () => {
   const names = getRuntimeSecretNames(
     {
       VITE_API_BASE_URL: 'https://api.example.com',
@@ -123,5 +118,5 @@ test('getRuntimeSecretNames ignores empty values', () => {
     },
     ['VITE_API_BASE_URL', 'NETLIFY_AUTH_TOKEN', 'NETLIFY_SITE_ID'],
   );
-  assert.deepEqual(names.sort(), ['NETLIFY_SITE_ID', 'VITE_API_BASE_URL']);
+  expect(names.sort()).toStrictEqual(['NETLIFY_SITE_ID', 'VITE_API_BASE_URL']);
 });

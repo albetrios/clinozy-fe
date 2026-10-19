@@ -2,10 +2,9 @@
  * What `.husky/pre-push` runs for its Vitest step (`pre-push-tests.mjs`): the selected files, and
  * still everything when the selection escalates or fails.
  */
-import assert from 'node:assert/strict';
+import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { describe, test } from 'node:test';
 import { prePushTests } from './pre-push-tests.mjs';
 
 const PRE_PUSH = readFileSync(
@@ -21,7 +20,7 @@ const selected = (projects) => ({
 });
 
 describe('pre-push tests', () => {
-  test('runs the selected files of every project', () => {
+  it('runs the selected files of every project', () => {
     const plan = prePushTests({
       select: () =>
         selected({
@@ -29,14 +28,14 @@ describe('pre-push tests', () => {
           security: ['tests/security/b.security.test.ts'],
         }),
     });
-    assert.deepEqual(plan, {
+    expect(plan).toStrictEqual({
       run: 'selected',
       files: ['src/a.test.ts', 'tests/security/b.security.test.ts'],
       reason: '2 test file(s) selected',
     });
   });
 
-  test('runs everything when the selection escalates or fails, nothing when empty', () => {
+  it('runs everything when the selection escalates or fails, nothing when empty', () => {
     const escalated = prePushTests({
       select: () => ({
         mode: 'all',
@@ -45,7 +44,7 @@ describe('pre-push tests', () => {
         why: {},
       }),
     });
-    assert.deepEqual(escalated, {
+    expect(escalated).toStrictEqual({
       run: 'all',
       files: [],
       reason: 'package.json escalates',
@@ -55,16 +54,16 @@ describe('pre-push tests', () => {
         throw new Error('no merge base');
       },
     });
-    assert.equal(failed.run, 'all');
-    assert.match(failed.reason, /no merge base/);
+    expect(failed.run).toBe('all');
+    expect(failed.reason).toMatch(/no merge base/);
     const empty = prePushTests({
       select: () => ({ mode: 'none', reasons: [], projects: {}, why: {} }),
     });
-    assert.equal(empty.run, 'none');
+    expect(empty.run).toBe('none');
   });
 
-  test('is what the hook runs, against the push base', () => {
-    assert.ok(PRE_PUSH.includes('pnpm test:pre-push --base "$PUSH_BASE"'));
-    assert.ok(!/^\s*pnpm test$/m.test(PRE_PUSH));
+  it('is what the hook runs, against the push base', () => {
+    expect(PRE_PUSH.includes('pnpm test:pre-push --base "$PUSH_BASE"')).toBeTruthy();
+    expect(!/^\s*pnpm test$/m.test(PRE_PUSH)).toBeTruthy();
   });
 });

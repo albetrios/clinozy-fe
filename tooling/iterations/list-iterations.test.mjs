@@ -3,11 +3,10 @@
  * Status | Intake mode | Schema-routes | Intake hash | Drop placed, oldest first, with live
  * fingerprints — an Intake hash the README does not record shows both.
  */
-import assert from 'node:assert/strict';
+import { afterEach, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, test } from 'node:test';
 import {
   cleanScratch,
   completeDrop,
@@ -21,7 +20,7 @@ import { formatIterationTable, readIterationListings } from './list-iterations.m
 
 afterEach(cleanScratch);
 
-test('lists every iteration oldest first, with the live fingerprint of intake-files/schema-routes.md', () => {
+it('lists every iteration oldest first, with the live fingerprint of intake-files/schema-routes.md', () => {
   const repositoryRoot = createRepository();
   writeIteration({
     repositoryRoot,
@@ -40,7 +39,7 @@ test('lists every iteration oldest first, with the live fingerprint of intake-fi
   const launchHash = intakeHash(
     join(repositoryRoot, 'iterations', 'launch-2026-09-30-jxmr', 'intake-files'),
   );
-  assert.deepEqual(
+  expect(
     listings.map((listing) => [
       listing.name,
       listing.status,
@@ -49,24 +48,22 @@ test('lists every iteration oldest first, with the live fingerprint of intake-fi
       listing.intakeHash,
       listing.dropPlaced,
     ]),
+  ).toStrictEqual([
     [
-      [
-        'launch-2026-09-30-jxmr',
-        'implementing',
-        'full',
-        createHash('sha256').update(SCHEMA_ROUTES).digest('hex').slice(0, 12),
-        launchHash,
-        '2026-10-01',
-      ],
-      ['feat-returns-2026-10-06-kqzx', 'planning', '—', '—', '—', '2026-10-07'],
+      'launch-2026-09-30-jxmr',
+      'implementing',
+      'full',
+      createHash('sha256').update(SCHEMA_ROUTES).digest('hex').slice(0, 12),
+      launchHash,
+      '2026-10-01',
     ],
-  );
+    ['feat-returns-2026-10-06-kqzx', 'planning', '—', '—', '—', '2026-10-07'],
+  ]);
   const lines = formatIterationTable(listings).split('\n');
-  assert.match(
-    lines[0],
+  expect(lines[0]).toMatch(
     /^\| Name +\| Type +\| Owner +\| Opened +\| Baseline +\| Status +\| Intake mode +\| Schema-routes +\| Intake hash +\| Drop placed +\|$/,
   );
-  assert.equal(new Set(lines.map((line) => line.length)).size, 1);
+  expect(new Set(lines.map((line) => line.length)).size).toBe(1);
 
   writeFileSync(
     join(
@@ -78,18 +75,17 @@ test('lists every iteration oldest first, with the live fingerprint of intake-fi
     ),
     'edited\n',
   );
-  assert.equal(
-    readIterationListings(repositoryRoot)[0].intakeHash,
+  expect(readIterationListings(repositoryRoot)[0].intakeHash).toBe(
     `${intakeHash(join(repositoryRoot, 'iterations', 'launch-2026-09-30-jxmr', 'intake-files'))} ≠ README ${launchHash}`,
   );
 });
 
-test('shows — for an iteration folder without a README', () => {
+it('shows — for an iteration folder without a README', () => {
   const repositoryRoot = createRepository();
   mkdirSync(join(repositoryRoot, 'iterations', 'fix-typo-2026-10-07-abcd'), {
     recursive: true,
   });
-  assert.deepEqual(readIterationListings(repositoryRoot), [
+  expect(readIterationListings(repositoryRoot)).toStrictEqual([
     {
       name: 'fix-typo-2026-10-07-abcd',
       type: '—',
@@ -105,7 +101,7 @@ test('shows — for an iteration folder without a README', () => {
   ]);
 });
 
-test('a brief that stores only BRIEF.md lists the fingerprints of the snapshot it resolves to', () => {
+it('a brief that stores only BRIEF.md lists the fingerprints of the snapshot it resolves to', () => {
   const repositoryRoot = createRepository();
   writeIteration({
     repositoryRoot,
@@ -143,9 +139,8 @@ test('a brief that stores only BRIEF.md lists the fingerprints of the snapshot i
   const listing = readIterationListings(repositoryRoot).find(
     (row) => row.name === 'feat-returns-2026-10-06-kqzx',
   );
-  assert.equal(listing.intakeHash, resolvedHash);
-  assert.equal(
-    listing.schemaRoutes,
+  expect(listing.intakeHash).toBe(resolvedHash);
+  expect(listing.schemaRoutes).toBe(
     createHash('sha256').update(SCHEMA_ROUTES).digest('hex').slice(0, 12),
   );
 });

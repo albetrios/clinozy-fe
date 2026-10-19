@@ -28,17 +28,18 @@
 
 ## Commands
 
-| Command                                   | What it runs                                      |
-| ----------------------------------------- | ------------------------------------------------- |
-| `pnpm test`                               | Vitest all projects — unit + security + ci-policy |
-| `pnpm test:unit`                          | Colocated unit suites only                        |
-| `pnpm test:security`                      | Security tripwires                                |
-| `pnpm test:e2e`                           | All Playwright E2E specs                          |
-| `pnpm test:e2e:integration`               | Routes integration + org switching                |
-| `pnpm test:e2e:integration:cross-browser` | Live integration on Chromium, Firefox, WebKit     |
-| `pnpm test:visual`                        | Visual regression only                            |
-| `pnpm validate:testids`                   | Page/form/shell `data-testid` gate                |
-| `pnpm validate:structure`                 | Route-island + test colocation gate               |
+| Command                                   | What it runs                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------- |
+| `pnpm test`                               | Vitest all projects — unit + security + ci-policy + tooling               |
+| `pnpm test:unit`                          | Colocated unit suites only                                                |
+| `pnpm test:security`                      | Security tripwires                                                        |
+| `pnpm test:github-scripts`                | The tooling scripts' tests (`tooling/**`, Vitest `tooling` project, Node) |
+| `pnpm test:e2e`                           | All Playwright E2E specs                                                  |
+| `pnpm test:e2e:integration`               | Routes integration + org switching                                        |
+| `pnpm test:e2e:integration:cross-browser` | Live integration on Chromium, Firefox, WebKit                             |
+| `pnpm test:visual`                        | Visual regression only                                                    |
+| `pnpm validate:testids`                   | Page/form/shell `data-testid` gate                                        |
+| `pnpm validate:structure`                 | Route-island + test colocation gate                                       |
 
 E2E artifacts: **`test-results/`** — `pnpm test:e2e:report` to open the HTML report.
 

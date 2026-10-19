@@ -4,12 +4,13 @@ Single reference for **every test kind** in this repo: where it lives, how to ru
 
 ## Two layers
 
-| Layer                  | Tool         | Location               | Pattern              | Command               | Server                                   |
-| ---------------------- | ------------ | ---------------------- | -------------------- | --------------------- | ---------------------------------------- |
-| **Unit / component**   | Vitest + RTL | Colocated under `src/` | `*.test.ts(x)`       | `pnpm test:unit`      | None — `vi.mock()` only                  |
-| **Security tripwires** | Vitest       | `tests/security/`      | `*.security.test.ts` | `pnpm test:security`  | None                                     |
-| **CI-flow policy**     | Vitest       | `tests/ci/`            | `*.policy.test.ts`   | `pnpm test:ci-policy` | None — reads workflow/config files       |
-| **E2E**                | Playwright   | `tests/e2e/`           | `*.e2e.test.ts`      | `pnpm test:e2e`       | **clinozy-be** on `:3000` (**required**) |
+| Layer                  | Tool          | Location                            | Pattern                    | Command                    | Server                                              |
+| ---------------------- | ------------- | ----------------------------------- | -------------------------- | -------------------------- | --------------------------------------------------- |
+| **Unit / component**   | Vitest + RTL  | Colocated under `src/`              | `*.test.ts(x)`             | `pnpm test:unit`           | None — `vi.mock()` only                             |
+| **Security tripwires** | Vitest        | `tests/security/`                   | `*.security.test.ts`       | `pnpm test:security`       | None                                                |
+| **CI-flow policy**     | Vitest        | `tests/ci/`                         | `*.policy.test.ts`         | `pnpm test:ci-policy`      | None — reads workflow/config files                  |
+| **Tooling scripts**    | Vitest (Node) | Beside each script under `tooling/` | `*.test.mjs` / `*.test.ts` | `pnpm test:github-scripts` | None — runs the scripts, throwaway git repositories |
+| **E2E**                | Playwright    | `tests/e2e/`                        | `*.e2e.test.ts`            | `pnpm test:e2e`            | **clinozy-be** on `:3000` (**required**)            |
 
 **Never** use `.spec.ts` or the words `real`/`live` in test file names.
 
@@ -154,19 +155,20 @@ Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`.
 
 ## Commands
 
-| Command                                   | What runs                                                  |
-| ----------------------------------------- | ---------------------------------------------------------- |
-| `pnpm test`                               | Vitest all projects — unit + security + ci-policy          |
-| `pnpm test:unit`                          | Colocated `src/**/*.test.*` only                           |
-| `pnpm test:security`                      | `tests/security/`                                          |
-| `pnpm test:e2e`                           | All Playwright specs in `tests/e2e/`                       |
-| `pnpm test:e2e:integration`               | Routes integration + org-switching only                    |
-| `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be)     |
-| `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)               |
-| `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                                |
-| `pnpm test:select [--why\|--run]`         | The Vitest files a change can affect, and why              |
-| `pnpm test:affected [--base <ref>]`       | What `git push` will run, and the tests picked, and why    |
-| `pnpm test:pre-push [--base <ref>]`       | Pre-push's Vitest step: the files `pnpm test:select` picks |
+| Command                                   | What runs                                                    |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| `pnpm test`                               | Vitest all projects — unit + security + ci-policy + tooling  |
+| `pnpm test:github-scripts`                | The tooling scripts' tests — Vitest `tooling` project (Node) |
+| `pnpm test:unit`                          | Colocated `src/**/*.test.*` only                             |
+| `pnpm test:security`                      | `tests/security/`                                            |
+| `pnpm test:e2e`                           | All Playwright specs in `tests/e2e/`                         |
+| `pnpm test:e2e:integration`               | Routes integration + org-switching only                      |
+| `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be)       |
+| `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)                 |
+| `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                                  |
+| `pnpm test:select [--why\|--run]`         | The Vitest files a change can affect, and why                |
+| `pnpm test:affected [--base <ref>]`       | What `git push` will run, and the tests picked, and why      |
+| `pnpm test:pre-push [--base <ref>]`       | Pre-push's Vitest step: the files `pnpm test:select` picks   |
 
 Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes.txt`.
 

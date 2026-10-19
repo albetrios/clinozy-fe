@@ -3,8 +3,7 @@
  * check runs, how each reads its command's result, and which pushed
  * files Semgrep scans.
  */
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, it } from 'vitest';
 import {
   EARLY_CHECKS_FALSE_POSITIVE_LOG,
   reportEarlyCheck,
@@ -37,87 +36,64 @@ function quietly(body) {
 }
 
 describe('a finding blocks', () => {
-  test('a finding fails; no finding passes', () => {
-    assert.equal(
-      quietly(() => reportEarlyCheck({ check: 'x', findings: ['a finding'] })),
+  it('a finding fails; no finding passes', () => {
+    expect(quietly(() => reportEarlyCheck({ check: 'x', findings: ['a finding'] }))).toBe(
       1,
     );
-    assert.equal(
-      quietly(() => reportEarlyCheck({ check: 'x', findings: [] })),
-      0,
-    );
+    expect(quietly(() => reportEarlyCheck({ check: 'x', findings: [] }))).toBe(0);
   });
 
-  test('names the false-positive log, the one clinozy-be keeps', () => {
-    assert.equal(EARLY_CHECKS_FALSE_POSITIVE_LOG, 'agent-os/evals/false-positives.md');
+  it('names the false-positive log, the one clinozy-be keeps', () => {
+    expect(EARLY_CHECKS_FALSE_POSITIVE_LOG).toBe('agent-os/evals/false-positives.md');
   });
 });
 
 describe('the commit checks', () => {
-  test('the audit runs on a staged lockfile; the allowlist on a staged env schema', () => {
-    assert.equal(
+  it('the audit runs on a staged lockfile; the allowlist on a staged env schema', () => {
+    expect(
       shouldRunCommitCheck({ check: 'audit', stagedFiles: ['pnpm-lock.yaml'] }),
-      true,
-    );
-    assert.equal(
-      shouldRunCommitCheck({ check: 'audit', stagedFiles: ['package.json'] }),
+    ).toBe(true);
+    expect(shouldRunCommitCheck({ check: 'audit', stagedFiles: ['package.json'] })).toBe(
       false,
     );
     for (const file of ['src/core/config/env-schema.ts', '.env.example'])
-      assert.equal(
-        shouldRunCommitCheck({ check: 'client-env', stagedFiles: [file] }),
+      expect(shouldRunCommitCheck({ check: 'client-env', stagedFiles: [file] })).toBe(
         true,
       );
-    assert.equal(
+    expect(
       shouldRunCommitCheck({
         check: 'client-env',
         stagedFiles: ['src/core/config/env.ts'],
       }),
-      false,
-    );
+    ).toBe(false);
   });
 
-  test('the audit: clean passes, an unreachable registry passes, an advisory blocks', () => {
-    assert.equal(
-      quietly(() => runLockfileAudit({ run: stub([{ status: 0 }]).run })),
-      0,
-    );
+  it('the audit: clean passes, an unreachable registry passes, an advisory blocks', () => {
+    expect(quietly(() => runLockfileAudit({ run: stub([{ status: 0 }]).run }))).toBe(0);
     const offline = stub([
       { status: 1, stdout: '', stderr: 'ERR_PNPM_AUDIT_NO_RESPONSE' },
     ]);
-    assert.equal(
-      quietly(() => runLockfileAudit({ run: offline.run })),
-      0,
-    );
-    assert.deepEqual(offline.calls, [['pnpm', 'deps:audit:prod']]);
+    expect(quietly(() => runLockfileAudit({ run: offline.run }))).toBe(0);
+    expect(offline.calls).toStrictEqual([['pnpm', 'deps:audit:prod']]);
     const advisory = () => stub([{ status: 1, stdout: '1 high', stderr: '' }]).run;
-    assert.equal(
-      quietly(() => runLockfileAudit({ run: advisory() })),
-      1,
-    );
+    expect(quietly(() => runLockfileAudit({ run: advisory() }))).toBe(1);
   });
 
-  test('the allowlist checks both deploy environments and fails on either', () => {
+  it('the allowlist checks both deploy environments and fails on either', () => {
     const clean = stub([]);
-    assert.equal(
-      quietly(() => runClientEnv({ run: clean.run })),
-      0,
-    );
-    assert.deepEqual(clean.calls, [
+    expect(quietly(() => runClientEnv({ run: clean.run }))).toBe(0);
+    expect(clean.calls).toStrictEqual([
       ['pnpm', 'validate:client-env', '--env', 'development'],
       ['pnpm', 'validate:client-env', '--env', 'production'],
     ]);
     const production = stub([{ status: 0 }, { status: 1, stdout: 'out of range' }]);
-    assert.equal(
-      quietly(() => runClientEnv({ run: production.run })),
-      1,
-    );
+    expect(quietly(() => runClientEnv({ run: production.run }))).toBe(1);
   });
 });
 
 describe('Semgrep at push', () => {
-  test('scans the auth runtime, the HTTP client and the CSP builders — never their tests', () => {
-    assert.deepEqual(
+  it('scans the auth runtime, the HTTP client and the CSP builders — never their tests', () => {
+    expect(
       pushSemgrepTargets([
         'src/shared/auth/service.ts',
         'src/shared/auth/service.test.ts',
@@ -127,12 +103,11 @@ describe('Semgrep at push', () => {
         'src/shared/tenancy/resolver.ts',
         'docs/reference/security-model.md',
       ]),
-      [
-        'src/shared/auth/service.ts',
-        'src/core/http/fetch-client.ts',
-        'src/lib/csp-api-origin.ts',
-        'plugins/csp-api-origin.ts',
-      ],
-    );
+    ).toStrictEqual([
+      'src/shared/auth/service.ts',
+      'src/core/http/fetch-client.ts',
+      'src/lib/csp-api-origin.ts',
+      'plugins/csp-api-origin.ts',
+    ]);
   });
 });

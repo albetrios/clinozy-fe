@@ -4,10 +4,9 @@
  * `--compact`, a merged iteration is never removed, and git that cannot name the changes fails
  * closed. The same rules as clinozy-be's.
  */
-import assert from 'node:assert/strict';
+import { afterEach, describe, expect, it } from 'vitest';
 import { rmSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, describe, test } from 'node:test';
 import {
   BASE_BRANCH,
   cleanScratch,
@@ -45,15 +44,15 @@ const check = (repositoryRoot) =>
   checkIterationFreeze({ repositoryRoot, base: BASE_BRANCH });
 
 describe('checkIterationFreeze', () => {
-  test('passes a branch that changes no iteration, and names only iteration paths', () => {
+  it('passes a branch that changes no iteration, and names only iteration paths', () => {
     const repositoryRoot = repository();
-    assert.deepEqual(check(repositoryRoot), { touched: [], problems: [] });
-    assert.equal(iterationOfPath(`iterations/${LAUNCH}/README.md`), LAUNCH);
-    assert.equal(iterationOfPath('iterations/README.md'), undefined);
-    assert.equal(iterationOfPath('docs/x.md'), undefined);
+    expect(check(repositoryRoot)).toStrictEqual({ touched: [], problems: [] });
+    expect(iterationOfPath(`iterations/${LAUNCH}/README.md`)).toBe(LAUNCH);
+    expect(iterationOfPath('iterations/README.md')).toBe(undefined);
+    expect(iterationOfPath('docs/x.md')).toBe(undefined);
   });
 
-  test('a changed iteration merges frozen: planning and done are refused with their fix', () => {
+  it('a changed iteration merges frozen: planning and done are refused with their fix', () => {
     const repositoryRoot = repository();
     writeIteration({
       repositoryRoot,
@@ -61,8 +60,7 @@ describe('checkIterationFreeze', () => {
       fields: { type: 'fix', topic: 'rounding' },
     });
     commitAll(repositoryRoot, 'open the fix');
-    assert.match(
-      check(repositoryRoot).problems[0],
+    expect(check(repositoryRoot).problems[0]).toMatch(
       /Status planning — .*finish it \(Status done\)/,
     );
     writeIteration({
@@ -71,8 +69,7 @@ describe('checkIterationFreeze', () => {
       fields: { type: 'fix', topic: 'rounding', status: 'done' },
     });
     commitAll(repositoryRoot, 'done');
-    assert.match(
-      check(repositoryRoot).problems[0],
+    expect(check(repositoryRoot).problems[0]).toMatch(
       new RegExp(`pnpm iteration:status ${FIX} frozen`),
     );
     writeIteration({
@@ -81,10 +78,10 @@ describe('checkIterationFreeze', () => {
       fields: { type: 'fix', topic: 'rounding', status: 'frozen' },
     });
     commitAll(repositoryRoot, 'frozen');
-    assert.deepEqual(check(repositoryRoot), { touched: [FIX], problems: [] });
+    expect(check(repositoryRoot)).toStrictEqual({ touched: [FIX], problems: [] });
   });
 
-  test('a merged frozen iteration is never edited, and never removed', () => {
+  it('a merged frozen iteration is never edited, and never removed', () => {
     const edited = repository();
     writeIteration({
       repositoryRoot: edited,
@@ -94,18 +91,19 @@ describe('checkIterationFreeze', () => {
       intake: completeDrop(),
     });
     commitAll(edited, 'edit the launch');
-    assert.match(check(edited).problems[0], /merged frozen, and this branch changes it/);
+    expect(check(edited).problems[0]).toMatch(
+      /merged frozen, and this branch changes it/,
+    );
 
     const removed = repository();
     rmSync(join(removed, 'iterations', LAUNCH), { recursive: true });
     commitAll(removed, 'remove the launch');
-    assert.match(
-      check(removed).problems[0],
+    expect(check(removed).problems[0]).toMatch(
       /removed — a merged iteration is never removed/,
     );
   });
 
-  test('a compaction that keeps the Intake hash is the one change a merged iteration takes', () => {
+  it('a compaction that keeps the Intake hash is the one change a merged iteration takes', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
@@ -132,17 +130,16 @@ describe('checkIterationFreeze', () => {
     git(repositoryRoot, ['switch', '-q', '-c', WORK_BRANCH]);
     rmSync(join(repositoryRoot, 'iterations', overlay, 'intake-files', 'PRD.md'));
     commitAll(repositoryRoot, 'compact the overlay');
-    assert.deepEqual(check(repositoryRoot), { touched: [overlay], problems: [] });
+    expect(check(repositoryRoot)).toStrictEqual({ touched: [overlay], problems: [] });
   });
 
-  test('fails closed when git cannot name the changes', () => {
+  it('fails closed when git cannot name the changes', () => {
     const repositoryRoot = repository();
     const result = checkIterationFreeze({
       repositoryRoot,
       base: 'origin/no-such-branch',
     });
-    assert.match(
-      result.problems[0],
+    expect(result.problems[0]).toMatch(
       /git cannot name the changes since origin\/no-such-branch/,
     );
   });

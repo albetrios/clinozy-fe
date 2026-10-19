@@ -33,6 +33,8 @@ One way for each job a script does, each pinned by a `tests/ci` policy:
 - **git** — `git`, `tryGit` and `resolveBase` from `ci/git-environment.mjs`, never a `git` child
   process of its own.
 - **`.ts` tooling** — run with `tsx <file>`.
+- **Tests** — beside the script (`<script>.test.mjs`), on Vitest: `describe` / `it` / `expect`
+  from `vitest`, run by the `tooling` project of `vitest.config.ts` (`pnpm test:github-scripts`).
 
 ## Common commands
 

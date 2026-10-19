@@ -1,8 +1,7 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import test from 'node:test';
 
 import { applyDotenvFile } from './load-env-files.mjs';
 
@@ -25,26 +24,26 @@ function withEnvFile(body) {
   }
 }
 
-test('a value the shell set survives a blank placeholder (cloud Variables)', () => {
+it('a value the shell set survives a blank placeholder (cloud Variables)', () => {
   withEnvFile((file) => {
     process.env[`${PREFIX}BLANK`] = 'from-the-cloud-environment';
     applyDotenvFile(file);
-    assert.equal(process.env[`${PREFIX}BLANK`], 'from-the-cloud-environment');
+    expect(process.env[`${PREFIX}BLANK`]).toBe('from-the-cloud-environment');
   });
 });
 
-test('a blank placeholder with nothing behind it is unset', () => {
+it('a blank placeholder with nothing behind it is unset', () => {
   withEnvFile((file) => {
     applyDotenvFile(file);
-    assert.equal(`${PREFIX}BLANK` in process.env, false);
-    assert.equal(process.env[`${PREFIX}FROM_FILE`], 'file');
+    expect(`${PREFIX}BLANK` in process.env).toBe(false);
+    expect(process.env[`${PREFIX}FROM_FILE`]).toBe('file');
   });
 });
 
-test('with override, a blank file line still unsets the key', () => {
+it('with override, a blank file line still unsets the key', () => {
   withEnvFile((file) => {
     process.env[`${PREFIX}BLANK`] = 'shell';
     applyDotenvFile(file, true);
-    assert.equal(`${PREFIX}BLANK` in process.env, false);
+    expect(`${PREFIX}BLANK` in process.env).toBe(false);
   });
 });

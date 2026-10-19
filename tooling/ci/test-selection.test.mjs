@@ -2,11 +2,10 @@
  * The test selector (`test-selection.mjs`, `pnpm test:select`): each rule on a fixture repository,
  * the fail-closed cases, and its Vitest projects and setup files pinned to `vitest.config.ts`.
  */
-import assert from 'node:assert/strict';
+import { afterEach, describe, expect, it } from 'vitest';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { afterEach, describe, test } from 'node:test';
 import { describeSelection, parseSelectArguments } from './select-tests.mjs';
 import {
   changedOnly,
@@ -61,45 +60,43 @@ const select = (repositoryRoot, changedFiles) =>
 const selectedFiles = (selection) => Object.values(selection.projects).flat().sort();
 
 describe('selectTests', () => {
-  test('a page change selects the tests that import it, plus the always-run set — not other pages', () => {
+  it('a page change selects the tests that import it, plus the always-run set — not other pages', () => {
     const root = fixture();
     const selection = select(root, ['src/pages/today/TodayPage.tsx']);
-    assert.equal(selection.mode, 'selected');
-    assert.deepEqual(selectedFiles(selection), [
+    expect(selection.mode).toBe('selected');
+    expect(selectedFiles(selection)).toStrictEqual([
       'src/pages/today/TodayPage.test.tsx',
       'tests/ci/docs.policy.test.ts',
       'tests/security/token.security.test.ts',
     ]);
-    assert.deepEqual(selection.why['src/pages/today/TodayPage.test.tsx'], [
+    expect(selection.why['src/pages/today/TodayPage.test.tsx']).toStrictEqual([
       'imports src/pages/today/TodayPage.tsx',
       'mentions src/pages/today/TodayPage.tsx',
     ]);
-    assert.deepEqual(selection.why['tests/security/token.security.test.ts'], [
+    expect(selection.why['tests/security/token.security.test.ts']).toStrictEqual([
       'always run',
     ]);
-    assert.deepEqual(selection.why['tests/ci/docs.policy.test.ts'], [
+    expect(selection.why['tests/ci/docs.policy.test.ts']).toStrictEqual([
       'always run (imports nothing from the repository)',
     ]);
-    assert.deepEqual(selection.projects.unit, ['src/pages/today/TodayPage.test.tsx']);
+    expect(selection.projects.unit).toStrictEqual(['src/pages/today/TodayPage.test.tsx']);
   });
 
-  test('a docs or agent-os change selects only the tests that mention it, as a path or as segments', () => {
+  it('a docs or agent-os change selects only the tests that mention it, as a path or as segments', () => {
     const root = fixture();
     for (const changed of ['docs/guide.md', 'agent-os/hooks/guard.sh']) {
       const selection = select(root, [changed]);
-      assert.deepEqual(
-        selectedFiles(selection),
-        ['tests/ci/docs.policy.test.ts'],
-        changed,
-      );
-      assert.deepEqual(selection.why['tests/ci/docs.policy.test.ts'], [
+      expect(selectedFiles(selection), changed).toStrictEqual([
+        'tests/ci/docs.policy.test.ts',
+      ]);
+      expect(selection.why['tests/ci/docs.policy.test.ts']).toStrictEqual([
         `mentions ${changed}`,
       ]);
     }
-    assert.equal(select(root, ['docs/other.md']).mode, 'none');
+    expect(select(root, ['docs/other.md']).mode).toBe('none');
   });
 
-  test('walks a folder named like a build output (a reports page) — the button proof miss', () => {
+  it('walks a folder named like a build output (a reports page) — the button proof miss', () => {
     const root = fixture({
       'src/shared/ui/button.tsx': 'export const Button = 1;\n',
       'src/pages/patients/reports/ReportsPage.tsx':
@@ -109,31 +106,33 @@ describe('selectTests', () => {
       'src/pages/patients/reports/ReportsPage.test.tsx':
         "import { render } from './__tests__/reports-router.tsx';\n",
     });
-    assert.ok(
+    expect(
       selectedFiles(select(root, ['src/shared/ui/button.tsx'])).includes(
         'src/pages/patients/reports/ReportsPage.test.tsx',
       ),
-    );
+    ).toBeTruthy();
   });
 
-  test('follows import.meta.glob to the files it matches', () => {
+  it('follows import.meta.glob to the files it matches', () => {
     const root = fixture();
     const selection = select(root, ['src/shared/pins/data/pin-north.json']);
-    assert.ok(selectedFiles(selection).includes('src/shared/pins/loader.test.ts'));
+    expect(
+      selectedFiles(selection).includes('src/shared/pins/loader.test.ts'),
+    ).toBeTruthy();
   });
 
-  test('selects a changed test itself, and only it when it is all that changed', () => {
+  it('selects a changed test itself, and only it when it is all that changed', () => {
     const root = fixture();
     const selection = select(root, ['src/pages/billing/BillingPage.test.tsx']);
-    assert.deepEqual(selectedFiles(selection), [
+    expect(selectedFiles(selection)).toStrictEqual([
       'src/pages/billing/BillingPage.test.tsx',
     ]);
-    assert.deepEqual(selection.why['src/pages/billing/BillingPage.test.tsx'], [
+    expect(selection.why['src/pages/billing/BillingPage.test.tsx']).toStrictEqual([
       'the changed test itself',
     ]);
   });
 
-  test('runs everything for the escalation list, the setup closure and an unknown path', () => {
+  it('runs everything for the escalation list, the setup closure and an unknown path', () => {
     const root = fixture();
     for (const [changed, reason] of [
       ['package.json', /escalation list/],
@@ -146,25 +145,25 @@ describe('selectTests', () => {
       ['weird/thing.txt', /outside the known roots/],
     ]) {
       const selection = select(root, [changed]);
-      assert.equal(selection.mode, 'all', changed);
-      assert.match(selection.reasons[0], reason, changed);
+      expect(selection.mode, changed).toBe('all');
+      expect(selection.reasons[0], changed).toMatch(reason);
     }
   });
 
-  test('a deleted file still selects its importers; one nothing imports runs everything', () => {
+  it('a deleted file still selects its importers; one nothing imports runs everything', () => {
     const root = fixture();
     rmSync(join(root, 'src/pages/billing/BillingPage.tsx'));
-    assert.ok(
+    expect(
       selectedFiles(select(root, ['src/pages/billing/BillingPage.tsx'])).includes(
         'src/pages/billing/BillingPage.test.tsx',
       ),
-    );
+    ).toBeTruthy();
     const gone = select(root, ['src/pages/gone/Gone.tsx']);
-    assert.equal(gone.mode, 'all');
-    assert.match(gone.reasons[0], /deleted and nothing imports it/);
+    expect(gone.mode).toBe('all');
+    expect(gone.reasons[0]).toMatch(/deleted and nothing imports it/);
   });
 
-  test('fails closed on any error, and selects nothing for no change', () => {
+  it('fails closed on any error, and selects nothing for no change', () => {
     const root = fixture();
     const broken = selectTests({
       changedFiles: ['src/pages/today/TodayPage.tsx'],
@@ -176,43 +175,43 @@ describe('selectTests', () => {
         importers: new Map(),
       },
     });
-    assert.equal(broken.mode, 'all');
-    assert.match(broken.reasons[0], /selector error/);
-    assert.equal(select(root, []).mode, 'none');
+    expect(broken.mode).toBe('all');
+    expect(broken.reasons[0]).toMatch(/selector error/);
+    expect(select(root, []).mode).toBe('none');
   });
 
-  test('changedOnly drops the always-run tests and turns everything into nothing; --exclude filters', () => {
+  it('changedOnly drops the always-run tests and turns everything into nothing; --exclude filters', () => {
     const root = fixture();
     const page = select(root, ['src/pages/today/TodayPage.tsx']);
-    assert.deepEqual(selectedFiles(changedOnly(page)), [
+    expect(selectedFiles(changedOnly(page))).toStrictEqual([
       'src/pages/today/TodayPage.test.tsx',
     ]);
-    assert.equal(changedOnly(select(root, ['package.json'])).mode, 'none');
+    expect(changedOnly(select(root, ['package.json'])).mode).toBe('none');
     const excluded = withoutTests({ selection: page, globs: ['tests/**'] });
-    assert.deepEqual(selectedFiles(excluded), ['src/pages/today/TodayPage.test.tsx']);
-    assert.equal(withoutTests({ selection: page, globs: ['**'] }).mode, 'none');
+    expect(selectedFiles(excluded)).toStrictEqual(['src/pages/today/TodayPage.test.tsx']);
+    expect(withoutTests({ selection: page, globs: ['**'] }).mode).toBe('none');
   });
 });
 
 describe('pinned to vitest.config.ts', () => {
-  test('the projects and the setup files are the ones Vitest runs', () => {
+  it('the projects and the setup files are the ones Vitest runs', () => {
     const config = readFileSync(join(ROOT, 'vitest.config.ts'), 'utf8');
     for (const { name, include } of VITEST_PROJECTS) {
-      assert.ok(config.includes(`name: '${name}'`), name);
-      for (const glob of include) assert.ok(config.includes(`'${glob}'`), glob);
+      expect(config.includes(`name: '${name}'`), name).toBeTruthy();
+      for (const glob of include) expect(config.includes(`'${glob}'`), glob).toBeTruthy();
     }
-    assert.equal(
+    expect(
       (config.match(/name: '[a-z-]+'/g) ?? []).length,
-      VITEST_PROJECTS.length,
       'a project in vitest.config.ts the selector does not know',
-    );
-    for (const setup of SETUP_FILES) assert.ok(config.includes(`'./${setup}'`), setup);
+    ).toBe(VITEST_PROJECTS.length);
+    for (const setup of SETUP_FILES)
+      expect(config.includes(`'./${setup}'`), setup).toBeTruthy();
   });
 });
 
 describe('pnpm test:select', () => {
-  test('reads --files, --why, --json, --changed-only and repeated --exclude', () => {
-    assert.deepEqual(
+  it('reads --files, --why, --json, --changed-only and repeated --exclude', () => {
+    expect(
       parseSelectArguments([
         '--files',
         'a.ts,b.md',
@@ -223,24 +222,23 @@ describe('pnpm test:select', () => {
         'src/x/**',
         '--changed-only',
       ]),
-      {
-        base: undefined,
-        files: ['a.ts', 'b.md'],
-        why: true,
-        json: false,
-        run: false,
-        changedOnly: true,
-        exclude: ['tests/**', 'src/x/**'],
-      },
-    );
+    ).toStrictEqual({
+      base: undefined,
+      files: ['a.ts', 'b.md'],
+      why: true,
+      json: false,
+      run: false,
+      changedOnly: true,
+      exclude: ['tests/**', 'src/x/**'],
+    });
   });
 
-  test('describes a selection of this repository, as text or JSON', () => {
+  it('describes a selection of this repository, as text or JSON', () => {
     const text = describeSelection(['--files', 'package.json']);
-    assert.equal(text.selection.mode, 'all');
-    assert.equal(text.lines[0], 'Selection: all');
+    expect(text.selection.mode).toBe('all');
+    expect(text.lines[0]).toBe('Selection: all');
     const json = describeSelection(['--files', 'docs/reference/design.md', '--json']);
-    assert.deepEqual(JSON.parse(json.lines[0]), json.selection);
-    assert.notEqual(json.selection.mode, 'all');
+    expect(JSON.parse(json.lines[0])).toStrictEqual(json.selection);
+    expect(json.selection.mode).not.toBe('all');
   });
 });

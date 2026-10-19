@@ -1,8 +1,7 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import test from 'node:test';
 
 import { firstPaintAssets } from './first-paint.mjs';
 
@@ -18,7 +17,7 @@ function withIndexHtml(html, check) {
   }
 }
 
-test('reads the entry script and every modulepreload, entry first', () => {
+it('reads the entry script and every modulepreload, entry first', () => {
   withIndexHtml(
     [
       '<link rel="modulepreload" crossorigin href="/assets/vendor-def.js">',
@@ -27,7 +26,7 @@ test('reads the entry script and every modulepreload, entry first', () => {
       '<link rel="stylesheet" crossorigin href="/assets/index-abc.css">',
     ].join('\n'),
     (root) =>
-      assert.deepEqual(firstPaintAssets(root), [
+      expect(firstPaintAssets(root)).toStrictEqual([
         'assets/index-abc.js',
         'assets/vendor-def.js',
         'assets/query-ghi.js',
@@ -35,7 +34,7 @@ test('reads the entry script and every modulepreload, entry first', () => {
   );
 });
 
-test('does not care where crossorigin sits, and lists a file once', () => {
+it('does not care where crossorigin sits, and lists a file once', () => {
   withIndexHtml(
     [
       '<script type="module" src="/assets/index-abc.js" crossorigin></script>',
@@ -43,15 +42,15 @@ test('does not care where crossorigin sits, and lists a file once', () => {
       '<link rel="modulepreload" crossorigin href="/assets/vendor-def.js">',
     ].join('\n'),
     (root) =>
-      assert.deepEqual(firstPaintAssets(root), [
+      expect(firstPaintAssets(root)).toStrictEqual([
         'assets/index-abc.js',
         'assets/vendor-def.js',
       ]),
   );
 });
 
-test('reads nothing from an index without an entry or preloads', () => {
+it('reads nothing from an index without an entry or preloads', () => {
   withIndexHtml('<link rel="prefetch" href="/assets/lazy-xyz.js">', (root) =>
-    assert.deepEqual(firstPaintAssets(root), []),
+    expect(firstPaintAssets(root)).toStrictEqual([]),
   );
 });
