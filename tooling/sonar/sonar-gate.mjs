@@ -16,6 +16,8 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { parse } from 'dotenv';
 
+import { requireTool } from '../ci/require-tool.mjs';
+
 const PROJECT_KEY = 'clinozy-fe';
 const COMPOSE_FILE = 'docker-compose.sonar.yml';
 const DOCKER_DAEMON_SCRIPT = 'tooling/setup/agent/ensure-docker-daemon.sh';
@@ -115,6 +117,9 @@ function dockerCompose(args, extraEnv = {}) {
  * the same script as clinozy-be). Elsewhere Docker Desktop or OrbStack owns the daemon.
  */
 function ensureDockerDaemon() {
+  if (!requireTool({ name: 'docker', mode: 'block', purpose: 'the SonarQube gate' })) {
+    throw new Error('Docker is required for the SonarQube gate.');
+  }
   if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status === 0) return;
   if (process.platform !== 'linux' || !existsSync(DOCKER_DAEMON_SCRIPT)) return;
   log(

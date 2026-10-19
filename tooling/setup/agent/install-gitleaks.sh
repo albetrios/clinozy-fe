@@ -25,6 +25,12 @@ if [ -n "${installed}" ] && [ "${installed}" = "${version}" ]; then
   exit 0
 fi
 
+# The pinned release binaries are Linux builds; elsewhere (a Mac) the package manager owns gitleaks.
+if [ "$(uname -s)" != "Linux" ]; then
+  log "not Linux — install gitleaks ${version} with your package manager (brew install gitleaks)."
+  exit 1
+fi
+
 arch="$(arch_for go)" || {
   log "unsupported architecture '$(uname -m)'."
   exit 1

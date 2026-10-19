@@ -1,5 +1,7 @@
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
@@ -26,19 +28,29 @@ const secretsStep = guard.slice(
 
 describe('git-hook gate tools', () => {
   it('stops the commit when gitleaks is missing', () => {
-    // A PATH with only the base system directories: no gitleaks there.
-    const result = spawnSync(
-      '/bin/bash',
-      ['-c', `set -e\n${secretsStep}\nstep_7\necho scanned`],
-      {
-        encoding: 'utf8',
-        env: { PATH: '/usr/bin:/bin' },
-      },
-    );
-    expect(result.status).toBe(1);
-    expect(result.stdout).toContain('the staged secrets scan is mandatory');
-    expect(result.stdout).not.toContain('scanned');
-    expect(guard).not.toMatch(/Skipping secret scan/i);
+    // A PATH with node (the shared tool check runs on it) and the base system directories only:
+    // no gitleaks there.
+    const nodeOnly = mkdtempSync(join(tmpdir(), 'fe-gate-tools-'));
+    symlinkSync(process.execPath, join(nodeOnly, 'node'));
+    try {
+      const result = spawnSync(
+        '/bin/bash',
+        ['-c', `set -e\n${secretsStep}\nstep_7\necho scanned`],
+        {
+          encoding: 'utf8',
+          env: { PATH: `${nodeOnly}:/usr/bin:/bin` },
+        },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain(
+        'gitleaks is not installed — the staged secrets scan cannot run',
+      );
+      expect(result.stderr).toContain('bash tooling/setup/agent/install-gitleaks.sh');
+      expect(result.stdout).not.toContain('scanned');
+      expect(guard).not.toMatch(/Skipping secret scan/i);
+    } finally {
+      rmSync(nodeOnly, { recursive: true, force: true });
+    }
   });
 
   it('a web session without gitleaks installs it at session start', () => {

@@ -23,5 +23,6 @@ GITLEAKS_VERSION=8.30.1
 GITLEAKS_SHA256_LINUX_X64=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
 GITLEAKS_SHA256_LINUX_ARM64=e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080
 
-# semgrep — the CI SAST job runs the semgrep/semgrep image of this version (pinned by digest there).
+# semgrep — install-semgrep.sh (`pnpm security:semgrep:push`); the CI SAST job runs the
+# semgrep/semgrep image of this version (pinned by digest there).
 SEMGREP_VERSION=1.179.0

@@ -26,6 +26,7 @@ and a dev server that serves the app shell.
 | `install-node.sh`          | Pinned Node from `.nvmrc` into `/opt/node<major>`, linked into `~/.local/bin`                   |
 | `install-apt-tools.sh`     | `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`                                       |
 | `install-gh.sh`            | GitHub CLI from the official `cli/cli` release                                                  |
+| `install-semgrep.sh`       | Semgrep at the pin, for `pnpm security:semgrep:push` (a warning when missing)                   |
 | `install-gitleaks.sh`      | Secret scanner used by `.husky/pre-commit` (mandatory there) and the CI gitleaks lane           |
 | `install-docker-images.sh` | Docker Hub mirror (`mirror.gcr.io`) + pre-pull of the SonarQube gate images                     |
 | `ensure-docker-daemon.sh`  | Starts `dockerd` when stopped (same script as clinozy-be); used by step 4 and `pnpm sonar:scan` |

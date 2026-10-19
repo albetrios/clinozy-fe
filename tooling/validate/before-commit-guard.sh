@@ -48,11 +48,7 @@ step_6() {
 # A commit without the scan could carry a secret into history, so a missing gitleaks stops the
 # commit (as in clinozy-be). Cloud sessions install it in setup and self-heal it at session start.
 step_7() {
-  if ! command -v gitleaks >/dev/null 2>&1; then
-    echo "ERROR: gitleaks is not installed, and the staged secrets scan is mandatory."
-    echo "Install it: bash tooling/setup/agent/install-gitleaks.sh (Linux, cloud) or brew install gitleaks (macOS)."
-    return 1
-  fi
+  node tooling/ci/require-tool.mjs gitleaks block "the staged secrets scan" || return 1
   gitleaks protect --staged --config .gitleaks.toml --verbose
 }
 

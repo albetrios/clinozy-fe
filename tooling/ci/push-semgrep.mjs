@@ -15,6 +15,7 @@
 import { spawnSync } from 'node:child_process';
 import { reportEarlyCheck } from './early-checks.mjs';
 import { resolveBase, tryGit } from './git-environment.mjs';
+import { requireTool } from './require-tool.mjs';
 import { isMain, parseCommandLine } from './script.mjs';
 
 /** The code Semgrep scans at push: the auth runtime, the HTTP client, the CSP builders. */
@@ -62,12 +63,8 @@ function main() {
     console.log('Semgrep at push: no auth, HTTP client or CSP changes.');
     return;
   }
-  if (spawnSync('semgrep', ['--version'], { encoding: 'utf8' }).status !== 0) {
-    console.warn(
-      '⚠ Semgrep at push: semgrep is not installed (pip install semgrep); skipped — the PR Semgrep lane scans',
-    );
-    return;
-  }
+  // A warning, not a block: the PR's Semgrep lane scans everything.
+  if (!requireTool({ name: 'semgrep', mode: 'warn', purpose: 'Semgrep at push' })) return;
   console.log(`Semgrep at push: ${targets.length} file(s) in auth, the HTTP client, CSP`);
   const scan = spawnSync(
     'semgrep',

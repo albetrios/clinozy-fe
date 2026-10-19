@@ -124,6 +124,7 @@ const SCRIPTS = [
   'tooling/ci/pre-push-tests.mjs',
   'tooling/ci/probe-live-site.mjs',
   'tooling/ci/push-semgrep.mjs',
+  'tooling/ci/require-tool.mjs',
   'tooling/ci/run-size-limit.mjs',
   'tooling/ci/select-tests.mjs',
   'tooling/ci/selector-misses.mjs',
