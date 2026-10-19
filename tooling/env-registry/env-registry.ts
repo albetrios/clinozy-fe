@@ -17,7 +17,7 @@
  *                        print JSON of `envProfiles.<env>.defaults` — the starting
  *                        values `github:sync` writes into a NEW `.env.<env>` file.
  *
- * Run via tsx: `node --import tsx tooling/env-registry/env-registry.ts …`.
+ * Run via tsx: `tsx tooling/env-registry/env-registry.ts …`.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';

@@ -10,7 +10,7 @@
  * app code should never embed a branch name, but the branch→env map and its
  * tests legitimately name branches.
  *
- * Usage: node --import tsx tooling/validate/no-static-branch-name.ts
+ * Usage: tsx tooling/validate/no-static-branch-name.ts
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';

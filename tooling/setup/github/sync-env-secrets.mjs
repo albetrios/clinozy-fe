@@ -30,6 +30,7 @@ import { parse } from 'dotenv';
 import {
   deleteGitHubSecret,
   deleteGitHubVariable,
+  envRegistryJson,
   GitHubApiError,
   listGitHubEnvironmentSecretNames,
   listGitHubEnvironmentVariables,
@@ -49,7 +50,6 @@ import {
 } from './setup-config.mjs';
 
 const PROJECT_ROOT = resolve(import.meta.dirname, '../../..');
-const ENV_REGISTRY = resolve(PROJECT_ROOT, 'tooling/env-registry/env-registry.ts');
 
 /**
  * Runtime-fallback schema defaults (the Zod `envSchemaBase` defaults, env-INDEPENDENT)
@@ -60,11 +60,7 @@ const ENV_REGISTRY = resolve(PROJECT_ROOT, 'tooling/env-registry/env-registry.ts
  * @returns {Map<string, string>}
  */
 function loadSchemaDefaults() {
-  const output = execFileSync('node', ['--import', 'tsx', ENV_REGISTRY, '--defaults'], {
-    encoding: 'utf-8',
-    timeout: 30_000,
-  });
-  return new Map(Object.entries(JSON.parse(output)));
+  return new Map(Object.entries(envRegistryJson(['--defaults'])));
 }
 
 /**

@@ -1,8 +1,27 @@
 /**
- * Shared GitHub CLI helpers for tooling/setup/github/*.
+ * Shared helpers for tooling/setup/github/*: the GitHub CLI, and the env-registry bridge.
  */
 import { execFileSync, execSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import { tryGit } from '../../ci/git-environment.mjs';
+
+const PROJECT_ROOT = resolve(import.meta.dirname, '../../..');
+/** The repository's own tsx — the one launcher for `.ts` tooling, found without pnpm on PATH. */
+const TSX = resolve(PROJECT_ROOT, 'node_modules/.bin/tsx');
+const ENV_REGISTRY = resolve(PROJECT_ROOT, 'tooling/env-registry/env-registry.ts');
+
+/**
+ * Runs the env-registry bridge (`tsx tooling/env-registry/env-registry.ts <args>`) and parses
+ * the JSON it prints — how the plain-Node GitHub tooling reads `src/core/config/env-schema.ts`.
+ *
+ * @param {readonly string[]} args
+ * @returns {Record<string, string>}
+ */
+export function envRegistryJson(args) {
+  return JSON.parse(
+    execFileSync(TSX, [ENV_REGISTRY, ...args], { encoding: 'utf-8', timeout: 30_000 }),
+  );
+}
 
 export class GitHubApiError extends Error {
   /**

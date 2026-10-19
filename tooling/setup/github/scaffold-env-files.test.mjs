@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { envFileContent, scaffoldGithubEnvFiles } from './scaffold-env-files.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
+const TSX = join(ROOT, 'node_modules/.bin/tsx');
 const ENVIRONMENTS = [
   { name: 'development', deploySecrets: ['VITE_API_BASE_URL', 'NETLIFY_AUTH_TOKEN'] },
   { name: 'production', deploySecrets: ['VITE_API_BASE_URL'] },
@@ -77,10 +78,8 @@ test('envFileContent writes one KEY=value line per default, after the secrets', 
 test('the env-registry bridge emits each profile’s defaults, identity included', () => {
   for (const environment of ['development', 'production']) {
     const output = execFileSync(
-      'node',
+      TSX,
       [
-        '--import',
-        'tsx',
         join(ROOT, 'tooling/env-registry/env-registry.ts'),
         '--profile-defaults',
         environment,
@@ -93,14 +92,8 @@ test('the env-registry bridge emits each profile’s defaults, identity included
 
 test('the env-registry bridge refuses an unknown environment', () => {
   const result = spawnSync(
-    'node',
-    [
-      '--import',
-      'tsx',
-      join(ROOT, 'tooling/env-registry/env-registry.ts'),
-      '--profile-defaults',
-      'staging',
-    ],
+    TSX,
+    [join(ROOT, 'tooling/env-registry/env-registry.ts'), '--profile-defaults', 'staging'],
     { encoding: 'utf8' },
   );
   assert.equal(result.status, 1);
