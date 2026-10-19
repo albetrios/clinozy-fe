@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -15,6 +15,13 @@ const SIBLING = join(process.cwd(), '..', 'clinozy-be');
 const COPIES = [
   'tooling/setup/agent/ensure-docker-daemon.sh',
   'tooling/ci/early-failure-alert.d.mts',
+  // clinozy-be's CI actions, copied rather than used as `albetrios/clinozy-be/...@<sha>`: the
+  // runner downloads that whole repository, and its tracked `.mcp.json` and `.cursor/mcp.json`
+  // link to a gitignored file, so the download stops at "Could not find file" before any step.
+  '.github/actions/ci-failure-issue/action.yml',
+  '.github/actions/ci-failure-issue/ci-failure-issue.sh',
+  '.github/actions/ci-failure-issue/fix-plan.mjs',
+  '.github/actions/test-env/action.yml',
 ] as const;
 
 /** A file's text with the repository names folded together, so "the other one" reads the same. */
@@ -29,6 +36,16 @@ const normalised = (path: string) =>
 describe('files mirrored in clinozy-be', () => {
   it('keeps every listed copy in this repository', () => {
     for (const path of COPIES) expect(existsSync(path), path).toBe(true);
+  });
+
+  it("uses the copied actions, never clinozy-be's own (its download fails)", () => {
+    const workflows = join('.github', 'workflows');
+    const downloads = readdirSync(workflows)
+      .filter((name) => name.endsWith('.yml'))
+      .filter((name) =>
+        /uses: [\w.-]+\/clinozy-be\//.test(readFileSync(join(workflows, name), 'utf8')),
+      );
+    expect(downloads).toEqual([]);
   });
 
   it.skipIf(!existsSync(join(SIBLING, '.git')))(

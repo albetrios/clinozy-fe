@@ -6,13 +6,13 @@ import { describe, expect, it } from 'vitest';
 import { jobBlocks } from '@/tests/utils/workflow-jobs.ts';
 
 // Every scheduled check, and post-merge CI, opens (or comments on) one `ci-failure` issue per
-// check when it fails and closes it on the next green run, through clinozy-be's shared
+// check when it fails and closes it on the next green run, through the
 // `.github/actions/ci-failure-issue` action — so an open issue means the check is red right now.
-// clinozy-be pins the action itself in src/tests/unit/ci/ci-failure-issue.policy.unit.test.ts.
+// The action is a true copy of clinozy-be's (tests/ci/mirrored-files.policy.test.ts); clinozy-be
+// pins the action itself in src/tests/unit/ci/ci-failure-issue.policy.unit.test.ts.
 
 const WORKFLOWS = '.github/workflows';
-const ACTION =
-  /uses: [\w.-]+\/clinozy-be\/\.github\/actions\/ci-failure-issue@[0-9a-f]{40}\b/;
+const USES = 'uses: ./.github/actions/ci-failure-issue';
 
 // Not checks: cache housekeeping, and two jobs whose job is a tracked issue of their own.
 const OWN_SIGNAL = new Set([
@@ -56,9 +56,12 @@ describe('ci-failure alert on every scheduled check', () => {
     expect(opened.length).toBeGreaterThan(0);
     expect(new Set(titles(source, 'close'))).toEqual(new Set(opened));
     for (const [job, block] of jobBlocks(source)) {
-      if (!block.includes('/.github/actions/ci-failure-issue@')) continue;
-      expect(block, `${name} → ${job}`).toMatch(ACTION);
+      if (!block.includes(USES)) continue;
       expect(block, `${name} → ${job}`).toContain('issues: write');
+      // A local action needs the checkout first; this job needs nothing else from it.
+      const checkout = block.indexOf('sparse-checkout: .github/actions/ci-failure-issue');
+      expect(checkout, `${name} → ${job}`).toBeGreaterThan(-1);
+      expect(checkout, `${name} → ${job}`).toBeLessThan(block.indexOf(USES));
     }
   });
 
@@ -103,7 +106,7 @@ describe('ci-failure alert on every scheduled check', () => {
 
   it('CodeQL alerts on its scheduled runs only, never on a PR', () => {
     for (const [job, block] of jobBlocks(text('codeql.yml'))) {
-      if (block.includes('/.github/actions/ci-failure-issue@')) {
+      if (block.includes(USES)) {
         expect(block, job).toContain("github.event_name != 'pull_request'");
       }
     }
