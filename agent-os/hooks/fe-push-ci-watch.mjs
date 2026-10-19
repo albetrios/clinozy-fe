@@ -11,29 +11,21 @@
 // cancelled run counts only while HEAD is still the pushed commit (a newer push cancels the older
 // runs and starts its own watch). One watch per commit.
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { isInRepository, pushDirectory } from './_fe-push-target.mjs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import {
+  hookStateDirectory,
+  isInsideRepository,
+  readHookPayload,
+  repositoryRoot,
+} from './_fe-hook.mjs';
+import { pushDirectory } from './_fe-push-target.mjs';
 
 const HOOK_ID = 'fe-push-ci-watch';
 const POLL_MILLISECONDS = Number(process.env.PUSH_CI_WATCH_POLL_MILLISECONDS || 30_000);
 const APPEAR_WITHIN_MILLISECONDS = 5 * 60_000;
 const FINISH_WITHIN_MILLISECONDS = 40 * 60_000;
 const FAILED_CONCLUSIONS = new Set(['failure', 'timed_out', 'startup_failure']);
-
-const repositoryRoot =
-  process.env.CLAUDE_PROJECT_DIR ||
-  resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const stateRoot = join(process.env.TMPDIR || '/tmp', 'clinozy-fe-hooks');
-
-function readPayload() {
-  try {
-    return JSON.parse(readFileSync(0, 'utf8'));
-  } catch {
-    return null;
-  }
-}
 
 function run(command, args) {
   const result = spawnSync(command, args, { cwd: repositoryRoot, encoding: 'utf8' });
@@ -103,13 +95,13 @@ async function watch(payload) {
   const command = payload.tool_input?.command || '';
   if (!/\bgit\s+(?:-C\s+\S+\s+)?push\b/.test(command)) return 'silent';
   const directory = pushDirectory({ command, cwd: payload.cwd || repositoryRoot });
-  if (!isInRepository({ directory, repositoryRoot })) return 'silent';
+  if (!isInsideRepository(directory)) return 'silent';
   if (!run('gh', ['auth', 'status']).ok) return 'no-gh';
   const sha = run('git', ['rev-parse', 'HEAD']).output;
   if (!sha) return 'silent';
 
-  mkdirSync(stateRoot, { recursive: true });
-  const lock = join(stateRoot, `${HOOK_ID}-${sha}.lock`);
+  mkdirSync(hookStateDirectory, { recursive: true });
+  const lock = join(hookStateDirectory, `${HOOK_ID}-${sha}.lock`);
   if (existsSync(lock)) return 'busy';
   writeFileSync(lock, String(process.pid));
   try {
@@ -121,7 +113,7 @@ async function watch(payload) {
 
 let outcome = 'error';
 try {
-  const payload = readPayload();
+  const payload = readHookPayload();
   outcome = payload ? await watch(payload) : 'silent';
 } catch {
   /* fail-open */

@@ -1,5 +1,14 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -18,7 +27,7 @@ const installImages = readFileSync(
 );
 const sonarCompose = readFileSync('docker-compose.sonar.yml', 'utf8');
 const sonarGate = readFileSync('tooling/sonar/sonar-gate.mjs', 'utf8');
-const sessionStart = readFileSync('agent-os/hooks/fe-session-start.sh', 'utf8');
+const SESSION_START = join(process.cwd(), 'agent-os', 'hooks', 'fe-session-start.mjs');
 
 /** The guard's step 7, the staged secrets scan (the `step_7` function), as a script of its own. */
 const secretsStep = guard.slice(
@@ -54,7 +63,37 @@ describe('git-hook gate tools', () => {
   });
 
   it('a web session without gitleaks installs it at session start', () => {
-    expect(sessionStart).toContain('bash tooling/setup/agent/install-gitleaks.sh');
+    // A bare project root with a stub installer that records it ran, the dependencies already
+    // there (no pnpm install) and a PATH without gitleaks.
+    const root = mkdtempSync(join(tmpdir(), 'fe-gate-tools-session-'));
+    try {
+      const marker = join(root, 'installer-ran');
+      mkdirSync(join(root, 'tooling', 'setup', 'agent'), { recursive: true });
+      writeFileSync(
+        join(root, 'tooling', 'setup', 'agent', 'install-gitleaks.sh'),
+        `touch "${marker}"\n`,
+      );
+      mkdirSync(join(root, 'node_modules', '.bin'), { recursive: true });
+      writeFileSync(join(root, 'node_modules', '.bin', 'vite'), '#!/bin/sh\n');
+      chmodSync(join(root, 'node_modules', '.bin', 'vite'), 0o755);
+      const result = spawnSync(process.execPath, [SESSION_START], {
+        encoding: 'utf8',
+        input: JSON.stringify({ hook_event_name: 'SessionStart', source: 'resume' }),
+        env: {
+          PATH: '/usr/bin:/bin',
+          HOME: root,
+          CLAUDE_PROJECT_DIR: root,
+          CLAUDE_CODE_REMOTE: 'true',
+        },
+      });
+      expect(result.status).toBe(0);
+      expect(existsSync(marker)).toBe(true);
+      expect(result.stdout).toContain(
+        'gitleaks install-failed (run: bash tooling/setup/agent/install-gitleaks.sh)',
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 
   it('the Setup script starts Docker and pre-pulls the images the gate runs', () => {

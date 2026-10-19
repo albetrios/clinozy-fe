@@ -128,7 +128,7 @@ Two deliberate divergences from the Mac list:
 | `pnpm setup:local`                      | Developer on macOS/Linux     | 5 phases, ends by starting `pnpm dev`               |
 | `tooling/setup/agent/bootstrap.sh`      | Cloud agent session          | This directory — terminates, never leaves a server  |
 | `agent-os/cloud-environment/install.sh` | Environment **Setup script** | Thin wrapper that calls `bootstrap.sh`              |
-| `agent-os/hooks/fe-session-start.sh`    | Every interactive session    | Fast path — switches Node, installs deps if missing |
+| `agent-os/hooks/fe-session-start.mjs`   | Every interactive session    | Fast path — switches Node, installs deps if missing |
 
 A cached **Setup script** must terminate, which is why `bootstrap.sh` passes
 `--only-env` to `setup:local` and stops the dev server it started for the

@@ -8,7 +8,7 @@
 // - PostToolUse queues the edited file for formatting and adds, as additionalContext (a
 //   PostToolUse hook's plain stdout never reaches the model), the skill reminders its path implies
 //   and the gates the uncommitted changes imply. Each reminder appears once per turn: the record
-//   lives in the _fe-turn-once.sh directory, which fe-prompt-skill-router.sh clears at every prompt.
+//   is _fe-turn-once.mjs's, which fe-prompt-skill-router.mjs clears at every prompt.
 // - Stop formats every file queued during the turn with one Prettier call (with its cache), so a
 //   turn of many edits formats once, then prints the gate checklist on stdout — Codex shows it;
 //   Claude does not pass a Stop hook's stdout to the model, and the hook never blocks the stop.
@@ -19,20 +19,20 @@
 // Only files in this repository are judged: a session that holds several repositories runs every
 // repository's hooks (tooling/agent-os/session-hooks.ts), and clinozy-be formats with Biome. Fails
 // open: any error exits 0 with no output — a hook must never block or fail an edit.
-import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import {
-  appendFileSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
-import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const HOOK_ID = 'fe-edit-hooks';
+import {
+  addModelContext,
+  hookStateDirectory,
+  isInsideRepository,
+  readHookPayload,
+  repositoryRoot,
+} from './_fe-hook.mjs';
+import { turnOnce } from './_fe-turn-once.mjs';
+
 const SKILL_MAP = 'Full map: agent-os/docs/skill-triggers.md';
 const FORMATTED_EXTENSIONS = /\.(ts|tsx|js|jsx|mjs|cjs|json|jsonc|css|md|html|yml|yaml)$/;
 const UNFORMATTED = /(^|\/)(dist|node_modules)\/|pnpm-lock\.yaml$/;
@@ -97,46 +97,17 @@ const GATE_REMINDERS = [
   [/\.md$|(^|\/)docs\//, 'docs changed → pnpm docs:lint'],
 ];
 
-const repositoryRoot =
-  process.env.CLAUDE_PROJECT_DIR ||
-  resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const stateRoot = join(process.env.TMPDIR || '/tmp', 'clinozy-fe-hooks');
-
-function readPayload() {
-  try {
-    return JSON.parse(readFileSync(0, 'utf8'));
-  } catch {
-    return null;
-  }
-}
-
 /** The edited file as an absolute path in this repository, or "" when it is elsewhere. */
 function repositoryFile(filePath) {
-  if (!filePath) return '';
-  const absolute = isAbsolute(filePath) ? filePath : join(repositoryRoot, filePath);
-  return absolute.startsWith(`${repositoryRoot}/`) ? absolute : '';
-}
-
-/** Succeeds the first time `key` is seen this turn (the _fe-turn-once.sh record); fails open. */
-function turnOnce(session, key) {
-  const directory = join(stateRoot, session);
-  try {
-    mkdirSync(directory, { recursive: true });
-    const marker = join(
-      directory,
-      `${HOOK_ID}-${createHash('sha1').update(key).digest('hex')}`,
-    );
-    if (existsSync(marker)) return false;
-    writeFileSync(marker, '');
-  } catch {
-    /* every reminder counts as new when the record cannot be written */
-  }
-  return true;
+  if (typeof filePath !== 'string' || !filePath || !isInsideRepository(filePath))
+    return '';
+  const absolute = resolve(repositoryRoot, filePath);
+  return absolute === repositoryRoot ? '' : absolute;
 }
 
 /** The queue of files to format at Stop — outside the turn record, so a missed Stop formats later. */
 function formatQueuePath(session) {
-  return join(stateRoot, `${session}.format-queue`);
+  return join(hookStateDirectory, `${session}.format-queue`);
 }
 
 /** Uncommitted paths, status prefix stripped; `untracked: false` skips the slow untracked scan. */
@@ -171,7 +142,7 @@ function afterEdit(payload, session) {
 
   if (FORMATTED_EXTENSIONS.test(file) && !UNFORMATTED.test(relative)) {
     try {
-      mkdirSync(stateRoot, { recursive: true });
+      mkdirSync(hookStateDirectory, { recursive: true });
       appendFileSync(formatQueuePath(session), `${file}\n`);
     } catch {
       /* not queued: the pre-commit lint-staged run still formats it */
@@ -186,7 +157,7 @@ function afterEdit(payload, session) {
       const note = route.note ? ` — ${route.note}` : '';
       return `${route.skills.join(' → ')}${optional}${note}`;
     })
-    .filter((reminder) => turnOnce(session, `skill-reminder:${reminder}`));
+    .filter((reminder) => turnOnce({ session, key: `skill-reminder:${reminder}` }));
   if (skills.length > 0) {
     sections.push(
       [
@@ -199,7 +170,7 @@ function afterEdit(payload, session) {
   // Tracked changes plus this file (a new one is untracked): the untracked scan is the slow
   // part, and the Stop checklist still reads the whole tree.
   const gates = gateReminders({ untracked: false, extraPaths: [relative] }).filter(
-    (reminder) => turnOnce(session, `stop-gate-reminder:${reminder}`),
+    (reminder) => turnOnce({ session, key: `stop-gate-reminder:${reminder}` }),
   );
   if (gates.length > 0) {
     sections.push(
@@ -211,9 +182,7 @@ function afterEdit(payload, session) {
     );
   }
   if (sections.length === 0) return;
-  process.stdout.write(
-    `${JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: sections.join('\n\n') } })}\n`,
-  );
+  addModelContext({ event: 'PostToolUse', context: sections.join('\n\n') });
 }
 
 function formatQueuedFiles(session) {
@@ -250,7 +219,7 @@ function atStop(session) {
   console.log('   Skill map: agent-os/docs/skill-triggers.md');
 }
 
-const payload = readPayload();
+const payload = readHookPayload();
 if (payload) {
   const session = payload.session_id || 'unknown-session';
   try {

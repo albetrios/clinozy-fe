@@ -88,7 +88,7 @@ These clinozy-be commands are **backend-specific** and intentionally omitted:
 The session-start and guardrail follow-up is implemented — see
 [`agent-os/hooks/README.md`](../hooks/README.md):
 
-- **SessionStart** (`agent-os/hooks/fe-session-start.sh`) — verifies Node/deps, installs if needed, prints the skill-trigger map.
+- **SessionStart** (`agent-os/hooks/fe-session-start.mjs`) — verifies Node/deps, installs if needed, prints the skill-trigger map.
 - **Guardrails** — block destructive shell, secret writes and skipping the git hooks
   (`--no-verify`, `git commit -n`, `HUSKY=0`); warn on protected paths
   and cross-layer imports. Claude: `PreToolUse`; Cursor: `beforeShellExecution`

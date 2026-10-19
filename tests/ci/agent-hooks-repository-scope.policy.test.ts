@@ -28,12 +28,11 @@ function runHook({
   payload: unknown;
   turnDirectory?: string;
 }) {
-  const runtime = script.endsWith('.mjs') ? process.execPath : '/bin/bash';
   // Each run gets its own TMPDIR unless one is passed: the reminders' once-per-turn record
-  // (_fe-turn-once.sh) and the format queue live there, and an earlier run's record would silence
+  // (_fe-turn-once.mjs) and the format queue live there, and an earlier run's record would silence
   // the next one.
   temporaryDirectories.push(turnDirectory);
-  return spawnSync(runtime, [join(HOOKS, script)], {
+  return spawnSync(process.execPath, [join(HOOKS, script)], {
     input: JSON.stringify(payload),
     encoding: 'utf8',
     env: { ...process.env, CLAUDE_PROJECT_DIR: REPOSITORY_ROOT, TMPDIR: turnDirectory },
@@ -62,11 +61,11 @@ afterEach(() => {
 describe.runIf(process.platform !== 'win32')(
   'agent-os hooks act on this repository only',
   () => {
-    it('fe-guard-edits.sh judges this repository and leaves another one alone', () => {
+    it('fe-guard-edits.mjs judges this repository and leaves another one alone', () => {
       const edit = (filePath: string) =>
         decisionOf(
           runHook({
-            script: 'fe-guard-edits.sh',
+            script: 'fe-guard-edits.mjs',
             payload: {
               tool_input: {
                 file_path: filePath,

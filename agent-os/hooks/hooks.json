@@ -1,10 +1,9 @@
 {
-  "description": "Single source of truth for clinozy-fe agent hook wiring. tooling/agent-os/generate.ts derives agent-os/platforms/claude/settings.json (hooks block), agent-os/platforms/cursor/hooks.json, and agent-os/platforms/codex/hooks.json from this manifest + agent-os/platforms/targets.json. Tool dirs (.claude/, .cursor/, .codex/) symlink into agent-os/platforms/ — edit here only. All hooks FAIL OPEN.",
+  "description": "Single source of truth for clinozy-fe agent hook wiring. tooling/agent-os/generate.ts derives agent-os/platforms/claude/settings.json (hooks block), agent-os/platforms/cursor/hooks.json, and agent-os/platforms/codex/hooks.json from this manifest + agent-os/platforms/targets.json. Tool dirs (.claude/, .cursor/, .codex/) symlink into agent-os/platforms/ — edit here only. Every hook is a Node script (node agent-os/hooks/<script>) on the shared _fe-hook.mjs helper. All hooks FAIL OPEN.",
   "hooks": [
     {
       "id": "fe-session-start",
-      "runtime": "bash",
-      "script": "fe-session-start.sh",
+      "script": "fe-session-start.mjs",
       "claude": {
         "event": "SessionStart",
         "matcher": "startup|resume"
@@ -17,8 +16,7 @@
     },
     {
       "id": "fe-prompt-skill-router",
-      "runtime": "bash",
-      "script": "fe-prompt-skill-router.sh",
+      "script": "fe-prompt-skill-router.mjs",
       "claude": {
         "event": "UserPromptSubmit"
       },
@@ -29,8 +27,7 @@
     },
     {
       "id": "fe-guard-edits",
-      "runtime": "bash",
-      "script": "fe-guard-edits.sh",
+      "script": "fe-guard-edits.mjs",
       "claude": {
         "event": "PreToolUse",
         "matcher": "Edit|Write|MultiEdit"
@@ -38,7 +35,6 @@
     },
     {
       "id": "fe-guardrails",
-      "runtime": "node",
       "script": "fe-guardrails.mjs",
       "claude": {
         "event": "PreToolUse",
@@ -52,8 +48,7 @@
     },
     {
       "id": "fe-no-unrequested-pr",
-      "runtime": "bash",
-      "script": "fe-no-unrequested-pr.sh",
+      "script": "fe-no-unrequested-pr.mjs",
       "claude": {
         "event": "PreToolUse",
         "matcher": "mcp__github__create_pull_request"
@@ -61,7 +56,6 @@
     },
     {
       "id": "fe-edit-hooks",
-      "runtime": "node",
       "script": "fe-edit-hooks.mjs",
       "claude": {
         "event": "PostToolUse",
@@ -71,7 +65,6 @@
     },
     {
       "id": "fe-edit-hooks-stop",
-      "runtime": "node",
       "script": "fe-edit-hooks.mjs",
       "claude": {
         "event": "Stop"
@@ -83,7 +76,6 @@
     },
     {
       "id": "fe-turn-end-tests",
-      "runtime": "node",
       "script": "fe-turn-end-tests.mjs",
       "claude": {
         "event": "Stop",
@@ -93,7 +85,6 @@
     },
     {
       "id": "fe-push-ci-watch",
-      "runtime": "node",
       "script": "fe-push-ci-watch.mjs",
       "claude": {
         "event": "PostToolUse",
@@ -105,8 +96,7 @@
     },
     {
       "id": "fe-gate-failure-hint",
-      "runtime": "bash",
-      "script": "fe-gate-failure-hint.sh",
+      "script": "fe-gate-failure-hint.mjs",
       "claude": {
         "event": "PostToolUseFailure",
         "matcher": "Bash"
@@ -114,8 +104,7 @@
     },
     {
       "id": "fe-compact-resume-card",
-      "runtime": "bash",
-      "script": "fe-compact-resume-card.sh",
+      "script": "fe-compact-resume-card.mjs",
       "claude": {
         "event": "SessionStart",
         "matcher": "compact"
@@ -123,15 +112,13 @@
     },
     {
       "id": "fe-session-end",
-      "runtime": "bash",
-      "script": "fe-session-end.sh",
+      "script": "fe-session-end.mjs",
       "claude": {
         "event": "SessionEnd"
       }
     },
     {
       "id": "fe-cursor-shell-guard",
-      "runtime": "node",
       "script": "fe-cursor-shell-guard.mjs",
       "cursor": {
         "event": "beforeShellExecution"

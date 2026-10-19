@@ -3,39 +3,35 @@
 //
 // BLOCK (deny): reading or writing secret files (.env*, not .env.example), secret content,
 //   destructive shell commands, skipping the git hooks (--no-verify, `git commit -n`, HUSKY=0).
-// ASK: `gh pr create` — a PR only when the user asked (fe-no-unrequested-pr.sh covers the MCP tool),
-//   except in a turn the user started with /fe-ship or /fe-open-pr (fe-prompt-skill-router.sh marks it);
+// ASK: `gh pr create` — a PR only when the user asked (fe-no-unrequested-pr.mjs covers the MCP tool),
+//   except in a turn the user started with /fe-ship or /fe-open-pr (fe-prompt-skill-router.mjs marks it);
 //   `git push` of auth, token, CSP, routeTree or guard changes with no clean /fe-pre-merge-review
 //   recorded for HEAD (`pnpm agent-os:review-clean` records it).
 // WARN (systemMessage): edits to protected/vendored paths.
 //
-// Reads the PreToolUse payload on stdin. Fail-open by design: any parse/read
+// Reads the PreToolUse payload on stdin (_fe-hook.mjs). Fail-open by design: any parse/read
 // error allows the tool (exit 0) so a guardrail bug can never brick the agent.
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   destructiveShellReason,
   isSecretEnvPath,
   withoutQuotedText,
 } from './_fe-guard-rules.mjs';
-import { isInRepository, pushDirectory } from './_fe-push-target.mjs';
+import {
+  askBeforeToolCall,
+  denyToolCall,
+  isInsideRepository,
+  readHookPayload,
+  repositoryRoot,
+  showSystemMessage,
+} from './_fe-hook.mjs';
+import { pushDirectory } from './_fe-push-target.mjs';
+import { isTurnMarked } from './_fe-turn-once.mjs';
 
-let raw = '';
-try {
-  raw = readFileSync(0, 'utf8');
-} catch {
-  process.exit(0);
-}
-
-let payload;
-try {
-  payload = JSON.parse(raw);
-} catch {
-  process.exit(0);
-}
+const payload = readHookPayload();
+if (!payload) process.exit(0);
 
 const tool = payload.tool_name || '';
 const input = payload.tool_input || {};
@@ -50,10 +46,7 @@ const content = [input.content, input.new_string, ...edits].filter(Boolean).join
 // The WARN rules are clinozy-fe's conventions, so they judge only files in this repository; the
 // BLOCK rules (destructive shell, secrets) guard every path. A session that holds several
 // repositories runs every repository's hooks on every call (tooling/agent-os/session-hooks.ts).
-const repositoryRoot =
-  process.env.CLAUDE_PROJECT_DIR ||
-  resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const inRepository = !isAbsolute(filePath) || filePath.startsWith(`${repositoryRoot}/`);
+const inRepository = isInsideRepository(filePath);
 
 const warnings = [];
 
@@ -62,42 +55,16 @@ const SECRET_READ_DENIAL =
   '.env.<environment>) — they hold real keys. The variable names and defaults are in ' +
   '.env.example and src/core/config/env-schema.ts; if a value is needed, ask the user.';
 
-function ask(reason) {
-  process.stdout.write(
-    JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'PreToolUse',
-        permissionDecision: 'ask',
-        permissionDecisionReason: reason,
-      },
-    }),
-  );
-  process.exit(0);
-}
-
-function deny(reason) {
-  process.stdout.write(
-    JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'PreToolUse',
-        permissionDecision: 'deny',
-        permissionDecisionReason: reason,
-      },
-    }),
-  );
-  process.exit(0);
-}
-
 // --- BLOCK: agent reading secret env files ----------------------------------
 if ((tool === 'Read' || tool === 'Grep') && isSecretEnvPath(filePath)) {
-  deny(SECRET_READ_DENIAL);
+  denyToolCall(SECRET_READ_DENIAL);
 }
 if (tool === 'Bash' && command) {
   // Any token that resolves to a secret env file (cat/grep/cp/source/< redirection, …).
   const touchesSecret = command
     .split(/[\s;|&><()'"`]+/)
     .some((token) => isSecretEnvPath(token));
-  if (touchesSecret) deny(SECRET_READ_DENIAL);
+  if (touchesSecret) denyToolCall(SECRET_READ_DENIAL);
 }
 
 /** Pushed paths where a missed check leaks a session, a token or another clinic's data. */
@@ -125,7 +92,7 @@ function gitIn(directory, args) {
  */
 function unreviewedSensitivePush(scan) {
   const directory = pushDirectory({ command: scan, cwd: payload.cwd || repositoryRoot });
-  if (!isInRepository({ directory, repositoryRoot })) return '';
+  if (!isInsideRepository(directory)) return '';
   const head = gitIn(repositoryRoot, ['rev-parse', 'HEAD']);
   const gitDirectory = gitIn(repositoryRoot, ['rev-parse', '--absolute-git-dir']);
   if (!(head && gitDirectory)) return '';
@@ -162,21 +129,14 @@ if (tool === 'Bash' && command) {
   const scan = withoutQuotedText(command);
   const why = destructiveShellReason(command);
   if (why) {
-    deny(
+    denyToolCall(
       `Blocked by clinozy-fe guardrail: ${why}. Command: "${command.slice(0, 160)}". If you truly intend this, run it yourself in a terminal.`,
     );
   }
-  // The marker _fe-turn-once.sh's turn_mark writes for a /fe-ship or /fe-open-pr turn.
-  const prRequested = existsSync(
-    join(
-      tmpdir(),
-      'clinozy-fe-hooks',
-      payload.session_id || 'unknown-session',
-      'mark.pr-requested',
-    ),
-  );
+  // The mark fe-prompt-skill-router.mjs records for a /fe-ship or /fe-open-pr turn.
+  const prRequested = isTurnMarked({ session: payload.session_id, mark: 'pr-requested' });
   if (/\bgh\s+pr\s+create\b/.test(scan) && !prRequested) {
-    ask(
+    askBeforeToolCall(
       'clinozy-fe policy: open a PR only when the user explicitly asked for one (Bash(gh pr*) is allowlisted, so this hook is the check). Confirm this was requested before proceeding.',
     );
   }
@@ -187,7 +147,7 @@ if (tool === 'Bash' && command) {
     } catch {
       /* fail-open */
     }
-    if (reason) ask(reason);
+    if (reason) askBeforeToolCall(reason);
   }
   if (/\bgit\s+reset\s+--hard\b/i.test(scan) || /\bgit\s+clean\s+-[a-z]*f/i.test(scan)) {
     warnings.push(
@@ -198,7 +158,7 @@ if (tool === 'Bash' && command) {
 
 // --- BLOCK: secrets ----------------------------------------------------------
 if (isWrite && isSecretEnvPath(filePath)) {
-  deny(
+  denyToolCall(
     `Blocked by clinozy-fe guardrail: "${filePath}" is a gitignored secrets file. Put template keys in .env.example (VITE_ prefix = public) and provide real values via the environment, not source control.`,
   );
 }
@@ -210,7 +170,7 @@ const secretPatterns = [
   /\bxox[baprs]-[A-Za-z0-9-]{10,}/,
 ];
 if (isWrite && content && secretPatterns.some((re) => re.test(content))) {
-  deny(
+  denyToolCall(
     'Blocked by clinozy-fe guardrail: the content looks like a private key or live credential. Use environment variables / a secret manager instead of committing secrets.',
   );
 }
@@ -235,10 +195,6 @@ if (isWrite && filePath && inRepository) {
 }
 
 if (warnings.length) {
-  process.stdout.write(
-    JSON.stringify({
-      systemMessage: '⚠️ clinozy-fe guardrail:\n- ' + warnings.join('\n- '),
-    }),
-  );
+  showSystemMessage('⚠️ clinozy-fe guardrail:\n- ' + warnings.join('\n- '));
 }
 process.exit(0);

@@ -6,47 +6,32 @@
 // rules are advisory in agent-os/rules/. The rules come from _fe-guard-rules.mjs, the one copy
 // both guards import.
 //
-// Reads the hook payload on stdin; prints { "permission": "allow" | "deny", … }.
-import { readFileSync } from 'node:fs';
-
+// Reads the hook payload on stdin (_fe-hook.mjs; an unreadable one is allowed); prints
+// { "permission": "allow" | "deny", … } — Cursor's output shape, not Claude Code's.
 import { destructiveShellReason } from './_fe-guard-rules.mjs';
+import { readHookPayload, writeHookOutput } from './_fe-hook.mjs';
 
 function allow() {
-  process.stdout.write(JSON.stringify({ continue: true, permission: 'allow' }));
+  writeHookOutput({ continue: true, permission: 'allow' });
   process.exit(0);
 }
 function deny(message) {
-  process.stdout.write(
-    JSON.stringify({
-      continue: true,
-      permission: 'deny',
-      userMessage: message,
-      agentMessage: message,
-    }),
-  );
+  writeHookOutput({
+    continue: true,
+    permission: 'deny',
+    userMessage: message,
+    agentMessage: message,
+  });
   process.exit(0);
 }
 
-let raw = '';
-try {
-  raw = readFileSync(0, 'utf8');
-} catch {
-  allow();
-}
-
-let payload = {};
-try {
-  payload = JSON.parse(raw);
-} catch {
-  allow();
-}
-
+const payload = readHookPayload() ?? {};
 const command =
   payload.command ||
   (payload.tool_input && payload.tool_input.command) ||
   payload.shellCommand ||
   '';
-if (!command) allow();
+if (typeof command !== 'string' || !command) allow();
 
 // The same rules as the Claude guardrail, from one module (quoted text and heredocs are ignored).
 const why = destructiveShellReason(command);

@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-start.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-start.mjs\""
           }
         ]
       },
@@ -84,7 +84,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-compact-resume-card.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-compact-resume-card.mjs\""
           }
         ]
       }
@@ -94,7 +94,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-prompt-skill-router.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-prompt-skill-router.mjs\""
           }
         ]
       }
@@ -105,7 +105,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-guard-edits.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-guard-edits.mjs\""
           }
         ]
       },
@@ -123,7 +123,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-no-unrequested-pr.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-no-unrequested-pr.mjs\""
           }
         ]
       }
@@ -183,7 +183,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-gate-failure-hint.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-gate-failure-hint.mjs\""
           }
         ]
       }
@@ -193,7 +193,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-end.sh\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-end.mjs\""
           }
         ]
       }

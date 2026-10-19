@@ -646,12 +646,10 @@ for (const file of listFilesWithExtension(join(agentOsDirectory, 'rules'), '.mdc
   requirePrefix('rule', basename(file, '.mdc'));
 // Hook scripts and their manifest ids too, so a block message, a telemetry row or a session-root
 // settings entry always names its repository. A helper the hooks import (never registered
-// itself) keeps its leading `_` before the prefix: `_fe-turn-once.sh`.
+// itself) keeps its leading `_` before the prefix: `_fe-hook.mjs`. Every hook is a Node script
+// (tests/ci/agent-hook-runtime.policy.test.ts), so `.mjs` is the one extension to scan.
 const hooksDirectory = join(agentOsDirectory, 'hooks');
-for (const file of [
-  ...listFilesWithExtension(hooksDirectory, '.sh'),
-  ...listFilesWithExtension(hooksDirectory, '.mjs'),
-])
+for (const file of listFilesWithExtension(hooksDirectory, '.mjs'))
   if (!file.replace(/^_/, '').startsWith(repositoryPrefix))
     error(
       'name-prefix',

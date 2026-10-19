@@ -22,9 +22,9 @@ import { gitEnvironmentWithoutInheritedRepository } from '../../tooling/ci/git-e
 // next one skip.
 
 const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'fe-turn-end-tests.mjs');
-/** The hook's state folder under TMPDIR, as the hook names it. */
+/** The hooks' state folder under TMPDIR, as the shared hook helper names it. */
 const HOOK_STATE = /join\(process\.env\.TMPDIR \|\| '\/tmp', '([a-z-]+)'\)/.exec(
-  readFileSync(HOOK, 'utf8'),
+  readFileSync(join(process.cwd(), 'agent-os', 'hooks', '_fe-hook.mjs'), 'utf8'),
 )?.[1] as string;
 const temporaryDirectories: string[] = [];
 

@@ -22,9 +22,10 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { stripVTControlCharacters } from 'node:util';
+
+import { hookStateDirectory, readHookPayload, repositoryRoot } from './_fe-hook.mjs';
 
 const HOOK_ID = 'fe-turn-end-tests';
 const TEST_BUDGET_MILLISECONDS = 60_000;
@@ -33,25 +34,17 @@ const FAILURE_LINES = 40;
 /** How every always-run reason starts (tooling/ci/test-selection.mjs › ALWAYS_RUN_REASON). */
 const ALWAYS_RUN_REASON = 'always run';
 
-const repositoryRoot =
-  process.env.CLAUDE_PROJECT_DIR ||
-  resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const stateRoot = join(process.env.TMPDIR || '/tmp', 'clinozy-fe-hooks');
-const lockPath = join(stateRoot, `${HOOK_ID}.lock`);
-const passedPath = join(stateRoot, `${HOOK_ID}.passed`);
+const lockPath = join(hookStateDirectory, `${HOOK_ID}.lock`);
+const passedPath = join(hookStateDirectory, `${HOOK_ID}.passed`);
 
 /** The Stop payload's session id, or `unknown-session`. */
 function sessionId() {
-  try {
-    return JSON.parse(readFileSync(0, 'utf8')).session_id || 'unknown-session';
-  } catch {
-    return 'unknown-session';
-  }
+  return readHookPayload()?.session_id || 'unknown-session';
 }
 
 /** Holds the one-run lock, or returns false while a live run holds it. */
 function takeLock() {
-  mkdirSync(stateRoot, { recursive: true });
+  mkdirSync(hookStateDirectory, { recursive: true });
   if (existsSync(lockPath)) {
     const holder = Number(readFileSync(lockPath, 'utf8'));
     try {
@@ -120,7 +113,7 @@ function select(files) {
 function warnFullPush({ session, reasons }) {
   const reason = reasons[0] ?? 'everything is selected';
   const key = createHash('sha1').update(`${session}\n${reason}`).digest('hex');
-  const marker = join(stateRoot, `${HOOK_ID}.warned-${key}`);
+  const marker = join(hookStateDirectory, `${HOOK_ID}.warned-${key}`);
   if (existsSync(marker)) return 'silent';
   writeFileSync(marker, reason);
   process.stderr.write(

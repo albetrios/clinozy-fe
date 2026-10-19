@@ -63,6 +63,8 @@ const commandsOf = (settings: Settings) =>
     groups.flatMap((group) => group.hooks.map((hook) => hook.command)),
   );
 
+// The other repository of the session (clinozy-be's names): it still runs a bash hook, so the
+// script keeps replacing `bash` commands as well as `node` ones.
 const OTHER_SETTINGS = JSON.stringify({
   permissions: { allow: ['Bash(pnpm test*)'] },
   hooks: {
@@ -71,7 +73,7 @@ const OTHER_SETTINGS = JSON.stringify({
         hooks: [
           {
             type: 'command',
-            command: 'bash "$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-session-start.sh"',
+            command: 'bash "$CLAUDE_PROJECT_DIR/agent-os/hooks/be-session-start.sh"',
           },
         ],
       },
@@ -82,7 +84,7 @@ const OTHER_SETTINGS = JSON.stringify({
         hooks: [
           {
             type: 'command',
-            command: 'node "$CLAUDE_PROJECT_DIR/agent-os/hooks/fe-guardrails.mjs"',
+            command: 'node "$CLAUDE_PROJECT_DIR/agent-os/hooks/be-guardrails.mjs"',
           },
         ],
       },

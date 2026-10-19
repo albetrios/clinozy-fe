@@ -13,7 +13,6 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 const REPOSITORY_ROOT = process.cwd();
 const HOOKS = join(REPOSITORY_ROOT, 'agent-os', 'hooks');
 const FAKE_ACCESS_KEY = ['AKIA', 'ABCDEFGHIJKLMNOP'].join('');
-const HAS_JQ = spawnSync('/bin/bash', ['-c', 'command -v jq']).status === 0;
 
 interface HookManifest {
   hooks: Array<{
@@ -41,8 +40,7 @@ afterEach(() => {
 });
 
 function runHook(script: string, payload: unknown) {
-  const runtime = script.endsWith('.mjs') ? process.execPath : '/bin/bash';
-  return spawnSync(runtime, [join(HOOKS, script)], {
+  return spawnSync(process.execPath, [join(HOOKS, script)], {
     input: JSON.stringify(payload),
     encoding: 'utf8',
     env: { ...process.env, CLAUDE_PROJECT_DIR: REPOSITORY_ROOT, TMPDIR: turnDirectory },
@@ -114,57 +112,54 @@ describe('agent-os guard gaps', () => {
     expect(guardDecision('Bash', { command: 'gh pr view 12' })).toBe('silent');
   });
 
-  it.skipIf(!HAS_JQ)(
-    'a turn the user started with /fe-ship or /fe-open-pr is the PR request; the next prompt is not',
-    () => {
-      const prompt = (session_id: string, text: string) =>
-        runHook('fe-prompt-skill-router.sh', {
-          session_id,
-          hook_event_name: 'UserPromptSubmit',
-          prompt: text,
-        });
-      const decisions = (session_id: string) => {
-        const decision = (stdout: string) =>
-          stdout.trim()
-            ? (
-                JSON.parse(stdout) as {
-                  hookSpecificOutput: { permissionDecision: string };
-                }
-              ).hookSpecificOutput.permissionDecision
-            : 'silent';
-        return [
-          decision(
-            runHook('fe-guardrails.mjs', {
-              session_id,
-              tool_name: 'Bash',
-              tool_input: { command: 'gh pr create --title x --body y' },
-            }).stdout,
-          ),
-          decision(
-            runHook('fe-no-unrequested-pr.sh', {
-              session_id,
-              tool_name: 'mcp__github__create_pull_request',
-              tool_input: { title: 'feat: x' },
-            }).stdout,
-          ),
-        ];
-      };
+  it('a turn the user started with /fe-ship or /fe-open-pr is the PR request; the next prompt is not', () => {
+    const prompt = (session_id: string, text: string) =>
+      runHook('fe-prompt-skill-router.mjs', {
+        session_id,
+        hook_event_name: 'UserPromptSubmit',
+        prompt: text,
+      });
+    const decisions = (session_id: string) => {
+      const decision = (stdout: string) =>
+        stdout.trim()
+          ? (
+              JSON.parse(stdout) as {
+                hookSpecificOutput: { permissionDecision: string };
+              }
+            ).hookSpecificOutput.permissionDecision
+          : 'silent';
+      return [
+        decision(
+          runHook('fe-guardrails.mjs', {
+            session_id,
+            tool_name: 'Bash',
+            tool_input: { command: 'gh pr create --title x --body y' },
+          }).stdout,
+        ),
+        decision(
+          runHook('fe-no-unrequested-pr.mjs', {
+            session_id,
+            tool_name: 'mcp__github__create_pull_request',
+            tool_input: { title: 'feat: x' },
+          }).stdout,
+        ),
+      ];
+    };
 
-      prompt('ship-session', '/fe-ship feat: billing invoices');
-      expect(decisions('ship-session')).toEqual(['silent', 'silent']);
-      prompt('ship-session', 'now tidy the docs');
-      expect(decisions('ship-session')).toEqual(['ask', 'ask']);
+    prompt('ship-session', '/fe-ship feat: billing invoices');
+    expect(decisions('ship-session')).toEqual(['silent', 'silent']);
+    prompt('ship-session', 'now tidy the docs');
+    expect(decisions('ship-session')).toEqual(['ask', 'ask']);
 
-      prompt('open-session', '  /fe-open-pr');
-      expect(decisions('open-session')).toEqual(['silent', 'silent']);
+    prompt('open-session', '  /fe-open-pr');
+    expect(decisions('open-session')).toEqual(['silent', 'silent']);
 
-      prompt('look-alike-session', '/fe-shipping-notes then /fe-ship');
-      expect(decisions('look-alike-session')).toEqual(['ask', 'ask']);
-      expect(decisions('never-prompted-session')).toEqual(['ask', 'ask']);
-    },
-  );
+    prompt('look-alike-session', '/fe-shipping-notes then /fe-ship');
+    expect(decisions('look-alike-session')).toEqual(['ask', 'ask']);
+    expect(decisions('never-prompted-session')).toEqual(['ask', 'ask']);
+  });
 
-  it.skipIf(!HAS_JQ)('a skill reminder reaches the model once per turn', () => {
+  it('a skill reminder reaches the model once per turn', () => {
     const edit = {
       session_id: 'policy-session',
       hook_event_name: 'PostToolUse',
@@ -179,7 +174,7 @@ describe('agent-os guard gaps', () => {
 
     expect(runHook('fe-edit-hooks.mjs', edit).stdout.trim()).toBe('');
 
-    runHook('fe-prompt-skill-router.sh', {
+    runHook('fe-prompt-skill-router.mjs', {
       session_id: 'policy-session',
       prompt: 'next',
     });

@@ -1,6 +1,7 @@
 // Shared by fe-guardrails.mjs (the push review gate) and fe-push-ci-watch.mjs: the directory a
 // `git push` command runs in — its `git -C <dir>`, else its last `cd <dir>`, else the session's
-// working directory — so a hook judges only pushes in its own repository (clinozy-be's).
+// working directory — so a hook judges only pushes in its own repository (as clinozy-be's
+// _be-push-target.mjs does); _fe-hook.mjs's isInsideRepository tells whether it is this one.
 import { resolve } from 'node:path';
 
 /** The absolute directory `command` pushes from, resolved against `cwd`. */
@@ -11,9 +12,4 @@ export function pushDirectory({ command, cwd }) {
   );
   const target = flag ?? changes.pop();
   return target ? resolve(cwd, target) : cwd;
-}
-
-/** True when `directory` is `repositoryRoot` or inside it. */
-export function isInRepository({ directory, repositoryRoot }) {
-  return directory === repositoryRoot || directory.startsWith(`${repositoryRoot}/`);
 }

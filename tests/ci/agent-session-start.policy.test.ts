@@ -5,18 +5,17 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-// fe-session-start.sh runs on startup and resume only, and puts the 16 KB skill-routing map
+// fe-session-start.mjs runs on startup and resume only, and puts the 16 KB skill-routing map
 // in on startup: a resumed conversation already holds it.
 
-const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'fe-session-start.sh');
+const HOOK = join(process.cwd(), 'agent-os', 'hooks', 'fe-session-start.mjs');
 const MAP = join(process.cwd(), 'agent-os', 'docs', 'skill-triggers.md');
-const HAS_JQ = spawnSync('/bin/bash', ['-c', 'command -v jq']).status === 0;
 
 interface HookManifest {
   hooks: Array<{ script: string; claude?: { event: string; matcher?: string } }>;
 }
 
-describe('agent-os/hooks/fe-session-start.sh', () => {
+describe('agent-os/hooks/fe-session-start.mjs', () => {
   let root = '';
 
   beforeEach(() => {
@@ -32,7 +31,7 @@ describe('agent-os/hooks/fe-session-start.sh', () => {
   });
 
   function context(source: string): string {
-    const result = spawnSync('/bin/bash', [HOOK], {
+    const result = spawnSync(process.execPath, [HOOK], {
       encoding: 'utf8',
       input: JSON.stringify({ hook_event_name: 'SessionStart', source }),
       env: { PATH: process.env.PATH ?? '', HOME: root, CLAUDE_PROJECT_DIR: root },
@@ -48,22 +47,19 @@ describe('agent-os/hooks/fe-session-start.sh', () => {
     const manifest = JSON.parse(
       readFileSync(join(process.cwd(), 'agent-os', 'hooks', 'hooks.json'), 'utf8'),
     ) as HookManifest;
-    const entry = manifest.hooks.find((hook) => hook.script === 'fe-session-start.sh');
+    const entry = manifest.hooks.find((hook) => hook.script === 'fe-session-start.mjs');
     expect(entry?.claude).toEqual({ event: 'SessionStart', matcher: 'startup|resume' });
   });
 
-  it.skipIf(!HAS_JQ)(
-    'injects the routing map on startup and only the summary on resume',
-    () => {
-      const map = readFileSync(MAP, 'utf8').trim();
-      const startup = context('startup');
-      expect(startup).toContain(map);
+  it('injects the routing map on startup and only the summary on resume', () => {
+    const map = readFileSync(MAP, 'utf8').trim();
+    const startup = context('startup');
+    expect(startup).toContain(map);
 
-      const resume = context('resume');
-      expect(resume).toContain('clinozy-fe session ready');
-      expect(resume).not.toContain(map);
-      expect(resume).toContain('already earlier in this conversation');
-      expect(resume.length).toBeLessThan(startup.length / 10);
-    },
-  );
+    const resume = context('resume');
+    expect(resume).toContain('clinozy-fe session ready');
+    expect(resume).not.toContain(map);
+    expect(resume).toContain('already earlier in this conversation');
+    expect(resume.length).toBeLessThan(startup.length / 10);
+  });
 });

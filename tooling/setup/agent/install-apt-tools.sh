@@ -5,7 +5,7 @@
 # that Homebrew installs on a developer's Mac and that apt provides on the Linux
 # cloud image. Keep the two lists in step — see this directory's README.
 #
-#   - jq            JSON in shell/CI scripts + the session-start hook's MCP count
+#   - jq            JSON in shell/CI scripts (no agent hook needs it — they are Node)
 #   - ripgrep       fast search used by the code-review report tooling
 #   - shellcheck    shell lint — parity with the CI shellcheck/actionlint lanes
 #   - librsvg2-bin  rsvg-convert — regenerate PWA icon PNGs from public/app-icon.svg

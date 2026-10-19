@@ -11,7 +11,7 @@
 # install aborts.
 #
 # This installs the pinned version into /opt/node<major> — the same layout the
-# image uses and exactly where agent-os/hooks/fe-session-start.sh looks — so the
+# image uses and exactly where agent-os/hooks/fe-session-start.mjs looks — so the
 # SessionStart hook switches PATH to it and runs `pnpm install` automatically.
 # No repo files change; nothing depends on a version manager being present.
 #

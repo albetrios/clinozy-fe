@@ -42,7 +42,7 @@ const writeMode =
 
 interface HookManifestEntry {
   id: string;
-  runtime: 'bash' | 'node';
+  /** A Node script under agent-os/hooks/ — every hook runs on `node`, no other runtime. */
   script: string;
   /**
    * `if`: permission rules (`Edit(**)`, `Write(**)`), one handler each — Claude Code spawns the
@@ -89,11 +89,11 @@ const cursorTarget = targets.agents.cursor;
 const codexTarget = targets.agents.codex;
 
 const claudeCommand = (entry: HookManifestEntry): string =>
-  `${entry.runtime} "$CLAUDE_PROJECT_DIR/agent-os/hooks/${entry.script}"`;
+  `node "$CLAUDE_PROJECT_DIR/agent-os/hooks/${entry.script}"`;
 const cursorCommand = (entry: HookManifestEntry): string =>
-  `${entry.runtime} ../agent-os/hooks/${entry.script}`;
+  `node ../agent-os/hooks/${entry.script}`;
 const codexCommand = (entry: HookManifestEntry): string =>
-  `CLAUDE_PROJECT_DIR="$(git rev-parse --show-toplevel)" ${entry.runtime} "$(git rev-parse --show-toplevel)/agent-os/hooks/${entry.script}"`;
+  `CLAUDE_PROJECT_DIR="$(git rev-parse --show-toplevel)" node "$(git rev-parse --show-toplevel)/agent-os/hooks/${entry.script}"`;
 
 /**
  * The events whose handlers may carry an `if` rule; on any other event Claude Code never runs a
