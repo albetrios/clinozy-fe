@@ -161,7 +161,7 @@ sequenceDiagram
 - **`.env.local`** (gitignored) at project root: `VITE_DEV_API_URL` (e.g. `http://localhost:3000`) if your backend runs locally. No token needed for basic dev.
 - **Sentry (local build):** If you run `pnpm build` locally and want source maps uploaded, put `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` in `.env.sentry-build-plugin` (gitignored) or `.env.local`. Optional.
 
-**Summary:** Build runs only on GitHub Actions (Deploy workflow on push to `main`). Set **GitHub secrets** (`VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`). Netlify never builds (`netlify.toml` cancels or fails any build there); the workflow uploads `dist/` with `--no-build`. **Backend CORS** must allow your frontend origin.
+**Summary:** Build runs only on GitHub Actions (Deploy workflow on push to `main`). Set **GitHub secrets** (`VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`). Netlify never builds (`netlify.toml` cancels or fails any build there); the workflow uploads `dist/` with `--no-build`. **Backend CORS** must allow your frontend origin.
 
 **CLI-only deploy:** You can still run `pnpm run deploy:netlify:prod` locally (build runs on your machine, then Netlify CLI uploads `dist/`). See [netlify-cli-setup.md](netlify-cli-setup.md).
 
@@ -188,10 +188,9 @@ Backend must allow CORS from the frontend origin (Netlify site URL / custom doma
 
 Build runs on GitHub; env comes from **GitHub Secrets**. Set in GitHub → Settings → Secrets and variables → Actions:
 
-| Variable            | Value                         | Notes                                                                                                                                       |
-| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VITE_API_BASE_URL` | `https://your-api-domain.com` | Production API base; app appends `/api/v1`.                                                                                                 |
-| `NODE_VERSION`      | `24`                          | Required in **`.env.<environment>`** and GitHub Actions; must match `package.json` `engines.node` and `netlify.toml` `[build.environment]`. |
+| Variable            | Value                         | Notes                                       |
+| ------------------- | ----------------------------- | ------------------------------------------- |
+| `VITE_API_BASE_URL` | `https://your-api-domain.com` | Production API base; app appends `/api/v1`. |
 
 Optional (Sentry, PostHog): add to GitHub secrets; they are baked into the client at build time.
 
@@ -199,14 +198,14 @@ Optional (Sentry, PostHog): add to GitHub secrets; they are baked into the clien
 
 **Option A — From `.env.<environment>` (CLI)**
 
-Each environment's deploy values live in a gitignored `.env.<environment>` at the repo root, derived from the committed `.env.example` — that file is the source of truth. Fill it in, then run `pnpm github:sync` after `gh auth login` to push every non-empty deploy key (`VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, …) to the matching GitHub Environment. Preview with `pnpm github:sync --dry-run`; check drift with `pnpm github:sync --check`.
+Each environment's deploy values live in a gitignored `.env.<environment>` at the repo root, derived from the committed `.env.example` — that file is the source of truth. Fill it in, then run `pnpm github:sync` after `gh auth login` to push every non-empty deploy key (`VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, …) to the matching GitHub Environment. Preview with `pnpm github:sync --dry-run`; check drift with `pnpm github:sync --check`.
 
 **Option B — Manual in GitHub UI**
 
 1. Go to GitHub → repo → Settings → Secrets and variables → Actions.
-2. Add `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.
+2. Add `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.
 
-**Variable names (required):** `VITE_API_BASE_URL`, `NODE_VERSION`. **Optional:** `VITE_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`.
+**Variable names (required):** `VITE_API_BASE_URL` (Node comes from `.nvmrc`, the one Node pin — no variable). **Optional:** `VITE_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`.
 
 **Local dev:** Use `.env.local` (gitignored) for `VITE_*` vars.
 
@@ -305,7 +304,7 @@ Single trunk (`main`) drives both GitHub Environments by **purpose**, not by bra
 | **Production API**  | `https://your-api-domain.com` (path `/api/v1` in app).                                                                                                |
 | **Frontend host**   | Netlify (static host only; no build on Netlify).                                                                                                      |
 | **Build**           | GitHub Actions only (Deploy workflow on push to `main`; Release workflow when release created). Env from GitHub secrets.                              |
-| **Env vars**        | GitHub secrets: `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.                                                         |
+| **Env vars**        | GitHub secrets: `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.                                                                         |
 | **Deploy (GitHub)** | Deploy workflow: push to `main` → build → upload `dist/` to Netlify.                                                                                  |
 | **Deploy (CLI)**    | `pnpm run deploy:netlify` (draft), `pnpm run deploy:netlify:prod` (production); build runs locally.                                                   |
 | **CI**              | GitHub Actions: lint, type-check, unit + security tests, build (smoke) on push/PR. E2E: `e2e-backend.yml` against the backend image (main + nightly). |
