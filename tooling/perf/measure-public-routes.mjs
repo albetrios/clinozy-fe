@@ -47,13 +47,21 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseCommandLine } from '../ci/script.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const budgetPath = path.join(root, 'tooling/perf/public-route-budgets.json');
 
-const UPDATE = process.argv.includes('--update');
-const AS_JSON = process.argv.includes('--json');
-const AUTHED = process.argv.includes('--authed');
+const { values: commandLine } = parseCommandLine(process.argv.slice(2), {
+  options: {
+    update: { type: 'boolean' },
+    json: { type: 'boolean' },
+    authed: { type: 'boolean' },
+  },
+});
+const UPDATE = commandLine.update === true;
+const AS_JSON = commandLine.json === true;
+const AUTHED = commandLine.authed === true;
 const API_ORIGIN = process.env.PERF_API_ORIGIN ?? 'http://localhost:3001';
 const FIXTURE_EMAIL = process.env.PERF_FIXTURE_EMAIL ?? 'demo@example.com';
 /*
@@ -209,8 +217,9 @@ async function waitForResourceQuiet(page) {
   while (Date.now() < deadline) {
     const count = await page.evaluate(
       () =>
-        performance.getEntriesByType('resource').filter((e) => e.name.includes('/assets/'))
-          .length,
+        performance
+          .getEntriesByType('resource')
+          .filter((e) => e.name.includes('/assets/')).length,
     );
     if (count !== lastCount) {
       lastCount = count;
@@ -325,7 +334,9 @@ async function signInFixture(browser) {
   let code;
   for (let attempt = 0; attempt < SEND_CODE_ATTEMPTS && !code; attempt += 1) {
     if (attempt > 0) {
-      log(`[perf:routes] send-code cooldown held; retrying in ${COOLDOWN_WAIT_MS / 1000}s`);
+      log(
+        `[perf:routes] send-code cooldown held; retrying in ${COOLDOWN_WAIT_MS / 1000}s`,
+      );
       await new Promise((done) => setTimeout(done, COOLDOWN_WAIT_MS));
     }
     const send = await fetch(`${API_ORIGIN}/api/v1/auth/email/send-code`, {
@@ -486,8 +497,11 @@ async function main() {
   if (breaches.length > 0) {
     log('\n[perf:routes] ✗ budget exceeded:');
     for (const breach of breaches) {
-      log(`  ${breach.routePath} ${breach.key}: ${breach.actual} kB > ${breach.limit} kB`);
-      for (const row of breach.top) log(`      ${String(row.kb).padStart(7)} kB  ${row.file}`);
+      log(
+        `  ${breach.routePath} ${breach.key}: ${breach.actual} kB > ${breach.limit} kB`,
+      );
+      for (const row of breach.top)
+        log(`      ${String(row.kb).padStart(7)} kB  ${row.file}`);
     }
     log('\n  Budgets are a RATCHET: lower them as routes shrink, never raise to');
     log('  absorb growth. Re-pin deliberately with `pnpm perf:routes --update`,');

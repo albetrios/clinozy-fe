@@ -12,7 +12,7 @@
  */
 import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { isMain, parseCommandLine } from '../ci/script.mjs';
 import {
   appendHistoryEntry,
   gitUserName,
@@ -41,30 +41,22 @@ const USAGE = `Usage:
  * @throws on an unknown option, a `--reason` without text, or a third positional
  */
 export function parseStatusArguments(commandLine) {
-  const positionals = [];
-  let reason;
-  let help = false;
-  for (let index = 0; index < commandLine.length; index += 1) {
-    const token = commandLine[index];
-    if (token === '--help' || token === '-h') help = true;
-    else if (token === '--reason') {
-      reason = commandLine[index + 1]?.trim();
-      if (!reason || reason.startsWith('--'))
-        throw new Error(
-          '--reason needs text, e.g. --reason "scope changed after review"',
-        );
-      index += 1;
-    } else if (token.startsWith('--reason=')) {
-      reason = token.slice('--reason='.length).trim();
-      if (reason === '') throw new Error('--reason needs text.');
-    } else if (token.startsWith('-')) throw new Error(`Unknown option "${token}".`);
-    else positionals.push(token);
-  }
-  if (positionals.length > 2)
-    throw new Error(
-      `Too many arguments: ${positionals.join(' ')} — expected <iteration> <status>.`,
-    );
-  return { iteration: positionals[0], status: positionals[1], reason, help };
+  const { values, positionals } = parseCommandLine(commandLine, {
+    options: { reason: { type: 'string' }, help: { type: 'boolean', short: 'h' } },
+    maxPositionals: 2,
+    usage: 'expected <iteration> <status>.',
+    messages: {
+      needsValue: () => '--reason needs text, e.g. --reason "scope changed after review"',
+    },
+  });
+  const reason = values.reason?.trim();
+  if (reason === '') throw new Error('--reason needs text.');
+  return {
+    iteration: positionals[0],
+    status: positionals[1],
+    reason,
+    help: values.help === true,
+  };
 }
 
 /**
@@ -136,7 +128,7 @@ export function runStatus(commandLine, context = {}) {
   };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   try {
     const { exitCode, lines } = runStatus(process.argv.slice(2));
     console.log(lines.join('\n'));

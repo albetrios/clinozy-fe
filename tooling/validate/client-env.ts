@@ -37,14 +37,13 @@ import {
   envProfiles,
 } from '../../src/core/config/env-schema.ts';
 import { tryGit } from '../ci/git-environment.mjs';
+import { parseCommandLine } from '../ci/script.mjs';
 
 const projectRoot = resolve(import.meta.dirname, '../..');
 
-function argValue(flag: string): string | undefined {
-  const index = process.argv.indexOf(flag);
-  if (index !== -1 && index + 1 < process.argv.length) return process.argv[index + 1];
-  return undefined;
-}
+const { values: commandLine } = parseCommandLine(process.argv.slice(2), {
+  options: { env: { type: 'string' }, production: { type: 'boolean' } },
+});
 
 function currentBranch(): string | undefined {
   const fromCi = process.env.GITHUB_REF_NAME;
@@ -58,7 +57,7 @@ function isAppEnvironment(value: string | undefined): value is AppEnvironment {
 }
 
 function resolveEnvironment(): AppEnvironment | undefined {
-  const explicit = argValue('--env');
+  const explicit = commandLine.env;
   if (explicit) {
     if (!isAppEnvironment(explicit)) {
       console.error(
@@ -73,7 +72,7 @@ function resolveEnvironment(): AppEnvironment | undefined {
   if (fromBranch) return fromBranch;
 
   // Legacy `--production` CLI flag only — no NODE_ENV/VITE_MODE env checks.
-  if (process.argv.includes('--production')) return 'production';
+  if (commandLine.production === true) return 'production';
 
   return undefined;
 }

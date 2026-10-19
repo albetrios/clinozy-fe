@@ -38,6 +38,8 @@ import {
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
+import { parseCommandLine } from '../ci/script.mjs';
+
 const claudeSettingsPath = join('agent-os', 'platforms', 'claude', 'settings.json');
 const projectDirectoryToken = '$CLAUDE_PROJECT_DIR';
 /** The command shape this script writes, and so the only commands it replaces on a later run. */
@@ -222,16 +224,18 @@ function mergePermissions({
 }
 
 function main(): void {
-  const options = process.argv.slice(2);
-  const dryRun = options.includes('--dry-run');
-  const sessionRootIndex = options.indexOf('--session-root');
-  const sessionRootOption =
-    sessionRootIndex >= 0 ? options[sessionRootIndex + 1] : undefined;
-  if (sessionRootIndex >= 0 && !sessionRootOption) {
-    console.error('session-hooks: --session-root needs a directory');
+  let commandLine;
+  try {
+    commandLine = parseCommandLine(process.argv.slice(2), {
+      options: { 'dry-run': { type: 'boolean' }, 'session-root': { type: 'string' } },
+      messages: { needsValue: () => '--session-root needs a directory' },
+    }).values;
+  } catch (error) {
+    console.error(`session-hooks: ${(error as Error).message}`);
     process.exit(2);
   }
-  const sessionRoot = resolve(sessionRootOption ?? dirname(process.cwd()));
+  const dryRun = commandLine['dry-run'] === true;
+  const sessionRoot = resolve(commandLine['session-root'] ?? dirname(process.cwd()));
 
   if (isInsideGitCheckout(sessionRoot)) {
     log(

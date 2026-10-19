@@ -10,6 +10,7 @@
  *
  * Existing entries are never overwritten. See `agent-os/docs/cursor-mcp-setup.md`.
  */
+import { parseCommandLine } from '../ci/script.mjs';
 import {
   ensureDefaultMcpServers,
   ensureMcpServers,
@@ -86,18 +87,26 @@ function reportResult(result: EnsureResult, dryRun: boolean): void {
 }
 
 function main(): void {
-  const argv = process.argv.slice(2);
-  if (argv.includes('--help') || argv.includes('-h')) {
+  const { values, positionals: names } = parseCommandLine(process.argv.slice(2), {
+    options: {
+      help: { type: 'boolean', short: 'h' },
+      list: { type: 'boolean' },
+      check: { type: 'boolean' },
+      'dry-run': { type: 'boolean' },
+      default: { type: 'boolean' },
+    },
+    maxPositionals: Number.POSITIVE_INFINITY,
+  });
+  if (values.help === true) {
     printHelp();
     return;
   }
-  if (argv.includes('--list')) {
+  if (values.list === true) {
     printList();
     return;
   }
-  const dryRun = argv.includes('--check') || argv.includes('--dry-run');
-  const names = argv.filter((arg) => !arg.startsWith('-'));
-  const defaultOnly = names.length === 0 && argv.includes('--default');
+  const dryRun = values.check === true || values['dry-run'] === true;
+  const defaultOnly = names.length === 0 && values.default === true;
 
   let scope = 'full set';
   if (names.length > 0) scope = `selected: ${names.join(', ')}`;

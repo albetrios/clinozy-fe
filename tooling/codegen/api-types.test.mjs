@@ -32,15 +32,12 @@ function documentWith(operations) {
 
 describe('api-types: resolveSource', () => {
   it('takes --source, else $CLINOZY_BE_DIR, else the sibling checkout', () => {
-    assert.match(resolveSource(['node', 'x', '--source', 'a/b.json'], {}), /a\/b\.json$/);
+    assert.match(resolveSource(['--source', 'a/b.json'], {}), /a\/b\.json$/);
     assert.equal(
-      resolveSource(['node', 'x'], { CLINOZY_BE_DIR: '/srv/be' }),
+      resolveSource([], { CLINOZY_BE_DIR: '/srv/be' }),
       join('/srv/be', 'docs/openapi/openapi.json'),
     );
-    assert.match(
-      resolveSource(['node', 'x'], {}),
-      /clinozy-be\/docs\/openapi\/openapi\.json$/,
-    );
+    assert.match(resolveSource([], {}), /clinozy-be\/docs\/openapi\/openapi\.json$/);
   });
 });
 

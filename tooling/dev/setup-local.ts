@@ -27,6 +27,7 @@ import { resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 
 import { type AppEnvironment, envProfiles } from '../../src/core/config/env-schema.ts';
+import { parseCommandLine } from '../ci/script.mjs';
 import {
   describeFilled,
   fillExternalCredentials,
@@ -125,19 +126,38 @@ function reportStep(
   );
 }
 
-function parseArgs(): BootstrapOptions {
-  const argv = process.argv.slice(2);
-  const has = (flag: string) => argv.includes(flag);
+/** The flags `pnpm setup:local` takes (`--force-env` is the short spelling of `--force-env-local`). */
+const SETUP_LOCAL_FLAGS = [
+  'check',
+  'no-start',
+  'skip-deps',
+  'skip-mcp',
+  'skip-codegraph',
+  'skip-mac-tools',
+  'only-env',
+  'only-codegraph',
+  'force-env-local',
+  'force-env',
+] as const;
+
+/** Reads `pnpm setup:local`'s flags; throws on any other argument. */
+function parseSetupLocalArguments(argv: readonly string[]): BootstrapOptions {
+  const { values } = parseCommandLine(argv, {
+    options: Object.fromEntries(
+      SETUP_LOCAL_FLAGS.map((flag) => [flag, { type: 'boolean' as const }]),
+    ),
+  });
+  const has = (flag: (typeof SETUP_LOCAL_FLAGS)[number]) => values[flag] === true;
   return {
-    check: has('--check'),
-    noStart: has('--no-start'),
-    skipDeps: has('--skip-deps'),
-    skipMcp: has('--skip-mcp'),
-    skipCodegraph: has('--skip-codegraph'),
-    skipMacTools: has('--skip-mac-tools'),
-    onlyEnv: has('--only-env'),
-    onlyCodegraph: has('--only-codegraph'),
-    forceEnvLocal: has('--force-env-local') || has('--force-env'),
+    check: has('check'),
+    noStart: has('no-start'),
+    skipDeps: has('skip-deps'),
+    skipMcp: has('skip-mcp'),
+    skipCodegraph: has('skip-codegraph'),
+    skipMacTools: has('skip-mac-tools'),
+    onlyEnv: has('only-env'),
+    onlyCodegraph: has('only-codegraph'),
+    forceEnvLocal: has('force-env-local') || has('force-env'),
   };
 }
 
@@ -537,7 +557,7 @@ function printSummary(reports: StepReport[]): void {
 }
 
 async function main(): Promise<void> {
-  const options = parseArgs();
+  const options = parseSetupLocalArguments(process.argv.slice(2));
   const reports: StepReport[] = [];
 
   logBanner();

@@ -9,6 +9,11 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 import { firstPaintAssets } from './first-paint.mjs';
+import { parseCommandLine } from './script.mjs';
+
+const { values: commandLine } = parseCommandLine(process.argv.slice(2), {
+  options: { json: { type: 'boolean' } },
+});
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const html = readFileSync(path.join(root, 'dist/index.html'), 'utf8');
@@ -627,6 +632,6 @@ const configPath = path.join(root, '.size-limit.generated.json');
 writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
 
 const args = ['size-limit', '--config', configPath];
-if (process.argv.includes('--json')) args.push('--json');
+if (commandLine.json === true) args.push('--json');
 
 execFileSync('pnpm', args, { cwd: root, stdio: 'inherit' });

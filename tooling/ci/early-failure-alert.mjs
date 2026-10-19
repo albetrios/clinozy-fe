@@ -15,7 +15,7 @@
  * Usage (pr-ci.yml `early-failure-alert` job; the same script as clinozy-be): `node tooling/ci/early-failure-alert.mjs`.
  */
 
-import { pathToFileURL } from 'node:url';
+import { isMain } from './script.mjs';
 
 export const ALERT_CONTEXT = 'Early failure alert';
 
@@ -109,7 +109,7 @@ async function main() {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isMain(import.meta.url)) {
   main().catch((error) => {
     // An alert that cannot post must not fail the run; the lanes and Quality gate still gate.
     console.log(`early-failure-alert: ${error.message}`);

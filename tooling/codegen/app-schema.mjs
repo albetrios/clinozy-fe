@@ -14,6 +14,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { isMain, parseCommandLine } from '../ci/script.mjs';
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const SCHEMA_SOURCE =
   'iterations/launch-2026-09-30-jxmr/intake-files/schema-routes.md';
@@ -302,10 +304,13 @@ export type AppCommon = z.infer<typeof appCommonSchema>;`);
 }
 
 async function main() {
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { check: { type: 'boolean' } },
+  });
   const markdown = readFileSync(join(ROOT, SCHEMA_SOURCE), 'utf8');
   const generated = await generateAppSchemaFile(markdown);
   const target = join(ROOT, SCHEMA_TARGET);
-  if (process.argv.includes('--check')) {
+  if (values.check === true) {
     const current = readFileSync(target, 'utf8');
     if (current !== generated) {
       console.error(
@@ -320,4 +325,4 @@ async function main() {
   console.log(`wrote ${SCHEMA_TARGET}`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (isMain(import.meta.url)) await main();

@@ -16,8 +16,8 @@
 import { randomInt } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { tryGit } from '../ci/git-environment.mjs';
+import { isMain, parseCommandLine } from '../ci/script.mjs';
 import { configuredBaseBranch } from '../setup/github/setup-config.mjs';
 import {
   DEFAULT_ITERATION_PROCESS,
@@ -27,9 +27,10 @@ import {
   ITERATIONS_DIRECTORY,
   localDate,
   NO_BASELINE,
-  parseCommandLine,
   parseIterationName,
   resolveSiblingRoot,
+  SIBLING_MESSAGES,
+  SIBLING_OPTIONS,
   gitUserName,
   workingTreeIterationNames,
 } from './iterations.mjs';
@@ -62,19 +63,25 @@ const USAGE = `Usage:
  * @returns {{ type: string | undefined, topic: string | undefined, createInSibling: boolean, siblingPath: string | undefined, lite: boolean, dryRun: boolean, help: boolean }}
  */
 export function parseNewIterationArguments(commandLine) {
-  const parsed = parseCommandLine(commandLine, {
-    flags: ['--both', '--lite', '--dry-run'],
+  const { values, positionals } = parseCommandLine(commandLine, {
+    options: {
+      ...SIBLING_OPTIONS,
+      lite: { type: 'boolean' },
+      'dry-run': { type: 'boolean' },
+      help: { type: 'boolean', short: 'h' },
+    },
     maxPositionals: 2,
     usage: 'expected <type> [topic].',
+    messages: SIBLING_MESSAGES,
   });
   return {
-    type: parsed.positionals[0],
-    topic: parsed.positionals[1],
-    createInSibling: parsed.createInSibling,
-    siblingPath: parsed.siblingPath,
-    lite: parsed.flags.has('--lite'),
-    dryRun: parsed.flags.has('--dry-run'),
-    help: parsed.help,
+    type: positionals[0],
+    topic: positionals[1],
+    createInSibling: values.both === true || values.sibling !== undefined,
+    siblingPath: values.sibling,
+    lite: values.lite === true,
+    dryRun: values['dry-run'] === true,
+    help: values.help === true,
   };
 }
 
@@ -398,7 +405,7 @@ export function runNewIteration(commandLine, context = {}) {
   };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   try {
     const { exitCode, lines } = runNewIteration(process.argv.slice(2));
     console.log(lines.join('\n'));

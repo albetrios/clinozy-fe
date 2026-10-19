@@ -27,7 +27,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
-import { pathToFileURL } from 'node:url';
+import { isMain, parseCommandLine } from './script.mjs';
 
 /** Mirrors `BUILD_ENVIRONMENTS` in plugins/build-environment.ts (pinned equal by a test). */
 export const ENVIRONMENTS = ['local', 'development', 'production'];
@@ -46,29 +46,24 @@ export const DEFAULTS_VARIABLE = 'BUILD_SCHEMA_DEFAULTS';
  * @returns {{ environment?: string, defaults?: true, sentry?: true }}
  */
 export function parseBuildArguments(argv) {
-  let environment;
-  let defaults = false;
-  let sentry = false;
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index];
-    if (argument === '--env') {
-      environment = argv[index + 1];
-      index += 1;
-      if (environment === undefined || environment.startsWith('--')) {
-        throw new Error(`--env needs an environment: ${ENVIRONMENTS.join(', ')}.`);
-      }
-    } else if (argument.startsWith('--env=')) {
-      environment = argument.slice('--env='.length);
-    } else if (argument === '--defaults') {
-      defaults = true;
-    } else if (argument === '--sentry') {
-      sentry = true;
-    } else {
-      throw new Error(
-        `Unknown argument "${argument}" — pnpm build takes --env <environment>, --defaults and --sentry.`,
-      );
-    }
-  }
+  const unknown = (argument) =>
+    `Unknown argument "${argument}" — pnpm build takes --env <environment>, --defaults and --sentry.`;
+  const { values, positionals } = parseCommandLine(argv, {
+    options: {
+      env: { type: 'string' },
+      defaults: { type: 'boolean' },
+      sentry: { type: 'boolean' },
+    },
+    maxPositionals: Number.POSITIVE_INFINITY,
+    messages: {
+      unknownOption: unknown,
+      needsValue: () => `--env needs an environment: ${ENVIRONMENTS.join(', ')}.`,
+    },
+  });
+  if (positionals.length > 0) throw new Error(unknown(positionals[0]));
+  const environment = values.env;
+  const defaults = values.defaults === true;
+  const sentry = values.sentry === true;
   if (defaults && environment !== undefined) {
     throw new Error(
       '--defaults builds from no env file; it cannot be combined with --env.',
@@ -245,6 +240,6 @@ async function main() {
   process.exit(result.status ?? 1);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+if (isMain(import.meta.url)) {
   await main();
 }

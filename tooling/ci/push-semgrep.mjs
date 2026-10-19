@@ -13,10 +13,9 @@
  * blocks (`tooling/ci/early-checks.mjs`).
  */
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { reportEarlyCheck } from './early-checks.mjs';
 import { resolveBase, tryGit } from './git-environment.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 
 /** The code Semgrep scans at push: the auth runtime, the HTTP client, the CSP builders. */
 export const PUSH_SEMGREP_PATTERNS = [
@@ -41,10 +40,10 @@ export function pushSemgrepTargets(changedFiles) {
 }
 
 function main() {
-  const baseIndex = process.argv.indexOf('--base');
-  const base = resolveBase({
-    base: baseIndex === -1 ? undefined : process.argv[baseIndex + 1],
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { base: { type: 'string' } },
   });
+  const base = resolveBase({ base: values.base });
   const mergeBase = tryGit(['merge-base', 'HEAD', base]);
   if (!mergeBase.ok) {
     console.warn(
@@ -104,5 +103,4 @@ function main() {
   });
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
-  main();
+if (isMain(import.meta.url)) main();

@@ -27,7 +27,6 @@ import {
   localDate,
   missingBriefSections,
   missingIntakeFiles,
-  parseCommandLine,
   parseIterationName,
   parseIterationReadme,
   prototypeScripts,
@@ -538,36 +537,6 @@ describe('a brief from scratch', () => {
         'PRD.md',
       ),
     );
-  });
-});
-
-describe('parseCommandLine', () => {
-  const shape = {
-    flags: ['--both', '--check'],
-    values: ['--mode'],
-    maxPositionals: 2,
-    usage: 'expected <a> <b>.',
-  };
-
-  test('reads flags, --name value and --name=value options, and --sibling', () => {
-    const parsed = parseCommandLine(
-      ['x', '--mode', 'overlay', 'y', '--check', '--sibling', '../b'],
-      shape,
-    );
-    assert.deepEqual(parsed.positionals, ['x', 'y']);
-    assert.deepEqual([...parsed.flags], ['--check']);
-    assert.equal(parsed.values.get('--mode'), 'overlay');
-    assert.equal(parsed.siblingPath, '../b');
-    assert.equal(parsed.createInSibling, true);
-    assert.equal(parseCommandLine(['--mode=brief'], shape).values.get('--mode'), 'brief');
-  });
-
-  test('refuses a value option without its value, an unknown option and extra positionals', () => {
-    assert.throws(() => parseCommandLine(['--mode'], shape), /--mode needs a value/);
-    assert.throws(() => parseCommandLine(['--mode', '--check'], shape), /needs a value/);
-    assert.throws(() => parseCommandLine(['--mode='], shape), /needs a value/);
-    assert.throws(() => parseCommandLine(['--nope'], shape), /Unknown option "--nope"/);
-    assert.throws(() => parseCommandLine(['a', 'b', 'c'], shape), /Too many arguments/);
   });
 });
 

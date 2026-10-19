@@ -16,11 +16,14 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 
 import { skillFileHash } from '../../tooling/agent-os/lock.ts';
+import { parseCommandLine } from '../../tooling/ci/script.mjs';
 import { checkSelectorFixtures } from '../../tooling/ci/selector-fixtures.check.mjs';
 
 const repositoryRoot = process.cwd();
 const agentOsDirectory = join(repositoryRoot, 'agent-os');
-const reportMode = process.argv.includes('--report');
+const reportMode =
+  parseCommandLine(process.argv.slice(2), { options: { report: { type: 'boolean' } } })
+    .values.report === true;
 
 type Level = 'error' | 'warn';
 interface Finding {

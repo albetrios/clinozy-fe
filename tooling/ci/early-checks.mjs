@@ -11,8 +11,7 @@
  *   node tooling/ci/early-checks.mjs client-env   # validate:client-env for each deploy environment
  */
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { isMain, parseCommandLine } from './script.mjs';
 
 /** Where a finding the user judges wrong is recorded, one row each. */
 export const EARLY_CHECKS_FALSE_POSITIVE_LOG = 'agent-os/evals/false-positives.md';
@@ -116,8 +115,10 @@ const SKIPPED = {
   'client-env': 'skipped — the env schema is not staged',
 };
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const check = process.argv[2];
+if (isMain(import.meta.url)) {
+  const [check] = parseCommandLine(process.argv.slice(2), {
+    maxPositionals: 1,
+  }).positionals;
   if (check !== 'audit' && check !== 'client-env') {
     console.error('Usage: node tooling/ci/early-checks.mjs <audit|client-env>');
     process.exitCode = 2;

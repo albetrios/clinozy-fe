@@ -16,6 +16,8 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { isMain } from '../ci/script.mjs';
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 interface Violation {
@@ -99,7 +101,7 @@ export function findViolations(root = ROOT): {
 }
 
 // CLI
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (isMain(import.meta.url)) {
   const { branchNames, violations } = findViolations();
   if (violations.length > 0) {
     console.error(

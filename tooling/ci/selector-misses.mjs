@@ -10,8 +10,8 @@
  */
 import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { git, resolveBase } from './git-environment.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 import { selectTests } from './test-selection.mjs';
 
 /**
@@ -55,19 +55,14 @@ export function fixtureFor({ changedFiles, test }) {
   });
 }
 
-function option(name) {
-  const index = process.argv.indexOf(name);
-  return index === -1 ? undefined : process.argv[index + 1];
-}
-
 function main() {
   const repositoryRoot = resolve(import.meta.dirname, '../..');
   const at = { cwd: repositoryRoot };
-  const resultsDirectory = option('--results') ?? 'test-results';
-  const base = git(
-    ['merge-base', 'HEAD', resolveBase({ base: option('--base'), ...at })],
-    at,
-  );
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { base: { type: 'string' }, results: { type: 'string' } },
+  });
+  const resultsDirectory = values.results ?? 'test-results';
+  const base = git(['merge-base', 'HEAD', resolveBase({ base: values.base, ...at })], at);
   const changedFiles = git(['diff', '--name-only', '--no-renames', `${base}...HEAD`], at)
     .split('\n')
     .filter(Boolean);
@@ -103,5 +98,4 @@ function main() {
     );
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
-  main();
+if (isMain(import.meta.url)) main();

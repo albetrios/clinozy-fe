@@ -20,9 +20,8 @@
  *   node tooling/ci/git-environment.mjs trunk   # the trunk from the setup config
  */
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { configuredBaseBranch } from '../setup/github/setup-config.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 
 /** The variables git exports into hooks that pin a child `git` process to a repository. */
 export const INHERITED_GIT_REPOSITORY_VARIABLES = Object.freeze([
@@ -123,8 +122,11 @@ const COMMAND_LINE_ANSWERS = new Map([
   ['trunk', configuredBaseBranch],
 ]);
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const answer = COMMAND_LINE_ANSWERS.get(process.argv[2] ?? '');
+if (isMain(import.meta.url)) {
+  const [name] = parseCommandLine(process.argv.slice(2), {
+    maxPositionals: 1,
+  }).positionals;
+  const answer = COMMAND_LINE_ANSWERS.get(name ?? '');
   if (answer === undefined) {
     console.error('Usage: node tooling/ci/git-environment.mjs <base|trunk>');
     process.exitCode = 2;

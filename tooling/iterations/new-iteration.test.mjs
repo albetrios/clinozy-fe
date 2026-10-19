@@ -76,6 +76,11 @@ describe('arguments and names', () => {
       parseNewIterationArguments(['fix', 'x', '--sibling', '../other-be']).siblingPath,
       '../other-be',
     );
+    assert.equal(
+      parseNewIterationArguments(['fix', 'x', '--sibling', '../other-be'])
+        .createInSibling,
+      true,
+    );
     assert.throws(
       () => parseNewIterationArguments(['feat', 'x', '--sibling']),
       /needs a path/,

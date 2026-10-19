@@ -37,11 +37,14 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { git } from './git-environment.mjs';
+import { parseCommandLine } from './script.mjs';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '../..');
 const ALLOWLIST_FILE = join(ROOT, 'tooling/ci/doc-staleness-allowlist.json');
 const SKILLS_LOCK = join(ROOT, 'agent-os/skills-lock.json');
-const JSON_MODE = process.argv.includes('--json');
+const JSON_MODE =
+  parseCommandLine(process.argv.slice(2), { options: { json: { type: 'boolean' } } })
+    .values.json === true;
 
 // ── What to scan ────────────────────────────────────────────────────────────
 // The doc trees plus the root guidance files that reference code paths.

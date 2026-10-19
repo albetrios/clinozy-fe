@@ -23,6 +23,17 @@ tooling/
 ├── load-env-files.mjs        # Node script env loader for tooling
 ```
 
+## Writing a script
+
+One way for each job a script does, each pinned by a `tests/ci` policy:
+
+- **Command line** — `parseCommandLine(process.argv.slice(2), { options })` (node:util `parseArgs`,
+  strict) and `if (isMain(import.meta.url))` from `ci/script.mjs`; add the script to the table in
+  `ci/script.test.mjs`, which checks it stops on an unknown option.
+- **git** — `git`, `tryGit` and `resolveBase` from `ci/git-environment.mjs`, never a `git` child
+  process of its own.
+- **`.ts` tooling** — run with `tsx <file>`.
+
 ## Common commands
 
 | Command                   | Script                                          |

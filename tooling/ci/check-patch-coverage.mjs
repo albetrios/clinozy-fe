@@ -35,40 +35,30 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 import { git, resolveBase } from './git-environment.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 
 const DEFAULT_THRESHOLD = 90;
 
 function parseArguments(argv) {
-  let coveragePath = null;
-  let base;
-  let threshold = DEFAULT_THRESHOLD;
-  let reportOnly = false;
-  for (let index = 0; index < argv.length; index += 1) {
-    const token = argv[index];
-    if (token === '') continue;
-    if (token === '--coverage') {
-      coveragePath = argv[index + 1];
-      index += 1;
-      continue;
-    }
-    if (token === '--base') {
-      base = argv[index + 1];
-      index += 1;
-      continue;
-    }
-    if (token === '--threshold') {
-      threshold = Number(argv[index + 1]);
-      index += 1;
-      continue;
-    }
-    if (token === '--report-only') {
-      reportOnly = true;
-      continue;
-    }
-    throw new Error(`Unknown flag: ${token}`);
-  }
+  const { values, positionals } = parseCommandLine(argv, {
+    options: {
+      coverage: { type: 'string' },
+      base: { type: 'string' },
+      threshold: { type: 'string' },
+      'report-only': { type: 'boolean' },
+    },
+    // An empty argument (a CI step's unset optional flag) is skipped; anything else is unknown.
+    maxPositionals: Number.POSITIVE_INFINITY,
+    messages: { unknownOption: (option) => `Unknown flag: ${option}` },
+  });
+  const stray = positionals.find((positional) => positional !== '');
+  if (stray !== undefined) throw new Error(`Unknown flag: ${stray}`);
+  const coveragePath = values.coverage;
+  const base = values.base;
+  const threshold =
+    values.threshold === undefined ? DEFAULT_THRESHOLD : Number(values.threshold);
+  const reportOnly = values['report-only'] === true;
   if (!coveragePath) throw new Error('Missing --coverage <coverage-final.json>');
   if (!Number.isFinite(threshold)) throw new Error('--threshold must be a number');
   return { coveragePath, base, threshold, reportOnly };
@@ -246,9 +236,7 @@ export {
 };
 
 // Run as CLI only when invoked directly (not when imported by tests).
-const invokedDirectly =
-  process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (invokedDirectly) {
+if (isMain(import.meta.url)) {
   try {
     main();
   } catch (error) {

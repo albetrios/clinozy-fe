@@ -22,8 +22,8 @@
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { tryGit } from '../ci/git-environment.mjs';
+import { isMain, parseCommandLine } from '../ci/script.mjs';
 import {
   EMPTY_FIELD,
   INTAKE_DIRECTORY,
@@ -298,19 +298,13 @@ export function rawIntakeDiff({ repositoryRoot, baseline, current }) {
  * @returns {{ baseline: string | undefined, current: string | undefined, json: boolean, help: boolean }}
  */
 export function parseDiffArguments(commandLine) {
-  const positionals = [];
-  let json = false;
-  let help = false;
-  for (const token of commandLine) {
-    if (token === '--json') json = true;
-    else if (token === '--help' || token === '-h') help = true;
-    else if (token.startsWith('-')) throw new Error(`Unknown option "${token}".`);
-    else positionals.push(token);
-  }
-  if (positionals.length > 2)
-    throw new Error(
-      `Too many arguments: ${positionals.join(' ')} — expected [<baseline>] <current>.`,
-    );
+  const { values, positionals } = parseCommandLine(commandLine, {
+    options: { json: { type: 'boolean' }, help: { type: 'boolean', short: 'h' } },
+    maxPositionals: 2,
+    usage: 'expected [<baseline>] <current>.',
+  });
+  const json = values.json === true;
+  const help = values.help === true;
   return positionals.length === 2
     ? { baseline: positionals[0], current: positionals[1], json, help }
     : { baseline: undefined, current: positionals[0], json, help };
@@ -381,7 +375,7 @@ export function runDiff(commandLine, context = {}) {
   };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   try {
     const { exitCode, lines } = runDiff(process.argv.slice(2));
     console.log(lines.join('\n'));

@@ -816,59 +816,19 @@ export function resolveSiblingRoot({ repositoryRoot, siblingPath }) {
 }
 
 /**
- * Parses `--sibling <path>`, `--both`, the given flags and the given value options
- * (`--name <value>` or `--name=<value>`) out of a command line.
- *
- * @param {readonly string[]} commandLine
- * @param {{ flags: readonly string[], values?: readonly string[], maxPositionals: number, usage: string }} shape
- * @returns {{ positionals: string[], flags: Set<string>, values: Map<string, string>, createInSibling: boolean, siblingPath: string | undefined, help: boolean }}
- * @throws on an unknown option, a `--sibling` or value option without its value, or too many
- *   positionals
+ * The `--both` and `--sibling <path>` options of the commands that also write the sibling
+ * repository's same-named iteration (`--sibling` implies `--both`), for `parseCommandLine` in
+ * `tooling/ci/script.mjs`.
  */
-export function parseCommandLine(
-  commandLine,
-  { flags, values = [], maxPositionals, usage },
-) {
-  const positionals = [];
-  const seen = new Set();
-  const optionValues = new Map();
-  let createInSibling = false;
-  let siblingPath;
-  let help = false;
-  for (let index = 0; index < commandLine.length; index += 1) {
-    const token = commandLine[index];
-    const equals = token.indexOf('=');
-    const option =
-      token.startsWith('--') && equals !== -1 ? token.slice(0, equals) : token;
-    if (values.includes(option)) {
-      const value = option === token ? commandLine[index + 1] : token.slice(equals + 1);
-      if (value === undefined || value === '' || value.startsWith('--')) {
-        throw new Error(`${option} needs a value — ${usage}`);
-      }
-      optionValues.set(option, value);
-      if (option === token) index += 1;
-    } else if (token === '--help' || token === '-h') help = true;
-    else if (token === '--both' && flags.includes('--both')) createInSibling = true;
-    else if (token === '--sibling' && flags.includes('--both')) {
-      siblingPath = commandLine[index + 1];
-      if (siblingPath === undefined || siblingPath.startsWith('--')) {
-        throw new Error('--sibling needs a path, e.g. --sibling ../clinozy-be');
-      }
-      createInSibling = true;
-      index += 1;
-    } else if (flags.includes(token)) seen.add(token);
-    else if (token.startsWith('-')) throw new Error(`Unknown option "${token}".`);
-    else positionals.push(token);
-  }
-  if (positionals.length > maxPositionals) {
-    throw new Error(`Too many arguments: ${positionals.join(' ')} — ${usage}`);
-  }
-  return {
-    positionals,
-    flags: seen,
-    values: optionValues,
-    createInSibling,
-    siblingPath,
-    help,
-  };
-}
+export const SIBLING_OPTIONS = Object.freeze({
+  both: { type: 'boolean' },
+  sibling: { type: 'string' },
+});
+
+/** `--sibling` without its path names an example; every other message is the default. */
+export const SIBLING_MESSAGES = Object.freeze({
+  needsValue: (option) =>
+    option === '--sibling'
+      ? '--sibling needs a path, e.g. --sibling ../clinozy-be'
+      : undefined,
+});

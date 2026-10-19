@@ -36,6 +36,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import { isMain, parseCommandLine } from '../../ci/script.mjs';
+
 const REPO_ROOT = resolve(import.meta.dirname, '../../../');
 const SETUP_CONFIG_PATH = join(REPO_ROOT, 'tooling/setup/setup.config.json');
 const RULESETS_DIR = join(REPO_ROOT, '.github/rulesets');
@@ -457,11 +459,15 @@ function runApply(mode) {
 }
 
 function main() {
-  const args = process.argv.slice(2);
-  if (args.includes('--check')) {
+  const { values, positionals } = parseCommandLine(process.argv.slice(2), {
+    options: { check: { type: 'boolean' } },
+    maxPositionals: 1,
+    usage: 'governance-mode.mjs [status | personal | team | --check]',
+  });
+  if (values.check === true) {
     process.exit(runCheck());
   }
-  const positional = args.find((arg) => !arg.startsWith('-'));
+  const [positional] = positionals;
   if (!positional || positional === 'status') {
     runStatus();
     return;
@@ -475,6 +481,6 @@ function main() {
 }
 
 // Run only as a CLI, not when imported by tests.
-if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename)) {
+if (isMain(import.meta.url)) {
   main();
 }

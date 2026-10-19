@@ -9,8 +9,8 @@
  * changes nothing.
  */
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { resolveBase, tryGit } from './git-environment.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 import { pushSemgrepTargets } from './push-semgrep.mjs';
 import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
@@ -107,11 +107,10 @@ export function selectionTable(selection) {
 
 function main() {
   const repositoryRoot = resolve(import.meta.dirname, '../..');
-  const baseIndex = process.argv.indexOf('--base');
-  const base = resolveBase({
-    base: baseIndex === -1 ? undefined : process.argv[baseIndex + 1],
-    cwd: repositoryRoot,
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { base: { type: 'string' } },
   });
+  const base = resolveBase({ base: values.base, cwd: repositoryRoot });
   const changed = tryGit(['diff', '--name-only', '--no-renames', `${base}...HEAD`], {
     cwd: repositoryRoot,
   });
@@ -139,5 +138,4 @@ function main() {
   console.log(lines.join('\n'));
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
-  main();
+if (isMain(import.meta.url)) main();

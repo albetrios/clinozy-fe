@@ -14,8 +14,8 @@
  */
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { git, resolveBase } from './git-environment.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 import { selectTests } from './test-selection.mjs';
 
 /**
@@ -50,8 +50,10 @@ function changedFiles({ base, repositoryRoot }) {
 
 function main() {
   const repositoryRoot = resolve(import.meta.dirname, '../..');
-  const baseIndex = process.argv.indexOf('--base');
-  const given = baseIndex === -1 ? undefined : process.argv[baseIndex + 1];
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { base: { type: 'string' } },
+  });
+  const given = values.base;
   const plan = prePushTests({
     select: () => {
       const base = resolveBase({ base: given, cwd: repositoryRoot });
@@ -68,5 +70,4 @@ function main() {
     spawnSync('pnpm', args, { cwd: repositoryRoot, stdio: 'inherit' }).status ?? 1;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
-  main();
+if (isMain(import.meta.url)) main();

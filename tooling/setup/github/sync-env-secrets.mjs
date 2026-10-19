@@ -23,10 +23,10 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { parse } from 'dotenv';
 
+import { isMain, parseCommandLine } from '../../ci/script.mjs';
 import {
   deleteGitHubSecret,
   deleteGitHubVariable,
@@ -396,26 +396,37 @@ export function syncEnvironmentValues(environmentName, mode, options = {}) {
 }
 
 function parseArguments() {
-  const argumentsList = process.argv.slice(2);
-  if (argumentsList.includes('--help') || argumentsList.includes('-h')) {
+  const { values, positionals } = parseCommandLine(process.argv.slice(2), {
+    options: {
+      help: { type: 'boolean', short: 'h' },
+      check: { type: 'boolean' },
+      'dry-run': { type: 'boolean' },
+      diff: { type: 'boolean' },
+      'keep-schema-defaults': { type: 'boolean' },
+      all: { type: 'boolean' },
+    },
+    maxPositionals: Number.POSITIVE_INFINITY,
+  });
+  if (values.help === true) {
     console.log(
       'Usage: node tooling/setup/github/sync-env-secrets.mjs [environment...] [--all] [--check | --dry-run | --diff] [--keep-schema-defaults]',
     );
     process.exit(0);
   }
 
-  const mode = argumentsList.includes('--check')
-    ? 'check'
-    : argumentsList.includes('--dry-run')
-      ? 'dry-run'
-      : argumentsList.includes('--diff')
-        ? 'diff'
-        : 'sync';
-  const keepSchemaDefaults = argumentsList.includes('--keep-schema-defaults');
+  const mode =
+    values.check === true
+      ? 'check'
+      : values['dry-run'] === true
+        ? 'dry-run'
+        : values.diff === true
+          ? 'diff'
+          : 'sync';
+  const keepSchemaDefaults = values['keep-schema-defaults'] === true;
 
-  const all = argumentsList.includes('--all');
-  const environments = argumentsList.filter(
-    (argument) => !argument.startsWith('--') && /^[a-z][a-z0-9-]*$/.test(argument),
+  const all = values.all === true;
+  const environments = positionals.filter((argument) =>
+    /^[a-z][a-z0-9-]*$/.test(argument),
   );
 
   let selected = environments;
@@ -453,6 +464,6 @@ function main() {
   if (totalFailures > 0) process.exit(1);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   main();
 }

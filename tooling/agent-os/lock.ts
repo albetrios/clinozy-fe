@@ -14,8 +14,9 @@
  */
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+
+import { isMain, parseCommandLine } from '../ci/script.mjs';
 
 interface SkillEntry {
   source?: string;
@@ -36,7 +37,9 @@ export function skillFileHash(absolutePath: string): string {
 function main(): void {
   const repositoryRoot = process.cwd();
   const lockFile = join(repositoryRoot, 'agent-os', 'skills-lock.json');
-  const checkMode = process.argv.includes('--check');
+  const checkMode =
+    parseCommandLine(process.argv.slice(2), { options: { check: { type: 'boolean' } } })
+      .values.check === true;
   const lock = JSON.parse(readFileSync(lockFile, 'utf8')) as SkillsLock;
 
   const drifted: string[] = [];
@@ -75,5 +78,4 @@ function main(): void {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
-  main();
+if (isMain(import.meta.url)) main();

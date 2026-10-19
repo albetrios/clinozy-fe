@@ -20,8 +20,8 @@
  */
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { git, resolveBase } from './git-environment.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 import { changedOnly, selectTests, withoutTests } from './test-selection.mjs';
 
 const REPOSITORY_ROOT = resolve(import.meta.dirname, '../..');
@@ -33,21 +33,26 @@ const REPOSITORY_ROOT = resolve(import.meta.dirname, '../..');
  * @returns {{ base: string | undefined, files: string[] | undefined, why: boolean, json: boolean, run: boolean, changedOnly: boolean, exclude: string[] }}
  */
 export function parseSelectArguments(argv) {
-  const value = (name) => {
-    const index = argv.indexOf(name);
-    return index === -1 ? undefined : argv[index + 1];
-  };
-  const files = value('--files');
+  const { values } = parseCommandLine(argv, {
+    options: {
+      base: { type: 'string' },
+      files: { type: 'string' },
+      why: { type: 'boolean' },
+      json: { type: 'boolean' },
+      run: { type: 'boolean' },
+      'changed-only': { type: 'boolean' },
+      exclude: { type: 'string', multiple: true },
+    },
+  });
   return {
-    base: value('--base'),
-    files: files === undefined ? undefined : files.split(',').filter(Boolean),
-    why: argv.includes('--why'),
-    json: argv.includes('--json'),
-    run: argv.includes('--run'),
-    changedOnly: argv.includes('--changed-only'),
-    exclude: argv.flatMap((argument, index) =>
-      argument === '--exclude' && argv[index + 1] !== undefined ? [argv[index + 1]] : [],
-    ),
+    base: values.base,
+    files:
+      values.files === undefined ? undefined : values.files.split(',').filter(Boolean),
+    why: values.why === true,
+    json: values.json === true,
+    run: values.run === true,
+    changedOnly: values['changed-only'] === true,
+    exclude: values.exclude ?? [],
   };
 }
 
@@ -102,7 +107,7 @@ export function describeSelection(argv) {
   return { selection, lines };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const argv = process.argv.slice(2);
   const { selection, lines } = describeSelection(argv);
   console.log(lines.join('\n'));

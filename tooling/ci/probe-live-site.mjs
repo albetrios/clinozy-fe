@@ -14,9 +14,8 @@
  * `'unsafe-eval'`, `*`, `data:` or `http:`; `Strict-Transport-Security` of 180 days or more;
  * `X-Content-Type-Options: nosniff`.
  */
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { reportEarlyCheck } from './early-checks.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 
 /** The least HSTS max-age accepted: 180 days, in seconds. */
 export const MINIMUM_HSTS_SECONDS = 180 * 24 * 60 * 60;
@@ -107,9 +106,10 @@ export async function probeLiveSite({ url, fetchImplementation = fetch }) {
   return findings;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const index = process.argv.indexOf('--url');
-  const url = index === -1 ? undefined : process.argv[index + 1];
+if (isMain(import.meta.url)) {
+  const { url } = parseCommandLine(process.argv.slice(2), {
+    options: { url: { type: 'string' } },
+  }).values;
   if (!url) {
     console.error('Usage: pnpm deploy:probe-live --url https://<deploy>.netlify.app');
     process.exitCode = 2;

@@ -12,7 +12,7 @@
  */
 import { writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { isMain, parseCommandLine } from '../ci/script.mjs';
 import {
   appendHistoryEntry,
   EMPTY_FIELD,
@@ -102,13 +102,14 @@ export function planBaselineChange({ repositoryRoot, iteration, baseline, today 
  * @returns {{ exitCode: number, lines: string[] }}
  */
 export function runBaseline(commandLine, context = {}) {
-  if (commandLine.includes('--help') || commandLine.includes('-h'))
-    return { exitCode: 0, lines: [USAGE] };
-  const unknown = commandLine.find((token) => token.startsWith('-'));
-  if (unknown !== undefined) throw new Error(`Unknown option "${unknown}".`);
-  if (commandLine.length !== 2) return { exitCode: 1, lines: [USAGE] };
+  const { values, positionals } = parseCommandLine(commandLine, {
+    options: { help: { type: 'boolean', short: 'h' } },
+    maxPositionals: Number.POSITIVE_INFINITY,
+  });
+  if (values.help === true) return { exitCode: 0, lines: [USAGE] };
+  if (positionals.length !== 2) return { exitCode: 1, lines: [USAGE] };
   const repositoryRoot = context.repositoryRoot ?? REPOSITORY_ROOT;
-  const [iteration, baseline] = commandLine;
+  const [iteration, baseline] = positionals;
   const plan = planBaselineChange({
     repositoryRoot,
     iteration,
@@ -126,7 +127,7 @@ export function runBaseline(commandLine, context = {}) {
   };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   try {
     const { exitCode, lines } = runBaseline(process.argv.slice(2));
     console.log(lines.join('\n'));

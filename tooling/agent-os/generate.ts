@@ -23,6 +23,7 @@ import { dirname, join } from 'node:path';
 
 import { format, resolveConfig } from 'prettier';
 
+import { parseCommandLine } from '../ci/script.mjs';
 import {
   renderRoutingJson,
   renderSkillCatalog,
@@ -33,7 +34,11 @@ import {
 
 const repositoryRoot = process.cwd();
 const agentOsDirectory = join(repositoryRoot, 'agent-os');
-const writeMode = process.argv.includes('--write');
+// --check is the default; --write writes the derived artifacts instead.
+const writeMode =
+  parseCommandLine(process.argv.slice(2), {
+    options: { write: { type: 'boolean' }, check: { type: 'boolean' } },
+  }).values.write === true;
 
 interface HookManifestEntry {
   id: string;
