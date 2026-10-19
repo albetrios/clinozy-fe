@@ -47,23 +47,23 @@ step_6() {
 # ── 7. Gitleaks secret scan on staged files (mandatory) ──
 # A commit without the scan could carry a secret into history, so a missing gitleaks stops the
 # commit (as in clinozy-be). Cloud sessions install it in setup and self-heal it at session start.
+# The flags are clinozy-be's, exactly: --redact keeps a found secret out of the log.
 step_7() {
   node tooling/ci/require-tool.mjs gitleaks block "the staged secrets scan" || return 1
-  gitleaks protect --staged --config .gitleaks.toml --verbose
+  gitleaks protect --staged --redact --verbose --config .gitleaks.toml
 }
 
-# ── 8. Reject committing gitignored env files (only .env.example is tracked) ──
-# Two environments, one committed template: every other .env* is gitignored and
-# deploys inject env from GitHub Environments. Catches a forced `git add -f .env*`
-# before it can leak secrets (mirrors the pr-governance CI guard, locally).
+# ── 8. Reject committing gitignored secret and state files ──
+# Every .env* but the template .env.example (deploys inject env from GitHub Environments), the
+# Sentry CLI token file, the E2E auth-header cache and the Netlify CLI state: the one list is
+# tooling/validate/never-committed.mjs, which the pr-governance CI guard reads too. Catches a
+# forced `git add -f` before it can leak a secret. A check that cannot run blocks the commit.
 step_8() {
-  STAGED_ENV=$(git diff --cached --name-only --diff-filter=d | grep -E '^\.env($|\.)' | grep -vE '^\.env\.example$' || true)
-  if [ -n "$STAGED_ENV" ]; then
-    echo "ERROR: Only .env.example may be committed. These are gitignored:"
-    echo "$STAGED_ENV"
-    echo "Provide real values via GitHub Environments (deploy) or your local .env.local."
-    return 1
-  fi
+  STAGED_SECRETS=$(git diff --cached --name-only --diff-filter=d | node tooling/validate/never-committed.mjs) && return 0
+  echo "ERROR: these gitignored files hold secrets or machine state and must never be committed:"
+  echo "$STAGED_SECRETS"
+  echo "Unstage them (git restore --staged <file>). Provide real values via GitHub Environments (deploy) or your local .env.local."
+  return 1
 }
 
 # ── 9. Reject merge conflict markers ──
@@ -103,7 +103,7 @@ step_label() {
     5) echo "Type check" ;;
     6) echo "Lockfile sync" ;;
     7) echo "Staged secrets scan" ;;
-    8) echo "Env-file guard" ;;
+    8) echo "Secret and state files guard" ;;
     9) echo "Merge conflict markers" ;;
     10) echo "Large staged files (>3MB; iterations/ exempt)" ;;
     11) echo "Dependency audit (lockfile staged)" ;;

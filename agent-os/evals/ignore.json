@@ -1,6 +1,7 @@
 {
   "paths": [
     "agent-os/mcp/mcp.json",
+    "tests/e2e/.e2e-auth-headers.json",
     "docs/reference/project-tree.txt",
     "dist/",
     "coverage/",

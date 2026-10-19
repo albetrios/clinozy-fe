@@ -5,6 +5,8 @@
  */
 import { describe, expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isMain, parseCommandLine } from './script.mjs';
@@ -101,6 +103,19 @@ describe('isMain', () => {
       process.argv[1] = entry;
     }
   });
+
+  it('is true for the script started through a symlinked folder', () => {
+    const entry = process.argv[1];
+    const folder = mkdtempSync(join(tmpdir(), 'is-main-'));
+    try {
+      symlinkSync(join(ROOT, 'tooling'), join(folder, 'tooling'));
+      process.argv[1] = join(folder, 'tooling/ci/script.mjs');
+      expect(isMain(pathToFileURL(join(ROOT, 'tooling/ci/script.mjs')).href)).toBe(true);
+    } finally {
+      process.argv[1] = entry;
+      rmSync(folder, { recursive: true, force: true });
+    }
+  });
 });
 
 /**
@@ -152,6 +167,7 @@ const SCRIPTS = [
   'tooling/setup/github/validate-github-env.mjs',
   'tooling/tsdoc-coverage/check-coverage.mjs',
   'tooling/validate/client-env.ts',
+  'tooling/validate/never-committed.mjs',
   'tooling/validate/sync-env-example.ts',
 ];
 

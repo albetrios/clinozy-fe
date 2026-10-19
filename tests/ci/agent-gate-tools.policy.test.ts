@@ -62,6 +62,13 @@ describe('git-hook gate tools', () => {
     }
   });
 
+  it("runs the staged scan with clinozy-be's flags, exactly", () => {
+    expect(secretsStep).toContain(
+      'gitleaks protect --staged --redact --verbose --config .gitleaks.toml\n',
+    );
+    expect(secretsStep.match(/gitleaks protect/g)).toHaveLength(1);
+  });
+
   it('a web session without gitleaks installs it at session start', () => {
     // A bare project root with a stub installer that records it ran, the dependencies already
     // there (no pnpm install) and a PATH without gitleaks.

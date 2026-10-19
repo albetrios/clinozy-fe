@@ -8,20 +8,35 @@
  * `process.argv[1]` comparisons each script carried. `tests/ci/tooling-command-line.policy.test.ts`
  * holds every script under `tooling/` and `agent-os/evals/` to both.
  */
+import { realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
+/** `path` with every symlink resolved, or `path` itself when it cannot be resolved. */
+function realPath(path) {
+  try {
+    return realpathSync(path);
+  } catch {
+    return path;
+  }
+}
+
 /**
  * True when the module at `importMetaUrl` is the script node was started with — not a test or
- * another script importing it.
+ * another script importing it. Both sides are compared by real path: node loads the entry module
+ * from its real path, so a script started through a symlink (a symlinked checkout or parent
+ * folder) would otherwise not know it is the entry and silently do nothing.
  *
  * @param {string} importMetaUrl the caller's `import.meta.url`
  * @returns {boolean}
  */
 export function isMain(importMetaUrl) {
   const entry = process.argv[1];
-  return entry !== undefined && resolve(entry) === fileURLToPath(importMetaUrl);
+  return (
+    entry !== undefined &&
+    realPath(resolve(entry)) === realPath(fileURLToPath(importMetaUrl))
+  );
 }
 
 /**
