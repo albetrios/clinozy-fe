@@ -34,7 +34,7 @@ afterEach(() => {
 });
 
 /** A repository with one commit, and a stub `gh` that answers `run list` with `runs`. */
-function fixture(options: { runs: object[]; authenticated?: boolean }) {
+function fixture(options: { runs: object[] | string; authenticated?: boolean }) {
   const { root } = createThrowawayRepository({
     prefix: 'push-ci-watch-',
     files: { 'README.md': '# fixture\n' },
@@ -44,7 +44,11 @@ function fixture(options: { runs: object[]; authenticated?: boolean }) {
   const bin = join(state, 'bin');
   mkdirSync(bin);
   const calls = join(state, 'gh-calls');
-  writeFileSync(join(state, 'runs.json'), JSON.stringify(options.runs));
+  // A string is gh's raw output (a broken answer); an array is the runs it lists.
+  writeFileSync(
+    join(state, 'runs.json'),
+    typeof options.runs === 'string' ? options.runs : JSON.stringify(options.runs),
+  );
   writeFileSync(
     join(bin, 'gh'),
     [
@@ -135,6 +139,15 @@ describe('fe-push-ci-watch.mjs', () => {
     const unauthenticated = fixture({ runs: [], authenticated: false });
     runHook(unauthenticated);
     expect(lastTelemetry(unauthenticated.state)).toBe('PostToolUse,silent,no-gh');
+  });
+
+  it('fails open on a broken gh answer: exits 0 and records silent, never fired', () => {
+    // The planted-bug drill (20 Oct 2026) made the fail-open path record `fired` and no test drove it.
+    const broken = fixture({ runs: 'not json' });
+    const result = runHook(broken);
+    expect(result.status).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(lastTelemetry(broken.state)).toBe('PostToolUse,silent,error');
   });
 
   it('judges only pushes in its own repository', () => {
