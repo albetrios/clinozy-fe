@@ -73,6 +73,11 @@ describe('test:affected mirrors .husky/pre-push', () => {
       'src/a.css',
     ])
       expect(answer('pnpm sonar:scan', [file]), file).toBe('no');
+    // A hooks.json edit with the generated platform settings behind (planted-bug drill, 20 Oct
+    // 2026) is caught at push, not first in CI.
+    for (const file of ['agent-os/hooks/hooks.json', 'tooling/agent-os/generate.ts'])
+      expect(answer('pnpm agent-os:generate:check', [file]), file).toBe('yes');
+    expect(answer('pnpm agent-os:generate:check', ['src/app/a.tsx'])).toBe('no');
     expect(answer('pnpm docs:lint:changed', ['docs/a.md'])).toBe('yes');
     expect(answer('pnpm docs:lint:changed', ['src/a.ts'])).toBe('no');
     expect(answer('pnpm knip', [])).toBe('yes');

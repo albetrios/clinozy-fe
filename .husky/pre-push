@@ -68,8 +68,16 @@ else
   echo "Skipping unit tests on pre-push (no unit-relevant changes)."
 fi
 
-# Semgrep on the pushed auth, HTTP client and CSP code (the PR's Semgrep lane scans everything) —
-# an early check: a finding blocks; no semgrep → a warning.
+# The generated platform files (agent-os/platforms/*) must match their agent-os sources — run when
+# agent-os/ or its generator is pushed (AGENT_OS_GENERATED_RELEVANT in affected.mjs).
+if step_runs 'pnpm agent-os:generate:check'; then
+  pnpm agent-os:generate:check
+else
+  echo "Skipping the agent-os generate check on pre-push (no agent-os changes)."
+fi
+
+# Semgrep on every pushed source file under src/ and plugins/ (the PR's Semgrep lane scans
+# everything) — an early check: a finding blocks; no semgrep → a warning.
 pnpm security:semgrep:push --base "$PUSH_BASE"
 
 # API contract drift — every endpoint this app references must exist in

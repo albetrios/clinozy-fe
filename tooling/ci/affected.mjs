@@ -29,6 +29,14 @@ import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 export const UNIT_RELEVANT =
   /^(src\/|tests\/|tooling\/|\.github\/|agent-os\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
 
+/**
+ * The files that make pre-push run `pnpm agent-os:generate:check`: the agent-os sources it
+ * generates from and its generator. It ran only in CI until the planted-bug drill (20 Oct 2026)
+ * showed a hook timeout edited in `agent-os/hooks/hooks.json` reach the PR with the generated
+ * platform settings left behind (clinozy-be's `AGENT_OS_GENERATED_RELEVANT`, the same paths).
+ */
+export const AGENT_OS_GENERATED_RELEVANT = /^(agent-os\/|tooling\/agent-os\/)/;
+
 /** The pushed files the SonarQube gate analyzes (`pnpm sonar:scan`): src/ runtime, without these. */
 export const SONAR_RUNTIME = /^src\/.*\.(ts|tsx)$/;
 export const SONAR_EXCLUDED =
@@ -44,6 +52,7 @@ export function pushSteps(changedFiles) {
   const markdown = changedFiles.some((file) => file.endsWith('.md'));
   const unitRelevant = changedFiles.some((file) => UNIT_RELEVANT.test(file));
   const semgrep = pushSemgrepTargets(changedFiles);
+  const agentOsGenerated = changedFiles.some((file) => AGENT_OS_GENERATED_RELEVANT.test(file));
   const runtime = changedFiles.filter(
     (file) => SONAR_RUNTIME.test(file) && !SONAR_EXCLUDED.test(file),
   );
@@ -69,12 +78,19 @@ export function pushSteps(changedFiles) {
         : 'nothing unit-relevant pushed',
     },
     {
+      command: 'pnpm agent-os:generate:check',
+      runs: agentOsGenerated,
+      why: agentOsGenerated
+        ? 'pushed agent-os/ or its generator — the generated platform files must match'
+        : 'no agent-os/ change pushed',
+    },
+    {
       command: 'pnpm security:semgrep:push',
       runs: semgrep.length > 0,
       why:
         semgrep.length > 0
-          ? `${semgrep.length} auth / HTTP client / CSP file(s)`
-          : 'none of auth, the HTTP client, CSP',
+          ? `${semgrep.length} source file(s) under src/ or plugins/`
+          : 'no source file under src/ or plugins/',
     },
     always('pnpm contracts:drift', 'always (skips without the clinozy-be checkout)'),
     always(
