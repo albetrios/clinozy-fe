@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest';
 // The E2E workflow against the backend's GHCR image (.github/workflows/e2e-backend.yml): a merge to
 // main runs the @smoke set, the nightly run the full suite, with one retry; the backend comes from
 // its latest image with Postgres, Redis and the reference seed — never the shared development
-// environment — and a red run opens a ci-failure issue.
+// environment — and a red run on main opens a ci-failure issue. A Dependabot pull request that
+// changes a dependency runs the @smoke set too.
 
 const WORKFLOW = readFileSync(join('.github', 'workflows', 'e2e-backend.yml'), 'utf8');
 const SPECS = join('tests', 'e2e');
@@ -31,6 +32,26 @@ describe('E2E against the backend image', () => {
     expect(WORKFLOW).toContain("github.event_name == 'schedule' && 'full'");
     expect(WORKFLOW).toContain('pnpm exec playwright test --grep @smoke --retries=1');
     expect(WORKFLOW).toContain('pnpm exec playwright test --retries=1');
+  });
+
+  it('runs the smoke set on a Dependabot PR that changes a dependency, and no issue for it', () => {
+    // An axe-core bump (Dependabot #119) passed PR CI on 20 Oct 2026, merged, and kept main's run
+    // red for 9 h: this run is red on the bump's own PR, before anyone approves it.
+    expect(WORKFLOW).toMatch(
+      /pull_request:\n\s+paths:\n\s+- package\.json\n\s+- pnpm-lock\.yaml\n\s+- pnpm-workspace\.yaml\n/,
+    );
+    expect(WORKFLOW).toContain(
+      "if: github.event_name != 'pull_request' || github.event.pull_request.user.login == 'dependabot[bot]'",
+    );
+    // No input on a pull request, so the suite is the @smoke set.
+    expect(WORKFLOW).toContain("inputs.suite || 'smoke'");
+    // A pull request's red is its own: neither issue job runs for one.
+    for (const job of ['close-failure-issue', 'notify-failure']) {
+      const block = WORKFLOW.slice(WORKFLOW.indexOf(`  ${job}:`));
+      expect(block.slice(0, block.indexOf('runs-on:')), job).toContain(
+        "github.event_name != 'pull_request'",
+      );
+    }
   });
 
   it("boots the backend's latest image, never the shared development environment", () => {

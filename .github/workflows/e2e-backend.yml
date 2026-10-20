@@ -5,13 +5,23 @@ name: E2E against the backend image
 # with the image's own scripts, starts the API, and runs the app's dev server against it (the same
 # setup as a local `pnpm test:e2e`). A merge to main runs the @smoke set — sign-in, Today, one
 # create and one edit, axe on five key pages; the nightly run is the full suite. One retry, then a
-# red run opens (or comments on) one ci-failure issue; the next green run closes it.
+# red run on main opens (or comments on) one ci-failure issue; the next green run closes it.
+#
+# A Dependabot pull request that changes a dependency runs the @smoke set too, so a bump that
+# breaks the app is red on its own PR before anyone approves it: on 20 Oct 2026 an axe-core bump
+# (Dependabot #119) passed PR CI, merged, and kept main's run red for 9 h. Only Dependabot's PRs:
+# a person's dependency change is reviewed with the code that needs it, and main's run follows.
 #
 # Pulling the image needs read access for this repository on the backend's GHCR package (package
 # settings → Manage Actions access) while that package is private.
 on:
   push:
     branches: [main]
+  pull_request:
+    paths:
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
   schedule:
     - cron: '30 1 * * *' # Daily 01:30 UTC (07:00 IST): the full suite
   workflow_dispatch:
@@ -38,6 +48,9 @@ env:
 jobs:
   e2e:
     name: Playwright against the backend image
+    # On a pull request, Dependabot's only (its token is read-only and it gets no repository
+    # secrets; this job needs neither: the backend image is public and the fixtures are inline).
+    if: github.event_name != 'pull_request' || github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -176,7 +189,8 @@ jobs:
   close-failure-issue:
     name: Close ci-failure issue
     needs: [e2e]
-    if: success()
+    # An issue tracks main (the action skips any other ref too); a pull request's red is its own.
+    if: success() && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -198,7 +212,7 @@ jobs:
   notify-failure:
     name: Notify failure
     needs: [e2e]
-    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
+    if: always() && github.event_name != 'pull_request' && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
