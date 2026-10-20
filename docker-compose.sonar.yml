@@ -12,6 +12,11 @@
 # SONAR_ADMIN_PASSWORD from clinozy-be/.env.local into this repo's .env.local
 # so the gate can mint a clinozy-fe token.
 
+# The Compose project, pinned to the product name (tooling/identity/identity.mjs writes it). Left
+# to its default, the project is the checkout's folder name, so a push from a worktree starts a
+# second project whose fixed container_name collides with the main checkout's running server.
+name: clinozy-fe
+
 services:
   sonarqube:
     image: sonarqube:25.5.0.107428-community

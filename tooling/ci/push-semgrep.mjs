@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * Semgrep at push on every changed app source file (`src/`, `plugins/`; tests excluded) — an early
- * check in `.husky/pre-push`. The PR's Semgrep lane scans everything (clinozy-be's
+ * Semgrep at push on every changed app source, test and tooling file (`src/`, `plugins/`, `tests/`,
+ * `tooling/`) — an early check in `.husky/pre-push`. The PR's Semgrep lane scans everything (clinozy-be's
  * `pnpm security:semgrep:push`, on this repository's surface). It covered only the auth runtime, the
  * HTTP client and the CSP builders until the planted-bug drill (20 Oct 2026) showed a hole outside
- * them reach the PR.
+ * them reach the PR. Test files are scanned too, as the PR's lane scans them: in clinozy-be a
+ * test's `new RegExp(...)` passed the push step and failed PR SAST (albetrios/clinozy-be#124).
  *
  * Usage:
  *   pnpm security:semgrep:push                # files changed since the upstream (or origin/<trunk>)
@@ -21,20 +22,23 @@ import { resolveBase, tryGit } from './git-environment.mjs';
 import { requireTool } from './require-tool.mjs';
 import { isMain, parseCommandLine } from './script.mjs';
 
-/** The code Semgrep scans at push: the app source and the Vite plugins. */
-export const PUSH_SEMGREP_PATTERNS = [/^src\/.+\.tsx?$/, /^plugins\/.+\.ts$/];
+/** The code Semgrep scans at push: the app source, the Vite plugins, the tests and the tooling. */
+export const PUSH_SEMGREP_PATTERNS = [
+  /^src\/.+\.tsx?$/,
+  /^plugins\/.+\.ts$/,
+  /^tests\/.+\.tsx?$/,
+  /^tooling\/.+\.(?:ts|mts|js|mjs)$/,
+];
 
 /**
- * The changed files Semgrep scans at push — test files excluded.
+ * The changed files Semgrep scans at push — tests included, as the PR's Semgrep lane scans them.
  *
  * @param {readonly string[]} changedFiles
  * @returns {string[]}
  */
 export function pushSemgrepTargets(changedFiles) {
-  return changedFiles.filter(
-    (file) =>
-      PUSH_SEMGREP_PATTERNS.some((pattern) => pattern.test(file)) &&
-      !/\.test\.tsx?$/.test(file),
+  return changedFiles.filter((file) =>
+    PUSH_SEMGREP_PATTERNS.some((pattern) => pattern.test(file)),
   );
 }
 
@@ -58,7 +62,9 @@ function main() {
   ]);
   const targets = pushSemgrepTargets(changed.output.split('\n'));
   if (targets.length === 0) {
-    console.log('Semgrep at push: no source changes under src/ or plugins/.');
+    console.log(
+      'Semgrep at push: no code changes under src/, plugins/, tests/ or tooling/.',
+    );
     return;
   }
   // A warning, not a block: the PR's Semgrep lane scans everything.

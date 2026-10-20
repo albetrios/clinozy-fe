@@ -114,6 +114,15 @@ describe('git-hook gate tools', () => {
     expect(sonarCompose).toMatch(/^ {2}scanner:$/m);
   });
 
+  it("pins the Compose project, so a worktree's push reuses the main checkout's server", () => {
+    // Unpinned, the project was the folder name: a push from a worktree (20 Oct 2026) started a
+    // second project and stopped on the main checkout's fixed `container_name`.
+    const project = /^name: ([\w-]+)$/m.exec(sonarCompose)?.[1];
+    expect(project).toBeDefined();
+    expect(sonarCompose).toContain(`container_name: ${project}-sonarqube`);
+    expect(sonarCompose).toContain(`container_name: ${project}-sonar-scanner`);
+  });
+
   it('the Elasticsearch index is on tmpfs, clear of a disk that is under 10% free', () => {
     expect(sonarCompose).toContain(
       '- /opt/sonarqube/data/es8:size=2g,uid=1000,gid=0,mode=0770',

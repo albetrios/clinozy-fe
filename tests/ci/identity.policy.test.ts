@@ -109,6 +109,16 @@ describe('product identity', () => {
     }
   });
 
+  it('renames the SonarQube Compose project together with its containers', () => {
+    const sonar = derivedSurfaces({ ...identity, name: 'zzslug-fe' }, ROOT).find(
+      (surface) => surface.file === 'docker-compose.sonar.yml',
+    );
+    const next = sonar?.apply(read('docker-compose.sonar.yml')) ?? '';
+    expect(next).toMatch(/^name: zzslug-fe$/m);
+    expect(next).toContain('container_name: zzslug-fe-sonarqube');
+    expect(next).toContain('container_name: zzslug-fe-sonar-scanner');
+  });
+
   it('keeps index.html branding tokenized, never hardcoded', () => {
     // `plugins/product-identity-html.ts` substitutes these at transform time.
     const html = read('index.html');

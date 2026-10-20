@@ -127,11 +127,11 @@ loosens local Docker.
 
 **Local:** Vite serves the FE on `:5173` and proxies `/api` → `http://localhost:3000`. Start clinozy-be, then `pnpm test:e2e`.
 
-**CI:** `.github/workflows/e2e-backend.yml`, never a PR lane. It boots Postgres and Redis, then
+**CI:** `.github/workflows/e2e-backend.yml`; on a pull request only Dependabot's, when it changes a dependency (`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`), with the @smoke set — so a bump that breaks the app is red on its own PR. It boots Postgres and Redis, then
 the backend's latest GHCR image (migrate, reference seed, API with the backend's CI test env), and
 the app's dev server against it. A merge to `main` runs the **@smoke** set (`--grep @smoke`: sign-in,
 Today, one create, one edit, axe on five key pages — tagged `{ tag: '@smoke' }`); the nightly run
-(01:30 UTC) runs the full suite. One retry, then a self-closing `ci-failure` issue. Pulling the
+(01:30 UTC) runs the full suite. One retry, then a self-closing `ci-failure` issue (main's runs only). Pulling the
 image needs this repository's read access on the backend's GHCR package while it is private.
 
 **Naming:** UI flows → `<feature>.e2e.test.ts`; HTTP contract suites → `<feature>-api.e2e.test.ts`.
