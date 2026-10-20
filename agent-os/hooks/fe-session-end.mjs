@@ -12,12 +12,12 @@ import { recordTelemetry } from './_fe-telemetry.mjs';
 
 let status = 'silent';
 if (existsSync(repositoryRoot)) {
-  const status = spawnSync('git', ['status', '--porcelain'], {
+  const gitStatus = spawnSync('git', ['status', '--porcelain'], {
     cwd: repositoryRoot,
     encoding: 'utf8',
   });
   const count =
-    status.status === 0 ? status.stdout.split('\n').filter(Boolean).length : 0;
+    gitStatus.status === 0 ? gitStatus.stdout.split('\n').filter(Boolean).length : 0;
   console.log('');
   if (count > 0) {
     status = 'fired';
