@@ -170,10 +170,11 @@ jobs:
           # whose photos are real uploads, skips and says why.
           E2E_OBJECT_STORAGE: 'false'
         run: |
+          set -o pipefail
           if [ "$SUITE" = full ]; then
-            pnpm exec playwright test --retries=1
+            pnpm exec playwright test --retries=1 2>&1 | tee playwright-output.txt
           else
-            pnpm exec playwright test --grep @smoke --retries=1
+            pnpm exec playwright test --grep @smoke --retries=1 2>&1 | tee playwright-output.txt
           fi
 
       # TEMPORARY (fix/nightly-e2e-full-suite): the visual specs' actual screenshots, base64 in the
@@ -183,9 +184,12 @@ jobs:
         run: |
           find test-results -name '*-actual.png' | sort | while read -r shot; do
             echo "PNG-BEGIN ${shot}"
-            base64 -w 76 "${shot}"
+            base64 -w 4000 "${shot}"
             echo "PNG-END ${shot}"
           done
+          echo "SUMMARY-BEGIN"
+          tail -n 90 playwright-output.txt
+          echo "SUMMARY-END"
 
       - name: Upload the Playwright report
         if: failure()
