@@ -35,6 +35,8 @@ import {
   type AppEnvironment,
   environmentForBranch,
   envProfiles,
+  envSchemaKeys,
+  isSecretNamedClientKey,
 } from '../../src/core/config/env-schema.ts';
 import { tryGit } from '../ci/git-environment.mjs';
 import { parseCommandLine } from '../ci/script.mjs';
@@ -150,6 +152,27 @@ function forbiddenErrors(
   return errors;
 }
 
+/**
+ * Client variables whose name says they hold a secret, from every name this check reads: the
+ * schema, `.env.example`, and the committed and per-environment env files. A `VITE_` value is
+ * bundled into the browser, so such a variable is an error whatever its value.
+ */
+function secretNameErrors(environment: AppEnvironment | undefined): string[] {
+  const exampleFile = resolve(projectRoot, '.env.example');
+  const names = new Set<string>([
+    ...envSchemaKeys,
+    ...(existsSync(exampleFile) ? Object.keys(parse(readFileSync(exampleFile))) : []),
+    ...(environment ? Object.keys(committedEnv(environment)) : []),
+    ...(environment ? Object.keys(envFileValues(environment)) : []),
+  ]);
+  return [...names]
+    .filter((name) => isSecretNamedClientKey(name))
+    .map(
+      (name) =>
+        `${name} is a client variable named like a secret — a VITE_ value ships to the browser; keep the secret on the backend`,
+    );
+}
+
 /** Non-empty values set in the per-environment file `.env.<env>` (behavior config). */
 function envFileValues(environment: AppEnvironment): Record<string, string> {
   const path = resolve(projectRoot, `.env.${environment}`);
@@ -202,6 +225,8 @@ function report(environment: AppEnvironment, errors: string[], warnings: string[
 function main(): void {
   const environment = resolveEnvironment();
   if (!environment) {
+    const nameErrors = secretNameErrors(undefined);
+    if (nameErrors.length > 0) report('local', nameErrors, []);
     console.log(
       'client-env: skipped (no deploy environment — pass --env, --production, or run on `main`)',
     );
@@ -219,6 +244,7 @@ function main(): void {
     ...required.errors,
     ...forbiddenErrors(environment, committedEnv(environment)),
     ...allowedErrors(environment),
+    ...secretNameErrors(environment),
   ];
   report(environment, errors, required.warnings);
 }
