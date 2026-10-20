@@ -8,6 +8,7 @@ import {
 
 import { API_BASE_PATH } from '@/core/config/constants.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
+import { withApiRetry } from '@/tests/utils/e2e-api-retry.ts';
 import { establishSessionInPage, navigateInApp } from '@/tests/utils/e2e-auth.ts';
 import {
   fetchMeContextWire,
@@ -124,6 +125,9 @@ export interface ClinicSeed {
   saleId: string;
 }
 
+/** Backoff for the seed's calls: 1 s, 2 s … 5 s between six attempts, past a rate-limit window. */
+const SEED_RETRY = { attempts: 6, baseDelayMs: 1_000 } as const;
+
 /** A `data` answer, or a thrown error naming the call. */
 export async function seedData<T>(
   response: Awaited<ReturnType<APIRequestContext['post']>>,
@@ -156,10 +160,22 @@ export async function seedClinic(
   api: APIRequestContext,
   token: string,
 ): Promise<ClinicSeed> {
+  // A seeded clinic is a dozen calls in a row, and the full suite seeds dozens of clinics: a 429
+  // from the backend's rate limit backs off and retries (a refused request did nothing).
   const write = (path: string, data: unknown, method: 'post' | 'patch' = 'post') =>
-    api[method](`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token, true), data });
+    withApiRetry(
+      () =>
+        api[method](`${API_BASE_PATH}${path}`, {
+          headers: bearerHeaders(token, true),
+          data,
+        }),
+      SEED_RETRY,
+    );
   const read = (path: string) =>
-    api.get(`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token) });
+    withApiRetry(
+      () => api.get(`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token) }),
+      SEED_RETRY,
+    );
 
   const ownerId = (await fetchMeContextWire(api, token)).membership_id;
   await seedData(
