@@ -93,7 +93,7 @@ describe('the commit checks', () => {
 });
 
 describe('Semgrep at push', () => {
-  it('scans every app source file, Vite plugin and test, as the PR Semgrep lane does', () => {
+  it('scans every app source file, Vite plugin, test and tooling script, as the PR Semgrep lane does', () => {
     // A test file the push step skipped failed PR SAST in clinozy-be (albetrios/clinozy-be#124).
     expect(
       pushSemgrepTargets([
@@ -119,6 +119,8 @@ describe('Semgrep at push', () => {
       'src/pages/login/LoginPage.test.tsx',
       'tests/ci/e2e-backend.policy.test.ts',
       'tests/e2e/auth.e2e.test.ts',
+      // The PR's Semgrep lane scans tooling/ too (clinozy-be's push step covers its tooling/).
+      'tooling/ci/affected.mjs',
     ]);
   });
 

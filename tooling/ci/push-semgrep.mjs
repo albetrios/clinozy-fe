@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Semgrep at push on every changed app source and test file (`src/`, `plugins/`, `tests/`) — an
- * early check in `.husky/pre-push`. The PR's Semgrep lane scans everything (clinozy-be's
+ * Semgrep at push on every changed app source, test and tooling file (`src/`, `plugins/`, `tests/`,
+ * `tooling/`) — an early check in `.husky/pre-push`. The PR's Semgrep lane scans everything (clinozy-be's
  * `pnpm security:semgrep:push`, on this repository's surface). It covered only the auth runtime, the
  * HTTP client and the CSP builders until the planted-bug drill (20 Oct 2026) showed a hole outside
  * them reach the PR. Test files are scanned too, as the PR's lane scans them: in clinozy-be a
@@ -22,11 +22,12 @@ import { resolveBase, tryGit } from './git-environment.mjs';
 import { requireTool } from './require-tool.mjs';
 import { isMain, parseCommandLine } from './script.mjs';
 
-/** The code Semgrep scans at push: the app source, the Vite plugins and the test tree. */
+/** The code Semgrep scans at push: the app source, the Vite plugins, the tests and the tooling. */
 export const PUSH_SEMGREP_PATTERNS = [
   /^src\/.+\.tsx?$/,
   /^plugins\/.+\.ts$/,
   /^tests\/.+\.tsx?$/,
+  /^tooling\/.+\.(?:ts|mts|js|mjs)$/,
 ];
 
 /**
@@ -62,7 +63,7 @@ function main() {
   const targets = pushSemgrepTargets(changed.output.split('\n'));
   if (targets.length === 0) {
     console.log(
-      'Semgrep at push: no source or test changes under src/, plugins/ or tests/.',
+      'Semgrep at push: no code changes under src/, plugins/, tests/ or tooling/.',
     );
     return;
   }
