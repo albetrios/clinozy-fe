@@ -18,8 +18,16 @@ const files = readdirSync(HOOKS).filter(
 const source = (file: string) => readFileSync(join(HOOKS, file), 'utf8');
 
 interface HookManifest {
-  hooks: Array<{ id: string; script: string; runtime?: string }>;
+  hooks: Array<{
+    id: string;
+    script: string;
+    runtime?: string;
+    claude?: { timeout?: number };
+  }>;
 }
+
+/** A hook script's own time budgets (`const TEST_BUDGET_MILLISECONDS = 60_000;`). */
+const BUDGETS = /const \w+_BUDGET_MILLISECONDS = ([\d_]+);/g;
 
 /** Every `command` under the `hooks` key of a generated platform config. */
 function hookCommands(path: string): string[] {
@@ -74,6 +82,25 @@ describe('one hook runtime', () => {
       );
     }
     expect(source(HELPER)).toMatch(/process\.env\.CLAUDE_PROJECT_DIR \|\|/);
+  });
+
+  it("every hook's timeout covers its own script budgets, run one after another", () => {
+    // The planted-bug drill (A8-2, 20 Oct 2026) lowered the turn-end hook's timeout to 60 s, below
+    // the 80 s its test selection and test run may take in turn: the platform kills the hook
+    // mid-run, which reads as a pass. 10 s is left for the hook's own start-up and git calls.
+    const manifest = JSON.parse(source('hooks.json')) as HookManifest;
+    const budgeted = manifest.hooks.filter((entry) =>
+      source(entry.script).match(BUDGETS),
+    );
+    expect(budgeted.length).toBeGreaterThan(0);
+    for (const entry of budgeted) {
+      const total = [...source(entry.script).matchAll(BUDGETS)]
+        .map((match) => Number((match[1] ?? '0').replaceAll('_', '')))
+        .reduce((sum, value) => sum + value, 0);
+      expect((entry.claude?.timeout ?? 0) * 1000, entry.id).toBeGreaterThanOrEqual(
+        total + 10_000,
+      );
+    }
   });
 
   it('no hook runs jq', () => {
