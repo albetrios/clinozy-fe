@@ -31,6 +31,7 @@ import {
   readHookPayload,
   repositoryRoot,
 } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 import { turnOnce } from './_fe-turn-once.mjs';
 
 const SKILL_MAP = 'Full map: agent-os/docs/skill-triggers.md';
@@ -137,7 +138,7 @@ function gateReminders({ untracked, extraPaths = [] }) {
 
 function afterEdit(payload, session) {
   const file = repositoryFile(payload.tool_input?.file_path || '');
-  if (!file) return;
+  if (!file) return 'silent';
   const relative = file.slice(repositoryRoot.length + 1);
 
   if (FORMATTED_EXTENSIONS.test(file) && !UNFORMATTED.test(relative)) {
@@ -181,8 +182,9 @@ function afterEdit(payload, session) {
       ].join('\n'),
     );
   }
-  if (sections.length === 0) return;
+  if (sections.length === 0) return 'silent';
   addModelContext({ event: 'PostToolUse', context: sections.join('\n\n') });
+  return 'fired';
 }
 
 function formatQueuedFiles(session) {
@@ -211,12 +213,13 @@ function atStop(session) {
     console.log('\n📋 Before you finish — gates implied by your uncommitted changes:');
     for (const reminder of gates) console.log(`  • ${reminder}`);
     console.log(`  Then: pnpm health (all phases). ${SKILL_MAP}`);
-    return;
+    return 'fired';
   }
   console.log(
     '\n📋 Done. Quick check: pnpm health (tsc + lint + biome + format + tokens + structure + tests + docs).',
   );
   console.log('   Skill map: agent-os/docs/skill-triggers.md');
+  return 'silent';
 }
 
 const payload = readHookPayload();
@@ -224,8 +227,8 @@ if (payload) {
   const session = payload.session_id || 'unknown-session';
   try {
     if ((payload.hook_event_name || 'Stop') === 'PostToolUse')
-      afterEdit(payload, session);
-    else atStop(session);
+      recordTelemetry('fe-edit-hooks', 'PostToolUse', afterEdit(payload, session));
+    else recordTelemetry('fe-edit-hooks-stop', 'Stop', atStop(session));
   } catch {
     /* fail-open */
   }

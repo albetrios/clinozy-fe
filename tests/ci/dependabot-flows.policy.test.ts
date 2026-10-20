@@ -66,6 +66,11 @@ describe('dependabot CI triage policy', () => {
     );
     expect(triage).toMatch(/mode: close\n\s+title: 'Dependabot PR blocked by CI: PR #/);
   });
+
+  it('files its issue with the dependencies label beside ci-failure', () => {
+    // The issue had it before the move to the shared action, which now takes more labels.
+    expect(triage).toMatch(/mode: open[\s\S]*?labels: dependencies\n[\s\S]*?mode: close/);
+  });
 });
 
 describe('dependabot grouping policy', () => {

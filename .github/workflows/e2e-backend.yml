@@ -44,7 +44,9 @@ jobs:
       contents: read
       packages: read
     env:
-      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be-api:latest
+      # clinozy-be pushes ghcr.io/<owner>/<repository>/<image> (reusable-docker-build-trivy.yml:
+      # "ghcr.io/${repository_lowercase}/${API_IMAGE}"), so the repository is part of the name.
+      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api:latest
       SUITE: ${{ github.event_name == 'schedule' && 'full' || inputs.suite || 'smoke' }}
       # The services below, for the backend container and the suite's email-code helpers (they
       # read the verification codes from auth.mail_outbox).
@@ -84,7 +86,7 @@ jobs:
       # The backend's own CI fixtures (fake JWT keypair, retention, secrets key), so the image
       # boots exactly as in its own pipeline; the app's dev server is the one allowed origin.
       - name: Export the backend's CI test env
-        uses: albetrios/clinozy-be/.github/actions/test-env@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        uses: ./.github/actions/test-env
         with:
           allowed-origins: http://localhost:5180
 
@@ -181,8 +183,13 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
       - name: Close the open ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        uses: ./.github/actions/ci-failure-issue
         with:
           mode: close
           title: E2E against the backend image failing
@@ -199,8 +206,13 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
       - name: Open or update ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        uses: ./.github/actions/ci-failure-issue
         with:
           mode: open
           title: E2E against the backend image failing

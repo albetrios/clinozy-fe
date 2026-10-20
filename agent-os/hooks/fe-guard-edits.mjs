@@ -12,6 +12,7 @@
 // files are its own hooks' to judge. Fails OPEN: an unreadable payload allows the edit.
 import { editRuleViolations } from './_fe-guard-rules.mjs';
 import { denyToolCall, isInsideRepository, readHookPayload } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 
 const input = readHookPayload()?.tool_input ?? {};
 const filePath = typeof input.file_path === 'string' ? input.file_path : '';
@@ -28,6 +29,10 @@ if (filePath) {
     content,
     inRepository: isInsideRepository(filePath),
   });
-  if (violation) denyToolCall(violation.reason);
+  if (violation) {
+    recordTelemetry('fe-guard-edits', 'PreToolUse', 'fired');
+    denyToolCall(violation.reason);
+  }
 }
+recordTelemetry('fe-guard-edits', 'PreToolUse', 'silent');
 process.exit(0);

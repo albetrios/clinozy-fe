@@ -1,5 +1,5 @@
 # Opens or updates a ci-failure issue when PR CI fails on a Dependabot pull request, and closes it
-# when that pull request's PR CI is green again — through clinozy-be's shared ci-failure-issue action,
+# when that pull request's PR CI is green again — through the ci-failure-issue action, a true copy of clinozy-be's,
 # the one way every workflow here reports a failure.
 # Low-risk (npm-non-major) Dependabot PRs auto-merge after approval
 # (dependabot-auto-merge.yml); majors / security / github-actions are manual.
@@ -45,6 +45,11 @@ jobs:
       issues: write
       pull-requests: read
     steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
       - name: Describe the failed Dependabot pull request
         id: describe
         env:
@@ -107,11 +112,12 @@ jobs:
 
       - name: Open or update the ci-failure issue
         if: steps.describe.outputs.title != ''
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        uses: ./.github/actions/ci-failure-issue
         with:
           mode: open
           title: ${{ steps.describe.outputs.title }}
           body: ${{ steps.describe.outputs.body }}
+          labels: dependencies
           run-id: ${{ github.event.workflow_run.id }}
           head-sha: ${{ github.event.workflow_run.head_sha }}
 
@@ -133,8 +139,13 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
       - name: Close the open ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        uses: ./.github/actions/ci-failure-issue
         with:
           mode: close
           title: 'Dependabot PR blocked by CI: PR #${{ github.event.workflow_run.pull_requests[0].number }}'

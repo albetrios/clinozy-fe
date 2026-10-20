@@ -1,6 +1,9 @@
 import '@testing-library/jest-dom/vitest';
 import '@/lib/i18n/i18n.ts';
 
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { configure } from '@testing-library/react';
 import { beforeAll, beforeEach, expect, vi } from 'vitest';
 import * as matchers from 'vitest-axe/matchers';
@@ -11,6 +14,13 @@ import type { AppPreferences } from '@/shared/api/app/preferences-api.ts';
 import { resetPreferencesDouble } from './app-shell-doubles.ts';
 
 expect.extend(matchers);
+
+// The hook tests spawn the real hooks against this checkout: their telemetry goes to a scratch
+// file, never the real agent-os/hooks/.telemetry.log (agent-os/hooks/_fe-telemetry.mjs).
+process.env.HOOK_TELEMETRY_LOG ??= join(
+  tmpdir(),
+  `clinozy-fe-test-telemetry-${process.pid}.log`,
+);
 
 // How long `findBy*` / `waitFor` wait before failing. Testing Library's 1s default is tight for a
 // route island's first, cold lazy load when the whole suite runs four workers beside a build (the

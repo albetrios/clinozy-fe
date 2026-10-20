@@ -382,6 +382,11 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
       - name: Emit post-merge failure notice
         env:
           RELEASE_RESULT: ${{ needs.release-please.result }}
@@ -393,9 +398,9 @@ jobs:
 
       # A run-scoped ::error annotation dies with the run. One tracked `ci-failure` issue keeps a
       # broken release/deploy visible until it is fixed: repeats become comments, and the next
-      # green post-merge run closes it (clinozy-be's shared ci-failure-issue action).
+      # green post-merge run closes it (the ci-failure-issue action, a true copy of clinozy-be's).
       - name: Open or update the ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        uses: ./.github/actions/ci-failure-issue
         with:
           mode: open
           title: Post-merge CI failing
@@ -420,8 +425,13 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
       - name: Close the open ci-failure issue
-        uses: albetrios/clinozy-be/.github/actions/ci-failure-issue@b9bb2b71a8eb9175c47c3d62bf49aee3bb663bf3 # clinozy-be main (albetrios/clinozy-be#98)
+        uses: ./.github/actions/ci-failure-issue
         with:
           mode: close
           title: Post-merge CI failing

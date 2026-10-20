@@ -78,8 +78,15 @@ function runHook(options: {
       TMPDIR: options.state,
       PATH: `${options.bin}:${process.env.PATH ?? ''}`,
       PUSH_CI_WATCH_POLL_MILLISECONDS: '10',
+      HOOK_TELEMETRY_LOG: join(options.state, 'telemetry.log'),
     },
   });
+}
+
+/** The last telemetry row's status and detail columns (`fired,failed`), as the readers see them. */
+function lastTelemetry(state: string): string {
+  const rows = readFileSync(join(state, 'telemetry.log'), 'utf8').trim();
+  return rows.split('\n').at(-1)?.split(',').slice(2).join(',') ?? '';
 }
 
 const run = (name: string, conclusion: string) => ({
@@ -114,6 +121,20 @@ describe('fe-push-ci-watch.mjs', () => {
     });
     expect(runHook(unauthenticated).status).toBe(0);
     expect(readFileSync(unauthenticated.calls, 'utf8')).not.toContain('run list');
+  });
+
+  it('records fired when it wakes the model, else silent with why, for the hooks report', () => {
+    const failed = fixture({ runs: [run('PR CI', 'failure')] });
+    runHook(failed);
+    expect(lastTelemetry(failed.state)).toBe('PostToolUse,fired,failed');
+    const green = fixture({ runs: [run('PR CI', 'success')] });
+    runHook(green);
+    expect(lastTelemetry(green.state)).toBe('PostToolUse,silent,green');
+    runHook({ ...green, command: 'for x in a; do echo "$x"; done | sort' });
+    expect(lastTelemetry(green.state)).toBe('PostToolUse,silent,not-a-push');
+    const unauthenticated = fixture({ runs: [], authenticated: false });
+    runHook(unauthenticated);
+    expect(lastTelemetry(unauthenticated.state)).toBe('PostToolUse,silent,no-gh');
   });
 
   it('judges only pushes in its own repository', () => {

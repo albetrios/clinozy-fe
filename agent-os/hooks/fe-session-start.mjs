@@ -27,6 +27,7 @@ import {
 import { delimiter, join } from 'node:path';
 
 import { addModelContext, readHookPayload, repositoryRoot } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 
 const DEFAULT_NODE_MAJOR = 24;
 const isRemote = process.env.CLAUDE_CODE_REMOTE === 'true';
@@ -228,21 +229,49 @@ function routingMapSection(source) {
 }
 
 /**
- * Canary: the first context line names the root these hooks ran from, and each run appends a row
- * to the gitignored agent-os/hooks/.telemetry.log in clinozy-be's telemetry format, so `grep
- * fe-session-start agent-os/hooks/.telemetry.log` shows the hook ran — including in a session
- * that holds several repositories (tooling/agent-os/session-hooks.ts).
+ * Hook health from telemetry (clinozy-be's `hookHealth`): names any hook whose last `fired` row is
+ * older than 30 days, or that never fired across 50+ runs, with why it stayed quiet (the detail
+ * column, e.g. `not-a-push 519, no-gh 18`), so a dead hook and a too-narrow trigger read
+ * differently. Empty when telemetry is absent.
  */
-function recordTelemetry() {
+function hookHealth() {
+  let rows;
   try {
-    const timestamp = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
-    appendFileSync(
+    rows = readFileSync(
       join(repositoryRoot, 'agent-os', 'hooks', '.telemetry.log'),
-      `${timestamp},fe-session-start,SessionStart,fired\n`,
-    );
+      'utf8',
+    ).split('\n');
   } catch {
-    /* no telemetry row */
+    return '';
   }
+  const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const hooks = new Map();
+  for (const row of rows) {
+    const [timestamp, hook, , status, detail] = row.split(',');
+    if (status === undefined) continue;
+    const entry = hooks.get(hook) ?? { runs: 0, lastFired: 0, quiet: new Map() };
+    entry.runs += 1;
+    if (status === 'fired')
+      entry.lastFired = Math.max(entry.lastFired, Date.parse(timestamp) || 0);
+    else entry.quiet.set(detail || status, (entry.quiet.get(detail || status) ?? 0) + 1);
+    hooks.set(hook, entry);
+  }
+  const why = (quiet) =>
+    [...quiet]
+      .sort((first, second) => second[1] - first[1])
+      .slice(0, 3)
+      .map(([reason, count]) => `${reason} ${count}`)
+      .join(', ');
+  const candidates = [...hooks]
+    .map(([hook, { runs, lastFired, quiet }]) => {
+      if (lastFired === 0 && runs >= 50)
+        return `${hook} (never fired, ${runs} runs: ${why(quiet)})`;
+      if (lastFired !== 0 && lastFired < cutoff) return `${hook} (silent >30d)`;
+      return '';
+    })
+    .filter(Boolean);
+  if (candidates.length === 0) return '';
+  return `\n- Hook pruning candidates (silent 30+ days / never fired): ${candidates.join(' ')} — review with \`pnpm agent-os:hooks:report\` (agent-os/hooks/README.md)`;
 }
 
 function sessionContext(source) {
@@ -255,13 +284,14 @@ function sessionContext(source) {
     : 'missing';
   const githubCli = githubCliStatus();
   const gitleaks = gitleaksStatus();
+  const health = hookHealth();
   const provisioned = node.adequate && dependencies === 'installed' ? 'yes' : 'no';
   const nodeNote = node.adequate
     ? ''
     : `  (switch to Node >=${requiredMajor} from .nvmrc, then pnpm install)`;
   return [
     `clinozy-fe session ready (hooks from ${repositoryRoot}) — environment provisioned: ${provisioned}.`,
-    `- Node ${node.version} (need >=${requiredMajor}) · deps ${dependencies} · gh ${githubCli} · mcp ${mcp} · gitleaks ${gitleaks}${nodeNote}`,
+    `- Node ${node.version} (need >=${requiredMajor}) · deps ${dependencies} · gh ${githubCli} · mcp ${mcp} · gitleaks ${gitleaks}${nodeNote}${health}`,
     '- Dev: pnpm dev (Vite :5173) + clinozy-be on :3000. Bootstrap: pnpm setup:local. Gates: pnpm health (all phases) · pnpm tsc · pnpm lint · pnpm validate:tokens · pnpm validate:structure · pnpm validate:testids · pnpm validate:theme-axis · pnpm test',
     '- Skill-first: consult agent-os/skills/fe-skill-registry/SKILL.md, then the listed skill(s) for the files you change.',
     '',
@@ -276,7 +306,9 @@ try {
     process.chdir(repositoryRoot);
     // The payload's `source` (startup | resume | clear | compact); unknown → startup.
     const context = sessionContext(readHookPayload()?.source || 'startup');
-    recordTelemetry();
+    // Canary: the first context line names the root these hooks ran from, and the row shows the
+    // hook ran — including in a session that holds several repositories.
+    recordTelemetry('fe-session-start', 'SessionStart', 'fired');
     addModelContext({ event: 'SessionStart', context });
   }
 } catch {

@@ -42,10 +42,12 @@ a PR gate, even though both compare docs to code.
 | `scheduled-deps-audit.yml`     | `30 7 * * 1`  | weekly Mon 07:30                | `pnpm deps:audit` drift + expired `ignoreGhsas` entries                                                 | self-closing `ci-failure` issue                        |
 | `dead-code-audit-reminder.yml` | `0 7 1 */3 *` | quarterly (1st Jan/Apr/Jul/Oct) | reminder to run the barrel-hidden dead-code audit                                                       | tracked `dead-code-audit` issue                        |
 
-A **self-closing `ci-failure` issue** comes from clinozy-be's shared
-`.github/actions/ci-failure-issue` action: a red run opens one issue per check (repeats become
-comments) and the next green run closes it, so an open issue means the check is red now.
-Pinned by `tests/ci/ci-failure-alert.policy.test.ts`.
+A **self-closing `ci-failure` issue** comes from the `.github/actions/ci-failure-issue` action, a
+true copy of clinozy-be's: a red run opens one issue per check (repeats become comments) and the
+next green run closes it, so an open issue means the check is red now. Pinned by
+`tests/ci/ci-failure-alert.policy.test.ts`; the copy by `tests/ci/mirrored-files.policy.test.ts`,
+which also keeps workflows from using clinozy-be's own (its download fails on two tracked links
+to a gitignored file).
 
 Times are UTC (GitHub cron is always UTC). Every **weekly** job runs Monday,
 staggered across the off-peak window (03:00 → 04:00 → 04:27 → 05:00 → 06:30 →

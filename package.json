@@ -131,6 +131,7 @@
     "agent-os:check:report": "tsx agent-os/evals/check.ts --report",
     "agent-os:triggers": "tsx agent-os/evals/trigger-eval.ts",
     "agent-os:triggers:strict": "tsx agent-os/evals/trigger-eval.ts --strict",
+    "agent-os:hooks:report": "tsx tooling/agent-os/hooks-telemetry.ts",
     "agent-os:lock": "tsx tooling/agent-os/lock.ts",
     "agent-os:review-clean": "node tooling/agent-os/review-marker.mjs",
     "agent-os:session-hooks": "tsx tooling/agent-os/session-hooks.ts",
