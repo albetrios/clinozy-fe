@@ -74,6 +74,9 @@ jobs:
       id-token: write
       attestations: write
     uses: ./.github/workflows/reusable-netlify-deploy.yml
+    # The run job reads its environment's secrets, and a called job reaches them only through
+    # `inherit`: without it #150's deploy read every secret empty (run 39454666563).
+    # nosemgrep: yaml.github-actions.security.secrets-inherit.secrets-inherit — environment secrets reach a called job only through inherit
     secrets: inherit
     with:
       github_environment: production

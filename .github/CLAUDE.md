@@ -30,7 +30,8 @@ context; branch protection as code:
 (the @smoke set on main and on a Dependabot PR that changes a dependency, the full suite nightly) — no other PR lane. CodeQL, Stryker mutation tests, Lighthouse
 budgets, cache cleanup, release-flow guards (environment-drift canary),
 the sync-drift canary (weekly docs↔code drift → tracked issue),
-and Dependabot CI triage + approval-gated auto-merge (low-risk `npm-non-major` group only)
+and Dependabot CI triage + approval-gated auto-merge (low-risk `npm-non-major` group only; a
+dependency bump arms only once its @smoke e2e is green)
 run as scheduled/event workflows (enforced registry: docs/reference/scheduled-jobs.md).
 
 **Merge policy — never merge on red (enforced, not just convention):** the `main` ruleset carries
