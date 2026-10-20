@@ -10,6 +10,8 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import unusedImports from 'eslint-plugin-unused-imports';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
+import conventions from './tooling/eslint/conventions-plugin.mjs';
+
 /**
  * Shared by the app-wide restriction block, every layer block below and the
  * LocalizedCalendar override. Flat config REPLACES a rule's options rather than
@@ -108,6 +110,29 @@ export default defineConfig([
       'no-new-func': 'error',
       'no-param-reassign': 'error',
     },
+  },
+
+  // CLAUDE.md conventions no installed plugin checks (tooling/eslint/conventions-plugin.mjs):
+  // imports name their extension, a static inline style is a Tailwind class, and a page never
+  // imports a sideways page island by a relative path. Vendored shadcn primitives are exempt
+  // from the style rule (their upstream source sets CSS variables inline).
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { conventions },
+    rules: {
+      'conventions/import-extension': 'error',
+      'conventions/no-static-inline-style': 'error',
+    },
+  },
+  {
+    files: ['src/shared/components/ui/**/*.{ts,tsx}'],
+    rules: { 'conventions/no-static-inline-style': 'off' },
+  },
+  {
+    files: ['src/pages/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.*'],
+    plugins: { conventions },
+    rules: { 'conventions/no-sibling-island-import': 'error' },
   },
 
   // Icons flow through the @/shared/icons barrel so the icon library is
