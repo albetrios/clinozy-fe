@@ -310,6 +310,21 @@ interface RequiredKeyRule {
   readonly satisfiedBy?: (value: string) => boolean;
 }
 
+/**
+ * Name words that mark a value as server-only. Every `VITE_` variable is bundled into the
+ * browser, so a `VITE_` name made with one of these words is a secret about to ship to every
+ * visitor (the planted-bug drill, 20 Oct 2026: `VITE_STRIPE_SECRET_KEY` passed every gate).
+ */
+export const SECRET_NAME_WORDS: readonly string[] = ['SECRET', 'PRIVATE', 'PASSWORD'];
+
+/** True when `key` is a client (`VITE_`) variable whose name says it holds a secret. */
+export function isSecretNamedClientKey(key: string): boolean {
+  return (
+    key.startsWith('VITE_') &&
+    key.split('_').some((word) => SECRET_NAME_WORDS.includes(word))
+  );
+}
+
 /** A key that must NOT reach an environment (optionally only when value matches). */
 export interface ForbiddenKeyRule {
   readonly key: string;

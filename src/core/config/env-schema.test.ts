@@ -9,6 +9,7 @@ import {
   envSchemaConditionallyRequiredKeys,
   envSchemaKeys,
   type ForbiddenKeyRule,
+  isSecretNamedClientKey,
 } from './env-schema.ts';
 
 /** Mirrors the validator's forbidden matcher (tooling/validate/client-env.ts). */
@@ -43,6 +44,22 @@ describe('environmentForBranch', () => {
 
   it('stays in lock step with branchEnvironmentMap', () => {
     expect(branchEnvironmentMap).toEqual({ main: 'production' });
+  });
+});
+
+describe('isSecretNamedClientKey (a VITE_ value ships to the browser)', () => {
+  it('flags a client variable whose name says it holds a secret', () => {
+    // The planted-bug drill (20 Oct 2026) added VITE_STRIPE_SECRET_KEY to .env.example; it passed.
+    expect(isSecretNamedClientKey('VITE_STRIPE_SECRET_KEY')).toBe(true);
+    expect(isSecretNamedClientKey('VITE_DATABASE_PASSWORD')).toBe(true);
+    expect(isSecretNamedClientKey('VITE_PRIVATE_KEY')).toBe(true);
+  });
+
+  it('passes every name the schema has, and server-only or look-alike names', () => {
+    expect(envSchemaKeys.filter((key) => isSecretNamedClientKey(key))).toEqual([]);
+    expect(isSecretNamedClientKey('VITE_PRIVACY_POLICY_URL')).toBe(false);
+    expect(isSecretNamedClientKey('VITE_STRIPE_PUBLISHABLE_KEY')).toBe(false);
+    expect(isSecretNamedClientKey('SONAR_ADMIN_PASSWORD')).toBe(false);
   });
 });
 
