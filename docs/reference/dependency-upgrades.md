@@ -187,6 +187,27 @@ accepted one that now has a fix.
 
 ## Upgrade decisions log
 
+### npm-non-major group — 29 updates, `pnpm dedupe` again, first-paint JS limit 240.1 → 250 kB (2026-10-20) — ADOPTED
+
+- **What:** Dependabot's npm-non-major group (#119, 29 updates): `react`/`react-dom` 19.3.1,
+  `radix-ui` 1.8.1, `i18next` 26.5.2, `react-i18next` 17.1.0, `@sentry/react` 11.8.0,
+  `lucide-react` 1.59, `zod` 4.6.7, patches across TanStack, `vitest` 5.0.5, `eslint` 10.13,
+  `jsdom` 30.1.3 and the dev tooling.
+- **Broke:** the unit lane and the ci-policy lane, the same way as #50 — `radix-ui` 1.8.1
+  moved onto `@radix-ui/react-dialog` 1.3.1, `react-dismissable-layer` 1.2.1 and
+  `react-focus-scope` 1.3.1 while `vaul` and `cmdk` kept the 1.3.0 / 1.2.0 / 1.3.0 copies, so
+  35 interaction tests failed on a `<body>` left at `pointer-events: none`, and
+  `tests/ci/lockfile-single-radix.policy.test.ts` named the three duplicates.
+- **Fixed:** `pnpm dedupe` (+11 −9 packages: the Radix copies collapsed, and the
+  `typescript-eslint` 8.71.1 / `axe-core` 4.13 leftovers Dependabot's incremental update kept
+  went with them). All 35 tests pass on the deduped lockfile.
+- **Bundle:** first-paint JS 239.99 kB on main and 240.15 kB here, 46 B over the 240.1 kB
+  limit. Attributed through the hidden source maps: `i18next` (+443 B raw) and
+  `react-i18next` (+476 B raw) in the entry, a few dozen bytes of TanStack patches in `query`
+  and `vendor`; the app's own code is byte-identical, so there was nothing to trim. The owner
+  raised the limit to **250 kB** (`tooling/ci/run-size-limit.mjs`) — ~9.85 kB of headroom
+  for the upcoming work, to be lowered again per the ratchet rule once it lands.
+
 ### npm-non-major group with radix-ui 1.8 — `pnpm dedupe` and a duplicate-copy guard (2026-10-13) — ADOPTED
 
 - **What:** Dependabot's npm-non-major group (#50, 26 updates, after #47 closed): patch and

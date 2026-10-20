@@ -431,8 +431,24 @@ const config = [
      * - me/context carrying `plan_access` through unparsed (`planAccessWire`).
      * Trimmed first: the plan-access schema and its parsing left me/context for the clinic
      * shell's notice (`plan-access.ts`, read by `usePlanAccess`; −0.06 kB). ~0.15 kB of headroom.
+     *
+     * 240.1 → 250 kB. A deliberate exception to the ratchet rule above, by the owner's
+     * decision (2026-10-20), on Dependabot's npm-non-major group (#119, 29 updates;
+     * docs/reference/dependency-upgrades.md › Upgrade decisions log). The group measured
+     * 240.15 kB against main's (819fc33) 239.99 kB, built the same way side by side (no env
+     * file, no ambient VITE_ variables) — 46 B over, and every byte library code, attributed
+     * through the build's hidden source maps:
+     * - `i18next` 26.4.3 → 26.5.2 (+443 B raw) and `react-i18next` 17.0.16 → 17.1.0
+     *   (+476 B raw), both in the entry chunk (the shell translates before any lazy
+     *   namespace loads).
+     * - `@tanstack/query-core` 5.104.2 → 5.104.4 (+30 B raw in the entry, +29 B in `query`),
+     *   `@tanstack/react-query` (+13 B in `query`) and `@tanstack/router-core` 1.170.42 →
+     *   1.170.45 (+24 B in `vendor`).
+     * Nothing to trim: the app's own code is byte-identical to main's, and ~0.15 kB of
+     * headroom meant every library patch tripped the gate. 250 kB leaves ~9.85 kB for the
+     * upcoming work; lower it again, per the rule, once that work has landed.
      */
-    limit: '240.1 kB',
+    limit: '250 kB',
     gzip: true,
   },
   ...(cssPaths.length
