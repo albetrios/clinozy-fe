@@ -16,7 +16,8 @@ const triage = readFileSync(
 const dependabotConfig = readFileSync(join(ROOT, '.github/dependabot.yml'), 'utf8');
 
 // The approval IS the manual gate: only the low-risk npm-non-major group may
-// auto-merge, and only after a maintainer approves. Everything else is manual.
+// auto-merge, and only after a maintainer approves, and, for a dependency bump, only
+// once its @smoke e2e against the backend image is green. Everything else is manual.
 describe('dependabot auto-merge policy', () => {
   it('arms only on a submitted approval review', () => {
     expect(autoMerge).toContain('pull_request_review:');
@@ -31,6 +32,33 @@ describe('dependabot auto-merge policy', () => {
     );
     expect(autoMerge).toContain("'npm-non-major'");
     expect(autoMerge).not.toContain("'npm-major'");
+  });
+
+  it('waits for the @smoke e2e on the head before arming auto-merge when a dependency file changed', () => {
+    // e2e-backend.yml runs on a pull request that changes one of these files. It is not a
+    // required check, so auto-merge would not wait for it: the job waits, and it must look
+    // for the same files, or a bump would merge without its e2e.
+    const e2eBackend = readFileSync(
+      join(ROOT, '.github/workflows/e2e-backend.yml'),
+      'utf8',
+    );
+    const pathsBlock =
+      /pull_request:\n\s+paths:\n((?:\s+- .+\n)+)/.exec(e2eBackend)?.[1] ?? '';
+    const pullRequestPaths = [...pathsBlock.matchAll(/- (\S+)/g)].map(
+      (match) => match[1] ?? '',
+    );
+    expect(pullRequestPaths.length).toBeGreaterThan(0);
+    for (const path of pullRequestPaths)
+      expect(autoMerge).toContain(path.replaceAll('.', '\\.'));
+
+    const wait = autoMerge.indexOf('- name: Wait for the @smoke e2e on this head');
+    expect(wait).toBeGreaterThan(-1);
+    expect(wait).toBeLessThan(autoMerge.indexOf('gh pr merge --auto --squash'));
+    expect(autoMerge).toContain('--workflow e2e-backend.yml');
+    expect(autoMerge).toMatch(/gh run watch [^\n]*--exit-status/);
+    expect(autoMerge).toMatch(/^ {2}actions: read$/m);
+    // `gh pr diff | grep -q` under pipefail reads a match as "no match" once grep stops early.
+    expect(autoMerge).not.toMatch(/gh pr diff[^\n]*\|\s*grep/);
   });
 
   it('uses squash auto-merge with no third-party actions', () => {
