@@ -20,8 +20,8 @@ import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
  * through one happy path — on a brand-new clinic whose owner lands on Today.
  *
  * The rooms read the live clinozy-be, so each new clinic is seeded through the API before its
- * owner walks in (`seedClinic`: a branch open all week, an offering, a patient, a lead, a task
- * and a booking later today). Medical alone still runs on the fixture world (parked).
+ * owner walks in (`seedClinic`: a branch open all week, an offering, a patient, a lead, a task,
+ * a booking later today and a sale of a medicine in stock).
  */
 
 /**

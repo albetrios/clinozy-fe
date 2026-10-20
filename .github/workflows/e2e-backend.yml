@@ -165,6 +165,10 @@ jobs:
           timeout 120 bash -c 'until curl -sf http://localhost:5180/ >/dev/null; do sleep 2; done'
 
       - name: Run the ${{ env.SUITE }} suite (one retry)
+        env:
+          # The backend above runs with no object storage (no S3_*), so the patient-photos spec,
+          # whose photos are real uploads, skips and says why.
+          E2E_OBJECT_STORAGE: 'false'
         run: |
           if [ "$SUITE" = full ]; then
             pnpm exec playwright test --retries=1

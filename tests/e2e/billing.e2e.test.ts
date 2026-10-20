@@ -1,5 +1,6 @@
 import { expect, type Page, type PlaywrightWorkerArgs, test } from '@playwright/test';
 
+import { readAppStripeEnabled } from '@/tests/utils/e2e-app-config.ts';
 import {
   establishSessionInPage,
   navigateInApp,
@@ -33,11 +34,21 @@ async function openPlanPicker(page: Page) {
   return picker;
 }
 
-type TeamContext = { slug: string; subscribed: boolean; planCount: number };
+type TeamContext = {
+  slug: string;
+  subscribed: boolean;
+  planCount: number;
+  /** The app has a Stripe publishable key, so a subscription shows its invoices and cards. */
+  stripe: boolean;
+};
 
 /** Why a subscription spec skips: no paid plan carries a Stripe sandbox price. */
 const NO_PAID_SUBSCRIPTION =
   'no paid plan with a Stripe sandbox price — run `pnpm db:seed:stripe-catalog` in clinozy-be';
+
+/** Why an invoices / payment-methods spec skips: the panel shows them only with Stripe. */
+const NO_STRIPE_KEY =
+  'the app has no Stripe publishable key (VITE_STRIPE_PUBLISHABLE_KEY), so a subscription shows no invoices or payment methods';
 
 /**
  * Create a team org via the API, optionally subscribe it to the cheapest paid plan, then
@@ -92,7 +103,12 @@ async function setUpTeamBilling(
     if (!org.slug) throw new Error('team org slug missing');
     await navigateInApp(page, `/organization/${org.slug}`);
     await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
-    return { slug: org.slug, subscribed, planCount: plans.length };
+    return {
+      slug: org.slug,
+      subscribed,
+      planCount: plans.length,
+      stripe: await readAppStripeEnabled(page),
+    };
   } finally {
     await api.dispose();
   }
@@ -208,6 +224,7 @@ test.describe('Billing & subscription', () => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
     test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
+    test.skip(!ctx?.stripe, NO_STRIPE_KEY);
 
     await openSettingsHash(page, 'account', 'billing');
 
@@ -311,6 +328,7 @@ test.describe('Billing & subscription', () => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
     test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
+    test.skip(!ctx?.stripe, NO_STRIPE_KEY);
 
     await openSettingsHash(page, 'account', 'billing');
     await expect(page.getByTestId('billing-invoices-card')).toBeVisible({

@@ -28,9 +28,6 @@ import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
  */
 const unknownId = (prefix: string): string => `${prefix}_${'z'.repeat(21)}`;
 
-/** Matches no sale in the fixture world (Medical still runs on fixtures, parked). */
-const UNKNOWN_FIXTURE_ID = '00000000-0000-4000-8000-00000000dead';
-
 /** A cold load of a path inside the clinic — the session comes back from the refresh cookie. */
 async function coldLoad(page: Page, slug: string, path: string): Promise<void> {
   await page.goto(`/organization/${slug}/${path}`, { waitUntil: 'domcontentloaded' });
@@ -70,7 +67,7 @@ const CREATE_ROUTES = [
 /**
  * Record routes: opened from the room's list, then reloaded — the id in the URL
  * alone brings the drawer back over its room. The clinic is seeded through the
- * API (`seedClinic`), so each room has a real row; Medical's sale is a fixture's.
+ * API (`seedClinic`), so each room has a real row (Medical's is a sale of the seeded medicine).
  */
 const RECORD_ROUTES: readonly {
   room: AppRoom;
@@ -131,8 +128,8 @@ const UNKNOWN_RECORD_ROUTES = [
     record: /^Offering not found/,
   },
   {
-    id: UNKNOWN_FIXTURE_ID,
-    path: `medical/sales/${UNKNOWN_FIXTURE_ID}`,
+    id: unknownId('msal'),
+    path: `medical/sales/${unknownId('msal')}`,
     room: 'medical',
     record: /^Sale not found/,
   },
