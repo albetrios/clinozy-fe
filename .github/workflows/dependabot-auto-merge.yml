@@ -2,6 +2,11 @@
 # once a maintainer APPROVES it — the approval is the manual gate. The PR then merges
 # automatically when the required PR CI checks pass.
 #
+# A PR that changes a dependency file also runs the @smoke e2e against the backend
+# image (e2e-backend.yml). That run is not a required check (it runs on dependency
+# PRs alone, so requiring it would block every other PR), so auto-merge would not
+# wait for it: this job waits for it first and arms nothing when it fails.
+#
 # Why approval-triggered (and not a required approval): main is solo-maintained with
 # 0 required approvals (.github/rulesets/main.json) because an author can't approve
 # their own PRs. A maintainer CAN approve Dependabot's PRs, so we use that approval
@@ -21,6 +26,7 @@ on:
     types: [submitted]
 
 permissions:
+  actions: read
   contents: write
   pull-requests: write
 
@@ -35,7 +41,8 @@ jobs:
   enable-auto-merge:
     name: Enable auto-merge for approved low-risk Dependabot updates
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # The e2e job alone may take 45 minutes; the wait below sits inside this budget.
+    timeout-minutes: 60
     # RELEASE_PLEASE_TOKEN is an environment secret, so this job selects the
     # `development` environment to read it. That environment has an empty
     # protection block, so nothing is gated — which matters here because this
@@ -52,6 +59,34 @@ jobs:
         contains(github.event.pull_request.head.ref, 'npm-non-major')
       )
     steps:
+      - name: Wait for the @smoke e2e on this head
+        run: |
+          set -euo pipefail
+          # The list is read whole first: `grep -q` stopping early would hand `gh` a
+          # SIGPIPE, and pipefail would then read a match as "no match".
+          changed=$(gh pr diff "$PR_URL" --name-only)
+          if ! grep -qxE 'package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml' <<<"$changed"; then
+            echo "No dependency file changed, so no e2e runs on this PR: nothing to wait for."
+            exit 0
+          fi
+          run_id=''
+          for _ in $(seq 1 20); do
+            run_id=$(gh run list --repo "$REPOSITORY" --workflow e2e-backend.yml --commit "$HEAD_SHA" \
+              --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+            [ -n "$run_id" ] && break
+            sleep 15
+          done
+          if [ -z "$run_id" ]; then
+            echo "::error::No 'E2E against the backend image' run for $HEAD_SHA after 5 minutes; auto-merge stays off."
+            exit 1
+          fi
+          gh run watch "$run_id" --repo "$REPOSITORY" --exit-status --interval 30
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
       - name: Enable squash auto-merge
         run: gh pr merge --auto --squash "$PR_URL"
         env:
