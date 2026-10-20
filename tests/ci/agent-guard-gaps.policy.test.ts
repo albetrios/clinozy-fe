@@ -39,12 +39,23 @@ afterEach(() => {
   rmSync(turnDirectory, { recursive: true, force: true });
 });
 
+/**
+ * Runs one hook and returns its result; throws when the hook process did not run to the end. Every
+ * hook here exits 0 on every path, so a missing answer would otherwise read as "silent": clinozy-be's
+ * PR-request test failed once under heavy load (20 Oct 2026) with an empty decision and no other trace.
+ */
 function runHook(script: string, payload: unknown) {
-  return spawnSync(process.execPath, [join(HOOKS, script)], {
+  const result = spawnSync(process.execPath, [join(HOOKS, script)], {
     input: JSON.stringify(payload),
     encoding: 'utf8',
     env: { ...process.env, CLAUDE_PROJECT_DIR: REPOSITORY_ROOT, TMPDIR: turnDirectory },
   });
+  if (result.error || result.signal || result.status !== 0) {
+    throw new Error(
+      `${script} did not run to the end (status ${result.status}, signal ${result.signal}, ${result.error?.message ?? 'no spawn error'}): ${result.stderr}`,
+    );
+  }
+  return result;
 }
 
 function guardDecision(
