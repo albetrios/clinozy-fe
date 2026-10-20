@@ -97,3 +97,16 @@ describe('dependabot grouping policy', () => {
     expect(routerIgnoreBlock).toContain('version-update:semver-major');
   });
 });
+
+describe('dependabot cooldown policy', () => {
+  it('makes every ecosystem wait 7 days before proposing a new release', () => {
+    // Semgrep's dependabot-missing-cooldown (20 Oct 2026 triage): a release this new has had no
+    // time to be found broken or compromised. Cooldown never delays a security update.
+    const ecosystems = dependabotConfig.split(/^ {2}- package-ecosystem: /m).slice(1);
+    expect(ecosystems.length).toBeGreaterThan(0);
+    for (const block of ecosystems) {
+      const days = Number(/cooldown:\n\s+default-days: (\d+)/.exec(block)?.[1] ?? 0);
+      expect(days, block.split('\n')[0]).toBeGreaterThanOrEqual(7);
+    }
+  });
+});
