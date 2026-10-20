@@ -43,6 +43,7 @@ Real-time inline feedback via ESLint plugins. All rules run through the existing
 | `eslint-plugin-unused-imports`     | Dead import detection                                                                               |
 | `eslint-plugin-react-hooks`        | Rules of hooks, exhaustive deps                                                                     |
 | `eslint-plugin-react-refresh`      | Fast refresh boundary violations                                                                    |
+| `tooling/eslint/conventions-plugin.mjs` (local) | CLAUDE.md conventions no installed plugin checks: an import without its extension, a constant inline `style`, a page importing a sideways page island by a relative path (`tests/ci/eslint-conventions.policy.test.ts`) |
 
 ### Built-in Rules
 
