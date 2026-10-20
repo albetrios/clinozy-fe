@@ -84,6 +84,13 @@ export const MENTION_ONLY_GLOBS = [
   'typedoc.json',
 ];
 
+/**
+ * Policy tests that read every test file's source rather than import it — no test builds a git
+ * repository outside the throwaway-repository fixture. Nothing imports a test, so a changed test
+ * selects them; otherwise a new test's own `git init` runs inside pre-push before CI judges it.
+ */
+export const TEST_SOURCE_POLICIES = ['tests/ci/git-hook-environment.policy.test.ts'];
+
 /** Test files that run on any source change under `src/`. */
 export const ALWAYS_RUN_GLOBS = ['tests/security/**/*.test.ts'];
 
@@ -481,6 +488,20 @@ export function withoutTests({ selection, globs }) {
 const all = (reason) => ({ mode: 'all', reasons: [reason], projects: {}, why: {} });
 
 /**
+ * A changed test: itself, and each test-source policy the repository has ({@link TEST_SOURCE_POLICIES}).
+ *
+ * @param {{ changed: string, repositoryRoot: string, select: (test: string, reason: string) => void }} options
+ */
+function selectChangedTest({ changed, repositoryRoot, select }) {
+  select(changed, 'the changed test itself');
+  for (const policy of TEST_SOURCE_POLICIES) {
+    if (policy !== changed && existsSync(join(repositoryRoot, policy))) {
+      select(policy, `reads every test's source (${changed})`);
+    }
+  }
+}
+
+/**
  * Select the tests a set of changed files can affect (see the module comment for the rules). Any
  * error selects everything.
  *
@@ -530,7 +551,7 @@ function selectTestsOrThrow({
   for (const changed of changedFiles) {
     const exists = existsSync(join(repositoryRoot, changed));
     if (isTestFile(changed)) {
-      if (exists) select(changed, 'the changed test itself');
+      if (exists) selectChangedTest({ changed, repositoryRoot, select });
       continue;
     }
     if (setup.has(changed))

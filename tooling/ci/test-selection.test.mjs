@@ -11,6 +11,7 @@ import {
   changedOnly,
   SETUP_FILES,
   selectTests,
+  TEST_SOURCE_POLICIES,
   VITEST_PROJECTS,
   withoutTests,
 } from './test-selection.mjs';
@@ -130,6 +131,21 @@ describe('selectTests', () => {
     expect(selection.why['src/pages/billing/BillingPage.test.tsx']).toStrictEqual([
       'the changed test itself',
     ]);
+  });
+
+  it('runs the test-source policies with a changed test, when the repository has them', () => {
+    const root = fixture(
+      Object.fromEntries(TEST_SOURCE_POLICIES.map((policy) => [policy, 'export {};\n'])),
+    );
+    const selection = select(root, ['src/pages/billing/BillingPage.test.tsx']);
+    expect(selectedFiles(selection)).toStrictEqual(
+      ['src/pages/billing/BillingPage.test.tsx', ...TEST_SOURCE_POLICIES].sort(),
+    );
+    for (const policy of TEST_SOURCE_POLICIES) {
+      expect(selection.why[policy]).toStrictEqual([
+        "reads every test's source (src/pages/billing/BillingPage.test.tsx)",
+      ]);
+    }
   });
 
   it('runs everything for the escalation list, the setup closure and an unknown path', () => {
