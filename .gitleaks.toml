@@ -1,3 +1,15 @@
+# Gitleaks configuration — gitleaks' built-in rules plus this repository's allowlist
+# https://github.com/gitleaks/gitleaks
+#
+# `[extend] useDefault = true` loads the built-in rules: without it this file defines no rule
+# and every scan passes. The PR CI secrets job plants a key before it scans and fails when this
+# config misses it; tests/ci/secret-scan.policy.test.ts pins the block. A fixture value that
+# looks like a secret carries an inline `gitleaks:allow`; findings in old commits, which no
+# edit can mark, are listed by fingerprint in .gitleaksignore.
+
+[extend]
+useDefault = true
+
 [allowlist]
 description = "Global Allowlist"
 paths = [

@@ -99,7 +99,7 @@ See **fe-before-commit-guard** skill (`agent-os/skills/fe-before-commit-guard/SK
 | `tooling/ci/early-checks.mjs` | Guard steps 11–12 (lockfile audit, client env allowlist): a finding blocks; Semgrep at push is `tooling/ci/push-semgrep.mjs` (auth, HTTP client, CSP) |
 | `.husky/commit-msg`                       | Commit message validation hook                                                                                      |
 | `.commitlintrc.json`                      | Conventional commit config                                                                                          |
-| `.gitleaks.toml`                          | Gitleaks secret scan allowlist                                                                                      |
+| `.gitleaks.toml`                          | gitleaks' built-in rules (`[extend] useDefault = true`) + the allowlist; `.gitleaksignore` holds old-commit fingerprints only|
 | `package.json` `lint-staged`              | Defines which tools run on which file patterns                                                                      |
 | `.prettierignore`                         | Excludes vendored `agent-os/skills/**` so formatting never breaks skills-lock hashes                                |
 
