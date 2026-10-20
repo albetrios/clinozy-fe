@@ -33,7 +33,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isMain, parseCommandLine } from './script.mjs';
 
 const REGISTRY = 'https://registry.npmjs.org';
 const BULK_ENDPOINT = `${REGISTRY}/-/npm/v1/security/advisories/bulk`;
@@ -414,11 +414,11 @@ async function checkNewestReleases(advisories, accepted) {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-  const prodOnly = args.includes('--prod');
-  const level = args.includes('--level')
-    ? (args[args.indexOf('--level') + 1] ?? 'high')
-    : 'high';
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { prod: { type: 'boolean' }, level: { type: 'string' } },
+  });
+  const prodOnly = values.prod === true;
+  const level = values.level ?? 'high';
   if (!SEVERITY_RANK.has(level)) {
     console.error(`[bulk-audit] unknown --level "${level}" (low|moderate|high|critical)`);
     process.exit(1);
@@ -494,6 +494,6 @@ async function main() {
   );
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+if (isMain(import.meta.url)) {
   await main();
 }

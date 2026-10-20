@@ -18,6 +18,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { envFieldDescriptions, envSchemaKeys } from '../../src/core/config/env-schema.ts';
+import { parseCommandLine } from '../ci/script.mjs';
 
 const projectRoot = resolve(import.meta.dirname, '../..');
 const envExamplePath = resolve(projectRoot, '.env.example');
@@ -105,7 +106,9 @@ function reportAndExit(
 }
 
 function main(): void {
-  const fix = process.argv.includes('--fix');
+  const fix =
+    parseCommandLine(process.argv.slice(2), { options: { fix: { type: 'boolean' } } })
+      .values.fix === true;
   if (!existsSync(envExamplePath)) {
     console.error('[sync-env-example] .env.example not found');
     process.exit(1);

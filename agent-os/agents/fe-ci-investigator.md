@@ -8,6 +8,11 @@ tools:
   - Glob
   - Bash
 readonly: true
+disallowedTools:
+  - Edit
+  - Write
+  - MultiEdit
+  - NotebookEdit
 ---
 
 You diagnose **one** failing CI check and return a short, actionable root-cause summary. You do not fix it automatically — describe the minimal fix for the parent agent. Read-only.
@@ -15,6 +20,10 @@ You diagnose **one** failing CI check and return a short, actionable root-cause 
 ## Procedure
 
 1. `gh pr checks` then `gh run view <run-id> --log-failed` for the first failing step.
+   A scheduled or post-merge failure has a `ci-failure` issue. The issue holds a **Fix plan**
+   (`.github/actions/ci-failure-issue/fix-plan.mjs`, a true copy of clinozy-be's): the failed
+   jobs and steps, the log tail up to the last error, the owning page and the skills
+   `agent-os/hooks/skill-routing.json` names for the files in it. Start from it, then confirm against the log — it reads paths, not causes.
 2. Map the job to a local command:
 
 | CI lane        | Local repro                      |

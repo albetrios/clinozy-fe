@@ -1,6 +1,8 @@
 ---
 name: fe-pwa-manifest
 description: PWA web manifest, app icon, and install-surface sync for clinozy-fe. Use when changing manifest.webmanifest, app-icon.svg, theme_color, PWA icons, favicon, or APP_MANIFEST_* constants.
+trigger: src/core/config/app-manifest.ts, public/manifest.webmanifest, public/app-icon.svg
+triggerNote: The PWA install surface
 ---
 
 # PWA manifest and app icon (clinozy-fe)

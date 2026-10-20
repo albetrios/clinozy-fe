@@ -1,6 +1,8 @@
 ---
 name: fe-http-forms-errors
-description: Form mutations, API error mapping, and read-path error UX in clinozy-fe — mapValidationErrors + RHF, 429 RateLimitNotice, notifyError, QueryBoundary. Use when wiring forms to apiClient mutations or server-state panels.
+description: Form mutations and API error UX — mapValidationErrors with react-hook-form, RateLimitNotice, notifyError, QueryBoundary. Use when wiring a form to an apiClient mutation or a server-state panel.
+trigger: "**/forms/**"
+triggerNote: Forms, and mutation hooks touching apiClient
 ---
 
 # HTTP, forms & errors (clinozy-fe)

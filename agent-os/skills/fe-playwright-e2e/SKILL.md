@@ -1,6 +1,8 @@
 ---
 name: fe-playwright-e2e
 description: Write and refactor Playwright E2E specs using the hybrid selector strategy — data-testid for actions, getByRole/getByLabel for a11y guards. Use when adding or updating tests/e2e/*.e2e.test.ts.
+trigger: tests/e2e/**
+triggerNote: Playwright E2E (local-only; needs clinozy-be on :3000)
 ---
 
 # Playwright E2E (hybrid selectors)

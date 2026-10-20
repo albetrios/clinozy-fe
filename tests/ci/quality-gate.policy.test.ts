@@ -66,6 +66,9 @@ const MERGE_GATING_LANES = [
   'security-iac',
   'dependency-review',
   'actionlint',
+  'workflow-security',
+  'iteration-freeze',
+  'sonarqube',
 ];
 
 function qualityGateScalar(key: 'RESULTS' | 'run'): string {

@@ -1,6 +1,8 @@
 ---
 name: fe-agent-os-authoring
-description: Add, rename or remove an agent-os skill or rule without breaking the integrity gates — every registration surface in one checklist, in the order that keeps agent-os:check, triggers:strict and generate:check green. Use when creating or editing anything under agent-os/skills or agent-os/rules.
+description: Add, rename or remove an agent-os skill or rule without breaking the gates (agent-os:check, triggers:strict, generate:check). Use when editing anything under agent-os/skills or agent-os/rules.
+trigger: agent-os/rules/**
+triggerNote: Eight surfaces; regenerate the tree last
 ---
 
 # Agent-os authoring (clinozy-fe)
@@ -39,8 +41,12 @@ Plus, when the skill is part of an ordered pipeline:
 
 - `agent-os/skills/chains.json` — every `steps`/`optional` entry must reference a
   real skill directory.
-- `agent-os/docs/skill-triggers.md` — the file→skill map the hooks consult
-  (by-intent table and/or file-area table).
+- File routing — give the skill a `trigger` (comma-separated globs; quote it when it starts
+  with `*`) and a `triggerNote` in its frontmatter, or a chain a `trigger` (an upstream skill
+  routes only through a chain), then `pnpm agent-os:generate`: it writes the "By file pattern"
+  table of `agent-os/docs/skill-triggers.md` and `agent-os/hooks/skill-routing.json` (the edit
+  hook's reminders). Never edit the generated table. The by-intent table there stays
+  hand-written; add a `cases/triggers.json` case for a new file route.
 
 **A new rule** (`agent-os/rules/fe-<name>.mdc`) needs frontmatter `description` plus
 `alwaysApply: true` if it should always load; reference it from the skill it
@@ -61,14 +67,12 @@ Derived artifacts are computed from the tree, so they go **last**:
 pnpm agent-os:check              # frontmatter, names + fe- prefix, registry paths, groups, chains
 pnpm agent-os:triggers:strict    # routing cases still resolve
 pnpm agent-os:generate:check     # per-agent wiring in sync (.claude/.cursor/.codex)
-# 3. ONLY NOW regenerate the tree — new files changed it
-pnpm tool:project-structure-tree
-pnpm sync:check                  # all 9, including project-tree docs
+# 3. Last: the whole drift set
+pnpm sync:check                  # all 9, including that the project tree generates
 ```
 
-Running `sync:check` before the last file exists is how a stale
-`project-tree.txt` reaches CI. It happened twice while authoring this very
-bundle.
+`docs/reference/project-tree.txt` is generated and gitignored — write it locally with
+`pnpm tool:project-structure-tree` when you want the map; it is never committed.
 
 ## Reading gate failures
 
@@ -79,7 +83,7 @@ bundle.
 | claimed count mismatch | the `## Skill Inventory (N skills)` heading was not bumped |
 | skill not grouped / grouped twice | `groups.json` |
 | chain step references unknown skill | `chains.json` typo |
-| `project-tree.txt is out of date` | regenerate **after** the last file |
+| `project-tree.txt could not be generated` | the generator lost the repository listing (no tracked files, or `src/` / `tests/` / `docs/` missing) |
 | `skill "x" must start with "fe-"` (or agent / command / rule) | the item lacks the prefix — rename it `fe-x`; a vendored skill needs its `skills-lock.json` entry instead |
 
 A skill's frontmatter `name` must equal its folder, vendored skills included, and a

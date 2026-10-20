@@ -32,11 +32,11 @@ Granular procedures live in **skills** (invoked by name); these commands are **w
 
 **Core gates**
 
-| Command           | Purpose                                                                                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/fe-validate`    | Run `pnpm lint`, `pnpm type-check`, `pnpm validate:structure`, `pnpm validate:tokens`, `pnpm validate:testids`, `pnpm validate:theme-axis`; fix introduced issues. |
-| `/fe-ci-local`    | Run `pnpm health` (local PR gate) and map failures to `.github/workflows/pr-ci.yml` lanes.                                                                         |
-| `/fe-routes-sync` | Re-sync `routeTree.tsx`, RBAC, and `docs/reference/routes-and-ui.md` after route changes.                                                                          |
+| Command                     | Purpose                                                                                                                                                                                                                                                                                             |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/fe-validate [--affected]` | Run `pnpm lint`, `pnpm type-check`, `pnpm validate:structure`, `pnpm validate:tokens`, `pnpm validate:testids`, `pnpm validate:theme-axis`; fix introduced issues. `--affected`: `pnpm test:affected` — what `git push` will run and the tests the selection picks, each with why; changes nothing. |
+| `/fe-ci-local`              | Run `pnpm health` (local PR gate) and map failures to `.github/workflows/pr-ci.yml` lanes.                                                                                                                                                                                                          |
+| `/fe-routes-sync`           | Re-sync `routeTree.tsx`, RBAC, and `docs/reference/routes-and-ui.md` after route changes.                                                                                                                                                                                                           |
 
 **Autonomous build**
 
@@ -46,19 +46,19 @@ Granular procedures live in **skills** (invoked by name); these commands are **w
 
 **Review**
 
-| Command                | Purpose                                                                                                                                      |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/fe-pre-merge-review` | Read-only pipeline (steps from `agent-os/agents/pipelines.json`: verifier → fe-docs-auditor); one aggregated report.                         |
-| `/fe-prod-readiness`   | Read-only production-readiness sweep (fe-dependency-auditor → fe-bundle-size-reviewer → fe-perf-auditor → fe-production-hardening-reviewer). |
+| Command                          | Purpose                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/fe-pre-merge-review [release]` | Read-only pipeline (steps and their `when` from `agent-os/agents/pipelines.json`: the verifier always, fe-docs-auditor on docs changes, fe-production-hardening-reviewer and the fe-full-code-review code pass when auth, tokens, CSP or tenancy change; `release`: everything since the last release tag) — the needed reviewers at once, in the background; one report in `REVIEW.md` → Findings format. |
+| `/fe-prod-readiness`             | Read-only production-readiness sweep: fe-dependency-auditor + fe-production-hardening-reviewer at once (the hardening reviewer once per HEAD), then fe-bundle-size-reviewer → fe-perf-auditor (each builds); one report in `REVIEW.md` → Findings format.                                                                                                                                                  |
 
 **PR lifecycle**
 
 | Command               | Purpose                                                                                                                                                                               |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/fe-open-pr [title]` | Push the branch + open a PR to **`main`** (explicit PR opt-in).                                                                                                                       |
-| `/fe-watch-pr <n>`    | Triage CI + review comments until both required contexts — **`Quality gate`** + **`Checks`** — are green.                                                                             |
-| `/fe-merge-pr <n>`    | Squash-merge once CI is green.                                                                                                                                                        |
-| `/fe-ship [title]`    | Full flow: open-pr → watch-pr → merge-pr.                                                                                                                                             |
+| `/fe-watch-pr <n>`    | Triage CI + review comments until both required contexts — **`Quality gate`** + **`Checks`** — are green; then /fe-merge-pr.                                                          |
+| `/fe-merge-pr <n>`    | Turn on GitHub auto-merge (`gh pr merge --auto --squash`): GitHub merges when every required check passes; never around a red one.                                                    |
+| `/fe-ship [title]`    | Full flow: pre-merge-review (a critical or major finding stops the push) → open-pr → merge-pr (auto-merge on) → watch-pr.                                                             |
 | _Release_             | Trunk-based (single `main`): merge the standing release-please **Release PR** to ship → tag + prod deploy. See [trunk-based-workflow.md](../../docs/process/trunk-based-workflow.md). |
 
 **Maintenance**
@@ -88,8 +88,9 @@ These clinozy-be commands are **backend-specific** and intentionally omitted:
 The session-start and guardrail follow-up is implemented — see
 [`agent-os/hooks/README.md`](../hooks/README.md):
 
-- **SessionStart** (`agent-os/hooks/session-start.sh`) — verifies Node/deps, installs if needed, prints the skill-trigger map.
-- **Guardrails** — block destructive shell + secret writes; warn on protected paths
+- **SessionStart** (`agent-os/hooks/fe-session-start.mjs`) — verifies Node/deps, installs if needed, prints the skill-trigger map.
+- **Guardrails** — block destructive shell, secret writes and skipping the git hooks
+  (`--no-verify`, `git commit -n`, `HUSKY=0`); warn on protected paths
   and cross-layer imports. Claude: `PreToolUse`; Cursor: `beforeShellExecution`
   - advisory rules; Codex: AGENTS.md policy + sandbox/approvals.
 

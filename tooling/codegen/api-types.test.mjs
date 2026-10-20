@@ -1,6 +1,5 @@
-import assert from 'node:assert/strict';
+import { describe, expect, it } from 'vitest';
 import { join } from 'node:path';
-import { describe, it } from 'node:test';
 
 import {
   prepareDocument,
@@ -32,15 +31,11 @@ function documentWith(operations) {
 
 describe('api-types: resolveSource', () => {
   it('takes --source, else $CLINOZY_BE_DIR, else the sibling checkout', () => {
-    assert.match(resolveSource(['node', 'x', '--source', 'a/b.json'], {}), /a\/b\.json$/);
-    assert.equal(
-      resolveSource(['node', 'x'], { CLINOZY_BE_DIR: '/srv/be' }),
+    expect(resolveSource(['--source', 'a/b.json'], {})).toMatch(/a\/b\.json$/);
+    expect(resolveSource([], { CLINOZY_BE_DIR: '/srv/be' })).toBe(
       join('/srv/be', 'docs/openapi/openapi.json'),
     );
-    assert.match(
-      resolveSource(['node', 'x'], {}),
-      /clinozy-be\/docs\/openapi\/openapi\.json$/,
-    );
+    expect(resolveSource([], {})).toMatch(/clinozy-be\/docs\/openapi\/openapi\.json$/);
   });
 });
 
@@ -53,7 +48,7 @@ describe('api-types: stripProse', () => {
         tags: { type: 'array', items: { type: 'string', examples: ['a'] } },
       },
     });
-    assert.deepEqual(stripped, {
+    expect(stripped).toStrictEqual({
       properties: {
         id: { type: 'string' },
         tags: { type: 'array', items: { type: 'string' } },
@@ -69,7 +64,7 @@ describe('api-types: stripProse', () => {
         example: { type: 'object', properties: { description: { type: 'string' } } },
       },
     });
-    assert.deepEqual(stripped, {
+    expect(stripped).toStrictEqual({
       type: 'object',
       properties: {
         description: { type: 'string' },
@@ -91,16 +86,15 @@ describe('api-types: shareErrorResponses', () => {
       },
     });
 
-    assert.equal(shareErrorResponses(document), true);
+    expect(shareErrorResponses(document)).toBe(true);
 
     const responses = document.paths['/api/v1/app/things'].get.responses;
-    assert.deepEqual(responses[400], { $ref: '#/components/responses/ApiError' });
-    assert.deepEqual(responses[409], { $ref: '#/components/responses/ApiError' });
-    assert.deepEqual(responses[200], { description: 'ok' });
-    assert.deepEqual(
+    expect(responses[400]).toStrictEqual({ $ref: '#/components/responses/ApiError' });
+    expect(responses[409]).toStrictEqual({ $ref: '#/components/responses/ApiError' });
+    expect(responses[200]).toStrictEqual({ description: 'ok' });
+    expect(
       Object.keys(document.components.schemas.ApiErrorBody.properties.error.properties),
-      ['code', 'detail', 'reason'],
-    );
+    ).toStrictEqual(['code', 'detail', 'reason']);
   });
 
   it('leaves the document as it was when the error bodies differ', () => {
@@ -114,8 +108,8 @@ describe('api-types: shareErrorResponses', () => {
       },
     });
 
-    assert.equal(shareErrorResponses(document), false);
-    assert.equal(document.components.responses, undefined);
+    expect(shareErrorResponses(document)).toBe(false);
+    expect(document.components.responses).toBe(undefined);
   });
 });
 
@@ -144,9 +138,9 @@ describe('api-types: relaxDefaultedQueryParameters', () => {
     relaxDefaultedQueryParameters(document);
 
     const [limit, branch, path] = document.paths['/api/v1/app/things'].get.parameters;
-    assert.equal(limit.required, false);
-    assert.equal(branch.required, true);
-    assert.equal(path.required, true);
+    expect(limit.required).toBe(false);
+    expect(branch.required).toBe(true);
+    expect(path.required).toBe(true);
   });
 });
 
@@ -187,8 +181,8 @@ describe('api-types: defaulted body fields (M6)', () => {
     const schema =
       document.paths['/api/v1/app/things'].post.requestBody.content['application/json']
         .schema;
-    assert.deepEqual(schema.required, ['email']);
-    assert.deepEqual(schema.properties.phones.items.required, ['phone']);
+    expect(schema.required).toStrictEqual(['email']);
+    expect(schema.properties.phones.items.required).toStrictEqual(['phone']);
   });
 });
 
@@ -212,10 +206,10 @@ describe('api-types: prepareDocument and renderModule', () => {
 
     const prepared = prepareDocument(raw);
 
-    assert.equal(JSON.stringify(raw), before);
-    assert.equal(prepared.paths['/api/v1/app/things'].get.description, undefined);
-    assert.equal(prepared.paths['/api/v1/app/things'].get.parameters[0].required, false);
-    assert.ok(prepared.components.responses.ApiError);
+    expect(JSON.stringify(raw)).toBe(before);
+    expect(prepared.paths['/api/v1/app/things'].get.description).toBe(undefined);
+    expect(prepared.paths['/api/v1/app/things'].get.parameters[0].required).toBe(false);
+    expect(prepared.components.responses.ApiError).toBeTruthy();
   });
 
   it('heads the module, drops the empty roots and documents the others', () => {
@@ -238,12 +232,11 @@ describe('api-types: prepareDocument and renderModule', () => {
 
     const text = renderModule(generated, { info: { version: '8.0.0' } });
 
-    assert.match(text, /^\/\*\*\n \* clinozy-be's API \(OpenAPI 8\.0\.0\)/);
-    assert.doesNotMatch(text, /auto-generated by openapi-typescript/);
-    assert.doesNotMatch(text, /webhooks|\$defs/);
+    expect(text).toMatch(/^\/\*\*\n \* clinozy-be's API \(OpenAPI 8\.0\.0\)/);
+    expect(text).not.toMatch(/auto-generated by openapi-typescript/);
+    expect(text).not.toMatch(/webhooks|\$defs/);
     for (const name of ['paths', 'components', 'operations']) {
-      assert.match(
-        text,
+      expect(text).toMatch(
         new RegExp(`/\\*\\* [^\\n]+ \\*/\\nexport interface ${name} \\{`),
       );
     }

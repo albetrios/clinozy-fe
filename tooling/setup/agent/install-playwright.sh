@@ -15,10 +15,7 @@
 #     opt-in anyway (tests/e2e/global-setup.ts fails fast when it is down).
 #
 # Usage:  bash tooling/setup/agent/install-playwright.sh
-# Env:    AGENT_PLAYWRIGHT_BROWSERS  (default "chromium"; e.g. "chromium firefox webkit"
-#                                     for playwright.integration-cross-browser.config.ts)
-#         AGENT_PLAYWRIGHT_WITH_DEPS=1  also install OS deps (needs root; apt)
-#         AGENT_SKIP_PLAYWRIGHT=1       skip entirely
+# Installs Chromium only (the browser the E2E suites run); no OS deps.
 #
 # BEST-EFFORT: exits non-zero on failure; bootstrap.sh logs and carries on.
 set -uo pipefail
@@ -28,17 +25,12 @@ LOG_TAG="install-playwright"
 
 cd "${REPO_ROOT}" || exit 1
 
-if [ "${AGENT_SKIP_PLAYWRIGHT:-0}" = "1" ]; then
-  log "AGENT_SKIP_PLAYWRIGHT=1 — skipping."
-  exit 0
-fi
-
 if [ ! -d node_modules/@playwright ]; then
   log "@playwright/test is not installed yet — run pnpm install first."
   exit 1
 fi
 
-browsers="${AGENT_PLAYWRIGHT_BROWSERS:-chromium}"
+browsers="chromium"
 
 # Already provisioned? The image exports PLAYWRIGHT_BROWSERS_PATH and unpacks
 # revision-suffixed dirs (chromium-1194, firefox-1489, …) beside plain names.
@@ -61,17 +53,8 @@ log "installing:${missing} (into ${browsers_path})"
 
 # PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD only guards npm postinstall; an explicit
 # `playwright install` still downloads, which is what we want here.
-deps_flag=""
-if [ "${AGENT_PLAYWRIGHT_WITH_DEPS:-0}" = "1" ]; then
-  if [ "$(id -u)" = "0" ] || have sudo; then
-    deps_flag="--with-deps"
-  else
-    log "AGENT_PLAYWRIGHT_WITH_DEPS=1 but no root/sudo — installing browsers without OS deps."
-  fi
-fi
-
 # shellcheck disable=SC2086
-if pnpm exec playwright install ${deps_flag} ${missing} >&2; then
+if pnpm exec playwright install ${missing} >&2; then
   log "browsers installed:${missing}"
 else
   log "browser install failed — E2E will not run (needs playwright.azureedge.net / cdn.playwright.dev)."

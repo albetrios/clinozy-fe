@@ -141,7 +141,7 @@ git --version
 
 ## Step 2 — Install Node.js (24 LTS)
 
-The project pins **Node.js 24.21.0** (the latest release on the 24 Active LTS line, "Krypton") in `.nvmrc` and `.node-version`; `package.json` `engines` requires `>=24.15`.
+The project pins **Node.js 24.21.0** (the latest release on the 24 Active LTS line, "Krypton") in `.nvmrc` (the one Node pin); `package.json` `engines` requires `>=24.15`.
 
 <details>
 <summary><strong>macOS</strong></summary>
@@ -322,7 +322,7 @@ Download the Windows binary from [github.com/gitleaks/gitleaks/releases](https:/
 gitleaks version
 ```
 
-> **Note:** If Gitleaks is not installed, the pre-commit hook skips the secret scan gracefully and prints a notice. Strongly recommended but not required to run the app.
+> **Note:** The pre-commit secret scan is mandatory: without Gitleaks a commit fails and names the install command. It is not needed to run the app.
 
 ---
 

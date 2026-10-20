@@ -4,11 +4,10 @@
  * suggestion, the sibling repository and the command line. The same rules as clinozy-be's
  * `iteration.util.ts`.
  */
-import assert from 'node:assert/strict';
+import { afterEach, describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, describe, test } from 'node:test';
 import {
   brief,
   cleanScratch,
@@ -27,7 +26,6 @@ import {
   localDate,
   missingBriefSections,
   missingIntakeFiles,
-  parseCommandLine,
   parseIterationName,
   parseIterationReadme,
   prototypeScripts,
@@ -47,13 +45,13 @@ afterEach(cleanScratch);
 const readerOf = (files) => (name) => files[name];
 
 describe('names', () => {
-  test('parses launch and topic names, and nothing else', () => {
-    assert.deepEqual(parseIterationName('feat-pharmacy-returns-2026-10-06-kqzx'), {
+  it('parses launch and topic names, and nothing else', () => {
+    expect(parseIterationName('feat-pharmacy-returns-2026-10-06-kqzx')).toStrictEqual({
       type: 'feat',
       topic: 'pharmacy-returns',
       opened: '2026-10-06',
     });
-    assert.equal(parseIterationName('launch-2026-09-30-jxmr')?.topic, undefined);
+    expect(parseIterationName('launch-2026-09-30-jxmr')?.topic).toBe(undefined);
     for (const name of [
       'b-pharmacy-returns',
       'v1',
@@ -61,12 +59,12 @@ describe('names', () => {
       'feat-x-2026-10-06-KQZX',
       'release-x-2026-10-06-abcd',
     ]) {
-      assert.equal(parseIterationName(name), undefined, name);
+      expect(parseIterationName(name), name).toBe(undefined);
     }
   });
 
-  test('formats the local date', () => {
-    assert.equal(localDate(new Date(2026, 8, 5)), '2026-09-05');
+  it('formats the local date', () => {
+    expect(localDate(new Date(2026, 8, 5))).toBe('2026-09-05');
   });
 });
 
@@ -74,93 +72,82 @@ describe('README table', () => {
   const generated =
     '# x\n\n| Field | Value |\n| --- | --- |\n| Type | feat |\n| Drop placed | 2026-10-01 |\n| Schema-routes | — |\n';
 
-  test('reads generated and padded tables, labels with spaces and hyphens', () => {
+  it('reads generated and padded tables, labels with spaces and hyphens', () => {
     const padded =
       '| Field         | Value      |\n| ------------- | ---------- |\n| Type          | feat       |\n| Drop placed   | 2026-10-01 |\n| Schema-routes | —          |\n';
     for (const markdown of [generated, padded]) {
-      assert.deepEqual(
-        [...parseIterationReadme(markdown)],
-        [
-          ['Type', 'feat'],
-          ['Drop placed', '2026-10-01'],
-          ['Schema-routes', '—'],
-        ],
-      );
+      expect([...parseIterationReadme(markdown)]).toStrictEqual([
+        ['Type', 'feat'],
+        ['Drop placed', '2026-10-01'],
+        ['Schema-routes', '—'],
+      ]);
     }
   });
 
-  test('counts only two-cell rows', () => {
+  it('counts only two-cell rows', () => {
     const fields = parseIterationReadme(
       '| Summary | a | b |\n| Two2 | x |\n| Owner | Test Owner |\n',
     );
-    assert.deepEqual([...fields], [['Owner', 'Test Owner']]);
+    expect([...fields]).toStrictEqual([['Owner', 'Test Owner']]);
   });
 
-  test('sets one row and keeps every other line', () => {
+  it('sets one row and keeps every other line', () => {
     const updated = setReadmeField({
       readme: generated,
       label: 'Drop placed',
       value: '2026-10-02',
     });
-    assert.equal(
-      updated,
+    expect(updated).toBe(
       generated.replace('| Drop placed | 2026-10-01 |', '| Drop placed | 2026-10-02 |'),
     );
-    assert.throws(
-      () => setReadmeField({ readme: generated, label: 'Owner', value: 'x' }),
-      /no "\| Owner/,
-    );
-    assert.throws(
-      () => setReadmeField({ readme: generated, label: 'Type', value: 'a | b' }),
-      /cannot hold/,
-    );
+    expect(() =>
+      setReadmeField({ readme: generated, label: 'Owner', value: 'x' }),
+    ).toThrow(/no "\| Owner/);
+    expect(() =>
+      setReadmeField({ readme: generated, label: 'Type', value: 'a | b' }),
+    ).toThrow(/cannot hold/);
   });
 });
 
 describe('History', () => {
-  test('renders one line, collapsing the reason and defaulting it to —', () => {
-    assert.equal(
+  it('renders one line, collapsing the reason and defaulting it to —', () => {
+    expect(
       renderHistoryEntry({
         date: '2026-10-01',
         change: 'ready-for-approval → planning',
         reason: ' scope\n  changed ',
         owner: 'A',
       }),
-      '- 2026-10-01 · ready-for-approval → planning · scope changed · A',
-    );
-    assert.equal(
+    ).toBe('- 2026-10-01 · ready-for-approval → planning · scope changed · A');
+    expect(
       renderHistoryEntry({
         date: '2026-10-01',
         change: 'Baseline — → x',
         reason: undefined,
         owner: 'A',
       }),
-      '- 2026-10-01 · Baseline — → x · — · A',
-    );
+    ).toBe('- 2026-10-01 · Baseline — → x · — · A');
   });
 
-  test('creates the section, appends inside it, and never after a following section', () => {
+  it('creates the section, appends inside it, and never after a following section', () => {
     const table = '# x\n\n| Field | Value |\n| --- | --- |\n| Status | planning |\n';
     const first = appendHistoryEntry({ readme: table, historyEntry: '- one' });
-    assert.equal(first, `${table}\n## History\n\n- one\n`);
-    assert.equal(
-      appendHistoryEntry({ readme: first, historyEntry: '- two' }),
+    expect(first).toBe(`${table}\n## History\n\n- one\n`);
+    expect(appendHistoryEntry({ readme: first, historyEntry: '- two' })).toBe(
       `${table}\n## History\n\n- one\n- two\n`,
     );
     const withDrop = `${table}\n## History\n\n- one\n\n## Drop\n\nnotes\n`;
-    assert.equal(
-      appendHistoryEntry({ readme: withDrop, historyEntry: '- two' }),
+    expect(appendHistoryEntry({ readme: withDrop, historyEntry: '- two' })).toBe(
       `${table}\n## History\n\n- one\n- two\n\n## Drop\n\nnotes\n`,
     );
-    assert.equal(
+    expect(
       appendHistoryEntry({ readme: `${table}\n## History\n`, historyEntry: '- one' }),
-      `${table}\n## History\n\n- one\n`,
-    );
+    ).toBe(`${table}\n## History\n\n- one\n`);
   });
 });
 
 describe('validateStatusTransition', () => {
-  test('allows one step forward, and back to planning with a reason', () => {
+  it('allows one step forward, and back to planning with a reason', () => {
     const order = [
       'planning',
       'ready-for-approval',
@@ -178,63 +165,95 @@ describe('validateStatusTransition', () => {
     }
     for (const from of ['ready-for-approval', 'approved', 'implementing']) {
       validateStatusTransition({ from, to: 'planning', reason: 'scope changed' });
-      assert.throws(
-        () => validateStatusTransition({ from, to: 'planning', reason: undefined }),
-        /needs --reason/,
-      );
+      expect(() =>
+        validateStatusTransition({ from, to: 'planning', reason: undefined }),
+      ).toThrow(/needs --reason/);
     }
   });
 
-  test('refuses skips, other moves back, and anything from frozen', () => {
-    assert.throws(
-      () =>
-        validateStatusTransition({ from: 'planning', to: 'approved', reason: undefined }),
-      /allowed next status is ready-for-approval/,
-    );
-    assert.throws(
-      () => validateStatusTransition({ from: 'done', to: 'planning', reason: 'x' }),
-      /Cannot move done → planning/,
-    );
-    assert.throws(
-      () => validateStatusTransition({ from: 'frozen', to: 'planning', reason: 'x' }),
-      /never edited/,
-    );
+  it('moves a lite fix planning → implementing → done → frozen, and back only with a reason', () => {
+    for (const [from, to] of [
+      ['planning', 'implementing'],
+      ['implementing', 'done'],
+      ['done', 'frozen'],
+    ]) {
+      validateStatusTransition({ from, to, reason: undefined, process: 'lite' });
+    }
+    expect(() =>
+      validateStatusTransition({
+        from: 'planning',
+        to: 'ready-for-approval',
+        reason: undefined,
+        process: 'lite',
+      }),
+    ).toThrow(/a lite fix\)\. From planning the allowed next status is implementing/);
+    expect(() =>
+      validateStatusTransition({
+        from: 'implementing',
+        to: 'planning',
+        reason: undefined,
+        process: 'lite',
+      }),
+    ).toThrow(/needs --reason/);
+    validateStatusTransition({
+      from: 'done',
+      to: 'planning',
+      reason: 'reopened',
+      process: 'lite',
+    });
+    expect(() =>
+      validateStatusTransition({
+        from: 'planning',
+        to: 'implementing',
+        reason: undefined,
+      }),
+    ).toThrow(/allowed next status is ready-for-approval/);
+  });
+
+  it('refuses skips, other moves back, and anything from frozen', () => {
+    expect(() =>
+      validateStatusTransition({ from: 'planning', to: 'approved', reason: undefined }),
+    ).toThrow(/allowed next status is ready-for-approval/);
+    expect(() =>
+      validateStatusTransition({ from: 'done', to: 'planning', reason: 'x' }),
+    ).toThrow(/Cannot move done → planning/);
+    expect(() =>
+      validateStatusTransition({ from: 'frozen', to: 'planning', reason: 'x' }),
+    ).toThrow(/never edited/);
   });
 });
 
 describe('the required intake set', () => {
-  test('a complete drop passes with no warnings', () => {
+  it('a complete drop passes with no warnings', () => {
     const drop = completeDrop();
-    assert.deepEqual(
+    expect(
       checkIntakeSet({ names: Object.keys(drop), readText: readerOf(drop) }),
-      {
-        missing: [],
-        extras: [],
-        unlistedScreens: [],
-      },
-    );
+    ).toStrictEqual({
+      missing: [],
+      extras: [],
+      unlistedScreens: [],
+    });
   });
 
-  test('names every missing required file — a fixed file, a listed screen, a loaded script, the prototype', () => {
+  it('names every missing required file — a fixed file, a listed screen, a loaded script, the prototype', () => {
     const drop = completeDrop();
     delete drop['preset.md'];
     delete drop['beta.md'];
     delete drop['support.js'];
-    assert.deepEqual(
+    expect(
       checkIntakeSet({ names: Object.keys(drop), readText: readerOf(drop) }).missing,
-      ['beta.md', 'preset.md', 'support.js'],
-    );
+    ).toStrictEqual(['beta.md', 'preset.md', 'support.js']);
     const noPrototype = completeDrop();
     delete noPrototype['Demo.dc.html'];
-    assert.ok(
+    expect(
       checkIntakeSet({
         names: Object.keys(noPrototype),
         readText: readerOf(noPrototype),
       }).missing.includes('a prototype *.html'),
-    );
+    ).toBeTruthy();
   });
 
-  test('warns about extras and screen files _index.md does not list; optional files pass', () => {
+  it('warns about extras and screen files _index.md does not list; optional files pass', () => {
     const drop = {
       ...completeDrop(),
       'gamma.md': '# Screen: Gamma\n',
@@ -244,73 +263,67 @@ describe('the required intake set', () => {
       '_report.md': '#',
     };
     const result = checkIntakeSet({ names: Object.keys(drop), readText: readerOf(drop) });
-    assert.deepEqual(result.extras, ['notes.txt']);
-    assert.deepEqual(result.unlistedScreens, ['gamma.md']);
+    expect(result.extras).toStrictEqual(['notes.txt']);
+    expect(result.unlistedScreens).toStrictEqual(['gamma.md']);
   });
 
-  test('an optional file _index.md names becomes mandatory', () => {
+  it('an optional file _index.md names becomes mandatory', () => {
     const drop = completeDrop();
     delete drop['_patterns.md'];
     drop['_index.md'] +=
       '\nShared: `_patterns.md` · `preset.json` · see alpha.md and PRD.md\n';
-    assert.deepEqual(referencedOptionalFiles(drop['_index.md']), [
+    expect(referencedOptionalFiles(drop['_index.md'])).toStrictEqual([
       '_patterns.md',
       'preset.json',
     ]);
-    assert.deepEqual(
+    expect(
       checkIntakeSet({ names: Object.keys(drop), readText: readerOf(drop) }).missing,
-      ['_patterns.md', 'preset.json'],
-    );
+    ).toStrictEqual(['_patterns.md', 'preset.json']);
   });
 
-  test('brief mode also needs BRIEF.md; elsewhere BRIEF.md is optional', () => {
+  it('brief mode also needs BRIEF.md; elsewhere BRIEF.md is optional', () => {
     const drop = completeDrop();
-    assert.deepEqual(
+    expect(
       checkIntakeSet({
         names: Object.keys(drop),
         readText: readerOf(drop),
         mode: 'brief',
       }).missing,
-      ['BRIEF.md'],
-    );
+    ).toStrictEqual(['BRIEF.md']);
     const carried = { ...drop, 'BRIEF.md': brief() };
-    assert.deepEqual(
+    expect(
       checkIntakeSet({ names: Object.keys(carried), readText: readerOf(carried) }),
-      { missing: [], extras: [], unlistedScreens: [] },
-    );
+    ).toStrictEqual({ missing: [], extras: [], unlistedScreens: [] });
   });
 
-  test('a BRIEF.md needs every template section', () => {
-    assert.deepEqual(missingBriefSections(brief()), []);
-    assert.deepEqual(
+  it('a BRIEF.md needs every template section', () => {
+    expect(missingBriefSections(brief())).toStrictEqual([]);
+    expect(
       missingBriefSections(
         brief().replace('## Why', '## Reason').replace('## Rules\n', ''),
       ),
-      ['Why', 'Rules'],
-    );
+    ).toStrictEqual(['Why', 'Rules']);
   });
 
-  test('reads Slugs from the Slug column and local scripts from the prototype', () => {
-    assert.deepEqual(indexSlugs(completeDrop()['_index.md']), ['alpha', 'beta']);
-    assert.deepEqual(
+  it('reads Slugs from the Slug column and local scripts from the prototype', () => {
+    expect(indexSlugs(completeDrop()['_index.md'])).toStrictEqual(['alpha', 'beta']);
+    expect(
       indexSlugs('| Screen | Route |\n| --- | --- |\n| alpha | /a |\n'),
-      [],
-    );
-    assert.deepEqual(
+    ).toStrictEqual([]);
+    expect(
       prototypeScripts(
         '<script src="support.js"></script><script defer src="./lib/app.js#x"></script><script src="/abs.js"></script><script src="https://x.test/y.js"></script>',
       ),
-      ['app.js', 'support.js'],
-    );
+    ).toStrictEqual(['app.js', 'support.js']);
   });
 
-  test("reads the README's Intake mode — full when missing or unknown", () => {
-    assert.equal(recordedIntakeMode(new Map([['Intake mode', 'brief']])), 'brief');
-    assert.equal(recordedIntakeMode(new Map([['Intake mode', '—']])), 'full');
-    assert.equal(recordedIntakeMode(new Map()), 'full');
+  it("reads the README's Intake mode — full when missing or unknown", () => {
+    expect(recordedIntakeMode(new Map([['Intake mode', 'brief']]))).toBe('brief');
+    expect(recordedIntakeMode(new Map([['Intake mode', '—']]))).toBe('full');
+    expect(recordedIntakeMode(new Map())).toBe('full');
   });
 
-  test('checks an iteration folder for the mode its README records', () => {
+  it('checks an iteration folder for the mode its README records', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
@@ -324,13 +337,12 @@ describe('the required intake set', () => {
       intake: completeDrop(),
       fields: { intakeMode: 'brief', baseline: 'launch-2026-09-30-jxmr' },
     });
-    assert.deepEqual(
+    expect(
       missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
-      ['BRIEF.md'],
-    );
+    ).toStrictEqual(['BRIEF.md']);
   });
 
-  test("checks a brief that stores only BRIEF.md on its Baseline's snapshot", () => {
+  it("checks a brief that stores only BRIEF.md on its Baseline's snapshot", () => {
     const repositoryRoot = createRepository();
     const { 'shell.md': _shell, ...withoutShell } = completeDrop();
     writeIteration({
@@ -345,10 +357,9 @@ describe('the required intake set', () => {
       intake: { 'BRIEF.md': '# Brief\n' },
       fields: { intakeMode: 'brief', baseline: 'launch-2026-09-30-jxmr' },
     });
-    assert.deepEqual(
+    expect(
       missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
-      ['shell.md'],
-    );
+    ).toStrictEqual(['shell.md']);
     writeIteration({
       repositoryRoot,
       name: 'feat-returns-2026-10-06-kqzx',
@@ -356,10 +367,9 @@ describe('the required intake set', () => {
       fields: { intakeMode: 'brief', baseline: 'none' },
     });
     // From scratch the brief stands alone: BRIEF.md is the whole snapshot, nothing is missing.
-    assert.deepEqual(
+    expect(
       missingIntakeFiles({ repositoryRoot, iteration: 'feat-returns-2026-10-06-kqzx' }),
-      [],
-    );
+    ).toStrictEqual([]);
     // An overlay has no such reading: on Baseline none, what it does not store comes from nowhere.
     writeIteration({
       repositoryRoot,
@@ -367,50 +377,48 @@ describe('the required intake set', () => {
       intake: { 'PRD.md': '# PRD\n' },
       fields: { intakeMode: 'overlay', baseline: 'none' },
     });
-    assert.match(
+    expect(
       missingIntakeFiles({
         repositoryRoot,
         iteration: 'feat-returns-2026-10-06-kqzx',
       })[0],
+    ).toMatch(
       /^intake-files\/ \(feat-returns-2026-10-06-kqzx is a overlay intake with Baseline none/,
     );
   });
 
-  test('checks an iteration folder: missing intake-files/ and an incomplete drop', () => {
+  it('checks an iteration folder: missing intake-files/ and an incomplete drop', () => {
     const repositoryRoot = createRepository();
     writeIteration({ repositoryRoot, name: 'launch-2026-09-30-jxmr' });
-    assert.deepEqual(
+    expect(
       missingIntakeFiles({ repositoryRoot, iteration: 'launch-2026-09-30-jxmr' }),
-      ['intake-files/'],
-    );
+    ).toStrictEqual(['intake-files/']);
     const { 'shell.md': _shell, ...withoutShell } = completeDrop();
     writeIteration({
       repositoryRoot,
       name: 'launch-2026-09-30-jxmr',
       intake: withoutShell,
     });
-    assert.deepEqual(
+    expect(
       missingIntakeFiles({ repositoryRoot, iteration: 'launch-2026-09-30-jxmr' }),
-      ['shell.md'],
-    );
+    ).toStrictEqual(['shell.md']);
   });
 });
 
 describe('schemaRoutesHash', () => {
-  test('is the first 12 hex characters of the sha256, or — when missing', () => {
+  it('is the first 12 hex characters of the sha256, or — when missing', () => {
     const folder = scratchFolder();
     const path = join(folder, 'schema-routes.md');
     writeFileSync(path, 'routes\n');
-    assert.equal(
-      schemaRoutesHash(path),
+    expect(schemaRoutesHash(path)).toBe(
       createHash('sha256').update('routes\n').digest('hex').slice(0, 12),
     );
-    assert.equal(schemaRoutesHash(join(folder, 'missing.md')), '—');
+    expect(schemaRoutesHash(join(folder, 'missing.md'))).toBe('—');
   });
 });
 
 describe('the Intake hash', () => {
-  test('is one sha256 over every file — name, NUL, bytes, NUL — in code-unit order', () => {
+  it('is one sha256 over every file — name, NUL, bytes, NUL — in code-unit order', () => {
     const files = new Map([
       ['b.md', Buffer.from('two\n')],
       ['B.md', Buffer.from('one\n')],
@@ -423,16 +431,16 @@ describe('the Intake hash', () => {
       expected.update(files.get(name));
       expected.update('\0');
     }
-    assert.equal(snapshotFingerprint(files), expected.digest('hex').slice(0, 12));
-    assert.equal(snapshotFingerprint(new Map()), '—');
+    expect(snapshotFingerprint(files)).toBe(expected.digest('hex').slice(0, 12));
+    expect(snapshotFingerprint(new Map())).toBe('—');
   });
 
-  test('changes with any edited, added, removed or renamed file; ignores dotfiles', () => {
+  it('changes with any edited, added, removed or renamed file; ignores dotfiles', () => {
     const folder = writeDrop(join(scratchFolder(), 'intake'), completeDrop());
     const original = intakeHash(folder);
-    assert.match(original, /^[0-9a-f]{12}$/);
+    expect(original).toMatch(/^[0-9a-f]{12}$/);
     writeFileSync(join(folder, '.DS_Store'), 'x');
-    assert.equal(intakeHash(folder), original);
+    expect(intakeHash(folder)).toBe(original);
     const fingerprintOf = (change) => {
       const files = new Map(
         Object.entries(completeDrop()).map(([name, text]) => [name, Buffer.from(text)]),
@@ -440,10 +448,7 @@ describe('the Intake hash', () => {
       change(files);
       return snapshotFingerprint(files);
     };
-    assert.equal(
-      fingerprintOf(() => {}),
-      original,
-    );
+    expect(fingerprintOf(() => {})).toBe(original);
     for (const change of [
       (files) => files.set('alpha.md', Buffer.from('# Screen: Alpha!\n')),
       (files) => files.set('gamma.md', Buffer.from('')),
@@ -453,100 +458,69 @@ describe('the Intake hash', () => {
         files.delete('_patterns.md');
       },
     ]) {
-      assert.notEqual(fingerprintOf(change), original);
+      expect(fingerprintOf(change)).not.toBe(original);
     }
-    assert.equal(intakeHash(join(folder, 'missing')), '—');
+    expect(intakeHash(join(folder, 'missing'))).toBe('—');
   });
 });
 
 describe('a brief from scratch', () => {
-  test('is a brief on Baseline none — any other mode or a named Baseline is not', () => {
+  it('is a brief on Baseline none — any other mode or a named Baseline is not', () => {
     const fields = (baseline, mode) =>
       new Map([
         ['Baseline', baseline],
         ['Intake mode', mode],
       ]);
-    assert.equal(isStandaloneBrief(fields('none', 'brief')), true);
-    assert.equal(isStandaloneBrief(fields('launch-2026-09-30-jxmr', 'brief')), false);
-    assert.equal(isStandaloneBrief(fields('none', 'full')), false);
-    assert.equal(isStandaloneBrief(fields('none', 'overlay')), false);
+    expect(isStandaloneBrief(fields('none', 'brief'))).toBe(true);
+    expect(isStandaloneBrief(fields('launch-2026-09-30-jxmr', 'brief'))).toBe(false);
+    expect(isStandaloneBrief(fields('none', 'full'))).toBe(false);
+    expect(isStandaloneBrief(fields('none', 'overlay'))).toBe(false);
   });
 
-  test('needs BRIEF.md alone; anything else is reported, never required', () => {
+  it('needs BRIEF.md alone; anything else is reported, never required', () => {
     const readText = readerOf({});
-    assert.deepEqual(
+    expect(
       checkIntakeSet({ names: ['BRIEF.md'], readText, mode: 'brief', standalone: true }),
-      { missing: [], extras: [], unlistedScreens: [] },
-    );
-    assert.deepEqual(
+    ).toStrictEqual({ missing: [], extras: [], unlistedScreens: [] });
+    expect(
       checkIntakeSet({
         names: ['notes.md', 'mock.png'],
         readText,
         mode: 'brief',
         standalone: true,
       }),
-      { missing: ['BRIEF.md'], extras: ['mock.png'], unlistedScreens: ['notes.md'] },
-    );
+    ).toStrictEqual({
+      missing: ['BRIEF.md'],
+      extras: ['mock.png'],
+      unlistedScreens: ['notes.md'],
+    });
     // A brief on a named Baseline still needs the whole carried-forward set.
-    assert.ok(
+    expect(
       checkIntakeSet({ names: ['BRIEF.md'], readText, mode: 'brief' }).missing.includes(
         'PRD.md',
       ),
-    );
-  });
-});
-
-describe('parseCommandLine', () => {
-  const shape = {
-    flags: ['--both', '--check'],
-    values: ['--mode'],
-    maxPositionals: 2,
-    usage: 'expected <a> <b>.',
-  };
-
-  test('reads flags, --name value and --name=value options, and --sibling', () => {
-    const parsed = parseCommandLine(
-      ['x', '--mode', 'overlay', 'y', '--check', '--sibling', '../b'],
-      shape,
-    );
-    assert.deepEqual(parsed.positionals, ['x', 'y']);
-    assert.deepEqual([...parsed.flags], ['--check']);
-    assert.equal(parsed.values.get('--mode'), 'overlay');
-    assert.equal(parsed.siblingPath, '../b');
-    assert.equal(parsed.createInSibling, true);
-    assert.equal(parseCommandLine(['--mode=brief'], shape).values.get('--mode'), 'brief');
-  });
-
-  test('refuses a value option without its value, an unknown option and extra positionals', () => {
-    assert.throws(() => parseCommandLine(['--mode'], shape), /--mode needs a value/);
-    assert.throws(() => parseCommandLine(['--mode', '--check'], shape), /needs a value/);
-    assert.throws(() => parseCommandLine(['--mode='], shape), /needs a value/);
-    assert.throws(() => parseCommandLine(['--nope'], shape), /Unknown option "--nope"/);
-    assert.throws(() => parseCommandLine(['a', 'b', 'c'], shape), /Too many arguments/);
+    ).toBeTruthy();
   });
 });
 
 describe('sibling repository', () => {
-  test('maps -fe ↔ -be and resolves the folder next to this one', () => {
-    assert.equal(siblingPackageName('demo-fe'), 'demo-be');
-    assert.equal(siblingPackageName('demo-be'), 'demo-fe');
-    assert.throws(() => siblingPackageName('demo'), /--sibling/);
+  it('maps -fe ↔ -be and resolves the folder next to this one', () => {
+    expect(siblingPackageName('demo-fe')).toBe('demo-be');
+    expect(siblingPackageName('demo-be')).toBe('demo-fe');
+    expect(() => siblingPackageName('demo')).toThrow(/--sibling/);
 
     const repositoryRoot = createRepository();
     const siblingRoot = join(repositoryRoot, '..', 'demo-be');
     mkdirSync(siblingRoot);
     writeFileSync(join(siblingRoot, 'package.json'), '{"name":"demo-be"}');
-    assert.equal(
-      resolveSiblingRoot({ repositoryRoot, siblingPath: undefined }),
+    expect(resolveSiblingRoot({ repositoryRoot, siblingPath: undefined })).toBe(
       siblingRoot,
     );
-    assert.equal(
-      resolveSiblingRoot({ repositoryRoot, siblingPath: '../demo-be' }),
+    expect(resolveSiblingRoot({ repositoryRoot, siblingPath: '../demo-be' })).toBe(
       siblingRoot,
     );
-    assert.throws(
-      () => resolveSiblingRoot({ repositoryRoot, siblingPath: '../missing-be' }),
-      /not found/,
-    );
+    expect(() =>
+      resolveSiblingRoot({ repositoryRoot, siblingPath: '../missing-be' }),
+    ).toThrow(/not found/);
   });
 });

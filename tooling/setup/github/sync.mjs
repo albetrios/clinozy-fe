@@ -37,6 +37,7 @@ import { spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 
+import { parseCommandLine } from '../../ci/script.mjs';
 import { validateGitHubEnvironmentsDrift } from './check-environments-drift.mjs';
 import { driftResultsHaveIssues } from './environments-util.mjs';
 import { formatSyncPreviewTable } from './env-sync-plan.mjs';
@@ -64,36 +65,43 @@ function runNodeScript(scriptName, args) {
 }
 
 function parseArguments() {
-  const rawArguments = process.argv.slice(2);
+  // Strict parse: every positional must be a valid environment name, and any unknown --flag is
+  // a hard error (a typo'd flag must never silently no-op).
+  const { values, positionals } = parseCommandLine(process.argv.slice(2), {
+    options: {
+      help: { type: 'boolean', short: 'h' },
+      check: { type: 'boolean' },
+      'dry-run': { type: 'boolean' },
+      diff: { type: 'boolean' },
+      yes: { type: 'boolean', short: 'y' },
+      prune: { type: 'boolean' },
+      'keep-schema-defaults': { type: 'boolean' },
+      only: { type: 'string' },
+    },
+    maxPositionals: Number.POSITIVE_INFINITY,
+    messages: {
+      unknownOption: (option) => `Unknown argument "${option}". Use --help for options.`,
+      needsValue: () => '--only needs comma-separated KEY names.',
+    },
+  });
 
-  // `--only KEY,KEY` or `--only=KEY,KEY` — taken out before the flag/environment checks below.
+  // `--only KEY,KEY` or `--only=KEY,KEY`.
   /** @type {string[] | undefined} */
   let onlyKeys;
-  const argumentsList = [];
-  for (let index = 0; index < rawArguments.length; index += 1) {
-    const argument = rawArguments[index] ?? '';
-    if (argument === '--only' || argument.startsWith('--only=')) {
-      let value = argument.slice('--only='.length);
-      if (argument === '--only') {
-        index += 1;
-        value = rawArguments[index] ?? '';
-      }
-      onlyKeys = value
-        .split(',')
-        .map((key) => key.trim())
-        .filter(Boolean);
-      const invalid = onlyKeys.filter((key) => !/^[A-Z][A-Z0-9_]*$/.test(key));
-      if (onlyKeys.length === 0 || invalid.length > 0) {
-        throw new Error(
-          `--only needs comma-separated KEY names${invalid.length > 0 ? ` (invalid: ${invalid.join(', ')})` : ''}.`,
-        );
-      }
-      continue;
+  if (values.only !== undefined) {
+    onlyKeys = values.only
+      .split(',')
+      .map((key) => key.trim())
+      .filter(Boolean);
+    const invalid = onlyKeys.filter((key) => !/^[A-Z][A-Z0-9_]*$/.test(key));
+    if (onlyKeys.length === 0 || invalid.length > 0) {
+      throw new Error(
+        `--only needs comma-separated KEY names${invalid.length > 0 ? ` (invalid: ${invalid.join(', ')})` : ''}.`,
+      );
     }
-    argumentsList.push(argument);
   }
 
-  if (argumentsList.includes('--help') || argumentsList.includes('-h')) {
+  if (values.help === true) {
     console.log(
       'Usage: pnpm github:sync [environment...] [--check | --dry-run | --diff] [--yes] [--prune] [--keep-schema-defaults] [--only KEY,KEY]',
     );
@@ -125,32 +133,17 @@ function parseArguments() {
     process.exit(0);
   }
 
-  const readOnlyModes = ['--check', '--dry-run', '--diff'].filter((flag) =>
-    argumentsList.includes(flag),
-  );
+  const readOnlyModes = ['check', 'dry-run', 'diff']
+    .filter((flag) => values[flag] === true)
+    .map((flag) => `--${flag}`);
   if (readOnlyModes.length > 1) {
     throw new Error(
       `Use only one of --check / --dry-run / --diff (got ${readOnlyModes.join(', ')}).`,
     );
   }
 
-  // Strict parse: every non-flag token must be a valid environment name, and any
-  // unknown --flag is a hard error (a typo'd flag must never silently no-op).
-  const allowedFlags = new Set([
-    '--check',
-    '--dry-run',
-    '--diff',
-    '--yes',
-    '-y',
-    '--prune',
-    '--keep-schema-defaults',
-  ]);
   const environments = [];
-  for (const argument of argumentsList) {
-    if (allowedFlags.has(argument)) continue;
-    if (argument.startsWith('-')) {
-      throw new Error(`Unknown argument "${argument}". Use --help for options.`);
-    }
+  for (const argument of positionals) {
     if (!/^[a-z][a-z0-9-]*$/.test(argument)) {
       throw new Error(
         `Invalid environment "${argument}". Use lowercase letters, digits, dashes.`,
@@ -159,18 +152,18 @@ function parseArguments() {
     environments.push(argument);
   }
 
-  const mode = argumentsList.includes('--check')
-    ? 'check'
-    : argumentsList.includes('--dry-run')
-      ? 'dry-run'
-      : argumentsList.includes('--diff')
-        ? 'diff'
-        : 'sync';
+  const mode =
+    values.check === true
+      ? 'check'
+      : values['dry-run'] === true
+        ? 'dry-run'
+        : values.diff === true
+          ? 'diff'
+          : 'sync';
 
-  const skipConfirmation =
-    argumentsList.includes('--yes') || argumentsList.includes('-y');
-  const prune = argumentsList.includes('--prune');
-  const keepSchemaDefaults = argumentsList.includes('--keep-schema-defaults');
+  const skipConfirmation = values.yes === true;
+  const prune = values.prune === true;
+  const keepSchemaDefaults = values['keep-schema-defaults'] === true;
 
   const selectedEnvironments =
     environments.length === 0 ? getConfiguredEnvironmentNames() : environments;

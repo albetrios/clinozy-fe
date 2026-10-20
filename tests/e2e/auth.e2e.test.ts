@@ -41,14 +41,18 @@ test.describe('Authentication', () => {
     await expect(page.getByTestId('auth-email-verify-panel')).toBeVisible();
   });
 
-  test('email-code sign-in through clinozy-be reaches Today', async ({ page }) => {
-    test.skip(
-      !(await verifyDatabaseConnection()),
-      'DATABASE_URL must reach clinozy-be Postgres (auth.mail_outbox)',
-    );
-    await registerNewUserAndGoToToday(page);
-    await expect(page.getByTestId('today-page')).toBeVisible();
-  });
+  test(
+    'email-code sign-in through clinozy-be reaches Today',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      test.skip(
+        !(await verifyDatabaseConnection()),
+        'DATABASE_URL must reach clinozy-be Postgres (auth.mail_outbox)',
+      );
+      await registerNewUserAndGoToToday(page);
+      await expect(page.getByTestId('today-page')).toBeVisible();
+    },
+  );
 
   test('MFA route shows session-expired shell without token', async ({ page }) => {
     await page.goto('/mfa');

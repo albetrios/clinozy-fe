@@ -37,12 +37,17 @@ symlinks. Agents are read-only validators/investigators — for task instruction
 
 ## Conventions
 
-- Each agent is a Markdown file with frontmatter (`name`, `description`,
-  optional `model`, `tools`, `readonly`). Shape and discovery rules:
-  [`agent-os/agents/README.md`](../agents/README.md).
+- Each agent is a Markdown file with frontmatter (`name`, `description`, `model`,
+  optional `background`, `omitClaudeMd`, `tools`, `readonly`, `disallowedTools`). Shape and
+  discovery rules: [`agent-os/agents/README.md`](../agents/README.md).
+- Every agent is `model: inherit` with no `effort` (for now, since 18 Oct 2026): it runs on the
+  model and effort of the session that starts it. Per-job routing (Opus, Sonnet or Haiku by job)
+  is set aside. Report agents run in the background; the dependency, TSDoc and changelog
+  reviewers skip CLAUDE.md (`omitClaudeMd`). `check.ts` validates every field.
 - All are `readonly: true` — they investigate and report; they do not
   modify the working tree. `check.ts` enforces this: a `readonly` agent must
-  declare a `tools` allowlist that excludes every write tool.
+  declare a `tools` allowlist that excludes every write tool, and list every write tool in
+  `disallowedTools`.
 - Author once under `agent-os/agents/`; both Cursor and Claude pick them up via
   symlink.
 
@@ -51,13 +56,16 @@ symlinks. Agents are read-only validators/investigators — for task instruction
 Named sequences of these read-only agents live in
 [`agent-os/agents/pipelines.json`](../agents/pipelines.json) — the source of
 truth for what the [`/fe-pre-merge-review`](../commands/fe-pre-merge-review.md)
-command runs. The `pre-merge-review` pipeline fans out `fe-verifier` →
-`fe-docs-auditor` and aggregates one prioritized report; each step's `handoff`
+command runs. The `pre-merge-review` pipeline starts the reviewers its `when` says the diff
+needs (`fe-verifier` always, `fe-docs-auditor` on docs changes) at once, in the background, and
+aggregates one report in `REVIEW.md` → Findings format; each step's `handoff`
 names the skill that fixes its findings (`verifier → fe-test-generation`,
 `fe-docs-auditor → fe-documentation-maintenance`). The
 [`/fe-prod-readiness`](../commands/fe-prod-readiness.md) command runs the
-`prod-readiness` pipeline — `fe-dependency-auditor` → `fe-bundle-size-reviewer` →
-`fe-perf-auditor` → `fe-production-hardening-reviewer` before a release/deploy
+`prod-readiness` pipeline before a release/deploy — `fe-dependency-auditor` and
+`fe-production-hardening-reviewer` at once (the hardening reviewer runs once per HEAD, reusing a
+`/fe-pre-merge-review` report on the same HEAD), then `fe-bundle-size-reviewer` → `fe-perf-auditor`,
+which each build the app. Every report is one line per finding in `REVIEW.md` → Findings format
 (`fe-dependency-auditor → fe-dependency-management`,
 `fe-bundle-size-reviewer → fe-bundle-performance`,
 `fe-perf-auditor → fe-bundle-performance`,

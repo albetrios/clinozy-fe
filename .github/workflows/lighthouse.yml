@@ -67,3 +67,52 @@ jobs:
           path: .lighthouseci/
           include-hidden-files: true
           retention-days: 30
+
+  resolve-success:
+    name: Close ci-failure issue
+    needs: [lighthouse]
+    if: always() && needs.lighthouse.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
+      - name: Close the open ci-failure issue
+        uses: ./.github/actions/ci-failure-issue
+        with:
+          mode: close
+          title: Weekly Lighthouse budgets failing
+
+  notify-failure:
+    name: Notify failure
+    needs: [lighthouse]
+    if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read # the fix plan reads the failed jobs and their logs
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
+      - name: Open or update ci-failure issue
+        # A red scheduled run is invisible unless someone opens the Actions tab; one issue per
+        # check sends a real notification, collects repeats as comments, and closes on the next
+        # green run (the ci-failure-issue action, a true copy of clinozy-be's).
+        uses: ./.github/actions/ci-failure-issue
+        with:
+          mode: open
+          title: Weekly Lighthouse budgets failing
+          body: |
+            A Lighthouse performance budget failed on the public routes. The lighthouse-results artifact
+            holds the reports. The next green run closes this issue.

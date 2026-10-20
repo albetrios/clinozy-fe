@@ -120,21 +120,20 @@ jobs:
 
       # Branch names are repo-controlled, but pass them through env anyway —
       # never interpolate event data directly into run: scripts.
-      - name: Guard .env files
+      - name: Guard never-committed files
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref || github.base_ref || 'main' }}
         run: |
           git fetch origin "${BASE_REF}" --depth=1 2>/dev/null || true
-          # Only .env.example is committed (CLAUDE.md → Environment Variables).
-          # Every other .env* is gitignored — deploys inject env from GitHub
-          # Environments — so none (.env, .env.development, .env.production,
-          # .env.local, .env.*.backup, …) may ever reach a PR diff.
-          ENV_FILES=$(git diff --name-only "origin/${BASE_REF}...HEAD" 2>/dev/null \
-            | grep -E '^\.env(\.|$)' \
-            | grep -vE '^\.env\.example$' || true)
-          if [ -n "$ENV_FILES" ]; then
-            echo "::error::Environment files detected in PR diff: $ENV_FILES"
-            echo "Remove these from the commit. Only .env.example is committed; every other .env* is gitignored (deploys use GitHub Environments)."
+          # The gitignored files that hold secrets or machine state may never reach a PR
+          # diff: every .env* but .env.example (deploys inject env from GitHub Environments),
+          # .sentryclirc, the E2E auth-header cache and the Netlify CLI state. The one list is
+          # tooling/validate/never-committed.mjs — the before-commit guard (step 8) reads it too.
+          # The script needs no dependencies, so the runner's own Node runs it.
+          if ! FOUND=$({ git diff --name-only "origin/${BASE_REF}...HEAD" 2>/dev/null || true; } \
+            | node tooling/validate/never-committed.mjs); then
+            echo "::error::Files that must never be committed are in the PR diff: $FOUND"
+            echo "Remove them from the branch. Only .env.example is committed; every other .env*, .sentryclirc, tests/e2e/.e2e-auth-headers.json and .netlify/state.json is gitignored."
             exit 1
           fi
 

@@ -12,8 +12,8 @@
  *   CONFIG=production pnpm validate:deploy-env
  *   GITHUB_ENV_VALIDATION_SOURCE=runtime CONFIG=development node tooling/setup/github/validate-github-env.mjs
  */
-import { fileURLToPath } from 'node:url';
 
+import { isMain, parseCommandLine } from '../../ci/script.mjs';
 import { validateGitHubEnvironmentsDrift } from './check-environments-drift.mjs';
 import { driftResultsHaveIssues } from './environments-util.mjs';
 import { listGitHubEnvironmentSecretNames, requireGhAuth } from './github-shared.mjs';
@@ -75,8 +75,10 @@ function validateProtectionDrift(environment) {
 }
 
 function main() {
-  const argumentsList = process.argv.slice(2);
-  if (argumentsList.includes('--help') || argumentsList.includes('-h')) {
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { help: { type: 'boolean', short: 'h' } },
+  });
+  if (values.help === true) {
     console.log('Usage: pnpm validate:deploy-env');
     console.log('');
     console.log(
@@ -171,6 +173,6 @@ function main() {
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   main();
 }

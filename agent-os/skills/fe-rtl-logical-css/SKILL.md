@@ -1,6 +1,6 @@
 ---
 name: fe-rtl-logical-css
-description: Keep the app mirror-correct under RTL — logical Tailwind properties instead of physical ml/mr/pl/pr/left/right, rtl: variants for transform-based motion, and the validate:logical gate. Use when adding or restyling any component, or when RTL renders half-flipped.
+description: Keep the app mirror-correct under RTL — logical Tailwind properties, rtl variants for motion, the validate:logical gate. Use when adding or restyling a component, or when RTL renders half-flipped.
 ---
 
 # RTL & logical CSS (clinozy-fe)

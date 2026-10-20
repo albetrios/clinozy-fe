@@ -1,6 +1,8 @@
 ---
 name: fe-i18n-constants
-description: Extract static values into scoped constants files with react-i18next. Use when moving magic strings, test IDs, analytics events, or defaults into constants; adding user-facing copy; or setting up a new route island locale namespace.
+description: Move static values into scoped constants with react-i18next — copy, test IDs, analytics events, defaults. Use when adding user-facing copy or a route island's locale namespace.
+trigger: "**/*.constants.ts"
+triggerNote: New user-facing copy or a locale namespace
 ---
 
 # i18n + Constants

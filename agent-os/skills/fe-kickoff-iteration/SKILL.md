@@ -1,6 +1,6 @@
 ---
 name: fe-kickoff-iteration
-description: Implement an approved design iteration — confirm which approved iteration to build (Step 0), pass the intake gate (iteration:intake --check — stop on failure) and move it to implementing, then follow its KICKOFF.md ledger one row at a time — build each screen through fe-design-ditto, verify by Intake mode (side by side at 375px and 1440px per state, or the BRIEF.md acceptance criteria), write the AS-BUILT.md entry, check the impact on upcoming rows (a scope change stops for the user) and stop for review before the next row. Closes with the static design gates, the AS-BUILT summary with its Standing deviations and iteration:status done. Use when the user says "kickoff", "kickoff iteration <name>", "start implementing <iteration>". Requires README Status approved.
+description: Build an approved design iteration from its KICKOFF.md ledger, one row at a time through fe-design-ditto, verified and recorded in AS-BUILT.md. Use for kickoff or 'kickoff iteration <name>'.
 ---
 
 # Kickoff an iteration (build an approved `KICKOFF.md`, row by row)
@@ -22,7 +22,14 @@ Run `pnpm iteration:list` and show:
 
 Eligible = Status `approved` (not yet `implementing`), and Baseline `none` (from
 scratch, the default) or an iteration the user named that is `done` or `frozen` —
-a build never starts on an unbuilt Baseline. Recommend the earliest-opened eligible
+a build never starts on an unbuilt Baseline. A **lite** fix (README Process `lite`) is
+eligible in `planning` once the user gave the go on its `KICKOFF.md` (fe-iteration-planning ›
+Lite mode). **Under `--both`** (the same-named iteration exists in clinozy-be) it is eligible only
+once clinozy-be's `plans/routes-final.md` carries its `**Route review final — <date>.**` line
+under the title: every sub-domain is confirmed, so the frontend builds on final routes — without
+waiting for the backend's plan approval or build. No line yet → not eligible (Why: "route review
+not final"). If the line disappears during the build (a sub-domain reopened), stop before the next
+row that uses those routes and ask. Recommend the earliest-opened eligible
 iteration (the launch always comes first). If the user named one, check it against
 the rule. Confirm the iteration with **AskUserQuestion** — never pick silently —
 and never ask about or suggest a Baseline: it is whatever planning recorded.
@@ -35,11 +42,31 @@ pnpm iteration:intake <iteration> --check
 
 **Gate rule:** if it exits non-zero, stop now — write nothing, change no status, ask nothing
 else; print the command's output and end the turn. The intake has to be fixed (and the plan
-re-approved if it changed) before any build.
+re-approved if it changed) before any build. A lite fix with no drop placed (Drop placed `—`) has
+no intake to gate — the gate would only say "no intake yet" — so it is skipped; with a drop it runs.
 
-When it passes: `pnpm iteration:status <iteration> implementing`, and create `AS-BUILT.md` from
+When it passes: `pnpm iteration:status <iteration> implementing` (a lite fix moves there straight
+from `planning`), and create `AS-BUILT.md` from
 the skeleton below, dated today, with the Baseline's Standing deviations copied in as the starting
 list (empty for an iteration from scratch).
+
+**Offer the goal.** Show the user one `/goal` line they can set to let the build run on without a
+stop after every row (Claude Code keeps working until its condition holds). Its condition is this
+iteration's Close, named concretely:
+
+```text
+/goal iteration <iteration> is done: every KICKOFF.md ledger row done (or deferred with my OK) with
+its AS-BUILT.md row; pnpm validate:tokens, validate:theme-axis, validate:structure,
+validate:testids, type-check and lint green; the colocated tests and the full visual baseline set
+green; AS-BUILT.md Summary and Standing deviations written; Status done. Stop and ask on a scope
+change or a RED question.
+```
+
+Setting it is the user's choice — never set it yourself. Under a goal: a row ends with its
+`AS-BUILT.md` row and a one-line report instead of a stop, its `Reviewed` cell stays `—` until
+Close; a decision the plan left open is taken as the recommendation and logged in
+`plans/decisions.md` as AMBER, sourced `user /goal <date>`; a scope change or a RED question still
+stops and asks — a goal never widens the scope.
 
 ## Step 1 — Read the approved plan. Stop.
 
@@ -58,7 +85,9 @@ Follow the ledger in its order (respecting Depends on). For each row:
    motion. A foundation row runs the skill it names (`fe-theme-axis-audit` for
    the preset, the shell replacing the old design, `fe-route-island` /
    `fe-page-scaffolding` for islands, and so on).
-2. **Verify** — the row's Acceptance, by the README's Intake mode:
+2. **Verify** — the row's tests first: `pnpm test:select --run` (the tests the row's changes
+   reach, with why — `pnpm test:select --why`; a change on the escalation list runs the whole
+   suite), green before the comparison. Then the row's Acceptance, by the README's Intake mode:
    - **`full` / `overlay`** — a screen gets a **side-by-side comparison against
      the source at 375px and 1440px, per state** — the prototype open in the
      browser pane beside the app, or the md walked field by field — and the
@@ -71,7 +100,8 @@ Follow the ledger in its order (respecting Depends on). For each row:
    full baseline set; an unexpected diff on an untouched screen is a finding,
    not a baseline to bless.
 3. **Record** — add the row's `AS-BUILT.md` entry: planned · actually built ·
-   difference · why · decision link · commit. Set the ledger row's Status. Where
+   difference · why · decision link · commit — and the test run (files and result) in its
+   Actually built cell. Set the ledger row's Status. Where
    the build now differs from the design on purpose, add a **Standing
    deviation** (item · design says · built as · since iteration · decision);
    where this row resolves one, remove it.
@@ -84,7 +114,9 @@ Follow the ledger in its order (respecting Depends on). For each row:
      upcoming rows (the revised row text), and mark the KICKOFF ledger row
      `revised → AS-BUILT #n` — the only edit KICKOFF.md gets besides Status.
 5. **Stop for the user's review** — show the comparison and the entry, and wait
-   before the next row.
+   before the next row (under a `/goal`, a one-line report instead — Step 0). **This review is the row's review of record:** on the user's OK, fill the
+   row's `Reviewed` cell (date · who · the commit reviewed). A change they ask for is made,
+   verified and shown again before the cell is filled.
 
 ## Close
 
@@ -94,6 +126,13 @@ Follow the ledger in its order (respecting Depends on). For each row:
   (`fe-visual-regression`).
 - **The ledger is closed:** every row `done`, or `deferred` with the user's OK
   recorded. An open row means not done — say so and keep going.
+- **The goal's condition.** When a `/goal` was set, check each of its criteria now, one line each
+  with its evidence (the command and its result, or the file and section), before
+  `pnpm iteration:status <iteration> done`. A criterion not met is work to finish, not a note; the
+  goal is met only when every line is. The rows built under it are reviewed now (next item).
+- **The per-row reviews are the review of record.** Every `AS-BUILT.md` row has its `Reviewed`
+  cell; a row without one is reviewed now, before close. The PR's human review then covers what
+  changed after each row's reviewed commit (and the close), not the rows again.
 - **`AS-BUILT.md` › Summary:** planned but not built (deferred, user OK), built
   but not planned, follow-ups for the next iteration.
 - **`AS-BUILT.md` › Standing deviations:** the complete list of where the code
@@ -115,8 +154,8 @@ What was actually built, ledger row by ledger row, against the approved plan in
 
 ## Rows
 
-| # | Ledger row | Planned | Actually built | Difference | Why | Decision | Commit |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| # | Ledger row | Planned | Actually built | Difference | Why | Decision | Commit | Reviewed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
 ## Revisions to upcoming rows
 

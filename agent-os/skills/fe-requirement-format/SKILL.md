@@ -1,6 +1,6 @@
 ---
 name: fe-requirement-format
-description: When the user's request is vague or feature-sized, ask for requirements in the standard format; when they provide a requirement doc in that format, parse and implement fully without asking. Use the template in docs/getting-started/requirement-format.md and sample in docs/getting-started/requirements/sample-requirement.md.
+description: Ask for a vague or feature-sized request in the standard requirement format, and implement one given in that format without asking (docs/getting-started/requirement-format.md).
 ---
 
 # Requirement Format Skill

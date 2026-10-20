@@ -35,6 +35,50 @@ describe('deploy workflows policy', () => {
     );
   });
 
+  // cosign works on any plan: the production bundle and its SBOM are signed keyless, both
+  // signatures verified against this workflow before the deploy, and only the verified bytes ship.
+  it('signs the production bundle and its SBOM with cosign and deploys only verified bytes', () => {
+    const reusable = workflow('reusable-netlify-deploy.yml');
+    const steps = reusable.split('\n      - name: ');
+    const step = (title: string) => steps.find((entry) => entry.startsWith(title)) ?? '';
+    const production =
+      "if: needs.resolve-environment.outputs.environment == 'production'";
+    const sbom = step('Generate the production SBOM (CycloneDX)');
+    expect(sbom).toContain(production);
+    expect(sbom).toContain('format: cyclonedx-json');
+    expect(step('Install cosign')).toContain('sigstore/cosign-installer@');
+    const sign = step('Sign the production bundle and its SBOM (keyless)');
+    expect(sign).toContain(production);
+    expect(sign).toContain(
+      'for subject in clinozy-fe-dist.tgz clinozy-fe-sbom.cyclonedx.json',
+    );
+    expect(sign).toContain(
+      'cosign sign-blob --yes --bundle "${subject}.sigstore.json" "${subject}"',
+    );
+    const verify = step('Verify both signatures, then unpack the verified bundle');
+    expect(verify).toContain(production);
+    expect(verify).toContain('cosign verify-blob --bundle "${subject}.sigstore.json"');
+    expect(verify).toContain(
+      'SIGNER: ^${{ github.server_url }}/${{ github.repository }}/\\.github/workflows/reusable-netlify-deploy\\.yml@',
+    );
+    expect(verify).toContain(
+      '--certificate-oidc-issuer https://token.actions.githubusercontent.com',
+    );
+    expect(verify).toContain('tar -xzf clinozy-fe-dist.tgz -C dist-verified');
+    // Sign → verify → deploy, in that order, and production publishes the verified copy.
+    const order = [
+      'Sign the production bundle',
+      'Verify both signatures',
+      'Deploy to Netlify',
+    ].map((title) => reusable.indexOf(`- name: ${title}`));
+    expect(order.every((index) => index > -1)).toBe(true);
+    expect([...order].sort((a, b) => a - b)).toEqual(order);
+    expect(step('Deploy to Netlify')).toContain('DEPLOY_DIR="dist-verified"');
+    expect(step('Deploy to Netlify')).toContain('--dir="$DEPLOY_DIR"');
+    // Not gated on ARTIFACT_ATTESTATIONS: cosign needs no Enterprise plan.
+    expect(sign).not.toContain('ARTIFACT_ATTESTATIONS');
+  });
+
   // GitHub stores artifact attestations for a private repository only on Enterprise Cloud; on
   // other plans every attest step fails the job. ARTIFACT_ATTESTATIONS=disabled skips them —
   // so every attest step must honour the switch, and a disabled run must say so.

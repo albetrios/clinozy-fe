@@ -23,6 +23,11 @@ flowchart LR
   Merge --> PostMerge[Post-merge CI deploys development alias]
 ```
 
+**An iteration's PR** (`iterations/<iteration>/` in the diff) was reviewed as it was built: each
+ledger row's review is its review of record — the `Reviewed` cell of its `AS-BUILT.md` row (date ·
+who · commit). Check that every row has one, then review only what changed after each row's
+reviewed commit and the close; do not re-review a reviewed row.
+
 ---
 
 ## Severity legend
@@ -114,11 +119,11 @@ Check only what the PR touches.
 
 ### Documentation
 
-| Check              | What to look for                                                                     | Typical severity |
-| ------------------ | ------------------------------------------------------------------------------------ | ---------------- |
-| Route registration | New/changed routes reflected in `docs/reference/routes-and-ui.md` + island OVERVIEW  | Major            |
-| Index              | New `docs/**/*.md` listed in [docs/README.md](../README.md)                          | Major            |
-| Generated files    | Do not hand-edit `dist/`, `docs/reference/project-tree.txt`, version/build artifacts | Blocker          |
+| Check              | What to look for                                                                                                          | Typical severity |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| Route registration | New/changed routes reflected in `docs/reference/routes-and-ui.md` + island OVERVIEW                                       | Major            |
+| Index              | New `docs/**/*.md` listed in [docs/README.md](../README.md)                                                               | Major            |
+| Generated files    | Do not hand-edit `dist/`, version/build artifacts; never commit `docs/reference/project-tree.txt` (gitignored, generated) | Blocker          |
 
 ### Dependencies
 
@@ -182,7 +187,7 @@ Use when reviewing as a Cursor/Claude agent or via `/fe-pre-merge-review`. Read 
 
 - **fe-full-code-review** — full report across security/perf/quality when asked.
 - **fe-ci-investigator** — one failing check diagnosis.
-- **fe-code-smells-best-practices** — fix lint/idiom issues in touched files.
+- **fe-lint-guard** — fix lint, type and convention issues in touched files.
 - **fe-lint-guard** — background lint/type fixes after implementation.
 
 ---

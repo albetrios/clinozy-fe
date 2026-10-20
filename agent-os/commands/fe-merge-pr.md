@@ -1,14 +1,19 @@
 ---
-description: Merge a PR once CI is green and approvals are in
+description: Merge a PR on green — turn on GitHub's own auto-merge (squash)
 argument-hint: <pr-number>
-allowed-tools: Bash(git*), Bash(gh*)
+allowed-tools: Bash(git*), Bash(gh pr merge*), Bash(gh pr view*)
 ---
 
-Merge PR **$ARGUMENTS** safely:
+Merge PR **$ARGUMENTS** on green, through GitHub's own auto-merge:
 
-1. Confirm CI is green (both required contexts pass — **`Quality gate`** + **`Checks`**).
-2. Confirm there are no merge conflicts with **`main`** (strict-up-to-date is off, so a stale branch is fine unless it conflicts).
-3. Merge via `gh pr merge <n> --squash --delete-branch` (squash-only on `main`); the PR title becomes the squash commit.
-4. Report the merge result.
+1. Confirm there is no merge conflict with **`main`**. The branch need not be up to date — the
+   `main` ruleset does not require it (`strict` is off).
+2. Turn on auto-merge with squash: `gh pr merge --auto --squash <n>`, or the GitHub MCP
+   `enable_pr_auto_merge` (merge method `SQUASH`); the PR title becomes the squash commit. GitHub then
+   merges the moment both required contexts — **`Quality gate`** + **`Checks`** — pass and the
+   required approvals are in; it waits on its own, so there is nothing to poll. No `--delete-branch`:
+   the cloud git proxy rejects every branch delete, and the squash-merge deletes the branch anyway.
+3. Report that auto-merge is on, and the merge when the PR event arrives (/fe-watch-pr).
 
-Do not merge if any required check is failing or approvals are missing — report what is blocking instead.
+Never merge around a red or pending required check: no `--admin`, no merge API call that skips a
+gate. A check that stays red is fixed or re-run, never bypassed.

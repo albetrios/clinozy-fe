@@ -7,11 +7,18 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import {
   applyBuildEnvironment,
+  BUILD_DEFAULTS_VARIABLE,
   BUILD_ENVIRONMENT_VARIABLE,
   BUILD_ENVIRONMENTS,
 } from '../../plugins/build-environment.ts';
 import { envProfiles } from '../../src/core/config/env-schema.ts';
-import { ENVIRONMENTS } from '../../tooling/ci/build.mjs';
+import {
+  childEnvironment,
+  chooseEnvironment,
+  DEFAULTS_VARIABLE,
+  ENVIRONMENTS,
+  parseBuildArguments,
+} from '../../tooling/ci/build.mjs';
 
 const ROOT = process.cwd();
 
@@ -156,6 +163,56 @@ describe('build environment', () => {
     } finally {
       rmSync(ci, { recursive: true, force: true });
     }
+  });
+
+  // `pnpm build --defaults` builds as CI's Build verify lane does — no env file, no shell VITE_* —
+  // so the pre-push size budget measures the bundle the budget was set on.
+  it('--defaults reads no env file, even beside a .env.local', () => {
+    const processEnv: NodeJS.ProcessEnv = { [BUILD_DEFAULTS_VARIABLE]: 'true' };
+    const envDir = applyBuildEnvironment({ command: 'build', root, processEnv });
+    expect(envDir).toBe(join(root, 'tooling/test/empty-env'));
+    expect(processEnv[`${PREFIX}LOCAL_ONLY`]).toBeUndefined();
+    expect(loadEnv('production', envDir as string, PREFIX)).toEqual({});
+    expect(() =>
+      applyBuildEnvironment({
+        command: 'build',
+        root,
+        processEnv: {
+          [BUILD_DEFAULTS_VARIABLE]: 'true',
+          [BUILD_ENVIRONMENT_VARIABLE]: 'local',
+        },
+      }),
+    ).toThrow(/reads no env file/);
+  });
+
+  it('pnpm build --defaults drops shell VITE_* and never asks', async () => {
+    expect(DEFAULTS_VARIABLE).toBe(BUILD_DEFAULTS_VARIABLE);
+    expect(parseBuildArguments(['--defaults'])).toEqual({ defaults: true });
+    expect(() => parseBuildArguments(['--defaults', '--env', 'local'])).toThrow(
+      /--defaults/,
+    );
+    const child = childEnvironment({
+      defaults: true,
+      env: {
+        PATH: '/bin',
+        VITE_POSTHOG_KEY: 'shell',
+        [BUILD_ENVIRONMENT_VARIABLE]: 'local',
+      },
+    });
+    expect(child).toEqual({ PATH: '/bin', [DEFAULTS_VARIABLE]: 'true' });
+    let asked = false;
+    const chosen = await chooseEnvironment({
+      argv: ['--defaults'],
+      env: {},
+      root,
+      interactive: true,
+      ask: () => {
+        asked = true;
+        return Promise.resolve('local');
+      },
+    });
+    expect(chosen).toBeUndefined();
+    expect(asked).toBe(false);
   });
 
   it('the dev server and vite preview ignore BUILD_ENVIRONMENT', () => {

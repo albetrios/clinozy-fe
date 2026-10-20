@@ -1,7 +1,27 @@
 /**
- * Shared GitHub CLI helpers for tooling/setup/github/*.
+ * Shared helpers for tooling/setup/github/*: the GitHub CLI, and the env-registry bridge.
  */
 import { execFileSync, execSync } from 'node:child_process';
+import { resolve } from 'node:path';
+import { tryGit } from '../../ci/git-environment.mjs';
+
+const PROJECT_ROOT = resolve(import.meta.dirname, '../../..');
+/** The repository's own tsx — the one launcher for `.ts` tooling, found without pnpm on PATH. */
+const TSX = resolve(PROJECT_ROOT, 'node_modules/.bin/tsx');
+const ENV_REGISTRY = resolve(PROJECT_ROOT, 'tooling/env-registry/env-registry.ts');
+
+/**
+ * Runs the env-registry bridge (`tsx tooling/env-registry/env-registry.ts <args>`) and parses
+ * the JSON it prints — how the plain-Node GitHub tooling reads `src/core/config/env-schema.ts`.
+ *
+ * @param {readonly string[]} args
+ * @returns {Record<string, string>}
+ */
+export function envRegistryJson(args) {
+  return JSON.parse(
+    execFileSync(TSX, [ENV_REGISTRY, ...args], { encoding: 'utf-8', timeout: 30_000 }),
+  );
+}
 
 export class GitHubApiError extends Error {
   /**
@@ -15,21 +35,14 @@ export class GitHubApiError extends Error {
 }
 
 export function repositoryFromGitRemote() {
-  try {
-    const remoteUrl = execSync('git remote get-url origin', {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-      timeout: 5_000,
-    }).trim();
+  const remote = tryGit(['remote', 'get-url', 'origin']);
+  if (!remote.ok) return undefined;
 
-    const sshMatch = remoteUrl.match(/git@github\.com:([^/]+\/[^/.]+?)(?:\.git)?$/);
-    if (sshMatch?.[1]) return sshMatch[1];
+  const sshMatch = remote.output.match(/git@github\.com:([^/]+\/[^/.]+?)(?:\.git)?$/);
+  if (sshMatch?.[1]) return sshMatch[1];
 
-    const httpsMatch = remoteUrl.match(/github\.com\/([^/]+\/[^/.]+?)(?:\.git)?$/);
-    if (httpsMatch?.[1]) return httpsMatch[1];
-  } catch {
-    // fall through
-  }
+  const httpsMatch = remote.output.match(/github\.com\/([^/]+\/[^/.]+?)(?:\.git)?$/);
+  if (httpsMatch?.[1]) return httpsMatch[1];
   return undefined;
 }
 

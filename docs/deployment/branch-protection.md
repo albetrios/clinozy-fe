@@ -62,10 +62,29 @@ organization's plan; by hand:
 `gh variable set ARTIFACT_ATTESTATIONS --body disabled --repo albetrios/clinozy-fe`.
 Delete the variable after upgrading the plan.
 
+**cosign signatures** work on any plan. A production deploy
+([reusable-netlify-deploy.yml](../../.github/workflows/reusable-netlify-deploy.yml)) signs the
+bundle (`clinozy-fe-dist.tgz`) and its CycloneDX SBOM keyless with `cosign sign-blob`, verifies
+both with `cosign verify-blob` against that workflow and the GitHub OIDC issuer, and publishes only
+the verified bytes (unpacked from the signed tarball). The four files are kept 90 days as the
+`production-signatures` artifact, for verifying a release later with the same command. Keyless
+signing writes the repository name to the public Sigstore log; once the repository is private, sign
+with a key from GitHub secrets instead.
+
+**Unit shards.** The unit suite runs in `VITEST_SHARDS` shards (repository variable, default `4`)
+whose coverage is merged before the ratchet thresholds are checked, in
+[reusable-vitest-unit-only.yml](../../.github/workflows/reusable-vitest-unit-only.yml). Four suits
+the public repository's 4-vCPU runners; set `6` once the repository is private and its runners
+have 2 vCPUs: `gh variable set VITEST_SHARDS --body 6`. Each shard restores the main-branch Vitest
+cache that [scheduled-unit-nightly.yml](../../.github/workflows/scheduled-unit-nightly.yml) saves.
+
 ### Skipped PR CI jobs on docs-only pull requests
 
 When path filters detect **docs-only markdown** (`docs-only-md`), most PR CI jobs are
-**skipped**. Skipped required checks do **not** block merge.
+**skipped**. Skipped required checks do **not** block merge. A PR is docs-only only when **every**
+changed file is Markdown or under `docs/` (a second `paths-filter` step with
+`predicate-quantifier: every`): a root config such as `knip.jsonc` next to a README runs Knip and
+Build. Pinned by `tests/ci/pr-ci-docs-only.policy.test.ts`.
 
 ---
 

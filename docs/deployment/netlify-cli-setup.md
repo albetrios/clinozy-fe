@@ -86,7 +86,7 @@ After this, **you don't need to run anything**: push to `main` → Netlify build
 | 3    | Env + deploy                          | The two commands in §3 (CLI)                                                                                        |
 | 4    | Push = deploy                         | Link repo once in Netlify UI (Build & deploy → Link repository). After that, pushes to `main` deploy automatically. |
 
-**GitHub secrets:** For CI/CD deploy, add `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID` in GitHub → Settings → Secrets and variables → Actions. Run **`pnpm github:sync`** to push them from the gitignored `.env.<environment>`. See [cicd-and-netlify.md](cicd-and-netlify.md).
+**GitHub secrets:** For CI/CD deploy, add `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID` in GitHub → Settings → Secrets and variables → Actions. Run **`pnpm github:sync`** to push them from the gitignored `.env.<environment>`. See [cicd-and-netlify.md](cicd-and-netlify.md).
 
 **New env var:** Follow **`agent-os/skills/fe-env-schema-add/SKILL.md`**. Add the key to `src/core/config/env-schema.ts` and **`.env.example`**, then run `pnpm tool:sync-env-example`. Set values in GitHub Secrets/Variables via `pnpm github:sync`.
 

@@ -4,8 +4,7 @@
  * enums, routes and operations), the refusal when either side has no `intake-files/`, and the
  * missing-Baseline prompt. The same JSON shape as clinozy-be's.
  */
-import assert from 'node:assert/strict';
-import { afterEach, describe, test } from 'node:test';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   cleanScratch,
   completeDrop,
@@ -46,33 +45,32 @@ const CHANGED_SCHEMA_ROUTES = SCHEMA_ROUTES.replace(
   );
 
 describe('parseSchemaRoutes', () => {
-  test('reads routes, entity fields, enum values and screen operations', () => {
+  it('reads routes, entity fields, enum values and screen operations', () => {
     const model = parseSchemaRoutes(SCHEMA_ROUTES);
-    assert.deepEqual([...model.routes.keys()], ['/alpha', '/beta']);
-    assert.deepEqual([...model.entities.keys()], ['Patient', 'Note']);
-    assert.deepEqual([...model.entities.get('Patient').keys()], ['id', 'name']);
-    assert.deepEqual([...model.enums.get('gender').keys()], ['female', 'male']);
-    assert.deepEqual([...model.operations.keys()], ['Alpha › listPatients']);
+    expect([...model.routes.keys()]).toStrictEqual(['/alpha', '/beta']);
+    expect([...model.entities.keys()]).toStrictEqual(['Patient', 'Note']);
+    expect([...model.entities.get('Patient').keys()]).toStrictEqual(['id', 'name']);
+    expect([...model.enums.get('gender').keys()]).toStrictEqual(['female', 'male']);
+    expect([...model.operations.keys()]).toStrictEqual(['Alpha › listPatients']);
   });
 
-  test('compares two files', () => {
-    assert.deepEqual(
+  it('compares two files', () => {
+    expect(
       compareSchemaRoutes({
         before: parseSchemaRoutes(SCHEMA_ROUTES),
         after: parseSchemaRoutes(CHANGED_SCHEMA_ROUTES),
       }),
-      {
-        entities: { added: ['Invoice'], removed: ['Note'], changed: ['Patient'] },
-        fields: { added: ['Patient.dob'], removed: [], changed: ['Patient.name'] },
-        enums: { added: [], removed: [], changed: ['gender'] },
-        routes: { added: ['/gamma'], removed: ['/beta'], changed: ['/alpha'] },
-        operations: {
-          added: ['Alpha › createPatient'],
-          removed: [],
-          changed: ['Alpha › listPatients'],
-        },
+    ).toStrictEqual({
+      entities: { added: ['Invoice'], removed: ['Note'], changed: ['Patient'] },
+      fields: { added: ['Patient.dob'], removed: [], changed: ['Patient.name'] },
+      enums: { added: [], removed: [], changed: ['gender'] },
+      routes: { added: ['/gamma'], removed: ['/beta'], changed: ['/alpha'] },
+      operations: {
+        added: ['Alpha › createPatient'],
+        removed: [],
+        changed: ['Alpha › listPatients'],
       },
-    );
+    });
   });
 });
 
@@ -104,36 +102,36 @@ describe('summarizeIntakeDiff', () => {
     return repositoryRoot;
   }
 
-  test('names the files, screens, PRD, schema-routes and prototype changes', () => {
+  it('names the files, screens, PRD, schema-routes and prototype changes', () => {
     const summary = summarizeIntakeDiff({
       repositoryRoot: twoDrops(),
       baseline: BASELINE,
       current: CURRENT,
     });
-    assert.deepEqual(summary.files, {
+    expect(summary.files).toStrictEqual({
       added: ['gamma.md'],
       removed: ['beta.md'],
       changed: ['_index.md', 'alpha.md', 'schema-routes.md', 'support.js'],
     });
-    assert.deepEqual(summary.screens, {
+    expect(summary.screens).toStrictEqual({
       added: ['gamma'],
       removed: ['beta'],
       changed: ['alpha'],
     });
-    assert.equal(summary.prdChanged, false);
-    assert.equal(summary.schemaRoutesChanged, true);
-    assert.equal(summary.prototypeChanged, true);
-    assert.deepEqual(summary.schemaRoutes.routes, {
+    expect(summary.prdChanged).toBe(false);
+    expect(summary.schemaRoutesChanged).toBe(true);
+    expect(summary.prototypeChanged).toBe(true);
+    expect(summary.schemaRoutes.routes).toStrictEqual({
       added: ['/gamma'],
       removed: ['/beta'],
       changed: ['/alpha'],
     });
   });
 
-  test('--json prints the summary; the text form adds the raw git diff', () => {
+  it('--json prints the summary; the text form adds the raw git diff', () => {
     const repositoryRoot = twoDrops();
     const json = runDiff([BASELINE, CURRENT, '--json'], { repositoryRoot });
-    assert.deepEqual(Object.keys(JSON.parse(json.lines[0])), [
+    expect(Object.keys(JSON.parse(json.lines[0]))).toStrictEqual([
       'baseline',
       'current',
       'files',
@@ -144,11 +142,11 @@ describe('summarizeIntakeDiff', () => {
       'schemaRoutes',
     ]);
     const text = runDiff([BASELINE, CURRENT], { repositoryRoot }).lines.join('\n');
-    assert.match(text, /Screens \(via _index\.md\):\n {2}\+ added {3}\(1\): gamma/);
-    assert.match(text, /── git diff --no-index ──\ndiff --git/);
+    expect(text).toMatch(/Screens \(via _index\.md\):\n {2}\+ added {3}\(1\): gamma/);
+    expect(text).toMatch(/── git diff --no-index ──\ndiff --git/);
   });
 
-  test('compares a brief that stores only BRIEF.md as its resolved snapshot, paths as in the repository', () => {
+  it('compares a brief that stores only BRIEF.md as its resolved snapshot, paths as in the repository', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
@@ -171,31 +169,33 @@ describe('summarizeIntakeDiff', () => {
       baseline: BASELINE,
       current: CURRENT,
     });
-    assert.deepEqual(summary.files, { added: ['BRIEF.md'], removed: [], changed: [] });
-    assert.equal(summary.schemaRoutesChanged, false);
+    expect(summary.files).toStrictEqual({
+      added: ['BRIEF.md'],
+      removed: [],
+      changed: [],
+    });
+    expect(summary.schemaRoutesChanged).toBe(false);
     const text = runDiff([BASELINE, CURRENT], { repositoryRoot }).lines.join('\n');
-    assert.match(
-      text,
+    expect(text).toMatch(
       new RegExp(
         `diff --git a/iterations/${CURRENT}/intake-files/BRIEF\\.md b/iterations/${CURRENT}/intake-files/BRIEF\\.md\nnew file mode`,
       ),
     );
-    assert.doesNotMatch(text, /deleted file mode/);
+    expect(text).not.toMatch(/deleted file mode/);
   });
 
-  test('refuses an iteration without intake-files/ — the delta is a diff of intake-files/ only', () => {
+  it('refuses an iteration without intake-files/ — the delta is a diff of intake-files/ only', () => {
     const repositoryRoot = createRepository();
     writeIteration({ repositoryRoot, name: BASELINE, fields: { status: 'done' } });
     writeIteration({ repositoryRoot, name: CURRENT, intake: completeDrop() });
-    assert.throws(
-      () => summarizeIntakeDiff({ repositoryRoot, baseline: BASELINE, current: CURRENT }),
-      new RegExp(`${BASELINE} has no intake-files/`),
-    );
+    expect(() =>
+      summarizeIntakeDiff({ repositoryRoot, baseline: BASELINE, current: CURRENT }),
+    ).toThrow(new RegExp(`${BASELINE} has no intake-files/`));
   });
 });
 
 describe('without a Baseline', () => {
-  test('names the Baseline the user recorded, or says the iteration starts from scratch — never suggests one — and exits 2', () => {
+  it('names the Baseline the user recorded, or says the iteration starts from scratch — never suggests one — and exits 2', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
@@ -211,13 +211,12 @@ describe('without a Baseline', () => {
       intake: completeDrop(),
     });
     const scratch = runDiff([CURRENT], { repositoryRoot });
-    assert.equal(scratch.exitCode, 2);
-    assert.match(
-      scratch.lines[0],
+    expect(scratch.exitCode).toBe(2);
+    expect(scratch.lines[0]).toMatch(
       /starts from scratch \(Baseline none\), so there is nothing to compare/,
     );
-    assert.doesNotMatch(scratch.lines[0], /Suggested/);
-    assert.doesNotMatch(scratch.lines[0], new RegExp(BASELINE));
+    expect(scratch.lines[0]).not.toMatch(/Suggested/);
+    expect(scratch.lines[0]).not.toMatch(new RegExp(BASELINE));
 
     writeIteration({
       repositoryRoot,
@@ -226,31 +225,29 @@ describe('without a Baseline', () => {
       intake: completeDrop(),
     });
     const recorded = runDiff([CURRENT], { repositoryRoot });
-    assert.equal(recorded.exitCode, 2);
-    assert.match(
-      recorded.lines[0],
+    expect(recorded.exitCode).toBe(2);
+    expect(recorded.lines[0]).toMatch(
       new RegExp(`Recorded in ${CURRENT}/README.md: ${BASELINE}`),
     );
-    assert.match(
-      recorded.lines[0],
+    expect(recorded.lines[0]).toMatch(
       new RegExp(`Re-run: pnpm iteration:diff ${BASELINE} ${CURRENT}`),
     );
   });
 
-  test('reads [<baseline>] <current> [--json]', () => {
-    assert.deepEqual(parseDiffArguments([CURRENT]), {
+  it('reads [<baseline>] <current> [--json]', () => {
+    expect(parseDiffArguments([CURRENT])).toStrictEqual({
       baseline: undefined,
       current: CURRENT,
       json: false,
       help: false,
     });
-    assert.deepEqual(parseDiffArguments([BASELINE, CURRENT, '--json']), {
+    expect(parseDiffArguments([BASELINE, CURRENT, '--json'])).toStrictEqual({
       baseline: BASELINE,
       current: CURRENT,
       json: true,
       help: false,
     });
-    assert.throws(() => parseDiffArguments(['a', 'b', 'c']), /Too many arguments/);
-    assert.throws(() => parseDiffArguments(['--stat']), /Unknown option/);
+    expect(() => parseDiffArguments(['a', 'b', 'c'])).toThrow(/Too many arguments/);
+    expect(() => parseDiffArguments(['--stat'])).toThrow(/Unknown option/);
   });
 });

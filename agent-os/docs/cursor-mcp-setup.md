@@ -11,15 +11,15 @@ flowchart LR
     M[.mcp.json]
   end
   subgraph mcps["clinozy-fe MCP servers"]
-    C7[context7]
+    C7[fe-context7]
     S[shadcn]
     T[tailwindcss]
     BE[clinozy-be-api]
-    SG[semgrep]
-    SQ[sonarqube]
+    SG[fe-semgrep]
+    SQ[fe-sonarqube]
     CD[chrome-devtools]
-    CG[codegraph]
-    HR[headroom]
+    CG[fe-codegraph]
+    HR[fe-headroom]
   end
   C --> M
   M --> mcps
@@ -36,29 +36,34 @@ real, gitignored config is `.mcp.json` (the `.mcp.json` and
 
 | MCP                 | Why it's here (frontend)                                                                                                                                                                                        | How it runs                                  |
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| **context7**        | Up-to-date library docs (React, Vite, TanStack Query, Zod, …).                                                                                                                                                  | devDep · `pnpm exec` · API key               |
+| **fe-context7**     | Up-to-date library docs (React, Vite, TanStack Query, Zod, …).                                                                                                                                                  | devDep · `pnpm exec` · API key               |
 | **shadcn**          | Browse + add shadcn/ui components via CLI.                                                                                                                                                                      | devDep · `pnpm exec`                         |
 | **tailwindcss**     | Tailwind utilities, colors, docs, CSS-to-Tailwind conversion.                                                                                                                                                   | devDep · `pnpm exec`                         |
 | **clinozy-be-api**  | Discover the backend API this UI consumes (`call_api`) — the only                                                                                                                                               | hosted URL · backend on `:3000`              |
 |                     | cross-service link, and only when you opt to run the backend.                                                                                                                                                   |                                              |
-| **semgrep**         | Static security scanning (mirrors the CI semgrep lane) — the `semgrep mcp` server built into the CLI (the old `semgrep-mcp` package is deprecated).                                                             | `uvx --from semgrep` (ephemeral, needs `uv`) |
-| **sonarqube**       | Local code-quality gate (mirrors the pre-push SonarQube scan). `tooling/dev/sonarqube-mcp.mjs` passes `SONAR_TOKEN` / `SONAR_HOST_URL` from `.env.local` (mint once with `pnpm sonar:scan`) into the container. | `docker` · `.env.local` token                |
+| **fe-semgrep**      | Static security scanning (mirrors the CI semgrep lane) — the `semgrep mcp` server built into the CLI (the old `semgrep-mcp` package is deprecated).                                                             | `uvx --from semgrep` (ephemeral, needs `uv`) |
+| **fe-sonarqube**    | Local code-quality gate (mirrors the pre-push SonarQube scan). `tooling/dev/sonarqube-mcp.mjs` passes `SONAR_TOKEN` / `SONAR_HOST_URL` from `.env.local` (mint once with `pnpm sonar:scan`) into the container. | `docker` · `.env.local` token                |
 | **chrome-devtools** | Live-browser perf traces (LCP/CLS insights), network + console inspection, CPU/network throttling.                                                                                                              | devDep · Playwright Chromium                 |
-| **codegraph**       | Code-graph navigation across this repo.                                                                                                                                                                         | devDep · `pnpm exec`                         |
-| **headroom**        | Context compression for long sessions.                                                                                                                                                                          | `uvx` (ephemeral, needs `uv`)                |
+| **fe-codegraph**    | Code-graph navigation across this repo.                                                                                                                                                                         | devDep · `pnpm exec`                         |
+| **fe-headroom**     | Context compression for long sessions.                                                                                                                                                                          | `uvx` (ephemeral, needs `uv`)                |
+
+> **Names.** The five servers clinozy-be declares too (`codegraph`, `context7`, `headroom`,
+> `semgrep`, `sonarqube`, each launched differently there) carry the `fe-` prefix, so a client
+> that loads both repositories never runs one repository's server for the other.
+> `pnpm mcp:setup` renames them in an existing `.mcp.json`, keeping each definition.
 
 > This list is intentionally frontend-shaped — no database / cache / email /
 > deploy-platform servers (those belong to the backend). Add or remove servers in
 > `.mcp.json` freely; it is yours.
 >
 > **Project-local, container-safe, zero global installs.** The five CLI servers
-> (`context7`, `shadcn`, `tailwindcss`, `codegraph`, `chrome-devtools`) are
+> (`fe-context7`, `shadcn`, `tailwindcss`, `fe-codegraph`, `chrome-devtools`) are
 > **`devDependencies`**, invoked via `pnpm exec` — `pnpm install` provides them in
 > any fresh container, pinned, with nothing on the global PATH.
-> `semgrep`/`headroom` run via `uvx` and `sonarqube` via `docker` (ephemeral, not
+> `fe-semgrep`/`fe-headroom` run via `uvx` and `fe-sonarqube` via `docker` (ephemeral, not
 > global — the container's base image needs `uv` / `docker` for those three).
 > `clinozy-be-api` is a hosted URL and only resolves when you run the backend
-> locally. `sonarqube` reads its env vars from your shell. `chrome-devtools`
+> locally. `fe-sonarqube` reads its env vars from your shell. `chrome-devtools`
 > launches through `tooling/dev/chrome-devtools-mcp.mjs`, which points it at the
 > Playwright-managed Chromium (no system Chrome needed — works on Linux cloud VMs;
 > one-time `pnpm exec playwright install --with-deps chromium`, headless by
@@ -81,7 +86,7 @@ Then set `CONTEXT7_API_KEY` in `.env.local` (from [context7.com/dashboard](https
 | Command                  | What it scaffolds                                                        |
 | ------------------------ | ------------------------------------------------------------------------ |
 | `pnpm setup:local`       | deps + `.env.local` + CodeGraph index + **all** MCP servers + `pnpm dev` |
-| `pnpm mcp:setup:default` | codegraph + headroom only (subset)                                       |
+| `pnpm mcp:setup:default` | fe-codegraph + fe-headroom only (subset)                                 |
 | `pnpm mcp:setup`         | full set from `.mcp.example.json` (non-destructive merge)                |
 | `pnpm mcp:setup --list`  | template servers + declared status                                       |
 

@@ -147,3 +147,40 @@ persist_path() {
   # shellcheck disable=SC2016
   printf 'export PATH=%s:$PATH\n' "${dir}" >>"${CLAUDE_ENV_FILE}"
 }
+
+# pinned_version KEY — the KEY's value: an environment variable of that name wins (a trial on a
+# separate cloud environment), else the line in tool-versions.sh. Empty when neither.
+pinned_version() {
+  local key="$1"
+  if [ -n "${!key:-}" ]; then
+    printf '%s' "${!key}"
+    return 0
+  fi
+  sed -n "s/^${key}=//p" "${AGENT_SETUP_DIR}/tool-versions.sh" | head -n 1
+}
+
+# file_sha256 FILE — the file's SHA-256 (GNU sha256sum, or shasum on macOS).
+file_sha256() {
+  if have sha256sum; then
+    sha256sum "$1" | cut -d' ' -f1
+  else
+    shasum -a 256 "$1" | cut -d' ' -f1
+  fi
+}
+
+# download_verified URL OUT EXPECTED_SHA256 — downloads URL to OUT and succeeds only when its
+# SHA-256 equals EXPECTED_SHA256; a mismatch, or no pinned checksum, deletes the file and fails.
+download_verified() {
+  local url="$1" out="$2" expected="$3" actual
+  if [ -z "${expected}" ]; then
+    log "no pinned SHA-256 for ${url} — refusing to install an unverified binary."
+    return 1
+  fi
+  fetch "${url}" "${out}" || return 1
+  actual="$(file_sha256 "${out}")"
+  if [ "${actual}" != "${expected}" ]; then
+    rm -f "${out}"
+    log "SHA-256 mismatch for ${url} (pinned ${expected}, got ${actual}) — refusing to install."
+    return 1
+  fi
+}

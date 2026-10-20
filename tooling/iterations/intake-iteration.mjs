@@ -34,7 +34,6 @@
  * resolved snapshot and its Intake hash do not change, so it works at any Status and never writes
  * the README. The model: iterations/README.md.
  */
-import { spawnSync } from 'node:child_process';
 import {
   copyFileSync,
   existsSync,
@@ -47,14 +46,14 @@ import {
 } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { tryGit } from '../ci/git-environment.mjs';
+import { isMain, parseCommandLine } from '../ci/script.mjs';
 import {
   BRIEF_FILE,
   checkIntakeSet,
   DEFAULT_INTAKE_MODE,
   EMPTY_FIELD,
   flatFileNames,
-  gitEnvironment,
   INTAKE_DIRECTORY,
   INTAKE_MODES,
   intakeFolder,
@@ -65,8 +64,8 @@ import {
   isStandaloneBrief,
   missingBriefSections,
   NO_BASELINE,
-  parseCommandLine,
   parseIterationName,
+  OPTIONAL_README_FIELDS,
   README_FIELD_LABELS,
   readIterationReadme,
   readResolvedSnapshot,
@@ -75,8 +74,9 @@ import {
   resolveSiblingRoot,
   schemaRoutesHash,
   setReadmeField,
+  SIBLING_MESSAGES,
+  SIBLING_OPTIONS,
   snapshotFingerprint,
-  tryGit,
 } from './iterations.mjs';
 
 /** Files `--both` sends to the sibling repository's same-named iteration (plus `BRIEF.md` in brief mode). */
@@ -121,31 +121,40 @@ const USAGE = `Usage:
  *   without `--check`
  */
 export function parseIntakeArguments(commandLine) {
-  const parsed = parseCommandLine(commandLine, {
-    flags: ['--both', '--replace', '--dry-run', '--check', '--compact'],
-    values: ['--mode', '--baseline'],
+  const { values, positionals } = parseCommandLine(commandLine, {
+    options: {
+      ...SIBLING_OPTIONS,
+      replace: { type: 'boolean' },
+      'dry-run': { type: 'boolean' },
+      check: { type: 'boolean' },
+      compact: { type: 'boolean' },
+      mode: { type: 'string' },
+      baseline: { type: 'string' },
+      help: { type: 'boolean', short: 'h' },
+    },
     maxPositionals: 2,
     usage: 'expected <iteration> <source>, <iteration> --check or <iteration> --compact.',
+    messages: SIBLING_MESSAGES,
   });
-  const mode = parsed.values.get('--mode') ?? DEFAULT_INTAKE_MODE;
+  const mode = values.mode ?? DEFAULT_INTAKE_MODE;
   if (!INTAKE_MODES.includes(mode))
     throw new Error(`Unknown --mode "${mode}" — use ${INTAKE_MODES.join(', ')}.`);
   const options = {
-    iteration: parsed.positionals[0],
-    source: parsed.positionals[1],
+    iteration: positionals[0],
+    source: positionals[1],
     mode,
-    check: parsed.flags.has('--check'),
-    compact: parsed.flags.has('--compact'),
-    baseline: parsed.values.get('--baseline'),
-    createInSibling: parsed.createInSibling,
-    siblingPath: parsed.siblingPath,
-    replace: parsed.flags.has('--replace'),
-    dryRun: parsed.flags.has('--dry-run'),
-    help: parsed.help,
+    check: values.check === true,
+    compact: values.compact === true,
+    baseline: values.baseline,
+    createInSibling: values.both === true || values.sibling !== undefined,
+    siblingPath: values.sibling,
+    replace: values.replace === true,
+    dryRun: values['dry-run'] === true,
+    help: values.help === true,
   };
   const intakeOptions =
     options.source !== undefined ||
-    parsed.values.has('--mode') ||
+    values.mode !== undefined ||
     options.createInSibling ||
     options.replace ||
     options.dryRun;
@@ -153,7 +162,7 @@ export function parseIntakeArguments(commandLine) {
     throw new Error('--check takes only <iteration> [--baseline <iteration>].');
   const placeOptions =
     options.source !== undefined ||
-    parsed.values.has('--mode') ||
+    values.mode !== undefined ||
     options.createInSibling ||
     options.replace;
   if (options.compact && (options.check || placeOptions))
@@ -186,11 +195,8 @@ export function displaySourcePath({ repositoryRoot, source }) {
  * @param {{ before: string, after: string }} files
  */
 export function fileDiff({ before, after }) {
-  const result = spawnSync('git', ['diff', '--no-index', '--', before, after], {
-    encoding: 'utf-8',
-    env: gitEnvironment(),
-  });
-  const lines = (result.stdout ?? '').split('\n');
+  // `git diff --no-index` exits 1 when the files differ, so its output is read either way.
+  const lines = tryGit(['diff', '--no-index', '--', before, after]).output.split('\n');
   return lines.length > DIFF_PREVIEW_LINES
     ? [
         ...lines.slice(0, DIFF_PREVIEW_LINES),
@@ -277,26 +283,25 @@ function changeKind(code) {
  */
 function gitIntakeChanges({ repositoryRoot, iteration }) {
   const path = relativeIntakeFolder(iteration);
-  if (!tryGit(repositoryRoot, ['ls-files', '--', path])) {
+  if (!tryGit(['ls-files', '--', path], { cwd: repositoryRoot }).output) {
     return {
       details: [`${path} is not committed yet, so git cannot name the changed file.`],
       restore: '',
     };
   }
-  const tracked = (
-    tryGit(repositoryRoot, ['diff', '--name-status', 'HEAD', '--', path]) ?? ''
-  )
-    .split('\n')
+  const tracked = tryGit(['diff', '--name-status', 'HEAD', '--', path], {
+    cwd: repositoryRoot,
+  })
+    .output.split('\n')
     .filter(Boolean)
     .map((line) => {
       const [code, ...paths] = line.split('\t');
       return `${changeKind(code)} ${basename(paths[0] ?? '')}`;
     });
-  const untracked = (
-    tryGit(repositoryRoot, ['ls-files', '--others', '--exclude-standard', '--', path]) ??
-    ''
-  )
-    .split('\n')
+  const untracked = tryGit(['ls-files', '--others', '--exclude-standard', '--', path], {
+    cwd: repositoryRoot,
+  })
+    .output.split('\n')
     .filter(Boolean)
     .map((file) => `added ${basename(file)}`);
   const changes = [...tracked, ...untracked];
@@ -807,7 +812,9 @@ function planSide({
   diffs,
 }) {
   const status = readme.fields.get('Status') ?? '';
-  const missingRows = README_FIELD_LABELS.filter((field) => !readme.fields.has(field));
+  const missingRows = README_FIELD_LABELS.filter(
+    (field) => !readme.fields.has(field) && !OPTIONAL_README_FIELDS.has(field),
+  );
   if (missingRows.length > 0) {
     problems.push(
       `${label}: README.md has no ${missingRows.join(', ')} row — it predates the field; add the rows from tooling/iterations/templates/README.md.`,
@@ -1153,7 +1160,7 @@ export function runIntake(commandLine, context = {}) {
   };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   try {
     const { exitCode, lines } = runIntake(process.argv.slice(2));
     console.log(lines.join('\n'));

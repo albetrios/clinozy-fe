@@ -1,11 +1,13 @@
 {
-  "description": "Single source of truth for clinozy-fe agent hook wiring. tooling/agent-os/generate.ts derives agent-os/platforms/claude/settings.json (hooks block), agent-os/platforms/cursor/hooks.json, and agent-os/platforms/codex/hooks.json from this manifest + agent-os/platforms/targets.json. Tool dirs (.claude/, .cursor/, .codex/) symlink into agent-os/platforms/ — edit here only. All hooks FAIL OPEN.",
+  "description": "Single source of truth for clinozy-fe agent hook wiring. tooling/agent-os/generate.ts derives agent-os/platforms/claude/settings.json (hooks block), agent-os/platforms/cursor/hooks.json, and agent-os/platforms/codex/hooks.json from this manifest + agent-os/platforms/targets.json. Tool dirs (.claude/, .cursor/, .codex/) symlink into agent-os/platforms/ — edit here only. Every hook is a Node script (node agent-os/hooks/<script>) on the shared _fe-hook.mjs helper. All hooks FAIL OPEN.",
   "hooks": [
     {
-      "id": "session-start",
-      "runtime": "bash",
-      "script": "session-start.sh",
-      "claude": { "event": "SessionStart" },
+      "id": "fe-session-start",
+      "script": "fe-session-start.mjs",
+      "claude": {
+        "event": "SessionStart",
+        "matcher": "startup|resume"
+      },
       "codex": {
         "event": "SessionStart",
         "matcher": "startup|resume",
@@ -13,26 +15,31 @@
       }
     },
     {
-      "id": "prompt-skill-router",
-      "runtime": "bash",
-      "script": "prompt-skill-router.sh",
-      "claude": { "event": "UserPromptSubmit" },
+      "id": "fe-prompt-skill-router",
+      "script": "fe-prompt-skill-router.mjs",
+      "claude": {
+        "event": "UserPromptSubmit"
+      },
       "codex": {
         "event": "UserPromptSubmit",
         "statusMessage": "Checking clinozy-fe skill routing"
       }
     },
     {
-      "id": "guard-edits",
-      "runtime": "bash",
-      "script": "guard-edits.sh",
-      "claude": { "event": "PreToolUse", "matcher": "Edit|Write|MultiEdit" }
+      "id": "fe-guard-edits",
+      "script": "fe-guard-edits.mjs",
+      "claude": {
+        "event": "PreToolUse",
+        "matcher": "Edit|Write|MultiEdit"
+      }
     },
     {
-      "id": "guardrails",
-      "runtime": "node",
-      "script": "guardrails.mjs",
-      "claude": { "event": "PreToolUse", "matcher": "Bash|Edit|Write" },
+      "id": "fe-guardrails",
+      "script": "fe-guardrails.mjs",
+      "claude": {
+        "event": "PreToolUse",
+        "matcher": "Bash|Read|Grep|Edit|Write|MultiEdit"
+      },
       "codex": {
         "event": "PreToolUse",
         "matcher": "^Bash$",
@@ -40,56 +47,82 @@
       }
     },
     {
-      "id": "no-unrequested-pr",
-      "runtime": "bash",
-      "script": "no-unrequested-pr.sh",
-      "claude": { "event": "PreToolUse", "matcher": "mcp__github__create_pull_request" }
+      "id": "fe-no-unrequested-pr",
+      "script": "fe-no-unrequested-pr.mjs",
+      "claude": {
+        "event": "PreToolUse",
+        "matcher": "mcp__github__create_pull_request"
+      }
     },
     {
-      "id": "format-edits",
-      "runtime": "bash",
-      "script": "format-edits.sh",
-      "claude": { "event": "PostToolUse", "matcher": "Edit|Write" }
+      "id": "fe-edit-hooks",
+      "script": "fe-edit-hooks.mjs",
+      "claude": {
+        "event": "PostToolUse",
+        "matcher": "Edit|Write",
+        "if": ["Edit(**)", "Write(**)"]
+      }
     },
     {
-      "id": "skill-reminder",
-      "runtime": "bash",
-      "script": "skill-reminder.sh",
-      "claude": { "event": "PostToolUse", "matcher": "Edit|Write" }
-    },
-    {
-      "id": "gate-failure-hint",
-      "runtime": "bash",
-      "script": "gate-failure-hint.sh",
-      "claude": { "event": "PostToolUseFailure", "matcher": "Bash" }
-    },
-    {
-      "id": "stop-gate-reminder",
-      "runtime": "bash",
-      "script": "stop-gate-reminder.sh",
-      "claude": { "event": "Stop" },
+      "id": "fe-edit-hooks-stop",
+      "script": "fe-edit-hooks.mjs",
+      "claude": {
+        "event": "Stop"
+      },
       "codex": {
         "event": "Stop",
         "statusMessage": "Checking clinozy-fe completion gates"
       }
     },
     {
-      "id": "compact-resume-card",
-      "runtime": "bash",
-      "script": "compact-resume-card.sh",
-      "claude": { "event": "SessionStart", "matcher": "compact" }
+      "id": "fe-turn-end-tests",
+      "script": "fe-turn-end-tests.mjs",
+      "claude": {
+        "event": "Stop",
+        "asyncRewake": true,
+        "timeout": 120
+      }
     },
     {
-      "id": "session-end",
-      "runtime": "bash",
-      "script": "session-end.sh",
-      "claude": { "event": "SessionEnd" }
+      "id": "fe-push-ci-watch",
+      "script": "fe-push-ci-watch.mjs",
+      "claude": {
+        "event": "PostToolUse",
+        "matcher": "Bash",
+        "if": ["Bash(git push*)"],
+        "asyncRewake": true,
+        "timeout": 2700
+      }
     },
     {
-      "id": "cursor-shell-guard",
-      "runtime": "node",
-      "script": "cursor-shell-guard.mjs",
-      "cursor": { "event": "beforeShellExecution" }
+      "id": "fe-gate-failure-hint",
+      "script": "fe-gate-failure-hint.mjs",
+      "claude": {
+        "event": "PostToolUseFailure",
+        "matcher": "Bash"
+      }
+    },
+    {
+      "id": "fe-compact-resume-card",
+      "script": "fe-compact-resume-card.mjs",
+      "claude": {
+        "event": "SessionStart",
+        "matcher": "compact"
+      }
+    },
+    {
+      "id": "fe-session-end",
+      "script": "fe-session-end.mjs",
+      "claude": {
+        "event": "SessionEnd"
+      }
+    },
+    {
+      "id": "fe-cursor-shell-guard",
+      "script": "fe-cursor-shell-guard.mjs",
+      "cursor": {
+        "event": "beforeShellExecution"
+      }
     }
   ]
 }

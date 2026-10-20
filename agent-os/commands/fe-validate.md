@@ -1,10 +1,15 @@
 ---
 description: Run the local validate gate (lint, types, structure, tokens) and fix issues you introduced
-argument-hint: (no arguments)
-allowed-tools: Bash(pnpm lint*), Bash(pnpm type-check*), Bash(pnpm validate*), Bash(pnpm biome*)
+argument-hint: '[--affected] — show what git push will run and which tests the selection picks, and why'
+allowed-tools: Bash(pnpm lint*), Bash(pnpm type-check*), Bash(pnpm validate*), Bash(pnpm biome*), Bash(pnpm test:affected*)
 ---
 
-Run the clinozy-fe local validate gate in order:
+With `--affected`: run `pnpm test:affected` (the base is the upstream, else `origin/<trunk>`; pass
+`--base <ref>` for another) and show its two tables as they are — the steps `.husky/pre-push` will
+run for the pushed commits, each with why it runs or not, and the tests `pnpm test:select` picks,
+each with why. Change nothing, then stop.
+
+Without an argument, run the clinozy-fe local validate gate in order:
 
 1. `pnpm lint`
 2. `pnpm type-check`

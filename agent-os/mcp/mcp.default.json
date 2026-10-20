@@ -1,10 +1,10 @@
 {
   "mcpServers": {
-    "codegraph": {
+    "fe-codegraph": {
       "command": "pnpm",
       "args": ["exec", "codegraph", "serve", "--mcp"]
     },
-    "headroom": {
+    "fe-headroom": {
       "command": "uvx",
       "args": ["--from", "headroom-ai[mcp]", "headroom", "mcp", "serve"]
     }

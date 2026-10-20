@@ -74,10 +74,10 @@ flowchart TB
   subgraph trunk [Trunk]
     main[main]
   end
-  releasepr["Release PR (chore: release X.Y.Z)"]
+  releasepr["Release PR (chore(main): release X.Y.Z)"]
   feature -->|squash-merge| main
   fix -->|squash-merge| main
-  main -->|release-please refreshes| releasepr
+  main -->|release_pr dispatch refreshes| releasepr
   releasepr -->|merge = ship ★| main
 ```
 
@@ -125,8 +125,11 @@ git push -u origin feat/ai-stream-response
 
 ### 4. Release (on your cadence)
 
-release-please keeps **one standing Release PR** open (`chore: release X.Y.Z`), recomputing
-the next version + changelog from all unreleased commits. **Merging it is the ship button:**
+Open or refresh the Release PR when you mean to ship —
+`gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true` (an ordinary merge
+no longer refreshes it). release-please keeps **one standing Release PR**
+(`chore(main): release X.Y.Z`), recomputing the next version + changelog from all unreleased
+commits. **Merging it is the ship button:**
 
 - version bump + `CHANGELOG.md` + tag `vX.Y.Z` + GitHub Release + SBOM attach, then
 - the published release's production deploy (`release-deploy.yml`) → prod serves `vX.Y.Z`.
@@ -150,6 +153,7 @@ No release branches — patch on the trunk and cut the next release:
 ```bash
 git switch -c fix/null-user main      # short-lived; squash-merges back to main
 # fix, commit, open a `fix:` PR to main → PR CI → squash-merge
+# gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true  → the Release PR
 # merge the standing release-please Release PR → v1.0.1 tag + GitHub Release
 # → release-deploy.yml deploys v1.0.1 to prod ⛔ approval
 ```
@@ -173,5 +177,5 @@ work on a branch instead of a flag.
 
 - **One trunk:** `main`. Feature branches squash-merge to it and auto-delete.
 - **Deploys:** every src-path `main` push → development alias; releases only → production (one approval).
-- **Ship:** merge the standing `chore: release X.Y.Z` Release PR.
+- **Ship:** open or refresh the Release PR (`gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true`), then merge the standing `chore(main): release X.Y.Z` Release PR.
 - **Rollback:** **Rollback deploy** (instant restore, no rebuild) or **Release deploy** `{tag}` (rebuild).

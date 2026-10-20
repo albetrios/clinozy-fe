@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { expect, it } from 'vitest';
 
 import {
   GOVERNANCE_PRESETS,
@@ -59,7 +58,7 @@ function facts(overrides = {}) {
   };
 }
 
-test('parseCodeownersOwners: counts user handles, excludes teams and comments', () => {
+it('parseCodeownersOwners: counts user handles, excludes teams and comments', () => {
   const text = [
     '# TODO: replace @nikunjmavani with @core/frontend when the team grows',
     '* @nikunjmavani',
@@ -67,30 +66,30 @@ test('parseCodeownersOwners: counts user handles, excludes teams and comments', 
     '/docs/ @core/frontend',
   ].join('\n');
   const { users, teams } = parseCodeownersOwners(text);
-  assert.deepEqual(users, ['nikunjmavani', 'second-dev']);
-  assert.deepEqual(teams, ['core/frontend']);
+  expect(users).toStrictEqual(['nikunjmavani', 'second-dev']);
+  expect(teams).toStrictEqual(['core/frontend']);
 });
 
-test('detectRulesetMode: recognizes each preset and flags a hybrid', () => {
-  assert.equal(detectRulesetMode(rulesetFixture('personal')), 'personal');
-  assert.equal(detectRulesetMode(rulesetFixture('team')), 'team');
+it('detectRulesetMode: recognizes each preset and flags a hybrid', () => {
+  expect(detectRulesetMode(rulesetFixture('personal'))).toBe('personal');
+  expect(detectRulesetMode(rulesetFixture('team'))).toBe('team');
 
   const hybrid = rulesetFixture('personal');
   hybrid.rules[1].parameters.dismiss_stale_reviews_on_push = true; // half team
-  assert.equal(detectRulesetMode(hybrid), 'unknown');
+  expect(detectRulesetMode(hybrid)).toBe('unknown');
 });
 
-test('detectProductionMode: keys off preventSelfReview', () => {
-  assert.equal(detectProductionMode(productionFixture('personal', ['a'])), 'personal');
-  assert.equal(detectProductionMode(productionFixture('team', ['a', 'b'])), 'team');
-  assert.equal(detectProductionMode({ protection: {} }), 'unknown');
+it('detectProductionMode: keys off preventSelfReview', () => {
+  expect(detectProductionMode(productionFixture('personal', ['a']))).toBe('personal');
+  expect(detectProductionMode(productionFixture('team', ['a', 'b']))).toBe('team');
+  expect(detectProductionMode({ protection: {} })).toBe('unknown');
 });
 
-test('findGovernanceIssues: none for a consistent personal repo', () => {
-  assert.deepEqual(findGovernanceIssues(facts()), []);
+it('findGovernanceIssues: none for a consistent personal repo', () => {
+  expect(findGovernanceIssues(facts())).toStrictEqual([]);
 });
 
-test('findGovernanceIssues: none for a consistent team repo (2 owners)', () => {
+it('findGovernanceIssues: none for a consistent team repo (2 owners)', () => {
   const twoOwnerTeam = facts({
     rulesetMode: 'team',
     productionMode: 'team',
@@ -99,17 +98,17 @@ test('findGovernanceIssues: none for a consistent team repo (2 owners)', () => {
     preventSelfReview: true,
     codeownersUsers: ['nikunjmavani', 'second-dev'],
   });
-  assert.deepEqual(findGovernanceIssues(twoOwnerTeam), []);
+  expect(findGovernanceIssues(twoOwnerTeam)).toStrictEqual([]);
 });
 
-test('findGovernanceIssues: flags ruleset/production disagreement', () => {
+it('findGovernanceIssues: flags ruleset/production disagreement', () => {
   const issues = findGovernanceIssues(
     facts({ productionMode: 'team', preventSelfReview: true }),
   );
-  assert.ok(issues.some((issue) => issue.includes('disagrees')));
+  expect(issues.some((issue) => issue.includes('disagrees'))).toBeTruthy();
 });
 
-test('findGovernanceIssues: flags team with fewer than two owners (deadlock)', () => {
+it('findGovernanceIssues: flags team with fewer than two owners (deadlock)', () => {
   const issues = findGovernanceIssues(
     facts({
       rulesetMode: 'team',
@@ -120,53 +119,54 @@ test('findGovernanceIssues: flags team with fewer than two owners (deadlock)', (
       codeownersUsers: ['nikunjmavani'],
     }),
   );
-  assert.ok(issues.some((issue) => issue.includes('≥2 CODEOWNERS users')));
-  assert.ok(issues.some((issue) => issue.includes('Deadlock: preventSelfReview')));
+  expect(issues.some((issue) => issue.includes('≥2 CODEOWNERS users'))).toBeTruthy();
+  expect(
+    issues.some((issue) => issue.includes('Deadlock: preventSelfReview')),
+  ).toBeTruthy();
 });
 
-test('findGovernanceIssues: flags a reviewer not present in CODEOWNERS', () => {
+it('findGovernanceIssues: flags a reviewer not present in CODEOWNERS', () => {
   const issues = findGovernanceIssues(facts({ productionReviewers: ['ghost'] }));
-  assert.ok(issues.some((issue) => issue.includes('not in CODEOWNERS')));
+  expect(issues.some((issue) => issue.includes('not in CODEOWNERS'))).toBeTruthy();
 });
 
-test('resolveReviewers: personal picks the first owner; team needs two', () => {
-  assert.deepEqual(resolveReviewers('personal', ['nikunjmavani', 'second-dev']), [
+it('resolveReviewers: personal picks the first owner; team needs two', () => {
+  expect(resolveReviewers('personal', ['nikunjmavani', 'second-dev'])).toStrictEqual([
     'nikunjmavani',
   ]);
-  assert.deepEqual(resolveReviewers('team', ['nikunjmavani', 'second-dev']), [
+  expect(resolveReviewers('team', ['nikunjmavani', 'second-dev'])).toStrictEqual([
     'nikunjmavani',
     'second-dev',
   ]);
-  assert.throws(() => resolveReviewers('team', ['nikunjmavani']), /≥2 CODEOWNERS users/);
-  assert.throws(() => resolveReviewers('personal', []), /no individual user owners/);
+  expect(() => resolveReviewers('team', ['nikunjmavani'])).toThrow(/≥2 CODEOWNERS users/);
+  expect(() => resolveReviewers('personal', [])).toThrow(/no individual user owners/);
 });
 
-test('nextRulesetPayload: sets review params, preserves everything else', () => {
+it('nextRulesetPayload: sets review params, preserves everything else', () => {
   const before = rulesetFixture('personal');
   const after = nextRulesetPayload(before, 'team');
   const params = after.rules.find((rule) => rule.type === 'pull_request').parameters;
-  assert.equal(params.required_approving_review_count, 1);
-  assert.equal(params.require_code_owner_review, true);
+  expect(params.required_approving_review_count).toBe(1);
+  expect(params.require_code_owner_review).toBe(true);
   // Untouched fields survive.
-  assert.deepEqual(params.allowed_merge_methods, ['squash']);
-  assert.equal(params.required_review_thread_resolution, true);
+  expect(params.allowed_merge_methods).toStrictEqual(['squash']);
+  expect(params.required_review_thread_resolution).toBe(true);
   // Input is not mutated.
-  assert.equal(
+  expect(
     before.rules.find((rule) => rule.type === 'pull_request').parameters
       .required_approving_review_count,
-    0,
-  );
+  ).toBe(0);
 });
 
-test('nextProductionPayload: sets reviewers + preventSelfReview, keeps branch policy', () => {
+it('nextProductionPayload: sets reviewers + preventSelfReview, keeps branch policy', () => {
   const before = productionFixture('personal', ['nikunjmavani']);
   const after = nextProductionPayload(before, 'team', ['nikunjmavani', 'second-dev']);
-  assert.deepEqual(after.protection.requiredReviewers.users, [
+  expect(after.protection.requiredReviewers.users).toStrictEqual([
     'nikunjmavani',
     'second-dev',
   ]);
-  assert.equal(after.protection.requiredReviewers.preventSelfReview, true);
-  assert.deepEqual(after.protection.deploymentBranchPolicy, {
+  expect(after.protection.requiredReviewers.preventSelfReview).toBe(true);
+  expect(after.protection.deploymentBranchPolicy).toStrictEqual({
     protectedBranches: true,
     customBranchPolicies: false,
   });

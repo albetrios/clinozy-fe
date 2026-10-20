@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { expect, it } from 'vitest';
 
 import { checkSyncConsistency, collectConsistencyIssues } from './sync-consistency.mjs';
 
@@ -12,47 +11,47 @@ const CONSISTENT = {
   rulesetBranches: ['main'],
 };
 
-test('collectConsistencyIssues: none when everything agrees (order-insensitive)', () => {
-  assert.deepEqual(collectConsistencyIssues(CONSISTENT), []);
+it('collectConsistencyIssues: none when everything agrees (order-insensitive)', () => {
+  expect(collectConsistencyIssues(CONSISTENT)).toStrictEqual([]);
 });
 
-test('collectConsistencyIssues: flags an env in config with no environment JSON file', () => {
+it('collectConsistencyIssues: flags an env in config with no environment JSON file', () => {
   const issues = collectConsistencyIssues({
     ...CONSISTENT,
     environmentJsonNames: ['development'],
   });
-  assert.equal(issues.length, 1);
-  assert.equal(issues[0].dimension, 'environments');
+  expect(issues.length).toBe(1);
+  expect(issues[0].dimension).toBe('environments');
 });
 
-test('collectConsistencyIssues: flags an env the deploy workflow does not accept', () => {
+it('collectConsistencyIssues: flags an env the deploy workflow does not accept', () => {
   const issues = collectConsistencyIssues({
     ...CONSISTENT,
     deployWorkflowEnvironments: ['production'],
   });
-  assert.equal(issues.length, 1);
-  assert.equal(issues[0].dimension, 'environments');
+  expect(issues.length).toBe(1);
+  expect(issues[0].dimension).toBe('environments');
 });
 
-test('collectConsistencyIssues: flags a protectedBranch with no committed ruleset (stale dev)', () => {
+it('collectConsistencyIssues: flags a protectedBranch with no committed ruleset (stale dev)', () => {
   const issues = collectConsistencyIssues({
     ...CONSISTENT,
     protectedBranches: ['dev', 'main'],
   });
-  assert.equal(issues.length, 1);
-  assert.equal(issues[0].dimension, 'branches');
+  expect(issues.length).toBe(1);
+  expect(issues[0].dimension).toBe('branches');
 });
 
-test('collectConsistencyIssues: flags a defaultBranch protected by no ruleset', () => {
+it('collectConsistencyIssues: flags a defaultBranch protected by no ruleset', () => {
   const issues = collectConsistencyIssues({
     ...CONSISTENT,
     defaultBranch: 'dev',
     protectedBranches: ['dev'],
     rulesetBranches: ['main'],
   });
-  assert.ok(issues.some((issue) => issue.detail.includes('defaultBranch')));
+  expect(issues.some((issue) => issue.detail.includes('defaultBranch'))).toBeTruthy();
 });
 
-test('checkSyncConsistency: the committed tree is self-consistent (single trunk)', () => {
-  assert.deepEqual(checkSyncConsistency(), []);
+it('checkSyncConsistency: the committed tree is self-consistent (single trunk)', () => {
+  expect(checkSyncConsistency()).toStrictEqual([]);
 });

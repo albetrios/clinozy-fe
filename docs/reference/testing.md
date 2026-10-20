@@ -4,12 +4,13 @@ Single reference for **every test kind** in this repo: where it lives, how to ru
 
 ## Two layers
 
-| Layer                  | Tool         | Location               | Pattern              | Command               | Server                                   |
-| ---------------------- | ------------ | ---------------------- | -------------------- | --------------------- | ---------------------------------------- |
-| **Unit / component**   | Vitest + RTL | Colocated under `src/` | `*.test.ts(x)`       | `pnpm test:unit`      | None — `vi.mock()` only                  |
-| **Security tripwires** | Vitest       | `tests/security/`      | `*.security.test.ts` | `pnpm test:security`  | None                                     |
-| **CI-flow policy**     | Vitest       | `tests/ci/`            | `*.policy.test.ts`   | `pnpm test:ci-policy` | None — reads workflow/config files       |
-| **E2E**                | Playwright   | `tests/e2e/`           | `*.e2e.test.ts`      | `pnpm test:e2e`       | **clinozy-be** on `:3000` (**required**) |
+| Layer                  | Tool          | Location                            | Pattern                    | Command                    | Server                                              |
+| ---------------------- | ------------- | ----------------------------------- | -------------------------- | -------------------------- | --------------------------------------------------- |
+| **Unit / component**   | Vitest + RTL  | Colocated under `src/`              | `*.test.ts(x)`             | `pnpm test:unit`           | None — `vi.mock()` only                             |
+| **Security tripwires** | Vitest        | `tests/security/`                   | `*.security.test.ts`       | `pnpm test:security`       | None                                                |
+| **CI-flow policy**     | Vitest        | `tests/ci/`                         | `*.policy.test.ts`         | `pnpm test:ci-policy`      | None — reads workflow/config files                  |
+| **Tooling scripts**    | Vitest (Node) | Beside each script under `tooling/` | `*.test.mjs` / `*.test.ts` | `pnpm test:github-scripts` | None — runs the scripts, throwaway git repositories |
+| **E2E**                | Playwright    | `tests/e2e/`                        | `*.e2e.test.ts`            | `pnpm test:e2e`            | **clinozy-be** on `:3000` (**required**)            |
 
 **Never** use `.spec.ts` or the words `real`/`live` in test file names.
 
@@ -126,7 +127,12 @@ loosens local Docker.
 
 **Local:** Vite serves the FE on `:5173` and proxies `/api` → `http://localhost:3000`. Start clinozy-be, then `pnpm test:e2e`.
 
-**CI:** none — E2E is **local-only**. No workflow boots postgres/redis/clinozy-be (see `pr-ci.yml` header note); run the suite locally against clinozy-be on `:3000`.
+**CI:** `.github/workflows/e2e-backend.yml`, never a PR lane. It boots Postgres and Redis, then
+the backend's latest GHCR image (migrate, reference seed, API with the backend's CI test env), and
+the app's dev server against it. A merge to `main` runs the **@smoke** set (`--grep @smoke`: sign-in,
+Today, one create, one edit, axe on five key pages — tagged `{ tag: '@smoke' }`); the nightly run
+(01:30 UTC) runs the full suite. One retry, then a self-closing `ci-failure` issue. Pulling the
+image needs this repository's read access on the backend's GHCR package while it is private.
 
 **Naming:** UI flows → `<feature>.e2e.test.ts`; HTTP contract suites → `<feature>-api.e2e.test.ts`.
 
@@ -149,18 +155,70 @@ Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`.
 
 ## Commands
 
-| Command                                   | What runs                                              |
-| ----------------------------------------- | ------------------------------------------------------ |
-| `pnpm test`                               | Vitest all projects — unit + security + ci-policy      |
-| `pnpm test:unit`                          | Colocated `src/**/*.test.*` only                       |
-| `pnpm test:security`                      | `tests/security/`                                      |
-| `pnpm test:e2e`                           | All Playwright specs in `tests/e2e/`                   |
-| `pnpm test:e2e:integration`               | Routes integration + org-switching only                |
-| `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be) |
-| `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)           |
-| `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                            |
+| Command                                   | What runs                                                    |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| `pnpm test`                               | Vitest all projects — unit + security + ci-policy + tooling  |
+| `pnpm test:github-scripts`                | The tooling scripts' tests — Vitest `tooling` project (Node) |
+| `pnpm test:unit`                          | Colocated `src/**/*.test.*` only                             |
+| `pnpm test:security`                      | `tests/security/`                                            |
+| `pnpm test:e2e`                           | All Playwright specs in `tests/e2e/`                         |
+| `pnpm test:e2e:integration`               | Routes integration + org-switching only                      |
+| `pnpm test:e2e:integration:cross-browser` | Same, on Chromium + Firefox + WebKit (live clinozy-be)       |
+| `pnpm test:visual`                        | Screenshot regression (`visual.e2e.test.ts`)                 |
+| `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                                  |
+| `pnpm test:select [--why\|--run]`         | The Vitest files a change can affect, and why                |
+| `pnpm test:affected [--base <ref>]`       | What `git push` will run, and the tests picked, and why      |
+| `pnpm test:pre-push [--base <ref>]`       | Pre-push's Vitest step: the files `pnpm test:select` picks   |
 
 Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes.txt`.
+
+## Test selection (`pnpm test:select`)
+
+`tooling/ci/test-selection.mjs` names the Vitest files a set of changed files can affect (changes
+since the merge base with the upstream, else `origin/<trunk>` — `resolveBase` in
+`tooling/ci/git-environment.mjs` — plus the working tree, or `--files a,b`). A test is selected
+when its imports reach a changed file (static and dynamic `import`, `vi.mock`, `import.meta.glob`),
+when it mentions the changed path (the `tests/ci` policy tests that read files), or when it is the
+changed test itself. Pages never import pages, so a page change stays inside its section. A file
+name alone counts as a mention only when no other file has it and it is not part of a longer name.
+Any `src/` change also runs `tests/security/`, every test that imports nothing from the repository,
+and every test no single change selects (it builds its paths at run time — 2 today).
+
+It runs everything for the escalation list — dependencies, `tsconfig`, the Vitest and Vite config
+and the plugins they load, `src/locales/`, and the test setup (`tests/utils/setup.ts`) with
+everything it imports (i18n, `shared/api`, auth, the stores: every test runs through it) — and fails
+closed: a path outside the known roots, a deleted file nothing imports, or any error selects
+everything. `--why` lists each test's reason, `--json` the whole selection, `--run` runs it (`pnpm
+test` when everything is selected), `--changed-only` drops the always-run set, `--exclude <glob>`
+leaves tests out. The pre-push hook runs its selection (see **Selected tests at push** below), and
+the selector feeds the other fast signals built on it. Its rules are pinned by `tooling/ci/test-selection.test.mjs` (`pnpm
+test:github-scripts`), which also pins its project list to `vitest.config.ts`.
+
+**Fixtures.** `pnpm agent-os:check` holds the selector to its fixtures
+(`tooling/ci/selector-fixtures.check.mjs`): one generated per route island — a change to its main
+file selects its own test and no test in another section (a top-level page, or an organization
+room; a layout wires its own children, so siblings inside a section may reach each other) — 108
+today; one file of each escalating kind running everything; the misses recorded in
+`tooling/ci/selector-fixtures.json`; and the unreachable tests always run.
+
+**Selected tests at push.** `.husky/pre-push` runs its Vitest step through `pnpm test:pre-push`
+(`tooling/ci/pre-push-tests.mjs`): only the files the selection picks for the pushed commits,
+always-run files included, in one Vitest process. An escalating change runs the whole suite
+(`pnpm test`), as does a selection that cannot be built. CI still runs every suite.
+`pnpm test:affected` previews it.
+
+Proven before it became the default (18 Oct): eleven planted breaks, one at a time, each against
+the whole suite — top-level throws in a page, a layout, a component, `src/lib`, `src/core` (twice),
+the shared button and the turn-end hook, a weakened password blocklist, a workflow without
+`VITE_E2E_HOOKS`, and a row dropped from `scheduled-jobs.md`. The button plant found 5 misses (the
+walk skipped every folder named `reports`, so the patient reports page was not in the graph); with
+that fixed, every failing test was in the selection (0 misses).
+
+**Selector misses.** When a PR's merged unit shards fail, the `Unit + global` job's `Selector miss
+check` step (not a gate) lists every failed file `pnpm test:select` would have skipped for the PR's
+changes — a selector miss, or a flake — as a warning, in the job summary, and as a fixture line for
+`tooling/ci/selector-fixtures.json`, which the selection must satisfy from then on. `pnpm
+test:selector-misses --base <ref> --results <dir of Vitest JSON reports>` runs it locally.
 
 ## Mutation testing (Stryker, weekly)
 
@@ -229,7 +287,7 @@ pnpm build   # CI uses preview; local dev can use `pnpm dev` via config reuseExi
 DATABASE_URL=postgresql://clinozy:clinozy@localhost:5432/clinozy pnpm test:e2e:integration:cross-browser
 ```
 
-CI: none — live FE ↔ BE integration runs are local-only (CI never boots clinozy-be).  
+CI: the cross-browser runs are local-only; `e2e-backend.yml` covers Chromium against the backend image.  
 Details: **`docs/reference/cross-browser-support.md`**.
 
 ## Local production performance

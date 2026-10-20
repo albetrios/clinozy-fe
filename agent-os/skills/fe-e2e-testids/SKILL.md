@@ -1,6 +1,8 @@
 ---
 name: fe-e2e-testids
 description: Add and maintain data-testid attributes for Playwright E2E and stable selectors. Use when scaffolding UI, preparing E2E specs, auditing test hooks, or when the user asks for test ids on elements.
+trigger: tests/e2e/**
+triggerNote: Hybrid selectors — data-testid for actions
 ---
 
 # E2E Test IDs (`data-testid`)

@@ -17,7 +17,7 @@
  *                        print JSON of `envProfiles.<env>.defaults` — the starting
  *                        values `github:sync` writes into a NEW `.env.<env>` file.
  *
- * Run via tsx: `node --import tsx tooling/env-registry/env-registry.ts …`.
+ * Run via tsx: `tsx tooling/env-registry/env-registry.ts …`.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -28,6 +28,7 @@ import {
   envProfiles,
   envSchemaBase,
 } from '../../src/core/config/env-schema.ts';
+import { parseCommandLine } from '../ci/script.mjs';
 
 const PROJECT_ROOT = resolve(import.meta.dirname, '../..');
 const CATALOG_PATH = resolve(PROJECT_ROOT, 'docs/reference/env-catalog.md');
@@ -196,17 +197,33 @@ function runProfileDefaults(environment: string | undefined): void {
 }
 
 function main(): void {
-  const argv = process.argv.slice(2);
-  const profileFlag = argv.indexOf('--profile-defaults');
-  if (profileFlag !== -1) {
-    runProfileDefaults(argv[profileFlag + 1]);
+  const known = Object.keys(envProfiles).join(', ');
+  let values;
+  try {
+    ({ values } = parseCommandLine(process.argv.slice(2), {
+      options: {
+        'profile-defaults': { type: 'string' },
+        catalog: { type: 'boolean' },
+        check: { type: 'boolean' },
+        defaults: { type: 'boolean' },
+      },
+      messages: {
+        needsValue: () => `--profile-defaults needs an environment: ${known}.`,
+      },
+    }));
+  } catch (error) {
+    console.error((error as Error).message);
+    process.exit(1);
+  }
+  if (values['profile-defaults'] !== undefined) {
+    runProfileDefaults(values['profile-defaults']);
     return;
   }
-  if (argv.includes('--catalog')) {
-    runCatalog(argv.includes('--check'));
+  if (values.catalog === true) {
+    runCatalog(values.check === true);
     return;
   }
-  if (argv.includes('--defaults')) {
+  if (values.defaults === true) {
     runDefaults();
     return;
   }

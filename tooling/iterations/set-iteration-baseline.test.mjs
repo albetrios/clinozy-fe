@@ -3,10 +3,9 @@
  * `intake-files/` holds the required set (the incremental delta is a diff of `intake-files/`
  * only), written to the Baseline row with a History line.
  */
-import assert from 'node:assert/strict';
+import { afterEach, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, test } from 'node:test';
 import {
   cleanScratch,
   completeDrop,
@@ -30,32 +29,30 @@ function repositoryWithLaunch(intake = completeDrop()) {
   return repositoryRoot;
 }
 
-test('records the confirmed Baseline with a History line', () => {
+it('records the confirmed Baseline with a History line', () => {
   const repositoryRoot = repositoryWithLaunch();
   const result = runBaseline([CURRENT, LAUNCH], { repositoryRoot, today: TODAY });
-  assert.equal(result.exitCode, 0);
+  expect(result.exitCode).toBe(0);
   const readme = readFileSync(
     join(repositoryRoot, 'iterations', CURRENT, 'README.md'),
     'utf-8',
   );
-  assert.equal(parseIterationReadme(readme).get('Baseline'), LAUNCH);
-  assert.ok(
+  expect(parseIterationReadme(readme).get('Baseline')).toBe(LAUNCH);
+  expect(
     readme.endsWith(`## History\n\n- ${TODAY} · Baseline — → ${LAUNCH} · — · ${OWNER}\n`),
-  );
-  assert.throws(
-    () => runBaseline([CURRENT, LAUNCH], { repositoryRoot }),
+  ).toBeTruthy();
+  expect(() => runBaseline([CURRENT, LAUNCH], { repositoryRoot })).toThrow(
     /already has Baseline/,
   );
   runBaseline([CURRENT, 'none'], { repositoryRoot, today: TODAY });
-  assert.equal(
+  expect(
     parseIterationReadme(
       readFileSync(join(repositoryRoot, 'iterations', CURRENT, 'README.md'), 'utf-8'),
     ).get('Baseline'),
-    'none',
-  );
+  ).toBe('none');
 });
 
-test('refuses itself, a later or unknown iteration', () => {
+it('refuses itself, a later or unknown iteration', () => {
   const repositoryRoot = repositoryWithLaunch();
   writeIteration({
     repositoryRoot,
@@ -68,38 +65,34 @@ test('refuses itself, a later or unknown iteration', () => {
     'feat-later-2026-10-09-abcd',
     'feat-ghost-2026-09-01-abcd',
   ]) {
-    assert.throws(
+    expect(
       () => planBaselineChange({ repositoryRoot, iteration: CURRENT, baseline }),
-      /earlier iteration/,
       baseline,
-    );
+    ).toThrow(/earlier iteration/);
   }
 });
 
-test("refuses a Baseline whose intake-files/ is missing or incomplete — it's what the diff compares", () => {
+it("refuses a Baseline whose intake-files/ is missing or incomplete — it's what the diff compares", () => {
   const { 'schema-routes.md': _schema, ...withoutSchema } = completeDrop();
   const incomplete = repositoryWithLaunch(withoutSchema);
-  assert.throws(
-    () =>
-      planBaselineChange({
-        repositoryRoot: incomplete,
-        iteration: CURRENT,
-        baseline: LAUNCH,
-      }),
-    /missing: schema-routes\.md/,
-  );
+  expect(() =>
+    planBaselineChange({
+      repositoryRoot: incomplete,
+      iteration: CURRENT,
+      baseline: LAUNCH,
+    }),
+  ).toThrow(/missing: schema-routes\.md/);
 
   const repositoryRoot = createRepository();
   writeIteration({ repositoryRoot, name: LAUNCH, fields: { status: 'done' } });
   writeIteration({ repositoryRoot, name: CURRENT });
-  assert.throws(
-    () => planBaselineChange({ repositoryRoot, iteration: CURRENT, baseline: LAUNCH }),
-    /missing: intake-files\//,
-  );
+  expect(() =>
+    planBaselineChange({ repositoryRoot, iteration: CURRENT, baseline: LAUNCH }),
+  ).toThrow(/missing: intake-files\//);
 });
 
-test('prints the usage for a wrong command line', () => {
-  assert.equal(runBaseline([CURRENT]).exitCode, 1);
-  assert.equal(runBaseline(['--help']).exitCode, 0);
-  assert.throws(() => runBaseline([CURRENT, LAUNCH, '--force']), /Unknown option/);
+it('prints the usage for a wrong command line', () => {
+  expect(runBaseline([CURRENT]).exitCode).toBe(1);
+  expect(runBaseline(['--help']).exitCode).toBe(0);
+  expect(() => runBaseline([CURRENT, LAUNCH, '--force'])).toThrow(/Unknown option/);
 });

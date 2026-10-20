@@ -74,7 +74,6 @@ export const envSchemaBase = z.object({
   SENTRY_PROJECT: z.string().min(1).optional(),
   NETLIFY_AUTH_TOKEN: z.string().min(1).optional(),
   NETLIFY_SITE_ID: z.string().min(1).optional(),
-  NODE_VERSION: z.string().min(1).optional(),
   // Repository-level GitHub Actions PAT — not environment-scoped, never bundled,
   // never read by the app or the local dev server. Cataloged here for reference;
   // the real value lives in GitHub repository secrets (gh secret set --repo).
@@ -166,7 +165,6 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   SENTRY_PROJECT: 'Sentry project slug (source-map upload).',
   NETLIFY_AUTH_TOKEN: 'Netlify CLI deploy token (CI only).',
   NETLIFY_SITE_ID: 'Netlify site ID (deploy target).',
-  NODE_VERSION: 'Node version for CI/build; keep in lock step with .nvmrc.',
   RELEASE_PLEASE_TOKEN:
     'GitHub Actions PAT (environment secret on `development`) for release-please, dependabot-auto-merge, and the weekly PAT canary — all three jobs select `environment: development` to read it. Managed deploy secret on `development`: clinozy-infra (`pnpm setup:infra`) writes it into `.env.development` and `pnpm github:sync` pushes it; CI only — never bundled or read locally.',
   CONTEXT7_API_KEY:

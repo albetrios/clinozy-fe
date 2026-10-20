@@ -1,10 +1,12 @@
-import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { afterEach, expect, it } from 'vitest';
+import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
-import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { gitEnvironmentWithoutInheritedRepository } from '../ci/git-environment.mjs';
+import {
+  createThrowawayRepository,
+  removeThrowawayRepositories,
+} from '../ci/throwaway-repository.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GATE = join(ROOT, 'tooling/validate/large-staged-files.sh');
@@ -19,53 +21,56 @@ const LIMIT_BYTES = 3 * 1024 * 1024;
  * runs in, so every case gets its own repo instead of staging into the real one.
  */
 function runGateWith(files) {
-  const repo = mkdtempSync(join(tmpdir(), 'large-staged-files-'));
-  try {
-    execFileSync('git', ['init', '--quiet'], { cwd: repo });
-    for (const [path, size] of Object.entries(files)) {
-      const file = join(repo, path);
-      mkdirSync(dirname(file), { recursive: true });
-      writeFileSync(file, Buffer.alloc(size, 'a'));
-    }
-    execFileSync('git', ['add', '--all'], { cwd: repo });
-    const result = spawnSync('sh', [GATE], { cwd: repo, encoding: 'utf8' });
-    return { status: result.status, output: `${result.stdout}${result.stderr}` };
-  } finally {
-    rmSync(repo, { recursive: true, force: true });
-  }
+  const repository = createThrowawayRepository({ prefix: 'large-staged-files-' });
+  repository.writeFiles(
+    Object.fromEntries(
+      Object.entries(files).map(([path, size]) => [path, Buffer.alloc(size, 'a')]),
+    ),
+  );
+  repository.git(['add', '--all']);
+  // From a git hook the inherited GIT_DIR / GIT_INDEX_FILE would outrank `cwd`: the gate would
+  // then read the hook's own index.
+  const result = spawnSync('sh', [GATE], {
+    cwd: repository.root,
+    encoding: 'utf8',
+    env: gitEnvironmentWithoutInheritedRepository(),
+  });
+  return { status: result.status, output: `${result.stdout}${result.stderr}` };
 }
 
-test('rejects a staged file over the limit', () => {
+afterEach(removeThrowawayRepositories);
+
+it('rejects a staged file over the limit', () => {
   const { status, output } = runGateWith({ 'src/big.bin': LIMIT_BYTES + 1 });
-  assert.equal(status, 1, output);
-  assert.ok(output.includes(`src/big.bin (${LIMIT_BYTES + 1} bytes)`), output);
+  expect(status, output).toBe(1);
+  expect(output.includes(`src/big.bin (${LIMIT_BYTES + 1} bytes)`), output).toBeTruthy();
 });
 
-test('allows a 2MB file — over the old 1MB limit, under 3MB', () => {
+it('allows a 2MB file — over the old 1MB limit, under 3MB', () => {
   const { status, output } = runGateWith({ 'src/medium.bin': 2 * 1024 * 1024 });
-  assert.equal(status, 0, output);
+  expect(status, output).toBe(0);
 });
 
-test('allows a staged file exactly at the limit', () => {
+it('allows a staged file exactly at the limit', () => {
   const { status, output } = runGateWith({ 'src/edge.bin': LIMIT_BYTES });
-  assert.equal(status, 0, output);
+  expect(status, output).toBe(0);
 });
 
-test('exempts design exports under iterations/', () => {
+it('exempts design exports under iterations/', () => {
   const { status, output } = runGateWith({
     'iterations/launch-2026-09-30-jxmr/intake-files/Prototype.html': LIMIT_BYTES * 3,
   });
-  assert.equal(status, 0, output);
+  expect(status, output).toBe(0);
 });
 
-test('the iterations/ exemption does not hide a large file elsewhere in the same commit', () => {
+it('the iterations/ exemption does not hide a large file elsewhere in the same commit', () => {
   const { status, output } = runGateWith({
     'iterations/launch-2026-09-30-jxmr/intake-files/Prototype.html': LIMIT_BYTES * 3,
     'docs/big.bin': LIMIT_BYTES + 1,
   });
-  assert.equal(status, 1, output);
-  assert.match(output, /docs\/big\.bin/);
-  assert.doesNotMatch(output, /Prototype\.html/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/docs\/big\.bin/);
+  expect(output).not.toMatch(/Prototype\.html/);
 });
 
 // Only the top-level iterations/ folder is exempt — not a path that merely
@@ -75,9 +80,9 @@ for (const path of [
   'iterations-archive/big.bin',
   'iterations.bin',
 ]) {
-  test(`does not exempt ${path}`, () => {
+  it(`does not exempt ${path}`, () => {
     const { status, output } = runGateWith({ [path]: LIMIT_BYTES + 1 });
-    assert.equal(status, 1, output);
-    assert.match(output, /Files exceed 3MB limit/);
+    expect(status, output).toBe(1);
+    expect(output).toMatch(/Files exceed 3MB limit/);
   });
 }

@@ -1,6 +1,8 @@
 ---
 name: fe-platform-hygiene
-description: Platform config, env read paths, dead-code and deploy validators for clinozy-fe — platformConfig, build-env allowlist, knip, validate:vite-env, validate:client-env. Use when touching env schema, Vite env reads, knip, or platform config wiring.
+description: Platform config, env read paths, dead code and deploy validators (platformConfig, knip, validate:vite-env, validate:client-env). Use when touching env schema, Vite env reads, knip or platform wiring.
+trigger: src/core/config/env-schema.ts, **/platform-config.ts, **/build-env.ts, knip.jsonc, .env.example, plugins/dev-server-mode.ts, plugins/build-environment.ts, tooling/ci/build.mjs, tooling/setup/github/scaffold-env-files.mjs, .github/rulesets/**, .github/environments/**, tooling/setup/github/governance-mode.mjs, tooling/validate/**
+triggerNote: Env schema, Vite env reads, knip, the validators; which env file each command reads; governance mode — use github:tool:governance-mode, never hand-edit review fields
 ---
 
 # Platform hygiene (clinozy-fe)
@@ -156,11 +158,9 @@ A desynced lockfile produces `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` on `pnpm instal
    schemas that actually parse or validate values.
 4. When retaining removed source as a local archive, use a non-source extension
    outside application paths. Do not weaken lint configuration to accommodate an
-   archive. Stage approved new files before regenerating
-   `docs/reference/project-tree.txt`: its generator uses tracked-file enumeration,
-   so a pre-stage sync check cannot detect omitted new files. Regenerate after
-   additions or removals, stage the updated tree, and rerun `pnpm sync:check` after
-   commit against the same tracked snapshot CI receives.
+   archive. `docs/reference/project-tree.txt` is generated from tracked files and
+   gitignored — never stage it; rerun `pnpm sync:check` after commit against the
+   same tracked snapshot CI receives.
 5. Run Knip, type-check, lint, relevant tests, and `pnpm sync:check`. A scanner pass
    alone does not establish that the cleanup preserved behavior.
 

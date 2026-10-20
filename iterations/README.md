@@ -108,6 +108,7 @@ nothing, changes no status and asks nothing else; it prints the command's output
 | Field         | Value                                                                                    |
 | ------------- | ---------------------------------------------------------------------------------------- |
 | Type          | `launch`, `feat`, `change` or `fix`                                                      |
+| Process       | `full`, or `lite` — a `fix` planned in one step (`--lite`); no row means `full`          |
 | Topic         | the kebab-case topic; `—` for launch                                                     |
 | Owner         | the person driving it (`git config user.name`)                                           |
 | Opened        | `YYYY-MM-DD`                                                                             |
@@ -166,12 +167,21 @@ Status moves one step at a time with `pnpm iteration:status <iteration> <status>
 
 `ready-for-approval`, `approved` or `implementing` may go back to `planning` with
 `--reason "<why>"`; nothing else is allowed. Never edit a frozen iteration — a correction is a new
-`fix` iteration.
+`fix` iteration. PR CI's **Iteration freeze** lane (`pnpm iteration:freeze-check`, in the Quality
+gate) checks both at merge time: every iteration a PR changes must be `frozen`, and a merged frozen
+iteration may change only by a hash-keeping `pnpm iteration:intake <iteration> --compact`.
+
+A **lite** fix (Process `lite`, opened with `pnpm iteration:new fix <topic> --lite`) moves
+`planning → implementing → done → frozen`: fe-iteration-planning plans it in one step — `KICKOFF.md`
+and `plans/decisions.md`, one stop for the user's go — and fe-kickoff-iteration moves it to
+`implementing`, with no `ready-for-approval` or `approved`. It needs no drop; when one is placed, the
+gate runs as usual. `implementing` or `done` may go back to `planning` with `--reason`.
 
 ## Commands
 
 ```bash
 pnpm iteration:new feat pharmacy-returns --both                    # open (README only)
+pnpm iteration:new fix rounding --lite                             # a fix planned in one step
 pnpm iteration:intake <iteration> <source-folder> --both           # place a full drop + check it
 pnpm iteration:intake <iteration> <source-folder> --mode overlay   # only the changed files arrived (named Baseline)
 pnpm iteration:intake <iteration> <source-folder> --mode brief     # only BRIEF.md arrived
@@ -181,6 +191,7 @@ pnpm iteration:baseline <iteration> <baseline|none>                # record the 
 pnpm iteration:diff <baseline> <iteration> [--json]                # the delta: the two resolved intakes only
 pnpm iteration:status <iteration> <status> [--reason "<text>"]
 pnpm iteration:list   # Name · Type · Owner · Opened · Baseline · Status · Intake mode · Schema-routes · Intake hash · Drop placed
+pnpm iteration:freeze-check [--base <ref>]  # every iteration the branch changes merges frozen (PR CI's Iteration freeze lane)
 ```
 
 Every command takes `--help`. `iteration:new` and `iteration:intake` take `--dry-run`; `--both` works

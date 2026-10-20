@@ -9,13 +9,13 @@ stack notes are in [`agents-cloud.md`](agents-cloud.md).
 `install.sh` installs the **default pair** and scaffolds
 [`.mcp.json`](../../.mcp.json) via `pnpm mcp:setup:default`:
 
-| Server      | Command                           | Notes                               |
-| ----------- | --------------------------------- | ----------------------------------- |
-| `codegraph` | `pnpm exec codegraph serve --mcp` | Code intelligence (devDependency)   |
-| `headroom`  | `pnpm exec headroom mcp serve`    | Context compression (devDependency) |
+| Server         | Command                           | Notes                               |
+| -------------- | --------------------------------- | ----------------------------------- |
+| `fe-codegraph` | `pnpm exec codegraph serve --mcp` | Code intelligence (devDependency)   |
+| `fe-headroom`  | `pnpm exec headroom mcp serve`    | Context compression (devDependency) |
 
-On-demand servers (`chrome-devtools`, `context7`, `clinozy-be-api`, `semgrep`,
-`shadcn`, `sonarqube`, `tailwindcss`): `pnpm mcp:setup <name>`. `chrome-devtools`
+On-demand servers (`chrome-devtools`, `fe-context7`, `clinozy-be-api`, `fe-semgrep`,
+`shadcn`, `fe-sonarqube`, `tailwindcss`): `pnpm mcp:setup <name>`. `chrome-devtools`
 reuses the Playwright Chromium (install once with
 `pnpm exec playwright install --with-deps chromium`; the launcher
 `tooling/dev/chrome-devtools-mcp.mjs` runs it headless and errors with that hint

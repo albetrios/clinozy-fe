@@ -59,7 +59,7 @@ flowchart LR
 ```mermaid
 flowchart TB
   subgraph env_sources["Env sources"]
-    GitHubSecrets["GitHub Secrets: VITE_API_BASE_URL, NODE_VERSION, NETLIFY_AUTH_TOKEN, NETLIFY_SITE_ID"]
+    GitHubSecrets["GitHub Secrets: VITE_API_BASE_URL, NETLIFY_AUTH_TOKEN, NETLIFY_SITE_ID"]
   end
 
   subgraph build_time["Build time"]
@@ -143,8 +143,8 @@ sequenceDiagram
 
 | What                   | Where                                               | Notes                                                                                                                                                                                                                                                                        |
 | ---------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Env vars for build** | **GitHub Secrets**                                  | Put `VITE_API_BASE_URL`, `NODE_VERSION` in GitHub → Settings → Secrets and variables → Actions. Build runs on GitHub; these are injected at build time. No build on Netlify.                                                                                                 |
-| **GitHub secrets**     | GitHub → Settings → Secrets and variables → Actions | **Required for deploy:** `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN` (Netlify → User settings → Applications → Personal access tokens), `NETLIFY_SITE_ID` (Netlify → Site settings → General → Site information).                                              |
+| **Env vars for build** | **GitHub Secrets**                                  | Put `VITE_API_BASE_URL` in GitHub → Settings → Secrets and variables → Actions. Build runs on GitHub (Node from `.nvmrc`); it is injected at build time. No build on Netlify.                                                                                                |
+| **GitHub secrets**     | GitHub → Settings → Secrets and variables → Actions | **Required for deploy:** `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN` (Netlify → User settings → Applications → Personal access tokens), `NETLIFY_SITE_ID` (Netlify → Site settings → General → Site information).                                                              |
 | **Netlify: no build**  | `netlify.toml` (enforced)                           | Nothing builds on Netlify: `ignore = "exit 0"` cancels Git-triggered builds and the `command` fails any other build. Deploys upload the pre-built `dist/` with `netlify deploy --no-build`. Disconnecting the build in the Netlify UI is still tidy, but no longer required. |
 | **Backend CORS**       | Your API server                                     | Allow your Netlify site origin (or custom domain) so the browser can call the production API.                                                                                                                                                                                |
 
@@ -161,7 +161,7 @@ sequenceDiagram
 - **`.env.local`** (gitignored) at project root: `VITE_DEV_API_URL` (e.g. `http://localhost:3000`) if your backend runs locally. No token needed for basic dev.
 - **Sentry (local build):** If you run `pnpm build` locally and want source maps uploaded, put `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` in `.env.sentry-build-plugin` (gitignored) or `.env.local`. Optional.
 
-**Summary:** Build runs only on GitHub Actions (Deploy workflow on push to `main`). Set **GitHub secrets** (`VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`). Netlify never builds (`netlify.toml` cancels or fails any build there); the workflow uploads `dist/` with `--no-build`. **Backend CORS** must allow your frontend origin.
+**Summary:** Build runs only on GitHub Actions (Deploy workflow on push to `main`). Set **GitHub secrets** (`VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`). Netlify never builds (`netlify.toml` cancels or fails any build there); the workflow uploads `dist/` with `--no-build`. **Backend CORS** must allow your frontend origin.
 
 **CLI-only deploy:** You can still run `pnpm run deploy:netlify:prod` locally (build runs on your machine, then Netlify CLI uploads `dist/`). See [netlify-cli-setup.md](netlify-cli-setup.md).
 
@@ -188,10 +188,9 @@ Backend must allow CORS from the frontend origin (Netlify site URL / custom doma
 
 Build runs on GitHub; env comes from **GitHub Secrets**. Set in GitHub → Settings → Secrets and variables → Actions:
 
-| Variable            | Value                         | Notes                                                                                                                                       |
-| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VITE_API_BASE_URL` | `https://your-api-domain.com` | Production API base; app appends `/api/v1`.                                                                                                 |
-| `NODE_VERSION`      | `24`                          | Required in **`.env.<environment>`** and GitHub Actions; must match `package.json` `engines.node` and `netlify.toml` `[build.environment]`. |
+| Variable            | Value                         | Notes                                       |
+| ------------------- | ----------------------------- | ------------------------------------------- |
+| `VITE_API_BASE_URL` | `https://your-api-domain.com` | Production API base; app appends `/api/v1`. |
 
 Optional (Sentry, PostHog): add to GitHub secrets; they are baked into the client at build time.
 
@@ -199,14 +198,14 @@ Optional (Sentry, PostHog): add to GitHub secrets; they are baked into the clien
 
 **Option A — From `.env.<environment>` (CLI)**
 
-Each environment's deploy values live in a gitignored `.env.<environment>` at the repo root, derived from the committed `.env.example` — that file is the source of truth. Fill it in, then run `pnpm github:sync` after `gh auth login` to push every non-empty deploy key (`VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, …) to the matching GitHub Environment. Preview with `pnpm github:sync --dry-run`; check drift with `pnpm github:sync --check`.
+Each environment's deploy values live in a gitignored `.env.<environment>` at the repo root, derived from the committed `.env.example` — that file is the source of truth. Fill it in, then run `pnpm github:sync` after `gh auth login` to push every non-empty deploy key (`VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, …) to the matching GitHub Environment. Preview with `pnpm github:sync --dry-run`; check drift with `pnpm github:sync --check`.
 
 **Option B — Manual in GitHub UI**
 
 1. Go to GitHub → repo → Settings → Secrets and variables → Actions.
-2. Add `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.
+2. Add `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.
 
-**Variable names (required):** `VITE_API_BASE_URL`, `NODE_VERSION`. **Optional:** `VITE_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`.
+**Variable names (required):** `VITE_API_BASE_URL` (Node comes from `.nvmrc`, the one Node pin — no variable). **Optional:** `VITE_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`.
 
 **Local dev:** Use `.env.local` (gitignored) for `VITE_*` vars.
 
@@ -249,20 +248,23 @@ Both run `pnpm build` then `netlify deploy --no-build` (with or without `--prod`
 
 ## CI (GitHub Actions)
 
-| Workflow                                                                   | Trigger                               | What it does                                                                                                                                                                                                                                                                                                                                                      |
-| -------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **PR CI** (`.github/workflows/pr-ci.yml`)                                  | PR to `main`                          | Path-filtered parallel lanes: lint, biome, knip, format, type-check, structure/token validators, agent-os evals, unit + security Vitest, build + bundle size, gitleaks, Semgrep, Trivy IaC, dependency review, actionlint; aggregate **Quality gate**.                                                                                                            |
-| **Post-merge CI** (`.github/workflows/post-merge-ci.yml`)                  | Push to `main`                        | Single-channel release-please (ungated; CHANGELOG lint-fix + PAT probe), SBOM on releases, and `deploy-development` (`--alias development`) on every src push. **Production deploy moved to Release deploy.** NO redundant re-testing — pr-ci already gated the SHA.                                                                                              |
-| **Release deploy** (`.github/workflows/release-deploy.yml`)                | `release: published` + manual `{tag}` | Production deploy (`--prod`) pinned to the release **tag** (never a moving branch SHA). Re-deploy any tag: `gh workflow run release-deploy.yml --ref main -f tag=vX.Y.Z`.                                                                                                                                                                                         |
-| **Rollback deploy** (`.github/workflows/rollback-deploy.yml`)              | Manual `workflow_dispatch`            | Instant production rollback — restores a previous immutable Netlify deploy (no rebuild), in the same `production` environment.                                                                                                                                                                                                                                    |
-| **Preview** (`.github/workflows/preview.yml`)                              | PR to `main` (src-path-filtered)      | Live per-PR Netlify preview: builds `dist/` with the `development` environment's client env and publishes it to a PR-scoped alias (`pr-<n>--clinozy-fe.netlify.app`), then upserts a sticky PR comment with the URL. Advisory — not a required check; skipped for fork/Dependabot PRs (no environment secrets).                                                   |
-| **PR Governance** (`.github/workflows/pr-governance.yml`)                  | PR opened/edited/synchronize/reopened | Single `Checks` job (the second required context): validates the conventional-commits PR title, syncs the size label, guards `.env` files, and auto-applies path labels.                                                                                                                                                                                          |
-| **Release-flow guards** (`.github/workflows/scheduled-release-guards.yml`) | Weekly (Mon) schedule + manual        | Weekly GitHub environment protection + ruleset drift check (committed `.github/environments/*.json` + `.github/rulesets/*.json` vs GitHub — the Netlify deploy pre-flight refuses to deploy on drift). (The branch-ancestry canary is gone — single trunk.)                                                                                                       |
-| **Dependabot auto-merge** (`.github/workflows/dependabot-auto-merge.yml`)  | PR review submitted                   | Approval-triggered squash auto-merge for the low-risk `npm-non-major` Dependabot group only — the maintainer approval is the manual gate; the PR merges when PR CI goes green (PAT-attributed via `RELEASE_PLEASE_TOKEN` so the merge push triggers post-merge CI). Majors / security / github-actions stay manual. Requires the repo "Allow auto-merge" setting. |
+| Workflow                                                                   | Trigger                               | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------------------------------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **PR CI** (`.github/workflows/pr-ci.yml`)                                  | PR to `main`                          | Path-filtered parallel lanes: lint, biome, knip, format, type-check, structure/token validators, agent-os evals, unit + security Vitest, build + bundle size, gitleaks, Semgrep, Trivy IaC, dependency review, actionlint; aggregate **Quality gate**. ESLint (content-keyed cache) and type-check (incremental build info) restore caches the nightly saves on main; Semgrep runs in its pinned image (`semgrep/semgrep:<version>@sha256:…`). |
+| **Post-merge CI** (`.github/workflows/post-merge-ci.yml`)                  | Push to `main`                        | Single-channel release-please on demand — a merged Release PR, or a dispatch with `release_pr` (ordinary merges no longer refresh the Release PR); CHANGELOG lint-fix + PAT probe — SBOM on releases, and `deploy-development` (`--alias development`) on every src push. **Production deploy moved to Release deploy.** NO redundant re-testing — pr-ci already gated the SHA.                                                                |
+| **Release deploy** (`.github/workflows/release-deploy.yml`)                | `release: published` + manual `{tag}` | Production deploy (`--prod`) pinned to the release **tag** (never a moving branch SHA). Re-deploy any tag: `gh workflow run release-deploy.yml --ref main -f tag=vX.Y.Z`.                                                                                                                                                                                                                                                                      |
+| **Rollback deploy** (`.github/workflows/rollback-deploy.yml`)              | Manual `workflow_dispatch`            | Instant production rollback — restores a previous immutable Netlify deploy (no rebuild), in the same `production` environment.                                                                                                                                                                                                                                                                                                                 |
+| **Preview** (`.github/workflows/preview.yml`)                              | PR to `main` (src-path-filtered)      | Live per-PR Netlify preview: builds `dist/` with the `development` environment's client env and publishes it to a PR-scoped alias (`pr-<n>--clinozy-fe.netlify.app`), then upserts a sticky PR comment with the URL. Advisory — not a required check; skipped for fork/Dependabot PRs (no environment secrets).                                                                                                                                |
+| **PR Governance** (`.github/workflows/pr-governance.yml`)                  | PR opened/edited/synchronize/reopened | Single `Checks` job (the second required context): validates the conventional-commits PR title, syncs the size label, guards `.env` files, and auto-applies path labels.                                                                                                                                                                                                                                                                       |
+| **Release-flow guards** (`.github/workflows/scheduled-release-guards.yml`) | Weekly (Mon) schedule + manual        | Weekly GitHub environment protection + ruleset drift check (committed `.github/environments/*.json` + `.github/rulesets/*.json` vs GitHub — the Netlify deploy pre-flight refuses to deploy on drift). (The branch-ancestry canary is gone — single trunk.)                                                                                                                                                                                    |
+| **Dependabot auto-merge** (`.github/workflows/dependabot-auto-merge.yml`)  | PR review submitted                   | Approval-triggered squash auto-merge for the low-risk `npm-non-major` Dependabot group only — the maintainer approval is the manual gate; the PR merges when PR CI goes green (PAT-attributed via `RELEASE_PLEASE_TOKEN` so the merge push triggers post-merge CI). Majors / security / github-actions stay manual. Requires the repo "Allow auto-merge" setting.                                                                              |
 
 **Build runs only on GitHub.** Netlify never runs a build; it only serves the uploaded `dist/` (every `main` src push → development alias via post-merge CI; a published release → production via `release-deploy.yml`, pinned to the tag). Netlify is the current deploy target of record.
 
-**CI never boots clinozy-be.** Playwright E2E is local-only (`pnpm test:e2e` against a live clinozy-be on `:3000`); CI and CD need only the deployed backend URL (`VITE_API_BASE_URL` secret per environment) — never a full backend.
+**Only the E2E workflow boots clinozy-be.** `e2e-backend.yml` runs Playwright against the
+backend's latest GHCR image (the @smoke set on `main`, the full suite nightly; see
+`docs/reference/testing.md`). Every other CI and CD job needs only the deployed backend URL
+(`VITE_API_BASE_URL` secret per environment) — never a full backend.
 
 ### Change detection and the aggregate gate
 
@@ -288,7 +290,7 @@ Single trunk (`main`) drives both GitHub Environments by **purpose**, not by bra
 
 **One Netlify project (`clinozy-fe`) serves both** on the same site via deploy contexts. Both GitHub Environments carry the same `NETLIFY_SITE_ID`; only `VITE_API_BASE_URL` differs.
 
-- Feature PRs target **`main`** and squash-merge. Ship by merging the standing release-please Release PR.
+- Feature PRs target **`main`** and squash-merge. Ship by merging the standing release-please Release PR (opened or refreshed on demand: `gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true`).
 - PR CI (`pr-ci.yml`), PR Governance (`pr-governance.yml`), and Preview (`preview.yml`) run on PRs to `main`.
 - Branch protection and required checks: [branch-protection.md](branch-protection.md).
 - Full workflow: [trunk-based-workflow.md](../process/trunk-based-workflow.md) and [deployment-and-pre-launch.md](deployment-and-pre-launch.md#branch--environment-flow).
@@ -297,12 +299,12 @@ Single trunk (`main`) drives both GitHub Environments by **purpose**, not by bra
 
 ## Summary
 
-| Item                | Where / How                                                                                                              |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Production API**  | `https://your-api-domain.com` (path `/api/v1` in app).                                                                   |
-| **Frontend host**   | Netlify (static host only; no build on Netlify).                                                                         |
-| **Build**           | GitHub Actions only (Deploy workflow on push to `main`; Release workflow when release created). Env from GitHub secrets. |
-| **Env vars**        | GitHub secrets: `VITE_API_BASE_URL`, `NODE_VERSION`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.                            |
-| **Deploy (GitHub)** | Deploy workflow: push to `main` → build → upload `dist/` to Netlify.                                                     |
-| **Deploy (CLI)**    | `pnpm run deploy:netlify` (draft), `pnpm run deploy:netlify:prod` (production); build runs locally.                      |
-| **CI**              | GitHub Actions: lint, type-check, unit + security tests, build (smoke) on push/PR. E2E is local-only.                    |
+| Item                | Where / How                                                                                                                                           |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Production API**  | `https://your-api-domain.com` (path `/api/v1` in app).                                                                                                |
+| **Frontend host**   | Netlify (static host only; no build on Netlify).                                                                                                      |
+| **Build**           | GitHub Actions only (Deploy workflow on push to `main`; Release workflow when release created). Env from GitHub secrets.                              |
+| **Env vars**        | GitHub secrets: `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`.                                                                         |
+| **Deploy (GitHub)** | Deploy workflow: push to `main` → build → upload `dist/` to Netlify.                                                                                  |
+| **Deploy (CLI)**    | `pnpm run deploy:netlify` (draft), `pnpm run deploy:netlify:prod` (production); build runs locally.                                                   |
+| **CI**              | GitHub Actions: lint, type-check, unit + security tests, build (smoke) on push/PR. E2E: `e2e-backend.yml` against the backend image (main + nightly). |

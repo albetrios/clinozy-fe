@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parseEnv } from 'node:util';
 
+import { parse } from 'dotenv';
 import type { ConfigEnv } from 'vite';
 
 /**
@@ -22,6 +22,16 @@ export type BuildEnvironment = (typeof BUILD_ENVIRONMENTS)[number];
  * never itself written in one.
  */
 export const BUILD_ENVIRONMENT_VARIABLE = 'BUILD_ENVIRONMENT';
+
+/**
+ * Set by `pnpm build --defaults`: the build reads NO env file — every value is the env schema's
+ * default, as CI's Build verify lane builds (its checkout has no `.env.local`). The bundle-size
+ * budget is measured on that build, so a local check of it must build the same way.
+ */
+export const BUILD_DEFAULTS_VARIABLE = 'BUILD_SCHEMA_DEFAULTS';
+
+/** An empty directory, so Vite finds no env file there (the Vitest runner points at it too). */
+const EMPTY_ENV_DIRECTORY = 'tooling/test/empty-env';
 
 /** The variable a bundle reports its environment through (Sentry, PostHog). */
 const IDENTITY_VARIABLE = 'VITE_APP_ENV';
@@ -63,6 +73,14 @@ export function applyBuildEnvironment({
 }): string | false {
   if (command !== 'build') return root;
   let environment = processEnv[BUILD_ENVIRONMENT_VARIABLE] || undefined;
+  if (processEnv[BUILD_DEFAULTS_VARIABLE] === 'true') {
+    if (environment !== undefined) {
+      throw new Error(
+        `${BUILD_DEFAULTS_VARIABLE}=true reads no env file, but ${BUILD_ENVIRONMENT_VARIABLE}=${environment} names one — set one of them.`,
+      );
+    }
+    return join(root, EMPTY_ENV_DIRECTORY);
+  }
   if (environment === undefined) {
     if (!existsSync(join(root, '.env.local'))) return root;
     environment = 'local';
@@ -78,7 +96,7 @@ export function applyBuildEnvironment({
       `${BUILD_ENVIRONMENT_VARIABLE}=${environment}, but there is no .env.${environment} to build with.`,
     );
   }
-  for (const [key, value] of Object.entries(parseEnv(readFileSync(file, 'utf8')))) {
+  for (const [key, value] of Object.entries(parse(readFileSync(file, 'utf8')))) {
     if (processEnv[key] === undefined) processEnv[key] = value;
   }
   // The bundle reports the environment it was built for — as the deploy workflow derives

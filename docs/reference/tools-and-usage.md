@@ -106,7 +106,8 @@ Further gates, all mirroring clinozy-be:
 - **CodeQL** (`.github/workflows/codeql.yml`) — weekly + per-PR taint-tracking analysis scoped by
   `.github/codeql/codeql-config.yml` to the deployed surface; complements Semgrep.
 - **PR governance** (`.github/workflows/pr-governance.yml`) — conventional PR title, size labels,
-  path labels (`.github/labeler.yml` / `labels.yml`), and a committed-env-file guard. The
+  path labels (`.github/labeler.yml` / `labels.yml`), and a never-committed-files guard
+  (`tooling/validate/never-committed.mjs`, the list the before-commit guard reads too). The
   Dependency review CI lane blocks high-severity/GPL-AGPL dependency changes.
 - **Branch protection as code** (`.github/rulesets/main.json`, `pnpm github:sync`) — `main`
   requires only the aggregate `Quality gate` + governance `Checks`; adding a CI lane never touches

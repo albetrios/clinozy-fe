@@ -2,8 +2,7 @@
  * `.env.local` takes the external credentials `envProfiles.local.externalCredentials` names —
  * from `.env.development`, else the environment — filling only what is missing or blank.
  */
-import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 import {
   describeFilled,
@@ -24,14 +23,11 @@ describe('fillExternalCredentials', () => {
   it('fills listed keys that are blank or missing locally, from .env.development', () => {
     const local = 'VITE_API_BASE_URL=\nVITE_STRIPE_PUBLISHABLE_KEY=\n';
     const { content, filled } = fillExternalCredentials(local, DEVELOPMENT, KEYS);
-    assert.deepEqual(
-      filled.map((entry) => entry.key),
-      KEYS,
-    );
-    assert.ok(filled.every((entry) => entry.source === '.env.development'));
-    assert.match(content, /^VITE_STRIPE_PUBLISHABLE_KEY=pk_test_dev$/m);
-    assert.match(content, /^VITE_POSTHOG_HOST=https:\/\/us\.i\.posthog\.com$/m);
-    assert.match(content, /^VITE_API_BASE_URL=$/m);
+    expect(filled.map((entry) => entry.key)).toStrictEqual(KEYS);
+    expect(filled.every((entry) => entry.source === '.env.development')).toBeTruthy();
+    expect(content).toMatch(/^VITE_STRIPE_PUBLISHABLE_KEY=pk_test_dev$/m);
+    expect(content).toMatch(/^VITE_POSTHOG_HOST=https:\/\/us\.i\.posthog\.com$/m);
+    expect(content).toMatch(/^VITE_API_BASE_URL=$/m);
   });
 
   it('falls back to the environment when .env.development is absent or leaves a key out', () => {
@@ -45,15 +41,15 @@ describe('fillExternalCredentials', () => {
       KEYS,
       environment,
     );
-    assert.deepEqual(filled, [
+    expect(filled).toStrictEqual([
       { key: 'VITE_STRIPE_PUBLISHABLE_KEY', source: 'environment' },
       { key: 'VITE_POSTHOG_KEY', source: 'environment' },
     ]);
-    assert.deepEqual(missing, ['VITE_POSTHOG_HOST']);
-    assert.match(content, /^VITE_POSTHOG_KEY=phc_cloud$/m);
+    expect(missing).toStrictEqual(['VITE_POSTHOG_HOST']);
+    expect(content).toMatch(/^VITE_POSTHOG_KEY=phc_cloud$/m);
     // .env.development wins over the environment when it has the key.
     const both = fillExternalCredentials('', DEVELOPMENT, KEYS, environment);
-    assert.match(both.content, /^VITE_POSTHOG_KEY=phc_dev$/m);
+    expect(both.content).toMatch(/^VITE_POSTHOG_KEY=phc_dev$/m);
   });
 
   it('never overwrites a value already set locally', () => {
@@ -61,25 +57,27 @@ describe('fillExternalCredentials', () => {
     const { content, filled } = fillExternalCredentials(local, DEVELOPMENT, KEYS, {
       VITE_STRIPE_PUBLISHABLE_KEY: 'pk_test_env',
     });
-    assert.deepEqual(
-      filled.map((entry) => entry.key),
-      ['VITE_POSTHOG_KEY', 'VITE_POSTHOG_HOST'],
-    );
-    assert.match(content, /^VITE_STRIPE_PUBLISHABLE_KEY=pk_test_mine$/m);
+    expect(filled.map((entry) => entry.key)).toStrictEqual([
+      'VITE_POSTHOG_KEY',
+      'VITE_POSTHOG_HOST',
+    ]);
+    expect(content).toMatch(/^VITE_STRIPE_PUBLISHABLE_KEY=pk_test_mine$/m);
   });
 
   it('changes nothing and reports the key missing when no source has it', () => {
     const local = 'VITE_POSTHOG_KEY=\n';
-    assert.deepEqual(fillExternalCredentials(local, 'VITE_POSTHOG_KEY=\n', KEYS, {}), {
-      content: local,
-      filled: [],
-      missing: KEYS,
-    });
+    expect(fillExternalCredentials(local, 'VITE_POSTHOG_KEY=\n', KEYS, {})).toStrictEqual(
+      {
+        content: local,
+        filled: [],
+        missing: KEYS,
+      },
+    );
   });
 
   it('reports nothing missing once every key is set locally', () => {
     const local = DEVELOPMENT;
-    assert.deepEqual(fillExternalCredentials(local, '', KEYS, {}), {
+    expect(fillExternalCredentials(local, '', KEYS, {})).toStrictEqual({
       content: local,
       filled: [],
       missing: [],
@@ -87,24 +85,23 @@ describe('fillExternalCredentials', () => {
   });
 
   it('describes what it filled by key name and source only', () => {
-    assert.equal(
+    expect(
       describeFilled([
         { key: 'A', source: '.env.development' },
         { key: 'B', source: 'environment' },
       ]),
-      'A (.env.development), B (environment)',
-    );
+    ).toBe('A (.env.development), B (environment)');
   });
 });
 
 describe('upsertEnvAssignment', () => {
   it('replaces an existing line and appends a missing one', () => {
-    assert.equal(upsertEnvAssignment('A=1\nB=2\n', 'A', 'x'), 'A=x\nB=2\n');
-    assert.equal(upsertEnvAssignment('A=1', 'C', '3'), 'A=1\nC=3\n');
+    expect(upsertEnvAssignment('A=1\nB=2\n', 'A', 'x')).toBe('A=x\nB=2\n');
+    expect(upsertEnvAssignment('A=1', 'C', '3')).toBe('A=1\nC=3\n');
   });
 
   it('quotes a value that would not survive as a bare token, and keeps `$` literal', () => {
-    assert.equal(upsertEnvAssignment('A=\n', 'A', 'a b'), 'A="a b"\n');
-    assert.equal(upsertEnvAssignment('A=\n', 'A', 'p$1'), 'A="p$1"\n');
+    expect(upsertEnvAssignment('A=\n', 'A', 'a b')).toBe('A="a b"\n');
+    expect(upsertEnvAssignment('A=\n', 'A', 'p$1')).toBe('A="p$1"\n');
   });
 });

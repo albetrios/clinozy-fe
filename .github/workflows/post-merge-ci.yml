@@ -8,8 +8,8 @@ name: Post-merge CI
 # unit + security tests, build, and the security scans on this exact SHA behind
 # the required `quality-gate` check. Post-merge does ONLY what the gate cannot.
 #
-# Per-merge cost is minimized — a routine feature merge runs only release-please
-# (~30s) + a batched development-alias deploy:
+# Per-merge cost is minimized — a routine feature merge runs only a batched
+# development-alias deploy (release-please runs on demand, below):
 #   • SBOM is generated ONLY when release-please actually cuts a release (it is
 #     consumed only by release-sbom), not on every merge.
 #   • deploy-development batches: cancel-in-progress on its concurrency group, so
@@ -29,6 +29,13 @@ name: Post-merge CI
 # Rollback: rollback-deploy.yml (instant restore of the previous deploy). Redeploy
 # an old tag: release-deploy.yml via workflow_dispatch{tag}. Both run in the
 # production environment.
+#
+# Release PR on demand: an ordinary merge no longer refreshes the Release PR (each refresh
+# re-ran its PR CI). release-please runs when a Release PR is merged (the push's head commit
+# is `chore(main): release …`, so the tag and GitHub Release are cut as before) or when this
+# workflow is dispatched with `release_pr: true` — to open or refresh the Release PR, and as
+# the fallback that also cuts a release whose commit was not the head of its push:
+#   gh workflow run post-merge-ci.yml -f release_pr=true -f skip_deploy=true
 
 on:
   push:
@@ -40,8 +47,8 @@ on:
         required: false
         type: boolean
         default: false
-      skip_release:
-        description: Skip release-please
+      release_pr:
+        description: Open or refresh the Release PR (release-please) — ordinary merges no longer do
         required: false
         type: boolean
         default: false
@@ -89,7 +96,13 @@ jobs:
 
   release-please:
     name: Release Please
-    if: always() && inputs.skip_release != true
+    # On demand (see the header): when a Release PR merges, or when dispatched with release_pr.
+    if: |
+      always() &&
+      (
+        (github.event_name == 'workflow_dispatch' && inputs.release_pr) ||
+        startsWith(github.event.head_commit.message, 'chore(main): release ')
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Serialized across runs, NEVER cancelled — a release push must complete, and
@@ -350,10 +363,14 @@ jobs:
   notify-failure:
     name: Notify failure
     needs: [release-please, deploy-development]
+    # A job past its timeout-minutes ends cancelled, not failed, so release-please (never
+    # cancelled by concurrency) alerts on cancelled too. deploy-development does not: a burst of
+    # merges cancels the superseded deploys on purpose (batching).
     if: |
       always() &&
       (
         needs.release-please.result == 'failure' ||
+        needs.release-please.result == 'cancelled' ||
         needs.deploy-development.result == 'failure'
       )
     runs-on: ubuntu-latest
@@ -361,9 +378,15 @@ jobs:
     # `issues: write` to open/update the tracked `ci-failure` issue; the
     # workflow default is `contents: read`, so widen it here only.
     permissions:
+      actions: read # the fix plan reads the failed jobs and their logs
       contents: read
       issues: write
     steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
       - name: Emit post-merge failure notice
         env:
           RELEASE_RESULT: ${{ needs.release-please.result }}
@@ -373,57 +396,42 @@ jobs:
           set -euo pipefail
           echo "::error title=Post-merge CI failed::release=${RELEASE_RESULT} deploy-dev=${DEV_DEPLOY_RESULT} — ${WORKFLOW_URL}"
 
-      # A run-scoped ::error annotation dies with the run. Persist a tracked issue
-      # (find-or-create by a hidden marker, labelled `ci-failure`) so a broken
-      # release/deploy stays visible until someone acts on it. Idempotent: reuses
-      # the open issue and appends a comment rather than spamming new ones.
+      # A run-scoped ::error annotation dies with the run. One tracked `ci-failure` issue keeps a
+      # broken release/deploy visible until it is fixed: repeats become comments, and the next
+      # green post-merge run closes it (the ci-failure-issue action, a true copy of clinozy-be's).
       - name: Open or update the ci-failure issue
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          RELEASE_RESULT: ${{ needs.release-please.result }}
-          DEV_DEPLOY_RESULT: ${{ needs.deploy-development.result }}
+        uses: ./.github/actions/ci-failure-issue
         with:
-          script: |
-            const marker = '<!-- post-merge-ci-failure -->';
-            const { owner, repo } = context.repo;
-            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
-            const body = [
-              marker,
-              `Post-merge CI failed on \`${context.sha}\`.`,
-              '',
-              '| Job | Result |',
-              '| --- | --- |',
-              `| release-please | ${process.env.RELEASE_RESULT} |`,
-              `| deploy-development | ${process.env.DEV_DEPLOY_RESULT} |`,
-              '',
-              `Run: ${runUrl}`,
-            ].join('\n');
+          mode: open
+          title: Post-merge CI failing
+          body: |
+            Post-merge CI failed on `${{ github.sha }}`.
 
-            const open = await github.paginate(github.rest.issues.listForRepo, {
-              owner,
-              repo,
-              state: 'open',
-              labels: 'ci-failure',
-              per_page: 100,
-            });
-            const existing = open.find((issue) => (issue.body || '').includes(marker));
+            | Job | Result |
+            | --- | --- |
+            | release-please | ${{ needs.release-please.result }} |
+            | deploy-development | ${{ needs.deploy-development.result }} |
 
-            if (existing) {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: existing.number,
-                body,
-              });
-              core.notice(`Updated ci-failure issue #${existing.number}`);
-            } else {
-              // `labels` auto-creates the `ci-failure` label if it does not exist.
-              const created = await github.rest.issues.create({
-                owner,
-                repo,
-                title: 'Post-merge CI failing',
-                labels: ['ci-failure'],
-                body,
-              });
-              core.notice(`Opened ci-failure issue #${created.data.number}`);
-            }
+  resolve-success:
+    name: Close ci-failure issue
+    needs: [release-please, deploy-development]
+    if: |
+      always() &&
+      needs.release-please.result == 'success' &&
+      (needs.deploy-development.result == 'success' || needs.deploy-development.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout the ci-failure-issue action
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          sparse-checkout: .github/actions/ci-failure-issue
+      - name: Close the open ci-failure issue
+        uses: ./.github/actions/ci-failure-issue
+        with:
+          mode: close
+          title: Post-merge CI failing

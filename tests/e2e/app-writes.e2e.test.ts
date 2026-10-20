@@ -93,56 +93,60 @@ test.describe('Clinic rooms write through to clinozy-be', () => {
     await expectListedAfterReload(page, 'tasks', title);
   });
 
-  test('patients: a new patient is saved, listed and exported with Updated timestamps', async ({
-    page,
-  }) => {
-    // A patient needs a branch to call home: the seeded clinic has one.
-    await openNewClinic(page, { seed: true });
-    await openRoomFromShell(page, 'patients', 'desktop');
-    const first = uniqueName('Priya').replace(' ', '');
-    await byTestId(page, 'patients-new').click();
-    await expectDrawer(page, 'patient-drawer');
-    await page.getByTestId('patient-drawer-first-name').fill(first);
-    // Ten digits, unique per run so the duplicate-number check finds no one.
-    const mobile = `9${Date.now().toString().slice(-9)}`;
-    await page.getByTestId('patient-drawer-mobile').fill(mobile);
-    await page.getByTestId('patient-drawer-save').click();
-    await expect(page.getByTestId('patient-drawer')).toHaveCount(0, { timeout: 15_000 });
-    // The new file may open over the room; the room lists her either way.
-    await page.goto(page.url().replace(/\/patients\/.*$/, '/patients'));
-    await expectRoomReady(page, 'patients');
-    await expectListedAfterReload(page, 'patients', first);
+  test(
+    'patients: a new patient is saved, listed and exported with Updated timestamps',
+    { tag: '@smoke' },
+    async ({ page }) => {
+      // A patient needs a branch to call home: the seeded clinic has one.
+      await openNewClinic(page, { seed: true });
+      await openRoomFromShell(page, 'patients', 'desktop');
+      const first = uniqueName('Priya').replace(' ', '');
+      await byTestId(page, 'patients-new').click();
+      await expectDrawer(page, 'patient-drawer');
+      await page.getByTestId('patient-drawer-first-name').fill(first);
+      // Ten digits, unique per run so the duplicate-number check finds no one.
+      const mobile = `9${Date.now().toString().slice(-9)}`;
+      await page.getByTestId('patient-drawer-mobile').fill(mobile);
+      await page.getByTestId('patient-drawer-save').click();
+      await expect(page.getByTestId('patient-drawer')).toHaveCount(0, {
+        timeout: 15_000,
+      });
+      // The new file may open over the room; the room lists her either way.
+      await page.goto(page.url().replace(/\/patients\/.*$/, '/patients'));
+      await expectRoomReady(page, 'patients');
+      await expectListedAfterReload(page, 'patients', first);
 
-    const listRead = page.waitForResponse(
-      (response) =>
-        new URL(response.url()).pathname === `${API_BASE_PATH}/app/patients` &&
-        response.request().method() === 'GET' &&
-        response.ok(),
-    );
-    await page.reload();
-    const { data: patients } = (await (await listRead).json()) as {
-      data: { updated_at: string }[];
-    };
-    await expectRoomReady(page, 'patients');
-    // The clinic's seeded patient and the newly saved patient both have an Updated value.
-    expect(patients).toHaveLength(2);
-    await expect(page.getByTestId('patients-table-row')).toHaveCount(2);
-    await byTestId(page, 'patients-table-select-all').click();
-    const downloaded = page.waitForEvent('download');
-    await byTestId(page, 'patients-table-bulk-export').click();
-    const download = await downloaded;
-    expect(download.suggestedFilename()).toBe('patients.csv');
-    const content = await readFile((await download.path())!, 'utf8');
-    // These fixtures have no commas or newlines; the shared CSV suite covers escaping.
-    const records = content.split('\n').map((line) => line.split(','));
-    const headers = records[0]!;
-    const updated = headers.indexOf('Updated');
-    expect(updated).toBeGreaterThanOrEqual(0);
-    expect(records.slice(1).map((record) => record[updated])).toEqual(
-      patients.map((patient) => patient.updated_at),
-    );
-    expect(records.every((record) => record.length === headers.length)).toBe(true);
-  });
+      const listRead = page.waitForResponse(
+        (response) =>
+          new URL(response.url()).pathname === `${API_BASE_PATH}/app/patients` &&
+          response.request().method() === 'GET' &&
+          response.ok(),
+      );
+      await page.reload();
+      const { data: patients } = (await (await listRead).json()) as {
+        data: { updated_at: string }[];
+      };
+      await expectRoomReady(page, 'patients');
+      // The clinic's seeded patient and the newly saved patient both have an Updated value.
+      expect(patients).toHaveLength(2);
+      await expect(page.getByTestId('patients-table-row')).toHaveCount(2);
+      await byTestId(page, 'patients-table-select-all').click();
+      const downloaded = page.waitForEvent('download');
+      await byTestId(page, 'patients-table-bulk-export').click();
+      const download = await downloaded;
+      expect(download.suggestedFilename()).toBe('patients.csv');
+      const content = await readFile((await download.path())!, 'utf8');
+      // These fixtures have no commas or newlines; the shared CSV suite covers escaping.
+      const records = content.split('\n').map((line) => line.split(','));
+      const headers = records[0]!;
+      const updated = headers.indexOf('Updated');
+      expect(updated).toBeGreaterThanOrEqual(0);
+      expect(records.slice(1).map((record) => record[updated])).toEqual(
+        patients.map((patient) => patient.updated_at),
+      );
+      expect(records.every((record) => record.length === headers.length)).toBe(true);
+    },
+  );
   test('leads: a lead for a new contact is saved and listed', async ({ page }) => {
     await openNewClinic(page, { seed: true });
     await openRoomFromShell(page, 'leads', 'desktop');

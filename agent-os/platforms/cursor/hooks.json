@@ -4,7 +4,7 @@
   "hooks": {
     "beforeShellExecution": [
       {
-        "command": "node ../agent-os/hooks/cursor-shell-guard.mjs"
+        "command": "node ../agent-os/hooks/fe-cursor-shell-guard.mjs"
       }
     ]
   }

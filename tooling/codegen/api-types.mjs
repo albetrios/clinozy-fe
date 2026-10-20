@@ -40,6 +40,8 @@ import { fileURLToPath } from 'node:url';
 
 import openapiTS, { astToString } from 'openapi-typescript';
 
+import { isMain, parseCommandLine } from '../ci/script.mjs';
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const API_TYPES_TARGET = 'src/core/http/openapi-types.d.ts';
 
@@ -55,10 +57,13 @@ const HTTP_METHODS = [
   'trace',
 ];
 
-/** The document's path, from `--source` or the sibling clinozy-be checkout. */
-export function resolveSource(argv, env) {
-  const flag = argv.indexOf('--source');
-  if (flag !== -1 && argv[flag + 1]) return resolve(argv[flag + 1]);
+/** The options `pnpm api:types` takes. */
+const API_TYPES_OPTIONS = { source: { type: 'string' }, check: { type: 'boolean' } };
+
+/** The document's path, from `--source` in `args` (after the script) or the sibling clinozy-be checkout. */
+export function resolveSource(args, env) {
+  const { source } = parseCommandLine(args, { options: API_TYPES_OPTIONS }).values;
+  if (source) return resolve(source);
   const backendDir = env.CLINOZY_BE_DIR ?? resolve(ROOT, '../clinozy-be');
   return join(backendDir, 'docs/openapi/openapi.json');
 }
@@ -216,8 +221,10 @@ export async function generate(source) {
 }
 
 async function main() {
-  const check = process.argv.includes('--check');
-  const source = resolveSource(process.argv, process.env);
+  const check =
+    parseCommandLine(process.argv.slice(2), { options: API_TYPES_OPTIONS }).values
+      .check === true;
+  const source = resolveSource(process.argv.slice(2), process.env);
   if (!existsSync(source)) {
     const message = `api:types — no OpenAPI document at ${source} (run \`pnpm docs:generate\` in clinozy-be, or pass --source).`;
     if (check) {
@@ -244,6 +251,6 @@ async function main() {
   console.log(`api:types — wrote ${API_TYPES_TARGET} from ${source}.`);
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   await main();
 }

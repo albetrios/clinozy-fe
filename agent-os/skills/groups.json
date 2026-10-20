@@ -28,7 +28,6 @@
     ],
     "quality": [
       "fe-lint-guard",
-      "fe-code-smells-best-practices",
       "fe-code-quality-security",
       "fe-full-code-review",
       "fe-before-commit-guard",

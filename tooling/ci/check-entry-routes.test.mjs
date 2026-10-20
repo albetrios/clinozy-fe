@@ -1,9 +1,8 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -75,22 +74,24 @@ function run({ entry, vendor = 'export const v = 1;\n', html = HTML, sources = {
 /** A minified entry that carries the page's manifest and the org-level builder — as it should. */
 const CLEAN_ENTRY = `var a={segment:\`leads\`,path:\`${SLUG}/leads\`,kind:\`leaf\`};function h(e){return{to:\`${SLUG}\`,params:{organizationSlug:e}}}\n`;
 
-test('passes when the entry carries only the pages’ own paths', () => {
+it('passes when the entry carries only the pages’ own paths', () => {
   const { status, output } = run({ entry: CLEAN_ENTRY });
-  assert.equal(status, 0, output);
-  assert.match(output, /build:check OK/);
+  expect(status, output).toBe(0);
+  expect(output).toMatch(/build:check OK/);
 });
 
-test('fails on a dialog manifest in the entry chunk', () => {
+it('fails on a dialog manifest in the entry chunk', () => {
   const { status, output } = run({
     entry: `${CLEAN_ENTRY}var b={segment:\`create\`,path:\`${SLUG}/leads/create\`,kind:\`leaf\`};\n`,
   });
-  assert.equal(status, 1, output);
-  assert.match(output, /build:check FAILED/);
-  assert.match(output, /leads\/create .*create\.manifest\.ts.* in assets\/index-abc\.js/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/build:check FAILED/);
+  expect(output).toMatch(
+    /leads\/create .*create\.manifest\.ts.* in assets\/index-abc\.js/,
+  );
 });
 
-test('fails on a dialog manifest the route tree imports statically again', () => {
+it('fails on a dialog manifest the route tree imports statically again', () => {
   // The way it used to be registered: the tree importing the dialog's manifest
   // does not make its path a page's.
   const { status, output } = run({
@@ -102,37 +103,38 @@ test('fails on a dialog manifest the route tree imports statically again', () =>
       ].join(''),
     },
   });
-  assert.equal(status, 1, output);
-  assert.match(output, /leads\/create .*create\.manifest\.ts.* in assets\/index-abc\.js/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(
+    /leads\/create .*create\.manifest\.ts.* in assets\/index-abc\.js/,
+  );
 });
 
-test('fails on a room builder in a modulepreloaded chunk', () => {
+it('fails on a room builder in a modulepreloaded chunk', () => {
   const { status, output } = run({
     entry: CLEAN_ENTRY,
     vendor: `function l(e,t){return{to:"${SLUG}/leads/$leadId",params:{organizationSlug:e,leadId:t}}}\n`,
   });
-  assert.equal(status, 1, output);
-  assert.match(
-    output,
+  expect(status, output).toBe(1);
+  expect(output).toMatch(
     /leads\/\$leadId .*leads-builders\.ts.* in assets\/vendor-def\.js/,
   );
 });
 
-test('allows a room builder’s page path — the page’s manifest carries it anyway', () => {
+it('allows a room builder’s page path — the page’s manifest carries it anyway', () => {
   // `leads-builders.ts` spells `/leads`, which `leads.manifest.ts` (a static
   // import of the route tree) puts on the first paint by design.
   const { status, output } = run({ entry: `${CLEAN_ENTRY}const p='${SLUG}/leads';\n` });
-  assert.equal(status, 0, output);
+  expect(status, output).toBe(0);
 });
 
-test('ignores lazy chunks: a dialog manifest may load on demand', () => {
+it('ignores lazy chunks: a dialog manifest may load on demand', () => {
   const { status, output } = run({ entry: CLEAN_ENTRY });
-  assert.equal(status, 0, output);
-  assert.doesNotMatch(output, /dialog-routes-ghi/);
+  expect(status, output).toBe(0);
+  expect(output).not.toMatch(/dialog-routes-ghi/);
 });
 
-test('fails when the build has not run', () => {
+it('fails when the build has not run', () => {
   const { status, output } = run({ entry: CLEAN_ENTRY, html: null });
-  assert.equal(status, 1, output);
-  assert.match(output, /Run `pnpm build` first/);
+  expect(status, output).toBe(1);
+  expect(output).toMatch(/Run `pnpm build` first/);
 });

@@ -11,7 +11,7 @@
 # before the first push. See agent-os/rules/fe-git-branch-naming.mdc. Bypass once:
 #   SKIP_BRANCH_CHECK=1 git push
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)
-DEFAULT_BRANCH=$(node -e "const fs=require('fs');try{const c=JSON.parse(fs.readFileSync('tooling/setup/setup.config.json','utf8'));process.stdout.write((c.git&&c.git.defaultBranch)||'main')}catch(e){process.stdout.write('main')}" 2>/dev/null || echo main)
+DEFAULT_BRANCH=$(node tooling/ci/git-environment.mjs trunk 2>/dev/null || echo main)
 if [ "${SKIP_BRANCH_CHECK:-0}" = "1" ]; then
   echo "Skipping branch-name policy on pre-push."
 elif [ "$CURRENT_BRANCH" != "HEAD" ] && [ "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ]; then
@@ -27,30 +27,50 @@ fi
 
 pnpm biome:check
 pnpm type-check
-pnpm build
+# Dead code and the bundle-size budget: CI's Knip and Build lanes, which every recent red PR CI
+# run failed on. The build reads no env file (--defaults), as CI's Build verify lane builds: the
+# size budget is measured on that build, and a .env.local build carries ~11 kB more first-paint JS.
+pnpm knip
+pnpm build --defaults
 pnpm build:check
+pnpm size
+
+# The base every step below measures the push from, computed once (resolveBase in
+# tooling/ci/git-environment.mjs): the upstream, else origin/<trunk> on a branch's first push —
+# without an upstream the diff would be empty and every gate below would skip.
+PUSH_BASE=$(node tooling/ci/git-environment.mjs base) || {
+  echo "✖ Cannot resolve the push base (tooling/ci/git-environment.mjs base)." >&2
+  exit 1
+}
+
+# Which pushed files make a step below run is one rule, pushSteps in tooling/ci/affected.mjs (the
+# `pnpm test:affected` preview prints the same answers). It answers yes or no; anything else (it
+# could not run) runs the step, so a broken answer never skips a gate.
+step_runs() {
+  [ "$(node tooling/ci/affected.mjs --base "$PUSH_BASE" --runs "$1")" != "no" ]
+}
 
 # Markdown lint on the pushed diff (mirrors the Docs lint CI lane). lint-staged
 # only formats staged markdown; this lints every changed file in the push.
-# Base falls back to origin/main when the branch has no upstream yet (first
-# push of a new branch) — otherwise the diff is empty and the gate is skipped.
-PUSH_BASE=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)
-PUSHED_MD=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E '\.md$' || true)
-if [ -n "$PUSHED_MD" ]; then
-  pnpm docs:lint:changed
+if step_runs 'pnpm docs:lint:changed'; then
+  pnpm docs:lint:changed --base "$PUSH_BASE"
 else
   echo "Skipping changed-markdown lint on pre-push (no markdown changes)."
 fi
 
 # Unit tests (matches the CI unit lane).
-# Run only when pushed commits include unit-relevant files.
-PUSHED_UNIT_RELEVANT=$(git diff --name-only "$PUSH_BASE"...HEAD 2>/dev/null | grep -E \
-  '^(src/|tests/utils/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)' || true)
-if [ -n "$PUSHED_UNIT_RELEVANT" ]; then
-  pnpm test
+# Run only when pushed commits include unit-relevant files (UNIT_RELEVANT in affected.mjs).
+# `pnpm test:pre-push` runs the files `pnpm test:select` picks for them (an escalating change, or a
+# selection that cannot be built, runs the whole suite; CI runs every suite).
+if step_runs 'pnpm test:pre-push'; then
+  pnpm test:pre-push --base "$PUSH_BASE"
 else
   echo "Skipping unit tests on pre-push (no unit-relevant changes)."
 fi
+
+# Semgrep on the pushed auth, HTTP client and CSP code (the PR's Semgrep lane scans everything) —
+# an early check: a finding blocks; no semgrep → a warning.
+pnpm security:semgrep:push --base "$PUSH_BASE"
 
 # API contract drift — every endpoint this app references must exist in
 # clinozy-be's committed route catalog (skips with a notice when the sibling
@@ -66,10 +86,8 @@ pnpm api:types:check
 # (src/ runtime — the only thing Sonar analyzes; tests/mocks/fixtures/scripts are excluded). The
 # gate auto-starts the server on first use (first boot ~2 min) and provisions a token in
 # .env.local. There is no per-gate skip: a red Sonar gate must be fixed, not bypassed.
-SONAR_BASE=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)
-PUSHED_RUNTIME=$(git diff --name-only "$SONAR_BASE"...HEAD 2>/dev/null | grep -E '^src/.*\.(ts|tsx)$' | \
-  grep -Ev '(__tests__/|\.test\.tsx?$|\.spec\.tsx?$|\.fixtures\.ts$|/mock-[^/]*\.ts$|\.d\.ts$)' || true)
-if [ -n "$PUSHED_RUNTIME" ]; then
+# The files are SONAR_RUNTIME without SONAR_EXCLUDED, in affected.mjs.
+if step_runs 'pnpm sonar:scan'; then
   pnpm sonar:scan
 else
   echo "Skipping SonarQube gate on pre-push (no deployed-surface code changes)."

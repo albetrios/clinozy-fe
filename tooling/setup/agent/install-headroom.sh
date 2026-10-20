@@ -5,7 +5,7 @@
 #   uvx --from headroom-ai[mcp] headroom mcp serve
 # so the prerequisite is `uv`/`uvx` (Astral), not a global headroom install —
 # uvx resolves the package into an ephemeral env on first use. This script makes
-# sure uv is on PATH and, unless AGENT_SKIP_MCP_WARM is set, pre-warms the
+# sure uv is on PATH and pre-warms the
 # headroom env so the first MCP call in a session is not a cold download.
 #
 # The codegraph half of the default MCP pair needs nothing here: it is the
@@ -13,7 +13,6 @@
 # `pnpm install` has run.
 #
 # Usage:  bash tooling/setup/agent/install-headroom.sh
-# Env:    AGENT_SKIP_MCP_WARM=1 — install uv but skip the uvx pre-warm
 #
 # BEST-EFFORT: exits non-zero on failure; bootstrap.sh logs and carries on.
 set -uo pipefail
@@ -50,11 +49,6 @@ fi
 
 persist_path "${HOME}/.local/bin"
 log "uv $(uv --version 2>/dev/null | awk '{print $2}') ready ($(command -v uvx))"
-
-if [ "${AGENT_SKIP_MCP_WARM:-0}" = "1" ]; then
-  log "AGENT_SKIP_MCP_WARM=1 — skipping the headroom pre-warm."
-  exit 0
-fi
 
 # Pre-warm: resolve + cache headroom-ai[mcp] now so the first MCP call in the
 # session is instant. --help exits 0 without starting a server.

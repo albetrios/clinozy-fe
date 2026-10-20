@@ -1,9 +1,8 @@
-import assert from 'node:assert/strict';
+import { expect, it } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -49,142 +48,140 @@ async function choose(
   return { environment, asked };
 }
 
-test('parseBuildArguments reads --env in both spellings', () => {
-  assert.deepEqual(parseBuildArguments([]), {});
-  assert.deepEqual(parseBuildArguments(['--env', 'production']), {
+it('parseBuildArguments reads --env in both spellings', () => {
+  expect(parseBuildArguments([])).toStrictEqual({});
+  expect(parseBuildArguments(['--env', 'production'])).toStrictEqual({
     environment: 'production',
   });
-  assert.deepEqual(parseBuildArguments(['--env=development']), {
+  expect(parseBuildArguments(['--env=development'])).toStrictEqual({
     environment: 'development',
   });
 });
 
-test('parseBuildArguments rejects an unknown environment, a missing value and other flags', () => {
-  assert.throws(
-    () => parseBuildArguments(['--env', 'staging']),
+it('parseBuildArguments rejects an unknown environment, a missing value and other flags', () => {
+  expect(() => parseBuildArguments(['--env', 'staging'])).toThrow(
     /"staging" is not an environment/,
   );
-  assert.throws(() => parseBuildArguments(['--env']), /--env needs an environment/);
-  assert.throws(
-    () => parseBuildArguments(['--env', '--mode']),
+  expect(() => parseBuildArguments(['--env'])).toThrow(/--env needs an environment/);
+  expect(() => parseBuildArguments(['--env', '--mode'])).toThrow(
     /--env needs an environment/,
   );
-  assert.throws(() => parseBuildArguments(['--mode', 'x']), /Unknown argument "--mode"/);
+  expect(() => parseBuildArguments(['--mode', 'x'])).toThrow(/Unknown argument "--mode"/);
 });
 
-test('availableEnvironments lists the env files that exist, in a fixed order', async () => {
+it('availableEnvironments lists the env files that exist, in a fixed order', async () => {
   await withEnvFiles(['production', 'local'], (root) => {
-    assert.deepEqual(availableEnvironments(root), ['local', 'production']);
+    expect(availableEnvironments(root)).toStrictEqual(['local', 'production']);
   });
   await withEnvFiles([], (root) => {
-    assert.deepEqual(availableEnvironments(root), []);
+    expect(availableEnvironments(root)).toStrictEqual([]);
   });
 });
 
-test('resolveAnswer takes a number, a name, or Enter for the first listed', () => {
+it('resolveAnswer takes a number, a name, or Enter for the first listed', () => {
   const available = ['local', 'development', 'production'];
-  assert.equal(resolveAnswer('', available), 'local');
-  assert.equal(resolveAnswer('  ', available), 'local');
-  assert.equal(resolveAnswer('2', available), 'development');
-  assert.equal(resolveAnswer(' Production ', available), 'production');
-  assert.equal(resolveAnswer('4', available), undefined);
-  assert.equal(resolveAnswer('0', available), undefined);
-  assert.equal(resolveAnswer('staging', available), undefined);
-  assert.equal(resolveAnswer('', ['development']), 'development');
+  expect(resolveAnswer('', available)).toBe('local');
+  expect(resolveAnswer('  ', available)).toBe('local');
+  expect(resolveAnswer('2', available)).toBe('development');
+  expect(resolveAnswer(' Production ', available)).toBe('production');
+  expect(resolveAnswer('4', available)).toBe(undefined);
+  expect(resolveAnswer('0', available)).toBe(undefined);
+  expect(resolveAnswer('staging', available)).toBe(undefined);
+  expect(resolveAnswer('', ['development'])).toBe('development');
 });
 
-test('asks in a terminal when .env.local exists, offering every env file present', async () => {
+it('asks in a terminal when .env.local exists, offering every env file present', async () => {
   await withEnvFiles(['local', 'development', 'production'], async (root) => {
     const { environment, asked } = await choose(root, { answer: 'development' });
-    assert.equal(environment, 'development');
-    assert.deepEqual(asked, [['local', 'development', 'production']]);
+    expect(environment).toBe('development');
+    expect(asked).toStrictEqual([['local', 'development', 'production']]);
   });
 });
 
-test('asks when only .env.development exists', async () => {
+it('asks when only .env.development exists', async () => {
   await withEnvFiles(['development'], async (root) => {
     const { environment, asked } = await choose(root, { answer: 'development' });
-    assert.equal(environment, 'development');
-    assert.deepEqual(asked, [['development']]);
+    expect(environment).toBe('development');
+    expect(asked).toStrictEqual([['development']]);
   });
 });
 
-test('--env and BUILD_ENVIRONMENT choose without asking', async () => {
+it('--env and BUILD_ENVIRONMENT choose without asking', async () => {
   await withEnvFiles(['local', 'production'], async (root) => {
     const flag = await choose(root, { argv: ['--env', 'production'] });
-    assert.deepEqual(flag, { environment: 'production', asked: [] });
+    expect(flag).toStrictEqual({ environment: 'production', asked: [] });
     const shell = await choose(root, { env: { BUILD_ENVIRONMENT: 'local' } });
-    assert.deepEqual(shell, { environment: 'local', asked: [] });
+    expect(shell).toStrictEqual({ environment: 'local', asked: [] });
   });
 });
 
-test('a chosen environment without its env file stops before the build', async () => {
+it('a chosen environment without its env file stops before the build', async () => {
   await withEnvFiles(['local'], async (root) => {
-    await assert.rejects(
-      choose(root, { argv: ['--env', 'production'] }),
+    await expect(choose(root, { argv: ['--env', 'production'] })).rejects.toThrow(
       /no \.env\.production/,
     );
   });
 });
 
-test('never asks in CI, outside a terminal, or with no env file — Vite defaults apply', async () => {
+it('never asks in CI, outside a terminal, or with no env file — Vite defaults apply', async () => {
   await withEnvFiles(['local', 'development'], async (root) => {
-    assert.deepEqual(await choose(root, { env: { CI: 'true' } }), {
+    expect(await choose(root, { env: { CI: 'true' } })).toStrictEqual({
       environment: undefined,
       asked: [],
     });
-    assert.deepEqual(await choose(root, { interactive: false }), {
+    expect(await choose(root, { interactive: false })).toStrictEqual({
       environment: undefined,
       asked: [],
     });
   });
   await withEnvFiles([], async (root) => {
-    assert.deepEqual(await choose(root), { environment: undefined, asked: [] });
+    expect(await choose(root)).toStrictEqual({ environment: undefined, asked: [] });
   });
 });
 
-test('--sentry is read alongside --env, in either order', () => {
-  assert.deepEqual(parseBuildArguments(['--sentry']), { sentry: true });
-  assert.deepEqual(parseBuildArguments(['--env', 'production', '--sentry']), {
+it('--sentry is read alongside --env, in either order', () => {
+  expect(parseBuildArguments(['--sentry'])).toStrictEqual({ sentry: true });
+  expect(parseBuildArguments(['--env', 'production', '--sentry'])).toStrictEqual({
     environment: 'production',
     sentry: true,
   });
-  assert.deepEqual(parseBuildArguments(['--sentry', '--env=development']), {
+  expect(parseBuildArguments(['--sentry', '--env=development'])).toStrictEqual({
     environment: 'development',
     sentry: true,
   });
-  assert.throws(
-    () => parseBuildArguments(['--env', '--sentry']),
+  expect(() => parseBuildArguments(['--env', '--sentry'])).toThrow(
     /--env needs an environment/,
   );
 });
 
-test('childEnvironment sets BUILD_ENVIRONMENT, and the Sentry upload only for --sentry', () => {
+it('childEnvironment sets BUILD_ENVIRONMENT, and the Sentry upload only for --sentry', () => {
   const env = { PATH: '/usr/bin' };
-  assert.deepEqual(childEnvironment({ env }), { PATH: '/usr/bin' });
-  assert.deepEqual(childEnvironment({ environment: 'production', env }), {
+  expect(childEnvironment({ env })).toStrictEqual({ PATH: '/usr/bin' });
+  expect(childEnvironment({ environment: 'production', env })).toStrictEqual({
     PATH: '/usr/bin',
     BUILD_ENVIRONMENT: 'production',
   });
-  assert.deepEqual(childEnvironment({ environment: 'production', sentry: true, env }), {
+  expect(
+    childEnvironment({ environment: 'production', sentry: true, env }),
+  ).toStrictEqual({
     PATH: '/usr/bin',
     BUILD_ENVIRONMENT: 'production',
     SENTRY_UPLOAD_SOURCEMAPS: 'true',
   });
   // Without --sentry nothing is added — a value the shell set on purpose is passed through.
-  assert.deepEqual(childEnvironment({ env: { SENTRY_UPLOAD_SOURCEMAPS: 'true' } }), {
+  expect(childEnvironment({ env: { SENTRY_UPLOAD_SOURCEMAPS: 'true' } })).toStrictEqual({
     SENTRY_UPLOAD_SOURCEMAPS: 'true',
   });
 });
 
-test('the command line stops on a bad argument before anything is built', () => {
+it('the command line stops on a bad argument before anything is built', () => {
   const script = fileURLToPath(new URL('./build.mjs', import.meta.url));
   for (const [args, message] of [
     [['--env', 'staging'], 'pnpm build: "staging" is not an environment'],
     [['--mode', 'production'], 'pnpm build: Unknown argument "--mode"'],
   ]) {
     const result = spawnSync('node', [script, ...args], { encoding: 'utf8' });
-    assert.equal(result.status, 1, args.join(' '));
-    assert.ok(result.stderr.includes(message), result.stderr);
+    expect(result.status, args.join(' ')).toBe(1);
+    expect(result.stderr.includes(message), result.stderr).toBeTruthy();
   }
 });

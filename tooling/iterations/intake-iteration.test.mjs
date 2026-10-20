@@ -5,7 +5,7 @@
  * `--both` into the sibling's same-named iteration on its own Baseline, the README rows it fills,
  * the gate (`--check`) and `--compact`. Any problem stops the intake with nothing written.
  */
-import assert from 'node:assert/strict';
+import { afterEach, describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
 import {
   existsSync,
@@ -16,7 +16,6 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { afterEach, describe, test } from 'node:test';
 import { summarizeIntakeDiff } from './diff-iterations.mjs';
 import {
   brief,
@@ -99,8 +98,8 @@ function withBaseline({ fields = {} } = {}) {
 }
 
 describe('arguments and paths', () => {
-  test('reads the flags and values; --sibling implies --both', () => {
-    assert.deepEqual(
+  it('reads the flags and values; --sibling implies --both', () => {
+    expect(
       parseIntakeArguments([
         NAME,
         '~/drop',
@@ -110,30 +109,29 @@ describe('arguments and paths', () => {
         '--sibling',
         '../x-be',
       ]),
-      {
-        iteration: NAME,
-        source: '~/drop',
-        mode: 'overlay',
-        check: false,
-        compact: false,
-        baseline: undefined,
-        createInSibling: true,
-        siblingPath: '../x-be',
-        replace: true,
-        dryRun: true,
-        help: false,
-      },
-    );
-    assert.equal(parseIntakeArguments([NAME, 'drop']).mode, 'full');
+    ).toStrictEqual({
+      iteration: NAME,
+      source: '~/drop',
+      mode: 'overlay',
+      check: false,
+      compact: false,
+      baseline: undefined,
+      createInSibling: true,
+      siblingPath: '../x-be',
+      replace: true,
+      dryRun: true,
+      help: false,
+    });
+    expect(parseIntakeArguments([NAME, 'drop']).mode).toBe('full');
     const check = parseIntakeArguments([NAME, '--check', '--baseline', LAUNCH]);
-    assert.equal(check.check, true);
-    assert.equal(check.baseline, LAUNCH);
+    expect(check.check).toBe(true);
+    expect(check.baseline).toBe(LAUNCH);
     const compact = parseIntakeArguments([NAME, '--compact', '--dry-run']);
-    assert.equal(compact.compact, true);
-    assert.equal(compact.dryRun, true);
+    expect(compact.compact).toBe(true);
+    expect(compact.dryRun).toBe(true);
   });
 
-  test('--compact takes only the iteration and --dry-run', () => {
+  it('--compact takes only the iteration and --dry-run', () => {
     for (const commandLine of [
       [NAME, 'drop', '--compact'],
       [NAME, '--compact', '--check'],
@@ -141,189 +139,179 @@ describe('arguments and paths', () => {
       [NAME, '--compact', '--replace'],
       [NAME, '--compact', '--both'],
     ]) {
-      assert.throws(
-        () => parseIntakeArguments(commandLine),
+      expect(() => parseIntakeArguments(commandLine)).toThrow(
         /--(compact|check) takes only/,
       );
     }
   });
 
-  test('refuses an unknown mode, --check mixed with intake options, and a lone --baseline', () => {
-    assert.throws(
-      () => parseIntakeArguments([NAME, 'drop', '--mode', 'partial']),
+  it('refuses an unknown mode, --check mixed with intake options, and a lone --baseline', () => {
+    expect(() => parseIntakeArguments([NAME, 'drop', '--mode', 'partial'])).toThrow(
       /Unknown --mode "partial"/,
     );
-    assert.throws(() => parseIntakeArguments([NAME, 'drop', '--mode']), /needs a value/);
-    assert.throws(
-      () => parseIntakeArguments([NAME, 'drop', '--check']),
+    expect(() => parseIntakeArguments([NAME, 'drop', '--mode'])).toThrow(/needs a value/);
+    expect(() => parseIntakeArguments([NAME, 'drop', '--check'])).toThrow(
       /--check takes only/,
     );
-    assert.throws(
-      () => parseIntakeArguments([NAME, '--check', '--mode', 'brief']),
+    expect(() => parseIntakeArguments([NAME, '--check', '--mode', 'brief'])).toThrow(
       /--check takes only/,
     );
-    assert.throws(
-      () => parseIntakeArguments([NAME, 'drop', '--baseline', LAUNCH]),
+    expect(() => parseIntakeArguments([NAME, 'drop', '--baseline', LAUNCH])).toThrow(
       /--baseline works only with --check/,
     );
-    assert.throws(
-      () => parseIntakeArguments([NAME, 'drop', 'extra']),
+    expect(() => parseIntakeArguments([NAME, 'drop', 'extra'])).toThrow(
       /Too many arguments/,
     );
   });
 
-  test('shows the source repository-relative, home-relative or absolute', () => {
-    assert.equal(
+  it('shows the source repository-relative, home-relative or absolute', () => {
+    expect(
       displaySourcePath({ repositoryRoot: '/work/fe', source: '/work/fe/drops/a' }),
-      'drops/a',
-    );
-    assert.equal(
+    ).toBe('drops/a');
+    expect(
       displaySourcePath({ repositoryRoot: '/work/fe', source: '/elsewhere/a' }),
-      '/elsewhere/a',
-    );
+    ).toBe('/elsewhere/a');
   });
 
-  test('renders the Intake note: received, then carried forward from the Baseline', () => {
-    assert.equal(
+  it('renders the Intake note: received, then carried forward from the Baseline', () => {
+    expect(
       renderIntakeNote({
         mode: 'full',
         taken: ['a', 'b'],
         total: 2,
         baseline: undefined,
       }),
-      '2 received',
-    );
-    assert.equal(
+    ).toBe('2 received');
+    expect(
       renderIntakeNote({
         mode: 'overlay',
         taken: ['a.md', 'b.md'],
         total: 9,
         baseline: LAUNCH,
       }),
-      `2 received (a.md, b.md) · 7 carried forward from ${LAUNCH}`,
-    );
+    ).toBe(`2 received (a.md, b.md) · 7 carried forward from ${LAUNCH}`);
   });
 });
 
 describe('full mode', () => {
-  test('copies a complete drop flat and fills the six intake rows', () => {
+  it('copies a complete drop flat and fills the six intake rows', () => {
     const { repositoryRoot, drop } = setup();
     writeFileSync(join(drop, 'README.md'), '# not copied\n');
     writeFileSync(join(drop, '.DS_Store'), '');
     mkdirSync(join(drop, 'screenshots'));
     const result = runIntake([NAME, drop], { repositoryRoot, today: TODAY });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(repositoryRoot), Object.keys(completeDrop()).sort());
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(repositoryRoot)).toStrictEqual(Object.keys(completeDrop()).sort());
     const fields = readmeFields(repositoryRoot);
-    assert.equal(fields.get('Drop placed'), TODAY);
-    assert.equal(fields.get('Drop source'), drop);
-    assert.equal(fields.get('Intake mode'), 'full');
-    assert.equal(fields.get('Intake note'), `${DROP_SIZE} received`);
-    assert.equal(fields.get('Schema-routes'), SCHEMA_ROUTES_HASH);
-    assert.equal(fields.get('Intake hash'), intakeHash(intakePath(repositoryRoot)));
-    assert.ok(hasLine(result, 'skipped README.md'));
-    assert.ok(hasLine(result, 'skipped screenshots/'));
-    assert.ok(hasLine(result, 'planning runs the gate first'));
+    expect(fields.get('Drop placed')).toBe(TODAY);
+    expect(fields.get('Drop source')).toBe(drop);
+    expect(fields.get('Intake mode')).toBe('full');
+    expect(fields.get('Intake note')).toBe(`${DROP_SIZE} received`);
+    expect(fields.get('Schema-routes')).toBe(SCHEMA_ROUTES_HASH);
+    expect(fields.get('Intake hash')).toBe(intakeHash(intakePath(repositoryRoot)));
+    expect(hasLine(result, 'skipped README.md')).toBeTruthy();
+    expect(hasLine(result, 'skipped screenshots/')).toBeTruthy();
+    expect(hasLine(result, 'planning runs the gate first')).toBeTruthy();
   });
 
-  test('a missing mandatory file stops the intake with nothing written', () => {
+  it('a missing mandatory file stops the intake with nothing written', () => {
     const { repositoryRoot } = setup();
     const { 'preset.md': _preset, 'beta.md': _beta, ...partial } = completeDrop();
     const missing = writeDrop(join(scratchFolder(), 'partial'), partial);
     const result = runIntake([NAME, missing], { repositoryRoot, today: TODAY });
-    assert.equal(result.exitCode, 1);
-    assert.ok(hasLine(result, 'missing mandatory file(s): beta.md, preset.md'));
-    assert.equal(existsSync(intakePath(repositoryRoot)), false);
-    assert.equal(readmeFields(repositoryRoot).get('Drop placed'), '—');
+    expect(result.exitCode).toBe(1);
+    expect(hasLine(result, 'missing mandatory file(s): beta.md, preset.md')).toBeTruthy();
+    expect(existsSync(intakePath(repositoryRoot))).toBe(false);
+    expect(readmeFields(repositoryRoot).get('Drop placed')).toBe('—');
   });
 
-  test('an optional file _index.md names is mandatory', () => {
+  it('an optional file _index.md names is mandatory', () => {
     const { repositoryRoot } = setup();
     const { '_patterns.md': _patterns, ...drop } = completeDrop();
     drop['_index.md'] += '\nShared: `_patterns.md` (drawer, table).\n';
     const source = writeDrop(join(scratchFolder(), 'drop'), drop);
     const result = runIntake([NAME, source], { repositoryRoot });
-    assert.equal(result.exitCode, 1);
-    assert.ok(hasLine(result, 'missing mandatory file(s): _patterns.md'));
+    expect(result.exitCode).toBe(1);
+    expect(hasLine(result, 'missing mandatory file(s): _patterns.md')).toBeTruthy();
   });
 
-  test('warns about extras and screen files _index.md does not list, but still places the drop', () => {
+  it('warns about extras and screen files _index.md does not list, but still places the drop', () => {
     const { repositoryRoot, drop } = setup();
     writeFileSync(join(drop, 'gamma.md'), '# Screen: Gamma\n');
     writeFileSync(join(drop, 'notes.txt'), 'x');
     const result = runIntake([NAME, drop], { repositoryRoot, today: TODAY });
-    assert.equal(result.exitCode, 0);
-    assert.ok(
+    expect(result.exitCode).toBe(0);
+    expect(
       result.lines.includes(
         '! extra file (not in the required or optional set): notes.txt',
       ),
-    );
-    assert.ok(result.lines.includes('! screen file not listed in _index.md: gamma.md'));
+    ).toBeTruthy();
+    expect(
+      result.lines.includes('! screen file not listed in _index.md: gamma.md'),
+    ).toBeTruthy();
   });
 
-  test('the same drop again changes nothing; a dry run writes nothing', () => {
+  it('the same drop again changes nothing; a dry run writes nothing', () => {
     const { repositoryRoot, drop } = setup();
     const dry = runIntake([NAME, drop, '--dry-run'], { repositoryRoot });
-    assert.equal(dry.exitCode, 0, dry.lines.join('\n'));
-    assert.match(dry.lines[0], /the snapshot passes/);
-    assert.equal(existsSync(intakePath(repositoryRoot)), false);
-    assert.equal(runIntake([NAME, drop], { repositoryRoot, today: TODAY }).exitCode, 0);
+    expect(dry.exitCode, dry.lines.join('\n')).toBe(0);
+    expect(dry.lines[0]).toMatch(/the snapshot passes/);
+    expect(existsSync(intakePath(repositoryRoot))).toBe(false);
+    expect(runIntake([NAME, drop], { repositoryRoot, today: TODAY }).exitCode).toBe(0);
     const readme = readmeText(repositoryRoot);
     const again = runIntake([NAME, drop], { repositoryRoot, today: '2026-10-09' });
-    assert.equal(again.exitCode, 0);
-    assert.ok(hasLine(again, `0 new, 0 replaced, 0 removed, ${DROP_SIZE} unchanged`));
-    assert.equal(readmeText(repositoryRoot), readme);
+    expect(again.exitCode).toBe(0);
+    expect(
+      hasLine(again, `0 new, 0 replaced, 0 removed, ${DROP_SIZE} unchanged`),
+    ).toBeTruthy();
+    expect(readmeText(repositoryRoot)).toBe(readme);
   });
 
-  test('the launch is always full', () => {
+  it('the launch is always full', () => {
     const repositoryRoot = createRepository();
     writeIteration({ repositoryRoot, name: LAUNCH });
     const drop = writeDrop(join(scratchFolder(), 'drop'), completeDrop());
     const result = runIntake([LAUNCH, drop, '--mode', 'overlay'], { repositoryRoot });
-    assert.equal(result.exitCode, 1);
-    assert.ok(hasLine(result, 'The launch is always --mode full'));
+    expect(result.exitCode).toBe(1);
+    expect(hasLine(result, 'The launch is always --mode full')).toBeTruthy();
   });
 });
 
 describe('replacing a snapshot', () => {
-  test('a different drop shows its diff and stops; --replace replaces the whole snapshot while planning', () => {
+  it('a different drop shows its diff and stops; --replace replaces the whole snapshot while planning', () => {
     const { repositoryRoot, drop } = setup({ intake: completeDrop() });
     writeFileSync(join(drop, 'alpha.md'), '# Screen: Alpha — redesigned\n');
     rmSync(join(drop, '_patterns.md'));
     const conflict = runIntake([NAME, drop], { repositoryRoot });
-    assert.equal(conflict.exitCode, 1);
-    assert.ok(
+    expect(conflict.exitCode).toBe(1);
+    expect(
       conflict.lines.some(
         (line) =>
           line.includes('intake-files/alpha.md differs from the new snapshot') &&
           line.includes('redesigned'),
       ),
-    );
-    assert.ok(
+    ).toBeTruthy();
+    expect(
       hasLine(
         conflict,
         'already holds a different snapshot (changed: alpha.md · removed: _patterns.md) — re-run with --replace',
       ),
-    );
-    assert.equal(readIntake(repositoryRoot, 'alpha.md'), '# Screen: Alpha\n');
+    ).toBeTruthy();
+    expect(readIntake(repositoryRoot, 'alpha.md')).toBe('# Screen: Alpha\n');
 
     const replaced = runIntake([NAME, drop, '--replace'], {
       repositoryRoot,
       today: TODAY,
     });
-    assert.equal(replaced.exitCode, 0, replaced.lines.join('\n'));
-    assert.equal(
-      readIntake(repositoryRoot, 'alpha.md'),
-      '# Screen: Alpha — redesigned\n',
-    );
-    assert.equal(existsSync(join(intakePath(repositoryRoot), '_patterns.md')), false);
-    assert.equal(
-      readmeFields(repositoryRoot).get('Intake hash'),
+    expect(replaced.exitCode, replaced.lines.join('\n')).toBe(0);
+    expect(readIntake(repositoryRoot, 'alpha.md')).toBe('# Screen: Alpha — redesigned\n');
+    expect(existsSync(join(intakePath(repositoryRoot), '_patterns.md'))).toBe(false);
+    expect(readmeFields(repositoryRoot).get('Intake hash')).toBe(
       intakeHash(intakePath(repositoryRoot)),
     );
   });
 
-  test('--replace works only while planning', () => {
+  it('--replace works only while planning', () => {
     const ready = setup({ status: 'ready-for-approval', intake: completeDrop() });
     writeFileSync(join(ready.drop, 'alpha.md'), 'changed\n');
     const refused = planIntake({
@@ -333,20 +321,23 @@ describe('replacing a snapshot', () => {
       siblingRoot: undefined,
       replace: true,
     });
-    assert.ok(
+    expect(
       refused.problems.some((problem) =>
         problem.includes('--replace replaces a snapshot only while Status is planning'),
       ),
-    );
-    assert.throws(() => applyIntake(refused), /only while Status is planning/);
+    ).toBeTruthy();
+    expect(() => applyIntake(refused)).toThrow(/only while Status is planning/);
   });
 
-  test('refuses any change once the Status is approved or later — files or the recorded hash', () => {
+  it('refuses any change once the Status is approved or later — files or the recorded hash', () => {
     for (const status of ['approved', 'implementing', 'done', 'frozen']) {
       const { repositoryRoot, drop } = setup({ status });
       const result = runIntake([NAME, drop], { repositoryRoot });
-      assert.equal(result.exitCode, 1, status);
-      assert.ok(hasLine(result, `the intake is locked (Status ${status})`), status);
+      expect(result.exitCode, status).toBe(1);
+      expect(
+        hasLine(result, `the intake is locked (Status ${status})`),
+        status,
+      ).toBeTruthy();
     }
     const { repositoryRoot } = setup({ status: 'approved', intake: completeDrop() });
     writeFileSync(
@@ -354,13 +345,13 @@ describe('replacing a snapshot', () => {
       'edited after approval\n',
     );
     const rerecord = runIntake([NAME, intakePath(repositoryRoot)], { repositoryRoot });
-    assert.equal(rerecord.exitCode, 1);
-    assert.ok(hasLine(rerecord, 'the intake is locked (Status approved)'));
+    expect(rerecord.exitCode).toBe(1);
+    expect(hasLine(rerecord, 'the intake is locked (Status approved)')).toBeTruthy();
   });
 });
 
 describe('overlay mode', () => {
-  test("stores the received files, resolved over the Baseline's snapshot", () => {
+  it("stores the received files, resolved over the Baseline's snapshot", () => {
     const repositoryRoot = withBaseline();
     const received = writeDrop(join(scratchFolder(), 'changes'), {
       'alpha.md': '# Screen: Alpha — with a returns badge\n',
@@ -371,87 +362,89 @@ describe('overlay mode', () => {
       repositoryRoot,
       today: TODAY,
     });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(repositoryRoot), ['_index.md', 'alpha.md', 'gamma.md']);
-    assert.equal(
-      readIntake(repositoryRoot, 'alpha.md'),
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(repositoryRoot)).toStrictEqual([
+      '_index.md',
+      'alpha.md',
+      'gamma.md',
+    ]);
+    expect(readIntake(repositoryRoot, 'alpha.md')).toBe(
       '# Screen: Alpha — with a returns badge\n',
     );
     const { files } = resolveIntakeSnapshot({ repositoryRoot, iteration: NAME });
-    assert.deepEqual(
-      [...files.keys()].sort(),
+    expect([...files.keys()].sort()).toStrictEqual(
       [...Object.keys(completeDrop()), 'gamma.md'].sort(),
     );
-    assert.equal(
-      files.get('beta.md'),
+    expect(files.get('beta.md')).toBe(
       join(intakePath(repositoryRoot, LAUNCH), 'beta.md'),
     );
     const fields = readmeFields(repositoryRoot);
-    assert.equal(fields.get('Intake mode'), 'overlay');
-    assert.equal(
-      fields.get('Intake note'),
+    expect(fields.get('Intake mode')).toBe('overlay');
+    expect(fields.get('Intake note')).toBe(
       `3 received (_index.md, alpha.md, gamma.md) · ${DROP_SIZE - 2} carried forward from ${LAUNCH}`,
     );
-    assert.equal(
-      fields.get('Intake hash'),
+    expect(fields.get('Intake hash')).toBe(
       resolvedIntakeHash({ repositoryRoot, iteration: NAME }),
     );
-    assert.equal(fields.get('Schema-routes'), SCHEMA_ROUTES_HASH);
-    assert.equal(
+    expect(fields.get('Schema-routes')).toBe(SCHEMA_ROUTES_HASH);
+    expect(
       runIntake([NAME, '--check', '--baseline', LAUNCH], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
   });
 
-  test('needs a Baseline the user named and at least one received file', () => {
+  it('needs a Baseline the user named and at least one received file', () => {
     const received = writeDrop(join(scratchFolder(), 'changes'), { 'alpha.md': 'x\n' });
     const scratch = runIntake([NAME, received, '--mode', 'overlay'], {
       repositoryRoot: withBaseline({ fields: { baseline: 'none' } }),
     });
-    assert.equal(scratch.exitCode, 1);
-    assert.ok(hasLine(scratch, `${NAME} starts from scratch (Baseline none)`));
-    assert.ok(
+    expect(scratch.exitCode).toBe(1);
+    expect(hasLine(scratch, `${NAME} starts from scratch (Baseline none)`)).toBeTruthy();
+    expect(
       hasLine(scratch, `record it first: pnpm iteration:baseline ${NAME} <baseline>`),
-    );
+    ).toBeTruthy();
 
     const repositoryRoot = withBaseline({ fields: { baseline: '—' } });
     const noBaseline = runIntake([NAME, received, '--mode', 'overlay'], {
       repositoryRoot,
     });
-    assert.equal(noBaseline.exitCode, 1);
-    assert.ok(
+    expect(noBaseline.exitCode).toBe(1);
+    expect(
       hasLine(noBaseline, `${NAME} has no Baseline (—) — record none, the default`),
-    );
+    ).toBeTruthy();
 
     const withLaunch = withBaseline();
     const empty = writeDrop(join(scratchFolder(), 'empty'), {});
     const nothing = runIntake([NAME, empty, '--mode', 'overlay'], {
       repositoryRoot: withLaunch,
     });
-    assert.equal(nothing.exitCode, 1);
-    assert.ok(hasLine(nothing, '--mode overlay needs at least one received file'));
+    expect(nothing.exitCode).toBe(1);
+    expect(
+      hasLine(nothing, '--mode overlay needs at least one received file'),
+    ).toBeTruthy();
   });
 
-  test('refuses a Baseline that fails the gate', () => {
+  it('refuses a Baseline that fails the gate', () => {
     const repositoryRoot = withBaseline();
     writeFileSync(join(intakePath(repositoryRoot, LAUNCH), 'beta.md'), 'edited\n');
     const received = writeDrop(join(scratchFolder(), 'changes'), { 'alpha.md': 'x\n' });
     const result = runIntake([NAME, received, '--mode', 'overlay'], { repositoryRoot });
-    assert.equal(result.exitCode, 1);
-    assert.ok(
+    expect(result.exitCode).toBe(1);
+    expect(
       hasLine(result, `the Baseline ${LAUNCH} fails the gate — changed since the intake`),
-    );
-    assert.equal(existsSync(intakePath(repositoryRoot)), false);
+    ).toBeTruthy();
+    expect(existsSync(intakePath(repositoryRoot))).toBe(false);
   });
 
-  test('checks the mandatory set on the resulting snapshot', () => {
+  it('checks the mandatory set on the resulting snapshot', () => {
     const repositoryRoot = withBaseline();
     const received = writeDrop(join(scratchFolder(), 'changes'), {
       '_index.md': `${completeDrop()['_index.md']}| gamma | /gamma | Third |\n`,
     });
     const result = runIntake([NAME, received, '--mode', 'overlay'], { repositoryRoot });
-    assert.equal(result.exitCode, 1);
-    assert.ok(hasLine(result, 'The snapshot is missing mandatory file(s): gamma.md'));
+    expect(result.exitCode).toBe(1);
+    expect(
+      hasLine(result, 'The snapshot is missing mandatory file(s): gamma.md'),
+    ).toBeTruthy();
   });
 });
 
@@ -469,46 +462,45 @@ describe('brief from scratch (Baseline none, the default)', () => {
     return repositoryRoot;
   }
 
-  test('is the BRIEF.md alone — nothing carried forward — and passes the gate', () => {
+  it('is the BRIEF.md alone — nothing carried forward — and passes the gate', () => {
     const repositoryRoot = fromScratch();
     const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
     const result = runIntake([NAME, folder, '--mode', 'brief'], {
       repositoryRoot,
       today: TODAY,
     });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(repositoryRoot), ['BRIEF.md']);
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(repositoryRoot)).toStrictEqual(['BRIEF.md']);
     const fields = readmeFields(repositoryRoot);
-    assert.equal(fields.get('Intake mode'), 'brief');
-    assert.equal(fields.get('Intake note'), '1 received (BRIEF.md) · from scratch');
-    assert.equal(fields.get('Baseline'), 'none');
-    assert.equal(runIntake([NAME, '--check'], { repositoryRoot }).exitCode, 0);
+    expect(fields.get('Intake mode')).toBe('brief');
+    expect(fields.get('Intake note')).toBe('1 received (BRIEF.md) · from scratch');
+    expect(fields.get('Baseline')).toBe('none');
+    expect(runIntake([NAME, '--check'], { repositoryRoot }).exitCode).toBe(0);
   });
 
-  test('refuses design files beside the BRIEF.md — those go in with --mode full', () => {
+  it('refuses design files beside the BRIEF.md — those go in with --mode full', () => {
     const repositoryRoot = fromScratch();
     const folder = writeDrop(join(scratchFolder(), 'brief'), {
       'BRIEF.md': brief(),
       'alpha.md': '# Screen: Alpha\n',
     });
     const result = runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot });
-    assert.equal(result.exitCode, 1);
-    assert.ok(
+    expect(result.exitCode).toBe(1);
+    expect(
       hasLine(
         result,
         'a brief from scratch is BRIEF.md alone, but alpha.md also came in',
       ),
-    );
-    assert.equal(existsSync(intakePath(repositoryRoot)), false);
+    ).toBeTruthy();
+    expect(existsSync(intakePath(repositoryRoot))).toBe(false);
   });
 
-  test('the gate fails when its BRIEF.md is gone or a Baseline is recorded after the intake', () => {
+  it('the gate fails when its BRIEF.md is gone or a Baseline is recorded after the intake', () => {
     const repositoryRoot = fromScratch();
     const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
-    assert.equal(
+    expect(
       runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
     const readme = join(repositoryRoot, 'iterations', NAME, 'README.md');
     writeFileSync(
       readme,
@@ -518,31 +510,32 @@ describe('brief from scratch (Baseline none, the default)', () => {
       ),
     );
     const moved = runIntake([NAME, '--check'], { repositoryRoot });
-    assert.equal(moved.exitCode, 1);
-    assert.ok(
+    expect(moved.exitCode).toBe(1);
+    expect(
       hasLine(
         moved,
         `built on no Baseline (from scratch), but the README's Baseline is ${LAUNCH}`,
       ),
-    );
+    ).toBeTruthy();
   });
 
-  test('--compact has nothing to compact: the BRIEF.md is the whole snapshot', () => {
+  it('--compact has nothing to compact: the BRIEF.md is the whole snapshot', () => {
     const repositoryRoot = fromScratch();
     const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
-    assert.equal(
+    expect(
       runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
     const result = runIntake([NAME, '--compact'], { repositoryRoot });
-    assert.equal(result.exitCode, 1);
-    assert.ok(hasLine(result, 'is a brief from scratch — it stores only its BRIEF.md'));
-    assert.deepEqual(intakeNames(repositoryRoot), ['BRIEF.md']);
+    expect(result.exitCode).toBe(1);
+    expect(
+      hasLine(result, 'is a brief from scratch — it stores only its BRIEF.md'),
+    ).toBeTruthy();
+    expect(intakeNames(repositoryRoot)).toStrictEqual(['BRIEF.md']);
   });
 });
 
 describe('brief mode', () => {
-  test("stores only BRIEF.md, resolves to the Baseline's snapshot plus it — and the diff shows nothing else", () => {
+  it("stores only BRIEF.md, resolves to the Baseline's snapshot plus it — and the diff shows nothing else", () => {
     const repositoryRoot = withBaseline();
     const folder = writeDrop(join(scratchFolder(), 'brief'), {
       'BRIEF.md': brief(),
@@ -552,53 +545,52 @@ describe('brief mode', () => {
       repositoryRoot,
       today: TODAY,
     });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(repositoryRoot), ['BRIEF.md']);
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(repositoryRoot)).toStrictEqual(['BRIEF.md']);
     const fields = readmeFields(repositoryRoot);
-    assert.equal(fields.get('Intake mode'), 'brief');
-    assert.equal(
-      fields.get('Intake hash'),
+    expect(fields.get('Intake mode')).toBe('brief');
+    expect(fields.get('Intake hash')).toBe(
       resolvedIntakeHash({ repositoryRoot, iteration: NAME }),
     );
-    assert.equal(
-      fields.get('Intake note'),
+    expect(fields.get('Intake note')).toBe(
       `1 received (BRIEF.md) · ${DROP_SIZE} carried forward from ${LAUNCH}`,
     );
     const diff = summarizeIntakeDiff({ repositoryRoot, baseline: LAUNCH, current: NAME });
-    assert.deepEqual(diff.files, { added: ['BRIEF.md'], removed: [], changed: [] });
-    assert.equal(
+    expect(diff.files).toStrictEqual({ added: ['BRIEF.md'], removed: [], changed: [] });
+    expect(
       runIntake([NAME, '--check', '--baseline', LAUNCH], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
   });
 
-  test('takes the BRIEF.md file itself as the source', () => {
+  it('takes the BRIEF.md file itself as the source', () => {
     const repositoryRoot = withBaseline();
     const file = join(
       writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() }),
       'BRIEF.md',
     );
     const result = runIntake([NAME, file, '--mode', 'brief'], { repositoryRoot });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.equal(readIntake(repositoryRoot, 'BRIEF.md'), brief());
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(readIntake(repositoryRoot, 'BRIEF.md')).toBe(brief());
   });
 
-  test('needs a BRIEF.md with every template section', () => {
+  it('needs a BRIEF.md with every template section', () => {
     const repositoryRoot = withBaseline();
     const none = writeDrop(join(scratchFolder(), 'none'), { 'notes.md': 'x\n' });
     const missing = runIntake([NAME, none, '--mode', 'brief'], { repositoryRoot });
-    assert.equal(missing.exitCode, 1);
-    assert.ok(hasLine(missing, '--mode brief needs a received BRIEF.md'));
+    expect(missing.exitCode).toBe(1);
+    expect(hasLine(missing, '--mode brief needs a received BRIEF.md')).toBeTruthy();
 
     const thin = writeDrop(join(scratchFolder(), 'thin'), {
       'BRIEF.md': brief().replace('## Acceptance criteria', '## Done when'),
     });
     const incomplete = runIntake([NAME, thin, '--mode', 'brief'], { repositoryRoot });
-    assert.equal(incomplete.exitCode, 1);
-    assert.ok(hasLine(incomplete, 'BRIEF.md is missing section(s): Acceptance criteria'));
+    expect(incomplete.exitCode).toBe(1);
+    expect(
+      hasLine(incomplete, 'BRIEF.md is missing section(s): Acceptance criteria'),
+    ).toBeTruthy();
   });
 
-  test('refuses any other changed file', () => {
+  it('refuses any other changed file', () => {
     const repositoryRoot = withBaseline();
     const folder = writeDrop(join(scratchFolder(), 'brief'), {
       'BRIEF.md': brief(),
@@ -606,14 +598,14 @@ describe('brief mode', () => {
       'gamma.md': '# Screen: Gamma\n',
     });
     const result = runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot });
-    assert.equal(result.exitCode, 1);
-    assert.ok(
+    expect(result.exitCode).toBe(1);
+    expect(
       hasLine(
         result,
         `--mode brief changes only BRIEF.md, but alpha.md, gamma.md differ from the Baseline ${LAUNCH}`,
       ),
-    );
-    assert.equal(existsSync(intakePath(repositoryRoot)), false);
+    ).toBeTruthy();
+    expect(existsSync(intakePath(repositoryRoot))).toBe(false);
   });
 });
 
@@ -622,31 +614,30 @@ describe('the gate (--check)', () => {
   function briefed() {
     const repositoryRoot = withBaseline();
     const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
-    assert.equal(
+    expect(
       runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
     commitAll(repositoryRoot, 'intake', 2_000);
     return repositoryRoot;
   }
   const gate = (repositoryRoot, ...options) =>
     runIntake([NAME, '--check', ...options], { repositoryRoot });
 
-  test('a clean intake passes, with its Baseline', () => {
+  it('a clean intake passes, with its Baseline', () => {
     const repositoryRoot = briefed();
     const result = gate(repositoryRoot, '--baseline', LAUNCH);
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.ok(
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(
       hasLine(
         result,
         `✓ iterations/${NAME}/intake-files/ — ${DROP_SIZE + 1} files (1 stored, ${DROP_SIZE} from ${LAUNCH})`,
       ),
-    );
-    assert.ok(hasLine(result, `✓ iterations/${LAUNCH}/intake-files/`));
-    assert.equal(result.lines.at(-1), 'Gate passed.');
+    ).toBeTruthy();
+    expect(hasLine(result, `✓ iterations/${LAUNCH}/intake-files/`)).toBeTruthy();
+    expect(result.lines.at(-1)).toBe('Gate passed.');
   });
 
-  test('a missing mandatory file fails, naming the folder, the file and the fix', () => {
+  it('a missing mandatory file fails, naming the folder, the file and the fix', () => {
     const repositoryRoot = setup().repositoryRoot;
     const drop = { ...completeDrop() };
     delete drop['shell.md'];
@@ -657,55 +648,57 @@ describe('the gate (--check)', () => {
       intake: drop,
     });
     const result = gate(repositoryRoot);
-    assert.equal(result.exitCode, 1);
-    assert.match(result.lines[0], /^Gate failed — 2 problems\. Stop here/);
-    assert.ok(
+    expect(result.exitCode).toBe(1);
+    expect(result.lines[0]).toMatch(/^Gate failed — 2 problems\. Stop here/);
+    expect(
       result.lines.includes(
         `✗ iterations/${NAME}/intake-files/: missing mandatory file(s): shell.md`,
       ),
-    );
-    assert.ok(
+    ).toBeTruthy();
+    expect(
       result.lines.includes(
         `    fix: re-run the intake: pnpm iteration:intake ${NAME} <source> --replace`,
       ),
-    );
+    ).toBeTruthy();
   });
 
-  test('a brief whose BRIEF.md is removed stores nothing: no intake yet', () => {
+  it('a brief whose BRIEF.md is removed stores nothing: no intake yet', () => {
     const repositoryRoot = briefed();
     rmSync(join(intakePath(repositoryRoot), 'BRIEF.md'));
     const result = gate(repositoryRoot);
-    assert.equal(result.exitCode, 1);
-    assert.ok(result.lines.includes(`✗ iterations/${NAME}/intake-files/: no intake yet`));
+    expect(result.exitCode).toBe(1);
+    expect(
+      result.lines.includes(`✗ iterations/${NAME}/intake-files/: no intake yet`),
+    ).toBeTruthy();
   });
 
-  test("a file missing from the Baseline's intake fails in the Baseline's folder — and in each iteration resolved through it", () => {
+  it("a file missing from the Baseline's intake fails in the Baseline's folder — and in each iteration resolved through it", () => {
     const repositoryRoot = briefed();
     rmSync(join(intakePath(repositoryRoot, LAUNCH), 'shell.md'));
     const result = gate(repositoryRoot, '--baseline', LAUNCH);
-    assert.equal(result.exitCode, 1);
-    assert.ok(
+    expect(result.exitCode).toBe(1);
+    expect(
       result.lines.includes(
         `✗ iterations/${NAME}/intake-files/: missing mandatory file(s): shell.md`,
       ),
-    );
-    assert.ok(
+    ).toBeTruthy();
+    expect(
       hasLine(
         result,
         `a change anywhere in the Baseline chain (${LAUNCH}) changes it too: pnpm iteration:intake ${LAUNCH} --check`,
       ),
-    );
-    assert.ok(
+    ).toBeTruthy();
+    expect(
       result.lines.includes(
         `✗ iterations/${LAUNCH}/intake-files/: missing mandatory file(s): shell.md`,
       ),
-    );
-    assert.ok(
+    ).toBeTruthy();
+    expect(
       hasLine(result, `move it back first (pnpm iteration:status ${LAUNCH} planning`),
-    );
+    ).toBeTruthy();
   });
 
-  test('an edited file fails on the Intake hash and names the file git saw change', () => {
+  it('an edited file fails on the Intake hash and names the file git saw change', () => {
     const repositoryRoot = briefed();
     const recorded = readmeFields(repositoryRoot).get('Intake hash');
     writeFileSync(
@@ -713,47 +706,51 @@ describe('the gate (--check)', () => {
       `${brief()}\nA late edit.\n`,
     );
     const uncommitted = gate(repositoryRoot);
-    assert.equal(uncommitted.exitCode, 1);
-    assert.ok(
+    expect(uncommitted.exitCode).toBe(1);
+    expect(
       uncommitted.lines.includes(
         `✗ iterations/${NAME}/intake-files/: changed since the intake — the Intake hash is ${resolvedIntakeHash({ repositoryRoot, iteration: NAME })}, the README records ${recorded}`,
       ),
-    );
-    assert.ok(uncommitted.lines.includes('    Uncommitted: modified BRIEF.md'));
-    assert.ok(
+    ).toBeTruthy();
+    expect(uncommitted.lines.includes('    Uncommitted: modified BRIEF.md')).toBeTruthy();
+    expect(
       hasLine(uncommitted, 'fix: restore the delivered files (git restore --source=HEAD'),
-    );
+    ).toBeTruthy();
 
     commitAll(repositoryRoot, 'edit an intake file', 3_000);
     const committed = gate(repositoryRoot);
-    assert.equal(committed.exitCode, 1);
-    assert.ok(hasLine(committed, 'No uncommitted change — a commit changed it'));
+    expect(committed.exitCode).toBe(1);
+    expect(
+      hasLine(committed, 'No uncommitted change — a commit changed it'),
+    ).toBeTruthy();
   });
 
-  test('an intake that is not committed yet still fails on the hash', () => {
+  it('an intake that is not committed yet still fails on the hash', () => {
     const repositoryRoot = withBaseline();
     const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
     runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot });
     writeFileSync(join(intakePath(repositoryRoot), 'notes.md'), 'added later\n');
     const result = gate(repositoryRoot);
-    assert.equal(result.exitCode, 1);
-    assert.ok(
+    expect(result.exitCode).toBe(1);
+    expect(
       hasLine(result, 'is not committed yet, so git cannot name the changed file'),
-    );
+    ).toBeTruthy();
   });
 
-  test('fails when there is no intake, or the Baseline is not the one the snapshot was built on', () => {
+  it('fails when there is no intake, or the Baseline is not the one the snapshot was built on', () => {
     const empty = setup().repositoryRoot;
     const none = runIntake([NAME, '--check'], { repositoryRoot: empty });
-    assert.equal(none.exitCode, 1);
-    assert.ok(none.lines.includes(`✗ iterations/${NAME}/intake-files/: no intake yet`));
+    expect(none.exitCode).toBe(1);
+    expect(
+      none.lines.includes(`✗ iterations/${NAME}/intake-files/: no intake yet`),
+    ).toBeTruthy();
 
     const repositoryRoot = briefed();
     const other = gate(repositoryRoot, '--baseline', 'feat-other-2026-10-01-abcd');
-    assert.equal(other.exitCode, 1);
-    assert.ok(
+    expect(other.exitCode).toBe(1);
+    expect(
       hasLine(other, `the Baseline is ${LAUNCH}, not feat-other-2026-10-01-abcd`),
-    );
+    ).toBeTruthy();
 
     const readme = join(repositoryRoot, 'iterations', NAME, 'README.md');
     writeFileSync(
@@ -766,15 +763,15 @@ describe('the gate (--check)', () => {
     // On Baseline none the brief stands alone — BRIEF.md is its whole snapshot — so the snapshot
     // resolves, but it was built on the launch and its hash covered the launch's files too.
     const rebased = gate(repositoryRoot);
-    assert.equal(rebased.exitCode, 1);
-    assert.ok(!hasLine(rebased, 'cannot be resolved'));
-    assert.ok(hasLine(rebased, 'changed since the intake'));
-    assert.ok(
+    expect(rebased.exitCode).toBe(1);
+    expect(!hasLine(rebased, 'cannot be resolved')).toBeTruthy();
+    expect(hasLine(rebased, 'changed since the intake')).toBeTruthy();
+    expect(
       hasLine(
         rebased,
         `the brief snapshot was built on ${LAUNCH}, but the README's Baseline is none`,
       ),
-    );
+    ).toBeTruthy();
   });
 });
 
@@ -825,20 +822,20 @@ describe('--both', () => {
     return { repositoryRoot, siblingRoot, siblingBaseline };
   }
 
-  test('full: copies PRD.md and schema-routes.md into the sibling and fills its rows', () => {
+  it('full: copies PRD.md and schema-routes.md into the sibling and fills its rows', () => {
     const { repositoryRoot, drop, siblingRoot } = withSibling();
     const result = runIntake([NAME, drop, '--both'], { repositoryRoot, today: TODAY });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(siblingRoot), ['PRD.md', 'schema-routes.md']);
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(siblingRoot)).toStrictEqual(['PRD.md', 'schema-routes.md']);
     const fields = readmeFields(siblingRoot);
-    assert.equal(fields.get('Schema-routes'), SCHEMA_ROUTES_HASH);
-    assert.equal(fields.get('Drop placed'), TODAY);
-    assert.equal(fields.get('Intake mode'), 'full');
-    assert.equal(fields.get('Intake note'), '2 received');
-    assert.equal(fields.get('Intake hash'), intakeHash(intakePath(siblingRoot)));
+    expect(fields.get('Schema-routes')).toBe(SCHEMA_ROUTES_HASH);
+    expect(fields.get('Drop placed')).toBe(TODAY);
+    expect(fields.get('Intake mode')).toBe('full');
+    expect(fields.get('Intake note')).toBe('2 received');
+    expect(fields.get('Intake hash')).toBe(intakeHash(intakePath(siblingRoot)));
   });
 
-  test('overlay: builds the sibling snapshot on its own Baseline', () => {
+  it('overlay: builds the sibling snapshot on its own Baseline', () => {
     const { repositoryRoot, siblingRoot, siblingBaseline } = withBaselines();
     const received = writeDrop(join(scratchFolder(), 'changes'), {
       'PRD.md': '# Demo — PRD, with returns\n',
@@ -847,34 +844,31 @@ describe('--both', () => {
       repositoryRoot,
       today: TODAY,
     });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(siblingRoot), ['PRD.md', 'schema-routes.md']);
-    assert.deepEqual(
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(siblingRoot)).toStrictEqual(['PRD.md', 'schema-routes.md']);
+    expect(
       [
         ...resolveIntakeSnapshot({
           repositoryRoot: siblingRoot,
           iteration: NAME,
         }).files.keys(),
       ].sort(),
-      ['PRD.md', 'design-overview.md', 'schema-routes.md'],
-    );
-    assert.equal(readIntake(siblingRoot, 'PRD.md'), '# Demo — PRD, with returns\n');
-    assert.equal(
-      readmeFields(siblingRoot).get('Intake note'),
+    ).toStrictEqual(['PRD.md', 'design-overview.md', 'schema-routes.md']);
+    expect(readIntake(siblingRoot, 'PRD.md')).toBe('# Demo — PRD, with returns\n');
+    expect(readmeFields(siblingRoot).get('Intake note')).toBe(
       `2 received (PRD.md, schema-routes.md) · 1 carried forward from ${siblingBaseline}`,
     );
   });
 
-  test('brief: sends BRIEF.md onto the sibling Baseline, whose shared files must match', () => {
+  it('brief: sends BRIEF.md onto the sibling Baseline, whose shared files must match', () => {
     const { repositoryRoot, siblingRoot, siblingBaseline } = withBaselines();
     const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
     const result = runIntake([NAME, folder, '--mode', 'brief', '--both'], {
       repositoryRoot,
     });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.equal(readIntake(siblingRoot, 'BRIEF.md'), brief());
-    assert.equal(
-      readmeFields(siblingRoot).get('Intake note'),
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(readIntake(siblingRoot, 'BRIEF.md')).toBe(brief());
+    expect(readmeFields(siblingRoot).get('Intake note')).toBe(
       `1 received (BRIEF.md) · 3 carried forward from ${siblingBaseline}`,
     );
 
@@ -891,23 +885,23 @@ describe('--both', () => {
     const stopped = runIntake([NAME, folder, '--mode', 'brief', '--both'], {
       repositoryRoot: drifted.repositoryRoot,
     });
-    assert.equal(stopped.exitCode, 1);
-    assert.ok(
+    expect(stopped.exitCode).toBe(1);
+    expect(
       hasLine(
         stopped,
         `Sibling repository: --mode brief changes only BRIEF.md, but PRD.md differs from the Baseline ${drifted.siblingBaseline}`,
       ),
-    );
+    ).toBeTruthy();
   });
 
-  test('stops when the sibling has no such iteration, or no Baseline for an overlay', () => {
+  it('stops when the sibling has no such iteration, or no Baseline for an overlay', () => {
     const { repositoryRoot, drop } = withSibling({ openSibling: false });
     const result = runIntake([NAME, drop, '--both'], { repositoryRoot });
-    assert.equal(result.exitCode, 1);
-    assert.ok(
+    expect(result.exitCode).toBe(1);
+    expect(
       hasLine(result, 'open it in both first: pnpm iteration:new <type> <topic> --both'),
-    );
-    assert.equal(existsSync(intakePath(repositoryRoot)), false);
+    ).toBeTruthy();
+    expect(existsSync(intakePath(repositoryRoot))).toBe(false);
 
     const { repositoryRoot: local, siblingRoot } = withBaselines();
     writeIteration({
@@ -919,11 +913,13 @@ describe('--both', () => {
     const noBaseline = runIntake([NAME, received, '--mode', 'overlay', '--both'], {
       repositoryRoot: local,
     });
-    assert.equal(noBaseline.exitCode, 1);
-    assert.ok(hasLine(noBaseline, `Sibling repository: ${NAME} has no Baseline (—)`));
+    expect(noBaseline.exitCode).toBe(1);
+    expect(
+      hasLine(noBaseline, `Sibling repository: ${NAME} has no Baseline (—)`),
+    ).toBeTruthy();
   });
 
-  test('a differing sibling copy shows the diff and stops, unless --replace while the sibling is planning', () => {
+  it('a differing sibling copy shows the diff and stops, unless --replace while the sibling is planning', () => {
     const differing = {
       'PRD.md': '# Demo — PRD, older\n',
       'schema-routes.md': SCHEMA_ROUTES,
@@ -932,31 +928,30 @@ describe('--both', () => {
       siblingIntake: differing,
     });
     const stopped = runIntake([NAME, drop, '--both'], { repositoryRoot });
-    assert.equal(stopped.exitCode, 1);
-    assert.ok(
+    expect(stopped.exitCode).toBe(1);
+    expect(
       stopped.lines.some((line) =>
         line.startsWith(
           'Sibling repository: intake-files/PRD.md differs from the new snapshot',
         ),
       ),
-    );
-    assert.equal(existsSync(intakePath(repositoryRoot)), false);
+    ).toBeTruthy();
+    expect(existsSync(intakePath(repositoryRoot))).toBe(false);
 
-    assert.equal(
+    expect(
       runIntake([NAME, drop, '--both', '--replace'], { repositoryRoot, today: TODAY })
         .exitCode,
-      0,
-    );
-    assert.equal(readIntake(siblingRoot, 'PRD.md'), '# Demo — PRD\n');
+    ).toBe(0);
+    expect(readIntake(siblingRoot, 'PRD.md')).toBe('# Demo — PRD\n');
 
     const locked = withSibling({ siblingIntake: differing, siblingStatus: 'approved' });
     const refused = runIntake([NAME, locked.drop, '--both', '--replace'], {
       repositoryRoot: locked.repositoryRoot,
     });
-    assert.equal(refused.exitCode, 1);
-    assert.ok(
+    expect(refused.exitCode).toBe(1);
+    expect(
       hasLine(refused, 'Sibling repository: the intake is locked (Status approved)'),
-    );
+    ).toBeTruthy();
   });
 });
 
@@ -968,11 +963,10 @@ describe('--compact', () => {
   function legacyBrief({ status = 'frozen' } = {}) {
     const repositoryRoot = withBaseline();
     const folder = writeDrop(join(scratchFolder(), 'brief'), { 'BRIEF.md': brief() });
-    assert.equal(
+    expect(
       runIntake([NAME, folder, '--mode', 'brief'], { repositoryRoot, today: TODAY })
         .exitCode,
-      0,
-    );
+    ).toBe(0);
     writeDrop(intakePath(repositoryRoot), completeDrop());
     setStatus(repositoryRoot, NAME, status);
     commitAll(repositoryRoot, 'legacy brief', 2_000);
@@ -981,123 +975,117 @@ describe('--compact', () => {
   const compact = (repositoryRoot, ...options) =>
     runIntake([NAME, '--compact', ...options], { repositoryRoot });
 
-  test('a legacy full copy hashes the same as what it resolves to', () => {
+  it('a legacy full copy hashes the same as what it resolves to', () => {
     const repositoryRoot = legacyBrief();
-    assert.equal(intakeNames(repositoryRoot).length, DROP_SIZE + 1);
-    assert.equal(
-      intakeHash(intakePath(repositoryRoot)),
+    expect(intakeNames(repositoryRoot).length).toBe(DROP_SIZE + 1);
+    expect(intakeHash(intakePath(repositoryRoot))).toBe(
       readmeFields(repositoryRoot).get('Intake hash'),
     );
-    assert.equal(
+    expect(
       runIntake([NAME, '--check', '--baseline', LAUNCH], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
   });
 
-  test("removes the copies of the Baseline's files and keeps what was received, even when frozen", () => {
+  it("removes the copies of the Baseline's files and keeps what was received, even when frozen", () => {
     const repositoryRoot = legacyBrief();
     const readmeBefore = readmeText(repositoryRoot);
     const result = compact(repositoryRoot);
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(repositoryRoot), ['BRIEF.md']);
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(repositoryRoot)).toStrictEqual(['BRIEF.md']);
     const hash = readmeFields(repositoryRoot).get('Intake hash');
-    assert.match(
-      result.lines[0],
+    expect(result.lines[0]).toMatch(
       new RegExp(
         `^Compacted iterations/${NAME}/intake-files/: removed ${DROP_SIZE} copies identical to ${LAUNCH} \\(.+\\) · kept BRIEF\\.md · Intake hash ${hash} unchanged$`,
       ),
     );
-    assert.equal(readmeText(repositoryRoot), readmeBefore);
-    assert.equal(resolvedIntakeHash({ repositoryRoot, iteration: NAME }), hash);
-    assert.equal(
+    expect(readmeText(repositoryRoot)).toBe(readmeBefore);
+    expect(resolvedIntakeHash({ repositoryRoot, iteration: NAME })).toBe(hash);
+    expect(
       runIntake([NAME, '--check', '--baseline', LAUNCH], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
     const again = compact(repositoryRoot);
-    assert.equal(again.exitCode, 0);
-    assert.match(again.lines[0], /already stores only what arrived — kept BRIEF\.md/);
+    expect(again.exitCode).toBe(0);
+    expect(again.lines[0]).toMatch(/already stores only what arrived — kept BRIEF\.md/);
   });
 
-  test('--dry-run removes nothing', () => {
+  it('--dry-run removes nothing', () => {
     const repositoryRoot = legacyBrief();
     const result = compact(repositoryRoot, '--dry-run');
-    assert.equal(result.exitCode, 0);
-    assert.match(result.lines[0], /^Dry run — nothing removed; would remove /);
-    assert.equal(intakeNames(repositoryRoot).length, DROP_SIZE + 1);
+    expect(result.exitCode).toBe(0);
+    expect(result.lines[0]).toMatch(/^Dry run — nothing removed; would remove /);
+    expect(intakeNames(repositoryRoot).length).toBe(DROP_SIZE + 1);
   });
 
-  test('keeps a stored file that differs from the Baseline’s', () => {
+  it('keeps a stored file that differs from the Baseline’s', () => {
     const repositoryRoot = withBaseline();
     const received = writeDrop(join(scratchFolder(), 'changes'), {
       'alpha.md': '# Screen: Alpha — with a returns badge\n',
     });
-    assert.equal(
+    expect(
       runIntake([NAME, received, '--mode', 'overlay'], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
     writeDrop(intakePath(repositoryRoot), {
       'beta.md': completeDrop()['beta.md'],
       'shell.md': completeDrop()['shell.md'],
     });
     commitAll(repositoryRoot, 'legacy overlay', 2_000);
     const result = compact(repositoryRoot);
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(repositoryRoot), ['alpha.md']);
-    assert.equal(
-      readIntake(repositoryRoot, 'alpha.md'),
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(repositoryRoot)).toStrictEqual(['alpha.md']);
+    expect(readIntake(repositoryRoot, 'alpha.md')).toBe(
       '# Screen: Alpha — with a returns badge\n',
     );
   });
 
-  test('refuses a full intake, and an intake that fails the gate', () => {
+  it('refuses a full intake, and an intake that fails the gate', () => {
     const repositoryRoot = withBaseline();
     const launch = runIntake([LAUNCH, '--compact'], { repositoryRoot });
-    assert.equal(launch.exitCode, 1);
-    assert.ok(hasLine(launch, 'is a full intake — it stores the whole drop'));
-    assert.equal(launch.lines.at(-1), 'Nothing removed.');
+    expect(launch.exitCode).toBe(1);
+    expect(hasLine(launch, 'is a full intake — it stores the whole drop')).toBeTruthy();
+    expect(launch.lines.at(-1)).toBe('Nothing removed.');
 
     const failing = legacyBrief();
     writeFileSync(join(intakePath(failing), 'BRIEF.md'), `${brief()}\nEdited.\n`);
     const refused = compact(failing);
-    assert.equal(refused.exitCode, 1);
-    assert.ok(hasLine(refused, 'the gate fails first — changed since the intake'));
-    assert.equal(intakeNames(failing).length, DROP_SIZE + 1);
+    expect(refused.exitCode).toBe(1);
+    expect(
+      hasLine(refused, 'the gate fails first — changed since the intake'),
+    ).toBeTruthy();
+    expect(intakeNames(failing).length).toBe(DROP_SIZE + 1);
   });
 });
 
 describe('resolving a snapshot', () => {
-  test('follows a chain of layered intakes, the nearest file winning', () => {
+  it('follows a chain of layered intakes, the nearest file winning', () => {
     const repositoryRoot = withBaseline();
     const first = writeDrop(join(scratchFolder(), 'first'), {
       'alpha.md': '# Screen: Alpha — first\n',
     });
-    assert.equal(
+    expect(
       runIntake([NAME, first, '--mode', 'overlay'], { repositoryRoot }).exitCode,
-      0,
-    );
+    ).toBe(0);
     setStatus(repositoryRoot, NAME, 'done');
     const next = 'fix-badge-2026-10-08-wxyz';
     writeIteration({ repositoryRoot, name: next, fields: { baseline: NAME } });
     const second = writeDrop(join(scratchFolder(), 'second'), { 'BRIEF.md': brief() });
     const result = runIntake([next, second, '--mode', 'brief'], { repositoryRoot });
-    assert.equal(result.exitCode, 0, result.lines.join('\n'));
-    assert.deepEqual(intakeNames(repositoryRoot, next), ['BRIEF.md']);
+    expect(result.exitCode, result.lines.join('\n')).toBe(0);
+    expect(intakeNames(repositoryRoot, next)).toStrictEqual(['BRIEF.md']);
     const { files, stored, baseline, problem } = resolveIntakeSnapshot({
       repositoryRoot,
       iteration: next,
     });
-    assert.equal(problem, undefined);
-    assert.deepEqual(stored, ['BRIEF.md']);
-    assert.equal(baseline, NAME);
-    assert.equal(files.get('alpha.md'), join(intakePath(repositoryRoot), 'alpha.md'));
-    assert.equal(
-      files.get('beta.md'),
+    expect(problem).toBe(undefined);
+    expect(stored).toStrictEqual(['BRIEF.md']);
+    expect(baseline).toBe(NAME);
+    expect(files.get('alpha.md')).toBe(join(intakePath(repositoryRoot), 'alpha.md'));
+    expect(files.get('beta.md')).toBe(
       join(intakePath(repositoryRoot, LAUNCH), 'beta.md'),
     );
-    assert.equal(files.size, DROP_SIZE + 1);
+    expect(files.size).toBe(DROP_SIZE + 1);
   });
 
-  test('names a Baseline chain that loops or reaches no iteration', () => {
+  it('names a Baseline chain that loops or reaches no iteration', () => {
     const repositoryRoot = createRepository();
     writeIteration({
       repositoryRoot,
@@ -1105,8 +1093,7 @@ describe('resolving a snapshot', () => {
       fields: { baseline: 'feat-other-2026-10-01-abcd', intakeMode: 'brief' },
       intake: { 'BRIEF.md': brief() },
     });
-    assert.match(
-      resolveIntakeSnapshot({ repositoryRoot, iteration: NAME }).problem,
+    expect(resolveIntakeSnapshot({ repositoryRoot, iteration: NAME }).problem).toMatch(
       /reaches feat-other-2026-10-01-abcd, which is not an iteration with a README/,
     );
     writeIteration({
@@ -1115,8 +1102,7 @@ describe('resolving a snapshot', () => {
       fields: { baseline: NAME, intakeMode: 'brief' },
       intake: { 'BRIEF.md': brief() },
     });
-    assert.match(
-      resolveIntakeSnapshot({ repositoryRoot, iteration: NAME }).problem,
+    expect(resolveIntakeSnapshot({ repositoryRoot, iteration: NAME }).problem).toMatch(
       new RegExp(`loops: ${NAME} → feat-other-2026-10-01-abcd → ${NAME}`),
     );
   });

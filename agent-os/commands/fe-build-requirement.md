@@ -39,7 +39,7 @@ Follow **`agent-os/skills/fe-auto-implement/SKILL.md`** end-to-end:
 4. **`/fe-routes-sync`** — update `docs/reference/routes-and-ui.md` when routes change.
 5. **fe-test-generation** — colocated tests, vitest-axe, data-testid.
 6. **fe-e2e-testids** — when interactive UI needs Playwright-ready selectors.
-7. **fe-lint-guard** + **fe-code-smells-best-practices** — zero ESLint/TS errors; import and pattern hygiene.
+7. **fe-lint-guard** — zero ESLint/TS errors; its conventions pass for import and pattern hygiene.
 8. **fe-documentation-maintenance** — README / CLAUDE / docs index when structure or routes change.
 
 ## 3. Autonomous verify → heal loop

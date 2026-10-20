@@ -8,7 +8,9 @@
 # session enforce the same gate a developer's machine does.
 #
 # Usage:  bash tooling/setup/agent/install-gitleaks.sh
-# Env:    GITLEAKS_VERSION (default: latest release) — e.g. 8.30.0, no "v"
+# Version: pinned in tool-versions.sh (GITLEAKS_VERSION + GITLEAKS_SHA256_LINUX_<ARCH>), which the
+# CI `security-secrets` job reads too — one pin, no drift. Installs when missing, reinstalls when
+# the installed version differs, and refuses a release download whose SHA-256 does not match.
 #
 # BEST-EFFORT: exits non-zero on failure; bootstrap.sh logs and carries on.
 set -uo pipefail
@@ -16,9 +18,17 @@ LOG_TAG="install-gitleaks"
 # shellcheck source=tooling/setup/agent/lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 
-if have gitleaks; then
-  log "already installed: $(gitleaks version 2>/dev/null) — nothing to do."
+version="$(pinned_version GITLEAKS_VERSION)"
+installed="$(have gitleaks && gitleaks version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)"
+if [ -n "${installed}" ] && [ "${installed}" = "${version}" ]; then
+  log "gitleaks ${installed} is at the pin — nothing to do."
   exit 0
+fi
+
+# The pinned release binaries are Linux builds; elsewhere (a Mac) the package manager owns gitleaks.
+if [ "$(uname -s)" != "Linux" ]; then
+  log "not Linux — install gitleaks ${version} with your package manager (brew install gitleaks)."
+  exit 1
 fi
 
 arch="$(arch_for go)" || {
@@ -26,21 +36,18 @@ arch="$(arch_for go)" || {
   exit 1
 }
 
-version="${GITLEAKS_VERSION:-}"
 if [ -z "${version}" ]; then
-  tag="$(github_latest_tag gitleaks/gitleaks || true)"
-  version="${tag#v}"
-fi
-if [ -z "${version}" ]; then
-  log "could not resolve the latest gitleaks release — set GITLEAKS_VERSION to pin one."
+  log "no GITLEAKS_VERSION in tool-versions.sh."
   exit 1
 fi
+log "installing gitleaks ${version} (found: ${installed:-none})"
 
 # Release assets use x64/arm64 (not amd64) from 8.19 onward.
 asset_arch="${arch}"
 [ "${asset_arch}" = "amd64" ] && asset_arch="x64"
 
 tarball="gitleaks_${version}_linux_${asset_arch}.tar.gz"
+expected_sha256="$(pinned_version "GITLEAKS_SHA256_LINUX_$(printf '%s' "${asset_arch}" | tr '[:lower:]' '[:upper:]')")"
 url="https://github.com/gitleaks/gitleaks/releases/download/v${version}/${tarball}"
 target="$(bin_dir)" || {
   log "no writable bin directory."
@@ -51,8 +58,8 @@ log "downloading ${url}"
 tmp="$(mktemp -d)"
 trap 'rm -rf "${tmp}"' EXIT
 
-fetch "${url}" "${tmp}/${tarball}" || {
-  log "download failed — is github.com allowed by the network policy?"
+download_verified "${url}" "${tmp}/${tarball}" "${expected_sha256}" || {
+  log "download failed or unverified — is github.com allowed by the network policy?"
   exit 1
 }
 tar -xzf "${tmp}/${tarball}" -C "${tmp}" gitleaks 2>/dev/null || tar -xzf "${tmp}/${tarball}" -C "${tmp}" || {
@@ -70,4 +77,4 @@ install -m 0755 "${tmp}/gitleaks" "${target}/gitleaks" || {
 }
 persist_path "${target}"
 
-log "installed gitleaks $("${target}/gitleaks" version 2>/dev/null) at ${target}/gitleaks"
+log "installed gitleaks $("${target}/gitleaks" version 2>/dev/null) at ${target}/gitleaks (SHA-256 verified)"

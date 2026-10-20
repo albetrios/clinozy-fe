@@ -1,6 +1,8 @@
 ---
 name: fe-extension-settings-recommendations
-description: Recommends and updates workspace extensions and .vscode settings for productivity. Use when the user asks about extensions, setup, or productivity; when adding new tooling (e.g. new test framework, new language, new linter); or when onboarding/setup context is detected.
+description: Recommend and update workspace extensions and .vscode settings. Use when asked about extensions, setup or productivity, or when adding new tooling (a test framework, language or linter).
+trigger: ".vscode/**"
+triggerNote: Workspace extensions and settings
 ---
 
 # Extension and Settings Recommendations

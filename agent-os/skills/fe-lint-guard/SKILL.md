@@ -1,6 +1,8 @@
 ---
 name: fe-lint-guard
-description: Automatically fix lint, type-check, and code-quality issues after every implementation. Runs in the background without asking the user. Handles ESLint errors, TypeScript errors, nested ternaries, React purity, import ordering, and security warnings so the user only provides requirements and never sees lint failures.
+description: After every implementation, without asking — fix lint, type-check and code smells in the changed code: ESLint, TypeScript, React purity, imports, layer rules, inline styles, no any.
+trigger: eslint.config.mjs
+triggerNote: A lint config change — then fix what it flags
 ---
 
 # Lint Guard — Background Code Quality
@@ -16,6 +18,8 @@ After completing **any** code change under `src/`, `plugins/`, or config files:
 3. If tests were added/changed, run `pnpm test` to confirm no regressions.
 
 Do **not** tell the user "I'll now run lint." Just do it silently as part of the implementation. If there are issues, fix them before responding. The user should never see lint or type-check failures in their terminal.
+
+**Explicit:** the user asks to "fix code smells", "check best practices", "review my changes" or "clean up this code" — the same passes below, on the changed code.
 
 ## What to Fix (Without Asking)
 
@@ -135,6 +139,35 @@ pnpm lint          # Must pass (0 errors; warnings OK)
 pnpm build         # Must pass
 pnpm test          # Must pass if tests were changed
 ```
+
+## Conventions and smells — the changed code only
+
+The second pass, on the files **added or modified** in this change (never a whole-codebase audit
+unless the user asks). Fix in the same change set without asking.
+
+1. **Architecture and dependencies** — app never imports from pages (move the used API or type to
+   `src/shared/` or `src/core/`, e.g. the route tree uses `resolveRootRedirect` from
+   `@/shared/tenancy/organization-resolver.ts`); pages never import other pages (promote to
+   `shared/` or `core/`); shared and core never import from pages.
+2. **Imports** — a single space after commas in import lists; `.ts` / `.tsx` extensions on `@/`
+   imports; `import type { X }` for types only; every API call through
+   `apiClient` from `@/core/http/fetch-client.ts` (auth service and auth API keep raw fetch, to
+   avoid interceptor recursion).
+3. **Styling** — no inline styles: Tailwind utilities, or a class in `src/index.css` referenced by
+   `className` (prefer a class even for third-party components that take style objects).
+4. **TypeScript** — no `any`: `unknown` narrowed by type guards, or a real type (e.g.
+   `typeof import('./service')['fn']` in tests); drop the matching `eslint-disable` when fixing.
+5. **Test ids** — the form-level error is `data-testid="form-error"`, never a form-specific name;
+   new pages and forms carry the standard test ids (`agent-os/rules/fe-testing-requirements.mdc`).
+6. **Anti-patterns** (`agent-os/rules/fe-engineering-principles.mdc`), when the change introduces
+   them — leftover `console.log` / `console.debug`; unexplained numbers (name them); the same
+   block twice (extract a helper or hook); React context where props or colocated state suffice;
+   a `useEffect` for data that belongs in TanStack Query or derived render state; `memo` /
+   `useMemo` / `useCallback` without a measured need; a new file over ~300 lines without clear
+   structure (split it).
+
+Rules behind these: `agent-os/rules/fe-file-structure.mdc`, `agent-os/rules/fe-project-conventions.mdc`;
+where code lives: **fe-code-structure**.
 
 ## Integration with Other Skills
 

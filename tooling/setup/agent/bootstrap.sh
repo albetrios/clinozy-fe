@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One-shot cloud-session bring-up for clinozy-fe cloud agents.
 #
-# Runs every agent setup helper in order — Node, distro CLI tools, gh, gitleaks,
+# Runs every agent setup helper in order — Node, distro CLI tools, gh, gitleaks and Docker,
 # headroom/uv — installs dependencies, scaffolds a self-contained `.env.local`
 # (`pnpm setup:local --only-env`) and the default MCP pair, provisions Playwright
 # browsers, then verifies the Vite dev server actually serves the app shell. A
@@ -18,17 +18,11 @@
 # Steps 1-5 (tool installs) and 8-9 (MCP, browsers) are BEST-EFFORT and log
 # ✓/skip without aborting; dependencies, the env scaffold, and the healthcheck
 # are HARD gates (non-zero exit on failure). The dev server is started only
-# transiently for the healthcheck and then stopped — set KEEP_APP=1 to leave
-# `pnpm dev` up.
+# transiently for the healthcheck (on :5173, which must be free — --strictPort)
+# and then stopped.
 #
 # Env:
-#   KEEP_APP=1                 leave `pnpm dev` running after the healthcheck
-#   AGENT_SKIP_HEALTHCHECK=1   skip step 10 entirely (no dev server started)
-#   AGENT_SKIP_PLAYWRIGHT=1    skip browser provisioning
-#   AGENT_SKIP_MCP_WARM=1      install uv but do not pre-warm headroom
 #   NODE_INSTALL_PREFIX        parent dir for node<major> (default /opt)
-#   HEALTHCHECK_PORT           port for the transient dev server (default 5173; it
-#                              must be free — the check uses --strictPort)
 set -uo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../../.." || exit 1
@@ -95,7 +89,7 @@ bash "${AGENT_DIR}/install-node.sh" >&2 || skip "install-node best-effort (using
 # a child process and so cannot change THIS shell's PATH. Activate it here so
 # every pnpm step below runs on the pinned Node; otherwise the image default
 # (e.g. Node 22) trips pnpm's engine-strict gate at the install step. The
-# SessionStart hook (agent-os/hooks/session-start.sh) does the same switch for
+# SessionStart hook (agent-os/hooks/fe-session-start.mjs) does the same switch for
 # interactive sessions, but does not run when bootstrap.sh is the Setup script.
 #
 # `cut -d. -f1` is load-bearing: .nvmrc pins `24.21.0`, so stripping the dots would
@@ -162,13 +156,25 @@ else
   skip "[3/${TOTAL}] gh unavailable (non-fatal — MCP GitHub tools still work)"
 fi
 
-# 4) gitleaks (pre-commit secret scan) --------------------------------------
-step "[4/${TOTAL}] gitleaks (secret scan)"
+# 4) The git hooks' gate tools: gitleaks + Docker with the SonarQube images --
+# The pre-commit secret scan is mandatory and the pre-push SonarQube gate runs in Docker, so both
+# are provisioned here, in the cached Setup script, once per container.
+step "[4/${TOTAL}] Gate tools (gitleaks secret scan, Docker + SonarQube images)"
 bash "${AGENT_DIR}/install-gitleaks.sh" || true
 if command -v gitleaks >/dev/null 2>&1; then
   ok "[4/${TOTAL}] gitleaks $(gitleaks version 2>/dev/null)"
 else
-  skip "[4/${TOTAL}] gitleaks unavailable — .husky/pre-commit will SKIP the secret scan (non-fatal)"
+  skip "[4/${TOTAL}] gitleaks unavailable — commits fail until it is installed (bash ${AGENT_DIR}/install-gitleaks.sh)"
+fi
+if command -v docker >/dev/null 2>&1; then
+  bash "${AGENT_DIR}/install-docker-images.sh" || true
+  if docker info >/dev/null 2>&1; then
+    ok "[4/${TOTAL}] Docker running (SonarQube images pre-pulled when reachable)"
+  else
+    skip "[4/${TOTAL}] Docker not reachable — the pre-push SonarQube gate starts it on demand"
+  fi
+else
+  skip "[4/${TOTAL}] Docker CLI absent — the pre-push SonarQube gate needs Docker"
 fi
 
 # 5) headroom / uv (MCP context compression) ---------------------------------
@@ -203,11 +209,11 @@ for oauth_key in VITE_AUTH_OAUTH_GOOGLE VITE_AUTH_OAUTH_GITHUB; do
 done
 ok "[7/${TOTAL}] .env.local ready (OAuth buttons off in the cloud)"
 
-# 8) MCP default pair + the codegraph index it serves ------------------------
-step "[8/${TOTAL}] MCP default pair (.mcp.json) + codegraph index"
+# 8) MCP default pair + the codegraph index it serves + session hooks --------
+step "[8/${TOTAL}] MCP default pair (.mcp.json) + codegraph index + session hooks"
 pnpm mcp:setup:default >&2 || skip "mcp:setup:default failed — run it manually if MCP tools are missing"
 if [ -f .mcp.json ]; then
-  ok "[8/${TOTAL}] .mcp.json written (codegraph + headroom)"
+  ok "[8/${TOTAL}] .mcp.json written (fe-codegraph + fe-headroom)"
 else
   skip "[8/${TOTAL}] .mcp.json absent (non-fatal)"
 fi
@@ -218,6 +224,10 @@ if [ -f .codegraph/codegraph.db ]; then
 else
   skip "[8/${TOTAL}] codegraph index absent — codegraph MCP answers nothing until it is built (non-fatal)"
 fi
+# A session that holds several repositories reads hooks only from the parent directory's
+# .claude/settings.json; agent-os:session-hooks writes every repository's there (a no-op in a
+# single-repository checkout).
+pnpm agent-os:session-hooks >&2 || skip "agent-os:session-hooks failed (non-fatal)"
 
 # 9) Playwright browsers -----------------------------------------------------
 step "[9/${TOTAL}] Playwright browsers (E2E)"
@@ -230,35 +240,26 @@ else
 fi
 
 # 10) App health (dev server serves the app shell) ---------------------------
-if [ "${AGENT_SKIP_HEALTHCHECK:-0}" = "1" ]; then
-  step "[10/${TOTAL}] App health — skipped (AGENT_SKIP_HEALTHCHECK=1)"
+step "[10/${TOTAL}] App health (Vite dev server serves the app shell)"
+app_log="$(mktemp)"
+# --strictPort: a port already in use fails at once with Vite's own message,
+# instead of Vite drifting to the next port while the probe waits 90s on this one.
+health_port=5173
+pnpm dev --port "${health_port}" --strictPort >"${app_log}" 2>&1 &
+dev_pid=$!
+if HEALTHCHECK_URL="${HEALTHCHECK_URL:-http://localhost:${health_port}/}" bash "${AGENT_DIR}/healthcheck.sh"; then
+  ok "[10/${TOTAL}] app shell served"
   app_ok=1
 else
-  step "[10/${TOTAL}] App health (Vite dev server serves the app shell)"
-  app_log="$(mktemp)"
-  # --strictPort: a port already in use fails at once with Vite's own message,
-  # instead of Vite drifting to the next port while the probe waits 90s on this one.
-  health_port="${HEALTHCHECK_PORT:-5173}"
-  pnpm dev --port "${health_port}" --strictPort >"${app_log}" 2>&1 &
-  dev_pid=$!
-  if HEALTHCHECK_URL="${HEALTHCHECK_URL:-http://localhost:${health_port}/}" bash "${AGENT_DIR}/healthcheck.sh"; then
-    ok "[10/${TOTAL}] app shell served"
-    app_ok=1
-  else
-    echo "---- pnpm dev log (tail) ----" >&2
-    tail -20 "${app_log}" >&2
-    app_ok=0
-  fi
-
-  if [ "${KEEP_APP:-0}" = "1" ] && [ "${app_ok}" = "1" ]; then
-    echo "  KEEP_APP=1 — leaving \`pnpm dev\` running on :5173 (pid ${dev_pid})." >&2
-  else
-    kill_tree "${dev_pid}"
-    echo "  stopped the transient dev server." >&2
-  fi
-  rm -f "${app_log}"
-  [ "${app_ok}" = "1" ] || die "healthcheck failed"
+  echo "---- pnpm dev log (tail) ----" >&2
+  tail -20 "${app_log}" >&2
+  app_ok=0
 fi
+
+kill_tree "${dev_pid}"
+echo "  stopped the transient dev server." >&2
+rm -f "${app_log}"
+[ "${app_ok}" = "1" ] || die "healthcheck failed"
 
 echo ""
 echo "✓ bring-up complete in $(($(date +%s) - start_ts))s — session matches local."

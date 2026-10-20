@@ -1,6 +1,8 @@
 ---
 name: fe-dependency-management
-description: Safely add, update, remove, or pin npm dependencies in clinozy-fe — atomic lockfile commits, pnpm-workspace.yaml overrides for transitive pins, audit triage, and license plus bundle-impact checks. Use when acting on a fe-dependency-auditor finding or changing package.json / pnpm-lock.yaml.
+description: Add, update, remove or pin npm dependencies — atomic lockfile commits, pnpm-workspace.yaml overrides, audit triage, license and bundle impact. Use when package.json or pnpm-lock.yaml changes.
+trigger: package.json, pnpm-lock.yaml, pnpm-workspace.yaml
+triggerNote: Dependencies and overrides — the lockfile in the same commit
 ---
 
 # Dependency management

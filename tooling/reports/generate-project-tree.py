@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Generate docs/reference/project-tree.txt from the live filesystem."""
+"""Generate docs/reference/project-tree.txt from the live filesystem.
+
+The tree is generated, not committed (it is gitignored): every branch that added a file changed
+it, so two open branches conflicted on it and forced a merge of main. `--check` is what CI runs —
+it builds the tree without writing it and fails when the generator cannot list the repository.
+"""
 
 from __future__ import annotations
 
@@ -146,7 +151,7 @@ def main() -> None:
 
     header = f"""# clinozy-fe — Project File Tree
 Generated: auto (python3 tooling/reports/generate-project-tree.py)
-Regenerate: python3 tooling/reports/generate-project-tree.py
+Regenerate: python3 tooling/reports/generate-project-tree.py (gitignored — generated, never committed)
 
 > Architecture reference. Live routes: docs/reference/routes-and-ui.md
 > Excluded: node_modules, .git, dist, coverage, .pnpm-store, test-results, __pycache__
@@ -198,18 +203,20 @@ Tests:
     content = header + "clinozy-fe/\n" + "\n".join(body) + footer
     rel = OUT.relative_to(ROOT)
 
-    # --check: compare against the committed file and fail on drift, without
-    # writing. Lets the tree be verified in CI / a review without a side effect.
+    # --check: build the tree without writing it, and fail when the generator cannot list the
+    # repository (no tracked files, or a top-level directory missing). The file itself is not
+    # committed, so there is nothing to compare against — CI checks the generator instead.
     if "--check" in sys.argv[1:]:
-        current = OUT.read_text() if OUT.exists() else ""
-        if current != content:
+        missing = [name for name in ("src/", "tests/", "docs/") if f"── {name}" not in content]
+        if not TRACKED or missing:
             print(
-                f"✖ {rel} is out of date. Regenerate with: "
-                "pnpm tool:project-structure-tree",
+                f"✖ {rel} could not be generated "
+                f"(tracked paths: {len(TRACKED)}, missing: {', '.join(missing) or 'none'}).",
                 file=sys.stderr,
             )
             raise SystemExit(1)
-        print(f"{rel} is up to date.")
+        print(f"{rel} generates ({len(content.splitlines())} lines); not committed — "
+              "write it locally with: pnpm tool:project-structure-tree")
         return
 
     OUT.write_text(content)

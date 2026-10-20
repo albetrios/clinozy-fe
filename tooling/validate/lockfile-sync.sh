@@ -29,7 +29,7 @@ if printf '%s' "$output" | grep -q 'ERR_PNPM_UNSUPPORTED_ENGINE'; then
   echo "[validate-lockfile] ERROR: Node $(node -v) is too old for this dependency tree."
   echo "  The lockfile is FINE — pnpm aborted before it could compare anything."
   echo "  Fix: switch to the pinned toolchain, then re-run:  nvm use"
-  echo "  (.nvmrc pins 24.21.0; engines.node's floor is 24.15.)"
+  echo "  (.nvmrc pins $(cat .nvmrc 2>/dev/null || echo 'the Node version'); package.json engines.node sets the floor.)"
   echo ""
   echo "  pnpm error:"
   printf '%s\n' "$output" | sed 's/^/    /'
