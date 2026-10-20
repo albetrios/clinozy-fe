@@ -557,10 +557,12 @@ export function AccountMenu({
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
+      {/* The avatar is named by its screen-reader text, not an aria-label: the disc's initials
+          and the count are decorative (PersonAvatar), and an aria-label would have to hold them
+          as visible text (WCAG 2.5.3 Label in Name, axe label-content-name-mismatch). */}
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={triggerLabel({ t, name, presence, invitationCount, setupCount })}
           data-testid="user-menu-trigger"
           data-slot="pill"
           className={cn(
@@ -570,6 +572,9 @@ export function AccountMenu({
               : 'hover:shadow-[0_0_0_2px_var(--color-card),0_0_0_3.5px_var(--color-border-strong)]',
           )}
         >
+          <span className="sr-only">
+            {triggerLabel({ t, name, presence, invitationCount, setupCount })}
+          </span>
           {avatar('cell')}
           {setupCount ? (
             <SetupRing done={setupCount.done} total={setupCount.total} />

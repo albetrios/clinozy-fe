@@ -13,6 +13,7 @@ import {
   useDevicePrefsStore,
 } from '@/shared/store/useDevicePrefsStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { axeLabelInName } from '@/tests/utils/axe-label-in-name.ts';
 import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
 
 import { DataTableColumnChooser } from './DataTableColumnChooser.tsx';
@@ -56,19 +57,25 @@ const option = (name: string) =>
   screen.getByRole('option', { name: new RegExp(`^${name}`) });
 
 describe('DataTableColumnChooser', () => {
-  it('counts the hidden columns on its 36px Eye button', () => {
-    renderWithQueryClient(<Harness />);
-    const trigger = screen.getByRole('button', { name: 'Show or hide columns' });
+  it('counts the hidden columns on its 36px Eye button', async () => {
+    const { container } = renderWithQueryClient(<Harness />);
+    // The badge's count is shown text, so the name says it too (WCAG 2.5.3 Label in Name).
+    const trigger = screen.getByRole('button', {
+      name: 'Show or hide columns · 2 hidden',
+    });
     expect(trigger).toHaveAttribute('title', 'Columns · 2 of 4 shown');
     expect(trigger).toHaveTextContent('2');
     // The picker's field wrapper hides below md: phone rows fold columns themselves.
     expect(trigger.parentElement?.className).toContain('max-md:hidden');
+    const results = await axeLabelInName(container);
+    expect(results.violations).toEqual([]);
+    expect(results.incomplete).toEqual([]);
   });
 
   it('lists "Show all columns" under View, then each hideable column under Columns', async () => {
     const user = userEvent.setup();
     renderWithQueryClient(<Harness />);
-    await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
+    await user.click(screen.getByRole('button', { name: /^Show or hide columns/ }));
 
     const options = screen.getAllByRole('option');
     expect(options[0]).toHaveTextContent('Show all columns');
@@ -88,7 +95,7 @@ describe('DataTableColumnChooser', () => {
   it('persists a toggled column on this device', async () => {
     const user = userEvent.setup();
     renderWithQueryClient(<Harness />);
-    await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
+    await user.click(screen.getByRole('button', { name: /^Show or hide columns/ }));
     await user.click(option('Gender'));
 
     expect(option('Gender')).toHaveAttribute('aria-checked', 'true');
@@ -98,7 +105,7 @@ describe('DataTableColumnChooser', () => {
   it('shows everything, then returns to the recommended set on a second tap', async () => {
     const user = userEvent.setup();
     renderWithQueryClient(<Harness />);
-    await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
+    await user.click(screen.getByRole('button', { name: /^Show or hide columns/ }));
 
     await user.click(option('Show all columns'));
     expect(useDevicePrefsStore.getState().hiddenColumns.patients).toEqual([]);
@@ -122,7 +129,7 @@ describe('DataTableColumnChooser', () => {
       { accessorKey: 'source', header: 'Source' },
     ];
     renderWithQueryClient(<Harness columns={plain} />);
-    await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
+    await user.click(screen.getByRole('button', { name: /^Show or hide columns/ }));
     expect(option('Show all columns')).toHaveTextContent('All 2 columns shown');
     await user.click(option('Source'));
     expect(option('Show all columns')).toHaveTextContent('1 hidden');
@@ -135,7 +142,7 @@ describe('DataTableColumnChooser', () => {
       header: `Column ${'ABCDEFGHI'[index]}`,
     })) satisfies ColumnDef<DataTableFeatures, Row>[];
     renderWithQueryClient(<Harness columns={many} />);
-    await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
+    await user.click(screen.getByRole('button', { name: /^Show or hide columns/ }));
     const search = screen.getByPlaceholderText('Search columns');
     await user.type(search, 'column c');
     const listbox = screen.getByRole('listbox');
@@ -154,14 +161,14 @@ describe('DataTableColumnChooser', () => {
   it('has no search box at eight columns or fewer', async () => {
     const user = userEvent.setup();
     renderWithQueryClient(<Harness />);
-    await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
+    await user.click(screen.getByRole('button', { name: /^Show or hide columns/ }));
     expect(screen.queryByPlaceholderText('Search columns')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations while open', async () => {
     const user = userEvent.setup();
     renderWithQueryClient(<Harness />);
-    await user.click(screen.getByRole('button', { name: 'Show or hide columns' }));
+    await user.click(screen.getByRole('button', { name: /^Show or hide columns/ }));
     expect(await axeForDialog(screen.getByRole('dialog'))).toHaveNoViolations();
   });
 });

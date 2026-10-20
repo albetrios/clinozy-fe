@@ -44,6 +44,11 @@ export function SkipLink() {
 /**
  * The section bar's ⌘K search (slot 6, `shell.md:23`; H:541): a 240px field
  * from `md`, a 36px icon button on a phone.
+ *
+ * Its name is its text, so the name holds what is shown (WCAG 2.5.3 Label in
+ * Name): from `md` the field's words ("Search patients, leads…"), on a phone —
+ * where only the icon shows — the screen-reader words "Search or jump to". The
+ * shortcut is `aria-keyshortcuts`, its key cap hidden from the name.
  */
 export function SearchTrigger({ className }: { className?: string }) {
   const { t } = useTranslation(LAYOUT_NS);
@@ -56,7 +61,7 @@ export function SearchTrigger({ className }: { className?: string }) {
       onClick={open}
       onMouseEnter={preloadCommandPalette}
       onFocus={preloadCommandPalette}
-      aria-label={t(keys.searchLabel)}
+      aria-keyshortcuts={isMac ? 'Meta+K' : 'Control+K'}
       title={t(isMac ? keys.searchTitleMac : keys.searchTitleWindows)}
       data-testid="search-trigger"
       className={cn(
@@ -66,10 +71,13 @@ export function SearchTrigger({ className }: { className?: string }) {
       )}
     >
       <Search className="size-3.75 flex-none" aria-hidden />
+      <span className="sr-only md:hidden">{t(keys.searchLabel)}</span>
       <span className="hidden min-w-0 flex-1 truncate text-start md:inline">
         {t(keys.searchPlaceholder)}
       </span>
+      {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: a <kbd> takes no focus; the key cap is decoration, announced as the button's aria-keyshortcuts */}
       <kbd
+        aria-hidden="true"
         data-slot="kbd"
         className="bg-card text-muted-foreground text-tiny hidden h-5 flex-none items-center rounded-sm border px-1.5 font-mono md:flex"
       >
@@ -177,6 +185,11 @@ function SectionTabBar({
   if (elsewhere) lensIndex = 4;
   else if (pinnedIndex !== -1) lensIndex = pinnedIndex;
   const lensTone = nav.current ? TONE_CLASSES[nav.current.tone].bg : null;
+  // The slot shows "More", or the room it stands in for; its name starts with that word, then
+  // says what it opens (WCAG 2.5.3 Label in Name).
+  const moreLabel = elsewhere
+    ? t(elsewhere.labelKey, { ns: elsewhere.labelNs })
+    : t(LAYOUT_KEYS.app.sectionBar.more);
   return (
     <>
       <TabBarLens index={lensIndex} tone={lensTone} />
@@ -191,7 +204,7 @@ function SectionTabBar({
       <button
         type="button"
         onClick={onMore}
-        aria-label={t(LAYOUT_KEYS.app.sectionBar.allSections)}
+        aria-label={`${moreLabel} · ${t(LAYOUT_KEYS.app.sectionBar.allSections)}`}
         aria-haspopup="dialog"
         aria-current={elsewhere ? 'page' : undefined}
         data-testid="nav-more-sections"
@@ -215,11 +228,7 @@ function SectionTabBar({
             aria-hidden
           />
           <WeightStableLabel
-            label={
-              elsewhere
-                ? t(elsewhere.labelKey, { ns: elsewhere.labelNs })
-                : t(LAYOUT_KEYS.app.sectionBar.more)
-            }
+            label={moreLabel}
             className={cn(tabLabelClassName, elsewhere ? 'font-semibold' : 'font-medium')}
           />
         </span>

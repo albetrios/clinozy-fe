@@ -9,6 +9,7 @@ import { fetchMyPreferences } from '@/shared/api/app/preferences-api.ts';
 import { pickerTestIds } from '@/shared/components/Picker/index.ts';
 import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { axeLabelInName } from '@/tests/utils/axe-label-in-name.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { BranchPicker } from './BranchPicker.tsx';
@@ -53,6 +54,13 @@ describe('BranchPicker', () => {
     await waitFor(() =>
       expect(screen.getByTestId('branch-picker')).toHaveTextContent(`${main.name}+1`),
     );
+    // The "+1" is shown text, so the button's name carries it too (WCAG 2.5.3 Label in Name).
+    expect(screen.getByTestId('branch-picker')).toHaveAccessibleName(
+      `Branch · ${main.name} +1`,
+    );
+    const results = await axeLabelInName(screen.getByTestId('branch-picker'));
+    expect(results.violations).toEqual([]);
+    expect(results.incomplete).toEqual([]);
   });
 
   it('is the compact pin on a phone: the name hides below md, the button keeps it (L-64)', async () => {

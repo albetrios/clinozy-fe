@@ -265,7 +265,7 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
     await user.click(await screen.findByTestId('new-lead-hit-10412'));
 
     await user.click(
-      screen.getByRole('button', { name: 'Assigned and involved people' }),
+      screen.getByRole('button', { name: /^Assigned and involved people/ }),
     );
     const people = await screen.findByRole('dialog', { name: 'People on this lead' });
     await user.click(within(people).getByRole('button', { name: 'Assign' }));

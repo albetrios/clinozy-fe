@@ -90,9 +90,12 @@ export function CalendarPicker({
         { civilDay: true },
       )
     : undefined;
-  const triggerLabel = shown
-    ? t(PICKER_KEYS.triggerLabel, { label: name, value: shown })
-    : name;
+  const shownPlaceholder = placeholder ?? t(PICKER_KEYS.date.placeholder);
+  // The name holds the words the trigger shows: the date, or the placeholder (WCAG 2.5.3).
+  const triggerLabel = t(PICKER_KEYS.triggerLabel, {
+    label: name,
+    value: shown ?? shownPlaceholder,
+  });
 
   const disabledDays = useMemo(() => {
     const matchers: Matcher[] = [];
@@ -130,9 +133,7 @@ export function CalendarPicker({
             {shown ? (
               <span className="truncate tabular-nums">{shown}</span>
             ) : (
-              <span className="text-muted-foreground truncate">
-                {placeholder ?? t(PICKER_KEYS.date.placeholder)}
-              </span>
+              <span className="text-muted-foreground truncate">{shownPlaceholder}</span>
             )}
           </PickerTrigger>
         }

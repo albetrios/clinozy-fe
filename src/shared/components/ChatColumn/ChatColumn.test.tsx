@@ -596,7 +596,7 @@ describe('suggestions and templates', () => {
     const user = userEvent.setup();
     renderChat({ person: ANAYA, contact: ANAYA_CONTACT });
     await screen.findByTestId(ids.textarea);
-    await user.click(screen.getByRole('button', { name: 'Suggestions' }));
+    await user.click(screen.getByRole('button', { name: 'Suggest' }));
 
     const popover = await screen.findByRole('dialog', { name: 'Suggested for Anaya' });
     expect(

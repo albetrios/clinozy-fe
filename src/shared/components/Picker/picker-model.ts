@@ -91,7 +91,10 @@ export interface PickerCopy {
   searchPlaceholder: string;
   /** The list's and the surface's accessible name. */
   listLabel: string;
-  /** The trigger's accessible name and title: "<label> · <picks>". */
+  /**
+   * The trigger's accessible name and title: "<label> · <picks>", or "<label> · <placeholder>"
+   * while nothing is picked — the name holds the words the trigger shows (WCAG 2.5.3).
+   */
   triggerLabel: string | undefined;
   /** The footer action's text without the query ("New supplier"). */
   createFullLabel: string;
@@ -111,12 +114,12 @@ export function pickerCopy<T>(
   const label = props.label ?? '';
   const lower = label.toLocaleLowerCase(language);
   const value = selected.map((option) => option.label).join(', ');
-  let triggerLabel: string | undefined;
-  if (label) {
-    triggerLabel = value ? t(PICKER_KEYS.triggerLabel, { label, value }) : label;
-  }
+  const placeholder = props.placeholder ?? t(PICKER_KEYS.placeholder);
+  const triggerLabel = label
+    ? t(PICKER_KEYS.triggerLabel, { label, value: value || placeholder })
+    : undefined;
   return {
-    placeholder: props.placeholder ?? t(PICKER_KEYS.placeholder),
+    placeholder,
     searchPlaceholder:
       props.searchPlaceholder ??
       (label ? t(PICKER_KEYS.search, { label: lower }) : t(PICKER_KEYS.searchDefault)),

@@ -118,7 +118,8 @@ describe('picker model', () => {
     );
     expect(named.searchPlaceholder).toBe('Find');
     expect(named.createFullLabel).toBe('New supplier');
-    expect(named.triggerLabel).toBe('Supplier');
+    // Nothing picked: the placeholder it shows, after the label (WCAG 2.5.3 Label in Name).
+    expect(named.triggerLabel).toBe('Supplier · Select…');
   });
 
   it('words the empty states (H:3967)', () => {

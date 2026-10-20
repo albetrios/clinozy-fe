@@ -274,13 +274,17 @@ describe('SectionBarShell — phone tab bar', () => {
     const more = within(bar).getByTestId('nav-more-sections');
     expect(more).toHaveTextContent(/tasks/i);
     expect(more).toHaveAttribute('aria-current', 'page');
+    // Its name starts with the word it shows, then says what it opens (WCAG 2.5.3).
+    expect(more).toHaveAccessibleName('Tasks · All sections');
   });
 
   it('reads "More" when the current room is pinned', async () => {
     renderShell('/organization/acme/patients');
     const bar = await screen.findByTestId('mobile-bottom-bar');
     await within(bar).findByTestId('nav-patients');
-    expect(within(bar).getByTestId('nav-more-sections')).toHaveTextContent('More');
+    const more = within(bar).getByTestId('nav-more-sections');
+    expect(more).toHaveTextContent('More');
+    expect(more).toHaveAccessibleName('More · All sections');
   });
 });
 

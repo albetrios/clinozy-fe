@@ -1,11 +1,12 @@
-import { act, render } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { axeLabelInName } from '@/tests/utils/axe-label-in-name.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { AppMain } from './AppLayout.shared.tsx';
+import { AppMain, SearchTrigger } from './AppLayout.shared.tsx';
 
 vi.mock('@/core/http/fetch-client.ts', () => ({
   apiClient: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -122,5 +123,42 @@ describe('AppMain — the room frame while the page rises', () => {
   it('leaves a padded page alone: its padding already absorbs the 6px rise', async () => {
     const { main } = await mountMain();
     expect(main.firstElementChild).not.toHaveClass(FRAME_CLIP);
+  });
+});
+
+describe('SearchTrigger — its name holds what it shows (WCAG 2.5.3)', () => {
+  it('is named by its words, never an aria-label over them', async () => {
+    const { container } = render(<SearchTrigger />);
+    const trigger = screen.getByTestId('search-trigger');
+    expect(trigger).not.toHaveAttribute('aria-label');
+    // From md the field's words; on a phone (icon only) the screen-reader words.
+    expect(trigger).toHaveAccessibleName(/Search patients, leads…/);
+    expect(trigger).toHaveAccessibleName(/^Search or jump to/);
+    expect(screen.getByText('Search patients, leads…')).toHaveClass(
+      'hidden',
+      'md:inline',
+    );
+    expect(screen.getByText(/^Search or jump to/)).toHaveClass('sr-only', 'md:hidden');
+    // The key cap is decoration: the shortcut is announced as one.
+    expect(trigger).toHaveAttribute('aria-keyshortcuts', 'Control+K');
+    expect(container.querySelector('kbd')).toHaveAttribute('aria-hidden', 'true');
+    expect(trigger).not.toHaveAccessibleName(/Ctrl/);
+
+    const results = await axeLabelInName(container);
+    expect(results.violations).toEqual([]);
+    expect(results.incomplete).toEqual([]);
+  });
+
+  it('the check has teeth: the aria-label axe-core 4.14 failed in e2e fails here too', async () => {
+    const { container } = render(
+      <button type="button" aria-label="Search or jump to (Command K)">
+        <span>Search patients, leads…</span>
+        <kbd>Ctrl+K</kbd>
+      </button>,
+    );
+    const results = await axeLabelInName(container);
+    expect(results.violations.map((violation) => violation.id)).toEqual([
+      'label-content-name-mismatch',
+    ]);
   });
 });

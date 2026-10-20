@@ -21,7 +21,7 @@ Single reference for **every test kind** in this repo: where it lives, how to ru
 - Stub with `vi.mock()` (API modules, hooks, `dataProvider`, router)
 - Reset mocks in `beforeEach` with `vi.resetAllMocks()`, never `vi.clearAllMocks()` (ESLint rejects it): clearing keeps whatever implementation a test installed, so it leaks into every later test. Give each mock its default as `vi.fn(impl)`, because a reset restores that, while a bare `vi.fn()` resets to returning `undefined`
 - `renderWithProviders` from `tests/utils/`
-- `vitest-axe` required on components (`toHaveNoViolations()`)
+- `vitest-axe` required on components (`toHaveNoViolations()`); the setup file's canvas stand-in lets axe decide `label-content-name-mismatch` (WCAG 2.5.3) in jsdom — `axeLabelInName` runs it alone
 
 Details: `agent-os/rules/fe-testing-requirements.mdc`, `agent-os/skills/fe-test-generation/SKILL.md`.
 
@@ -138,7 +138,7 @@ image needs this repository's read access on the backend's GHCR package while it
 
 Hybrid selectors: `data-testid` for actions, `getByRole`/`getByLabel` for a11y — `agent-os/skills/fe-playwright-e2e/SKILL.md`, `tests/utils/e2e-hybrid.ts`.
 
-Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`.
+Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`, `tests/utils/axe-label-in-name.ts`.
 
 ## Security specs (Vitest)
 

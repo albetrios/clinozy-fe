@@ -42,6 +42,9 @@ export function BranchPicker() {
     .map((b) => b.name);
   const [first] = names;
   const label = isAll ? t(keys.all) : (first ?? t(keys.all));
+  // The "+n" badge beside the first name is shown text, so the name carries it too (WCAG 2.5.3).
+  const others = isAll ? 0 : names.length - 1;
+  const shownLabel = others > 0 ? `${label} +${others}` : label;
 
   const set = (next: string[]) => {
     if (next.length === 0) {
@@ -110,7 +113,7 @@ export function BranchPicker() {
           type="button"
           variant="outline"
           size="sm"
-          aria-label={t(keys.label, { label })}
+          aria-label={t(keys.label, { label: shownLabel })}
           title={t(keys.title, { names: isAll ? t(keys.all) : names.join(', ') })}
           data-testid="branch-picker"
           className={cn(
@@ -123,9 +126,7 @@ export function BranchPicker() {
           <span data-testid="branch-picker-label" className="hidden md:inline">
             {label}
           </span>
-          {!isAll && names.length > 1 ? (
-            <CountBadge count={names.length - 1}>+{names.length - 1}</CountBadge>
-          ) : null}
+          {others > 0 ? <CountBadge count={others}>+{others}</CountBadge> : null}
           <ChevronDown
             className={cn(
               'text-muted-foreground size-3.5 transition-transform duration-150',

@@ -61,7 +61,10 @@ describe('PickerTrigger', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<PickerTrigger aria-label="Doctor">Pick</PickerTrigger>);
+    // The trigger words a labelled Picker gives it: the label, then the pick it shows.
+    const { container } = render(
+      <PickerTrigger aria-label="Doctor · Dr. Mavani">Dr. Mavani</PickerTrigger>,
+    );
     expect(await axe(container)).toHaveNoViolations();
   });
 });

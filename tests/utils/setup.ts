@@ -117,3 +117,31 @@ if (typeof Element.prototype.releasePointerCapture !== 'function') {
 if (typeof Element.prototype.scrollIntoView !== 'function') {
   Element.prototype.scrollIntoView = () => {};
 }
+
+// jsdom has no canvas: `getContext('2d')` returns null. axe's label-content-name-mismatch (WCAG
+// 2.5.3 Label in Name; on by default since axe-core 4.14) measures each text on a canvas to tell
+// an icon-font ligature from a word, so without one it errors and reports "incomplete" — which
+// `toHaveNoViolations()` lets through, and an aria-label that dropped its control's visible text
+// passed every component test while the e2e scan against the backend failed. This 2D context
+// measures every character 7.5px wide (the width `measureTextWidth` assumes without a canvas, so
+// fit-tabs reads the same) and inks every pixel, so no text reads as a ligature and the rule
+// decides. jsdom has no CSS either: `sr-only` and `hidden` text counts as visible here.
+const plainTextCanvasContext = (canvas: HTMLCanvasElement) => ({
+  canvas,
+  font: '',
+  textAlign: 'start',
+  textBaseline: 'alphabetic',
+  measureText: (text: string) => ({ width: text.length * 7.5 }),
+  fillText: () => {},
+  clearRect: () => {},
+  getImageData: (_x: number, _y: number, width: number, height: number) => ({
+    data: new Uint8ClampedArray(Math.max(1, width * height * 4)).fill(255),
+  }),
+});
+Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+  configurable: true,
+  writable: true,
+  value: function getContext(this: HTMLCanvasElement) {
+    return plainTextCanvasContext(this);
+  },
+});
