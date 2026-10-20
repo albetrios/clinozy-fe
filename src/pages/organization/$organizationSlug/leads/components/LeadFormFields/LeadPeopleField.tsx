@@ -104,14 +104,17 @@ export function LeadPeopleField({
   return (
     <LeadField label={t(LEADS_KEYS.drawer.people)} action={action}>
       <Popover onOpenChange={(open) => !open && setQuery('')}>
+        {/* Named by its text — the screen-reader words, then the owner and "+ Add involved" as
+            shown — not an aria-label, which would have to hold the avatars' initials too (WCAG
+            2.5.3 Label in Name). */}
         <PopoverTrigger asChild disabled={readOnly}>
           <button
             type="button"
-            aria-label={t(LEADS_KEYS.drawer.peopleAria)}
             data-testid={LEADS_TEST_IDS.drawerPeople}
             data-slot="input"
             className="bg-card hover:bg-canvas flex h-9 w-full items-center gap-2 overflow-hidden rounded-lg border ps-1.75 pe-3 text-start shadow-(--elevation-sm)"
           >
+            <span className="sr-only">{t(LEADS_KEYS.drawer.peopleAria)}</span>
             {owner ? (
               <span
                 data-slot="pill"

@@ -14,6 +14,7 @@ import { composerModes } from '@/shared/components/ChatColumn/chat-composer.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { Calendar, WhatsAppMark } from '@/shared/icons/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { axeLabelInName } from '@/tests/utils/axe-label-in-name.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { ChatComposer, type ChatComposerProps } from './ChatComposer.tsx';
@@ -141,9 +142,9 @@ describe('ChatComposer', () => {
   it('opens the suggestions from Suggest, closes them with ×, and fills the box with a pick', async () => {
     const user = userEvent.setup();
     render(<Harness />);
-    await user.click(screen.getByRole('button', { name: 'Suggestions' }));
+    await user.click(screen.getByRole('button', { name: 'Suggest' }));
     const popover = screen.getByRole('dialog', { name: 'Suggested for Anaya' });
-    expect(screen.getByRole('button', { name: 'Suggestions' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Suggest' })).toHaveAttribute(
       'aria-expanded',
       'true',
     );
@@ -151,7 +152,7 @@ describe('ChatComposer', () => {
     await user.click(within(popover).getByRole('button', { name: 'Close suggestions' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Suggestions' }));
+    await user.click(screen.getByRole('button', { name: 'Suggest' }));
     await user.click(screen.getByRole('button', { name: /Greet/ }));
     expect(box()).toHaveValue(
       'Hi Anaya, this is Riya from Cresence Skin 😊 How can I help you today?',
@@ -187,7 +188,7 @@ describe('ChatComposer', () => {
     render(<Harness onBook={vi.fn()} />);
     expect(screen.getByRole('button', { name: 'Book an appointment' })).toBeVisible();
     await user.click(screen.getByRole('tab', { name: 'Note' }));
-    expect(screen.queryByRole('button', { name: 'Suggestions' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Suggest' })).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Book an appointment' }),
     ).not.toBeInTheDocument();
@@ -196,7 +197,7 @@ describe('ChatComposer', () => {
   it('offers a "Fill in" chip per placeholder', async () => {
     const user = userEvent.setup();
     render(<Harness text={undefined} />);
-    await user.click(screen.getByRole('button', { name: 'Suggestions' }));
+    await user.click(screen.getByRole('button', { name: 'Suggest' }));
     await user.click(screen.getByTestId(`${ids.template}-location`));
     expect(screen.getByText('Fill in')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'maps link' }));
@@ -206,5 +207,15 @@ describe('ChatComposer', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<Harness showLabels />);
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('names Suggest by the word it shows, not "Suggestions" over it (WCAG 2.5.3)', async () => {
+    const { container } = render(<Harness />);
+    const suggest = screen.getByTestId(ids.suggest);
+    expect(suggest).not.toHaveAttribute('aria-label');
+    expect(suggest).toHaveAccessibleName('Suggest');
+    const results = await axeLabelInName(container);
+    expect(results.violations).toEqual([]);
+    expect(results.incomplete).toEqual([]);
   });
 });

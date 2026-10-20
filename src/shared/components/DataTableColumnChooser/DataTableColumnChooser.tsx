@@ -162,7 +162,12 @@ export function DataTableColumnChooser<TData extends RowData>({
           type="button"
           variant="outline"
           size="icon"
-          aria-label={t(TABLE_KEYS.columns.trigger)}
+          // The badge's count is shown text, so the name says it too (WCAG 2.5.3 Label in Name).
+          aria-label={
+            hidden > 0
+              ? `${t(TABLE_KEYS.columns.trigger)} · ${t(TABLE_KEYS.columns.hiddenCount, { count: hidden })}`
+              : t(TABLE_KEYS.columns.trigger)
+          }
           title={t(TABLE_KEYS.columns.title, { shown, total })}
           data-testid={TABLE_TEST_IDS.columnsTrigger(prefix)}
           className={cn(

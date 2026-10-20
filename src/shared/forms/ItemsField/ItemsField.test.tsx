@@ -879,7 +879,7 @@ const DOSE_PARTS = [
   ['doseNight', 'Night'],
 ] as const;
 
-/** One dose tap (a host's own cell): 0 → 1 → 2 → 0. */
+/** One dose tap (a host's own cell): 0 → 1 → 2 → 0, named with the count it shows (WCAG 2.5.3). */
 function DoseTap({
   control,
   name,
@@ -893,7 +893,7 @@ function DoseTap({
   return (
     <button
       type="button"
-      aria-label={label}
+      aria-label={`${label} · ${field.value}`}
       onClick={() => field.onChange((field.value + 1) % 3)}
     >
       {field.value}
@@ -970,8 +970,8 @@ describe('ItemsField — host: Rx medicines (§6.6)', () => {
     });
     await user.click(row().getByTestId('rx-meds-medicine'));
     await user.click(await screen.findByTestId('rx-meds-medicine-option-flubolt'));
-    await user.click(row().getByRole('button', { name: 'Morning' }));
-    await user.click(row().getByRole('button', { name: 'Night' }));
+    await user.click(row().getByRole('button', { name: /^Morning/ }));
+    await user.click(row().getByRole('button', { name: /^Night/ }));
 
     const note = row().getByRole('textbox', {
       name: 'Remarks · e.g. 10 days, apply thin layer, avoid sun',
@@ -984,7 +984,9 @@ describe('ItemsField — host: Rx medicines (§6.6)', () => {
     // The only row is cleared, not dropped (H:4807).
     await user.click(screen.getByTestId('rx-meds-remove'));
     expect(screen.getAllByTestId('rx-meds-row')).toHaveLength(1);
-    expect(row().getByTestId('rx-meds-medicine')).toHaveAccessibleName('Medicine');
+    expect(row().getByTestId('rx-meds-medicine')).toHaveAccessibleName(
+      'Medicine · Select…',
+    );
     expect(row().getByRole('spinbutton', { name: 'Qty' })).toHaveValue('1');
     expect(screen.getByTestId('rx-meds-note')).toHaveValue('');
   });

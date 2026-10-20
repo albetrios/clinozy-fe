@@ -483,7 +483,7 @@ describe('ItemsPickerCell — the row’s picker', () => {
       </CellHarness>,
     );
     const trigger = screen.getByTestId('mode');
-    expect(trigger).toHaveAccessibleName('Mode');
+    expect(trigger).toHaveAccessibleName('Mode · Select…');
     expect(trigger.className).toContain('min-h-8');
 
     await user.click(trigger);

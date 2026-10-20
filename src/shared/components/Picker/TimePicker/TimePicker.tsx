@@ -68,7 +68,12 @@ export function TimePicker({
   const gridRef = useRef<HTMLDivElement>(null);
   const slots = useMemo(() => timeSlots(from, to, step), [from, to, step]);
   const name = label ?? t(PICKER_KEYS.time.label);
-  const triggerLabel = value ? t(PICKER_KEYS.triggerLabel, { label: name, value }) : name;
+  const shownPlaceholder = placeholder ?? t(PICKER_KEYS.time.placeholder);
+  // The name holds the words the trigger shows: the time, or the placeholder (WCAG 2.5.3).
+  const triggerLabel = t(PICKER_KEYS.triggerLabel, {
+    label: name,
+    value: value === null || value === '' ? shownPlaceholder : value,
+  });
 
   const focusTile = () => {
     const grid = gridRef.current;
@@ -105,9 +110,7 @@ export function TimePicker({
             {value ? (
               <span className="truncate tabular-nums">{value}</span>
             ) : (
-              <span className="text-muted-foreground truncate">
-                {placeholder ?? t(PICKER_KEYS.time.placeholder)}
-              </span>
+              <span className="text-muted-foreground truncate">{shownPlaceholder}</span>
             )}
           </PickerTrigger>
         }

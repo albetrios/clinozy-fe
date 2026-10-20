@@ -17,12 +17,14 @@ export const AUTH_LABELS = {
 
 /**
  * The clinic shell's header (the section bar, KICKOFF §3.2 — the default shell
- * for a team deployment): search is "Search or jump to (Command K)", the
- * avatar names the member and their status ("Riya S. · Online") and opens the
- * Account menu, which holds the platform rows the old header carried.
+ * for a team deployment): search is named by the words it shows — "Search
+ * patients, leads…" from `md`, "Search or jump to" for the phone's icon (WCAG
+ * 2.5.3 Label in Name) — the avatar names the member and their status ("Riya S.
+ * · Online") and opens the Account menu, which holds the platform rows the old
+ * header carried.
  */
 export const LAYOUT_LABELS = {
-  search: /^search or jump to/i,
+  search: /^search (patients|or jump to)/i,
   // The status, then what else the avatar carries: pending invitations, the clinic setup's progress.
   userMenu: / · (online|away|busy)(?: · |$)/i,
   accountMenu: /^account$/i,

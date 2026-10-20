@@ -56,7 +56,7 @@ describe('CalendarPicker', () => {
     render(<Controlled label="Birth date" />);
     const trigger = screen.getByTestId('calendar-picker');
     expect(trigger).toHaveTextContent('Pick a date');
-    expect(trigger).toHaveAccessibleName('Birth date');
+    expect(trigger).toHaveAccessibleName('Birth date · Pick a date');
   });
 
   it('opens the 260px calendar (padding 10px, rounded-xl) on the picked day', async () => {

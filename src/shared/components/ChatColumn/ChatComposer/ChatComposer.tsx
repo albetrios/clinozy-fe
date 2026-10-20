@@ -433,7 +433,6 @@ function ComposerActions({
               type="button"
               variant="ghost"
               size="xs"
-              aria-label={t(keys.suggestions)}
               aria-haspopup="dialog"
               aria-expanded={suggestOpen}
               data-testid={ids.suggest}

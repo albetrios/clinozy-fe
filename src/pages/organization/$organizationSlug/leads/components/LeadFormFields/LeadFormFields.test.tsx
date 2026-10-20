@@ -163,7 +163,7 @@ describe('LeadPeopleField', () => {
 
   const openPeople = async (user: ReturnType<typeof userEvent.setup>) => {
     await user.click(
-      screen.getByRole('button', { name: 'Assigned and involved people' }),
+      screen.getByRole('button', { name: /^Assigned and involved people/ }),
     );
     return screen.findByRole('dialog');
   };
@@ -172,7 +172,7 @@ describe('LeadPeopleField', () => {
     const user = userEvent.setup();
     const onAssign = vi.fn();
     const { container } = render(field({ onAssign }));
-    const trigger = screen.getByRole('button', { name: 'Assigned and involved people' });
+    const trigger = screen.getByRole('button', { name: /^Assigned and involved people/ });
     expect(trigger).toHaveTextContent('Riya S.');
     expect(within(trigger).getByTitle('Nidhi Kapoor')).toBeInTheDocument();
     const popover = await openPeople(user);
@@ -215,7 +215,7 @@ describe('LeadPeopleField', () => {
     const onToggleInvolved = vi.fn();
     render(field({ ownerId: null, involvedIds: [], onToggleInvolved }));
     expect(
-      screen.getByRole('button', { name: 'Assigned and involved people' }),
+      screen.getByRole('button', { name: /^Assigned and involved people/ }),
     ).toHaveTextContent('+ Add involved');
     const popover = await openPeople(user);
     expect(within(popover).getAllByRole('button', { name: 'Assign' })).toHaveLength(2);
@@ -242,7 +242,7 @@ describe('LeadPeopleField', () => {
 
   it('only shows the people without Edit', () => {
     render(field({ readOnly: true }));
-    const trigger = screen.getByRole('button', { name: 'Assigned and involved people' });
+    const trigger = screen.getByRole('button', { name: /^Assigned and involved people/ });
     expect(trigger).toBeDisabled();
     expect(trigger).toHaveTextContent('Riya S.');
   });

@@ -41,7 +41,7 @@ describe('TimePicker', () => {
     render(<Controlled />);
     const trigger = screen.getByTestId('time-picker');
     expect(trigger).toHaveTextContent('Pick a time');
-    expect(trigger).toHaveAccessibleName('From');
+    expect(trigger).toHaveAccessibleName('From · Pick a time');
     expect(trigger.querySelector('svg')).not.toBeNull();
   });
 

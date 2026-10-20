@@ -157,25 +157,29 @@ export function PhotosBentoCard({
         {rows.length > 0 ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2">
             {onUpload ? <AddPhotosTile onClick={onUpload} /> : null}
-            {rows.map((photo) => (
-              <button
-                key={photo.id}
-                type="button"
-                onClick={() => onAlbum(photo.album)}
-                title={photoName(photo)}
-                aria-label={photoName(photo)}
-                data-testid={`${testId}-thumb`}
-                className="bg-muted hover:border-muted-foreground relative aspect-square overflow-hidden rounded-lg border transition-colors"
-              >
-                <PhotoThumb src={photo.fileUrl} />
-                <span
-                  data-slot="pill"
-                  className="bg-card/90 text-tiny text-muted-foreground-strong absolute start-1 bottom-1 flex h-4.5 items-center rounded-full px-1.5 font-medium"
+            {rows.map((photo) => {
+              const album = t(TIMELINE_KEYS.photos.albums[photo.album]);
+              return (
+                <button
+                  key={photo.id}
+                  type="button"
+                  onClick={() => onAlbum(photo.album)}
+                  title={photoName(photo)}
+                  // The album chip it shows, then the photo (WCAG 2.5.3 Label in Name).
+                  aria-label={`${album} · ${photoName(photo)}`}
+                  data-testid={`${testId}-thumb`}
+                  className="bg-muted hover:border-muted-foreground relative aspect-square overflow-hidden rounded-lg border transition-colors"
                 >
-                  {t(TIMELINE_KEYS.photos.albums[photo.album])}
-                </span>
-              </button>
-            ))}
+                  <PhotoThumb src={photo.fileUrl} />
+                  <span
+                    data-slot="pill"
+                    className="bg-card/90 text-tiny text-muted-foreground-strong absolute start-1 bottom-1 flex h-4.5 items-center rounded-full px-1.5 font-medium"
+                  >
+                    {album}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         ) : null}
         {emptyDropZone ? (

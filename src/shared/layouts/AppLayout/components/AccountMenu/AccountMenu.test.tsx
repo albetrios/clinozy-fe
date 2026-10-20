@@ -11,6 +11,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { presetMyRoles } from '@/tests/utils/app-preset-codes.ts';
+import { axeLabelInName } from '@/tests/utils/axe-label-in-name.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { AccountMenu } from './AccountMenu.tsx';
@@ -116,6 +117,22 @@ describe('AccountMenu', () => {
     const trigger = await screen.findByTestId('user-menu-trigger');
     expect(trigger).toHaveAccessibleName('Riya Shah · Online · Invitations: 2');
     expect(screen.getByTestId('user-menu-invitation-count')).toHaveTextContent('2');
+  });
+
+  it('is named by its screen-reader text, so the initials and the count shown are not missing from an aria-label (WCAG 2.5.3)', async () => {
+    invitationsRef.count = 2;
+    const { container } = renderWithProviders(
+      <AccountMenu onOpenNotifications={vi.fn()} />,
+    );
+
+    const trigger = await screen.findByTestId('user-menu-trigger');
+    expect(trigger).not.toHaveAttribute('aria-label');
+    expect(
+      await within(trigger).findByText('Riya Shah · Online · Invitations: 2'),
+    ).toHaveClass('sr-only');
+    const results = await axeLabelInName(container);
+    expect(results.violations).toEqual([]);
+    expect(results.incomplete).toEqual([]);
   });
 
   it('shows no count without invitations', async () => {

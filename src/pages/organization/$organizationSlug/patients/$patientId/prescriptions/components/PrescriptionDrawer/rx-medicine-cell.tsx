@@ -270,7 +270,8 @@ export function RxMedicineCell({
               disabled={readOnly}
               aria-invalid={invalid ? true : undefined}
               aria-describedby={describedBy}
-              aria-label={[row.label, line.medicineName, words]
+              // The medicine, or the placeholder it shows before one (WCAG 2.5.3 Label in Name).
+              aria-label={[row.label, line.medicineName || placeholder, words]
                 .filter(Boolean)
                 .join(' · ')}
               title={words || undefined}

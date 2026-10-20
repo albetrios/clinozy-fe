@@ -92,12 +92,12 @@ Requires **clinozy-be** on `:3000` — Vite proxies `/api` in dev.
 The clinic shell has no sidebar, bell or header theme toggle: the Account menu (the avatar,
 `user-menu-trigger`) holds them.
 
-| Helper                         | Purpose                                                                    |
-| ------------------------------ | -------------------------------------------------------------------------- |
-| `expectAppHeaderReady(page)`   | Header, search ("Search or jump to") and avatar ("<name> · <status>")      |
-| `openAccountMenu(page)`        | Open the Account menu (`account-menu`, named "Account")                    |
-| `openNotificationCenter(page)` | Account menu › Notifications → `notification-popover`                      |
-| `chooseThemeMode(page, mode)`  | Account menu › Appearance pills (`account-menu-theme-<mode>`), then closes |
+| Helper                         | Purpose                                                                       |
+| ------------------------------ | ----------------------------------------------------------------------------- |
+| `expectAppHeaderReady(page)`   | Header, search (named by the words it shows) and avatar ("<name> · <status>") |
+| `openAccountMenu(page)`        | Open the Account menu (`account-menu`, named "Account")                       |
+| `openNotificationCenter(page)` | Account menu › Notifications → `notification-popover`                         |
+| `chooseThemeMode(page, mode)`  | Account menu › Appearance pills (`account-menu-theme-<mode>`), then closes    |
 
 ### `e2e-app.ts` — the clinic rooms
 
@@ -127,6 +127,24 @@ Radix dialogs portal outside the render container — use `axeForDialog` instead
 ```ts
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 ```
+
+### `axe-label-in-name.ts` (WCAG 2.5.3 Label in Name)
+
+`axeLabelInName` runs axe's `label-content-name-mismatch` alone: a control named by an
+`aria-label` must say the words it shows. jsdom has no canvas, and without one the rule reports
+"incomplete" (which `toHaveNoViolations()` lets through) — so `setup.ts` installs a 2D canvas
+stand-in, and every `axe(container)` in the suite now decides the rule too. Check both lists:
+
+```ts
+import { axeLabelInName } from '@/tests/utils/axe-label-in-name.ts';
+
+const results = await axeLabelInName(container);
+expect(results.violations).toEqual([]);
+expect(results.incomplete).toEqual([]);
+```
+
+jsdom has no CSS either, so `sr-only` and `hidden` text counts as visible to it; the browser scan
+(`tests/e2e/accessibility.e2e.test.ts`) is the per-breakpoint truth.
 
 ### `bidi-marks.ts` (isolated data tokens)
 

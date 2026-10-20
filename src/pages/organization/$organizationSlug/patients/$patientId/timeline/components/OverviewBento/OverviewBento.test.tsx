@@ -484,10 +484,12 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     // "Use a session" goes — a recorded treatment spends one (§6 #20).
     expect(within(packages).queryByText('Use session')).not.toBeInTheDocument();
 
-    // Each thumb shows its photo from its link (D86), named for the reader; the server's count.
+    // Each thumb shows its photo from its link (D86), named by the album chip it shows, then the
+    // photo (WCAG 2.5.3); the server's count.
     const photos = await card('photos');
     const [thumb] = await within(photos).findAllByTestId('overview-card-photos-thumb');
-    expect(thumb).toHaveAccessibleName('Face before');
+    expect(thumb).toHaveAccessibleName('LHR · Face before');
+    expect(thumb).toHaveAttribute('title', 'Face before');
     expect(within(photos).getByText('9')).toBeInTheDocument();
     expect(thumb?.querySelector('img')).toHaveAttribute('src', PHOTO.fileUrl);
     expect(listPatientPhotos).toHaveBeenCalledWith(

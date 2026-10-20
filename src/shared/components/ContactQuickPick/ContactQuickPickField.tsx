@@ -96,10 +96,12 @@ export function ContactQuickPickField({
       ]
     : [];
   const showClear = Boolean(onClear) && value !== null && !disabled;
-  // "For · Kavya Mehta" once someone is picked — the Picker's trigger words (`picker.triggerLabel`).
-  const triggerLabel = value
-    ? t(PICKER_KEYS.triggerLabel, { label: title, value: value.name })
-    : title;
+  // "For · Kavya Mehta" once someone is picked, "For · <placeholder>" before — the Picker's
+  // trigger words (`picker.triggerLabel`): the name holds what the trigger shows (WCAG 2.5.3).
+  const triggerLabel = t(PICKER_KEYS.triggerLabel, {
+    label: title,
+    value: value ? value.name : placeholder,
+  });
 
   return (
     <div className="relative min-w-0">

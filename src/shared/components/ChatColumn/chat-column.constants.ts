@@ -98,7 +98,6 @@ export const CHAT_COLUMN_KEYS = {
   prefersNoCalls: 'chatColumn.prefersNoCalls',
   prefersAfterSix: 'chatColumn.prefersAfterSix',
   suggest: 'chatColumn.suggest',
-  suggestions: 'chatColumn.suggestions',
   suggestHint: 'chatColumn.suggestHint',
   book: 'chatColumn.book',
   bookHint: 'chatColumn.bookHint',

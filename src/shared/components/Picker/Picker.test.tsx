@@ -93,7 +93,8 @@ describe('Picker — surfaces', () => {
     );
     const trigger = screen.getByTestId('status');
     expect(trigger).toHaveTextContent('Select…');
-    expect(trigger).toHaveAttribute('aria-label', 'Status');
+    // The label, then the placeholder it shows (WCAG 2.5.3 Label in Name).
+    expect(trigger).toHaveAttribute('aria-label', 'Status · Select…');
     expect(trigger.className).toContain('min-h-9');
 
     await user.click(trigger);
