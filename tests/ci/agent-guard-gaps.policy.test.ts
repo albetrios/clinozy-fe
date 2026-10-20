@@ -47,10 +47,15 @@ function runHook(script: string, payload: unknown) {
   });
 }
 
-function guardDecision(tool: string, toolInput: Record<string, unknown>): string {
+function guardDecision(
+  tool: string,
+  toolInput: Record<string, unknown>,
+  cwd?: string,
+): string {
   const stdout = runHook('fe-guardrails.mjs', {
     tool_name: tool,
     tool_input: toolInput,
+    ...(cwd ? { cwd } : {}),
   }).stdout.trim();
   if (!stdout) return 'silent';
   const parsed = JSON.parse(stdout) as {
@@ -58,6 +63,32 @@ function guardDecision(tool: string, toolInput: Record<string, unknown>): string
   };
   return parsed.hookSpecificOutput?.permissionDecision ?? 'warn';
 }
+
+// Every branch of destructiveShellReason (_fe-guard-rules.mjs), each with a safe twin: the
+// planted-bug drill (20 Oct 2026) narrowed the force-push rule to --force and no test noticed.
+// The commands run from outside this repository: the push review gate judges only this
+// repository's pushes, so a sensitive diff on the checkout's branch cannot answer for the rule.
+describe('fe-guardrails: every destructive shell shape', () => {
+  it.each([
+    'git push -f origin main',
+    'git push origin main -f',
+    'rm -Rf build',
+    ':(){ :|:& };:',
+    'mkfs.ext4 /dev/sdb1',
+    'dd if=/dev/zero of=/dev/sdb bs=1M',
+  ])('denies %s', (command) => {
+    expect(guardDecision('Bash', { command }, turnDirectory)).toBe('deny');
+  });
+
+  it.each([
+    'git push --force-with-lease origin feat/x',
+    'git push origin feat/x',
+    'rm -r build',
+    'git commit -m "never git push -f"',
+  ])('lets the safe twin through: %s', (command) => {
+    expect(guardDecision('Bash', { command }, turnDirectory)).toBe('silent');
+  });
+});
 
 describe('agent-os guard gaps', () => {
   it('routes Read, Grep and MultiEdit to fe-guardrails.mjs and the reminders', () => {
