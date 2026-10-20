@@ -176,6 +176,17 @@ jobs:
             pnpm exec playwright test --grep @smoke --retries=1
           fi
 
+      # TEMPORARY (fix/nightly-e2e-full-suite): the visual specs' actual screenshots, base64 in the
+      # log, so new baselines come from this run's own output. Removed before merge.
+      - name: Print the visual actuals
+        if: failure()
+        run: |
+          find test-results -name '*-actual.png' | sort | while read -r shot; do
+            echo "PNG-BEGIN ${shot}"
+            base64 -w 76 "${shot}"
+            echo "PNG-END ${shot}"
+          done
+
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
