@@ -285,9 +285,11 @@ test.describe('Billing & subscription', () => {
     // a11y guard: the destructive confirm is a labelled button.
     await page.getByRole('button', { name: 'Confirm cancellation' }).click();
 
-    // The dialog closes and the panel stays healthy (no error toast / crash).
+    // The dialog closes and the panel stays healthy (no error toast / crash). Its plan header
+    // stays; the cancellation card may not — with Stripe the subscription ends at the period's
+    // end and the card stays, without it the backend ends it now and the card goes with it.
     await expect(page.getByTestId('billing-cancel-dialog')).toHaveCount(0);
-    await expect(page.getByTestId('billing-cancellation-card')).toBeVisible();
+    await expect(page.getByTestId('billing-summary')).toBeVisible();
   });
 
   test('switching plans updates the subscription (upgrade)', async ({
