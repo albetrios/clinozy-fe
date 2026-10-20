@@ -3,6 +3,8 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { jobBlocks } from '@/tests/utils/workflow-jobs.ts';
+
 // Two supply-chain invariants across every GitHub Actions workflow:
 //
 //  1. Third-party actions are pinned to a full 40-hex commit SHA — a moving
@@ -14,12 +16,21 @@ import { describe, expect, it } from 'vitest';
 //     `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`, so a lagging action can never drag
 //     a job back onto a retired Node runtime. `.nvmrc` pins the toolchain; this
 //     env pins the action runtime.
+//  3. A called workflow reaches its secrets one way. They live in GitHub
+//     Environments, so every reusable-workflow job that reads one sets
+//     `environment:`, and that job sees its environment's secrets only when the
+//     caller passes `secrets: inherit`: #150 dropped it and the called deploy
+//     read every secret empty (run 39454666563).
 //
 // actionlint validates syntax but enforces neither of these — this lane does.
 
 const WORKFLOWS_DIR = join(process.cwd(), '.github/workflows');
 const NODE24_ENV_KEY = 'FORCE_JAVASCRIPT_ACTIONS_TO_NODE24';
 const SHA_PIN = /@[0-9a-f]{40}$/;
+// A `${{ secrets.NAME }}` read; `GITHUB_TOKEN` is the run's own token, never an environment secret.
+const SECRET_READ = /\$\{\{ *secrets\.(?!GITHUB_TOKEN\b)[A-Za-z_]\w*/;
+const JOB_ENVIRONMENT = /^ {4}environment:/m;
+const LOCAL_CALL = /^ {4}uses: \.\/\.github\/workflows\/([\w.-]+\.ya?ml)$/m;
 
 interface WorkflowFile {
   file: string;
@@ -88,6 +99,53 @@ describe('github actions hardening policy', () => {
       missing,
       `Workflow(s) missing the ${NODE24_ENV_KEY} env — add it under a top-level env: block:\n${missing
         .map((file) => `  ${file}`)
+        .join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('every call of a reusable workflow that reads a secret passes secrets: inherit', () => {
+    const byFile = new Map(
+      workflows.map((workflow) => [workflow.file, workflow.content]),
+    );
+    const readsSecret = (file: string): boolean =>
+      jobBlocks(byFile.get(file) ?? '').some(([, block]) => SECRET_READ.test(block));
+    const secretCalls = workflows.flatMap((workflow) =>
+      jobBlocks(workflow.content).flatMap(([name, block]) => {
+        const callee = LOCAL_CALL.exec(block)?.[1];
+        return callee && readsSecret(callee)
+          ? [{ caller: `${workflow.file}: ${name}`, block }]
+          : [];
+      }),
+    );
+    expect(secretCalls.length).toBeGreaterThan(0);
+    const withoutInherit = secretCalls
+      .filter(
+        ({ block }) =>
+          !block.split('\n').some((line) => line.trim() === 'secrets: inherit'),
+      )
+      .map(({ caller }) => caller);
+    expect(
+      withoutInherit,
+      `Call(s) of a secret-reading reusable workflow without secrets: inherit — the callee would read every secret empty:\n${withoutInherit
+        .map((caller) => `  ${caller}`)
+        .join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('every reusable-workflow job that reads a secret sets environment:', () => {
+    const reusable = workflows.filter((workflow) =>
+      /^ {2}workflow_call:/m.test(workflow.content),
+    );
+    expect(reusable.length).toBeGreaterThan(0);
+    const unscoped = reusable.flatMap((workflow) =>
+      jobBlocks(workflow.content)
+        .filter(([, block]) => SECRET_READ.test(block) && !JOB_ENVIRONMENT.test(block))
+        .map(([name]) => `${workflow.file}: ${name}`),
+    );
+    expect(
+      unscoped,
+      `Reusable-workflow job(s) reading a secret with no environment: — set one:\n${unscoped
+        .map((job) => `  ${job}`)
         .join('\n')}`,
     ).toEqual([]);
   });
