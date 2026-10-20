@@ -355,8 +355,10 @@ jobs:
       contents: read
       id-token: write
       attestations: write
+    # No `secrets:` here: the reusable's run job sets its GitHub Environment and reads
+    # that environment's secrets itself; `secrets: inherit` would hand it every
+    # repository secret too.
     uses: ./.github/workflows/reusable-netlify-deploy.yml
-    secrets: inherit
     with:
       github_environment: development
 
