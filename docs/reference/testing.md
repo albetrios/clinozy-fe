@@ -204,7 +204,11 @@ today; one file of each escalating kind running everything; the misses recorded 
 **Selected tests at push.** `.husky/pre-push` runs its Vitest step through `pnpm test:pre-push`
 (`tooling/ci/pre-push-tests.mjs`): only the files the selection picks for the pushed commits,
 always-run files included, in one Vitest process. An escalating change runs the whole suite
-(`pnpm test`), as does a selection that cannot be built. CI still runs every suite.
+(`pnpm test`), as does a selection that cannot be built. CI still runs every suite. A changed test
+also selects the policies that read every test's source (`TEST_SOURCE_POLICIES`: no test builds
+a git repository outside the throwaway-repository fixture), since nothing imports a test. They run
+first and alone, so a new test that builds a git repository by hand fails the push before it runs
+inside the hook and rewrites the developer's repository (planted-bug drill, 20 Oct).
 `pnpm test:affected` previews it.
 
 Proven before it became the default (18 Oct): eleven planted breaks, one at a time, each against

@@ -29,8 +29,32 @@ const HELPER_FILE = 'tooling/ci/git-environment.mjs';
 const REPOSITORY_FIXTURE = 'tooling/ci/throwaway-repository.mjs';
 /** This file: its `init` lines are samples for the scan pattern, not a repository it builds. */
 const THIS_FILE = 'tests/ci/git-hook-environment.policy.test.ts';
-/** A `git init` handed to a child process: `git('init'`, `git(root, ['init'`, `'git', ['init'`. */
-const BUILDS_REPOSITORY = /(?:\bgit\(|['"]git['"],)[^\n]*['"]init['"]/;
+/**
+ * A `git init` handed to a child process: `git('init'`, `git(root, ['init'`, `'git', ['init'`, or
+ * one command string, `execSync('git init -q')`.
+ */
+const BUILDS_REPOSITORY =
+  /(?:\bgit\(|['"]git['"],)[^\n]*['"]init['"]|['"`]git\s[^'"`\n]*\binit\b/;
+
+/** A binding that holds the git binary's name: `const GIT = 'git'`. */
+const GIT_BINARY_BINDING = /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(['"`])git\2/g;
+
+/** Whether `source` runs `git init`: by the binary's name, or through a binding that holds it. */
+function buildsRepository(source: string): boolean {
+  // Comments name git commands without running them: skip comment lines, cut trailing comments.
+  const lines = source
+    .split('\n')
+    .map((line) =>
+      /^\s*(?:\/\/|\*|\/\*)/.test(line) ? '' : (line.split('//')[0] ?? ''),
+    );
+  if (lines.some((line) => BUILDS_REPOSITORY.test(line))) return true;
+  const calls = source.replace(/\(\s+/g, '(').replace(/,\s+/g, ', ');
+  return [...source.matchAll(GIT_BINARY_BINDING)].some(([, name]) =>
+    calls
+      .split('\n')
+      .some((line) => line.includes(`(${name}, [`) && /['"]init['"]/.test(line)),
+  );
+}
 
 /** A `git` child process started by hand: `spawnSync('git'`, `execFileSync(\n 'git'`, `execSync('git …`. */
 const STARTS_GIT =
@@ -71,11 +95,7 @@ function repositoryBuilders(): string[] {
   return SCANNED_DIRECTORIES.flatMap((directory) => sourceFiles(join(ROOT, directory)))
     .map((path) => relative(ROOT, path))
     .filter((file) => file !== HELPER_FILE && file !== THIS_FILE)
-    .filter((file) =>
-      readFileSync(join(ROOT, file), 'utf8')
-        .split('\n')
-        .some((line) => BUILDS_REPOSITORY.test(line.split('//')[0] ?? '')),
-    );
+    .filter((file) => buildsRepository(readFileSync(join(ROOT, file), 'utf8')));
 }
 
 describe('git hook environment — inherited repository variables', () => {
@@ -127,6 +147,19 @@ describe('git hook environment — inherited repository variables', () => {
     expect(repositoryBuilders()).toEqual([REPOSITORY_FIXTURE]);
     expect(BUILDS_REPOSITORY.test("git(['init', '-q'], { cwd })")).toBe(true);
     expect(BUILDS_REPOSITORY.test("spawnSync('git', ['init'])")).toBe(true);
+    // The shapes the planted-bug drill used (20 Oct 2026): one command string, and a binding.
+    expect(buildsRepository("execSync('git init -q -b main', { cwd })")).toBe(true);
+    expect(
+      buildsRepository("const GIT = 'git';\nspawnSync(GIT, ['init', '-q'], { cwd });"),
+    ).toBe(true);
+    expect(
+      buildsRepository("const GIT = 'git';\nexecFileSync(\n  GIT,\n  ['init'],\n)"),
+    ).toBe(true);
+    // A payload or a message that only names a git command builds nothing.
+    expect(buildsRepository("const command = 'git push origin main';")).toBe(false);
+    expect(
+      buildsRepository("const GIT = 'git';\nspawnSync(GIT, ['status'], { cwd });"),
+    ).toBe(false);
 
     // Run as if from a hook pinned to another repository: the fixture still builds its own.
     const pinned = createThrowawayRepository({ prefix: 'git-environment-pinned-' });

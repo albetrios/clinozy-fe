@@ -5,7 +5,8 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { prePushTests } from './pre-push-tests.mjs';
+import { prePushRuns, prePushTests } from './pre-push-tests.mjs';
+import { TEST_SOURCE_POLICIES } from './test-selection.mjs';
 
 const PRE_PUSH = readFileSync(
   join(resolve(import.meta.dirname, '../..'), '.husky/pre-push'),
@@ -60,6 +61,26 @@ describe('pre-push tests', () => {
       select: () => ({ mode: 'none', reasons: [], projects: {}, why: {} }),
     });
     expect(empty.run).toBe('none');
+  });
+
+  it('runs the test-source policies first and alone, so a bad new test never runs in the hook', () => {
+    const vitest = (files) => ['exec', 'vitest', 'run', ...files];
+    const policies = [...TEST_SOURCE_POLICIES];
+    expect(
+      prePushRuns({
+        run: 'selected',
+        files: ['src/new.test.ts', ...policies],
+        reason: '',
+      }),
+    ).toStrictEqual([vitest(policies), vitest(['src/new.test.ts'])]);
+    expect(
+      prePushRuns({ run: 'selected', files: ['src/a.test.ts'], reason: '' }),
+    ).toStrictEqual([vitest(['src/a.test.ts'])]);
+    expect(prePushRuns({ run: 'all', files: [], reason: '' })).toStrictEqual([
+      vitest(policies),
+      ['test'],
+    ]);
+    expect(prePushRuns({ run: 'none', files: [], reason: '' })).toStrictEqual([]);
   });
 
   it('is what the hook runs, against the push base', () => {
