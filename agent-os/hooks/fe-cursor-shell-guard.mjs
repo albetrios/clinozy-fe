@@ -10,12 +10,15 @@
 // { "permission": "allow" | "deny", … } — Cursor's output shape, not Claude Code's.
 import { destructiveShellReason } from './_fe-guard-rules.mjs';
 import { readHookPayload, writeHookOutput } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 
 function allow() {
+  recordTelemetry('fe-cursor-shell-guard', 'beforeShellExecution', 'silent');
   writeHookOutput({ continue: true, permission: 'allow' });
   process.exit(0);
 }
 function deny(message) {
+  recordTelemetry('fe-cursor-shell-guard', 'beforeShellExecution', 'fired');
   writeHookOutput({
     continue: true,
     permission: 'deny',

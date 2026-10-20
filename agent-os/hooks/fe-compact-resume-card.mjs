@@ -16,6 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 
 import { addModelContext, repositoryRoot } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 
 /** `git <args>` in the repository: its stdout, or `null` when git fails. */
 function git(args) {
@@ -38,4 +39,9 @@ if (existsSync(repositoryRoot)) {
     ].join('\n'),
   });
 }
+recordTelemetry(
+  'fe-compact-resume-card',
+  'SessionStart',
+  existsSync(repositoryRoot) ? 'fired' : 'silent',
+);
 process.exit(0);

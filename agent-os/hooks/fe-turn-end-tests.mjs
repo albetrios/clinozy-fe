@@ -10,6 +10,10 @@
 //
 // It skips a tree it already passed (same changes) and a change no test reaches.
 //
+// Telemetry: `fired` when it wakes the model (a failure or the heads-up), else `silent`, with the
+// outcome in the detail column (`no-changes`, `passed`, …) so the hooks report can say why it stayed
+// quiet.
+//
 // Only this repository is judged: a session that holds several repositories runs every
 // repository's hooks, each with its own CLAUDE_PROJECT_DIR (tooling/agent-os/session-hooks.ts).
 import { createHash } from 'node:crypto';
@@ -26,6 +30,7 @@ import { join } from 'node:path';
 import { stripVTControlCharacters } from 'node:util';
 
 import { hookStateDirectory, readHookPayload, repositoryRoot } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 
 const HOOK_ID = 'fe-turn-end-tests';
 const TEST_BUDGET_MILLISECONDS = 60_000;
@@ -114,7 +119,7 @@ function warnFullPush({ session, reasons }) {
   const reason = reasons[0] ?? 'everything is selected';
   const key = createHash('sha1').update(`${session}\n${reason}`).digest('hex');
   const marker = join(hookStateDirectory, `${HOOK_ID}.warned-${key}`);
-  if (existsSync(marker)) return 'silent';
+  if (existsSync(marker)) return 'already-warned';
   writeFileSync(marker, reason);
   process.stderr.write(
     `Turn-end tests (a heads-up, nothing failed): the next push runs the whole Vitest suite — ${reason}. ` +
@@ -127,15 +132,15 @@ function run(session) {
   if (!takeLock()) return 'busy';
   try {
     const files = changedFiles();
-    if (files.length === 0) return 'silent';
+    if (files.length === 0) return 'no-changes';
     const tree = fingerprint(files);
     if (existsSync(passedPath) && readFileSync(passedPath, 'utf8') === tree)
       return 'already-passed';
     const selection = select(files);
-    if (!selection) return 'silent';
+    if (!selection) return 'no-selection';
     if (selection.mode === 'all')
       return warnFullPush({ session, reasons: selection.reasons });
-    if (selection.mode !== 'selected') return 'silent';
+    if (selection.mode !== 'selected') return 'selects-everything';
     const tests = Object.values(selection.projects)
       .flat()
       .filter((test) =>
@@ -143,7 +148,7 @@ function run(session) {
           (reason) => !reason.startsWith(ALWAYS_RUN_REASON),
         ),
       );
-    if (tests.length === 0) return 'silent';
+    if (tests.length === 0) return 'no-change-tests';
 
     const result = spawnSync(
       join(repositoryRoot, 'node_modules', '.bin', 'vitest'),
@@ -187,4 +192,10 @@ try {
 } catch {
   /* fail-open */
 }
-process.exit(outcome === 'failed' || outcome === 'warned' ? 2 : 0);
+const woke = outcome === 'failed' || outcome === 'warned';
+try {
+  recordTelemetry(HOOK_ID, 'Stop', woke ? 'fired' : 'silent', outcome);
+} catch {
+  /* telemetry never changes the outcome */
+}
+process.exit(woke ? 2 : 0);

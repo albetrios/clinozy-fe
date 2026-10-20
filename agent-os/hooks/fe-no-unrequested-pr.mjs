@@ -10,11 +10,13 @@
 //
 // Fails OPEN: an unreadable payload exits 0, leaving the normal permission flow in charge.
 import { askBeforeToolCall, readHookPayload } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 import { isTurnMarked } from './_fe-turn-once.mjs';
 
 const payload = readHookPayload();
 if (payload && !isTurnMarked({ session: payload.session_id, mark: 'pr-requested' })) {
   const title = payload.tool_input?.title;
+  recordTelemetry('fe-no-unrequested-pr', 'PreToolUse', 'fired');
   askBeforeToolCall(
     [
       'clinozy-fe policy: open a PR only when the user explicitly asked for one.',
@@ -23,4 +25,5 @@ if (payload && !isTurnMarked({ session: payload.session_id, mark: 'pr-requested'
     ].join(' '),
   );
 }
+recordTelemetry('fe-no-unrequested-pr', 'PreToolUse', 'silent');
 process.exit(0);

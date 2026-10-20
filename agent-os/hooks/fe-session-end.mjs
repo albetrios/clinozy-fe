@@ -8,16 +8,19 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 
 import { repositoryRoot } from './_fe-hook.mjs';
+import { recordTelemetry } from './_fe-telemetry.mjs';
 
+let status = 'silent';
 if (existsSync(repositoryRoot)) {
-  const status = spawnSync('git', ['status', '--porcelain'], {
+  const gitStatus = spawnSync('git', ['status', '--porcelain'], {
     cwd: repositoryRoot,
     encoding: 'utf8',
   });
   const count =
-    status.status === 0 ? status.stdout.split('\n').filter(Boolean).length : 0;
+    gitStatus.status === 0 ? gitStatus.stdout.split('\n').filter(Boolean).length : 0;
   console.log('');
   if (count > 0) {
+    status = 'fired';
     console.log(
       `⚠ Session ending with ${count} uncommitted change(s). A cloud env is ephemeral —`,
     );
@@ -28,4 +31,5 @@ if (existsSync(repositoryRoot)) {
     console.log('✓ Session ending — working tree clean.');
   }
 }
+recordTelemetry('fe-session-end', 'SessionEnd', status);
 process.exit(0);
