@@ -55,9 +55,11 @@ describe('test:affected mirrors .husky/pre-push', () => {
       'pnpm-lock.yaml',
       'pnpm-workspace.yaml',
       'tooling/ci/a.mjs',
-      // The CI policy tests read the workflows, so a workflow-only push runs the ones naming it;
-      // a changed policy test selects itself.
+      // The CI policy tests read the workflows and the hook tests spawn the hooks, so a push of
+      // only a workflow or only a hook runs the ones naming it; a changed policy test selects
+      // itself.
       '.github/workflows/post-merge-ci.yml',
+      'agent-os/hooks/fe-push-ci-watch.mjs',
       'tests/ci/a.policy.test.ts',
     ])
       expect(answer('pnpm test:pre-push', [file]), file).toBe('yes');

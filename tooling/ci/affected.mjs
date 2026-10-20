@@ -18,14 +18,16 @@ import { ALWAYS_RUN_REASON, selectTests } from './test-selection.mjs';
 
 /**
  * The pushed files that make pre-push run the selected tests (`pnpm test:pre-push`): source and
- * tests, tooling, the workflows, and the dependency and Vitest config. `.github/` counts because
- * the CI policy tests (`tests/ci`) read the workflows and actions, so a push that changes only a
- * workflow runs the ones that name it; a changed test selects itself. The same rule as
+ * tests, tooling, the workflows, the agent hooks, and the dependency and Vitest config. `.github/`
+ * counts because the CI policy tests (`tests/ci`) read the workflows and actions, so a push that
+ * changes only a workflow runs the ones that name it; `agent-os/` counts because the hook tests
+ * (`tests/ci`) spawn the hooks, so a hooks-only push runs them; a changed test selects itself.
+ * The same rule as
  * clinozy-be's `tooling/validate/pre-push-steps.ts`, on this repository's paths (its tests live
  * under `src/` and `tests/`).
  */
 export const UNIT_RELEVANT =
-  /^(src\/|tests\/|tooling\/|\.github\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
+  /^(src\/|tests\/|tooling\/|\.github\/|agent-os\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$)/;
 
 /** The pushed files the SonarQube gate analyzes (`pnpm sonar:scan`): src/ runtime, without these. */
 export const SONAR_RUNTIME = /^src\/.*\.(ts|tsx)$/;
