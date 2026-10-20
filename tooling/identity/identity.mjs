@@ -307,9 +307,10 @@ export function derivedSurfaces(identity, _root = ROOT) {
     },
     {
       file: 'docker-compose.sonar.yml',
-      label: 'Sonar container + project key',
+      label: 'Sonar Compose project, containers + project key',
       apply: (text) =>
         text
+          .replace(/^name: [\w-]+$/m, `name: ${name}`)
           .replace(/^(\s*container_name:\s*)[\w-]+(-sonarqube)$/m, `$1${name}$2`)
           .replace(/^(\s*container_name:\s*)[\w-]+(-sonar-scanner)$/m, `$1${name}$2`)
           .replace(/(-Dsonar\.projectKey=)\S+/g, `$1${name}`)
