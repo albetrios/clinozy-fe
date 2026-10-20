@@ -4,7 +4,7 @@ import { checkPasswordBreached } from './password-breach.ts';
 
 // SHA-1('password') = 5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8
 // → prefix 5BAA6, suffix 1E4C9B93F3F0682250B6CF8331B7EE68FD8
-const PASSWORD_SUFFIX = '1E4C9B93F3F0682250B6CF8331B7EE68FD8';
+const PASSWORD_SUFFIX = '1E4C9B93F3F0682250B6CF8331B7EE68FD8'; // gitleaks:allow
 
 describe('checkPasswordBreached', () => {
   let fetchMock: ReturnType<typeof vi.fn>;

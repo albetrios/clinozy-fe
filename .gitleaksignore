@@ -1,0 +1,8 @@
+# Findings in commits already pushed, on any branch, when gitleaks' built-in rules were turned on
+# (20 Oct 2026). CI checks out every ref (`fetch-depth: 0`), so it scans every branch's history.
+# Every one is a test fixture or a documentation example, and its line in the current tree
+# carries an inline `gitleaks:allow`. A fingerprint names its commit, which never changes, so
+# the list stays valid. Never add a finding from a new commit here: mark the fixture line with
+# `gitleaks:allow`, or take the secret out.
+104512fe28859835601a263222c735df02aabc3a:src/lib/password-breach.test.ts:generic-api-key:7
+7bc155032ba40be90324bf172c4a99877daf244f:src/lib/password-breach.test.ts:generic-api-key:7
