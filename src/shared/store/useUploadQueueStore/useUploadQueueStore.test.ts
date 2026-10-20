@@ -102,6 +102,60 @@ describe('useUploadQueueStore', () => {
     expect(row('e.jpg').status).toBe('queued');
   });
 
+  // An attaching row still holds its slot: the bytes are stored, but the row is not done
+  // until the hand-off settles. A queued file must wait for it, or a slow attach lets more
+  // than three files move at once.
+  it('counts attaching rows toward the cap, so a queued file waits for a slot', async () => {
+    const attaches: Array<() => void> = [];
+    const onUploaded = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          attaches.push(resolve);
+        }),
+    );
+    const moving = () =>
+      rows().filter(
+        (candidate) =>
+          candidate.status === 'uploading' || candidate.status === 'attaching',
+      ).length;
+    const names = ['a.jpg', 'b.jpg', 'c.jpg', 'd.jpg', 'e.jpg'];
+    useUploadQueueStore.getState().add(
+      names.map((name) => photo(name)),
+      { onUploaded },
+      'org_a',
+    );
+
+    upload(0).succeed('organization-files/org_a/a.jpg');
+    upload(1).succeed('organization-files/org_a/b.jpg');
+    upload(2).succeed('organization-files/org_a/c.jpg');
+    await flush();
+    expect(rows().map((candidate) => candidate.status)).toEqual([
+      'attaching',
+      'attaching',
+      'attaching',
+      'queued',
+      'queued',
+    ]);
+
+    // Another file joins while every slot is attaching: nothing new may start.
+    useUploadQueueStore.getState().add([photo('f.jpg')], { onUploaded }, 'org_a');
+    expect(uploadFileMock).toHaveBeenCalledTimes(UPLOAD_CONCURRENCY);
+    expect(moving()).toBe(UPLOAD_CONCURRENCY);
+    expect(row('d.jpg')).toMatchObject({ status: 'queued', progress: 0 });
+    expect(row('f.jpg').status).toBe('queued');
+
+    // One attach settles: its slot goes to the oldest waiting file, and only to it.
+    const firstAttach = attaches[0];
+    if (!firstAttach) throw new Error('the first attach never started');
+    firstAttach();
+    await flush();
+    expect(row('a.jpg').status).toBe('done');
+    expect(uploadFileMock).toHaveBeenCalledTimes(UPLOAD_CONCURRENCY + 1);
+    expect(row('d.jpg').status).toBe('uploading');
+    expect(row('e.jpg').status).toBe('queued');
+    expect(moving()).toBe(UPLOAD_CONCURRENCY);
+  });
+
   it('uploads into the organization as an organization file', () => {
     useUploadQueueStore
       .getState()

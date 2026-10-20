@@ -51,6 +51,42 @@ describe('useOnboardingStore', () => {
     expect(state.completed).toBe(true);
   });
 
+  // A reset wizard is a new wizard: a `completed` left behind would send the next run
+  // straight past every step with nothing asked.
+  it('reset puts every field of a completed wizard back to its initial value', () => {
+    const store = useOnboardingStore.getState();
+    store.claimForUser('usr_done');
+    store.patch({
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      organizationName: 'Acme Inc.',
+      organizationSlug: 'acme',
+    });
+    store.setStepIndex(ONBOARDING_STEPS.length - 1);
+    store.setCreatedOrganizationId('org_done');
+    store.setCreatedOrganizationSlug('acme');
+    store.complete();
+    expect(useOnboardingStore.getState().completed).toBe(true);
+
+    useOnboardingStore.getState().reset();
+
+    /** The store's values without its actions — what a reset has to put back. */
+    const progressOf = (state: object) =>
+      Object.fromEntries(
+        Object.entries(state).filter(([, value]) => typeof value !== 'function'),
+      );
+    const initial = {
+      stepIndex: 0,
+      data: { firstName: '', lastName: '', organizationName: '', organizationSlug: '' },
+      completed: false,
+      forUserId: null,
+      createdOrganizationId: null,
+      createdOrganizationSlug: null,
+    };
+    expect(progressOf(useOnboardingStore.getInitialState())).toEqual(initial);
+    expect(progressOf(useOnboardingStore.getState())).toEqual(initial);
+  });
+
   describe('claimForUser (cross-user leak guard)', () => {
     it("wipes a DIFFERENT user's persisted progress and binds the new owner", () => {
       const store = useOnboardingStore.getState();
