@@ -3,6 +3,7 @@
  * check runs, how each reads its command's result, and which pushed
  * files Semgrep scans.
  */
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   EARLY_CHECKS_FALSE_POSITIVE_LOG,
@@ -92,22 +93,36 @@ describe('the commit checks', () => {
 });
 
 describe('Semgrep at push', () => {
-  it('scans the auth runtime, the HTTP client and the CSP builders — never their tests', () => {
+  it('scans every app source file and Vite plugin — never their tests', () => {
     expect(
       pushSemgrepTargets([
         'src/shared/auth/service.ts',
         'src/shared/auth/service.test.ts',
         'src/core/http/fetch-client.ts',
-        'src/lib/csp-api-origin.ts',
         'plugins/csp-api-origin.ts',
         'src/shared/tenancy/resolver.ts',
+        'src/pages/login/LoginPage.tsx',
+        'src/pages/login/LoginPage.test.tsx',
+        'tooling/ci/affected.mjs',
         'docs/reference/security-model.md',
       ]),
     ).toStrictEqual([
       'src/shared/auth/service.ts',
       'src/core/http/fetch-client.ts',
-      'src/lib/csp-api-origin.ts',
       'plugins/csp-api-origin.ts',
+      'src/shared/tenancy/resolver.ts',
+      'src/pages/login/LoginPage.tsx',
     ]);
+  });
+
+  it('runs the same rules as the PR CI Semgrep SAST step, and that step can fail', () => {
+    const sast = readFileSync('.github/workflows/pr-ci.yml', 'utf8')
+      .split('\n')
+      .find((line) => line.includes('run: semgrep scan'));
+    expect(readFileSync('tooling/ci/push-semgrep.mjs', 'utf8')).toContain("'p/default'");
+    expect(sast).toContain('--config p/default');
+    // Without --error Semgrep exits 0 on a finding, so the lane passed whatever it found.
+    expect(sast).toContain('--error');
+    expect(sast).toContain('--baseline-commit "$BASE_SHA"');
   });
 });

@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 /**
- * Semgrep at push on the code where a hole is a session or tenant leak — the auth runtime, the HTTP
- * client and the CSP builders — an early check in `.husky/pre-push`. The PR's Semgrep lane scans
- * everything (clinozy-be's `pnpm security:semgrep:push`, on this repository's surface).
+ * Semgrep at push on every changed app source file (`src/`, `plugins/`; tests excluded) — an early
+ * check in `.husky/pre-push`. The PR's Semgrep lane scans everything (clinozy-be's
+ * `pnpm security:semgrep:push`, on this repository's surface). It covered only the auth runtime, the
+ * HTTP client and the CSP builders until the planted-bug drill (20 Oct 2026) showed a hole outside
+ * them reach the PR.
  *
  * Usage:
  *   pnpm security:semgrep:push                # files changed since the upstream (or origin/<trunk>)
  *   pnpm security:semgrep:push --base <ref>   # files changed since <ref>
  *
- * Same rules as CI (`--config p/default`), only findings new since the base. Semgrep missing, or a
+ * Same rules as CI (`--config p/default`, `tests/ci` holds the two equal), only findings new since
+ * the base. Semgrep missing, or a
  * Semgrep error (no network for the registry rules), warns and passes — CI still scans. A finding
  * blocks (`tooling/ci/early-checks.mjs`).
  */
@@ -18,13 +21,8 @@ import { resolveBase, tryGit } from './git-environment.mjs';
 import { requireTool } from './require-tool.mjs';
 import { isMain, parseCommandLine } from './script.mjs';
 
-/** The code Semgrep scans at push: the auth runtime, the HTTP client, the CSP builders. */
-export const PUSH_SEMGREP_PATTERNS = [
-  /^src\/shared\/auth\/.+\.tsx?$/,
-  /^src\/core\/http\/.+\.tsx?$/,
-  /^src\/lib\/csp-api-origin\.ts$/,
-  /^plugins\/csp-api-origin\.ts$/,
-];
+/** The code Semgrep scans at push: the app source and the Vite plugins. */
+export const PUSH_SEMGREP_PATTERNS = [/^src\/.+\.tsx?$/, /^plugins\/.+\.ts$/];
 
 /**
  * The changed files Semgrep scans at push — test files excluded.
@@ -60,12 +58,12 @@ function main() {
   ]);
   const targets = pushSemgrepTargets(changed.output.split('\n'));
   if (targets.length === 0) {
-    console.log('Semgrep at push: no auth, HTTP client or CSP changes.');
+    console.log('Semgrep at push: no source changes under src/ or plugins/.');
     return;
   }
   // A warning, not a block: the PR's Semgrep lane scans everything.
   if (!requireTool({ name: 'semgrep', mode: 'warn', purpose: 'Semgrep at push' })) return;
-  console.log(`Semgrep at push: ${targets.length} file(s) in auth, the HTTP client, CSP`);
+  console.log(`Semgrep at push: ${targets.length} source file(s)`);
   const scan = spawnSync(
     'semgrep',
     [
