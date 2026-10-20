@@ -187,6 +187,25 @@ accepted one that now has a fix.
 
 ## Upgrade decisions log
 
+### npm-major group — `@sentry/vite-plugin` 5.4.1 → 11.8.0 (2026-10-20) — ADOPTED
+
+- **What:** Dependabot's npm-major group (#120): the four Sentry bundler plugins now release
+  from the SDK repository, so `@sentry/vite-plugin` jumps from 5.4.1 to the SDK's 11.8.0 and
+  re-exports `@sentry/bundler-plugins`. Dev-only — the plugin runs at build time, and only
+  when a build asks for the upload (`SENTRY_UPLOAD_SOURCEMAPS=true` on a deploy, `pnpm build
+--sentry` locally); nothing of it ships in the bundle.
+- **Breaking changes, none of which reach this repo:** Node ≥ 20.19 (`engines.node >=24`);
+  the webpack 5.1 floor (Vite here); the Vercel `VERCEL_TARGET_ENV` deploy environment
+  (Netlify here); and the upload now goes through the `sentry` CLI SDK (`sentry@0.45.0` in the
+  lockfile) instead of `@sentry/cli` — Sentry SaaS, no self-hosted floor to meet. The plugin
+  options are unchanged, so `vite.config.ts` is untouched.
+- **Broke:** only the `Static sync` lane, and not from the bump — the branch predated the
+  generated-not-committed `docs/reference/project-tree.txt` (#118), so its tree check compared
+  a stale committed file. Merging `main` into the branch made it pass.
+- Verified by the full `Quality gate`. The first deploy after this merge is the first real
+  source-map upload through the new CLI; `docs/integrations/sentry-sourcemaps.md` says how to
+  check the release in Sentry.
+
 ### npm-non-major group with radix-ui 1.8 — `pnpm dedupe` and a duplicate-copy guard (2026-10-13) — ADOPTED
 
 - **What:** Dependabot's npm-non-major group (#50, 26 updates, after #47 closed): patch and
