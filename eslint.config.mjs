@@ -11,10 +11,11 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 /**
- * Shared by the app-wide restriction block and the LocalizedCalendar override.
- * Flat config REPLACES a rule's options rather than merging them, so any block
- * that re-declares `no-restricted-imports` must restate these or it silently
- * drops the icon/toast boundaries for the files it matches.
+ * Shared by the app-wide restriction block, every layer block below and the
+ * LocalizedCalendar override. Flat config REPLACES a rule's options rather than
+ * merging them, so any block that re-declares `no-restricted-imports` must restate
+ * these or it silently drops the icon/toast boundaries for the files it matches
+ * (tests/ci/eslint-restricted-paths.policy.test.ts checks every layer).
  */
 const RESTRICTED_IMPORT_PATHS = [
   {
@@ -359,6 +360,7 @@ export default defineConfig([
       'no-restricted-imports': [
         'error',
         {
+          paths: RESTRICTED_IMPORT_PATHS,
           patterns: [
             {
               group: ['@/shared/**', '@/pages/**', '@/app/**'],
@@ -383,6 +385,7 @@ export default defineConfig([
       'no-restricted-imports': [
         'error',
         {
+          paths: RESTRICTED_IMPORT_PATHS,
           patterns: [
             {
               group: ['@/pages/**', '@/app/**'],
@@ -412,6 +415,7 @@ export default defineConfig([
       'no-restricted-imports': [
         'error',
         {
+          paths: RESTRICTED_IMPORT_PATHS,
           patterns: [
             {
               group: ['@/pages/**', '@/app/**'],
@@ -430,6 +434,21 @@ export default defineConfig([
   },
   {
     files: ['src/shared/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.*'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: RESTRICTED_IMPORT_PATHS,
+          patterns: [SHARED_LAYER_PATTERN, RESTRICTED_CALENDAR_PATTERN],
+        },
+      ],
+    },
+  },
+  // The two sanctioned wrappers: icons/ re-exports lucide-react and notify/ wraps
+  // sonner, so they keep the shared layer boundary without the icon/toast paths.
+  {
+    files: ['src/shared/icons/**/*.{ts,tsx}', 'src/shared/notify/**/*.{ts,tsx}'],
     ignores: ['**/*.test.*'],
     rules: {
       'no-restricted-imports': [
@@ -463,6 +482,7 @@ export default defineConfig([
       'no-restricted-imports': [
         'error',
         {
+          paths: RESTRICTED_IMPORT_PATHS,
           patterns: [
             {
               group: ['@/pages/**'],
