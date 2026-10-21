@@ -6,6 +6,11 @@ Claude Code loads this file when it works in `src/core/`. It holds sections move
 
 - Use `apiClient` from `@/core/http/fetch-client.ts` for all API calls.
 - Exception: the auth service uses raw `fetch` (`authFetch`) to avoid interceptor recursion.
+- ESLint bans a raw `fetch` (and `window`/`globalThis`/`self.fetch`) in `src/`. Six files are
+  exempt: the client itself, the two `authFetch`s (`shared/auth/service.ts`,
+  `shared/api/auth-api.ts`), the breach check (`lib/password-breach.ts`), the service worker
+  and the `version.json` poll. `tests/ci/eslint-raw-fetch.policy.test.ts` pins the rule and
+  fails when an exempt file stops calling `fetch`.
 - The fetch client is the reactive auth layer: Bearer attach, single-flight 401 refresh
   (concurrent 401s share ONE refresh) + replay. clinozy-be keeps ONE live access token per
   session — every refresh, workspace switch or other tab's refresh retires the one before it —

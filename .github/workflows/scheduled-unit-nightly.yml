@@ -3,7 +3,8 @@ name: Nightly unit suite
 # The full sharded Vitest suite on main every night (reusable-vitest-unit-only.yml, the same
 # workflow as the PR gate). Two jobs in one: a main that went red without a PR (a merge of two
 # green PRs, a dependency resolved differently) shows within a day, since post-merge-ci.yml does
-# not re-run the tests; and its shards save the main-branch Vitest cache that every PR's shards
+# not re-run the tests; it also compares the files kept as true copies with clinozy-be's main (the
+# mirrored-files job); and its shards save the main-branch Vitest cache that every PR's shards
 # restore — a PR-scoped cache is dropped when the PR's run ends (cleanup-cache.yml), so main's is
 # the only one that lasts. Scheduled, so a failure is a red run on the Actions tab; trigger on
 # demand with workflow_dispatch.
@@ -59,10 +60,41 @@ jobs:
           path: node_modules/.tmp/tsconfig.app.tsbuildinfo
           key: tsc-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig*.json') }}-${{ github.run_id }}
 
+  # The files kept as true copies in both repositories (tests/ci/mirrored-files.policy.test.ts). A
+  # PR's CI checks out this repository only, so there the test can check the copies exist but not
+  # that they match; a PR that edits a copy cannot be told apart from one whose sibling PR is still
+  # open. Comparing the two mains each night catches a copy changed on one side only within a day.
+  mirrored-files:
+    name: Mirrored files match clinozy-be main
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Checkout clinozy-be main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository_owner }}/clinozy-be
+          ref: main
+          path: .mirror-sibling
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Compare the mirrored files
+        env:
+          MIRROR_SIBLING_CHECKOUT: .mirror-sibling
+        run: pnpm exec vitest run --project ci-policy tests/ci/mirrored-files.policy.test.ts
+
   resolve-success:
     name: Close ci-failure issue
-    needs: [unit]
-    if: always() && needs.unit.result == 'success'
+    needs: [unit, mirrored-files]
+    if: always() && needs.unit.result == 'success' && needs.mirrored-files.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -82,7 +114,7 @@ jobs:
 
   notify-failure:
     name: Notify failure
-    needs: [unit]
+    needs: [unit, mirrored-files]
     if: always() && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -106,5 +138,7 @@ jobs:
           title: Nightly unit suite failing
           body: |
             The nightly sharded unit suite on main failed — main is red without a PR (two green PRs that
-            conflict, or a dependency resolved differently). Read the failed shard. The next green night
+            conflict, or a dependency resolved differently). Read the failed shard. If the failed job is
+            "Mirrored files match clinozy-be main", a true copy (tests/ci/mirrored-files.policy.test.ts)
+            changed on one side only: copy the change across in a sibling PR. The next green night
             closes this issue.

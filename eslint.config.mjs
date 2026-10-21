@@ -276,6 +276,51 @@ export default defineConfig([
     },
   },
 
+  // API calls go through apiClient, never a raw fetch.
+  //
+  // `apiClient` (src/core/http/fetch-client.ts) attaches the in-memory access
+  // token, refreshes it once on a 401 through `refreshAccessToken()`, retries,
+  // and maps errors to the typed shapes the forms and toasts read. A raw
+  // `fetch()` skips all of it: the call goes out without a token, and a 401
+  // surfaces as a broken screen instead of a refresh. The files below are the
+  // ones that must stay below apiClient: the client itself, the auth service's
+  // `authFetch` and the auth screens' pre-session calls, the third-party
+  // breach check, the service worker, and the version.json poll.
+  // `no-restricted-globals` is set nowhere else, and the only other
+  // `no-restricted-properties` block covers test files, which this block
+  // ignores, so neither replaces anything.
+  {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    ignores: [
+      '**/*.test.*',
+      'src/core/http/fetch-client.ts',
+      'src/shared/auth/service.ts',
+      'src/shared/api/auth-api.ts',
+      'src/lib/password-breach.ts',
+      'src/sw.ts',
+      'src/core/version/check.ts',
+    ],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        {
+          name: 'fetch',
+          message:
+            'Call the API through apiClient (@/core/http/fetch-client.ts): a raw fetch skips the access token, the 401 refresh, retries and error mapping.',
+        },
+      ],
+      'no-restricted-properties': [
+        'error',
+        ...['window', 'globalThis', 'self'].map((object) => ({
+          object,
+          property: 'fetch',
+          message:
+            'Call the API through apiClient (@/core/http/fetch-client.ts): a raw fetch skips the access token, the 401 refresh, retries and error mapping.',
+        })),
+      ],
+    },
+  },
+
   // Playwright specs + helpers: a feature check must not swallow its own error.
   //
   // `locator.isVisible()` (and its siblings) already return `false` when nothing
