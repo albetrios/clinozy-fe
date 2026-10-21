@@ -140,4 +140,30 @@ describe('git-hook gate tools', () => {
       sonarGate.indexOf("dockerCompose(['up', '-d', 'sonarqube'])"),
     );
   });
+
+  it('the Docker start never runs a second dockerd beside one still starting or stopping', () => {
+    // The same script as clinozy-be's: a dockerd still alive has not failed, and a second one
+    // stops on its pid file while the first, answering later, was recorded as the fallback.
+    const daemonScript = readFileSync(
+      'tooling/setup/agent/ensure-docker-daemon.sh',
+      'utf8',
+    );
+    expect(daemonScript).toContain('pgrep -x dockerd');
+    expect(daemonScript).toContain(
+      'if ! wait_for_docker && command -v dockerd >/dev/null 2>&1 && ! dockerd_running; then',
+    );
+    expect(daemonScript).toContain(
+      'if command -v dockerd >/dev/null 2>&1 && ! dockerd_running; then\n  start_restricted_dockerd',
+    );
+    expect(daemonScript).toContain(
+      'log "Docker daemon is reachable after a slow start."',
+    );
+    // Stopping waits for the process to exit, not for the API to stop answering.
+    const stop = daemonScript.slice(
+      daemonScript.indexOf('stop_dockerd() {'),
+      daemonScript.indexOf('probe_docker_layer_extract() {'),
+    );
+    expect(stop).toContain('dockerd_running || return 0');
+    expect(stop).not.toContain('docker info');
+  });
 });
