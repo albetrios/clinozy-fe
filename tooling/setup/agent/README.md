@@ -31,7 +31,7 @@ and a dev server that serves the app shell.
 | `install-docker-images.sh` | Docker Hub mirror (`mirror.gcr.io`) + pre-pull of the SonarQube gate images                     |
 | `ensure-docker-daemon.sh`  | Starts `dockerd` when stopped (same script as clinozy-be); used by step 4 and `pnpm sonar:scan` |
 | `install-headroom.sh`      | `uv`/`uvx` — the prerequisite for the `headroom` MCP server                                     |
-| `install-playwright.sh`    | E2E browsers; detects a pre-installed set instead of re-downloading                             |
+| `install-playwright.sh`    | E2E browsers; downloads only when the build the pinned `@playwright/test` needs is missing      |
 | `healthcheck.sh`           | Probes the dev server for the real app shell                                                    |
 
 Each `install-*.sh` runs standalone as well as under `bootstrap.sh`.
@@ -83,15 +83,15 @@ Never set in a cloud session: `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJE
 Cloud environments restrict egress. Each host maps to one capability, and a
 blocked host degrades exactly one step:
 
-| Host                                             | Needed for              | If blocked                   |
-| ------------------------------------------------ | ----------------------- | ---------------------------- |
-| `nodejs.org`                                     | Pinned Node download    | **Bring-up fails** on step 6 |
-| `registry.npmjs.org`                             | `pnpm install`          | **Bring-up fails** on step 6 |
-| `github.com` / `api.github.com`                  | `gh`, gitleaks releases | Those tools are skipped      |
-| Distro apt mirrors                               | Step 2 packages         | Those tools are skipped      |
-| `astral.sh` / `pypi.org`                         | `uv` + headroom         | headroom MCP unavailable     |
-| `playwright.azureedge.net`, `cdn.playwright.dev` | E2E browsers            | E2E unavailable              |
-| `challenges.cloudflare.com`                      | The Turnstile widget    | `/login` shows no captcha    |
+| Host                            | Needed for              | If blocked                   |
+| ------------------------------- | ----------------------- | ---------------------------- |
+| `nodejs.org`                    | Pinned Node download    | **Bring-up fails** on step 6 |
+| `registry.npmjs.org`            | `pnpm install`          | **Bring-up fails** on step 6 |
+| `github.com` / `api.github.com` | `gh`, gitleaks releases | Those tools are skipped      |
+| Distro apt mirrors              | Step 2 packages         | Those tools are skipped      |
+| `astral.sh` / `pypi.org`        | `uv` + headroom         | headroom MCP unavailable     |
+| `cdn.playwright.dev`            | E2E browsers            | E2E unavailable              |
+| `challenges.cloudflare.com`     | The Turnstile widget    | `/login` shows no captcha    |
 
 Only the first two are required. In the Claude Code web UI: set Network access
 to **Custom**, add the hosts you want, and keep "Also include default list of
