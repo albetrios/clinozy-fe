@@ -3,8 +3,8 @@
 # stack is running, so the pre-push quality gate finds the server up instead of booting it (about
 # two minutes) on the first push that needs it.
 #
-# Launched detached, so nothing waits on it: by clinozy-be's bootstrap.sh once the stack is live,
-# and by clinozy-fe's session-start hook once it has started the dev server. It waits for
+# Launched detached, so nothing waits on it: by the backend's bootstrap.sh once the stack is live,
+# and by the frontend's session-start hook once it has started the dev server. It waits for
 #   1. no bring-up holding the agent-stack lock ($AGENT_STACK_DIR/lock, default /tmp/agent-stack),
 #      so SonarQube's boot does not compete with the migrations and the seed, then
 #   2. a reachable Docker daemon,
@@ -13,7 +13,7 @@
 # SONARQUBE_START_WAIT_SECONDS (default 900); either way the pre-push gate still starts SonarQube
 # itself when it needs it.
 #
-# Kept byte-identical in clinozy-be and clinozy-fe (the mirrored-files policy test).
+# Identical in clinozy-be (the mirrored-files policy test).
 set -uo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
