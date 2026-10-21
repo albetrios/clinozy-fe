@@ -107,7 +107,9 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
   it('a web session starts SonarQube in the background once the stack is up', () => {
     const hook = readFileSync(HOOK, 'utf8');
     // Launched only where the dev server is (web, a fresh start), detached and fail-open; the
-    // shared script waits for the bring-up lock to clear and Docker to answer.
+    // shared script waits for the bring-up lock to clear and Docker to answer — first checked
+    // after a settle window, since clinozy-be's hook starts at the same moment and its
+    // bootstrap.sh takes the lock a moment after this hook launches the script.
     expect(hook).toContain('startSonarQubeInBackground(stackDirectory);');
     expect(hook).toContain(
       "join(repositoryRoot, 'tooling', 'setup', 'agent', 'start-sonarqube.sh')",
@@ -115,7 +117,11 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
     expect(hook).toContain("starter.on('error', () => {});");
     expect(hook).toContain('starter.unref();');
     const script = readFileSync('tooling/setup/agent/start-sonarqube.sh', 'utf8');
-    expect(script).toContain('[ -d "${lock_directory}" ] || ! docker info');
+    expect(script).toContain('settle_seconds=30');
+    expect(script).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: shell parameter expansions, asserted verbatim
+      'while [ "${waited}" -lt "${settle_seconds}" ] || [ -d "${lock_directory}" ] || ! docker info',
+    );
     expect(script).toContain(
       'docker compose -f docker-compose.sonar.yml up -d sonarqube',
     );
