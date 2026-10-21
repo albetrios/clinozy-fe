@@ -141,6 +141,32 @@ describe('git-hook gate tools', () => {
     );
   });
 
+  it('the Docker start waits on a service manager only when it started a dockerd', () => {
+    // `service docker start` can return with no daemon behind it, and systemctl can start
+    // nothing without systemd: a 30 s wait after each cost a cold start about 60 s.
+    const daemonScript = readFileSync(
+      'tooling/setup/agent/ensure-docker-daemon.sh',
+      'utf8',
+    );
+    expect(daemonScript).toContain('dockerd_appeared() {');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: a shell parameter expansion, asserted verbatim
+    expect(daemonScript).toContain('"${DOCKERD_APPEAR_SECONDS:-5}"');
+    expect(daemonScript).toContain(
+      'if dockerd_appeared; then\n    wait_for_docker || true\n  else\n    log "service docker start left no dockerd running; moving on."',
+    );
+    expect(daemonScript).toContain('[ -d /run/systemd/system ]');
+    // Between the service attempts and the direct start, nothing waits on a daemon that no
+    // process is starting.
+    const serviceAttempts = daemonScript.slice(
+      daemonScript.indexOf(
+        'log "Docker daemon is not reachable; attempting to start it."',
+      ),
+      daemonScript.indexOf('  start_dockerd "directly"'),
+    );
+    expect(serviceAttempts.match(/wait_for_docker/g)).toHaveLength(2);
+    expect(serviceAttempts.match(/dockerd_appeared/g)).toHaveLength(2);
+  });
+
   it('the Docker start never runs a second dockerd beside one still starting or stopping', () => {
     // The same script as clinozy-be's: a dockerd still alive has not failed, and a second one
     // stops on its pid file while the first, answering later, was recorded as the fallback.
@@ -150,7 +176,7 @@ describe('git-hook gate tools', () => {
     );
     expect(daemonScript).toContain('pgrep -x dockerd');
     expect(daemonScript).toContain(
-      'if ! wait_for_docker && command -v dockerd >/dev/null 2>&1 && ! dockerd_running; then',
+      'if ! docker info >/dev/null 2>&1 && command -v dockerd >/dev/null 2>&1 && ! dockerd_running; then',
     );
     expect(daemonScript).toContain(
       'if command -v dockerd >/dev/null 2>&1 && ! dockerd_running; then\n  start_restricted_dockerd',
