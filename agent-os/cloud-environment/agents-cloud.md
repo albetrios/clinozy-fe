@@ -138,5 +138,6 @@ every other host degrades exactly one best-effort step:
 - `astral.sh` + `pypi.org` — `uv`/`uvx`, needed by the `headroom` MCP server.
   Blocked → headroom does not start; `codegraph` is unaffected (it is a
   devDependency).
-- `playwright.azureedge.net` (and `cdn.playwright.dev`) — only when the image
-  does not already ship browsers.
+- `cdn.playwright.dev` — whenever the image's browsers are not the build the
+  pinned `@playwright/test` needs (an image can ship `chromium-1194` while the
+  pin needs `chromium-1248`). Blocked → E2E is unavailable.
