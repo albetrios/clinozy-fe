@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "android-design-guidelines": {
+      "source": "ehmo/platform-design-skills",
+      "sourceType": "github",
+      "skillPath": "agent-os/skills/android-design-guidelines/SKILL.md",
+      "computedHash": "403458e7700c7aabf5f7096151065de38619ec58648a011dc6a9c7900f7f02e3"
+    },
     "animejs": {
       "source": "freshtechbro/claudedesignskills",
       "sourceType": "github",
@@ -30,6 +36,18 @@
       "sourceType": "github",
       "skillPath": "agent-os/skills/impeccable/SKILL.md",
       "computedHash": "4ff55c665ec610d7e20a15abe9483e4f8b41ff22b72ef1ab5a0d5e5e6a09f3f5"
+    },
+    "ios-design-guidelines": {
+      "source": "ehmo/platform-design-skills",
+      "sourceType": "github",
+      "skillPath": "agent-os/skills/ios-design-guidelines/SKILL.md",
+      "computedHash": "76260eaca00b70d0f5fda733dc83b5ae6c8e8b845abdca3ac363f8683823c53c"
+    },
+    "mobile-app-ui-design": {
+      "source": "ceorkm/mobile-app-ui-design",
+      "sourceType": "github",
+      "skillPath": "agent-os/skills/mobile-app-ui-design/SKILL.md",
+      "computedHash": "5cbaf5631832d1682fea0df510642d5da6d79e8dbd0b27a02bf8aaf67d0abc1a"
     },
     "review-animations": {
       "source": "emilkowalski/skill",

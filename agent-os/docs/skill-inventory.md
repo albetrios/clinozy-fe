@@ -319,6 +319,28 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 ---
 
+### 4h. mobile-app-ui-design (installed — mobile-first design process)
+
+**Path:** `agent-os/skills/mobile-app-ui-design/SKILL.md` (installed via `npx skills add ceorkm/mobile-app-ui-design --skill mobile-app-ui-design -a claude-code --copy`)
+**Purpose:** Five-step mobile design process, industry conventions (health included), emotional design, 60/30/10 color, 8-point spacing, smart UI patterns and anti-patterns for mobile screens and flows. Its stack (React, Tailwind, Lucide) matches ours; project tokens, shadcn and the brand still win.
+
+**Trigger keywords:** "mobile screen", "mobile UX", "app design", "mobile-first", "make this screen better on a phone"
+
+**Related skills:** ios-design-guidelines and android-design-guidelines (platform rules), frontend-design (craft), web-design-guidelines (a11y)
+
+---
+
+### 4i. ios-design-guidelines / android-design-guidelines (installed — platform rule packs)
+
+**Path:** `agent-os/skills/ios-design-guidelines/SKILL.md`, `agent-os/skills/android-design-guidelines/SKILL.md` (installed via `npx skills add ehmo/platform-design-skills --skill ios-design-guidelines --skill android-design-guidelines -a claude-code --copy`)
+**Purpose:** Apple Human Interface Guidelines (iPhone) and Material Design 3 (Android) as rule packs: touch targets, safe areas, Dynamic Type, sheets, tab bars, navigation, gestures, dark mode, accessibility. Written for SwiftUI / Compose; in this web app they are **advisory** for how the PWA should feel on each phone platform. The same package's `web-design-guidelines` was deliberately **not** installed — it would overwrite the Vercel skill of that name.
+
+**Trigger keywords:** "iOS feel", "Apple HIG", "Material 3", "Android conventions", "platform-native"
+
+**Related skills:** mobile-app-ui-design (process), web-design-guidelines (web a11y)
+
+---
+
 ### 5. composition-patterns
 
 **Path:** `agent-os/skills/composition-patterns/SKILL.md`
@@ -1057,6 +1079,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 | Full project / post-change audit                            | **fe-project-health-check**, fe-lint-guard, fe-test-generation, fe-documentation-maintenance                                                                             |
 | Full code review report                                     | **fe-full-code-review**                                                                                                                                                  |
 | Any React component                                         | react-best-practices, composition-patterns, web-design-guidelines, fe-test-generation                                                                                    |
+| Mobile-first screens and phone platform conventions         | **mobile-app-ui-design**, **ios-design-guidelines**, **android-design-guidelines** (advisory), **web-design-guidelines**                                                 |
 | UI/design decisions (style, palette, font, chart, UX)       | **ui-ux-pro-max** (advisory DB), **frontend-design**, **shadcn**, **web-design-guidelines**                                                                              |
 | Product UI redesign / audit ("impeccable")                  | **impeccable**, **shadcn**, **frontend-design**, **web-design-guidelines**                                                                                               |
 | Animation implementation                                    | **animejs**, **emil-design-eng**                                                                                                                                         |

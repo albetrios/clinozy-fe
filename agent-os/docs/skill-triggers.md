@@ -10,16 +10,18 @@ guardrails (shadcn components, semantic tokens, configured fonts/brand).
 
 Read in order; **project guardrails always win** over skill suggestions.
 
-| Priority      | Skill                     | When                                                             |
-| ------------- | ------------------------- | ---------------------------------------------------------------- |
-| 1             | **shadcn**                | Any component, block, CLI, styling primitives                    |
-| 2             | **frontend-design**       | Default craft for build/style/beautify                           |
-| 3             | **web-design-guidelines** | A11y, forms, focus, UX audit                                     |
-| Advisory      | **ui-ux-pro-max**         | Query UX/style/chart DB (`python3 …/search.py`) — hints only     |
-| Explicit pass | **impeccable**            | User says redesign / audit / polish / “impeccable” on product UI |
-| Motion impl   | **animejs**               | Implement animations (onboarding uses this today)                |
-| Motion bar    | **emil-design-eng**       | Decide if/when/how motion should exist                           |
-| Motion review | **review-animations**     | Review animation diffs in PRs only                               |
+| Priority       | Skill                                                     | When                                                             |
+| -------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
+| 1              | **shadcn**                                                | Any component, block, CLI, styling primitives                    |
+| 2              | **frontend-design**                                       | Default craft for build/style/beautify                           |
+| 3              | **web-design-guidelines**                                 | A11y, forms, focus, UX audit                                     |
+| Advisory       | **ui-ux-pro-max**                                         | Query UX/style/chart DB (`python3 …/search.py`) — hints only     |
+| Explicit pass  | **impeccable**                                            | User says redesign / audit / polish / “impeccable” on product UI |
+| Mobile pass    | **mobile-app-ui-design**                                  | Mobile-first screens, flows, touch, navigation (process)         |
+| Platform rules | **ios-design-guidelines** / **android-design-guidelines** | iPhone (Apple HIG) / Android (Material 3) conventions — advisory |
+| Motion impl    | **animejs**                                               | Implement animations (onboarding uses this today)                |
+| Motion bar     | **emil-design-eng**                                       | Decide if/when/how motion should exist                           |
+| Motion review  | **review-animations**                                     | Review animation diffs in PRs only                               |
 
 **Do not use** (removed from repo): `high-end-visual-design`, `redesign-existing-projects`, `shadcn-ui-blocks`, `image-to-code`, `motion-framer`, `full-output-enforcement`.
 

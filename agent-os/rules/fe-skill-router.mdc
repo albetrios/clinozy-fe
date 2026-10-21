@@ -31,6 +31,9 @@ When a task matches a pattern below, read the corresponding SKILL.md **before** 
 | Implement JavaScript animations (count-up, timelines, stagger) with Anime.js | animejs | `agent-os/skills/animejs/SKILL.md` |
 | Motion craft philosophy — why/when/how to animate (Emil Kowalski bar) | emil-design-eng | `agent-os/skills/emil-design-eng/SKILL.md` |
 | Review animation/motion code in a PR or diff (read-only) | review-animations | `agent-os/skills/review-animations/SKILL.md` |
+| Design or review a mobile-first screen, flow or component (phone layout, touch targets, gestures, mobile navigation) | mobile-app-ui-design | `agent-os/skills/mobile-app-ui-design/SKILL.md` |
+| iPhone platform conventions — Apple HIG rules (touch, Dynamic Type, safe areas, sheets, tab bars); advisory for this web app | ios-design-guidelines | `agent-os/skills/ios-design-guidelines/SKILL.md` |
+| Android platform conventions — Material Design 3 rules (navigation, touch, dynamic color, accessibility); advisory for this web app | android-design-guidelines | `agent-os/skills/android-design-guidelines/SKILL.md` |
 | Look up design intelligence — styles, color palettes, font pairings, UX/stack guidelines (incl. shadcn), chart choice | ui-ux-pro-max | `agent-os/skills/ui-ux-pro-max/SKILL.md` |
 | Component API, compound components, boolean props | composition-patterns | `agent-os/skills/composition-patterns/SKILL.md` |
 | Lint rules, security scan, pre-commit, CI pipeline | fe-code-quality-security | `agent-os/skills/fe-code-quality-security/SKILL.md` |

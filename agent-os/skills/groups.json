@@ -1,5 +1,5 @@
 {
-  "description": "Skill taxonomy — every project skill belongs to exactly one group. Single source for grouped rendering of the skill registry and for group-level operations ('run all docs maintainers'). agent-os/evals/check.ts asserts this stays in sync with the skills on disk (every skill grouped exactly once; no unknown names).",
+  "description": "Skill taxonomy \u2014 every project skill belongs to exactly one group. Single source for grouped rendering of the skill registry and for group-level operations ('run all docs maintainers'). agent-os/evals/check.ts asserts this stays in sync with the skills on disk (every skill grouped exactly once; no unknown names).",
   "groups": {
     "ui-design": [
       "frontend-design",
@@ -69,7 +69,10 @@
       "animejs",
       "emil-design-eng",
       "review-animations",
-      "find-skills"
+      "find-skills",
+      "mobile-app-ui-design",
+      "ios-design-guidelines",
+      "android-design-guidelines"
     ]
   }
 }
