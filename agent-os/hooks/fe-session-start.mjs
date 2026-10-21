@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 // Claude Code SessionStart hook for clinozy-fe (self-contained — no other repo).
 //
-// Two jobs:
+// Three jobs:
 //   1. (web) Make the env usable: verify Node, switch to a new-enough Node when needed (pinned for
 //      the session via $CLAUDE_ENV_FILE), and install deps so `pnpm health` / tests / linters
 //      work. The installers stay what they are — pnpm, corepack and
 //      tooling/setup/agent/install-gitleaks.sh, spawned from here.
-//   2. Inject session context: the agent-os skill-routing map plus a short env/commands summary,
+//   2. (web) Start the dev server (`pnpm dev`, Vite :5173) detached, beside clinozy-be's live
+//      stack, so the app is up without anyone asking.
+//   3. Inject session context: the agent-os skill-routing map plus a short env/commands summary,
 //      as SessionStart additionalContext.
 //
 // Claude runs it on startup and resume only (hooks.json): /clear and compact leave the
@@ -15,14 +17,18 @@
 //
 // stderr carries the install logs and diagnostics (NOT added to context). Fails open: any error
 // exits 0.
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import {
   accessSync,
   appendFileSync,
   constants,
   existsSync,
+  lstatSync,
+  mkdirSync,
+  openSync,
   readdirSync,
   readFileSync,
+  writeFileSync,
 } from 'node:fs';
 import { delimiter, join } from 'node:path';
 
@@ -31,6 +37,9 @@ import { recordTelemetry } from './_fe-telemetry.mjs';
 
 const DEFAULT_NODE_MAJOR = 24;
 const isRemote = process.env.CLAUDE_CODE_REMOTE === 'true';
+// `localhost`, as tooling/setup/agent/healthcheck.sh probes it: Vite binds `localhost`.
+const DEV_SERVER_PORT = 5173;
+const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
 
 /** Writes one diagnostic line to stderr (never the model's context). */
 function diagnose(message) {
@@ -213,6 +222,58 @@ function gitleaksStatus() {
     : 'install-failed (run: bash tooling/setup/agent/install-gitleaks.sh)';
 }
 
+/** True when the dev server already serves the app shell (Vite rewrites the /src/main.tsx entry). */
+async function devServerServes() {
+  try {
+    const response = await fetch(`${DEV_SERVER_URL}/`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    return response.ok && (await response.text()).includes('/src/main.tsx');
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The dev server (web): `pnpm dev` on :5173, launched detached in its own session so the session
+ * starts at once and the app comes up beside clinozy-be's live stack. Never starts twice: a server
+ * already serving the app shell (a resumed session) is left alone. Its log and pid go in the stack
+ * directory clinozy-be's bring-up uses (`$AGENT_STACK_DIR`, default /tmp/agent-stack), and only
+ * into one this user owns. Local sessions are untouched.
+ */
+async function frontendStatus() {
+  if (!isRemote) return 'on demand (local session) — pnpm dev';
+  if (!isExecutable(join(repositoryRoot, 'node_modules', '.bin', 'vite'))) {
+    return 'not started (dependencies missing) — pnpm install, then pnpm dev';
+  }
+  if (await devServerServes()) return `live — ${DEV_SERVER_URL}`;
+  const stackDirectory = process.env.AGENT_STACK_DIR || '/tmp/agent-stack';
+  mkdirSync(stackDirectory, { recursive: true, mode: 0o700 });
+  // A stack directory another user made in /tmp, or a link, could aim this log anywhere: refuse it.
+  const directory = lstatSync(stackDirectory);
+  if (!directory.isDirectory() || directory.uid !== process.getuid?.()) {
+    return `not started (${stackDirectory} is not this user's directory) — pnpm dev`;
+  }
+  const logPath = join(stackDirectory, 'frontend.log');
+  const log = openSync(logPath, 'w', 0o600);
+  // detached: its own session (setsid), so it outlives this hook and the agent's process group.
+  // --strictPort: a taken :5173 fails in the log instead of drifting to a port the API's CORS
+  // list does not name.
+  const server = spawn(
+    'pnpm',
+    ['dev', '--port', String(DEV_SERVER_PORT), '--strictPort'],
+    {
+      cwd: repositoryRoot,
+      detached: true,
+      stdio: ['ignore', log, log],
+    },
+  );
+  server.unref();
+  // The session id: `pkill -s <pid>` stops pnpm and the Vite it runs in another process group.
+  writeFileSync(join(stackDirectory, 'frontend.pid'), `${server.pid}\n`);
+  return `starting in the background — ${DEV_SERVER_URL} · follow: tail -f ${logPath}`;
+}
+
 /** The skill-routing map on startup; on resume, a note that the conversation already holds it. */
 function routingMapSection(source) {
   if (source === 'resume') {
@@ -274,10 +335,11 @@ function hookHealth() {
   return `\n- Hook pruning candidates (silent 30+ days / never fired): ${candidates.join(' ')} — review with \`pnpm agent-os:hooks:report\` (agent-os/hooks/README.md)`;
 }
 
-function sessionContext(source) {
+async function sessionContext(source) {
   const requiredMajor = requiredNodeMajor();
   const node = provisionNode(requiredMajor);
   installDependencies({ node, requiredMajor });
+  const frontend = await frontendStatus();
   const mcp = mcpStatus();
   const dependencies = isExecutable(join(repositoryRoot, 'node_modules', '.bin', 'vite'))
     ? 'installed'
@@ -292,6 +354,7 @@ function sessionContext(source) {
   return [
     `clinozy-fe session ready (hooks from ${repositoryRoot}) — environment provisioned: ${provisioned}.`,
     `- Node ${node.version} (need >=${requiredMajor}) · deps ${dependencies} · gh ${githubCli} · mcp ${mcp} · gitleaks ${gitleaks}${nodeNote}${health}`,
+    `- Frontend: ${frontend}`,
     '- Dev: pnpm dev (Vite :5173) + clinozy-be on :3000. Bootstrap: pnpm setup:local. Gates: pnpm health (all phases) · pnpm tsc · pnpm lint · pnpm validate:tokens · pnpm validate:structure · pnpm validate:testids · pnpm validate:theme-axis · pnpm test',
     '- Skill-first: consult agent-os/skills/fe-skill-registry/SKILL.md, then the listed skill(s) for the files you change.',
     '',
@@ -305,7 +368,7 @@ try {
   if (existsSync(repositoryRoot)) {
     process.chdir(repositoryRoot);
     // The payload's `source` (startup | resume | clear | compact); unknown → startup.
-    const context = sessionContext(readHookPayload()?.source || 'startup');
+    const context = await sessionContext(readHookPayload()?.source || 'startup');
     // Canary: the first context line names the root these hooks ran from, and the row shows the
     // hook ran — including in a session that holds several repositories.
     recordTelemetry('fe-session-start', 'SessionStart', 'fired');

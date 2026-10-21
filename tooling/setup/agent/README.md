@@ -123,13 +123,20 @@ Two deliberate divergences from the Mac list:
 
 ## Relationship to the other setup entry points
 
-| Entry point                             | Audience                     | What it does                                        |
-| --------------------------------------- | ---------------------------- | --------------------------------------------------- |
-| `pnpm setup:local`                      | Developer on macOS/Linux     | 5 phases, ends by starting `pnpm dev`               |
-| `tooling/setup/agent/bootstrap.sh`      | Cloud agent session          | This directory — terminates, never leaves a server  |
-| `agent-os/cloud-environment/install.sh` | Environment **Setup script** | Thin wrapper that calls `bootstrap.sh`              |
-| `agent-os/hooks/fe-session-start.mjs`   | Every interactive session    | Fast path — switches Node, installs deps if missing |
+| Entry point                             | Audience                     | What it does                                                                       |
+| --------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------- |
+| `pnpm setup:local`                      | Developer on macOS/Linux     | 5 phases, ends by starting `pnpm dev`                                              |
+| `tooling/setup/agent/bootstrap.sh`      | Cloud agent session          | This directory — terminates, never leaves a server of its own                      |
+| `agent-os/cloud-environment/install.sh` | Environment **Setup script** | Thin wrapper that calls `bootstrap.sh`                                             |
+| `agent-os/hooks/fe-session-start.mjs`   | Every interactive session    | Fast path — switches Node, installs deps if missing; on the web, starts `pnpm dev` |
 
 A cached **Setup script** must terminate, which is why `bootstrap.sh` passes
 `--only-env` to `setup:local` and stops the dev server it started for the
 healthcheck.
+
+In a web session the session-start hook starts `pnpm dev` on :5173 itself, detached, so the app
+is up beside clinozy-be's live stack without anyone asking. It starts it once: a server already
+serving the app shell (a resumed session) is left alone, and step 10 probes that server instead of
+starting a second one. Its log is `/tmp/agent-stack/frontend.log` (`$AGENT_STACK_DIR`, the
+directory clinozy-be's bring-up uses); stop it with `pkill -s "$(cat /tmp/agent-stack/frontend.pid)"`
+— the pid is the session's, so Vite, which pnpm runs in another process group, stops with it.
