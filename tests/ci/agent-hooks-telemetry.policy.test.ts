@@ -1,5 +1,12 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -52,6 +59,31 @@ describe('hooks-telemetry.ts (pnpm agent-os:hooks:report)', () => {
     expect(output).not.toContain('fe-busy-hook:');
     expect(output).toContain(
       'retired ids still in the log (not in hooks.json): quiet-hook',
+    );
+  });
+
+  it('a hook a test spawns logs to the harness scratch file, never the real log', () => {
+    // tests/utils/setup.ts points HOOK_TELEMETRY_LOG at a scratch file for every test process, and
+    // a spawned hook inherits it, so no test run counts in the real agent-os/hooks/.telemetry.log.
+    const scratch = process.env.HOOK_TELEMETRY_LOG ?? '';
+    expect(scratch).not.toBe('');
+    expect(scratch.startsWith(process.cwd())).toBe(false);
+    const before = existsSync(scratch) ? readFileSync(scratch, 'utf8').length : 0;
+    const result = spawnSync(
+      process.execPath,
+      [join(process.cwd(), 'agent-os', 'hooks', 'fe-push-ci-watch.mjs')],
+      {
+        encoding: 'utf8',
+        input: JSON.stringify({
+          tool_name: 'Bash',
+          tool_input: { command: 'echo telemetry' },
+        }),
+        env: { ...process.env, CLAUDE_PROJECT_DIR: process.cwd() },
+      },
+    );
+    expect(result.status, result.stderr).toBe(0);
+    expect(readFileSync(scratch, 'utf8').slice(before)).toContain(
+      ',fe-push-ci-watch,PostToolUse,silent,not-a-push',
     );
   });
 });
