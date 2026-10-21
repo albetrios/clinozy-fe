@@ -76,6 +76,14 @@ else
   echo "Skipping the agent-os generate check on pre-push (no agent-os changes)."
 fi
 
+# The agent-os integrity evals (skills lock provenance, names, triggers), run on the same pushed
+# files. clinozy-be#130 reached its PR with two edited skills left unlocked; CI caught it.
+if step_runs 'pnpm agent-os:check'; then
+  pnpm agent-os:check
+else
+  echo "Skipping the agent-os integrity evals on pre-push (no agent-os changes)."
+fi
+
 # Semgrep on every pushed source file under src/ and plugins/ (the PR's Semgrep lane scans
 # everything) — an early check: a finding blocks; no semgrep → a warning.
 pnpm security:semgrep:push --base "$PUSH_BASE"
