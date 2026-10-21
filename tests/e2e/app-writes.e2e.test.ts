@@ -195,6 +195,9 @@ test.describe('Clinic rooms write through to clinozy-be', () => {
     await amount.fill('');
     await amount.fill('500');
     await page.getByTestId('receive-drawer-save').click();
+    // A new receipt turns the drawer into Payment received; its Done closes it.
+    await expect(page.getByTestId('payment-received')).toBeVisible({ timeout: 15_000 });
+    await page.getByTestId('receive-drawer-done').click();
     await expect(page.getByTestId('receive-drawer')).toHaveCount(0, { timeout: 15_000 });
     await expectListedAfterReload(page, 'payments', 'Asha Patel');
   });

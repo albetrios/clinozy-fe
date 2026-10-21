@@ -86,6 +86,19 @@ describe('post-merge CI policy (single trunk)', () => {
     expect(resolveBlock).toMatch(/mode: close\n\s+title: Post-merge CI failing/);
   });
 
+  it('closes the ci-failure issue on a green run that skips release-please (an ordinary merge)', () => {
+    // release-please runs on demand only; a close gated on its success never fired (#151 stayed
+    // open through three green deploys). Same shape as clinozy-be: no failure, no cancellation.
+    const resolveBlock = jobBlock(workflow, 'resolve-success');
+    expect(resolveBlock).not.toContain("needs.release-please.result == 'success'");
+    for (const job of ['release-please', 'deploy-development'])
+      for (const result of ['failure', 'cancelled'])
+        expect(resolveBlock, `${job} ${result}`).toContain(
+          `needs.${job}.result != '${result}'`,
+        );
+    expect(resolveBlock).toContain('!cancelled()');
+  });
+
   it('runs release-please on demand: a merged Release PR, or a dispatch with release_pr', () => {
     // An ordinary merge no longer refreshes the Release PR (each refresh re-ran its PR CI).
     const releaseBlock = jobBlock(workflow, 'release-please');

@@ -8,6 +8,7 @@ import {
 
 import { API_BASE_PATH } from '@/core/config/constants.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
+import { withApiRetry } from '@/tests/utils/e2e-api-retry.ts';
 import { establishSessionInPage, navigateInApp } from '@/tests/utils/e2e-auth.ts';
 import {
   fetchMeContextWire,
@@ -120,7 +121,12 @@ export interface ClinicSeed {
   taskId: string;
   /** A booking later today, in the arriving lane; `null` when no slot is left today. */
   appointmentId: string | null;
+  /** A sale of the seeded medicine — Medical's Sales list opens on it. */
+  saleId: string;
 }
+
+/** Backoff for the seed's calls: 1 s, 2 s … 5 s between six attempts, past a rate-limit window. */
+const SEED_RETRY = { attempts: 6, baseDelayMs: 1_000 } as const;
 
 /** A `data` answer, or a thrown error naming the call. */
 export async function seedData<T>(
@@ -133,6 +139,12 @@ export async function seedData<T>(
   return ((await response.json()) as { data: T }).data;
 }
 
+/** A batch's expiry month (`YYYY-MM`), two years out, so the seeded stock is never near expiry. */
+function seedExpiryMonth(): string {
+  const now = new Date();
+  return `${now.getUTCFullYear() + 2}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+}
+
 /** A mobile number no other seeded person in the clinic has (`contact_phone_exists`). */
 function seedPhone(): string {
   return `+9198${String(Math.floor(Math.random() * 1e8)).padStart(8, '0')}`;
@@ -140,18 +152,30 @@ function seedPhone(): string {
 
 /**
  * Fills a brand-new clinic with one of everything the rooms list — a branch open all week, an
- * offering, a patient, a lead, a task for the owner and a booking later today — so every room's
- * happy path meets a real row on the live clinozy-be. The owner works every day and every hour, so
+ * offering, a patient, a lead, a task for the owner, a booking later today and a sale of a medicine
+ * in stock — so every room's happy path meets a real row on the live clinozy-be. The owner works every day and every hour, so
  * the booking does not depend on the weekday the suite runs on.
  */
 export async function seedClinic(
   api: APIRequestContext,
   token: string,
 ): Promise<ClinicSeed> {
+  // A seeded clinic is a dozen calls in a row, and the full suite seeds dozens of clinics: a 429
+  // from the backend's rate limit backs off and retries (a refused request did nothing).
   const write = (path: string, data: unknown, method: 'post' | 'patch' = 'post') =>
-    api[method](`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token, true), data });
+    withApiRetry(
+      () =>
+        api[method](`${API_BASE_PATH}${path}`, {
+          headers: bearerHeaders(token, true),
+          data,
+        }),
+      SEED_RETRY,
+    );
   const read = (path: string) =>
-    api.get(`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token) });
+    withApiRetry(
+      () => api.get(`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token) }),
+      SEED_RETRY,
+    );
 
   const ownerId = (await fetchMeContextWire(api, token)).membership_id;
   await seedData(
@@ -206,7 +230,7 @@ export async function seedClinic(
     }),
     'patient',
   );
-  const lead = await seedData<{ id: string }>(
+  const lead = await seedData<{ id: string; contact_id: string }>(
     await write('/app/leads', {
       contact: {
         first_name: 'Neha',
@@ -227,6 +251,34 @@ export async function seedClinic(
       contact_id: patient.contact_id,
     }),
     'task',
+  );
+
+  // Medical's Sales list: a medicine with stock in one batch, sold once. The buyer is the lead,
+  // so the sale's open invoice is not one more for the patient a spec receives money from.
+  const manufacturer = await seedData<{ id: string }>(
+    await write('/app/manufacturers', { name: 'Sun Pharma' }),
+    'manufacturer',
+  );
+  const medicine = await seedData<{ id: string }>(
+    await write('/app/medicines', {
+      name: 'Paracetamol 500',
+      manufacturer_id: manufacturer.id,
+      mrp: 30,
+      gst_percent: 12,
+      is_prescription_only: false,
+      batches: [
+        { batch_number: 'PCM-001', expiry_month: seedExpiryMonth(), quantity: 20 },
+      ],
+    }),
+    'medicine',
+  );
+  const sale = await seedData<{ id: string }>(
+    await write('/app/medical-sales', {
+      branch_id: branch.id,
+      contact_id: lead.contact_id,
+      items: [{ medicine_id: medicine.id, quantity: 1 }],
+    }),
+    'sale',
   );
 
   const date = appToday(new Date(), organization.timezone);
@@ -261,6 +313,7 @@ export async function seedClinic(
     leadId: lead.id,
     taskId: task.id,
     appointmentId: appointment?.id ?? null,
+    saleId: sale.id,
   };
 }
 

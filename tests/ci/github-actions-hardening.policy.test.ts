@@ -3,6 +3,8 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { jobBlocks } from '@/tests/utils/workflow-jobs.ts';
+
 // Two supply-chain invariants across every GitHub Actions workflow:
 //
 //  1. Third-party actions are pinned to a full 40-hex commit SHA — a moving
@@ -14,12 +16,28 @@ import { describe, expect, it } from 'vitest';
 //     `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`, so a lagging action can never drag
 //     a job back onto a retired Node runtime. `.nvmrc` pins the toolchain; this
 //     env pins the action runtime.
+//  3. A called workflow reaches its secrets one way. They live in GitHub
+//     Environments, so every reusable-workflow job that reads one sets
+//     `environment:`, and that job sees its environment's secrets only when the
+//     caller passes `secrets: inherit`: #150 dropped it and the called deploy
+//     read every secret empty (run 39454666563).
+//  4. A synced key is read from the context its classification names: a
+//     `deploySecrets` key through `secrets.*`, a `deployVariables` key through
+//     `vars.*`. The wrong context reads an empty string, not an error.
+//  5. No step gates its `if:` on a value only its own `env:` sets: a step's
+//     `env:` is not visible to its `if:`, so the gate reads empty.
 //
-// actionlint validates syntax but enforces neither of these — this lane does.
+// actionlint validates syntax but enforces none of these — this lane does.
 
 const WORKFLOWS_DIR = join(process.cwd(), '.github/workflows');
 const NODE24_ENV_KEY = 'FORCE_JAVASCRIPT_ACTIONS_TO_NODE24';
 const SHA_PIN = /@[0-9a-f]{40}$/;
+// A `${{ secrets.NAME }}` read; `GITHUB_TOKEN` is the run's own token, never an environment secret.
+const SECRET_READ = /\$\{\{ *secrets\.(?!GITHUB_TOKEN\b)[A-Za-z_]\w*/;
+const JOB_ENVIRONMENT = /^ {4}environment:/m;
+const LOCAL_CALL = /^ {4}uses: \.\/\.github\/workflows\/([\w.-]+\.ya?ml)$/m;
+/** A `${{ secrets.NAME }}` or `${{ vars.NAME }}` read: the context and the key. */
+const CONTEXT_READ = /\$\{\{[^}]*?\b(secrets|vars)\.([A-Z_][A-Z0-9_]*)/g;
 
 interface WorkflowFile {
   file: string;
@@ -91,4 +109,156 @@ describe('github actions hardening policy', () => {
         .join('\n')}`,
     ).toEqual([]);
   });
+
+  it('every call of a reusable workflow that reads a secret passes secrets: inherit', () => {
+    const byFile = new Map(
+      workflows.map((workflow) => [workflow.file, workflow.content]),
+    );
+    const readsSecret = (file: string): boolean =>
+      jobBlocks(byFile.get(file) ?? '').some(([, block]) => SECRET_READ.test(block));
+    const secretCalls = workflows.flatMap((workflow) =>
+      jobBlocks(workflow.content).flatMap(([name, block]) => {
+        const callee = LOCAL_CALL.exec(block)?.[1];
+        return callee && readsSecret(callee)
+          ? [{ caller: `${workflow.file}: ${name}`, block }]
+          : [];
+      }),
+    );
+    expect(secretCalls.length).toBeGreaterThan(0);
+    const withoutInherit = secretCalls
+      .filter(
+        ({ block }) =>
+          !block.split('\n').some((line) => line.trim() === 'secrets: inherit'),
+      )
+      .map(({ caller }) => caller);
+    expect(
+      withoutInherit,
+      `Call(s) of a secret-reading reusable workflow without secrets: inherit — the callee would read every secret empty:\n${withoutInherit
+        .map((caller) => `  ${caller}`)
+        .join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('every reusable-workflow job that reads a secret sets environment:', () => {
+    const reusable = workflows.filter((workflow) =>
+      /^ {2}workflow_call:/m.test(workflow.content),
+    );
+    expect(reusable.length).toBeGreaterThan(0);
+    const unscoped = reusable.flatMap((workflow) =>
+      jobBlocks(workflow.content)
+        .filter(([, block]) => SECRET_READ.test(block) && !JOB_ENVIRONMENT.test(block))
+        .map(([name]) => `${workflow.file}: ${name}`),
+    );
+    expect(
+      unscoped,
+      `Reusable-workflow job(s) reading a secret with no environment: — set one:\n${unscoped
+        .map((job) => `  ${job}`)
+        .join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('reads every synced key from the context its classification names', () => {
+    // A Variable read through `secrets.*` (or a Secret through `vars.*`) is an empty string, not an
+    // error: clinozy-be's test-result email read TEST_RESULT_EMAIL_TO, a Variable, through
+    // `secrets.*` and never sent.
+    const { secrets, variables } = syncedKeys();
+    expect(secrets.size + variables.size).toBeGreaterThan(0);
+    const mismatched = workflows.flatMap((workflow) =>
+      [...workflow.content.matchAll(CONTEXT_READ)]
+        .filter(
+          ([, context, name = '']) =>
+            (context === 'secrets' && variables.has(name)) ||
+            (context === 'vars' && secrets.has(name)),
+        )
+        .map(([, context, name]) => `${workflow.file}: ${context}.${name}`),
+    );
+    expect(
+      mismatched,
+      `Read(s) from the wrong context — each reads an empty string:\n${mismatched
+        .map((read) => `  ${read}`)
+        .join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it("never gates a step on an env value that only the step's own env: sets", () => {
+    // A step's `env:` is not visible to its `if:`, so such a gate reads empty: clinozy-be's
+    // per-shard test-result email gated on `env.RESEND_API_KEY != ''` from its own `env:` and
+    // never sent.
+    const selfGated = workflows.flatMap((workflow) =>
+      stepsOf(workflow.content).flatMap((step) => {
+        const ownEnvironment = stepEnvironmentKeys(step);
+        const read = [...stepCondition(step).matchAll(/\benv\.([A-Z_][A-Z0-9_]*)/g)].map(
+          ([, name]) => name ?? '',
+        );
+        return read
+          .filter((name) => ownEnvironment.has(name))
+          .map(
+            (name) =>
+              `${workflow.file}: ${step.split('\n')[0]?.trim()} reads env.${name}`,
+          );
+      }),
+    );
+    expect(selfGated).toEqual([]);
+  });
 });
+
+/** The keys `pnpm github:sync` pushes as Secrets and as Variables, across every environment. */
+function syncedKeys(): { secrets: Set<string>; variables: Set<string> } {
+  const config = JSON.parse(
+    readFileSync(join(process.cwd(), 'tooling/setup/setup.config.json'), 'utf8'),
+  ) as { environments: { deploySecrets?: string[]; deployVariables?: string[] }[] };
+  return {
+    secrets: new Set(
+      config.environments.flatMap((environment) => environment.deploySecrets ?? []),
+    ),
+    variables: new Set(
+      config.environments.flatMap((environment) => environment.deployVariables ?? []),
+    ),
+  };
+}
+
+/** The steps of every job: each starts at a `      - ` line (steps sit six spaces in). */
+function stepsOf(workflow: string): string[] {
+  const steps: string[] = [];
+  let current: string[] | undefined;
+  for (const line of workflow.split('\n')) {
+    if (line.startsWith('      - ')) {
+      current = [line];
+      steps.push(current.join('\n'));
+      continue;
+    }
+    if (current && (line.startsWith('       ') || line.trim() === '')) {
+      current.push(line);
+      steps[steps.length - 1] = current.join('\n');
+    } else {
+      current = undefined;
+    }
+  }
+  return steps;
+}
+
+/** The step's `if:` expression, a block scalar's continuation lines included. */
+function stepCondition(step: string): string {
+  const lines = step.split('\n');
+  const start = lines.findIndex((line) => /^ {6}- if:|^ {8}if:/.test(line));
+  if (start === -1) return '';
+  const continuation = lines.slice(start + 1);
+  const end = continuation.findIndex((line) => /^ {8}\S/.test(line));
+  return [lines[start], ...(end === -1 ? continuation : continuation.slice(0, end))].join(
+    '\n',
+  );
+}
+
+/** The keys of the step's own `env:` block. */
+function stepEnvironmentKeys(step: string): Set<string> {
+  const lines = step.split('\n');
+  const start = lines.findIndex((line) => /^ {6}- env:\s*$|^ {8}env:\s*$/.test(line));
+  if (start === -1) return new Set();
+  const keys = new Set<string>();
+  for (const line of lines.slice(start + 1)) {
+    if (/^ {8}\S/.test(line)) break;
+    const key = /^ {10}([A-Z_][A-Z0-9_]*):/.exec(line)?.[1];
+    if (key) keys.add(key);
+  }
+  return keys;
+}
