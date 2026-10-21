@@ -166,4 +166,26 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
       'pnpm dev --port "${health_port}" --strictPort >"${app_log}" 2>&1 &',
     );
   });
+
+  it('bootstrap.sh takes --install-only, the switch clinozy-be uses, and refuses any other option', () => {
+    const bootstrap = readFileSync(
+      join(process.cwd(), 'tooling', 'setup', 'agent', 'bootstrap.sh'),
+      'utf8',
+    );
+    expect(bootstrap).toContain('--install-only) install_only=1 ;;');
+    expect(bootstrap).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: a shell parameter expansion, asserted verbatim
+      'echo "✗ unknown option: ${argument} (only --install-only)" >&2',
+    );
+    // The Setup script stops before step 10, the transient dev-server healthcheck.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: a shell parameter expansion, asserted verbatim
+    const stop = bootstrap.indexOf('if [ "${install_only}" = 1 ]; then');
+    expect(stop).toBeGreaterThan(-1);
+    expect(stop).toBeLessThan(bootstrap.indexOf('# 10) App health'));
+    const wrapper = readFileSync(
+      join(process.cwd(), 'agent-os', 'cloud-environment', 'install.sh'),
+      'utf8',
+    );
+    expect(wrapper).toContain('exec bash tooling/setup/agent/bootstrap.sh "$@"');
+  });
 });

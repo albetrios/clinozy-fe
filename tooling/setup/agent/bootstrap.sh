@@ -8,7 +8,13 @@
 # single command to make a cloud session "same as local", with a progress log
 # after each step so anyone watching the session sees live status.
 #
-#   bash tooling/setup/agent/bootstrap.sh
+#   bash tooling/setup/agent/bootstrap.sh                 # steps 1-10
+#   bash tooling/setup/agent/bootstrap.sh --install-only  # environment Setup script: steps 1-9,
+#                                                         # the same switch as clinozy-be's
+#
+# `--install-only` skips step 10: in a cached Setup script it only booted Vite to stop it again,
+# and in a session fe-session-start.mjs starts the dev server itself. Any other option is
+# refused, as clinozy-be's bootstrap.sh refuses one.
 #
 # Works from any agent harness — Claude Code (web, CLI, desktop), Cursor cloud
 # agents, Codex, or a plain shell. Nothing here is Claude-specific: the one
@@ -25,6 +31,17 @@
 # Env:
 #   NODE_INSTALL_PREFIX        parent dir for node<major> (default /opt)
 set -uo pipefail
+
+install_only=0
+for argument in "$@"; do
+  case "${argument}" in
+    --install-only) install_only=1 ;;
+    *)
+      echo "✗ unknown option: ${argument} (only --install-only)" >&2
+      exit 2
+      ;;
+  esac
+done
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../../.." || exit 1
 readonly AGENT_DIR="tooling/setup/agent"
@@ -239,6 +256,12 @@ if bash "${AGENT_DIR}/install-playwright.sh"; then
   ok "[9/${TOTAL}] chromium for the pinned @playwright/test available in ${browsers_path}"
 else
   skip "[9/${TOTAL}] no chromium build for the pinned @playwright/test — E2E unavailable (also needs clinozy-be on :3000)"
+fi
+
+if [ "${install_only}" = 1 ]; then
+  echo ""
+  echo "✓ install complete in $(($(date +%s) - start_ts))s (--install-only: step 10 skipped — a session's start hook starts the dev server)."
+  exit 0
 fi
 
 # 10) App health (dev server serves the app shell) ---------------------------

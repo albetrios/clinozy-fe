@@ -13,7 +13,8 @@
 # same bring-up is runnable by hand or from any other agent harness.
 #
 # Usage (Cursor environment.json install field or dashboard Setup script):
-#   bash agent-os/cloud-environment/install.sh
+#   bash agent-os/cloud-environment/install.sh                 # steps 1-10
+#   bash agent-os/cloud-environment/install.sh --install-only  # Setup script: steps 1-9
 #
 # Playwright browsers are provisioned best-effort and no service is left running
 # — a browser-download failure or a missing backend never marks the environment

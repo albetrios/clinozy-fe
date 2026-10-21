@@ -3,8 +3,13 @@
 One command makes a fresh cloud session behave like a local checkout:
 
 ```bash
-bash tooling/setup/agent/bootstrap.sh
+bash tooling/setup/agent/bootstrap.sh                 # steps 1-10
+bash tooling/setup/agent/bootstrap.sh --install-only  # the environment Setup script: steps 1-9
 ```
+
+`--install-only` (the same switch clinozy-be's `bootstrap.sh` takes) skips step 10, the transient
+dev-server healthcheck: in a cached Setup script it only booted Vite to stop it again, and a session's
+start hook starts the dev server itself. Any other option is refused.
 
 Harness-agnostic by design. It runs the same on **Claude Code** (web, CLI,
 desktop), **Cursor** cloud agents, **Codex**, CI, or a plain shell. The only
@@ -128,7 +133,7 @@ Two deliberate divergences from the Mac list:
 | --------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------- |
 | `pnpm setup:local`                      | Developer on macOS/Linux     | 5 phases, ends by starting `pnpm dev`                                              |
 | `tooling/setup/agent/bootstrap.sh`      | Cloud agent session          | This directory — terminates, never leaves a server of its own                      |
-| `agent-os/cloud-environment/install.sh` | Environment **Setup script** | Thin wrapper that calls `bootstrap.sh`                                             |
+| `agent-os/cloud-environment/install.sh` | Environment **Setup script** | Thin wrapper that calls `bootstrap.sh` — pass `--install-only` there               |
 | `agent-os/hooks/fe-session-start.mjs`   | Every interactive session    | Fast path — switches Node, installs deps if missing; on the web, starts `pnpm dev` |
 
 A cached **Setup script** must terminate, which is why `bootstrap.sh` passes

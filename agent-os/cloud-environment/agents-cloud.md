@@ -74,7 +74,14 @@ Ten steps, in order:
    session context.
 9. **Playwright browsers** — skipped when the image already ships them.
 10. **Healthcheck** — starts the dev server transiently, verifies it serves the
-    real app shell, then stops it.
+    real app shell, then stops it. Skipped by `--install-only`, the switch for the
+    environment's Setup script (the same one clinozy-be's `bootstrap.sh` takes):
+    there it only booted Vite to stop it again, and a session's start hook starts
+    the dev server itself. Any other option is refused.
+
+```bash
+bash agent-os/cloud-environment/install.sh --install-only   # the Setup script: steps 1-9
+```
 
 Steps 2–5 and 8–9 are best-effort and log `•` without aborting; Node, the
 dependency install, the env scaffold, and the healthcheck are hard gates. No
