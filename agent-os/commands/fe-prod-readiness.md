@@ -5,7 +5,7 @@ allowed-tools: Bash(git diff*), Bash(pnpm*)
 ---
 
 Read `REVIEW.md` (repo root) first — the severity ladder and the findings format. Then run the
-**`prod-readiness`** pipeline defined in [`agent-os/agents/pipelines.json`](../agents/pipelines.json)
+**`fe-prod-readiness`** pipeline defined in [`agent-os/agents/pipelines.json`](../agents/pipelines.json)
 as read-only agents before a release/deploy, and aggregate one report. The pipeline (not this prose)
 is the source of truth for the steps, their order and the handoffs:
 

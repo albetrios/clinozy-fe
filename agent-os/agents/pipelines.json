@@ -1,7 +1,7 @@
 {
   "description": "Read-only agent review pipelines — named sets of diagnostic agents that aggregate into one report, consumed by /fe-pre-merge-review and /fe-prod-readiness. Every step references a real agent in agent-os/agents/ and every handoff target a real skill in agent-os/skills/ (both eval-enforced). Each finding is one line in REVIEW.md → Findings format and names the procedural skill that fixes it (agent finds, skill fixes). An agent that two pipelines share (fe-production-hardening-reviewer) runs once per HEAD: a pipeline run after the other on the same HEAD reuses its report.",
   "pipelines": {
-    "pre-merge-review": {
+    "fe-pre-merge-review": {
       "description": "Read-only review of the current diff before merge. The steps whose `when` matches the diff run at once, in the background; each returns findings in REVIEW.md → Findings format.",
       "steps": ["fe-verifier", "fe-docs-auditor", "fe-production-hardening-reviewer"],
       "when": {
@@ -19,7 +19,7 @@
         "fe-full-code-review": "the code pass, in diff mode, on the same files as fe-production-hardening-reviewer — one general-purpose agent applies the skill's Diff mode to the diff"
       }
     },
-    "prod-readiness": {
+    "fe-prod-readiness": {
       "description": "Production-readiness sweep before a release/deploy — dependencies, bundle, runtime performance, and client-security hardening. fe-dependency-auditor and fe-production-hardening-reviewer run at once in the background; fe-bundle-size-reviewer and then fe-perf-auditor each build the app, so they run one after the other. The hardening reviewer runs once: when /fe-pre-merge-review already ran it on this HEAD, its report is reused.",
       "steps": [
         "fe-dependency-auditor",

@@ -204,7 +204,7 @@ The relationships above are also declared as data, eval-gated by
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `agent-os/skills/chains.json`     | Named ordered skill sequences (page-change, fe-resource-crud, form-mutation, …)                                                                   |
 | `agent-os/skills/groups.json`     | Every skill in exactly one group (ui-design, quality, platform, …)                                                                                |
-| `agent-os/agents/pipelines.json`  | Reviewer-agent pipelines (`pre-merge-review`, `prod-readiness`) + handoffs                                                                        |
+| `agent-os/agents/pipelines.json`  | Reviewer-agent pipelines (`fe-pre-merge-review`, `fe-prod-readiness`) + handoffs                                                                  |
 | `agent-os/docs/skill-triggers.md` | File-pattern → skill routing, generated from `chains.json` and each skill's `trigger` frontmatter (Tier-2 tested via `evals/cases/triggers.json`) |
 
 Read-only reviewer agents are catalogued in `agent-os/docs/agents-catalog.md`.
