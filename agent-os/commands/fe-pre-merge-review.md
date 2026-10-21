@@ -5,14 +5,14 @@ allowed-tools: Bash(git diff*), Bash(pnpm*)
 ---
 
 Read `REVIEW.md` (repo root) first — it defines the severity ladder and the findings format every
-reviewer in this pipeline uses. Then run the **`pre-merge-review`** pipeline over the diff:
+reviewer in this pipeline uses. Then run the **`fe-pre-merge-review`** pipeline over the diff:
 
 - No argument: the branch — `git diff main...HEAD`, plus uncommitted changes.
 - `release`: everything since the last release — `git fetch --tags --quiet origin`, then
   `git diff "$(git describe --tags --abbrev=0 --match 'v*' origin/main)"...HEAD`. No tag yet: say so
   and review the branch instead.
 
-1. Read [`agent-os/agents/pipelines.json`](../agents/pipelines.json) → `pre-merge-review`. Its
+1. Read [`agent-os/agents/pipelines.json`](../agents/pipelines.json) → `fe-pre-merge-review`. Its
    `steps` are the reviewers, its `when` says which ones the diff needs (the pipeline, not this
    prose, is the source of truth): **fe-verifier** always — `/fe-validate` plus the relevant tests
    (`pnpm test`; `pnpm test:security` when auth, CSP or token code changed), confirming the change

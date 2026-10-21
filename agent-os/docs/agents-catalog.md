@@ -27,7 +27,7 @@ symlinks. Agents are read-only validators/investigators — for task instruction
 - **CI is red** → `fe-ci-investigator` (one check at a time → root cause + fix plan).
 - **"Is this actually done?"** → `fe-verifier` before claiming a feature complete.
 - **Large doc change / doc review** → `fe-docs-auditor`.
-- **Before a release/deploy** → `fe-dependency-auditor` + `fe-bundle-size-reviewer` + `fe-perf-auditor` + `fe-production-hardening-reviewer` (the `prod-readiness` pipeline).
+- **Before a release/deploy** → `fe-dependency-auditor` + `fe-bundle-size-reviewer` + `fe-perf-auditor` + `fe-production-hardening-reviewer` (the `fe-prod-readiness` pipeline).
 - **"Why is first paint slow?" / Web-Vitals check** → `fe-perf-auditor` (production preview trace, never the dev server).
 - **A11y sweep beyond component tests** → `fe-a11y-auditor` (whole-page landmarks/focus/contrast; findings → `web-design-guidelines`).
 - **Before/after adding locales or extracting copy** → `fe-i18n-auditor` (findings → `fe-i18n-constants`).
@@ -56,13 +56,13 @@ symlinks. Agents are read-only validators/investigators — for task instruction
 Named sequences of these read-only agents live in
 [`agent-os/agents/pipelines.json`](../agents/pipelines.json) — the source of
 truth for what the [`/fe-pre-merge-review`](../commands/fe-pre-merge-review.md)
-command runs. The `pre-merge-review` pipeline starts the reviewers its `when` says the diff
+command runs. The `fe-pre-merge-review` pipeline starts the reviewers its `when` says the diff
 needs (`fe-verifier` always, `fe-docs-auditor` on docs changes) at once, in the background, and
 aggregates one report in `REVIEW.md` → Findings format; each step's `handoff`
 names the skill that fixes its findings (`verifier → fe-test-generation`,
 `fe-docs-auditor → fe-documentation-maintenance`). The
 [`/fe-prod-readiness`](../commands/fe-prod-readiness.md) command runs the
-`prod-readiness` pipeline before a release/deploy — `fe-dependency-auditor` and
+`fe-prod-readiness` pipeline before a release/deploy — `fe-dependency-auditor` and
 `fe-production-hardening-reviewer` at once (the hardening reviewer runs once per HEAD, reusing a
 `/fe-pre-merge-review` report on the same HEAD), then `fe-bundle-size-reviewer` → `fe-perf-auditor`,
 which each build the app. Every report is one line per finding in `REVIEW.md` → Findings format

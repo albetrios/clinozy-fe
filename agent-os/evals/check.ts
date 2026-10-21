@@ -666,6 +666,18 @@ if (existsSync(hooksManifestFile)) {
     // The hook manifest check above reports invalid JSON.
   }
 }
+// Review pipelines too: skills and commands find one as `agent-os/agents/pipelines.json` →
+// `<name>`, a path both repositories have, so a shared name would run the other one's reviewers.
+if (existsSync(pipelinesFile)) {
+  try {
+    const pipelines =
+      (JSON.parse(readText(pipelinesFile)) as { pipelines?: Record<string, unknown> })
+        .pipelines ?? {};
+    for (const pipeline of Object.keys(pipelines)) requirePrefix('pipeline', pipeline);
+  } catch {
+    // The agent pipelines check above reports invalid JSON.
+  }
+}
 
 // ── Plugin manifest references resolve to real paths ──
 // agent-os/.claude-plugin/plugin.json makes agent-os/ itself the installable

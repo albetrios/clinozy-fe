@@ -37,6 +37,6 @@ pattern: [`agent-os/docs/skill-triggers.md`](../docs/skill-triggers.md).
 Read-only reviewer agents (Cursor + Claude, via the `.cursor/agents/` and
 `.claude/agents/` symlinks) are catalogued in
 [`agent-os/docs/agents-catalog.md`](../docs/agents-catalog.md); review pipelines
-(`pre-merge-review`, `prod-readiness`) are declared in
+(`fe-pre-merge-review`, `fe-prod-readiness`) are declared in
 [`agent-os/agents/pipelines.json`](../agents/pipelines.json). All are read-only —
 they investigate and report; the parent applies fixes.
