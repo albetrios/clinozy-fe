@@ -247,6 +247,7 @@ async function frontendStatus() {
     return 'not started (dependencies missing) — pnpm install, then pnpm dev';
   }
   if (await devServerServes()) return `live — ${DEV_SERVER_URL}`;
+  if (!onPath('pnpm')) return 'not started (pnpm is not on PATH) — pnpm dev';
   const stackDirectory = process.env.AGENT_STACK_DIR || '/tmp/agent-stack';
   mkdirSync(stackDirectory, { recursive: true, mode: 0o700 });
   // A stack directory another user made in /tmp, or a link, could aim this log anywhere: refuse it.
@@ -268,6 +269,9 @@ async function frontendStatus() {
       stdio: ['ignore', log, log],
     },
   );
+  // A spawn that fails (pnpm gone, no permission) emits `error` later; unheard, that event would
+  // crash the hook, which must fail open.
+  server.on('error', () => {});
   server.unref();
   // The session id: `pkill -s <pid>` stops pnpm and the Vite it runs in another process group.
   writeFileSync(join(stackDirectory, 'frontend.pid'), `${server.pid}\n`);
