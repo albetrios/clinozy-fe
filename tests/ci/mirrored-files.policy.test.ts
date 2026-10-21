@@ -56,6 +56,18 @@ describe('files mirrored in clinozy-be', () => {
     expect(downloads).toEqual([]);
   });
 
+  it("is compared nightly with clinozy-be's main, and a difference opens the ci-failure issue", () => {
+    const workflow = readFileSync(
+      join('.github', 'workflows', 'scheduled-unit-nightly.yml'),
+      'utf8',
+    );
+    expect(workflow).toContain('repository: ${{ github.repository_owner }}/clinozy-be');
+    expect(workflow).toMatch(/ref: main\s+path: \.mirror-sibling/);
+    expect(workflow).toContain('MIRROR_SIBLING_CHECKOUT: .mirror-sibling');
+    expect(workflow).toContain('tests/ci/mirrored-files.policy.test.ts');
+    expect(workflow).toMatch(/notify-failure:[\s\S]*?needs: \[[^\]]*\bmirrored-files\b/);
+  });
+
   // The canary never skips: a sibling checkout that is missing there is a broken canary.
   it.skipIf(SIBLING_FROM_CANARY === undefined && !existsSync(join(SIBLING, '.git')))(
     'matches the sibling checkout byte for byte',
