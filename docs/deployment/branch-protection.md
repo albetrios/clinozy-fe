@@ -99,7 +99,7 @@ Committed ruleset: [main.json](../../.github/rulesets/main.json). Sync to GitHub
 | Required approving reviews      | **0** (personal mode; `github:tool:governance-mode team` sets it to 1 once a 2nd owner exists) |
 | Require CODEOWNER review        | No                                                                                             |
 | Require conversation resolution | Yes                                                                                            |
-| Strict up-to-date checks        | **On** — a branch must be up to date with `main` before it merges (merged tree == tested tree) |
+| Strict up-to-date checks        | **Off** — a branch behind `main` merges as is: every PR lane tests the PR merged with `main`   |
 | Allowed merge methods           | **`squash` only** (branch auto-deletes on merge)                                               |
 | Require signed commits          | Yes                                                                                            |
 | Block force-push / deletion     | Yes                                                                                            |

@@ -5,8 +5,10 @@ name: Post-merge CI
 # release-please config, one manifest, one changelog.
 #
 # NO redundant testing: pr-ci.yml is the merge gate and already ran lint, types,
-# unit + security tests, build, and the security scans on this exact SHA behind
-# the required `quality-gate` check. Post-merge does ONLY what the gate cannot.
+# unit + security tests, build, and the security scans on the PR merged with main
+# (`github.sha`) behind the required `quality-gate` check — the tree that lands,
+# unless main moved after the PR's last run (strict up-to-date is off). Post-merge
+# does ONLY what the gate cannot.
 #
 # Per-merge cost is minimized — a routine feature merge runs only a batched
 # development-alias deploy (release-please runs on demand, below):
