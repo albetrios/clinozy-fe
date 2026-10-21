@@ -14,7 +14,10 @@ import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
  * the same photos, in another order, opens it as it was left.
  *
  * Needs object storage on clinozy-be (`S3_*` in its `.env.local`, a bucket whose CORS admits this
- * origin): the photos are real uploads, so without it the upload step fails and says so.
+ * origin): the photos are real uploads, so without it the upload step fails and says so. A run
+ * that knows its clinozy-be has none says so with `E2E_OBJECT_STORAGE=false` and skips: CI's
+ * backend image runs without a bucket, and a local S3 stand-in is no answer there, since the CSP's
+ * `connect-src` admits object storage on `https://*.amazonaws.com` only.
  * Desktop, then the phone's bar on the same comparison.
  */
 
@@ -91,6 +94,10 @@ test.beforeEach(async () => {
   test.skip(
     !(await verifyDatabaseConnection()),
     'DATABASE_URL must reach clinozy-be Postgres (auth.mail_outbox)',
+  );
+  test.skip(
+    process.env.E2E_OBJECT_STORAGE === 'false',
+    'clinozy-be here has no object storage (E2E_OBJECT_STORAGE=false), so no photo can upload',
   );
 });
 

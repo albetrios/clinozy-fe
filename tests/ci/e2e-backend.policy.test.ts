@@ -73,6 +73,13 @@ describe('E2E against the backend image', () => {
     expect(WORKFLOW).toContain('-e DEPLOYMENT_TOTAL_REPLICA_COUNT=1');
   });
 
+  it('tells the suite the backend has no object storage, so the photo uploads skip', () => {
+    // The image boots with no S3_*: without the flag the patient-photos spec waits a minute for
+    // uploads that cannot happen, then fails the nightly run.
+    expect(WORKFLOW).not.toMatch(/-e S3_/);
+    expect(WORKFLOW).toContain("E2E_OBJECT_STORAGE: 'false'");
+  });
+
   it('tags the smoke set: sign-in, Today, one create, one edit and axe on five pages', () => {
     const tagged = smokeTests();
     expect(tagged).toHaveLength(9);

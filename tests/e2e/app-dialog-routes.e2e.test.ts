@@ -28,9 +28,6 @@ import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
  */
 const unknownId = (prefix: string): string => `${prefix}_${'z'.repeat(21)}`;
 
-/** Matches no sale in the fixture world (Medical still runs on fixtures, parked). */
-const UNKNOWN_FIXTURE_ID = '00000000-0000-4000-8000-00000000dead';
-
 /** A cold load of a path inside the clinic — the session comes back from the refresh cookie. */
 async function coldLoad(page: Page, slug: string, path: string): Promise<void> {
   await page.goto(`/organization/${slug}/${path}`, { waitUntil: 'domcontentloaded' });
@@ -70,7 +67,7 @@ const CREATE_ROUTES = [
 /**
  * Record routes: opened from the room's list, then reloaded — the id in the URL
  * alone brings the drawer back over its room. The clinic is seeded through the
- * API (`seedClinic`), so each room has a real row; Medical's sale is a fixture's.
+ * API (`seedClinic`), so each room has a real row (Medical's is a sale of the seeded medicine).
  */
 const RECORD_ROUTES: readonly {
   room: AppRoom;
@@ -131,8 +128,8 @@ const UNKNOWN_RECORD_ROUTES = [
     record: /^Offering not found/,
   },
   {
-    id: UNKNOWN_FIXTURE_ID,
-    path: `medical/sales/${UNKNOWN_FIXTURE_ID}`,
+    id: unknownId('msal'),
+    path: `medical/sales/${unknownId('msal')}`,
     room: 'medical',
     record: /^Sale not found/,
   },
@@ -169,8 +166,19 @@ test.describe('Clinic dialog routes — deep links', () => {
 
   test('a record route reopens its drawer after a reload', async ({ page }) => {
     test.setTimeout(180_000);
-    await openNewClinic(page, { seed: true });
-    for (const route of RECORD_ROUTES) {
+    const { seed } = await openNewClinic(page, { seed: true });
+    // As in app-rooms: past the clinic's last slot today the seed books no appointment, so that
+    // room has no row to open. The step is left out and says why in the report.
+    const routes = RECORD_ROUTES.filter(
+      (route) => route.room !== 'appointments' || seed?.appointmentId,
+    );
+    if (routes.length < RECORD_ROUTES.length)
+      test.info().annotations.push({
+        type: 'skip',
+        description:
+          'appointments: no bookable slot is left today in the clinic’s time zone',
+      });
+    for (const route of routes) {
       await test.step(route.room, async () => {
         await openRoomFromShell(page, route.room, 'desktop');
         if (route.room === 'leads') await byTestId(page, 'leads-tab-all').click();

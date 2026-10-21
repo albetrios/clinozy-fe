@@ -17,7 +17,6 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import {
   Picker,
-  PICKER_KEYS,
   PICKER_NS,
   type PickerOption,
 } from '@/shared/components/Picker/index.ts';
@@ -203,20 +202,19 @@ function DoctorField({
         testId={IDS.doctor}
         className="max-w-95"
         renderTrigger={({ open }) => (
+          // Named by its text — the screen-reader label, then the doctor as shown — not an
+          // aria-label, which would have to hold the avatar's initials too (WCAG 2.5.3 Label in
+          // Name).
           <button
             type="button"
             disabled={disabled}
-            aria-label={t(PICKER_KEYS.triggerLabel, {
-              ns: PICKER_NS,
-              label: t(K.doctor),
-              value: name,
-            })}
             data-testid={IDS.doctor}
             className={cn(
               'border-border bg-card hover:bg-canvas flex h-9 w-full min-w-0 items-center gap-2 overflow-hidden rounded-lg border ps-1.75 pe-3 text-start shadow-xs transition-colors disabled:opacity-50',
               open && 'border-disabled',
             )}
           >
+            <span className="sr-only">{`${t(K.doctor)} ·`}</span>{' '}
             {picked ? (
               <span
                 data-slot="pill"

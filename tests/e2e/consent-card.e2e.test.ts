@@ -32,15 +32,23 @@ interface Box {
 /**
  * Where the element comes to rest. The card slides in, and its `duration-300` also times every
  * transition, so when the tab bar mounts its `bottom` glides clear of the bar over 300ms. Wait out
- * every running animation and transition, then measure.
+ * every running animation and transition on the element and on each element around it — a button
+ * moves with the card's slide, which runs on the card, not on the button — then measure.
  */
 async function boxOf(page: Page, testId: string): Promise<Box> {
   const element = byTestId(page, testId);
   await element.evaluate(async (node) => {
+    const runningOnTheWayUp = () => {
+      const running: Animation[] = [];
+      for (let at: Element | null = node; at; at = at.parentElement) {
+        running.push(...at.getAnimations());
+      }
+      return running;
+    };
     for (
-      let running = node.getAnimations();
+      let running = runningOnTheWayUp();
       running.length > 0;
-      running = node.getAnimations()
+      running = runningOnTheWayUp()
     ) {
       await Promise.all(
         running.map((animation) => animation.finished.catch(() => undefined)),

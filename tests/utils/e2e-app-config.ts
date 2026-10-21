@@ -27,3 +27,19 @@ export async function readAppSignInMethods(page: Page): Promise<AppSignInMethods
     return { google, github };
   });
 }
+
+/**
+ * Whether the running app has Stripe — the same `isStripeEnabled()` (a `pk_` publishable key in
+ * `VITE_STRIPE_PUBLISHABLE_KEY`) the billing panel decides on before it shows a subscription's
+ * invoices and payment methods. Imported from the Vite dev server inside the page, like
+ * {@link readAppSignInMethods}, so a spec asserts what this build offers.
+ */
+export async function readAppStripeEnabled(page: Page): Promise<boolean> {
+  return page.evaluate(async () => {
+    const stripeModule = '/src/shared/billing/stripe-config.ts';
+    const { isStripeEnabled } = (await import(/* @vite-ignore */ stripeModule)) as {
+      isStripeEnabled: () => boolean;
+    };
+    return isStripeEnabled();
+  });
+}

@@ -8,6 +8,7 @@ import { axe } from 'vitest-axe';
 import type { AppointmentTreatment } from '@/shared/api/app/appointments-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { DOCTOR_ARJUN, DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
+import { axeLabelInName } from '@/tests/utils/axe-label-in-name.ts';
 
 import { APPOINTMENT_FORM_TEST_IDS as IDS } from './appointment-form.constants.ts';
 import {
@@ -185,6 +186,26 @@ describe('AppointmentDetails — step 1 (H:2764–2773)', () => {
     await u.click(arjun);
     expect(draftNow()).toMatchObject({ doctorId: DOCTOR_ARJUN.id, time: null });
     expect(screen.getByTestId(IDS.doctor)).toHaveAccessibleName(/Arjun Rao/);
+  });
+
+  it('names the doctor trigger by its words, never an aria-label over the initials (WCAG 2.5.3)', async () => {
+    const { container } = render(
+      <Details start={{ ...emptyDraft('2026-10-05'), doctorId: DOCTOR_NISHA.id }} />,
+    );
+    const trigger = screen.getByTestId(IDS.doctor);
+    expect(trigger).not.toHaveAttribute('aria-label');
+    expect(trigger).toHaveAccessibleName('Doctor · Nisha Shah');
+    expect(await axeLabelInName(container)).toHaveNoViolations();
+  });
+
+  it('the label-in-name check has teeth: an aria-label over shown initials fails it', async () => {
+    const { container } = render(
+      <button type="button" aria-label="Doctor · Nisha Shah">
+        <span aria-hidden="true">NS</span>
+        <span>Nisha Shah</span>
+      </button>,
+    );
+    expect(await axeLabelInName(container)).not.toHaveNoViolations();
   });
 
   it('asks for a doctor when none is picked', () => {
