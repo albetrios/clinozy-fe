@@ -167,6 +167,34 @@ describe('git-hook gate tools', () => {
     expect(serviceAttempts.match(/dockerd_appeared/g)).toHaveLength(2);
   });
 
+  it('the Docker start clears pid files left from before a pause, so a reused pid never blocks it', () => {
+    // A resumed container keeps /var/run but no processes: dockerd's and containerd's pid files
+    // named pids a kernel worker and a shell held after the reboot, and dockerd refused to start.
+    const daemonScript = readFileSync(
+      'tooling/setup/agent/ensure-docker-daemon.sh',
+      'utf8',
+    );
+    expect(daemonScript).toContain('clear_stale_pid_file /var/run/docker.pid dockerd');
+    expect(daemonScript).toContain(
+      'clear_stale_pid_file /var/run/docker/containerd/containerd.pid containerd',
+    );
+    // Stale means the pid does not run the program the file belongs to.
+    expect(daemonScript).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: a shell parameter expansion, asserted verbatim
+      '[ "$(ps -p "${pid}" -o comm= 2>/dev/null)" = "$2" ]',
+    );
+    const start = daemonScript.slice(
+      daemonScript.indexOf('start_dockerd() {'),
+      daemonScript.indexOf('stop_dockerd() {'),
+    );
+    expect(start.indexOf('clear_stale_pid_files')).toBeGreaterThan(-1);
+    expect(start.indexOf('clear_stale_pid_files')).toBeLessThan(start.indexOf('setsid'));
+    // The service script starts dockerd with the same pid file, so it is cleared before that too.
+    expect(daemonScript.indexOf('dockerd_running || clear_stale_pid_files')).toBeLessThan(
+      daemonScript.indexOf('service docker start >/dev/null'),
+    );
+  });
+
   it('the Docker start never runs a second dockerd beside one still starting or stopping', () => {
     // The same script as clinozy-be's: a dockerd still alive has not failed, and a second one
     // stops on its pid file while the first, answering later, was recorded as the fallback.
