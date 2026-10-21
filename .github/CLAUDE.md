@@ -39,7 +39,9 @@ run as scheduled/event workflows (enforced registry: docs/reference/scheduled-jo
 **cannot be merged by anyone — the repo owner included**. Never re-add `bypass_actors` to
 `.github/rulesets/main.json`, and never merge with `--admin` or the merge API to skip a red gate: a
 flaky-red required check is **re-run (or its branch updated) to green**, never bypassed. `strict up-to-date`
-is off so a green PR merges cleanly with `gh pr merge --squash` (no bypass needed); `required_signatures`
+is off so a green PR merges cleanly with `gh pr merge --squash` (no bypass needed) — safe because every
+PR CI lane tests the PR merged with `main` (`github.sha`), never the branch head (pinned by
+`tests/ci/pr-merge-commit.policy.test.ts`); `required_signatures`
 is intentionally absent (branch commits are unsigned — the squash-merge commit GitHub creates on `main`
 is signed regardless). The ruleset content is pinned by `tests/ci/rulesets.policy.test.ts`.
 

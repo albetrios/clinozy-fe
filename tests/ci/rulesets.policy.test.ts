@@ -86,6 +86,8 @@ describe('branch rulesets policy (one trunk, one ruleset)', () => {
   });
 
   it('does not require branches to be up to date (strict off) so a green PR merges cleanly', () => {
+    // A branch behind main is still tested with main's commits: every PR lane tests the PR
+    // merged with main (pr-merge-commit.policy.test.ts).
     const checksRule = (
       (rulesets[0]?.payload?.rules ?? []) as Array<{
         type: string;
