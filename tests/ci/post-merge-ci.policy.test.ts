@@ -89,12 +89,14 @@ describe('post-merge CI policy (single trunk)', () => {
   it('closes the ci-failure issue on a green run that skips release-please (an ordinary merge)', () => {
     // release-please runs on demand only; a close gated on its success never fired (#151 stayed
     // open through three green deploys). Same shape as clinozy-be: no failure, no cancellation.
-    const resolveBlock = jobBlock(workflow, 'resolve-success');
-    expect(resolveBlock).not.toContain("needs.release-please.result == 'success'");
+    // Compared without whitespace: an expression reads the same with or without spaces around
+    // its operators, so a literal match let `result=='success'` through.
+    const resolveBlock = jobBlock(workflow, 'resolve-success').replace(/\s+/g, '');
+    expect(resolveBlock).not.toContain("needs.release-please.result=='success'");
     for (const job of ['release-please', 'deploy-development'])
       for (const result of ['failure', 'cancelled'])
         expect(resolveBlock, `${job} ${result}`).toContain(
-          `needs.${job}.result != '${result}'`,
+          `needs.${job}.result!='${result}'`,
         );
     expect(resolveBlock).toContain('!cancelled()');
   });
