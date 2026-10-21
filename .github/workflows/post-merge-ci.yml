@@ -418,10 +418,16 @@ jobs:
   resolve-success:
     name: Close ci-failure issue
     needs: [release-please, deploy-development]
+    # The negation of `notify-failure`, plus a cancellation guard (clinozy-be's shape): a cancelled
+    # run proves nothing, so it never closes the issue; `skipped` is healthy. release-please runs on
+    # demand only, so an ordinary merge skips it, and requiring its success left issue #151 open
+    # through three green deploys.
     if: |
-      always() &&
-      needs.release-please.result == 'success' &&
-      (needs.deploy-development.result == 'success' || needs.deploy-development.result == 'skipped')
+      !cancelled() &&
+      needs.release-please.result != 'failure' &&
+      needs.release-please.result != 'cancelled' &&
+      needs.deploy-development.result != 'failure' &&
+      needs.deploy-development.result != 'cancelled'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
