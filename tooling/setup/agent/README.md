@@ -18,21 +18,22 @@ and a dev server that serves the app shell.
 
 ## Files
 
-| File                       | Role                                                                                            |
-| -------------------------- | ----------------------------------------------------------------------------------------------- |
-| `bootstrap.sh`             | Orchestrator — runs all 10 steps, logs progress, enforces the hard gates                        |
-| `lib.sh`                   | Shared helpers (logging, arch detection, apt, download, PATH persistence)                       |
-| `tool-versions.sh`         | The pinned tool versions and checksums (gitleaks, semgrep), read by the installers and CI       |
-| `install-node.sh`          | Pinned Node from `.nvmrc` into `/opt/node<major>`, linked into `~/.local/bin`                   |
-| `install-apt-tools.sh`     | `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`                                       |
-| `install-gh.sh`            | GitHub CLI from the official `cli/cli` release                                                  |
-| `install-semgrep.sh`       | Semgrep at the pin, for `pnpm security:semgrep:push` (a warning when missing)                   |
-| `install-gitleaks.sh`      | Secret scanner used by `.husky/pre-commit` (mandatory there) and the CI gitleaks lane           |
-| `install-docker-images.sh` | Docker Hub mirror (`mirror.gcr.io`) + pre-pull of the SonarQube gate images                     |
-| `ensure-docker-daemon.sh`  | Starts `dockerd` when stopped (same script as clinozy-be); used by step 4 and `pnpm sonar:scan` |
-| `install-headroom.sh`      | `uv`/`uvx` — the prerequisite for the `headroom` MCP server                                     |
-| `install-playwright.sh`    | E2E browsers; downloads only when the build the pinned `@playwright/test` needs is missing      |
-| `healthcheck.sh`           | Probes the dev server for the real app shell                                                    |
+| File                       | Role                                                                                               |
+| -------------------------- | -------------------------------------------------------------------------------------------------- |
+| `bootstrap.sh`             | Orchestrator — runs all 10 steps, logs progress, enforces the hard gates                           |
+| `lib.sh`                   | Shared helpers (logging, arch detection, apt, download, PATH persistence)                          |
+| `tool-versions.sh`         | The pinned tool versions and checksums (gitleaks, semgrep), read by the installers and CI          |
+| `install-node.sh`          | Pinned Node from `.nvmrc` into `/opt/node<major>`, linked into `~/.local/bin`                      |
+| `install-apt-tools.sh`     | `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`                                          |
+| `install-gh.sh`            | GitHub CLI from the official `cli/cli` release                                                     |
+| `install-semgrep.sh`       | Semgrep at the pin, for `pnpm security:semgrep:push` (a warning when missing)                      |
+| `install-gitleaks.sh`      | Secret scanner used by `.husky/pre-commit` (mandatory there) and the CI gitleaks lane              |
+| `install-docker-images.sh` | Docker Hub mirror (`mirror.gcr.io`) + pre-pull of the SonarQube gate images                        |
+| `ensure-docker-daemon.sh`  | Starts `dockerd` when stopped (same script as clinozy-be); used by step 4 and `pnpm sonar:scan`    |
+| `install-headroom.sh`      | `uv`/`uvx` — the prerequisite for the `headroom` MCP server                                        |
+| `install-playwright.sh`    | E2E browsers; downloads only when the build the pinned `@playwright/test` needs is missing         |
+| `healthcheck.sh`           | Probes the dev server for the real app shell                                                       |
+| `start-sonarqube.sh`       | SonarQube for the pre-push gate, once no bring-up holds the stack lock (same script as clinozy-be) |
 
 Each `install-*.sh` runs standalone as well as under `bootstrap.sh`.
 
@@ -140,3 +141,9 @@ serving the app shell (a resumed session) is left alone, and step 10 probes that
 starting a second one. Its log is `/tmp/agent-stack/frontend.log` (`$AGENT_STACK_DIR`, the
 directory clinozy-be's bring-up uses); stop it with `pkill -s "$(cat /tmp/agent-stack/frontend.pid)"`
 — the pid is the session's, so Vite, which pnpm runs in another process group, stops with it.
+
+Beside it the hook launches `start-sonarqube.sh`, detached. The script waits until no bring-up holds
+the agent-stack lock (clinozy-be's migrations and seed) and Docker answers, then starts this
+repository's SonarQube, so the first push finds the pre-push gate's server up instead of waiting
+about two minutes for it. Its log is `/tmp/agent-stack/sonarqube-frontend.log`; `SONAR=0` in the
+environment skips it, and the gate still starts SonarQube itself whenever it is not up.

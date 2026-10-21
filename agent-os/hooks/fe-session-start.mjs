@@ -275,7 +275,30 @@ async function frontendStatus() {
   server.unref();
   // The session id: `pkill -s <pid>` stops pnpm and the Vite it runs in another process group.
   writeFileSync(join(stackDirectory, 'frontend.pid'), `${server.pid}\n`);
+  startSonarQubeInBackground(stackDirectory);
   return `starting in the background — ${DEV_SERVER_URL} · follow: tail -f ${logPath}`;
+}
+
+/**
+ * SonarQube for the pre-push gate (web), beside the dev server: `start-sonarqube.sh` (kept
+ * byte-identical with clinozy-be's), launched detached. The script waits until no bring-up holds the
+ * agent-stack lock and Docker answers, so the server's two-minute boot never competes with
+ * clinozy-be's migrations and seed; the first push then finds it up instead of booting it.
+ */
+function startSonarQubeInBackground(stackDirectory) {
+  const log = openSync(join(stackDirectory, 'sonarqube-frontend.log'), 'w', 0o600);
+  const starter = spawn(
+    'bash',
+    [join(repositoryRoot, 'tooling', 'setup', 'agent', 'start-sonarqube.sh')],
+    {
+      cwd: repositoryRoot,
+      detached: true,
+      stdio: ['ignore', log, log],
+    },
+  );
+  // As with the dev server: a spawn that fails later must not crash the hook.
+  starter.on('error', () => {});
+  starter.unref();
 }
 
 /** The skill-routing map on startup; on resume, a note that the conversation already holds it. */

@@ -104,6 +104,23 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
     expect(hook).toContain("writeFileSync(join(stackDirectory, 'frontend.pid')");
   });
 
+  it('a web session starts SonarQube in the background once the stack is up', () => {
+    const hook = readFileSync(HOOK, 'utf8');
+    // Launched only where the dev server is (web, a fresh start), detached and fail-open; the
+    // shared script waits for the bring-up lock to clear and Docker to answer.
+    expect(hook).toContain('startSonarQubeInBackground(stackDirectory);');
+    expect(hook).toContain(
+      "join(repositoryRoot, 'tooling', 'setup', 'agent', 'start-sonarqube.sh')",
+    );
+    expect(hook).toContain("starter.on('error', () => {});");
+    expect(hook).toContain('starter.unref();');
+    const script = readFileSync('tooling/setup/agent/start-sonarqube.sh', 'utf8');
+    expect(script).toContain('[ -d "${lock_directory}" ] || ! docker info');
+    expect(script).toContain(
+      'docker compose -f docker-compose.sonar.yml up -d sonarqube',
+    );
+  });
+
   it('a web session whose dev server cannot start still briefs and exits 0', () => {
     // The dependencies are there (a stub vite), and PATH is /usr/bin:/bin, which holds no pnpm
     // on most machines (corepack can put one there). :5173 may or may not answer here, so any

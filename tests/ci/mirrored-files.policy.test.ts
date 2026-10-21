@@ -20,6 +20,7 @@ const SIBLING = SIBLING_FROM_CANARY ?? join(process.cwd(), '..', 'clinozy-be');
 const COPIES = [
   'agent-os/shared-contract.json',
   'tooling/setup/agent/ensure-docker-daemon.sh',
+  'tooling/setup/agent/start-sonarqube.sh',
   'tooling/ci/early-failure-alert.d.mts',
   // clinozy-be's CI actions, copied rather than used as `albetrios/clinozy-be/...@<sha>`: the
   // runner downloads that whole repository, and its tracked `.mcp.json` and `.cursor/mcp.json`
