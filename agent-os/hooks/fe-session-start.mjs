@@ -283,7 +283,9 @@ async function frontendStatus() {
  * SonarQube for the pre-push gate (web), beside the dev server: `start-sonarqube.sh` (kept
  * byte-identical with clinozy-be's), launched detached. The script waits until no bring-up holds the
  * agent-stack lock and Docker answers, so the server's two-minute boot never competes with
- * clinozy-be's migrations and seed; the first push then finds it up instead of booting it.
+ * clinozy-be's migrations and seed; the first push then finds it up instead of booting it. Its
+ * first lock check comes after a 30-second settle window: clinozy-be's hook runs beside this one,
+ * and its bootstrap.sh may not hold the lock yet when this launches the script.
  */
 function startSonarQubeInBackground(stackDirectory) {
   const log = openSync(join(stackDirectory, 'sonarqube-frontend.log'), 'w', 0o600);

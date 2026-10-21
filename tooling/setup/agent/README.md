@@ -145,5 +145,8 @@ directory clinozy-be's bring-up uses); stop it with `pkill -s "$(cat /tmp/agent-
 Beside it the hook launches `start-sonarqube.sh`, detached. The script waits until no bring-up holds
 the agent-stack lock (clinozy-be's migrations and seed) and Docker answers, then starts this
 repository's SonarQube, so the first push finds the pre-push gate's server up instead of waiting
-about two minutes for it. Its log is `/tmp/agent-stack/sonarqube-frontend.log`; `SONAR=0` in the
-environment skips it, and the gate still starts SonarQube itself whenever it is not up.
+about two minutes for it. It first checks the lock after 30 seconds: clinozy-be's session-start hook
+runs at the same moment as this one, and its `bootstrap.sh` takes the lock a moment later, so a
+check at once could miss a bring-up that is just starting. Its log is
+`/tmp/agent-stack/sonarqube-frontend.log`; `SONAR=0` in the environment skips it, and the gate still
+starts SonarQube itself whenever it is not up.
