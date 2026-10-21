@@ -44,6 +44,34 @@
     {
       "value": "src/lib/__tmp-probe.tsx",
       "reason": "Throwaway file inside a worked example in fe-guard-authoring/SKILL.md — the snippet creates it, runs the gate against it, then rm -f's it. Never tracked, by design."
+    },
+    {
+      "value": "docs/integrations/claude-code-web-environment.md",
+      "reason": "clinozy-be path, named as \"its docs/integrations/claude-code-web-environment.md\" in agent-os/cloud-environment/agents-cloud.md (cross-repo)."
+    },
+    {
+      "value": "docs/deployment/launch-checklist.md",
+      "reason": "clinozy-be path, named as clinozy-be's launch checklist in docs/deployment/production-readiness.md (cross-repo)."
+    },
+    {
+      "value": "agent-os/hooks/.telemetry.log",
+      "reason": "Gitignored per-machine hook telemetry, written at runtime; agent-os/hooks/README.md documents where it lands."
+    },
+    {
+      "value": "docs/reference/project-tree.txt",
+      "reason": "Gitignored since #118: pnpm tool:project-structure-tree writes it from the live filesystem; skills and docs name where it lands."
+    },
+    {
+      "value": "tests/e2e/.e2e-auth-headers.json",
+      "reason": "Gitignored cache tests/utils/e2e-captcha.ts writes per run (E2E_AUTH_HEADERS_CACHE); fe-before-commit-guard names it so it is never committed."
+    },
+    {
+      "value": "tests/e2e/theme-shape.e2e.test.ts",
+      "reason": "Retired with the studio in 2026-10; docs/reference/theme-axis-audit-playbook.md names it as history."
+    },
+    {
+      "value": "src/shared/components/ui/chart.tsx",
+      "reason": "Dated review record (docs/reviews/2026-06-29-codebase-audit-loop.md) citing a file removed after that review; kept as written."
     }
   ],
   "symbols": [
