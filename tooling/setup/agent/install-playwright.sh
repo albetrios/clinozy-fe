@@ -8,8 +8,10 @@
 #
 #  1. Chromium is often PRE-INSTALLED (PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers,
 #     with PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 so npm postinstall never refetches
-#     it). Re-running `playwright install` there is a pointless ~150 MB download,
-#     so this script detects an existing browser and exits early.
+#     it), but not always the build the pinned @playwright/test drives — an image
+#     can ship chromium-1194 while the pin needs chromium-1248. So this script
+#     asks Playwright which build directories the pin needs and downloads only
+#     when one of them is missing, never a pointless ~150 MB re-download.
 #  2. Downloading browsers must never fail the bring-up. E2E additionally needs
 #     clinozy-be on :3000, which cloud sessions do not have, so the suite is
 #     opt-in anyway (tests/e2e/global-setup.ts fails fast when it is down).
@@ -32,31 +34,35 @@ fi
 
 browsers="chromium"
 
-# Already provisioned? The image exports PLAYWRIGHT_BROWSERS_PATH and unpacks
-# revision-suffixed dirs (chromium-1194, firefox-1489, …) beside plain names.
+# Already provisioned? Only the exact revisions the pin needs count: `--dry-run`
+# prints their install locations (chromium-1248, chromium_headless_shell-1248,
+# ffmpeg-1013, …) without downloading, and Playwright writes INSTALLATION_COMPLETE
+# into each directory once its download has finished.
 browsers_path="${PLAYWRIGHT_BROWSERS_PATH:-${HOME}/.cache/ms-playwright}"
+# shellcheck disable=SC2086
+required=$(pnpm exec playwright install --dry-run ${browsers} | sed -n 's/^ *Install location: *//p')
+if [ -z "${required}" ]; then
+  log "could not list the browser builds @playwright/test needs (playwright install --dry-run printed none)."
+  exit 1
+fi
 missing=""
-for b in ${browsers}; do
-  # shellcheck disable=SC2144  # intentional glob test: any revision dir counts
-  if [ -d "${browsers_path}/${b}" ] || [ -d "${browsers_path}/${b}"-* ]; then
-    continue
-  fi
-  missing="${missing} ${b}"
-done
+while IFS= read -r directory; do
+  [ -f "${directory}/INSTALLATION_COMPLETE" ] || missing="${missing} ${directory##*/}"
+done <<<"${required}"
 
 if [ -z "${missing}" ]; then
-  log "browsers already present in ${browsers_path}:${browsers:+ ${browsers}} — nothing to download."
+  log "browsers for the pinned @playwright/test already present in ${browsers_path} — nothing to download."
   exit 0
 fi
 
-log "installing:${missing} (into ${browsers_path})"
+log "missing for the pinned @playwright/test:${missing} — installing ${browsers} into ${browsers_path}"
 
 # PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD only guards npm postinstall; an explicit
 # `playwright install` still downloads, which is what we want here.
 # shellcheck disable=SC2086
-if pnpm exec playwright install ${missing} >&2; then
+if pnpm exec playwright install ${browsers} >&2; then
   log "browsers installed:${missing}"
 else
-  log "browser install failed — E2E will not run (needs playwright.azureedge.net / cdn.playwright.dev)."
+  log "browser install failed — E2E will not run (needs cdn.playwright.dev; ffmpeg also tries playwright.download.prss.microsoft.com)."
   exit 1
 fi

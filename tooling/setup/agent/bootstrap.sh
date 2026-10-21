@@ -232,12 +232,13 @@ pnpm agent-os:session-hooks >&2 || skip "agent-os:session-hooks failed (non-fata
 
 # 9) Playwright browsers -----------------------------------------------------
 step "[9/${TOTAL}] Playwright browsers (E2E)"
-bash "${AGENT_DIR}/install-playwright.sh" || true
 browsers_path="${PLAYWRIGHT_BROWSERS_PATH:-${HOME}/.cache/ms-playwright}"
-if ls -d "${browsers_path}"/chromium* >/dev/null 2>&1; then
-  ok "[9/${TOTAL}] chromium available in ${browsers_path}"
+# The installer's verdict, not a chromium* glob: an image's older chromium-<revision>
+# does not run the pinned @playwright/test.
+if bash "${AGENT_DIR}/install-playwright.sh"; then
+  ok "[9/${TOTAL}] chromium for the pinned @playwright/test available in ${browsers_path}"
 else
-  skip "[9/${TOTAL}] no browsers — E2E unavailable (also needs clinozy-be on :3000)"
+  skip "[9/${TOTAL}] no chromium build for the pinned @playwright/test — E2E unavailable (also needs clinozy-be on :3000)"
 fi
 
 # 10) App health (dev server serves the app shell) ---------------------------
