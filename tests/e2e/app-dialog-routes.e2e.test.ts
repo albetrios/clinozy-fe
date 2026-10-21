@@ -166,8 +166,19 @@ test.describe('Clinic dialog routes — deep links', () => {
 
   test('a record route reopens its drawer after a reload', async ({ page }) => {
     test.setTimeout(180_000);
-    await openNewClinic(page, { seed: true });
-    for (const route of RECORD_ROUTES) {
+    const { seed } = await openNewClinic(page, { seed: true });
+    // As in app-rooms: past the clinic's last slot today the seed books no appointment, so that
+    // room has no row to open. The step is left out and says why in the report.
+    const routes = RECORD_ROUTES.filter(
+      (route) => route.room !== 'appointments' || seed?.appointmentId,
+    );
+    if (routes.length < RECORD_ROUTES.length)
+      test.info().annotations.push({
+        type: 'skip',
+        description:
+          'appointments: no bookable slot is left today in the clinic’s time zone',
+      });
+    for (const route of routes) {
       await test.step(route.room, async () => {
         await openRoomFromShell(page, route.room, 'desktop');
         if (route.room === 'leads') await byTestId(page, 'leads-tab-all').click();
