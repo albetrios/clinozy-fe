@@ -1,5 +1,46 @@
 # Changelog
 
+## [1.18.0](https://github.com/albetrios/clinozy-fe/compare/v1.17.0...v1.18.0) (2026-10-21)
+
+
+### Added
+
+* **app:** show an unpaid clinic's read-only state and explain a refused save ([#95](https://github.com/albetrios/clinozy-fe/issues/95)) ([dbbf387](https://github.com/albetrios/clinozy-fe/commit/dbbf38714d189d23b6e51a7ad1a2451677d70f9d))
+
+
+### Fixed
+
+* **a11y:** a control's accessible name holds its visible text ([#148](https://github.com/albetrios/clinozy-fe/issues/148)) ([501fbb5](https://github.com/albetrios/clinozy-fe/commit/501fbb5d45d007c55c6648203c1b055e43434b0c)), closes [#136](https://github.com/albetrios/clinozy-fe/issues/136)
+* **agent-os:** hooks record fired or silent, and the report says why a hook is silent ([#133](https://github.com/albetrios/clinozy-fe/issues/133)) ([ac8d7ae](https://github.com/albetrios/clinozy-fe/commit/ac8d7aeec8b51599ee36bd975f68a3bd0f159c98))
+* **agent-os:** session hooks keep the ask rules added to the root by hand ([#127](https://github.com/albetrios/clinozy-fe/issues/127)) ([dce1eb3](https://github.com/albetrios/clinozy-fe/commit/dce1eb3cf7854c03952a85c0b9ca002fdd48de0c))
+* **agent-os:** the review pipelines carry the repository prefix ([#162](https://github.com/albetrios/clinozy-fe/issues/162)) ([213cf5e](https://github.com/albetrios/clinozy-fe/commit/213cf5e77dab0f71a7ba2400d8822dcfa1e86c46))
+* **agent:** cloud sessions go live sooner, with the frontend up and the sign-in code filled in ([#160](https://github.com/albetrios/clinozy-fe/issues/160)) ([692dbae](https://github.com/albetrios/clinozy-fe/commit/692dbaef6a86aa83c7bcad40951a9217c2e3aa37))
+* **auth:** align passkey registration with the clinozy-be WebAuthn contract ([#114](https://github.com/albetrios/clinozy-fe/issues/114)) ([2d41749](https://github.com/albetrios/clinozy-fe/commit/2d41749f0e3a80d862c5f18ca4c9c32a8ca6960d))
+* **auth:** keep the session when a step-up code is wrong ([#113](https://github.com/albetrios/clinozy-fe/issues/113)) ([4b7caf0](https://github.com/albetrios/clinozy-fe/commit/4b7caf09835f7090063d596760cee94842756da7)), closes [#98](https://github.com/albetrios/clinozy-fe/issues/98)
+* **ci:** a green post-merge run closes the ci-failure issue when release-please is skipped ([#158](https://github.com/albetrios/clinozy-fe/issues/158)) ([84ac353](https://github.com/albetrios/clinozy-fe/commit/84ac353ea0b98aff3f78d410d5714dff85aa8fdc))
+* **ci:** pull the backend image by the name clinozy-be pushes ([#126](https://github.com/albetrios/clinozy-fe/issues/126)) ([35500dc](https://github.com/albetrios/clinozy-fe/commit/35500dc8f335087806b3494be7969b92c5ca1ec8))
+* **dependabot:** auto-merge waits for a dependency bump's [@smoke](https://github.com/smoke) e2e ([#153](https://github.com/albetrios/clinozy-fe/issues/153)) ([76bc9ca](https://github.com/albetrios/clinozy-fe/commit/76bc9cadcdab1a35b10b251cc7c74f33289e5bdd))
+* **e2e:** the nightly full suite against the backend image passes ([#156](https://github.com/albetrios/clinozy-fe/issues/156)) ([fc39b51](https://github.com/albetrios/clinozy-fe/commit/fc39b51be08a4eea84b19c80c1168ba12a73b6ed))
+* **env:** a client variable named like a secret fails the env check ([#143](https://github.com/albetrios/clinozy-fe/issues/143)) ([5dcc89c](https://github.com/albetrios/clinozy-fe/commit/5dcc89cd6276b42e83e120f3998c99f72f819261))
+* **gates:** Dependabot PRs run the smoke e2e, and a ci-failure issue tracks main only ([#149](https://github.com/albetrios/clinozy-fe/issues/149)) ([0630805](https://github.com/albetrios/clinozy-fe/commit/0630805952a2e9993df2f4805230512507fea08e))
+* **gates:** the smaller gaps the drill found ([#144](https://github.com/albetrios/clinozy-fe/issues/144)) ([f4085e1](https://github.com/albetrios/clinozy-fe/commit/f4085e1dcd80e0f26df9f1513032c04e315ad5d6))
+* **items-field:** read a typed quantity whole instead of stripping its point ([#117](https://github.com/albetrios/clinozy-fe/issues/117)) ([0a12521](https://github.com/albetrios/clinozy-fe/commit/0a12521cac36845c011f58a6f685b0c298e432b5)), closes [#97](https://github.com/albetrios/clinozy-fe/issues/97)
+* **lint:** every layer block keeps the icon and toast import ban ([#138](https://github.com/albetrios/clinozy-fe/issues/138)) ([9e34799](https://github.com/albetrios/clinozy-fe/commit/9e347995a6158f068a35a8ccc6e159b5667d62f7))
+* **lint:** imports keep their extension and island, and a constant style is a class ([#145](https://github.com/albetrios/clinozy-fe/issues/145)) ([1de416e](https://github.com/albetrios/clinozy-fe/commit/1de416e9d859450c2daac3b782747661e836bed5))
+* **patients:** preserve updated timestamps in CSV exports ([#116](https://github.com/albetrios/clinozy-fe/issues/116)) ([9c309bc](https://github.com/albetrios/clinozy-fe/commit/9c309bce6fbfd5b85d9d58b156edf2fc4c95a085))
+* **pre-push:** a changed test runs the fixture policy first, and the policy sees every git call ([#139](https://github.com/albetrios/clinozy-fe/issues/139)) ([49c757f](https://github.com/albetrios/clinozy-fe/commit/49c757f92b1bd9f8e0c2c41d56ccda99ef2efdcf))
+* **pre-push:** a pushed agent-os change runs the integrity evals ([#157](https://github.com/albetrios/clinozy-fe/issues/157)) ([f19b011](https://github.com/albetrios/clinozy-fe/commit/f19b0119514ef1ff0b7361f921e0b6a909abc01b))
+* **pre-push:** run the selected tests for a hooks-only push ([#134](https://github.com/albetrios/clinozy-fe/issues/134)) ([060c110](https://github.com/albetrios/clinozy-fe/commit/060c110f9efaa90947f959c7aab2425c9e99df47))
+* **routes:** warm the root 404 before a notFound() renders it; refresh the go / no-go ([#93](https://github.com/albetrios/clinozy-fe/issues/93)) ([7ebb5a1](https://github.com/albetrios/clinozy-fe/commit/7ebb5a14ff47960f9a6423439817cf43f19a4be5))
+* **security:** the secret scan loads gitleaks' built-in rules ([#137](https://github.com/albetrios/clinozy-fe/issues/137)) ([228b516](https://github.com/albetrios/clinozy-fe/commit/228b51695faa1c5d9bd01122c575382d6d24104d))
+* **upload-tray:** step beneath an open modal so its footer stays clickable ([#115](https://github.com/albetrios/clinozy-fe/issues/115)) ([f7c8d39](https://github.com/albetrios/clinozy-fe/commit/f7c8d39ba4d838478360d1a8d0336f64bf0e77f6)), closes [#102](https://github.com/albetrios/clinozy-fe/issues/102)
+
+
+### Documentation
+
+* **claude:** the same task follows the same pattern in both repositories ([#131](https://github.com/albetrios/clinozy-fe/issues/131)) ([58a1049](https://github.com/albetrios/clinozy-fe/commit/58a104908bf4028cda1f59d172ea57c4a38b5795))
+* **pr-template:** a change to how a job gets its secrets names the run that proves it ([#155](https://github.com/albetrios/clinozy-fe/issues/155)) ([c73f5d1](https://github.com/albetrios/clinozy-fe/commit/c73f5d1eae997c2336a905421389d39a5fdefd0d))
+
 ## [1.17.0](https://github.com/albetrios/clinozy-fe/compare/v1.16.0...v1.17.0) (2026-10-16)
 
 
