@@ -43,6 +43,15 @@ describe('fe-gate-failure-hint.mjs', () => {
     expect(telemetry).toBe('fe-gate-failure-hint,PostToolUseFailure,fired');
   });
 
+  it('names --silent when pnpm rejects the -s shorthand', () => {
+    const { result, telemetry } = failedCommand('pnpm -s sync:check');
+    expect(result.stdout).toContain(
+      'pnpm 12 has no -s shorthand → pnpm --silent <script>',
+    );
+    expect(telemetry).toBe('fe-gate-failure-hint,PostToolUseFailure,fired');
+    expect(failedCommand('pnpm sync:check --since 5m').result.stdout).toBe('');
+  });
+
   it('stays quiet for an ordinary failed command and records silent', () => {
     const { result, telemetry } = failedCommand('grep -q missing README.md');
     expect(result.status).toBe(0);
