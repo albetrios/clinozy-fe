@@ -122,7 +122,7 @@ test.describe.serial('MFA — TOTP enrollment and challenge login', () => {
 
   test('enrolls a TOTP factor through step-up + enroll + confirm', async () => {
     const session = await createSessionViaEmailCode(api, email);
-    signInCode = await pollVerificationCodeFromMailOutbox(email);
+    signInCode = session.code;
     const bearer = { Authorization: `Bearer ${session.accessToken}` };
 
     // Bootstrap step-up: a fresh emailed code (the sign-in consumed the first).

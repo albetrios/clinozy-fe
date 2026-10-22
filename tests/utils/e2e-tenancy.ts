@@ -1,6 +1,9 @@
 import { type APIRequestContext, type APIResponse, expect } from '@playwright/test';
+import pg from 'pg';
 
 import { e2eTeamOrgProfile } from './e2e-faker.ts';
+import { requireDatabaseUrl } from './e2e-session.ts';
+import { echoedInvitationToken } from './e2e-verification-code.ts';
 
 const API = '/api/v1';
 
@@ -88,29 +91,88 @@ async function resolveMemberRoleId(
   return memberRole.id;
 }
 
-/** Creates a pending member invitation in the active team org (owner must have switched in). */
+/** A `sub_` public id: the prefix and 21 characters of [a-z0-9], as clinozy-be mints them. */
+function subscriptionPublicId(): string {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const bytes = crypto.getRandomValues(new Uint8Array(21));
+  return `sub_${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join('')}`;
+}
+
+/**
+ * Gives the clinic `slug` room to invite: an ACTIVE subscription, with no payment provider, on the
+ * cheapest active plan with more than one seat. A new clinic is on Free, whose one seat its owner
+ * holds, so every invite would answer `409 seat_limit_reached`; a paid plan needs Stripe, which no
+ * local or CI stack here has. Written straight to clinozy-be Postgres (DATABASE_URL); a clinic
+ * that already has a live subscription keeps it. Throws when no seat could be granted.
+ */
+export async function grantInvitableSeats(slug: string): Promise<void> {
+  const client = new pg.Client({ connectionString: requireDatabaseUrl() });
+  await client.connect();
+  try {
+    await client.query(
+      `INSERT INTO billing.subscriptions
+         (public_id, organization_id, plan_id, billing_cycle, status,
+          current_period_start, current_period_end)
+       SELECT $1, organization.id, plan.id, 'MONTHLY', 'ACTIVE', now(), now() + interval '30 days'
+       FROM tenancy.organizations AS organization,
+         LATERAL (
+           SELECT id FROM billing.plans
+           WHERE is_active AND (included_seats IS NULL OR included_seats > 1)
+           ORDER BY included_seats IS NULL, price_monthly, included_seats
+           LIMIT 1
+         ) AS plan
+       WHERE organization.slug = $2
+         AND NOT EXISTS (
+           SELECT 1 FROM billing.subscriptions AS live
+           WHERE live.organization_id = organization.id AND live.status <> 'CANCELED'
+         )`,
+      [subscriptionPublicId(), slug],
+    );
+    const granted = await client.query(
+      `SELECT 1 FROM billing.subscriptions AS live
+       JOIN tenancy.organizations AS organization ON organization.id = live.organization_id
+       JOIN billing.plans AS plan ON plan.id = live.plan_id
+       WHERE organization.slug = $1 AND live.status = 'ACTIVE'
+         AND (plan.included_seats IS NULL OR plan.included_seats > 1)`,
+      [slug],
+    );
+    if (granted.rowCount === 0) {
+      throw new Error(
+        `grantInvitableSeats: no multi-seat subscription for clinic "${slug}" (no such clinic, or no active plan with more than one seat)`,
+      );
+    }
+  } finally {
+    await client.end();
+  }
+}
+
+/**
+ * Creates a pending member invitation in a new team org, with seats granted first.
+ * `invitationToken` is the accept token clinozy-be echoes on the answer, or `null`
+ * where it does not echo — then read it from the email (`pollInvitationTokenFromMailOutbox`).
+ */
 export async function createTeamInvitation(
   api: APIRequestContext,
   ownerToken: string,
   inviteeEmail: string,
   opts?: { slug?: string; name?: string },
-): Promise<{ invitationId: string; orgSlug: string; teamToken: string }> {
+): Promise<{
+  invitationId: string;
+  invitationToken: string | null;
+  orgSlug: string;
+  teamToken: string;
+}> {
   const { org, teamToken } = await createTeamOrganization(api, ownerToken, opts);
   if (!org?.slug) {
     throw new Error('createTeamInvitation: team org slug missing');
   }
+  await grantInvitableSeats(org.slug);
   const roleId = await resolveMemberRoleId(api, teamToken);
   const res = await api.post(`${API}/tenancy/organization/memberships`, {
     headers: bearerHeaders(teamToken, true),
     data: { email: inviteeEmail, role_ids: [roleId] },
   });
   if (res.status() !== 200) {
-    if (res.status() === 409) {
-      const body = (await res.json()) as { error?: { reason?: string } };
-      if (body.error?.reason === 'seat_limit_reached') {
-        throw new Error('SEAT_LIMIT_REACHED');
-      }
-    }
     throw new Error(
       `create membership invite failed: ${res.status()} ${await res.text()}`,
     );
@@ -124,5 +186,10 @@ export async function createTeamInvitation(
       'createTeamInvitation: invitation id missing from membership response',
     );
   }
-  return { invitationId, orgSlug: org.slug, teamToken };
+  return {
+    invitationId,
+    invitationToken: await echoedInvitationToken(res),
+    orgSlug: org.slug,
+    teamToken,
+  };
 }

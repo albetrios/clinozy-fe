@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { echoedVerificationCode } from '@/tests/utils/e2e-verification-code.ts';
+import {
+  echoedInvitationToken,
+  echoedVerificationCode,
+} from '@/tests/utils/e2e-verification-code.ts';
 
 // Every browser spec signs in through `createSessionViaEmailCode`, and that now
 // takes the code from clinozy-be's `send-code` echo before it falls back to polling
@@ -40,5 +43,41 @@ describe('E2E sign-in code: echo first, outbox as the fallback', () => {
     };
 
     await expect(echoedVerificationCode(response)).resolves.toBeNull();
+  });
+});
+
+// The invite journeys take the accept token the same way: clinozy-be's add-member
+// echo first, the emailed link in `auth.mail_outbox` as the fallback.
+describe('E2E invitation token: echo first, outbox as the fallback', () => {
+  it('returns the token clinozy-be echoes on the add-member answer', async () => {
+    const response = respond({
+      data: {
+        id: 'mem_a1b2c3d4e5f6g7h8i9j0k',
+        invitation: { id: 'inv_a1b2c3d4e5f6g7h8i9j0k', debug_invitation_token: 'tok-1' },
+      },
+    });
+
+    expect(await echoedInvitationToken(response)).toBe('tok-1');
+  });
+
+  it.each([
+    ['a backend that does not echo', { data: { invitation: { id: 'inv_x' } } }],
+    ['a membership with no invitation', { data: { invitation: null } }],
+    ['an empty echo', { data: { invitation: { debug_invitation_token: '' } } }],
+    [
+      'an echo of the wrong type',
+      { data: { invitation: { debug_invitation_token: 7 } } },
+    ],
+    ['a null body', null],
+  ])('returns null for %s — the caller then polls the outbox', async (_label, body) => {
+    expect(await echoedInvitationToken(respond(body))).toBeNull();
+  });
+
+  it('returns null, not a rejection, when the body is not JSON', async () => {
+    const response = {
+      json: () => Promise.reject(new SyntaxError('Unexpected token <')),
+    };
+
+    await expect(echoedInvitationToken(response)).resolves.toBeNull();
   });
 });

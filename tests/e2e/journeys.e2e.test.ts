@@ -58,22 +58,11 @@ test.describe('Product journeys', () => {
     });
     try {
       const ownerToken = (await createSessionViaEmailCode(ownerApi)).accessToken;
-      let invitationId: string;
-      let orgSlug: string;
-      try {
-        ({ invitationId, orgSlug } = await createTeamInvitation(
-          ownerApi,
-          ownerToken,
-          inviteeEmail,
-        ));
-      } catch (error) {
-        if (error instanceof Error && error.message === 'SEAT_LIMIT_REACHED') {
-          test.skip(true, 'team org seat limit reached in local billing seed');
-          return;
-        }
-        throw error;
-      }
-      const invitationToken = await pollInvitationTokenFromMailOutbox(inviteeEmail);
+      const invitation = await createTeamInvitation(ownerApi, ownerToken, inviteeEmail);
+      const { invitationId, orgSlug } = invitation;
+      const invitationToken =
+        invitation.invitationToken ??
+        (await pollInvitationTokenFromMailOutbox(inviteeEmail));
 
       const inviteeSession = await createSessionViaEmailCode(inviteeApi, inviteeEmail);
 

@@ -131,12 +131,14 @@ export async function pollInvitationTokenFromMailOutbox(email: string): Promise<
 /**
  * Creates a session via passwordless email send-code + login against clinozy-be on :3000.
  * Takes the code from the send-code echo when the backend provides one; otherwise
- * reads it from auth.mail_outbox, which needs DATABASE_URL.
+ * reads it from auth.mail_outbox, which needs DATABASE_URL. Returns the code it signed
+ * in with: a running mail worker scrubs the outbox row once it is sent, so a caller
+ * cannot read it back from there.
  */
 export async function createSessionViaEmailCode(
   api: APIRequestContext,
   email = uniqueE2eEmail(),
-): Promise<{ email: string; accessToken: string }> {
+): Promise<{ email: string; accessToken: string; code: string }> {
   const send = await withApiRetry(() =>
     api.post(`${API}${API_ENDPOINTS.AUTH.EMAIL_CODE_SEND}`, {
       data: { email },
@@ -178,5 +180,5 @@ export async function createSessionViaEmailCode(
     );
   }
 
-  return { email, accessToken };
+  return { email, accessToken, code };
 }

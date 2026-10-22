@@ -28,3 +28,23 @@ export async function echoedVerificationCode(
   const code = body?.data?.debug_verification_code;
   return typeof code === 'string' && code.length > 0 ? code : null;
 }
+
+/**
+ * The invitation accept token clinozy-be echoes on the add-member answer
+ * (`POST /tenancy/organization/memberships` → `data.invitation.debug_invitation_token`)
+ * when `MEMBERSHIP_INVITATION_TOKEN_ECHO_ENABLED` is on — local and development only —
+ * or `null` on a backend that does not echo.
+ *
+ * Prefer it to `mail_outbox` for the reason above, and one more: a running mail
+ * worker scrubs a sent row's HTML, so the emailed accept link can be gone before a
+ * spec reads it. The outbox stays as the fallback (a stack with no worker keeps it).
+ */
+export async function echoedInvitationToken(
+  response: JsonResponse,
+): Promise<string | null> {
+  const body = (await response.json().catch(() => null)) as {
+    data?: { invitation?: { debug_invitation_token?: unknown } | null };
+  } | null;
+  const token = body?.data?.invitation?.debug_invitation_token;
+  return typeof token === 'string' && token.length > 0 ? token : null;
+}
