@@ -65,8 +65,8 @@ The file→skill map these hooks consult lives in
   `/home/user/.claude/settings.json`. `pnpm agent-os:session-hooks`
   ([`tooling/agent-os/session-hooks.ts`](../../tooling/agent-os/session-hooks.ts), run by the cloud
   bootstrap's step 8) writes every repository's hooks there with absolute paths and
-  `CLAUDE_PROJECT_DIR="<repository>"` in front of each command; it is a no-op in a
-  single-repository checkout. Canary: the SessionStart context names the root the hooks ran from
+  `CLAUDE_PROJECT_DIR="<repository>"` in front of each command, and `/home/user/.mcp.json` with
+  each repository's codegraph server; it is a no-op in a single-repository checkout. Canary: the SessionStart context names the root the hooks ran from
   (`clinozy-fe session ready (hooks from …)`), and each run adds a `fe-session-start` row to the
   gitignored `agent-os/hooks/.telemetry.log`.
 

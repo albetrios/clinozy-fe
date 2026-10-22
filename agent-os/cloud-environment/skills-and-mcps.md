@@ -9,10 +9,17 @@ stack notes are in [`agents-cloud.md`](agents-cloud.md).
 `install.sh` installs the **default pair** and scaffolds
 [`.mcp.json`](../../.mcp.json) via `pnpm mcp:setup:default`:
 
-| Server         | Command                           | Notes                               |
-| -------------- | --------------------------------- | ----------------------------------- |
-| `fe-codegraph` | `pnpm exec codegraph serve --mcp` | Code intelligence (devDependency)   |
-| `fe-headroom`  | `pnpm exec headroom mcp serve`    | Context compression (devDependency) |
+| Server         | Command                                          | Notes                                                    |
+| -------------- | ------------------------------------------------ | -------------------------------------------------------- |
+| `fe-codegraph` | `pnpm exec codegraph serve --mcp`                | Code intelligence (devDependency)                        |
+| `fe-headroom`  | `uvx --from headroom-ai[mcp] headroom mcp serve` | Context compression (`install-headroom.sh` pre-warms it) |
+
+A session that holds both repos runs from their parent (`/home/user`), where neither
+`.mcp.json` is read. `pnpm agent-os:session-hooks` writes `/home/user/.mcp.json` with each
+repo's codegraph, pointed at it with `--path` (`fe-codegraph` runs the repo's
+`node_modules/.bin/codegraph`), and one user-level `headroom` serves both: `install-headroom.sh`
+registers it. Claude Code connects MCP servers when it starts, so a change loads at the next
+start.
 
 On-demand servers (`chrome-devtools`, `fe-context7`, `clinozy-be-api`, `fe-semgrep`,
 `shadcn`, `fe-sonarqube`, `tailwindcss`): `pnpm mcp:setup <name>`. `chrome-devtools`
