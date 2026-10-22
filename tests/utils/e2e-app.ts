@@ -282,28 +282,37 @@ export async function seedClinic(
   );
 
   const date = appToday(new Date(), organization.timezone);
-  const slots = await seedData<{ slots: { start_time: string }[] }>(
-    await read(
-      `/app/appointments/slots?branch_id=${branch.id}&appointment_date=${date}` +
-        `&duration_minutes=15&doctor_membership_id=${ownerId}`,
-    ),
-    'slots',
-  );
-  const start = slots.slots[0]?.start_time;
-  const appointment = start
-    ? await seedData<{ id: string }>(
-        await write('/app/appointments', {
-          contact_id: patient.contact_id,
-          branch_id: branch.id,
-          doctor_membership_id: ownerId,
-          appointment_date: date,
-          start_time: start,
-          type: 'consultation',
-          offering_id: offering.id,
-          duration_minutes: 15,
-        }),
-        'appointment',
-      )
+  // Books today's first free start, or answers null when none is left.
+  const bookFirstFreeStart = async () => {
+    const slots = await seedData<{ slots: { start_time: string }[] }>(
+      await read(
+        `/app/appointments/slots?branch_id=${branch.id}&appointment_date=${date}` +
+          `&duration_minutes=15&doctor_membership_id=${ownerId}`,
+      ),
+      'slots',
+    );
+    const start = slots.slots[0]?.start_time;
+    if (!start) return null;
+    return write('/app/appointments', {
+      contact_id: patient.contact_id,
+      branch_id: branch.id,
+      doctor_membership_id: ownerId,
+      appointment_date: date,
+      start_time: start,
+      type: 'consultation',
+      offering_id: offering.id,
+      duration_minutes: 15,
+    });
+  };
+  // The free starts include one in the current minute; booked after the minute turns, it answers
+  // 409 slot_in_past. Then the starts are read again and the next one is booked.
+  let booked = await bookFirstFreeStart();
+  if (booked?.status() === 409) {
+    const refused = (await booked.json()) as { error?: { reason?: string } };
+    if (refused.error?.reason === 'slot_in_past') booked = await bookFirstFreeStart();
+  }
+  const appointment = booked
+    ? await seedData<{ id: string }>(booked, 'appointment')
     : null;
 
   return {

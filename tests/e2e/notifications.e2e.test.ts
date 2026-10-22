@@ -1,11 +1,15 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  loginViaEmailCodeUI,
+  establishSessionInPage,
   navigateInApp,
   registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
-import { openAccountMenu, openNotificationCenter } from '@/tests/utils/e2e-hybrid.ts';
+import {
+  gotoApp,
+  openAccountMenu,
+  openNotificationCenter,
+} from '@/tests/utils/e2e-hybrid.ts';
 import {
   createSessionViaEmailCode,
   uniqueE2eEmail,
@@ -34,7 +38,7 @@ test.describe('Notifications (from a declined invitation)', () => {
     try {
       const owner = await createSessionViaEmailCode(api);
       const inviteeEmail = uniqueE2eEmail('declines');
-      const { invitationId, orgSlug } = await createTeamInvitation(
+      const { invitationId, orgSlug, teamToken } = await createTeamInvitation(
         api,
         owner.accessToken,
         inviteeEmail,
@@ -46,7 +50,11 @@ test.describe('Notifications (from a declined invitation)', () => {
       );
       expect(declined.status()).toBe(200);
 
-      await loginViaEmailCodeUI(page, owner.email);
+      // The owner is signed in already (above): the page takes that session. A second email-code
+      // sign-in within a minute would get no new code (clinozy-be's per-address resend
+      // cooldown) and, where send-code echoes none, read back the code already used.
+      await gotoApp(page, '/login');
+      await establishSessionInPage(page, teamToken);
       // Into the clinic by its address: where personal workspaces are on, a fresh sign-in
       // starts outside it, on the picker.
       await navigateInApp(page, `/organization/${orgSlug}`);
