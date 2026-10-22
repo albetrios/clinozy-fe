@@ -32,11 +32,11 @@ export default defineConfig({
   // `process.env`, which Vite's loadEnv copies in regardless, so the plugin strips those
   // first. Both halves together are what keeps the suite on schema defaults on every
   // machine + CI. Pinned by tests/ci/env-hermetic.policy.test.ts.
-  envDir: path.resolve(__dirname, 'tooling/test/empty-env'),
+  envDir: path.resolve(import.meta.dirname, 'tooling/test/empty-env'),
   resolve: {
     alias: {
-      '@/tests': path.resolve(__dirname, './tests'),
-      '@': path.resolve(__dirname, './src'),
+      '@/tests': path.resolve(import.meta.dirname, './tests'),
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
   test: {

@@ -27,7 +27,7 @@ describe('test env hermeticity', () => {
   it('vitest.config.ts points envDir at the empty env dir', () => {
     const config = readFileSync(join(ROOT, 'vitest.config.ts'), 'utf8');
     expect(config).toMatch(
-      /envDir:\s*path\.resolve\(__dirname,\s*['"]tooling\/test\/empty-env['"]\)/,
+      /envDir:\s*path\.resolve\(import\.meta\.dirname,\s*['"]tooling\/test\/empty-env['"]\)/,
     );
   });
 

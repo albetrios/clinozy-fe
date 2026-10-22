@@ -42,7 +42,7 @@ export default defineConfig(({ command, mode }) => {
   // hand. Read here, before any env file loads, so a value written in a file never turns
   // uploads on — a local build is a test build and never creates a Sentry release.
   const uploadSourceMaps = process.env.SENTRY_UPLOAD_SOURCEMAPS === 'true';
-  const envDir = applyBuildEnvironment({ command, root: path.resolve(__dirname) });
+  const envDir = applyBuildEnvironment({ command, root: import.meta.dirname });
   const env = loadEnv(mode, envDir, '');
   if (command === 'build' && uploadSourceMaps && !env.SENTRY_AUTH_TOKEN) {
     console.warn(
@@ -161,8 +161,8 @@ export default defineConfig(({ command, mode }) => {
 
     resolve: {
       alias: {
-        '@/tests': path.resolve(__dirname, './tests'),
-        '@': path.resolve(__dirname, './src'),
+        '@/tests': path.resolve(import.meta.dirname, './tests'),
+        '@': path.resolve(import.meta.dirname, './src'),
       },
     },
 

@@ -263,7 +263,7 @@ describe('build environment', () => {
 
     const config = readFileSync(join(ROOT, 'vite.config.ts'), 'utf8');
     expect(config).toMatch(
-      /const envDir = applyBuildEnvironment\(\{ command, root: path\.resolve\(__dirname\) \}\);\s*const env = loadEnv\(mode, envDir, ''\);/,
+      /const envDir = applyBuildEnvironment\(\{ command, root: import\.meta\.dirname \}\);\s*const env = loadEnv\(mode, envDir, ''\);/,
     );
     expect(config).toMatch(/return \{\s*envDir,/);
   });
