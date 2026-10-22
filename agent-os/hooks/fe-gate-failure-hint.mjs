@@ -2,7 +2,8 @@
 // Claude Code PostToolUseFailure hook (Bash) for clinozy-fe.
 //
 // When a known clinozy-fe gate fails, inject a concise hint with the fix command + owning skill —
-// turning a raw non-zero exit into a fix path. Scoped to gates only: an ordinary failed command
+// turning a raw non-zero exit into a fix path. The one non-gate rule is the pnpm flag pnpm 12
+// rejects outright (`-s`), so the next try is right. Scoped to those: an ordinary failed command
 // (a grep with no match, a test mid-TDD) produces no output, so this never nags.
 //
 // Adds context via hookSpecificOutput.additionalContext (PostToolUseFailure cannot block — the
@@ -12,6 +13,10 @@ import { recordTelemetry } from './_fe-telemetry.mjs';
 
 /** The fix hint each failed gate implies, matched on the lowercased command, in order. */
 const GATE_HINTS = [
+  [
+    /\bpnpm\s+-s\b/,
+    'pnpm 12 has no -s shorthand → pnpm --silent <script>, or plain pnpm <script>',
+  ],
   [
     /validate:tokens/,
     'raw color token → use semantic tokens (bg-background/text-success/bg-brand), never raw palette; vendored components/ui/ is exempt (frontend-design)',
@@ -63,7 +68,7 @@ if (hints.length > 0) {
   addModelContext({
     event: 'PostToolUseFailure',
     context: [
-      '⚡ clinozy-fe gate failed — likely fix:',
+      '⚡ clinozy-fe command failed — likely fix:',
       ...hints.map((hint) => `  • ${hint}`),
       'Skill map: agent-os/docs/skill-triggers.md',
     ].join('\n'),
