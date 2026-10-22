@@ -12,6 +12,12 @@ name: E2E against the backend image
 # (Dependabot #119) passed PR CI, merged, and kept main's run red for 9 h. Only Dependabot's PRs:
 # a person's dependency change is reviewed with the code that needs it, and main's run follows.
 #
+# The organization mode follows the variable settings: the job reads the development
+# environment's VITE_PERSONAL_ORGANIZATIONS / VITE_TEAM_ORGANIZATIONS (as preview.yml does; only
+# its variables, the backend stays this job's own container), builds the app with them, and boots
+# the backend in the same mode. clinozy-be no longer sends deployment flags, so without this the
+# app and the backend could each run a different mode, and the team-only specs never ran.
+#
 # Pulling the image needs read access for this repository on the backend's GHCR package (package
 # settings → Manage Actions access) while that package is private.
 on:
@@ -53,10 +59,15 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # For its variables only (no protection → no gate, no branch policy): the organization mode.
+    environment: development
     permissions:
       contents: read
       packages: read
     env:
+      # The organization mode the deployed app is built with; empty when a variable is unset.
+      VITE_PERSONAL_ORGANIZATIONS: ${{ vars.VITE_PERSONAL_ORGANIZATIONS }}
+      VITE_TEAM_ORGANIZATIONS: ${{ vars.VITE_TEAM_ORGANIZATIONS }}
       # clinozy-be pushes ghcr.io/<owner>/<repository>/<image> (reusable-docker-build-trivy.yml:
       # "ghcr.io/${repository_lowercase}/${API_IMAGE}"), so the repository is part of the name.
       BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api:latest
@@ -120,6 +131,22 @@ jobs:
             -e AUDIT_RETENTION_DAYS -e AUTH_SESSION_RETENTION_DAYS -e METRICS_SCRAPE_TOKEN
             -e SECRETS_ENCRYPTION_KEY -e GLOBAL_ADMIN_EMAILS
           )
+          # The backend runs the app's organization mode. A set variable is off when "false" and
+          # on otherwise, as the app reads it (resolveDeploymentOverride); an unset one leaves the
+          # backend on its default, as it leaves the app on its own. Never pass it empty: the
+          # backend reads an empty flag as false.
+          organization_flag() {
+            case "$1" in
+              '') ;;
+              false) echo false ;;
+              *) echo true ;;
+            esac
+          }
+          personal="$(organization_flag "$VITE_PERSONAL_ORGANIZATIONS")"
+          team="$(organization_flag "$VITE_TEAM_ORGANIZATIONS")"
+          if [ -n "$personal" ]; then backend_env+=(-e "PERSONAL_ORGANIZATION_ENABLED=$personal"); fi
+          if [ -n "$team" ]; then backend_env+=(-e "TEAM_ORGANIZATION_ENABLED=$team"); fi
+          echo "Organization mode: personal ${personal:-default}, team ${team:-default}"
           # The backend's one database step, compiled: create if missing, migrate, then permissions
           # and plans — what clinic provisioning needs; the suite creates its own clinics and users.
           # (The full demo seed needs dev dependencies the image does not have.) An image built
