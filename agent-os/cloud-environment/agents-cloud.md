@@ -69,8 +69,8 @@ Ten steps, in order:
    only `sync` it. Last, `pnpm agent-os:session-hooks` registers the hooks: a
    session that holds both repos takes them only from `/home/user/.claude/settings.json`,
    so it writes both repos' hooks there, each with absolute paths and its own
-   `CLAUDE_PROJECT_DIR`, and `/home/user/.mcp.json` with each repo's codegraph server, pointed
-   at it with `--path` (a no-op with one repo). Each repo's file hooks then act only on its own files. To check it in a
+   `CLAUDE_PROJECT_DIR`, and registers each repo's codegraph server at user level
+   (`~/.claude.json`), pointed at it with `--path` (a no-op with one repo). Each repo's file hooks then act only on its own files. To check it in a
    new session, look for one "session ready (hooks from …)" line per repo in the
    session context.
 9. **Playwright browsers** — skipped when the image already ships them.
