@@ -211,6 +211,8 @@ test.describe('Clinic rooms write through to clinozy-be', () => {
     await form.getByTestId('appointment-form-who-search').fill('Asha');
     await form.getByTestId('appointment-form-who-hit').first().click();
     await expect(form.getByTestId('appointment-form-who-card')).toContainText('Asha');
+    // Step 1 ends with "Next: Date & time →"; the slot grid lives in step 2.
+    await form.getByTestId('appointment-form-details-next').click();
     const slots = form.getByTestId('appointment-form-slot-time');
     const hasFreeStart = await slots
       .first()
