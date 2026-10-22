@@ -17,10 +17,9 @@ const API = '/api/v1';
 
 /**
  * A real notification, made the way clinozy-be makes one (D84): a clinic's owner invites
- * someone, they decline, and the owner is told. Inviting needs a free seat, and a local
- * clinic's Free plan holds one — so where the local billing seed has no room the invite is
- * answered `409 seat_limit_reached` and the test skips, as the other invite journeys do. The
- * empty inbox needs nothing, so it runs on a fresh account below.
+ * someone, they decline, and the owner is told. Inviting needs a free seat, which
+ * `createTeamInvitation` grants the new clinic first (its Free plan holds only the owner's).
+ * The empty inbox needs nothing, so it runs on a fresh account below.
  */
 test.describe('Notifications (from a declined invitation)', () => {
   test('the owner sees the decline in the notification center, counted', async ({
@@ -35,20 +34,11 @@ test.describe('Notifications (from a declined invitation)', () => {
     try {
       const owner = await createSessionViaEmailCode(api);
       const inviteeEmail = uniqueE2eEmail('declines');
-      let invitationId: string;
-      let orgSlug: string;
-      try {
-        ({ invitationId, orgSlug } = await createTeamInvitation(
-          api,
-          owner.accessToken,
-          inviteeEmail,
-        ));
-      } catch (error) {
-        if (error instanceof Error && error.message === 'SEAT_LIMIT_REACHED') {
-          test.skip(true, 'team org seat limit reached in local billing seed');
-        }
-        throw error;
-      }
+      const { invitationId, orgSlug } = await createTeamInvitation(
+        api,
+        owner.accessToken,
+        inviteeEmail,
+      );
       const invitee = await createSessionViaEmailCode(api, inviteeEmail);
       const declined = await api.post(
         `${API}/tenancy/membership-invitations/${invitationId}/decline`,
