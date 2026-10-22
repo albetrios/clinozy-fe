@@ -15,8 +15,8 @@ stack notes are in [`agents-cloud.md`](agents-cloud.md).
 | `fe-headroom`  | `uvx --from headroom-ai[mcp] headroom mcp serve` | Context compression (`install-headroom.sh` pre-warms it) |
 
 A session that holds both repos runs from their parent (`/home/user`), where neither
-`.mcp.json` is read. `pnpm agent-os:session-hooks` writes `/home/user/.mcp.json` with each
-repo's codegraph, pointed at it with `--path` (`fe-codegraph` runs the repo's
+`.mcp.json` is read, so its servers are user-level (`~/.claude.json`): `pnpm agent-os:session-hooks`
+registers each repo's codegraph there, pointed at it with `--path` (`fe-codegraph` runs the repo's
 `node_modules/.bin/codegraph`), and one user-level `headroom` serves both: `install-headroom.sh`
 registers it. Claude Code connects MCP servers when it starts, so a change loads at the next
 start. Each server gets 3 minutes to start: `agent-os/platforms/claude/settings.json` sets

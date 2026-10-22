@@ -30,6 +30,7 @@ import {
   readFileSync,
   writeFileSync,
 } from 'node:fs';
+import { homedir } from 'node:os';
 import { delimiter, join } from 'node:path';
 
 import { addModelContext, readHookPayload, repositoryRoot } from './_fe-hook.mjs';
@@ -196,6 +197,26 @@ function mcpStatus() {
     'scaffolded .mcp.json via pnpm mcp:setup; set CONTEXT7_API_KEY in .env.local.',
   );
   return `${declaredServerCount()} scaffolded (full set)`;
+}
+
+/**
+ * The user-level MCP servers (`~/.claude.json`): Claude Code loads them wherever the session
+ * starts, and they are all a session that holds several repositories gets — it runs from their
+ * parent, where no repository's `.mcp.json` is read (tooling/agent-os/session-hooks.ts registers
+ * each repository's codegraph there, install-headroom.sh the one headroom).
+ */
+function userLevelServers() {
+  try {
+    const config = JSON.parse(
+      readFileSync(
+        join(process.env.CLAUDE_CONFIG_DIR || homedir(), '.claude.json'),
+        'utf8',
+      ),
+    );
+    return Object.keys(config.mcpServers ?? {}).join(', ') || 'none';
+  } catch {
+    return 'none';
+  }
 }
 
 /** The `gh` version, or `absent`. */
@@ -369,7 +390,7 @@ async function sessionContext(source) {
   const node = provisionNode(requiredMajor);
   installDependencies({ node, requiredMajor });
   const frontend = await frontendStatus();
-  const mcp = mcpStatus();
+  const mcp = `${mcpStatus()} · user-level mcp ${userLevelServers()}`;
   const dependencies = isExecutable(join(repositoryRoot, 'node_modules', '.bin', 'vite'))
     ? 'installed'
     : 'missing';

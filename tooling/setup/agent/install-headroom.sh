@@ -63,7 +63,7 @@ fi
 
 # One headroom for the whole session, registered at user level. A session that holds clinozy-fe
 # and clinozy-be runs from their parent directory, where neither repository's .mcp.json is read
-# (tooling/agent-os/session-hooks.ts declares only each repository's codegraph there), and
+# (tooling/agent-os/session-hooks.ts registers each repository's codegraph at user level too), and
 # headroom keeps no repository state. clinozy-be registers its pip-installed headroom with
 # `headroom mcp install`; under uvx that command would register uv's cache path, which a cache
 # clean removes, so this registers fe-headroom's own uvx command. An existing one is kept.
