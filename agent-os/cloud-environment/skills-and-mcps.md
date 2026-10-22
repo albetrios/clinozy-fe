@@ -19,7 +19,10 @@ A session that holds both repos runs from their parent (`/home/user`), where nei
 repo's codegraph, pointed at it with `--path` (`fe-codegraph` runs the repo's
 `node_modules/.bin/codegraph`), and one user-level `headroom` serves both: `install-headroom.sh`
 registers it. Claude Code connects MCP servers when it starts, so a change loads at the next
-start.
+start. Each server gets 3 minutes to start: `agent-os/platforms/claude/settings.json` sets
+`env.MCP_TIMEOUT` to `180000`, carried to the parent by `pnpm agent-os:session-hooks`. The
+default is 30 s, and on a freshly booted container codegraph and headroom started about 55 s
+after launch; the first reply still waits at most 5 s for MCP servers.
 
 On-demand servers (`chrome-devtools`, `fe-context7`, `clinozy-be-api`, `fe-semgrep`,
 `shadcn`, `fe-sonarqube`, `tailwindcss`): `pnpm mcp:setup <name>`. `chrome-devtools`
