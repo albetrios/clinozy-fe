@@ -13,7 +13,8 @@ import {
   uniqueE2eEmail,
   verifyDatabaseConnection,
 } from '@/tests/utils/e2e-session.ts';
-import { bearerHeaders } from '@/tests/utils/e2e-tenancy.ts';
+import { bearerHeaders, grantInvitableSeats } from '@/tests/utils/e2e-tenancy.ts';
+import { echoedInvitationToken } from '@/tests/utils/e2e-verification-code.ts';
 
 const HOST = 'http://localhost:3000';
 const API = `${HOST}/api/v1`;
@@ -110,6 +111,8 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
     try {
       await registerNewUserAndGoToToday(page);
       const { slug } = await createTeamOrgAndOpenToday(page);
+      // A new clinic's Free plan holds only the owner's seat: give it room to invite.
+      await grantInvitableSeats(slug);
 
       // Invite through the Users room's "New user" — the members surface (D17).
       await navigateInApp(page, `/organization/${slug}/users/create`);
@@ -122,25 +125,22 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
         { timeout: 15_000 },
       );
       await byTestId(page, 'user-drawer-save').click();
-      // A fresh team organization sits on a one-seat plan in the local billing seed,
-      // so the owner fills it and the invite is refused (`journeys` skips the same way).
       const invited = await invite;
-      if (invited.status() === 409) {
-        const body = (await invited.json()) as { error?: { reason?: string } };
-        test.skip(
-          body.error?.reason === 'seat_limit_reached',
-          'team org seat limit reached in local billing seed',
-        );
-      }
+      expect(invited.status()).toBe(200);
       const row = page
         .getByTestId('users-team-table-row')
         .filter({ hasText: inviteeEmail });
       await expect(row).toHaveCount(1, { timeout: 15_000 });
 
-      // Accept via API as the invitee — both the invitation id and the raw
-      // token live only in the emailed accept link.
-      const invitationToken = await pollInvitationTokenFromMailOutbox(inviteeEmail);
-      const invitationId = await pollInvitationIdFromMailOutbox(inviteeEmail);
+      // Accept via API as the invitee. The add-member answer carries the invitation id, and
+      // the raw token where clinozy-be echoes it; elsewhere the token is read from the email.
+      const invitedBody = (await invited.json()) as {
+        data: { invitation: { id: string } };
+      };
+      const invitationId = invitedBody.data.invitation.id;
+      const invitationToken =
+        (await echoedInvitationToken(invited)) ??
+        (await pollInvitationTokenFromMailOutbox(inviteeEmail));
       inviteeApi = await playwright.request.newContext({ baseURL: HOST });
       const invitee = await createSessionViaEmailCode(inviteeApi, inviteeEmail);
       const accept = await inviteeApi.post(
@@ -182,27 +182,3 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
     }
   });
 });
-
-/** Reads the invitation id out of the emailed accept link. */
-async function pollInvitationIdFromMailOutbox(email: string): Promise<string> {
-  const { Client } = await import('pg');
-  const client = new Client({ connectionString: process.env.DATABASE_URL });
-  await client.connect();
-  try {
-    const deadline = Date.now() + 20_000;
-    while (Date.now() < deadline) {
-      const result = await client.query<{ html: string }>(
-        `SELECT html FROM auth.mail_outbox
-         WHERE to_addresses @> $1::jsonb AND html ILIKE '%Accept Invitation%'
-         ORDER BY id DESC LIMIT 1`,
-        [JSON.stringify([email])],
-      );
-      const match = /\/accept-invite\/([A-Za-z0-9_-]+)/.exec(result.rows[0]?.html ?? '');
-      if (match?.[1]) return match[1];
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
-  } finally {
-    await client.end();
-  }
-  throw new Error(`no invitation id in outbox for ${email}`);
-}

@@ -20,10 +20,9 @@ import { createTeamInvitation } from '@/tests/utils/e2e-tenancy.ts';
  * app, without the emailed link; someone already in a clinic lands as usual, with the invitation
  * counted on their avatar and listed under Switch clinic.
  *
- * Every invitation comes from a clinic a spec opens for the purpose, and a local clinic's Free
- * plan holds one seat — so where the local billing seed has no room, the invite is answered
- * `409 seat_limit_reached` and the test skips, as the other invite journeys do. The three flows
- * were driven live on the local stack against a clinic with seats (Role QA Clinic B).
+ * Every invitation comes from a clinic a spec opens for the purpose. A new clinic's Free plan holds
+ * one seat, its owner's, so `createTeamInvitation` first grants the clinic seats
+ * (`grantInvitableSeats`); a `409 seat_limit_reached` after that fails the test.
  *
  * Local only: it needs clinozy-be on :3000 with team organizations on, and DATABASE_URL for the
  * sign-in codes.
@@ -31,23 +30,18 @@ import { createTeamInvitation } from '@/tests/utils/e2e-tenancy.ts';
 
 const API = '/api/v1';
 
-/** A clinic's owner invites `inviteeEmail`; `null` when the clinic has no seat to give. */
+/** A new clinic's owner invites `inviteeEmail`. */
 async function inviteFromNewClinic(
   api: APIRequestContext,
   inviteeEmail: string,
-): Promise<{ invitationId: string; orgSlug: string; inviterToken: string } | null> {
+): Promise<{ invitationId: string; orgSlug: string; inviterToken: string }> {
   const ownerToken = (await createSessionViaEmailCode(api)).accessToken;
-  try {
-    const { invitationId, orgSlug, teamToken } = await createTeamInvitation(
-      api,
-      ownerToken,
-      inviteeEmail,
-    );
-    return { invitationId, orgSlug, inviterToken: teamToken };
-  } catch (error) {
-    if (error instanceof Error && error.message === 'SEAT_LIMIT_REACHED') return null;
-    throw error;
-  }
+  const { invitationId, orgSlug, teamToken } = await createTeamInvitation(
+    api,
+    ownerToken,
+    inviteeEmail,
+  );
+  return { invitationId, orgSlug, inviterToken: teamToken };
 }
 
 /** Signs `email` in through the sign-in form and expects the invitations picker. */
@@ -86,8 +80,6 @@ test.describe('Invitations for the person signing in (D84)', () => {
   }) => {
     const email = uniqueE2eEmail('invited');
     const invitation = await inviteFromNewClinic(api, email);
-    test.skip(!invitation, 'team org seat limit reached in local billing seed');
-    if (!invitation) return;
 
     await signInToInvitations(page, email, invitation.invitationId);
     await clickTestId(
@@ -109,8 +101,6 @@ test.describe('Invitations for the person signing in (D84)', () => {
   }) => {
     const email = uniqueE2eEmail('declines');
     const invitation = await inviteFromNewClinic(api, email);
-    test.skip(!invitation, 'team org seat limit reached in local billing seed');
-    if (!invitation) return;
 
     await signInToInvitations(page, email, invitation.invitationId);
     await clickTestId(
@@ -147,8 +137,6 @@ test.describe('Invitations for the person signing in (D84)', () => {
   }) => {
     const email = uniqueE2eEmail('member-invited');
     const invitation = await inviteFromNewClinic(api, email);
-    test.skip(!invitation, 'team org seat limit reached in local billing seed');
-    if (!invitation) return;
 
     const { slug } = await openNewClinic(page, { email });
     await expect(page).toHaveURL(new RegExp(`/organization/${slug}/`));
