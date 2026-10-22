@@ -73,6 +73,24 @@ describe('E2E against the backend image', () => {
     expect(WORKFLOW).toContain('-e DEPLOYMENT_TOTAL_REPLICA_COUNT=1');
   });
 
+  it("runs the app and the backend in the variables' organization mode", () => {
+    // clinozy-be no longer sends deployment flags, so the app's mode is VITE_PERSONAL_ORGANIZATIONS
+    // / VITE_TEAM_ORGANIZATIONS alone. Before this the job set neither: the app and the backend
+    // each ran their default, and the team-only specs never ran. It reads development's
+    // variables (as preview.yml does) and boots the backend in the same mode.
+    expect(WORKFLOW).toMatch(/^ {4}environment: development$/m);
+    for (const key of ['VITE_PERSONAL_ORGANIZATIONS', 'VITE_TEAM_ORGANIZATIONS']) {
+      expect(WORKFLOW).toMatch(new RegExp(`${key}: \\$\\{\\{ vars\\.${key} \\}\\}`));
+    }
+    expect(WORKFLOW).toContain('-e "PERSONAL_ORGANIZATION_ENABLED=$personal"');
+    expect(WORKFLOW).toContain('-e "TEAM_ORGANIZATION_ENABLED=$team"');
+    // An unset variable never reaches the backend as an empty flag, which it reads as false:
+    // each flag is added only when the variable is set.
+    expect(WORKFLOW).not.toMatch(/-e (PERSONAL|TEAM)_ORGANIZATION_ENABLED(\s|$)/m);
+    expect(WORKFLOW).toContain('if [ -n "$personal" ]; then');
+    expect(WORKFLOW).toContain('if [ -n "$team" ]; then');
+  });
+
   it('tells the suite the backend has no object storage, so the photo uploads skip', () => {
     // The image boots with no S3_*: without the flag the patient-photos spec waits a minute for
     // uploads that cannot happen, then fails the nightly run.

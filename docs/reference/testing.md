@@ -129,7 +129,9 @@ loosens local Docker.
 
 **CI:** `.github/workflows/e2e-backend.yml`; on a pull request only Dependabot's, when it changes a dependency (`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`), with the @smoke set — so a bump that breaks the app is red on its own PR. It boots Postgres and Redis, then
 the backend's latest GHCR image (migrate, reference seed, API with the backend's CI test env), and
-the app's dev server against it. A merge to `main` runs the **@smoke** set (`--grep @smoke`: sign-in,
+the app's dev server against it. Both run the organization mode the `development` environment's
+`VITE_PERSONAL_ORGANIZATIONS` / `VITE_TEAM_ORGANIZATIONS` variables set (an unset one leaves each side
+on its default), so the deployment-mode specs that run are the ones for that mode. A merge to `main` runs the **@smoke** set (`--grep @smoke`: sign-in,
 Today, one create, one edit, axe on five key pages — tagged `{ tag: '@smoke' }`); the nightly run
 (01:30 UTC) runs the full suite. One retry, then a self-closing `ci-failure` issue (main's runs only). Pulling the
 image needs this repository's read access on the backend's GHCR package while it is private.
