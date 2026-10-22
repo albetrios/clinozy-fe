@@ -65,7 +65,7 @@ describe('Claude Code permission rules', () => {
       'Bash(git push *)',
       'Bash(git switch *)',
       'Bash(gh run *)',
-      // The project's own server (`.mcp.json`) and the one a web environment's MCP settings name.
+      // The project's own server (`.mcp.json`) and the user-level one (install-headroom.sh).
       'mcp__fe-headroom__*',
       'mcp__headroom__*',
     ]) {

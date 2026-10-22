@@ -243,8 +243,8 @@ else
   skip "[8/${TOTAL}] codegraph index absent — codegraph MCP answers nothing until it is built (non-fatal)"
 fi
 # A session that holds several repositories reads hooks only from the parent directory's
-# .claude/settings.json; agent-os:session-hooks writes every repository's there (a no-op in a
-# single-repository checkout).
+# .claude/settings.json and .mcp.json; agent-os:session-hooks writes every repository's hooks and
+# codegraph server there (a no-op in a single-repository checkout).
 pnpm agent-os:session-hooks >&2 || skip "agent-os:session-hooks failed (non-fatal)"
 
 # 9) Playwright browsers -----------------------------------------------------

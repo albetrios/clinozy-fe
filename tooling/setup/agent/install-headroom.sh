@@ -6,7 +6,8 @@
 # so the prerequisite is `uv`/`uvx` (Astral), not a global headroom install —
 # uvx resolves the package into an ephemeral env on first use. This script makes
 # sure uv is on PATH and pre-warms the
-# headroom env so the first MCP call in a session is not a cold download.
+# headroom env so the first MCP call in a session is not a cold download, then
+# registers that command once at user level for a session that holds both repositories.
 #
 # The codegraph half of the default MCP pair needs nothing here: it is the
 # @colbymchenry/codegraph devDependency and resolves from `pnpm exec` once
@@ -58,4 +59,23 @@ if uvx --from 'headroom-ai[mcp]' headroom --help >/dev/null 2>&1; then
 else
   log "pre-warm failed — headroom will try again on first MCP use (needs pypi.org)."
   exit 1
+fi
+
+# One headroom for the whole session, registered at user level. A session that holds clinozy-fe
+# and clinozy-be runs from their parent directory, where neither repository's .mcp.json is read
+# (tooling/agent-os/session-hooks.ts declares only each repository's codegraph there), and
+# headroom keeps no repository state. clinozy-be registers its pip-installed headroom with
+# `headroom mcp install`; under uvx that command would register uv's cache path, which a cache
+# clean removes, so this registers fe-headroom's own uvx command. An existing one is kept.
+if ! have claude; then
+  log "claude CLI not found — no user-level headroom MCP server registered."
+elif claude mcp get headroom >/dev/null 2>&1 </dev/null; then
+  log "user-level headroom MCP server already registered."
+else
+  server="$(node -e 'const { mcpServers } = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")); console.log(JSON.stringify(mcpServers["fe-headroom"]));' "${REPO_ROOT}/.mcp.default.json")"
+  if claude mcp add-json --scope user headroom "${server}" </dev/null >/dev/null 2>&1; then
+    log "registered the user-level headroom MCP server (${server})."
+  else
+    log "could not register the user-level headroom MCP server (non-fatal)."
+  fi
 fi

@@ -185,7 +185,7 @@ function mcpStatus() {
   if (existsSync(join(repositoryRoot, '.mcp.json')))
     return `${declaredServerCount()} declared`;
   if (isRemote || !existsSync(join(repositoryRoot, '.mcp.example.json'))) {
-    return 'platform-managed on web (configure in environment MCP settings); local: pnpm setup:local';
+    return 'none yet on web (bootstrap.sh declares the pair); local: pnpm setup:local';
   }
   const scaffolded = spawnSync('pnpm', ['exec', 'tsx', 'tooling/dev/setup-mcp.ts'], {
     cwd: repositoryRoot,
