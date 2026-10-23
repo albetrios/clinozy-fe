@@ -91,7 +91,7 @@ describe('git-hook gate tools', () => {
           HOME: root,
           CLAUDE_PROJECT_DIR: root,
           CLAUDE_CODE_REMOTE: 'true',
-          // A web session also starts the dev server: keep its log and pid inside this root.
+          // A web session also launches the bring-up: keep its log inside this root.
           AGENT_STACK_DIR: join(root, 'agent-stack'),
         },
       });

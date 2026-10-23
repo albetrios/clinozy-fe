@@ -1,35 +1,42 @@
 #!/usr/bin/env bash
-# One-shot cloud-session bring-up for clinozy-fe cloud agents.
+# The one cloud-agent setup script for clinozy-fe, as clinozy-be's bootstrap.sh is for the backend:
+# install everything, then bring the app up — the dev server serving the app shell, left running.
 #
-# Runs every agent setup helper in order — Node, distro CLI tools, gh, gitleaks and Docker,
-# headroom/uv — installs dependencies, scaffolds a self-contained `.env.local`
-# (`pnpm setup:local --only-env`) and the default MCP pair, provisions Playwright
-# browsers, then verifies the Vite dev server actually serves the app shell. A
-# single command to make a cloud session "same as local", with a progress log
-# after each step so anyone watching the session sees live status.
+#   bash tooling/setup/agent/bootstrap.sh                 # the session: setup → the dev server live
+#   bash tooling/setup/agent/bootstrap.sh --install-only  # environment Setup script: the installs,
+#                                                         # cached; no server left running
 #
-#   bash tooling/setup/agent/bootstrap.sh                 # steps 1-10
-#   bash tooling/setup/agent/bootstrap.sh --install-only  # environment Setup script: steps 1-9,
-#                                                         # the same switch as clinozy-be's
+# A session's steps (the session-start hook launches this detached in every web session):
+#    1 Node                      the pinned .nvmrc Node, put first on PATH
+#    2 Dependencies              pnpm install — only when Node or the lockfile changed
+#    3 Environment (.env.local)  every run; the OAuth buttons off in the cloud
+#    4 Dev server                `pnpm dev` on :5173 in its own session, health checked (it serves
+#                                the app shell), then left running
+# Then "live", and in the background the agent's own tools (install-agent-tools.sh: the distro CLI
+# tools, gh, gitleaks, semgrep, headroom + the MCP pair + the CodeGraph index + the session hooks,
+# the Playwright browsers) and SonarQube — the app needs none of them, so they never hold "live" up.
 #
-# `--install-only` skips step 10: in a cached Setup script it only booted Vite to stop it again,
-# and in a session fe-session-start.mjs starts the dev server itself. Any other option is
-# refused, as clinozy-be's bootstrap.sh refuses one.
+# The Setup script's steps (--install-only): 1 Node, 2 Dependencies, 3 Environment, 4 Docker + the
+# SonarQube gate images, 5 the agent tools (inline). A cached Setup script must terminate, so it
+# starts no server; Docker is touched only here, never in a session, where a restart to apply the
+# registry mirror would take clinozy-be's Postgres and Redis down with it.
 #
-# Works from any agent harness — Claude Code (web, CLI, desktop), Cursor cloud
-# agents, Codex, or a plain shell. Nothing here is Claude-specific: the one
-# harness integration is $CLAUDE_ENV_FILE, which is written only when the
-# variable exists and is otherwise a no-op.
+# A lock (stack-lock.lib.sh, in $AGENT_STACK_DIR/frontend) keeps two bring-ups from racing; a
+# re-run is safe (a dev server already serving the app shell is kept). The logs sit in the
+# directory clinozy-be's bring-up uses ($AGENT_STACK_DIR, default /tmp/agent-stack):
+# bootstrap-frontend.log (this script, when the hook launches it), frontend.log (Vite),
+# agent-tools-frontend.log and sonarqube-frontend.log.
 #
-# Steps 1-5 (tool installs) and 8-9 (MCP, browsers) are BEST-EFFORT and log
-# ✓/skip without aborting; dependencies, the env scaffold, and the healthcheck
-# are HARD gates (non-zero exit on failure). The dev server is started only
-# transiently for the healthcheck (on :5173 — --strictPort) and then stopped; one
-# already serving the app shell there (a web session's start hook keeps one) is
-# probed and left running.
+# Works from any agent harness — Claude Code (web, CLI, desktop), Cursor cloud agents, Codex, or a
+# plain shell. Nothing here is Claude-specific: the one harness integration is $CLAUDE_ENV_FILE,
+# which is written only when the variable exists and is otherwise a no-op.
+#
+# Tool installs are BEST-EFFORT and log ✓/skip without aborting; Node, dependencies, the env
+# scaffold and, in a session, the dev server's health check are HARD gates (non-zero exit).
 #
 # Env:
 #   NODE_INSTALL_PREFIX        parent dir for node<major> (default /opt)
+#   HEALTHCHECK_URL            the dev server's probe (default http://localhost:5173/)
 set -uo pipefail
 
 install_only=0
@@ -42,15 +49,30 @@ for argument in "$@"; do
       ;;
   esac
 done
+# Every run but the cached Setup script brings the dev server live.
+live=1
+[ "${install_only}" = 1 ] && live=0
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../../.." || exit 1
 readonly AGENT_DIR="tooling/setup/agent"
-readonly TOTAL=10
+readonly STACK_DIR="${AGENT_STACK_DIR:-/tmp/agent-stack}"
+# The lock's parent: clinozy-be's bring-up holds $STACK_DIR/lock, so this one is apart from it.
+readonly LOCK_PARENT="${STACK_DIR}/frontend"
+readonly STAMP_DIR="node_modules/.agent-stamps"
+readonly DEV_SERVER_PORT=5173
+TOTAL=4
+[ "${install_only}" = 1 ] && TOTAL=5
 start_ts=$(date +%s)
+
+# shellcheck source=tooling/setup/agent/stack-lock.lib.sh
+source "${AGENT_DIR}/stack-lock.lib.sh"
+
+# Seconds since this run started, for the log.
+elapsed() { echo "$(($(date +%s) - start_ts))s"; }
 
 step() {
   echo ""
-  echo "▶ $*"
+  echo "▶ $* (+$(elapsed))"
 }
 ok() { echo "✓ $*"; }
 skip() { echo "• $*"; }
@@ -59,45 +81,38 @@ die() {
   exit 1
 }
 
-# --- process-tree teardown for the transient dev server ----------------------
-# `pnpm dev` spawns pnpm -> vite (-> esbuild/rolldown workers). Killing only the
-# pnpm pid orphans Vite and leaves :5173 bound, so walk the real tree. Reading
-# ppid from /proc/<pid>/stat must skip past "(comm)" — a process name can itself
-# contain spaces and parentheses, which breaks naive field splitting.
-ppid_of() {
-  local stat
-  stat="$(cat "/proc/$1/stat" 2>/dev/null)" || return 1
-  stat="${stat##*) }"
-  # shellcheck disable=SC2086  # deliberate word-splitting: state=$1, ppid=$2
-  set -- ${stat}
-  printf '%s' "${2:-}"
-}
-
-# Children of a pid: /proc on Linux (the cloud image), `pgrep -P` where there is
-# no /proc (macOS, when this is run by hand) — without the fallback the Vite child
-# survived and kept the port bound.
-children_of() {
-  local p pid
-  if [ -d /proc/self ]; then
-    for p in /proc/[0-9]*; do
-      pid="${p#/proc/}"
-      [ "${pid}" = "$$" ] && continue
-      [ "$(ppid_of "${pid}" 2>/dev/null)" = "$1" ] && printf '%s\n' "${pid}"
-    done
+# start_detached NAME COMMAND… — COMMAND in its own session, so it outlives this script
+# (and the hook that launched it); output in $STACK_DIR/NAME.log, pid in $STACK_DIR/NAME.pid.
+start_detached() {
+  local name=$1
+  shift
+  if command -v setsid >/dev/null 2>&1; then
+    setsid nohup "$@" >"${STACK_DIR}/${name}.log" 2>&1 </dev/null &
   else
-    pgrep -P "$1" 2>/dev/null || true
+    nohup "$@" >"${STACK_DIR}/${name}.log" 2>&1 </dev/null &
   fi
+  echo $! >"${STACK_DIR}/${name}.pid"
 }
 
-kill_tree() {
-  local root="$1" pid
-  for pid in $(children_of "${root}"); do
-    kill_tree "${pid}"
-  done
-  kill -TERM "${root}" 2>/dev/null || true
-}
+# One bring-up at a time (a session resume, or a manual run while the hook's runs). A lock
+# whose holder is gone — or from another boot, carried in by a cached environment — is stale.
+if [ "${live}" = 1 ]; then
+  mkdir -p "${LOCK_PARENT}"
+  if ! mkdir "${LOCK_PARENT}/lock" 2>/dev/null; then
+    if lock_holder="$(stack_lock_holder "${LOCK_PARENT}")"; then
+      echo "bootstrap: a bring-up is already running (pid ${lock_holder}) — follow ${STACK_DIR}/bootstrap-frontend.log" >&2
+      exit 0
+    fi
+    echo "bootstrap: clearing a stale bring-up lock (pid $(cat "${LOCK_PARENT}/lock/pid" 2>/dev/null || echo '?') is no bring-up running in this boot)." >&2
+    rm -f "${LOCK_PARENT}/lock/pid" "${LOCK_PARENT}/lock/boot_id"
+    rmdir "${LOCK_PARENT}/lock" 2>/dev/null
+    mkdir "${LOCK_PARENT}/lock" || die "cannot take the bring-up lock ${LOCK_PARENT}/lock"
+  fi
+  stack_lock_write "${LOCK_PARENT}"
+  trap 'rm -f "${LOCK_PARENT}/lock/pid" "${LOCK_PARENT}/lock/boot_id"; rmdir "${LOCK_PARENT}/lock" 2>/dev/null' EXIT
+fi
 
-echo "clinozy-fe cloud bring-up — $(date -u '+%Y-%m-%d %H:%M:%SZ')"
+echo "clinozy-fe cloud bring-up — $(date -u '+%Y-%m-%d %H:%M:%SZ')$([ "${install_only}" = 1 ] && echo ' (install only)')"
 
 # 1) Node runtime ------------------------------------------------------------
 step "[1/${TOTAL}] Node runtime"
@@ -156,63 +171,31 @@ case ":${PATH}:" in
   *) export PATH="${HOME}/.local/bin:${PATH}" ;;
 esac
 
-# 2) Distro CLI tools --------------------------------------------------------
-step "[2/${TOTAL}] Distro CLI tools (jq, ripgrep, shellcheck, rsvg-convert, xz)"
-bash "${AGENT_DIR}/install-apt-tools.sh" || true
-present=""
-for b in jq rg shellcheck rsvg-convert xz; do
-  command -v "$b" >/dev/null 2>&1 && present="${present} ${b}"
-done
-if [ -n "${present}" ]; then ok "[2/${TOTAL}] present:${present}"; else skip "[2/${TOTAL}] none installed (non-fatal)"; fi
-
-# 3) GitHub CLI --------------------------------------------------------------
-step "[3/${TOTAL}] GitHub CLI (gh)"
-bash "${AGENT_DIR}/install-gh.sh" || true
-if command -v gh >/dev/null 2>&1; then
-  ok "[3/${TOTAL}] $(gh --version | head -1)"
+# 2) Dependencies (HARD GATE) ------------------------------------------------
+# Only when what it depends on changed since it last succeeded here (the cached Setup script, or an
+# earlier bring-up in this container): the hash of Node and the lockfile, as clinozy-be stamps its
+# own install.
+step "[2/${TOTAL}] Dependencies (pnpm install --frozen-lockfile)"
+hash_of() { "$@" 2>/dev/null | { sha256sum 2>/dev/null || shasum -a 256; } | cut -d' ' -f1; }
+dependency_inputs() {
+  node -v
+  cat .nvmrc pnpm-lock.yaml pnpm-workspace.yaml patches/* 2>/dev/null
+  grep '"packageManager"' package.json
+}
+dependency_stamp="$(hash_of dependency_inputs)"
+if [ -f "${STAMP_DIR}/dependencies" ] && [ "$(cat "${STAMP_DIR}/dependencies")" = "${dependency_stamp}" ] &&
+  [ -x node_modules/.bin/vite ]; then
+  skip "[2/${TOTAL}] dependencies current — same Node and lockfile as the last install (${STAMP_DIR}/dependencies)"
 else
-  skip "[3/${TOTAL}] gh unavailable (non-fatal — MCP GitHub tools still work)"
+  # Frozen deliberately: a desynced lockfile must fail loudly here rather than be
+  # silently "fixed" in a throwaway session and then red every CI job on push.
+  pnpm install --frozen-lockfile >&2 || die "pnpm install failed (frozen lockfile — run pnpm install locally and commit pnpm-lock.yaml if it is out of date)"
+  mkdir -p "${STAMP_DIR}" && printf '%s\n' "${dependency_stamp}" >"${STAMP_DIR}/dependencies"
+  ok "[2/${TOTAL}] node_modules ready"
 fi
 
-# 4) The git hooks' gate tools: gitleaks + Docker with the SonarQube images --
-# The pre-commit secret scan is mandatory and the pre-push SonarQube gate runs in Docker, so both
-# are provisioned here, in the cached Setup script, once per container.
-step "[4/${TOTAL}] Gate tools (gitleaks secret scan, Docker + SonarQube images)"
-bash "${AGENT_DIR}/install-gitleaks.sh" || true
-if command -v gitleaks >/dev/null 2>&1; then
-  ok "[4/${TOTAL}] gitleaks $(gitleaks version 2>/dev/null)"
-else
-  skip "[4/${TOTAL}] gitleaks unavailable — commits fail until it is installed (bash ${AGENT_DIR}/install-gitleaks.sh)"
-fi
-if command -v docker >/dev/null 2>&1; then
-  bash "${AGENT_DIR}/install-docker-images.sh" || true
-  if docker info >/dev/null 2>&1; then
-    ok "[4/${TOTAL}] Docker running (SonarQube images pre-pulled when reachable)"
-  else
-    skip "[4/${TOTAL}] Docker not reachable — the pre-push SonarQube gate starts it on demand"
-  fi
-else
-  skip "[4/${TOTAL}] Docker CLI absent — the pre-push SonarQube gate needs Docker"
-fi
-
-# 5) headroom / uv (MCP context compression) ---------------------------------
-step "[5/${TOTAL}] headroom via uvx (MCP context compression)"
-bash "${AGENT_DIR}/install-headroom.sh" || true
-if command -v uvx >/dev/null 2>&1; then
-  ok "[5/${TOTAL}] uvx ready ($(command -v uvx))"
-else
-  skip "[5/${TOTAL}] uvx unavailable — headroom MCP will not start (codegraph unaffected)"
-fi
-
-# 6) Dependencies (HARD GATE) ------------------------------------------------
-step "[6/${TOTAL}] Dependencies (pnpm install --frozen-lockfile)"
-# Frozen deliberately: a desynced lockfile must fail loudly here rather than be
-# silently "fixed" in a throwaway session and then red every CI job on push.
-pnpm install --frozen-lockfile >&2 || die "pnpm install failed (frozen lockfile — run pnpm install locally and commit pnpm-lock.yaml if it is out of date)"
-ok "[6/${TOTAL}] node_modules ready"
-
-# 7) Environment file (HARD GATE) --------------------------------------------
-step "[7/${TOTAL}] Environment (.env.local)"
+# 3) Environment file (HARD GATE) --------------------------------------------
+step "[3/${TOTAL}] Environment (.env.local)"
 # --only-env is REQUIRED: a bare `pnpm setup:local` runs through to phase 5/5
 # and spawns a long-lived `pnpm dev`, which would hang this script.
 pnpm setup:local --only-env >&2 || die "env scaffold failed (pnpm setup:local --only-env)"
@@ -222,79 +205,75 @@ for oauth_key in VITE_AUTH_OAUTH_GOOGLE VITE_AUTH_OAUTH_GITHUB; do
   if grep -q "^${oauth_key}=" .env.local; then
     sed -i.bak "s/^${oauth_key}=.*/${oauth_key}=false/" .env.local && rm -f .env.local.bak
   else
-    printf '%s=false\n' "${oauth_key}" >> .env.local
+    printf '%s=false\n' "${oauth_key}" >>.env.local
   fi
 done
-ok "[7/${TOTAL}] .env.local ready (OAuth buttons off in the cloud)"
-
-# 8) MCP default pair + the codegraph index it serves + session hooks --------
-step "[8/${TOTAL}] MCP default pair (.mcp.json) + codegraph index + session hooks"
-pnpm mcp:setup:default >&2 || skip "mcp:setup:default failed — run it manually if MCP tools are missing"
-if [ -f .mcp.json ]; then
-  ok "[8/${TOTAL}] .mcp.json written (fe-codegraph + fe-headroom)"
-else
-  skip "[8/${TOTAL}] .mcp.json absent (non-fatal)"
-fi
-# Step 7's --only-env stops before the index phase of setup:local, so build it here.
-pnpm setup:local --only-codegraph >&2 || skip "codegraph index failed — run \`pnpm setup:local --only-codegraph\` (non-fatal)"
-if [ -f .codegraph/codegraph.db ]; then
-  ok "[8/${TOTAL}] codegraph index ready (.codegraph/)"
-else
-  skip "[8/${TOTAL}] codegraph index absent — codegraph MCP answers nothing until it is built (non-fatal)"
-fi
-# A session that holds several repositories reads hooks only from the parent directory's
-# .claude/settings.json, and no repository's .mcp.json; agent-os:session-hooks writes every
-# repository's hooks there and registers its codegraph server at user level (a no-op in a
-# single-repository checkout).
-pnpm agent-os:session-hooks >&2 || skip "agent-os:session-hooks failed (non-fatal)"
-
-# 9) Playwright browsers -----------------------------------------------------
-step "[9/${TOTAL}] Playwright browsers (E2E)"
-browsers_path="${PLAYWRIGHT_BROWSERS_PATH:-${HOME}/.cache/ms-playwright}"
-# The installer's verdict, not a chromium* glob: an image's older chromium-<revision>
-# does not run the pinned @playwright/test.
-if bash "${AGENT_DIR}/install-playwright.sh"; then
-  ok "[9/${TOTAL}] chromium for the pinned @playwright/test available in ${browsers_path}"
-else
-  skip "[9/${TOTAL}] no chromium build for the pinned @playwright/test — E2E unavailable (also needs clinozy-be on :3000)"
-fi
+ok "[3/${TOTAL}] .env.local ready (OAuth buttons off in the cloud)"
 
 if [ "${install_only}" = 1 ]; then
+  # 4) Docker + the SonarQube gate images ------------------------------------
+  # The pre-push SonarQube gate runs in Docker, so its images are pulled here, into the cached
+  # Setup filesystem, once per environment.
+  step "[4/${TOTAL}] Docker + the SonarQube gate images"
+  if command -v docker >/dev/null 2>&1; then
+    bash "${AGENT_DIR}/install-docker-images.sh" || true
+    if docker info >/dev/null 2>&1; then
+      ok "[4/${TOTAL}] Docker running (SonarQube images pre-pulled when reachable)"
+    else
+      skip "[4/${TOTAL}] Docker not reachable — the pre-push SonarQube gate starts it on demand"
+    fi
+  else
+    skip "[4/${TOTAL}] Docker CLI absent — the pre-push SonarQube gate needs Docker"
+  fi
+
+  # 5) The agent's tools -------------------------------------------------------
+  step "[5/${TOTAL}] Agent tools (distro CLI tools, gh, gitleaks, semgrep, headroom + MCP pair + CodeGraph index + session hooks, Playwright)"
+  if bash "${AGENT_DIR}/install-agent-tools.sh"; then
+    ok "[5/${TOTAL}] agent tools ready"
+  else
+    skip "[5/${TOTAL}] agent tools: gitleaks is missing — see the report above (non-fatal)"
+  fi
   echo ""
-  echo "✓ install complete in $(($(date +%s) - start_ts))s (--install-only: step 10 skipped — a session's start hook starts the dev server)."
+  echo "✓ install complete in $(elapsed) — every session brings the dev server live itself (bash tooling/setup/agent/bootstrap.sh)."
   exit 0
 fi
 
-# 10) App health (dev server serves the app shell) ---------------------------
-step "[10/${TOTAL}] App health (Vite dev server serves the app shell)"
-health_port=5173
-health_url="${HEALTHCHECK_URL:-http://localhost:${health_port}/}"
-# A web session's start hook keeps a dev server on :5173 (fe-session-start.mjs): that one is
-# probed and left running, since a second on the same port would only fail --strictPort.
+# 4) The dev server — started in its own session and left running (HARD GATE) --
+# --strictPort: a taken :5173 fails at once in the log, instead of Vite drifting to a port the API's
+# CORS list does not name. A server already serving the app shell (a resumed session) is kept,
+# never joined by a second one, which would only fail on the taken port.
+step "[4/${TOTAL}] Dev server live (Vite :${DEV_SERVER_PORT}, kept running)"
+health_url="${HEALTHCHECK_URL:-http://localhost:${DEV_SERVER_PORT}/}"
+mkdir -p "${STACK_DIR}"
 running_shell="$(curl -fsS --max-time 5 "${health_url}" 2>/dev/null || true)"
 if [[ "${running_shell}" == *'/src/main.tsx'* ]]; then
-  ok "[10/${TOTAL}] app shell served (the dev server already running on :${health_port})"
+  ok "[4/${TOTAL}] dev server already live on :${DEV_SERVER_PORT}"
 else
-  app_log="$(mktemp)"
-  # --strictPort: a port already in use fails at once with Vite's own message,
-  # instead of Vite drifting to the next port while the probe waits 90s on this one.
-  pnpm dev --port "${health_port}" --strictPort >"${app_log}" 2>&1 &
-  dev_pid=$!
-  if HEALTHCHECK_URL="${health_url}" bash "${AGENT_DIR}/healthcheck.sh"; then
-    ok "[10/${TOTAL}] app shell served"
-    app_ok=1
-  else
+  start_detached frontend pnpm dev --port "${DEV_SERVER_PORT}" --strictPort
+  if ! HEALTHCHECK_URL="${health_url}" bash "${AGENT_DIR}/healthcheck.sh"; then
     echo "---- pnpm dev log (tail) ----" >&2
-    tail -20 "${app_log}" >&2
-    app_ok=0
+    tail -20 "${STACK_DIR}/frontend.log" >&2
+    die "dev server healthcheck failed (log: ${STACK_DIR}/frontend.log)"
   fi
-
-  kill_tree "${dev_pid}"
-  echo "  stopped the transient dev server." >&2
-  rm -f "${app_log}"
-  [ "${app_ok}" = "1" ] || die "healthcheck failed"
+  ok "[4/${TOTAL}] dev server live on :${DEV_SERVER_PORT} (kept running)"
 fi
 
+# The agent's tools, then SonarQube, in the background — the app needs neither. One tools run at a
+# time.
+agent_tools_pid="$(cat "${STACK_DIR}/agent-tools-frontend.pid" 2>/dev/null || true)"
+if [ -n "${agent_tools_pid}" ] && ps -p "${agent_tools_pid}" -o args= 2>/dev/null | grep -q 'install-agent-tools\.sh'; then
+  agent_tools_note="already running (pid ${agent_tools_pid})"
+else
+  start_detached agent-tools-frontend bash "${AGENT_DIR}/install-agent-tools.sh"
+  agent_tools_note="installing in the background"
+fi
+# start-sonarqube.sh waits until clinozy-be's bring-up no longer holds its lock and Docker answers,
+# so SonarQube's two-minute boot never competes with the backend's migrations and seed, and the
+# first push finds the pre-push gate's server up instead of booting it.
+start_detached sonarqube-frontend bash "${AGENT_DIR}/start-sonarqube.sh"
 echo ""
-echo "✓ bring-up complete in $(($(date +%s) - start_ts))s — session matches local."
-echo "  Next: \`pnpm dev\` (Vite :5173). Gates: \`pnpm health\`. E2E also needs clinozy-be on :3000."
+echo "✓ dev server live in $(elapsed) — http://localhost:${DEV_SERVER_PORT}"
+echo "  Agent tools  ${agent_tools_note} (log: ${STACK_DIR}/agent-tools-frontend.log)"
+echo "  SonarQube    starting in the background for the pre-push gate (log: ${STACK_DIR}/sonarqube-frontend.log)"
+echo "  Logs         ${STACK_DIR}/{bootstrap-frontend,frontend}.log · stop Vite: pkill -s \"\$(cat ${STACK_DIR}/frontend.pid)\""
+echo "  Gates        pnpm health. E2E also needs clinozy-be on :3000."
