@@ -130,6 +130,30 @@ describe('SupplierDrawer (medical.md:190–206)', () => {
     });
   });
 
+  // QA-03 (same pattern): the Supplier step read "Complete" over a phone the save refuses.
+  it('flags the Supplier step once left with a phone the save would refuse — never done', async () => {
+    const user = setup();
+    renderMedicalDrawer(
+      <SupplierDrawer
+        mode="create"
+        prefill={{ name: 'Om Pharma' }}
+        open
+        onClose={vi.fn()}
+      />,
+    );
+    const drawer = await screen.findByTestId(D);
+    await user.type(within(drawer).getByTestId(`${D}-phone`), '98765');
+    await user.click(within(drawer).getByTestId(`${D}-step-distributes-trigger`));
+    expect(within(drawer).getByTestId(`${D}-step-supplier`)).toHaveAttribute(
+      'data-status',
+      'missing',
+    );
+    expect(within(drawer).getByTestId(`${D}-step-supplier-trigger`)).toHaveTextContent(
+      'Enter a 10-digit mobile',
+    );
+    expect(createSupplier).not.toHaveBeenCalled();
+  });
+
   it('editing shows what is owed, the orders and the Account rows, offers a new order and Pay', async () => {
     const user = setup();
     const onNewOrder = vi.fn();

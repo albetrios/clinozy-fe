@@ -12,8 +12,10 @@ import {
   lineAmount,
   linesMissingRate,
   newOrderForm,
+  ORDER_LINES_MAX,
   orderFormOf,
   orderInputOf,
+  orderLinesProblem,
   orderServerFields,
   orderTotal,
   pickedLines,
@@ -105,6 +107,23 @@ describe('the purchase order’s form (medical.md:254–267)', () => {
     expect(
       linesMissingRate([...lines, { medicineId: 'b', qty: 1, free: 0, rate: 0 }]),
     ).toEqual([2]);
+  });
+
+  // The Items step's head and the save's check read this one rule (QA-04's pattern).
+  it('says why lines cannot be sent: none picked, more than 50, a rate missing', () => {
+    expect(orderLinesProblem([])).toBe('empty');
+    expect(orderLinesProblem([emptyOrderLine()])).toBe('empty');
+    const many = Array.from({ length: ORDER_LINES_MAX + 1 }, (_line, index) => ({
+      medicineId: `med-${index}`,
+      qty: 1,
+      free: 0,
+      rate: 100,
+    }));
+    expect(orderLinesProblem(many)).toBe('tooMany');
+    expect(orderLinesProblem(many.slice(0, ORDER_LINES_MAX))).toBeNull();
+    expect(orderLinesProblem([{ medicineId: 'a', qty: 1, free: 0, rate: 0 }])).toBe(
+      'rate',
+    );
   });
 
   it('prices a medicine at the order’s supplier, else its best rate, else nothing — the API’s rupees as paise', () => {

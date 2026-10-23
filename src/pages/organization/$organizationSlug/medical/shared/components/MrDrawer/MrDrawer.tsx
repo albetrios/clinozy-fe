@@ -279,6 +279,11 @@ function useSteps(
   const phone = storedPhoneOf(values.phone);
   const phoneText = phone ? formatAppPhone(phone) : '';
   const next = values.nextVisitOn ? dates.day(values.nextVisitOn) : '';
+  const { t: tPatient } = useTranslation(PATIENT_DRAWER_NS);
+  // The save's own phone check, so the step never reads done while Save would stop on it.
+  const problems = phoneIsInvalid(values.phone)
+    ? [tPatient(PATIENT_DRAWER_KEYS.mobileInvalid)]
+    : [];
   const byId = new Map(body.pickers.manufacturers.map((option) => [option.key, option]));
   const makers = values.manufacturerIds.flatMap((id) => {
     const option = byId.get(id);
@@ -294,6 +299,7 @@ function useSteps(
         { kind: 'value', label: t(K.fields.nextVisit), value: next },
       ],
       missing: name ? [] : [t(K.fields.name)],
+      problems,
       content: (
         <DrawerStepBody readOnly={readOnly}>
           <MrFields {...body} />

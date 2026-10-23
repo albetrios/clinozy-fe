@@ -347,6 +347,29 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     expect(onCreated).not.toHaveBeenCalled();
   });
 
+  // QA-03: "123" in Mobile read "Complete" on step 1 while Save refused it.
+  it('keeps "Contact & personal" flagged while the mobile is not ten digits from 6–9', async () => {
+    const user = setUser();
+    renderCreate();
+    const panel = await drawer();
+    const contact = () => within(panel).getByTestId('patient-drawer-step-contact');
+    const head = () => within(panel).getByTestId('patient-drawer-step-contact-trigger');
+    await fillRequired(user, { first: 'QA unsaved check', mobile: '123' });
+    await user.click(within(panel).getByTestId('patient-drawer-step-contact-next'));
+
+    expect(contact()).toHaveAttribute('data-status', 'missing');
+    expect(head()).toHaveTextContent('Enter a 10-digit mobile');
+    expect(head()).not.toHaveTextContent('Complete');
+
+    // Ten digits that start 6–9: the step reads done.
+    await user.click(head());
+    await user.clear(within(panel).getByTestId('patient-drawer-mobile'));
+    await user.type(within(panel).getByTestId('patient-drawer-mobile'), '9876500001');
+    await user.click(within(panel).getByTestId('patient-drawer-step-contact-next'));
+    expect(contact()).toHaveAttribute('data-status', 'done');
+    expect(createPatient).not.toHaveBeenCalled();
+  });
+
   it('creates the patient with a new person and toasts "Patient #3509 created" with "Open file"', async () => {
     const user = setUser();
     const { onCreated } = renderCreate();

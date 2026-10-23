@@ -571,6 +571,8 @@
         "addMedicine": "医薬品を追加",
         "newMedicine": "新しい医薬品",
         "enterRate": "仕入単価を入力してください",
+        "addLine": "品目を1つ以上追加してください",
+        "tooManyLines": "1件の仕入れは最大 {{max}} 品目までです",
         "peek_other": "{{count}} 品目 · {{amount}}",
         "quickLine": "医薬品・数量・無償・単価を入力 · 例: azel 20 +2 @180",
         "quickHint": "20 = 数量 · +2 = 無償 · @180 = 単価",

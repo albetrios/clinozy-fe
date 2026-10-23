@@ -9,6 +9,11 @@ export interface DrawerStepStatusInput {
   open: boolean;
   /** How many of its required fields are still empty. */
   missingCount: number;
+  /**
+   * How many rules its filled fields break — the ones its save checks (a mobile that is not
+   * ten digits, a purchase with no item).
+   */
+  problemCount?: number;
   /** It holds something: a filled value in its peek, or its `complete` flag. */
   filled: boolean;
   /** The user has been to it — opened it at least once since the drawer opened. */
@@ -24,22 +29,26 @@ export interface DrawerStepStatusInput {
 
 /**
  * A step's status — the same rule in every drawer: open; missing a required
- * field ("!", only once the step was reached or a save was tried — a step the
- * user has not got to yet is never red); done ("✓", it holds something or was
- * reached, and nothing required is empty — a saved record's steps, a step a
- * default or a Quick fill filled — unless the step says it is not complete);
- * otherwise later (its grey number).
+ * field or breaking a rule its save checks ("!", only once the step was reached
+ * or a save was tried — a step the user has not got to yet is never red); done
+ * ("✓", it holds something or was reached, nothing required is empty and
+ * nothing filled breaks a rule — a saved record's steps, a step a default or a
+ * Quick fill filled — unless the step says it is not complete); otherwise later
+ * (its grey number).
  */
 export function drawerStepStatus({
   open,
   missingCount,
+  problemCount = 0,
   filled,
   reached,
   revealMissing = false,
   complete,
 }: DrawerStepStatusInput): DrawerStepStatus {
   if (open) return 'open';
-  if (missingCount > 0) return reached || revealMissing ? 'missing' : 'later';
+  if (missingCount > 0 || problemCount > 0) {
+    return reached || revealMissing ? 'missing' : 'later';
+  }
   if (complete !== undefined) return complete ? 'done' : 'later';
   return filled || reached ? 'done' : 'later';
 }

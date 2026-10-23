@@ -308,6 +308,11 @@ function useSteps(
   const phone = storedPhoneOf(values.phone);
   const phoneText = phone ? formatAppPhone(phone) : '';
   const gst = values.gstNumber.trim();
+  const { t: tPatient } = useTranslation(PATIENT_DRAWER_NS);
+  // The save's own phone check, so the step never reads done while Save would stop on it.
+  const problems = phoneIsInvalid(values.phone)
+    ? [tPatient(PATIENT_DRAWER_KEYS.mobileInvalid)]
+    : [];
   const makers = makerPills(body.pickers, values.manufacturerIds);
   const account = useAccountWords(supplier);
   const steps: DrawerStep[] = [
@@ -320,6 +325,7 @@ function useSteps(
         { kind: 'value', label: t(K.fields.gst), value: gst },
       ],
       missing: name ? [] : [t(K.fields.name)],
+      problems,
       content: (
         <DrawerStepBody readOnly={readOnly}>
           <SupplierFields {...body} />

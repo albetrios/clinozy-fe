@@ -183,6 +183,22 @@ export const pickedCount = (lines: readonly PurchaseLineValues[]) =>
 export const linesMissingRate = (lines: readonly PurchaseLineValues[]) =>
   pickedLines(lines).flatMap(({ line, row }) => (line.rate <= 0 ? [row] : []));
 
+/** Why a new purchase's lines cannot be sent: none picked, more than the API takes, a rate missing. */
+export type PurchaseLinesProblem = 'empty' | 'tooMany' | 'rate';
+
+/**
+ * The one rule a new purchase's lines answer to — the API's `items` (1–50), each with its rate:
+ * the save's check and the Items step's head both read it. `null` when the lines can be sent.
+ */
+export function purchaseLinesProblem(
+  lines: readonly PurchaseLineValues[],
+): PurchaseLinesProblem | null {
+  const count = pickedCount(lines);
+  if (count === 0) return 'empty';
+  if (count > PURCHASE_LINES_MAX) return 'tooMany';
+  return linesMissingRate(lines).length > 0 ? 'rate' : null;
+}
+
 /** Typed text without its outer spaces, or null when nothing is left. */
 function textOrNull(text: string): string | null {
   const trimmed = text.trim();

@@ -323,6 +323,50 @@ describe('DrawerSteps', () => {
     expect(circle).toHaveTextContent('1');
   });
 
+  // QA-03 / QA-04: "123" in Mobile, an Items step with nothing added — never "Complete".
+  it('flags a reached step whose save would stop on it: "!", its problem in red, never done', async () => {
+    const user = userEvent.setup();
+    function Problem() {
+      const [value, setValue] = useState('contact');
+      return (
+        <DrawerSteps
+          steps={[
+            { ...STEPS[0]!, problems: ['Enter a 10-digit mobile'] },
+            {
+              id: 'items',
+              title: 'Items received',
+              peek: [{ kind: 'value', label: 'Items received' }],
+              problems: ['Add at least one item'],
+              content: <p>items body</p>,
+            },
+            STEPS[3]!,
+          ]}
+          value={value}
+          onValueChange={setValue}
+          testId="pt"
+        />
+      );
+    }
+    render(<Problem />);
+    // Not reached yet: grey, as any untouched step.
+    expect(card('items')).toHaveAttribute('data-status', 'later');
+
+    await user.click(screen.getByTestId('pt-step-contact-next'));
+    await user.click(screen.getByTestId('pt-step-items-next'));
+
+    for (const [id, problem] of [
+      ['contact', 'Enter a 10-digit mobile'],
+      ['items', 'Add at least one item'],
+    ] as const) {
+      expect(card(id)).toHaveAttribute('data-status', 'missing');
+      expect(within(trigger(id)).getByText('!')).toBeInTheDocument();
+      expect(within(trigger(id)).getByText(problem)).toHaveClass('text-destructive');
+      expect(trigger(id)).toHaveTextContent('Needs attention');
+      expect(trigger(id)).not.toHaveTextContent('Complete');
+      expect(trigger(id)).not.toHaveTextContent('Not filled yet');
+    }
+  });
+
   it('reads a collapsed `complete` step without a peek as done', () => {
     render(
       <DrawerSteps

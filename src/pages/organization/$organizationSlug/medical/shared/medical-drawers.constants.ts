@@ -227,6 +227,8 @@ export const MEDICAL_DRAWER_KEYS = {
       newMedicine: 'drawers.purchaseOrder.fields.newMedicine',
       /** The red rate cell's tooltip. */
       enterRate: 'drawers.purchaseOrder.fields.enterRate',
+      addLine: 'drawers.purchaseOrder.fields.addLine',
+      tooManyLines: 'drawers.purchaseOrder.fields.tooManyLines',
       /** "2 medicines · ₹4,236" — the Items step's peek (plural). */
       peek: 'drawers.purchaseOrder.fields.peek',
       /** The quick line's placeholder and its hint (`medical.md:261`). */

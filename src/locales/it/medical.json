@@ -607,6 +607,8 @@
         "addMedicine": "Aggiungi farmaco",
         "newMedicine": "Nuovo farmaco",
         "enterRate": "Inserisci il prezzo d’acquisto",
+        "addLine": "Aggiungi almeno un articolo",
+        "tooManyLines": "Un acquisto accetta fino a {{max}} articoli",
         "peek_one": "{{count}} farmaco · {{amount}}",
         "peek_many": "{{count}} farmaci · {{amount}}",
         "peek_other": "{{count}} farmaci · {{amount}}",

@@ -98,6 +98,24 @@ describe('MrDrawer (medical.md:224–237)', () => {
     });
   });
 
+  // QA-03 (same pattern): the MR step read "Complete" over a phone the save refuses.
+  it('flags the MR step once left with a phone the save would refuse — never done', async () => {
+    const user = setup();
+    renderMedicalDrawer(<MrDrawer mode="create" open onClose={vi.fn()} />);
+    const drawer = await screen.findByTestId(D);
+    await user.type(within(drawer).getByTestId(`${D}-name`), 'Ravi');
+    await user.type(within(drawer).getByTestId(`${D}-phone`), '98765');
+    await user.click(within(drawer).getByTestId(`${D}-step-represents-trigger`));
+    expect(within(drawer).getByTestId(`${D}-step-mr`)).toHaveAttribute(
+      'data-status',
+      'missing',
+    );
+    expect(within(drawer).getByTestId(`${D}-step-mr-trigger`)).toHaveTextContent(
+      'Enter a 10-digit mobile',
+    );
+    expect(createMedicalRep).not.toHaveBeenCalled();
+  });
+
   it('edits an MR against the record it read and offers Delete to an admin', async () => {
     const user = setup();
     const onClose = vi.fn();

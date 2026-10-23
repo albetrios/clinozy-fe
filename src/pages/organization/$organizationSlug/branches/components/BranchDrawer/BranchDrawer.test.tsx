@@ -493,6 +493,37 @@ describe('the branch drawer — New branch (users.md:176–198)', () => {
     expect(notifyMock.warning).toHaveBeenLastCalledWith('Enter a valid email address');
     expect(api.saveBranch).not.toHaveBeenCalled();
   });
+
+  // QA-03 (same pattern): a step read "Complete" over a PIN or phone the save refuses.
+  it('flags a reached step whose PIN, phone or email the save would refuse — never done', async () => {
+    const user = userEvent.setup();
+    renderBranches('/organization/acme/branches/create');
+    const panel = await drawer();
+    const step = (id: string) => within(panel).getByTestId(`branch-drawer-step-${id}`);
+    const head = (id: string) =>
+      within(panel).getByTestId(`branch-drawer-step-${id}-trigger`);
+    await user.type(within(panel).getByTestId('branch-drawer-name'), 'Piplod');
+    await user.type(within(panel).getByTestId('branch-drawer-line1'), 'Shop 1');
+    await user.type(within(panel).getByTestId('branch-drawer-area'), 'Piplod');
+    await user.type(within(panel).getByTestId('branch-drawer-pin'), '3950');
+    await user.click(head('contact'));
+
+    expect(step('place')).toHaveAttribute('data-status', 'missing');
+    expect(head('place')).toHaveTextContent('PIN code needs 6 digits');
+    expect(head('place')).not.toHaveTextContent('Complete');
+
+    await user.type(await within(panel).findByTestId('branch-drawer-phone'), '98250');
+    await user.type(within(panel).getByTestId('branch-drawer-email'), 'not-an-email');
+    await user.click(head('place'));
+    expect(step('contact')).toHaveAttribute('data-status', 'missing');
+    expect(head('contact')).toHaveTextContent('Phone needs 10 digits');
+
+    // Six digits: the place step reads done.
+    await user.type(await within(panel).findByTestId('branch-drawer-pin'), '07');
+    await user.click(head('people'));
+    expect(step('place')).toHaveAttribute('data-status', 'done');
+    expect(api.saveBranch).not.toHaveBeenCalled();
+  });
 });
 
 describe('the branch drawer — Edit branch', () => {

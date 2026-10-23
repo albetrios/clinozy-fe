@@ -178,6 +178,25 @@ export function orderFormOf(order: PurchaseOrderRow): PurchaseOrderFormValues {
 export const linesMissingRate = (lines: readonly OrderLineValues[]) =>
   lines.flatMap((line, index) => (line.medicineId && line.rate <= 0 ? [index] : []));
 
+/** clinozy-be's `MEDICAL_PURCHASE_ORDER_ITEMS_MAX`: an order takes 1–50 medicines. */
+export const ORDER_LINES_MAX = 50;
+
+/** Why an order's lines cannot be sent: none picked, more than the API takes, a rate missing. */
+export type OrderLinesProblem = 'empty' | 'tooMany' | 'rate';
+
+/**
+ * The one rule an order's lines answer to — the API's `items` (1–50), each with its rate: the
+ * save's check and the Items step's head both read it. `null` when the lines can be sent.
+ */
+export function orderLinesProblem(
+  lines: readonly OrderLineValues[],
+): OrderLinesProblem | null {
+  const count = pickedLines(lines).length;
+  if (count === 0) return 'empty';
+  if (count > ORDER_LINES_MAX) return 'tooMany';
+  return linesMissingRate(lines).length > 0 ? 'rate' : null;
+}
+
 /**
  * A line as the API's input takes it, rupees: the medicine — or a typed one's
  * name, which the server adds (MD26).

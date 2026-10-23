@@ -571,6 +571,8 @@
         "addMedicine": "添加药品",
         "newMedicine": "新建药品",
         "enterRate": "请输入采购单价",
+        "addLine": "请至少添加一个物品",
+        "tooManyLines": "一次采购最多 {{max}} 个物品",
         "peek_other": "{{count}} 种药品 · {{amount}}",
         "quickLine": "输入药品、数量、赠品、单价 · 例如 azel 20 +2 @180",
         "quickHint": "20 = 数量 · +2 = 赠品 · @180 = 单价",

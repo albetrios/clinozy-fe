@@ -13,10 +13,12 @@ import {
   newPurchaseForm,
   paidOf,
   pickedCount,
+  PURCHASE_LINES_MAX,
   purchaseChangeOf,
   purchaseFieldOrder,
   purchaseFormOf,
   purchaseInputOf,
+  purchaseLinesProblem,
   purchaseServerFields,
   reorderLines,
   type StockPurchaseFormValues,
@@ -62,6 +64,21 @@ describe('the purchase form (clinic-stock.md:142–157)', () => {
 
   it('names the picked lines still without a rate', () => {
     expect(linesMissingRate(LINES)).toEqual([1]);
+  });
+
+  // QA-04: the Items step's head and the save's check read this one rule.
+  it('says why lines cannot be sent: none picked, more than 50, a rate missing', () => {
+    expect(purchaseLinesProblem([])).toBe('empty');
+    expect(purchaseLinesProblem([emptyLine()])).toBe('empty');
+    const many = Array.from({ length: PURCHASE_LINES_MAX + 1 }, (_line, index) => ({
+      itemId: `item-${index}`,
+      qty: 1,
+      rate: 100,
+      amount: null,
+    }));
+    expect(purchaseLinesProblem(many)).toBe('tooMany');
+    expect(purchaseLinesProblem(LINES)).toBe('rate');
+    expect(purchaseLinesProblem(LINES.slice(0, 1))).toBeNull();
   });
 
   it('reorders every item at or below its minimum up to its maximum', () => {

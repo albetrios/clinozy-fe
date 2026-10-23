@@ -31,6 +31,13 @@ export interface DrawerStep {
   title: string;
   /** Labels of this step's required fields that are still empty. */
   missing?: readonly string[];
+  /**
+   * What its filled fields break of the rules its save checks, in the screen's
+   * words ("Enter a 10-digit mobile", "Add at least one item") — read from the
+   * same rule as the save's check, so a step never reads done while Save would
+   * stop on it. Flagged like an empty required field; Save still runs the check.
+   */
+  problems?: readonly string[];
   /** What the collapsed card summarises: its fields, filled or not. */
   peek?: readonly DrawerPeekItem[];
   /**
@@ -94,15 +101,18 @@ interface StepCardProps {
 
 /**
  * A collapsed head's words: "Missing: …" (in the destructive ink) when a
- * reached step lacks a required field; else "Not filled yet" when it holds
- * nothing; else the step's summary when it has no peek. The hint reads "Edit"
- * once the step holds something, "Open" before — a locked step's own words.
+ * reached step lacks a required field, else its first problem ("Enter a
+ * 10-digit mobile"); else "Not filled yet" when it holds nothing; else the
+ * step's summary when it has no peek. The hint reads "Edit" once the step
+ * holds something, "Open" before — a locked step's own words.
  */
 function useStepHead(step: DrawerStep, status: DrawerStepStatus, filled: boolean) {
   const { t } = useTranslation(RECORD_DRAWER_NS);
   let line: string | undefined;
   if (status === 'missing') {
-    line = t(RECORD_DRAWER_KEYS.step.missing, { fields: step.missing ?? [] });
+    line = step.missing?.length
+      ? t(RECORD_DRAWER_KEYS.step.missing, { fields: step.missing })
+      : step.problems?.[0];
   } else if (step.peek && !filled) line = t(RECORD_DRAWER_KEYS.step.notFilled);
   else if (!step.peek || step.locked) line = step.summary;
   const hint =
@@ -231,8 +241,9 @@ function useReachedSteps(value: string) {
  * strong border and ends with "Next: <step> →"; a collapsed one sits on
  * `canvas`, lifts on hover, opens from anywhere on it and summarises what it
  * holds ({@link DrawerStepPeek}). A step reads done ("✓") once it holds
- * something or was reached with nothing required empty, and is flagged ("!",
- * "Missing: …") only once the user reached it or tried to save.
+ * something or was reached with nothing required empty and no problem, and is
+ * flagged ("!", "Missing: …" or its problem) only once the user reached it or
+ * tried to save.
  */
 export function DrawerSteps({
   steps,
@@ -279,6 +290,7 @@ export function DrawerSteps({
             status={drawerStepStatus({
               open: step.id === value,
               missingCount: step.missing?.length ?? 0,
+              problemCount: step.problems?.length ?? 0,
               filled,
               reached: reached.has(step.id),
               revealMissing,

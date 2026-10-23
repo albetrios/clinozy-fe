@@ -287,6 +287,38 @@ describe('StockPurchaseDrawer (clinic-stock.md:142–157, 247–259)', () => {
     });
   });
 
+  // QA-04: an empty "Items received" read "Complete" beside "Not filled yet".
+  it('keeps "Items received" flagged while nothing is added — "Add at least one item", never done', async () => {
+    const user = setup();
+    renderStockDrawer(<StockPurchaseDrawer mode="create" open onClose={vi.fn()} />);
+    const drawer = await screen.findByTestId(D);
+    const items = () => within(drawer).getByTestId(`${D}-step-items`);
+    const head = () => within(drawer).getByTestId(`${D}-step-items-trigger`);
+    await user.click(within(drawer).getByTestId(`${D}-step-bill-next`));
+    await user.click(within(drawer).getByTestId(`${D}-step-items-next`));
+
+    expect(items()).toHaveAttribute('data-status', 'missing');
+    expect(head()).toHaveTextContent(word(K.fields.addLine));
+    expect(head()).not.toHaveTextContent('Complete');
+    expect(head()).not.toHaveTextContent('Not filled yet');
+
+    // Save still asks for the supplier first, and nothing is written.
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    expect(notifyMock.warning).toHaveBeenLastCalledWith('Pick a supplier');
+    expect(createStockPurchase).not.toHaveBeenCalled();
+
+    // One line with its rate: the step reads done.
+    await user.click(head());
+    await user.type(
+      await within(drawer).findByTestId(`${D}-quick-line-input`),
+      'gauze 2 @45',
+    );
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(badges(drawer)).toHaveTextContent('Bill ₹90'));
+    await user.click(within(drawer).getByTestId(`${D}-step-payment-trigger`));
+    expect(items()).toHaveAttribute('data-status', 'done');
+  });
+
   it('without payment:create there is no Paid — the purchase is recorded unpaid', async () => {
     const user = setup();
     const onClose = vi.fn();

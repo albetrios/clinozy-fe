@@ -661,6 +661,8 @@
         "addMedicine": "إضافة دواء",
         "newMedicine": "دواء جديد",
         "enterRate": "أدخل سعر الشراء",
+        "addLine": "أضف صنفًا واحدًا على الأقل",
+        "tooManyLines": "تقبل عملية الشراء {{max}} صنفًا كحد أقصى",
         "peek_zero": "{{count}} أدوية · {{amount}}",
         "peek_one": "{{count}} دواء · {{amount}}",
         "peek_two": "{{count}} دواءان · {{amount}}",

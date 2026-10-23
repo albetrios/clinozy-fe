@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -41,8 +42,11 @@ import { rateMessage } from './order-medicine.ts';
 import {
   linesMissingRate,
   newOrderForm,
+  ORDER_LINES_MAX,
   orderFormOf,
   orderInputOf,
+  type OrderLinesProblem,
+  orderLinesProblem,
   orderServerFields,
   orderTotal,
   pickedLines,
@@ -89,6 +93,13 @@ export type PurchaseOrderDrawerProps = PurchaseOrderDrawerBaseProps &
 const stepOfField = (field: string) =>
   field.startsWith('lines') || field.startsWith('items') ? 'items' : 'order';
 
+/** What each lines problem says on the Items step's head; the save's toast for an empty or full order. */
+function linesProblemMessage(problem: OrderLinesProblem, t: TFunction): string {
+  if (problem === 'empty') return t(K.fields.addLine);
+  if (problem === 'tooMany') return t(K.fields.tooManyLines, { max: ORDER_LINES_MAX });
+  return t(K.fields.enterRate);
+}
+
 /** The step cards: Order → Items (`medical.md:434`). */
 function useSteps(
   body: OrderFieldsProps,
@@ -98,6 +109,8 @@ function useSteps(
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
   const picked = pickedLines(values.lines);
+  // A received order is read-only: its lines answer to nothing more.
+  const linesProblem = body.readOnly ? null : orderLinesProblem(values.lines);
   const billNo = values.billNo.trim();
   return [
     {
@@ -130,6 +143,7 @@ function useSteps(
               : undefined,
         },
       ],
+      problems: linesProblem ? [linesProblemMessage(linesProblem, t)] : [],
       content: <ItemsFields {...body} />,
     },
   ];
@@ -137,9 +151,10 @@ function useSteps(
 
 /**
  * The order's save — past the Order step's "Pick a supplier", which the drawer
- * asks first: every picked line's rate, each cell red with "Enter the purchase
- * rate" and the toast naming the medicine (validated before submit, §7.3);
- * "Purchase order saved".
+ * asks first: {@link orderLinesProblem}, the rule the Items step's head reads
+ * too — one medicine at least, at most 50, and every picked line's rate, each
+ * cell red with "Enter the purchase rate" and the toast naming the medicine
+ * (validated before submit, §7.3); "Purchase order saved".
  */
 function useOrderSave({
   form,
@@ -169,15 +184,19 @@ function useOrderSave({
     toastId: 'purchase-order-save-failed',
     check: (current) => {
       form.clearErrors('lines');
+      const problem = orderLinesProblem(current.lines);
+      if (problem === null) return null;
+      setOpenStep('items');
+      if (problem !== 'rate') {
+        return { fields: ['lines'], message: linesProblemMessage(problem, t) };
+      }
       const missing = linesMissingRate(current.lines);
-      if (missing.length === 0) return null;
       for (const index of missing) {
         form.setError(`lines.${index}.rate`, {
           type: 'client',
           message: t(K.fields.enterRate),
         });
       }
-      setOpenStep('items');
       const names = missing.map((index) => {
         const medicineId = current.lines[index]?.medicineId ?? null;
         return (

@@ -179,6 +179,32 @@ describe('UserDrawer — New user (users.md:99–124)', () => {
     expect(within(panel).getByTestId('user-drawer-colour-sky')).toHaveTextContent('✓');
   });
 
+  // QA-03 (same pattern): Profile read "Complete" over an email or mobile the save refuses.
+  it('flags Profile once left with an email or mobile the save would refuse — never done', async () => {
+    const user = userEvent.setup();
+    const panel = await openCreate();
+    const profile = () => within(panel).getByTestId('user-drawer-step-profile');
+    const head = () => within(panel).getByTestId('user-drawer-step-profile-trigger');
+    await user.type(within(panel).getByTestId('user-drawer-email'), 'kavya-at-clinic');
+    await user.type(within(panel).getByTestId('user-drawer-mobile'), '98250');
+    await user.click(within(panel).getByTestId('user-drawer-step-hours-trigger'));
+
+    expect(profile()).toHaveAttribute('data-status', 'missing');
+    expect(head()).toHaveTextContent('Enter a valid email address');
+    expect(head()).not.toHaveTextContent('Complete');
+
+    await user.click(head());
+    await user.clear(within(panel).getByTestId('user-drawer-email'));
+    await user.type(within(panel).getByTestId('user-drawer-email'), 'kavya@clinic.com');
+    await user.click(within(panel).getByTestId('user-drawer-step-hours-trigger'));
+    expect(head()).toHaveTextContent('Mobile needs 10 digits');
+
+    await user.click(head());
+    await user.type(within(panel).getByTestId('user-drawer-mobile'), '44120');
+    await user.click(within(panel).getByTestId('user-drawer-step-hours-trigger'));
+    expect(profile()).toHaveAttribute('data-status', 'done');
+  });
+
   it('is view only without the right to invite, with the read-only note', async () => {
     const panel = await openCreate({ ...ACCESS, canWrite: false });
     expect(within(panel).queryByTestId('user-drawer-save')).toBeNull();
