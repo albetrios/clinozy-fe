@@ -2,8 +2,10 @@ import { spawnSync } from 'node:child_process';
 import {
   chmodSync,
   copyFileSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -77,45 +79,67 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
     );
   });
 
-  it('a web session starts the dev server once, detached, beside the backend stack', () => {
+  it('a web session launches bootstrap.sh once, detached, as clinozy-be launches its own', () => {
     const hook = readFileSync(HOOK, 'utf8');
     expect(hook).toContain(
       "if (!isRemote) return 'on demand (local session) — pnpm dev';",
     );
-    // Never twice: a dev server already serving the app shell (a resumed session) is left alone.
+    // Never twice: a dev server already serving the app shell (a resumed session), or a bring-up
+    // holding the lock, is left alone.
     expect(hook).toContain('if (await devServerServes()) return `live — ');
     expect(hook).toContain("(await response.text()).includes('/src/main.tsx')");
-    // Its own session (setsid), on the port the API's CORS list names, not waited for.
-    expect(hook).toMatch(
-      /spawn\(\s*'pnpm',\s*\['dev', '--port', String\(DEV_SERVER_PORT\), '--strictPort'\],/,
-    );
-    expect(hook).toMatch(/detached: true,\s*stdio: \['ignore', log, log\],\s*\},\s*\);/);
-    expect(hook).toContain('server.unref();');
-    // Fail-open: no pnpm on PATH is reported, and a spawn that fails later cannot crash the hook.
     expect(hook).toContain(
-      "if (!onPath('pnpm')) return 'not started (pnpm is not on PATH) — pnpm dev';",
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: a shell parameter expansion, asserted verbatim
+      'source tooling/setup/agent/stack-lock.lib.sh && stack_lock_holder "${AGENT_STACK_DIR:-/tmp/agent-stack}/frontend"',
     );
-    expect(hook).toContain("server.on('error', () => {});");
-    // The log and pid go only into a stack directory this user owns.
+    // AGENT_STACK_DIR reaches the lock check through the environment, never the command line.
+    expect(hook).toContain("spawnSync('bash', ['-c', FRONTEND_LOCK_HOLDER_COMMAND]");
+    // Its own session (setsid), its log in the stack directory, and not waited for.
+    expect(hook).toMatch(
+      /spawn\('bash', \['tooling\/setup\/agent\/bootstrap\.sh'\], \{\s*cwd: repositoryRoot,\s*detached: true,\s*stdio: \['ignore', log, log\],\s*\}\);/,
+    );
+    expect(hook).toContain("join(stackDirectory, 'bootstrap-frontend.log')");
+    expect(hook).toContain('bringUp.unref();');
+    // Fail-open: a spawn that fails later cannot crash the hook.
+    expect(hook).toContain("bringUp.on('error', () => {});");
+    // The log goes only into a stack directory this user owns.
     expect(hook).toContain(
       'mkdirSync(stackDirectory, { recursive: true, mode: 0o700 });',
     );
     expect(hook).toContain('directory.uid !== process.getuid?.()');
-    expect(hook).toContain("writeFileSync(join(stackDirectory, 'frontend.pid')");
+    // The hook starts nothing else: the dev server and SonarQube are bootstrap.sh's.
+    expect(hook).not.toContain("'dev', '--port'");
+    expect(hook).not.toContain('start-sonarqube.sh');
   });
 
-  it('a web session starts SonarQube in the background once the stack is up', () => {
-    const hook = readFileSync(HOOK, 'utf8');
-    // Launched only where the dev server is (web, a fresh start), detached and fail-open; the
-    // shared script waits for the bring-up lock to clear and Docker to answer — first checked
-    // after a settle window, since clinozy-be's hook starts at the same moment and its
-    // bootstrap.sh takes the lock a moment after this hook launches the script.
-    expect(hook).toContain('startSonarQubeInBackground(stackDirectory);');
-    expect(hook).toContain(
-      "join(repositoryRoot, 'tooling', 'setup', 'agent', 'start-sonarqube.sh')",
+  it('bootstrap.sh keeps the dev server running, then starts the agent tools and SonarQube', () => {
+    const bootstrap = readFileSync(
+      join(process.cwd(), 'tooling', 'setup', 'agent', 'bootstrap.sh'),
+      'utf8',
     );
-    expect(hook).toContain("starter.on('error', () => {});");
-    expect(hook).toContain('starter.unref();');
+    // Its own session, on the port the API's CORS list names, health checked and left running.
+    const devServer = bootstrap.indexOf(
+      `start_detached frontend pnpm dev --port "\${DEV_SERVER_PORT}" --strictPort`,
+    );
+    expect(devServer).toBeGreaterThan(-1);
+    expect(bootstrap).toContain('setsid nohup "$@"');
+    const healthcheck = bootstrap.indexOf(
+      `if ! HEALTHCHECK_URL="\${health_url}" bash "\${AGENT_DIR}/healthcheck.sh"; then`,
+    );
+    expect(healthcheck).toBeGreaterThan(devServer);
+    expect(bootstrap).not.toContain('kill_tree');
+    // After the dev server is live, in the background: the app needs neither.
+    const tools = bootstrap.indexOf(
+      `start_detached agent-tools-frontend bash "\${AGENT_DIR}/install-agent-tools.sh"`,
+    );
+    expect(tools).toBeGreaterThan(healthcheck);
+    // The shared script waits for clinozy-be's bring-up lock to clear and Docker to answer, so
+    // SonarQube's boot never competes with the migrations and the seed.
+    expect(
+      bootstrap.indexOf(
+        `start_detached sonarqube-frontend bash "\${AGENT_DIR}/start-sonarqube.sh"`,
+      ),
+    ).toBeGreaterThan(healthcheck);
     const script = readFileSync('tooling/setup/agent/start-sonarqube.sh', 'utf8');
     expect(script).toContain('settle_seconds=30');
     expect(script).toContain(
@@ -127,10 +151,25 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
     );
   });
 
-  it('a web session whose dev server cannot start still briefs and exits 0', () => {
-    // The dependencies are there (a stub vite), and PATH is /usr/bin:/bin, which holds no pnpm
-    // on most machines (corepack can put one there). :5173 may or may not answer here, so any
-    // of the three answers passes; a crash does not.
+  it('bootstrap.sh holds its own lock, apart from the one clinozy-be holds', () => {
+    const bootstrap = readFileSync(
+      join(process.cwd(), 'tooling', 'setup', 'agent', 'bootstrap.sh'),
+      'utf8',
+    );
+    expect(bootstrap).toContain(`source "\${AGENT_DIR}/stack-lock.lib.sh"`);
+    expect(bootstrap).toContain(`readonly LOCK_PARENT="\${STACK_DIR}/frontend"`);
+    expect(bootstrap).toContain(
+      `if lock_holder="$(stack_lock_holder "\${LOCK_PARENT}")"; then`,
+    );
+    expect(bootstrap).toContain(`stack_lock_write "\${LOCK_PARENT}"`);
+    // start-sonarqube.sh waits on clinozy-be's lock alone: the frontend's never holds it up.
+    expect(bootstrap).not.toContain(`"\${STACK_DIR}/lock"`);
+  });
+
+  it('a web session whose bring-up cannot start still briefs and exits 0', () => {
+    // The dependencies are there (a stub vite), and the bare root holds no bootstrap.sh, so the
+    // detached bring-up dies at once. :5173 may or may not answer here, so either answer passes;
+    // a crash does not.
     mkdirSync(join(root, 'node_modules', '.bin'), { recursive: true });
     writeFileSync(join(root, 'node_modules', '.bin', 'vite'), '#!/bin/sh\n');
     chmodSync(join(root, 'node_modules', '.bin', 'vite'), 0o755);
@@ -150,7 +189,7 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
       hookSpecificOutput: { additionalContext: string };
     };
     expect(output.hookSpecificOutput.additionalContext).toMatch(
-      /- Frontend: (live|not started \(pnpm is not on PATH\)|starting in the background)/,
+      /- Frontend: (live|starting in the background)/,
     );
   });
 
@@ -159,12 +198,47 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
       join(process.cwd(), 'tooling', 'setup', 'agent', 'bootstrap.sh'),
       'utf8',
     );
-    expect(bootstrap).toContain(
+    const probe = bootstrap.indexOf(
       `if [[ "\${running_shell}" == *'/src/main.tsx'* ]]; then`,
     );
-    expect(bootstrap).toContain(
-      'pnpm dev --port "${health_port}" --strictPort >"${app_log}" 2>&1 &',
+    expect(probe).toBeGreaterThan(-1);
+    expect(probe).toBeLessThan(bootstrap.indexOf('start_detached frontend pnpm dev'));
+  });
+
+  it('the dependency install runs only when Node or the lockfile changed', () => {
+    const bootstrap = readFileSync(
+      join(process.cwd(), 'tooling', 'setup', 'agent', 'bootstrap.sh'),
+      'utf8',
     );
+    expect(bootstrap).toContain('readonly STAMP_DIR="node_modules/.agent-stamps"');
+    const inputs = bootstrap.slice(
+      bootstrap.indexOf('dependency_inputs() {'),
+      bootstrap.indexOf('dependency_stamp="$(hash_of dependency_inputs)"'),
+    );
+    expect(inputs).toContain('node -v');
+    expect(inputs).toContain('pnpm-lock.yaml');
+    // The stamp is written only after the install succeeded.
+    expect(bootstrap.indexOf('pnpm install --frozen-lockfile >&2 || die')).toBeLessThan(
+      bootstrap.indexOf(
+        `printf '%s\\n' "\${dependency_stamp}" >"\${STAMP_DIR}/dependencies"`,
+      ),
+    );
+  });
+
+  it('every installer runs from bootstrap.sh, directly or through install-agent-tools.sh', () => {
+    // bootstrap.sh is the one entry point, in the Setup script and in a session alike: an
+    // installer that neither reaches would only ever run by hand.
+    const directory = join(process.cwd(), 'tooling', 'setup', 'agent');
+    const reached =
+      readFileSync(join(directory, 'bootstrap.sh'), 'utf8') +
+      readFileSync(join(directory, 'install-agent-tools.sh'), 'utf8');
+    const installers = readdirSync(directory).filter((file) =>
+      /^install-.+\.sh$/.test(file),
+    );
+    expect(installers).toContain('install-semgrep.sh');
+    for (const installer of installers) {
+      expect(reached, installer).toContain(`"\${AGENT_DIR}/${installer}"`);
+    }
   });
 
   it('bootstrap.sh takes --install-only, the switch clinozy-be uses, and refuses any other option', () => {
@@ -177,15 +251,42 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
       // biome-ignore lint/suspicious/noTemplateCurlyInString: a shell parameter expansion, asserted verbatim
       'echo "✗ unknown option: ${argument} (only --install-only)" >&2',
     );
-    // The Setup script stops before step 10, the transient dev-server healthcheck.
-    // biome-ignore lint/suspicious/noTemplateCurlyInString: a shell parameter expansion, asserted verbatim
-    const stop = bootstrap.indexOf('if [ "${install_only}" = 1 ]; then');
-    expect(stop).toBeGreaterThan(-1);
-    expect(stop).toBeLessThan(bootstrap.indexOf('# 10) App health'));
-    const wrapper = readFileSync(
-      join(process.cwd(), 'agent-os', 'cloud-environment', 'install.sh'),
+    // The Setup script must terminate: it ends before the dev server, which only a session starts.
+    const setupOnly = bootstrap.slice(
+      bootstrap.indexOf(`if [ "\${install_only}" = 1 ]; then\n  # 4) Docker`),
+      bootstrap.indexOf('# 4) The dev server'),
+    );
+    expect(setupOnly).toContain('exit 0\nfi');
+    expect(setupOnly).toContain(`bash "\${AGENT_DIR}/install-agent-tools.sh"`);
+    // Docker is touched only there: in a session, a restart to apply the registry mirror would
+    // take clinozy-be's Postgres and Redis down with it.
+    expect(setupOnly).toContain(`bash "\${AGENT_DIR}/install-docker-images.sh"`);
+    expect(bootstrap.match(/install-docker-images\.sh"/g)).toHaveLength(1);
+  });
+
+  it("the cached install calls bootstrap.sh --install-only itself, as clinozy-be's does", () => {
+    // One entry point, at the path clinozy-be uses: Cursor's install runs the same line as the
+    // environment's Setup script, and no wrapper stands in front of it (a wrapper called without
+    // the flag once ran a session's bring-up inside the cached install).
+    const environment = JSON.parse(
+      readFileSync(
+        join(process.cwd(), 'agent-os', 'cloud-environment', 'environment.json'),
+        'utf8',
+      ),
+    ) as { install: string };
+    expect(environment.install).toBe(
+      'bash tooling/setup/agent/bootstrap.sh --install-only',
+    );
+    expect(
+      existsSync(join(process.cwd(), 'agent-os', 'cloud-environment', 'install.sh')),
+    ).toBe(false);
+    // The documented Setup-script line for a session that holds both repositories.
+    const guide = readFileSync(
+      join(process.cwd(), 'agent-os', 'cloud-environment', 'agents-cloud.md'),
       'utf8',
     );
-    expect(wrapper).toContain('exec bash tooling/setup/agent/bootstrap.sh "$@"');
+    expect(guide).toContain(
+      'bash /home/user/clinozy-fe/tooling/setup/agent/bootstrap.sh --install-only',
+    );
   });
 });

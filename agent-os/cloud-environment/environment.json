@@ -1,9 +1,9 @@
 {
-  "install": "bash agent-os/cloud-environment/install.sh",
+  "install": "bash tooling/setup/agent/bootstrap.sh --install-only",
   "terminals": [
     {
       "name": "dev",
-      "command": "pnpm dev"
+      "command": "export PATH=\"/opt/node24/bin:$HOME/.local/bin:$PATH\" && pnpm dev"
     }
   ]
 }

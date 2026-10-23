@@ -543,6 +543,25 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 ---
 
+### 6a9. fe-pr-babysit
+
+**Path:** `agent-os/skills/fe-pr-babysit/SKILL.md`
+
+**Purpose:** Keep a PR merge-ready — resolve conflicts, fix CI, work the review threads — until both required contexts (`Quality gate`, `Checks`) are green, then merge on the user's go-ahead. clinozy-fe's babysit skill (clinozy-be's is be-pr-babysit); there is no bare `babysit` or `steward` skill.
+
+**Trigger keywords:** "babysit the PR", "make it green", "fix CI", "CI is red", "watch the PR", "merge-ready", "merge when green"
+
+**Key behaviors:**
+
+- Subscribe to the PR's activity; never poll checks or sleep
+- One `fe-ci-investigator` per red check; fix in scope and push
+- Never skip a test, weaken a workflow or push an empty commit to go green
+- `/fe-merge-pr` only when green and the user asked
+
+**Related skills:** fe-review-response, fe-pre-pr-sweep, fe-before-commit-guard, fe-code-quality-security
+
+---
+
 ### 6b. fe-route-island
 
 **Path:** `agent-os/skills/fe-route-island/SKILL.md`

@@ -6,7 +6,7 @@ stack notes are in [`agents-cloud.md`](agents-cloud.md).
 
 ## MCP servers
 
-`install.sh` installs the **default pair** and scaffolds
+`bootstrap.sh` (its agent tools, `install-agent-tools.sh`) installs the **default pair** and scaffolds
 [`.mcp.json`](../../.mcp.json) via `pnpm mcp:setup:default`:
 
 | Server         | Command                                          | Notes                                                    |

@@ -6,8 +6,9 @@
 //      the session via $CLAUDE_ENV_FILE), and install deps so `pnpm health` / tests / linters
 //      work. The installers stay what they are — pnpm, corepack and
 //      tooling/setup/agent/install-gitleaks.sh, spawned from here.
-//   2. (web) Start the dev server (`pnpm dev`, Vite :5173) detached, beside clinozy-be's live
-//      stack, so the app is up without anyone asking.
+//   2. (web) Launch the bring-up (`tooling/setup/agent/bootstrap.sh`, as clinozy-be's hook launches
+//      its own) detached, so the dev server (Vite :5173) comes up beside clinozy-be's live stack
+//      without anyone asking.
 //   3. Inject session context: the agent-os skill-routing map plus a short env/commands summary,
 //      as SessionStart additionalContext.
 //
@@ -28,7 +29,6 @@ import {
   openSync,
   readdirSync,
   readFileSync,
-  writeFileSync,
 } from 'node:fs';
 import { homedir } from 'node:os';
 import { delimiter, join } from 'node:path';
@@ -41,6 +41,10 @@ const isRemote = process.env.CLAUDE_CODE_REMOTE === 'true';
 // `localhost`, as tooling/setup/agent/healthcheck.sh probes it: Vite binds `localhost`.
 const DEV_SERVER_PORT = 5173;
 const DEV_SERVER_URL = `http://localhost:${DEV_SERVER_PORT}`;
+/** Exits 0 while a bring-up holds the frontend's lock (stack-lock.lib.sh), with bootstrap.sh's default. */
+const FRONTEND_LOCK_HOLDER_COMMAND =
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: a shell parameter expansion, not a template.
+  'source tooling/setup/agent/stack-lock.lib.sh && stack_lock_holder "${AGENT_STACK_DIR:-/tmp/agent-stack}/frontend"';
 
 /** Writes one diagnostic line to stderr (never the model's context). */
 function diagnose(message) {
@@ -228,9 +232,9 @@ function githubCliStatus() {
 
 /**
  * The pre-commit secret scan is mandatory, so a web session without gitleaks could not commit.
- * The cached Setup script installs it (bootstrap.sh step 4), but an older cached image can
- * predate that: install it on demand when absent. A plain PATH check when present (the common
- * case).
+ * The cached Setup script installs it (install-agent-tools.sh, from bootstrap.sh), but an older
+ * cached image can predate that: install it on demand when absent. A plain PATH check when present
+ * (the common case).
  */
 function gitleaksStatus() {
   if (onPath('gitleaks')) return 'present';
@@ -256,72 +260,50 @@ async function devServerServes() {
 }
 
 /**
- * The dev server (web): `pnpm dev` on :5173, launched detached in its own session so the session
- * starts at once and the app comes up beside clinozy-be's live stack. Never starts twice: a server
- * already serving the app shell (a resumed session) is left alone. Its log and pid go in the stack
+ * The bring-up (web): `bootstrap.sh` (Node → dependencies → .env.local → the dev server on :5173,
+ * kept running → the agent tools and SonarQube in the background) launched detached in its own
+ * session, as clinozy-be's hook launches its own, so the session starts at once and the app comes
+ * up beside clinozy-be's live stack. Never launches twice: a dev server already serving the app
+ * shell (a resumed session) or a bring-up holding the lock (stack-lock.lib.sh's stack_lock_holder,
+ * which treats a lock whose run is gone as stale) is left alone. Its log goes in the stack
  * directory clinozy-be's bring-up uses (`$AGENT_STACK_DIR`, default /tmp/agent-stack), and only
  * into one this user owns. Local sessions are untouched.
  */
 async function frontendStatus() {
   if (!isRemote) return 'on demand (local session) — pnpm dev';
-  if (!isExecutable(join(repositoryRoot, 'node_modules', '.bin', 'vite'))) {
-    return 'not started (dependencies missing) — pnpm install, then pnpm dev';
-  }
   if (await devServerServes()) return `live — ${DEV_SERVER_URL}`;
-  if (!onPath('pnpm')) return 'not started (pnpm is not on PATH) — pnpm dev';
   const stackDirectory = process.env.AGENT_STACK_DIR || '/tmp/agent-stack';
+  const logPath = join(stackDirectory, 'bootstrap-frontend.log');
+  // The shell reads AGENT_STACK_DIR itself, as bootstrap.sh does: no value of it is ever part of
+  // a command line.
+  const lockHolder = spawnSync('bash', ['-c', FRONTEND_LOCK_HOLDER_COMMAND], {
+    cwd: repositoryRoot,
+    stdio: 'ignore',
+  });
+  if (lockHolder.status === 0) {
+    return `starting (bring-up already running) — ${DEV_SERVER_URL} · follow: tail -f ${logPath}`;
+  }
+  if (!isExecutable(join(repositoryRoot, 'node_modules', '.bin', 'vite'))) {
+    return 'not started (dependencies missing) — bash tooling/setup/agent/bootstrap.sh';
+  }
   mkdirSync(stackDirectory, { recursive: true, mode: 0o700 });
   // A stack directory another user made in /tmp, or a link, could aim this log anywhere: refuse it.
   const directory = lstatSync(stackDirectory);
   if (!directory.isDirectory() || directory.uid !== process.getuid?.()) {
-    return `not started (${stackDirectory} is not this user's directory) — pnpm dev`;
+    return `not started (${stackDirectory} is not this user's directory) — bash tooling/setup/agent/bootstrap.sh`;
   }
-  const logPath = join(stackDirectory, 'frontend.log');
   const log = openSync(logPath, 'w', 0o600);
   // detached: its own session (setsid), so it outlives this hook and the agent's process group.
-  // --strictPort: a taken :5173 fails in the log instead of drifting to a port the API's CORS
-  // list does not name.
-  const server = spawn(
-    'pnpm',
-    ['dev', '--port', String(DEV_SERVER_PORT), '--strictPort'],
-    {
-      cwd: repositoryRoot,
-      detached: true,
-      stdio: ['ignore', log, log],
-    },
-  );
-  // A spawn that fails (pnpm gone, no permission) emits `error` later; unheard, that event would
+  const bringUp = spawn('bash', ['tooling/setup/agent/bootstrap.sh'], {
+    cwd: repositoryRoot,
+    detached: true,
+    stdio: ['ignore', log, log],
+  });
+  // A spawn that fails (bash gone, no permission) emits `error` later; unheard, that event would
   // crash the hook, which must fail open.
-  server.on('error', () => {});
-  server.unref();
-  // The session id: `pkill -s <pid>` stops pnpm and the Vite it runs in another process group.
-  writeFileSync(join(stackDirectory, 'frontend.pid'), `${server.pid}\n`);
-  startSonarQubeInBackground(stackDirectory);
+  bringUp.on('error', () => {});
+  bringUp.unref();
   return `starting in the background — ${DEV_SERVER_URL} · follow: tail -f ${logPath}`;
-}
-
-/**
- * SonarQube for the pre-push gate (web), beside the dev server: `start-sonarqube.sh` (kept
- * byte-identical with clinozy-be's), launched detached. The script waits until no bring-up holds the
- * agent-stack lock and Docker answers, so the server's two-minute boot never competes with
- * clinozy-be's migrations and seed; the first push then finds it up instead of booting it. Its
- * first lock check comes after a 30-second settle window: clinozy-be's hook runs beside this one,
- * and its bootstrap.sh may not hold the lock yet when this launches the script.
- */
-function startSonarQubeInBackground(stackDirectory) {
-  const log = openSync(join(stackDirectory, 'sonarqube-frontend.log'), 'w', 0o600);
-  const starter = spawn(
-    'bash',
-    [join(repositoryRoot, 'tooling', 'setup', 'agent', 'start-sonarqube.sh')],
-    {
-      cwd: repositoryRoot,
-      detached: true,
-      stdio: ['ignore', log, log],
-    },
-  );
-  // As with the dev server: a spawn that fails later must not crash the hook.
-  starter.on('error', () => {});
-  starter.unref();
 }
 
 /** The skill-routing map on startup; on resume, a note that the conversation already holds it. */

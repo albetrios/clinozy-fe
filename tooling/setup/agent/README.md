@@ -1,15 +1,18 @@
 # `tooling/setup/agent/` — cloud-agent bring-up
 
-One command makes a fresh cloud session behave like a local checkout:
+One command makes a fresh cloud session behave like a local checkout, the same entry point
+clinozy-be's `bootstrap.sh` is for the backend — everything else runs inside it:
 
 ```bash
-bash tooling/setup/agent/bootstrap.sh                 # steps 1-10
-bash tooling/setup/agent/bootstrap.sh --install-only  # the environment Setup script: steps 1-9
+bash tooling/setup/agent/bootstrap.sh                 # the session: setup → the dev server live
+bash tooling/setup/agent/bootstrap.sh --install-only  # the environment Setup script: the installs
 ```
 
-`--install-only` (the same switch clinozy-be's `bootstrap.sh` takes) skips step 10, the transient
-dev-server healthcheck: in a cached Setup script it only booted Vite to stop it again, and a session's
-start hook starts the dev server itself. Any other option is refused.
+A session's run (the session-start hook launches it detached) ends with the dev server on :5173
+**left running**, then starts the agent's tools and SonarQube in the background. `--install-only`
+(the same switch clinozy-be's `bootstrap.sh` takes) installs Docker's SonarQube images and the
+agent's tools inline instead, and starts no server: a cached Setup script must terminate. Any other
+option is refused.
 
 Harness-agnostic by design. It runs the same on **Claude Code** (web, CLI,
 desktop), **Cursor** cloud agents, **Codex**, CI, or a plain shell. The only
@@ -25,7 +28,9 @@ and a dev server that serves the app shell.
 
 | File                       | Role                                                                                               |
 | -------------------------- | -------------------------------------------------------------------------------------------------- |
-| `bootstrap.sh`             | Orchestrator — runs all 10 steps, logs progress, enforces the hard gates                           |
+| `bootstrap.sh`             | Orchestrator — the one entry point: runs the steps, logs progress, enforces the hard gates         |
+| `install-agent-tools.sh`   | The agent's own tools, every installer below but Node and Docker (same step as clinozy-be's)       |
+| `stack-lock.lib.sh`        | The bring-up lock, so two runs never race (same script as clinozy-be)                              |
 | `lib.sh`                   | Shared helpers (logging, arch detection, apt, download, PATH persistence)                          |
 | `tool-versions.sh`         | The pinned tool versions and checksums (gitleaks, semgrep), read by the installers and CI          |
 | `install-node.sh`          | Pinned Node from `.nvmrc` into `/opt/node<major>`, linked into `~/.local/bin`                      |
@@ -40,23 +45,28 @@ and a dev server that serves the app shell.
 | `healthcheck.sh`           | Probes the dev server for the real app shell                                                       |
 | `start-sonarqube.sh`       | SonarQube for the pre-push gate, once no bring-up holds the stack lock (same script as clinozy-be) |
 
-Each `install-*.sh` runs standalone as well as under `bootstrap.sh`.
+Each `install-*.sh` runs standalone as well as under `bootstrap.sh`, which reaches every one of them,
+directly or through `install-agent-tools.sh` (pinned by `tests/ci/agent-session-start.policy.test.ts`).
 
 ## Steps and which ones can fail
 
-| #   | Step                                                                  | Gate        |
-| --- | --------------------------------------------------------------------- | ----------- |
-| 1   | Node runtime (pinned major) + corepack                                | **hard**¹   |
-| 2–5 | Distro tools, `gh`, gitleaks + Docker with the SonarQube images, `uv` | best-effort |
-| 6   | `pnpm install --frozen-lockfile`                                      | **hard**    |
-| 7   | `.env.local` (`setup:local --only-env`)                               | **hard**    |
-| 8–9 | MCP pair + codegraph index + session hooks, Playwright                | best-effort |
-| 10  | Dev server serves the app shell                                       | **hard**²   |
+| #   | Step                                                                      | Runs in      | Gate        |
+| --- | ------------------------------------------------------------------------- | ------------ | ----------- |
+| 1   | Node runtime (pinned major) + corepack                                    | both         | **hard**¹   |
+| 2   | `pnpm install --frozen-lockfile` — only when Node or the lockfile changed | both         | **hard**    |
+| 3   | `.env.local` (`setup:local --only-env`), OAuth buttons off                | both         | **hard**    |
+| 4   | Dev server on :5173 serves the app shell — **left running**               | a session    | **hard**    |
+| 4   | Docker + the SonarQube gate images                                        | Setup script | best-effort |
+| 5   | The agent's tools (`install-agent-tools.sh`), inline                      | Setup script | best-effort |
+| —   | The agent's tools, then SonarQube, detached once the dev server is live   | a session    | best-effort |
 
 ¹ The install itself is best-effort — a session Node of the right major is fine.
 Missing Node entirely is fatal.
 Best-effort steps log `•` and continue: a locked-down network should not cost
 you a whole session over an optional linter.
+
+Docker is touched only by the Setup script: in a session, `install-docker-images.sh` restarting the
+daemon to apply the registry mirror would take clinozy-be's Postgres and Redis down with it.
 
 ## Environment variables
 
@@ -91,10 +101,10 @@ blocked host degrades exactly one step:
 
 | Host                            | Needed for              | If blocked                   |
 | ------------------------------- | ----------------------- | ---------------------------- |
-| `nodejs.org`                    | Pinned Node download    | **Bring-up fails** on step 6 |
-| `registry.npmjs.org`            | `pnpm install`          | **Bring-up fails** on step 6 |
+| `nodejs.org`                    | Pinned Node download    | **Bring-up fails** on step 2 |
+| `registry.npmjs.org`            | `pnpm install`          | **Bring-up fails** on step 2 |
 | `github.com` / `api.github.com` | `gh`, gitleaks releases | Those tools are skipped      |
-| Distro apt mirrors              | Step 2 packages         | Those tools are skipped      |
+| Distro apt mirrors              | Distro CLI tools        | Those tools are skipped      |
 | `astral.sh` / `pypi.org`        | `uv` + headroom         | headroom MCP unavailable     |
 | `cdn.playwright.dev`            | E2E browsers            | E2E unavailable              |
 | `challenges.cloudflare.com`     | The Turnstile widget    | `/login` shows no captcha    |
@@ -124,34 +134,41 @@ Two deliberate divergences from the Mac list:
   pre-push gate; in a cloud session that gate is skipped and the daemon is
   usually unavailable anyway.
 - **codegraph** needs no installer: `@colbymchenry/codegraph` is a
-  devDependency, so `pnpm exec codegraph` works after step 6. On clinozy-be it is a
+  devDependency, so `pnpm exec codegraph` works after step 2. On clinozy-be it is a
   standalone CLI and does have one.
 
 ## Relationship to the other setup entry points
 
-| Entry point                             | Audience                     | What it does                                                                       |
-| --------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------- |
-| `pnpm setup:local`                      | Developer on macOS/Linux     | 5 phases, ends by starting `pnpm dev`                                              |
-| `tooling/setup/agent/bootstrap.sh`      | Cloud agent session          | This directory — terminates, never leaves a server of its own                      |
-| `agent-os/cloud-environment/install.sh` | Environment **Setup script** | Thin wrapper that calls `bootstrap.sh` — pass `--install-only` there               |
-| `agent-os/hooks/fe-session-start.mjs`   | Every interactive session    | Fast path — switches Node, installs deps if missing; on the web, starts `pnpm dev` |
+| Entry point                           | Audience                                                                                            | What it does                                                                             |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `pnpm setup:local`                    | Developer on macOS/Linux                                                                            | 5 phases, ends by starting `pnpm dev`                                                    |
+| `tooling/setup/agent/bootstrap.sh`    | Cloud agent session                                                                                 | This directory — the one entry point; a session's run leaves the dev server running      |
+| `bootstrap.sh --install-only`         | Environment **Setup script** and Cursor's `install` (`agent-os/cloud-environment/environment.json`) | The installs only, no server — the same line clinozy-be's Setup script runs              |
+| `agent-os/hooks/fe-session-start.mjs` | Every interactive session                                                                           | Fast path — switches Node, installs deps if missing; on the web, launches `bootstrap.sh` |
 
 A cached **Setup script** must terminate, which is why `bootstrap.sh` passes
-`--only-env` to `setup:local` and stops the dev server it started for the
-healthcheck.
+`--only-env` to `setup:local` and, with `--install-only`, starts no server. The Setup script runs
+outside the repositories, so it names each one by path — in a session that holds both:
 
-In a web session the session-start hook starts `pnpm dev` on :5173 itself, detached, so the app
-is up beside clinozy-be's live stack without anyone asking. It starts it once: a server already
-serving the app shell (a resumed session) is left alone, and step 10 probes that server instead of
-starting a second one. Its log is `/tmp/agent-stack/frontend.log` (`$AGENT_STACK_DIR`, the
-directory clinozy-be's bring-up uses); stop it with `pkill -s "$(cat /tmp/agent-stack/frontend.pid)"`
-— the pid is the session's, so Vite, which pnpm runs in another process group, stops with it.
+```bash
+bash /home/user/clinozy-be/tooling/setup/agent/bootstrap.sh --install-only
+bash /home/user/clinozy-fe/tooling/setup/agent/bootstrap.sh --install-only
+```
 
-Beside it the hook launches `start-sonarqube.sh`, detached. The script waits until no bring-up holds
-the agent-stack lock (clinozy-be's migrations and seed) and Docker answers, then starts this
-repository's SonarQube, so the first push finds the pre-push gate's server up instead of waiting
-about two minutes for it. It first checks the lock after 30 seconds: clinozy-be's session-start hook
-runs at the same moment as this one, and its `bootstrap.sh` takes the lock a moment later, so a
-check at once could miss a bring-up that is just starting. Its log is
+In a web session the session-start hook launches `bootstrap.sh` detached — as clinozy-be's hook
+launches its own — so the app is up beside clinozy-be's live stack without anyone asking. It
+launches it once: a dev server already serving the app shell (a resumed session), or a bring-up
+holding the lock (`stack-lock.lib.sh`, in `/tmp/agent-stack/frontend/`), is left alone, and a
+bring-up that finds the shell already served keeps that server instead of starting a second one.
+The logs sit in `/tmp/agent-stack/` (`$AGENT_STACK_DIR`, the directory clinozy-be's bring-up uses):
+`bootstrap-frontend.log` (the bring-up), `frontend.log` (Vite) and `agent-tools-frontend.log`. Stop
+the dev server with `pkill -s "$(cat /tmp/agent-stack/frontend.pid)"` — the pid is its session's,
+so Vite, which pnpm runs in another process group, stops with it.
+
+Once the dev server is live, `bootstrap.sh` launches `start-sonarqube.sh`, detached. The script
+waits until no bring-up holds clinozy-be's agent-stack lock (its migrations and seed) and Docker
+answers, then starts this repository's SonarQube, so the first push finds the pre-push gate's server
+up instead of waiting about two minutes for it. It first checks the lock after 30 seconds, so a
+check at once cannot miss a clinozy-be bring-up that is just starting. Its log is
 `/tmp/agent-stack/sonarqube-frontend.log`; `SONAR=0` in the environment skips it, and the gate still
 starts SonarQube itself whenever it is not up.

@@ -3,38 +3,39 @@
 Read this on **remote / cloud** sessions (Cursor Cloud Agents, Claude Code on
 the web) before tasks that need a browser or a live backend.
 
-Canonical config: [`agent-os/cloud-environment/`](./) (`install.sh`,
-`environment.json`) — `install.sh` is a thin wrapper over the bring-up scripts
-in [`tooling/setup/agent/`](../../tooling/setup/agent/README.md), which mirror
-clinozy-be's layout and run under any agent harness
-(`bash tooling/setup/agent/bootstrap.sh`).
+Canonical config: [`agent-os/cloud-environment/`](./) (`environment.json`, Cursor's) and the
+bring-up scripts in [`tooling/setup/agent/`](../../tooling/setup/agent/README.md), which mirror
+clinozy-be's layout and run under any agent harness. The one entry point is
+[`bootstrap.sh`](../../tooling/setup/agent/bootstrap.sh), as in clinozy-be: everything else runs
+inside it.
 **Skills, MCPs, subagents:** [`skills-and-mcps.md`](skills-and-mcps.md).
 
 clinozy-fe is a Vite SPA — there is **no** Postgres, Redis, Docker, or worker to
-bring up. The cached `install.sh` gives you everything the static and unit lanes
-need; only end-to-end browser tests need extra bring-up.
+bring up. The cached `bootstrap.sh --install-only` gives you everything the static and unit lanes
+need, and a web session's start brings the dev server up; only end-to-end browser tests need
+more.
 
 ## When to run bring-up
 
-| Task needs                                                                        | Run bring-up?                                            |
-| --------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Lint, `type-check`, unit tests (`pnpm test`), `pnpm agent-os:check`, `pnpm build` | No — runs cold after `install.sh`                        |
-| Playwright e2e (`pnpm test:e2e`)                                                  | Yes — install browsers **and** run clinozy-be on `:3000` |
-| `pnpm dev` preview against a real backend                                         | Yes — needs clinozy-be on `:3000`                        |
+| Task needs                                                                        | Run bring-up?                                                                         |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Lint, `type-check`, unit tests (`pnpm test`), `pnpm agent-os:check`, `pnpm build` | No — runs cold after `bootstrap.sh --install-only`                                    |
+| Playwright e2e (`pnpm test:e2e`)                                                  | Yes — install browsers **and** run clinozy-be on `:3000`                              |
+| `pnpm dev` preview against a real backend                                         | No on the web — a session's start keeps it on `:5173`; it needs clinozy-be on `:3000` |
 
 Everything in the "No" row runs on schema defaults: in `test` mode Vite loads no
 env files, so the suite is hermetic on a fresh checkout.
 
-## What `install.sh` does (cached, idempotent)
+## What `bootstrap.sh` does (idempotent)
 
-`install.sh` is a thin wrapper that `exec`s
-[`tooling/setup/agent/bootstrap.sh`](../../tooling/setup/agent/bootstrap.sh) —
-the same layout clinozy-be uses, so both repos are brought up the same way. The
-Setup-script path stays stable while the logic lives under `tooling/`, and the
-bring-up is runnable by hand or from any agent harness (Claude Code, Cursor,
+[`tooling/setup/agent/bootstrap.sh`](../../tooling/setup/agent/bootstrap.sh) is the same entry
+point clinozy-be has, at the same path, so both repos are brought up the same way: the
+environment's Setup script and Cursor's `install` call it with `--install-only`, a web session's
+start hook calls it without, and it runs by hand or from any agent harness (Claude Code, Cursor,
 Codex).
 
-Ten steps, in order:
+In a session — the session-start hook launches it detached, as clinozy-be's hook launches its
+own — four steps, in order:
 
 1. **Node runtime** —
    [`install-node.sh`](../../tooling/setup/agent/install-node.sh) downloads the
@@ -51,49 +52,69 @@ Ten steps, in order:
    the exact release (`24.21.0`), which is downloaded as-is; a less specific pin
    (`24` or `24.21`) would be resolved from `nodejs.org/dist/index.json` at
    install time rather than hardcoded — either way the pin stays authoritative.
-2. **Distro CLI tools** — `jq`, `ripgrep`, `shellcheck`, `rsvg-convert`, `xz`.
-3. **GitHub CLI** (`gh`) from the official `cli/cli` release.
-4. **Gate tools** — **gitleaks** (the `.husky/pre-commit` secret scan is mandatory: a commit
-   without gitleaks fails) and **Docker** with the SonarQube images the pre-push gate runs
-   (`install-docker-images.sh`: the `mirror.gcr.io` Docker Hub mirror, `dockerd`, pre-pull).
-5. **`uv`/`uvx`** — the prerequisite for the `headroom` MCP server.
-6. `corepack enable` + `pnpm install --frozen-lockfile`.
-7. `pnpm setup:local --only-env` — scaffolds `.env.local` (schema defaults; no
-   secrets). The `--only-env` flag is required: a bare `pnpm setup:local` runs
-   through to phase 5/5 and spawns a long-lived `pnpm dev`, which would hang
-   this script.
-8. `pnpm mcp:setup:default` — writes the default MCP pair (fe-codegraph +
-   fe-headroom) to `.mcp.json`; then `pnpm setup:local --only-codegraph` builds the codegraph
-   index the MCP server answers from (step 7's `--only-env` stops before it). The
-   first build takes about 2–3 minutes and ~250 MB in `.codegraph/`; later runs
-   only `sync` it. Last, `pnpm agent-os:session-hooks` registers the hooks: a
-   session that holds both repos takes them only from `/home/user/.claude/settings.json`,
-   so it writes both repos' hooks there, each with absolute paths and its own
-   `CLAUDE_PROJECT_DIR`, and registers each repo's codegraph server at user level
-   (`~/.claude.json`), pointed at it with `--path` (a no-op with one repo). Each repo's file hooks then act only on its own files. To check it in a
-   new session, look for one "session ready (hooks from …)" line per repo in the
-   session context.
-9. **Playwright browsers** — skipped when the image already ships them.
-10. **Healthcheck** — starts the dev server transiently, verifies it serves the
-    real app shell, then stops it. Skipped by `--install-only`, the switch for the
-    environment's Setup script (the same one clinozy-be's `bootstrap.sh` takes):
-    there it only booted Vite to stop it again, and a session's start hook starts
-    the dev server itself. Any other option is refused.
+2. `corepack enable` + `pnpm install --frozen-lockfile` — only when Node or the lockfile changed
+   since it last succeeded here (a stamp in `node_modules/.agent-stamps/`, as clinozy-be keeps).
+3. `pnpm setup:local --only-env` — scaffolds `.env.local` (schema defaults; no
+   secrets), with the Google / GitHub sign-in buttons off. The `--only-env` flag is required: a
+   bare `pnpm setup:local` runs through to phase 5/5 and spawns a long-lived `pnpm dev`, which
+   would hang this script.
+4. **Dev server** — `pnpm dev` on :5173 in its own session, health checked (it serves the real
+   app shell), then **left running**, as clinozy-be leaves its API running. One already serving
+   the shell (a resumed session) is kept, never joined by a second.
+
+Then, in the background — the app needs none of them, so they never hold the dev server up — the
+agent's tools ([`install-agent-tools.sh`](../../tooling/setup/agent/install-agent-tools.sh)) and
+SonarQube for the pre-push gate ([`start-sonarqube.sh`](../../tooling/setup/agent/start-sonarqube.sh)).
+A lock in `/tmp/agent-stack/frontend/` keeps two bring-ups from racing.
+
+The environment's Setup script runs the same script with `--install-only` (the switch
+clinozy-be's `bootstrap.sh` takes): steps 1–3, then
+
+4. **Docker** with the SonarQube images the pre-push gate runs (`install-docker-images.sh`: the
+   `mirror.gcr.io` Docker Hub mirror, `dockerd`, pre-pull) — only here, never in a session, where
+   a restart to apply the mirror would take clinozy-be's Postgres and Redis down with it.
+5. **The agent's tools**, inline
+   ([`install-agent-tools.sh`](../../tooling/setup/agent/install-agent-tools.sh)):
+   - the distro CLI tools — `jq`, `ripgrep`, `shellcheck`, `rsvg-convert`, `xz`;
+   - the GitHub CLI (`gh`) from the official `cli/cli` release;
+   - **gitleaks** (the `.husky/pre-commit` secret scan is mandatory: a commit without gitleaks
+     fails) and **semgrep** at its pin (`pnpm security:semgrep:push`);
+   - **`uv`/`uvx`** — the prerequisite for the `headroom` MCP server;
+   - `pnpm mcp:setup:default` — writes the default MCP pair (fe-codegraph + fe-headroom) to
+     `.mcp.json`; then `pnpm setup:local --only-codegraph` builds the codegraph index the MCP
+     server answers from (step 3's `--only-env` stops before it). The first build takes about 2–3
+     minutes and ~250 MB in `.codegraph/`; later runs only `sync` it. Last,
+     `pnpm agent-os:session-hooks` registers the hooks: a session that holds both repos takes them
+     only from `/home/user/.claude/settings.json`, so it writes both repos' hooks there, each with
+     absolute paths and its own `CLAUDE_PROJECT_DIR`, and registers each repo's codegraph server
+     at user level (`~/.claude.json`), pointed at it with `--path` (a no-op with one repo). Each
+     repo's file hooks then act only on its own files. To check it in a new session, look for one
+     "session ready (hooks from …)" line per repo in the session context;
+   - **Playwright browsers** — skipped when the image already ships them.
+
+It starts no server: a cached Setup script must terminate. Any other option is refused.
 
 ```bash
-bash agent-os/cloud-environment/install.sh --install-only   # the Setup script: steps 1-9
+bash tooling/setup/agent/bootstrap.sh --install-only   # the Setup script, and Cursor's install
 ```
 
-Steps 2–5 and 8–9 are best-effort and log `•` without aborting; Node, the
-dependency install, the env scaffold, and the healthcheck are hard gates. No
-service is left running.
+The environment's Setup script runs outside the repositories, so it names each one by path — for
+a session that holds both, one line per repository, clinozy-be's first:
+
+```bash
+bash /home/user/clinozy-be/tooling/setup/agent/bootstrap.sh --install-only
+bash /home/user/clinozy-fe/tooling/setup/agent/bootstrap.sh --install-only
+```
+
+The tool installs are best-effort and log `•` without aborting; Node, the dependency install, the
+env scaffold and, in a session, the dev server's healthcheck are hard gates.
 
 Full reference — every step, env var, and network host:
 [`tooling/setup/agent/README.md`](../../tooling/setup/agent/README.md).
 
 ## Environment variables (cloud)
 
-A cloud session runs as **`local`** — the `.env.local` from step 7 — on **development** values for
+A cloud session runs as **`local`** — the `.env.local` from step 3 — on **development** values for
 everything except the API it talks to (clinozy-be does the same with everything except its
 database and Redis; see its `docs/integrations/claude-code-web-environment.md`):
 
@@ -123,7 +144,7 @@ pnpm test:e2e
 
 ## MCP default pair
 
-`install.sh` scaffolds `codegraph` and `headroom` into
+`bootstrap.sh` (its agent tools, `install-agent-tools.sh`) scaffolds `codegraph` and `headroom` into
 [`.mcp.json`](../../.mcp.json) via `pnpm mcp:setup:default` (same as local
 `pnpm setup:local`). If MCP tools are missing in a session, confirm the platform
 MCP settings match [`.mcp.default.json`](../../.mcp.default.json) and start a

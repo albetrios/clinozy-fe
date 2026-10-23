@@ -101,6 +101,31 @@ describe('fe-guardrails: every destructive shell shape', () => {
   });
 });
 
+// A prompt to drive a PR names this repository's babysit skill — fe-pr-babysit, the fe- prefixed
+// name, since there is no bare `babysit` or `steward` skill — without a build verb, while an
+// ordinary prompt still produces nothing. clinozy-be pins the same for be-pr-babysit.
+describe('fe-prompt-skill-router.mjs routes a PR to drive to fe-pr-babysit', () => {
+  it('names fe-pr-babysit for babysit / make it green / fix CI, and stays silent otherwise', () => {
+    const context = (text: string) =>
+      runHook('fe-prompt-skill-router.mjs', {
+        session_id: 'routing',
+        hook_event_name: 'UserPromptSubmit',
+        prompt: text,
+      }).stdout;
+
+    for (const text of [
+      'yes please create PRs and make it green',
+      'babysit the PR',
+      'CI is red — fix CI on the PR',
+      'watch the PR until it is merge-ready',
+    ]) {
+      expect(context(text), text).toContain('fe-pr-babysit');
+    }
+    expect(context('what does the auth guard do?')).toBe('');
+    expect(context('make the button green')).not.toContain('fe-pr-babysit');
+  });
+});
+
 describe('agent-os guard gaps', () => {
   it('routes Read, Grep and MultiEdit to fe-guardrails.mjs and the reminders', () => {
     expect(entry('fe-guardrails.mjs')?.claude?.matcher?.split('|')).toEqual(

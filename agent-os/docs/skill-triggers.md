@@ -38,6 +38,7 @@ Read in order; **project guardrails always win** over skill suggestions.
 | codemod / sweep / bulk file edits                                            | `fe-safe-bulk-edits`                                                          |
 | adding / renaming an agent-os skill or rule                                  | `fe-agent-os-authoring`                                                       |
 | addressing a review report / PR threads                                      | `fe-review-response`                                                          |
+| babysit a PR / make it green / fix CI on a PR                                | `fe-pr-babysit` (`/fe-watch-pr`)                                              |
 | org-scoped route / guards / gateway / session                                | `fe-routing-tenancy` (after `fe-route-island`)                                |
 | backend resource CRUD (list + URL dialogs)                                   | `fe-route-island` → `fe-resource-crud` → `fe-routing-tenancy` (if org-scoped) |
 | form mutation + API errors                                                   | `composition-patterns` → `fe-http-forms-errors` → `fe-test-generation`        |

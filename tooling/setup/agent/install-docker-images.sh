@@ -13,7 +13,8 @@
 # It (a) writes the registry mirror into /etc/docker/daemon.json, (b) starts dockerd
 # (ensure-docker-daemon.sh) and (c) best-effort pre-pulls the SonarQube server and scanner the
 # pre-push gate runs, so the cached Setup filesystem (including /var/lib/docker) already holds them.
-# Run by bootstrap.sh step 4.
+# Run by bootstrap.sh in the Setup script only (--install-only, step 4): in a session, a restart to
+# apply the mirror would take clinozy-be's Postgres and Redis down with it.
 #
 # Idempotent and best-effort: never hard-fails the setup chain. Diagnostics → stderr.
 set -uo pipefail
