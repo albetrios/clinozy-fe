@@ -93,8 +93,12 @@ export async function createOrganization(
   return mapOrganizationWire(res.data);
 }
 
+/**
+ * Rename the ACTIVE organization. There is no organization id to pass: clinozy-be resolves
+ * the target from the signed `org` claim in the access token (`PATCH /tenancy/organization`),
+ * so a parameter here could only suggest a choice the server never offers.
+ */
 export async function updateOrganization(
-  _organizationId: string,
   input: UpdateOrganizationInput,
 ): Promise<Organization> {
   const payload = updateOrganizationSchema.parse(input);
