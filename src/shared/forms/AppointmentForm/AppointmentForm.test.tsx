@@ -23,6 +23,7 @@ import type { Contact } from '@/shared/api/app/contacts-contracts.ts';
 import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import { CONFIRM_TEST_IDS } from '@/shared/components/ConfirmDialog/index.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAppointment } from '@/shared/hooks/useAppointments/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -1098,5 +1099,64 @@ describe('AppointmentForm — the width (KICKOFF §6.4)', () => {
     renderBooking(BOOKING);
     const panel = await form(EDIT);
     expect(within(panel).queryByTestId(IDS.chat)).not.toBeInTheDocument();
+  });
+});
+
+describe('AppointmentForm — a booking that has to be tried again (WF-01)', () => {
+  /** A refusal in clinozy-be's error envelope. */
+  const refusal = (path: string, reason: string, detail: string) =>
+    new HttpError(detail, 409, path, 'POST', { error: { reason, detail } });
+
+  it('books a new person whose slot was just taken on another slot — as the contact the first try made', async () => {
+    const user = setUser();
+    const makeContact = vi.mocked(createContact).getMockImplementation();
+    if (!makeContact) throw new Error('createContact has no world implementation');
+    // clinozy-be: the person's number, sent again, is that contact's now (CT3).
+    vi.mocked(createContact)
+      .mockImplementationOnce(makeContact)
+      .mockRejectedValue(
+        refusal(
+          '/app/contacts',
+          'contact_phone_exists',
+          '+919811122233 is already on Meera Iyer (C-1300)',
+        ),
+      );
+    vi.mocked(createAppointment).mockRejectedValueOnce(
+      refusal(
+        '/app/appointments',
+        'slot_taken',
+        'The doctor is already booked at this time',
+      ),
+    );
+    const { onSaved } = renderNew({ prefill: { date: '2026-10-05' } });
+    const panel = await form(NEW);
+    await user.type(within(panel).getByTestId(IDS.whoSearch), 'Meera Iyer');
+    await user.click(await within(panel).findByTestId(IDS.whoCreate));
+    await user.type(
+      within(panel).getByTestId(`${IDS.who}-quick-add-mobile`),
+      '9811122233',
+    );
+    await user.click(within(panel).getByTestId(`${IDS.who}-quick-add-submit`));
+    await user.click(await slotAt(panel, '11:00'));
+    await user.click(within(panel).getByTestId(`${NEW}-save`));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith('Just taken · pick another slot'),
+    );
+    // The card is that contact now, not "New contact · add their mobile to book".
+    await waitFor(() =>
+      expect(within(panel).getByTestId(IDS.whoCard)).not.toHaveTextContent('New contact'),
+    );
+    await user.click(await slotAt(panel, '14:00'));
+    await user.click(within(panel).getByTestId(`${NEW}-save`));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
+    expect(createContact).toHaveBeenCalledOnce();
+    expect(
+      vi
+        .mocked(createAppointment)
+        .mock.calls.map(([vars]) => [vars.input.contactId, vars.input.startTime]),
+    ).toEqual([
+      ['con_meera0000000000000000', '11:00'],
+      ['con_meera0000000000000000', '14:00'],
+    ]);
   });
 });

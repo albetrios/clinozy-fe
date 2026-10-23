@@ -27,7 +27,7 @@ import {
   APPOINTMENT_FORM_NS,
   APPOINTMENT_FORM_TEST_IDS,
 } from './appointment-form.constants.ts';
-import { draftComplete, saveLabelKind } from './appointment-form-model.ts';
+import { draftComplete, saveLabelKind, whoOfContact } from './appointment-form-model.ts';
 import { appointmentFormWidths } from './appointment-form-widths.ts';
 import { footerSummary, formTitle, saveLabelText } from './appointment-form-words.ts';
 import {
@@ -220,6 +220,9 @@ function useFormSave(
       }
     },
     onDone: (outcome) => (onSaved ? onSaved(outcome) : onClose()),
+    // Now that contact: the card offers Change and Edit, and a retry books them.
+    onContactCreated: (contact) =>
+      state.change({ kind: 'who', who: whoOfContact(contact) }),
   });
 }
 

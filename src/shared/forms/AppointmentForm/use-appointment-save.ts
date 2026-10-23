@@ -1,11 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { appInstant } from '@/shared/api/app/app-time.ts';
 import { appointmentQueryKeys } from '@/shared/api/app/appointments-api.ts';
 import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import type { Contact } from '@/shared/api/app/contacts-contracts.ts';
 import { appPhoneProblem } from '@/shared/app/app-phone-field.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import {
@@ -100,6 +101,12 @@ export interface UseAppointmentSaveOptions {
   /** A check failed: the form opens the step that holds it. */
   onProblem: (problem: Exclude<AppointmentSaveProblem, null>) => void;
   onDone: (outcome: AppointmentSaveOutcome) => void;
+  /**
+   * A new person was added as a contact (`POST /app/contacts`) before their booking landed: the
+   * form holds them as that contact from now on — as the invoice drawer keeps a new buyer
+   * (`buyerContactOf`) — so the next save books them instead of adding them again.
+   */
+  onContactCreated?: (contact: Contact) => void;
 }
 
 /**
@@ -113,7 +120,9 @@ export interface UseAppointmentSaveOptions {
  * toasts "Just taken · pick another slot"; the other slot refusals and any
  * other 4xx toast the server's reason — the grid is read again and the draft
  * kept; a dropped connection keeps it with "Not saved · your changes are
- * kept", "Retry save" and a toast whose "Retry" saves again.
+ * kept", "Retry save" and a toast whose "Retry" saves again. A new person is
+ * added once: every later attempt — a slot refusal, the toast's Retry, another
+ * click — books the contact the first one made (`onContactCreated`).
  */
 export function useAppointmentSave({
   mode,
@@ -122,11 +131,17 @@ export function useAppointmentSave({
   branchId,
   onProblem,
   onDone,
+  onContactCreated,
 }: UseAppointmentSaveOptions) {
   const { t } = useTranslation([APPOINTMENT_FORM_NS, ERRORS_NS]);
   const queryClient = useQueryClient();
   const organizationId = useOrganizationStore((state) => state.organizationId);
   const [saveState, setSaveState] = useState<DrawerSaveState>('idle');
+  /**
+   * The contact this opening already made for a new person, by the name and mobile it was made
+   * with. A Retry closure holds the draft it started from, so the draft alone cannot carry it.
+   */
+  const created = useRef<{ person: string; contactId: string } | null>(null);
   const createContact = useCreateContact({ notifyOnError: false });
   const create = useCreateAppointment({ notifyOnError: false });
   const copy = useCopyAppointment({ notifyOnError: false });
@@ -152,14 +167,21 @@ export function useAppointmentSave({
     });
   };
 
-  /** The contact a new booking points at — a new person's is created first. */
+  /**
+   * The contact a new booking points at — a new person's is created first, once: a retry books
+   * the contact already made (`409 contact_phone_exists` otherwise — the number is theirs now).
+   */
   const contactIdOf = async (draft: AppointmentDraft): Promise<string> => {
     const who = draft.who;
     if (who?.contactId) return who.contactId;
     const phone = newContactPhone(draft);
+    const person = `${who?.name ?? ''}|${phone ?? ''}`;
+    if (created.current?.person === person) return created.current.contactId;
     const contact = await createContact.mutateAsync(
       contactFieldsOf(emptyContactValue(who?.name ?? '', phone)),
     );
+    created.current = { person, contactId: contact.id };
+    onContactCreated?.(contact);
     return contact.id;
   };
 
