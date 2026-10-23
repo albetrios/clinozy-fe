@@ -10,7 +10,8 @@
 // prompt that is /fe-ship or /fe-open-pr marks the turn as the PR request.
 //
 // Conservative by design: requires a build/change verb AND a domain noun, so ordinary prompts
-// (questions, "run the tests", "explain this") produce nothing and never nag. Fails OPEN: an
+// (questions, "run the tests", "explain this") produce nothing and never nag; the one exception is
+// a PR to drive ("babysit", "make it green", "fix CI"), routed to fe-pr-babysit. Fails OPEN: an
 // unreadable payload, no prompt, or no match exits 0 silently.
 import { addModelContext, readHookPayload } from './_fe-hook.mjs';
 import { recordTelemetry } from './_fe-telemetry.mjs';
@@ -62,6 +63,15 @@ const SKILL_HINTS = [
   ],
 ];
 
+/**
+ * Driving a PR needs no build verb: "babysit the PR", "make it green", "fix CI" name the babysit
+ * skill, which carries the fe- prefix (there is no bare `babysit` or `steward` skill to find).
+ */
+const PULL_REQUEST_INTENT =
+  /\bbabysit|\bmake (it|them|the prs?|this pr) green\b|\bfix (the )?ci\b|\bci (is |went )?red\b|\bmerge[- ]ready\b|\bwatch (the |this )?prs?\b/;
+const PULL_REQUEST_ROUTE =
+  'PR to green / merge → fe-pr-babysit (/fe-watch-pr; one fe-ci-investigator per red check; /fe-merge-pr only when green and asked)';
+
 const payload = readHookPayload();
 const session = payload?.session_id;
 resetTurn(session);
@@ -76,6 +86,7 @@ const lower = prompt.toLowerCase();
 const hints = BUILD_INTENT.test(lower)
   ? SKILL_HINTS.filter(([pattern]) => pattern.test(lower)).map(([, hint]) => hint)
   : [];
+if (PULL_REQUEST_INTENT.test(lower)) hints.push(PULL_REQUEST_ROUTE);
 if (hints.length > 0) {
   addModelContext({
     event: 'UserPromptSubmit',

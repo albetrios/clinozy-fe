@@ -39,7 +39,8 @@
       "fe-guard-authoring",
       "fe-pre-pr-sweep",
       "fe-safe-bulk-edits",
-      "fe-review-response"
+      "fe-review-response",
+      "fe-pr-babysit"
     ],
     "docs": [
       "fe-documentation-maintenance",

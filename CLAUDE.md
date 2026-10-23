@@ -182,3 +182,7 @@ Colocated unit tests (`src/**/*.test.{ts,tsx}`), `tests/` for helpers, security,
 ## Git branch naming
 
 Working branches are `<type>/<short-description>`; `main` is the only long-lived branch (`.husky/pre-push`). A web session starts on a throwaway `claude/<slug>` branch: **rename it before the first push** (`git branch -m <type>/<short-description>`), because the cloud git proxy rejects every branch delete. The full rule and deriving the name: [`.github/CLAUDE.md`](.github/CLAUDE.md).
+
+## Driving a pull request
+
+To babysit a PR — make it green, fix CI, work the review threads, resolve a conflict, merge when asked — use the **`fe-pr-babysit`** skill ([`agent-os/skills/fe-pr-babysit/SKILL.md`](agent-os/skills/fe-pr-babysit/SKILL.md)) and `/fe-watch-pr <n>` to watch it; `/fe-merge-pr` only on green. It is this repository's babysit: agent-os names carry the `fe-` prefix, so there is no bare `babysit` or `steward` skill (`.claude/skills/babysit/` does not exist). The prompt router (`fe-prompt-skill-router.mjs`) names it on a prompt like "make it green" or "fix CI".
