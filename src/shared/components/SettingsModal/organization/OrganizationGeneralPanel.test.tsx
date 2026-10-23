@@ -97,9 +97,7 @@ describe('OrganizationGeneralPanel', () => {
     await user.clear(input);
     await user.type(input, 'Acme Co.');
     await user.click(screen.getByTestId('org-general-save'));
-    await waitFor(() =>
-      expect(updateMock).toHaveBeenCalledWith(ACME_ID, { name: 'Acme Co.' }),
-    );
+    await waitFor(() => expect(updateMock).toHaveBeenCalledWith({ name: 'Acme Co.' }));
   });
 
   it('disables editing without the manage permission', async () => {

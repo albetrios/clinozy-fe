@@ -87,7 +87,7 @@ describe('updateOrganization', () => {
       },
     } as never);
 
-    await updateOrganization('org_acme', { name: 'Acme Co.' });
+    await updateOrganization({ name: 'Acme Co.' });
 
     expect(apiClient.patch).toHaveBeenCalledWith(
       expect.stringContaining('/tenancy/organization'),

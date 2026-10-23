@@ -36,12 +36,10 @@ beforeEach(() => {
 });
 
 describe('useUpdateOrganization', () => {
-  it('renames the active org via updateOrganization with the store org id', async () => {
+  it('renames the active org via updateOrganization', async () => {
     const { result } = renderHook(() => useUpdateOrganization(), { wrapper });
     result.current.mutate({ name: 'Acme Co.' });
-    await waitFor(() =>
-      expect(updateMock).toHaveBeenCalledWith('org_acme', { name: 'Acme Co.' }),
-    );
+    await waitFor(() => expect(updateMock).toHaveBeenCalledWith({ name: 'Acme Co.' }));
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
   });
 

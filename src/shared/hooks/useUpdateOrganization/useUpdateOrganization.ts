@@ -22,7 +22,7 @@ export function useUpdateOrganization() {
   return useAppMutation({
     mutationFn: (input: UpdateOrganizationInput) => {
       if (!organizationId) throw new Error('No active organization');
-      return updateOrganization(organizationId, input);
+      return updateOrganization(input);
     },
     invalidateKeys: [myOrganizationsQueryKey, meContextQueryKey],
     successMessage: i18n.t(ERRORS_KEYS.frontend.organization.updateSuccess, {
