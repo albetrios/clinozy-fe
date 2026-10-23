@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import {
   chmodSync,
   copyFileSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -261,10 +262,31 @@ describe('agent-os/hooks/fe-session-start.mjs', () => {
     // take clinozy-be's Postgres and Redis down with it.
     expect(setupOnly).toContain(`bash "\${AGENT_DIR}/install-docker-images.sh"`);
     expect(bootstrap.match(/install-docker-images\.sh"/g)).toHaveLength(1);
-    const wrapper = readFileSync(
-      join(process.cwd(), 'agent-os', 'cloud-environment', 'install.sh'),
+  });
+
+  it("the cached install calls bootstrap.sh --install-only itself, as clinozy-be's does", () => {
+    // One entry point, at the path clinozy-be uses: Cursor's install runs the same line as the
+    // environment's Setup script, and no wrapper stands in front of it (a wrapper called without
+    // the flag once ran a session's bring-up inside the cached install).
+    const environment = JSON.parse(
+      readFileSync(
+        join(process.cwd(), 'agent-os', 'cloud-environment', 'environment.json'),
+        'utf8',
+      ),
+    ) as { install: string };
+    expect(environment.install).toBe(
+      'bash tooling/setup/agent/bootstrap.sh --install-only',
+    );
+    expect(
+      existsSync(join(process.cwd(), 'agent-os', 'cloud-environment', 'install.sh')),
+    ).toBe(false);
+    // The documented Setup-script line for a session that holds both repositories.
+    const guide = readFileSync(
+      join(process.cwd(), 'agent-os', 'cloud-environment', 'agents-cloud.md'),
       'utf8',
     );
-    expect(wrapper).toContain('exec bash tooling/setup/agent/bootstrap.sh "$@"');
+    expect(guide).toContain(
+      'bash /home/user/clinozy-fe/tooling/setup/agent/bootstrap.sh --install-only',
+    );
   });
 });

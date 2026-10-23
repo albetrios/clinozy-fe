@@ -139,15 +139,21 @@ Two deliberate divergences from the Mac list:
 
 ## Relationship to the other setup entry points
 
-| Entry point                             | Audience                     | What it does                                                                             |
-| --------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------- |
-| `pnpm setup:local`                      | Developer on macOS/Linux     | 5 phases, ends by starting `pnpm dev`                                                    |
-| `tooling/setup/agent/bootstrap.sh`      | Cloud agent session          | This directory — the one entry point; a session's run leaves the dev server running      |
-| `agent-os/cloud-environment/install.sh` | Environment **Setup script** | Thin wrapper that calls `bootstrap.sh` — pass `--install-only` there                     |
-| `agent-os/hooks/fe-session-start.mjs`   | Every interactive session    | Fast path — switches Node, installs deps if missing; on the web, launches `bootstrap.sh` |
+| Entry point                           | Audience                                                                                            | What it does                                                                             |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `pnpm setup:local`                    | Developer on macOS/Linux                                                                            | 5 phases, ends by starting `pnpm dev`                                                    |
+| `tooling/setup/agent/bootstrap.sh`    | Cloud agent session                                                                                 | This directory — the one entry point; a session's run leaves the dev server running      |
+| `bootstrap.sh --install-only`         | Environment **Setup script** and Cursor's `install` (`agent-os/cloud-environment/environment.json`) | The installs only, no server — the same line clinozy-be's Setup script runs              |
+| `agent-os/hooks/fe-session-start.mjs` | Every interactive session                                                                           | Fast path — switches Node, installs deps if missing; on the web, launches `bootstrap.sh` |
 
 A cached **Setup script** must terminate, which is why `bootstrap.sh` passes
-`--only-env` to `setup:local` and, with `--install-only`, starts no server.
+`--only-env` to `setup:local` and, with `--install-only`, starts no server. The Setup script runs
+outside the repositories, so it names each one by path — in a session that holds both:
+
+```bash
+bash /home/user/clinozy-be/tooling/setup/agent/bootstrap.sh --install-only
+bash /home/user/clinozy-fe/tooling/setup/agent/bootstrap.sh --install-only
+```
 
 In a web session the session-start hook launches `bootstrap.sh` detached — as clinozy-be's hook
 launches its own — so the app is up beside clinozy-be's live stack without anyone asking. It

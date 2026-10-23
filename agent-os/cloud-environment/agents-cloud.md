@@ -3,35 +3,35 @@
 Read this on **remote / cloud** sessions (Cursor Cloud Agents, Claude Code on
 the web) before tasks that need a browser or a live backend.
 
-Canonical config: [`agent-os/cloud-environment/`](./) (`install.sh`,
-`environment.json`) — `install.sh` is a thin wrapper over the bring-up scripts
-in [`tooling/setup/agent/`](../../tooling/setup/agent/README.md), which mirror
-clinozy-be's layout and run under any agent harness
-(`bash tooling/setup/agent/bootstrap.sh`).
+Canonical config: [`agent-os/cloud-environment/`](./) (`environment.json`, Cursor's) and the
+bring-up scripts in [`tooling/setup/agent/`](../../tooling/setup/agent/README.md), which mirror
+clinozy-be's layout and run under any agent harness. The one entry point is
+[`bootstrap.sh`](../../tooling/setup/agent/bootstrap.sh), as in clinozy-be: everything else runs
+inside it.
 **Skills, MCPs, subagents:** [`skills-and-mcps.md`](skills-and-mcps.md).
 
 clinozy-fe is a Vite SPA — there is **no** Postgres, Redis, Docker, or worker to
-bring up. The cached `install.sh` gives you everything the static and unit lanes
-need; only end-to-end browser tests need extra bring-up.
+bring up. The cached `bootstrap.sh --install-only` gives you everything the static and unit lanes
+need, and a web session's start brings the dev server up; only end-to-end browser tests need
+more.
 
 ## When to run bring-up
 
-| Task needs                                                                        | Run bring-up?                                            |
-| --------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Lint, `type-check`, unit tests (`pnpm test`), `pnpm agent-os:check`, `pnpm build` | No — runs cold after `install.sh`                        |
-| Playwright e2e (`pnpm test:e2e`)                                                  | Yes — install browsers **and** run clinozy-be on `:3000` |
-| `pnpm dev` preview against a real backend                                         | Yes — needs clinozy-be on `:3000`                        |
+| Task needs                                                                        | Run bring-up?                                                                         |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Lint, `type-check`, unit tests (`pnpm test`), `pnpm agent-os:check`, `pnpm build` | No — runs cold after `bootstrap.sh --install-only`                                    |
+| Playwright e2e (`pnpm test:e2e`)                                                  | Yes — install browsers **and** run clinozy-be on `:3000`                              |
+| `pnpm dev` preview against a real backend                                         | No on the web — a session's start keeps it on `:5173`; it needs clinozy-be on `:3000` |
 
 Everything in the "No" row runs on schema defaults: in `test` mode Vite loads no
 env files, so the suite is hermetic on a fresh checkout.
 
-## What `install.sh` does (cached, idempotent)
+## What `bootstrap.sh` does (idempotent)
 
-`install.sh` is a thin wrapper that `exec`s
-[`tooling/setup/agent/bootstrap.sh`](../../tooling/setup/agent/bootstrap.sh) —
-the same layout clinozy-be uses, so both repos are brought up the same way. The
-Setup-script path stays stable while the logic lives under `tooling/`, and the
-bring-up is runnable by hand or from any agent harness (Claude Code, Cursor,
+[`tooling/setup/agent/bootstrap.sh`](../../tooling/setup/agent/bootstrap.sh) is the same entry
+point clinozy-be has, at the same path, so both repos are brought up the same way: the
+environment's Setup script and Cursor's `install` call it with `--install-only`, a web session's
+start hook calls it without, and it runs by hand or from any agent harness (Claude Code, Cursor,
 Codex).
 
 In a session — the session-start hook launches it detached, as clinozy-be's hook launches its
@@ -95,7 +95,15 @@ clinozy-be's `bootstrap.sh` takes): steps 1–3, then
 It starts no server: a cached Setup script must terminate. Any other option is refused.
 
 ```bash
-bash agent-os/cloud-environment/install.sh --install-only   # the Setup script
+bash tooling/setup/agent/bootstrap.sh --install-only   # the Setup script, and Cursor's install
+```
+
+The environment's Setup script runs outside the repositories, so it names each one by path — for
+a session that holds both, one line per repository, clinozy-be's first:
+
+```bash
+bash /home/user/clinozy-be/tooling/setup/agent/bootstrap.sh --install-only
+bash /home/user/clinozy-fe/tooling/setup/agent/bootstrap.sh --install-only
 ```
 
 The tool installs are best-effort and log `•` without aborting; Node, the dependency install, the
@@ -136,7 +144,7 @@ pnpm test:e2e
 
 ## MCP default pair
 
-`install.sh` scaffolds `codegraph` and `headroom` into
+`bootstrap.sh` (its agent tools, `install-agent-tools.sh`) scaffolds `codegraph` and `headroom` into
 [`.mcp.json`](../../.mcp.json) via `pnpm mcp:setup:default` (same as local
 `pnpm setup:local`). If MCP tools are missing in a session, confirm the platform
 MCP settings match [`.mcp.default.json`](../../.mcp.default.json) and start a
