@@ -6,6 +6,7 @@ import {
   composerShowsLabels,
 } from '@/shared/components/ChatColumn/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
+import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
 
 import { taskContactCard } from '../../tasks.display.ts';
@@ -48,6 +49,8 @@ export function TaskDrawerChat({
   onSent,
 }: TaskDrawerChatProps) {
   const contact = useContact(canReadContact ? person.id : undefined).data;
+  // The composer needs `contact_activity:create` (the codes in force, a View-as preview's too).
+  const stream = useContactActivityAccess();
   return (
     <ChatColumn
       person={{ kind: 'contact', contactId: person.id }}
@@ -72,6 +75,7 @@ export function TaskDrawerChat({
           : undefined
       }
       showModeLabels={composerShowsLabels(viewportWidth, chatWidth)}
+      canSend={stream.writes}
       contactCard={{ data: taskContactCard({ person }) ?? undefined, ...contactActions }}
       onBookAppointment={onBookAppointment ? () => onBookAppointment() : undefined}
       onSent={onSent}

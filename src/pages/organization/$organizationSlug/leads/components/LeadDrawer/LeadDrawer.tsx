@@ -22,6 +22,7 @@ import {
   type AppointmentFormPrefill,
   leadBookingPrefill,
 } from '@/shared/forms/AppointmentForm/index.ts';
+import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
@@ -159,6 +160,8 @@ export function LeadDrawer({
   const widths = leadDrawerWidths(viewport, chatWidth);
   const draft = useLeadDraft(lead);
   const contact = useContact(lead.contactId).data;
+  // The composer needs `contact_activity:create` (the codes in force, a View-as preview's too).
+  const stream = useContactActivityAccess();
   const [removing, setRemoving] = useState(false);
   const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
 
@@ -188,6 +191,7 @@ export function LeadDrawer({
           patientId: lead.patientId,
         }}
         showModeLabels={!phone && composerShowsLabels(viewport, chatWidth)}
+        canSend={stream.writes}
         contactCard={{
           data: leadContactCardData(
             lead,

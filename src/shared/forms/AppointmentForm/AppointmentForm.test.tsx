@@ -66,11 +66,13 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
+/** Whether the member may write to the person's stream (`contact_activity:create`). */
+const stream = vi.hoisted(() => ({ writes: true }));
 vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
   useAppAccess: () => ({
     previewRole: null,
     can: () => true,
-    canCode: () => true,
+    canCode: (code: string) => code !== 'contact_activity:create' || stream.writes,
     viewableSections: [],
     isResolved: true,
   }),
@@ -460,6 +462,7 @@ beforeEach(async () => {
   viewport.tier = 'desktop';
   viewport.width = 1440;
   vi.resetAllMocks();
+  stream.writes = true;
   world.appointments = [];
   world.slots = new Map();
   world.contacts = [structuredClone(RIYA)];
@@ -822,7 +825,20 @@ describe('AppointmentForm — Edit (KICKOFF §6.4)', () => {
     );
     expect(within(panel).getByTestId(`${EDIT}-save`)).toBeDisabled();
     expect(within(panel).getByTestId(IDS.chat)).toBeInTheDocument();
+    expect(await within(panel).findByTestId('chat-textarea')).toBeInTheDocument();
     expect(await axeForDialog(panel)).toHaveNoViolations();
+  });
+
+  // QA-07's pattern: a member who reads the stream but may not write it had a composer the server
+  // refused.
+  it('shows the chat without a composer to a member who may not write to the person', async () => {
+    stream.writes = false;
+    renderBooking(BOOKING);
+    const panel = await form(EDIT);
+    const chat = within(panel).getByTestId(IDS.chat);
+    // The thread is read — its divider is up — and has no composer under it.
+    expect(await within(chat).findByTestId('chat-thread-divider')).toBeInTheDocument();
+    expect(within(chat).queryByTestId('chat-textarea')).not.toBeInTheDocument();
   });
 
   it('confirms through the confirm route — no field is sent', async () => {

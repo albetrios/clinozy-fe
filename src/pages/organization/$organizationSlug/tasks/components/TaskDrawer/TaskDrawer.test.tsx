@@ -85,11 +85,13 @@ vi.mock('@/shared/components/ChatColumn/index.ts', async (importOriginal) => {
     ChatColumn: ({
       person,
       lead,
+      canSend,
       onSent,
       onBookAppointment,
     }: {
       person: { contactId: string };
       lead?: { leadId: string };
+      canSend?: boolean;
       onSent?: () => void;
       onBookAppointment?: (booking: { reason: string | null }) => void;
     }) =>
@@ -99,6 +101,7 @@ vi.mock('@/shared/components/ChatColumn/index.ts', async (importOriginal) => {
           'data-testid': 'chat-column-stub',
           'data-contact': person.contactId,
           'data-lead': lead?.leadId ?? 'none',
+          'data-can-send': String(canSend ?? true),
         },
         createElement('button', { type: 'button', onClick: onSent }, 'Send'),
         onBookAppointment
@@ -331,6 +334,7 @@ describe('TaskDrawer (KICKOFF §6.10 Task drawer) on clinozy-be', () => {
     expect(chat).toHaveAttribute('data-contact', TEST_TASK_CONTACT_ID);
     // The thread's divider names the lead the task points at.
     expect(chat).toHaveAttribute('data-lead', TEST_TASK_LEAD_ID);
+    expect(chat).toHaveAttribute('data-can-send', 'true');
     // A rule's task is never deleted by hand.
     expect(screen.queryByTestId('task-drawer-delete')).toBeNull();
     expect(useContact).toHaveBeenLastCalledWith(TEST_TASK_CONTACT_ID);
@@ -523,6 +527,17 @@ describe('TaskDrawer (KICKOFF §6.10 Task drawer) on clinozy-be', () => {
     member.codes = OWNER_CODES.filter((code) => code !== 'contact_activity:read');
     rerender(replyDetail());
     expect(screen.queryByTestId('chat-column-stub')).toBeNull();
+  });
+
+  // QA-07's pattern: a member who reads the stream but may not write it had a composer the server
+  // refused.
+  it('reads the chat without a composer for a member who may not write it', async () => {
+    member.codes = OWNER_CODES.filter((code) => code !== 'contact_activity:create');
+    await openDrawer(replyDetail());
+    expect(screen.getByTestId('chat-column-stub')).toHaveAttribute(
+      'data-can-send',
+      'false',
+    );
   });
 
   it('deletes a task made by hand with a reason, and its Undo restores it', async () => {

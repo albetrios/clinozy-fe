@@ -16,6 +16,7 @@ import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
+import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
@@ -161,6 +162,8 @@ function useChatAside(
   const phone = useViewportTier() === 'phone';
   const viewportWidth = useViewportWidth();
   const chatPreference = useDevicePrefsStore((store) => store.leadChatWidth);
+  // The composer needs `contact_activity:create` (the codes in force, a View-as preview's too).
+  const stream = useContactActivityAccess();
   const person = chatPersonOf(state);
   const who = state.draft.who;
   const show = state.edit && !phone && person !== null && who !== null;
@@ -179,6 +182,7 @@ function useChatAside(
           <ChatColumn
             person={person}
             contact={{ name: who.name, phone: who.phone, isPatient: state.isPatient }}
+            canSend={stream.writes}
             onOpenHistory={openHistory}
           />
         </div>
