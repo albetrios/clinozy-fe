@@ -88,8 +88,10 @@ async function liveSwitch(
  * `removeQueries` purge also makes switching *back* to a recently-visited org
  * instant — its cache is served immediately and `staleTime` governs any
  * background refetch, instead of forcing a cold reload every time. Access is
- * still re-validated by the org guard chain on entry, so a serving a brief
- * cached view of an org the user belongs to is safe.
+ * still re-validated on entry: the org guard awaits this switch before the
+ * route renders, so no cached view shows until clinozy-be has accepted it, and
+ * a membership revoked since the cached list was fetched is refused here and
+ * answered with the non-member 404 (`switchOrNotFound` in route-guards.ts).
  */
 export async function switchToOrganization(
   organizationId: string,

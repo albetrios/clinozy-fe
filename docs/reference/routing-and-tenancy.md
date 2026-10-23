@@ -174,7 +174,10 @@ Implemented chain for `/organization/acme/…` (shell guards on `$organizationSl
 2. `requireTeamDeployment` + `requireProvisionedWorkspace` (`app/guards/org-gates.ts`) — deployment
    mode allows the team space and the workspace is provisioned
 3. `resolveActiveOrg` / `requireOrganizationContext` (`app/guards/route-guards.ts`) — slug is
-   well-formed; user is a member; switch-on-navigation syncs context → else **404** (don't leak existence)
+   well-formed; user is a member; switch-on-navigation syncs context → else **404** (don't leak existence).
+   Membership is read from the cached list, so a membership revoked since can still pass it; the
+   switch then gets clinozy-be's 403, which the guard answers with the same **404**, dropping the
+   stale list (a 403 with reason `mfa_required` is not a membership answer and propagates)
 4. `gatewayFromManifest(manifest)` (`core/security/gateway.ts`) — on the **leaf** route:
    session → module (`requireModuleGate`) → permission (`requirePermissionGate`,
    `manifest.permission`) → else **403** `/unauthorized`

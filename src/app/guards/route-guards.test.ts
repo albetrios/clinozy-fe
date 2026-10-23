@@ -2,10 +2,12 @@ import { isNotFound, isRedirect } from '@tanstack/react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { queryClient } from '@/core/http/queryClient.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { type MeContext, meContextQueryKey } from '@/shared/tenancy/me-context.ts';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
+import { myOrganizationsQueryKey } from '@/shared/tenancy/my-organization-summaries.ts';
 import { resetPermissionCacheForTests } from '@/shared/tenancy/organization-membership.ts';
 
 import {
@@ -79,7 +81,10 @@ vi.mock('@/shared/tenancy/switch.ts', () => ({
 
 function seedActiveOrg(id: string) {
   queryClient.setQueryData(meContextQueryKey, {
-    activeOrganization: { id },
+    activeOrganization: { id, slug: null, type: 'PERSONAL', status: 'ACTIVE' },
+    myPermissions: [],
+    deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
+    personalOrganizationId: 'org_personal',
     organizations: [
       {
         id: 'org_acme',
@@ -142,6 +147,49 @@ describe('requireOrganizationContext', () => {
     seedActiveOrg('org_acme');
     await requireOrganizationContext('acme');
     expect(switchToOrganizationMock).not.toHaveBeenCalled();
+  });
+
+  describe('when clinozy-be refuses the switch', () => {
+    const refusal = (reason?: string) =>
+      new HttpError('Forbidden', 403, '/api/v1/auth/switch-to-organization', 'POST', {
+        error: reason ? { reason } : {},
+      });
+
+    it('answers a revoked membership with the non-member 404, not a 403 page', async () => {
+      // The cached list still names the clinic; the membership behind it is gone.
+      seedActiveOrg('org_personal');
+      const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
+      switchToOrganizationMock.mockRejectedValue(refusal());
+
+      await expect(requireOrganizationContext('acme')).rejects.toSatisfy(isNotFound);
+
+      // The stale list goes, so the switcher stops offering the clinic.
+      expect(invalidate).toHaveBeenCalledWith({ queryKey: myOrganizationsQueryKey });
+      // The store goes back to the organization the token still carries.
+      expect(useOrganizationStore.getState().organizationId).toBe('org_personal');
+      invalidate.mockRestore();
+    });
+
+    it('lets an mfa_required refusal through — it is not a membership answer', async () => {
+      seedActiveOrg('org_personal');
+      const mfaRequired = refusal('mfa_required');
+      switchToOrganizationMock.mockRejectedValue(mfaRequired);
+
+      await expect(requireOrganizationContext('acme')).rejects.toBe(mfaRequired);
+    });
+
+    it('lets any other failure through unchanged', async () => {
+      seedActiveOrg('org_personal');
+      const outage = new HttpError(
+        'Unavailable',
+        503,
+        '/api/v1/auth/switch-to-organization',
+        'POST',
+      );
+      switchToOrganizationMock.mockRejectedValue(outage);
+
+      await expect(requireOrganizationContext('acme')).rejects.toBe(outage);
+    });
   });
 });
 

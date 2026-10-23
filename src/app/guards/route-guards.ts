@@ -4,6 +4,8 @@ import { platformConfig } from '@/core/config/env.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { parseOrganizationSlugParam } from '@/lib/routes/params.ts';
+import { apiErrorReason } from '@/shared/errors/errorHandler.ts';
+import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { mergeDeploymentFlags } from '@/shared/tenancy/deployment-mode.ts';
@@ -12,8 +14,12 @@ import {
   meContextQueryKey,
   needsOnboarding,
 } from '@/shared/tenancy/me-context.ts';
+import { invalidateMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';
 import type { Organization } from '@/shared/tenancy/my-organizations.ts';
-import { syncOrganizationFromRoute } from '@/shared/tenancy/organization-context.ts';
+import {
+  deriveOrgContext,
+  syncOrganizationFromRoute,
+} from '@/shared/tenancy/organization-context.ts';
 import {
   ensurePermissionsFor,
   findMembershipBySlug,
@@ -78,10 +84,38 @@ export async function requireOrganizationContext(
   const activeId =
     queryClient.getQueryData<MeContext>(meContextQueryKey)?.activeOrganization?.id;
   if (activeId !== organization.id) {
-    await switchToOrganization(organization.id);
+    await switchOrNotFound(organization.id);
   }
   await ensurePermissionsFor(organization.id);
   return organization;
+}
+
+/**
+ * Switch to the URL's organization, answering a membership refusal with the
+ * same 404 a non-member slug gets.
+ *
+ * The slug resolved from a CACHED membership list, so a membership revoked
+ * since that list was fetched still passes it — and clinozy-be then refuses the
+ * switch with a 403. Re-thrown as-is, that 403 rendered an error page naming a
+ * clinic the user no longer belongs to, and the stale list kept offering it in
+ * the switcher. Instead: put the store back on the organization the token still
+ * carries, drop the stale list, and 404. A 403 with reason `mfa_required` is
+ * not a refusal of membership and keeps propagating, as does any other failure.
+ */
+async function switchOrNotFound(organizationId: string): Promise<void> {
+  try {
+    await switchToOrganization(organizationId);
+  } catch (error) {
+    const membershipRefused =
+      isHttpError(error) &&
+      error.status === 403 &&
+      apiErrorReason(error) !== 'mfa_required';
+    if (!membershipRefused) throw error;
+    const context = queryClient.getQueryData<MeContext>(meContextQueryKey);
+    if (context) deriveOrgContext(context);
+    invalidateMyOrganizationSummaries();
+    throw notFound();
+  }
 }
 
 /**
