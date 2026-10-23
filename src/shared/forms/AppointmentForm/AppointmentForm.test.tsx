@@ -1160,3 +1160,46 @@ describe('AppointmentForm — a booking that has to be tried again (WF-01)', () 
     ]);
   });
 });
+
+describe('AppointmentForm — the grid of a booking being moved (WF-02)', () => {
+  it('asks a Reschedule’s grid without the booking itself: its start is offered, and again after another day', async () => {
+    const user = setUser();
+    // clinozy-be: the booking (10:30, 20 min) blocks 10:15–10:45 — unless it is the one moved.
+    vi.mocked(fetchAppointmentSlots).mockImplementation(async (params) =>
+      slotDay(
+        params.date,
+        params.excludeAppointmentId === BOOKING.id
+          ? ['10:00', '10:15', '10:30', '10:45', '11:00']
+          : ['10:00', '11:00'],
+      ),
+    );
+    renderBooking(BOOKING, { mode: 'reschedule' });
+    const panel = await form(EDIT);
+    await waitFor(() =>
+      expect(fetchAppointmentSlots).toHaveBeenCalledWith(
+        expect.objectContaining({ date: BOOKING.date, excludeAppointmentId: BOOKING.id }),
+      ),
+    );
+    expect(await slotAt(panel, '10:30')).toHaveAttribute('aria-checked', 'true');
+    await user.click(await slotAt(panel, '10:45')); // overlaps only itself
+    expect(within(panel).getByTestId(`${EDIT}-save`)).toHaveTextContent(/^Move to /);
+    const calendar = within(panel).getByTestId(IDS.calendar);
+    await user.click(calendarDay(calendar, '2026-10-06'));
+    await user.click(calendarDay(calendar, BOOKING.date));
+    await user.click(await slotAt(panel, '10:30'));
+    expect(within(panel).getByTestId(`${EDIT}-save`)).not.toHaveTextContent(
+      'Pick a time',
+    );
+  });
+
+  it('asks a New booking’s grid with no booking left out', async () => {
+    renderNew({ prefill: { date: '2026-10-05' } });
+    const panel = await form(NEW);
+    await slotAt(panel, '11:00');
+    expect(
+      vi
+        .mocked(fetchAppointmentSlots)
+        .mock.calls.every(([params]) => params.excludeAppointmentId === undefined),
+    ).toBe(true);
+  });
+});

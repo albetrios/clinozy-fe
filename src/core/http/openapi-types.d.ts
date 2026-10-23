@@ -6991,6 +6991,7 @@ export interface operations {
                 branch_room_id?: string;
                 doctor_membership_id?: string;
                 duration_minutes: number;
+                exclude_appointment_id?: string;
                 step_minutes?: number;
             };
             header?: never;

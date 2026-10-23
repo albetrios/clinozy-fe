@@ -269,7 +269,8 @@ export async function fetchAppointment(appointmentId: string): Promise<Appointme
 
 /**
  * A day's free starts for a doctor and a length (`GET /app/appointments/slots`) — or why the
- * day takes none: past, the branch inactive, a closed day, a holiday, the doctor off.
+ * day takes none: past, the branch inactive, a closed day, a holiday, the doctor off. A booking
+ * being moved (`excludeAppointmentId`) does not block its own starts.
  */
 export async function fetchAppointmentSlots(
   params: AppointmentSlotParams,
@@ -281,6 +282,7 @@ export async function fetchAppointmentSlots(
       doctor_membership_id: params.doctorId,
       duration_minutes: params.durationMin,
       step_minutes: params.step,
+      exclude_appointment_id: params.excludeAppointmentId,
     },
   });
   const day = appointmentSlotDayWire.parse(response.data);

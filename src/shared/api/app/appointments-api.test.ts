@@ -561,6 +561,30 @@ describe('fetchAppointmentSlots (the slot grid)', () => {
     expect(day).toEqual(slotDay(APPOINTMENT_TOMORROW, ['10:00', '11:30']));
   });
 
+  // WF-02: the booking being moved does not block its own starts.
+  it('asks without the booking being moved — `exclude_appointment_id`', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        appointment_date: APPOINTMENT_TOMORROW,
+        is_open: true,
+        closed_reason: null,
+        closed_label: null,
+        slots: [],
+      },
+    } as never);
+
+    await fetchAppointmentSlots({
+      ...params,
+      excludeAppointmentId: 'appt_moved00000000000000',
+    });
+
+    expect(api.get).toHaveBeenCalledWith('/app/appointments/slots', {
+      query: expect.objectContaining({
+        exclude_appointment_id: 'appt_moved00000000000000',
+      }),
+    });
+  });
+
   it('reads a closed day by its reason and a holiday’s name', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({
       data: {

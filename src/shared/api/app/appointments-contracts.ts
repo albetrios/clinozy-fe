@@ -313,13 +313,15 @@ export interface AppointmentSlotDay {
   slots: AppointmentSlot[];
 }
 
-/** What the slot grid asks for: the day, branch, doctor, length and step. */
+/** What the slot grid asks for: day, branch, doctor, length, step — and the booking moved. */
 export interface AppointmentSlotParams {
   date: string;
   branchId: string;
   doctorId: string;
   durationMin: number;
   step: AppointmentSlotStep;
+  /** The booking being edited or moved — not busy for itself (`exclude_appointment_id`). */
+  excludeAppointmentId?: string;
 }
 
 /** The slots wire — `GET /app/appointments/slots` (the OpenAPI document leaves it untyped, M44). */
