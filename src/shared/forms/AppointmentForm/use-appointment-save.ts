@@ -14,7 +14,7 @@ import {
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { isClientRefusal } from '@/shared/errors/HttpError.ts';
 import {
   contactFieldsOf,
   emptyContactValue,
@@ -149,7 +149,7 @@ export function useAppointmentSave({
   const move = useMoveAppointment({ notifyOnError: false });
 
   const failed = (error: unknown, retry: () => void) => {
-    if (isHttpError(error) && error.status < 500) {
+    if (isClientRefusal(error)) {
       setSaveState('idle');
       const reason = apiErrorReason(error);
       if (reason && SLOT_REFUSALS.has(reason)) {

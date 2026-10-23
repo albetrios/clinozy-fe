@@ -13,7 +13,11 @@ import {
   mapApiError,
   notifyError,
 } from '@/shared/errors/errorHandler.ts';
-import { type HttpError, isHttpError } from '@/shared/errors/HttpError.ts';
+import {
+  type HttpError,
+  isClientRefusal,
+  isHttpError,
+} from '@/shared/errors/HttpError.ts';
 import { mapValidationErrors } from '@/shared/errors/map-validation-errors.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -134,7 +138,7 @@ export function useDrawerSave<TValues extends FieldValues, TOutcome>({
     try {
       onDone(await write(another), another);
     } catch (error) {
-      if (isHttpError(error) && error.status < 500) {
+      if (isClientRefusal(error)) {
         refused(error);
         return;
       }

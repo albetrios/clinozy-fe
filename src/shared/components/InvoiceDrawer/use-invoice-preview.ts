@@ -7,7 +7,7 @@ import {
   type InvoiceRecord,
 } from '@/shared/api/app/invoices-contracts.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { isClientRefusal } from '@/shared/errors/HttpError.ts';
 import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue/index.ts';
 import { useInvoicePreview } from '@/shared/hooks/useInvoices/index.ts';
 
@@ -135,7 +135,7 @@ export function useDrawerPreview({
   const preview =
     status === 'ready' || status === 'pending' ? (query.data ?? null) : null;
   const failed = status === 'failed';
-  const retryable = failed && !(isHttpError(query.error) && query.error.status < 500);
+  const retryable = failed && !isClientRefusal(query.error);
   return {
     preview,
     status,

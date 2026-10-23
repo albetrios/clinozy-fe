@@ -8,7 +8,7 @@ import {
   notifyQueryError,
   reportError,
 } from '@/shared/errors/errorHandler.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { isClientRefusal } from '@/shared/errors/HttpError.ts';
 
 /**
  * TanStack Query client.
@@ -26,7 +26,7 @@ export const queryClient = new QueryClient({
         if (isUnauthorized(error)) return false;
         // Nor any other 4xx: no access, not found, a filter the API refuses — asking
         // again gets the same answer (a 429 already waited once inside apiClient).
-        if (isHttpError(error) && error.status >= 400 && error.status < 500) return false;
+        if (isClientRefusal(error)) return false;
         return failureCount < 2;
       },
       refetchOnWindowFocus: false,

@@ -410,6 +410,22 @@ describe('useAppointmentSave — the write and its refusals', () => {
     expect(result.current.saveState).toBe('idle');
   });
 
+  // The fetch client surfaces a dropped connection as status 0: "failed" and Retry, never a refusal.
+  it('keeps the draft when the connection dropped before an answer (status 0): "failed" and Retry', async () => {
+    appointmentsApi.createAppointment.mockRejectedValueOnce(
+      new HttpError('Failed to fetch', 0, '/app/appointments', 'POST'),
+    );
+    const { result, onDone } = render();
+    await act(() => result.current.save(draft()));
+    expect(result.current.saveState).toBe('failed');
+    const [message, options] = notifyMock.error.mock.lastCall ?? [];
+    expect(message).toBe(
+      'Couldn’t save · connection dropped. Everything you entered is still here.',
+    );
+    expect(options).toMatchObject({ action: { label: 'Retry' } });
+    expect(onDone).not.toHaveBeenCalled();
+  });
+
   it('keeps the draft after a failed connection: "failed", and a toast whose Retry saves again', async () => {
     appointmentsApi.createAppointment.mockRejectedValueOnce(
       new HttpError('Service unavailable', 503, '/app/appointments', 'POST'),
