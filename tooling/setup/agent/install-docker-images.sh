@@ -33,10 +33,10 @@ wait_for_docker() {
   return 1
 }
 
-# Start (or restart) the Docker daemon so a freshly written daemon.json applies.
+# Start the Docker daemon the one way (ensure-docker-daemon.sh), so a freshly written daemon.json
+# applies on its next start.
 start_docker() {
-  service docker start >/dev/null 2>&1 || (dockerd >/tmp/dockerd-setup.log 2>&1 &)
-  wait_for_docker
+  bash "${agent_dir}/ensure-docker-daemon.sh" && wait_for_docker
 }
 
 # Steps 1–2 are for the Linux cloud image, whose Docker Hub blob CDN is blocked. Docker Desktop
@@ -66,7 +66,7 @@ if [ "$(uname -s)" = "Linux" ]; then
   # 2) Ensure dockerd is running and has actually picked up the mirror.
   if ! docker info >/dev/null 2>&1; then
     echo "install-docker-images: starting dockerd…" >&2
-    bash "${agent_dir}/ensure-docker-daemon.sh" || start_docker || true
+    start_docker || true
   fi
 
   if ! docker info >/dev/null 2>&1; then
@@ -76,11 +76,7 @@ if [ "$(uname -s)" = "Linux" ]; then
 
   if grep -q 'mirror.gcr.io' "${DAEMON_JSON}" 2>/dev/null && ! docker info 2>/dev/null | grep -q 'mirror.gcr.io'; then
     echo "install-docker-images: restarting dockerd to apply the mirror…" >&2
-    if ! service docker restart >/dev/null 2>&1; then
-      pkill -TERM dockerd 2>/dev/null || true
-      for _ in $(seq 1 20); do docker info >/dev/null 2>&1 || break; sleep 1; done
-      start_docker || true
-    fi
+    RESTART_DOCKERD=1 start_docker || true
   fi
 else
   echo "install-docker-images: $(uname -s) Docker pulls from Docker Hub directly — no mirror needed." >&2
