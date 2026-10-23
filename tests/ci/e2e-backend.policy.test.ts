@@ -39,11 +39,19 @@ function step(name: string): string {
   return block ?? '';
 }
 
+/**
+ * A value a boot states — `KEY=n` on a `docker run`. Literal patterns, one per key, as
+ * clinozy-be's test reads them: its static security scan refuses a RegExp built from a variable.
+ */
+const STATED = {
+  DEPLOYMENT_TOTAL_REPLICA_COUNT: /DEPLOYMENT_TOTAL_REPLICA_COUNT=(\d+)/,
+  DATABASE_POOL_MAX: /DATABASE_POOL_MAX=(\d+)/,
+  DATABASE_MAINTENANCE_POOL_MAX: /DATABASE_MAINTENANCE_POOL_MAX=(\d+)/,
+} as const;
+
 /** Connections a boot asks for: stated (or inferred) processes × per-process pools. */
 function connectionDemand(boot: string): number {
-  const stated = (
-    key: keyof typeof BACKEND_DEFAULTS | 'DEPLOYMENT_TOTAL_REPLICA_COUNT',
-  ) => boot.match(new RegExp(`${key}=(\\d+)`))?.[1];
+  const stated = (key: keyof typeof STATED) => boot.match(STATED[key])?.[1];
   const processes = Number(
     stated('DEPLOYMENT_TOTAL_REPLICA_COUNT') ?? INFERRED_LOCAL_PROCESS_COUNT,
   );
