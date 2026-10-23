@@ -552,6 +552,21 @@ describe('InvoiceDrawer — New invoice on clinozy-be (KICKOFF §6.9)', () => {
     expect(onCreated).not.toHaveBeenCalled();
   });
 
+  // QA-04's pattern: an Items step left empty read "Complete" beside "Not filled yet".
+  it('never reads an empty Items step as done — grey until a line is named', async () => {
+    const user = setUser();
+    signIn();
+    renderCreate();
+    await panel();
+    await user.click(screen.getByTestId('invoice-drawer-step-party-next'));
+    await user.click(screen.getByTestId('invoice-drawer-step-items-next'));
+    const items = screen.getByTestId('invoice-drawer-step-items');
+    expect(items).toHaveAttribute('data-status', 'later');
+    expect(screen.getByTestId('invoice-drawer-step-items-trigger')).not.toHaveTextContent(
+      'Complete',
+    );
+  });
+
   it('refuses "Paid now" above the server’s bill', async () => {
     const user = setUser();
     signIn();

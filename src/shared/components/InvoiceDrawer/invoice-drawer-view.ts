@@ -43,7 +43,7 @@ export interface InvoiceDrawerView {
   saveLabel: string;
   steps: Record<
     InvoiceStepId,
-    { title: string; peek: DrawerPeekItem[]; missing: string[] }
+    { title: string; peek: DrawerPeekItem[]; missing: string[]; complete?: boolean }
   >;
 }
 
@@ -169,8 +169,10 @@ function stepsOf(
     },
     items: {
       title: t(medical ? K.steps.medicines : K.steps.items),
-      // The rows are checked on save ("Add at least one item"), never in the head (H:3840).
+      // The rows are checked on save ("Add at least one item"), never in the head (H:3840) —
+      // but an empty Items step is never done either: grey until a line is named (QA-04).
       missing: [],
+      complete: lines.length > 0,
       peek: [
         {
           kind: 'items',
