@@ -63,7 +63,7 @@ overrides:
   nanoid@5: '>=5.1.16 <6'
   multiparty: '>=4.3.0'
   tmp: '>=0.2.6'
-  dompurify: '>=3.4.7'
+  dompurify: '>=3.4.17 <4'
   undici@7: '^7.28.0'
   ws: '>=8.21.0'
   http-proxy-middleware: '>=3.0.7'
@@ -74,10 +74,15 @@ overrides:
   fast-uri: '>=3.1.8 <4'
   smol-toml: '>=1.8.0 <2'
   find-my-way: '>=9.7.0 <10'
-  ip-address: '>=10.4.0 <11'
+  ip-address: '>=10.7.4 <11'
   js-yaml@5: '>=5.2.2 <6'
   postcss: '>=8.5.23 <9'
   sharp: '>=0.35.1 <0.36'
+  # Across the parents' major: every netlify-cli package (27.14.2 the newest) declares toml
+  # ^4, and the parse DoS fixes (GHSA-4qx8-w7c3-pj3p, GHSA-9j65-hcg3-gc64, GHSA-9qmh-m7c6-f92p)
+  # ship only in 5.0.1. toml 5 keeps the one export they call, `parse`, and parses this
+  # repository's netlify.toml identically to 4.3.0. Remove when netlify-cli moves to toml 5.
+  toml: '>=5.0.1 <6'
   svgo: '>=4.0.2 <5'
   '@hono/node-server': '>=2.0.5 <3'
   hono: '>=4.12.34 <5'
