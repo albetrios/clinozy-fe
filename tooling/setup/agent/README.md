@@ -39,7 +39,7 @@ and a dev server that serves the app shell.
 | `install-semgrep.sh`       | Semgrep at the pin, for `pnpm security:semgrep:push` (a warning when missing)                      |
 | `install-gitleaks.sh`      | Secret scanner used by `.husky/pre-commit` (mandatory there) and the CI gitleaks lane              |
 | `install-docker-images.sh` | Docker Hub mirror (`mirror.gcr.io`) + pre-pull of the SonarQube gate images                        |
-| `ensure-docker-daemon.sh`  | Starts `dockerd` when stopped (same script as clinozy-be); used by step 4 and `pnpm sonar:scan`    |
+| `ensure-docker-daemon.sh`  | Starts or restarts `dockerd` (same script as clinozy-be); used by step 4 and `pnpm sonar:scan`     |
 | `install-headroom.sh`      | `uv`/`uvx` — the prerequisite for the `headroom` MCP server                                        |
 | `install-playwright.sh`    | E2E browsers; downloads only when the build the pinned `@playwright/test` needs is missing         |
 | `healthcheck.sh`           | Probes the dev server for the real app shell                                                       |
