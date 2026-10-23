@@ -1,76 +1,49 @@
 /**
- * Telemetry URL scrubbing — keeps single-use secrets out of third-party
- * stores. Reset/verify links carry `?token=`; the pages strip it from the
- * address bar on mount, but telemetry booted in the same window can capture
- * the URL first (Sentry `request.url` + breadcrumbs, PostHog `$current_url`
- * and `$set_once` person props). Every outgoing event passes through here.
+ * Telemetry URL scrubbing — a URL that leaves for a third-party store (PostHog,
+ * Sentry) keeps its path and loses everything after it. The query string is
+ * where the app writes what a person typed or was sent: a room's search (`?q=` —
+ * a patient's name, mobile or #ID), a create drawer's prefill (`?name=&phone=`,
+ * `?medicines=`), a reset / verify / invite link's single-use `?token=`, Stripe's
+ * `*_client_secret` on the billing return, and — URL-encoded inside a signed-out
+ * deep link's `/login?redirect=` — all of them again. A list of sensitive param
+ * names missed every param added after it (`q`, SEC-01), so nothing after the
+ * path is kept: `$pathname` and `route_viewed`'s `route_id` still say where the
+ * person was. Every outgoing event passes through here (Sentry `request.url` +
+ * breadcrumbs, PostHog `properties`, `$set` and `$set_once`).
  */
 
-/** Query params whose values are single-use secrets. */
-// `token` covers invite / reset / verify-email links. The Stripe
-// `*_client_secret` params land in the billing-return URL — Stripe documents
-// that they must never be logged or embedded in URLs, and `capture_pageview`
-// records `$current_url` before the billing panel strips them, so without this
-// they would reach PostHog/Sentry.
-// `name` and `phone` are the clinic's create-drawer prefills —
-// `leads/create?name=&phone=` and `patients/create` (S:23, S:31): a person's
-// name and mobile number must not reach pageviews or breadcrumbs.
-const SENSITIVE_QUERY_PARAMS = [
-  'token',
-  'payment_intent_client_secret',
-  'setup_intent_client_secret',
-  'name',
-  'phone',
-];
+/** A URL(-ish) string: absolute (`https://…`) or root-relative (`/…`). */
+const URL_LIKE = /^(?:[a-z][a-z\d+.-]*:\/\/|\/)/i;
 
-const FILTERED = '[Filtered]';
-
-// `[?&#]` anchors a real param boundary (so `access_token=` never matches
-// the `token` rule); values never contain `&` or `#`. Bounded character
-// classes — no backtracking risk. Literal regexes on purpose; when adding a
-// param, add BOTH a pattern here and the name above (the static security
-// lint forbids dynamically-built RegExps).
-const PARAM_PATTERNS = [
-  /([?&#]token=)[^&#]*/gi,
-  /([?&#]payment_intent_client_secret=)[^&#]*/gi,
-  /([?&#]setup_intent_client_secret=)[^&#]*/gi,
-  /([?&#]name=)[^&#]*/gi,
-  /([?&#]phone=)[^&#]*/gi,
-];
-
-/** Replace sensitive query-param values in a URL(-ish) string. */
+/** Drop a URL's query string and fragment; a string that is not a URL comes back unchanged. */
 export function scrubSensitiveUrl(url: string): string {
-  let out = url;
-  for (const pattern of PARAM_PATTERNS) {
-    out = out.replace(pattern, `$1${FILTERED}`);
-  }
-  return out;
-}
-
-/** Cheap gate: does this string even mention a sensitive param? */
-export function hasSensitiveParams(value: string): boolean {
-  return SENSITIVE_QUERY_PARAMS.some((param) => value.includes(`${param}=`));
+  if (!URL_LIKE.test(url)) return url;
+  const end = url.search(/[?#]/);
+  return end === -1 ? url : url.slice(0, end);
 }
 
 /**
- * Scrub every string value in a JSON-ish record (nested objects included) —
- * the shape of PostHog `event.properties`, where URLs hide in `$current_url`,
- * `$referrer`, and nested `$set_once` person props.
+ * Scrub every URL-ish string in a JSON-ish value, in place — objects and arrays,
+ * nested — the shape of PostHog `event.properties` / `$set` / `$set_once`, where
+ * URLs hide in `$current_url`, `$session_entry_url`, `$referrer` and
+ * `$initial_current_url`, and of Sentry breadcrumb `data`.
  */
-export function scrubObjectUrls(record: Record<string, unknown>): void {
+export function scrubObjectUrls(record: Record<string, unknown> | unknown[]): void {
   for (const [key, value] of Object.entries(record)) {
-    if (typeof value === 'string' && hasSensitiveParams(value)) {
+    if (typeof value === 'string') {
+      const scrubbed = scrubSensitiveUrl(value);
       // Reflect.set instead of record[key]: keys come from Object.entries
       // (never attacker-chosen paths), and this shape keeps the static
       // object-injection lint quiet without a disable.
-      Reflect.set(record, key, scrubSensitiveUrl(value));
-    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
-      scrubObjectUrls(value as Record<string, unknown>);
+      if (scrubbed !== value) Reflect.set(record, key, scrubbed);
+    } else if (value && typeof value === 'object') {
+      scrubObjectUrls(value as Record<string, unknown> | unknown[]);
     }
   }
 }
 
-type ScrubbableBreadcrumb = { data?: Record<string, unknown> };
+/** Anything on a Sentry event that carries a `data` bag: breadcrumbs, spans, the trace context. */
+type ScrubbableData = { data?: Record<string, unknown> };
 
 /**
  * Structural slice of a Sentry event (errors AND transactions both fit).
@@ -79,18 +52,27 @@ type ScrubbableBreadcrumb = { data?: Record<string, unknown> };
  */
 type ScrubbableEvent = {
   request?: { url?: string };
-  breadcrumbs?: ScrubbableBreadcrumb[];
+  breadcrumbs?: ScrubbableData[];
+  spans?: ScrubbableData[];
+  contexts?: { trace?: ScrubbableData };
 };
 
-/** Scrub request + breadcrumb URLs on a Sentry-shaped event, in place. */
+/**
+ * Scrub URLs on a Sentry-shaped event, in place: `request.url` (the
+ * httpClient integration sets it to the failed request's full URL, past
+ * `dataCollection.urlQueryParams`), breadcrumb data, and span / trace data
+ * (long-animation-frame spans carry the page URL as `browser.script.invoker`).
+ */
 export function scrubEventUrls<E extends ScrubbableEvent>(event: E): E {
   if (event.request?.url) {
     event.request.url = scrubSensitiveUrl(event.request.url);
   }
-  if (event.breadcrumbs) {
-    for (const crumb of event.breadcrumbs) {
-      if (crumb.data) scrubObjectUrls(crumb.data);
-    }
+  for (const carrier of [
+    ...(event.breadcrumbs ?? []),
+    ...(event.spans ?? []),
+    event.contexts?.trace,
+  ]) {
+    if (carrier?.data) scrubObjectUrls(carrier.data);
   }
   return event;
 }

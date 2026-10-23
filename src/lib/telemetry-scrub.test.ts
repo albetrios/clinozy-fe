@@ -1,93 +1,91 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  hasSensitiveParams,
-  scrubEventUrls,
-  scrubObjectUrls,
-  scrubSensitiveUrl,
-} from './telemetry-scrub.ts';
+import { scrubEventUrls, scrubObjectUrls, scrubSensitiveUrl } from './telemetry-scrub.ts';
 
-describe('scrubSensitiveUrl', () => {
-  it('filters ?token= values and keeps the rest of the URL', () => {
+describe('scrubSensitiveUrl — single-use secrets', () => {
+  it('drops ?token= with the rest of the query', () => {
     expect(
-      scrubSensitiveUrl('https://app.example.com/reset-password?token=sec-123'),
-    ).toBe('https://app.example.com/reset-password?token=[Filtered]');
+      scrubSensitiveUrl('https://app.example.com/reset-password?token=sec-123&a=1'),
+    ).toBe('https://app.example.com/reset-password');
   });
 
-  it('filters &token= mid-query and is case-insensitive', () => {
-    expect(scrubSensitiveUrl('/verify-email?a=1&Token=abc&b=2')).toBe(
-      '/verify-email?a=1&Token=[Filtered]&b=2',
-    );
-  });
-
-  it('does NOT touch differently-named params like access_token', () => {
-    const url = '/cb?access_token=keepme';
-    expect(scrubSensitiveUrl(url)).toBe(url);
-  });
-
-  it('leaves URLs without sensitive params unchanged', () => {
-    const url = '/organization/org_1/dashboard?tab=overview';
-    expect(scrubSensitiveUrl(url)).toBe(url);
-  });
-
-  it('filters Stripe client secrets from the billing-return URL', () => {
-    const url =
-      'https://app.example.com/organization/acme/dashboard?payment_intent_client_secret=pi_3ABC_secret_xyz&redirect_status=succeeded';
-    expect(scrubSensitiveUrl(url)).toBe(
-      'https://app.example.com/organization/acme/dashboard?payment_intent_client_secret=[Filtered]&redirect_status=succeeded',
-    );
-  });
-
-  it('filters the setup-intent client secret (add-card return)', () => {
+  it('drops the Stripe client secrets the billing return carries', () => {
+    expect(
+      scrubSensitiveUrl(
+        'https://app.example.com/organization/acme/dashboard?payment_intent_client_secret=pi_3ABC_secret_xyz&redirect_status=succeeded',
+      ),
+    ).toBe('https://app.example.com/organization/acme/dashboard');
     expect(
       scrubSensitiveUrl('/dashboard?setup_intent_client_secret=seti_1_secret_2#settings'),
-    ).toBe('/dashboard?setup_intent_client_secret=[Filtered]#settings');
+    ).toBe('/dashboard');
   });
 
-  it('does NOT touch the non-secret intent id or redirect_status', () => {
-    const url = '/dashboard?payment_intent=pi_3ABC&redirect_status=succeeded';
-    expect(scrubSensitiveUrl(url)).toBe(url);
-  });
-});
-
-describe('scrubSensitiveUrl — clinic create prefills', () => {
-  it('filters the name and phone a create drawer carries (S:23, S:31)', () => {
+  it('drops the name and phone a create drawer carries (S:23, S:31)', () => {
     expect(
       scrubSensitiveUrl(
         'https://app.test/organization/acme/leads/create?name=Rhea%20Shah&phone=%2B919876543210&source=whatsapp',
       ),
-    ).toBe(
-      'https://app.test/organization/acme/leads/create?name=[Filtered]&phone=[Filtered]&source=whatsapp',
-    );
+    ).toBe('https://app.test/organization/acme/leads/create');
   });
 
-  it('does NOT touch params that only end in name or phone', () => {
-    const url = 'https://app.test/x?username=riya&homephone=1&q=name';
+  it('leaves a URL with no query or fragment unchanged', () => {
+    const url = '/organization/org_1/dashboard';
     expect(scrubSensitiveUrl(url)).toBe(url);
   });
 });
 
-describe('hasSensitiveParams', () => {
-  it('detects token=', () => {
-    expect(hasSensitiveParams('/x?token=1')).toBe(true);
-    expect(hasSensitiveParams('/x?safe=1')).toBe(false);
+// SEC-01: what a person typed or was sent lives in the query — telemetry keeps the path only.
+describe('scrubSensitiveUrl — nothing after the path leaves (SEC-01)', () => {
+  const ORG = 'https://app.test/organization/acme';
+  it.each([
+    [`${ORG}/patients?q=Priya%20Sharma`, `${ORG}/patients`],
+    [`${ORG}/patients?view=follow&q=%2B919876543210&sort=seq:desc`, `${ORG}/patients`],
+    [`${ORG}/leads?q=C-12345`, `${ORG}/leads`],
+    [`${ORG}/appointments?view=day&q=%232371`, `${ORG}/appointments`],
+    [`${ORG}/payments/pending?q=Rhea`, `${ORG}/payments/pending`],
+    [`${ORG}/tasks?q=Rhea`, `${ORG}/tasks`],
+    [`${ORG}/stock?q=Rhea`, `${ORG}/stock`],
+    [
+      `${ORG}/patients/pat_1/prescriptions/create?medicines=Isotretinoin`,
+      `${ORG}/patients/pat_1/prescriptions/create`,
+    ],
+    ['/login?redirect=%2Forganization%2Facme%2Fpatients%3Fq%3DPriya', '/login'],
+    [`${ORG}/patients#q=Priya`, `${ORG}/patients`],
+    ['/reset-password?token=sec-123', '/reset-password'],
+  ])('%s → %s', (input, expected) => {
+    expect(scrubSensitiveUrl(input)).toBe(expected);
+  });
+
+  it('leaves strings that are not URLs alone', () => {
+    expect(scrubSensitiveUrl('$direct')).toBe('$direct');
+    expect(scrubSensitiveUrl('Why? Because.')).toBe('Why? Because.');
+  });
+
+  it('scrubs URLs inside arrays and nested objects in place', () => {
+    const props: Record<string, unknown> = {
+      $current_url: `${ORG}/patients?q=Priya`,
+      $session_entry_url: '/login?redirect=%2Fx%3Fq%3DPriya',
+      nested: { list: [`${ORG}/leads?q=Priya`, 'plain'] },
+    };
+    scrubObjectUrls(props);
+    expect(JSON.stringify(props)).not.toContain('Priya');
+    expect(props.$current_url).toBe(`${ORG}/patients`);
   });
 });
 
 describe('scrubObjectUrls', () => {
-  it('scrubs flat and nested string values (PostHog $set_once shape)', () => {
+  it('scrubs flat and nested string values', () => {
     const props: Record<string, unknown> = {
       $current_url: 'https://x.dev/reset-password?token=abc',
       $set_once: { $initial_current_url: 'https://x.dev/verify-email?token=xyz' },
       count: 3,
-      tags: ['?token=in-array-untouched'],
     };
 
     scrubObjectUrls(props);
 
-    expect(props.$current_url).toBe('https://x.dev/reset-password?token=[Filtered]');
+    expect(props.$current_url).toBe('https://x.dev/reset-password');
     expect((props.$set_once as Record<string, unknown>).$initial_current_url).toBe(
-      'https://x.dev/verify-email?token=[Filtered]',
+      'https://x.dev/verify-email',
     );
     expect(props.count).toBe(3);
   });
@@ -98,12 +96,7 @@ describe('scrubEventUrls', () => {
     const event = {
       request: { url: 'https://x.dev/reset-password?token=abc' },
       breadcrumbs: [
-        {
-          data: {
-            from: '/login',
-            to: '/reset-password?token=abc',
-          },
-        },
+        { data: { from: '/login', to: '/reset-password?token=abc' } },
         { data: undefined },
       ],
     };
@@ -111,14 +104,12 @@ describe('scrubEventUrls', () => {
     const out = scrubEventUrls(event);
 
     expect(out).toBe(event); // in place, same reference back to Sentry
-    expect(out.request.url).toBe('https://x.dev/reset-password?token=[Filtered]');
-    expect(out.breadcrumbs[0]?.data?.to).toBe('/reset-password?token=[Filtered]');
+    expect(out.request.url).toBe('https://x.dev/reset-password');
+    expect(out.breadcrumbs[0]?.data?.to).toBe('/reset-password');
     expect(out.breadcrumbs[0]?.data?.from).toBe('/login');
   });
 
   it('handles an event with no request and no breadcrumbs without throwing', () => {
-    // Pins the `event.request?.url` / `event.breadcrumbs` guards: a transaction
-    // or minimal event has neither, and the scrubber must pass it through.
     const event = { type: 'transaction' };
     expect(() => scrubEventUrls(event)).not.toThrow();
     expect(scrubEventUrls(event)).toBe(event);
