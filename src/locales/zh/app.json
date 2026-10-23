@@ -643,6 +643,7 @@
     "created": {
       "lead": "线索已创建 · {{time}} · 来自 {{source}}",
       "patientThread": "患者 · 仅聊天 · 无线索",
+      "fromLead": "患者 · 来自线索",
       "contactThread": "联系人 · 仅聊天 · 无线索"
     },
     "history": {

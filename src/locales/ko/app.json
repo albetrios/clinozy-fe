@@ -643,6 +643,7 @@
     "created": {
       "lead": "리드 생성 · {{time}} · {{source}} 경유",
       "patientThread": "환자 · 채팅만 · 리드 없음",
+      "fromLead": "환자 · 리드에서 전환",
       "contactThread": "연락처 · 채팅만 · 리드 없음"
     },
     "history": {

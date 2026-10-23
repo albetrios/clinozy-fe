@@ -14,6 +14,7 @@ import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
+import { PRESET_CODES, previewPreset } from '@/tests/utils/app-preset-codes.ts';
 import { DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
@@ -249,6 +250,36 @@ describe('the patient file layout (KICKOFF §6.6)', () => {
     expect(layout()).toHaveAttribute('data-activity', 'closed');
   });
 
+  it('shows a signed-in Accountant no Activity and never reads the thread (QA-07)', async () => {
+    renderPatientFile(`${at('/timeline')}?activity=open`, { role: 'accountant' });
+    await screen.findByTestId('patient-section-timeline');
+    expect(screen.queryByTestId('patient-file-activity-column')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('patient-file-activity')).not.toBeInTheDocument();
+    expect(layout()).toHaveAttribute('data-activity', 'closed');
+    expect(fetchContactThread).not.toHaveBeenCalled();
+  });
+
+  it('takes the Owner’s thread away while an Admin previews the Accountant (QA-07)', async () => {
+    const { queryClient } = renderPatientFile(`${at('/timeline')}?activity=open`);
+    await screen.findByTestId('patient-file-activity-column');
+    act(() => previewPreset(queryClient, 'accountant'));
+    await waitFor(() =>
+      expect(
+        screen.queryByTestId('patient-file-activity-column'),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.queryByTestId('patient-file-activity')).not.toBeInTheDocument();
+  });
+
+  it('shows a member who reads but may not write the thread no composer (QA-07)', async () => {
+    renderPatientFile(`${at('/timeline')}?activity=open`, {
+      codes: PRESET_CODES.front_desk.filter((code) => code !== 'contact_activity:create'),
+    });
+    const column = await screen.findByTestId('patient-file-activity-column');
+    await within(column).findByTestId('chat-thread-divider');
+    expect(within(column).queryByTestId('chat-textarea')).not.toBeInTheDocument();
+  });
+
   it('starts with Activity closed on a phone and open from md (no link, no state)', async () => {
     viewport.tier = 'phone';
     const phone = renderPatientFile(at('/visits'));
@@ -325,16 +356,28 @@ describe('the patient file layout (KICKOFF §6.6)', () => {
     await user.click(screen.getByTestId('patient-file-add'));
     const menu = await screen.findByTestId('patient-file-add-menu');
     expect(within(menu).getByText('Add for Priya')).toBeInTheDocument();
-    // Front desk: no Rx or treatment (the role-named gates, S:35, 38); Invoice and Payment.
+    // Front desk: no Rx or treatment (the role-named gates, S:35, 38); Invoice and Payment;
+    // no Photo or Report — without the clinical record it opens neither section (QA-05).
     expect(
       within(menu)
         .getAllByRole('menuitem')
         .map((item) => item.dataset.testid),
     ).toEqual(
-      ['invoice', 'payment', 'photo', 'appointment', 'report', 'note'].map(
+      ['invoice', 'payment', 'appointment', 'note'].map(
         (id) => `patient-file-add-menu-${id}`,
       ),
     );
+  });
+
+  it('never offers a Front desk an item its section would send back (QA-05)', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPatientFile(at('/timeline'), { role: 'front_desk' });
+    await screen.findByTestId('patient-section-timeline');
+    await user.click(screen.getByTestId('patient-file-add'));
+    const menu = await screen.findByTestId('patient-file-add-menu');
+    expect(within(menu).queryByTestId('patient-file-add-menu-report')).toBeNull();
+    expect(within(menu).queryByTestId('patient-file-add-menu-photo')).toBeNull();
+    expect(router.state.location.pathname).toBe(at('/timeline'));
   });
 
   it('shows a Therapist the treatment gate but no Rx and no billing in the Add menu', async () => {
@@ -366,7 +409,7 @@ describe('the patient file layout (KICKOFF §6.6)', () => {
   it('sends a signed-in member without the clinical record code from Clinical notes to the Overview', async () => {
     const { router } = renderPatientFile(at('/visits'));
     await screen.findByTestId('patient-section-visits');
-    signedInWith(['patient:read']);
+    signedInWith(['patient:read', 'appointment:read']);
     await waitFor(() => expect(tabs()).not.toContain('Clinical notes'));
     expect(tabs()).toContain('Visits');
 
@@ -379,12 +422,31 @@ describe('the patient file layout (KICKOFF §6.6)', () => {
     await screen.findByTestId('patient-section-visits');
     signedInWith([
       'patient:read',
+      'appointment:read',
       'patient:clinical_record:read',
       'patient_prescription:read',
     ] as OrganizationPermission[]);
     await waitFor(() =>
       expect(tabs()).toEqual(['Clinical notes', 'Visits', 'Prescriptions']),
     );
+  });
+
+  it('keeps an Accountant out of Visits and never reads the bookings (QA-06)', async () => {
+    const { router } = renderPatientFile(at('/visits'), { role: 'accountant' });
+    await waitFor(() => expect(router.state.location.pathname).toBe(at('/timeline')));
+    await screen.findByTestId('patient-section-timeline');
+    expect(screen.queryByTestId('overview-card-visits')).not.toBeInTheDocument();
+    expect(fetchPersonAppointments).not.toHaveBeenCalled();
+  });
+
+  it('says a refused Visits read failed — never "No appointments yet" (QA-06)', async () => {
+    vi.mocked(fetchPersonAppointments).mockRejectedValue(
+      new HttpError('Forbidden', 403, '/app/appointments', 'GET'),
+    );
+    renderPatientFile(at('/visits'));
+    const section = await screen.findByTestId('patient-section-visits');
+    expect(await within(section).findByTestId('retry-error')).toBeInTheDocument();
+    expect(within(section).queryByText('No appointments yet')).not.toBeInTheDocument();
   });
 
   it('goes back to the list on an Esc nothing else takes', async () => {

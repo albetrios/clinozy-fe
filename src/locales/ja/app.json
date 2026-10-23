@@ -643,6 +643,7 @@
     "created": {
       "lead": "リード作成 · {{time}} · {{source}} 経由",
       "patientThread": "患者 · チャットのみ · リードなし",
+      "fromLead": "患者 · リード経由",
       "contactThread": "連絡先 · チャットのみ · リードなし"
     },
     "history": {

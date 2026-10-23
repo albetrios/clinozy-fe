@@ -65,7 +65,23 @@ describe('viewablePatientFileSections (Q-F1)', () => {
   it('shows a member without the record codes only the sections that need none', () => {
     expect(
       viewablePatientFileSections({ patients: true, billing: true, canCode: holding() }),
-    ).toEqual(['timeline', 'visits', 'invoices', 'payments', 'packages', 'notes']);
+    ).toEqual(['timeline', 'invoices', 'payments', 'packages', 'notes']);
+  });
+
+  it('opens Visits only with appointment:read — never for an Accountant or Marketing (QA-06)', () => {
+    const accountant = viewablePatientFileSections({
+      patients: true,
+      billing: true,
+      canCode: holding('patient:read', 'payment:read'),
+    });
+    expect(accountant).toEqual(['timeline', 'invoices', 'payments', 'packages', 'notes']);
+    expect(
+      viewablePatientFileSections({
+        patients: true,
+        billing: false,
+        canCode: holding('appointment:read'),
+      }),
+    ).toContain('visits');
   });
 
   it('opens Clinical notes, Photos and Reports with the clinical record code', () => {
@@ -77,7 +93,6 @@ describe('viewablePatientFileSections (Q-F1)', () => {
     expect(sections).toEqual([
       'timeline',
       'overview',
-      'visits',
       'images',
       'reports',
       'packages',

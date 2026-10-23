@@ -111,8 +111,10 @@ export interface PatientFileActions {
  * sections' split "New …"): each item checks its own permission — the
  * Rx and treatment gates (the member's `patient_prescription:create` /
  * `patient_treatment:create`), `payment:create` for an invoice or a payment,
- * appointments create for a booking, patients create or edit for a photo, a
- * report or a note — and runs its action: the record's drawer, the Invoice
+ * appointments create for a booking, patients create for a note, and for a
+ * photo or a report patients edit AND the member opening Photos / Reports
+ * (their clinical-record read — the section and the server's `POST` both ask
+ * for it, P14) — and runs its action: the record's drawer, the Invoice
  * drawer or Receive payment keeping the file behind it (`from`, §4), the
  * appointment form for this patient's person, or the section. Payment, when the
  * server says she owes nothing (`meta.due_total`), says so instead.
@@ -121,7 +123,7 @@ export function usePatientFileActions(): PatientFileActions {
   const { t } = useTranslation(PATIENT_FILE_ACTIONS_NS);
   const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
-  const { patientId, file, section, photos } = usePatientFileContext();
+  const { patientId, file, section, viewable, photos } = usePatientFileContext();
   const access = useAppAccess();
   const money = usePaymentAccess();
   // What she owes, for Payment's "Nothing due" — read only by a member who records and reads money.
@@ -134,6 +136,9 @@ export function usePatientFileActions(): PatientFileActions {
     access.isResolved && access.can(area, action);
   const passes = (gate: 'prescriptions' | 'treatments') =>
     access.isResolved && passesPatientFileGate(access, gate);
+  // An item that lands in a section is offered only to a member who may open it — else the
+  // section guard sends the click back to the first section, and nothing happens (QA-05).
+  const opens = (target: PatientFileSectionSlug) => viewable.includes(target);
 
   const openSection = (target: PatientFileSectionSlug) => () =>
     void navigate(organizationPatientSection(organizationSlug, patientId, target));
@@ -182,7 +187,8 @@ export function usePatientFileActions(): PatientFileActions {
       },
     },
     photo: {
-      allowed: can('patients', 'create'),
+      // `POST …/images` asks patient:update + patient:clinical_record:read (P14).
+      allowed: can('patients', 'edit') && opens('images'),
       // The picker first, inside the click — the browser opens it only there.
       run: () => {
         photos.pick('general');
@@ -202,7 +208,8 @@ export function usePatientFileActions(): PatientFileActions {
         ),
     },
     report: {
-      allowed: can('patients', 'edit'),
+      // `POST …/reports` asks patient:update + patient:clinical_record:read (P14).
+      allowed: can('patients', 'edit') && opens('reports'),
       run: () => void navigate(organizationReportCreate(organizationSlug, patientId)),
     },
     note: { allowed: can('patients', 'create'), run: openSection('notes') },

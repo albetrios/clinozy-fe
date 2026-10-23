@@ -4,7 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { fetchInvoiceTotals } from '@/shared/api/app/invoices-api.ts';
+import { viewablePatientFileSections } from '@/shared/app/patient-file-sections.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
 import {
   patientFile,
   TEST_CONTACT_ID,
@@ -148,14 +150,27 @@ describe('usePatientFileActions', () => {
   it('keeps the Rx and treatment items from a Front desk, who holds neither code (S:35, 38)', async () => {
     renderInPatientFile(<ActionsProbe />, { file: patientFile(), role: 'front_desk' });
     await screen.findByRole('button', { name: 'appointment' });
-    expect(itemIds()).toEqual([
-      'invoice',
-      'payment',
-      'photo',
-      'appointment',
-      'report',
-      'note',
-    ]);
+    expect(itemIds()).not.toContain('prescription');
+    expect(itemIds()).not.toContain('treatment');
+  });
+
+  it('offers Photo and Report only with their sections — none for a Front desk (QA-05)', async () => {
+    const codes = PRESET_CODES.front_desk;
+    const held = new Set<string>(codes);
+    renderInPatientFile(<ActionsProbe />, {
+      file: patientFile(),
+      role: 'front_desk',
+      // What the layout hands the file: the Front desk's sections (no clinical record read).
+      viewable: viewablePatientFileSections({
+        patients: true,
+        billing: true,
+        canCode: (code) => held.has(code),
+      }),
+    });
+    await screen.findByRole('button', { name: 'appointment' });
+    expect(itemIds()).toEqual(['invoice', 'payment', 'appointment', 'note']);
+    expect(screen.getByTestId('primaries')).toHaveTextContent('images:-');
+    expect(screen.getByTestId('primaries')).toHaveTextContent('reports:-');
   });
 
   it('asks a signed-in member’s own codes for every item', async () => {

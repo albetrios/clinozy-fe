@@ -14,6 +14,7 @@ export const CHAT_COLUMN_KEYS = {
   created: {
     lead: 'chatColumn.created.lead',
     patientThread: 'chatColumn.created.patientThread',
+    fromLead: 'chatColumn.created.fromLead',
     contactThread: 'chatColumn.created.contactThread',
   },
   history: {
