@@ -647,7 +647,7 @@
     "created": {
       "lead": "लीड बनी · {{time}} · {{source}} से",
       "patientThread": "मरीज़ · सिर्फ़ चैट · कोई लीड नहीं",
-      "fromLead": "मरीज़ · लीड से आए",
+      "leadJourney": "लीड → अपॉइंटमेंट → मरीज़",
       "contactThread": "संपर्क · सिर्फ़ चैट · कोई लीड नहीं"
     },
     "history": {

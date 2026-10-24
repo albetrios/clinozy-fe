@@ -162,10 +162,10 @@ describe('PatientActivity', () => {
       expect(fetchLead).toHaveBeenCalledWith(LEAD_ID);
     });
 
-    it('says she came from a lead — not "no lead" — to a member who cannot read it', async () => {
+    it('names the way she came — not "no lead" — to a member who cannot read her lead', async () => {
       holdPreset('therapist');
       renderActivity({ file: linkedFile() });
-      expect(await divider()).toHaveTextContent('Patient · came from a lead');
+      expect(await divider()).toHaveTextContent('Lead → appointment → patient');
       expect(fetchLead).not.toHaveBeenCalled();
     });
 
@@ -176,7 +176,7 @@ describe('PatientActivity', () => {
       renderActivity({ file: linkedFile() });
       const line = await divider();
       await vi.waitFor(() => expect(fetchLead).toHaveBeenCalled());
-      expect(line).toHaveTextContent('Patient · came from a lead');
+      expect(line).toHaveTextContent('Lead → appointment → patient');
     });
 
     it('keeps "no lead" for a patient who never had one', async () => {

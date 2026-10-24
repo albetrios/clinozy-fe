@@ -484,9 +484,9 @@ describe('the divider (threadDivider, H:5785)', () => {
     );
   });
 
-  it('never denies a lead the host knows of but could not read (QA-02)', () => {
+  it('never denies a lead the host knows of but could not read — it names the way they came (QA-02)', () => {
     expect(threadDivider(null, true, formatWith(), { hasLead: true })).toBe(
-      'Patient · came from a lead',
+      'Lead → appointment → patient',
     );
   });
 });

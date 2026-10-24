@@ -651,7 +651,7 @@
     "created": {
       "lead": "Prospect créé · {{time}} · via {{source}}",
       "patientThread": "Patient · chat uniquement · pas de prospect",
-      "fromLead": "Patient · issu d’un prospect",
+      "leadJourney": "Prospect → rendez-vous → patient",
       "contactThread": "Contact · chat uniquement · pas de prospect"
     },
     "history": {

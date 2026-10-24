@@ -178,9 +178,10 @@ export function historyText(entry: ContactHistoryEntry, format: ChatFormat): str
 /**
  * The divider above the first line (`_patterns.md:151`, H:5785): "Lead
  * created · <time> · via <source>"; for a patient whose lead the host knows of
- * but could not read (no `lead:read`, another branch's lead) "Patient · came
- * from a lead"; only for a person without a lead "Patient · chat only · no
- * lead" / "Contact · chat only · no lead".
+ * but could not read (no `lead:read`, another branch's lead) the way they came
+ * — "Lead → appointment → patient": a lead books, the check-in makes the patient
+ * file (A14); only for a person without a lead "Patient · chat only · no lead" /
+ * "Contact · chat only · no lead".
  */
 export function threadDivider(
   thread: ChatThread | null,
@@ -195,7 +196,7 @@ export function threadDivider(
       source: thread.source ? t(APP_KEYS.leads.sources[thread.source]) : '—',
     });
   }
-  if (hasLead) return t(keys.created.fromLead);
+  if (hasLead) return t(keys.created.leadJourney);
   return t(
     isPatient || thread?.patientId
       ? keys.created.patientThread
