@@ -162,11 +162,12 @@ function useChatAside(
   const phone = useViewportTier() === 'phone';
   const viewportWidth = useViewportWidth();
   const chatPreference = useDevicePrefsStore((store) => store.leadChatWidth);
-  // The composer needs `contact_activity:create` (the codes in force, a View-as preview's too).
+  // The chat needs `contact_activity:read`, its composer `contact_activity:create` (the codes in
+  // force, a View-as preview's too): without the stream the form is its own width.
   const stream = useContactActivityAccess();
   const person = chatPersonOf(state);
   const who = state.draft.who;
-  const show = state.edit && !phone && person !== null && who !== null;
+  const show = state.edit && !phone && stream.reads && person !== null && who !== null;
   const widths = appointmentFormWidths(viewportWidth, chatPreference, show);
   const openHistory = (target: ChatHistoryTarget) => {
     if (target.kind === 'appointment') props.onOpenAppointment?.(target.appointmentId);

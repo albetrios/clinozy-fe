@@ -67,12 +67,14 @@ const { notifyMock } = vi.hoisted(() => ({
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 /** Whether the member may write to the person's stream (`contact_activity:create`). */
-const stream = vi.hoisted(() => ({ writes: true }));
+const stream = vi.hoisted(() => ({ reads: true, writes: true }));
 vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
   useAppAccess: () => ({
     previewRole: null,
     can: () => true,
-    canCode: (code: string) => code !== 'contact_activity:create' || stream.writes,
+    canCode: (code: string) =>
+      (code !== 'contact_activity:create' || stream.writes) &&
+      (code !== 'contact_activity:read' || stream.reads),
     viewableSections: [],
     isResolved: true,
   }),
@@ -462,6 +464,7 @@ beforeEach(async () => {
   viewport.tier = 'desktop';
   viewport.width = 1440;
   vi.resetAllMocks();
+  stream.reads = true;
   stream.writes = true;
   world.appointments = [];
   world.slots = new Map();
@@ -831,6 +834,17 @@ describe('AppointmentForm — Edit (KICKOFF §6.4)', () => {
 
   // QA-07's pattern: a member who reads the stream but may not write it had a composer the server
   // refused.
+  // Decided with the owner: a member who may not read the person's stream sees no chat at all.
+  it('opens a booking without the chat for a member who may not read the person’s stream', async () => {
+    stream.reads = false;
+    renderBooking(BOOKING);
+    const panel = await form(EDIT);
+    expect(within(panel).getByTestId(`${EDIT}-title`)).toHaveTextContent(
+      'Appointment #2861',
+    );
+    expect(within(panel).queryByTestId(IDS.chat)).not.toBeInTheDocument();
+  });
+
   it('shows the chat without a composer to a member who may not write to the person', async () => {
     stream.writes = false;
     renderBooking(BOOKING);
