@@ -14,6 +14,7 @@ import { cspApiOrigin } from './plugins/csp-api-origin.ts';
 import { devServerMode } from './plugins/dev-server-mode.ts';
 import { i18nBuild } from './plugins/i18n-build.ts';
 import { productIdentityHtml } from './plugins/product-identity-html.ts';
+import { securityTxt } from './plugins/security-txt.ts';
 import { versionJson } from './plugins/version-json.ts';
 
 export default defineConfig(({ command, mode }) => {
@@ -77,6 +78,8 @@ export default defineConfig(({ command, mode }) => {
       // The release version rides along so version.json can carry the critical-update
       // floor (src/core/version/minimum-version.constants.ts).
       versionJson(buildId, { version: env.VITE_APP_VERSION }),
+      // /.well-known/security.txt from the identity manifest's security contact (RFC 9116).
+      securityTxt(),
       // Substitutes {{PRODUCT_*}} in index.html; runs `pre` so the CSP pass below
       // sees final markup. Keeps branding out of the rebrand surface entirely.
       productIdentityHtml(),

@@ -105,6 +105,9 @@
       "notConfirmed": "No se pudo verificar el archivo tras subirlo. Vuelve a subirlo.",
       "invalidFileName": "Cambia el nombre del archivo e inténtalo de nuevo: no puede contener barras, «..» ni caracteres de control."
     },
+    "viewAs": {
+      "readOnly": "La vista previa es de solo lectura, así que no se guardó nada. Sal de la vista previa para hacer cambios."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "No se pudo añadir la llave de acceso",

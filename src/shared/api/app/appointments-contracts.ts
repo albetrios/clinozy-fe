@@ -322,6 +322,12 @@ export interface AppointmentSlotParams {
   step: AppointmentSlotStep;
   /** The booking being edited or moved — not busy for itself (`exclude_appointment_id`). */
   excludeAppointmentId?: string;
+  /**
+   * The room and the machine the booking holds (`branch_room_id`, `branch_machine_id`): their
+   * other bookings block a start too, as the save's own checks do.
+   */
+  roomId?: string;
+  machineId?: string;
 }
 
 /** The slots wire — `GET /app/appointments/slots` (the OpenAPI document leaves it untyped, M44). */

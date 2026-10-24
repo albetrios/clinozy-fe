@@ -57,3 +57,15 @@ describe('HttpError', () => {
     expect(isNotFound(null)).toBe(false);
   });
 });
+
+describe('HttpError — the response body stays out of telemetry (SEC-01)', () => {
+  it('reads its body as `data`, but never lists it among its own fields', () => {
+    const error = new HttpError('Internal error', 503, '/api/v1/app/contacts', 'GET', {
+      error: { detail: 'No contact matches Priya' },
+    });
+
+    expect(error.data).toEqual({ error: { detail: 'No contact matches Priya' } });
+    expect(Object.keys(error)).not.toContain('data');
+    expect(JSON.stringify({ ...error })).not.toContain('Priya');
+  });
+});

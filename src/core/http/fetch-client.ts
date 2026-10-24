@@ -351,6 +351,27 @@ const FIRST_ATTEMPT: AttemptState = { attempt: 0, refreshes: 0, rotationReplays:
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 /**
+ * Asked before a write leaves: a refusal `reason` keeps it here, thrown as a `403` whose
+ * `error.reason` is that reason, as clinozy-be would refuse it; `null` sends it. The View-as
+ * preview holds the clinic's writes this way (`startViewAsWriteHold`).
+ */
+export type WriteHold = (write: { method: string; path: string }) => string | null;
+
+let writeHold: WriteHold | null = null;
+
+/**
+ * Set the one {@link WriteHold} (`null` clears it).
+ *
+ * @returns A function that clears it again (tests).
+ */
+export function setWriteHold(hold: WriteHold | null): () => void {
+  writeHold = hold;
+  return () => {
+    if (writeHold === hold) writeHold = null;
+  };
+}
+
+/**
  * Per-call options. `idempotencyKey` is the caller's key for ONE user action: pass the same key
  * when the user retries that action, so clinozy-be replays its first answer instead of acting twice
  * (a create that landed but lost its response is not made again). Omitted, the call mints its own.
@@ -367,6 +388,8 @@ async function request<T>(
   options?: RequestOptions,
 ): Promise<HttpResponse<T>> {
   const url = buildRequestUrl(path);
+  const held = WRITE_METHODS.has(method) ? writeHold?.({ method, path }) : null;
+  if (held) throw new HttpError(held, 403, url, method, { error: { reason: held } });
   const isRefreshUrl =
     path === API_ENDPOINTS.AUTH.REFRESH || url.endsWith(API_ENDPOINTS.AUTH.REFRESH);
   // One key per logical request (or the caller's per-action key): retries and the post-refresh

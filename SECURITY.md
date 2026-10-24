@@ -6,6 +6,7 @@ Please report security vulnerabilities **privately** so we can address them befo
 
 - **Preferred:** Use GitHub **Security** → **Report a vulnerability** on this repository (private security advisory).
 - **Alternative:** Email **nikunj.mavani@albetrios.com** with the same details below.
+- The app publishes both channels at `/.well-known/security.txt` (RFC 9116), written at each build from the same identity manifest (`plugins/security-txt.ts`).
 
 Include, where possible:
 

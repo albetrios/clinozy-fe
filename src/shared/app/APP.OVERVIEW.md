@@ -121,7 +121,8 @@ Access itself — the fixture matrix, the resolver and the member's clinic roles
 is `src/shared/api/app/access-api.ts`, read through
 `src/shared/hooks/useAppAccess/` (narrowed by View-as, `useUIStore.previewRole` —
 a contract role or a custom role's id, which the View-as pill names from the
-clinozy-be roles and tones from the matrix).
+clinozy-be roles and tones from the matrix). While it runs, the fetch client's write
+hold refuses the clinic's writes before they leave (`startViewAsWriteHold`).
 A member's clinic roles are their staff profile's (`useMyStaffProfile`, by sign-in
 email), else least privilege from their clinozy-be codes; the Users room and
 "Change roles & access" always follow those codes (D17). The Users room's data —

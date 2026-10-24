@@ -109,6 +109,25 @@ describe('scrubEventUrls', () => {
     expect(out.breadcrumbs[0]?.data?.from).toBe('/login');
   });
 
+  it('scrubs the extras and every context — the error fields extraErrorData copies (SEC-01)', () => {
+    const event = {
+      extra: { url: 'https://api.x.dev/api/v1/app/contacts?q=9876543210', status: 503 },
+      contexts: {
+        HttpError: { url: '/api/v1/app/contacts?q=9876543210', status: 503 },
+        trace: {
+          data: { 'browser.script.invoker': 'https://app.x.dev/patients?q=Priya' },
+        },
+      },
+    };
+
+    scrubEventUrls(event);
+
+    expect(JSON.stringify(event)).not.toMatch(/9876543210|Priya/);
+    expect(event.extra.url).toBe('https://api.x.dev/api/v1/app/contacts');
+    expect(event.contexts.HttpError.url).toBe('/api/v1/app/contacts');
+    expect(event.extra.status).toBe(503);
+  });
+
   it('handles an event with no request and no breadcrumbs without throwing', () => {
     const event = { type: 'transaction' };
     expect(() => scrubEventUrls(event)).not.toThrow();

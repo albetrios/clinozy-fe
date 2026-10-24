@@ -122,6 +122,9 @@ export const ERRORS_KEYS = {
       notConfirmed: 'frontend.upload.notConfirmed',
       invalidFileName: 'frontend.upload.invalidFileName',
     },
+    viewAs: {
+      readOnly: 'frontend.viewAs.readOnly',
+    },
     profileUpdated: 'frontend.profileUpdated',
     hooks: {
       passkeys: {

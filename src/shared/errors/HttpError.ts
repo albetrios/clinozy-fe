@@ -6,7 +6,11 @@ export class HttpError extends Error {
   public readonly status: number;
   public readonly url: string;
   public readonly method: string;
-  public readonly data: unknown;
+  /**
+   * The response body. Not enumerable: an error reporter copies an error's own fields into
+   * its event (Sentry's extraErrorData), and a body may echo what a person typed.
+   */
+  declare public readonly data: unknown;
 
   constructor(
     message: string,
@@ -20,7 +24,7 @@ export class HttpError extends Error {
     this.status = status;
     this.url = url;
     this.method = method;
-    this.data = data;
+    Object.defineProperty(this, 'data', { value: data, enumerable: false });
   }
 }
 

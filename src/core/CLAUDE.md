@@ -23,7 +23,10 @@ Claude Code loads this file when it works in `src/core/`. It holds sections move
   never another clinic's records under this tab's screen. A switch waits for a refresh in
   flight. A boot that got no answer (refresh or `me/context` offline, 429, 5xx) is asked again
   by the next guard, not settled as signed out. Writes auto-carry an `X-Idempotency-Key`
-  (minted once per logical request, reused across retries/replay). Organization context:
+  (minted once per logical request, reused across retries/replay). One **write hold**
+  (`setWriteHold`) may keep a write from leaving — a `403` whose `error.reason` is the hold's;
+  the View-as preview holds the clinic's writes that way (`startViewAsWriteHold`, `useUIStore`),
+  because they would go out as the signed-in member. Organization context:
   the **app URL** drives the active org — guards sync it via `/auth/switch-to-organization`,
   which re-mints the access token with a signed `org` claim. API requests carry **no**
   org header (`X-Organization-ID` does not exist) and no org id path segment; the backend

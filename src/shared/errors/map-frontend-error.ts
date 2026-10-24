@@ -43,6 +43,8 @@ const CODE_TO_AUTH_KEY: Record<string, string> = {
   [FRONTEND_ERROR_CODES.UPLOAD_NOT_CONFIRMED]: ERRORS_KEYS.frontend.upload.notConfirmed,
   [FRONTEND_ERROR_CODES.UPLOAD_INVALID_FILE_NAME]:
     ERRORS_KEYS.frontend.upload.invalidFileName,
+  // A clinic write held while View-as previews a role (`startViewAsWriteHold`): never sent.
+  [FRONTEND_ERROR_CODES.VIEW_AS_READ_ONLY]: ERRORS_KEYS.frontend.viewAs.readOnly,
 };
 
 /**

@@ -196,6 +196,35 @@ describe('initSentry', () => {
     expect(sent.request.url).toBe('https://api.x.dev/api/v1/app/patients');
   });
 
+  it('beforeSend strips the query from a reported 5xx’s extras and its HttpError context (SEC-01)', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    await initSentry(ROUTER);
+    const { beforeSend } = initConfig();
+
+    // reportError's extras and extraErrorData's copy of the HttpError's own fields.
+    const sent = beforeSend(
+      {
+        message: 'Internal error',
+        extra: {
+          url: 'https://api.x.dev/api/v1/app/contacts?q=Priya&limit=8',
+          queryKey: 'app,contacts',
+          method: 'GET',
+          status: 503,
+        },
+        contexts: {
+          HttpError: {
+            url: 'https://api.x.dev/api/v1/app/contacts?q=Priya',
+            status: 503,
+          },
+        },
+      },
+      { originalException: new HttpError('Internal error', 503, '/x', 'GET') },
+    ) as { extra: { url: string } };
+
+    expect(JSON.stringify(sent)).not.toContain('Priya');
+    expect(sent.extra.url).toBe('https://api.x.dev/api/v1/app/contacts');
+  });
+
   it('beforeSendTransaction strips the query from span data — long-animation-frame spans carry the page URL (SEC-01)', async () => {
     config.sentryDsn = 'https://key@sentry.example/1';
     await initSentry(ROUTER);

@@ -30,6 +30,7 @@ import {
   type AppointmentFormMode,
   type AppointmentFormPrefill,
   type AppointmentSlotsStatus,
+  copiesAsIs,
   emptyDraft,
   isDraftDirty,
   newDraftOf,
@@ -119,7 +120,9 @@ function effectiveMode(
  * The doctor's free starts that day at the branch — asked once a date, a doctor and a branch
  * are set, never once locked. The booking being edited or moved is asked without its own
  * time (`exclude_appointment_id`): its saved start, and any start overlapping only itself,
- * are offered; every other booking still blocks.
+ * are offered; every other booking still blocks. The room and machine the save will hold are
+ * asked too — the booking's own (Edit, Reschedule) or the source's of a Copy that books as is —
+ * so a start another booking holds them at is never offered and then refused.
  */
 function slotQueryOf(
   draft: AppointmentDraft,
@@ -129,9 +132,12 @@ function slotQueryOf(
     branchId: string | null;
     /** The saved booking (Edit, Reschedule); none for a New one or a Copy. */
     appointmentId: string | undefined;
+    /** The booking whose room and machine the save keeps, if any. */
+    holder: Pick<AppointmentRow, 'roomId' | 'machineId'> | undefined;
   },
 ): AppointmentSlotParams | null {
   if (!(draft.date && draft.doctorId && context.branchId) || context.locked) return null;
+  const { roomId, machineId } = context.holder ?? {};
   return {
     date: draft.date,
     branchId: context.branchId,
@@ -139,6 +145,8 @@ function slotQueryOf(
     durationMin: draft.durationMin,
     step: context.step,
     ...(context.appointmentId ? { excludeAppointmentId: context.appointmentId } : {}),
+    ...(roomId ? { roomId } : {}),
+    ...(machineId ? { machineId } : {}),
   };
 }
 
@@ -259,16 +267,21 @@ function slotsStatusOf({
 /** What hangs off the draft: the free slots. */
 function useDraftReads(
   draft: AppointmentDraft,
-  row: AppointmentRow | undefined,
+  booking: { row: AppointmentRow | undefined; source: AppointmentRow | undefined },
   branchId: string | null,
 ) {
+  const { row, source } = booking;
   const locked = row !== undefined && isAppointmentSlotLocked(draft.status);
   const [slotStep, setSlotStep] = useState<AppointmentSlotStep>(30);
+  // A Copy goes through `…/copy` — keeping the source's room and machine — only as is.
+  const copiedAsIs =
+    source && branchId && copiesAsIs(draft, source, branchId) ? source : undefined;
   const query = slotQueryOf(draft, {
     locked,
     step: slotStep,
     branchId,
     appointmentId: row?.id,
+    holder: row ?? copiedAsIs,
   });
   const slots = useAppointmentSlots(query);
   return {
@@ -343,7 +356,7 @@ export function useAppointmentFormState(
   });
   const draft = session?.draft ?? emptyDraft(today);
   return {
-    ...useDraftReads(draft, row, branch.branchId),
+    ...useDraftReads(draft, { row, source: sources.source }, branch.branchId),
     ...bookingFlags(row, readOnly, access.can('appointments', 'edit')),
     mode,
     row,

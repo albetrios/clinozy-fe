@@ -1,5 +1,6 @@
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
+import { scrubSensitiveUrl } from '@/lib/telemetry-scrub.ts';
 import { AppError } from '@/shared/errors/AppError.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { resolveKnownFrontendError } from '@/shared/errors/map-frontend-error.ts';
@@ -41,7 +42,8 @@ export function reportError(error: unknown, context?: Record<string, unknown>): 
         }
 
         if (isHttpError(error)) {
-          scope.setExtra('url', error.url);
+          // The path only: the query is what a person typed (a search, a note).
+          scope.setExtra('url', scrubSensitiveUrl(error.url));
           scope.setExtra('method', error.method);
           scope.setExtra('status', error.status);
           // Do NOT log response body — may contain PII

@@ -22,7 +22,7 @@ import {
   refreshAccessToken,
 } from '@/shared/auth/service.ts';
 
-import { apiClient } from './fetch-client.ts';
+import { apiClient, setWriteHold } from './fetch-client.ts';
 
 /** Helper to create a base64url-encoded JWT */
 function makeJwt(payload: Record<string, unknown>): string {
@@ -520,6 +520,57 @@ describe('fetch-client', () => {
       const replay = (fetchMock.mock.calls[1][1] as RequestInit).headers as Headers;
       expect(first.get('X-Idempotency-Key')).toBe(replay.get('X-Idempotency-Key'));
       expect(first.get('X-Idempotency-Key')).toMatch(/[0-9a-f-]{36}/);
+    });
+  });
+
+  describe('write hold', () => {
+    it('keeps a held write here: a 403 with the hold reason, nothing sent', async () => {
+      const stop = setWriteHold(({ path }) => (path.startsWith('/app/') ? 'held' : null));
+      try {
+        const refusal = await apiClient
+          .post('/app/leads', { a: 1 })
+          .catch((error) => error);
+
+        expect(refusal).toBeInstanceOf(HttpError);
+        expect(refusal).toMatchObject({
+          status: 403,
+          method: 'POST',
+          data: { error: { reason: 'held' } },
+        });
+        expect(fetchMock).not.toHaveBeenCalled();
+      } finally {
+        stop();
+      }
+    });
+
+    it('sends what the hold lets through, and never asks it about a read', async () => {
+      const hold = vi.fn(({ path }: { path: string }) =>
+        path.startsWith('/app/') ? 'held' : null,
+      );
+      const stop = setWriteHold(hold);
+      fetchMock.mockImplementation(() => Promise.resolve(ok()));
+      try {
+        await apiClient.get('/app/leads');
+        await apiClient.patch('/users/me/settings', { a: 1 });
+
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(hold).toHaveBeenCalledTimes(1);
+        expect(hold).toHaveBeenCalledWith({
+          method: 'PATCH',
+          path: '/users/me/settings',
+        });
+      } finally {
+        stop();
+      }
+    });
+
+    it('sends every write again once the hold is cleared', async () => {
+      setWriteHold(() => 'held')();
+      fetchMock.mockImplementation(() => Promise.resolve(ok()));
+
+      await apiClient.delete('/app/leads/lead_1');
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     });
   });
 

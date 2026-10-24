@@ -105,6 +105,9 @@
       "notConfirmed": "Não foi possível verificar o arquivo após o envio. Tente enviá-lo novamente.",
       "invalidFileName": "Renomeie o arquivo e tente novamente: o nome não pode conter barras, “..” ou caracteres de controle."
     },
+    "viewAs": {
+      "readOnly": "A visualização é somente leitura, então nada foi salvo. Saia da visualização para fazer alterações."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Não foi possível adicionar a passkey",

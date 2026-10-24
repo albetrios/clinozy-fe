@@ -29,7 +29,10 @@ Settings' role dialog did lives on the role page too.
 "Preview as <role>" starts View-as for any role but Owner and Admin, a custom role included (by its
 clinozy-be id): `useUIStore.previewRole` narrows `useAppAccess` everywhere, the shell's pill
 names the role, and a role that can't view Users is taken to its first room by the org layout
-(`useRoomLanding`, Q-U11). Session-only — a reload ends it.
+(`useRoomLanding`, Q-U11). Session-only — a reload ends it. A preview is read-only: a save
+would go out as the signed-in member, so `startViewAsWriteHold` (`useUIStore`) keeps every
+clinic write in the browser while it runs, refused as "Previews are read-only, so nothing was
+saved"; the member's own account still writes.
 
 The page itself is thin: the family-shared `../shared/components/RolesAccess/` holds the toolbar,
 the role list, the role page and the writes, because the Team page also keeps it behind a member

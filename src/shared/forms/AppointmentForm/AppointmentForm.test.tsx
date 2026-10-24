@@ -1222,6 +1222,55 @@ describe('AppointmentForm — the grid of a booking being moved (WF-02)', () => 
     );
   });
 
+  it('asks a moved booking’s grid with its room and machine: a start another booking holds them at is never offered', async () => {
+    const user = setUser();
+    const held = appointmentRow({
+      roomId: 'room_laser00000000000000',
+      machineId: 'mach_diode00000000000000',
+    });
+    // clinozy-be: the laser room is booked at 14:00 by another doctor — busy only when asked.
+    vi.mocked(fetchAppointmentSlots).mockImplementation(async (params) =>
+      slotDay(
+        params.date,
+        params.roomId === held.roomId ? ['10:30', '11:00'] : ['10:30', '11:00', '14:00'],
+      ),
+    );
+    renderBooking(held, { mode: 'reschedule' });
+    const panel = await form(EDIT);
+    await waitFor(() =>
+      expect(fetchAppointmentSlots).toHaveBeenCalledWith(
+        expect.objectContaining({
+          excludeAppointmentId: held.id,
+          roomId: held.roomId,
+          machineId: held.machineId,
+        }),
+      ),
+    );
+    await slotAt(panel, '11:00');
+    const offered = within(panel)
+      .queryAllByTestId(IDS.slotTime)
+      .map((button) => button.getAttribute('data-time'));
+    expect(offered).not.toContain('14:00');
+    await user.click(await slotAt(panel, '11:00'));
+    expect(within(panel).getByTestId(`${EDIT}-save`)).toHaveTextContent(/^Move to /);
+  });
+
+  it('asks a Copy that books as is with its source’s room; a New booking with none', async () => {
+    const source = appointmentRow({
+      branchId: mainBranchId,
+      roomId: 'room_laser00000000000000',
+    });
+    world.appointments = [source];
+    renderNew({ prefill: { copyOf: source.id } });
+    await slotAt(await form(NEW), '14:00');
+    expect(fetchAppointmentSlots).toHaveBeenLastCalledWith(
+      expect.objectContaining({ roomId: source.roomId }),
+    );
+    expect(fetchAppointmentSlots).toHaveBeenLastCalledWith(
+      expect.not.objectContaining({ excludeAppointmentId: expect.anything() }),
+    );
+  });
+
   it('asks a New booking’s grid with no booking left out', async () => {
     renderNew({ prefill: { date: '2026-10-05' } });
     const panel = await form(NEW);
@@ -1229,7 +1278,12 @@ describe('AppointmentForm — the grid of a booking being moved (WF-02)', () => 
     expect(
       vi
         .mocked(fetchAppointmentSlots)
-        .mock.calls.every(([params]) => params.excludeAppointmentId === undefined),
+        .mock.calls.every(
+          ([params]) =>
+            params.excludeAppointmentId === undefined &&
+            params.roomId === undefined &&
+            params.machineId === undefined,
+        ),
     ).toBe(true);
   });
 });

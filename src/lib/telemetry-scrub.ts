@@ -8,8 +8,9 @@
  * deep link's `/login?redirect=` — all of them again. A list of sensitive param
  * names missed every param added after it (`q`, SEC-01), so nothing after the
  * path is kept: `$pathname` and `route_viewed`'s `route_id` still say where the
- * person was. Every outgoing event passes through here (Sentry `request.url` +
- * breadcrumbs, PostHog `properties`, `$set` and `$set_once`).
+ * person was. Every outgoing event passes through here (Sentry `request.url`,
+ * breadcrumbs, spans, extras and contexts; PostHog `properties`, `$set` and
+ * `$set_once`).
  */
 
 /** A URL(-ish) string: absolute (`https://…`) or root-relative (`/…`). */
@@ -42,7 +43,7 @@ export function scrubObjectUrls(record: Record<string, unknown> | unknown[]): vo
   }
 }
 
-/** Anything on a Sentry event that carries a `data` bag: breadcrumbs, spans, the trace context. */
+/** Anything on a Sentry event that carries a `data` bag: breadcrumbs and spans. */
 type ScrubbableData = { data?: Record<string, unknown> };
 
 /**
@@ -54,25 +55,27 @@ type ScrubbableEvent = {
   request?: { url?: string };
   breadcrumbs?: ScrubbableData[];
   spans?: ScrubbableData[];
-  contexts?: { trace?: ScrubbableData };
+  extra?: Record<string, unknown>;
+  contexts?: Record<string, unknown>;
 };
 
 /**
  * Scrub URLs on a Sentry-shaped event, in place: `request.url` (the
  * httpClient integration sets it to the failed request's full URL, past
- * `dataCollection.urlQueryParams`), breadcrumb data, and span / trace data
- * (long-animation-frame spans carry the page URL as `browser.script.invoker`).
+ * `dataCollection.urlQueryParams`), breadcrumb and span data
+ * (long-animation-frame spans carry the page URL as `browser.script.invoker`),
+ * the extras and every context — the trace's data, and the error's own fields
+ * that extraErrorData copies under its name (`contexts.HttpError.url`, the
+ * failed request's full URL).
  */
 export function scrubEventUrls<E extends ScrubbableEvent>(event: E): E {
   if (event.request?.url) {
     event.request.url = scrubSensitiveUrl(event.request.url);
   }
-  for (const carrier of [
-    ...(event.breadcrumbs ?? []),
-    ...(event.spans ?? []),
-    event.contexts?.trace,
-  ]) {
+  for (const carrier of [...(event.breadcrumbs ?? []), ...(event.spans ?? [])]) {
     if (carrier?.data) scrubObjectUrls(carrier.data);
   }
+  if (event.extra) scrubObjectUrls(event.extra);
+  if (event.contexts) scrubObjectUrls(event.contexts);
   return event;
 }

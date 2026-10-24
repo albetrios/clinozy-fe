@@ -192,7 +192,8 @@ describe('StockPurchaseDrawer (clinic-stock.md:142–157, 247–259)', () => {
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent('New purchase');
     expect(drawer).toHaveTextContent('Items received are added to stock');
-    expect(badges(drawer)).toHaveTextContent('No supplierBill ₹0Paid');
+    // Nothing billed yet: neither due nor paid (it read a sage "Paid" before).
+    expect(badges(drawer).textContent).toBe('No supplierBill ₹0');
 
     await user.click(within(drawer).getByTestId(`${D}-save`));
     expect(notifyMock.warning).toHaveBeenCalledWith('Pick a supplier');
