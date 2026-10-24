@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.18.1](https://github.com/albetrios/clinozy-fe/compare/v1.18.0...v1.18.1) (2026-10-24)
+
+
+### Fixed
+
+* **agent:** a Docker pid file left by a pause no longer blocks the daemon's start ([#169](https://github.com/albetrios/clinozy-fe/issues/169)) ([17e22bf](https://github.com/albetrios/clinozy-fe/commit/17e22bfde4bf574e9d68419178fbf9f26b586911))
+* **agent:** a slow dockerd is waited for, not recorded as the restricted fallback ([#167](https://github.com/albetrios/clinozy-fe/issues/167)) ([aae37ef](https://github.com/albetrios/clinozy-fe/commit/aae37ef6bd112e0688cffcd31d6e6210f66e70c0))
+* **agent:** cloud setup installs the Chromium build the pinned Playwright needs ([#164](https://github.com/albetrios/clinozy-fe/issues/164)) ([d471558](https://github.com/albetrios/clinozy-fe/commit/d4715584ffc6ec90112b677f79439ecf1026eb0a))
+* **agent:** restart dockerd only through ensure-docker-daemon.sh, which waits for it to exit ([#185](https://github.com/albetrios/clinozy-fe/issues/185)) ([816a771](https://github.com/albetrios/clinozy-fe/commit/816a771c64b51738faa1cef8d240fa8b6af92df3))
+* **agent:** the failure hint names --silent when pnpm 12 rejects -s ([#170](https://github.com/albetrios/clinozy-fe/issues/170)) ([433ecbe](https://github.com/albetrios/clinozy-fe/commit/433ecbeb5d9002a33228ff66ea50d8232cde63c6))
+* **agent:** the setup script takes --install-only, and Docker starts without service waits ([#168](https://github.com/albetrios/clinozy-fe/issues/168)) ([2ffda72](https://github.com/albetrios/clinozy-fe/commit/2ffda727c134a1709a9d6d36c893dd5a313c1f7a))
+* **agent:** the SonarQube starter waits for a bring-up that has not taken the lock yet ([#166](https://github.com/albetrios/clinozy-fe/issues/166)) ([d5e0fcb](https://github.com/albetrios/clinozy-fe/commit/d5e0fcb7be2e40ee0acdd7f07887ce8b0e34bb84))
+* **deps:** clear the high and critical advisories, dompurify 3.4.17 first ([#184](https://github.com/albetrios/clinozy-fe/issues/184)) ([d5b4304](https://github.com/albetrios/clinozy-fe/commit/d5b43048eb70e4f3c9f6f264ac038d9b204559fe))
+* **deps:** undici 7.30.1, body-parser 2.4.0, fast-uri 3.1.9 and four more advisory floors ([#187](https://github.com/albetrios/clinozy-fe/issues/187)) ([d7f3e72](https://github.com/albetrios/clinozy-fe/commit/d7f3e72acb7543e453c5949585c5c3fc3a980df6))
+* read-only preview, room-aware slot grid, Sentry extras scrub, security.txt ([#188](https://github.com/albetrios/clinozy-fe/issues/188)) ([0ddf31f](https://github.com/albetrios/clinozy-fe/commit/0ddf31fafb00b678e5ada627af029921c854bec3))
+* **tenancy:** answer a refused organization switch with the non-member 404 ([#183](https://github.com/albetrios/clinozy-fe/issues/183)) ([e3b8dd7](https://github.com/albetrios/clinozy-fe/commit/e3b8dd752f54a3d8a3f0d946a35d8d516dced843))
+* the 17 Oct QA fixes — drawer steps, patient file, booking retries, telemetry, security contact ([#186](https://github.com/albetrios/clinozy-fe/issues/186)) ([9a06867](https://github.com/albetrios/clinozy-fe/commit/9a068674634509fde6545fd7b867e23cad9ca6b7))
+
+
+### Changed
+
+* **tenancy:** drop the unused organization id from updateOrganization ([#182](https://github.com/albetrios/clinozy-fe/issues/182)) ([fdd4a07](https://github.com/albetrios/clinozy-fe/commit/fdd4a07f8f40bc74dcfb90a8c2db85e0eb66d91d))
+
 ## [1.18.0](https://github.com/albetrios/clinozy-fe/compare/v1.17.0...v1.18.0) (2026-10-21)
 
 
