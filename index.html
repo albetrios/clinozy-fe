@@ -86,6 +86,7 @@
         --color-brand-mark: oklch(0.72 0.14 150);
         --color-brand-mark-strong: oklch(0.6 0.14 150);
         --color-canvas: oklch(0.985 0 0);
+        --color-muted: oklch(0.967 0.001 286.4);
         --radius-lg: 0.5rem;
         background: var(--color-background);
       }
@@ -96,6 +97,7 @@
         --color-primary: oklch(0.967 0.001 286.4);
         --color-primary-foreground: oklch(0.165 0.004 285.9);
         --color-canvas: oklch(0.165 0.004 285.9);
+        --color-muted: oklch(0.237 0.008 285.8);
       }
       /* The layer: full bleed on `card`, one column centred on both axes. */
       #app-splash {
@@ -221,20 +223,35 @@
           top: 16px;
         }
       }
-      /* From xl the sign-in screen's header starts at the stage's padding. */
-      @media (min-width: 80rem) {
-        .app-boot-frame-logo {
-          inset-inline-start: 3.5rem;
-        }
+      /* The sign-in screen itself (`/`, `/login`: APP_BOOT_FRAME_LOGIN): AuthLayout's
+         outline — its column on the page colour and, from 68.75rem, the stage panel
+         beside it (12px in, rounded), the logo at the column's 40px padding. */
+      .app-boot-frame-stage {
+        display: none;
       }
-      @media (min-width: 96rem) {
-        .app-boot-frame-logo {
-          inset-inline-start: 5rem;
+      .app-boot-frame-login #app-boot-frame {
+        background: var(--color-background);
+      }
+      @media (min-width: 68.75rem) {
+        .app-boot-frame-login .app-boot-frame-logo {
+          inset-inline-start: 2.5rem;
+        }
+        .app-boot-frame-login .app-boot-frame-stage {
+          display: block;
+          position: absolute;
+          inset-block: 0.75rem;
+          inset-inline-end: 0.75rem;
+          inset-inline-start: clamp(28rem, 38vw, 38rem);
+          border-radius: calc(var(--radius-lg) * 2);
+          background: var(--color-muted);
+        }
+        .dark.app-boot-frame-login .app-boot-frame-stage {
+          background: var(--color-canvas);
         }
       }
       @media (min-width: 120rem) {
-        .app-boot-frame-logo {
-          inset-inline-start: 7rem;
+        .app-boot-frame-login .app-boot-frame-stage {
+          inset-inline-start: 40rem;
         }
       }
       .app-splash-emblem {
@@ -561,6 +578,7 @@
         </svg>
         <span class="app-boot-frame-word" dir="ltr">{{PRODUCT_WORDMARK}}</span>
       </span>
+      <span class="app-boot-frame-stage"></span>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

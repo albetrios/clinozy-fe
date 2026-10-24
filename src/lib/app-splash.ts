@@ -41,6 +41,14 @@ export const APP_SPLASH_SKIP = 'app-splash-skip';
 export const APP_BOOT_FRAME = 'app-boot-frame';
 
 /**
+ * Beside {@link APP_BOOT_FRAME} on `/` and `/login`, where a signed-out visit
+ * ends: the frame is the sign-in screen's own outline (AuthLayout) — its column
+ * on the page colour and, from 68.75rem, the stage panel beside it — so the
+ * screen lands on the same shapes it was painted in.
+ */
+export const APP_BOOT_FRAME_LOGIN = 'app-boot-frame-login';
+
+/**
  * The OAuth hand-off (`/callback/<provider>`): the `<html>` class
  * `public/splash-init.js` adds there. The provider has just sent the visitor back
  * mid sign-in, so the splash shows every frame at its end state from the first

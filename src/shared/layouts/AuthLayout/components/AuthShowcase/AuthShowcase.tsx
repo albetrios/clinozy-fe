@@ -1,317 +1,394 @@
 import './auth-showcase.css';
 
-import { useId } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
-import { Lock } from '@/shared/icons/index.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
+import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar.tsx';
+import { Check, Lock, Pause, Play } from '@/shared/icons/index.ts';
 
 import {
-  AUTH_SHOWCASE_KEYS,
+  AUTH_SHOWCASE_KEYS as K,
   AUTH_SHOWCASE_NS,
   AUTH_SHOWCASE_TEST_IDS,
-  JOURNEY_STOPS,
-  SHOWCASE_MOMENTS,
-  SHOWCASE_VALUES,
+  TOUR_CHAPTERS,
+  TOUR_LANE_COUNTS,
+  TOUR_PATIENT,
+  TOUR_STAFF,
+  TOUR_STATUS_TONES,
+  TOUR_STORY,
+  TOUR_VISITS_AFTER,
+  TOUR_VISITS_BEFORE,
+  TOUR_VISITS_TODAY,
+  type TourStatus,
+  type TourVisit,
 } from './auth-showcase.constants.ts';
+import { addMinutes, buildTourDay, type TourDay } from './tour-day.ts';
+import { useTourFormat } from './tour-format.ts';
+import { TourLens } from './TourLens.tsx';
+import { useTour } from './useTour.ts';
 
-const K = AUTH_SHOWCASE_KEYS;
+/** How often the now line re-reads the clock. */
+const CLOCK_TICK_MS = 15_000;
 
-/** The live dot: the sage dot with a breathing halo (still under reduced motion). */
-function LiveDot() {
-  return (
-    <span
-      aria-hidden="true"
-      className="bg-tone-sage-dot size-1.5 flex-none animate-[pulse-dot_2400ms_ease-in-out_infinite] rounded-full motion-reduce:animate-none"
-    />
-  );
+/** The viewer's clock, re-read every {@link CLOCK_TICK_MS}: the now line keeps their time. */
+function useViewerClock(): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), CLOCK_TICK_MS);
+    return () => clearInterval(timer);
+  }, []);
+  return now;
 }
 
 /**
- * The sign-in screen's hero: who Clinozy is for, the promise, and what it
- * replaces — product truth from the PRD only (D11). Its heading is an `h2`:
- * the form's heading stays the page's `h1`. The three lines rise in turn on
- * the page load.
+ * The sign-in stage: one patient's day through the clinic, told in seven
+ * chapters — Leads, Appointments, Front desk, Patient file, Treatment,
+ * Payments, Tasks — each with its feature shown working beside her row on a
+ * Today sheet set to the viewer's own clock (after hours, tomorrow's).
+ *
+ * @remarks
+ * Decorative but not silent: the sheet is one image with a name, the narration
+ * is text, and the step buttons and the pause button are real controls. It
+ * plays on its own only where `autoplay` says (the first sign-in screen), never
+ * under reduced motion, and holds still while the viewer is busy elsewhere
+ * ({@link useTour}).
  */
-export function AuthShowcaseHero({ className }: { className?: string }) {
+export function AuthShowcaseStage({
+  autoplay,
+  className,
+}: {
+  autoplay: boolean;
+  className?: string;
+}) {
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
-  const headingId = useId();
+  const titleId = useId();
+  const tour = useTour({ autoplay });
+  const { chapter, announce, live, run, attachStage } = tour;
+  const now = useViewerClock();
+  const day = buildTourDay(now);
   return (
-    <section
-      aria-labelledby={headingId}
-      data-testid={AUTH_SHOWCASE_TEST_IDS.hero}
-      className={cn(
-        'auth-rise flex flex-col items-start gap-4 text-start sm:items-center sm:text-center xl:items-start xl:gap-5 xl:text-start',
-        className,
-      )}
+    <aside
+      ref={attachStage}
+      aria-labelledby={titleId}
+      data-testid={AUTH_SHOWCASE_TEST_IDS.stage}
+      className={cn('tour-stage', className)}
     >
-      <span
-        data-slot="pill"
-        className="bg-background text-foreground-soft text-caption inline-flex h-7 items-center gap-2 rounded-full border px-3 font-medium"
-      >
-        <LiveDot />
-        {t(K.eyebrow)}
-      </span>
-      <h2
-        id={headingId}
-        className="font-heading text-foreground 3xl:text-7xl text-[2.375rem] leading-[1.04] font-semibold tracking-[-0.035em] text-balance sm:text-5xl xl:text-[2.75rem] 2xl:text-[3.5rem]"
-      >
-        {t(K.headline)}
-      </h2>
-      <p className="text-muted-foreground-strong 3xl:text-lg max-w-xl text-[0.9375rem] leading-relaxed text-pretty sm:text-base">
-        {t(K.lead)}
-      </p>
-    </section>
+      <div className="tour-copy">
+        <span className="tour-kicker">
+          <svg viewBox="0 0 20 20" aria-hidden="true" className="size-3.5 flex-none">
+            <circle
+              cx="10"
+              cy="10"
+              r="7.6"
+              fill="none"
+              strokeWidth="4"
+              className="stroke-current"
+            />
+            <circle cx="10" cy="10" r="3" className="fill-brand-mark-strong" />
+          </svg>
+          {t(K.kicker)}
+        </span>
+        <h2 id={titleId} className="tour-title">
+          {t(K.title)}
+        </h2>
+        <TourBar tour={tour} />
+        <TourNarration chapter={chapter} announce={announce} day={day} now={now} />
+      </div>
+      <TourSheet chapter={chapter} live={live} run={run} day={day} now={now} />
+    </aside>
   );
 }
 
-/**
- * The ring under the stops — an SVG, so it stays a circle whatever the Shape
- * axis does to surfaces: the track the thread runs on, a dotted inner bezel,
- * and the disc the centre label sits on.
- */
-function DialFace() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 100 100"
-      className="absolute inset-0 size-full overflow-visible"
-    >
-      <circle
-        cx="50"
-        cy="50"
-        r="35"
-        fill="none"
-        strokeWidth="1.25"
-        vectorEffect="non-scaling-stroke"
-        className="stroke-border-strong"
-      />
-      <circle
-        cx="50"
-        cy="50"
-        r="28.5"
-        fill="none"
-        strokeWidth="1.5"
-        strokeDasharray="0.1 2.1"
-        strokeLinecap="round"
-        className="stroke-border-strong"
-      />
-      <circle
-        cx="50"
-        cy="50"
-        r="23"
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-        className="fill-card stroke-border"
-      />
-    </svg>
-  );
-}
-
-/** The seven stops on the ring, clockwise from the top; each lifts as the thread arrives. */
-function DialStops() {
+/** The seven step buttons (story bars that fill as a chapter plays) and the pause button. */
+function TourBar({ tour }: { tour: ReturnType<typeof useTour> }) {
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
+  const steps = TOUR_CHAPTERS.length;
   return (
-    <ol
-      aria-label={t(K.journey.label)}
-      data-testid={AUTH_SHOWCASE_TEST_IDS.journey}
-      className="m-0 list-none p-0"
-    >
-      {JOURNEY_STOPS.map((stop) => {
-        const tone = TONE_CLASSES[stop.tone];
-        return (
-          <li key={stop.id} data-stop={stop.id} className="auth-dial-stop">
-            <span aria-hidden="true" className={cn('auth-dial-halo', tone.dot)} />
-            <span
-              data-slot="pill"
-              data-tone={stop.tone}
-              className={cn(
-                'auth-dial-node relative flex size-10 items-center justify-center rounded-full border sm:size-11',
-                tone.surface,
-                tone.border,
-              )}
-            >
-              <stop.icon aria-hidden="true" className="size-4 sm:size-4.5" />
-            </span>
-            <span className="auth-dial-label text-micro text-foreground-soft sm:text-caption font-medium">
-              {t(K.journey.stops[stop.id])}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
-/**
- * The disc in the middle: "Live", the stop the thread is on (each label rises
- * in as it arrives — decoration, the list above names every stop), and what
- * the dial is: one patient, one thread.
- */
-function DialCentre() {
-  const { t } = useTranslation(AUTH_SHOWCASE_NS);
-  return (
-    <div className="absolute inset-[29%] flex flex-col items-center justify-center gap-1 text-center sm:gap-1.5">
-      <span className="text-micro text-muted-foreground-strong inline-flex items-center gap-1.5 font-medium">
-        <LiveDot />
-        {t(K.journey.live)}
-      </span>
-      <span aria-hidden="true" className="auth-dial-now w-full">
-        {JOURNEY_STOPS.map((stop) => (
-          <span
-            key={stop.id}
-            data-stop={stop.id}
-            className={cn(
-              'text-lg leading-tight font-semibold tracking-[-0.02em] text-balance sm:text-2xl',
-              TONE_CLASSES[stop.tone].ink,
-            )}
+    <div className="tour-bar" data-testid={AUTH_SHOWCASE_TEST_IDS.tour}>
+      <div role="group" aria-label={t(K.tour.steps, { steps })} className="tour-steps">
+        {TOUR_CHAPTERS.map((chapter, index) => (
+          <button
+            key={chapter.id}
+            ref={tour.attachStep(index)}
+            type="button"
+            className="tour-step"
+            aria-label={t(K.tour.step, {
+              step: index + 1,
+              steps,
+              room: t(K.chapters[chapter.id].room),
+            })}
+            aria-current={index === tour.chapter ? 'step' : undefined}
+            data-testid={AUTH_SHOWCASE_TEST_IDS.step(index)}
+            onClick={() => tour.goTo(index)}
           >
-            {t(K.journey.stops[stop.id])}
-          </span>
+            <span data-slot="pill" className="tour-step-track" />
+            <span data-slot="pill" className="tour-step-fill" />
+          </button>
         ))}
-      </span>
-      <span className="text-micro sm:text-caption text-muted-foreground-strong max-w-[9rem] leading-snug text-balance">
-        {t(K.journey.title)}
-      </span>
+      </div>
+      {tour.autoplay ? (
+        <button
+          type="button"
+          data-slot="pill"
+          className="tour-toggle"
+          aria-label={t(tour.playing ? K.tour.pause : K.tour.play)}
+          data-testid={AUTH_SHOWCASE_TEST_IDS.toggle}
+          onClick={tour.togglePlaying}
+        >
+          {tour.playing ? (
+            <Pause aria-hidden="true" className="size-3 fill-current" />
+          ) : (
+            <Play aria-hidden="true" className="size-3 fill-current" />
+          )}
+        </button>
+      ) : null}
     </div>
   );
 }
 
 /**
- * Three anonymous moments from a clinic day, each lifting as the thread
- * reaches its stop. From `sm` they float by the dial; below it they stack
- * under it.
+ * The chapter's room, headline and one line. Narrated (`aria-live="polite"`)
+ * only after the viewer picked the chapter; an automatic change is silent.
  */
-function Moments() {
+function TourNarration({
+  chapter,
+  announce,
+  day,
+  now,
+}: {
+  chapter: number;
+  announce: boolean;
+  day: TourDay;
+  now: Date;
+}) {
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
-  return (
-    <ul
-      aria-label={t(K.moments.label)}
-      data-testid={AUTH_SHOWCASE_TEST_IDS.moments}
-      className="auth-moments m-0 mt-10 grid list-none gap-2 p-0 sm:mt-0 sm:block"
-    >
-      {SHOWCASE_MOMENTS.map((moment) => {
-        const tone = TONE_CLASSES[moment.tone];
-        return (
-          <li key={moment.id} data-moment={moment.id} className="flex">
-            <div
-              data-slot="card"
-              className="auth-moment bg-card text-card-foreground 3xl:max-w-[16rem] relative flex w-full items-center gap-3 rounded-xl border py-2.5 ps-2.5 pe-4 sm:w-max sm:max-w-[13.5rem]"
-            >
-              <span
-                aria-hidden="true"
-                data-slot="icon-chip"
-                className={cn(
-                  'flex size-8 flex-none items-center justify-center',
-                  tone.surface,
-                )}
-              >
-                <moment.icon className="size-4" />
-              </span>
-              <span className="flex min-w-0 flex-col gap-0.5">
-                <span className="text-detail text-foreground leading-snug font-medium">
-                  {t(K.moments[moment.id].title)}
-                </span>
-                <span className="text-micro text-muted-foreground-strong">
-                  {t(K.moments[moment.id].meta)}
-                </span>
-              </span>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-/**
- * The journey dial — the showcase's centrepiece: one patient's day as a turn
- * of a dial. Seven tone-coded stops on a ring, the logo's green thread
- * stepping from one to the next, the stop it is on named in the middle, and
- * three moments from the day lifting as it passes their stop. Every motion
- * runs one 15.4s turn, so nothing drifts out of step; under reduced motion
- * the dial stands still with every stop named. Its geometry and motion live
- * in `auth-showcase.css`, which loads with this lazy chunk.
- */
-export function AuthShowcaseDial({ className }: { className?: string }) {
-  const { t } = useTranslation(AUTH_SHOWCASE_NS);
-  return (
-    <section
-      aria-label={t(K.regionLabel)}
-      data-testid={AUTH_SHOWCASE_TEST_IDS.board}
-      className={cn(
-        'relative w-full sm:mx-auto sm:max-w-[30rem] xl:max-w-none',
-        className,
-      )}
-    >
-      <div className="auth-dial relative mx-auto aspect-square w-full max-w-[22rem] sm:max-w-none">
-        <div aria-hidden="true" className="auth-dial-aura" />
-        <DialFace />
-        {/* The thread: the logo's green dot and its tail, stepping round the
-            track from stop to stop. Gone under reduced motion. */}
-        <div aria-hidden="true" className="auth-dial-thread" />
-        <DialCentre />
-        <DialStops />
-      </div>
-      <Moments />
-    </section>
-  );
-}
-
-/** Why clinics choose Clinozy — three value lines, each in a room's tone. */
-export function AuthShowcaseValues({ className }: { className?: string }) {
-  const { t } = useTranslation(AUTH_SHOWCASE_NS);
-  return (
-    <ul
-      aria-label={t(K.values.label)}
-      data-testid={AUTH_SHOWCASE_TEST_IDS.values}
-      className={cn('auth-values m-0 flex list-none flex-col p-0', className)}
-    >
-      {SHOWCASE_VALUES.map((value) => (
-        <li
-          key={value.id}
-          className="border-border flex items-start gap-3.5 border-t py-4 first:border-t-0 xl:first:border-t"
-        >
-          <span
-            aria-hidden="true"
-            data-slot="icon-chip"
-            className={cn(
-              'flex size-8 flex-none items-center justify-center',
-              TONE_CLASSES[value.tone].surface,
-            )}
-          >
-            <value.icon className="size-4" />
-          </span>
-          <div className="flex min-w-0 flex-col gap-1">
-            <p className="text-detail text-foreground font-semibold">
-              {t(K.values[value.id].title)}
-            </p>
-            <p className="text-caption text-muted-foreground-strong max-w-md text-pretty">
-              {t(K.values[value.id].body)}
-            </p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/**
- * The sign-in stage's atmosphere — decoration only: a fine dot grid that fades
- * out from the dial, and two of the rooms' tones washed in from the corners.
- * Tokens only, so dark mode and every preset follow.
- */
-export function AuthShowcaseBackdrop({ className }: { className?: string }) {
+  const format = useTourFormat();
+  const current = TOUR_CHAPTERS[chapter] ?? TOUR_CHAPTERS[0];
+  if (!current) return null;
+  const keys = K.chapters[current.id];
+  const titles: Record<typeof current.id, string> = {
+    leads: t(keys.title, { time: format.time(now) }),
+    appointments: day.open
+      ? t(keys.title, { time: format.time(day.slot) })
+      : t(K.chapters.appointmentsTomorrow, { time: format.time(day.slot) }),
+    frontDesk: t(keys.title),
+    patientFile: t(keys.title),
+    treatment: t(keys.title),
+    payments: t(keys.title, { amount: format.money(format.bill) }),
+    tasks: t(keys.title, { weekday: format.weekday(day.followUp) }),
+  };
   return (
     <div
-      aria-hidden="true"
-      className={cn(
-        'auth-backdrop pointer-events-none absolute inset-0 -z-10 overflow-hidden',
-        className,
-      )}
+      className="tour-narration"
+      aria-live={announce ? 'polite' : 'off'}
+      data-testid={AUTH_SHOWCASE_TEST_IDS.narration}
     >
-      <div className="auth-backdrop-grid" />
+      <div key={current.id} className="tour-narration-in">
+        <span className={cn('tour-room', TONE_CLASSES[current.tone].ink)}>
+          <span
+            aria-hidden="true"
+            className={cn('size-2 rounded-full', TONE_CLASSES[current.tone].dot)}
+          />
+          {t(keys.room)}
+        </span>
+        <p className="tour-headline">{titles[current.id]}</p>
+        <p className="tour-body">{t(keys.body)}</p>
+      </div>
+    </div>
+  );
+}
+
+/** A staff member's avatar and name, as a Today row draws them. */
+function TourStaffCell({ staff }: { staff: keyof typeof TOUR_STAFF }) {
+  const person = TOUR_STAFF[staff];
+  return (
+    <span className="tour-staff">
+      <Avatar size="sm" className="size-6">
+        <AvatarFallback
+          className={cn(
+            'text-[0.65625rem] font-semibold',
+            TONE_CLASSES[person.tone].surface,
+          )}
+        >
+          {person.initials}
+        </AvatarFallback>
+      </Avatar>
+      <span dir="auto" className="truncate">
+        {person.name}
+      </span>
+    </span>
+  );
+}
+
+/** A visit's status pill — the dashed free-slot pill for `open`. */
+function TourStatusPill({ status, label }: { status: TourStatus; label: string }) {
+  if (status === 'open') {
+    return (
+      <span data-slot="pill" className="tour-free">
+        {label}
+      </span>
+    );
+  }
+  const tone = TOUR_STATUS_TONES[status];
+  return (
+    <TonePill
+      tone={tone}
+      dot={status === 'paid' ? false : 'tone'}
+      icon={
+        status === 'paid' ? <Check aria-hidden="true" className="size-3" /> : undefined
+      }
+      className={cn('border', TONE_CLASSES[tone].border)}
+    >
+      {label}
+    </TonePill>
+  );
+}
+
+/**
+ * The Today sheet: the day and its live state, the lanes with their counts,
+ * Riya's row among five others and the now line — one named image to
+ * assistive technology (its words are the narration's).
+ */
+function TourSheet({
+  chapter,
+  live,
+  run,
+  day,
+  now,
+}: {
+  chapter: number;
+  live: boolean;
+  /** The arrival count: the lens remounts, and so replays, on each. */
+  run: number;
+  day: TourDay;
+  now: Date;
+}) {
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
+  const format = useTourFormat();
+  const current = TOUR_CHAPTERS[chapter] ?? TOUR_CHAPTERS[0];
+  if (!current) return null;
+  const counts = day.open ? TOUR_LANE_COUNTS[current.id] : ([0, 0, 0, 0] as const);
+  const lanes = [
+    K.sheet.tabs.waiting,
+    K.sheet.tabs.withDoctor,
+    K.sheet.tabs.inTreatment,
+    K.sheet.tabs.done,
+  ];
+
+  const statusLabel = (status: TourStatus) => {
+    if (status === 'followUp') {
+      return t(K.sheet.status.followUp, { weekday: format.weekdayShort(day.followUp) });
+    }
+    if (status === 'waitingFor') {
+      return t(K.sheet.status.waitingFor, { minutes: format.number(6) });
+    }
+    return t(K.sheet.status[status]);
+  };
+
+  const visitRow = (visit: TourVisit) => {
+    const status = day.open ? visit.status : 'booked';
+    return (
+      <li key={visit.patient} className="tour-visit">
+        <span className="tour-time">{format.time(addMinutes(day.base, visit.at))}</span>
+        <span className="tour-who">
+          <span className="tour-name">
+            <bdi>{visit.patient}</bdi>
+          </span>
+          <span className="tour-what">{t(K.sheet.visits[visit.visit])}</span>
+        </span>
+        <TourStaffCell staff={visit.staff} />
+        <span className="tour-status">
+          <TourStatusPill status={status} label={statusLabel(status)} />
+        </span>
+      </li>
+    );
+  };
+
+  const story = TOUR_STORY[current.id];
+  const freeSlot = day.open ? K.sheet.freeToday : K.sheet.freeTomorrow;
+  return (
+    <div
+      role="img"
+      aria-label={t(K.sheet.label, { productName: PRODUCT_NAME })}
+      className="tour-glimpse"
+      data-testid={AUTH_SHOWCASE_TEST_IDS.sheet}
+    >
+      <div className="tour-glimpse-frame" aria-hidden="true">
+        <div data-slot="surface" className="tour-day">
+          <div className="tour-day-head">
+            <div className="tour-day-title">
+              <b>{t(day.open ? K.sheet.today : K.sheet.tomorrow)}</b>
+              <span>{format.longDate(day.base)}</span>
+            </div>
+            <span className={cn('tour-live', !day.open && 'is-closed')}>
+              <span className="tour-live-dot" />
+              {t(day.open ? K.sheet.live : K.sheet.closed)}
+            </span>
+          </div>
+          <div className="tour-tabs">
+            <span className="tour-tab is-on">
+              {t(K.sheet.tabs.all)} <b>{format.number(TOUR_VISITS_TODAY)}</b>
+            </span>
+            {lanes.map((lane, index) => (
+              <span key={lane} className="tour-tab">
+                {t(lane)}{' '}
+                <b key={`${current.id}-${counts[index]}`} className="tour-count">
+                  {format.number(counts[index] ?? 0)}
+                </b>
+              </span>
+            ))}
+          </div>
+          <ol className="tour-rows">
+            {TOUR_VISITS_BEFORE.map(visitRow)}
+            {day.open ? (
+              <li className="tour-now">
+                <span>{format.time(now)}</span>
+              </li>
+            ) : null}
+            <li
+              className={cn('tour-visit tour-story', story.open && 'is-open')}
+              data-tone={story.open ? undefined : current.tone}
+              data-testid={AUTH_SHOWCASE_TEST_IDS.story}
+              data-chapter={current.id}
+            >
+              <span className="tour-time">{format.time(day.slot)}</span>
+              <span className="tour-who">
+                <span key={`name-${story.open}`} className="tour-name tour-swap">
+                  {story.open ? t(K.sheet.openSlot) : <bdi>{TOUR_PATIENT.name}</bdi>}
+                </span>
+                <span
+                  key={`what-${story.open}-${story.visit}`}
+                  className="tour-what tour-swap"
+                >
+                  {story.open ? t(freeSlot) : t(K.sheet.visits[story.visit])}
+                </span>
+              </span>
+              {story.open ? (
+                <span />
+              ) : (
+                <span key={`staff-${story.staff}`} className="tour-swap">
+                  <TourStaffCell staff={story.staff} />
+                </span>
+              )}
+              <span key={`status-${story.status}`} className="tour-status tour-swap">
+                <TourStatusPill status={story.status} label={statusLabel(story.status)} />
+              </span>
+              <TourLens
+                key={`${current.id}-${run}`}
+                chapter={current.id}
+                live={live}
+                day={day}
+                now={now}
+              />
+            </li>
+            {TOUR_VISITS_AFTER.map(visitRow)}
+          </ol>
+        </div>
+      </div>
     </div>
   );
 }
@@ -323,11 +400,11 @@ export function AuthShowcasePrivacy({ className }: { className?: string }) {
     <p
       data-testid={AUTH_SHOWCASE_TEST_IDS.privacy}
       className={cn(
-        'text-caption text-muted-foreground-strong flex items-center justify-center gap-1.5 text-center text-pretty',
+        'text-caption text-muted-foreground-strong flex items-start gap-2 text-start text-pretty',
         className,
       )}
     >
-      <Lock aria-hidden="true" className="size-3.5 flex-none" />
+      <Lock aria-hidden="true" className="mt-0.5 size-3.5 flex-none" />
       {t(K.privacy)}
     </p>
   );

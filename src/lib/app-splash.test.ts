@@ -8,6 +8,7 @@ import { PRODUCT_NAME, PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 
 import {
   APP_BOOT_FRAME,
+  APP_BOOT_FRAME_LOGIN,
   APP_SPLASH_SKIP,
   APP_SPLASH_STATIC,
   appSplashElapsedMs,
@@ -719,9 +720,21 @@ describe('app-splash', () => {
     });
 
     it('opens a signed-out visit on the boot frame, with no splash', () => {
-      loadAt('/login');
+      loadAt('/organization/acme/today');
       expect(htmlClasses()).toEqual([APP_SPLASH_SKIP, APP_BOOT_FRAME]);
     });
+
+    it.each(['/', '/login'])(
+      'draws the sign-in screen’s own outline on %s, where the visit ends',
+      (pathname) => {
+        loadAt(pathname);
+        expect(htmlClasses()).toEqual([
+          APP_SPLASH_SKIP,
+          APP_BOOT_FRAME,
+          APP_BOOT_FRAME_LOGIN,
+        ]);
+      },
+    );
 
     it('keeps the splash for a browser with a session hint', () => {
       localStorage.setItem(hintKey, String(Date.now()));
@@ -773,6 +786,17 @@ describe('app-splash', () => {
       expect(html).toMatch(
         new RegExp(`\\.${APP_BOOT_FRAME} #app-boot-frame \\{[^}]*z-index: -1;`),
       );
+      // The sign-in outline: the page colour, and from 68.75rem the stage panel.
+      const css = html.replaceAll(/\s+/g, ' ');
+      expect(css).toContain(
+        `.${APP_BOOT_FRAME_LOGIN} #app-boot-frame { background: var(--color-background); }`,
+      );
+      expect(css).toMatch(
+        new RegExp(
+          `@media \\(min-width: 68\\.75rem\\) \\{ \\.${APP_BOOT_FRAME_LOGIN} \\.app-boot-frame-logo \\{ inset-inline-start: 2\\.5rem; \\}`,
+        ),
+      );
+      expect(html).toContain('<span class="app-boot-frame-stage"></span>');
       expect(html).toMatch(
         new RegExp(
           `\\.${APP_SPLASH_STATIC} #app-splash \\*\\s*\\{[^}]*animation-duration: 1ms !important;`,

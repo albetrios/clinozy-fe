@@ -1,8 +1,18 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { act, waitFor, within } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  RouterProvider,
+} from '@tanstack/react-router';
+import { act, render, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
@@ -30,6 +40,25 @@ vi.mock('@/core/config/env.ts', async (importOriginal) => {
 
 const LANGUAGE = pickerTestIds('auth-locale-select');
 
+/** Renders `ui` as the page at one sign-in path: the tour reads the path. */
+function renderAt(ui: ReactElement, { at }: { at: '/login' | '/mfa' }) {
+  const rootRoute = createRootRoute({ component: () => <Outlet /> });
+  const page = createRoute({
+    getParentRoute: () => rootRoute,
+    path: at,
+    component: () => ui,
+  });
+  const router = createRouter({
+    routeTree: rootRoute.addChildren([page]),
+    history: createMemoryHistory({ initialEntries: [at] }),
+  });
+  return render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
+}
+
 describe('AuthLayout', () => {
   beforeEach(() => {
     platformOverrides.themeLock = false;
@@ -48,7 +77,7 @@ describe('AuthLayout', () => {
     expect(getByText('Form content')).toBeInTheDocument();
   });
 
-  it('is the signed-out canvas: the logo, the controls, and the form in a 360px card that docks from xl', async () => {
+  it('is the sign-in frame: the logo, the controls, the form on the page, the footer', async () => {
     const { findByTestId, getByTestId } = renderWithProviders(
       <AuthLayout>
         <span>child</span>
@@ -56,68 +85,76 @@ describe('AuthLayout', () => {
     );
 
     const layout = await findByTestId('auth-layout');
-    expect(layout).toHaveClass('bg-canvas', 'min-h-dvh');
+    expect(layout).toHaveClass('auth-layout', 'bg-background', 'min-h-dvh');
     // The logo where the clinic header draws it.
     expect(within(layout).getByRole('img', { name: PRODUCT_NAME })).toHaveAttribute(
       'data-testid',
       'brand-logo',
     );
-    // Theme toggle and language picker sit at the header's end — from xl, at
-    // the top of the form's panel.
+    // Theme toggle and language picker at the header's end.
     const controls = getByTestId('public-frame-controls');
     expect(within(controls).getByTestId('theme-toggle')).toBeInTheDocument();
-    expect(controls).toHaveClass('auth-layout-controls');
-    // The form sits in a 360px card below xl; from xl the panel is its surface
-    // (`auth-layout-card` drops the card's own chrome there).
-    const card = (await findByTestId('auth-form-container')).parentElement;
-    expect(card).toHaveAttribute('data-slot', 'surface');
-    expect(card).toHaveClass('auth-layout-card', 'max-w-90', 'rounded-2xl');
+    expect(controls.closest('header')).toHaveClass('auth-layout-header');
+    // No card: the form sits on the page, in the column's block.
+    const block = (await findByTestId('auth-form-container')).parentElement;
+    expect(block).toHaveClass('auth-layout-block');
+    expect(block).not.toHaveAttribute('data-slot');
     expect(within(layout).getByRole('main')).toHaveAttribute('id', 'main-content');
-    // "Privacy choices" stays in the footer, under the panel from xl.
-    expect(getByTestId('privacy-choices').closest('footer')).toHaveClass(
-      'auth-layout-footer',
-    );
+    // "Privacy choices" and the year's line in the footer.
+    const footer = getByTestId('privacy-choices').closest('footer');
+    expect(footer).toHaveClass('auth-layout-footer');
+    expect(footer).toHaveTextContent(`© ${new Date().getFullYear()} ${PRODUCT_NAME}`);
   });
 
-  it('docks the form in a full-height panel from xl only', () => {
-    // auth-layout.css rides the lazy chunk: the panel and the split grid exist
-    // only from xl (80rem), and the card drops its chrome there.
+  it('is one column below 68.75rem — the form first — and two from it, the stage held in view', () => {
+    // auth-layout.css rides the lazy chunk.
     const css = readFileSync(
       join(process.cwd(), 'src/shared/layouts/AuthLayout/auth-layout.css'),
       'utf8',
+    ).replaceAll(/\s+/g, ' ');
+    expect(css).toContain("grid-template-areas: 'header' 'main' 'stage' 'footer';");
+    const twoColumns = css.slice(css.indexOf('@media (min-width: 68.75rem)'));
+    expect(twoColumns).toContain(
+      'grid-template-columns: var(--auth-form-column) minmax(0, 1fr);',
     );
-    expect(css).toMatch(/^\.auth-layout-panel \{\s*display: none;/m);
-    const fromXl = css.slice(css.indexOf('@media (min-width: 80rem)'));
-    expect(fromXl).toMatch(/\.auth-layout-panel \{\s*display: block;/);
-    expect(fromXl).toMatch(
-      /grid-template-columns: minmax\(0, 1fr\) auto var\(--auth-panel\);/,
+    expect(twoColumns).toContain(
+      "grid-template-areas: 'header stage' 'main stage' 'footer stage';",
     );
-    expect(fromXl).toMatch(/\.auth-layout-card \{[^}]*box-shadow: none;/);
+    expect(twoColumns).toMatch(/\.auth-layout-stage \{ position: sticky;/);
   });
 
-  it('frames the card with the showcase, in the order hero → card → dial → values', async () => {
-    const { findByTestId, getByTestId } = renderWithProviders(
+  it('reaches the form before the tour, and plays the tour only on /login', async () => {
+    const { findByTestId, getByTestId } = renderAt(
       <AuthLayout>
         <span>child</span>
       </AuthLayout>,
+      { at: '/login' },
     );
-    const card = (await findByTestId('auth-form-container')).parentElement;
-    const hero = getByTestId('auth-showcase-hero');
-    const board = getByTestId('auth-showcase');
-    const values = getByTestId('auth-showcase-values');
-    const follows = (first: Node, second: Node) =>
-      Boolean(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING);
-    // The tab order reaches the email field before anything in the showcase.
-    expect(card && follows(hero, card)).toBe(true);
-    expect(card && follows(card, board)).toBe(true);
-    expect(follows(board, values)).toBe(true);
-    // The card stays the page's `h1`; the hero's headline is an `h2`.
-    expect(within(hero).getByRole('heading', { level: 2 })).toHaveTextContent(
-      'Your whole clinic, calm in one place.',
+    const form = await findByTestId('auth-form-container');
+    const stage = getByTestId('auth-showcase');
+    // The tab order reaches the email field before the tour's steps and pause button.
+    expect(
+      Boolean(form.compareDocumentPosition(stage) & Node.DOCUMENT_POSITION_FOLLOWING),
+    ).toBe(true);
+    // The form keeps the page's `h1`; the stage's title is an `h2`.
+    expect(within(stage).getByRole('heading', { level: 2 })).toHaveTextContent(
+      'The whole clinic day, in one calm place.',
     );
+    expect(within(stage).getByTestId('auth-showcase-toggle')).toBeInTheDocument();
     expect(getByTestId('auth-showcase-privacy')).toHaveTextContent(
-      'Private by design — each clinic sees only its own records.',
+      'Private by design. Each clinic sees only its own records.',
     );
+  });
+
+  it('shows the tour still away from /login: no pause button, nothing moves', async () => {
+    const { findByTestId } = renderAt(
+      <AuthLayout>
+        <span>child</span>
+      </AuthLayout>,
+      { at: '/mfa' },
+    );
+    const stage = await findByTestId('auth-showcase');
+    expect(within(stage).queryByTestId('auth-showcase-toggle')).toBeNull();
   });
 
   it('on a theme-locked deployment, the header keeps the language picker and drops the theme toggle', async () => {

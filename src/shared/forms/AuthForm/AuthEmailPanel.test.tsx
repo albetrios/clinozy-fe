@@ -395,6 +395,10 @@ describe('AuthEmailPanel', () => {
       /change email address/i,
     );
     expect(screen.queryByText(/use a different email/i)).not.toBeInTheDocument();
+    // Where a code that never arrived usually is.
+    expect(
+      screen.getByText('Not in your inbox? Check spam or promotions.'),
+    ).toBeInTheDocument();
   });
 
   it('returns to the email step and clears any error when changing email', async () => {

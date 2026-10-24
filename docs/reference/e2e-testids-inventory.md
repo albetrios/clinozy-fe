@@ -23,13 +23,15 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 | `auth-email-resend` / `auth-email-resend-countdown` / `auth-email-change`    | Resend link, timer, change email                         | AuthEmailPanel                                       |
 | `mfa-form` / `mfa-code` / `mfa-submit`                                       | MFA                                                      | `MfaForm.tsx`                                        |
 | `public-frame-controls`                                                      | Signed-out canvas header: the controls (language, theme) | `shared/layouts/AuthLayout/AuthLayout.tsx`           |
-| `auth-showcase-hero` / `auth-showcase` / `auth-showcase-privacy`             | Sign-in showcase: hero, journey dial, privacy line       | `shared/layouts/AuthLayout/components/AuthShowcase/` |
-| `auth-showcase-journey` / `auth-showcase-moments` / `auth-showcase-values`   | The dial's stops, its moment cards, the reasons          | AuthShowcase                                         |
+| `auth-showcase` / `auth-showcase-tour` / `auth-showcase-privacy`             | Sign-in stage, its steps bar, the privacy line           | `shared/layouts/AuthLayout/components/AuthShowcase/` |
+| `auth-showcase-step-<n>` / `auth-showcase-toggle`                            | A tour step (0–6) · the pause / play button              | AuthShowcase                                         |
+| `auth-showcase-narration` / `auth-showcase-sheet`                            | The chapter's room, headline and line · the Today sheet  | AuthShowcase                                         |
+| `auth-showcase-story` / `auth-showcase-lens`                                 | Riya's row (`data-chapter`) · the lens under it          | `TourLens.tsx`                                       |
 
 The auth shell (`AuthLayout.tsx`) is the signed-out canvas — built from `PublicFrame`'s parts
-(`PublicSkipLink`, `PublicPrivacyChoices`) as a split screen from `xl`: it keeps `auth-layout`,
-`public-frame-controls` and `auth-form-container`, and its logo is `brand-logo`; the form docks
-in its own panel beside the sign-in showcase (`auth-showcase*`). `PublicLayout`, the
+(`PublicSkipLink`, `PublicPrivacyChoices`) as two columns from 68.75rem: it keeps `auth-layout`,
+`public-frame-controls` and `auth-form-container`, and its logo is `brand-logo`; the form's
+column sits beside the sign-in stage (`auth-showcase*`). `PublicLayout`, the
 organization picker and the 404 draw `PublicFrame` itself, without the showcase.
 
 **Hybrid helpers:** `tests/utils/e2e-hybrid.ts` — `expectAuthScreenReady`, `expectLoginFormReady`, `fillTestId`, `clickTestId`, label constants.

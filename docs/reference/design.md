@@ -179,15 +179,19 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   plays (`data-replaying`, set by `useReplayedAnimation`) the room frame clips its
   vertical overflow — the 6px never flashes `<main>`'s scrollbar. `accordion` for
   disclosure; `shimmer` for skeleton loading. Overlays use the shadcn enter/exit
-  utilities (`tw-animate-css`). The sign-in showcase is the one ambient motion —
-  the **journey dial**: one 15.4s turn in which the logo's green thread steps round
-  the seven tone-coded stops (holding 1.54s on each, moving 0.66s), and every stop's
-  lift, the centre label and the moment cards answer it on the same clock, started
-  `--stop × 2.2s` in, so nothing drifts out of step. Its keyframes ship with the lazy
-  auth chunk (`AuthShowcase/auth-showcase.css`), not with `index.css`; only the live
-  dot's `pulse-dot` (2.4s) is global. Under reduced motion the dial stands still with
-  every stop named. Motion never takes text below WCAG AA: a stop lifts (scale) and
-  is never dimmed, pinned in `AuthShowcase.test.tsx`.
+  utilities (`tw-animate-css`). The sign-in stage is the one ambient motion —
+  the **tour**: one patient (Riya) through seven chapters, each in its room's tone —
+  Leads, Appointments, Front desk, Patient file, Treatment, Payments, Tasks — 5.2s
+  each (the last rests 2.4s more), on a Today sheet set to the viewer's own clock
+  (after 21:00 or before 08:00 it is tomorrow's, the clinic closed). Under her row a
+  lens shows the chapter's feature at work: her message typing in, a slot picked, the
+  wait counting, a prescription writing itself, a session filling, the bill settling,
+  a follow-up dropping in. It plays on its own only on `/login`, never under reduced
+  motion, and holds still while the pointer is on it, the viewer types, the tab is
+  hidden or it is scrolled away; its pause button answers WCAG 2.2.2, and only a
+  picked chapter is narrated (`aria-live`). Its keyframes ship with the lazy auth
+  chunk (`AuthShowcase/auth-showcase.css`), not with `index.css`; the engine is
+  `AuthShowcase/useTour.ts`, pinned in `AuthShowcase.test.tsx`.
 - **One motion system — Emil Kowalski's.** The app's motion follows Emil Kowalski's
   design-engineering standards (`agent-os/skills/emil-design-eng`,
   `review-animations/STANDARDS.md`); the audit that applied them is

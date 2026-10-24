@@ -1,153 +1,110 @@
-/* The sign-in screen's split (AuthLayout). Loaded with the lazy auth layout
+/* The sign-in screen's layout (AuthLayout). Loaded with the lazy auth layout
    chunk, never on the first paint (the initial-CSS budget): these rules are
-   this one screen's, so they ride its chunk rather than the global stylesheet
-   — the same split as `bug-report.css`. Spacing is `--spacing` steps, so the
-   Density axis still reaches it; widths are the Tailwind breakpoints (`sm`
-   40rem, `xl` 80rem, `2xl` 96rem, `3xl` 120rem).
+   this one screen's, so they ride its chunk — the same split as
+   `bug-report.css`. Spacing is `--spacing` steps, so the Density axis still
+   reaches it.
 
-   Below `xl` the page is one column — header, hero, the form's card, the dial,
-   the values, footer — and the classes here only space it. These rules are
-   unlayered, so at `xl` they win over the card's Tailwind utilities (which sit
-   in the utilities layer) without `!important`. From `xl` it is a
-   split screen: the stage on the canvas (columns 1–2: the hero and the values,
-   then the dial) and the form docked in its own panel (column 3, full height),
-   with the header's controls at its top and "Privacy choices" at its foot. */
+   Below 68.75rem it is one column — the header, the form, the stage (the
+   tour), the footer — so a phone meets the form first. From 68.75rem it is two:
+   the form's column at the inline start (header, form, footer) and the stage
+   beside it, a rounded panel held in view (sticky) while the column scrolls.
+   The boot frame in index.html draws this outline before the app loads
+   (`app-boot-frame-login`); the two move together. */
 
 .auth-layout {
-  --auth-panel: 26rem;
-  --auth-stage-pad: calc(var(--spacing) * 14);
-  --auth-stage-gap: calc(var(--spacing) * 12);
+  --auth-form-column: clamp(28rem, 38vw, 38rem);
+  --auth-stage-inset: calc(var(--spacing) * 3);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'header'
+    'main'
+    'stage'
+    'footer';
 }
 
-.auth-layout-panel {
-  display: none;
+.auth-layout-header {
+  grid-area: header;
 }
-
 .auth-layout-main {
-  margin-inline: auto;
-  width: 100%;
-  max-width: 36rem;
-  gap: calc(var(--spacing) * 10);
-  padding: calc(var(--spacing) * 4) calc(var(--spacing) * 4) calc(var(--spacing) * 10);
+  grid-area: main;
+  display: grid;
+  align-items: start;
+  padding: calc(var(--spacing) * 9) calc(var(--spacing) * 5) calc(var(--spacing) * 10);
 }
-
-.auth-layout-mark {
+.auth-layout-block {
+  width: 100%;
+  max-width: 24rem;
+  margin-inline: auto;
+}
+.auth-layout-stage {
+  grid-area: stage;
+  margin-inline: var(--auth-stage-inset);
+}
+.auth-layout-stage .tour-glimpse {
+  flex: none;
+  height: 29rem;
+}
+.auth-layout-footer {
+  grid-area: footer;
+  justify-content: center;
+}
+.auth-layout-copyright {
   display: none;
 }
 
-@media (min-width: 40rem) {
-  .auth-layout-main {
-    gap: calc(var(--spacing) * 12);
-    padding-top: calc(var(--spacing) * 8);
-  }
-  .auth-layout-dial {
-    margin-block: calc(var(--spacing) * 4) calc(var(--spacing) * 14);
-  }
-  .auth-layout-values {
-    margin-inline: auto;
-    width: 100%;
-    max-width: 32rem;
-  }
-}
-
-@media (min-width: 80rem) {
-  .auth-layout-panel {
-    display: block;
-    position: absolute;
-    inset-block: 0;
-    inset-inline-end: 0;
-    z-index: -10;
-    width: var(--auth-panel);
-    border-inline-start: 1px solid var(--color-border);
-    background: var(--color-background);
-  }
-  .auth-layout-backdrop {
-    inset-inline-end: var(--auth-panel);
+@media (min-width: 68.75rem) {
+  .auth-layout {
+    grid-template-columns: var(--auth-form-column) minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      'header stage'
+      'main stage'
+      'footer stage';
   }
   .auth-layout-header {
-    padding-inline-start: var(--auth-stage-pad);
-  }
-  .auth-layout-controls {
-    width: var(--auth-panel);
-    justify-content: flex-end;
-    padding-inline-end: calc(var(--spacing) * 1);
+    padding-inline: calc(var(--spacing) * 10) calc(var(--spacing) * 8);
   }
   .auth-layout-main {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto var(--auth-panel);
-    grid-template-rows: 1fr auto auto 1fr;
-    gap: 0 var(--auth-stage-gap);
-    margin-inline: 0;
-    max-width: none;
-    padding: 0;
-    padding-inline-start: var(--auth-stage-pad);
+    align-items: center;
+    padding: calc(var(--spacing) * 10) calc(var(--spacing) * 8) calc(var(--spacing) * 10)
+      calc(var(--spacing) * 10);
   }
-  .auth-layout-hero {
-    grid-area: 2 / 1;
-    max-width: 36rem;
-    padding-bottom: calc(var(--spacing) * 8);
+  .auth-layout-stage {
+    position: sticky;
+    top: var(--auth-stage-inset);
+    align-self: start;
+    height: calc(100dvh - 2 * var(--auth-stage-inset));
+    min-height: 38rem;
+    margin: var(--auth-stage-inset);
+    margin-inline-start: 0;
+    padding-inline: clamp(2.5rem, 4.4vw, 4rem);
+    padding-top: clamp(2.5rem, 6vh, 3.75rem);
   }
-  .auth-layout-values {
-    grid-area: 3 / 1;
-    margin-inline: 0;
-    max-width: 36rem;
-  }
-  .auth-layout-dial {
-    grid-column: 2;
-    grid-row: 1 / -1;
-    align-self: center;
-    margin-block: 0;
-    width: clamp(22rem, 30vw, 30rem);
-  }
-  /* The form owns its panel: the mark over it, and no card of its own. */
-  .auth-layout-form {
-    grid-column: 3;
-    grid-row: 1 / -1;
-    align-self: center;
-    justify-self: center;
-    align-items: flex-start;
-    width: 100%;
-    max-width: 22.5rem;
-  }
-  .auth-layout-mark {
-    display: block;
-    margin-bottom: calc(var(--spacing) * 2);
-  }
-  .auth-layout-card {
-    border: 0;
-    background: transparent;
-    padding: 0;
-    box-shadow: none;
-  }
-  .auth-layout-privacy {
-    margin-top: calc(var(--spacing) * 2);
-    justify-content: flex-start;
-    text-align: start;
+  .auth-layout-stage .tour-glimpse {
+    flex: 1;
+    height: auto;
   }
   .auth-layout-footer {
-    margin-inline-start: auto;
-    width: var(--auth-panel);
+    justify-content: space-between;
+    padding-inline: calc(var(--spacing) * 10) calc(var(--spacing) * 8);
   }
-}
-
-@media (min-width: 96rem) {
-  .auth-layout {
-    --auth-panel: 28rem;
-    --auth-stage-pad: calc(var(--spacing) * 20);
-    --auth-stage-gap: calc(var(--spacing) * 20);
+  .auth-layout-copyright {
+    display: inline;
   }
 }
 
 @media (min-width: 120rem) {
   .auth-layout {
-    --auth-panel: 32rem;
-    --auth-stage-pad: calc(var(--spacing) * 28);
-    --auth-stage-gap: calc(var(--spacing) * 28);
+    --auth-form-column: 40rem;
   }
-  .auth-layout-hero {
-    max-width: 42rem;
+  .auth-layout-block {
+    max-width: 26rem;
   }
-  .auth-layout-dial {
-    width: clamp(30rem, 28vw, 38rem);
+  .auth-layout-stage .tour-title {
+    font-size: 3.25rem;
+  }
+  .auth-layout-stage .tour-copy {
+    max-width: 40rem;
   }
 }

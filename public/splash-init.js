@@ -1,6 +1,6 @@
 // Decide, before the first paint, what this load shows in place of the opening
-// splash. The keys and the <html> classes are APP_SPLASH_SKIP, APP_BOOT_FRAME and
-// APP_SPLASH_STATIC in src/lib/app-splash.ts; index.html's rules read the classes.
+// splash. The keys and the <html> classes are APP_SPLASH_SKIP, APP_BOOT_FRAME,
+// APP_BOOT_FRAME_LOGIN and APP_SPLASH_STATIC in src/lib/app-splash.ts; index.html's rules read the classes.
 //
 // 1. The load right after a sign-out: no splash, and the app at once, so the page
 //    being left stays on screen until the login screen paints. forceLogout()
@@ -14,7 +14,8 @@
 //    sits in paints first. The key is the one markSessionStart() writes
 //    (src/shared/auth/session-lifetime.ts); index.html names it. A hint only picks
 //    what to paint — it never authorizes anything. Offline, the splash stays: it is
-//    where the boot says it cannot reach the server, and offers Retry.
+//    where the boot says it cannot reach the server, and offers Retry. On `/` and
+//    `/login` the frame is the sign-in screen's own outline (APP_BOOT_FRAME_LOGIN).
 // Its own scope: nothing it names leaks onto `window`.
 (function () {
   try {
@@ -26,8 +27,16 @@
       root.classList.add('app-splash-static');
     } else {
       var hintKey = root.getAttribute('data-session-hint-key');
-      if (hintKey && navigator.onLine !== false && localStorage.getItem(hintKey) === null) {
+      if (
+        hintKey &&
+        navigator.onLine !== false &&
+        localStorage.getItem(hintKey) === null
+      ) {
         root.classList.add('app-splash-skip', 'app-boot-frame');
+        // The sign-in screen is where the visit ends: draw its own outline.
+        if (location.pathname === '/' || location.pathname === '/login') {
+          root.classList.add('app-boot-frame-login');
+        }
       }
     }
   } catch (e) {}
