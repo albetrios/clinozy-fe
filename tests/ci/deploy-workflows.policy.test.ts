@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -8,7 +8,40 @@ import { describe, expect, it } from 'vitest';
 const workflow = (name: string): string =>
   readFileSync(join(process.cwd(), '.github/workflows', name), 'utf8');
 
+/** Credentials the deploy itself uses: Netlify's, and Sentry's source-map upload (build only). */
+const DEPLOY_CREDENTIALS = new Set([
+  'NETLIFY_AUTH_TOKEN',
+  'NETLIFY_SITE_ID',
+  'SENTRY_AUTH_TOKEN',
+  'SENTRY_ORG',
+  'SENTRY_PROJECT',
+]);
+
 describe('deploy workflows policy', () => {
+  // clinozy-be's Railway deploy mirrored the whole GitHub Environment into the services, so CI-only
+  // credentials (RELEASE_PLEASE_TOKEN, the Postman and Scalar keys) reached production's runtime
+  // variables. Here every secret is named: the build reads VITE_* (public by design) and the deploy
+  // its own credentials, never the environment wholesale. clinozy-be pins its side in
+  // railway-variables-push.policy.unit.test.ts.
+  it('names every secret the deploy reads, and never mirrors the GitHub Environment', () => {
+    for (const name of readdirSync(join(process.cwd(), '.github/workflows'))) {
+      expect(workflow(name), name).not.toMatch(/toJSON\((?:secrets|vars)\)/);
+    }
+    const named = [
+      ...workflow('reusable-netlify-deploy.yml').matchAll(
+        /\bsecrets\.([A-Z_][A-Z0-9_]*)/g,
+      ),
+    ].map((match) => match[1] ?? '');
+    expect(named).toEqual(
+      expect.arrayContaining(['NETLIFY_AUTH_TOKEN', 'VITE_API_BASE_URL']),
+    );
+    expect(
+      named.filter(
+        (secret) => !(secret.startsWith('VITE_') || DEPLOY_CREDENTIALS.has(secret)),
+      ),
+    ).toEqual([]);
+  });
+
   it('rollback-deploy.yml is manual, production-gated, and restores without a rebuild', () => {
     const rollback = workflow('rollback-deploy.yml');
     expect(rollback).toContain('workflow_dispatch:');
