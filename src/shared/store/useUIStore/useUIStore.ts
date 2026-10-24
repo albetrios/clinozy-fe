@@ -87,11 +87,13 @@ const CLINIC_WRITE =
   /^\/(?:app|tenancy\/organization|uploads|billing|notify\/webhooks)(?:[/?]|$)/;
 /** A write that only works out figures and keeps nothing (the invoice drawer's totals). */
 const FIGURES_ONLY = /^\/app\/invoices\/(?:preview|[^/?]+\/preview)(?:\?|$)/;
+/** The member's own settings in the clinic (pins, saved views) — theirs, not the role's. */
+const MEMBER_OWN = /^\/app\/memberships\/me(?:[/?]|$)/;
 
 /** Whether a write path is the clinic's own, View-as holds it (`/api/v1` or not). */
 export function isClinicWrite(path: string): boolean {
   const local = path.startsWith(API_BASE_PATH) ? path.slice(API_BASE_PATH.length) : path;
-  return CLINIC_WRITE.test(local) && !FIGURES_ONLY.test(local);
+  return CLINIC_WRITE.test(local) && !FIGURES_ONLY.test(local) && !MEMBER_OWN.test(local);
 }
 
 /**
@@ -100,7 +102,7 @@ export function isClinicWrite(path: string): boolean {
  * permissions and branches. Each held write is refused before it leaves, as a `403`
  * {@link FRONTEND_ERROR_CODES.VIEW_AS_READ_ONLY} ("Previews are read-only …"), so a drawer reads
  * it as a refusal and keeps nothing. The member's own account (sign-in, settings,
- * notifications) still writes.
+ * notifications) and their own clinic preferences (pins, saved views) still write.
  *
  * @returns A stop function (tests).
  */

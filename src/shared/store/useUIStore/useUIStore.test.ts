@@ -135,6 +135,7 @@ describe("useUIStore — View-as holds the clinic's writes", () => {
   it.each([
     '/api/v1/app/invoices/preview',
     '/api/v1/app/invoices/invc_1/preview',
+    '/api/v1/app/memberships/me/preferences',
     '/api/v1/auth/switch-to-organization',
     '/api/v1/auth/me/sessions/ses_1',
     '/api/v1/users/me/settings',
