@@ -3,6 +3,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { renderSecurityTxt } from '../../plugins/security-txt.ts';
 import {
   loadIdentity,
   RESERVED_EMAIL_DOMAIN,
@@ -47,4 +48,32 @@ describe('security contact', () => {
       expect(reserved).toEqual([]);
     },
   );
+});
+
+describe('/.well-known/security.txt (RFC 9116)', () => {
+  const identity = loadIdentity(ROOT);
+  const now = new Date('2026-10-24T10:00:00.000Z');
+  const text = renderSecurityTxt(identity, now);
+  const field = (name: string) =>
+    text
+      .split('\n')
+      .filter((line) => line.startsWith(`${name}: `))
+      .map((line) => line.slice(name.length + 2));
+
+  it('names the manifest mailbox and GitHub private reporting as its contacts', () => {
+    expect(field('Contact')).toEqual([
+      `mailto:${identity.securityContact}`,
+      `https://github.com/${identity.repository}/security/advisories/new`,
+    ]);
+    expect(field('Policy')).toEqual([
+      `https://github.com/${identity.repository}/security/policy`,
+    ]);
+  });
+
+  it('expires under a year after the build that wrote it', () => {
+    const [expires] = field('Expires');
+    const at = Date.parse(expires ?? '');
+    expect(at).toBeGreaterThan(now.getTime());
+    expect(at - now.getTime()).toBeLessThan(365 * 86_400_000);
+  });
 });

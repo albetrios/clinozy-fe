@@ -97,7 +97,7 @@ The single source of truth is `tooling/setup/setup.config.json` → `project.*`.
 - **App-facing** — the generated `src/lib/product-identity.ts` (imported by `page-head.ts`, `app-manifest.ts` and the i18n bootstrap), `public/manifest.webmanifest`, `public/app-icon.svg`, `public/offline.html` and `public/robots.txt`.
 - **Repo + tooling** — `package.json`, `sonar-project.properties`, `typedoc.json`, `context7.json`, `catalog-info.yaml`, `docker-compose.sonar.yml`, `.github/release-please/config.json`, `.github/codeql/codeql-config.yml`.
 - **Ownership + deploy** — `.github/CODEOWNERS`, `.github/environments/production.json`, the build artifact name and Netlify hostnames in `.github/workflows/reusable-netlify-deploy.yml`, and the PR preview hostname in `.github/workflows/preview.yml`.
-- **Security contact** — `project.securityContact`, the mailbox `SECURITY.md` and `CODE_OF_CONDUCT.md` give for private reports. Set your own monitored address: a placeholder on a reserved domain (`example.com`, `.test`, `.invalid`) fails `loadIdentity` and `tests/ci/security-contact.policy.test.ts`, because a report sent there reaches nobody.
+- **Security contact** — `project.securityContact`, the mailbox `SECURITY.md`, `CODE_OF_CONDUCT.md` and the app's `/.well-known/security.txt` give for private reports. Set your own monitored address: a placeholder on a reserved domain (`example.com`, `.test`, `.invalid`) fails `loadIdentity` and `tests/ci/security-contact.policy.test.ts`, because a report sent there reaches nobody.
 
 Two surfaces are **not** in that list, because the brand was moved out of them entirely rather than rewritten:
 
