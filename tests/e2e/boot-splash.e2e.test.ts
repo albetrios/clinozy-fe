@@ -1,7 +1,7 @@
 import { type BrowserContext, expect, type Page, test } from '@playwright/test';
 
 import { SPLASH_FRAMES_MS, SPLASH_REDUCED_FRAMES_MS } from '@/lib/app-splash.ts';
-import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import { PRODUCT_NAME, PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, clickTestId, expectLoginFormReady } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
@@ -83,6 +83,17 @@ async function slowAuthBootstrap(page: Page, delayMs = 1500): Promise<void> {
   });
 }
 
+/**
+ * A browser that has signed in before: the session hint `markSessionStart` writes. Only
+ * such a browser still opens on the splash — with none, the visit ends on the login
+ * screen, and `public/splash-init.js` opens it on that screen's frame instead.
+ */
+async function rememberASignIn(page: Page): Promise<void> {
+  await page.addInitScript((key) => {
+    localStorage.setItem(key, String(Date.now()));
+  }, `${PRODUCT_NAMESPACE}:session-started-at`);
+}
+
 function expectOneContinuousScreen(trace: BootTrace) {
   expect(trace.fadeStarts, 'the splash fades out once').toBe(1);
   expect(trace.fadeCancels, 'a fade is never yanked back (the blink)').toBe(0);
@@ -98,6 +109,20 @@ test.describe('Cold load — one continuous screen', () => {
     await expect(page).toHaveURL(/\/login/, { timeout: 20_000 });
     await expectLoginFormReady(page);
     expectOneContinuousScreen(await bootTrace(page));
+  });
+
+  test('a guest never sees the splash: the boot frame, then the login form', async ({
+    page,
+  }) => {
+    await page.addInitScript(TRACE_BOOT);
+    await page.goto('/login', { waitUntil: 'commit' });
+
+    await expect(page.locator('html')).toHaveClass(/\bapp-boot-frame\b/);
+    await expect(page.locator('#app-splash')).toBeHidden();
+    await expectLoginFormReady(page);
+    expectOneContinuousScreen(await bootTrace(page));
+    // The frame goes with the (hidden) splash, once the screen is up over it.
+    await expect(page.locator('#app-boot-frame')).toHaveCount(0);
   });
 
   test('a guest opening a deep link is sent to login without a blank page', async ({
@@ -332,9 +357,10 @@ async function signInToNewTeamOrganization(page: Page): Promise<string> {
 }
 
 test.describe('Splash — frames, slot, offline hold, reduced motion', () => {
-  test('a guest boot plays frames 1–4 and leaves no earlier than the wordmark lands', async ({
+  test('a returning browser’s boot plays frames 1–4 and leaves no earlier than the wordmark lands', async ({
     page,
   }) => {
+    await rememberASignIn(page);
     await page.addInitScript(TRACE_FRAMES);
     // Look for the splash from the first byte, not from `load`: the splash is in
     // the HTML and leaves on its own clock, and on a busy dev server `load` (every
@@ -348,7 +374,7 @@ test.describe('Splash — frames, slot, offline hold, reduced motion', () => {
     const trace = await splashFrames(page);
 
     expect(trace.wordmarkOpacityAtStart, 'the wordmark waits for its beat').toBe('0');
-    expect(trace.block, 'a guest boot shows frames 1–4 only').toBe(false);
+    expect(trace.block, 'a boot that ends on login shows frames 1–4 only').toBe(false);
     expect(exitAfterMs(trace)).toBeGreaterThanOrEqual(SPLASH_FRAMES_MS - 5);
   });
 
@@ -356,6 +382,7 @@ test.describe('Splash — frames, slot, offline hold, reduced motion', () => {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    await rememberASignIn(page);
     await page.addInitScript(TRACE_FRAMES);
     await page.goto('/login');
 
@@ -453,5 +480,60 @@ test.describe('Splash — frames, slot, offline hold, reduced motion', () => {
     await clickTestId(page, 'app-splash-retry');
     await expectLoginFormReady(page);
     await expect(page.locator('#app-splash')).toHaveCount(0, { timeout: 30_000 });
+  });
+});
+
+test.describe('OAuth hand-off — the provider sends the visitor back', () => {
+  test('the code is exchanged at boot — the callback page does not have to load first', async ({
+    page,
+  }) => {
+    // When the exchange leaves, and when the callback page first mounts: the page no
+    // longer has to load before the code is sent.
+    await page.addInitScript(() => {
+      const marks = { pageMountedAt: null as number | null };
+      (window as unknown as { __handOff: typeof marks }).__handOff = marks;
+      new MutationObserver(() => {
+        if (
+          marks.pageMountedAt === null &&
+          document.querySelector('[data-testid="callback-page"]')
+        ) {
+          marks.pageMountedAt = performance.now();
+        }
+      }).observe(document, { childList: true, subtree: true });
+    });
+    const exchanges: number[] = [];
+    // Stand in for the provider round trip: the code is refused, as a spent one is.
+    await page.route('**/api/v1/auth/oauth/google/callback**', async (route) => {
+      exchanges.push(await page.evaluate(() => performance.now()));
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          status: 401,
+          title: 'Unauthorized',
+          detail: 'Invalid state',
+        }),
+      });
+    });
+
+    await page.goto(`/callback/google?code=e2e-code&state=${'ab'.repeat(32)}`, {
+      waitUntil: 'commit',
+    });
+
+    // A hand-off screen at rest, not an opening with a wordmark beat to wait out.
+    await expect(page.locator('html')).toHaveClass(/\bapp-splash-static\b/);
+    await expect(page).toHaveURL(/\/login\?error=oauth_failed/, { timeout: 20_000 });
+    expect(exchanges, 'the code is sent once').toHaveLength(1);
+    const { pageMountedAt } = await page.evaluate(
+      () =>
+        (window as unknown as { __handOff: { pageMountedAt: number | null } }).__handOff,
+    );
+    // Mounted or not by the time the redirect to /login ran, the page never came first.
+    if (pageMountedAt !== null) {
+      expect(
+        exchanges[0],
+        'the exchange left before the callback page mounted',
+      ).toBeLessThan(pageMountedAt);
+    }
   });
 });

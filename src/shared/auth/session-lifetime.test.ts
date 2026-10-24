@@ -8,6 +8,7 @@ import {
   hasSessionHint,
   isSessionExpired,
   markSessionStart,
+  SESSION_STARTED_AT_KEY,
   startSessionLifetimeWatch,
 } from './session-lifetime.ts';
 
@@ -111,5 +112,12 @@ describe('session-lifetime', () => {
     localStorage.setItem(KEY, 'not-a-number');
     expect(getSessionAge()).toBeNull();
     expect(isSessionExpired()).toBe(false);
+  });
+});
+
+describe('the session hint key', () => {
+  it('is the one index.html names for public/splash-init.js — pinned there by app-splash.test.ts', () => {
+    // index.html: data-session-hint-key="{{PRODUCT_NAMESPACE}}:session-started-at".
+    expect(SESSION_STARTED_AT_KEY).toBe(`${PRODUCT_NAMESPACE}:session-started-at`);
   });
 });

@@ -15,16 +15,42 @@ const SLOT_CLASS = 'app-splash-slot';
 const DISMISS_EVENT = 'app-splash-dismissed';
 
 /**
- * The load right after a sign-out skips the splash: the class `public/splash-init.js`
- * puts on `<html>` before the first paint, for index.html's CSS and for this module,
- * when it finds this sessionStorage key — which `forceLogout()` writes
- * (`skipSplashOnNextLoad` in `shared/auth/service.ts`). On that load the splash is hidden and `#root` shown, and
- * nothing paints until the login screen has rendered — so browsers keep the page
- * being left on screen until then. The splash node stays (hidden), so the loaders'
- * holds still keep React's own full-page loader away. Pinned across the files by
- * `app-splash.test.ts` and `service.test.ts`.
+ * A load with no splash: the class `public/splash-init.js` puts on `<html>` before
+ * the first paint, for index.html's CSS and for this module. Two loads earn it: the
+ * one right after a sign-out — splash-init.js finds this sessionStorage key, which
+ * `forceLogout()` writes (`skipSplashOnNextLoad` in `shared/auth/service.ts`) — and
+ * any cold load with no session hint, which ends on the login screen anyway (it adds
+ * {@link APP_BOOT_FRAME} too). The splash is hidden and `#root` shown; after a
+ * sign-out nothing paints until the login screen has rendered, so browsers keep the
+ * page being left on screen until then. The splash node stays (hidden), so the
+ * loaders' holds still keep React's own full-page loader away. Pinned across the
+ * files by `app-splash.test.ts` and `service.test.ts`.
  */
 export const APP_SPLASH_SKIP = 'app-splash-skip';
+
+/**
+ * A signed-out cold load's first paint: the `<html>` class `public/splash-init.js`
+ * adds, beside {@link APP_SPLASH_SKIP}, when no session hint says this browser is
+ * signed in (`session-lifetime.ts`). index.html then shows `#app-boot-frame` — the
+ * canvas and the logo where the header draws it — under `#root`, so the visit opens
+ * on the frame of the screen it lands on instead of on the splash; the frame goes
+ * with the splash node ({@link runExit}). It only picks what to paint: the hint
+ * never authorizes anything. A device offline at the first paint keeps the
+ * splash, which is where the boot says so and offers Retry ({@link holdAppSplashOffline}).
+ */
+export const APP_BOOT_FRAME = 'app-boot-frame';
+
+/**
+ * The OAuth hand-off (`/callback/<provider>`): the `<html>` class
+ * `public/splash-init.js` adds there. The provider has just sent the visitor back
+ * mid sign-in, so the splash shows every frame at its end state from the first
+ * paint, and its exit waits for no wordmark beat ({@link framesRemainingMs}) — only
+ * for the sign-in to land somewhere.
+ */
+export const APP_SPLASH_STATIC = 'app-splash-static';
+
+/** The signed-out first paint's node in index.html ({@link APP_BOOT_FRAME}). */
+const BOOT_FRAME_ID = 'app-boot-frame';
 
 /**
  * The `#app-splash` opacity/visibility transition in index.html (500ms ease,
@@ -185,17 +211,23 @@ export function appSplashElapsedMs(): number {
   return Number.isFinite(start) ? now - start : now;
 }
 
-/** This load skips the splash (`public/splash-init.js` read the key). */
+/** This load skips the splash (`public/splash-init.js` marked `<html>`). */
 function isAppSplashSkipped(): boolean {
   return document.documentElement.classList.contains(APP_SPLASH_SKIP);
 }
 
+/** This load holds the splash at rest — the OAuth hand-off ({@link APP_SPLASH_STATIC}). */
+function isAppSplashStatic(): boolean {
+  return document.documentElement.classList.contains(APP_SPLASH_STATIC);
+}
+
 /**
  * How long until the exit may start: the wordmark (or, reduced, 500ms) has to
- * land first — unless this load skips the splash, which then has no frames to wait for.
+ * land first — unless this load skips the splash or holds it at rest, which then
+ * has no frames to wait for.
  */
 function framesRemainingMs(): number {
-  if (isAppSplashSkipped()) return 0;
+  if (isAppSplashSkipped() || isAppSplashStatic()) return 0;
   const floor = prefersReducedMotion() ? SPLASH_REDUCED_FRAMES_MS : SPLASH_FRAMES_MS;
   return Math.max(0, floor - appSplashElapsedMs());
 }
@@ -210,7 +242,7 @@ export function onAppSplashDismissed(callback: () => void): () => void {
   return () => window.removeEventListener(DISMISS_EVENT, callback);
 }
 
-/** Start the fade-out and remove the node when it lands. */
+/** Start the fade-out and remove the node — and the boot frame — when it lands. */
 function runExit(): void {
   const splash = currentSplash();
   if (!splash || exitFinish) return;
@@ -225,6 +257,8 @@ function runExit(): void {
     exitFinish = undefined;
     splash.removeEventListener('transitionend', finish);
     splash.remove();
+    // The signed-out first paint lives exactly as long: the screen is up over it.
+    document.getElementById(BOOT_FRAME_ID)?.remove();
     window.dispatchEvent(new CustomEvent(DISMISS_EVENT));
   };
 

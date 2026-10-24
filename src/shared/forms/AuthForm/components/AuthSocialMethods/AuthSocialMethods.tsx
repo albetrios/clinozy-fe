@@ -5,6 +5,7 @@ import { Fingerprint } from '@/shared/icons/index.ts';
 
 import { AUTH_FORM_TEST_IDS } from '../../auth-form.constants.ts';
 import type { AuthContinuePending } from '../../auth-form-pending.ts';
+import { preconnectOAuthProvider } from '../../oauth-preconnect.ts';
 import { AuthMethodButton } from '../AuthMethodButton/index.ts';
 import { ProviderIcon } from './ProviderIcon.tsx';
 
@@ -48,6 +49,7 @@ export function AuthSocialMethods({
             provider: t(AUTH_KEYS.login.oauth.providerKey(provider)),
           })}
           onClick={() => onProvider(provider)}
+          onPress={() => preconnectOAuthProvider(provider)}
           testId={providerTestId(provider)}
         />
       ))}

@@ -133,9 +133,22 @@ splash's own mark starts at 2% for the same reason, so First Contentful Paint
 lands on the first paint instead of when the "C" starts drawing — see
 [tests/performance/README.md → Lighthouse CI](../../tests/performance/README.md#lighthouse-ci).
 
+**Signed out, there is no splash at all.** A cold load with no session hint ends
+on the login screen, so `public/splash-init.js` opens it on that screen's frame
+instead (design.md → "The splash is for opening the app"). Measured on a production
+build (`pnpm build --defaults` + `vite preview`, fresh browser, median of 5):
+
+| Moment                                                | With the splash         | Without                    |
+| ----------------------------------------------------- | ----------------------- | -------------------------- |
+| Login form in the DOM                                 | ~435 ms                 | ~426 ms                    |
+| Login form on screen                                  | ~2,700 ms (splash gone) | **~426 ms**                |
+| OAuth hand-off: code exchange leaves                  | ~464 ms                 | **~295 ms** (sent at boot) |
+| OAuth hand-off: splash gone (refused code → `/login`) | > 2,700 ms              | **~1,285 ms**              |
+
 Wall-clock numbers flake, so **CI does not assert them**. It asserts the
 invariants that made the load _feel_ slow (`tests/e2e/boot-splash.e2e.test.ts`):
-the splash fades exactly once, and the page is never blank behind it.
+the splash fades exactly once, the page is never blank behind it, a guest never
+sees the splash, and the OAuth hand-off sends its code before its page has loaded.
 
 ---
 

@@ -140,10 +140,15 @@ test.describe('Signing out goes straight to the login screen', () => {
     expect(trace.splashFrames).toBe(0);
     expect(trace.loaderFrames).toBe(0);
 
-    // One load only: opening the app again plays the splash as always.
+    // One load only: the key is spent with it, and the next load decides on its own.
+    // Signed out, that is the login screen's frame — never the splash
+    // (public/splash-init.js, APP_BOOT_FRAME).
+    expect(
+      await page.evaluate(() => sessionStorage.getItem('app-splash-skip')),
+    ).toBeNull();
     await page.reload({ waitUntil: 'commit' });
-    await expect(page.locator('html')).not.toHaveClass(/app-splash-skip/);
-    await expect(page.locator('#app-splash')).toBeVisible();
+    await expect(page.locator('html')).toHaveClass(/\bapp-boot-frame\b/);
+    await expect(page.locator('#app-splash')).toBeHidden();
     await expectLoginFormReady(page);
   });
 

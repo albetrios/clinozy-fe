@@ -1,15 +1,19 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 
-import { OAUTH_PROVIDER_SLUG_PATTERN } from '@/lib/routes/params.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
-import { authApi, MfaRequiredError } from '@/shared/api/auth-api.ts';
+import { MfaRequiredError } from '@/shared/api/auth-api.ts';
 import { AUTH_KEYS } from '@/shared/auth/auth-shell.constants.ts';
 import { skipAutoGoogleSignIn } from '@/shared/auth/auto-google-sign-in.ts';
 import { stashMfaHandoff } from '@/shared/auth/mfa-handoff.ts';
+import {
+  completeOAuthSignIn,
+  readOAuthCallbackParams,
+  takeOAuthCallbackSignIn,
+} from '@/shared/auth/oauth-callback-sign-in.ts';
 import { popReturnTo } from '@/shared/auth/redirect-safety.ts';
-import { establishSession, silentRefresh } from '@/shared/auth/service.ts';
+import { silentRefresh } from '@/shared/auth/service.ts';
 import { hasSessionHint } from '@/shared/auth/session-lifetime.ts';
 import { FullPageSpinner } from '@/shared/components/FullPageSpinner/index.ts';
 import { UnauthorizedError } from '@/shared/errors/AppError.ts';
@@ -17,43 +21,6 @@ import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { CALLBACK_TEST_IDS } from './callback.constants.ts';
-
-/**
- * `state` is clinozy-be's own mint — 32 random bytes hex-encoded by
- * `createOAuthState` — so anything but 64 lowercase hex chars is not ours.
- */
-const OAUTH_STATE_PATTERN = /^[0-9a-f]{64}$/;
-
-/** Provider authorization codes: visible ASCII, bounded to the callback DTO limit. */
-const OAUTH_CODE_PATTERN = /^[!-~]{1,2048}$/;
-
-/**
- * Validate the three provider/user-supplied inputs before any of them selects a
- * code path. Pure and module-level: it is the same decision every render, and
- * keeping it out of the effect leaves that body about one thing.
- *
- * The server remains the real gate either way — single-use CSRF state,
- * browser-nonce binding and PKCE all verify before a session is minted.
- */
-function readCallbackParams(rawProvider: unknown): {
-  code: string | null;
-  state: string | null;
-  provider: string | null;
-} {
-  // Read from window.location, not router state: these come straight from the
-  // provider's full-page redirect, before any SPA navigation.
-  const params = new URLSearchParams(window.location.search);
-  const rawCode = params.get('code');
-  const rawState = params.get('state');
-  return {
-    code: rawCode !== null && OAUTH_CODE_PATTERN.test(rawCode) ? rawCode : null,
-    state: rawState !== null && OAUTH_STATE_PATTERN.test(rawState) ? rawState : null,
-    provider:
-      typeof rawProvider === 'string' && OAUTH_PROVIDER_SLUG_PATTERN.test(rawProvider)
-        ? rawProvider
-        : null,
-  };
-}
 
 /**
  * The no-code fallback: restore a session this browser may still hold.
@@ -108,7 +75,7 @@ export function CallbackPage() {
     }
 
     async function runCallback() {
-      const { code, state, provider } = readCallbackParams(rawProvider);
+      const { code, state, provider } = readOAuthCallbackParams(rawProvider);
 
       const finishSignIn = () => {
         // The user may have left while the exchange was in flight (a back
@@ -143,8 +110,11 @@ export function CallbackPage() {
 
       if (code && state && provider) {
         try {
-          const { accessToken } = await authApi.oauthCallback(provider, { code, state });
-          await establishSession(accessToken);
+          // Usually already under way: main.tsx starts the exchange at boot, beside the
+          // app's own download (`oauth-callback-sign-in.ts`). The code is single-use, so
+          // the page exchanges it only when the boot did not.
+          await (takeOAuthCallbackSignIn(provider, state) ??
+            completeOAuthSignIn(provider, { code, state }));
         } catch (error) {
           if (error instanceof MfaRequiredError) {
             // Stash regardless — the hand-off token is worth keeping even if we

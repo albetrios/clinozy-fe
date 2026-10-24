@@ -233,8 +233,46 @@ export async function silentRefresh(): Promise<void> {
 let authBootstrapPromise: Promise<void> | null = null;
 /** The sign-out this boot finishes on the server ({@link finishPendingRevoke}); settled once done. */
 let pendingRevoke: Promise<void> | null = null;
+/** A sign-in this load started before the bootstrap ({@link bootstrapWithSignIn}). */
+let signInAtBoot: Promise<void> | null = null;
+
+/**
+ * Hand the auth bootstrap a sign-in this load is already completing, so the bootstrap
+ * waits for it instead of asking `/auth/refresh`.
+ *
+ * @remarks
+ * The OAuth hand-off starts its code exchange at boot (`oauth-callback-sign-in.ts`),
+ * before the router or React exist. A refresh sent beside it would carry the previous
+ * session's cookie while the exchange sets the new one, and whichever answer landed
+ * last would own the cookie jar. Call it before {@link startAuthBootstrap}: the
+ * sign-in's outcome is then the bootstrap's.
+ */
+export function bootstrapWithSignIn(signIn: Promise<void>): void {
+  signInAtBoot = signIn;
+}
+
+/**
+ * The bootstrap of a load that is completing a sign-in ({@link bootstrapWithSignIn}):
+ * that sign-in's answer IS this boot's session. Never rejects, like the bootstrap
+ * it stands in for — a failed sign-in is the callback page's to report, and leaves
+ * a guest. Whatever it answers, the store stops loading: one that fails after its
+ * token (`me/context`) has moved the auth generation on.
+ */
+async function settleSignInAtBoot(signIn: Promise<void>): Promise<void> {
+  try {
+    await signIn;
+  } catch {
+    if (!getAccessToken()) useAuthStore.getState().clearAuth();
+  } finally {
+    if (useAuthStore.getState().isLoading) useAuthStore.getState().setLoading(false);
+  }
+}
 
 export function startAuthBootstrap(): Promise<void> {
+  if (signInAtBoot) {
+    authBootstrapPromise ??= settleSignInAtBoot(signInAtBoot);
+    return authBootstrapPromise;
+  }
   authBootstrapPromise ??= (async () => {
     const generation = authGeneration;
     try {
@@ -601,7 +639,16 @@ function clearRevokePending(): void {
   }
 }
 
-function isRevokePending(): boolean {
+/**
+ * A sign-out this browser has not yet finished on the server (the
+ * `logout-pending` flag {@link logout} leaves when the revoke could not be sent).
+ *
+ * @remarks
+ * The next boot finishes it before anything else (`startAuthBootstrap`), and a
+ * sign-in waits for that (`settlePendingRevoke`). The OAuth hand-off reads it to
+ * leave its code exchange to that order instead of starting it at boot.
+ */
+export function isRevokePending(): boolean {
   try {
     return localStorage.getItem(REVOKE_PENDING_KEY) === '1';
   } catch {

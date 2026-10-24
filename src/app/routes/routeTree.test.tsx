@@ -366,6 +366,14 @@ describe('router configuration', () => {
       expect(shellLoads.login).not.toHaveBeenCalled();
     });
 
+    it('warms the signed-in side, never the sign-in side, for the OAuth hand-off', async () => {
+      // main.tsx has already started the code exchange: the visit lands in the app.
+      preloadBootRoutes({ likelySignedIn: false, signingIn: true });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(shellLoads.login).not.toHaveBeenCalled();
+    });
+
     it('warms the sign-in side for a likely guest, in parallel with the auth bootstrap', async () => {
       preloadBootRoutes({ likelySignedIn: false });
 

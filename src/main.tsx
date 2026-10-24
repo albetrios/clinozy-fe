@@ -32,6 +32,7 @@ import {
 } from '@/shared/analytics/capture.ts';
 import { subscribeToAuthBroadcast } from '@/shared/auth/auth-channel.ts';
 import { peekTurnstileToken } from '@/shared/auth/captcha/turnstile-token-store.ts';
+import { startOAuthCallbackSignIn } from '@/shared/auth/oauth-callback-sign-in.ts';
 import {
   establishSession,
   handleCrossTabLogout,
@@ -157,6 +158,11 @@ onAppSplashDismissed(() => {
   stopPending();
 });
 
+// The OAuth hand-off (/callback/<provider>): exchange the provider's code now,
+// beside the app's own download, instead of after the callback page's chunk. Before
+// the bootstrap, which then waits for this sign-in rather than refreshing beside it.
+const signingIn = startOAuthCallbackSignIn();
+
 // Attempt silent refresh in background (no backend = fast fail → login screen).
 void startAuthBootstrap();
 
@@ -167,7 +173,7 @@ void startAuthBootstrap();
 // with, so the first submit already has somewhere to send the warm-up.
 registerSignedInShellWarmup(() => void preloadSignedInShell());
 
-preloadBootRoutes({ likelySignedIn: hasSessionHint() });
+preloadBootRoutes({ likelySignedIn: hasSessionHint(), signingIn });
 
 // Initialize observability/analytics after splash dismiss + idle (auth funnels stay lean).
 initObservabilityWhenIdle();

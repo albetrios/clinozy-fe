@@ -35,6 +35,7 @@ import { AuthAutoGooglePending } from './components/AuthAutoGooglePending/index.
 import { AuthMethodDivider } from './components/AuthMethodDivider/index.ts';
 import { AuthSocialMethods } from './components/AuthSocialMethods/index.ts';
 import { AuthWelcomeHeader } from './components/AuthWelcomeHeader/index.ts';
+import { preconnectOAuthProvider } from './oauth-preconnect.ts';
 
 /** Brief pause so users can cancel auto Google and use email instead. */
 const AUTO_GOOGLE_DELAY_MS = 800;
@@ -307,6 +308,9 @@ export function AuthForm() {
       cancelAutoGoogle();
     }
     setPending({ method: 'oauth', provider });
+    // The provider's page is where this ends: connect to it while `oauthStart` below
+    // is still on its way (a press already did, unless this is the auto-Google path).
+    preconnectOAuthProvider(provider);
     /*
      * Same commitment as submitting an email, and a wider window: `oauthStart`
      * below is a full round trip before the redirect, and chunks fetched now

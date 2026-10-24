@@ -407,16 +407,22 @@ function preloadAppShell(island: {
  * the answer. `likelySignedIn` is a hint,
  * not a decision — it only picks which side to warm first, and being wrong costs
  * a few idle kilobytes; the guards still decide where the user actually lands.
+ * `signingIn` is the OAuth hand-off, whose code exchange `main.tsx` has already
+ * started: it warms the callback page and the signed-in shell that sign-in lands on.
  *
  * Failures are swallowed on purpose: this is speculation. The router loads the
  * same chunks again through the normal path, where a failure has an error
  * boundary and a Retry (`onceAsync` and the route loaders do not cache a
  * rejection).
  */
-export function preloadBootRoutes(hint: { likelySignedIn: boolean }): void {
-  const warm = hint.likelySignedIn
-    ? [preloadSignedInShell()]
-    : [preloadAuthShell(), LoginPage.preload?.()];
+export function preloadBootRoutes(hint: {
+  likelySignedIn: boolean;
+  signingIn?: boolean;
+}): void {
+  let warm: unknown[];
+  if (hint.signingIn) warm = [CallbackPage.preload?.(), preloadSignedInShell()];
+  else if (hint.likelySignedIn) warm = [preloadSignedInShell()];
+  else warm = [preloadAuthShell(), LoginPage.preload?.()];
   Promise.all(warm).catch(() => undefined);
 }
 

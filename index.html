@@ -1,5 +1,9 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html
+  lang="en"
+  dir="ltr"
+  data-session-hint-key="{{PRODUCT_NAMESPACE}}:session-started-at"
+>
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/app-icon.svg" />
@@ -54,8 +58,11 @@
     <script src="/theme-init.js"></script>
     <!-- Prevent locale/dir FOUC: apply lang + dir from locale-preference before paint -->
     <script src="/locale-init.js"></script>
-    <!-- Skip the boot splash on the load right after a sign-out: the page being left
-         stays until the login screen paints (APP_SPLASH_SKIP, app-splash.ts) -->
+    <!-- Decide, before the first paint, what this load shows instead of the opening
+         splash: nothing after a sign-out (the page being left stays until the login
+         screen paints), the boot frame when no session hint says this browser is
+         signed in, the splash at rest on the OAuth hand-off (APP_SPLASH_SKIP,
+         APP_BOOT_FRAME, APP_SPLASH_STATIC in app-splash.ts) -->
     <script src="/splash-init.js"></script>
     <!-- Boot splash (KICKOFF §6.1; splash.md). Frames 1–4 — the mark, its halo,
          the "C", the dot and the wordmark — are CSS keyframes here, so they play
@@ -78,6 +85,7 @@
         --color-primary-foreground: oklch(0.985 0 0);
         --color-brand-mark: oklch(0.72 0.14 150);
         --color-brand-mark-strong: oklch(0.6 0.14 150);
+        --color-canvas: oklch(0.985 0 0);
         --radius-lg: 0.5rem;
         background: var(--color-background);
       }
@@ -87,6 +95,7 @@
         --color-foreground: oklch(0.985 0 0);
         --color-primary: oklch(0.967 0.001 286.4);
         --color-primary-foreground: oklch(0.165 0.004 285.9);
+        --color-canvas: oklch(0.165 0.004 285.9);
       }
       /* The layer: full bleed on `card`, one column centred on both axes. */
       #app-splash {
@@ -139,6 +148,88 @@
       .app-splash-skip #app-splash ~ #root {
         opacity: 1;
         transition: none;
+      }
+      /* The OAuth hand-off (/callback/<provider>): the provider has just sent the
+         visitor back mid sign-in, so this is a hand-off screen, not an opening —
+         every frame at its end state from the first paint, and no wordmark beat
+         for the exit to wait out (APP_SPLASH_STATIC). */
+      .app-splash-static #app-splash,
+      .app-splash-static #app-splash * {
+        animation-duration: 1ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+      }
+      /* A signed-out cold load (no session hint): no splash at all — the visit
+         ends on the login screen, so it opens on it. The frame that screen sits in
+         paints first: the canvas, and the logo exactly where the header draws it
+         (AuthLayout's and PublicFrame's: 28px mark, the 19px wordmark 9px after it,
+         centred in a 52px / 60px header). The screen paints over it; it goes with
+         the splash (APP_BOOT_FRAME, app-splash.ts). No copy: the HTML carries none. */
+      #app-boot-frame {
+        display: none;
+      }
+      /* Below every box #root paints (z-index -1: above only the page's own
+         background), so whichever screen arrives covers it with no stacking to
+         arrange. */
+      .app-boot-frame #app-boot-frame {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: var(--color-canvas);
+      }
+      .app-boot-frame-logo {
+        position: absolute;
+        top: 12px;
+        inset-inline-start: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .app-boot-frame-mark {
+        display: block;
+        flex: none;
+        width: 28px;
+        height: 28px;
+      }
+      .app-boot-frame-c {
+        stroke: var(--color-primary-foreground);
+      }
+      .app-boot-frame-dot {
+        fill: var(--color-brand-mark);
+      }
+      .app-boot-frame-word {
+        display: inline-flex;
+        align-items: baseline;
+        font:
+          600 19px/1 'Inter',
+          ui-sans-serif,
+          system-ui,
+          sans-serif;
+        letter-spacing: -0.03em;
+        color: var(--color-foreground);
+        white-space: nowrap;
+      }
+      @media (min-width: 48rem) {
+        .app-boot-frame-logo {
+          top: 16px;
+        }
+      }
+      /* From xl the sign-in screen's header starts at the stage's padding. */
+      @media (min-width: 80rem) {
+        .app-boot-frame-logo {
+          inset-inline-start: 3.5rem;
+        }
+      }
+      @media (min-width: 96rem) {
+        .app-boot-frame-logo {
+          inset-inline-start: 5rem;
+        }
+      }
+      @media (min-width: 120rem) {
+        .app-boot-frame-logo {
+          inset-inline-start: 7rem;
+        }
       }
       .app-splash-emblem {
         position: relative;
@@ -446,6 +537,28 @@
         >{{PRODUCT_WORDMARK}}</span
       >
       <div class="app-splash-slot"></div>
+    </div>
+    <!-- The signed-out first paint (APP_BOOT_FRAME): the frame the screen sits in,
+         under #root, which paints over it. Decorative. -->
+    <div id="app-boot-frame" aria-hidden="true">
+      <span class="app-boot-frame-logo">
+        <svg
+          class="app-boot-frame-mark"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 28 28"
+        >
+          <rect width="28" height="28" rx="8" class="app-splash-tile" />
+          <path
+            d="M18.6 9.1a6.4 6.4 0 1 0 0 9.8"
+            fill="none"
+            stroke-width="2.6"
+            stroke-linecap="round"
+            class="app-boot-frame-c"
+          />
+          <circle cx="20.2" cy="14" r="2.3" class="app-boot-frame-dot" />
+        </svg>
+        <span class="app-boot-frame-word" dir="ltr">{{PRODUCT_WORDMARK}}</span>
+      </span>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

@@ -4,6 +4,7 @@ import { wordmarkParts } from '../src/lib/brand-wordmark.ts';
 import {
   PRODUCT_DESCRIPTION,
   PRODUCT_NAME,
+  PRODUCT_NAMESPACE,
   PRODUCT_THEME_COLOR,
 } from '../src/lib/product-identity.ts';
 
@@ -42,6 +43,9 @@ const TOKENS: Record<string, string> = {
   '{{PRODUCT_DESCRIPTION}}': PRODUCT_DESCRIPTION,
   '{{PRODUCT_THEME_COLOR}}': PRODUCT_THEME_COLOR,
   '{{PRODUCT_WORDMARK}}': productWordmarkHtml(PRODUCT_NAME),
+  // The storage namespace: `public/splash-init.js` reads the session hint's key
+  // off `<html data-session-hint-key>` before the first paint.
+  '{{PRODUCT_NAMESPACE}}': PRODUCT_NAMESPACE,
 };
 
 /** Any `{{PRODUCT_*}}` token left after substitution is a typo, not a value. */

@@ -56,6 +56,9 @@ vi.mock('@/shared/analytics/capture.ts', () => ({
 vi.mock('@/shared/auth/service.ts', () => ({
   establishSession: establishSessionMock,
   silentRefresh: silentRefreshMock,
+  // The boot exchange's hooks (`oauth-callback-sign-in.ts`): no sign-out pending.
+  bootstrapWithSignIn: vi.fn(),
+  isRevokePending: () => false,
 }));
 
 vi.mock('@/shared/auth/mfa-handoff.ts', () => ({
@@ -71,6 +74,7 @@ vi.mock('@/shared/auth/session-lifetime.ts', () => ({
 }));
 
 import { authApi, MfaRequiredError } from '@/shared/api/auth-api.ts';
+import { startOAuthCallbackSignIn } from '@/shared/auth/oauth-callback-sign-in.ts';
 
 import { CallbackPage } from './CallbackPage.tsx';
 
@@ -122,6 +126,23 @@ describe('CallbackPage', () => {
       expect(establishSessionMock).toHaveBeenCalledWith('oauth-access-token'),
     );
     expect(silentRefreshMock).not.toHaveBeenCalled();
+  });
+
+  it('takes the exchange the boot started — the single-use code is never sent twice', async () => {
+    arrangeProviderReturn();
+    const oauthCallbackSpy = vi
+      .spyOn(authApi, 'oauthCallback')
+      .mockResolvedValue({ accessToken: 'oauth-access-token' });
+    // main.tsx, on this very load, before the page's chunk had arrived.
+    expect(startOAuthCallbackSignIn(window.location)).toBe(true);
+
+    renderWithProviders(<CallbackPage />);
+
+    await waitFor(() =>
+      expect(establishSessionMock).toHaveBeenCalledWith('oauth-access-token'),
+    );
+    expect(oauthCallbackSpy).toHaveBeenCalledTimes(1);
+    expect(establishSessionMock).toHaveBeenCalledTimes(1);
   });
 
   it('hands off to /mfa when the exchange reports a second factor is required', async () => {

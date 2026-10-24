@@ -21,6 +21,8 @@ type AuthMethodButtonProps = {
   /** Required for E2E + a11y selectors. */
   testId: string;
   onClick?: () => void;
+  /** A press, ahead of the click it becomes — the moment to warm what the click opens. */
+  onPress?: () => void;
   type?: 'button' | 'submit';
   variant?: ButtonVariant;
   className?: string;
@@ -52,6 +54,7 @@ export function AuthMethodButton({
   icon,
   testId,
   onClick,
+  onPress,
   type = 'button',
   variant = 'outline',
   className = 'w-full',
@@ -74,6 +77,7 @@ export function AuthMethodButton({
       disabled={disabled}
       isLoading={spinning}
       onClick={onClick}
+      onPointerDown={onPress}
       data-testid={testId}
     >
       {spinning ? null : icon}

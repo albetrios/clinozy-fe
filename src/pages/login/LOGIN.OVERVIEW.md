@@ -62,6 +62,13 @@ backwards while the destination loads.
 - Guards on the way out read `me/context` **cache-first** (`ensureSessionContext`,
   `ensurePermissionsFor`), so the screen is not held open for a redundant fetch.
 
+### The first paint is the login screen's own frame
+
+A cold load with no session hint lands here, so it never shows the boot splash:
+`public/splash-init.js` paints `#app-boot-frame` — the canvas and the logo where
+the header draws it — and this screen paints over it (`APP_BOOT_FRAME`,
+`lib/app-splash.ts`). Offline, the splash stays, for its notice and Retry.
+
 ## Login + signup rules (product)
 
 | Step         | FE                         | BE                                                            |

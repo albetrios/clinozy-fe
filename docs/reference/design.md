@@ -342,6 +342,18 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   by `tests/e2e/boot-splash.e2e.test.ts`: the splash fades **exactly once**, and
   the page is **never blank** behind it. Numbers and method:
   [local-production-perf.md](local-production-perf.md#cold-load-timeline).
+- **The splash is for opening the app, never for reaching the login screen.** A
+  cold load with no session hint ends on the login screen, so it opens on it:
+  `public/splash-init.js` hides the splash before the first paint and shows
+  `#app-boot-frame` instead — the canvas and the logo exactly where the header draws
+  it (`APP_BOOT_FRAME`) — and the login screen paints over that frame (measured on a
+  production build: the form at ~0.43s instead of after the ~2.7s splash). Offline
+  is the exception: the splash stays, because it is where the boot says it cannot
+  reach the server and offers Retry. The OAuth hand-off (`/callback/<provider>`)
+  keeps the splash but **at rest** (`APP_SPLASH_STATIC`): every frame at its end
+  state from the first paint and no wordmark beat to wait out — a hand-off screen,
+  not an opening — while the code exchange runs from boot, beside the app's own
+  download (`shared/auth/oauth-callback-sign-in.ts`).
 - **Signing out goes straight to the login screen.** The app stays exactly as it
   is until the login screen replaces it: nothing it shows is cleared before the
   page goes (`pagehide`), and the `/login` load a sign-out hands the tab to skips

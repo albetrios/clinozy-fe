@@ -47,6 +47,10 @@ new method through `AuthMethodButton` and it inherits these rules:
   progress cue (no "Continuing…/Sending…/Verifying…" swaps — a label flicker reads as jank).
 - **Leading icon → spinner** — the method icon is replaced by the spinner while loading, so there
   is never a double icon.
+- **A press warms what the click opens** — `onPress` (pointer-down) runs before the click lands;
+  the OAuth buttons preconnect to the provider's sign-in page there
+  (`oauth-preconnect.ts`), and `startOAuth` does it again for the auto-Google path, so its DNS and
+  TLS overlap `oauthStart`'s round trip. Never at page load: most visitors sign in with email.
 - **One spinner at a time** — only the clicked method spins; every other method is **disabled
   without a spinner**. Exactly one auth action is ever in flight (`AuthContinuePending`).
 - **Captcha coupling is per-method** — pass `captchaGated` only for methods that need a Turnstile
