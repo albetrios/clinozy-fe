@@ -831,10 +831,6 @@ describe('app-splash', () => {
         'app-splash-up 500ms ease var(--app-splash-block-delay, 1900ms) both',
       ],
       [
-        '.app-splash-bar',
-        'app-splash-bar 1500ms cubic-bezier(0.4, 0, 0.2, 1) calc(var(--app-splash-block-delay, 1900ms) + 150ms) both',
-      ],
-      [
         '.app-splash-reel',
         'app-splash-tick 1500ms cubic-bezier(0.65, 0, 0.35, 1) calc(var(--app-splash-block-delay, 1900ms) + 150ms) both',
       ],
@@ -848,6 +844,21 @@ describe('app-splash', () => {
           animationOf('.app-splash-word'),
         ) ?? [];
       expect(Number(duration) + Number(delay)).toBe(SPLASH_FRAMES_MS);
+    });
+
+    // One loader: the splash's "o" turns at ui/spinner.tsx's tempo, and no bar fills.
+    it('turns the wordmark’s "o" as the loader, in the splash only', () => {
+      const css = html.replaceAll(/\s+/g, ' ');
+      expect(css).toContain(
+        '#app-splash .app-splash-ring { animation: app-splash-turn 900ms linear infinite; }',
+      );
+      expect(css).toContain('.app-splash-ring-arc { display: none;');
+      expect(css).toContain('#app-splash .app-splash-ring-arc { display: inline; }');
+      // The hand-off's frames rest at their end, but its loader keeps turning.
+      expect(css).toContain(
+        '.app-splash-static #app-splash .app-splash-ring { animation-duration: 900ms !important; animation-iteration-count: infinite !important; }',
+      );
+      expect(html).not.toContain('app-splash-bar');
     });
 
     it('rises the greeting block on the beat the slot counts from', () => {
@@ -928,9 +939,13 @@ describe('app-splash', () => {
       expect(body).toContain('animation-delay: 0s !important');
       expect(body).toContain('animation-duration: 1ms !important');
       expect(body).toContain('transition-duration: 1ms !important');
-      // The block, a full bar and "All set" are drawn, not animated, at once.
+      // The block and "All set" are drawn, not animated, at once.
       expect(body).toContain(
-        '.app-splash-block, .app-splash-bar, .app-splash-reel { animation: none !important; }',
+        '.app-splash-block, .app-splash-reel { animation: none !important; }',
+      );
+      // The loader alone keeps moving, slower — as the Spinner does (index.css).
+      expect(body).toContain(
+        '#app-splash .app-splash-ring, .app-splash-static #app-splash .app-splash-ring { animation-duration: 2.4s !important; animation-iteration-count: infinite !important; }',
       );
       expect(body).toContain('.app-splash-reel { transform: translateY(-36px); }');
     });

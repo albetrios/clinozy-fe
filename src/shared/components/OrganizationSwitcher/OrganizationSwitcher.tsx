@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
-import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   DropdownMenu,
@@ -20,6 +19,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu.tsx';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import { notifyError, reportError } from '@/shared/errors/errorHandler.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';

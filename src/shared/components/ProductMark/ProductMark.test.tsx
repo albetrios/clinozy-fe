@@ -32,6 +32,26 @@ describe('ProductWordmark', () => {
     expect(word.querySelectorAll('circle')).toHaveLength(name.includes('o') ? 2 : 0);
   });
 
+  it('stays still by default: no loader rides on the logo', () => {
+    render(<ProductWordmark />);
+    expect(
+      screen.getByTestId('product-wordmark').querySelector('[data-slot="spinner"]'),
+    ).toBeNull();
+  });
+
+  // The one loader, drawn in the brand: the ring keeps its ink, an arc turns round it.
+  it.runIf(PRODUCT_NAME.toLowerCase().includes('o'))(
+    'turns its "o" as the loader when asked',
+    () => {
+      render(<ProductWordmark turning />);
+      const ring = screen.getByTestId('product-wordmark').querySelector('svg');
+      expect(ring).toHaveAttribute('data-slot', 'spinner');
+      const arc = ring?.querySelectorAll('circle')[1];
+      expect(arc).toHaveClass('stroke-brand-mark-strong');
+      expect(arc).toHaveAttribute('stroke-dasharray', '16 100');
+    },
+  );
+
   it('reads left to right under an RTL page, its parts in order', () => {
     document.documentElement.dir = 'rtl';
     try {

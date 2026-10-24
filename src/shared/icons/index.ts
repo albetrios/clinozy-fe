@@ -48,7 +48,6 @@ import {
   LayoutGrid as LuLayoutGrid,
   Link as LuLink,
   ListFilter as LuListFilter,
-  Loader2 as LuLoader,
   Lock as LuLock,
   LogOut as LuLogOut,
   Mail as LuMail,
@@ -180,7 +179,6 @@ export const LayoutGrid: AppIcon = LuLayoutGrid;
 export const LinkIcon: AppIcon = LuLink;
 /** Lucide `list-filter`: the Filters button. */
 export const ListFilter: AppIcon = LuListFilter;
-export const Loader: AppIcon = LuLoader;
 /** Lucide `lock`: private and locked items. */
 export const Lock: AppIcon = LuLock;
 export const LogOut: AppIcon = LuLogOut;

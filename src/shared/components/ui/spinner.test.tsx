@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { Spinner } from './Spinner.tsx';
+import { Spinner } from './spinner.tsx';
 
 function svgOf(container: HTMLElement): SVGSVGElement {
   const svg = container.querySelector('svg');
@@ -11,11 +11,23 @@ function svgOf(container: HTMLElement): SVGSVGElement {
 }
 
 describe('Spinner', () => {
-  it('spins at the inline icon size by default', () => {
+  it('draws at the inline icon size by default, turned by its data-slot', () => {
     const { container } = render(<Spinner />);
     const svg = svgOf(container);
-    expect(svg).toHaveClass('animate-spin');
+    expect(svg).toHaveAttribute('data-slot', 'spinner');
     expect(svg).toHaveClass('size-4');
+    // index.css turns it: no animation class rides on the glyph.
+    expect(svg.getAttribute('class')).not.toMatch(/animate-/);
+  });
+
+  // The wordmark's "o": a faint ring, the turning arc, the brand-mark dot.
+  it('draws the ring, the arc and the brand-mark dot', () => {
+    const { container } = render(<Spinner />);
+    const [ring, arc, dot] = Array.from(svgOf(container).querySelectorAll('circle'));
+    expect(ring).toHaveAttribute('stroke-opacity', '0.2');
+    expect(arc).toHaveAttribute('stroke-dasharray', '16 100');
+    expect(arc).toHaveAttribute('stroke-linecap', 'round');
+    expect(dot).toHaveClass('fill-brand-mark');
   });
 
   // Every call site sits next to text or inside something that already reports it is busy.
@@ -28,21 +40,13 @@ describe('Spinner', () => {
   it('lets a caller size replace the default rather than fight it', () => {
     const { container } = render(<Spinner className="text-primary size-8" />);
     const svg = svgOf(container);
-    expect(svg).toHaveClass('size-8', 'text-primary', 'animate-spin');
+    expect(svg).toHaveClass('size-8', 'text-primary');
     expect(svg).not.toHaveClass('size-4');
   });
 
   it('passes other props through to the glyph', () => {
     const { getByTestId } = render(<Spinner data-testid="row-spinner" />);
-    expect(getByTestId('row-spinner')).toHaveClass('animate-spin');
-  });
-
-  // The reason this is not shadcn's vendored spinner: that one imports Lucide directly, so it
-  // would bypass the icon barrel every other app icon is named through.
-  it('draws the barrel’s Loader glyph', () => {
-    const { container } = render(<Spinner />);
-    expect(svgOf(container).getAttribute('class')).toContain('lucide');
-    expect(svgOf(container).childElementCount).toBeGreaterThan(0);
+    expect(getByTestId('row-spinner')).toHaveAttribute('data-slot', 'spinner');
   });
 
   it('has no accessibility violations', async () => {

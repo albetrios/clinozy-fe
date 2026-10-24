@@ -188,12 +188,13 @@ interface SplashFrames {
   wordmarkOpacityAtStart: string | null;
   /** The greeting line, if the slot rendered one. */
   greeting: string | null;
-  /** The slot rendered its block / progress (bar + ticker), and when the block landed. */
+  /** The slot rendered its block / progress (the ticker), and when the block landed. */
   block: boolean;
   blockAt: number | null;
   progress: boolean;
-  /** The bar's and the ticker's computed transforms, sampled as the block lands. */
-  barTransform: string | null;
+  /** The wordmark's "o" (the one loader): its turn's duration, sampled as the block lands. */
+  ringTurnMs: number | null;
+  /** The ticker's computed transform, sampled as the block lands. */
   tickerTransform: string | null;
 }
 
@@ -201,7 +202,7 @@ const TRACE_FRAMES = `
 (() => {
   const trace = {
     framesAt: null, exitAt: null, wordmarkOpacityAtStart: null, greeting: null,
-    block: false, blockAt: null, progress: false, barTransform: null, tickerTransform: null,
+    block: false, blockAt: null, progress: false, ringTurnMs: null, tickerTransform: null,
   };
   window.__splashFrames = trace;
   const byId = (root, id) => root.querySelector('[data-testid="' + id + '"]');
@@ -212,12 +213,16 @@ const TRACE_FRAMES = `
       .filter((time) => typeof time === 'number');
     return starts.length ? Math.min(...starts) : null;
   };
-  // Read the bar and the ticker as the block lands: on the normal beat they
-  // have not started yet; under reduced motion they are drawn at their end.
+  // Read the loader and the ticker as the block lands: the "o" turns throughout
+  // (slower under reduced motion); the ticker has not started on the normal beat
+  // and is drawn at its end under reduced motion.
   const sampleBlock = (splash) => {
-    const bar = byId(splash, 'app-splash-bar');
+    const ring = splash.querySelector('.app-splash-ring');
     const ticker = byId(splash, 'app-splash-ticker');
-    if (bar) trace.barTransform = getComputedStyle(bar).transform;
+    const turn = ring && typeof ring.getAnimations === 'function'
+      ? ring.getAnimations().find((animation) => animation.animationName === 'app-splash-turn')
+      : undefined;
+    if (turn) trace.ringTurnMs = Number(turn.effect.getTiming().duration);
     if (ticker) trace.tickerTransform = getComputedStyle(ticker).transform;
   };
   // Two frames after the wordmark's animation has started — not after
@@ -414,21 +419,23 @@ test.describe('Splash — frames, slot, offline hold, reduced motion', () => {
 
     const trace = await splashFrames(page);
     expect(trace.greeting).toMatch(/^Good (morning|afternoon|evening), \S/);
-    expect(trace.progress, 'online: the bar and ticker, not the notice').toBe(true);
+    expect(trace.progress, 'online: the ticker, not the notice').toBe(true);
+    expect(trace.ringTurnMs, 'the wordmark’s "o" turns at the Spinner’s tempo').toBe(900);
     expect(trace.blockAt, 'the block is on the splash before it leaves').toBeLessThan(
       trace.exitAt ?? 0,
     );
     expect(exitAfterMs(trace)).toBeGreaterThanOrEqual(SPLASH_FRAMES_MS - 5);
 
-    // Reduced motion: the same block, already at its end state — a full bar,
-    // the ticker on "All set" (−36px) — even though the exit may start at 500ms.
+    // Reduced motion: the same block, already at its end state — the ticker on
+    // "All set" (−36px) — even though the exit may start at 500ms. The loader
+    // alone keeps turning, slower.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`/organization/${slug}`);
     await expect(byTestId(page, 'today-page')).toBeVisible({ timeout: 30_000 });
     const reduced = await splashFrames(page);
     expect(reduced.greeting).toMatch(/^Good (morning|afternoon|evening), \S/);
     expect(reduced.blockAt).toBeLessThan(reduced.exitAt ?? 0);
-    expect(reduced.barTransform, 'the bar is full: never scaled').toBe('none');
+    expect(reduced.ringTurnMs, 'the "o" still turns, slower').toBe(2400);
     expect(reduced.tickerTransform, 'the ticker sits on "All set"').toBe(
       'matrix(1, 0, 0, 1, 0, -36)',
     );

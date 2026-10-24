@@ -279,6 +279,16 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
 
 ### Loading States
 
+- **One loader: the wordmark's "o".** Every busy moment draws the same glyph — a
+  faint ring in the text colour, an arc turning round it, the `brand-mark` dot at
+  rest in the centre — at one tempo (900ms a turn; 2.4s under reduced motion,
+  never still, since a loader that stops reads as a hang). A busy button is
+  `Button` `isLoading` (its label stays as it is), any other busy glyph — a row,
+  chip, search field or overlay — is `Spinner` (`ui/spinner.tsx`), and a screen
+  that waits whole is `BrandLoader`: the mark over the wordmark, its own "o"
+  turning, as the boot splash's does. index.css turns it by
+  `data-slot="spinner"`, so no app code spins anything: ESLint rejects
+  `animate-spin`. Content waits as skeletons, never under a spinner.
 - Render known interface structure immediately: dialog titles, navigation, search,
   close controls, widget headings, and section labels are real UI, not skeletons.
   Keep lazy boundaries inside that structure, around dynamic content only.

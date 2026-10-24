@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { prefersReducedMotion } from '@/lib/animations/index.ts';
-import { Spinner } from '@/shared/components/Spinner/index.ts';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useWorkspaceSwitchStore } from '@/shared/store/useWorkspaceSwitchStore/index.ts';
 

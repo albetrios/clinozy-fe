@@ -24,6 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover.tsx';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -45,7 +46,7 @@ import {
   type SpeechRecognitionState,
   useSpeechRecognition,
 } from '@/shared/hooks/useSpeechRecognition/index.ts';
-import { Bug, Loader, Send, X } from '@/shared/icons/index.ts';
+import { Bug, Send, X } from '@/shared/icons/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
@@ -142,7 +143,6 @@ function BugReportToolbar({
   const { t } = useTranslation(BUG_REPORT_NS);
   const statusKey = voiceStatusKey(speech);
   const voiceLabel = t(speech.listening ? VOICE_INPUT_KEYS.stop : VOICE_INPUT_KEYS.start);
-  const SendIcon = pending ? Loader : Send;
 
   return (
     <div className="flex items-center gap-2 px-2 pt-1 pb-2">
@@ -176,7 +176,7 @@ function BugReportToolbar({
         disabled={!canSend}
         className="bug-report-press"
       >
-        <SendIcon className={cn(pending && 'animate-spin')} aria-hidden="true" />
+        {pending ? <Spinner /> : <Send aria-hidden="true" />}
         {t(pending ? BUG_REPORT_KEYS.sending : BUG_REPORT_KEYS.send)}
       </Button>
     </div>

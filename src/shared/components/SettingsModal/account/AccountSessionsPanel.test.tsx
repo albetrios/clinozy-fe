@@ -213,7 +213,7 @@ describe('AccountSessionsPanel', () => {
 
     const retry = screen.getByTestId('retry-button');
     expect(retry).toBeDisabled();
-    expect(retry.querySelector('.animate-spin')).not.toBeNull();
+    expect(retry.querySelector('[data-slot="spinner"]')).not.toBeNull();
   });
 
   it('says the list is empty instead of rendering nothing', () => {

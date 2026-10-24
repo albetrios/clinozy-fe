@@ -1,7 +1,7 @@
 import { ESLint } from 'eslint';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-// Locks the two `no-restricted-syntax` guards in `eslint.config.mjs` against the
+// Locks the `no-restricted-syntax` guards in `eslint.config.mjs` against the
 // REAL config — wiring (which files they reach) and behaviour (what they flag).
 //
 // Both were first proven with a throwaway probe file, which shows a rule fired
@@ -68,6 +68,43 @@ describe('same-route navigation must state the hash (src)', () => {
   });
 });
 
+describe('one loader: no spinning class in app code (src)', () => {
+  // `animate-spin` on a Lucide icon and two hand-rolled border rings drew three
+  // loaders beside the Spinner, each at its own tempo. `ui/spinner.tsx` turns by
+  // its `data-slot`, so app code never needs the class.
+  const FILE = 'src/shared/components/Probe/Probe.tsx';
+
+  it.each([
+    ['a class string', "export const look = 'size-4 animate-spin';"],
+    ['a variant', "export const look = 'motion-safe:animate-spin text-primary';"],
+    ['the old ring token', "export const look = 'rounded-full animate-spinner';"],
+    [
+      'a template',
+      `declare const size: string;\nexport const look = \`\${size} animate-spin\`;`,
+    ],
+  ])('flags %s', async (_label, source) => {
+    const messages = await restricted(source, FILE);
+
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain('One loader');
+  });
+
+  it('allows the motion the app keeps', async () => {
+    const source =
+      "export const look = 'animate-[route-progress_1.1s_ease-in-out_infinite]';";
+
+    expect(await restricted(source, FILE)).toEqual([]);
+  });
+
+  it('leaves colocated tests alone — they look for the class to prove it is gone', async () => {
+    const source = "export const gone = '.animate-spin';";
+
+    expect(
+      await restricted(source, 'src/shared/components/Probe/Probe.test.tsx'),
+    ).toEqual([]);
+  });
+});
+
 describe('an instantaneous locator check must not swallow its own error (tests/e2e, tests/utils)', () => {
   // `isVisible()` already returns false for no match, so a trailing `.catch()` can
   // only hide a strict-mode violation (the locator matched more than one element).
@@ -111,7 +148,7 @@ describe('an instantaneous locator check must not swallow its own error (tests/e
   });
 });
 
-describe('the two guards do not reach each other’s files', () => {
+describe('the src and spec guards do not reach each other’s files', () => {
   // Each block sets `no-restricted-syntax` for its own globs. If they overlapped,
   // the later one would REPLACE the earlier one for the shared files.
   it('app source is not held to the spec rule, and specs are not held to the app rule', async () => {

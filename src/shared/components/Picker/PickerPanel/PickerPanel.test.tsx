@@ -57,7 +57,7 @@ describe('PickerPanel', () => {
     const search = screen.getByTestId('who-search');
     expect(search).toHaveAttribute('placeholder', 'Search who');
     expect(screen.getByText('esc')).toHaveAttribute('data-slot', 'kbd');
-    expect(document.querySelector('.animate-spinner')).toBeNull();
+    expect(document.querySelector('[data-slot="spinner"]')).toBeNull();
     rerender(
       <PickerPanel
         label="Who"
@@ -77,7 +77,7 @@ describe('PickerPanel', () => {
         onScroll={vi.fn()}
       />,
     );
-    expect(document.querySelector('.animate-spinner')).not.toBeNull();
+    expect(document.querySelector('[data-slot="spinner"]')).not.toBeNull();
     const loading = screen.getByTestId('who-loading');
     // An `<output>`: its implicit role is `status`.
     expect(screen.getAllByRole('status')).toContain(loading);

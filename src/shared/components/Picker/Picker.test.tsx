@@ -622,7 +622,7 @@ describe('Picker — paging', () => {
     await user.click(screen.getByTestId('patient'));
     const panel = await screen.findByTestId('patient-panel');
     expect(await screen.findByTestId('patient-loading')).toHaveTextContent('Loading');
-    expect(panel.querySelector('.animate-spinner')).not.toBeNull();
+    expect(panel.querySelector('[data-slot="spinner"]')).not.toBeNull();
     expect(screen.getByTestId('patient-search')).toHaveAttribute(
       'placeholder',
       'Search patient',

@@ -15,7 +15,6 @@ import { APP_PHONE_PREFIX, formatAppPhoneDigits } from '@/shared/app/app-phone-f
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import { ProgressLine } from '@/shared/components/ProgressLine/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
-import { Spinner } from '@/shared/components/Spinner/index.ts';
 import {
   Command,
   CommandGroup,
@@ -23,6 +22,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/shared/components/ui/command.tsx';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import { useScrollEdges } from '@/shared/hooks/useScrollEdges/index.ts';
 import { Plus, Search, X } from '@/shared/icons/index.ts';
 

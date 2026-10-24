@@ -10,8 +10,8 @@ import {
   DrawerInput,
   DrawerPhoneInput,
 } from '@/shared/components/DrawerField/index.ts';
-import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import {
   CONTACT_EDITOR_KEYS,
   CONTACT_HANDLE_MAX,

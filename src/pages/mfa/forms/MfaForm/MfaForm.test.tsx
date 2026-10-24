@@ -191,7 +191,7 @@ describe('MfaForm', () => {
       expect(submit).toHaveTextContent(/verifying/i);
       // A changed label alone reads as a dead button — something has to move.
       expect(submit).toHaveAttribute('aria-busy', 'true');
-      expect(submit.querySelector('.animate-spin')).toBeInTheDocument();
+      expect(submit.querySelector('[data-slot="spinner"]')).toBeInTheDocument();
     });
 
     it('holds the pending state through the post-verify navigation', async () => {

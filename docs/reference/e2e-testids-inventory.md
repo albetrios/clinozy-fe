@@ -457,8 +457,8 @@ greeting block the React slot renders into it. Gone once the splash exits.
 | `app-splash-mark` · `app-splash-wordmark` | The 64px mark with its halo · the wordmark (frames 1–4, CSS)          | `index.html`                       |
 | `app-splash-block`                        | The greeting block (frame 5); carries `--app-splash-block-delay`      | `shared/components/AppSplashSlot/` |
 | `app-splash-greeting`                     | "Good morning, <first name>" (org layout's first load, session ready) | `shared/components/AppSplashSlot/` |
-| `app-splash-progress`                     | Bar + ticker (online)                                                 | `shared/components/AppSplashSlot/` |
-| `app-splash-bar` · `app-splash-ticker`    | The bar's fill · the ticker's moving reel                             | `shared/components/AppSplashSlot/` |
+| `app-splash-progress`                     | The ticker (online)                                                   | `shared/components/AppSplashSlot/` |
+| `app-splash-ticker`                       | The ticker's moving reel                                              | `shared/components/AppSplashSlot/` |
 | `app-splash-offline` · `app-splash-retry` | Offline notice (`role="alert"`) · its Retry (reloads the boot URL)    | `shared/components/AppSplashSlot/` |
 
 ---

@@ -36,8 +36,18 @@ export function ProductMark({ className }: { className?: string }) {
  * with a `brand-mark-strong` centre ({@link wordmarkParts} — the same split the
  * HTML splash is drawn with). A brand drawing, not translated copy; decorative
  * (`aria-hidden`) — size it with the caller's font size.
+ *
+ * `turning` makes the "o" the app's loader while a whole screen waits
+ * (`BrandLoader`): a `brand-mark-strong` arc runs round the ring, turned by the
+ * same `data-slot="spinner"` rule, at the same tempo, as `ui/spinner.tsx`.
  */
-export function ProductWordmark({ className }: { className?: string }) {
+export function ProductWordmark({
+  className,
+  turning = false,
+}: {
+  className?: string;
+  turning?: boolean;
+}) {
   const { head, ring, tail } = wordmarkParts(PRODUCT_NAME);
   return (
     <span
@@ -57,6 +67,7 @@ export function ProductWordmark({ className }: { className?: string }) {
           <svg
             aria-hidden
             viewBox="0 0 20 20"
+            data-slot={turning ? 'spinner' : undefined}
             className="inline-block size-[0.56em] overflow-visible align-[-0.02em]"
           >
             <circle
@@ -67,6 +78,19 @@ export function ProductWordmark({ className }: { className?: string }) {
               strokeWidth="4.2"
               className="stroke-foreground"
             />
+            {turning ? (
+              <circle
+                cx="10"
+                cy="10"
+                r="7.6"
+                fill="none"
+                strokeWidth="4.2"
+                strokeLinecap="round"
+                strokeDasharray="16 100"
+                pathLength={100}
+                className="stroke-brand-mark-strong"
+              />
+            ) : null}
             <circle cx="10" cy="10" r="3" className="fill-brand-mark-strong" />
           </svg>
           {tail}

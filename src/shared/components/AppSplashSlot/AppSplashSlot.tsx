@@ -83,8 +83,9 @@ function TickerSteps({ weekday }: { weekday: string }) {
 }
 
 /**
- * The greeting block (frames 5–6): the greeting, then the progress bar and
- * ticker — or, offline, the notice and Retry instead. Mounted the moment it has
+ * The greeting block (frames 5–6): the greeting, then the ticker — the
+ * wordmark's turning "o" above is the loader, so there is no bar — or, offline,
+ * the notice and Retry instead. Mounted the moment it has
  * something to say, and timed against the splash's own clock.
  */
 function SplashBlock({
@@ -154,17 +155,6 @@ function SplashBlock({
         </div>
       ) : (
         <div className="app-splash-progress" data-testid={SPLASH_TEST_IDS.progress}>
-          <span
-            className="app-splash-track bg-muted-strong"
-            data-slot="pill"
-            aria-hidden="true"
-          >
-            <span
-              className="app-splash-bar bg-primary"
-              data-slot="pill"
-              data-testid={SPLASH_TEST_IDS.bar}
-            />
-          </span>
           {/* Fixed copy on a timer (D15), not live status — announcing all three
               lines at once would only say "All set" before it is. */}
           <span className="app-splash-ticker" aria-hidden="true">
@@ -180,7 +170,7 @@ function SplashBlock({
  * The boot splash's React slot (KICKOFF §6.1): renders the greeting block into
  * `#app-splash` once i18n and the session are ready — the HTML carries no copy
  * (Q-S1). On the first load of the org layout it greets the user by name on the
- * clinic-local clock (D15) and runs the progress bar and ticker; offline at mount
+ * clinic-local clock (D15) and runs the ticker; offline at mount
  * it shows the notice and Retry and holds the splash until a reload
  * (`holdAppSplashOffline`). Mounted, lazily, by `AppSplashSlotLazy`.
  */

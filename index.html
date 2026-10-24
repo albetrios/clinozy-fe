@@ -159,6 +159,12 @@
         animation-delay: 0s !important;
         animation-iteration-count: 1 !important;
       }
+      /* …all but the loader: the hand-off waits on the code exchange, so its "o"
+         keeps turning. */
+      .app-splash-static #app-splash .app-splash-ring {
+        animation-duration: 900ms !important;
+        animation-iteration-count: infinite !important;
+      }
       /* A signed-out cold load (no session hint): no splash at all — the visit
          ends on the login screen, so it opens on it. The frame that screen sits in
          paints first: the canvas, and the logo exactly where the header draws it
@@ -304,6 +310,19 @@
       .app-splash-ring-dot {
         fill: var(--color-brand-mark-strong);
       }
+      /* The app's one loader while the splash holds (ui/spinner.tsx's tempo,
+         ProductWordmark's turning "o"): an arc runs round the ring. The boot
+         frame draws the header's still logo, so only the splash shows it. */
+      .app-splash-ring-arc {
+        display: none;
+        stroke: var(--color-brand-mark-strong);
+      }
+      #app-splash .app-splash-ring-arc {
+        display: inline;
+      }
+      #app-splash .app-splash-ring {
+        animation: app-splash-turn 900ms linear infinite;
+      }
       /* The greeting block's room, held from the first frame so the mark and
          wordmark never move when the React slot fills it (at 390 × 844 the
          mark's top sits at y≈322). Every boot keeps this geometry; only the
@@ -331,27 +350,8 @@
         align-items: center;
         gap: 8px;
       }
-      .app-splash-track {
-        display: block;
-        width: 180px;
-        height: 2px;
-        border-radius: 9999px;
-        overflow: hidden;
-      }
-      /* Frame 6: 150ms after the block (2,050ms on the beat) the bar fills from
-         the inline start while the ticker steps through its three lines. */
-      .app-splash-bar {
-        display: block;
-        width: 100%;
-        height: 100%;
-        border-radius: 9999px;
-        transform-origin: left;
-        animation: app-splash-bar 1500ms cubic-bezier(0.4, 0, 0.2, 1)
-          calc(var(--app-splash-block-delay, 1900ms) + 150ms) both;
-      }
-      [dir='rtl'] .app-splash-bar {
-        transform-origin: right;
-      }
+      /* Frame 6: 150ms after the block (2,050ms on the beat) the ticker steps
+         through its three lines while the wordmark's "o" turns. */
       .app-splash-ticker {
         display: block;
         height: 18px;
@@ -454,12 +454,9 @@
           transform: none;
         }
       }
-      @keyframes app-splash-bar {
-        from {
-          transform: scaleX(0);
-        }
+      @keyframes app-splash-turn {
         to {
-          transform: scaleX(1);
+          transform: rotate(360deg);
         }
       }
       @keyframes app-splash-tick {
@@ -476,8 +473,9 @@
           transform: translateY(-36px);
         }
       }
-      /* Reduced motion: every frame lands at once — mark, wordmark, greeting, a
-         full bar and "All set" — and the exit is a cut. */
+      /* Reduced motion: every frame lands at once — mark, wordmark, greeting and
+         "All set" — and the exit is a cut. The loader alone keeps moving, slower
+         (index.css's rule for the Spinner): one standing still reads as a hang. */
       @media (prefers-reduced-motion: reduce) {
         #app-splash,
         #app-splash *,
@@ -491,12 +489,16 @@
         /* The block can land when the exit is already due: draw its end state
            outright rather than race even a 1ms animation to the next frame. */
         .app-splash-block,
-        .app-splash-bar,
         .app-splash-reel {
           animation: none !important;
         }
         .app-splash-reel {
           transform: translateY(-36px);
+        }
+        #app-splash .app-splash-ring,
+        .app-splash-static #app-splash .app-splash-ring {
+          animation-duration: 2.4s !important;
+          animation-iteration-count: infinite !important;
         }
       }
     </style>

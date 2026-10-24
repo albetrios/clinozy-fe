@@ -412,7 +412,7 @@ describe('OrganizationMembersPanel', () => {
     // row's own control has to carry the busy state.
     const trigger = screen.getByTestId('member-actions-mem_1');
     expect(trigger).toHaveAttribute('aria-busy', 'true');
-    expect(trigger.querySelector('.animate-spin')).not.toBeNull();
+    expect(trigger.querySelector('[data-slot="spinner"]')).not.toBeNull();
 
     // Radix closes the menu on select; reopen it and try to pick again.
     await user.click(screen.getByTestId('member-actions-mem_1'));

@@ -39,3 +39,24 @@ describe('Button — the press (change-motion-polish)', () => {
     );
   });
 });
+
+describe('Button — busy', () => {
+  it('draws the one loader before a label that stays as it is', () => {
+    render(<Button isLoading>Send code</Button>);
+    const button = screen.getByRole('button', { name: 'Send code' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button.firstElementChild).toHaveAttribute('data-slot', 'spinner');
+    // Working, not unavailable: aria-busy lifts the disabled dim.
+    expect(button).toHaveClass('disabled:opacity-50', 'aria-busy:disabled:opacity-100');
+  });
+
+  it('draws no loader while idle', () => {
+    render(<Button>Send code</Button>);
+    expect(
+      screen
+        .getByRole('button', { name: 'Send code' })
+        .querySelector('[data-slot="spinner"]'),
+    ).toBeNull();
+  });
+});

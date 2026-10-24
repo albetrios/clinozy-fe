@@ -398,7 +398,6 @@
   --animate-bulk-in: bulk-in 220ms var(--ease-sheet) both;
   --animate-reveal: reveal 240ms var(--ease-out-strong) both;
   --animate-fade: fade-in 150ms var(--ease-out-strong) both;
-  --animate-spinner: spinner 700ms linear infinite;
   --animate-sheet-up: sheet-up 260ms var(--ease-sheet) both;
 
   @keyframes dropdown-in {
@@ -462,11 +461,6 @@
     to {
       opacity: 1;
       transform: none;
-    }
-  }
-  @keyframes spinner {
-    to {
-      transform: rotate(360deg);
     }
   }
   @keyframes sheet-up {
@@ -1315,10 +1309,16 @@
   }
 }
 
-/* The branded loader's bar (BrandLoader): an indeterminate sweep — the boot
-   splash's own frames live in index.html. */
-.animate-boot-progress {
-  animation: route-progress 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+/* The one loader (ui/spinner.tsx, and the wordmark's "o" in BrandLoader): a
+   whole-glyph turn — its ring and dot are round about the centre, so only the
+   arc is seen to move. One tempo everywhere. */
+[data-slot='spinner'] {
+  animation: loader-turn 900ms linear infinite;
+}
+@keyframes loader-turn {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Utility classes (avoid inline styles) ── */
@@ -1730,5 +1730,11 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  /* A loader is the one motion that keeps moving, slower: one standing still
+     reads as a hang. */
+  [data-slot='spinner'] {
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
   }
 }

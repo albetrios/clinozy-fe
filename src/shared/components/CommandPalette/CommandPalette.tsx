@@ -13,6 +13,7 @@ import {
   CommandInput,
   CommandList,
 } from '@/shared/components/ui/command.tsx';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
@@ -339,12 +340,7 @@ function CommandPaletteInput({
       trailing={
         <>
           {searching ? (
-            <span
-              aria-hidden="true"
-              data-slot="pill"
-              data-testid="command-palette-searching"
-              className="border-border border-t-foreground animate-spinner size-3.5 flex-none rounded-full border-2"
-            />
+            <Spinner data-testid="command-palette-searching" className="size-3.5" />
           ) : null}
           <CommandPaletteKbd>{tPicker(PICKER_KEYS.escKey)}</CommandPaletteKbd>
         </>

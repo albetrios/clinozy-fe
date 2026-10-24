@@ -746,11 +746,11 @@ describe('AccountBillingPanel', () => {
     const other = screen.getByTestId('plan-pln_plus');
     expect(pressed).toHaveAttribute('aria-busy', 'true');
     expect(pressed).toBeDisabled();
-    expect(pressed.querySelector('.animate-spin')).not.toBeNull();
+    expect(pressed.querySelector('[data-slot="spinner"]')).not.toBeNull();
     // The others are held, but they are not the thing that is happening.
     expect(other).toBeDisabled();
     expect(other).not.toHaveAttribute('aria-busy', 'true');
-    expect(other.querySelector('.animate-spin')).toBeNull();
+    expect(other.querySelector('[data-slot="spinner"]')).toBeNull();
   });
 
   it('says so when the payment step cannot be started', async () => {
