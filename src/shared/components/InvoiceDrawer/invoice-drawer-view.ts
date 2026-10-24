@@ -24,6 +24,7 @@ import {
   overallDiscountPaise,
   paidNowSplits,
   percentOf,
+  sentLines,
 } from './invoice-form.ts';
 import { coveredSessions } from './invoice-lines.ts';
 
@@ -43,7 +44,7 @@ export interface InvoiceDrawerView {
   saveLabel: string;
   steps: Record<
     InvoiceStepId,
-    { title: string; peek: DrawerPeekItem[]; missing: string[]; complete?: boolean }
+    { title: string; peek: DrawerPeekItem[]; missing: string[]; problems?: string[] }
   >;
 }
 
@@ -169,10 +170,11 @@ function stepsOf(
     },
     items: {
       title: t(medical ? K.steps.medicines : K.steps.items),
-      // The rows are checked on save ("Add at least one item"), never in the head (H:3840) —
-      // but an empty Items step is never done either: grey until a line is named (QA-04).
+      // The save's own rule, on the head too (QA-04): an Items step with nothing the save would
+      // bill — a sale's named lines, an invoice's picked offerings — reads "Add at least one
+      // item" in red once reached, as the stock purchase's does.
       missing: [],
-      complete: lines.length > 0,
+      problems: billedCount(values.items, input.sale) > 0 ? [] : [t(K.errors.addItem)],
       peek: [
         {
           kind: 'items',
@@ -193,6 +195,10 @@ function stepsOf(
     },
   };
 }
+
+/** What the save bills (`use-invoice-save.ts`'s check): a sale's named lines, an invoice's picked offerings. */
+const billedCount = (items: InvoiceFormValues['items'], sale: boolean) =>
+  sale ? namedLines(items).length : sentLines(items).length;
 
 /** The header's words for the drawer's mode: new or edit, invoice or sale (`payments.md:134`). */
 function headerOf(input: InvoiceDrawerViewInput, t: TFunction) {
