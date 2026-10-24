@@ -135,7 +135,8 @@ const dueBadge = (due: string | null, t: TFunction): DrawerBadge =>
 /**
  * The header's badges (`clinic-stock.md:256`): the supplier, the bill, and what
  * is due — a saved purchase's as the server has it, a new one's what its
- * "Paid" leaves of the bill being typed.
+ * "Paid" leaves of the bill being typed. A new purchase that bills nothing yet
+ * is neither due nor paid, so it has no third badge (never a sage "Paid").
  */
 function usePurchaseBadges(
   values: StockPurchaseFormValues,
@@ -149,10 +150,11 @@ function usePurchaseBadges(
   const unpaid = bill - paidOf(values);
   let due: string | null = unpaid > 0 ? formatPaise(unpaid) : null;
   if (saved) due = saved.due > 0 ? formatRupees(saved.due) : null;
+  const billed = saved !== null || bill > 0;
   return [
     { id: 'vendor', label: vendorName ?? t(K.noSupplier), tone: 'sky' },
     { id: 'bill', label: t(K.bill, { amount: formatPaise(bill) }) },
-    dueBadge(due, t),
+    ...(billed ? [dueBadge(due, t)] : []),
   ];
 }
 
