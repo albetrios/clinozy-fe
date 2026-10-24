@@ -1,19 +1,19 @@
 {
   "global": {
-    "title": "Something went wrong",
-    "message": "An unexpected error occurred. Please try reloading the page.",
+    "title": "Something went wrong on our side",
+    "message": "Refresh to try again. If it keeps happening, tell us what you were doing and we’ll look into it.",
     "reload": "Reload page"
   },
   "route": {
-    "notFound": "The page you are looking for does not exist.",
+    "notFound": "The link may be out of date, or the page has moved. Everything else is where you left it.",
     "generic": "Something went wrong.",
     "pageTitle": "This page hit an error",
     "pageMessage": "Something went wrong rendering this page.",
     "tryAgain": "Try again",
     "goHome": "Go home",
     "refresh": "Refresh page",
-    "forbidden": "You do not have permission to access this page.",
-    "forbiddenTitle": "No access to this page",
+    "forbidden": "Your access in this clinic doesn’t include it. If you need it, ask a clinic admin to update your role.",
+    "forbiddenTitle": "This page isn’t open to your role",
     "signOut": "Sign out",
     "signingOut": "Signing out…",
     "pageNotFound": "Page not found",
@@ -183,5 +183,11 @@
     "title": "Organization suspended",
     "message": "This organization is currently suspended. Contact an organization administrator to review billing, or switch to another organization.",
     "switchOrganization": "Switch organization"
+  },
+  "public": {
+    "status": "Error {{status}}",
+    "missingTitle": "We can’t find that page",
+    "goBack": "Go back",
+    "brokenLabel": "Something broke"
   }
 }

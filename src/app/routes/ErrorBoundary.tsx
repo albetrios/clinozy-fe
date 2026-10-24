@@ -67,17 +67,10 @@ export function ErrorBoundary({ error }: { error?: unknown }) {
           headingLevel={1}
           tone={missing ? 'stone' : 'blush'}
           icon={missing ? <Compass /> : <AlertTriangle />}
+          emblem={missing ? 'missing' : 'broken'}
+          label={t(ERRORS_KEYS.public.status, { status: err.status })}
           title={
-            <>
-              {/* The status as the design's 22px neutral pill (TonePill `neutral`, `sm`). */}
-              <span
-                data-slot="pill"
-                className="bg-muted text-muted-foreground-strong text-caption inline-flex h-5.5 items-center rounded-full px-2 leading-none font-medium tabular-nums"
-              >
-                {err.status}
-              </span>
-              {missing ? t(ERRORS_KEYS.route.pageNotFound) : t(ERRORS_KEYS.global.title)}
-            </>
+            missing ? t(ERRORS_KEYS.public.missingTitle) : t(ERRORS_KEYS.global.title)
           }
           description={
             missing
@@ -100,6 +93,8 @@ export function ErrorBoundary({ error }: { error?: unknown }) {
         headingLevel={1}
         tone="blush"
         icon={<AlertTriangle />}
+        emblem="broken"
+        label={t(ERRORS_KEYS.public.brokenLabel)}
         title={t(ERRORS_KEYS.global.title)}
         description={t(ERRORS_KEYS.global.message)}
         actions={

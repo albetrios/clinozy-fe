@@ -194,7 +194,7 @@ describe('AcceptInvitePage', () => {
       await screen.findByTestId('accept-invite-error');
       expect(document.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'blush');
       expect(
-        screen.getByRole('heading', { level: 1, name: 'Invitation problem' }),
+        screen.getByRole('heading', { level: 1, name: 'This invitation can’t be used' }),
       ).toBeInTheDocument();
       expect(screen.getByTestId('accept-invite-retry')).toHaveClass('h-9', 'rounded-lg');
       const login = screen.getByTestId('accept-invite-login');

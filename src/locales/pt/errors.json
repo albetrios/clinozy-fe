@@ -1,19 +1,19 @@
 {
   "global": {
-    "title": "Algo deu errado",
-    "message": "Ocorreu um erro inesperado. Tente recarregar a página.",
+    "title": "Algo deu errado do nosso lado",
+    "message": "Atualize a página para tentar novamente. Se continuar acontecendo, conte-nos o que você estava fazendo e vamos verificar.",
     "reload": "Recarregar página"
   },
   "route": {
-    "notFound": "A página que você procura não existe.",
+    "notFound": "O link pode estar desatualizado ou a página pode ter mudado de lugar. Todo o resto está onde você deixou.",
     "generic": "Algo deu errado.",
     "pageTitle": "Esta página encontrou um erro",
     "pageMessage": "Algo deu errado ao renderizar esta página.",
     "tryAgain": "Tentar novamente",
     "goHome": "Ir para o início",
     "refresh": "Atualizar página",
-    "forbidden": "Você não tem permissão para acessar esta página.",
-    "forbiddenTitle": "Sem acesso a esta página",
+    "forbidden": "Seu acesso nesta clínica não inclui esta página. Se precisar dela, peça a um administrador da clínica para atualizar sua função.",
+    "forbiddenTitle": "Esta página não está disponível para a sua função",
     "signOut": "Sair",
     "signingOut": "Saindo…",
     "pageNotFound": "Página não encontrada",
@@ -183,5 +183,11 @@
     "title": "Organização suspensa",
     "message": "Esta organização está suspensa. Fale com uma pessoa administradora para revisar a cobrança ou mude para outra organização.",
     "switchOrganization": "Trocar de organização"
+  },
+  "public": {
+    "status": "Erro {{status}}",
+    "missingTitle": "Não encontramos essa página",
+    "goBack": "Voltar",
+    "brokenLabel": "Ocorreu um problema"
   }
 }

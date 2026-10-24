@@ -24,6 +24,14 @@ export const ERRORS_KEYS = {
     signOut: 'route.signOut',
     signingOut: 'route.signingOut',
   },
+  /** The public status pages' own words (404, 403, the full-page failure). */
+  public: {
+    /** The label above the heading: "Error 404". */
+    status: 'public.status',
+    missingTitle: 'public.missingTitle',
+    goBack: 'public.goBack',
+    brokenLabel: 'public.brokenLabel',
+  },
   /** Blocked-organization status screen (guard target, not a crash). */
   suspended: {
     title: 'suspended.title',

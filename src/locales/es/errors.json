@@ -1,19 +1,19 @@
 {
   "global": {
-    "title": "Algo salió mal",
-    "message": "Ocurrió un error inesperado. Intenta recargar la página.",
+    "title": "Algo salió mal por nuestra parte",
+    "message": "Actualiza la página para volver a intentarlo. Si sigue pasando, cuéntanos qué estabas haciendo y lo revisaremos.",
     "reload": "Recargar página"
   },
   "route": {
-    "notFound": "La página que buscas no existe.",
+    "notFound": "Puede que el enlace esté desactualizado o que la página se haya movido. Todo lo demás sigue donde lo dejaste.",
     "generic": "Algo salió mal.",
     "pageTitle": "Esta página tuvo un error",
     "pageMessage": "Algo salió mal al renderizar esta página.",
     "tryAgain": "Reintentar",
     "goHome": "Ir al inicio",
     "refresh": "Actualizar página",
-    "forbidden": "No tienes permiso para acceder a esta página.",
-    "forbiddenTitle": "Sin acceso a esta página",
+    "forbidden": "Tu acceso en esta clínica no incluye esta página. Si la necesitas, pide a un administrador de la clínica que actualice tu rol.",
+    "forbiddenTitle": "Esta página no está disponible para tu rol",
     "signOut": "Cerrar sesión",
     "signingOut": "Cerrando sesión…",
     "pageNotFound": "Página no encontrada",
@@ -183,5 +183,11 @@
     "title": "Organización suspendida",
     "message": "Esta organización está suspendida. Contacta con una persona administradora para revisar la facturación o cambia a otra organización.",
     "switchOrganization": "Cambiar de organización"
+  },
+  "public": {
+    "status": "Error {{status}}",
+    "missingTitle": "No encontramos esa página",
+    "goBack": "Volver",
+    "brokenLabel": "Algo falló"
   }
 }

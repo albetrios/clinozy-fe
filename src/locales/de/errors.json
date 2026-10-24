@@ -1,19 +1,19 @@
 {
   "global": {
-    "title": "Etwas ist schiefgelaufen",
-    "message": "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu.",
+    "title": "Bei uns ist etwas schiefgelaufen",
+    "message": "Laden Sie die Seite neu, um es erneut zu versuchen. Wenn das wiederholt passiert, teilen Sie uns mit, was Sie gerade getan haben, und wir sehen uns das an.",
     "reload": "Seite neu laden"
   },
   "route": {
-    "notFound": "Die gesuchte Seite existiert nicht.",
+    "notFound": "Der Link ist möglicherweise veraltet, oder die Seite wurde verschoben. Alles andere ist noch da, wo Sie es gelassen haben.",
     "generic": "Etwas ist schiefgelaufen.",
     "pageTitle": "Diese Seite hat einen Fehler",
     "pageMessage": "Beim Rendern dieser Seite ist etwas schiefgelaufen.",
     "tryAgain": "Erneut versuchen",
     "goHome": "Zur Startseite",
     "refresh": "Seite aktualisieren",
-    "forbidden": "Sie haben keine Berechtigung für diese Seite.",
-    "forbiddenTitle": "Kein Zugriff auf diese Seite",
+    "forbidden": "Ihr Zugriff in dieser Klinik umfasst diese Seite nicht. Wenn Sie sie brauchen, bitten Sie einen Administrator der Klinik, Ihre Rolle anzupassen.",
+    "forbiddenTitle": "Diese Seite ist für Ihre Rolle nicht freigegeben",
     "signOut": "Abmelden",
     "signingOut": "Abmeldung läuft…",
     "pageNotFound": "Seite nicht gefunden",
@@ -183,5 +183,11 @@
     "title": "Organisation gesperrt",
     "message": "Diese Organisation ist derzeit gesperrt. Wenden Sie sich an eine Organisationsadministration, um die Abrechnung zu prüfen, oder wechseln Sie zu einer anderen Organisation.",
     "switchOrganization": "Organisation wechseln"
+  },
+  "public": {
+    "status": "Fehler {{status}}",
+    "missingTitle": "Wir können diese Seite nicht finden",
+    "goBack": "Zurück",
+    "brokenLabel": "Ein Fehler ist aufgetreten"
   }
 }

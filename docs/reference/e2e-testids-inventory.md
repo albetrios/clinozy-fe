@@ -413,6 +413,8 @@ See grep in `src/` or sections above for: `onboarding-*`, `accept-invite-*`, `or
 | `unauthorized-page`            | 403                                                                        |
 | `route-error-boundary`         | Error boundary (route and global)                                          |
 | `fallback-illustration`        | The status pages' empty-state art (`FallbackState`, `RouteErrorBoundary/`) |
+| `fallback-emblem`              | A public status page's emblem (`data-emblem`: missing · locked · broken)   |
+| `not-found-back`               | The 404's "Go back", shown when the tab has a page to return to            |
 | `retry-error` / `retry-button` | A panel's failed read and its retry (`RetryError/`)                        |
 | `widget-error`                 | A section's contained throw — the dashed card (`WidgetErrorBoundary/`)     |
 | `offline-indicator`            | The offline notice pill (root-mounted)                                     |

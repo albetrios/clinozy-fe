@@ -19,15 +19,18 @@ describe('UnauthorizedPage', () => {
     expect(screen.getByRole('link', { name: /go home/i })).toBeInTheDocument();
   });
 
-  it('is the empty state: the 403 pill and "No access to this page" as the page heading', async () => {
+  it('is the public emblem: "Error 403" and the role it is closed to, as the page heading', async () => {
     renderWithProviders(<UnauthorizedPage />);
     const page = await screen.findByTestId('unauthorized-page');
     const heading = screen.getByRole('heading', { level: 1, name: /403/ });
-    expect(heading).toHaveTextContent('No access to this page');
+    expect(heading).toHaveTextContent('Error 403');
+    expect(heading).toHaveTextContent('This page isn’t open to your role');
     expect(
-      screen.getByText('You do not have permission to access this page.'),
+      screen.getByText(
+        'Your access in this clinic doesn’t include it. If you need it, ask a clinic admin to update your role.',
+      ),
     ).toBeInTheDocument();
-    expect(page.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'stone');
+    expect(page.querySelector('[data-emblem]')).toHaveAttribute('data-emblem', 'locked');
   });
 
   it('has no accessibility violations', async () => {

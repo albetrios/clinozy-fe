@@ -387,6 +387,12 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   too.
 - **Restraint.** Icons clarify; they don't decorate. Pair an icon with a label
   unless the glyph is unambiguous and space-constrained.
+- **The wordmark's "o" is the brand's one glyph.** Beyond the loader (§5,
+  Loading States), it marks the public status pages: on the 404 its dot has gone
+  astray, on the 403 a lock sits inside it, on a full-page failure the ring is
+  broken round its dot (`FallbackState` `emblem`, with the status — "Error 404" —
+  as a pill inside the page's heading). In-app error states keep the empty-state
+  illustration.
 
 ## 7. Themeability (one look, two modes)
 
