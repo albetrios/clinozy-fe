@@ -31,7 +31,7 @@ pnpm quality      # health + local SonarQube gate (Docker)
 - **Local setup:** docs/getting-started/setup.md
 - **Requirement intake (format, types, skills, rules):** docs/getting-started/requirement-intake.md — template: docs/getting-started/requirement-format.md, example: docs/getting-started/requirements/sample-requirement.md
 - **Deploy / CI-CD:** docs/deployment/cicd-and-netlify.md, docs/deployment/deployment-and-pre-launch.md; **release + versioning:** docs/process/release-versioning.md
-- **Path to production (gate):** docs/deployment/path-to-production.md
+- **Path to production (gate):** docs/deployment/path-to-production.md — agents run it as `/fe-release` (skill `fe-path-to-production`), after clinozy-be's `/be-release` when the API changed
 - **Netlify CLI setup:** docs/deployment/netlify-cli-setup.md
 - **Credentials / env:** docs/integrations/credentials-and-env.md; **env runbook:** docs/deployment/runbooks/environment-variables.md; Sentry: docs/integrations/sentry-sourcemaps.md
 - **Cursor ↔ backend API (MCP):** agent-os/docs/cursor-backend-mcp.md

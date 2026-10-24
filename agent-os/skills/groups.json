@@ -64,7 +64,8 @@
       "fe-agent-os-authoring",
       "fe-iteration-planning",
       "fe-kickoff-iteration",
-      "fe-design-ditto"
+      "fe-design-ditto",
+      "fe-path-to-production"
     ],
     "external": [
       "animejs",

@@ -28,4 +28,5 @@ it, per the pipeline's `handoff` map: `fe-dependency-auditor → fe-dependency-m
 `fe-bundle-size-reviewer → fe-bundle-performance`, `fe-perf-auditor → fe-bundle-performance`,
 `fe-production-hardening-reviewer → fe-code-quality-security`. Produce one report: satisfied items,
 then the findings by severity — `critical` and `major` block the release, `minor` and `nit` are the
-optional improvements. This is review-only: do not edit files.
+optional improvements. This is review-only: do not edit files. It is step 1 of **`/fe-release`**
+(skill **fe-path-to-production**); clinozy-be runs the same sweep as **`/be-prod-readiness`**.

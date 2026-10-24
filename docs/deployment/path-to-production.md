@@ -17,3 +17,8 @@ flowchart LR
 2. **Complete the pre-launch checklist** — See [deployment-and-pre-launch.md](deployment-and-pre-launch.md#pre-launch-checklist): API URL, auth, CORS, optional Sentry/PostHog, HTTPS.
 
 Do not proceed with deployment or release until these are done and reviewed as needed.
+
+Agents run the whole procedure, readiness plan to live, as **`/fe-release`** (skill
+`agent-os/skills/fe-path-to-production/SKILL.md`): the Release PR is opened on demand, the
+production deploy waits for the `production` reviewer in GitHub, and the frontend goes after
+clinozy-be's `/be-release` whenever the release calls anything new in the API.
