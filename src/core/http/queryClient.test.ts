@@ -20,7 +20,7 @@ vi.mock('@/core/http/fetch-client.ts', () => ({
 import { reportError } from '@/shared/errors/errorHandler.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
-import { queryClient } from './queryClient.ts';
+import { keyHead, queryClient } from './queryClient.ts';
 
 /** A query object shaped the way the cache callback reads it. */
 function fakeQuery(meta?: Record<string, unknown>) {
@@ -45,6 +45,28 @@ describe('queryClient', () => {
     const mutation = { options: { mutationKey: ['m'], meta: undefined } } as never;
     onError?.(new Error('boom'), undefined, undefined, mutation);
     expect(reportError).toHaveBeenCalled();
+  });
+
+  // SEC-01: a people search's key ends with what was typed — Sentry hears its first words only.
+  it('reports a query or mutation by its key’s leading words, never a typed search', () => {
+    expect(
+      keyHead(['app', 'contacts', 'org_acme', 'search', 'everyone', '9876543210']),
+    ).toBe('app,contacts');
+    expect(keyHead(['app', 'invoice-previews', null, { q: 'x' }])).toBe(
+      'app,invoice-previews',
+    );
+    expect(keyHead(undefined)).toBe('unknown');
+    vi.mocked(reportError).mockClear();
+    const onError = queryClient.getQueryCache().config.onError;
+    const search = {
+      queryKey: ['app', 'contacts', 'org_acme', 'search', 'everyone', 'Priya'],
+      queryHash: 'h',
+      meta: undefined,
+    } as never;
+    onError?.(new Error('boom'), search);
+    expect(reportError).toHaveBeenCalledWith(expect.any(Error), {
+      queryKey: 'app,contacts',
+    });
   });
 
   describe('the failure surface for a query that opts in (X-1 / X-3)', () => {

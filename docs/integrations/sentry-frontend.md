@@ -201,11 +201,15 @@ Issues then show **original TypeScript** stack frames. See
 All outgoing events pass through scrubbers in `lib/telemetry-scrub.ts`:
 
 - **Every query string and fragment** is dropped from `request.url` (the httpClient
-  integration sets it past `dataCollection`), breadcrumb data and span / trace data — a
-  room's search (`?q=`) holds a patient's name or mobile, a reset link's `?token=` a secret
+  integration sets it past `dataCollection`), breadcrumb data, span data, the extras
+  (`reportError`'s `url`) and every context (the trace's, and `HttpError`'s own fields that
+  extraErrorData copies) — a room's search (`?q=`) holds a patient's name or mobile, a reset
+  link's `?token=` a secret
+- **Query and mutation keys** are reported by their leading words only (`app,contacts`): a
+  people search's key ends with what was typed
 - **UI input breadcrumbs** → message replaced with `[Filtered]`
 - **No PII in user object** — id only
-- **No API response bodies** in error extras
+- **No API response bodies** in error extras or contexts: `HttpError.data` is not enumerable
 - **`dataCollection` — every category off**: no IP inference (`userInfo`), cookies,
   headers, request/response bodies, query params, GraphQL / gen-AI payloads or local
   variables. Sentry v11 replaced `sendDefaultPii` with this option, and its defaults

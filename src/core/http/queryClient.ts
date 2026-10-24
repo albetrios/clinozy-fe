@@ -11,6 +11,20 @@ import {
 import { isClientRefusal } from '@/shared/errors/HttpError.ts';
 
 /**
+ * What Sentry hears of a query or mutation key: its leading words (`app,contacts`), never
+ * what follows them — an organization, an id, a filter, or a typed search
+ * (`contactQueryKeys.search` ends with what the person typed).
+ */
+export function keyHead(key: readonly unknown[] | undefined): string {
+  const words: string[] = [];
+  for (const part of key ?? []) {
+    if (typeof part !== 'string' || !/^[a-z][a-z-]*$/.test(part)) break;
+    words.push(part);
+  }
+  return words.join(',') || 'unknown';
+}
+
+/**
  * TanStack Query client.
  *
  * IMPORTANT: 401 refresh logic lives ONLY in the fetch client (fetch-client.ts).
@@ -42,7 +56,7 @@ export const queryClient = new QueryClient({
         if (platformConfig.debugLogging) {
           console.error(`[Query Error] ${query.queryKey.toString()}:`, error.message);
         }
-        reportError(error, { queryKey: query.queryKey.toString() });
+        reportError(error, { queryKey: keyHead(query.queryKey) });
         // Queries that set meta.notifyOnError surface ONE toast (de-duped by
         // query hash) carrying a Retry that refetches this exact query. This is
         // the failure surface for anything that must not move the layout it
@@ -62,11 +76,11 @@ export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
     onError: (error, _variables, _context, mutation) => {
       if (!isUnauthorized(error)) {
-        const key = mutation.options.mutationKey?.toString() ?? 'unknown';
         if (platformConfig.debugLogging) {
+          const key = mutation.options.mutationKey?.toString() ?? 'unknown';
           console.error(`[Mutation Error] ${key}:`, error.message);
         }
-        reportError(error, { mutationKey: key });
+        reportError(error, { mutationKey: keyHead(mutation.options.mutationKey) });
         // Opt-in: mutations that set meta.notifyOnError surface a toast (hooks
         // that already toast inline simply omit the flag — no double toast).
         if (mutation.options.meta?.notifyOnError === true) {
