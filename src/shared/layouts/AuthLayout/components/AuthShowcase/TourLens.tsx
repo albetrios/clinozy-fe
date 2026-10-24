@@ -22,11 +22,16 @@ import { addMinutes, type TourDay } from './tour-day.ts';
 import { type TourFormat, useTourFormat } from './tour-format.ts';
 
 /** What every scene gets: whether it plays, the day, the clock and the formatters. */
-interface SceneProps {
+interface SceneContext {
   live: boolean;
   day: TourDay;
   now: Date;
   format: TourFormat;
+}
+
+/** A scene's props: one context, each scene reading the parts it draws. */
+interface SceneProps {
+  scene: SceneContext;
 }
 
 /**
@@ -74,7 +79,8 @@ function LensAvatar({
 }
 
 /** Leads: Riya's Instagram message types itself in, and she becomes a lead. */
-function LeadsScene({ live, now, format }: SceneProps) {
+function LeadsScene({ scene }: SceneProps) {
+  const { live, now, format } = scene;
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const arrived = useLater(live, false, true, 1100);
   const filed = useLater(live, false, true, 1600);
@@ -106,7 +112,8 @@ function LeadsScene({ live, now, format }: SceneProps) {
 }
 
 /** Appointments: the selection glides from the last free slot to the earliest. */
-function AppointmentsScene({ live, day, format }: SceneProps) {
+function AppointmentsScene({ scene }: SceneProps) {
+  const { live, day, format } = scene;
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const slots = [
     { at: 0, taken: true },
@@ -166,7 +173,8 @@ function AppointmentsScene({ live, day, format }: SceneProps) {
 }
 
 /** Front desk: the doctor's bell rings and the wait starts counting. */
-function FrontDeskScene({ live, format }: SceneProps) {
+function FrontDeskScene({ scene }: SceneProps) {
+  const { live, format } = scene;
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const seconds = useSeconds(live, 7);
   return (
@@ -189,7 +197,8 @@ function FrontDeskScene({ live, format }: SceneProps) {
 }
 
 /** Patient file: the prescription writes itself, a character at a time. */
-function PatientFileScene({ live, format }: SceneProps) {
+function PatientFileScene({ scene }: SceneProps) {
+  const { live, format } = scene;
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const line = t(K.lens.patientFile.line);
   const [typed, setTyped] = useState(live ? 0 : line.length);
@@ -235,7 +244,8 @@ function PatientFileScene({ live, format }: SceneProps) {
 }
 
 /** Treatment: the package's first session dot fills. */
-function TreatmentScene({ live, day, format }: SceneProps) {
+function TreatmentScene({ scene }: SceneProps) {
+  const { live, day, format } = scene;
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   return (
     <>
@@ -274,7 +284,8 @@ function TreatmentScene({ live, day, format }: SceneProps) {
 }
 
 /** Payments: the bill, paid by UPI, its total counting up. */
-function PaymentsScene({ live, format }: SceneProps) {
+function PaymentsScene({ scene }: SceneProps) {
+  const { live, format } = scene;
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const [shown, setShown] = useState(live ? 0 : format.bill);
   useEffect(() => {
@@ -330,7 +341,8 @@ function PaymentsScene({ live, format }: SceneProps) {
 }
 
 /** Tasks: the follow-up call drops onto the front desk's list. */
-function TasksScene({ live, day, format }: SceneProps) {
+function TasksScene({ scene }: SceneProps) {
+  const { live, day, format } = scene;
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   return (
     <>
@@ -422,7 +434,7 @@ export function TourLens({
       data-testid={AUTH_SHOWCASE_TEST_IDS.lens}
       data-chapter={chapter}
     >
-      <Scene live={live} day={day} now={now} format={format} />
+      <Scene scene={{ live, day, now, format }} />
     </div>
   );
 }

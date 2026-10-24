@@ -109,7 +109,8 @@ function TourBar({ tour }: { tour: ReturnType<typeof useTour> }) {
   const steps = TOUR_CHAPTERS.length;
   return (
     <div className="tour-bar" data-testid={AUTH_SHOWCASE_TEST_IDS.tour}>
-      <div role="group" aria-label={t(K.tour.steps, { steps })} className="tour-steps">
+      <fieldset className="tour-steps">
+        <legend className="sr-only">{t(K.tour.steps, { steps })}</legend>
         {TOUR_CHAPTERS.map((chapter, index) => (
           <button
             key={chapter.id}
@@ -129,7 +130,7 @@ function TourBar({ tour }: { tour: ReturnType<typeof useTour> }) {
             <span data-slot="pill" className="tour-step-fill" />
           </button>
         ))}
-      </div>
+      </fieldset>
       {tour.autoplay ? (
         <button
           type="button"
@@ -311,7 +312,7 @@ function TourSheet({
   const story = TOUR_STORY[current.id];
   const freeSlot = day.open ? K.sheet.freeToday : K.sheet.freeTomorrow;
   return (
-    <div
+    <div // NOSONAR(S6819): a drawn Today sheet of many decorative parts, named once — an <img> cannot hold them
       role="img"
       aria-label={t(K.sheet.label, { productName: PRODUCT_NAME })}
       className="tour-glimpse"
