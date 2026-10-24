@@ -44,6 +44,7 @@ import {
   startConsentFollow,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
+import { startViewAsWriteHold } from '@/shared/store/useUIStore/index.ts';
 import { resolveOrganizationFromSubdomain } from '@/shared/tenancy/tenancy-service.ts';
 
 import App from './App.tsx';
@@ -174,6 +175,10 @@ initObservabilityWhenIdle();
 // The cookie answer is this browser's (claude.com's model): no sign-in or sign-out touches it.
 // Follow another tab's answer when this one is shown again, and drop the launch's stored answer.
 startConsentFollow();
+
+// View-as previews what a role sees; the clinic's writes stay here while it runs, since they
+// would go out as the signed-in member.
+startViewAsWriteHold();
 
 // Recover from a lazy chunk that a newer deploy has already renamed away: one
 // reload onto the current build per buildId, never over a field being typed in.

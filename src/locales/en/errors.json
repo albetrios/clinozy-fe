@@ -105,6 +105,9 @@
       "notConfirmed": "The file couldn't be verified after upload. Try uploading it again.",
       "invalidFileName": "Rename the file and try again: its name can't contain slashes, “..” or control characters."
     },
+    "viewAs": {
+      "readOnly": "Previews are read-only, so nothing was saved. Exit preview to make changes."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Could not add passkey",

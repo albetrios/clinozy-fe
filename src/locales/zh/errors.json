@@ -105,6 +105,9 @@
       "notConfirmed": "上传后无法验证该文件。请重新上传。",
       "invalidFileName": "请重命名文件后重试：文件名不能包含斜杠、“..”或控制字符。"
     },
+    "viewAs": {
+      "readOnly": "预览为只读，因此未保存任何内容。请退出预览后再进行更改。"
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "无法添加通行密钥",

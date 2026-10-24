@@ -105,6 +105,9 @@
       "notConfirmed": "Die Datei konnte nach dem Hochladen nicht geprüft werden. Versuchen Sie, sie erneut hochzuladen.",
       "invalidFileName": "Benennen Sie die Datei um und versuchen Sie es erneut: Der Name darf keine Schrägstriche, „..“ oder Steuerzeichen enthalten."
     },
+    "viewAs": {
+      "readOnly": "Die Vorschau ist schreibgeschützt, daher wurde nichts gespeichert. Beenden Sie die Vorschau, um Änderungen vorzunehmen."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Passkey konnte nicht hinzugefügt werden",

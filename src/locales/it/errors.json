@@ -105,6 +105,9 @@
       "notConfirmed": "Impossibile verificare il file dopo il caricamento. Prova a caricarlo di nuovo.",
       "invalidFileName": "Rinomina il file e riprova: il nome non può contenere barre, «..» o caratteri di controllo."
     },
+    "viewAs": {
+      "readOnly": "L’anteprima è di sola lettura, quindi non è stato salvato nulla. Esci dall’anteprima per apportare modifiche."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Impossibile aggiungere la passkey",
