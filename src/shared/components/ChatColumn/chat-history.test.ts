@@ -28,6 +28,7 @@ import {
   chatWhenLabel,
   historyChip,
   historyText,
+  threadDivider,
   threadEntries,
 } from './chat-history.ts';
 
@@ -472,5 +473,20 @@ describe('the thread as drawn (threadEntries)', () => {
       ['history', `task:${UNTOLD}`],
       ['system', '00000000-0000-4000-8000-0000000000a2'],
     ]);
+  });
+});
+
+describe('the divider (threadDivider, H:5785)', () => {
+  it('says "no lead" only for a person without one', () => {
+    expect(threadDivider(null, true, formatWith())).toBe('Patient · chat only · no lead');
+    expect(threadDivider(null, false, formatWith())).toBe(
+      'Contact · chat only · no lead',
+    );
+  });
+
+  it('never denies a lead the host knows of but could not read — it names the way they came (QA-02)', () => {
+    expect(threadDivider(null, true, formatWith(), { hasLead: true })).toBe(
+      'Lead → appointment → patient',
+    );
   });
 });

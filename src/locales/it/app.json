@@ -651,6 +651,7 @@
     "created": {
       "lead": "Lead creato · {{time}} · tramite {{source}}",
       "patientThread": "Paziente · solo chat · nessun lead",
+      "leadJourney": "Lead → appuntamento → paziente",
       "contactThread": "Contatto · solo chat · nessun lead"
     },
     "history": {

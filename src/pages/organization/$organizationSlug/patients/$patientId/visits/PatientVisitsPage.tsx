@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { APPOINTMENT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { usePersonAppointments } from '@/shared/hooks/useAppointments/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
@@ -26,7 +27,8 @@ import { manifest } from './visits.manifest.ts';
  * (`GET /app/appointments?contact_id=`, every page) — ID · When · Offering ·
  * Doctor · Status with the status's start bar, "3 appointments" and "All
  * appointments loaded". "New appointment" opens the appointment form for this
- * person; a row opens nothing.
+ * person; a row opens nothing. A failed read says so with Retry — never "No
+ * appointments yet".
  */
 export function PatientVisitsPage() {
   const { t } = useTranslation(PATIENT_TABLE_NS);
@@ -47,18 +49,25 @@ export function PatientVisitsPage() {
       }
       className="flex flex-col"
     >
-      <PatientSectionTable
-        section="visits"
-        table={table}
-        loading={visits.isPending}
-        countLabel={
-          rows.length > 0
-            ? t(PATIENT_TABLE_KEYS.visits.count, { count: rows.length })
-            : undefined
-        }
-        minWidth={760}
-        rowTone={(row) => APPOINTMENT_STATUS_TONES[row.status]}
-      />
+      {visits.isError ? (
+        <RetryError
+          onRetry={() => void visits.refetch()}
+          isRetrying={visits.isFetching}
+        />
+      ) : (
+        <PatientSectionTable
+          section="visits"
+          table={table}
+          loading={visits.isPending}
+          countLabel={
+            rows.length > 0
+              ? t(PATIENT_TABLE_KEYS.visits.count, { count: rows.length })
+              : undefined
+          }
+          minWidth={760}
+          rowTone={(row) => APPOINTMENT_STATUS_TONES[row.status]}
+        />
+      )}
     </PatientSection>
   );
 }

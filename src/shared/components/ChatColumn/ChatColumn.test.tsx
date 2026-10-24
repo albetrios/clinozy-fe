@@ -357,6 +357,23 @@ describe('no conversation yet', () => {
   });
 });
 
+describe('a member who may read but not write (QA-07)', () => {
+  it('shows the thread without the composer, the starters or "Book"', async () => {
+    renderChat({
+      person: ANAYA,
+      contact: ANAYA_CONTACT,
+      canSend: false,
+      onBookAppointment: vi.fn(),
+    });
+    expect(await screen.findByTestId(ids.divider)).toBeInTheDocument();
+    expect(screen.queryByTestId(ids.composer)).not.toBeInTheDocument();
+    expect(screen.queryByTestId(ids.textarea)).not.toBeInTheDocument();
+    expect(screen.queryByTestId(ids.send)).not.toBeInTheDocument();
+    expect(screen.queryByTestId(ids.book)).not.toBeInTheDocument();
+    expect(screen.queryAllByTestId(ids.starter)).toHaveLength(0);
+  });
+});
+
 describe('drafts (KICKOFF §3.5)', () => {
   it('keeps each person’s unsent text and brings it back on return', async () => {
     const user = userEvent.setup();

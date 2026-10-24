@@ -23,6 +23,7 @@ import type { Contact } from '@/shared/api/app/contacts-contracts.ts';
 import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import { CONFIRM_TEST_IDS } from '@/shared/components/ConfirmDialog/index.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAppointment } from '@/shared/hooks/useAppointments/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -65,11 +66,15 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
+/** Whether the member may write to the person's stream (`contact_activity:create`). */
+const stream = vi.hoisted(() => ({ reads: true, writes: true }));
 vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
   useAppAccess: () => ({
     previewRole: null,
     can: () => true,
-    canCode: () => true,
+    canCode: (code: string) =>
+      (code !== 'contact_activity:create' || stream.writes) &&
+      (code !== 'contact_activity:read' || stream.reads),
     viewableSections: [],
     isResolved: true,
   }),
@@ -459,6 +464,8 @@ beforeEach(async () => {
   viewport.tier = 'desktop';
   viewport.width = 1440;
   vi.resetAllMocks();
+  stream.reads = true;
+  stream.writes = true;
   world.appointments = [];
   world.slots = new Map();
   world.contacts = [structuredClone(RIYA)];
@@ -821,7 +828,31 @@ describe('AppointmentForm — Edit (KICKOFF §6.4)', () => {
     );
     expect(within(panel).getByTestId(`${EDIT}-save`)).toBeDisabled();
     expect(within(panel).getByTestId(IDS.chat)).toBeInTheDocument();
+    expect(await within(panel).findByTestId('chat-textarea')).toBeInTheDocument();
     expect(await axeForDialog(panel)).toHaveNoViolations();
+  });
+
+  // QA-07's pattern: a member who reads the stream but may not write it had a composer the server
+  // refused.
+  // Decided with the owner: a member who may not read the person's stream sees no chat at all.
+  it('opens a booking without the chat for a member who may not read the person’s stream', async () => {
+    stream.reads = false;
+    renderBooking(BOOKING);
+    const panel = await form(EDIT);
+    expect(within(panel).getByTestId(`${EDIT}-title`)).toHaveTextContent(
+      'Appointment #2861',
+    );
+    expect(within(panel).queryByTestId(IDS.chat)).not.toBeInTheDocument();
+  });
+
+  it('shows the chat without a composer to a member who may not write to the person', async () => {
+    stream.writes = false;
+    renderBooking(BOOKING);
+    const panel = await form(EDIT);
+    const chat = within(panel).getByTestId(IDS.chat);
+    // The thread is read — its divider is up — and has no composer under it.
+    expect(await within(chat).findByTestId('chat-thread-divider')).toBeInTheDocument();
+    expect(within(chat).queryByTestId('chat-textarea')).not.toBeInTheDocument();
   });
 
   it('confirms through the confirm route — no field is sent', async () => {
@@ -1098,5 +1129,107 @@ describe('AppointmentForm — the width (KICKOFF §6.4)', () => {
     renderBooking(BOOKING);
     const panel = await form(EDIT);
     expect(within(panel).queryByTestId(IDS.chat)).not.toBeInTheDocument();
+  });
+});
+
+describe('AppointmentForm — a booking that has to be tried again (WF-01)', () => {
+  /** A refusal in clinozy-be's error envelope. */
+  const refusal = (path: string, reason: string, detail: string) =>
+    new HttpError(detail, 409, path, 'POST', { error: { reason, detail } });
+
+  it('books a new person whose slot was just taken on another slot — as the contact the first try made', async () => {
+    const user = setUser();
+    const makeContact = vi.mocked(createContact).getMockImplementation();
+    if (!makeContact) throw new Error('createContact has no world implementation');
+    // clinozy-be: the person's number, sent again, is that contact's now (CT3).
+    vi.mocked(createContact)
+      .mockImplementationOnce(makeContact)
+      .mockRejectedValue(
+        refusal(
+          '/app/contacts',
+          'contact_phone_exists',
+          '+919811122233 is already on Meera Iyer (C-1300)',
+        ),
+      );
+    vi.mocked(createAppointment).mockRejectedValueOnce(
+      refusal(
+        '/app/appointments',
+        'slot_taken',
+        'The doctor is already booked at this time',
+      ),
+    );
+    const { onSaved } = renderNew({ prefill: { date: '2026-10-05' } });
+    const panel = await form(NEW);
+    await user.type(within(panel).getByTestId(IDS.whoSearch), 'Meera Iyer');
+    await user.click(await within(panel).findByTestId(IDS.whoCreate));
+    await user.type(
+      within(panel).getByTestId(`${IDS.who}-quick-add-mobile`),
+      '9811122233',
+    );
+    await user.click(within(panel).getByTestId(`${IDS.who}-quick-add-submit`));
+    await user.click(await slotAt(panel, '11:00'));
+    await user.click(within(panel).getByTestId(`${NEW}-save`));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith('Just taken · pick another slot'),
+    );
+    // The card is that contact now, not "New contact · add their mobile to book".
+    await waitFor(() =>
+      expect(within(panel).getByTestId(IDS.whoCard)).not.toHaveTextContent('New contact'),
+    );
+    await user.click(await slotAt(panel, '14:00'));
+    await user.click(within(panel).getByTestId(`${NEW}-save`));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
+    expect(createContact).toHaveBeenCalledOnce();
+    expect(
+      vi
+        .mocked(createAppointment)
+        .mock.calls.map(([vars]) => [vars.input.contactId, vars.input.startTime]),
+    ).toEqual([
+      ['con_meera0000000000000000', '11:00'],
+      ['con_meera0000000000000000', '14:00'],
+    ]);
+  });
+});
+
+describe('AppointmentForm — the grid of a booking being moved (WF-02)', () => {
+  it('asks a Reschedule’s grid without the booking itself: its start is offered, and again after another day', async () => {
+    const user = setUser();
+    // clinozy-be: the booking (10:30, 20 min) blocks 10:15–10:45 — unless it is the one moved.
+    vi.mocked(fetchAppointmentSlots).mockImplementation(async (params) =>
+      slotDay(
+        params.date,
+        params.excludeAppointmentId === BOOKING.id
+          ? ['10:00', '10:15', '10:30', '10:45', '11:00']
+          : ['10:00', '11:00'],
+      ),
+    );
+    renderBooking(BOOKING, { mode: 'reschedule' });
+    const panel = await form(EDIT);
+    await waitFor(() =>
+      expect(fetchAppointmentSlots).toHaveBeenCalledWith(
+        expect.objectContaining({ date: BOOKING.date, excludeAppointmentId: BOOKING.id }),
+      ),
+    );
+    expect(await slotAt(panel, '10:30')).toHaveAttribute('aria-checked', 'true');
+    await user.click(await slotAt(panel, '10:45')); // overlaps only itself
+    expect(within(panel).getByTestId(`${EDIT}-save`)).toHaveTextContent(/^Move to /);
+    const calendar = within(panel).getByTestId(IDS.calendar);
+    await user.click(calendarDay(calendar, '2026-10-06'));
+    await user.click(calendarDay(calendar, BOOKING.date));
+    await user.click(await slotAt(panel, '10:30'));
+    expect(within(panel).getByTestId(`${EDIT}-save`)).not.toHaveTextContent(
+      'Pick a time',
+    );
+  });
+
+  it('asks a New booking’s grid with no booking left out', async () => {
+    renderNew({ prefill: { date: '2026-10-05' } });
+    const panel = await form(NEW);
+    await slotAt(panel, '11:00');
+    expect(
+      vi
+        .mocked(fetchAppointmentSlots)
+        .mock.calls.every(([params]) => params.excludeAppointmentId === undefined),
+    ).toBe(true);
   });
 });

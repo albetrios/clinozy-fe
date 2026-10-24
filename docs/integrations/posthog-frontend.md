@@ -54,7 +54,9 @@ flowchart TB
 | Web Vitals    | `app/observability/performance.ts`        | `web_vital` events                                |
 
 **Privacy:** `autocapture: false`, `disable_session_recording: true`, no emails in
-`identify()`. URLs scrubbed via `lib/telemetry-scrub.ts` (`?token=` → `[Filtered]`).
+`identify()`. Every URL in an event — `properties`, `$set` and `$set_once` — loses its query
+string and fragment in `before_send` (`lib/telemetry-scrub.ts`): the rooms write a search
+(`?q=` — a patient's name, mobile or #ID) and create-drawer prefills into the query.
 
 ---
 
@@ -151,7 +153,7 @@ Never with patient data — only steps, items, outcomes and a duration.
 
 | Event          | When                         | Extra properties              |
 | -------------- | ---------------------------- | ----------------------------- |
-| `$pageview`    | PostHog automatic            | Scrubbed `$current_url`       |
+| `$pageview`    | PostHog automatic            | `$current_url` (no query)     |
 | `route_viewed` | TanStack Router `onResolved` | `path` (no query), `route_id` |
 
 Settings hash routes (`#settings/...`) do **not** emit `route_viewed` duplicates —

@@ -39,6 +39,15 @@ export function isUnauthorized(error: unknown): boolean {
 }
 
 /**
+ * Whether the server answered and refused (a 4xx): asking again the same way gets the same
+ * answer, so the screen says why and keeps the draft, with no Retry. A dropped connection —
+ * the fetch client's status 0 — and a 5xx are failures to try again, never a refusal.
+ */
+export function isClientRefusal(error: unknown): error is HttpError {
+  return isHttpError(error) && error.status >= 400 && error.status < 500;
+}
+
+/**
  * Check if an error is a 404 — the record is unknown or deleted, so asking
  * again won't change it (no retry; "<Record> not found"). Anything else — a
  * dropped connection, a 5xx — is a failure to show, not a missing record.

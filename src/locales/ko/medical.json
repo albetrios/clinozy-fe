@@ -571,6 +571,8 @@
         "addMedicine": "의약품 추가",
         "newMedicine": "새 의약품",
         "enterRate": "구매 단가를 입력하세요",
+        "addLine": "품목을 하나 이상 추가하세요",
+        "tooManyLines": "한 번의 구매에는 최대 {{max}}개 품목까지 넣을 수 있어요",
         "peek_other": "의약품 {{count}}개 · {{amount}}",
         "quickLine": "의약품, 수량, 무상, 단가 입력 · 예: azel 20 +2 @180",
         "quickHint": "20 = 수량 · +2 = 무상 · @180 = 단가",

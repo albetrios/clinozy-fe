@@ -299,7 +299,7 @@ See docs/getting-started/new-project.md.`);
     // agent-os docs: "Core Philosophy", "Core Concepts", "Core Pattern" — and worst,
     // "Core Layer", which names the `src/core/` architecture layer, became
     // "<Product> Layer". User-visible branding does not rely on this pass: it comes
-    // from the 17 structural surfaces and the {{productName}} i18n variable.
+    // from the 19 structural surfaces and the {{productName}} i18n variable.
     // Each pair's matcher is chosen by token SHAPE (see patternFor): kebab slugs
     // match case-INSENSITIVELY and preserve capitalisation, UPPER_SNAKE matches
     // suffixed forms, camelCase matches identifier prefixes.

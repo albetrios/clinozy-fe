@@ -71,6 +71,11 @@ import { AUTH_EMAIL_VERIFICATION_CODE_RESEND_COOLDOWN_MS } from './auth-form.con
 import type { AuthContinuePending } from './auth-form-pending.ts';
 import { AuthEmailPanel } from './AuthEmailPanel.tsx';
 
+/** Every locale's sign-in copy — the code's visible label and its accessible name. */
+const AUTH_BUNDLES = import.meta.glob<{
+  auth: { email: { codeLabel: string; codeAria: string } };
+}>('/src/locales/*/auth.json', { eager: true, import: 'default' });
+
 function createTestRouter(component: () => ReactNode = () => <AuthEmailPanel />) {
   const rootRoute = createRootRoute({ component: () => <Outlet /> });
   const indexRoute = createRoute({
@@ -205,6 +210,43 @@ describe('AuthEmailPanel', () => {
     await screen.findByTestId('auth-email-verify-panel');
     expect(await screen.findByTestId('auth-email-code')).toHaveValue('');
   });
+
+  // QA-01: the input took letters, but its name said "6-digit".
+  it('names the code by its visible label and its real alphabet, and verifies a code with letters', async () => {
+    const user = userEvent.setup();
+    const router = createTestRouter();
+    render(<RouterProvider router={router} />);
+
+    await user.type(await screen.findByTestId('auth-email'), 'user@example.com');
+    await user.click(screen.getByTestId('auth-email-submit'));
+    await screen.findByTestId('auth-email-verify-panel');
+
+    const codeInput = screen.getByRole('textbox', {
+      name: 'Enter verification code, 6 letters or numbers',
+    });
+    expect(codeInput).toBe(screen.getByTestId('auth-email-code'));
+    expect(codeInput).toHaveAttribute('inputmode', 'text');
+    expect(codeInput).not.toHaveAccessibleName(/digit/i);
+
+    // clinozy-be draws the code from letters and digits (`VERIFICATION_CODE_CHARSET`).
+    await user.type(codeInput, 'k7mq2x');
+    await waitFor(() =>
+      expect(emailLogin).toHaveBeenCalledWith({
+        email: 'user@example.com',
+        code: 'k7mq2x',
+      }),
+    );
+  });
+
+  // WCAG 2.5.3: the name a screen reader and voice control use starts with the words on screen.
+  it.each(Object.keys(AUTH_BUNDLES))(
+    '%s: the code’s name starts with its visible label',
+    (path) => {
+      const { codeLabel, codeAria } = AUTH_BUNDLES[path]?.auth.email ?? {};
+      expect(codeAria?.startsWith(codeLabel ?? '\u0000')).toBe(true);
+      expect(codeAria).toContain('6');
+    },
+  );
 
   it('verifies the code and establishes a session', async () => {
     const user = userEvent.setup();

@@ -5,6 +5,9 @@ import {
   ChatColumn,
   type ChatHistoryTarget,
 } from '@/shared/components/ChatColumn/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
+import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 /** The Activity column's test id. */
@@ -28,7 +31,11 @@ export interface PatientActivityProps {
  * contact's, which their lead shares), with the history pills and the
  * composer; "Send via" shows icons only, the column being under
  * 460px. Below `md` the card loses its radius and side borders and takes the
- * whole body (the layout hides the main card).
+ * whole body (the layout hides the main card). The divider names the lead the
+ * file came from (`lead_id`, P10) for a member who reads leads, and never says
+ * "no lead" for a patient who has one. The layout mounts it only for a member
+ * who reads the stream (`contact_activity:read`); the composer needs
+ * `contact_activity:create` — the codes in force, a View-as preview's too.
  */
 export function PatientActivity({
   file,
@@ -39,6 +46,13 @@ export function PatientActivity({
 }: PatientActivityProps) {
   const phone = useViewportTier() === 'phone';
   const { patient } = file;
+  const access = useAppAccess();
+  // A lead of another branch is a 404 to this member: the divider then only says there was one.
+  const lead = useLead(
+    access.canCode('lead:read') ? (patient.leadId ?? undefined) : undefined,
+    { notifyOnError: false },
+  ).data;
+  const stream = useContactActivityAccess();
   return (
     <div
       data-slot={phone ? 'patient-activity' : 'card'}
@@ -56,7 +70,20 @@ export function PatientActivity({
           isPatient: true,
           instagram: file.instagram,
         }}
+        lead={
+          lead
+            ? {
+                leadId: lead.id,
+                kind: lead.kind,
+                createdAt: lead.createdAt,
+                source: lead.source,
+                patientId: lead.patientId,
+              }
+            : undefined
+        }
+        hasLead={patient.leadId !== null}
         maskMoney={masked}
+        canSend={stream.writes}
         onOpenHistory={onOpenHistory}
         onBookAppointment={onBookAppointment ? () => onBookAppointment() : undefined}
       />

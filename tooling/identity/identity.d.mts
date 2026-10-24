@@ -22,6 +22,8 @@ export interface Identity {
   backgroundColor: string;
   /** Default CODEOWNERS handle (`@user` or `@org/team`). */
   codeowner: string;
+  /** Private security-report mailbox (SECURITY.md, CODE_OF_CONDUCT.md); never a reserved domain. */
+  securityContact: string;
   /** GitHub `owner/repo` slug. */
   repository: string;
   /** Sibling backend repo this app calls (`clinozy-be`) — renamed with the product. */
@@ -50,6 +52,9 @@ export interface DerivedSurface {
 
 /** Repo root resolved from this module's location. */
 export const ROOT: string;
+
+/** An address on a name reserved for documentation (RFC 2606 / RFC 6761) — a placeholder. */
+export const RESERVED_EMAIL_DOMAIN: RegExp;
 
 /** Load and validate the identity block from `setup.config.json`. */
 export function loadIdentity(root?: string): Identity;

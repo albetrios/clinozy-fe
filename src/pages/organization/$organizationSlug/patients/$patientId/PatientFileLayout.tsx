@@ -21,6 +21,7 @@ import { SkeletonBar, SkeletonRows } from '@/shared/components/SkeletonRows/inde
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { isNotFound } from '@/shared/errors/HttpError.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePatientFile } from '@/shared/hooks/usePatientFile/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
@@ -175,7 +176,8 @@ function PatientFileBody({
   activity,
 }: {
   file: PatientFile;
-  activity: { open: boolean; toggle: () => void };
+  /** `toggle` is absent for a member who may not read the stream: no column, no button. */
+  activity: { open: boolean; toggle?: () => void };
 }) {
   const phone = useViewportTier() === 'phone';
   const { preferences, update } = usePreferences();
@@ -254,7 +256,9 @@ function PatientFileBody({
  * main card. The tiers switch on `data-activity` — no width reads. It holds
  * the file's money mask (masked, never persisted, reset per patient), sends
  * Esc back to the list when nothing else takes it, and leaves a section the
- * member may not open.
+ * member may not open. Activity — the person's stream — shows only to a member
+ * who reads it (`contact_activity:read`, the codes in force — a View-as
+ * preview's too), so no read is refused and no preview shows the Owner's thread.
  */
 export function PatientFileLayout() {
   const { organizationSlug = '', patientId = '' } = useParams({ strict: false });
@@ -263,7 +267,9 @@ export function PatientFileLayout() {
   const navigate = useNavigate();
   const leadChatWidth = useDevicePrefsStore((state) => state.leadChatWidth);
   const query = usePatientFile(patientId);
-  const activity = usePatientFileActivity(search.activity);
+  const stream = useContactActivityAccess();
+  const fileActivity = usePatientFileActivity(search.activity);
+  const activity = stream.reads ? fileActivity : { open: false, toggle: undefined };
   const sections = useViewableSections();
   const section = patientFileSectionOf(pathname, patientId, search.from);
 

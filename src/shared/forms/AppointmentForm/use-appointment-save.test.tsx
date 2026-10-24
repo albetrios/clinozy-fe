@@ -410,6 +410,22 @@ describe('useAppointmentSave — the write and its refusals', () => {
     expect(result.current.saveState).toBe('idle');
   });
 
+  // The fetch client surfaces a dropped connection as status 0: "failed" and Retry, never a refusal.
+  it('keeps the draft when the connection dropped before an answer (status 0): "failed" and Retry', async () => {
+    appointmentsApi.createAppointment.mockRejectedValueOnce(
+      new HttpError('Failed to fetch', 0, '/app/appointments', 'POST'),
+    );
+    const { result, onDone } = render();
+    await act(() => result.current.save(draft()));
+    expect(result.current.saveState).toBe('failed');
+    const [message, options] = notifyMock.error.mock.lastCall ?? [];
+    expect(message).toBe(
+      'Couldn’t save · connection dropped. Everything you entered is still here.',
+    );
+    expect(options).toMatchObject({ action: { label: 'Retry' } });
+    expect(onDone).not.toHaveBeenCalled();
+  });
+
   it('keeps the draft after a failed connection: "failed", and a toast whose Retry saves again', async () => {
     appointmentsApi.createAppointment.mockRejectedValueOnce(
       new HttpError('Service unavailable', 503, '/app/appointments', 'POST'),
@@ -433,5 +449,152 @@ describe('useAppointmentSave — the write and its refusals', () => {
     await vi.waitFor(() => expect(onDone).toHaveBeenCalledOnce());
     expect(appointmentsApi.createAppointment).toHaveBeenCalledTimes(2);
     expect(onDone).toHaveBeenCalledWith({ kind: 'created', appointment: booked });
+  });
+});
+
+describe('useAppointmentSave — a new person whose booking was refused is booked, not added again (WF-01)', () => {
+  let client: QueryClient;
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+  );
+  const render = (options: Partial<UseAppointmentSaveOptions> = {}) => {
+    const onDone = vi.fn();
+    const onContactCreated = vi.fn();
+    const view = renderHook(
+      () =>
+        useAppointmentSave({
+          mode: 'create',
+          row: null,
+          branchId: TEST_BRANCH_ID,
+          onProblem: vi.fn(),
+          onDone,
+          onContactCreated,
+          ...options,
+        }),
+      { wrapper },
+    );
+    return { ...view, onDone, onContactCreated };
+  };
+  const newPerson = (patch: Partial<AppointmentDraft> = {}) =>
+    draft({ who: MEERA, newPhone: '9811122233', ...patch });
+  const booked = appointmentRow({
+    id: 'appt_new000000000000000000',
+    seq: 2870,
+    date: '2026-10-05',
+    startTime: '11:30',
+    endTime: '11:50',
+  });
+  const MEERA_CONTACT = { id: 'con_meera0000000000000000' } as Contact;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(APPOINTMENT_NOW);
+    signInTestMember();
+    client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    for (const fn of [
+      ...Object.values(notifyMock),
+      ...Object.values(appointmentsApi),
+      contactsApi.createContact,
+    ]) {
+      fn.mockReset();
+    }
+    // clinozy-be: the first create lands; the same number again is that contact's now (CT3).
+    contactsApi.createContact.mockResolvedValueOnce(MEERA_CONTACT).mockRejectedValue(
+      new HttpError(
+        '+919811122233 is already on Meera Iyer (C-36)',
+        409,
+        '/app/contacts',
+        'POST',
+        {
+          error: {
+            reason: 'contact_phone_exists',
+            detail: 'already on Meera Iyer (C-36)',
+          },
+        },
+      ),
+    );
+  });
+  afterEach(() => {
+    client.clear();
+    vi.useRealTimers();
+  });
+
+  it('books the next slot as the contact the refused try made: one contact, two bookings', async () => {
+    appointmentsApi.createAppointment
+      .mockRejectedValueOnce(
+        refusal(409, 'slot_taken', 'The doctor is already booked at this time'),
+      )
+      .mockResolvedValueOnce(booked);
+    const { result, onDone, onContactCreated } = render();
+    await act(() => result.current.save(newPerson()));
+    expect(notifyMock.error).toHaveBeenLastCalledWith('Just taken · pick another slot');
+    expect(onContactCreated).toHaveBeenCalledExactlyOnceWith(MEERA_CONTACT);
+    await act(() => result.current.save(newPerson({ time: '11:30' })));
+    expect(contactsApi.createContact).toHaveBeenCalledOnce();
+    expect(
+      appointmentsApi.createAppointment.mock.calls.map(([vars]) => vars.input.contactId),
+    ).toEqual([MEERA_CONTACT.id, MEERA_CONTACT.id]);
+    expect(onDone).toHaveBeenCalledWith({ kind: 'created', appointment: booked });
+  });
+
+  it('a lost answer, then the toast’s Retry: the booking is sent again with its key, the contact is not', async () => {
+    appointmentsApi.createAppointment
+      .mockRejectedValueOnce(
+        new HttpError('Service unavailable', 503, '/app/appointments', 'POST'),
+      )
+      .mockResolvedValueOnce(booked);
+    const { result, onDone } = render();
+    await act(() => result.current.save(newPerson()));
+    const [, options] = notifyMock.error.mock.lastCall ?? [];
+    await act(async () => {
+      options.action.onClick();
+    });
+    await vi.waitFor(() => expect(onDone).toHaveBeenCalledOnce());
+    expect(contactsApi.createContact).toHaveBeenCalledOnce();
+    const [first, second] = appointmentsApi.createAppointment.mock.calls;
+    // The same key: had the first one landed, the server replays it — one booking.
+    expect(second?.[0].idempotencyKey).toBe(first?.[0].idempotencyKey);
+    expect(onDone).toHaveBeenCalledWith({ kind: 'created', appointment: booked });
+  });
+
+  it('a double click books once: one contact, one booking', async () => {
+    let release!: (row: AppointmentRow) => void;
+    appointmentsApi.createAppointment.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          release = resolve;
+        }),
+    );
+    const { result } = render();
+    await act(async () => {
+      const first = result.current.save(newPerson());
+      const second = result.current.save(newPerson());
+      await vi.waitFor(() =>
+        expect(appointmentsApi.createAppointment).toHaveBeenCalled(),
+      );
+      release(booked);
+      await Promise.all([first, second]);
+    });
+    expect(contactsApi.createContact).toHaveBeenCalledOnce();
+    expect(appointmentsApi.createAppointment).toHaveBeenCalledOnce();
+  });
+
+  it('a person changed after the contact was made is a new contact', async () => {
+    appointmentsApi.createAppointment
+      .mockRejectedValueOnce(
+        refusal(409, 'slot_taken', 'The doctor is already booked at this time'),
+      )
+      .mockResolvedValueOnce(booked);
+    contactsApi.createContact
+      .mockReset()
+      .mockResolvedValueOnce(MEERA_CONTACT)
+      .mockResolvedValueOnce({ id: 'con_meeraother00000000000' } as Contact);
+    const { result } = render();
+    await act(() => result.current.save(newPerson()));
+    await act(() => result.current.save(newPerson({ newPhone: '9811122244' })));
+    expect(contactsApi.createContact).toHaveBeenCalledTimes(2);
+    expect(appointmentsApi.createAppointment.mock.lastCall?.[0].input.contactId).toBe(
+      'con_meeraother00000000000',
+    );
   });
 });

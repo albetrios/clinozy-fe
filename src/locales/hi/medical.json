@@ -589,6 +589,8 @@
         "addMedicine": "दवा जोड़ें",
         "newMedicine": "नई दवा",
         "enterRate": "खरीद रेट दर्ज करें",
+        "addLine": "कम से कम एक आइटम जोड़ें",
+        "tooManyLines": "एक ख़रीद में अधिकतम {{max}} आइटम हो सकते हैं",
         "peek_one": "{{count}} दवा · {{amount}}",
         "peek_other": "{{count}} दवाइयाँ · {{amount}}",
         "quickLine": "दवा, मात्रा, मुफ़्त, रेट लिखें · जैसे azel 20 +2 @180",

@@ -10,6 +10,10 @@ import { BRANCHES_KEYS, BRANCHES_NS } from '../../branches.constants.ts';
 import { BRANCH_DEFAULT_ROLES, teamMemberById } from '../../hooks/useBranchRows/index.ts';
 import {
   type BranchFormValues,
+  isBranchEmailInvalid,
+  isBranchPhoneIncomplete,
+  isBranchPinIncomplete,
+  isBranchReviewLinkInvalid,
   missingContactFields,
   missingPlaceFields,
   type RequiredBranchField,
@@ -23,15 +27,18 @@ export interface BranchDrawerView {
   badges: DrawerBadge[];
   /** "New branch · Surat · 1 person" / "Vesu · Surat · 6 people". */
   summary: string;
-  place: { peek: DrawerPeekItem[]; missing: string[] };
-  contact: { peek: DrawerPeekItem[]; missing: string[] };
+  /** `problems`: the save's own checks (`useBranchSave`), so a step never reads done on a bad PIN. */
+  place: { peek: DrawerPeekItem[]; missing: string[]; problems: string[] };
+  /** `problems`: the save's phone, email and review-link checks, in its words. */
+  contact: { peek: DrawerPeekItem[]; missing: string[]; problems: string[] };
   people: { peek: DrawerPeekItem[] };
 }
 
 /**
  * The branch drawer's read-outs (`users.md:226–236`; H:5223–5230): the badge
  * strip, the footer summary — a plural count, never "1 people" (§7.3) — and
- * each step's peek grid and missing fields.
+ * each step's peek grid, missing fields and problems: what a filled field breaks
+ * of the save's own checks, so a step never reads done while Save would stop on it.
  */
 export function useBranchDrawerView({
   values,
@@ -98,6 +105,7 @@ export function useBranchDrawerView({
         { kind: 'value', label: t(K.fields.pin), value: values.pin },
       ],
       missing: missingPlaceFields(values).map((field) => fieldLabel[field]),
+      problems: isBranchPinIncomplete(values.pin) ? [t(K.pinInvalid)] : [],
     },
     contact: {
       peek: [
@@ -122,6 +130,11 @@ export function useBranchDrawerView({
         { kind: 'value', label: t(K.fields.closes), value: values.closesAt },
       ],
       missing: missingContactFields(values).map((field) => fieldLabel[field]),
+      problems: [
+        ...(isBranchPhoneIncomplete(values.phone) ? [t(K.phoneInvalid)] : []),
+        ...(isBranchEmailInvalid(values.email) ? [t(K.emailInvalid)] : []),
+        ...(isBranchReviewLinkInvalid(values.reviewLink) ? [t(K.reviewLinkInvalid)] : []),
+      ],
     },
     people: {
       peek: [

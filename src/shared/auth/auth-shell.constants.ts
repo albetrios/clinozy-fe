@@ -135,7 +135,6 @@ export const AUTH_KEYS = {
     tokenRequired: 'validation.tokenRequired',
     codeRequired: 'validation.codeRequired',
     mfaTotpFormat: 'validation.mfaTotpFormat',
-    emailVerificationCodeLength: 'validation.emailVerificationCodeLength',
   },
   apiErrors: {
     mfaUnsupported: 'apiErrors.mfaUnsupported',

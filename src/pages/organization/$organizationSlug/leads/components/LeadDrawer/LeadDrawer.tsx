@@ -10,7 +10,10 @@ import {
   composerShowsLabels,
 } from '@/shared/components/ChatColumn/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
-import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import {
+  RecordDrawer,
+  type RecordDrawerProps,
+} from '@/shared/components/RecordDrawer/index.ts';
 import {
   Tooltip,
   TooltipContent,
@@ -22,6 +25,7 @@ import {
   type AppointmentFormPrefill,
   leadBookingPrefill,
 } from '@/shared/forms/AppointmentForm/index.ts';
+import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
@@ -128,41 +132,33 @@ function ChatResizeHandle({ width }: { width: number }) {
 }
 
 /**
- * The lead drawer (KICKOFF §6.3; `leads.md:124–136`, H:1752–1867) — the record
- * drawer at `round(min(980, 0.94 × vw))`: the details form, then the chat in
- * its column with the resize handle, the form drawers' × floating outside; on
- * a phone the full screen with a Details · Chat switch under the header, one
- * pane at a time (the page keeps the pane between leads). The header: "Edit
- * lead", the ID to copy, "Re-target" and the sub line; the footer: Remove lead
- * · Discard (puts the draft back) or Cancel · Save lead. Focus moves to the
- * title and back; closing with an unsaved draft asks first (Q-P1).
+ * The lead drawer's chat column (`leads.md:131`): the person's one stream by their contact, the
+ * lead on its divider, "Book an appointment" for a member who books, and on a phone the
+ * Details · Chat switch. It shows only to a member who reads the stream
+ * (`contact_activity:read`), its composer to one who writes it (`contact_activity:create`) — the
+ * codes in force, a View-as preview's too. Without the stream the drawer is the details alone,
+ * at their own width.
  */
-export function LeadDrawer({
+function useLeadChatAside({
   lead,
-  members,
   team,
-  people,
-  canEdit,
-  canDelete,
-  canEditContact,
-  contactActions,
-  canBook,
-  onClose,
   pane,
   onPaneChange,
-}: LeadDrawerProps) {
+  onBook,
+}: Pick<LeadDrawerProps, 'lead' | 'team' | 'pane' | 'onPaneChange'> & {
+  /** "Book an appointment" with the reason from their last message — absent without it. */
+  onBook?: (reason: string | null) => void;
+}): { panelWidth: number; aside: RecordDrawerProps['aside'] } {
   const { t } = useTranslation(LEADS_NS);
   const { t: tApp } = useTranslation(APP_NS);
   const phone = useViewportTier() === 'phone';
   const chatWidth = useDevicePrefsStore((state) => state.leadChatWidth);
   const viewport = useViewportWidth();
   const widths = leadDrawerWidths(viewport, chatWidth);
-  const draft = useLeadDraft(lead);
+  const stream = useContactActivityAccess();
   const contact = useContact(lead.contactId).data;
-  const [removing, setRemoving] = useState(false);
-  const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
-
-  const chat = (
+  if (!stream.reads) return { panelWidth: widths.details, aside: undefined };
+  const content = (
     <div
       data-testid={LEADS_TEST_IDS.drawerChat}
       data-slot="surface"
@@ -188,6 +184,7 @@ export function LeadDrawer({
           patientId: lead.patientId,
         }}
         showModeLabels={!phone && composerShowsLabels(viewport, chatWidth)}
+        canSend={stream.writes}
         contactCard={{
           data: leadContactCardData(
             lead,
@@ -196,14 +193,64 @@ export function LeadDrawer({
             contact,
           ),
         }}
-        onBookAppointment={
-          canBook
-            ? ({ reason }) => setBooking(leadBookingPrefill(lead, reason))
-            : undefined
-        }
+        onBookAppointment={onBook ? ({ reason }) => onBook(reason) : undefined}
       />
     </div>
   );
+  return {
+    panelWidth: widths.total,
+    aside: {
+      content,
+      width: widths.chat,
+      panes: {
+        label: t(LEADS_KEYS.drawer.panels),
+        form: { id: 'details', label: t(LEADS_KEYS.drawer.details), icon: Users },
+        aside: { id: 'chat', label: t(LEADS_KEYS.drawer.chat), icon: WhatsAppMark },
+        value: pane === 'chat' ? 'aside' : 'form',
+        onValueChange: (next) => onPaneChange(next === 'aside' ? 'chat' : 'details'),
+        testIdPrefix: LEADS_TEST_IDS.drawerPanes,
+      },
+    },
+  };
+}
+
+/**
+ * The lead drawer (KICKOFF §6.3; `leads.md:124–136`, H:1752–1867) — the record
+ * drawer at `round(min(980, 0.94 × vw))`: the details form, then the chat in
+ * its column with the resize handle, the form drawers' × floating outside; on
+ * a phone the full screen with a Details · Chat switch under the header, one
+ * pane at a time (the page keeps the pane between leads). The header: "Edit
+ * lead", the ID to copy, "Re-target" and the sub line; the footer: Remove lead
+ * · Discard (puts the draft back) or Cancel · Save lead. Focus moves to the
+ * title and back; closing with an unsaved draft asks first (Q-P1).
+ */
+export function LeadDrawer({
+  lead,
+  members,
+  team,
+  people,
+  canEdit,
+  canDelete,
+  canEditContact,
+  contactActions,
+  canBook,
+  onClose,
+  pane,
+  onPaneChange,
+}: LeadDrawerProps) {
+  const { t } = useTranslation(LEADS_NS);
+  const draft = useLeadDraft(lead);
+  const [removing, setRemoving] = useState(false);
+  const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
+  const chat = useLeadChatAside({
+    lead,
+    team,
+    pane,
+    onPaneChange,
+    onBook: canBook
+      ? (reason) => setBooking(leadBookingPrefill(lead, reason))
+      : undefined,
+  });
 
   return (
     <TooltipProvider>
@@ -214,19 +261,8 @@ export function LeadDrawer({
         titleEnd={<LeadTitleChips lead={lead} />}
         sub={t(LEADS_KEYS.drawer.sub)}
         largeTitle
-        panelWidth={widths.total}
-        aside={{
-          content: chat,
-          width: widths.chat,
-          panes: {
-            label: t(LEADS_KEYS.drawer.panels),
-            form: { id: 'details', label: t(LEADS_KEYS.drawer.details), icon: Users },
-            aside: { id: 'chat', label: t(LEADS_KEYS.drawer.chat), icon: WhatsAppMark },
-            value: pane === 'chat' ? 'aside' : 'form',
-            onValueChange: (next) => onPaneChange(next === 'aside' ? 'chat' : 'details'),
-            testIdPrefix: LEADS_TEST_IDS.drawerPanes,
-          },
-        }}
+        panelWidth={chat.panelWidth}
+        aside={chat.aside}
         closeStyle="form"
         readOnly={!(canEdit || canDelete)}
         dirty={draft.dirty}

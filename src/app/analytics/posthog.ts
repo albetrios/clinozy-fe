@@ -59,7 +59,11 @@ export function initPostHog(router?: AnyRouter): void {
       autocapture: false,
       disable_session_recording: true,
       before_send: (event) => {
-        if (event?.properties) scrubObjectUrls(event.properties);
+        // posthog-js carries person properties (`$set`, `$set_once` with
+        // `$initial_current_url`) beside `properties`, not inside it.
+        for (const bag of [event?.properties, event?.$set, event?.$set_once]) {
+          if (bag) scrubObjectUrls(bag);
+        }
         return event;
       },
     });

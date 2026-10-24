@@ -200,7 +200,9 @@ Issues then show **original TypeScript** stack frames. See
 
 All outgoing events pass through scrubbers in `lib/telemetry-scrub.ts`:
 
-- **`?token=`** and other single-use query params → `[Filtered]` in URLs
+- **Every query string and fragment** is dropped from `request.url` (the httpClient
+  integration sets it past `dataCollection`), breadcrumb data and span / trace data — a
+  room's search (`?q=`) holds a patient's name or mobile, a reset link's `?token=` a secret
 - **UI input breadcrumbs** → message replaced with `[Filtered]`
 - **No PII in user object** — id only
 - **No API response bodies** in error extras

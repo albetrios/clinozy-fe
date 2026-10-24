@@ -59,14 +59,16 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
  * Whether the member may book (`appointment:create`) and read tasks (`task:read`) — every other
  * ability is granted.
  */
-const access = vi.hoisted(() => ({ book: true, tasks: true }));
+const access = vi.hoisted(() => ({ book: true, tasks: true, read: true, write: true }));
 vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
   useAppAccess: () => ({
     previewRole: null,
     can: (section: string) =>
       (section !== 'appointments' || access.book) &&
       (section !== 'tasks' || access.tasks),
-    canCode: () => true,
+    canCode: (code: string) =>
+      (code !== 'contact_activity:create' || access.write) &&
+      (code !== 'contact_activity:read' || access.read),
     viewableSections: [],
     isResolved: true,
   }),
@@ -139,6 +141,8 @@ beforeEach(() => {
   vi.resetAllMocks();
   access.book = true;
   access.tasks = true;
+  access.read = true;
+  access.write = true;
   signInTestMember();
 });
 afterEach(() => {
@@ -418,6 +422,28 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     await within(chat).findByText(/^Lead created/);
     expect(within(chat).queryByTestId('chat-book')).not.toBeInTheDocument();
     expect(screen.queryByTestId('new-appointment-drawer')).not.toBeInTheDocument();
+  });
+
+  // QA-07's pattern: a member who reads the stream but may not write it had a composer the server
+  // refused.
+  it('reads the chat without a composer for a member who may not write it', async () => {
+    access.write = false;
+    const { drawer } = await openAnaya();
+    const chat = within(drawer).getByTestId('lead-drawer-chat');
+    await within(chat).findByText(/^Lead created/);
+    expect(within(chat).queryByTestId('chat-textarea')).not.toBeInTheDocument();
+    expect(within(chat).queryByTestId('chat-send')).not.toBeInTheDocument();
+  });
+
+  // Decided with the owner: a member who may not read the person's stream sees no chat at all.
+  it('is the details alone for a member who may not read the stream — no chat, no thread read', async () => {
+    access.read = false;
+    const { drawer } = await openAnaya();
+    expect(
+      within(drawer).getByRole('region', { name: 'Lead details' }),
+    ).toBeInTheDocument();
+    expect(within(drawer).queryByTestId('lead-drawer-chat')).not.toBeInTheDocument();
+    expect(fetchContactThread).not.toHaveBeenCalled();
   });
 
   it('has no accessibility violations', async () => {

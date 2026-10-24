@@ -589,6 +589,8 @@
         "addMedicine": "Arzneimittel hinzufügen",
         "newMedicine": "Neues Arzneimittel",
         "enterRate": "Geben Sie den Einkaufspreis ein",
+        "addLine": "Füge mindestens einen Artikel hinzu",
+        "tooManyLines": "Ein Einkauf umfasst höchstens {{max}} Artikel",
         "peek_one": "{{count}} Arzneimittel · {{amount}}",
         "peek_other": "{{count}} Arzneimittel · {{amount}}",
         "quickLine": "Arzneimittel, Menge, Gratis, Preis eingeben · z. B. azel 20 +2 @180",

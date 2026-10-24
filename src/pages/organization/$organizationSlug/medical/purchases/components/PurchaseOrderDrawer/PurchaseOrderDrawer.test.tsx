@@ -225,6 +225,32 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
     );
   });
 
+  // QA-04's pattern: an order with no medicine read "Complete" — and was sent for the API to refuse.
+  it('keeps Items flagged while no medicine is added — "Add at least one item", never done, never sent', async () => {
+    const user = setup();
+    renderMedicalDrawer(<PurchaseOrderDrawer mode="create" open onClose={vi.fn()} />);
+    await waitFor(() =>
+      expect(screen.getByTestId(`${D}-supplier`)).toHaveTextContent('Akshar Medicines'),
+    );
+    const drawer = screen.getByTestId(D);
+    const items = () => within(drawer).getByTestId(`${D}-step-items`);
+    const head = () => within(drawer).getByTestId(`${D}-step-items-trigger`);
+    await user.click(within(drawer).getByTestId(`${D}-step-order-next`));
+    await user.click(within(drawer).getByTestId(`${D}-step-order-trigger`));
+
+    expect(items()).toHaveAttribute('data-status', 'missing');
+    expect(head()).toHaveTextContent('Add at least one item');
+    expect(head()).not.toHaveTextContent('Complete');
+
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() =>
+      expect(notifyMock.warning).toHaveBeenCalledWith('Add at least one item'),
+    );
+    expect(createPurchaseOrder).not.toHaveBeenCalled();
+    // The save opens Items, where the medicine goes.
+    expect(items()).toHaveAttribute('data-status', 'open');
+  });
+
   it('fills the items from the quick line — "azel 20 +2 @180" — the Low stock chips and Browse', async () => {
     const user = setup();
     const onClose = vi.fn();

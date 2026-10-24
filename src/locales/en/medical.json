@@ -589,6 +589,8 @@
         "addMedicine": "Add medicine",
         "newMedicine": "New medicine",
         "enterRate": "Enter the purchase rate",
+        "addLine": "Add at least one item",
+        "tooManyLines": "A purchase takes up to {{max}} items",
         "peek_one": "{{count}} medicine · {{amount}}",
         "peek_other": "{{count}} medicines · {{amount}}",
         "quickLine": "Type medicine, qty, free, rate · e.g. azel 20 +2 @180",

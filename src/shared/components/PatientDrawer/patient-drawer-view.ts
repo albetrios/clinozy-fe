@@ -20,6 +20,7 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constants.ts';
 import {
+  invalidPatientPhones,
   missingPatientFields,
   patientFormName,
   type PatientFormValues,
@@ -51,7 +52,8 @@ export interface PatientDrawerView {
   summary: string;
   /** Each type, the status, and "28 yrs". */
   badges: DrawerBadge[];
-  contact: { peek: DrawerPeekItem[]; missing: string[] };
+  /** `problems`: the save's own mobile rule, so the step never reads done on "123". */
+  contact: { peek: DrawerPeekItem[]; missing: string[]; problems: string[] };
   clinic: { peek: DrawerPeekItem[] };
 }
 
@@ -226,6 +228,7 @@ export function usePatientDrawerView({
       missing: missingPatientFields(values).map((field) =>
         field === 'firstName' ? t(K.fields.firstName) : t(K.fields.mobile),
       ),
+      problems: invalidPatientPhones(values).length > 0 ? [t(K.mobileInvalid)] : [],
     },
     clinic: { peek: clinicPeekOf(values, labels, t) },
   };

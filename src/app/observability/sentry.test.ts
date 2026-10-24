@@ -168,6 +168,60 @@ describe('initSentry', () => {
     expect(sent.breadcrumbs[1]?.message).toBe('/dashboard');
   });
 
+  it('beforeSend strips the query from an httpClient 5xx event and its breadcrumbs (SEC-01)', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    await initSentry(ROUTER);
+    const { beforeSend } = initConfig();
+
+    // httpClientIntegration sets request.url itself, so dataCollection.urlQueryParams never sees it.
+    const sent = beforeSend({
+      message: 'HTTP Client Error with status code: 503',
+      request: {
+        url: 'https://api.x.dev/api/v1/app/patients?limit=50&q=Priya',
+        method: 'GET',
+      },
+      breadcrumbs: [
+        {
+          category: 'fetch',
+          data: { url: '/api/v1/app/patients?q=Priya', method: 'GET' },
+        },
+        {
+          category: 'navigation',
+          data: { from: '/a', to: '/organization/acme/patients?q=Priya' },
+        },
+      ],
+    }) as { request: { url: string } };
+
+    expect(JSON.stringify(sent)).not.toContain('Priya');
+    expect(sent.request.url).toBe('https://api.x.dev/api/v1/app/patients');
+  });
+
+  it('beforeSendTransaction strips the query from span data — long-animation-frame spans carry the page URL (SEC-01)', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    await initSentry(ROUTER);
+    const { beforeSendTransaction } = initConfig();
+
+    const sent = beforeSendTransaction({
+      spans: [
+        {
+          op: 'ui.long_animation_frame',
+          data: {
+            'browser.script.invoker':
+              'https://app.x.dev/organization/acme/patients?q=Priya',
+            'code.file.path': 'https://app.x.dev/organization/acme/patients?q=Priya',
+          },
+        },
+      ],
+      contexts: {
+        trace: {
+          data: { 'url.full': 'https://app.x.dev/organization/acme/patients?q=Priya' },
+        },
+      },
+    });
+
+    expect(JSON.stringify(sent)).not.toContain('Priya');
+  });
+
   it('beforeSendTransaction filters typed input from breadcrumbs too', async () => {
     config.sentryDsn = 'https://key@sentry.example/1';
     await initSentry(ROUTER);

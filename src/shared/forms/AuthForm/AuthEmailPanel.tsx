@@ -418,7 +418,7 @@ export function AuthEmailPanel({
     onPendingChange?.({ method: 'email-send' });
     /*
      * Submitting an email is a declaration of intent to sign in, and the user is
-     * about to spend seconds hunting a six-digit code in their inbox. Warm the
+     * about to spend seconds hunting a six-character code in their inbox. Warm the
      * chunks that sign-in lands on during that dead air, rather than after the
      * post-login navigation when they are already watching a transition.
      * Deliberately not awaited: this must never delay the code being sent.

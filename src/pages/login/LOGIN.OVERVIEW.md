@@ -37,7 +37,7 @@ on the first paint.
 
 ## Flow
 
-1. **Email (default):** email → Continue → 6-digit code → verify → onboarding (new) or app (returning)
+1. **Email (default):** email → Continue → 6-character code (letters and digits) → verify → onboarding (new) or app (returning)
    - On the **verify** step, OAuth/passkey and the full welcome copy are hidden — focused “Check your email” + code entry only.
    - **Local-dev autofill:** when clinozy-be runs with `TEST_MODE` on, `send-code` echoes
      `debug_verification_code` and the verify step **prefills** it (fills, never

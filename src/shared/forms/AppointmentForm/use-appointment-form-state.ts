@@ -117,12 +117,19 @@ function effectiveMode(
 
 /**
  * The doctor's free starts that day at the branch — asked once a date, a doctor and a branch
- * are set, never once locked. The booking being moved still holds its own slot, so its saved
- * start is not among them (G3: no "except this booking").
+ * are set, never once locked. The booking being edited or moved is asked without its own
+ * time (`exclude_appointment_id`): its saved start, and any start overlapping only itself,
+ * are offered; every other booking still blocks.
  */
 function slotQueryOf(
   draft: AppointmentDraft,
-  context: { locked: boolean; step: AppointmentSlotStep; branchId: string | null },
+  context: {
+    locked: boolean;
+    step: AppointmentSlotStep;
+    branchId: string | null;
+    /** The saved booking (Edit, Reschedule); none for a New one or a Copy. */
+    appointmentId: string | undefined;
+  },
 ): AppointmentSlotParams | null {
   if (!(draft.date && draft.doctorId && context.branchId) || context.locked) return null;
   return {
@@ -131,6 +138,7 @@ function slotQueryOf(
     doctorId: draft.doctorId,
     durationMin: draft.durationMin,
     step: context.step,
+    ...(context.appointmentId ? { excludeAppointmentId: context.appointmentId } : {}),
   };
 }
 
@@ -256,7 +264,12 @@ function useDraftReads(
 ) {
   const locked = row !== undefined && isAppointmentSlotLocked(draft.status);
   const [slotStep, setSlotStep] = useState<AppointmentSlotStep>(30);
-  const query = slotQueryOf(draft, { locked, step: slotStep, branchId });
+  const query = slotQueryOf(draft, {
+    locked,
+    step: slotStep,
+    branchId,
+    appointmentId: row?.id,
+  });
   const slots = useAppointmentSlots(query);
   return {
     isPatient: draft.who?.kind === 'patient',

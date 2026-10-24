@@ -15,7 +15,12 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import type { TeamPill } from '../TeamCells/index.ts';
-import { missingUserFields, type UserFormValues } from './user-form.ts';
+import {
+  isMobileIncomplete,
+  isUserEmail,
+  missingUserFields,
+  type UserFormValues,
+} from './user-form.ts';
 
 const K = USERS_KEYS.drawer;
 
@@ -29,7 +34,8 @@ export interface UserDrawerView {
   badges: DrawerBadge[];
   /** "New user · Front desk · Adajan" / "<name> · <roles joined ' + '> · <branches>". */
   summary: string;
-  profile: { peek: DrawerPeekItem[]; missing: string[] };
+  /** `problems`: the save's own checks (`useUserChecks`), so Profile never reads done while Save stops on it. */
+  profile: { peek: DrawerPeekItem[]; missing: string[]; problems: string[] };
   hours: { peek: DrawerPeekItem[] };
 }
 
@@ -72,7 +78,8 @@ function userAccessLine(
 /**
  * The user drawer's read-outs (`users.md:169–170, 276`; H:5163–5177): the
  * badge strip, the footer summary, each step's peek grid, and Step 1's
- * missing fields.
+ * missing fields and problems — a role picked, an email that reads as one, a
+ * mobile of ten digits: the save's checks, in its words.
  */
 export function useUserDrawerView({
   values,
@@ -160,6 +167,11 @@ export function useUserDrawerView({
     profile: {
       peek: profilePeek,
       missing: missingUserFields(values).map(() => t(K.fields.email)),
+      problems: [
+        ...(values.roleIds.length === 0 ? [t(K.noRole)] : []),
+        ...(values.email.trim() && !isUserEmail(values.email) ? [t(K.emailInvalid)] : []),
+        ...(isMobileIncomplete(values.phone) ? [t(K.mobileInvalid)] : []),
+      ],
     },
     hours: { peek: hoursPeek },
   };

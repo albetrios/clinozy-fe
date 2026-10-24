@@ -82,13 +82,18 @@ export function useOpenLeadTasks(id: string | undefined, { enabled = true } = {}
   });
 }
 
-/** One lead by id; idle while there is no id. A deleted or unknown id fails with a 404. */
-export function useLead(id: string | undefined) {
+/**
+ * One lead by id; idle while there is no id. A deleted or unknown id fails with a 404 — and so does
+ * a lead of a branch the member does not work in. `notifyOnError: false` for a host that shows the
+ * failure in place (or can do without the lead).
+ */
+export function useLead(id: string | undefined, { notifyOnError = true } = {}) {
   const organizationId = useOrganizationId();
   return useAppQuery({
     queryKey: leadQueryKeys.detail(organizationId, id ?? ''),
     queryFn: () => fetchLead(id ?? ''),
     enabled: Boolean(id),
+    notifyOnError,
   });
 }
 

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { HttpError, isHttpError, isNotFound, isUnauthorized } from './HttpError.ts';
+import {
+  HttpError,
+  isClientRefusal,
+  isHttpError,
+  isNotFound,
+  isUnauthorized,
+} from './HttpError.ts';
 
 describe('HttpError', () => {
   it('creates error with status, url, method, data', () => {
@@ -32,6 +38,16 @@ describe('HttpError', () => {
   it('isUnauthorized returns false for non-401', () => {
     expect(isUnauthorized(new HttpError('Forbidden', 403, '/', 'GET'))).toBe(false);
     expect(isUnauthorized(new Error('x'))).toBe(false);
+  });
+
+  it('isClientRefusal is a 4xx answer — never a dropped connection (status 0) or a 5xx', () => {
+    for (const status of [400, 403, 404, 409, 422, 429]) {
+      expect(isClientRefusal(new HttpError('refused', status, '/', 'POST'))).toBe(true);
+    }
+    for (const status of [0, 500, 503]) {
+      expect(isClientRefusal(new HttpError('failed', status, '/', 'POST'))).toBe(false);
+    }
+    expect(isClientRefusal(new TypeError('Failed to fetch'))).toBe(false);
   });
 
   it('isNotFound is true only for a 404 HttpError', () => {

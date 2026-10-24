@@ -188,4 +188,10 @@ describe('PatientFileBar', () => {
       expect(screen.queryByTestId('patient-file-sections-panel')).not.toBeInTheDocument(),
     );
   });
+
+  it('shows no Activity button to a member who may not read the stream (QA-07)', async () => {
+    renderBar({ onToggleActivity: undefined });
+    await screen.findByTestId('patient-file-back');
+    expect(screen.queryByTestId('patient-file-activity')).not.toBeInTheDocument();
+  });
 });

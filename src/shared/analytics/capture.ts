@@ -116,11 +116,6 @@ export function getAnalyticsContext(): Record<string, unknown> {
 function scrubProperties(properties: Record<string, unknown>): Record<string, unknown> {
   const copy = { ...properties };
   scrubObjectUrls(copy);
-  for (const [key, value] of Object.entries(copy)) {
-    if (typeof value === 'string' && value.includes('://')) {
-      Reflect.set(copy, key, scrubSensitiveUrl(value));
-    }
-  }
   return copy;
 }
 
@@ -187,7 +182,7 @@ export function attachPostHogIdentitySync(ph: PostHogClient): void {
 
 /** Scrub pathname for SPA route analytics (no query string secrets). */
 export function scrubAnalyticsPath(pathname: string): string {
-  return scrubSensitiveUrl(pathname.split('?')[0] ?? pathname);
+  return scrubSensitiveUrl(pathname);
 }
 
 /** Emit `route_viewed` on TanStack Router navigations (pathname only). */

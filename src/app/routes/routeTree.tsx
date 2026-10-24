@@ -430,7 +430,7 @@ export function preloadBootRoutes(hint: { likelySignedIn: boolean }): void {
  *   happened — on the far side of the login exchange, with the user already
  *   committed and watching a transition.
  * - **When:** the moment the visitor submits an email — a declaration of intent
- *   to sign in. They then spend seconds finding a six-digit code in their inbox,
+ *   to sign in. They then spend seconds finding a six-character code in their inbox,
  *   which is otherwise dead air on a warm connection.
  * - **Being wrong is cheap:** a visitor who abandons the form has spent idle
  *   bandwidth on chunks the guards would never have shown them, exactly as the

@@ -69,12 +69,22 @@ export interface ChatColumnProps {
    */
   lead?: ChatThreadRecord;
   /**
+   * The person has a lead the host could not hand over as `lead` (not readable to the member, or
+   * not read yet) — the divider then never says "no lead".
+   */
+  hasLead?: boolean;
+  /**
    * Labels beside the "Send via" glyphs — the lead drawer passes
    * `composerShowsLabels(viewport, dragged width)`. Never on a phone.
    */
   showModeLabels?: boolean;
   /** The patient file's privacy: every ₹ amount in the history reads "₹ ••••". */
   maskMoney?: boolean;
+  /**
+   * The member may write to the thread (`contact_activity:create`, the codes in force — a View-as
+   * preview's too). False: the thread alone — no composer, no starters (default true).
+   */
+  canSend?: boolean;
   /**
    * "Book an appointment" (hidden without it): the host opens the booking with
    * the reason from their last message (H:5751).
@@ -166,14 +176,18 @@ function ChatLoaded({
   person,
   contact,
   lead,
+  hasLead,
   read,
   showModeLabels = false,
   maskMoney = false,
+  canSend,
   onBookAppointment,
   onOpenHistory,
   onSent,
 }: ChatConversationProps & { read: ChatThreadRead }) {
   const personKey = chatPersonKey(person);
+  // Only an explicit `false` takes the composer away (the default writes).
+  const readOnly = canSend === false;
   const tier = useViewportTier();
   const format = useChatFormat(maskMoney);
   const { t, clock } = format;
@@ -222,9 +236,11 @@ function ChatLoaded({
     <>
       <ChatThread
         entries={entries}
-        divider={threadDivider(read.thread ?? lead ?? null, contact.isPatient, format)}
+        divider={threadDivider(read.thread ?? lead ?? null, contact.isPatient, format, {
+          hasLead,
+        })}
         empty={
-          conversed
+          conversed || readOnly
             ? null
             : {
                 line: emptyLine(set, t, first, visits.upcoming, clock),
@@ -243,34 +259,36 @@ function ChatLoaded({
         onOpenHistory={onOpenHistory}
         selfName={ctx.me.short || null}
       />
-      <ChatComposer
-        mode={mode}
-        onModeChange={setMode}
-        modes={options}
-        showLabels={showModeLabels && tier !== 'phone'}
-        text={text}
-        onTextChange={changeText}
-        onSend={() => {
-          if (!text.trim()) return;
-          send(mode, text);
-          changeText('');
-        }}
-        textareaRef={textareaRef}
-        first={first}
-        hint={replyHint(lastFrom, mode)}
-        outage={whatsappDown}
-        notConnected={!isMessagingConnected}
-        warning={preferenceWarning(mode, contact.preferences)}
-        suggestions={composerSuggestions(lastFrom, ctx, t)}
-        templates={composerTemplates(ctx, t)}
-        fillValues={fill}
-        onBook={
-          onBookAppointment
-            ? () => onBookAppointment({ reason: bookingReason(lastFrom) })
-            : undefined
-        }
-        format={format}
-      />
+      {readOnly ? null : (
+        <ChatComposer
+          mode={mode}
+          onModeChange={setMode}
+          modes={options}
+          showLabels={showModeLabels && tier !== 'phone'}
+          text={text}
+          onTextChange={changeText}
+          onSend={() => {
+            if (!text.trim()) return;
+            send(mode, text);
+            changeText('');
+          }}
+          textareaRef={textareaRef}
+          first={first}
+          hint={replyHint(lastFrom, mode)}
+          outage={whatsappDown}
+          notConnected={!isMessagingConnected}
+          warning={preferenceWarning(mode, contact.preferences)}
+          suggestions={composerSuggestions(lastFrom, ctx, t)}
+          templates={composerTemplates(ctx, t)}
+          fillValues={fill}
+          onBook={
+            onBookAppointment
+              ? () => onBookAppointment({ reason: bookingReason(lastFrom) })
+              : undefined
+          }
+          format={format}
+        />
+      )}
     </>
   );
 }

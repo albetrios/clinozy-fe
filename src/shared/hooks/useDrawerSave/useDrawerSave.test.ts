@@ -109,4 +109,21 @@ describe('useDrawerSave', () => {
     await act(async () => options.action.onClick());
     expect(onDone).toHaveBeenCalledWith('saved', false);
   });
+  // The fetch client surfaces a dropped connection as status 0 — a failure, not a refusal.
+  it('keeps the draft with "Retry" when the fetch client reports the connection dropped (status 0)', async () => {
+    const write = vi
+      .fn()
+      .mockRejectedValueOnce(new HttpError('Failed to fetch', 0, '/x', 'POST'))
+      .mockResolvedValue('saved');
+    const { result, onDone } = render({ write });
+    await act(() => result.current.save());
+    expect(result.current.saveState).toBe('failed');
+    const [, options] = notifyMock.error.mock.lastCall as [
+      string,
+      { id: string; action: { onClick: () => void } },
+    ];
+    expect(options.id).toBe('test-save-failed');
+    await act(async () => options.action.onClick());
+    expect(onDone).toHaveBeenCalledWith('saved', false);
+  });
 });

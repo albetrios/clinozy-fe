@@ -1,6 +1,7 @@
 import { API_ENDPOINTS, HTTP } from '@/core/config/constants.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import i18n from '@/lib/i18n/i18n.ts';
+import { scrubSensitiveUrl } from '@/lib/telemetry-scrub.ts';
 import {
   forceLogout,
   isRefreshUnanswered,
@@ -175,10 +176,15 @@ function exponentialDelay(attempt: number): number {
   return Math.min(1000 * 2 ** attempt, 30_000);
 }
 
-/** Dev-only retry trace (kept out of the hot path to bound its complexity). */
+/**
+ * Dev-only retry trace (kept out of the hot path to bound its complexity). The path only:
+ * Sentry turns console warnings into breadcrumbs and logs, and the query holds a room's search.
+ */
 function logRetry(attempt: number, url: string, suffix = ''): void {
   if (platformConfig.debugLogging) {
-    console.warn(`[HTTP] Retry attempt ${attempt + 1} for ${url}${suffix}`);
+    console.warn(
+      `[HTTP] Retry attempt ${attempt + 1} for ${scrubSensitiveUrl(url)}${suffix}`,
+    );
   }
 }
 

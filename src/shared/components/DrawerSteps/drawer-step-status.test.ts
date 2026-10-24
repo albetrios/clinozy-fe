@@ -31,6 +31,21 @@ describe('drawerStepStatus', () => {
     expect(drawerStepStatus({ ...step, reached: true })).toBe('done');
   });
 
+  // QA-03 / QA-04: a mobile of "123", a purchase with no item — reached, never done.
+  it('flags a step whose filled fields break a rule its save checks, once reached or a save was tried', () => {
+    expect(drawerStepStatus({ ...step, problemCount: 1, filled: true })).toBe('later');
+    expect(
+      drawerStepStatus({ ...step, problemCount: 1, filled: true, reached: true }),
+    ).toBe('missing');
+    expect(drawerStepStatus({ ...step, problemCount: 1, reached: true })).toBe('missing');
+    expect(drawerStepStatus({ ...step, problemCount: 1, revealMissing: true })).toBe(
+      'missing',
+    );
+    expect(
+      drawerStepStatus({ ...step, problemCount: 1, reached: true, complete: true }),
+    ).toBe('missing');
+  });
+
   it('lets the step say whether it is complete, over what it holds and over a visit', () => {
     expect(
       drawerStepStatus({ ...step, filled: true, reached: true, complete: false }),

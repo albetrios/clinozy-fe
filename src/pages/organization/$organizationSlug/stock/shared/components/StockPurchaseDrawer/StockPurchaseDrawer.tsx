@@ -68,6 +68,8 @@ import {
   purchaseFieldOrder,
   purchaseFormOf,
   purchaseInputOf,
+  type PurchaseLinesProblem,
+  purchaseLinesProblem,
   type PurchaseLineValues,
   purchaseServerFields,
   reorderLines,
@@ -154,6 +156,13 @@ function usePurchaseBadges(
   ];
 }
 
+/** What each lines problem says — on the Items step's head and in the save's toast. */
+function linesProblemMessage(problem: PurchaseLinesProblem, t: TFunction): string {
+  if (problem === 'empty') return t(K.fields.addLine);
+  if (problem === 'tooMany') return t(K.fields.tooManyLines, { max: PURCHASE_LINES_MAX });
+  return t(K.fields.enterRate);
+}
+
 /** The step cards: Bill → Items received → Payment (`clinic-stock.md:257`). */
 function useSteps(
   body: PurchaseFieldsProps,
@@ -164,6 +173,8 @@ function useSteps(
   const formatPaise = usePaiseFormat();
   const formatRupees = useRupeeFormat();
   const lines = pickedCount(values.lines);
+  // A new purchase's lines answer to the save's rule; a saved one's were received as they are.
+  const linesProblem = body.saved ? null : purchaseLinesProblem(values.lines);
   const billNo = values.billNo.trim();
   const bill = formatPaise(billOf(values));
   const paidNow = paidOf(values);
@@ -194,6 +205,7 @@ function useSteps(
           value: lines > 0 ? t(K.fields.peek, { count: lines, amount: bill }) : undefined,
         },
       ],
+      problems: linesProblem ? [linesProblemMessage(linesProblem, t)] : [],
       content: <ItemsFields {...body} />,
     },
     {
@@ -265,9 +277,9 @@ const readStockPurchase = (
 });
 
 /**
- * A new purchase's lines before anything is sent: one item at least, at most
- * 50, each picked one with its rate — every rate cell left empty says "Enter
- * the rate" in red (validated before submit, §7.3).
+ * A new purchase's lines before anything is sent ({@link purchaseLinesProblem}, the rule the
+ * Items step's head reads too): one item at least, at most 50, each picked one with its rate —
+ * every rate cell left empty says "Enter the rate" in red (validated before submit, §7.3).
  */
 function useLinesCheck(
   form: UseFormReturn<StockPurchaseFormValues>,
@@ -278,25 +290,16 @@ function useLinesCheck(
     current: StockPurchaseFormValues,
   ): DrawerSaveProblem<StockPurchaseFormValues> | null => {
     form.clearErrors('lines');
-    const count = pickedCount(current.lines);
-    if (count === 0) return { fields: ['lines'], message: t(K.fields.addLine) };
-    if (count > PURCHASE_LINES_MAX) {
-      return {
-        fields: ['lines'],
-        message: t(K.fields.tooManyLines, { max: PURCHASE_LINES_MAX }),
-      };
-    }
-    const missing = linesMissingRate(current.lines);
-    if (missing.length === 0) return null;
+    const problem = purchaseLinesProblem(current.lines);
+    if (problem === null) return null;
+    const message = linesProblemMessage(problem, t);
+    if (problem !== 'rate') return { fields: ['lines'], message };
     // Each rate cell says it in red; the toast says what to do.
-    for (const index of missing) {
-      form.setError(`lines.${index}.rate`, {
-        type: 'client',
-        message: t(K.fields.enterRate),
-      });
+    for (const index of linesMissingRate(current.lines)) {
+      form.setError(`lines.${index}.rate`, { type: 'client', message });
     }
     openItems();
-    return { fields: [], message: t(K.fields.enterRate) };
+    return { fields: [], message };
   };
 }
 

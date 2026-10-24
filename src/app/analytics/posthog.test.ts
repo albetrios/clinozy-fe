@@ -107,13 +107,40 @@ describe('initPostHog', () => {
 
     const out = options.before_send(event) as typeof event;
 
-    expect(out.properties.$current_url).toBe(
-      'https://x.dev/reset-password?token=[Filtered]',
-    );
+    expect(out.properties.$current_url).toBe('https://x.dev/reset-password');
     expect(out.properties.$set_once.$initial_current_url).toBe(
-      'https://x.dev/verify-email?token=[Filtered]',
+      'https://x.dev/verify-email',
     );
     expect(options.before_send(null)).toBeNull(); // pass-through, no crash
+  });
+
+  it('before_send scrubs URL props in properties, $set and $set_once — the posthog-js CaptureResult shape (SEC-01)', async () => {
+    const { initPostHog, phMock } = await loadFreshPostHog();
+    initPostHog();
+
+    const options = vi.mocked(phMock.init).mock.calls[0]?.[1] as unknown as {
+      before_send: (event: unknown) => unknown;
+    };
+    // posthog-js 1.438: `$set` / `$set_once` are siblings of `properties`, not inside it.
+    const event = {
+      uuid: 'u-1',
+      event: '$pageview',
+      properties: {
+        $current_url: 'https://x.dev/organization/acme/patients?q=Priya%20Sharma',
+        $session_entry_url:
+          'https://x.dev/login?redirect=%2Forganization%2Facme%2Fpatients%3Fq%3DPriya',
+        $pathname: '/organization/acme/patients',
+      },
+      $set: { $current_url: 'https://x.dev/organization/acme/patients?q=Priya' },
+      $set_once: { $initial_current_url: 'https://x.dev/accept-invite?token=sec-3' },
+    };
+
+    const out = options.before_send(event) as typeof event;
+
+    expect(JSON.stringify(out)).not.toMatch(/Priya|sec-3/);
+    expect(out.properties.$current_url).toBe('https://x.dev/organization/acme/patients');
+    expect(out.properties.$pathname).toBe('/organization/acme/patients');
+    expect(out.$set_once.$initial_current_url).toBe('https://x.dev/accept-invite');
   });
 
   it('resets the anonymous identity when the session ends', async () => {

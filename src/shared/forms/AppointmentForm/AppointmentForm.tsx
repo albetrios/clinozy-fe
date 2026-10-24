@@ -16,6 +16,7 @@ import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
+import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
@@ -27,7 +28,7 @@ import {
   APPOINTMENT_FORM_NS,
   APPOINTMENT_FORM_TEST_IDS,
 } from './appointment-form.constants.ts';
-import { draftComplete, saveLabelKind } from './appointment-form-model.ts';
+import { draftComplete, saveLabelKind, whoOfContact } from './appointment-form-model.ts';
 import { appointmentFormWidths } from './appointment-form-widths.ts';
 import { footerSummary, formTitle, saveLabelText } from './appointment-form-words.ts';
 import {
@@ -161,9 +162,12 @@ function useChatAside(
   const phone = useViewportTier() === 'phone';
   const viewportWidth = useViewportWidth();
   const chatPreference = useDevicePrefsStore((store) => store.leadChatWidth);
+  // The chat needs `contact_activity:read`, its composer `contact_activity:create` (the codes in
+  // force, a View-as preview's too): without the stream the form is its own width.
+  const stream = useContactActivityAccess();
   const person = chatPersonOf(state);
   const who = state.draft.who;
-  const show = state.edit && !phone && person !== null && who !== null;
+  const show = state.edit && !phone && stream.reads && person !== null && who !== null;
   const widths = appointmentFormWidths(viewportWidth, chatPreference, show);
   const openHistory = (target: ChatHistoryTarget) => {
     if (target.kind === 'appointment') props.onOpenAppointment?.(target.appointmentId);
@@ -179,6 +183,7 @@ function useChatAside(
           <ChatColumn
             person={person}
             contact={{ name: who.name, phone: who.phone, isPatient: state.isPatient }}
+            canSend={stream.writes}
             onOpenHistory={openHistory}
           />
         </div>
@@ -220,6 +225,9 @@ function useFormSave(
       }
     },
     onDone: (outcome) => (onSaved ? onSaved(outcome) : onClose()),
+    // Now that contact: the card offers Change and Edit, and a retry books them.
+    onContactCreated: (contact) =>
+      state.change({ kind: 'who', who: whoOfContact(contact) }),
   });
 }
 

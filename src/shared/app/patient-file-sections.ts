@@ -44,10 +44,12 @@ export function isBillingSection(section: PatientFileSectionSlug): boolean {
 
 /**
  * The clinozy-be code a section's records need beyond Patients view: the clinical record
- * (Clinical notes, Photos, Reports), prescriptions and treatments (api-integration §5.4 Gate).
+ * (Clinical notes, Photos, Reports), the person's bookings (Visits — `GET /app/appointments`),
+ * prescriptions and treatments (api-integration §5.4 Gate).
  */
 const SECTION_READ_CODES: Readonly<Partial<Record<PatientFileSectionSlug, string>>> = {
   overview: 'patient:clinical_record:read',
+  visits: 'appointment:read',
   images: 'patient:clinical_record:read',
   reports: 'patient:clinical_record:read',
   prescriptions: 'patient_prescription:read',
@@ -57,9 +59,10 @@ const SECTION_READ_CODES: Readonly<Partial<Record<PatientFileSectionSlug, string
 /**
  * What the member may see of a patient file (Q-F1, AMBER A-F14): the clinical
  * and care sections with Patients view, the billing sections with Payments
- * view (`billing.view`, `S:33`) — so an Accountant reads Invoices and Payments
- * and nothing else — each section also needing its own read code (`canCode`, the codes in force,
- * a View-as preview's too). In the file's order.
+ * view (`billing.view`, `S:33`), each section also needing its own read code (`canCode`, the
+ * codes in force, a View-as preview's too) — so an Accountant (Patients view, no appointments,
+ * no clinical record) reads the Overview, Invoices, Payments, Packages and Team notes, never
+ * Visits. In the file's order.
  */
 export function viewablePatientFileSections(access: {
   patients: boolean;

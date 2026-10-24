@@ -49,8 +49,9 @@ capture settings are part of the threat model — verified:
   reacts to the decision and `initPostHog` refuses without consent). Beyond that:
   `autocapture: false` and `disable_session_recording: true` keep passive
   DOM/network capture off in code; only explicitly-coded events are sent;
-  `before_send` scrubs `token` and Stripe `*_client_secret` params from
-  `$current_url`-style properties; and
+  `before_send` drops the query string and fragment from every URL in
+  `properties`, `$set` and `$set_once` (a room's `?q=` search, create-drawer prefills,
+  `?token=`, Stripe `*_client_secret`); and
   `posthog.reset()` runs when the session ends so successive users on a shared
   device never chain into one anonymous profile. Accepting the banner emits a
   single `analytics_consent_decision` event (`shared/analytics/record-consent-decision.ts`).

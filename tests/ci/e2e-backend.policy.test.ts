@@ -12,6 +12,61 @@ import { describe, expect, it } from 'vitest';
 const WORKFLOW = readFileSync(join('.github', 'workflows', 'e2e-backend.yml'), 'utf8');
 const SPECS = join('tests', 'e2e');
 
+/** A service container takes no `-c` flags and `max_connections` needs a restart: the image default. */
+const SERVICE_POSTGRES_MAX_CONNECTIONS = 100;
+/**
+ * clinozy-be's defaults in `src/shared/config/env-schema.ts` (`DATABASE_POOL_MAX` 70,
+ * `DATABASE_MAINTENANCE_POOL_MAX` 10, `POSTGRES_RESERVED_CONNECTIONS` 10), which the image's boot
+ * here never overrides. clinozy-be's `ci-boot-connection-budget.policy.unit.test.ts` reads them from
+ * the schema; this repository cannot import it, so a change there is mirrored here.
+ */
+const BACKEND_DEFAULTS = {
+  DATABASE_POOL_MAX: 70,
+  DATABASE_MAINTENANCE_POOL_MAX: 10,
+  POSTGRES_RESERVED_CONNECTIONS: 10,
+} as const;
+/**
+ * What clinozy-be's connection budget assumes with no process count: one API plus one worker
+ * (`assert-connection-budget.ts`).
+ */
+const INFERRED_LOCAL_PROCESS_COUNT = 2;
+
+/** The text of one `- name:` step of the workflow. */
+function step(name: string): string {
+  const block = WORKFLOW.split(/^ {6}- name: /m).find((candidate) =>
+    candidate.startsWith(`${name}\n`),
+  );
+  return block ?? '';
+}
+
+/**
+ * A value a boot states — `KEY=n` on a `docker run`. Literal patterns, one per key, as
+ * clinozy-be's test reads them: its static security scan refuses a RegExp built from a variable.
+ */
+const STATED = {
+  DEPLOYMENT_TOTAL_REPLICA_COUNT: /DEPLOYMENT_TOTAL_REPLICA_COUNT=(\d+)/,
+  DATABASE_POOL_MAX: /DATABASE_POOL_MAX=(\d+)/,
+  DATABASE_MAINTENANCE_POOL_MAX: /DATABASE_MAINTENANCE_POOL_MAX=(\d+)/,
+} as const;
+
+/** Connections a boot asks for: stated (or inferred) processes × per-process pools. */
+function connectionDemand(boot: string): number {
+  const stated = (key: keyof typeof STATED) => boot.match(STATED[key])?.[1];
+  const processes = Number(
+    stated('DEPLOYMENT_TOTAL_REPLICA_COUNT') ?? INFERRED_LOCAL_PROCESS_COUNT,
+  );
+  const pool = Number(stated('DATABASE_POOL_MAX') ?? BACKEND_DEFAULTS.DATABASE_POOL_MAX);
+  const maintenance = Number(
+    stated('DATABASE_MAINTENANCE_POOL_MAX') ??
+      BACKEND_DEFAULTS.DATABASE_MAINTENANCE_POOL_MAX,
+  );
+  return processes * (pool + maintenance);
+}
+
+const BOOT_STEP = 'Migrate, seed the reference data and boot the backend';
+const ALLOWED_CONNECTIONS =
+  SERVICE_POSTGRES_MAX_CONNECTIONS - BACKEND_DEFAULTS.POSTGRES_RESERVED_CONNECTIONS;
+
 /** The `@smoke`-tagged tests: `test('<title>', { tag: '@smoke' }, …)`, per spec file. */
 function smokeTests(): string[] {
   return readdirSync(SPECS)
@@ -71,6 +126,19 @@ describe('E2E against the backend image', () => {
     // One API and no worker: without a count the backend's connection budget assumes both,
     // which the default Postgres here cannot hold, and the API exits before it listens.
     expect(WORKFLOW).toContain('-e DEPLOYMENT_TOTAL_REPLICA_COUNT=1');
+  });
+
+  // OPS-01: the string above is pinned; this checks the sum. clinozy-be's #82 raised the pool to 70,
+  // and every boot that stated no count asked 2 × (70 + 10) = 160 of the service's 90 and exited.
+  it('boots the backend within the service Postgres connection budget, by arithmetic', () => {
+    const boot = step(BOOT_STEP);
+    expect(boot).not.toBe('');
+    expect(connectionDemand(boot)).toBeLessThanOrEqual(ALLOWED_CONNECTIONS);
+    // Without its process count the same boot asks for 160 of 90 — the 17 Oct failure.
+    const unstated = boot.replace('-e DEPLOYMENT_TOTAL_REPLICA_COUNT=1 ', '');
+    expect(unstated).not.toBe(boot);
+    expect(connectionDemand(unstated)).toBe(160);
+    expect(connectionDemand(unstated)).toBeGreaterThan(ALLOWED_CONNECTIONS);
   });
 
   it("runs the app and the backend in the variables' organization mode", () => {

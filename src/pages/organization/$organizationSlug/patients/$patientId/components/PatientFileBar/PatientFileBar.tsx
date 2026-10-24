@@ -125,7 +125,8 @@ export interface PatientFileBarProps {
   /** The Add-to-record items the member may use; none hides "+". */
   addItems: readonly PatientAddItem[];
   activityOpen: boolean;
-  onToggleActivity: () => void;
+  /** "Activity" — hidden without it (a member who may not read the stream, `contact_activity:read`). */
+  onToggleActivity?: () => void;
   /** "Start visit" — hidden while a Visit is open (H:711 `notVisit`) or without it. */
   onStartVisit?: () => void;
   /** "Visit in progress · Resume" — while the patient has an open Visit away from its flow (A-F4). */
@@ -373,11 +374,13 @@ export function PatientFileBar({
             {t(K.startVisit)}
           </Button>
         ) : null}
-        <ActivityToggle
-          open={activityOpen}
-          awaitingReply={file.awaitingReply}
-          onToggle={onToggleActivity}
-        />
+        {onToggleActivity ? (
+          <ActivityToggle
+            open={activityOpen}
+            awaitingReply={file.awaitingReply}
+            onToggle={onToggleActivity}
+          />
+        ) : null}
       </div>
     </div>
   );

@@ -54,6 +54,7 @@ const SETUP_CONFIG = 'tooling/setup/setup.config.json';
  * @property {string} themeColor      PWA / browser-chrome theme colour.
  * @property {string} backgroundColor PWA splash background colour.
  * @property {string} codeowner       Default CODEOWNERS handle (`@user` or `@org/team`).
+ * @property {string} securityContact Private security-report mailbox (SECURITY.md, CODE_OF_CONDUCT.md).
  * @property {string} backendName     Sibling backend repo (`clinozy-be`).
  * @property {string} namespace       Prefix for storage keys / channel names (`core`).
  * @property {string} repository      GitHub `owner/repo` slug.
@@ -63,6 +64,13 @@ const SETUP_CONFIG = 'tooling/setup/setup.config.json';
 export function backendDirEnvVar(backendName) {
   return `${backendName.toUpperCase().replace(/-/g, '_')}_DIR`;
 }
+
+/**
+ * An address on a name reserved for documentation (RFC 2606 / RFC 6761): it reaches nobody.
+ * A security contact on one of these is a template placeholder that was never replaced.
+ */
+export const RESERVED_EMAIL_DOMAIN =
+  /@(?:[a-z0-9-]+\.)*(?:example\.(?:com|net|org)|example|test|invalid|localhost)$/i;
 
 /** Load and validate the identity block from `setup.config.json`. */
 export function loadIdentity(root = ROOT) {
@@ -77,6 +85,9 @@ export function loadIdentity(root = ROOT) {
     themeColor: project.themeColor,
     backgroundColor: project.backgroundColor,
     codeowner: project.codeowner,
+    // Where a researcher reports a vulnerability when GitHub private reporting is off or
+    // unreachable. Part of identity so a fork names its own mailbox, never the template's.
+    securityContact: project.securityContact,
     // The sibling backend repo this app talks to. Part of identity because a
     // derived product usually forks the backend too, and the frontend names it in
     // ~450 places: the `{ data, meta }` envelope comments, the E2E readiness probe,
@@ -96,6 +107,12 @@ export function loadIdentity(root = ROOT) {
     throw new Error(
       `${SETUP_CONFIG} is missing identity field(s): ${missing.join(', ')}. ` +
         'See docs/getting-started/new-project.md.',
+    );
+  }
+  if (RESERVED_EMAIL_DOMAIN.test(identity.securityContact)) {
+    throw new Error(
+      `${SETUP_CONFIG} project.securityContact is a placeholder (${identity.securityContact}): ` +
+        'set a monitored mailbox. See SECURITY.md.',
     );
   }
   // Every name this repo has carried. Validated separately from the string fields
@@ -164,8 +181,15 @@ const replaceValue = (pattern, value) => (text) =>
 // still pass it (and two tests pin the signature), so it stays in place rather than churning
 // them — underscored to say "deliberately unused" rather than "forgotten".
 export function derivedSurfaces(identity, _root = ROOT) {
-  const { name, displayName, productName, productDescription, codeowner, repository } =
-    identity;
+  const {
+    name,
+    displayName,
+    productName,
+    productDescription,
+    codeowner,
+    repository,
+    securityContact,
+  } = identity;
   const themeColor = identity.themeColor;
   const [repoOwner] = repository.split('/');
   const ownerHandle = codeowner.startsWith('@') ? codeowner : `@${codeowner}`;
@@ -346,6 +370,24 @@ export function derivedSurfaces(identity, _root = ROOT) {
       label: 'robots.txt product reference',
       apply: (text) =>
         text.replace(/^(#\s*)\S+( is an authenticated)/m, `$1${productName}$2`),
+    },
+    {
+      file: 'SECURITY.md',
+      label: 'private vulnerability report fallback address',
+      apply: (text) =>
+        text.replace(
+          /(\*\*Alternative:\*\* Email \*\*)[^*\s]+(\*\*)/,
+          `$1${securityContact}$2`,
+        ),
+    },
+    {
+      file: 'CODE_OF_CONDUCT.md',
+      label: 'enforcement contact address',
+      apply: (text) =>
+        text.replace(
+          /(responsible for enforcement at )\S+?(\. )/,
+          `$1${securityContact}$2`,
+        ),
     },
     {
       file: 'context7.json',
