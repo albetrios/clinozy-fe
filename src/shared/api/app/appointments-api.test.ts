@@ -585,6 +585,32 @@ describe('fetchAppointmentSlots (the slot grid)', () => {
     });
   });
 
+  // A booking's room and machine block a start as its doctor does (the save's exclusion checks).
+  it('asks with the room and machine the booking holds', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        appointment_date: APPOINTMENT_TOMORROW,
+        is_open: true,
+        closed_reason: null,
+        closed_label: null,
+        slots: [],
+      },
+    } as never);
+
+    await fetchAppointmentSlots({
+      ...params,
+      roomId: 'room_laser00000000000000',
+      machineId: 'mach_diode00000000000000',
+    });
+
+    expect(api.get).toHaveBeenCalledWith('/app/appointments/slots', {
+      query: expect.objectContaining({
+        branch_room_id: 'room_laser00000000000000',
+        branch_machine_id: 'mach_diode00000000000000',
+      }),
+    });
+  });
+
   it('reads a closed day by its reason and a holiday’s name', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({
       data: {
