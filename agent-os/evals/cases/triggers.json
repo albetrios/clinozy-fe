@@ -94,6 +94,11 @@
       "file": "package.json",
       "expectSkills": ["fe-dependency-management"],
       "why": "A dependency change and its lockfile are one commit (fe-dependency-management's trigger)."
+    },
+    {
+      "file": "docs/deployment/path-to-production.md",
+      "expectSkills": ["fe-path-to-production"],
+      "why": "The production gate doc is where a release starts; the skill carries the whole procedure."
     }
   ]
 }

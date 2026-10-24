@@ -232,6 +232,11 @@
       "note": "A new or changed page island"
     },
     {
+      "globs": ["docs/deployment/path-to-production.md"],
+      "skills": ["fe-path-to-production"],
+      "note": "Or the user asks to release / deploy to production / path to production — the readiness plan the user approves, then the Release PR, the approved deploy and the live check"
+    },
+    {
       "globs": [
         "src/core/config/env-schema.ts",
         "**/platform-config.ts",
