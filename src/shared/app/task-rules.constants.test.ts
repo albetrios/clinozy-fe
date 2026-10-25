@@ -48,7 +48,10 @@ describe('TASK_RULE_KEYS', () => {
   it('names every type and every outcome of the catalogue — no more, no fewer', () => {
     expect(Object.keys(TASK_RULE_KEYS.rules)).toEqual([...TASK_TYPE_VALUES]);
     expect(Object.keys(TASK_RULE_KEYS.groups)).toEqual([...TASK_RULE_GROUPS]);
-    expect(Object.keys(TASK_RULE_KEYS.snoozeOptions)).toEqual([...TASK_SNOOZE_OPTIONS]);
+    // "Tomorrow" is worded by the clock (the branch's next opening), not by a key.
+    expect(Object.keys(TASK_RULE_KEYS.snoozeOptions)).toEqual(
+      TASK_SNOOZE_OPTIONS.filter((option) => option !== 'tomorrow'),
+    );
     expect(Object.keys(TASK_RULE_KEYS.followUpWhen)).toEqual([...TASK_FOLLOW_UP_WHEN]);
     for (const type of TASK_TYPE_VALUES) {
       const keys = TASK_RULE_KEYS.rules[type];

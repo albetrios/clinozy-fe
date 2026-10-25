@@ -31,10 +31,81 @@ const FALLBACK_TONES = {
   },
 } as const;
 
+/**
+ * The public status pages' emblems: the wordmark's "o" telling what happened —
+ * its dot gone astray (missing), a lock inside it (locked), the ring broken
+ * round its dot (broken).
+ */
+type FallbackEmblemKind = 'missing' | 'locked' | 'broken';
+
+/** A public page's emblem: a brand drawing, decorative (the heading names it). */
+function FallbackEmblem({ kind }: { kind: FallbackEmblemKind }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 56 56"
+      fill="none"
+      data-testid="fallback-emblem"
+      data-emblem={kind}
+      className="mb-2 size-14 overflow-visible"
+    >
+      {kind === 'missing' ? (
+        <>
+          <circle
+            cx="26"
+            cy="30"
+            r="17"
+            strokeWidth="4.5"
+            className="stroke-foreground"
+          />
+          <circle cx="45" cy="11" r="5" className="fill-brand-mark" />
+        </>
+      ) : null}
+      {kind === 'locked' ? (
+        <>
+          <circle cx="28" cy="28" r="22" strokeWidth="4" className="stroke-foreground" />
+          <path
+            d="M23 26v-3a5 5 0 0 1 10 0v3"
+            strokeWidth="3"
+            strokeLinecap="round"
+            className="stroke-foreground"
+          />
+          <rect x="20" y="26" width="16" height="12" rx="3" className="fill-foreground" />
+        </>
+      ) : null}
+      {kind === 'broken' ? (
+        <>
+          <circle
+            cx="28"
+            cy="28"
+            r="20"
+            strokeWidth="4.5"
+            strokeLinecap="round"
+            strokeDasharray="19 6"
+            pathLength={100}
+            className="stroke-foreground"
+          />
+          <circle cx="28" cy="28" r="6" className="fill-brand-mark" />
+        </>
+      ) : null}
+    </svg>
+  );
+}
+
 /** Props for {@link FallbackState}. */
 export interface FallbackStateProps {
   tone: keyof typeof FALLBACK_TONES;
   icon: ReactNode;
+  /**
+   * A public page's emblem in place of the illustration (the 404, the 403, the
+   * full-page failure): the wordmark's "o", with a larger heading under it.
+   */
+  emblem?: FallbackEmblemKind;
+  /**
+   * The status — "Error 404" — as a quiet pill inside the heading, above its
+   * title, so the heading says it too (L-65a).
+   */
+  label?: ReactNode;
   title: ReactNode;
   description?: ReactNode;
   /** The buttons under the line. */
@@ -59,6 +130,8 @@ export interface FallbackStateProps {
 export function FallbackState({
   tone,
   icon,
+  emblem,
+  label,
   title,
   description,
   actions,
@@ -74,38 +147,63 @@ export function FallbackState({
       data-tone={tone}
       className={cn('flex flex-col items-center gap-2.5 px-4 text-center', className)}
     >
-      <span
-        aria-hidden="true"
-        data-testid="fallback-illustration"
-        className="relative mb-1.5 flex size-24 items-center justify-center"
-      >
+      {emblem ? <FallbackEmblem kind={emblem} /> : null}
+      {emblem ? null : (
         <span
-          data-slot="pill"
-          className="border-border absolute inset-0 rounded-full border-[1.5px] border-dashed"
-        />
-        <span
-          data-slot="pill"
-          className={cn('absolute inset-3.5 rounded-full', toneClasses.disc)}
-        />
-        <span
-          data-slot="empty-state-tile"
-          className={cn(
-            'bg-card ring-border relative flex size-10 items-center justify-center rounded-xl shadow-xs ring-1 [&_svg]:size-4.5',
-            toneClasses.ink,
-          )}
+          aria-hidden="true"
+          data-testid="fallback-illustration"
+          className="relative mb-1.5 flex size-24 items-center justify-center"
         >
-          {icon}
+          <span
+            data-slot="pill"
+            className="border-border absolute inset-0 rounded-full border-[1.5px] border-dashed"
+          />
+          <span
+            data-slot="pill"
+            className={cn('absolute inset-3.5 rounded-full', toneClasses.disc)}
+          />
+          <span
+            data-slot="empty-state-tile"
+            className={cn(
+              'bg-card ring-border relative flex size-10 items-center justify-center rounded-xl shadow-xs ring-1 [&_svg]:size-4.5',
+              toneClasses.ink,
+            )}
+          >
+            {icon}
+          </span>
+          <span
+            className={cn(
+              'absolute end-2 top-2.5 size-2.5 rounded-full',
+              toneClasses.dot,
+            )}
+          />
+          <span className="bg-border absolute start-1.5 bottom-3.5 size-1.5 rounded-full" />
         </span>
-        <span
-          className={cn('absolute end-2 top-2.5 size-2.5 rounded-full', toneClasses.dot)}
-        />
-        <span className="bg-border absolute start-1.5 bottom-3.5 size-1.5 rounded-full" />
-      </span>
-      <Heading className="text-title text-foreground flex flex-col items-center gap-2 leading-[1.2] font-semibold">
+      )}
+      <Heading
+        className={cn(
+          'text-foreground flex flex-col items-center gap-2 leading-[1.2] font-semibold',
+          emblem ? 'text-2xl tracking-[-0.02em] text-balance' : 'text-title',
+        )}
+      >
+        {/* The status inside the page's one heading, before its title (L-65a). */}
+        {label ? (
+          <span
+            data-slot="pill"
+            className="text-muted-foreground-strong text-caption bg-background inline-flex h-5.5 items-center rounded-full border px-2.5 font-medium tracking-normal tabular-nums"
+          >
+            {label}
+          </span>
+        ) : null}
         {title}
       </Heading>
       {description ? (
-        <p className="text-muted-foreground text-detail max-w-80 leading-normal text-pretty wrap-anywhere">
+        <p
+          className={cn(
+            'text-muted-foreground leading-normal text-pretty wrap-anywhere',
+            emblem ? 'text-body max-w-96' : 'text-detail max-w-80',
+          )}
+        >
           {description}
         </p>
       ) : null}

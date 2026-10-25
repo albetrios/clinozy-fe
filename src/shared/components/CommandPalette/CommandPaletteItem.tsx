@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils.ts';
-import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { CommandItem as CommandRow } from '@/shared/components/ui/command.tsx';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import type { AppIcon } from '@/shared/icons/index.ts';
 
 /**

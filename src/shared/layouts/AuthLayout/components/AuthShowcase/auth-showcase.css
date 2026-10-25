@@ -1,470 +1,1184 @@
-/* The sign-in showcase — the journey dial and its page-load choreography.
-   Loaded with the lazy auth layout chunk, never on the first paint (the
-   initial-CSS budget): the same split as `bug-report.css`.
+/* The sign-in stage: the tour of one patient's day (AuthShowcaseStage). Loaded
+   with the lazy auth layout chunk, never on the first paint (the initial-CSS
+   budget): the same split as `bug-report.css`.
 
-   One turn of the dial is 15.4s. The thread (the logo's green dot with its
-   tail) steps round the seven stops, holding on each for 1.54s (10% of a turn)
-   and moving for 0.66s on a strong ease-in-out. Everything that answers it — a
-   stop's lift and halo, the centre label, a moment card's lift and glow — runs
-   the same 15.4s, started `--stop × 2.2s` in, so the dial never drifts out of
-   step. `--stop` is the stop's place in the journey (0–6, clockwise from the
-   top, as `JOURNEY_STOPS` lists them; AuthShowcase.test.tsx pins the two
-   together). Only transform, opacity and a short blur animate; no stop label is
-   ever dimmed (they are text). Logical insets throughout, so under RTL the
-   journey runs the other way round, as the reading order does — the thread and
-   the aura are mirrored to match. Reduced motion: the dial stands still with
-   every stop named; the thread, the halos and the centre label leave. */
+   Tokens only, so dark mode and every preset follow; corners are radius steps
+   (a pill carries `data-slot="pill"`, so the Sharp shape squares it); logical
+   insets throughout, so under RTL the sheet and the fills run the reading way.
+   Motion is the app's: `--ease-out-strong` in, short, transform / opacity / a
+   little blur only. Reduced motion: the tour never plays on its own and every
+   scene is drawn at its end (index.css stops the keyframes). */
 
-.auth-dial {
-  --dial-turn: 15400ms;
-  --dial-step: 2200ms;
-  --dial-move: var(--ease-in-out-strong);
-  --dial-out: var(--ease-out-strong);
-  animation: auth-dial-enter 1100ms var(--dial-out) 120ms both;
+.tour-stage {
+  --tour-pad: calc(var(--spacing) * 6);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  background:
+    radial-gradient(
+      120% 70% at 0% 0%,
+      color-mix(in oklch, var(--color-background) 70%, transparent),
+      transparent 60%
+    ),
+    var(--color-muted);
+  padding: calc(var(--spacing) * 8) var(--tour-pad) 0;
 }
-
-/* Each stop's place: its index and its centre, 35% out from the middle, a
-   seventh of a turn apart, starting at the top. */
-.auth-dial [data-stop='enquiry'] {
-  --stop: 0;
-  --x: 50%;
-  --y: 15%;
+[dir='rtl'] .tour-stage {
+  background:
+    radial-gradient(
+      120% 70% at 100% 0%,
+      color-mix(in oklch, var(--color-background) 70%, transparent),
+      transparent 60%
+    ),
+    var(--color-muted);
 }
-.auth-dial [data-stop='booked'] {
-  --stop: 1;
-  --x: 77.4%;
-  --y: 28.2%;
-}
-.auth-dial [data-stop='waiting'] {
-  --stop: 2;
-  --x: 84.1%;
-  --y: 57.8%;
-}
-.auth-dial [data-stop='withDoctor'] {
-  --stop: 3;
-  --x: 65.2%;
-  --y: 81.5%;
-}
-.auth-dial [data-stop='treatment'] {
-  --stop: 4;
-  --x: 34.8%;
-  --y: 81.5%;
-}
-.auth-dial [data-stop='checkout'] {
-  --stop: 5;
-  --x: 15.9%;
-  --y: 57.8%;
-}
-.auth-dial [data-stop='followUp'] {
-  --stop: 6;
-  --x: 22.6%;
-  --y: 28.2%;
+.dark .tour-stage {
+  background: var(--color-canvas);
 }
 
-/* The seven stops' dots swept round a circle in journey order, blurred
-   behind the ring — breathing, slowly. */
-.auth-dial-aura {
-  position: absolute;
-  inset: 12%;
-  border-radius: 50%;
-  background: conic-gradient(
-    var(--color-tone-lav-dot),
-    var(--color-tone-sky-dot),
-    var(--color-tone-butter-dot),
-    var(--color-tone-blush-dot),
-    var(--color-tone-sage-dot),
-    var(--color-tone-peach-dot),
-    var(--color-tone-plum-dot),
-    var(--color-tone-lav-dot)
-  );
-  filter: blur(48px);
-  opacity: 0.4;
-  animation: auth-dial-breathe 7s ease-in-out infinite alternate both;
+.tour-copy {
+  max-width: 35rem;
 }
-.dark .auth-dial-aura {
-  opacity: 0.25;
+.tour-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  font-size: var(--text-detail);
+  font-weight: 500;
+  color: var(--color-foreground-soft);
 }
-
-/* The thread: a tail a seventh of a turn long, brightening to the head. */
-.auth-dial-thread {
-  position: absolute;
-  inset: 15%;
-  animation: auth-dial-thread var(--dial-turn) linear infinite;
+.tour-title {
+  margin-top: calc(var(--spacing) * 4);
+  font-family: var(--font-heading);
+  font-size: clamp(1.8125rem, 2.9vw, 2.75rem);
+  line-height: 1.08;
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  color: var(--color-foreground);
+  text-wrap: balance;
 }
-.auth-dial-thread::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: conic-gradient(transparent 0deg 308deg, var(--color-brand-mark) 360deg);
-  mask-image: radial-gradient(
-    farthest-side,
-    transparent calc(100% - 3px),
-    black calc(100% - 2.5px)
-  );
-}
-.auth-dial-thread::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 0.625rem;
-  height: 0.625rem;
-  border-radius: 50%;
-  translate: -50% -50%;
-  background: var(--color-brand-mark);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-brand-mark) 22%, transparent);
-}
-[dir='rtl'] :is(.auth-dial-thread, .auth-dial-aura) {
-  scale: -1 1;
+/* A sentence breaks only where it must: the lines part between sentences (TourTitleSentences). */
+.tour-title-sentence {
+  display: inline-block;
 }
 
-/* A stop: centred on its point, popping in a beat after the one before. */
-.auth-dial-stop {
+/* ── The steps: seven story bars and the pause button ── */
+.tour-bar {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 3);
+  margin-top: calc(var(--spacing) * 6.5);
+}
+.tour-steps {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: calc(var(--spacing) * 1.5);
+}
+.tour-step {
+  position: relative;
+  height: calc(var(--spacing) * 5.5);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+}
+.tour-step-track,
+.tour-step-fill {
   position: absolute;
-  inset-inline-start: var(--x);
-  top: var(--y);
-  translate: -50% -50%;
-  animation: auth-dial-pop 520ms var(--dial-out) both;
-  animation-delay: calc(420ms + var(--stop) * 60ms);
+  inset-inline: 0;
+  top: calc(50% - 1.5px);
+  height: 3px;
+  border-radius: 9999px;
 }
-[dir='rtl'] .auth-dial-stop {
-  translate: 50% -50%;
+.tour-step-track {
+  background: color-mix(in oklch, var(--color-foreground) 12%, transparent);
+  transition: background-color 150ms var(--ease-out-strong);
 }
-.auth-dial-node {
-  animation: auth-dial-lift-stop var(--dial-turn) var(--dial-out) infinite;
-  animation-delay: calc(var(--stop) * var(--dial-step));
+.tour-step:hover .tour-step-track {
+  background: color-mix(in oklch, var(--color-foreground) 24%, transparent);
 }
-.auth-dial-halo {
+.tour-step-fill {
+  background: var(--color-foreground);
+  transform-origin: left center;
+  transform: scaleX(var(--fill, 0));
+}
+[dir='rtl'] .tour-step-fill {
+  transform-origin: right center;
+}
+.tour-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-background);
+  color: var(--color-foreground-soft);
+  box-shadow: var(--elevation-control);
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--ease-out-strong),
+    scale 160ms var(--ease-out-strong);
+}
+.tour-toggle:hover {
+  background: var(--color-muted);
+}
+.tour-toggle:active {
+  scale: 0.94;
+}
+
+/* ── The narration ── */
+.tour-narration {
+  margin-top: calc(var(--spacing) * 3.5);
+  min-height: 6.5rem;
+}
+.tour-narration-in {
+  animation: tour-copy-in 300ms var(--ease-out-strong) both;
+}
+.tour-room {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--text-caption);
+  font-weight: 600;
+}
+.tour-headline {
+  margin-top: calc(var(--spacing) * 1.5);
+  font-size: 1.3125rem;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+  color: var(--color-foreground);
+}
+.tour-body {
+  margin-top: calc(var(--spacing) * 1.5);
+  max-width: 32rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-muted-foreground-strong);
+  text-wrap: pretty;
+}
+
+/* ── The Today sheet ── */
+.tour-glimpse {
+  /* The Branches deck's one clock (TourBranches.tsx): it fans out as the chapter arrives, holds
+     while each branch reads its state, and folds at --deck-fold-at. Fanned, Riya's sheet drops
+     --deck-drop to show two branch sheets above it; folded, --deck-rest shows their edges. */
+  --deck-fan-ms: 460ms;
+  --deck-fold-at: 2600ms;
+  --deck-fold-ms: 520ms;
+  --deck-drop: 92px;
+  --deck-rest: 16px;
+  position: relative;
+  margin-top: clamp(1.25rem, 3.2vh, 2rem);
+  flex: 1;
+  min-height: 0;
+}
+.tour-glimpse-frame {
   position: absolute;
-  inset: -0.5rem;
-  border-radius: 50%;
-  filter: blur(12px);
-  opacity: 0;
-  animation: auth-dial-halo var(--dial-turn) ease-out infinite;
-  animation-delay: calc(var(--stop) * var(--dial-step));
+  inset: 0 calc(var(--spacing) * -6);
+  padding: 0 calc(var(--spacing) * 6);
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 4rem), transparent);
 }
-.auth-dial-label {
-  position: absolute;
-  inset-inline-start: 50%;
-  top: 100%;
-  margin-top: 0.375rem;
-  translate: -50% 0;
+.tour-day {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  background: var(--color-card);
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    var(--elevation-panel);
+  transition: transform var(--deck-fold-ms) var(--ease-out-strong);
+}
+.tour-day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 4);
+  padding: calc(var(--spacing) * 3.75) calc(var(--spacing) * 5);
+  border-bottom: 1px solid var(--color-border);
+}
+.tour-day-title {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--spacing) * 2.5);
+  min-width: 0;
+}
+.tour-day-title b {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+.tour-day-title span {
+  overflow: hidden;
+  font-size: var(--text-detail);
+  color: var(--color-muted-foreground);
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
-[dir='rtl'] .auth-dial-label {
-  translate: 50% 0;
+.tour-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-foreground-soft);
+  white-space: nowrap;
+}
+.tour-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--color-brand-mark);
+  animation: tour-pulse 2.4s var(--ease-out-strong) infinite;
+}
+.tour-live.is-closed .tour-live-dot {
+  background: var(--color-border-strong);
+  animation: none;
+}
+.tour-tabs {
+  display: flex;
+  gap: calc(var(--spacing) * 1);
+  overflow: hidden;
+  padding: calc(var(--spacing) * 2.5) calc(var(--spacing) * 3.5);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.tour-tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 calc(var(--spacing) * 2.5);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-detail);
+  color: var(--color-muted-foreground-strong);
+}
+.tour-tab b {
+  display: inline-block;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted-foreground);
+}
+.tour-tab.is-on {
+  background: var(--color-muted-strong);
+  color: var(--color-foreground);
+  font-weight: 500;
+}
+.tour-tab.is-on b {
+  color: var(--color-foreground-soft);
+}
+.tour-count {
+  animation: tour-tick 320ms var(--ease-out-strong) both;
 }
 
-/* The centre: the stop the thread is on, each label rising in as it arrives. */
-.auth-dial-now {
+.tour-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* Six rows' room (a row and its border): the lens under Riya's row stays inside the sheet
+     when the branch's hours leave fewer visits around hers, near closing or just after opening. */
+  min-height: calc(6 * 59px);
+}
+.tour-visit {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4.75rem minmax(0, 1fr) 8.75rem 9.375rem;
+  align-items: center;
+  gap: calc(var(--spacing) * 3);
+  min-height: 58px;
+  padding: 0 calc(var(--spacing) * 5);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 420ms var(--ease-out-strong);
+}
+.tour-time {
+  font-size: var(--text-detail);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted-foreground-strong);
+  white-space: nowrap;
+}
+.tour-who {
+  display: block;
+  min-width: 0;
+}
+.tour-name,
+.tour-what {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tour-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+.tour-what {
+  margin-top: 1px;
+  font-size: var(--text-caption);
+  color: var(--color-muted-foreground);
+}
+.tour-staff {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  min-width: 0;
+  font-size: var(--text-detail);
+  color: var(--color-foreground-soft);
+  white-space: nowrap;
+}
+.tour-status {
+  justify-self: start;
+}
+.tour-free {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 9999px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-muted-foreground-strong);
+  white-space: nowrap;
+}
+
+/* Riya's row, in the tone of the chapter she is in. */
+.tour-story {
+  z-index: 3;
+}
+.tour-story.is-open .tour-name {
+  font-weight: 400;
+  color: var(--color-muted-foreground);
+}
+.tour-story .tour-what {
+  color: var(--color-muted-foreground-strong);
+}
+.tour-story[data-tone='lav'] {
+  background: color-mix(in oklch, var(--color-tone-lav) 42%, var(--color-card));
+}
+.tour-story[data-tone='sky'] {
+  background: color-mix(in oklch, var(--color-tone-sky) 42%, var(--color-card));
+}
+.tour-story[data-tone='butter'] {
+  background: color-mix(in oklch, var(--color-tone-butter) 42%, var(--color-card));
+}
+.tour-story[data-tone='blush'] {
+  background: color-mix(in oklch, var(--color-tone-blush) 42%, var(--color-card));
+}
+.tour-story[data-tone='sage'] {
+  background: color-mix(in oklch, var(--color-tone-sage) 42%, var(--color-card));
+}
+.tour-story[data-tone='peach'] {
+  background: color-mix(in oklch, var(--color-tone-peach) 42%, var(--color-card));
+}
+.tour-story[data-tone='plum'] {
+  background: color-mix(in oklch, var(--color-tone-plum) 42%, var(--color-card));
+}
+.tour-story[data-tone='stone'] {
+  background: color-mix(in oklch, var(--color-tone-stone) 70%, var(--color-card));
+}
+.tour-swap {
+  animation: tour-swap 300ms var(--ease-out-strong) both;
+}
+
+/* The now line: the viewer's own time, between the last visit and Riya's slot —
+   over her row (z 3), whose tint would otherwise cover the label's lower half. */
+.tour-now {
+  position: relative;
+  z-index: 4;
+  height: 0;
+}
+.tour-now::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: -1px;
+  height: 2px;
+  background: var(--color-brand-mark);
+}
+.tour-now span {
+  position: absolute;
+  inset-inline-start: calc(var(--spacing) * 3.5);
+  top: -10px;
+  padding: 0 7px;
+  border: 1px solid var(--color-tone-sage-border);
+  border-radius: 9999px;
+  background: var(--color-tone-sage);
+  color: var(--color-tone-sage-foreground);
+  font-size: var(--text-tiny);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 19px;
+  white-space: nowrap;
+}
+
+/* ── The lens: the chapter's feature at work, under Riya's row ── */
+.tour-lens {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-start: 6rem;
+  width: clamp(18rem, calc(100% - 27.625rem), 22rem);
+  padding: calc(var(--spacing) * 3.5);
+  border-radius: var(--radius-xl);
+  background: var(--color-card);
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    var(--elevation-menu);
+  font-size: var(--text-detail);
+  color: var(--color-foreground);
+}
+.tour-lens::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  inset-inline-start: 26px;
+  width: 11px;
+  height: 11px;
+  border-top: 1px solid var(--color-border);
+  border-inline-start: 1px solid var(--color-border);
+  background: var(--color-card);
+  transform: rotate(45deg);
+}
+[dir='rtl'] .tour-lens::before {
+  transform: rotate(-45deg);
+}
+.tour-lens.is-arriving {
+  animation: tour-lens-in 340ms var(--ease-out-strong) both;
+}
+.tour-lens-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 2.5);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+}
+.tour-lens-head b {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--color-foreground-soft);
+}
+.tour-lens-sub {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  margin-top: calc(var(--spacing) * 2.5);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+}
+.tour-lens-sub-icon {
+  display: inline-flex;
+  color: var(--color-tone-sage-foreground);
+}
+
+/* Leads: a message types itself in. */
+.tour-bubble-row {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--spacing) * 2);
+  margin-top: calc(var(--spacing) * 2.5);
+}
+.tour-bubble {
+  min-height: 36px;
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-xs);
+  background: var(--color-muted);
+  font-size: 0.84375rem;
+  line-height: 1.4;
+}
+[dir='rtl'] .tour-bubble {
+  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xs) var(--radius-xl);
+}
+.tour-typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 6px 2px;
+}
+.tour-typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-muted-foreground);
+  animation: tour-typing 1s var(--ease-in-out) infinite;
+}
+.tour-typing i:nth-child(2) {
+  animation-delay: 140ms;
+}
+.tour-typing i:nth-child(3) {
+  animation-delay: 280ms;
+}
+
+/* Appointments: the pick glides to the earliest free slot. */
+.tour-slots {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: calc(var(--spacing) * 2.5);
+}
+.tour-slot {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
+  min-height: 34px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: color 200ms var(--ease-out-strong);
 }
-.auth-dial-now > * {
+.tour-slot.is-taken {
+  border-color: transparent;
+  background: var(--color-muted);
+  color: var(--color-muted-foreground-strong);
+  text-decoration: line-through;
+}
+.tour-slot.is-picked {
+  border-color: transparent;
+  color: var(--color-primary-foreground);
+}
+.tour-slot-select {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  inset-inline-start: var(--slot-start, 0);
+  width: var(--slot-width, 0);
+  height: 34px;
+  border-radius: var(--radius-lg);
+  background: var(--color-primary);
+  transition:
+    inset-inline-start 460ms var(--ease-in-out),
+    width 460ms var(--ease-in-out);
+}
+
+/* Front desk: the doctor's bell, and the wait counting. */
+.tour-checkin {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 3);
+  margin-top: calc(var(--spacing) * 0.5);
+}
+.tour-checkin b {
+  display: block;
+  font-size: 0.84375rem;
+  font-weight: 600;
+}
+.tour-checkin small {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+}
+.tour-bell {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-lg);
+  background: var(--color-tone-butter);
+  color: var(--color-tone-butter-foreground);
+}
+.tour-bell svg {
+  transform-origin: 50% 10%;
+}
+.tour-bell.is-ringing svg {
+  animation: tour-ring 900ms var(--ease-out-strong) 1;
+}
+.tour-timer {
+  margin-inline-start: auto;
+  padding: 4px 9px;
+  border-radius: var(--radius-md);
+  background: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-detail);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Patient file: the prescription writes itself. */
+.tour-file-tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: calc(var(--spacing) * 2.5);
+}
+.tour-file-tabs span {
+  padding: 3px 9px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground-strong);
+}
+.tour-file-tabs .is-on {
+  background: var(--color-muted-strong);
+  color: var(--color-foreground);
+  font-weight: 500;
+}
+.tour-rx {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--spacing) * 2.5);
+  margin-top: calc(var(--spacing) * 2);
+  padding: calc(var(--spacing) * 2.5) calc(var(--spacing) * 3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+.tour-rx-mark {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.9375rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-tone-blush-foreground);
+}
+.tour-rx-line {
+  min-height: 19px;
+  font-size: 0.84375rem;
+  line-height: 1.4;
+}
+.tour-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 15px;
+  margin-inline-start: 1px;
+  vertical-align: -2px;
+  background: var(--color-foreground);
+  animation: tour-blink 1s steps(1) infinite;
+}
+
+/* Treatment: a session dot fills. */
+.tour-sessions {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  margin-top: calc(var(--spacing) * 3);
+}
+.tour-session {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border: 2px dashed var(--color-border-strong);
+  border-radius: 9999px;
+}
+.tour-session.is-used {
+  border: 0;
+  background: var(--color-tone-sage-dot);
+}
+.tour-session.is-filling {
+  animation: tour-fill 420ms var(--ease-out-strong) both;
+}
+.tour-sessions-count {
+  margin-inline-start: 6px;
+  font-size: var(--text-caption);
+  color: var(--color-muted-foreground-strong);
+}
+
+/* Payments: the bill settles. */
+.tour-method {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 9999px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-foreground-soft);
+}
+.tour-receipt {
+  display: grid;
+  gap: 6px;
+  margin-top: calc(var(--spacing) * 2.5);
+}
+.tour-receipt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 2.5);
+  color: var(--color-foreground-soft);
+  font-variant-numeric: tabular-nums;
+}
+.tour-receipt-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 2.5);
+  margin-top: 4px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--color-border-strong);
+}
+.tour-receipt-total b {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tasks: the follow-up drops onto the list. */
+.tour-task {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--spacing) * 2.5);
+  margin-top: calc(var(--spacing) * 2.5);
+  padding: calc(var(--spacing) * 2.5) calc(var(--spacing) * 3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+}
+.tour-task.is-dropping {
+  animation: tour-drop 420ms var(--ease-out-strong) both;
+}
+.tour-task b {
+  display: block;
+  font-size: 0.84375rem;
+  font-weight: 500;
+}
+.tour-task small {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+}
+.tour-task > :last-child {
+  margin-inline-start: auto;
+}
+.tour-task-box {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-xs);
+}
+
+/* ── A phone: the stage sits under the form, one column, shorter rows ── */
+/* ── Branches: Riya's sheet as the front of a deck, one sheet per branch ──
+   Each piece remounts on an arrival, so the chapter replays; the sheet itself does not, so its
+   drop alternates two keyframe names (`data-deck-run`). The sheet drops, holds and folds in ONE
+   animation that ends on the rest it starts from and holds nothing after, so leaving the chapter
+   slides it back up (a filled animation would block that transition); its stops are the clock in
+   percent of 3120ms (--deck-fold-at + --deck-fold-ms): the fan ends at 460ms (14.7%), the fold
+   starts at 2600ms (83.3%). Without `.is-playing` — still, or under
+   reduced motion — it is drawn folded: every branch on one sheet. */
+.tour-day.is-deck {
+  transform: translateY(var(--deck-rest));
+}
+.tour-day.is-deck.is-playing[data-deck-run='even'] {
+  animation: tour-deck-sheet-even 3120ms linear;
+}
+.tour-day.is-deck.is-playing[data-deck-run='odd'] {
+  animation: tour-deck-sheet-odd 3120ms linear;
+}
+.tour-deck {
+  position: absolute;
+  top: 0;
+  inset-inline: calc(var(--spacing) * 6);
+}
+.tour-deck-card {
+  --deck-inset: calc(var(--spacing) * 7);
+  --deck-card-rest: 0px;
+  --deck-card-fan: 0px;
+  position: absolute;
+  top: 0;
+  inset-inline: var(--deck-inset);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 3);
+  height: calc(var(--deck-drop) + 1.5rem);
+  padding: 0.8125rem calc(var(--spacing) * 5);
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklch, var(--color-card) 88%, var(--color-muted));
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    var(--elevation-panel);
+  transform: translateY(var(--deck-card-rest));
+}
+.tour-deck-card[data-depth='1'] {
+  --deck-inset: calc(var(--spacing) * 3.5);
+  --deck-card-rest: calc(var(--deck-rest) / 2);
+  --deck-card-fan: calc(var(--deck-drop) / 2);
+  background: color-mix(in oklch, var(--color-card) 95%, var(--color-muted));
+}
+.tour-deck-card > * {
+  opacity: 0;
+}
+.tour-deck.is-playing .tour-deck-card {
+  animation:
+    tour-deck-card-fan var(--deck-fan-ms) var(--ease-out-strong) both,
+    tour-deck-card-fold var(--deck-fold-ms) var(--ease-out-strong) var(--deck-fold-at)
+      forwards;
+}
+.tour-deck.is-playing .tour-deck-card > * {
+  animation:
+    tour-deck-show 280ms var(--ease-out-strong) 220ms both,
+    tour-deck-hide 200ms var(--ease-out-strong) calc(var(--deck-fold-at) - 80ms) forwards;
+}
+.tour-deck-name {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  min-width: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+.tour-day-end {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 3);
+  min-width: 0;
+}
+.tour-branch-chip {
+  display: inline-grid;
+  padding: 2px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  background: var(--color-card);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-foreground-soft);
+  white-space: nowrap;
+}
+.tour-branch-chip-label {
   grid-area: 1 / 1;
-  opacity: 0;
-  animation: auth-dial-label var(--dial-turn) ease-out infinite;
-  animation-delay: calc(var(--stop) * var(--dial-step));
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
 }
-
-/* The moments: each lifts and glows in its tone as the thread reaches its stop. */
-.auth-moments [data-moment='checkIn'] {
-  --stop: 2;
-  --moment-tone: var(--color-tone-sky-dot);
+/* The chip is as wide as the label it shows: Riya's branch collapses as "All branches" opens. */
+.tour-branch-chip .tour-deck-before {
+  max-width: 0;
 }
-.auth-moments [data-moment='followUp'] {
-  --stop: 6;
-  --moment-tone: var(--color-tone-plum-dot);
+.tour-day.is-playing .tour-branch-chip .tour-deck-before {
+  animation: tour-chip-out 260ms var(--ease-out-strong) var(--deck-fold-at) both;
 }
-.auth-moments [data-moment='invoice'] {
-  --stop: 5;
-  --moment-tone: var(--color-tone-peach-dot);
+.tour-day.is-playing .tour-branch-chip .tour-deck-after {
+  animation: tour-chip-in 320ms var(--ease-out-strong) var(--deck-fold-at) both;
 }
-.auth-moments > li {
-  animation: auth-rise 700ms var(--dial-out) both;
+.tour-branch-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
 }
-.auth-moments > li:nth-child(1) {
-  animation-delay: 900ms;
+.tour-branch-dots {
+  display: inline-flex;
+  flex: none;
 }
-.auth-moments > li:nth-child(2) {
-  animation-delay: 1000ms;
+.tour-branch-dots .tour-branch-dot + .tour-branch-dot {
+  margin-inline-start: -3px;
+  box-shadow: 0 0 0 1.5px var(--color-card);
 }
-.auth-moments > li:nth-child(3) {
-  animation-delay: 1100ms;
-}
-.auth-moment {
-  animation: auth-dial-lift var(--dial-turn) var(--dial-out) infinite;
-  animation-delay: calc(var(--stop) * var(--dial-step));
-}
-.auth-moment::after {
-  content: '';
+/* A row once the sheet is every branch's: a bar of its branch's tone at the start, and the
+   branch where its person was (the person stays under it until the fold). */
+.tour-row-branch {
   position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--moment-tone) 50%, transparent);
-  opacity: 0;
+  inset-block: 0;
+  inset-inline-start: 0;
+  display: flex;
+  align-items: center;
   pointer-events: none;
-  animation: auth-dial-glow var(--dial-turn) ease-out infinite;
-  animation-delay: calc(var(--stop) * var(--dial-step));
 }
-/* From `sm` the cards float by the dial (below it they stack under it). */
-@media (min-width: 40rem) {
-  .auth-moments {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-  .auth-moments > li {
-    position: absolute;
-  }
-  .auth-moments > [data-moment='checkIn'] {
-    inset-inline-end: -8%;
-    top: -4%;
-  }
-  .auth-moments > [data-moment='followUp'] {
-    inset-inline-start: -10%;
-    top: -4%;
-  }
-  .auth-moments > [data-moment='invoice'] {
-    inset-inline-start: -6%;
-    bottom: -15%;
-  }
+.tour-row-branch-bar {
+  width: 3px;
+  height: 26px;
+  border-start-end-radius: 3px;
+  border-end-end-radius: 3px;
 }
-/* From `xl` the dial is smaller than its column: the top pair rise clear of it. */
-@media (min-width: 80rem) {
-  .auth-moments > :is([data-moment='checkIn'], [data-moment='followUp']) {
-    top: -14%;
-  }
+.tour-staff-swap {
+  display: grid;
+  min-width: 0;
 }
-
-/* The page load: the hero's lines, then the values, rise in turn. */
-.auth-rise > * {
-  animation: auth-rise 700ms var(--ease-out-strong) both;
+.tour-staff-swap > * {
+  grid-area: 1 / 1;
+  min-width: 0;
 }
-.auth-rise > :nth-child(2) {
-  animation-delay: 80ms;
+/* Before the fold / after it: hidden at rest (the folded end state) / shown at rest. */
+.tour-deck-before {
+  opacity: 0;
 }
-.auth-rise > :nth-child(3) {
-  animation-delay: 160ms;
+.tour-day.is-playing .tour-deck-before {
+  animation: tour-deck-hide 220ms var(--ease-out-strong) var(--deck-fold-at) both;
 }
-.auth-values > li {
-  animation: auth-rise 700ms var(--ease-out-strong) both;
+.tour-day.is-playing .tour-deck-after {
+  animation: tour-deck-show 320ms var(--ease-out-strong) var(--deck-fold-at) both;
 }
-.auth-values > li:nth-child(1) {
-  animation-delay: 240ms;
+/* The lens: the header's branch picker. */
+.tour-branch-list {
+  display: grid;
+  gap: 2px;
+  margin: calc(var(--spacing) * 2.5) 0 0;
+  padding: 0;
+  list-style: none;
 }
-.auth-values > li:nth-child(2) {
-  animation-delay: 300ms;
+.tour-branch-option {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding: 5px calc(var(--spacing) * 2);
+  border-radius: var(--radius-md);
 }
-.auth-values > li:nth-child(3) {
-  animation-delay: 360ms;
+.tour-branch-option > :not(.tour-branch-pick) {
+  position: relative;
 }
-
-/* The stage's atmosphere: a fine dot grid fading out from the dial, and two of
-   the rooms' tones washed in from the corners. */
-.auth-backdrop::before,
-.auth-backdrop::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(64px);
+.tour-branch-option b {
+  font-weight: 600;
+  color: var(--color-foreground-soft);
 }
-.auth-backdrop::before {
-  inset-block-start: -10rem;
-  inset-inline-start: -10rem;
-  width: 36rem;
-  height: 36rem;
-  background: var(--color-tone-lav);
-  opacity: 0.7;
+.tour-branch-option small {
+  overflow: hidden;
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.auth-backdrop::after {
-  inset-block-end: -12rem;
-  inset-inline-start: 45%;
-  width: 30rem;
-  height: 30rem;
-  background: var(--color-tone-peach);
-  opacity: 0.5;
-}
-.dark .auth-backdrop::before {
-  opacity: 0.4;
-}
-.dark .auth-backdrop::after {
-  opacity: 0.3;
-}
-.auth-backdrop-grid {
+.tour-branch-pick {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(var(--color-border-strong) 1px, transparent 1.5px);
-  background-size: 22px 22px;
-  mask-image: radial-gradient(ellipse 60% 55% at 62% 50%, black, transparent 75%);
-  opacity: 0.7;
+  border-radius: inherit;
+  background: var(--color-muted);
+}
+.tour-branch-check {
+  color: var(--color-foreground);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .auth-dial,
-  .auth-dial *,
-  .auth-moments > li,
-  .auth-moment,
-  .auth-moment::after,
-  .auth-rise > *,
-  .auth-values > li {
-    animation: none;
+@media (max-width: 39.9375rem) {
+  .tour-stage {
+    --tour-pad: calc(var(--spacing) * 4);
   }
-  .auth-dial-thread,
-  .auth-dial-halo,
-  .auth-dial-now {
+  .tour-copy {
+    padding-inline: 4px;
+  }
+  .tour-narration {
+    min-height: 9.375rem;
+  }
+  .tour-headline {
+    font-size: 1.1875rem;
+  }
+  .tour-body {
+    font-size: 0.90625rem;
+  }
+  .tour-rows {
+    min-height: calc(6 * 57px);
+  }
+  .tour-visit {
+    grid-template-columns: 3.875rem minmax(0, 1fr) auto;
+    gap: calc(var(--spacing) * 2.5);
+    min-height: 56px;
+    padding: 0 calc(var(--spacing) * 3.5);
+  }
+  /* Branches: the header holds Today, the branch chip and the live state; the date gives way. */
+  .tour-day.is-deck .tour-day-title span {
     display: none;
   }
+  .tour-visit > .tour-staff,
+  .tour-visit > .tour-swap:has(.tour-staff),
+  .tour-visit > .tour-staff-swap,
+  .tour-story > span:nth-child(3) {
+    display: none;
+  }
+  .tour-day-head {
+    padding: calc(var(--spacing) * 3.5);
+  }
+  .tour-tabs {
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 2.5);
+    mask-image: linear-gradient(to right, #000 78%, transparent);
+  }
+  [dir='rtl'] .tour-tabs {
+    mask-image: linear-gradient(to left, #000 78%, transparent);
+  }
+  .tour-lens {
+    inset-inline: calc(var(--spacing) * 3);
+    width: auto;
+  }
+  .tour-lens::before {
+    inset-inline-start: 74px;
+  }
 }
 
-@keyframes auth-dial-thread {
-  0%,
-  10% {
-    transform: rotate(0deg);
-    animation-timing-function: var(--dial-move);
-  }
-  14.2857%,
-  24.2857% {
-    transform: rotate(51.4286deg);
-    animation-timing-function: var(--dial-move);
-  }
-  28.5714%,
-  38.5714% {
-    transform: rotate(102.857deg);
-    animation-timing-function: var(--dial-move);
-  }
-  42.8571%,
-  52.8571% {
-    transform: rotate(154.286deg);
-    animation-timing-function: var(--dial-move);
-  }
-  57.1429%,
-  67.1429% {
-    transform: rotate(205.714deg);
-    animation-timing-function: var(--dial-move);
-  }
-  71.4286%,
-  81.4286% {
-    transform: rotate(257.143deg);
-    animation-timing-function: var(--dial-move);
-  }
-  85.7143%,
-  95.7143% {
-    transform: rotate(308.571deg);
-    animation-timing-function: var(--dial-move);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-/* A stop as the thread reaches it: lifts 16% and holds while the thread rests. */
-@keyframes auth-dial-lift-stop {
-  0%,
-  13%,
-  100% {
-    transform: none;
-  }
-  2.5%,
-  9.5% {
-    transform: scale(1.16);
-  }
-}
-/* Its halo swells in with the lift and out after. */
-@keyframes auth-dial-halo {
-  0%,
-  13%,
-  100% {
-    opacity: 0;
-    transform: scale(0.7);
-  }
-  2.5%,
-  9.5% {
-    opacity: 0.5;
-    transform: none;
-  }
-}
-/* The centre label rises in, sharpens, holds, then rises out. */
-@keyframes auth-dial-label {
-  0% {
+@keyframes tour-copy-in {
+  from {
     opacity: 0;
     transform: translateY(6px);
-    filter: blur(4px);
-  }
-  2.5%,
-  9.5% {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-  13%,
-  100% {
-    opacity: 0;
-    transform: translateY(-6px);
-    filter: blur(4px);
+    filter: blur(3px);
   }
 }
-/* A moment card: a 5px lift, held, and its tone's ring. */
-@keyframes auth-dial-lift {
+@keyframes tour-swap {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+    filter: blur(2px);
+  }
+}
+@keyframes tour-lens-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+    filter: blur(3px);
+  }
+}
+@keyframes tour-tick {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
+@keyframes tour-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-brand-mark) 45%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+@keyframes tour-typing {
   0%,
-  14%,
+  60%,
   100% {
+    opacity: 0.35;
     transform: none;
   }
-  3%,
-  10% {
-    transform: translateY(-5px);
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
   }
 }
-@keyframes auth-dial-glow {
-  0%,
-  14%,
+@keyframes tour-ring {
+  15% {
+    transform: rotate(14deg);
+  }
+  30% {
+    transform: rotate(-12deg);
+  }
+  45% {
+    transform: rotate(8deg);
+  }
+  60% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+@keyframes tour-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes tour-fill {
+  from {
+    opacity: 0.4;
+    transform: scale(0.55);
+  }
+}
+@keyframes tour-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+@keyframes tour-deck-sheet-even {
+  0% {
+    transform: translateY(var(--deck-rest));
+    animation-timing-function: var(--ease-out-strong);
+  }
+  14.7% {
+    transform: translateY(var(--deck-drop));
+    animation-timing-function: linear;
+  }
+  83.3% {
+    transform: translateY(var(--deck-drop));
+    animation-timing-function: var(--ease-out-strong);
+  }
   100% {
-    opacity: 0;
-  }
-  3%,
-  10% {
-    opacity: 1;
+    transform: translateY(var(--deck-rest));
   }
 }
-/* The page load: the dial turns in from a blur, each stop pops into place. */
-@keyframes auth-dial-enter {
+@keyframes tour-deck-sheet-odd {
+  0% {
+    transform: translateY(var(--deck-rest));
+    animation-timing-function: var(--ease-out-strong);
+  }
+  14.7% {
+    transform: translateY(var(--deck-drop));
+    animation-timing-function: linear;
+  }
+  83.3% {
+    transform: translateY(var(--deck-drop));
+    animation-timing-function: var(--ease-out-strong);
+  }
+  100% {
+    transform: translateY(var(--deck-rest));
+  }
+}
+@keyframes tour-deck-card-fan {
+  to {
+    transform: translateY(var(--deck-card-fan));
+  }
+}
+@keyframes tour-deck-card-fold {
+  from {
+    transform: translateY(var(--deck-card-fan));
+  }
+  to {
+    transform: translateY(var(--deck-card-rest));
+  }
+}
+@keyframes tour-deck-show {
   from {
     opacity: 0;
-    transform: scale(0.94) rotate(-12deg);
-    filter: blur(8px);
+    transform: translateY(3px);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 }
-@keyframes auth-dial-pop {
+@keyframes tour-deck-hide {
   from {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  to {
     opacity: 1;
-    transform: none;
-  }
-}
-@keyframes auth-dial-breathe {
-  from {
-    transform: scale(0.94);
   }
   to {
-    transform: scale(1.04);
-  }
-}
-@keyframes auth-rise {
-  from {
     opacity: 0;
-    transform: translateY(14px);
+  }
+}
+@keyframes tour-chip-out {
+  from {
+    max-width: 12rem;
+    opacity: 1;
   }
   to {
+    max-width: 0;
+    opacity: 0;
+  }
+}
+@keyframes tour-chip-in {
+  from {
+    max-width: 0;
+    opacity: 0;
+  }
+  to {
+    max-width: 12rem;
     opacity: 1;
-    transform: none;
   }
 }

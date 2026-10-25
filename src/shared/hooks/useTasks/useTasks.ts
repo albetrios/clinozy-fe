@@ -33,6 +33,7 @@ import {
   type TaskSnoozeOption,
   taskSnoozeUntil,
 } from '@/shared/api/app/tasks-contracts.ts';
+import type { BranchHours } from '@/shared/app/branch-hours.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
@@ -212,12 +213,17 @@ export function useTaskOutcome(
   });
 }
 
-/** What a snooze sends: the task, the option, when it was chosen, and the words its row shows. */
+/**
+ * What a snooze sends: the task, the option, when it was chosen, its branch's hours and the words
+ * its row shows.
+ */
 export interface TaskSnoozeVars {
   taskId: string;
   option: TaskSnoozeOption;
   /** When the member chose it (an instant) — the wake time counts from here, so a retry sends the same. */
   now: string;
+  /** The task's branch's hours — "Tomorrow" wakes it at the branch's next opening. */
+  hours: BranchHours;
   /** The option's words ("1 hour") — the row's "Snoozed · <label>". */
   label: string | null;
 }
@@ -228,8 +234,13 @@ export function useSnoozeTask(
 ) {
   const organizationId = useOrganizationId();
   return useAppMutation<TaskRecord, TaskSnoozeVars, unknown, TaskRow>({
-    mutationFn: ({ taskId, option, now, label }, action) =>
-      snoozeTask({ taskId, until: taskSnoozeUntil(option, now), label, ...action }),
+    mutationFn: ({ taskId, option, now, hours, label }, action) =>
+      snoozeTask({
+        taskId,
+        until: taskSnoozeUntil(option, now, hours),
+        label,
+        ...action,
+      }),
     invalidateKeys: [taskQueryKeys.all],
     optimisticInfinite: {
       queryKey: taskQueryKeys.lists(organizationId),

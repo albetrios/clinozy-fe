@@ -183,11 +183,14 @@ Use the animation kit from `@/lib/animations/` (everything here respects
   no pulse (`_patterns.md:282`). They carry `data-slot="skeleton"` (via
   `ui/skeleton`), so the Shape axis squares them: a placeholder must have the
   corners of the thing it stands in for. A new placeholder needs the same slot.
-- Spinners are not part of this kit. A busy button uses `Button`'s `isLoading`; any
-  other spinning glyph (a busy row, chip or overlay) is `<Spinner />` from
-  `@/shared/components/Spinner/index.ts`, which follows the Icon library setting and is
-  `aria-hidden` because the text or `aria-busy` control beside it does the announcing.
-  Never hand-roll `animate-spin` on an icon.
+- Spinners are not part of this kit. There is **one loader**, the wordmark's "o": a
+  busy button uses `Button`'s `isLoading`; any other busy glyph (a row, chip, search
+  field or overlay) is `<Spinner />` from `@/shared/components/ui/spinner.tsx`; a
+  screen that waits whole is `BrandLoader` (the wordmark with its "o" turning). The
+  glyph is a brand drawing, not an icon, so an icon-library swap leaves it be; it is
+  `aria-hidden` because the text or `aria-busy` control beside it does the announcing,
+  and index.css turns it (`data-slot="spinner"`, slower under reduced motion). Never
+  hand-roll `animate-spin` or a loader icon — ESLint rejects the class.
 - `prefersReducedMotion` — gate custom motion on the user's setting.
 
 Richer motion (onboarding steps) is built with Anime.js (`animejs`) —

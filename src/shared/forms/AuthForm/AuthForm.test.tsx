@@ -361,7 +361,7 @@ describe('AuthForm', () => {
       const btn = screen.getByTestId(id);
       expect(btn).toBeDisabled();
       expect(btn).toHaveAttribute('aria-busy', 'false');
-      expect(btn.querySelector('.animate-spin')).toBeNull();
+      expect(btn.querySelector('[data-slot="spinner"]')).toBeNull();
     }
   });
 

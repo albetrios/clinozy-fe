@@ -145,7 +145,7 @@ describe('product identity', () => {
     expect(markup.includes('<svg')).toBe(ring);
     // A brand without an "o" is plain text — and the markup escapes the name.
     expect(productWordmarkHtml('Acme & Co')).toBe(
-      'acme &amp; c<svg class="app-splash-ring" viewBox="0 0 20 20" aria-hidden="true"><circle class="app-splash-ring-line" cx="10" cy="10" r="7.6" fill="none" stroke-width="4.2" /><circle class="app-splash-ring-dot" cx="10" cy="10" r="3" /></svg>',
+      'acme &amp; c<svg class="app-splash-ring" viewBox="0 0 20 20" aria-hidden="true"><circle class="app-splash-ring-line" cx="10" cy="10" r="7.6" fill="none" stroke-width="4.2" /><circle class="app-splash-ring-arc" cx="10" cy="10" r="7.6" fill="none" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="16 100" pathLength="100" /><circle class="app-splash-ring-dot" cx="10" cy="10" r="3" /></svg>',
     );
     expect(productWordmarkHtml('Acme')).toBe('acme');
   });

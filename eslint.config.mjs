@@ -259,6 +259,11 @@ export default defineConfig([
   // return, dropping a customer who had just finished 3DS onto a bare dashboard,
   // and the table URL-state hook would have done it on the first column sort.
   // Write `hash: true` to keep it, or `hash: ''` to clear it on purpose.
+  //
+  // And one loader: a spinning class (`animate-spin`, a hand-rolled ring) drew a
+  // second, third and fourth loader beside `ui/spinner.tsx`, each at its own
+  // tempo. The Spinner turns by its `data-slot` in index.css, so no app code
+  // needs the class at all.
   // (`no-restricted-syntax` is set for no other `src` glob, so nothing is replaced.)
   {
     files: ['src/**/*.ts', 'src/**/*.tsx'],
@@ -271,6 +276,12 @@ export default defineConfig([
             "CallExpression:matches([callee.name='navigate'], [callee.property.name='navigate']) > ObjectExpression:has(> Property[key.name='to'][value.value='.']):not(:has(> Property[key.name='hash']))",
           message:
             "Same-route navigate({ to: '.' }) must state the hash: the router drops an omitted hash, which closes the settings hash modal. Use `hash: true` to keep it (or `hash: ''` to clear it deliberately).",
+        },
+        {
+          selector:
+            'Literal[value=/animate-spin/], TemplateElement[value.raw=/animate-spin/]',
+          message:
+            'One loader: draw <Spinner /> from @/shared/components/ui/spinner.tsx (or Button isLoading, or BrandLoader for a whole screen) instead of a spinning class.',
         },
       ],
     },

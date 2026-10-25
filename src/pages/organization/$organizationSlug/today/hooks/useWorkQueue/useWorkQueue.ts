@@ -17,6 +17,7 @@ import {
 } from '@/shared/app/task-rules.constants.ts';
 import { taskFollowOnTarget, type TaskTarget } from '@/shared/app/task-targets.ts';
 import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
+import { useBranchHours } from '@/shared/hooks/useBranchHours/index.ts';
 import type { CursorListResult } from '@/shared/hooks/useCursorList/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
@@ -195,6 +196,7 @@ export function useWorkQueue({
   const queryClient = useQueryClient();
   const reads = useQueueReads(scope, enabled);
   const outcomeWrite = useTaskOutcome({ notifyOnError: false });
+  const hoursOf = useBranchHours();
   const [closing, setClosing] = useState<ReadonlyMap<string, Closing>>(new Map());
 
   const entries = useMemo(
@@ -233,6 +235,8 @@ export function useWorkQueue({
         note: null,
         // The times it sets count from the press, so a retry sends the same body.
         now: new Date().toISOString(),
+        // An "until tomorrow" wakes it at its branch's next opening.
+        hours: hoursOf(row.branchId),
         failedActivityId: null,
       });
     } catch (error) {

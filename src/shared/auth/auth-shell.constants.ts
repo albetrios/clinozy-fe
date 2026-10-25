@@ -59,6 +59,7 @@ export const AUTH_KEYS = {
       resendCode: 'auth.email.resendCode',
       wrongEmailPrompt: 'auth.email.wrongEmailPrompt',
       changeEmailAddress: 'auth.email.changeEmailAddress',
+      spamHint: 'auth.email.spamHint',
       toast: { codeSent: 'auth.email.toast.codeSent' },
     },
   },

@@ -18,6 +18,7 @@ import { taskFollowOnTarget, type TaskTarget } from '@/shared/app/task-targets.t
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useBranchHours } from '@/shared/hooks/useBranchHours/index.ts';
 import {
   useReassignTask,
   useSnoozeTask,
@@ -27,6 +28,7 @@ import { notify } from '@/shared/notify/index.ts';
 
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
 import type { TaskAssignees } from '../useTaskAssignees/index.ts';
+import { useTaskSnoozeWords } from '../useTaskSnoozeWords/index.ts';
 
 /** "What’s next" opens this long after a closing outcome (`tasks.md:180–233`, H:4293). */
 export const WHATS_NEXT_DELAY_MS = 380;
@@ -101,7 +103,8 @@ const rowAfter = (row: TaskRow, record: TaskRecord): TaskRow => ({ ...row, ...re
  * "Snoozed · <label>" (an outcome the server snoozes too — "No answer"),
  * "You now own <name>", "<task> → <name>". An outcome runs its plan
  * (`useTaskOutcome`: the record writes, then the task's resolve or snooze),
- * its words the button's label and its times counted from the screen's `now`;
+ * its words the button's label and its times counted from the screen's `now`
+ * (a "Tomorrow" from the task's branch's next opening, `useBranchHours`);
  * an outcome, a snooze and a claim close the drawer, a reassign keeps it. A
  * closing outcome's follow-on opens its screen (a booking, a check-in or
  * review, the person's record) — or, 380ms later, "What’s next" for a member
@@ -123,6 +126,8 @@ export function useTaskActions({
   const outcomeWrite = useTaskOutcome({ notifyOnError: false });
   const snoozeWrite = useSnoozeTask({ notifyOnError: false });
   const reassignWrite = useReassignTask({ notifyOnError: false });
+  const hoursOf = useBranchHours();
+  const snoozeWords = useTaskSnoozeWords();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(
     () => () => {
@@ -228,6 +233,7 @@ export function useTaskActions({
           words,
           note: choice.note.trim() || null,
           now: choice.now.toISOString(),
+          hours: hoursOf(row.branchId),
           // "Retry send" queues the message the drawer quoted.
           failedActivityId:
             row.type === 'failed_message' ? (detail.quote?.activityId ?? null) : null,
@@ -241,9 +247,16 @@ export function useTaskActions({
 
   const snooze = async (row: TaskRow, option: TaskSnoozeOption, now: Date) => {
     if (busy) return;
-    const label = tRules(TASK_RULE_KEYS.snoozeOptions[option]);
+    const hours = hoursOf(row.branchId);
+    const label = snoozeWords(option, { now, hours });
     const record = await attempt(() =>
-      snoozeWrite.mutateAsync({ taskId: row.id, option, now: now.toISOString(), label }),
+      snoozeWrite.mutateAsync({
+        taskId: row.id,
+        option,
+        now: now.toISOString(),
+        hours,
+        label,
+      }),
     );
     if (!record) return;
     notify.success(t(TASKS_KEYS.toasts.snoozed, { label: record.snoozeLabel ?? label }));

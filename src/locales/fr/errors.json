@@ -1,19 +1,19 @@
 {
   "global": {
-    "title": "Une erreur s'est produite",
-    "message": "Une erreur inattendue s'est produite. Veuillez recharger la page.",
+    "title": "Une erreur s’est produite de notre côté",
+    "message": "Actualisez la page pour réessayer. Si le problème persiste, dites-nous ce que vous faisiez et nous l’examinerons.",
     "reload": "Recharger la page"
   },
   "route": {
-    "notFound": "La page que vous recherchez n'existe pas.",
+    "notFound": "Le lien est peut-être obsolète, ou la page a été déplacée. Tout le reste est tel que vous l’avez laissé.",
     "generic": "Une erreur s'est produite.",
     "pageTitle": "Cette page a rencontré une erreur",
     "pageMessage": "Une erreur s'est produite lors du rendu de cette page.",
     "tryAgain": "Réessayer",
     "goHome": "Retour à l'accueil",
     "refresh": "Actualiser la page",
-    "forbidden": "Vous n'avez pas l'autorisation d'accéder à cette page.",
-    "forbiddenTitle": "Pas d'accès à cette page",
+    "forbidden": "Votre accès dans cette clinique n’inclut pas cette page. Si vous en avez besoin, demandez à un administrateur de la clinique de mettre à jour votre rôle.",
+    "forbiddenTitle": "Cette page n’est pas accessible à votre rôle",
     "signOut": "Se déconnecter",
     "signingOut": "Déconnexion…",
     "pageNotFound": "Page introuvable",
@@ -183,5 +183,11 @@
     "title": "Organisation suspendue",
     "message": "Cette organisation est actuellement suspendue. Contactez un administrateur pour vérifier la facturation, ou basculez vers une autre organisation.",
     "switchOrganization": "Changer d'organisation"
+  },
+  "public": {
+    "status": "Erreur {{status}}",
+    "missingTitle": "Impossible de trouver cette page",
+    "goBack": "Retour",
+    "brokenLabel": "Un problème est survenu"
   }
 }

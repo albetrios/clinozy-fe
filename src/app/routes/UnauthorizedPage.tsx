@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { CaptchaSlot } from '@/shared/auth/captcha/CaptchaSlot.tsx';
 import { logout } from '@/shared/auth/service.ts';
-import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import {
   FALLBACK_BUTTON_CLASS,
   FallbackState,
@@ -14,9 +13,9 @@ import { Button } from '@/shared/components/ui/button.tsx';
 import { Lock } from '@/shared/icons/index.ts';
 
 /**
- * The 403, on the public layout's canvas: the design's empty state — the stone
- * illustration with a lock, the status as a neutral pill inside the page's
- * heading, "No access to this page", the line — and two ways out.
+ * The 403, on the public layout's canvas: the public emblem — the wordmark's "o"
+ * with a lock inside — "Error 403", "This page isn’t open to your role", the
+ * line, and two ways out.
  */
 export function Component() {
   const { t } = useTranslation(ERRORS_NS);
@@ -42,14 +41,9 @@ export function Component() {
         headingLevel={1}
         tone="stone"
         icon={<Lock />}
-        title={
-          <>
-            <TonePill tone="neutral" size="sm" className="tabular-nums">
-              403
-            </TonePill>
-            {t(ERRORS_KEYS.route.forbiddenTitle)}
-          </>
-        }
+        emblem="locked"
+        label={t(ERRORS_KEYS.public.status, { status: 403 })}
+        title={t(ERRORS_KEYS.route.forbiddenTitle)}
         description={t(ERRORS_KEYS.route.forbidden)}
         // Two escapes so this page is never a dead-end: "Go Home" for the
         // common case, and a guaranteed "Sign out" for when the resolved home

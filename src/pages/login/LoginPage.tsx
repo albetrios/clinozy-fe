@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { AuthForm } from '@/shared/forms/AuthForm/index.ts';
@@ -21,7 +22,7 @@ export function LoginPage() {
   return (
     <div data-testid={LOGIN_TEST_IDS.page}>
       <SectionErrorBoundary
-        title={t(AUTH_KEYS.auth.heading)}
+        title={t(AUTH_KEYS.auth.heading, { productName: PRODUCT_NAME })}
         testId={LOGIN_TEST_IDS.formError}
       >
         <AuthForm />

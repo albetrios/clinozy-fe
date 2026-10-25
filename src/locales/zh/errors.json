@@ -1,19 +1,19 @@
 {
   "global": {
-    "title": "出了点问题",
-    "message": "发生意外错误。请尝试重新加载页面。",
+    "title": "我们这边出了点问题",
+    "message": "请刷新页面重试。如果问题持续出现，请告诉我们你当时在做什么，我们会进行排查。",
     "reload": "重新加载"
   },
   "route": {
-    "notFound": "您访问的页面不存在。",
+    "notFound": "链接可能已过期，或页面已被移动。其他内容都还在原处。",
     "generic": "出了点问题。",
     "pageTitle": "此页面发生错误",
     "pageMessage": "渲染此页面时出错。",
     "tryAgain": "重试",
     "goHome": "返回首页",
     "refresh": "刷新页面",
-    "forbidden": "你没有访问此页面的权限。",
-    "forbiddenTitle": "无权访问此页面",
+    "forbidden": "你在此诊所的访问权限不包括此页面。如需访问，请让诊所管理员更新你的角色。",
+    "forbiddenTitle": "你的角色无法访问此页面",
     "signOut": "退出登录",
     "signingOut": "正在退出…",
     "pageNotFound": "找不到页面",
@@ -183,5 +183,11 @@
     "title": "组织已暂停",
     "message": "该组织当前已暂停。请联系组织管理员核对账单，或切换到其他组织。",
     "switchOrganization": "切换组织"
+  },
+  "public": {
+    "status": "错误 {{status}}",
+    "missingTitle": "找不到该页面",
+    "goBack": "返回",
+    "brokenLabel": "出错了"
   }
 }

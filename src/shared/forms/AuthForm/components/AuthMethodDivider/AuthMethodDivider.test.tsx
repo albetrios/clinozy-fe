@@ -5,20 +5,17 @@ import { axe } from 'vitest-axe';
 import { AuthMethodDivider } from './AuthMethodDivider.tsx';
 
 describe('AuthMethodDivider', () => {
-  it('renders the or divider', () => {
+  it('says what comes after the one-click methods', () => {
     render(<AuthMethodDivider />);
     expect(screen.getByTestId('auth-method-divider')).toBeInTheDocument();
-    expect(screen.getByText('or')).toBeInTheDocument();
+    expect(screen.getByText('or use your email')).toBeInTheDocument();
   });
 
-  it("sets the word as the design's section eyebrow (11px/600, uppercase, +0.05em)", () => {
+  it('sets the words in the muted caption, as written (no uppercase eyebrow)', () => {
     render(<AuthMethodDivider />);
-    expect(screen.getByText('or')).toHaveClass(
-      'text-micro',
-      'font-semibold',
-      'uppercase',
-      'tracking-[0.05em]',
-    );
+    const words = screen.getByText('or use your email');
+    expect(words).toHaveClass('text-caption', 'text-muted-foreground');
+    expect(words).not.toHaveClass('uppercase');
   });
 
   it('has no accessibility violations', async () => {

@@ -1,5 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next';
 
+import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { PublicCardHeader } from '@/shared/components/PublicFrame/index.ts';
 
@@ -51,7 +52,7 @@ export function AuthWelcomeHeader({
     <PublicCardHeader
       className={className}
       size="display"
-      title={t(AUTH_KEYS.auth.heading)}
+      title={t(AUTH_KEYS.auth.heading, { productName: PRODUCT_NAME })}
       description={t(AUTH_KEYS.auth.subheading)}
     />
   );

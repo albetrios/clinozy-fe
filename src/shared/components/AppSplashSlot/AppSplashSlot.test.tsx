@@ -98,15 +98,11 @@ describe('AppSplashSlot', () => {
       expect(progress).toHaveTextContent('All set');
     });
 
-    it('draws the bar and its track as pills, both hidden from assistive technology', () => {
+    // One loader: the wordmark's "o" turns above the block, so it draws no bar.
+    it('draws no progress bar, and hides the ticker from assistive technology', () => {
       renderSlot({});
-      const track = slot.querySelector('.app-splash-track');
-      expect(track).toHaveAttribute('data-slot', 'pill');
-      expect(track).toHaveAttribute('aria-hidden', 'true');
-      expect(track?.querySelector('.app-splash-bar')).toHaveAttribute(
-        'data-slot',
-        'pill',
-      );
+      expect(slot.querySelector('.app-splash-track')).toBeNull();
+      expect(slot.querySelector('[data-slot="pill"]')).toBeNull();
       expect(slot.querySelector('.app-splash-ticker')).toHaveAttribute(
         'aria-hidden',
         'true',

@@ -46,9 +46,10 @@ describe('theme-init.js drift', () => {
 describe('boot splash shape drift (index.html ↔ AppSplashSlot ↔ BrandLoader)', () => {
   // Under the Sharp shape nothing in the app is round, and the splash is the
   // first thing on screen. The files have to agree or the loader changes shape
-  // half way through the boot: index.css squares the `pill` slots — the
-  // progress track and bar the React slot renders inside the splash, and
-  // BrandLoader's, which takes over from it.
+  // half way through the boot. The loader itself is the wordmark's turning "o" —
+  // a brand drawing, like the mark, round under every shape — in the splash and
+  // in BrandLoader, which takes over from it; index.css squares the `pill` slots
+  // the rest of the app draws.
   const html = readFileSync(join(root, 'index.html'), 'utf8');
   const css = readFileSync(join(root, 'src/index.css'), 'utf8');
   const loader = readFileSync(
@@ -60,10 +61,10 @@ describe('boot splash shape drift (index.html ↔ AppSplashSlot ↔ BrandLoader)
     'utf8',
   );
 
-  it('the splash’s progress track and bar are pills, squared by index.css', () => {
-    for (const part of ['app-splash-track', 'app-splash-bar']) {
-      expect(slot).toMatch(new RegExp(`className="${part}[^"]*"\\s+data-slot="pill"`));
-    }
+  it('the splash and BrandLoader both turn the wordmark’s "o", with no pill bar left', () => {
+    expect(html).toContain('#app-splash .app-splash-ring-arc');
+    expect(loader).toContain('<ProductWordmark turning');
+    for (const source of [slot, loader]) expect(source).not.toContain('data-slot="pill"');
     // No Sharp override of its own: one rule (index.css) squares every pill.
     expect(html).not.toContain("[data-shape='sharp']");
   });
@@ -94,8 +95,10 @@ describe('boot splash shape drift (index.html ↔ AppSplashSlot ↔ BrandLoader)
     expect(sharpSlots).toContain("[data-slot='pill']");
   });
 
-  it('BrandLoader renders the product mark and its track through the pill slots', () => {
+  it('BrandLoader renders the product mark above the turning wordmark', () => {
     expect(loader).toContain('<ProductMark');
-    expect(loader.match(/data-slot="pill"/g)).toHaveLength(2);
+    expect(loader.indexOf('<ProductMark')).toBeLessThan(
+      loader.indexOf('<ProductWordmark'),
+    );
   });
 });

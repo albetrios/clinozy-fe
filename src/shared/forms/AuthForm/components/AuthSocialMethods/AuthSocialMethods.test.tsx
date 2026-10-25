@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { preconnectOAuthProvider } from '../../oauth-preconnect.ts';
 import { AuthSocialMethods } from './AuthSocialMethods.tsx';
+
+vi.mock('../../oauth-preconnect.ts', () => ({ preconnectOAuthProvider: vi.fn() }));
 
 function renderMethods(overrides: Partial<Parameters<typeof AuthSocialMethods>[0]> = {}) {
   const onProvider = vi.fn();
@@ -40,6 +43,17 @@ describe('AuthSocialMethods', () => {
     const { onProvider } = renderMethods();
     await user.click(screen.getByTestId('auth-continue-github'));
     expect(onProvider).toHaveBeenCalledWith('github');
+  });
+
+  it('connects to a provider’s sign-in page on the press, before the click lands', async () => {
+    const user = userEvent.setup();
+    renderMethods();
+    await user.pointer({
+      keys: '[MouseLeft>]',
+      target: screen.getByTestId('auth-continue-google'),
+    });
+
+    expect(preconnectOAuthProvider).toHaveBeenCalledWith('google');
   });
 
   it('disables every method while one is in flight', () => {

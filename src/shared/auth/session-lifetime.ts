@@ -14,11 +14,16 @@ import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
  * the real cap; this is UX/defense-in-depth.
  */
 
-// Derived from `PRODUCT_NAMESPACE`, not hardcoded — a renamed product would
-// otherwise leak the previous brand into localStorage. For this repo the
-// namespace IS `core`, so the key string is unchanged and no live session is
-// reset; a renamed product has no prior users to migrate.
-const SESSION_STARTED_AT_KEY = `${PRODUCT_NAMESPACE}:session-started-at`;
+/**
+ * The session hint's localStorage key — the start stamp {@link markSessionStart} writes.
+ *
+ * Derived from `PRODUCT_NAMESPACE`, not hardcoded — a renamed product would
+ * otherwise leak the previous brand into localStorage. `public/splash-init.js`
+ * reads the same key before the first paint, named by index.html's
+ * `data-session-hint-key` (`{{PRODUCT_NAMESPACE}}:session-started-at`); the two are
+ * pinned together by `app-splash.test.ts`.
+ */
+export const SESSION_STARTED_AT_KEY = `${PRODUCT_NAMESPACE}:session-started-at`;
 
 /** Stamp the start of a freshly authenticated session (interactive auth only). */
 export function markSessionStart(): void {

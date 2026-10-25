@@ -1,189 +1,368 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
-import { render, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { act, fireEvent, render, within } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
+import { REMEMBERED_BRANCH_HOURS_KEY } from '@/shared/app/branch-hours.ts';
 
-import { JOURNEY_STOPS, SHOWCASE_MOMENTS } from './auth-showcase.constants.ts';
 import {
-  AuthShowcaseBackdrop,
-  AuthShowcaseDial,
-  AuthShowcaseHero,
-  AuthShowcasePrivacy,
-  AuthShowcaseValues,
-} from './AuthShowcase.tsx';
+  AUTH_SHOWCASE_TEST_IDS as IDS,
+  TOUR_CHAPTER_MS,
+  TOUR_CHAPTERS,
+  TOUR_END_REST_MS,
+} from './auth-showcase.constants.ts';
+import { AuthShowcasePrivacy, AuthShowcaseStage } from './AuthShowcase.tsx';
 
-/** The dial's own stylesheet — it loads with the lazy chunk, not with `index.css`. */
-const CSS = readFileSync(
-  join(
-    process.cwd(),
-    'src/shared/layouts/AuthLayout/components/AuthShowcase/auth-showcase.css',
-  ),
-  'utf8',
-);
+/** 24 October 2026, 17:22 local: inside clinic hours. */
+const AFTERNOON = new Date(2026, 9, 24, 17, 22);
 
-/** A rule's body: everything between `selector {` and its closing brace. */
-function ruleBody(selector: string): string {
-  const start = CSS.indexOf(`${selector} {`);
-  expect(start, selector).toBeGreaterThan(-1);
-  return CSS.slice(start, CSS.indexOf('}', start));
+function renderStage(autoplay = true) {
+  return render(<AuthShowcaseStage autoplay={autoplay} />);
 }
 
-/** A keyframe block, from its name to the next `@keyframes`. */
-function keyframes(name: string): string {
-  const start = CSS.indexOf(`@keyframes ${name} `);
-  expect(start, name).toBeGreaterThan(-1);
-  return CSS.slice(start, CSS.indexOf('@keyframes', start + 1));
+/** Which step is current (`aria-current="step"`), by index. */
+function currentStep(root: HTMLElement): number {
+  return TOUR_CHAPTERS.findIndex(
+    (_, index) =>
+      within(root).getByTestId(IDS.step(index)).getAttribute('aria-current') === 'step',
+  );
 }
 
-/** The `--stop` a rule gives, or NaN. */
-function stopIndexOf(body: string): number {
-  const match = /--stop:\s*(\d+);/.exec(body);
-  return match ? Number(match[1]) : Number.NaN;
+/** Runs `body` with the viewer asking for reduced motion. */
+async function withReducedMotion(body: () => Promise<void>) {
+  const matchMedia = window.matchMedia;
+  window.matchMedia = ((query: string) => ({
+    ...matchMedia(query),
+    matches: query.includes('reduce'),
+  })) as typeof window.matchMedia;
+  try {
+    await body();
+  } finally {
+    window.matchMedia = matchMedia;
+  }
 }
 
-describe('AuthShowcase', () => {
-  it('says who the product is for, the promise, and what it replaces', async () => {
-    const { findByTestId } = renderWithProviders(<AuthShowcaseHero />);
-    const hero = await findByTestId('auth-showcase-hero');
+/** Lets the tour's frame loop run for `ms`. */
+async function play(ms: number) {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
+  });
+}
+
+describe('AuthShowcaseStage — the tour', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({
+      toFake: [
+        'setTimeout',
+        'clearTimeout',
+        'setInterval',
+        'clearInterval',
+        'Date',
+        'requestAnimationFrame',
+        'cancelAnimationFrame',
+        'performance',
+      ],
+    });
+    vi.setSystemTime(AFTERNOON);
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    localStorage.clear();
+  });
+
+  it('names the stage, the clinics it is for and the promise', async () => {
+    const { getByTestId } = renderStage();
+    const stage = getByTestId(IDS.stage);
+    expect(within(stage).getByRole('heading', { level: 2 })).toHaveTextContent(
+      'Every patient. Every branch. One calm screen.',
+    );
+    expect(stage).toHaveTextContent('For skin, hair & aesthetic clinics');
+    expect(stage).toHaveAccessibleName('Every patient. Every branch. One calm screen.');
+  });
+
+  it('is one named image for the sheet, with eight named steps and a pause button', async () => {
+    const { getByTestId, getByRole } = renderStage();
+    const stage = getByTestId(IDS.stage);
     expect(
-      within(hero).getByText('For skin, hair & aesthetic clinics'),
+      getByRole('img', {
+        name: `A preview of ${PRODUCT_NAME}’s Today view, following one patient from enquiry to follow-up.`,
+      }),
     ).toBeInTheDocument();
-    expect(within(hero).getByRole('heading', { level: 2 })).toHaveTextContent(
-      'Your whole clinic, calm in one place.',
-    );
-    expect(hero).toHaveTextContent(
-      /no more WhatsApp threads, paper registers or spreadsheets/,
-    );
-    // The section is named by its own headline.
-    expect(within(hero.parentElement ?? hero).getByRole('region')).toBe(hero);
-  });
-
-  it('draws one patient’s journey as a dial: seven stops, each in its room’s tone', async () => {
-    const { findByRole } = renderWithProviders(<AuthShowcaseDial />);
-    const journey = await findByRole('list', {
-      name: `A patient’s journey through ${PRODUCT_NAME}`,
-    });
-    const stops = within(journey).getAllByRole('listitem');
-    // Every stop is named on the dial — the centre label is decoration on top.
-    expect(stops.map((stop) => stop.textContent)).toEqual([
-      'Enquiry',
-      'Booked',
-      'Waiting',
-      'With doctor',
-      'Treatment',
-      'Checkout',
-      'Follow-up',
-    ]);
-    stops.forEach((stop, index) => {
-      expect(stop).toHaveAttribute('data-stop', JOURNEY_STOPS[index]?.id);
-      expect(stop).toHaveClass('auth-dial-stop');
-      const pill = stop.querySelector('[data-slot="pill"]');
-      expect(pill).toHaveAttribute('data-tone', JOURNEY_STOPS[index]?.tone);
-      // It lifts as the thread arrives (`auth-dial-node`).
-      expect(pill).toHaveClass('auth-dial-node');
-    });
-  });
-
-  it('keeps the dial in step: each stop starts a seventh of a turn after the last', () => {
-    // The CSS places and times each stop by its index in JOURNEY_STOPS.
-    JOURNEY_STOPS.forEach((stop, index) => {
-      expect(stopIndexOf(ruleBody(`.auth-dial [data-stop='${stop.id}']`))).toBe(index);
-    });
-    // A stop is a seventh of a turn: 15.4s round, 2.2s a stop.
-    const dial = ruleBody('.auth-dial');
-    expect(dial).toContain('--dial-turn: 15400ms;');
-    expect(dial).toContain(`--dial-step: ${15_400 / JOURNEY_STOPS.length}ms;`);
-    // Every synced motion starts `--stop` steps in.
-    for (const selector of [
-      '.auth-dial-node',
-      '.auth-dial-halo',
-      '.auth-dial-now > *',
-      '.auth-moment',
-      '.auth-moment::after',
-    ]) {
-      expect(ruleBody(selector), selector).toContain(
-        'animation-delay: calc(var(--stop) * var(--dial-step));',
-      );
-    }
-    // The thread holds on each stop: seven holds, 360° / 7 apart.
-    const holds = [
-      ...keyframes('auth-dial-thread').matchAll(/rotate\(([\d.]+)deg\)/g),
-    ].map((match) => Number(match[1]));
-    expect(holds).toHaveLength(8);
-    holds.forEach((degrees, index) => {
-      expect(degrees).toBeCloseTo((360 / JOURNEY_STOPS.length) * index, 2);
-    });
-  });
-
-  it('never dims a stop: its lift is scale only, its label always full strength', () => {
-    // The stops' labels are text (12–13px). The launch's wave dimmed them, and
-    // dimming text costs WCAG AA contrast; the dial lifts a stop instead.
-    expect(keyframes('auth-dial-lift-stop')).not.toMatch(/opacity/);
-    expect(ruleBody('.auth-dial-label')).not.toMatch(/opacity/);
-  });
-
-  it('lifts each moment as the thread reaches its stop', async () => {
-    const { findByRole } = renderWithProviders(<AuthShowcaseDial />);
-    const moments = await findByRole('list', { name: 'Moments from a clinic day' });
-    const items = within(moments).getAllByRole('listitem');
-    expect(items).toHaveLength(3);
-    for (const moment of SHOWCASE_MOMENTS) {
-      // Each card takes its stop's place in the turn.
-      const stopIndex = JOURNEY_STOPS.findIndex((stop) => stop.id === moment.stop);
-      expect(stopIndexOf(ruleBody(`.auth-moments [data-moment='${moment.id}']`))).toBe(
-        stopIndex,
-      );
-    }
-    for (const item of items) {
-      expect(item.querySelector('[data-slot="card"]')).toHaveClass('auth-moment');
-    }
-    // No numbers or names: anonymous moments (D11) — "Tuesday" is not a number.
-    expect(moments.textContent).not.toMatch(/\d/);
-  });
-
-  it('names three reasons, with no numbers or names', async () => {
-    const { findByRole } = renderWithProviders(<AuthShowcaseValues />);
-    const values = await findByRole('list', {
-      name: `Why clinics choose ${PRODUCT_NAME}`,
-    });
+    const group = within(stage).getByRole('group', { name: 'Product tour, 8 steps' });
+    expect(within(group).getAllByRole('button')).toHaveLength(8);
     expect(
-      within(values)
-        .getAllByRole('listitem')
-        .map((value) => value.querySelector('p')?.textContent),
-    ).toEqual(['Every room in step', 'Nothing slips through', 'Calm by design']);
-    expect(values.textContent).not.toMatch(/\d/);
+      within(group).getByRole('button', { name: 'Step 4 of 8: Patient file' }),
+    ).toBeInTheDocument();
+    expect(
+      within(group).getByRole('button', { name: 'Step 8 of 8: Branches' }),
+    ).toBeInTheDocument();
+    expect(
+      within(stage).getByRole('button', { name: 'Pause the product tour' }),
+    ).toBeInTheDocument();
   });
 
-  it('paints its backdrop as decoration only', () => {
-    const { container } = render(<AuthShowcaseBackdrop />);
-    const backdrop = container.firstElementChild;
-    expect(backdrop).toHaveAttribute('aria-hidden', 'true');
-    expect(backdrop).toHaveClass('auth-backdrop', 'pointer-events-none', '-z-10');
+  it('opens on Leads: Riya’s message at the viewer’s own time, her row still an open slot', async () => {
+    const { getByTestId } = renderStage();
+    const stage = getByTestId(IDS.stage);
+    expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
+      /5:22\s?PM: a DM becomes a lead/i,
+    );
+    const story = within(stage).getByTestId(IDS.story);
+    expect(story).toHaveTextContent('Open slot');
+    expect(story).toHaveTextContent('Free for booking');
+    expect(within(stage).getByTestId(IDS.lens)).toHaveAttribute('data-chapter', 'leads');
   });
 
-  it('stands the dial still under reduced motion, every stop still named', () => {
-    const reduced = CSS.slice(CSS.indexOf('@media (prefers-reduced-motion: reduce)'));
-    expect(reduced).toMatch(/\.auth-dial \*[\s\S]*animation: none;/);
-    expect(reduced).toMatch(
-      /\.auth-dial-thread,\s*\.auth-dial-halo,\s*\.auth-dial-now \{\s*display: none;/,
+  it('moves on every chapter, rests on the last, and loops', async () => {
+    const { getByTestId } = renderStage();
+    const stage = getByTestId(IDS.stage);
+    expect(currentStep(stage)).toBe(0);
+    await play(TOUR_CHAPTER_MS + 50);
+    expect(currentStep(stage)).toBe(1);
+    expect(within(stage).getByTestId(IDS.story)).toHaveTextContent('Riya Sharma');
+    expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
+      /Booked for 5:30\s?PM\. Zero back-and-forth\./i,
+    );
+    await play(TOUR_CHAPTER_MS * 6 + 50);
+    expect(currentStep(stage)).toBe(7);
+    await play(TOUR_CHAPTER_MS + 50);
+    expect(currentStep(stage), 'the last chapter rests longer').toBe(7);
+    await play(TOUR_END_REST_MS);
+    expect(currentStep(stage)).toBe(0);
+  });
+
+  it('never narrates an automatic change, and does narrate a picked one', async () => {
+    const { getByTestId } = renderStage();
+    const stage = getByTestId(IDS.stage);
+    const narration = within(stage).getByTestId(IDS.narration);
+    expect(narration).toHaveAttribute('aria-live', 'off');
+    await play(TOUR_CHAPTER_MS + 50);
+    expect(narration).toHaveAttribute('aria-live', 'off');
+    fireEvent.click(within(stage).getByTestId(IDS.step(5)));
+    expect(narration).toHaveAttribute('aria-live', 'polite');
+    expect(narration).toHaveTextContent('Payments');
+    expect(narration).toHaveTextContent(/₹4,500 by UPI\. Nothing to chase\./);
+    expect(within(stage).getByTestId(IDS.lens)).toHaveAttribute(
+      'data-chapter',
+      'payments',
+    );
+  });
+
+  it('holds still while paused, and goes on from where it was', async () => {
+    const { getByTestId } = renderStage();
+    const stage = getByTestId(IDS.stage);
+    fireEvent.click(within(stage).getByTestId(IDS.toggle));
+    expect(within(stage).getByTestId(IDS.toggle)).toHaveAccessibleName(
+      'Play the product tour',
+    );
+    await play(TOUR_CHAPTER_MS * 3);
+    expect(currentStep(stage)).toBe(0);
+    fireEvent.click(within(stage).getByTestId(IDS.toggle));
+    await play(TOUR_CHAPTER_MS + 50);
+    expect(currentStep(stage)).toBe(1);
+  });
+
+  it('holds still while the pointer is over it, or the viewer types elsewhere', async () => {
+    const { getByTestId } = renderStage();
+    const stage = getByTestId(IDS.stage);
+    fireEvent.pointerEnter(stage);
+    await play(TOUR_CHAPTER_MS * 2);
+    expect(currentStep(stage)).toBe(0);
+    fireEvent.pointerLeave(stage);
+
+    const field = document.createElement('input');
+    document.body.append(field);
+    act(() => field.focus());
+    await play(TOUR_CHAPTER_MS * 2);
+    expect(currentStep(stage)).toBe(0);
+    act(() => field.blur());
+    await play(TOUR_CHAPTER_MS + 50);
+    expect(currentStep(stage)).toBe(1);
+    field.remove();
+  });
+
+  it('never plays on its own where autoplay is off — every step still answers a click', async () => {
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    expect(within(stage).queryByTestId(IDS.toggle)).toBeNull();
+    await play(TOUR_CHAPTER_MS * 2);
+    expect(currentStep(stage)).toBe(0);
+    fireEvent.click(within(stage).getByTestId(IDS.step(2)));
+    expect(currentStep(stage)).toBe(2);
+    expect(within(stage).getByTestId(IDS.story)).toHaveTextContent('Checked in');
+  });
+
+  it('never plays on its own under reduced motion', async () => {
+    await withReducedMotion(async () => {
+      const { getByTestId } = renderStage();
+      const stage = getByTestId(IDS.stage);
+      expect(within(stage).queryByTestId(IDS.toggle)).toBeNull();
+      await play(TOUR_CHAPTER_MS * 2);
+      expect(currentStep(stage)).toBe(0);
+    });
+  });
+
+  it('after hours shows tomorrow’s sheet, the clinic closed, and Riya booking into it', () => {
+    // Friday night: Saturday is a working day.
+    vi.setSystemTime(new Date(2026, 9, 23, 22, 40));
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    const sheet = within(stage).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent('Tomorrow');
+    expect(sheet).toHaveTextContent('Clinic closed');
+    expect(sheet).toHaveTextContent('Free tomorrow');
+    fireEvent.click(within(stage).getByTestId(IDS.step(1)));
+    expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
+      /Booked for tomorrow, 10:30\s?AM\. Zero back-and-forth\./i,
+    );
+  });
+
+  it('skips a closed day: Saturday night books into Monday’s opening', () => {
+    vi.setSystemTime(new Date(2026, 9, 24, 22, 40));
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    const sheet = within(stage).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent(/^Monday\s?October 26/);
+    expect(sheet).toHaveTextContent('Free on Monday');
+    expect(sheet).not.toHaveTextContent('Tomorrow');
+    fireEvent.click(within(stage).getByTestId(IDS.step(1)));
+    expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
+      /Booked for Monday, 10:30\s?AM\. Zero back-and-forth\./i,
+    );
+    expect(within(stage).getByTestId(IDS.lens)).toHaveTextContent('Dr. Iyer · Monday');
+  });
+
+  it('keeps this device’s branch hours: no visit before its opening or after its close', () => {
+    localStorage.setItem(
+      REMEMBERED_BRANCH_HOURS_KEY,
+      JSON.stringify({ opensAt: '11:00', closesAt: '19:00', workingDays: ['sat'] }),
+    );
+    // Saturday 10:30: the branch opens at 11:00, so the sheet is this morning's, not yet open.
+    vi.setSystemTime(new Date(2026, 9, 24, 10, 30));
+    const { getByTestId } = renderStage(false);
+    const sheet = within(getByTestId(IDS.stage)).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent(/^Today/);
+    expect(sheet).toHaveTextContent('Clinic closed');
+    expect(sheet).toHaveTextContent(/^Today.*11:00\s?AMKabir Shah/);
+    expect(sheet).not.toHaveTextContent(/10:45\s?AM/);
+  });
+
+  it('drops the visits past closing in the day’s last slots', () => {
+    vi.setSystemTime(new Date(2026, 9, 24, 19, 20));
+    const { getByTestId } = renderStage(false);
+    const sheet = within(getByTestId(IDS.stage)).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent('Live');
+    expect(sheet).toHaveTextContent('Meera Pillai');
+    expect(sheet).not.toHaveTextContent('Sana Qureshi');
+    expect(sheet).not.toHaveTextContent('Isha Kapoor');
+  });
+
+  it('Branches: a deck of the clinic’s branches, each in its state on the viewer’s clock', () => {
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    fireEvent.click(within(stage).getByTestId(IDS.step(7)));
+    expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
+      'Three branches. One calm Today.',
+    );
+    const sheet = within(stage).getByTestId(IDS.sheet);
+    // Saturday 17:22: Adajan (every day, 9–9) and Varachha (Tue–Sun, 11–7) are open.
+    expect(sheet).toHaveTextContent(/Adajan\s*Open · till 9:00\s?PM/i);
+    expect(sheet).toHaveTextContent(/Varachha\s*Open · till 7:00\s?PM/i);
+    expect(sheet).toHaveTextContent('All branches');
+    expect(sheet).toHaveTextContent('All 46');
+    // Each row names its branch once the sheet is every branch's; Riya's is Vesu.
+    expect(within(stage).getByTestId(IDS.story)).toHaveTextContent('Vesu');
+    const lens = within(stage).getByTestId(IDS.lens);
+    expect(lens).toHaveTextContent('3 of 3 open now');
+    expect(lens).toHaveTextContent(/Adajan\s*Every day · 9:00\s?AM–9:00\s?PM/i);
+    expect(lens).toHaveTextContent(/Vesu\s*Mon–Sat · 10:00\s?AM–8:00\s?PM/i);
+    expect(lens).toHaveTextContent(/Varachha\s*Tue–Sun · 11:00\s?AM–7:00\s?PM/i);
+  });
+
+  it('Branches: a closed branch names when it next opens', () => {
+    // Sunday 20:00: Riya's branch (Mon–Sat) is closed, Varachha closes at 19:00 and opens Tuesday.
+    vi.setSystemTime(new Date(2026, 9, 25, 20, 0));
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    fireEvent.click(within(stage).getByTestId(IDS.step(7)));
+    const sheet = within(stage).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent(/Adajan\s*Open · till 9:00\s?PM/i);
+    expect(sheet).toHaveTextContent(/Varachha\s*Closed · opens Tuesday 11:00\s?AM/i);
+    expect(within(stage).getByTestId(IDS.lens)).toHaveTextContent('1 of 3 open now');
+  });
+
+  it('Branches: the deck plays its fan and fold only when the chapter arrived in motion', async () => {
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    fireEvent.click(within(stage).getByTestId(IDS.step(7)));
+    const day = () => within(stage).getByTestId(IDS.sheet).querySelector('.tour-day');
+    expect(day()).toHaveClass('is-deck', 'is-playing');
+    // A replay alternates the sheet's keyframes, so the fan plays again.
+    const run = day()?.getAttribute('data-deck-run');
+    fireEvent.click(within(stage).getByTestId(IDS.step(7)));
+    expect(day()?.getAttribute('data-deck-run')).not.toBe(run);
+    fireEvent.click(within(stage).getByTestId(IDS.step(0)));
+    expect(day()).not.toHaveClass('is-deck');
+    expect(within(stage).getByTestId(IDS.sheet)).not.toHaveTextContent('Adajan');
+    await withReducedMotion(async () => {
+      const still = renderStage(false);
+      const stillStage = still.getAllByTestId(IDS.stage).at(-1) as HTMLElement;
+      fireEvent.click(within(stillStage).getByTestId(IDS.step(7)));
+      const stillDay = within(stillStage)
+        .getByTestId(IDS.sheet)
+        .querySelector('.tour-day');
+      expect(stillDay).toHaveClass('is-deck');
+      expect(stillDay).not.toHaveClass('is-playing');
+    });
+  });
+
+  it('draws every chapter’s scene — at its end under reduced motion', async () => {
+    await withReducedMotion(async () => {
+      const { getByTestId } = renderStage(false);
+      const stage = getByTestId(IDS.stage);
+      const scenes: Record<string, RegExp> = {
+        leads: /Do you treat acne scars\?/,
+        appointments: /Riya gets the earliest free slot/,
+        frontDesk: /Dr\. Iyer is notified/,
+        patientFile: /Adapalene 0\.1% gel · at night · 8 weeks/,
+        treatment: /1 of 4 used/,
+        payments: /Nothing due/,
+        tasks: /Call Riya: how is her skin settling\?/,
+        branches: /One patient file, in every branch/,
+      };
+      for (const [index, chapter] of TOUR_CHAPTERS.entries()) {
+        fireEvent.click(within(stage).getByTestId(IDS.step(index)));
+        const lens = within(stage).getByTestId(IDS.lens);
+        expect(lens).toHaveAttribute('data-chapter', chapter.id);
+        expect(lens).toHaveTextContent(scenes[chapter.id] ?? /./);
+      }
+    });
+  });
+
+  it('plays a picked chapter’s scene: the message types in, then arrives', async () => {
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    fireEvent.click(within(stage).getByTestId(IDS.step(0)));
+    const lens = within(stage).getByTestId(IDS.lens);
+    expect(lens).not.toHaveTextContent(/Do you treat acne scars\?/);
+    await play(1200);
+    expect(within(stage).getByTestId(IDS.lens)).toHaveTextContent(
+      /Do you treat acne scars\?/,
     );
   });
 
   it('has no accessibility violations', async () => {
-    const { container, findByTestId } = renderWithProviders(
-      <main>
-        <AuthShowcaseHero />
-        <AuthShowcasePrivacy />
-        <AuthShowcaseDial />
-        <AuthShowcaseValues />
-      </main>,
-    );
-    await findByTestId('auth-showcase');
+    vi.useRealTimers();
+    const { container } = renderStage(false);
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('AuthShowcasePrivacy', () => {
+  it('says each clinic sees only its own records', async () => {
+    const { getByTestId } = render(<AuthShowcasePrivacy />);
+    expect(getByTestId(IDS.privacy)).toHaveTextContent(
+      'Private by design. Each clinic sees only its own records.',
+    );
   });
 });

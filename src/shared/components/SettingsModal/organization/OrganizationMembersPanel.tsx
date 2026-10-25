@@ -33,7 +33,6 @@ import {
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
-import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   DropdownMenu,
@@ -45,6 +44,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu.tsx';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useAccessResolved, useCan } from '@/shared/hooks/useCan/index.ts';
 import { useDebouncedSearch } from '@/shared/hooks/useDebouncedValue/index.ts';

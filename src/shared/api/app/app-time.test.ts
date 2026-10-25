@@ -10,6 +10,7 @@ import {
   civilDayOffset,
   civilDayReading,
   civilMonthStart,
+  civilWeekday,
   civilYearsBetween,
   clockMinutes,
   clockOfMinutes,
@@ -88,6 +89,13 @@ describe('clinic clock (Asia/Kolkata)', () => {
     expect(civilYearsBetween('1997-09-17', '2026-09-17')).toBe(29);
     expect(civilYearsBetween('1997-09-18', '2026-09-17')).toBe(28);
     expect(civilYearsBetween('1997-10-01', '2026-09-30')).toBe(28);
+  });
+
+  it('reads the weekday of a calendar date, whatever the viewer’s zone', () => {
+    expect(civilWeekday('2026-10-25')).toBe('sun');
+    expect(civilWeekday('2026-10-26')).toBe('mon');
+    expect(civilWeekday('2026-10-31')).toBe('sat');
+    expect(civilWeekday('2028-02-29')).toBe('tue');
   });
 });
 

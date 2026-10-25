@@ -102,6 +102,15 @@ Cross-room clinic UI vocabulary for the clinic's eleven rooms (iteration
 - `app-branch.ts` — the branch a new record files under
   (`defaultBranchId`): the header's one open branch, else the main one — a
   new patient's home branch, a new booking's branch.
+- `branch-hours.ts` — a branch's clinic hours (`BranchHours`: opens, closes,
+  working days) and the defaults a new branch starts with
+  (`DEFAULT_BRANCH_HOURS`, Mon–Sat 10:00–20:00); the next working day on or after
+  a date (`nextBranchWorkingDay`). It also keeps this device's branch hours
+  (`rememberBranchHours` / `rememberedBranchHours`, localStorage
+  `clinozy:branch-hours`, hours only): the signed-in shell writes the current
+  branch's (`src/shared/hooks/useBranchHours/`), and the sign-in screen's tour,
+  which has no session, paints its sample day in them. A task's "Tomorrow"
+  snooze wakes at its branch's next opening (`useBranchHours`).
 - `app-lead-status.ts` — the label a lead's status shows under: the stored
   status's (`APP_KEYS.leads.statuses`), or "Re-targeted"
   (`APP_KEYS.leads.retargeted`) for a re-target lead still New — the

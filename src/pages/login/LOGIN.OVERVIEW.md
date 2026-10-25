@@ -19,21 +19,24 @@ New passwordless users → `/onboarding` → app.
 | `LoginPage.tsx`          | Thin wrapper around shared `<AuthForm />`.                |
 | `shared/forms/AuthForm/` | Unified auth UI — default email OTP + provider buttons.   |
 
-The frame is `AuthLayout` (`shared/layouts/AuthLayout/AuthLayout.tsx`). From `xl` it is a
-split screen: a **stage** on the signed-out canvas — the logo, a hero (who Clinozy is for and
-the promise), three reasons, and the **journey dial** — and the form docked in its own
-full-height panel at the inline end, with the language picker and theme toggle at its top and
-"Privacy choices" at its foot. The dial
-(`src/shared/layouts/AuthLayout/components/AuthShowcase/`) draws one patient's day: seven
-tone-coded stops on a ring, the logo's green thread stepping from stop to stop, the stop it is
-on named in the centre, and three moments from a clinic day lifting as the thread passes
-their stop — one 15.4s clock for all of it, still under reduced motion. Below `xl` the order
-is hero → the form's 360px card → dial → reasons, so the card stays above the fold. The
-showcase is static copy (`auth` › `showcase.*`, 11 locales); the split's grid and the dial's
-motion ship as CSS with the lazy auth chunk
-(`src/shared/layouts/AuthLayout/auth-layout.css`,
-`src/shared/layouts/AuthLayout/components/AuthShowcase/auth-showcase.css`), never
-on the first paint.
+The frame is `AuthLayout` (`shared/layouts/AuthLayout/AuthLayout.tsx`). From 68.75rem it is
+two columns: the **form's column** — the logo with the language picker and theme toggle, the
+form on the page (no card), the privacy line, and a footer with the year and "Privacy
+choices" — and the **stage** beside it, a rounded panel held in view (sticky) while the column
+scrolls. Below that it is one column, the form first: header → form → stage → "Privacy
+choices". The stage (`src/shared/layouts/AuthLayout/components/AuthShowcase/`) is a **tour**
+of one patient's day in seven chapters (Leads → Appointments → Front desk → Patient file →
+Treatment → Payments → Tasks), then Branches — her sheet fanning into a deck of the clinic's
+branches and folding back into "All branches" — on a Today sheet set to the viewer's own clock and this
+device's branch hours (the branch last worked in here — the signed-in shell keeps them — else
+the defaults a new branch starts with); closed, it shows the branch's next opening. Each
+chapter's feature is shown working in a lens under her row. It plays on
+its own only here, on `/login` (never under reduced motion), holds while the viewer is busy
+elsewhere, and has a pause button; the MFA and hand-off screens show it still. Its copy is
+`auth` › `showcase.*` (11 locales); the grid and the tour's motion ship as CSS with the lazy
+auth chunk (`src/shared/layouts/AuthLayout/auth-layout.css`,
+`src/shared/layouts/AuthLayout/components/AuthShowcase/auth-showcase.css`), never on the
+first paint.
 
 ## Flow
 
@@ -61,6 +64,13 @@ backwards while the destination loads.
   `lib/animations/useReplayedAnimation.ts`.
 - Guards on the way out read `me/context` **cache-first** (`ensureSessionContext`,
   `ensurePermissionsFor`), so the screen is not held open for a redundant fetch.
+
+### The first paint is the login screen's own frame
+
+A cold load with no session hint lands here, so it never shows the boot splash:
+`public/splash-init.js` paints `#app-boot-frame` — the canvas and the logo where
+the header draws it — and this screen paints over it (`APP_BOOT_FRAME`,
+`lib/app-splash.ts`). Offline, the splash stays, for its notice and Retry.
 
 ## Login + signup rules (product)
 

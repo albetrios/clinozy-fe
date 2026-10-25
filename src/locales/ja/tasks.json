@@ -362,7 +362,6 @@
   "snoozeOptions": {
     "oneHour": "1時間",
     "threeHours": "3時間",
-    "tomorrow": "明日 10:00",
     "nextWeek": "来週"
   },
   "followUpWhen": {

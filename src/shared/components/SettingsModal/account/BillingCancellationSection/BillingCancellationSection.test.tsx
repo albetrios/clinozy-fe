@@ -125,7 +125,7 @@ describe('BillingCancellationSection', () => {
     expect(screen.getByTestId('billing-cancel-dialog')).toBeInTheDocument();
     expect(confirm).toBeDisabled();
     expect(confirm).toHaveAttribute('aria-busy', 'true');
-    expect(confirm.querySelector('.animate-spin')).not.toBeNull();
+    expect(confirm.querySelector('[data-slot="spinner"]')).not.toBeNull();
     expect(confirm).toHaveTextContent(copy(KEYS.confirm));
 
     act(() => ctl.finish?.());

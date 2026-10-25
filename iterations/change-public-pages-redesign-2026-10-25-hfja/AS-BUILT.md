@@ -1,0 +1,43 @@
+# change-public-pages-redesign-2026-10-25-hfja — as built
+
+What was actually built, ledger row by ledger row, against the approved plan in
+[`KICKOFF.md`](KICKOFF.md). Built 2026-10-24 and 2026-10-25 on `claude/nice-goldberg-7asdq0`, in the
+eight commits the ledger names, before this record (D2).
+
+## Rows
+
+| #   | Ledger row | Planned                                     | Actually built                                                                                                                                                                                                                                                                   | Difference                                                                                                                                          | Reviewed                                                                     |
+| --- | ---------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| #1  | L-1        | No splash signed out; Google's code at boot | `splash-init.js` skips the splash without a session hint and draws the sign-in outline (`APP_BOOT_FRAME_LOGIN`); the `/callback` code exchanged as the app boots. Signed-out login on screen 2.7s → 0.43s; the Google exchange 464 → 295ms (production build)                    | As planned                                                                                                                                          | The user, 2026-10-24: approved the timings and the branch push               |
+| #2  | L-2        | One loader everywhere                       | `ui/spinner.tsx` (ring, arc, the green dot; 900ms, 2.4s under reduced motion); `Button isLoading` keeps colour and label; `BrandLoader` turns the wordmark's "o"; `ProductMark` `turning`; ESLint rejects `animate-spin` in app code                                             | As planned                                                                                                                                          | The user, 2026-10-24: "Yes go ahead with B and C"                            |
+| #3  | L-3        | The sign-in screen and the tour             | `AuthLayout` two columns from 68.75rem (1100px), a sticky stage; `AuthShowcase` (seven slides then, the engine `useTour`, the Today sheet, a lens per slide, the viewer's clock and locale); sign-in copy; 11 locales; the boot frame's outline                                  | As planned                                                                                                                                          | The user, 2026-10-24: approved v2 and the screenshots of C                   |
+| #4  | L-4        | The status pages                            | `FallbackState` `emblem` (`missing`, `locked`, `broken`) and `label`; 404 "Go back"; 403; the global boundary; the invitation problem title; 11 locales                                                                                                                          | As planned                                                                                                                                          | The user, 2026-10-24: screenshots of C2                                      |
+| #5  | L-5        | SonarQube's findings                        | The tour's steps a `<fieldset>`; `NOSONAR(S6819)` with its reason on the sheet's `role="img"`; scenes take one context                                                                                                                                                           | As planned                                                                                                                                          | Gate: SonarQube 0 issues                                                     |
+| #6  | L-6        | Branch hours                                | `branch-hours.ts` (`DEFAULT_BRANCH_HOURS` moved from the setup drawer, `nextBranchWorkingDay`, the device's memory); `civilWeekday`; `useBranchHours` / `useRememberBranchHours`; `tour-day.ts` on branch hours; the `nextOpening` span; `useTaskSnoozeWords`                    | The tour's sheet keeps six rows' room so the lens stays inside it near closing — found in verification                                              | The user, 2026-10-25: picked both answers; screenshots of four tour states   |
+| #7  | L-7        | The Branches slide                          | An eighth slide: the deck (Adajan, Vesu in this device's hours, Varachha), each branch's state on the viewer's clock, the fold to "All branches", the picker lens; CSS on one `--deck-fold-at`; 11 locales                                                                       | The chip's width follows its label and the phone header drops the date in this slide; the sheet's drop is one animation — all found in verification | The user, 2026-10-25: "Yes go ahead"; screenshots light, dark, Arabic, phone |
+| #8  | L-8        | The headlines                               | Every slide's headline and the title, "short and punchy", 11 locales; the title breaks only between sentences (`TourTitleSentences`)                                                                                                                                             | The title's sentence breaks were added in verification (the English line broke mid-phrase at 1440)                                                  | The user, 2026-10-25: picked the set and the title                           |
+| #9  | L-9        | The login visual shots pin the tour's clock | `pinTheTourClock` (`FIXED_NOW`, Monday 15:30 in Asia/Kolkata) on the four login shots; stable on a repeated run                                                                                                                                                                  | The Linux PNGs are not re-recorded here (D14)                                                                                                       | Claude (D14)                                                                 |
+| #10 | L-10       | Verify and gates                            | Unit: the full suite at every push (11,357 tests before the last two commits, all green at push). E2E against the live backend: auth, MFA, OAuth, accessibility, sign-out, accept-invite, boot splash. `pnpm size`, `build:check`, SonarQube 0 issues / 0 hotspots on every push | As planned                                                                                                                                          | Gates                                                                        |
+| #11 | L-11       | Close                                       | This file; Status `done`, then `frozen`                                                                                                                                                                                                                                          | As planned                                                                                                                                          | The user, 2026-10-25: "freeze and completed"                                 |
+
+## Revisions to upcoming rows
+
+None.
+
+## Summary
+
+- **Planned, not built:** — every ledger row is done.
+- **Planned, not kept:** — the seven-slide tour of L-3 grew an eighth, Branches (L-7), at the user's
+  request.
+- **Built, not planned:** — the six rows' room, the chip's width, the phone header in Branches, the
+  sheet's single animation and the title's sentence breaks, each found in verification (rows #6–#8).
+- **Follow-ups for the next iteration:**
+  - The Linux visual baselines of `/login` (4 PNGs) differ from the redesign until they are
+    re-recorded in the nightly's environment (`e2e-backend.yml`'s full suite: its report's
+    `*-actual.png` are the new baselines, the clock now pinned); the `-darwin` set likewise on a Mac.
+  - Branch holidays in the "Tomorrow" snooze (D11).
+
+## Standing deviations
+
+None. From scratch there is no Baseline list to carry, and the build matches `BRIEF.md` — the
+brief, with the prototype the user approved, is this iteration's design.

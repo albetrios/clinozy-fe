@@ -35,7 +35,6 @@ export const SPLASH_TEST_IDS = {
   block: 'app-splash-block',
   greeting: 'app-splash-greeting',
   progress: 'app-splash-progress',
-  bar: 'app-splash-bar',
   ticker: 'app-splash-ticker',
   offline: 'app-splash-offline',
   retry: 'app-splash-retry',

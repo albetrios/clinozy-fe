@@ -179,15 +179,23 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   plays (`data-replaying`, set by `useReplayedAnimation`) the room frame clips its
   vertical overflow — the 6px never flashes `<main>`'s scrollbar. `accordion` for
   disclosure; `shimmer` for skeleton loading. Overlays use the shadcn enter/exit
-  utilities (`tw-animate-css`). The sign-in showcase is the one ambient motion —
-  the **journey dial**: one 15.4s turn in which the logo's green thread steps round
-  the seven tone-coded stops (holding 1.54s on each, moving 0.66s), and every stop's
-  lift, the centre label and the moment cards answer it on the same clock, started
-  `--stop × 2.2s` in, so nothing drifts out of step. Its keyframes ship with the lazy
-  auth chunk (`AuthShowcase/auth-showcase.css`), not with `index.css`; only the live
-  dot's `pulse-dot` (2.4s) is global. Under reduced motion the dial stands still with
-  every stop named. Motion never takes text below WCAG AA: a stop lifts (scale) and
-  is never dimmed, pinned in `AuthShowcase.test.tsx`.
+  utilities (`tw-animate-css`). The sign-in stage is the one ambient motion —
+  the **tour**: one patient (Riya) through seven chapters, each in its room's tone —
+  Leads, Appointments, Front desk, Patient file, Treatment, Payments, Tasks — and an
+  eighth, Branches, where her sheet fans into a deck of the clinic's three branches
+  (each with its state on the viewer's clock) and folds back into "All branches";
+  5.2s each (the last rests 2.4s more), on a Today sheet set to the viewer's own clock
+  and this device's branch hours (`rememberedBranchHours`: the branch last worked in
+  here, else Mon–Sat 10:00–20:00). Closed, it is the branch's next opening — this
+  morning, tomorrow or its next working day — with no visit drawn outside its hours. Under her row a
+  lens shows the chapter's feature at work: her message typing in, a slot picked, the
+  wait counting, a prescription writing itself, a session filling, the bill settling,
+  a follow-up dropping in, the branch picker turning to every branch. It plays on its own only on `/login`, never under reduced
+  motion, and holds still while the pointer is on it, the viewer types, the tab is
+  hidden or it is scrolled away; its pause button answers WCAG 2.2.2, and only a
+  picked chapter is narrated (`aria-live`). Its keyframes ship with the lazy auth
+  chunk (`AuthShowcase/auth-showcase.css`), not with `index.css`; the engine is
+  `AuthShowcase/useTour.ts`, pinned in `AuthShowcase.test.tsx`.
 - **One motion system — Emil Kowalski's.** The app's motion follows Emil Kowalski's
   design-engineering standards (`agent-os/skills/emil-design-eng`,
   `review-animations/STANDARDS.md`); the audit that applied them is
@@ -279,6 +287,16 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
 
 ### Loading States
 
+- **One loader: the wordmark's "o".** Every busy moment draws the same glyph — a
+  faint ring in the text colour, an arc turning round it, the `brand-mark` dot at
+  rest in the centre — at one tempo (900ms a turn; 2.4s under reduced motion,
+  never still, since a loader that stops reads as a hang). A busy button is
+  `Button` `isLoading` (its label stays as it is), any other busy glyph — a row,
+  chip, search field or overlay — is `Spinner` (`ui/spinner.tsx`), and a screen
+  that waits whole is `BrandLoader`: the mark over the wordmark, its own "o"
+  turning, as the boot splash's does. index.css turns it by
+  `data-slot="spinner"`, so no app code spins anything: ESLint rejects
+  `animate-spin`. Content waits as skeletons, never under a spinner.
 - Render known interface structure immediately: dialog titles, navigation, search,
   close controls, widget headings, and section labels are real UI, not skeletons.
   Keep lazy boundaries inside that structure, around dynamic content only.
@@ -342,6 +360,18 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   by `tests/e2e/boot-splash.e2e.test.ts`: the splash fades **exactly once**, and
   the page is **never blank** behind it. Numbers and method:
   [local-production-perf.md](local-production-perf.md#cold-load-timeline).
+- **The splash is for opening the app, never for reaching the login screen.** A
+  cold load with no session hint ends on the login screen, so it opens on it:
+  `public/splash-init.js` hides the splash before the first paint and shows
+  `#app-boot-frame` instead — the canvas and the logo exactly where the header draws
+  it (`APP_BOOT_FRAME`) — and the login screen paints over that frame (measured on a
+  production build: the form at ~0.43s instead of after the ~2.7s splash). Offline
+  is the exception: the splash stays, because it is where the boot says it cannot
+  reach the server and offers Retry. The OAuth hand-off (`/callback/<provider>`)
+  keeps the splash but **at rest** (`APP_SPLASH_STATIC`): every frame at its end
+  state from the first paint and no wordmark beat to wait out — a hand-off screen,
+  not an opening — while the code exchange runs from boot, beside the app's own
+  download (`shared/auth/oauth-callback-sign-in.ts`).
 - **Signing out goes straight to the login screen.** The app stays exactly as it
   is until the login screen replaces it: nothing it shows is cleared before the
   page goes (`pagehide`), and the `/login` load a sign-out hands the tab to skips
@@ -361,6 +391,12 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   too.
 - **Restraint.** Icons clarify; they don't decorate. Pair an icon with a label
   unless the glyph is unambiguous and space-constrained.
+- **The wordmark's "o" is the brand's one glyph.** Beyond the loader (§5,
+  Loading States), it marks the public status pages: on the 404 its dot has gone
+  astray, on the 403 a lock sits inside it, on a full-page failure the ring is
+  broken round its dot (`FallbackState` `emblem`, with the status — "Error 404" —
+  as a pill inside the page's heading). In-app error states keep the empty-state
+  illustration.
 
 ## 7. Themeability (one look, two modes)
 

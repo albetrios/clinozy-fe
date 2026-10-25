@@ -30,6 +30,7 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/shared/components/ui/command.tsx';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import { Plus, Search } from '@/shared/icons/index.ts';
 
 import { PickerOptionItem } from './PickerOptionItem.tsx';
@@ -149,13 +150,7 @@ function PickerSearchRow({
       icon={<Search aria-hidden="true" className="size-3.75 shrink-0" />}
       trailing={
         <>
-          {searching ? (
-            <span
-              aria-hidden="true"
-              data-slot="pill"
-              className="border-border border-t-foreground animate-spinner size-3.5 shrink-0 rounded-full border-2"
-            />
-          ) : null}
+          {searching ? <Spinner className="size-3.5" /> : null}
           <kbd
             data-slot="kbd"
             className="bg-canvas text-muted-foreground flex h-5 shrink-0 items-center rounded-sm border px-1.5 font-mono text-[0.625rem]"

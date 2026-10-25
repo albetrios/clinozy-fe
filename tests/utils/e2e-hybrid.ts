@@ -10,8 +10,8 @@ import { exploreClinicSetupFirst } from '@/tests/utils/e2e-clinic-setup.ts';
  */
 export const AUTH_LABELS = {
   email: /^email$/i,
-  continue: /^continue$/i,
-  verifyAndContinue: /verify & continue/i,
+  continue: /^continue with email$/i,
+  verifyAndContinue: /verify and continue/i,
   enterVerificationCode: /enter verification code/i,
 } as const;
 

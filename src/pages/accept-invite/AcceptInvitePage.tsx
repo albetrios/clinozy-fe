@@ -7,7 +7,7 @@ import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import { PublicCard } from '@/shared/components/PublicFrame/index.ts';
-import { Spinner } from '@/shared/components/Spinner/index.ts';
+import { Spinner } from '@/shared/components/ui/spinner.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';

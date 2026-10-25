@@ -4,6 +4,7 @@ import { wordmarkParts } from '../src/lib/brand-wordmark.ts';
 import {
   PRODUCT_DESCRIPTION,
   PRODUCT_NAME,
+  PRODUCT_NAMESPACE,
   PRODUCT_THEME_COLOR,
 } from '../src/lib/product-identity.ts';
 
@@ -20,7 +21,10 @@ function escapeHtml(text: string): string {
  * The boot splash's wordmark (`splash.md:19`; H:518): the name in lower case, its
  * first "o" a ring (r 7.6, stroke 4.2 on a 20-unit grid) around a centre dot
  * (r 3). The same drawing as `ProductWordmark`, from the same split
- * ({@link wordmarkParts}); `index.html` colours it through the classes.
+ * ({@link wordmarkParts}); `index.html` colours it through the classes. The
+ * arc (`app-splash-ring-arc`) is `ProductWordmark turning`'s: only the splash
+ * shows it, turning the "o" as the app's one loader while it holds; the
+ * signed-out boot frame, which draws the header's still logo, hides it.
  */
 export function productWordmarkHtml(name: string): string {
   const { head, ring, tail } = wordmarkParts(name);
@@ -28,6 +32,7 @@ export function productWordmarkHtml(name: string): string {
   return (
     `${escapeHtml(head)}<svg class="app-splash-ring" viewBox="0 0 20 20" aria-hidden="true">` +
     '<circle class="app-splash-ring-line" cx="10" cy="10" r="7.6" fill="none" stroke-width="4.2" />' +
+    '<circle class="app-splash-ring-arc" cx="10" cy="10" r="7.6" fill="none" stroke-width="4.2" stroke-linecap="round" stroke-dasharray="16 100" pathLength="100" />' +
     '<circle class="app-splash-ring-dot" cx="10" cy="10" r="3" />' +
     `</svg>${escapeHtml(tail)}`
   );
@@ -42,6 +47,9 @@ const TOKENS: Record<string, string> = {
   '{{PRODUCT_DESCRIPTION}}': PRODUCT_DESCRIPTION,
   '{{PRODUCT_THEME_COLOR}}': PRODUCT_THEME_COLOR,
   '{{PRODUCT_WORDMARK}}': productWordmarkHtml(PRODUCT_NAME),
+  // The storage namespace: `public/splash-init.js` reads the session hint's key
+  // off `<html data-session-hint-key>` before the first paint.
+  '{{PRODUCT_NAMESPACE}}': PRODUCT_NAMESPACE,
 };
 
 /** Any `{{PRODUCT_*}}` token left after substitution is a typo, not a value. */

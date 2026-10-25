@@ -123,10 +123,11 @@ test.describe('Authentication', () => {
     const email = uniqueE2eEmail('verify-flow');
     await gotoApp(page, '/login');
     await submitAuthEmailForCode(page, email);
-    await expect(page.getByText(/we sent a verification code to/i)).toBeVisible();
+    await expect(page.getByText(/6-character code we sent to/i)).toBeVisible();
     await expect(page.getByText(/didn't receive a code/i)).toBeVisible();
     await expect(page.getByTestId('auth-email-resend-countdown')).toBeVisible();
     await expect(page.getByTestId('auth-email-change')).toBeVisible();
+    await expect(page.getByText(/check spam or promotions/i)).toBeVisible();
   });
 
   test('an invalid email format is blocked by native validation and never calls send-code', async ({

@@ -1043,4 +1043,44 @@ describe('auth/service', () => {
       expect(fetchMock).toHaveBeenCalledOnce();
     });
   });
+
+  describe('startAuthBootstrap on a load that is completing a sign-in', () => {
+    // A session hint is present: without the boot's sign-in, this load WOULD refresh.
+    async function freshService() {
+      vi.resetModules();
+      const service = await import('./service.ts');
+      const { useAuthStore: store } =
+        await import('@/shared/store/useAuthStore/index.ts');
+      localStorage.setItem(`${PRODUCT_NAMESPACE}:session-started-at`, String(Date.now()));
+      store.setState({ user: null, isAuthenticated: false, isLoading: true });
+      return { service, store };
+    }
+
+    it('waits for the sign-in instead of refreshing beside it', async () => {
+      const { service, store } = await freshService();
+      const signIn = deferred<void>();
+      service.bootstrapWithSignIn(signIn.promise);
+
+      const boot = service.startAuthBootstrap();
+      expect(service.startAuthBootstrap()).toBe(boot);
+      signIn.resolve();
+      await boot;
+
+      // No `/auth/refresh`: its answer would race the new session's refresh cookie.
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(store.getState().isLoading).toBe(false);
+    });
+
+    it('never rejects — a failed sign-in leaves a guest, done loading', async () => {
+      const { service, store } = await freshService();
+      service.bootstrapWithSignIn(Promise.reject(new Error('code already used')));
+
+      await expect(service.startAuthBootstrap()).resolves.toBeUndefined();
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(store.getState()).toMatchObject({
+        isAuthenticated: false,
+        isLoading: false,
+      });
+    });
+  });
 });

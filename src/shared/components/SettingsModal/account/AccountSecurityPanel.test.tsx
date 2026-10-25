@@ -328,13 +328,13 @@ describe('AccountSecurityPanel', () => {
 
     const [first, second] = await screen.findAllByTestId('passkey-remove');
     expect(first).toHaveAttribute('aria-busy', 'true');
-    expect(first?.querySelector('.animate-spin')).not.toBeNull();
+    expect(first?.querySelector('[data-slot="spinner"]')).not.toBeNull();
     // The other row is untouched: removing one credential is not a reason to
     // take the rest of the list away (SET-24). Each row owns its own mutation,
     // so its own single-flight guard covers a double-click on ITS button.
     expect(second).toBeEnabled();
     expect(second).not.toHaveAttribute('aria-busy', 'true');
-    expect(second?.querySelector('.animate-spin')).toBeNull();
+    expect(second?.querySelector('[data-slot="spinner"]')).toBeNull();
 
     await act(async () => release?.());
   });

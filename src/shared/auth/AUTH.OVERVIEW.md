@@ -15,15 +15,16 @@ The split is the dependency rule at work: core may import this folder (runtime t
 
 ## Files
 
-| File                            | What it does                                                                                                      |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `token.ts` (+ .test)            | In-memory access-token holder (read by every request)                                                             |
-| `service.ts` (+ .test)          | `login()`, `logout()`, `silentRefresh()`, `refreshAccessToken()`, `forceLogout()` — API + token + store           |
-| `refresh-timer.ts` (+ .test)    | Background timer that calls `silentRefresh()` shortly before token expiry                                         |
-| `idle-timeout.ts` (+ .test)     | Idle timer: warn, then sign out. Wall-clock anchored, shared across tabs, and deaf to activity while warning      |
-| `session-lifetime.ts` (+ .test) | Absolute session cap, plus `hasSessionHint()` — a boot-time guess at which chunks to warm, never an authorization |
-| `auth-channel.ts` (+ .test)     | Cross-tab logout broadcast (`BroadcastChannel('clinozy-auth')`) — only logout, never the token                    |
-| `types.ts`                      | `AuthUser`, `AuthTokenResponse`, schemas — single source of truth for auth shapes                                 |
+| File                                  | What it does                                                                                                      |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `token.ts` (+ .test)                  | In-memory access-token holder (read by every request)                                                             |
+| `service.ts` (+ .test)                | `login()`, `logout()`, `silentRefresh()`, `refreshAccessToken()`, `forceLogout()` — API + token + store           |
+| `refresh-timer.ts` (+ .test)          | Background timer that calls `silentRefresh()` shortly before token expiry                                         |
+| `idle-timeout.ts` (+ .test)           | Idle timer: warn, then sign out. Wall-clock anchored, shared across tabs, and deaf to activity while warning      |
+| `session-lifetime.ts` (+ .test)       | Absolute session cap, plus `hasSessionHint()` — a boot-time guess at which chunks to warm, never an authorization |
+| `oauth-callback-sign-in.ts` (+ .test) | The OAuth hand-off's code exchange, started at boot by `main.tsx` and taken once by the callback page             |
+| `auth-channel.ts` (+ .test)           | Cross-tab logout broadcast (`BroadcastChannel('clinozy-auth')`) — only logout, never the token                    |
+| `types.ts`                            | `AuthUser`, `AuthTokenResponse`, schemas — single source of truth for auth shapes                                 |
 
 The current-session state itself (the `user` + `isAuthenticated`) lives in `src/shared/store/useAuthStore/`.
 
@@ -129,6 +130,18 @@ session's cookie back over the new one. The flag survives only while the outcome
 is unknown (still offline); a refresh the server _rejects_ means there is nothing
 left to revoke, and an interactive sign-in clears it so it can never revoke the
 new session.
+
+**The OAuth hand-off signs in from boot, and the bootstrap waits for it.** On
+`/callback/<provider>`, `main.tsx` starts the code exchange before the router or
+React exist (`startOAuthCallbackSignIn()`), beside the app's own download instead of
+after the callback page's chunk; the page takes that promise
+(`takeOAuthCallbackSignIn()`) — the code is single-use, so it is never sent twice.
+The exchange is handed to the bootstrap first (`bootstrapWithSignIn()`), which then
+waits for it instead of asking `/auth/refresh`: a refresh beside it would carry the
+previous session's cookie while the exchange sets the new one, and whichever answer
+landed last would own the cookie jar. With a revoke still pending the boot keeps its
+old order — the revoke first, then the page's own exchange — so the hand-off does not
+start early.
 
 **A deliberate end also suppresses auto-Google sign-in** for the tab
 (`skipAutoGoogleSignIn()`), including in sibling tabs that hear the logout

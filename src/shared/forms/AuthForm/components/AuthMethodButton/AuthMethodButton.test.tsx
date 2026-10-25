@@ -36,7 +36,7 @@ describe('AuthMethodButton', () => {
     const btn = screen.getByTestId('btn-google');
     expect(btn).toHaveTextContent('Continue with Google');
     expect(btn).toHaveAttribute('aria-busy', 'true');
-    expect(btn.querySelector('.animate-spin')).not.toBeNull();
+    expect(btn.querySelector('[data-slot="spinner"]')).not.toBeNull();
     expect(screen.queryByTestId('provider-icon')).not.toBeInTheDocument();
   });
 
@@ -45,7 +45,7 @@ describe('AuthMethodButton', () => {
     const btn = screen.getByTestId('btn-google');
     expect(btn).toBeDisabled();
     expect(btn).toHaveAttribute('aria-busy', 'false');
-    expect(btn.querySelector('.animate-spin')).toBeNull();
+    expect(btn.querySelector('[data-slot="spinner"]')).toBeNull();
   });
 
   // A captcha the user never started must never take the control away from them:
@@ -57,7 +57,7 @@ describe('AuthMethodButton', () => {
     const btn = screen.getByTestId('btn-google');
     expect(btn).toBeEnabled();
     expect(btn).toHaveAttribute('aria-busy', 'false');
-    expect(btn.querySelector('.animate-spin')).toBeNull();
+    expect(btn.querySelector('[data-slot="spinner"]')).toBeNull();
   });
 
   it('still spins for its own in-flight request', () => {
@@ -73,7 +73,7 @@ describe('AuthMethodButton', () => {
     const btn = screen.getByTestId('btn-google');
     expect(btn).toBeDisabled();
     expect(btn).toHaveAttribute('aria-busy', 'false');
-    expect(btn.querySelector('.animate-spin')).toBeNull();
+    expect(btn.querySelector('[data-slot="spinner"]')).toBeNull();
   });
 
   it('honours extraDisabled (form/cooldown conditions)', () => {

@@ -4,10 +4,13 @@ import { fileURLToPath } from 'node:url';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import { PRODUCT_NAME, PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 
 import {
+  APP_BOOT_FRAME,
+  APP_BOOT_FRAME_LOGIN,
   APP_SPLASH_SKIP,
+  APP_SPLASH_STATIC,
   appSplashElapsedMs,
   appSplashSlotHost,
   dismissAppSplash,
@@ -645,6 +648,163 @@ describe('app-splash', () => {
     });
   });
 
+  describe('a signed-out cold load (APP_BOOT_FRAME)', () => {
+    afterEach(() => {
+      document.documentElement.classList.remove(APP_SPLASH_SKIP, APP_BOOT_FRAME);
+    });
+
+    it('takes the boot frame away with the splash — the screen is up over it', () => {
+      document.documentElement.classList.add(APP_SPLASH_SKIP, APP_BOOT_FRAME);
+      const frame = document.createElement('div');
+      frame.id = 'app-boot-frame';
+      document.getElementById('root')?.before(frame);
+      vi.useFakeTimers();
+      vi.advanceTimersByTime(120); // React's first paint
+      dismissAppSplash();
+      markAppContentSettled();
+
+      vi.advanceTimersByTime(32 + 80);
+      expect(isGone()).toBe(true);
+      expect(document.getElementById('app-boot-frame')).toBeNull();
+    });
+  });
+
+  describe('the OAuth hand-off (APP_SPLASH_STATIC)', () => {
+    afterEach(() => {
+      document.documentElement.classList.remove(APP_SPLASH_STATIC);
+    });
+
+    it('waits for no wordmark beat: it leaves once the sign-in has landed', () => {
+      document.documentElement.classList.add(APP_SPLASH_STATIC);
+      vi.useFakeTimers();
+      vi.advanceTimersByTime(120);
+      dismissAppSplash();
+      markAppContentSettled();
+
+      vi.advanceTimersByTime(32);
+      expect(isFading()).toBe(true); // long before SPLASH_FRAMES_MS
+      vi.advanceTimersByTime(520);
+      expect(isGone()).toBe(true);
+    });
+  });
+
+  describe('public/splash-init.js, before the first paint', () => {
+    const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+    const script = readFileSync(join(root, 'public/splash-init.js'), 'utf8');
+    const html = readFileSync(join(root, 'index.html'), 'utf8');
+    const hintKey = `${PRODUCT_NAMESPACE}:session-started-at`;
+    const htmlClasses = () => [...document.documentElement.classList];
+
+    /** Run the script on a load of `pathname`, as index.html's `<script>` does. */
+    function loadAt(pathname: string) {
+      window.history.replaceState(null, '', pathname);
+      const element = document.createElement('script');
+      element.textContent = script;
+      document.head.append(element);
+      element.remove();
+    }
+
+    beforeEach(() => {
+      document.documentElement.className = '';
+      document.documentElement.setAttribute('data-session-hint-key', hintKey);
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+
+    afterEach(() => {
+      document.documentElement.className = '';
+      document.documentElement.removeAttribute('data-session-hint-key');
+      localStorage.clear();
+      sessionStorage.clear();
+      window.history.replaceState(null, '', '/');
+    });
+
+    it('opens a signed-out visit on the boot frame, with no splash', () => {
+      loadAt('/organization/acme/today');
+      expect(htmlClasses()).toEqual([APP_SPLASH_SKIP, APP_BOOT_FRAME]);
+    });
+
+    it.each(['/', '/login'])(
+      'draws the sign-in screen’s own outline on %s, where the visit ends',
+      (pathname) => {
+        loadAt(pathname);
+        expect(htmlClasses()).toEqual([
+          APP_SPLASH_SKIP,
+          APP_BOOT_FRAME,
+          APP_BOOT_FRAME_LOGIN,
+        ]);
+      },
+    );
+
+    it('keeps the splash for a browser with a session hint', () => {
+      localStorage.setItem(hintKey, String(Date.now()));
+      loadAt('/organization/acme/today');
+      expect(htmlClasses()).toEqual([]);
+    });
+
+    it('holds the splash at rest on the OAuth hand-off, hint or not', () => {
+      loadAt('/callback/google');
+      expect(htmlClasses()).toEqual([APP_SPLASH_STATIC]);
+    });
+
+    it('skips the splash with no frame, once, on the load right after a sign-out', () => {
+      sessionStorage.setItem(APP_SPLASH_SKIP, '1');
+      loadAt('/login');
+      expect(htmlClasses()).toEqual([APP_SPLASH_SKIP]);
+      expect(sessionStorage.getItem(APP_SPLASH_SKIP)).toBeNull();
+    });
+
+    it('keeps the splash for a guest who is offline — it carries the notice and Retry', () => {
+      vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+      loadAt('/login');
+      expect(htmlClasses()).toEqual([]);
+    });
+
+    it('leaves the splash alone when storage is unavailable', () => {
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('storage denied');
+      });
+      loadAt('/login');
+      expect(htmlClasses()).toEqual([]);
+    });
+
+    it('reads the key index.html names — `markSessionStart`’s (session-lifetime.ts)', () => {
+      expect(html).toContain(
+        'data-session-hint-key="{{PRODUCT_NAMESPACE}}:session-started-at"',
+      );
+      expect(script).toContain("root.getAttribute('data-session-hint-key')");
+      expect(script).toContain(
+        `classList.add('${APP_SPLASH_SKIP}', '${APP_BOOT_FRAME}')`,
+      );
+      expect(script).toContain(`classList.add('${APP_SPLASH_STATIC}')`);
+    });
+
+    it('index.html draws the boot frame under #root and holds the hand-off at rest', () => {
+      const frame = html.indexOf('<div id="app-boot-frame"');
+      expect(frame).toBeGreaterThan(html.indexOf('<div id="app-splash"'));
+      expect(frame).toBeLessThan(html.indexOf('<div id="root">'));
+      expect(html).toMatch(
+        new RegExp(`\\.${APP_BOOT_FRAME} #app-boot-frame \\{[^}]*z-index: -1;`),
+      );
+      // The sign-in outline: the page colour, and from 68.75rem the stage panel.
+      const css = html.replaceAll(/\s+/g, ' ');
+      expect(css).toContain(
+        `.${APP_BOOT_FRAME_LOGIN} #app-boot-frame { background: var(--color-background); }`,
+      );
+      expect(css).toMatch(
+        new RegExp(
+          `@media \\(min-width: 68\\.75rem\\) \\{ \\.${APP_BOOT_FRAME_LOGIN} \\.app-boot-frame-logo \\{ inset-inline-start: 2\\.5rem; \\}`,
+        ),
+      );
+      expect(html).toContain('<span class="app-boot-frame-stage"></span>');
+      expect(html).toMatch(
+        new RegExp(
+          `\\.${APP_SPLASH_STATIC} #app-splash \\*\\s*\\{[^}]*animation-duration: 1ms !important;`,
+        ),
+      );
+    });
+  });
+
   describe('index.html drift', () => {
     const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
     const html = readFileSync(join(root, 'index.html'), 'utf8');
@@ -695,10 +855,6 @@ describe('app-splash', () => {
         'app-splash-up 500ms ease var(--app-splash-block-delay, 1900ms) both',
       ],
       [
-        '.app-splash-bar',
-        'app-splash-bar 1500ms cubic-bezier(0.4, 0, 0.2, 1) calc(var(--app-splash-block-delay, 1900ms) + 150ms) both',
-      ],
-      [
         '.app-splash-reel',
         'app-splash-tick 1500ms cubic-bezier(0.65, 0, 0.35, 1) calc(var(--app-splash-block-delay, 1900ms) + 150ms) both',
       ],
@@ -712,6 +868,21 @@ describe('app-splash', () => {
           animationOf('.app-splash-word'),
         ) ?? [];
       expect(Number(duration) + Number(delay)).toBe(SPLASH_FRAMES_MS);
+    });
+
+    // One loader: the splash's "o" turns at ui/spinner.tsx's tempo, and no bar fills.
+    it('turns the wordmark’s "o" as the loader, in the splash only', () => {
+      const css = html.replaceAll(/\s+/g, ' ');
+      expect(css).toContain(
+        '#app-splash .app-splash-ring { animation: app-splash-turn 900ms linear infinite; }',
+      );
+      expect(css).toContain('.app-splash-ring-arc { display: none;');
+      expect(css).toContain('#app-splash .app-splash-ring-arc { display: inline; }');
+      // The hand-off's frames rest at their end, but its loader keeps turning.
+      expect(css).toContain(
+        '.app-splash-static #app-splash .app-splash-ring { animation-duration: 900ms !important; animation-iteration-count: infinite !important; }',
+      );
+      expect(html).not.toContain('app-splash-bar');
     });
 
     it('rises the greeting block on the beat the slot counts from', () => {
@@ -792,9 +963,13 @@ describe('app-splash', () => {
       expect(body).toContain('animation-delay: 0s !important');
       expect(body).toContain('animation-duration: 1ms !important');
       expect(body).toContain('transition-duration: 1ms !important');
-      // The block, a full bar and "All set" are drawn, not animated, at once.
+      // The block and "All set" are drawn, not animated, at once.
       expect(body).toContain(
-        '.app-splash-block, .app-splash-bar, .app-splash-reel { animation: none !important; }',
+        '.app-splash-block, .app-splash-reel { animation: none !important; }',
+      );
+      // The loader alone keeps moving, slower — as the Spinner does (index.css).
+      expect(body).toContain(
+        '#app-splash .app-splash-ring, .app-splash-static #app-splash .app-splash-ring { animation-duration: 2.4s !important; animation-iteration-count: infinite !important; }',
       );
       expect(body).toContain('.app-splash-reel { transform: translateY(-36px); }');
     });

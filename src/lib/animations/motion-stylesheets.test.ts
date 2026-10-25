@@ -78,9 +78,11 @@ describe('the motion curves (src/index.css)', () => {
     );
   });
 
-  it('spells each curve once — the route-progress sweep is the only other literal', () => {
-    expect(index.match(/cubic-bezier\(/g)).toHaveLength(4);
-    expect(index).toContain('route-progress 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite');
+  it('spells each curve once — no other literal curve is left', () => {
+    // The last one, BrandLoader's route-progress bar sweep, went with the bar:
+    // its "o" turns now, at the Spinner's linear tempo.
+    expect(index.match(/cubic-bezier\(/g)).toHaveLength(3);
+    expect(index).not.toContain('route-progress 1.4s');
     for (const animation of [
       'drawer-in 340ms',
       'backdrop-in 340ms',

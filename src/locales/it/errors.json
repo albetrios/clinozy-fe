@@ -1,19 +1,19 @@
 {
   "global": {
-    "title": "Qualcosa è andato storto",
-    "message": "Si è verificato un errore imprevisto. Prova a ricaricare la pagina.",
+    "title": "Qualcosa è andato storto da parte nostra",
+    "message": "Aggiorna la pagina per riprovare. Se continua a succedere, dicci cosa stavi facendo e verificheremo.",
     "reload": "Ricarica pagina"
   },
   "route": {
-    "notFound": "La pagina che stai cercando non esiste.",
+    "notFound": "Il link potrebbe essere obsoleto, oppure la pagina è stata spostata. Tutto il resto è dove l’hai lasciato.",
     "generic": "Qualcosa è andato storto.",
     "pageTitle": "Questa pagina ha riscontrato un errore",
     "pageMessage": "Qualcosa è andato storto durante il rendering di questa pagina.",
     "tryAgain": "Riprova",
     "goHome": "Vai alla home",
     "refresh": "Aggiorna pagina",
-    "forbidden": "Non hai i permessi per accedere a questa pagina.",
-    "forbiddenTitle": "Nessun accesso a questa pagina",
+    "forbidden": "Il tuo accesso in questa clinica non include questa pagina. Se ti serve, chiedi a un amministratore della clinica di aggiornare il tuo ruolo.",
+    "forbiddenTitle": "Questa pagina non è disponibile per il tuo ruolo",
     "signOut": "Esci",
     "signingOut": "Disconnessione…",
     "pageNotFound": "Pagina non trovata",
@@ -183,5 +183,11 @@
     "title": "Organizzazione sospesa",
     "message": "Questa organizzazione è sospesa. Contatta un amministratore per verificare la fatturazione oppure passa a un'altra organizzazione.",
     "switchOrganization": "Cambia organizzazione"
+  },
+  "public": {
+    "status": "Errore {{status}}",
+    "missingTitle": "Non troviamo questa pagina",
+    "goBack": "Torna indietro",
+    "brokenLabel": "Si è verificato un problema"
   }
 }

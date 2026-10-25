@@ -750,7 +750,7 @@ describe('OnboardingPage', () => {
     // with only `disabled` left screen readers with a dead button and no reason.
     await waitFor(() => expect(finishButton).toHaveAttribute('aria-busy', 'true'));
     expect(finishButton).toBeDisabled();
-    expect(finishButton.querySelector('svg.animate-spin')).toBeInTheDocument();
+    expect(finishButton.querySelector('svg[data-slot="spinner"]')).toBeInTheDocument();
 
     await act(async () => {
       releaseCreate();

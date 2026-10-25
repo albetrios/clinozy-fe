@@ -273,6 +273,9 @@ function VerifyStepFooter({
           {t(AUTH_KEYS.auth.email.changeEmailAddress)}
         </Button>
       </p>
+      <p className="text-muted-foreground text-pretty">
+        {t(AUTH_KEYS.auth.email.spamHint)}
+      </p>
     </footer>
   );
 }
