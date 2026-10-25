@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.19.0](https://github.com/albetrios/clinozy-fe/compare/v1.18.1...v1.19.0) (2026-10-25)
+
+
+### Added
+
+* **auth:** redesign the public pages — instant sign-in, one loader, a branch-hours tour ([#191](https://github.com/albetrios/clinozy-fe/issues/191)) ([7599533](https://github.com/albetrios/clinozy-fe/commit/759953395ac922c9a69b550a52f5472503ac4c8e))
+
+
+### Fixed
+
+* **ci:** CI-only secrets stay out of the runtime; one release skill and command in both repos ([#190](https://github.com/albetrios/clinozy-fe/issues/190)) ([971c484](https://github.com/albetrios/clinozy-fe/commit/971c484ff6a436d99b1454af8f54b3c2dc09343f))
+
 ## [1.18.1](https://github.com/albetrios/clinozy-fe/compare/v1.18.0...v1.18.1) (2026-10-24)
 
 
