@@ -80,7 +80,7 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(stage).toHaveAccessibleName('The whole clinic day, in one calm place.');
   });
 
-  it('is one named image for the sheet, with seven named steps and a pause button', async () => {
+  it('is one named image for the sheet, with eight named steps and a pause button', async () => {
     const { getByTestId, getByRole } = renderStage();
     const stage = getByTestId(IDS.stage);
     expect(
@@ -88,10 +88,13 @@ describe('AuthShowcaseStage — the tour', () => {
         name: `A preview of ${PRODUCT_NAME}’s Today view, following one patient from enquiry to follow-up.`,
       }),
     ).toBeInTheDocument();
-    const group = within(stage).getByRole('group', { name: 'Product tour, 7 steps' });
-    expect(within(group).getAllByRole('button')).toHaveLength(7);
+    const group = within(stage).getByRole('group', { name: 'Product tour, 8 steps' });
+    expect(within(group).getAllByRole('button')).toHaveLength(8);
     expect(
-      within(group).getByRole('button', { name: 'Step 4 of 7: Patient file' }),
+      within(group).getByRole('button', { name: 'Step 4 of 8: Patient file' }),
+    ).toBeInTheDocument();
+    expect(
+      within(group).getByRole('button', { name: 'Step 8 of 8: Branches' }),
     ).toBeInTheDocument();
     expect(
       within(stage).getByRole('button', { name: 'Pause the product tour' }),
@@ -120,10 +123,10 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
       /Booked into the 5:30\s?PM slot/i,
     );
-    await play(TOUR_CHAPTER_MS * 5 + 50);
-    expect(currentStep(stage)).toBe(6);
+    await play(TOUR_CHAPTER_MS * 6 + 50);
+    expect(currentStep(stage)).toBe(7);
     await play(TOUR_CHAPTER_MS + 50);
-    expect(currentStep(stage), 'the last chapter rests longer').toBe(6);
+    expect(currentStep(stage), 'the last chapter rests longer').toBe(7);
     await play(TOUR_END_REST_MS);
     expect(currentStep(stage)).toBe(0);
   });
@@ -254,6 +257,65 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(sheet).not.toHaveTextContent('Isha Kapoor');
   });
 
+  it('Branches: a deck of the clinic’s branches, each in its state on the viewer’s clock', () => {
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    fireEvent.click(within(stage).getByTestId(IDS.step(7)));
+    expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
+      'Three branches, one Today',
+    );
+    const sheet = within(stage).getByTestId(IDS.sheet);
+    // Saturday 17:22: Adajan (every day, 9–9) and Varachha (Tue–Sun, 11–7) are open.
+    expect(sheet).toHaveTextContent(/Adajan\s*Open · till 9:00\s?PM/i);
+    expect(sheet).toHaveTextContent(/Varachha\s*Open · till 7:00\s?PM/i);
+    expect(sheet).toHaveTextContent('All branches');
+    expect(sheet).toHaveTextContent('All 46');
+    // Each row names its branch once the sheet is every branch's; Riya's is Vesu.
+    expect(within(stage).getByTestId(IDS.story)).toHaveTextContent('Vesu');
+    const lens = within(stage).getByTestId(IDS.lens);
+    expect(lens).toHaveTextContent('3 of 3 open now');
+    expect(lens).toHaveTextContent(/Adajan\s*Every day · 9:00\s?AM–9:00\s?PM/i);
+    expect(lens).toHaveTextContent(/Vesu\s*Mon–Sat · 10:00\s?AM–8:00\s?PM/i);
+    expect(lens).toHaveTextContent(/Varachha\s*Tue–Sun · 11:00\s?AM–7:00\s?PM/i);
+  });
+
+  it('Branches: a closed branch names when it next opens', () => {
+    // Sunday 20:00: Riya's branch (Mon–Sat) is closed, Varachha closes at 19:00 and opens Tuesday.
+    vi.setSystemTime(new Date(2026, 9, 25, 20, 0));
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    fireEvent.click(within(stage).getByTestId(IDS.step(7)));
+    const sheet = within(stage).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent(/Adajan\s*Open · till 9:00\s?PM/i);
+    expect(sheet).toHaveTextContent(/Varachha\s*Closed · opens Tuesday 11:00\s?AM/i);
+    expect(within(stage).getByTestId(IDS.lens)).toHaveTextContent('1 of 3 open now');
+  });
+
+  it('Branches: the deck plays its fan and fold only when the chapter arrived in motion', async () => {
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    fireEvent.click(within(stage).getByTestId(IDS.step(7)));
+    const day = () => within(stage).getByTestId(IDS.sheet).querySelector('.tour-day');
+    expect(day()).toHaveClass('is-deck', 'is-playing');
+    // A replay alternates the sheet's keyframes, so the fan plays again.
+    const run = day()?.getAttribute('data-deck-run');
+    fireEvent.click(within(stage).getByTestId(IDS.step(7)));
+    expect(day()?.getAttribute('data-deck-run')).not.toBe(run);
+    fireEvent.click(within(stage).getByTestId(IDS.step(0)));
+    expect(day()).not.toHaveClass('is-deck');
+    expect(within(stage).getByTestId(IDS.sheet)).not.toHaveTextContent('Adajan');
+    await withReducedMotion(async () => {
+      const still = renderStage(false);
+      const stillStage = still.getAllByTestId(IDS.stage).at(-1) as HTMLElement;
+      fireEvent.click(within(stillStage).getByTestId(IDS.step(7)));
+      const stillDay = within(stillStage)
+        .getByTestId(IDS.sheet)
+        .querySelector('.tour-day');
+      expect(stillDay).toHaveClass('is-deck');
+      expect(stillDay).not.toHaveClass('is-playing');
+    });
+  });
+
   it('draws every chapter’s scene — at its end under reduced motion', async () => {
     await withReducedMotion(async () => {
       const { getByTestId } = renderStage(false);
@@ -266,6 +328,7 @@ describe('AuthShowcaseStage — the tour', () => {
         treatment: /1 of 4 used/,
         payments: /Nothing due/,
         tasks: /Call Riya: how is her skin settling\?/,
+        branches: /One patient file, in every branch/,
       };
       for (const [index, chapter] of TOUR_CHAPTERS.entries()) {
         fireEvent.click(within(stage).getByTestId(IDS.step(index)));

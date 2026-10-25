@@ -1,8 +1,11 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { WEEK } from '@/shared/api/app/app-week.ts';
+import type { BranchHours } from '@/shared/app/branch-hours.ts';
 import {
   type AppIcon,
   Bell,
+  Building,
   Calendar,
   FileIcon,
   InstagramMark,
@@ -18,7 +21,10 @@ import {
  */
 export const AUTH_SHOWCASE_NS = I18N_NAMESPACES.auth;
 
-/** One of the tour's seven chapters, in the order one patient meets the clinic. */
+/**
+ * One of the tour's eight chapters: the seven in the order one patient meets the clinic, then
+ * Branches, the clinic it all happens in.
+ */
 export type TourChapterId =
   | 'leads'
   | 'appointments'
@@ -26,7 +32,8 @@ export type TourChapterId =
   | 'patientFile'
   | 'treatment'
   | 'payments'
-  | 'tasks';
+  | 'tasks'
+  | 'branches';
 
 /** A chapter's narration keys: the room it happens in, a headline, one line. */
 function chapterKeys<Id extends TourChapterId>(id: Id) {
@@ -62,6 +69,7 @@ export const AUTH_SHOWCASE_KEYS = {
     treatment: chapterKeys('treatment'),
     payments: chapterKeys('payments'),
     tasks: chapterKeys('tasks'),
+    branches: chapterKeys('branches'),
   },
   sheet: {
     label: 'showcase.sheet.label',
@@ -80,6 +88,14 @@ export const AUTH_SHOWCASE_KEYS = {
     freeToday: 'showcase.sheet.freeToday',
     freeTomorrow: 'showcase.sheet.freeTomorrow',
     freeLater: 'showcase.sheet.freeLater',
+    allBranches: 'showcase.sheet.allBranches',
+    /** A branch's state on the viewer's clock, as its sheet in the deck reads it. */
+    branchState: {
+      open: 'showcase.sheet.branchState.open',
+      opensToday: 'showcase.sheet.branchState.opensToday',
+      opensTomorrow: 'showcase.sheet.branchState.opensTomorrow',
+      opensLater: 'showcase.sheet.branchState.opensLater',
+    },
     visits: {
       hairLoss: 'showcase.sheet.visits.hairLoss',
       acneScars: 'showcase.sheet.visits.acneScars',
@@ -143,6 +159,13 @@ export const AUTH_SHOWCASE_KEYS = {
       when: 'showcase.lens.tasks.when',
       reminder: 'showcase.lens.tasks.reminder',
     },
+    branches: {
+      title: 'showcase.lens.branches.title',
+      openNow: 'showcase.lens.branches.openNow',
+      everyDay: 'showcase.lens.branches.everyDay',
+      days: 'showcase.lens.branches.days',
+      oneFile: 'showcase.lens.branches.oneFile',
+    },
   },
 } as const;
 
@@ -169,7 +192,7 @@ export interface TourChapter {
 /**
  * The tour's chapters, each in the tone of the room it happens in: Leads lav ·
  * Appointments sky · Front desk butter · Patient file blush · Treatment sage ·
- * Payments peach · Tasks plum.
+ * Payments peach · Tasks plum · Branches stone.
  */
 export const TOUR_CHAPTERS: readonly TourChapter[] = [
   { id: 'leads', tone: 'lav', icon: InstagramMark },
@@ -179,6 +202,7 @@ export const TOUR_CHAPTERS: readonly TourChapter[] = [
   { id: 'treatment', tone: 'sage', icon: Package },
   { id: 'payments', tone: 'peach', icon: Receipt },
   { id: 'tasks', tone: 'plum', icon: SquareCheck },
+  { id: 'branches', tone: 'stone', icon: Building },
 ];
 
 /** How long a chapter plays before the next. */
@@ -209,6 +233,50 @@ export const TOUR_STAFF = {
 /** The patient the tour follows. */
 export const TOUR_PATIENT = { name: 'Riya Sharma', initials: 'RS' } as const;
 
+/** One of the illustrated clinic's branches. */
+export type TourBranchId = 'adajan' | 'vesu' | 'varachha';
+
+/** A branch of the illustrated clinic: its name, its tone and its hours. */
+export interface TourBranch {
+  id: TourBranchId;
+  /** A place's name, not copy: it reads the same in every language. */
+  name: string;
+  tone: Tone;
+  /** Its own hours; null for Riya's branch, which keeps this device's (`rememberedBranchHours`). */
+  hours: BranchHours | null;
+}
+
+/**
+ * The illustrated clinic's branches — the demo clinic's Surat branches. Adajan, the main one,
+ * opens every day, 09:00–21:00; Vesu, Riya's branch, keeps the hours this device last worked in;
+ * Varachha opens Tuesday to Sunday, 11:00–19:00.
+ */
+export const TOUR_BRANCHES = {
+  adajan: {
+    id: 'adajan',
+    name: 'Adajan',
+    tone: 'sage',
+    hours: { opensAt: '09:00', closesAt: '21:00', workingDays: WEEK },
+  },
+  vesu: { id: 'vesu', name: 'Vesu', tone: 'sky', hours: null },
+  varachha: {
+    id: 'varachha',
+    name: 'Varachha',
+    tone: 'butter',
+    hours: {
+      opensAt: '11:00',
+      closesAt: '19:00',
+      workingDays: ['tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+    },
+  },
+} as const satisfies Readonly<Record<TourBranchId, TourBranch>>;
+
+/** The branches in the header picker's order: the main one first. */
+export const TOUR_BRANCH_ORDER: readonly TourBranchId[] = ['adajan', 'vesu', 'varachha'];
+
+/** Riya's branch: the sheet of the seven chapters before Branches, in this device's hours. */
+export const TOUR_HOME_BRANCH: TourBranchId = 'vesu';
+
 /** A visit status: its tone and the key for its label. */
 export type TourStatus = keyof (typeof AUTH_SHOWCASE_KEYS)['sheet']['status'];
 
@@ -231,6 +299,8 @@ export interface TourVisit {
   staff: keyof typeof TOUR_STAFF;
   /** Its status while the clinic is open; after hours every visit is booked. */
   status: TourStatus;
+  /** The branch it is booked at — named on its row once the sheet shows every branch. */
+  branch: TourBranchId;
 }
 
 /** The visit before Riya's slot: the row the now line sits under. */
@@ -241,6 +311,7 @@ export const TOUR_VISITS_BEFORE: readonly TourVisit[] = [
     visit: 'hairLoss',
     staff: 'mehta',
     status: 'withDoctor',
+    branch: 'adajan',
   },
 ];
 /** The four visits after Riya's slot, a quarter hour apart. */
@@ -251,15 +322,31 @@ export const TOUR_VISITS_AFTER: readonly TourVisit[] = [
     visit: 'peelSecond',
     staff: 'neha',
     status: 'waitingFor',
+    branch: 'vesu',
   },
-  { at: 45, patient: 'Sana Qureshi', visit: 'laser', staff: 'neha', status: 'booked' },
-  { at: 60, patient: 'Vikram Joshi', visit: 'botox', staff: 'iyer', status: 'booked' },
+  {
+    at: 45,
+    patient: 'Sana Qureshi',
+    visit: 'laser',
+    staff: 'neha',
+    status: 'booked',
+    branch: 'varachha',
+  },
+  {
+    at: 60,
+    patient: 'Vikram Joshi',
+    visit: 'botox',
+    staff: 'iyer',
+    status: 'booked',
+    branch: 'adajan',
+  },
   {
     at: 75,
     patient: 'Isha Kapoor',
     visit: 'hydrafacial',
     staff: 'neha',
     status: 'booked',
+    branch: 'vesu',
   },
 ];
 
@@ -275,7 +362,7 @@ export interface TourStory {
 /**
  * Riya's row as each chapter leaves it: an open slot (Leads), booked with Dr.
  * Iyer, checked in, with the doctor, into her first peel session with Neha,
- * paid, and a follow-up set.
+ * paid, and a follow-up set — still set when the sheet shows every branch.
  */
 export const TOUR_STORY: Readonly<Record<TourChapterId, TourStory>> = {
   leads: { open: true, visit: 'acneScars', staff: 'iyer', status: 'open' },
@@ -285,11 +372,13 @@ export const TOUR_STORY: Readonly<Record<TourChapterId, TourStory>> = {
   treatment: { open: false, visit: 'peelFirst', staff: 'neha', status: 'inTreatment' },
   payments: { open: false, visit: 'peelFirst', staff: 'neha', status: 'paid' },
   tasks: { open: false, visit: 'peelFirst', staff: 'neha', status: 'followUp' },
+  branches: { open: false, visit: 'peelFirst', staff: 'neha', status: 'followUp' },
 };
 
 /**
  * The lane counts above the rows at each chapter — Waiting, With doctor, In
- * treatment, Done — as Riya moves through them. After hours every lane is 0.
+ * treatment, Done — as Riya moves through them; at Branches, every branch's.
+ * After hours every lane is 0.
  */
 export const TOUR_LANE_COUNTS: Readonly<
   Record<TourChapterId, readonly [number, number, number, number]>
@@ -301,10 +390,11 @@ export const TOUR_LANE_COUNTS: Readonly<
   treatment: [1, 1, 1, 6],
   payments: [1, 1, 0, 7],
   tasks: [1, 1, 0, 7],
+  branches: [3, 3, 1, 19],
 };
 
-/** The day's visit count on the "All" tab. */
-export const TOUR_VISITS_TODAY = 18;
+/** The day's visit count on the "All" tab: Riya's branch's, and every branch's (Branches). */
+export const TOUR_VISITS_TODAY = { branch: 18, everyBranch: 46 } as const;
 /** Riya's bill, in rupees: the consultation and the first peel session. */
 export const TOUR_BILL = { consultation: 1000, session: 3500 } as const;
 /** Her package: sessions in it. */

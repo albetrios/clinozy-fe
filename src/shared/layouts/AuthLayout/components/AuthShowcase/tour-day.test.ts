@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { type BranchHours, DEFAULT_BRANCH_HOURS } from '@/shared/app/branch-hours.ts';
 
-import { addMinutes, buildTourDay, isInTourHours } from './tour-day.ts';
+import { addMinutes, buildTourDay, isInTourHours, tourBranchState } from './tour-day.ts';
 
 /** A local moment: 24 October 2026 is a Saturday, the 25th a Sunday. */
 function at(hours: number, minutes: number, day = 24): Date {
@@ -91,5 +91,39 @@ describe('buildTourDay', () => {
   it('books the next session three weeks on, at her slot’s time', () => {
     const day = buildTourDay(at(12, 0), DEFAULT_BRANCH_HOURS);
     expect(day.nextSession).toEqual(new Date(2026, 10, 14, 12, 15));
+  });
+});
+
+describe('tourBranchState', () => {
+  it('reads a branch open until its close', () => {
+    expect(tourBranchState(DEFAULT_BRANCH_HOURS, at(17, 22))).toEqual({
+      kind: 'open',
+      closes: on(24, 20),
+    });
+  });
+
+  it('reads a branch that opens later today', () => {
+    expect(tourBranchState(VESU, at(9, 30))).toEqual({
+      kind: 'opensToday',
+      opens: on(24, 11),
+    });
+  });
+
+  it('reads a closed branch by its next working day: tomorrow, or a later one', () => {
+    // Friday night: Saturday works.
+    expect(tourBranchState(DEFAULT_BRANCH_HOURS, at(21, 0, 23))).toEqual({
+      kind: 'opensTomorrow',
+      opens: on(24, 10),
+    });
+    // Saturday night: Sunday is closed, so Monday.
+    expect(tourBranchState(DEFAULT_BRANCH_HOURS, at(20, 0))).toEqual({
+      kind: 'opensLater',
+      opens: on(26, 10),
+    });
+    // Sunday noon, a Tuesday-to-Saturday branch: Tuesday.
+    expect(tourBranchState(VESU, at(12, 0, 25))).toEqual({
+      kind: 'opensLater',
+      opens: on(27, 11),
+    });
   });
 });

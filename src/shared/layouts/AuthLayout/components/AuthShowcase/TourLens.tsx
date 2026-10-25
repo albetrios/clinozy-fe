@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import type { BranchHours } from '@/shared/app/branch-hours.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar.tsx';
 import { Bell, Calendar, Check } from '@/shared/icons/index.ts';
@@ -13,24 +14,34 @@ import {
   AUTH_SHOWCASE_TEST_IDS,
   TOUR_BILL,
   TOUR_CHAPTERS,
+  TOUR_HOME_BRANCH,
   TOUR_PACKAGE_SESSIONS,
   TOUR_PATIENT,
   TOUR_STAFF,
   type TourChapterId,
 } from './auth-showcase.constants.ts';
 import {
+  TOUR_BRANCH_LIST,
+  tourBranchHours,
+  useTourBranchWords,
+} from './tour-branches.ts';
+import {
   addMinutes,
   isInTourHours,
+  tourBranchState,
   type TourDay,
   type TourSheetDay,
 } from './tour-day.ts';
 import { type TourFormat, useTourFormat } from './tour-format.ts';
+import { TourBranchDot, TourBranchDots } from './TourBranches.tsx';
 
-/** What every scene gets: whether it plays, the day, the clock and the formatters. */
+/** What every scene gets: whether it plays, the day, the clock, this device's hours and the formatters. */
 interface SceneContext {
   live: boolean;
   day: TourDay;
   now: Date;
+  /** This device's branch hours — Riya's branch's ({@link TOUR_HOME_BRANCH}). */
+  hours: BranchHours;
   format: TourFormat;
 }
 
@@ -385,6 +396,65 @@ function TasksScene({ scene }: SceneProps) {
   );
 }
 
+/**
+ * Branches: the header's branch picker — every branch in its hours, how many are open now — its
+ * check gliding from Riya's branch to "All branches" as the deck folds (CSS, `--deck-fold-at`).
+ */
+function BranchesScene({ scene }: SceneProps) {
+  const { now, hours, format } = scene;
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
+  const words = useTourBranchWords(format);
+  const open = TOUR_BRANCH_LIST.filter(
+    (branch) => tourBranchState(tourBranchHours(branch, hours), now).kind === 'open',
+  ).length;
+  return (
+    <>
+      <LensHead
+        chapter="branches"
+        title={t(K.lens.branches.title)}
+        aside={t(K.lens.branches.openNow, {
+          count: format.number(open),
+          total: format.number(TOUR_BRANCH_LIST.length),
+        })}
+      />
+      <ul className="tour-branch-list">
+        <li className="tour-branch-option">
+          <span className="tour-branch-pick tour-deck-after" />
+          <TourBranchDots />
+          <b>{t(K.sheet.allBranches)}</b>
+          <small />
+          <Check
+            aria-hidden="true"
+            className="tour-branch-check tour-deck-after size-3.5"
+          />
+        </li>
+        {TOUR_BRANCH_LIST.map((branch) => {
+          // Riya's branch is picked until the deck folds; the others never are.
+          const home = branch.id === TOUR_HOME_BRANCH;
+          return (
+            <li key={branch.id} className="tour-branch-option">
+              {home ? <span className="tour-branch-pick tour-deck-before" /> : null}
+              <TourBranchDot branch={branch} />
+              <b>{branch.name}</b>
+              <small>{words.hours(tourBranchHours(branch, hours), now)}</small>
+              <Check
+                aria-hidden="true"
+                className={cn(
+                  'tour-branch-check size-3.5',
+                  home ? 'tour-deck-before' : 'invisible',
+                )}
+              />
+            </li>
+          );
+        })}
+      </ul>
+      <LensSub icon={<Check aria-hidden="true" className="size-3.5" />}>
+        {t(K.lens.branches.oneFile)}
+      </LensSub>
+    </>
+  );
+}
+
 /** A scene's head: the chapter's icon and a title, a quiet note at the end. */
 function LensHead({
   chapter,
@@ -426,24 +496,28 @@ const SCENES: Record<TourChapterId, (props: SceneProps) => ReactNode> = {
   treatment: TreatmentScene,
   payments: PaymentsScene,
   tasks: TasksScene,
+  branches: BranchesScene,
 };
 
 /**
  * The lens under Riya's row: the chapter's feature, shown working — her
  * message arriving, a slot being picked, the wait counting, a prescription
  * writing itself, a session filling, the bill settling, a follow-up dropping
- * in. `live` plays the scene; otherwise it is drawn at its end.
+ * in, the branch picker turning to every branch. `live` plays the scene;
+ * otherwise it is drawn at its end.
  */
 export function TourLens({
   chapter,
   live,
   day,
   now,
+  hours,
 }: {
   chapter: TourChapterId;
   live: boolean;
   day: TourDay;
   now: Date;
+  hours: BranchHours;
 }) {
   const format = useTourFormat();
   const Scene = SCENES[chapter];
@@ -453,7 +527,7 @@ export function TourLens({
       data-testid={AUTH_SHOWCASE_TEST_IDS.lens}
       data-chapter={chapter}
     >
-      <Scene scene={{ live, day, now, format }} />
+      <Scene scene={{ live, day, now, hours, format }} />
     </div>
   );
 }

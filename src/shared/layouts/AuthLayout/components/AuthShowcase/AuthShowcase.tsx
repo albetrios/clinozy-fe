@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
-import { rememberedBranchHours } from '@/shared/app/branch-hours.ts';
+import { type BranchHours, rememberedBranchHours } from '@/shared/app/branch-hours.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar.tsx';
 import { Check, Lock, Pause, Play } from '@/shared/icons/index.ts';
@@ -16,6 +16,7 @@ import {
   AUTH_SHOWCASE_NS,
   AUTH_SHOWCASE_TEST_IDS,
   TOUR_CHAPTERS,
+  TOUR_HOME_BRANCH,
   TOUR_LANE_COUNTS,
   TOUR_PATIENT,
   TOUR_STAFF,
@@ -24,6 +25,8 @@ import {
   TOUR_VISITS_AFTER,
   TOUR_VISITS_BEFORE,
   TOUR_VISITS_TODAY,
+  type TourBranchId,
+  type TourChapterId,
   type TourStatus,
   type TourVisit,
 } from './auth-showcase.constants.ts';
@@ -35,6 +38,7 @@ import {
   type TourSheetDay,
 } from './tour-day.ts';
 import { useTourFormat } from './tour-format.ts';
+import { TourBranchChip, TourBranchDeck, TourBranchTag } from './TourBranches.tsx';
 import { TourLens } from './TourLens.tsx';
 import { useTour } from './useTour.ts';
 
@@ -70,7 +74,8 @@ function useViewerClock(): Date {
  * chapters — Leads, Appointments, Front desk, Patient file, Treatment,
  * Payments, Tasks — each with its feature shown working beside her row on a
  * Today sheet set to the viewer's own clock and this device's branch hours
- * (closed, its next opening's).
+ * (closed, its next opening's); then Branches, the sheet one of a deck of the
+ * clinic's branches.
  *
  * @remarks
  * Decorative but not silent: the sheet is one image with a name, the narration
@@ -122,12 +127,19 @@ export function AuthShowcaseStage({
         <TourBar tour={tour} />
         <TourNarration chapter={chapter} announce={announce} day={day} now={now} />
       </div>
-      <TourSheet chapter={chapter} live={live} run={run} day={day} now={now} />
+      <TourSheet
+        chapter={chapter}
+        live={live}
+        run={run}
+        day={day}
+        now={now}
+        hours={hours}
+      />
     </aside>
   );
 }
 
-/** The seven step buttons (story bars that fill as a chapter plays) and the pause button. */
+/** The eight step buttons (story bars that fill as a chapter plays) and the pause button. */
 function TourBar({ tour }: { tour: ReturnType<typeof useTour> }) {
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const steps = TOUR_CHAPTERS.length;
@@ -206,6 +218,7 @@ function TourNarration({
     treatment: t(keys.title),
     payments: t(keys.title, { amount: format.money(format.bill) }),
     tasks: t(keys.title, { weekday: format.weekday(day.followUp) }),
+    branches: t(keys.title),
   };
   return (
     <div
@@ -274,10 +287,130 @@ function TourStatusPill({ status, label }: { status: TourStatus; label: string }
   );
 }
 
+/** The sheet's head: its day, at Branches the branch chip, and whether the clinic is open. */
+function TourDayHead({ day, deck, run }: { day: TourDay; deck: boolean; run: number }) {
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
+  const format = useTourFormat();
+  // A later day is named by its weekday, today and tomorrow by the words.
+  const later = day.sheetDay === 'later';
+  const titles: Readonly<Record<TourSheetDay, string>> = {
+    today: t(K.sheet.today),
+    tomorrow: t(K.sheet.tomorrow),
+    later: format.weekday(day.base),
+  };
+  const title = titles[day.sheetDay];
+  return (
+    <div className="tour-day-head">
+      <div className="tour-day-title">
+        <b>{title}</b>
+        <span>{later ? format.dayMonth(day.base) : format.longDate(day.base)}</span>
+      </div>
+      <span className="tour-day-end">
+        {deck ? <TourBranchChip key={`chip-${run}`} /> : null}
+        <span className={cn('tour-live', !day.open && 'is-closed')}>
+          <span className="tour-live-dot" />
+          {t(day.open ? K.sheet.live : K.sheet.closed)}
+        </span>
+      </span>
+    </div>
+  );
+}
+
+const LANES = [
+  K.sheet.tabs.waiting,
+  K.sheet.tabs.withDoctor,
+  K.sheet.tabs.inTreatment,
+  K.sheet.tabs.done,
+] as const;
+
+/** The lane tabs and their counts as the chapter leaves them — at Branches, every branch's. */
+function TourTabs({ chapter, day }: { chapter: TourChapterId; day: TourDay }) {
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
+  const format = useTourFormat();
+  const deck = chapter === 'branches';
+  const counts = day.open ? TOUR_LANE_COUNTS[chapter] : ([0, 0, 0, 0] as const);
+  return (
+    <div className="tour-tabs">
+      <span className="tour-tab is-on">
+        {t(K.sheet.tabs.all)}{' '}
+        <b key={`all-${deck}`} className="tour-count">
+          {format.number(deck ? TOUR_VISITS_TODAY.everyBranch : TOUR_VISITS_TODAY.branch)}
+        </b>
+      </span>
+      {LANES.map((lane, index) => (
+        <span key={lane} className="tour-tab">
+          {t(lane)}{' '}
+          <b key={`${chapter}-${counts[index]}`} className="tour-count">
+            {format.number(counts[index] ?? 0)}
+          </b>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** A row's person cell — at Branches, its branch once the sheet is every branch's. */
+function TourPersonCell({
+  staff,
+  branchId,
+  deck,
+  run,
+}: {
+  staff: keyof typeof TOUR_STAFF;
+  branchId: TourBranchId;
+  deck: boolean;
+  run: number;
+}) {
+  if (!deck) return <TourStaffCell staff={staff} />;
+  return (
+    <TourBranchTag
+      key={`branch-${run}`}
+      branchId={branchId}
+      staff={<TourStaffCell staff={staff} />}
+    />
+  );
+}
+
+/** One of the other visits on the sheet: its time, who and what, its person and its status. */
+function TourVisitRow({
+  visit,
+  day,
+  deck,
+  run,
+  statusLabel,
+}: {
+  visit: TourVisit;
+  day: TourDay;
+  deck: boolean;
+  run: number;
+  statusLabel: (status: TourStatus) => string;
+}) {
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
+  const format = useTourFormat();
+  // After hours every visit is booked.
+  const status = day.open ? visit.status : 'booked';
+  return (
+    <li className="tour-visit">
+      <span className="tour-time">{format.time(addMinutes(day.base, visit.at))}</span>
+      <span className="tour-who">
+        <span className="tour-name">
+          <bdi>{visit.patient}</bdi>
+        </span>
+        <span className="tour-what">{t(K.sheet.visits[visit.visit])}</span>
+      </span>
+      <TourPersonCell staff={visit.staff} branchId={visit.branch} deck={deck} run={run} />
+      <span className="tour-status">
+        <TourStatusPill status={status} label={statusLabel(status)} />
+      </span>
+    </li>
+  );
+}
+
 /**
  * The Today sheet: the day and its live state, the lanes with their counts,
  * Riya's row among five others and the now line — one named image to
- * assistive technology (its words are the narration's).
+ * assistive technology (its words are the narration's). At Branches it is the
+ * front of a deck of the clinic's branches (`TourBranches.tsx`).
  */
 function TourSheet({
   chapter,
@@ -285,6 +418,7 @@ function TourSheet({
   run,
   day,
   now,
+  hours,
 }: {
   chapter: number;
   live: boolean;
@@ -292,19 +426,16 @@ function TourSheet({
   run: number;
   day: TourDay;
   now: Date;
+  /** This device's branch hours: Riya's branch's. */
+  hours: BranchHours;
 }) {
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const format = useTourFormat();
   const current = TOUR_CHAPTERS[chapter] ?? TOUR_CHAPTERS[0];
   if (!current) return null;
-  const counts = day.open ? TOUR_LANE_COUNTS[current.id] : ([0, 0, 0, 0] as const);
-  const lanes = [
-    K.sheet.tabs.waiting,
-    K.sheet.tabs.withDoctor,
-    K.sheet.tabs.inTreatment,
-    K.sheet.tabs.done,
-  ];
-
+  // Branches: the sheet is one of a deck, and plays its fan and fold when it arrived in motion.
+  const deck = current.id === 'branches';
+  const playing = deck && live;
   const statusLabel = (status: TourStatus) => {
     if (status === 'followUp') {
       return t(K.sheet.status.followUp, { weekday: format.weekdayShort(day.followUp) });
@@ -316,26 +447,26 @@ function TourSheet({
   };
 
   const drawn = (visit: TourVisit) => isInTourHours(day, addMinutes(day.base, visit.at));
-  const visitRow = (visit: TourVisit) => {
-    const status = day.open ? visit.status : 'booked';
-    return (
-      <li key={visit.patient} className="tour-visit">
-        <span className="tour-time">{format.time(addMinutes(day.base, visit.at))}</span>
-        <span className="tour-who">
-          <span className="tour-name">
-            <bdi>{visit.patient}</bdi>
-          </span>
-          <span className="tour-what">{t(K.sheet.visits[visit.visit])}</span>
-        </span>
-        <TourStaffCell staff={visit.staff} />
-        <span className="tour-status">
-          <TourStatusPill status={status} label={statusLabel(status)} />
-        </span>
-      </li>
-    );
-  };
+  const visitRow = (visit: TourVisit) => (
+    <TourVisitRow
+      key={visit.patient}
+      visit={visit}
+      day={day}
+      deck={deck}
+      run={run}
+      statusLabel={statusLabel}
+    />
+  );
 
   const story = TOUR_STORY[current.id];
+  // Riya's person cell — at Branches, her branch once the sheet shows every branch.
+  const storyStaff = deck ? (
+    <TourPersonCell staff={story.staff} branchId={TOUR_HOME_BRANCH} deck run={run} />
+  ) : (
+    <span key={`staff-${story.staff}`} className="tour-swap">
+      <TourStaffCell staff={story.staff} />
+    </span>
+  );
   const freeSlot = t(FREE_SLOT_KEYS[day.sheetDay], { weekday: format.weekday(day.slot) });
   return (
     <div // NOSONAR(S6819): a drawn Today sheet of many decorative parts, named once — an <img> cannot hold them
@@ -345,39 +476,23 @@ function TourSheet({
       data-testid={AUTH_SHOWCASE_TEST_IDS.sheet}
     >
       <div className="tour-glimpse-frame" aria-hidden="true">
-        <div data-slot="surface" className="tour-day">
-          <div className="tour-day-head">
-            <div className="tour-day-title">
-              {day.sheetDay === 'later' ? (
-                <>
-                  <b>{format.weekday(day.base)}</b>
-                  <span>{format.dayMonth(day.base)}</span>
-                </>
-              ) : (
-                <>
-                  <b>{t(day.sheetDay === 'today' ? K.sheet.today : K.sheet.tomorrow)}</b>
-                  <span>{format.longDate(day.base)}</span>
-                </>
-              )}
-            </div>
-            <span className={cn('tour-live', !day.open && 'is-closed')}>
-              <span className="tour-live-dot" />
-              {t(day.open ? K.sheet.live : K.sheet.closed)}
-            </span>
-          </div>
-          <div className="tour-tabs">
-            <span className="tour-tab is-on">
-              {t(K.sheet.tabs.all)} <b>{format.number(TOUR_VISITS_TODAY)}</b>
-            </span>
-            {lanes.map((lane, index) => (
-              <span key={lane} className="tour-tab">
-                {t(lane)}{' '}
-                <b key={`${current.id}-${counts[index]}`} className="tour-count">
-                  {format.number(counts[index] ?? 0)}
-                </b>
-              </span>
-            ))}
-          </div>
+        {deck ? (
+          <TourBranchDeck
+            key={`deck-${run}`}
+            hours={hours}
+            now={now}
+            playing={playing}
+            format={format}
+          />
+        ) : null}
+        <div
+          data-slot="surface"
+          className={cn('tour-day', deck && 'is-deck', playing && 'is-playing')}
+          // Alternating names restart the fan on a replay, without remounting the sheet.
+          data-deck-run={run % 2 === 0 ? 'even' : 'odd'}
+        >
+          <TourDayHead day={day} deck={deck} run={run} />
+          <TourTabs chapter={current.id} day={day} />
           <ol className="tour-rows">
             {TOUR_VISITS_BEFORE.filter(drawn).map(visitRow)}
             {day.open ? (
@@ -403,13 +518,7 @@ function TourSheet({
                   {story.open ? freeSlot : t(K.sheet.visits[story.visit])}
                 </span>
               </span>
-              {story.open ? (
-                <span />
-              ) : (
-                <span key={`staff-${story.staff}`} className="tour-swap">
-                  <TourStaffCell staff={story.staff} />
-                </span>
-              )}
+              {story.open ? <span /> : storyStaff}
               <span key={`status-${story.status}`} className="tour-status tour-swap">
                 <TourStatusPill status={story.status} label={statusLabel(story.status)} />
               </span>
@@ -419,6 +528,7 @@ function TourSheet({
                 live={live}
                 day={day}
                 now={now}
+                hours={hours}
               />
             </li>
             {TOUR_VISITS_AFTER.filter(drawn).map(visitRow)}

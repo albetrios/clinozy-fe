@@ -114,7 +114,39 @@ export function buildTourDay(now: Date, hours: BranchHours): TourDay {
   };
 }
 
+/** Today at a clock time `HH:mm` on the viewer's clock — an opening or a close, to format. */
+export function tourTimeOf(now: Date, time: string): Date {
+  return localAt(civilDateOf(now), time);
+}
+
 /** Whether a visit at `at` falls inside the sheet day's hours — one outside is not drawn. */
 export function isInTourHours(day: TourDay, at: Date): boolean {
   return at >= day.opens && at < day.closes;
+}
+
+/**
+ * A branch on the viewer's clock, as its sheet in the Branches deck reads it: open until its
+ * close, opening later today, or closed until its next working day — tomorrow or a later one.
+ */
+export type TourBranchState =
+  | { kind: 'open'; closes: Date }
+  | { kind: 'opensToday' | 'opensTomorrow' | 'opensLater'; opens: Date };
+
+/** Where a branch open `hours` stands at `now`: {@link TourBranchState}. */
+export function tourBranchState(hours: BranchHours, now: Date): TourBranchState {
+  const today = civilDateOf(now);
+  const nowMinutes = minutesOf(now);
+  if (isBranchWorkingDay(hours, today)) {
+    if (nowMinutes < clockMinutes(hours.opensAt)) {
+      return { kind: 'opensToday', opens: localAt(today, hours.opensAt) };
+    }
+    if (nowMinutes < clockMinutes(hours.closesAt)) {
+      return { kind: 'open', closes: localAt(today, hours.closesAt) };
+    }
+  }
+  const date = nextBranchWorkingDay(hours, addCivilDays(today, 1));
+  return {
+    kind: civilDayOffset(today, date) === 1 ? 'opensTomorrow' : 'opensLater',
+    opens: localAt(date, hours.opensAt),
+  };
 }

@@ -74,7 +74,8 @@
   padding: 0;
   border: 0;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: calc(var(--spacing) * 1.5);
 }
 .tour-step {
@@ -166,6 +167,14 @@
 
 /* ── The Today sheet ── */
 .tour-glimpse {
+  /* The Branches deck's one clock (TourBranches.tsx): it fans out as the chapter arrives, holds
+     while each branch reads its state, and folds at --deck-fold-at. Fanned, Riya's sheet drops
+     --deck-drop to show two branch sheets above it; folded, --deck-rest shows their edges. */
+  --deck-fan-ms: 460ms;
+  --deck-fold-at: 2600ms;
+  --deck-fold-ms: 520ms;
+  --deck-drop: 92px;
+  --deck-rest: 16px;
   position: relative;
   margin-top: clamp(1.25rem, 3.2vh, 2rem);
   flex: 1;
@@ -186,6 +195,7 @@
   box-shadow:
     0 0 0 1px var(--color-border),
     var(--elevation-panel);
+  transition: transform var(--deck-fold-ms) var(--ease-out-strong);
 }
 .tour-day-head {
   display: flex;
@@ -372,6 +382,9 @@
 }
 .tour-story[data-tone='plum'] {
   background: color-mix(in oklch, var(--color-tone-plum) 42%, var(--color-card));
+}
+.tour-story[data-tone='stone'] {
+  background: color-mix(in oklch, var(--color-tone-stone) 70%, var(--color-card));
 }
 .tour-swap {
   animation: tour-swap 300ms var(--ease-out-strong) both;
@@ -750,6 +763,200 @@
 }
 
 /* ── A phone: the stage sits under the form, one column, shorter rows ── */
+/* ── Branches: Riya's sheet as the front of a deck, one sheet per branch ──
+   Each piece remounts on an arrival, so the chapter replays; the sheet itself does not, so its
+   drop alternates two keyframe names (`data-deck-run`). The sheet drops, holds and folds in ONE
+   animation that ends on the rest it starts from and holds nothing after, so leaving the chapter
+   slides it back up (a filled animation would block that transition); its stops are the clock in
+   percent of 3120ms (--deck-fold-at + --deck-fold-ms): the fan ends at 460ms (14.7%), the fold
+   starts at 2600ms (83.3%). Without `.is-playing` — still, or under
+   reduced motion — it is drawn folded: every branch on one sheet. */
+.tour-day.is-deck {
+  transform: translateY(var(--deck-rest));
+}
+.tour-day.is-deck.is-playing[data-deck-run='even'] {
+  animation: tour-deck-sheet-even 3120ms linear;
+}
+.tour-day.is-deck.is-playing[data-deck-run='odd'] {
+  animation: tour-deck-sheet-odd 3120ms linear;
+}
+.tour-deck {
+  position: absolute;
+  top: 0;
+  inset-inline: calc(var(--spacing) * 6);
+}
+.tour-deck-card {
+  --deck-inset: calc(var(--spacing) * 7);
+  --deck-card-rest: 0px;
+  --deck-card-fan: 0px;
+  position: absolute;
+  top: 0;
+  inset-inline: var(--deck-inset);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 3);
+  height: calc(var(--deck-drop) + 1.5rem);
+  padding: 0.8125rem calc(var(--spacing) * 5);
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklch, var(--color-card) 88%, var(--color-muted));
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    var(--elevation-panel);
+  transform: translateY(var(--deck-card-rest));
+}
+.tour-deck-card[data-depth='1'] {
+  --deck-inset: calc(var(--spacing) * 3.5);
+  --deck-card-rest: calc(var(--deck-rest) / 2);
+  --deck-card-fan: calc(var(--deck-drop) / 2);
+  background: color-mix(in oklch, var(--color-card) 95%, var(--color-muted));
+}
+.tour-deck-card > * {
+  opacity: 0;
+}
+.tour-deck.is-playing .tour-deck-card {
+  animation:
+    tour-deck-card-fan var(--deck-fan-ms) var(--ease-out-strong) both,
+    tour-deck-card-fold var(--deck-fold-ms) var(--ease-out-strong) var(--deck-fold-at)
+      forwards;
+}
+.tour-deck.is-playing .tour-deck-card > * {
+  animation:
+    tour-deck-show 280ms var(--ease-out-strong) 220ms both,
+    tour-deck-hide 200ms var(--ease-out-strong) calc(var(--deck-fold-at) - 80ms) forwards;
+}
+.tour-deck-name {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  min-width: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+.tour-day-end {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 3);
+  min-width: 0;
+}
+.tour-branch-chip {
+  display: inline-grid;
+  padding: 2px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  background: var(--color-card);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--color-foreground-soft);
+  white-space: nowrap;
+}
+.tour-branch-chip-label {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+/* The chip is as wide as the label it shows: Riya's branch collapses as "All branches" opens. */
+.tour-branch-chip .tour-deck-before {
+  max-width: 0;
+}
+.tour-day.is-playing .tour-branch-chip .tour-deck-before {
+  animation: tour-chip-out 260ms var(--ease-out-strong) var(--deck-fold-at) both;
+}
+.tour-day.is-playing .tour-branch-chip .tour-deck-after {
+  animation: tour-chip-in 320ms var(--ease-out-strong) var(--deck-fold-at) both;
+}
+.tour-branch-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+}
+.tour-branch-dots {
+  display: inline-flex;
+  flex: none;
+}
+.tour-branch-dots .tour-branch-dot + .tour-branch-dot {
+  margin-inline-start: -3px;
+  box-shadow: 0 0 0 1.5px var(--color-card);
+}
+/* A row once the sheet is every branch's: a bar of its branch's tone at the start, and the
+   branch where its person was (the person stays under it until the fold). */
+.tour-row-branch {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.tour-row-branch-bar {
+  width: 3px;
+  height: 26px;
+  border-start-end-radius: 3px;
+  border-end-end-radius: 3px;
+}
+.tour-staff-swap {
+  display: grid;
+  min-width: 0;
+}
+.tour-staff-swap > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+/* Before the fold / after it: hidden at rest (the folded end state) / shown at rest. */
+.tour-deck-before {
+  opacity: 0;
+}
+.tour-day.is-playing .tour-deck-before {
+  animation: tour-deck-hide 220ms var(--ease-out-strong) var(--deck-fold-at) both;
+}
+.tour-day.is-playing .tour-deck-after {
+  animation: tour-deck-show 320ms var(--ease-out-strong) var(--deck-fold-at) both;
+}
+/* The lens: the header's branch picker. */
+.tour-branch-list {
+  display: grid;
+  gap: 2px;
+  margin: calc(var(--spacing) * 2.5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tour-branch-option {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding: 5px calc(var(--spacing) * 2);
+  border-radius: var(--radius-md);
+}
+.tour-branch-option > :not(.tour-branch-pick) {
+  position: relative;
+}
+.tour-branch-option b {
+  font-weight: 600;
+  color: var(--color-foreground-soft);
+}
+.tour-branch-option small {
+  overflow: hidden;
+  font-size: var(--text-xs);
+  color: var(--color-muted-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tour-branch-pick {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-muted);
+}
+.tour-branch-check {
+  color: var(--color-foreground);
+}
+
 @media (max-width: 39.9375rem) {
   .tour-stage {
     --tour-pad: calc(var(--spacing) * 4);
@@ -775,8 +982,13 @@
     min-height: 56px;
     padding: 0 calc(var(--spacing) * 3.5);
   }
+  /* Branches: the header holds Today, the branch chip and the live state; the date gives way. */
+  .tour-day.is-deck .tour-day-title span {
+    display: none;
+  }
   .tour-visit > .tour-staff,
   .tour-visit > .tour-swap:has(.tour-staff),
+  .tour-visit > .tour-staff-swap,
   .tour-story > span:nth-child(3) {
     display: none;
   }
@@ -879,5 +1091,90 @@
   from {
     opacity: 0;
     transform: translateY(-10px);
+  }
+}
+@keyframes tour-deck-sheet-even {
+  0% {
+    transform: translateY(var(--deck-rest));
+    animation-timing-function: var(--ease-out-strong);
+  }
+  14.7% {
+    transform: translateY(var(--deck-drop));
+    animation-timing-function: linear;
+  }
+  83.3% {
+    transform: translateY(var(--deck-drop));
+    animation-timing-function: var(--ease-out-strong);
+  }
+  100% {
+    transform: translateY(var(--deck-rest));
+  }
+}
+@keyframes tour-deck-sheet-odd {
+  0% {
+    transform: translateY(var(--deck-rest));
+    animation-timing-function: var(--ease-out-strong);
+  }
+  14.7% {
+    transform: translateY(var(--deck-drop));
+    animation-timing-function: linear;
+  }
+  83.3% {
+    transform: translateY(var(--deck-drop));
+    animation-timing-function: var(--ease-out-strong);
+  }
+  100% {
+    transform: translateY(var(--deck-rest));
+  }
+}
+@keyframes tour-deck-card-fan {
+  to {
+    transform: translateY(var(--deck-card-fan));
+  }
+}
+@keyframes tour-deck-card-fold {
+  from {
+    transform: translateY(var(--deck-card-fan));
+  }
+  to {
+    transform: translateY(var(--deck-card-rest));
+  }
+}
+@keyframes tour-deck-show {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tour-deck-hide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes tour-chip-out {
+  from {
+    max-width: 12rem;
+    opacity: 1;
+  }
+  to {
+    max-width: 0;
+    opacity: 0;
+  }
+}
+@keyframes tour-chip-in {
+  from {
+    max-width: 0;
+    opacity: 0;
+  }
+  to {
+    max-width: 12rem;
+    opacity: 1;
   }
 }
