@@ -36,6 +36,15 @@ const HIDE_TRANSIENT =
  * cold load renders the route under the splash first, so a 404 is "visible"
  * while the splash still covers it — and the transient layers hidden.
  */
+/**
+ * The sign-in screen's tour paints the viewer's clock and day — the sheet's rows, its open or
+ * closed state, the time in its headlines — so its shots hold one: {@link FIXED_NOW} in the
+ * clinic's zone (Monday 15:30, the sheet open). Date only, as Today's shot: timers keep running.
+ */
+async function pinTheTourClock(page: Page): Promise<void> {
+  await page.clock.setFixedTime(FIXED_NOW);
+}
+
 async function settled(page: Page): Promise<void> {
   await expect(page.locator('#app-splash')).toHaveCount(0, { timeout: 30_000 });
   await page.addStyleTag({ content: HIDE_TRANSIENT });
@@ -46,61 +55,70 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('Visual Regression', () => {
-  test('login page (light mode)', async ({ page }) => {
-    await gotoApp(page, '/login');
-    await expectAuthScreenReady(page);
-    await settled(page);
-    await expect(page).toHaveScreenshot('login-light.png', {
-      fullPage: true,
-      maxDiffPixelRatio: 0.02,
-      animations: 'disabled',
-    });
-  });
+  test.describe('the sign-in screen', () => {
+    // The tour's clock reads in the viewer's zone: the clinic's, wherever CI runs.
+    test.use({ timezoneId: 'Asia/Kolkata' });
 
-  test('login page (dark mode)', async ({ page }) => {
-    await seedDarkMode(page);
-    await gotoApp(page, '/login');
-    await expectAuthScreenReady(page);
-    await settled(page);
-    await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
-    await expect(page).toHaveScreenshot('login-dark.png', {
-      fullPage: true,
-      maxDiffPixelRatio: 0.02,
-      animations: 'disabled',
+    test('login page (light mode)', async ({ page }) => {
+      await pinTheTourClock(page);
+      await gotoApp(page, '/login');
+      await expectAuthScreenReady(page);
+      await settled(page);
+      await expect(page).toHaveScreenshot('login-light.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.02,
+        animations: 'disabled',
+      });
     });
-  });
 
-  test('login page (theme extremes — floating elevation + glow focus)', async ({
-    page,
-  }) => {
-    await gotoApp(page, '/login');
-    await page.evaluate(() => {
-      document.documentElement.dataset.elevation = 'floating';
-      document.documentElement.dataset.focus = 'glow';
+    test('login page (dark mode)', async ({ page }) => {
+      await pinTheTourClock(page);
+      await seedDarkMode(page);
+      await gotoApp(page, '/login');
+      await expectAuthScreenReady(page);
+      await settled(page);
+      await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
+      await expect(page).toHaveScreenshot('login-dark.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.02,
+        animations: 'disabled',
+      });
     });
-    await expectAuthScreenReady(page);
-    await settled(page);
-    await expect(page).toHaveScreenshot('login-theme-extremes.png', {
-      fullPage: true,
-      maxDiffPixelRatio: 0.02,
-      animations: 'disabled',
-    });
-  });
 
-  test('login page (dark + hairline separation)', async ({ page }) => {
-    await seedDarkMode(page);
-    await gotoApp(page, '/login');
-    await page.evaluate(() => {
-      document.documentElement.dataset.separation = 'hairline';
-      document.documentElement.dataset.menu = 'glass';
+    test('login page (theme extremes — floating elevation + glow focus)', async ({
+      page,
+    }) => {
+      await pinTheTourClock(page);
+      await gotoApp(page, '/login');
+      await page.evaluate(() => {
+        document.documentElement.dataset.elevation = 'floating';
+        document.documentElement.dataset.focus = 'glow';
+      });
+      await expectAuthScreenReady(page);
+      await settled(page);
+      await expect(page).toHaveScreenshot('login-theme-extremes.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.02,
+        animations: 'disabled',
+      });
     });
-    await expectAuthScreenReady(page);
-    await settled(page);
-    await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
-    await expect(page).toHaveScreenshot('login-dark-glass-hairline.png', {
-      fullPage: true,
-      maxDiffPixelRatio: 0.02,
-      animations: 'disabled',
+
+    test('login page (dark + hairline separation)', async ({ page }) => {
+      await pinTheTourClock(page);
+      await seedDarkMode(page);
+      await gotoApp(page, '/login');
+      await page.evaluate(() => {
+        document.documentElement.dataset.separation = 'hairline';
+        document.documentElement.dataset.menu = 'glass';
+      });
+      await expectAuthScreenReady(page);
+      await settled(page);
+      await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
+      await expect(page).toHaveScreenshot('login-dark-glass-hairline.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.02,
+        animations: 'disabled',
+      });
     });
   });
 
