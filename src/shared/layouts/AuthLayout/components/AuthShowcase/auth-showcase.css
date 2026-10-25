@@ -59,6 +59,10 @@
   color: var(--color-foreground);
   text-wrap: balance;
 }
+/* A sentence breaks only where it must: the lines part between sentences (TourTitleSentences). */
+.tour-title-sentence {
+  display: inline-block;
+}
 
 /* ── The steps: seven story bars and the pause button ── */
 .tour-bar {

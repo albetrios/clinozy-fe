@@ -138,7 +138,7 @@ describe('AuthLayout', () => {
     ).toBe(true);
     // The form keeps the page's `h1`; the stage's title is an `h2`.
     expect(within(stage).getByRole('heading', { level: 2 })).toHaveTextContent(
-      'The whole clinic day, in one calm place.',
+      'Every patient. Every branch. One calm screen.',
     );
     expect(within(stage).getByTestId('auth-showcase-toggle')).toBeInTheDocument();
     expect(getByTestId('auth-showcase-privacy')).toHaveTextContent(

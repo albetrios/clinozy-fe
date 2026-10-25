@@ -1,6 +1,6 @@
 import './auth-showcase.css';
 
-import { useEffect, useId, useState } from 'react';
+import { Fragment, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
@@ -122,7 +122,7 @@ export function AuthShowcaseStage({
           {t(K.kicker)}
         </span>
         <h2 id={titleId} className="tour-title">
-          {t(K.title)}
+          <TourTitleSentences text={t(K.title)} />
         </h2>
         <TourBar tour={tour} />
         <TourNarration chapter={chapter} announce={announce} day={day} now={now} />
@@ -137,6 +137,23 @@ export function AuthShowcaseStage({
       />
     </aside>
   );
+}
+
+/** Where a headline's sentences part: after a full stop (any script's) and a space. */
+const SENTENCE_BREAK = /(?<=[.!?।。])\s+/u;
+
+/**
+ * A headline's sentences, each kept whole on its line when it fits ("Every patient. Every
+ * branch." / "One calm screen.", never "… Every" / "branch. …"); one too long wraps inside.
+ */
+function TourTitleSentences({ text }: { text: string }) {
+  const sentences = text.split(SENTENCE_BREAK);
+  return sentences.map((sentence, index) => (
+    <Fragment key={sentence}>
+      <span className="tour-title-sentence">{sentence}</span>
+      {index < sentences.length - 1 ? ' ' : null}
+    </Fragment>
+  ));
 }
 
 /** The eight step buttons (story bars that fill as a chapter plays) and the pause button. */

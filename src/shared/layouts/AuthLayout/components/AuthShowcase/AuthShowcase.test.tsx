@@ -74,10 +74,10 @@ describe('AuthShowcaseStage — the tour', () => {
     const { getByTestId } = renderStage();
     const stage = getByTestId(IDS.stage);
     expect(within(stage).getByRole('heading', { level: 2 })).toHaveTextContent(
-      'The whole clinic day, in one calm place.',
+      'Every patient. Every branch. One calm screen.',
     );
     expect(stage).toHaveTextContent('For skin, hair & aesthetic clinics');
-    expect(stage).toHaveAccessibleName('The whole clinic day, in one calm place.');
+    expect(stage).toHaveAccessibleName('Every patient. Every branch. One calm screen.');
   });
 
   it('is one named image for the sheet, with eight named steps and a pause button', async () => {
@@ -105,7 +105,7 @@ describe('AuthShowcaseStage — the tour', () => {
     const { getByTestId } = renderStage();
     const stage = getByTestId(IDS.stage);
     expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
-      /Riya messages on Instagram at 5:22\s?PM/i,
+      /5:22\s?PM: a DM becomes a lead/i,
     );
     const story = within(stage).getByTestId(IDS.story);
     expect(story).toHaveTextContent('Open slot');
@@ -121,7 +121,7 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(currentStep(stage)).toBe(1);
     expect(within(stage).getByTestId(IDS.story)).toHaveTextContent('Riya Sharma');
     expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
-      /Booked into the 5:30\s?PM slot/i,
+      /Booked for 5:30\s?PM\. Zero back-and-forth\./i,
     );
     await play(TOUR_CHAPTER_MS * 6 + 50);
     expect(currentStep(stage)).toBe(7);
@@ -141,7 +141,7 @@ describe('AuthShowcaseStage — the tour', () => {
     fireEvent.click(within(stage).getByTestId(IDS.step(5)));
     expect(narration).toHaveAttribute('aria-live', 'polite');
     expect(narration).toHaveTextContent('Payments');
-    expect(narration).toHaveTextContent(/₹4,500 paid by UPI/);
+    expect(narration).toHaveTextContent(/₹4,500 by UPI\. Nothing to chase\./);
     expect(within(stage).getByTestId(IDS.lens)).toHaveAttribute(
       'data-chapter',
       'payments',
@@ -213,7 +213,7 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(sheet).toHaveTextContent('Free tomorrow');
     fireEvent.click(within(stage).getByTestId(IDS.step(1)));
     expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
-      /Booked into tomorrow’s 10:30\s?AM slot/i,
+      /Booked for tomorrow, 10:30\s?AM\. Zero back-and-forth\./i,
     );
   });
 
@@ -227,7 +227,7 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(sheet).not.toHaveTextContent('Tomorrow');
     fireEvent.click(within(stage).getByTestId(IDS.step(1)));
     expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
-      /Booked into Monday’s 10:30\s?AM slot/i,
+      /Booked for Monday, 10:30\s?AM\. Zero back-and-forth\./i,
     );
     expect(within(stage).getByTestId(IDS.lens)).toHaveTextContent('Dr. Iyer · Monday');
   });
@@ -262,7 +262,7 @@ describe('AuthShowcaseStage — the tour', () => {
     const stage = getByTestId(IDS.stage);
     fireEvent.click(within(stage).getByTestId(IDS.step(7)));
     expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
-      'Three branches, one Today',
+      'Three branches. One calm Today.',
     );
     const sheet = within(stage).getByTestId(IDS.sheet);
     // Saturday 17:22: Adajan (every day, 9–9) and Varachha (Tue–Sun, 11–7) are open.
