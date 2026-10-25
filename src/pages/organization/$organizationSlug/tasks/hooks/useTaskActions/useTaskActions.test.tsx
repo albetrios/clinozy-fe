@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { resolveAccessFromCodes } from '@/shared/api/app/access-api.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
 import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import {
   reassignTask,
@@ -11,6 +12,7 @@ import {
   snoozeTask,
 } from '@/shared/api/app/tasks-api.ts';
 import type { TaskDetail, TaskRow } from '@/shared/api/app/tasks-contracts.ts';
+import { type BranchHours, DEFAULT_BRANCH_HOURS } from '@/shared/app/branch-hours.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { AppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
@@ -42,6 +44,13 @@ vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => ({
   recordTaskOutcome: vi.fn(),
   snoozeTask: vi.fn(),
   reassignTask: vi.fn(),
+}));
+
+/** Each branch's hours, by id — a branch not listed has the defaults (`useBranchHours`). */
+const branchHours = vi.hoisted(() => new Map<string, BranchHours>());
+vi.mock('@/shared/hooks/useBranchHours/index.ts', () => ({
+  useBranchHours: () => (branchId: string | null) =>
+    (branchId ? branchHours.get(branchId) : undefined) ?? DEFAULT_BRANCH_HOURS,
 }));
 
 /** The member's clinozy-be codes. */
@@ -179,6 +188,7 @@ describe('useTaskActions — outcomes (KICKOFF §6.10 Outcome flow)', () => {
       words: 'Confirmed on call',
       note: 'Spoke to her mother',
       now: NOW.toISOString(),
+      hours: DEFAULT_BRANCH_HOURS,
       failedActivityId: null,
       idempotencyKey: expect.any(String),
     });
@@ -390,6 +400,42 @@ describe('useTaskActions — snooze and reassign', () => {
       idempotencyKey: expect.any(String),
     });
     expect(notifyMock.success).toHaveBeenCalledWith('Snoozed · 1 hour');
+  });
+
+  it('snoozes "Tomorrow" to the task’s branch’s next opening, and says when', async () => {
+    // NOW is Saturday 10 Oct, 10:30 in the clinic; this branch is closed Sunday and Monday.
+    branchHours.set('brn_vesu', {
+      opensAt: '11:30',
+      closesAt: '19:00',
+      workingDays: ['tue', 'wed', 'thu', 'fri', 'sat'],
+    });
+    vi.mocked(snoozeTask).mockImplementation(async ({ label }) =>
+      taskRecord({ status: 'snoozed', snoozeLabel: label }),
+    );
+    const { result, options } = setup();
+    act(() => result.current.snooze(taskRow({ branchId: 'brn_vesu' }), 'tomorrow', NOW));
+    await waitFor(() => expect(options.close).toHaveBeenCalledOnce());
+    expect(snoozeTask).toHaveBeenCalledWith({
+      taskId: taskRow().id,
+      until: appInstant('2026-10-13', '11:30'),
+      label: expect.stringMatching(/Oct.*13.*11:30/u),
+      idempotencyKey: expect.any(String),
+    });
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      expect.stringMatching(/^Snoozed · .*Oct.*13.*11:30/u),
+    );
+    branchHours.clear();
+  });
+
+  it('snoozes "Tomorrow" in the default hours for a task of no known branch', async () => {
+    vi.mocked(snoozeTask).mockResolvedValue(taskRecord({ status: 'snoozed' }));
+    const { result, options } = setup();
+    act(() => result.current.snooze(taskRow({ branchId: null }), 'tomorrow', NOW));
+    await waitFor(() => expect(options.close).toHaveBeenCalledOnce());
+    // Sunday is closed by default: Monday at 10:00.
+    expect(vi.mocked(snoozeTask).mock.calls[0]?.[0].until).toBe(
+      appInstant('2026-10-12', '10:00'),
+    );
   });
 
   it('gives the task to a member or a role’s queue, and keeps the drawer', async () => {

@@ -278,6 +278,7 @@ export function TaskDrawer({
               busy={actions.busy}
               canSnooze={gates.canSnooze}
               canReassign={gates.canReassign}
+              now={now}
               onSnooze={(option) => actions.snooze(row, option, now)}
               onReassign={(assignee) => actions.reassign(row, assignee)}
             />

@@ -4,6 +4,7 @@ import { api, type ApiData } from '@/core/http/api.ts';
 import { pageOf } from '@/core/http/pagination.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
+import type { BranchHours } from '@/shared/app/branch-hours.ts';
 import { apiErrorReason } from '@/shared/errors/errorHandler.ts';
 import { isHttpError, isNotFound } from '@/shared/errors/HttpError.ts';
 
@@ -317,6 +318,8 @@ export interface TaskOutcomeInput {
   note: string | null;
   /** When the member chose it — the times it sets count from here, so a retry sends the same. */
   now: string;
+  /** The task's branch's hours: an "until tomorrow" outcome wakes it at the branch's next opening. */
+  hours: BranchHours;
   /** The undelivered message the drawer quoted, for "Retry send" (read again when null). */
   failedActivityId: string | null;
 }
@@ -499,7 +502,7 @@ export async function recordTaskOutcome({
   if (write.type === 'snooze') {
     return snoozeTask({
       taskId: input.task.id,
-      until: taskTimeAfter(write.span, now),
+      until: taskTimeAfter(write.span, now, input.hours),
       label: input.words,
       idempotencyKey: `${idempotencyKey}:snooze`,
     });

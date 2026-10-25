@@ -183,7 +183,9 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   the **tour**: one patient (Riya) through seven chapters, each in its room's tone —
   Leads, Appointments, Front desk, Patient file, Treatment, Payments, Tasks — 5.2s
   each (the last rests 2.4s more), on a Today sheet set to the viewer's own clock
-  (after 21:00 or before 08:00 it is tomorrow's, the clinic closed). Under her row a
+  and this device's branch hours (`rememberedBranchHours`: the branch last worked in
+  here, else Mon–Sat 10:00–20:00). Closed, it is the branch's next opening — this
+  morning, tomorrow or its next working day — with no visit drawn outside its hours. Under her row a
   lens shows the chapter's feature at work: her message typing in, a slot picked, the
   wait counting, a prescription writing itself, a session filling, the bill settling,
   a follow-up dropping in. It plays on its own only on `/login`, never under reduced

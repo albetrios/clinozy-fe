@@ -405,10 +405,10 @@ export const TASK_RULE_KEYS = {
       },
     },
   },
+  // "Tomorrow" is worded by the clock: the task's branch's next opening (`useTaskSnoozeWords`).
   snoozeOptions: {
     oneHour: 'snoozeOptions.oneHour',
     threeHours: 'snoozeOptions.threeHours',
-    tomorrow: 'snoozeOptions.tomorrow',
     nextWeek: 'snoozeOptions.nextWeek',
   },
   followUpWhen: {
@@ -420,7 +420,7 @@ export const TASK_RULE_KEYS = {
 } as const satisfies {
   readonly groups: Readonly<Record<TaskRuleGroup, string>>;
   readonly rules: { readonly [T in TaskType]: TaskTypeKeySet<T> };
-  readonly snoozeOptions: Readonly<Record<TaskSnoozeOption, string>>;
+  readonly snoozeOptions: Readonly<Record<Exclude<TaskSnoozeOption, 'tomorrow'>, string>>;
   readonly followUpWhen: Readonly<Record<TaskFollowUpWhen, string>>;
 };
 

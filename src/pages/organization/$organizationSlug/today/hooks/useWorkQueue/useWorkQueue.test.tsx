@@ -196,6 +196,8 @@ describe('useWorkQueue (KICKOFF §6.2 Work queue aside; Q-T3) on clinozy-be', ()
         outcomeId: 'confirmedOnCall',
         words: 'Confirmed on call',
         note: null,
+        // The task's branch's hours: an "until tomorrow" wakes it at the next opening.
+        hours: expect.objectContaining({ opensAt: expect.stringMatching(/^\d\d:\d\d$/) }),
         failedActivityId: null,
         idempotencyKey: expect.any(String),
       }),

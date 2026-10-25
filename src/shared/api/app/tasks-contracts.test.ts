@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { type BranchHours, DEFAULT_BRANCH_HOURS } from '@/shared/app/branch-hours.ts';
 import {
   taskContactWireRow,
   taskPerson,
@@ -16,6 +17,7 @@ import {
   TASK_TYPE_VALUES,
   TASK_TYPES,
   taskCreateBodyOf,
+  taskNextOpening,
   type TaskOutcomeCode,
   taskOutcomeCodes,
   taskOutcomeFitsPerson,
@@ -292,6 +294,13 @@ describe('the catalogue', () => {
   });
 });
 
+/** A branch that opens at 11:30 and works Tuesday to Saturday. */
+const VESU_HOURS: BranchHours = {
+  opensAt: '11:30',
+  closesAt: '19:00',
+  workingDays: ['tue', 'wed', 'thu', 'fri', 'sat'],
+};
+
 describe('time', () => {
   it('snoozes "tomorrow at" to that time tomorrow in the clinic, not 24 hours on', () => {
     const now = new Date(appInstant('2026-10-03', '23:30'));
@@ -301,11 +310,33 @@ describe('time', () => {
     expect(taskTimeAfter({ kind: 'minutes', minutes: 30 }, now)).toBe(
       new Date(now.getTime() + 30 * 60_000).toISOString(),
     );
-    expect(taskSnoozeUntil('tomorrow', now.toISOString())).toBe(
-      appInstant('2026-10-04', '10:00'),
-    );
-    expect(taskSnoozeUntil('nextWeek', now.toISOString())).toBe(
+    expect(taskSnoozeUntil('nextWeek', now.toISOString(), DEFAULT_BRANCH_HOURS)).toBe(
       new Date(now.getTime() + 7 * 86_400_000).toISOString(),
+    );
+  });
+
+  it('snoozes "Tomorrow" to the branch’s opening on its next working day', () => {
+    // Friday 2 Oct 2026, 18:00 in the clinic.
+    const friday = new Date(appInstant('2026-10-02', '18:00')).toISOString();
+    expect(taskSnoozeUntil('tomorrow', friday, DEFAULT_BRANCH_HOURS)).toBe(
+      appInstant('2026-10-03', '10:00'),
+    );
+    expect(taskSnoozeUntil('tomorrow', friday, VESU_HOURS)).toBe(
+      appInstant('2026-10-03', '11:30'),
+    );
+    // Saturday: the default branch is closed on Sunday, so Monday at opening.
+    const saturday = new Date(appInstant('2026-10-03', '23:30'));
+    expect(
+      taskSnoozeUntil('tomorrow', saturday.toISOString(), DEFAULT_BRANCH_HOURS),
+    ).toBe(appInstant('2026-10-05', '10:00'));
+    expect(taskNextOpening(saturday, VESU_HOURS)).toEqual({
+      date: '2026-10-06',
+      time: '11:30',
+    });
+    // Just after midnight it is still the next day's opening, never the same morning.
+    const earlyMonday = new Date(appInstant('2026-10-05', '00:15'));
+    expect(taskTimeAfter({ kind: 'nextOpening' }, earlyMonday)).toBe(
+      appInstant('2026-10-06', '10:00'),
     );
   });
 

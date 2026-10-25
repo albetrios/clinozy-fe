@@ -18,7 +18,12 @@ import {
   TOUR_STAFF,
   type TourChapterId,
 } from './auth-showcase.constants.ts';
-import { addMinutes, type TourDay } from './tour-day.ts';
+import {
+  addMinutes,
+  isInTourHours,
+  type TourDay,
+  type TourSheetDay,
+} from './tour-day.ts';
 import { type TourFormat, useTourFormat } from './tour-format.ts';
 
 /** What every scene gets: whether it plays, the day, the clock and the formatters. */
@@ -111,17 +116,33 @@ function LeadsScene({ scene }: SceneProps) {
   );
 }
 
+/** The doctor's slots the lens offers, minutes after the sheet's base row; Riya's is the earliest free. */
+const LENS_SLOTS = [
+  { at: 0, taken: true },
+  { at: 15, taken: false },
+  { at: 30, taken: true },
+  { at: 90, taken: false },
+] as const;
+/** Riya's slot, a quarter hour after the base row. */
+const RIYA_SLOT = 15;
+
+/** Whose day the slots are, for the day the sheet shows. */
+const DOCTOR_DAY_KEYS: Readonly<Record<TourSheetDay, string>> = {
+  today: K.lens.appointments.doctorToday,
+  tomorrow: K.lens.appointments.doctorTomorrow,
+  later: K.lens.appointments.doctorLater,
+};
+
 /** Appointments: the selection glides from the last free slot to the earliest. */
 function AppointmentsScene({ scene }: SceneProps) {
   const { live, day, format } = scene;
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
-  const slots = [
-    { at: 0, taken: true },
-    { at: 15, taken: false },
-    { at: 30, taken: true },
-    { at: 90, taken: false },
-  ];
-  const picked = useLater(live, 3, 1, 450);
+  // Riya's slot is always offered; the others only inside the branch's hours.
+  const slots = LENS_SLOTS.filter(
+    (slot) => slot.at === RIYA_SLOT || isInTourHours(day, addMinutes(day.base, slot.at)),
+  );
+  const earliest = slots.findIndex((slot) => slot.at === RIYA_SLOT);
+  const picked = useLater(live, slots.length - 1, earliest, 450);
   const grid = useRef<HTMLDivElement>(null);
   const select = useRef<HTMLSpanElement>(null);
   // The highlight sits under the picked slot; it glides (a CSS transition) when the pick moves.
@@ -142,12 +163,10 @@ function AppointmentsScene({ scene }: SceneProps) {
     <>
       <LensHead
         chapter="appointments"
-        title={t(
-          day.open ? K.lens.appointments.doctorToday : K.lens.appointments.doctorTomorrow,
-          {
-            doctor,
-          },
-        )}
+        title={t(DOCTOR_DAY_KEYS[day.sheetDay], {
+          doctor,
+          weekday: format.weekday(day.slot),
+        })}
         aside={t(K.lens.appointments.length, { minutes: format.number(20) })}
       />
       <div ref={grid} className="tour-slots">

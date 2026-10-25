@@ -26,8 +26,10 @@ choices" — and the **stage** beside it, a rounded panel held in view (sticky) 
 scrolls. Below that it is one column, the form first: header → form → stage → "Privacy
 choices". The stage (`src/shared/layouts/AuthLayout/components/AuthShowcase/`) is a **tour**
 of one patient's day in seven chapters (Leads → Appointments → Front desk → Patient file →
-Treatment → Payments → Tasks) on a Today sheet set to the viewer's own clock — tomorrow's
-after hours — with each chapter's feature shown working in a lens under her row. It plays on
+Treatment → Payments → Tasks) on a Today sheet set to the viewer's own clock and this
+device's branch hours (the branch last worked in here — the signed-in shell keeps them — else
+the defaults a new branch starts with); closed, it shows the branch's next opening. Each
+chapter's feature is shown working in a lens under her row. It plays on
 its own only here, on `/login` (never under reduced motion), holds while the viewer is busy
 elsewhere, and has a pause button; the MFA and hand-off screens show it still. Its copy is
 `auth` › `showcase.*` (11 locales); the grid and the tour's motion ship as CSS with the lazy

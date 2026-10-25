@@ -362,7 +362,6 @@
   "snoozeOptions": {
     "oneHour": "1 घंटा",
     "threeHours": "3 घंटे",
-    "tomorrow": "कल 10:00",
     "nextWeek": "अगले हफ़्ते"
   },
   "followUpWhen": {

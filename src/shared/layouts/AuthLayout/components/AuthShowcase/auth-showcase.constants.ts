@@ -56,6 +56,7 @@ export const AUTH_SHOWCASE_KEYS = {
     leads: chapterKeys('leads'),
     appointments: chapterKeys('appointments'),
     appointmentsTomorrow: 'showcase.chapters.appointments.titleTomorrow',
+    appointmentsLater: 'showcase.chapters.appointments.titleLater',
     frontDesk: chapterKeys('frontDesk'),
     patientFile: chapterKeys('patientFile'),
     treatment: chapterKeys('treatment'),
@@ -78,6 +79,7 @@ export const AUTH_SHOWCASE_KEYS = {
     openSlot: 'showcase.sheet.openSlot',
     freeToday: 'showcase.sheet.freeToday',
     freeTomorrow: 'showcase.sheet.freeTomorrow',
+    freeLater: 'showcase.sheet.freeLater',
     visits: {
       hairLoss: 'showcase.sheet.visits.hairLoss',
       acneScars: 'showcase.sheet.visits.acneScars',
@@ -107,6 +109,7 @@ export const AUTH_SHOWCASE_KEYS = {
     appointments: {
       doctorToday: 'showcase.lens.appointments.doctorToday',
       doctorTomorrow: 'showcase.lens.appointments.doctorTomorrow',
+      doctorLater: 'showcase.lens.appointments.doctorLater',
       length: 'showcase.lens.appointments.length',
       earliest: 'showcase.lens.appointments.earliest',
     },

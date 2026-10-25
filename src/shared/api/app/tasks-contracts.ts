@@ -2,6 +2,11 @@ import { z } from 'zod';
 
 import type { ApiBody, ApiData } from '@/core/http/api.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
+import {
+  type BranchHours,
+  DEFAULT_BRANCH_HOURS,
+  nextBranchWorkingDay,
+} from '@/shared/app/branch-hours.ts';
 
 import {
   type LeadStatus,
@@ -203,11 +208,15 @@ export const TASK_RULE_GROUPS = [
 /** One rule group. */
 export type TaskRuleGroup = (typeof TASK_RULE_GROUPS)[number];
 
-/** A span of time from now: minutes, whole days, or tomorrow at a clinic-local time. */
+/**
+ * A span of time from now: minutes, whole days, tomorrow at a clinic-local time, or the task's
+ * branch's next opening — its opening time on its next working day after today.
+ */
 export type TaskTimeSpan =
   | { readonly kind: 'minutes'; readonly minutes: number }
   | { readonly kind: 'days'; readonly days: number }
-  | { readonly kind: 'tomorrowAt'; readonly at: string };
+  | { readonly kind: 'tomorrowAt'; readonly at: string }
+  | { readonly kind: 'nextOpening' };
 
 /**
  * A record write an outcome makes before the task's own — each one route of the record the task
@@ -281,11 +290,11 @@ const inMinutes = (minutes: number) =>
   ({ type: 'snooze', span: { kind: 'minutes', minutes } }) as const;
 const inDays = (days: number) =>
   ({ type: 'snooze', span: { kind: 'days', days } }) as const;
-/** "until tomorrow" — tomorrow morning, clinic-local (KICKOFF §6.10: not +24h). */
-const UNTIL_TOMORROW = {
-  type: 'snooze',
-  span: { kind: 'tomorrowAt', at: '10:00' },
-} as const;
+/**
+ * "until tomorrow" — when the task's branch next opens: tomorrow at its opening time, past any day
+ * it is closed (KICKOFF §6.10: not +24h).
+ */
+const UNTIL_TOMORROW = { type: 'snooze', span: { kind: 'nextOpening' } } as const;
 const LOG_CALL = { type: 'logCall' } as const;
 
 /** An outcome that writes `write` after `steps`, then shows "What’s next". */
@@ -605,12 +614,40 @@ export function taskReassignCodes(task: Pick<TaskRecord, 'link'>): string[] {
 const MINUTE = 60_000;
 const DAY = 86_400_000;
 
-/** The instant a span after `now` lands on (clinic-local for "tomorrow at"). */
-export function taskTimeAfter(span: TaskTimeSpan, now: Date): string {
+/** A clinic-local calendar date and clock time (`YYYY-MM-DD`, `HH:mm`). */
+export interface TaskWallTime {
+  date: string;
+  time: string;
+}
+
+/**
+ * When a branch next opens after `now`'s clinic day — its opening time on the first working day
+ * from tomorrow: "Tomorrow 10:00", or Monday's when Sunday is closed.
+ */
+export function taskNextOpening(now: Date, hours: BranchHours): TaskWallTime {
+  return {
+    date: nextBranchWorkingDay(hours, addCivilDays(appToday(now), 1)),
+    time: hours.opensAt,
+  };
+}
+
+/**
+ * The instant a span after `now` lands on (clinic-local for "tomorrow at" and the next opening,
+ * which reads the task's branch `hours` — the defaults when none are known).
+ */
+export function taskTimeAfter(
+  span: TaskTimeSpan,
+  now: Date,
+  hours: BranchHours = DEFAULT_BRANCH_HOURS,
+): string {
   if (span.kind === 'minutes')
     return new Date(now.getTime() + span.minutes * MINUTE).toISOString();
   if (span.kind === 'days')
     return new Date(now.getTime() + span.days * DAY).toISOString();
+  if (span.kind === 'nextOpening') {
+    const opening = taskNextOpening(now, hours);
+    return appInstant(opening.date, opening.time);
+  }
   return appInstant(addCivilDays(appToday(now), 1), span.at);
 }
 
@@ -624,17 +661,24 @@ export const TASK_SNOOZE_OPTIONS = [
 /** One Snooze option. */
 export type TaskSnoozeOption = (typeof TASK_SNOOZE_OPTIONS)[number];
 
-/** How long each Snooze option snoozes: "Tomorrow 10:00" is 10:00 tomorrow, clinic-local. */
+/**
+ * How long each Snooze option snoozes: "Tomorrow" is the task's branch's next opening — tomorrow at
+ * its opening time, clinic-local, past any day it is closed.
+ */
 const TASK_SNOOZE_SPANS: Readonly<Record<TaskSnoozeOption, TaskTimeSpan>> = {
   oneHour: { kind: 'minutes', minutes: 60 },
   threeHours: { kind: 'minutes', minutes: 180 },
-  tomorrow: { kind: 'tomorrowAt', at: '10:00' },
+  tomorrow: { kind: 'nextOpening' },
   nextWeek: { kind: 'days', days: 7 },
 };
 
-/** When a Snooze option chosen at `now` (an instant) wakes the task. */
-export function taskSnoozeUntil(option: TaskSnoozeOption, now: string): string {
-  return taskTimeAfter(TASK_SNOOZE_SPANS[option], new Date(now));
+/** When a Snooze option chosen at `now` (an instant) wakes a task of a branch open `hours`. */
+export function taskSnoozeUntil(
+  option: TaskSnoozeOption,
+  now: string,
+  hours: BranchHours,
+): string {
+  return taskTimeAfter(TASK_SNOOZE_SPANS[option], new Date(now), hours);
 }
 
 /** "What’s next" When chips (`tasks.md:91`). */

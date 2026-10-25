@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { DEFAULT_BRANCH_HOURS } from '@/shared/app/branch-hours.ts';
 import { appBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
@@ -11,7 +12,6 @@ import {
   type LocationFormValues,
   locationProblems,
   locationQuestionProblems,
-  SETUP_BRANCH_HOURS,
 } from './setup-location-form.ts';
 
 /** A step filled in as an owner would, ready to save. */
@@ -57,7 +57,7 @@ describe('initialLocationForm', () => {
   it('gives each form its own working days — the default is never shared', () => {
     const form = initialLocationForm({ clinicName: 'Acme', email: '' });
     form.workingDays.push('sun');
-    expect(SETUP_BRANCH_HOURS.workingDays).not.toContain('sun');
+    expect(DEFAULT_BRANCH_HOURS.workingDays).not.toContain('sun');
   });
 });
 

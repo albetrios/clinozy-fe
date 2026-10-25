@@ -105,6 +105,13 @@ export function addCivilDays(date: string, days: number): string {
   return next.toISOString().slice(0, 10);
 }
 
+/** The weekday of a calendar date (civil arithmetic): `2026-10-25` → `sun`. */
+export function civilWeekday(date: string): Weekday {
+  const [year, month, day] = civilParts(date);
+  const sundayFirst = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  return WEEK[(sundayFirst + 6) % WEEK.length] ?? 'mon';
+}
+
 /** The first day of a date's calendar month: `2026-10-17` → `2026-10-01`. */
 export function civilMonthStart(date: string): string {
   return `${date.slice(0, 7)}-01`;

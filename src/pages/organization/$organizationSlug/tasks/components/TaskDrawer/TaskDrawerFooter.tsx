@@ -9,10 +9,10 @@ import {
   type TaskSnoozeOption,
 } from '@/shared/api/app/tasks-contracts.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
-import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { useBranchHours } from '@/shared/hooks/useBranchHours/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import {
@@ -21,6 +21,7 @@ import {
   taskAssigneeOfKey,
   type TaskAssignees,
 } from '../../hooks/useTaskAssignees/index.ts';
+import { useTaskSnoozeWords } from '../../hooks/useTaskSnoozeWords/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 
 const K = TASKS_KEYS.drawer;
@@ -105,14 +106,17 @@ interface TaskDrawerFooterControlsProps {
   canSnooze: boolean;
   /** "Assigned" — `task:update`, and `lead:update` for a lead's task (`taskReassignCodes`). */
   canReassign: boolean;
+  /** The drawer's clock: "Tomorrow" names the branch's next opening from it. */
+  now: Date;
   onSnooze: (option: TaskSnoozeOption) => void;
   onReassign: (assignee: TaskAssignee) => void;
 }
 
 /**
  * The task column's footer controls (`tasks.md` › Task drawer › Footer), at
- * the record drawer footer's start: "Snooze ⌄" (1 hour · 3 hours · Tomorrow
- * 10:00 · Next week), "Assigned <name> ⌄" (the team who can work tasks, the
+ * the record drawer footer's start: "Snooze ⌄" (1 hour · 3 hours · the task's
+ * branch's next opening, "Tomorrow 10:00 am" · Next week), "Assigned <name> ⌄"
+ * (the team who can work tasks, the
  * member "(you)", then the role queues) with "Was <A> → <B>" after a move.
  * The footer's own "Close" (and Delete, for a task made by hand) follows; no
  * primary — the outcomes are the actions. A closed task has none of these; a
@@ -124,14 +128,16 @@ export function TaskDrawerFooterControls({
   busy,
   canSnooze,
   canReassign,
+  now,
   onSnooze,
   onReassign,
 }: TaskDrawerFooterControlsProps) {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tRules } = useTranslation(TASK_RULES_NS);
   const owner = useOwnerWords(row, assignees);
   const was = usePreviousOwners(row, assignees);
   const options = useAssigneeOptions(assignees);
+  const snoozeWords = useTaskSnoozeWords();
+  const hours = useBranchHours()(row.branchId);
   if (row.status === 'done') return null;
   return (
     <>
@@ -142,7 +148,7 @@ export function TaskDrawerFooterControls({
           value={null}
           options={TASK_SNOOZE_OPTIONS.map((option) => ({
             key: option,
-            label: tRules(TASK_RULE_KEYS.snoozeOptions[option]),
+            label: snoozeWords(option, { now, hours }),
             leading: { kind: 'none' },
           }))}
           onChange={(key) => {

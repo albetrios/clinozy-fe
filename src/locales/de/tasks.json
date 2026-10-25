@@ -362,7 +362,6 @@
   "snoozeOptions": {
     "oneHour": "1 Stunde",
     "threeHours": "3 Stunden",
-    "tomorrow": "Morgen 10:00",
     "nextWeek": "Nächste Woche"
   },
   "followUpWhen": {

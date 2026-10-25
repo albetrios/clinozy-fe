@@ -11,6 +11,7 @@ import { UploadTray } from '@/shared/components/UploadTray/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { WorkspaceSwitchOverlay } from '@/shared/components/WorkspaceSwitchOverlay/index.ts';
 import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
+import { useRememberBranchHours } from '@/shared/hooks/useBranchHours/index.ts';
 import { useOrgBrand } from '@/shared/hooks/useOrgBrand/index.ts';
 import { SkipLink } from '@/shared/layouts/AppLayout/AppLayout.shared.tsx';
 import { SectionBarShell } from '@/shared/layouts/AppLayout/AppLayoutSectionBar.tsx';
@@ -20,11 +21,14 @@ import { SectionBarShell } from '@/shared/layouts/AppLayout/AppLayoutSectionBar.
  * (KICKOFF §3.2) — one design per surface, so there is no shell to pick. The
  * org shell route only renders it for a team deployment (`requireTeamDeployment`,
  * D44). Exports `Component` for lazy() resolution. It also settles every list
- * the in-place skeleton leaves (`useRefreshSettle`, change-motion-polish).
+ * the in-place skeleton leaves (`useRefreshSettle`, change-motion-polish), and
+ * keeps the current branch's hours on the device for the sign-in screen's tour
+ * (`useRememberBranchHours`).
  */
 export function Component() {
   useOrgBrand();
   useRefreshSettle();
+  useRememberBranchHours();
   const { t } = useTranslation(ERRORS_NS);
   const { organizationSlug = '' } = useParams({ strict: false });
   const { entries: navItems } = useAppNav();

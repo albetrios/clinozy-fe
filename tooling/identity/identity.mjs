@@ -609,6 +609,7 @@ export const NAMESPACE_KEY_SUFFIXES = [
  * rewrite unrelated `key: value` prose.
  */
 export const NAMESPACE_STORAGE_KEYS = [
+  'branch-hours',
   'last-activity',
   'logout-pending',
   'session-started-at',

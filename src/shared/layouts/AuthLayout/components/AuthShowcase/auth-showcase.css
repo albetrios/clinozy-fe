@@ -274,6 +274,9 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  /* Six rows' room (a row and its border): the lens under Riya's row stays inside the sheet
+     when the branch's hours leave fewer visits around hers, near closing or just after opening. */
+  min-height: calc(6 * 59px);
 }
 .tour-visit {
   position: relative;
@@ -762,6 +765,9 @@
   }
   .tour-body {
     font-size: 0.90625rem;
+  }
+  .tour-rows {
+    min-height: calc(6 * 57px);
   }
   .tour-visit {
     grid-template-columns: 3.875rem minmax(0, 1fr) auto;

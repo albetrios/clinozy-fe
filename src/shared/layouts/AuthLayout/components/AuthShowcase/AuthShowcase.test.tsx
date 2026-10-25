@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import { REMEMBERED_BRANCH_HOURS_KEY } from '@/shared/app/branch-hours.ts';
 
 import {
   AUTH_SHOWCASE_TEST_IDS as IDS,
@@ -66,6 +67,7 @@ describe('AuthShowcaseStage — the tour', () => {
   });
   afterEach(() => {
     vi.useRealTimers();
+    localStorage.clear();
   });
 
   it('names the stage, the clinics it is for and the promise', async () => {
@@ -197,8 +199,9 @@ describe('AuthShowcaseStage — the tour', () => {
     });
   });
 
-  it('after hours shows tomorrow’s sheet, the clinic closed, and Riya booking into it', async () => {
-    vi.setSystemTime(new Date(2026, 9, 24, 22, 40));
+  it('after hours shows tomorrow’s sheet, the clinic closed, and Riya booking into it', () => {
+    // Friday night: Saturday is a working day.
+    vi.setSystemTime(new Date(2026, 9, 23, 22, 40));
     const { getByTestId } = renderStage(false);
     const stage = getByTestId(IDS.stage);
     const sheet = within(stage).getByTestId(IDS.sheet);
@@ -207,8 +210,48 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(sheet).toHaveTextContent('Free tomorrow');
     fireEvent.click(within(stage).getByTestId(IDS.step(1)));
     expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
-      /Booked into tomorrow’s 10:45\s?AM slot/i,
+      /Booked into tomorrow’s 10:30\s?AM slot/i,
     );
+  });
+
+  it('skips a closed day: Saturday night books into Monday’s opening', () => {
+    vi.setSystemTime(new Date(2026, 9, 24, 22, 40));
+    const { getByTestId } = renderStage(false);
+    const stage = getByTestId(IDS.stage);
+    const sheet = within(stage).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent(/^Monday\s?October 26/);
+    expect(sheet).toHaveTextContent('Free on Monday');
+    expect(sheet).not.toHaveTextContent('Tomorrow');
+    fireEvent.click(within(stage).getByTestId(IDS.step(1)));
+    expect(within(stage).getByTestId(IDS.narration)).toHaveTextContent(
+      /Booked into Monday’s 10:30\s?AM slot/i,
+    );
+    expect(within(stage).getByTestId(IDS.lens)).toHaveTextContent('Dr. Iyer · Monday');
+  });
+
+  it('keeps this device’s branch hours: no visit before its opening or after its close', () => {
+    localStorage.setItem(
+      REMEMBERED_BRANCH_HOURS_KEY,
+      JSON.stringify({ opensAt: '11:00', closesAt: '19:00', workingDays: ['sat'] }),
+    );
+    // Saturday 10:30: the branch opens at 11:00, so the sheet is this morning's, not yet open.
+    vi.setSystemTime(new Date(2026, 9, 24, 10, 30));
+    const { getByTestId } = renderStage(false);
+    const sheet = within(getByTestId(IDS.stage)).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent(/^Today/);
+    expect(sheet).toHaveTextContent('Clinic closed');
+    expect(sheet).toHaveTextContent(/^Today.*11:00\s?AMKabir Shah/);
+    expect(sheet).not.toHaveTextContent(/10:45\s?AM/);
+  });
+
+  it('drops the visits past closing in the day’s last slots', () => {
+    vi.setSystemTime(new Date(2026, 9, 24, 19, 20));
+    const { getByTestId } = renderStage(false);
+    const sheet = within(getByTestId(IDS.stage)).getByTestId(IDS.sheet);
+    expect(sheet).toHaveTextContent('Live');
+    expect(sheet).toHaveTextContent('Meera Pillai');
+    expect(sheet).not.toHaveTextContent('Sana Qureshi');
+    expect(sheet).not.toHaveTextContent('Isha Kapoor');
   });
 
   it('draws every chapter’s scene — at its end under reduced motion', async () => {

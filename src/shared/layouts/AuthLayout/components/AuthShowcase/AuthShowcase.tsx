@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { rememberedBranchHours } from '@/shared/app/branch-hours.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar.tsx';
 import { Check, Lock, Pause, Play } from '@/shared/icons/index.ts';
@@ -26,13 +27,33 @@ import {
   type TourStatus,
   type TourVisit,
 } from './auth-showcase.constants.ts';
-import { addMinutes, buildTourDay, type TourDay } from './tour-day.ts';
+import {
+  addMinutes,
+  buildTourDay,
+  isInTourHours,
+  type TourDay,
+  type TourSheetDay,
+} from './tour-day.ts';
 import { useTourFormat } from './tour-format.ts';
 import { TourLens } from './TourLens.tsx';
 import { useTour } from './useTour.ts';
 
 /** How often the now line re-reads the clock. */
 const CLOCK_TICK_MS = 15_000;
+
+/** Riya's booking, worded for the day the sheet shows. */
+const APPOINTMENTS_TITLES: Readonly<Record<TourSheetDay, string>> = {
+  today: K.chapters.appointments.title,
+  tomorrow: K.chapters.appointmentsTomorrow,
+  later: K.chapters.appointmentsLater,
+};
+
+/** The open slot's words, for the day the sheet shows. */
+const FREE_SLOT_KEYS: Readonly<Record<TourSheetDay, string>> = {
+  today: K.sheet.freeToday,
+  tomorrow: K.sheet.freeTomorrow,
+  later: K.sheet.freeLater,
+};
 
 /** The viewer's clock, re-read every {@link CLOCK_TICK_MS}: the now line keeps their time. */
 function useViewerClock(): Date {
@@ -48,7 +69,8 @@ function useViewerClock(): Date {
  * The sign-in stage: one patient's day through the clinic, told in seven
  * chapters — Leads, Appointments, Front desk, Patient file, Treatment,
  * Payments, Tasks — each with its feature shown working beside her row on a
- * Today sheet set to the viewer's own clock (after hours, tomorrow's).
+ * Today sheet set to the viewer's own clock and this device's branch hours
+ * (closed, its next opening's).
  *
  * @remarks
  * Decorative but not silent: the sheet is one image with a name, the narration
@@ -69,7 +91,9 @@ export function AuthShowcaseStage({
   const tour = useTour({ autoplay });
   const { chapter, announce, live, run, attachStage } = tour;
   const now = useViewerClock();
-  const day = buildTourDay(now);
+  // This device's branch (the one last worked in here), read once per visit.
+  const [hours] = useState(rememberedBranchHours);
+  const day = buildTourDay(now, hours);
   return (
     <aside
       ref={attachStage}
@@ -173,9 +197,10 @@ function TourNarration({
   const keys = K.chapters[current.id];
   const titles: Record<typeof current.id, string> = {
     leads: t(keys.title, { time: format.time(now) }),
-    appointments: day.open
-      ? t(keys.title, { time: format.time(day.slot) })
-      : t(K.chapters.appointmentsTomorrow, { time: format.time(day.slot) }),
+    appointments: t(APPOINTMENTS_TITLES[day.sheetDay], {
+      time: format.time(day.slot),
+      weekday: format.weekday(day.slot),
+    }),
     frontDesk: t(keys.title),
     patientFile: t(keys.title),
     treatment: t(keys.title),
@@ -290,6 +315,7 @@ function TourSheet({
     return t(K.sheet.status[status]);
   };
 
+  const drawn = (visit: TourVisit) => isInTourHours(day, addMinutes(day.base, visit.at));
   const visitRow = (visit: TourVisit) => {
     const status = day.open ? visit.status : 'booked';
     return (
@@ -310,7 +336,7 @@ function TourSheet({
   };
 
   const story = TOUR_STORY[current.id];
-  const freeSlot = day.open ? K.sheet.freeToday : K.sheet.freeTomorrow;
+  const freeSlot = t(FREE_SLOT_KEYS[day.sheetDay], { weekday: format.weekday(day.slot) });
   return (
     <div // NOSONAR(S6819): a drawn Today sheet of many decorative parts, named once — an <img> cannot hold them
       role="img"
@@ -322,8 +348,17 @@ function TourSheet({
         <div data-slot="surface" className="tour-day">
           <div className="tour-day-head">
             <div className="tour-day-title">
-              <b>{t(day.open ? K.sheet.today : K.sheet.tomorrow)}</b>
-              <span>{format.longDate(day.base)}</span>
+              {day.sheetDay === 'later' ? (
+                <>
+                  <b>{format.weekday(day.base)}</b>
+                  <span>{format.dayMonth(day.base)}</span>
+                </>
+              ) : (
+                <>
+                  <b>{t(day.sheetDay === 'today' ? K.sheet.today : K.sheet.tomorrow)}</b>
+                  <span>{format.longDate(day.base)}</span>
+                </>
+              )}
             </div>
             <span className={cn('tour-live', !day.open && 'is-closed')}>
               <span className="tour-live-dot" />
@@ -344,7 +379,7 @@ function TourSheet({
             ))}
           </div>
           <ol className="tour-rows">
-            {TOUR_VISITS_BEFORE.map(visitRow)}
+            {TOUR_VISITS_BEFORE.filter(drawn).map(visitRow)}
             {day.open ? (
               <li className="tour-now">
                 <span>{format.time(now)}</span>
@@ -365,7 +400,7 @@ function TourSheet({
                   key={`what-${story.open}-${story.visit}`}
                   className="tour-what tour-swap"
                 >
-                  {story.open ? t(freeSlot) : t(K.sheet.visits[story.visit])}
+                  {story.open ? freeSlot : t(K.sheet.visits[story.visit])}
                 </span>
               </span>
               {story.open ? (
@@ -386,7 +421,7 @@ function TourSheet({
                 now={now}
               />
             </li>
-            {TOUR_VISITS_AFTER.map(visitRow)}
+            {TOUR_VISITS_AFTER.filter(drawn).map(visitRow)}
           </ol>
         </div>
       </div>

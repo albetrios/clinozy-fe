@@ -8,6 +8,7 @@ import {
 } from '@/shared/api/app/branches-contracts.ts';
 import { toAppPhone } from '@/shared/app/app-phone.ts';
 import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
+import { DEFAULT_BRANCH_HOURS } from '@/shared/app/branch-hours.ts';
 import { PIN_CODE_PATTERN } from '@/shared/app/pin-directory/index.ts';
 
 import type { LocationQuestion } from './setup-place.ts';
@@ -36,13 +37,6 @@ export interface LocationFormValues {
   closesAt: string;
 }
 
-/** The hours a new branch starts with (F18): Monday to Saturday, 10:00–20:00. */
-export const SETUP_BRANCH_HOURS = {
-  workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as Weekday[],
-  opensAt: '10:00',
-  closesAt: '20:00',
-} as const;
-
 /** The step's starting values: the clinic's name cut to 60 (F3), the owner's email. */
 export function initialLocationForm({
   clinicName,
@@ -60,9 +54,9 @@ export function initialLocationForm({
     phone: '',
     email,
     name: clinicName.trim().slice(0, BRANCH_LIMITS.name),
-    workingDays: [...SETUP_BRANCH_HOURS.workingDays],
-    opensAt: SETUP_BRANCH_HOURS.opensAt,
-    closesAt: SETUP_BRANCH_HOURS.closesAt,
+    workingDays: [...DEFAULT_BRANCH_HOURS.workingDays],
+    opensAt: DEFAULT_BRANCH_HOURS.opensAt,
+    closesAt: DEFAULT_BRANCH_HOURS.closesAt,
   };
 }
 
