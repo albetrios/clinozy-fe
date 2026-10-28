@@ -7,7 +7,9 @@
  * fully cover. This scans every committed app source file (via Vite's raw glob)
  * and fails loudly if a sink appears. Vendored `components/ui/` and test files
  * are out of scope; comments are stripped so docs that *mention* a sink don't
- * trip it.
+ * trip it. Not in Stryker's `testFiles` (stryker.config.json): its sandbox copy of a
+ * mutated file carries an instrumentation header that reaches `globalThis` through
+ * `new Function("return this")`, which this scan would report once per file.
  */
 import { describe, expect, it } from 'vitest';
 
