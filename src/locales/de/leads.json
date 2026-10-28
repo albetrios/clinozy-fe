@@ -101,15 +101,26 @@
     "steps": {
       "done": "Erledigt",
       "current": "Aktuell",
-      "next": "Als Nächstes"
+      "next": "Als Nächstes",
+      "book": "Buchen"
     },
     "stepTips": {
       "done": "{{status}} · abgeschlossen",
       "current": "{{status}} · aktueller Schritt",
       "next": "Zu {{status}} wechseln",
-      "byCheckIn": "Klinik besucht · wird beim Check-in gesetzt"
+      "byCheckIn": "Klinik besucht · wird beim Check-in gesetzt",
+      "book": "Termin buchen · setzt den Lead auf {{status}}",
+      "byBooking": "{{status}} · wird beim Buchen eines Termins gesetzt",
+      "locked": "{{status}} · Termin stornieren, um zurückzugehen"
     },
     "closeAs": "Schließen als",
+    "booking": {
+      "aria": "Gebuchter Termin",
+      "label": "Gebucht · {{when}}",
+      "reschedule": "Verschieben",
+      "cancel": "Termin stornieren",
+      "lockedHint": "Gebucht · zuerst den Termin stornieren"
+    },
     "info": {
       "created": "Erstellt",
       "lastActivity": "Letzte Aktivität",

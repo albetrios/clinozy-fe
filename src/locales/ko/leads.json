@@ -98,15 +98,26 @@
     "steps": {
       "done": "완료",
       "current": "현재",
-      "next": "다음"
+      "next": "다음",
+      "book": "예약"
     },
     "stepTips": {
       "done": "{{status}} · 완료",
       "current": "{{status}} · 현재 단계",
       "next": "{{status}}(으)로 이동",
-      "byCheckIn": "내원함 · 체크인할 때 설정됩니다"
+      "byCheckIn": "내원함 · 체크인할 때 설정됩니다",
+      "book": "예약 잡기 · 리드가 {{status}}(으)로 이동합니다",
+      "byBooking": "{{status}} · 예약하면 설정됩니다",
+      "locked": "{{status}} · 되돌리려면 예약을 취소하세요"
     },
     "closeAs": "종료 사유",
+    "booking": {
+      "aria": "예약된 방문",
+      "label": "예약됨 · {{when}}",
+      "reschedule": "일정 변경",
+      "cancel": "예약 취소",
+      "lockedHint": "예약됨 · 먼저 예약을 취소하세요"
+    },
     "info": {
       "created": "생성일",
       "lastActivity": "최근 활동",

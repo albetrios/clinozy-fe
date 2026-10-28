@@ -104,15 +104,26 @@
     "steps": {
       "done": "Concluído",
       "current": "Atual",
-      "next": "Próximo"
+      "next": "Próximo",
+      "book": "Agendar"
     },
     "stepTips": {
       "done": "{{status}} · concluído",
       "current": "{{status}} · etapa atual",
       "next": "Mover para {{status}}",
-      "byCheckIn": "Visitou a clínica · definido no check-in"
+      "byCheckIn": "Visitou a clínica · definido no check-in",
+      "book": "Agende uma consulta · move o lead para {{status}}",
+      "byBooking": "{{status}} · definido ao agendar uma consulta",
+      "locked": "{{status}} · cancele a consulta para voltar"
     },
     "closeAs": "Encerrar como",
+    "booking": {
+      "aria": "Consulta agendada",
+      "label": "Agendada · {{when}}",
+      "reschedule": "Reagendar",
+      "cancel": "Cancelar consulta",
+      "lockedHint": "Agendada · cancele a consulta primeiro"
+    },
     "info": {
       "created": "Criado",
       "lastActivity": "Última atividade",

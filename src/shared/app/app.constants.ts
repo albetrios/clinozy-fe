@@ -71,6 +71,7 @@ export const APP_KEYS = {
       new: 'leads.statuses.new',
       contacted: 'leads.statuses.contacted',
       follow_up: 'leads.statuses.follow_up',
+      appointment_scheduled: 'leads.statuses.appointment_scheduled',
       clinic_visited: 'leads.statuses.clinic_visited',
       no_response: 'leads.statuses.no_response',
       not_interested: 'leads.statuses.not_interested',

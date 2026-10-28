@@ -112,6 +112,8 @@ export const LEADS_KEYS = {
       done: 'drawer.steps.done',
       current: 'drawer.steps.current',
       next: 'drawer.steps.next',
+      /** Over Appointment scheduled for a member who books: the step opens the booking. */
+      book: 'drawer.steps.book',
     },
     stepTips: {
       done: 'drawer.stepTips.done',
@@ -119,8 +121,24 @@ export const LEADS_KEYS = {
       next: 'drawer.stepTips.next',
       /** "Clinic visited · set when they check in" — the step a member never picks (L8). */
       byCheckIn: 'drawer.stepTips.byCheckIn',
+      /** "Book an appointment · moves the lead to <status>" — the step books (clinozy-be L11). */
+      book: 'drawer.stepTips.book',
+      /** "<status> · set when an appointment is booked" — for a member who does not book. */
+      byBooking: 'drawer.stepTips.byBooking',
+      /** "<status> · cancel the appointment to move back" — a booked lead's earlier steps. */
+      locked: 'drawer.stepTips.locked',
     },
     closeAs: 'drawer.closeAs',
+    /** The person's booking still to happen, on the Progress card (clinozy-be L11). */
+    booking: {
+      aria: 'drawer.booking.aria',
+      /** "Booked · <when>". */
+      label: 'drawer.booking.label',
+      reschedule: 'drawer.booking.reschedule',
+      cancel: 'drawer.booking.cancel',
+      /** A closing status the server refuses while booked (No response). */
+      lockedHint: 'drawer.booking.lockedHint',
+    },
     info: {
       created: 'drawer.info.created',
       /** The person's latest activity, on any record. */
@@ -228,6 +246,10 @@ export const LEADS_TEST_IDS = {
   drawerRemove: 'lead-drawer-remove',
   drawerPeople: 'lead-drawer-people',
   drawerResize: 'lead-drawer-resize',
+  /** The Progress track's steps: `lead-drawer-step-<status>`. */
+  drawerStep: 'lead-drawer-step',
+  /** The booking still to happen on Progress, and its `-reschedule` and `-cancel`. */
+  drawerBooking: 'lead-drawer-booking',
   /** New lead — the drawer's own parts derive theirs from it (`new-lead-drawer-save` …). */
   newLead: 'new-lead-drawer',
   /** The root of the contact picker's own ids (`new-lead-contact-recent`, `-quick-add-name` …). */

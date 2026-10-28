@@ -41,6 +41,7 @@ const STATUSES = [
   'not_interested',
   'invalid',
   'lost',
+  'appointment_scheduled',
 ] as const satisfies readonly LeadStatus[];
 const SOURCES = [
   'instagram',

@@ -42,6 +42,7 @@ import {
   LeadInterestsField,
   LeadPeopleField,
   type LeadPeopleFieldProps,
+  type LeadProgressBooking,
   LeadProgressField,
   LeadSourceField,
 } from '../LeadFormFields/index.ts';
@@ -59,6 +60,8 @@ export interface LeadDetailsBodyProps {
   canEditContact: boolean;
   /** The contact card's and the contact editor's band actions. */
   contactActions?: ContactCardActions;
+  /** Progress's booking — the step that books and the booking still to happen (clinozy-be L11). */
+  booking?: LeadProgressBooking;
 }
 
 /**
@@ -349,6 +352,7 @@ export function LeadDetailsBody({
   canEdit,
   canEditContact,
   contactActions = {},
+  booking,
 }: LeadDetailsBodyProps) {
   const { t } = useTranslation(LEADS_NS);
   const { draft: values, update } = draft;
@@ -388,6 +392,7 @@ export function LeadDetailsBody({
         <LeadProgressField
           status={values.status}
           onChange={(status) => update({ status })}
+          booking={booking}
         />
       </LeadCard>
       <LeadInfoCard lead={lead} />

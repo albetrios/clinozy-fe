@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { type DrawerChipOption, DrawerChips } from './drawer-chip-controls.tsx';
@@ -155,6 +155,26 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     const female = screen.getByRole('button', { name: 'Female' });
     expect(female).toBeDisabled();
     await user.click(female);
+  });
+
+  it('can turn off one chip and leave the rest', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <DrawerChips
+        label="Gender"
+        options={GENDERS.map((option, index) => ({ ...option, disabled: index === 0 }))}
+        value={null}
+        onChange={onChange}
+      />,
+    );
+    const [first, second] = GENDERS;
+    const off = screen.getByRole('button', { name: first?.label });
+    expect(off).toBeDisabled();
+    await user.click(off);
+    expect(onChange).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: second?.label }));
+    expect(onChange).toHaveBeenCalledWith(second?.value);
   });
 
   it('draws the outline look: dashed until picked, then muted on a solid edge, no check', () => {

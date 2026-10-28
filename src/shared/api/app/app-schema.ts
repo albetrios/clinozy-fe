@@ -103,6 +103,7 @@ export const LEAD_STATUS_VALUES = [
   'not_interested',
   'invalid',
   'lost',
+  'appointment_scheduled',
 ] as const;
 /** Zod enum of `lead_status`. */
 export const leadStatusSchema = z.enum(LEAD_STATUS_VALUES);

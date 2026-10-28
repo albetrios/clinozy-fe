@@ -101,15 +101,26 @@
     "steps": {
       "done": "Done",
       "current": "Current",
-      "next": "Next"
+      "next": "Next",
+      "book": "Book"
     },
     "stepTips": {
       "done": "{{status}} · completed",
       "current": "{{status}} · current step",
       "next": "Move to {{status}}",
-      "byCheckIn": "Clinic visited · set when they check in"
+      "byCheckIn": "Clinic visited · set when they check in",
+      "book": "Book an appointment · moves the lead to {{status}}",
+      "byBooking": "{{status}} · set when an appointment is booked",
+      "locked": "{{status}} · cancel the appointment to move back"
     },
     "closeAs": "Close as",
+    "booking": {
+      "aria": "Booked appointment",
+      "label": "Booked · {{when}}",
+      "reschedule": "Reschedule",
+      "cancel": "Cancel appointment",
+      "lockedHint": "Booked · cancel the appointment first"
+    },
     "info": {
       "created": "Created",
       "lastActivity": "Last activity",

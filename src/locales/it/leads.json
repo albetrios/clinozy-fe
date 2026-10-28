@@ -104,15 +104,26 @@
     "steps": {
       "done": "Fatto",
       "current": "Attuale",
-      "next": "Successivo"
+      "next": "Successivo",
+      "book": "Prenota"
     },
     "stepTips": {
       "done": "{{status}} · completato",
       "current": "{{status}} · passaggio attuale",
       "next": "Passa a {{status}}",
-      "byCheckIn": "Visita in clinica · impostato al check-in"
+      "byCheckIn": "Visita in clinica · impostato al check-in",
+      "book": "Prenota un appuntamento · porta il lead a {{status}}",
+      "byBooking": "{{status}} · impostato quando si prenota un appuntamento",
+      "locked": "{{status}} · annulla l’appuntamento per tornare indietro"
     },
     "closeAs": "Chiudi come",
+    "booking": {
+      "aria": "Appuntamento prenotato",
+      "label": "Prenotato · {{when}}",
+      "reschedule": "Riprogramma",
+      "cancel": "Annulla appuntamento",
+      "lockedHint": "Prenotato · annulla prima l’appuntamento"
+    },
     "info": {
       "created": "Creato",
       "lastActivity": "Ultima attività",

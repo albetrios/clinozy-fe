@@ -104,15 +104,26 @@
     "steps": {
       "done": "Hecho",
       "current": "Actual",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "book": "Reservar"
     },
     "stepTips": {
       "done": "{{status}} · completado",
       "current": "{{status}} · paso actual",
       "next": "Pasar a {{status}}",
-      "byCheckIn": "Visitó la clínica · se marca al registrar la llegada"
+      "byCheckIn": "Visitó la clínica · se marca al registrar la llegada",
+      "book": "Reserva una cita · pasa el cliente potencial a {{status}}",
+      "byBooking": "{{status}} · se marca al reservar una cita",
+      "locked": "{{status}} · cancela la cita para volver atrás"
     },
     "closeAs": "Cerrar como",
+    "booking": {
+      "aria": "Cita reservada",
+      "label": "Reservada · {{when}}",
+      "reschedule": "Reprogramar",
+      "cancel": "Cancelar cita",
+      "lockedHint": "Reservada · cancela primero la cita"
+    },
     "info": {
       "created": "Creado",
       "lastActivity": "Última actividad",

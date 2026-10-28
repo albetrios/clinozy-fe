@@ -1,4 +1,9 @@
-import type { LeadInterest, LeadSource, Tone } from '@/shared/api/app/app-schema.ts';
+import type {
+  LeadInterest,
+  LeadSource,
+  LeadStatus,
+  Tone,
+} from '@/shared/api/app/app-schema.ts';
 import { LEAD_INTEREST_TONES } from '@/shared/app/app-tones.ts';
 import {
   type AppIcon,
@@ -25,6 +30,32 @@ export const LEAD_SOURCE_ICONS: Readonly<Record<LeadSource, AppIcon>> = {
   referral: Users,
   retarget: RefreshCw,
 };
+
+/**
+ * The progress track's steps, in order (H:1810): Appointment scheduled is the person's bookings'
+ * step (clinozy-be L11), Clinic visited the check-in's.
+ */
+export const LEAD_TRACK_STATUSES = [
+  'new',
+  'contacted',
+  'follow_up',
+  'appointment_scheduled',
+  'clinic_visited',
+] as const satisfies readonly LeadStatus[];
+
+/** "Close as" (H:1811). */
+export const LEAD_CLOSING_STATUSES = [
+  'no_response',
+  'not_interested',
+  'invalid',
+  'lost',
+] as const satisfies readonly LeadStatus[];
+
+/** Every status in the pipeline's order — the track's steps, then "Close as" (the Status filter). */
+export const LEAD_STATUS_ORDER = [
+  ...LEAD_TRACK_STATUSES,
+  ...LEAD_CLOSING_STATUSES,
+] as const satisfies readonly LeadStatus[];
 
 /** The source chips in the design's order (`LSRC`, H:3348). */
 export const LEAD_SOURCE_ORDER = [

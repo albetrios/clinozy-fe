@@ -104,15 +104,26 @@
     "steps": {
       "done": "Fait",
       "current": "En cours",
-      "next": "Suivant"
+      "next": "Suivant",
+      "book": "Réserver"
     },
     "stepTips": {
       "done": "{{status}} · terminé",
       "current": "{{status}} · étape en cours",
       "next": "Passer à {{status}}",
-      "byCheckIn": "Clinique visitée · défini à l’arrivée du patient"
+      "byCheckIn": "Clinique visitée · défini à l’arrivée du patient",
+      "book": "Réserver un rendez-vous · passe le prospect à {{status}}",
+      "byBooking": "{{status}} · défini à la réservation d’un rendez-vous",
+      "locked": "{{status}} · annulez le rendez-vous pour revenir en arrière"
     },
     "closeAs": "Clore comme",
+    "booking": {
+      "aria": "Rendez-vous réservé",
+      "label": "Réservé · {{when}}",
+      "reschedule": "Reporter",
+      "cancel": "Annuler le rendez-vous",
+      "lockedHint": "Réservé · annulez d’abord le rendez-vous"
+    },
     "info": {
       "created": "Créé",
       "lastActivity": "Dernière activité",

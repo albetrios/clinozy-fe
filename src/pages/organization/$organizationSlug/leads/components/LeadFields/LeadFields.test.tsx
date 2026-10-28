@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { LEAD_SOURCE_VALUES } from '@/shared/api/app/app-schema.ts';
+import { LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES } from '@/shared/api/app/app-schema.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 
 import {
@@ -17,6 +17,7 @@ import {
   LEAD_INTEREST_CHIPS,
   LEAD_SOURCE_ICONS,
   LEAD_SOURCE_ORDER,
+  LEAD_STATUS_ORDER,
   leadInterestViews,
 } from './lead-display.ts';
 import { memberPerson, teamCardDataOf } from './lead-people.ts';
@@ -39,6 +40,21 @@ describe('lead display', () => {
       'retarget',
     ]);
     expect(LEAD_SOURCE_ORDER).not.toContain('phone_call');
+  });
+
+  it('orders every status as the pipeline runs — the track, then the closing ones', () => {
+    expect(LEAD_STATUS_ORDER).toEqual([
+      'new',
+      'contacted',
+      'follow_up',
+      'appointment_scheduled',
+      'clinic_visited',
+      'no_response',
+      'not_interested',
+      'invalid',
+      'lost',
+    ]);
+    expect([...LEAD_STATUS_ORDER].sort()).toEqual([...LEAD_STATUS_VALUES].sort());
   });
 
   it('offers six interest chips with "Others" last', () => {

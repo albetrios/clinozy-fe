@@ -98,15 +98,26 @@
     "steps": {
       "done": "已完成",
       "current": "当前",
-      "next": "下一步"
+      "next": "下一步",
+      "book": "预约"
     },
     "stepTips": {
       "done": "{{status}} · 已完成",
       "current": "{{status}} · 当前步骤",
       "next": "移至{{status}}",
-      "byCheckIn": "已到诊 · 签到时设置"
+      "byCheckIn": "已到诊 · 签到时设置",
+      "book": "预约就诊 · 线索将进入{{status}}",
+      "byBooking": "{{status}} · 预约后自动设置",
+      "locked": "{{status}} · 取消预约后才能退回"
     },
     "closeAs": "关闭为",
+    "booking": {
+      "aria": "已预约的就诊",
+      "label": "已预约 · {{when}}",
+      "reschedule": "改期",
+      "cancel": "取消预约",
+      "lockedHint": "已预约 · 请先取消预约"
+    },
     "info": {
       "created": "创建时间",
       "lastActivity": "最近动态",

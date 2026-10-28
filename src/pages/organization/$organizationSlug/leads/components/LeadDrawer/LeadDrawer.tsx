@@ -22,8 +22,7 @@ import {
 } from '@/shared/components/ui/tooltip.tsx';
 import {
   AppointmentForm,
-  type AppointmentFormPrefill,
-  leadBookingPrefill,
+  CancelVisitConfirm,
 } from '@/shared/forms/AppointmentForm/index.ts';
 import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
@@ -32,6 +31,7 @@ import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
 import { Users, WhatsAppMark } from '@/shared/icons/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
+import { useLeadBooking } from '../../hooks/useLeadBooking/index.ts';
 import { useLeadDraft } from '../../hooks/useLeadDraft/index.ts';
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
 import { leadContactCardData } from '../LeadFields/lead-contact.ts';
@@ -222,7 +222,10 @@ function useLeadChatAside({
  * pane at a time (the page keeps the pane between leads). The header: "Edit
  * lead", the ID to copy, "Re-target" and the sub line; the footer: Remove lead
  * · Discard (puts the draft back) or Cancel · Save lead. Focus moves to the
- * title and back; closing with an unsaved draft asks first (Q-P1).
+ * title and back; closing with an unsaved draft asks first (Q-P1). Progress's
+ * Appointment scheduled step and the chat's "Book an appointment" open the
+ * booking form over it; the person's booking still to happen shows on Progress
+ * with Reschedule (the form again) and Cancel (its confirm) — clinozy-be L11.
  */
 export function LeadDrawer({
   lead,
@@ -241,16 +244,8 @@ export function LeadDrawer({
   const { t } = useTranslation(LEADS_NS);
   const draft = useLeadDraft(lead);
   const [removing, setRemoving] = useState(false);
-  const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
-  const chat = useLeadChatAside({
-    lead,
-    team,
-    pane,
-    onPaneChange,
-    onBook: canBook
-      ? (reason) => setBooking(leadBookingPrefill(lead, reason))
-      : undefined,
-  });
+  const booking = useLeadBooking({ lead, canBook });
+  const chat = useLeadChatAside({ lead, team, pane, onPaneChange, onBook: booking.book });
 
   return (
     <TooltipProvider>
@@ -288,6 +283,7 @@ export function LeadDrawer({
           canEdit={canEdit}
           canEditContact={canEditContact}
           contactActions={contactActions}
+          booking={booking.progress}
         />
       </RecordDrawer>
       <LeadRemoveConfirm
@@ -296,12 +292,25 @@ export function LeadDrawer({
         onOpenChange={setRemoving}
         onRemoved={onClose}
       />
-      <AppointmentForm
-        open={booking !== null}
-        mode="create"
-        prefill={booking ?? undefined}
-        onClose={() => setBooking(null)}
-      />
+      {booking.form?.mode === 'reschedule' ? (
+        <AppointmentForm
+          open
+          mode="reschedule"
+          appointmentId={booking.form.appointment.id}
+          appointment={booking.form.appointment}
+          onClose={booking.closeForm}
+        />
+      ) : (
+        <AppointmentForm
+          open={booking.form !== null}
+          mode="create"
+          prefill={booking.form?.prefill}
+          onClose={booking.closeForm}
+        />
+      )}
+      {booking.cancelling ? (
+        <CancelVisitConfirm row={booking.cancelling} open onClose={booking.closeCancel} />
+      ) : null}
     </TooltipProvider>
   );
 }

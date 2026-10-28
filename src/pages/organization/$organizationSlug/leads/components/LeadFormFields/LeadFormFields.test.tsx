@@ -145,6 +145,120 @@ describe('LeadProgressField', () => {
     await user.click(screen.getByRole('button', { name: 'Lost' }));
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it('runs the five steps, Appointment scheduled between Follow-up and Clinic visited', () => {
+    render(<LeadProgressField status="new" onChange={() => {}} />);
+    const progress = screen.getByRole('region', { name: 'Lead progress' });
+    const steps = within(progress)
+      .getAllByRole('button')
+      .filter((button) => button.dataset.testid?.startsWith('lead-drawer-step-'));
+    expect(steps.map((step) => step.dataset.testid)).toEqual([
+      'lead-drawer-step-new',
+      'lead-drawer-step-contacted',
+      'lead-drawer-step-follow_up',
+      'lead-drawer-step-appointment_scheduled',
+      'lead-drawer-step-clinic_visited',
+    ]);
+  });
+
+  it('books from the Appointment scheduled step — the booking moves the lead, not the press', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onBook = vi.fn();
+    render(
+      <LeadProgressField
+        status="follow_up"
+        onChange={onChange}
+        booking={{ onBook, visit: null }}
+      />,
+    );
+    const step = screen.getByTestId('lead-drawer-step-appointment_scheduled');
+    expect(step).toHaveTextContent('Book');
+    expect(step).toHaveAttribute(
+      'title',
+      'Book an appointment · moves the lead to Appointment scheduled',
+    );
+    await user.click(step);
+    expect(onBook).toHaveBeenCalledOnce();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('leaves Appointment scheduled to the bookings for a member who does not book, or a closed lead', () => {
+    const { rerender } = render(
+      <LeadProgressField status="contacted" onChange={() => {}} />,
+    );
+    const step = () => screen.getByTestId('lead-drawer-step-appointment_scheduled');
+    expect(step()).toBeDisabled();
+    expect(step()).toHaveAttribute(
+      'title',
+      'Appointment scheduled · set when an appointment is booked',
+    );
+    rerender(
+      <LeadProgressField
+        status="lost"
+        onChange={() => {}}
+        booking={{ onBook: () => {} }}
+      />,
+    );
+    expect(step()).toBeDisabled();
+  });
+
+  it('holds a booked lead: earlier steps and No response wait for the cancel, the closing ones stay', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onReschedule = vi.fn();
+    const onCancel = vi.fn();
+    render(
+      <LeadProgressField
+        status="appointment_scheduled"
+        onChange={onChange}
+        booking={{
+          onBook: () => {},
+          visit: {
+            when: 'Tomorrow · 11:00 am',
+            what: 'Consultation · Dr Mehta',
+            onReschedule,
+            onCancel,
+          },
+        }}
+      />,
+    );
+    for (const status of ['new', 'contacted', 'follow_up']) {
+      const step = screen.getByTestId(`lead-drawer-step-${status}`);
+      expect(step).toBeDisabled();
+      expect(step.title).toMatch(/· cancel the appointment to move back$/);
+    }
+    expect(screen.getByTestId('lead-drawer-step-appointment_scheduled')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'No response' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Not interested' }));
+    expect(onChange).toHaveBeenLastCalledWith('not_interested');
+
+    const booked = screen.getByRole('region', { name: 'Booked appointment' });
+    expect(booked).toHaveTextContent('Booked · Tomorrow · 11:00 am');
+    expect(booked).toHaveTextContent('Consultation · Dr Mehta');
+    await user.click(within(booked).getByRole('button', { name: 'Reschedule' }));
+    expect(onReschedule).toHaveBeenCalledOnce();
+    await user.click(within(booked).getByRole('button', { name: 'Cancel appointment' }));
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
+  it('lets a booked lead move once no booking is left to happen', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <LeadProgressField
+        status="appointment_scheduled"
+        onChange={onChange}
+        booking={{ visit: null }}
+      />,
+    );
+    expect(screen.queryByRole('region', { name: 'Booked appointment' })).toBeNull();
+    await user.click(screen.getByTestId('lead-drawer-step-follow_up'));
+    expect(onChange).toHaveBeenLastCalledWith('follow_up');
+  });
 });
 
 describe('LeadPeopleField', () => {

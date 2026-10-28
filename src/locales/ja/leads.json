@@ -98,15 +98,26 @@
     "steps": {
       "done": "完了",
       "current": "現在",
-      "next": "次"
+      "next": "次",
+      "book": "予約"
     },
     "stepTips": {
       "done": "{{status}} · 完了",
       "current": "{{status}} · 現在のステップ",
       "next": "{{status}} に進める",
-      "byCheckIn": "来院済み · チェックイン時に設定されます"
+      "byCheckIn": "来院済み · チェックイン時に設定されます",
+      "book": "予約を入れる · リードが{{status}}になります",
+      "byBooking": "{{status}} · 予約を入れると設定されます",
+      "locked": "{{status}} · 戻すには予約をキャンセルしてください"
     },
     "closeAs": "終了理由",
+    "booking": {
+      "aria": "予約済みの来院",
+      "label": "予約済み · {{when}}",
+      "reschedule": "日時を変更",
+      "cancel": "予約をキャンセル",
+      "lockedHint": "予約済み · 先に予約をキャンセルしてください"
+    },
     "info": {
       "created": "作成日",
       "lastActivity": "最新のアクティビティ",
