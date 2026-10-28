@@ -1,5 +1,5 @@
 /**
- * clinozy-be's API (OpenAPI 9.3.0) as TypeScript types — generated, never edited.
+ * clinozy-be's API (OpenAPI 9.4.1) as TypeScript types — generated, never edited.
  *
  * Written by `pnpm api:types` (tooling/codegen/api-types.mjs) from clinozy-be's OpenAPI
  * document; `pnpm api:types:check` fails when it drifts. Read through `src/core/http/api.ts`.
