@@ -236,7 +236,7 @@ merge gate. Config: `stryker.config.json`, pinned on the PR gate by
 | Setting            | Value                                                                                                                               |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `mutate`           | rbac, `env.ts`, the data provider, the app guards, `shared/auth`, `shared/tenancy`, `lib/routes`, `csv.ts`, `utils.ts` (`.ts` only) |
-| `testFiles`        | the `*.test.*` files of those folders + `tests/security/` — a module's own tests must kill its mutants                              |
+| `testFiles`        | the `*.test.*` files of those folders + `tests/security/` minus the XSS-sink tripwire — a module's own tests must kill its mutants  |
 | `thresholds.break` | 70 — the run fails below a 70% score; never lowered                                                                                 |
 | `testRunner`       | `vitest-shim` (`tooling/stryker/vitest-runner-shim.mjs`) — the upstream runner plus its two missing Vitest 5 fixes                  |
 | `ignorePatterns`   | agent tooling (`.claude`, `.cursor`, `.mcp.json`, `agent-os`), docs, design intakes, build output                                   |
@@ -246,6 +246,13 @@ Why each of those exists:
 - **`.mcp.json` ignored.** It is a tracked symlink to a gitignored file, so it dangles on a fresh
   checkout and Stryker's sandbox copy failed with `ENOENT`. The policy test fails on any dangling
   symlink left out of `ignorePatterns`.
+- **The XSS-sink tripwire is not in `testFiles`.** `tests/security/xss-sinks.security.test.ts` scans
+  the committed `src/` for `eval(`, `new Function(` and the HTML sinks. Stryker runs the tests in a
+  sandbox copy whose mutated files carry its instrumentation header, and that header reaches
+  `globalThis` through `new Function("return this")` — one hit per mutated file, so the initial
+  run failed and no mutant was ever scored. A scan of the committed source is not a test of any
+  mutant, so the glob is `tests/security/!(xss-sinks).security.test.ts`; `pnpm test:security`
+  still runs it on every push.
 - **`testFiles`.** Without it the initial run takes every suite Vitest's `related` mode links to a
   mutated file — `cn` (`lib/utils.ts`) and the auth/tenancy runtime are imported by nearly every
   component — and Stryker's Vitest runner runs them on **one** thread, so it outgrew its 15-minute

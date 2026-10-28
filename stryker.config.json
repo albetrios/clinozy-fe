@@ -7,6 +7,7 @@
     ".claude",
     ".cursor",
     ".mcp.json",
+    ".codegraph",
     "agent-os",
     "docs",
     "iterations",
@@ -43,7 +44,7 @@
     "src/lib/routes/**/*.test.ts",
     "src/lib/csv*.test.ts",
     "src/lib/utils.test.ts",
-    "tests/security/**/*.security.test.ts"
+    "tests/security/!(xss-sinks).security.test.ts"
   ],
   "mutator": {
     "excludedMutations": ["StringLiteral", "Regex", "TemplateLiteral"]
