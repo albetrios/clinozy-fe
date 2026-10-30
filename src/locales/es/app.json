@@ -187,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · recordatorio programado",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · hueco liberado, recordatorios detenidos",
       "cancelled": "Cita {{id}} cancelada",
-      "restored": "Cita restaurada · el recordatorio se envía de nuevo"
+      "restored": "Cita restaurada · el recordatorio se envía de nuevo",
+      "alsoBooked": "También reservado · {{day}} · {{time}}",
+      "openBooking": "Abrir"
     }
   },
   "offerings": {

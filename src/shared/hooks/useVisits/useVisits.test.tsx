@@ -3,6 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { fetchPersonAppointments } from '@/shared/api/app/appointments-api.ts';
 import type { ClinicalNote } from '@/shared/api/app/clinical-notes-contracts.ts';
 import { fetchPatientFile } from '@/shared/api/app/patient-file-api.ts';
 import {
@@ -19,6 +20,9 @@ import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
+  APPOINTMENT_NOW,
+  APPOINTMENT_TODAY,
+  APPOINTMENT_TOMORROW,
   appointmentRow,
   DOCTOR_ARJUN,
   DOCTOR_NISHA,
@@ -41,6 +45,10 @@ import {
 
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
+}));
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchPersonAppointments: vi.fn(async () => []),
 }));
 vi.mock('@/shared/api/app/patient-file-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -105,8 +113,11 @@ beforeEach(() => {
   vi.mocked(fetchPatientFile).mockResolvedValue(patientFile());
   vi.mocked(fetchOpenVisit).mockResolvedValue(VISIT);
   vi.mocked(notify.error).mockClear();
+  vi.mocked(notify.info).mockClear();
+  vi.mocked(fetchPersonAppointments).mockClear();
 });
 afterEach(() => {
+  vi.useRealTimers();
   client.clear();
   vi.mocked(startVisit).mockClear();
   vi.mocked(fetchOpenVisit).mockReset();
@@ -199,6 +210,60 @@ describe('useStartVisit', () => {
     expect(notify.error).toHaveBeenCalledWith(
       'You do not have permission to perform this action.',
     );
+  });
+
+  const LATER_ID = 'appt_later00000000000000';
+  const start = { patientId: TEST_PATIENT_ID, doctorId: DOCTOR_ARJUN.id };
+  /** "Today" is the appointment doubles' day, so their tomorrow is a later day. */
+  const onTheDay = () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(APPOINTMENT_NOW);
+  };
+
+  it('after a walk-in, names the person’s later booking, with Open (clinozy-be D3, D20)', async () => {
+    onTheDay();
+    vi.mocked(startVisit).mockResolvedValueOnce('walk_in');
+    vi.mocked(fetchPersonAppointments).mockResolvedValueOnce([
+      appointmentRow({ date: APPOINTMENT_TODAY, status: 'checked_in' }),
+      appointmentRow({
+        id: LATER_ID,
+        date: APPOINTMENT_TOMORROW,
+        startTime: '11:00',
+        status: 'scheduled',
+      }),
+    ]);
+    const openBooking = vi.fn();
+    const { result } = renderHook(() => useStartVisit({ openBooking }), { wrapper });
+    await act(() => result.current.mutateAsync(start));
+    expect(fetchPersonAppointments).toHaveBeenCalledWith(TEST_CONTACT_ID);
+    expect(notify.info).toHaveBeenCalledWith(
+      expect.stringMatching(/^Also booked · Tomorrow · \S/),
+      { action: { label: 'Open', onClick: expect.any(Function) } },
+    );
+    vi.mocked(notify.info).mock.calls[0]?.[1]?.action?.onClick();
+    expect(openBooking).toHaveBeenCalledWith(LATER_ID);
+  });
+
+  it('says nothing after a check-in, a walk-in with nothing later, or a failed read', async () => {
+    onTheDay();
+    const { result } = renderHook(() => useStartVisit({ openBooking: vi.fn() }), {
+      wrapper,
+    });
+    vi.mocked(startVisit).mockResolvedValueOnce('checked_in');
+    await act(() => result.current.mutateAsync(start));
+    expect(fetchPersonAppointments).not.toHaveBeenCalled();
+
+    vi.mocked(startVisit).mockResolvedValueOnce('walk_in');
+    vi.mocked(fetchPersonAppointments).mockResolvedValueOnce([
+      appointmentRow({ date: APPOINTMENT_TODAY, status: 'checked_in' }),
+    ]);
+    await act(() => result.current.mutateAsync(start));
+
+    vi.mocked(startVisit).mockResolvedValueOnce('walk_in');
+    vi.mocked(fetchPersonAppointments).mockRejectedValueOnce(new Error('offline'));
+    await act(() => result.current.mutateAsync(start));
+    expect(fetchPersonAppointments).toHaveBeenCalledTimes(2);
+    expect(notify.info).not.toHaveBeenCalled();
   });
 });
 

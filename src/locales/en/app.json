@@ -187,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · reminder queued",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · slot freed, reminders stopped",
       "cancelled": "Appointment {{id}} cancelled",
-      "restored": "Appointment restored · reminder goes out again"
+      "restored": "Appointment restored · reminder goes out again",
+      "alsoBooked": "Also booked · {{day}} · {{time}}",
+      "openBooking": "Open"
     }
   },
   "offerings": {

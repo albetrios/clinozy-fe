@@ -1,9 +1,6 @@
 import { useState } from 'react';
 
-import {
-  isAppointmentSlotLocked,
-  isFinalAppointmentStatus,
-} from '@/shared/api/app/appointment-status.ts';
+import { nextLiveBooking } from '@/shared/api/app/appointment-status.ts';
 import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import {
@@ -20,22 +17,6 @@ import type {
   LeadBookedVisit,
   LeadProgressBooking,
 } from '../../components/LeadFormFields/index.ts';
-
-/**
- * The person's next booking still to happen — the earliest that is neither final (Completed,
- * Cancelled, No show) nor under way (checked in): a scheduled or confirmed one — or null. It is
- * what keeps their lead in Appointment scheduled (clinozy-be L11).
- */
-export function nextLiveBooking(rows: readonly AppointmentRow[]): AppointmentRow | null {
-  let next: AppointmentRow | null = null;
-  for (const row of rows) {
-    if (isFinalAppointmentStatus(row.status) || isAppointmentSlotLocked(row.status))
-      continue;
-    if (!next || `${row.date} ${row.startTime}` < `${next.date} ${next.startTime}`)
-      next = row;
-  }
-  return next;
-}
 
 /**
  * How Progress shows a booking: "Tomorrow · 11:00 am", "Consultation · Dr Mehta", and — for a

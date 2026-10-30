@@ -1,6 +1,9 @@
 import type { AppointmentStatus, CancelReason } from './app-schema.ts';
 import { appClockTime, appToday } from './app-time.ts';
-import type { AppointmentCancelReason } from './appointments-contracts.ts';
+import type {
+  AppointmentCancelReason,
+  AppointmentRow,
+} from './appointments-contracts.ts';
 
 /*
  * The appointment status machine (KICKOFF §6.4; `S:1137–1145`, H:3422,
@@ -48,6 +51,23 @@ export function isFinalAppointmentStatus(status: AppointmentStatus): boolean {
 /** Whether the date and time are locked — once the patient is checked in (`S:352`). */
 export function isAppointmentSlotLocked(status: AppointmentStatus): boolean {
   return status === 'checked_in' || status === 'completed';
+}
+
+/**
+ * The person's next booking still to happen — the earliest that is neither final (Completed,
+ * Cancelled, No show) nor under way (checked in): a scheduled or confirmed one — or null. It is
+ * what keeps their lead in Appointment scheduled (clinozy-be L11), and what Start visit names
+ * after a walk-in (D20).
+ */
+export function nextLiveBooking(rows: readonly AppointmentRow[]): AppointmentRow | null {
+  let next: AppointmentRow | null = null;
+  for (const row of rows) {
+    if (isFinalAppointmentStatus(row.status) || isAppointmentSlotLocked(row.status))
+      continue;
+    if (!next || `${row.date} ${row.startTime}` < `${next.date} ${next.startTime}`)
+      next = row;
+  }
+  return next;
 }
 
 /** The moves out of a status, in the popover's order (`allowedNext`). */

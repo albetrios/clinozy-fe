@@ -2,6 +2,10 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { nextLiveBooking } from '@/shared/api/app/appointment-status.ts';
+import { fetchPersonAppointments } from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { clinicalNoteQueryKeys } from '@/shared/api/app/clinical-notes-api.ts';
 import type { ClinicalNote } from '@/shared/api/app/clinical-notes-contracts.ts';
 import { contactQueryKeys } from '@/shared/api/app/contacts-api.ts';
@@ -26,12 +30,15 @@ import {
   type VisitCheck,
   type VisitRecord,
 } from '@/shared/api/app/visits-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { AppError } from '@/shared/errors/AppError.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
+import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { usePatientFile } from '@/shared/hooks/usePatientFile/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
@@ -97,17 +104,41 @@ export interface StartVisitVars {
   doctorId?: string | null;
 }
 
+/** What Start visit does past the visit itself. */
+export interface StartVisitOptions {
+  /**
+   * Opens the person's later booking — the heads-up's Open (the caller's route, D20); without it
+   * the heads-up has no action.
+   */
+  openBooking?: (appointmentId: string) => void;
+}
+
+/**
+ * After a walk-in, the person's booking still to happen on a later day — or null. A failed read
+ * is null too: the walk-in already landed, and the heads-up is only a heads-up.
+ */
+async function laterBookingOf(contactId: string): Promise<AppointmentRow | null> {
+  try {
+    const next = nextLiveBooking(await fetchPersonAppointments(contactId));
+    return next && next.date > appToday() ? next : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * "Start visit": the open visit, else today's booking checked in, else a walk-in at the patient's
  * home branch (`startVisit`). Not optimistic; the caller opens the flow once it lands and the open
  * visit has been read again. A member with no membership to book with is refused before any call
- * (403's words).
+ * (403's words). After a walk-in, a booking the person still has on a later day stays as it is
+ * (clinozy-be D3) — the heads-up "Also booked · <day> · <time>" names it, with Open (D20).
  */
-export function useStartVisit() {
+export function useStartVisit({ openBooking }: StartVisitOptions = {}) {
   const queryClient = useQueryClient();
   const organizationId = useOrganizationId();
   const me = useMyMembershipId();
-  return useAppMutation<void, StartVisitVars>({
+  const slotLabel = useAppointmentSlotLabel();
+  return useAppMutation<AppointmentRow | null, StartVisitVars>({
     mutationFn: async ({ patientId, doctorId }, action) => {
       const { patient } = await queryClient.query({
         queryKey: patientFileQueryKeys.detail(organizationId, patientId),
@@ -122,7 +153,7 @@ export function useStartVisit() {
           'NO_MEMBERSHIP',
         );
       }
-      await startVisit({
+      const outcome = await startVisit({
         contactId: patient.contactId,
         branchId: patient.homeBranchId,
         doctorId: doctor,
@@ -133,8 +164,26 @@ export function useStartVisit() {
       await queryClient.refetchQueries({
         queryKey: visitQueryKeys.open(organizationId, patient.contactId),
       });
+      return outcome === 'walk_in' ? laterBookingOf(patient.contactId) : null;
     },
-    // A check-in moves the person's open lead on and writes its activity line.
+    onSuccess: (later) => {
+      if (!later) return;
+      const slot = slotLabel(later.date, later.startTime);
+      notify.info(
+        i18n.t(APP_KEYS.appointments.toasts.alsoBooked, { ns: APP_NS, ...slot }),
+        {
+          ...(openBooking
+            ? {
+                action: {
+                  label: i18n.t(APP_KEYS.appointments.toasts.openBooking, { ns: APP_NS }),
+                  onClick: () => openBooking(later.id),
+                },
+              }
+            : {}),
+        },
+      );
+    },
+    // A check-in moves the person's lead on and writes its activity line.
     invalidateKeys: [...VISIT_WRITE_KEYS, leadQueryKeys.all, contactQueryKeys.all],
   });
 }

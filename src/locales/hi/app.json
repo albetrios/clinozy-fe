@@ -187,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · रिमाइंडर कतार में",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · स्लॉट खाली, रिमाइंडर रुके",
       "cancelled": "अपॉइंटमेंट {{id}} रद्द",
-      "restored": "अपॉइंटमेंट पुनर्स्थापित · रिमाइंडर फिर से जाएगा"
+      "restored": "अपॉइंटमेंट पुनर्स्थापित · रिमाइंडर फिर से जाएगा",
+      "alsoBooked": "यह भी बुक है · {{day}} · {{time}}",
+      "openBooking": "खोलें"
     }
   },
   "offerings": {

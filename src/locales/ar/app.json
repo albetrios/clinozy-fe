@@ -187,7 +187,9 @@
       "statusConfirmed": "{{name}} ← {{status}} · التذكير في قائمة الانتظار",
       "statusCancelled": "{{name}} ← {{status}} · {{reason}} · تم تحرير الوقت وإيقاف التذكيرات",
       "cancelled": "تم إلغاء الموعد {{id}}",
-      "restored": "تمت استعادة الموعد · يُرسل التذكير مجددًا"
+      "restored": "تمت استعادة الموعد · يُرسل التذكير مجددًا",
+      "alsoBooked": "محجوز أيضًا · {{day}} · {{time}}",
+      "openBooking": "فتح"
     }
   },
   "offerings": {

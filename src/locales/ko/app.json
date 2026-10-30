@@ -187,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · 알림 예약됨",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · 시간 해제, 알림 중지",
       "cancelled": "예약 {{id}} 취소됨",
-      "restored": "예약 복원됨 · 알림이 다시 발송됩니다"
+      "restored": "예약 복원됨 · 알림이 다시 발송됩니다",
+      "alsoBooked": "다른 예약도 있음 · {{day}} · {{time}}",
+      "openBooking": "열기"
     }
   },
   "offerings": {

@@ -187,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · rappel programmé",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · créneau libéré, rappels arrêtés",
       "cancelled": "Rendez-vous {{id}} annulé",
-      "restored": "Rendez-vous restauré · le rappel est renvoyé"
+      "restored": "Rendez-vous restauré · le rappel est renvoyé",
+      "alsoBooked": "Également réservé · {{day}} · {{time}}",
+      "openBooking": "Ouvrir"
     }
   },
   "offerings": {

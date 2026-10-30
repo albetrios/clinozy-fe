@@ -187,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · lembrete na fila",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · horário liberado, lembretes parados",
       "cancelled": "Consulta {{id}} cancelada",
-      "restored": "Consulta restaurada · o lembrete é enviado novamente"
+      "restored": "Consulta restaurada · o lembrete é enviado novamente",
+      "alsoBooked": "Também agendado · {{day}} · {{time}}",
+      "openBooking": "Abrir"
     }
   },
   "offerings": {

@@ -297,6 +297,10 @@ export const APP_KEYS = {
       statusCancelled: 'appointments.toasts.statusCancelled',
       cancelled: 'appointments.toasts.cancelled',
       restored: 'appointments.toasts.restored',
+      /** Start visit's heads-up after a walk-in: the person's later booking stays (clinozy-be D3). */
+      alsoBooked: 'appointments.toasts.alsoBooked',
+      /** The heads-up's action — the later booking, in Appointments. */
+      openBooking: 'appointments.toasts.openBooking',
     },
   },
   /**
