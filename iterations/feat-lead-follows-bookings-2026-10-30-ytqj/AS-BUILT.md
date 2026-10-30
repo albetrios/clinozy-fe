@@ -19,6 +19,8 @@ Baseline: none · KICKOFF.md approved 2026-10-30 · run on, reviewed at Close (D
 ## Revisions to upcoming rows
 
 - **D25 (scope change, approved by the user):** the Next step card and a follow-up time, built as F7.
+- **D26 (label, approved by the user at Close):** the status reads **Booked** in 11 locales; the track tile loses the
+  extra width the long name took. No wire or route change.
 
 ## Summary
 

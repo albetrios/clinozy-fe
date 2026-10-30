@@ -116,7 +116,7 @@ describe('LeadProgressField', () => {
     const current = screen.getByRole('button', { name: /Follow-up/ });
     expect(current).toHaveClass('bg-tone-butter');
     expect(current.className).not.toMatch(/\b(inset-ring|border)/);
-    const next = screen.getByRole('button', { name: /Appointment scheduled/ });
+    const next = screen.getByRole('button', { name: /Booked/ });
     expect(next).toHaveClass('bg-muted/50', 'text-muted-foreground');
     expect(next.className).not.toMatch(/\bborder/);
   });
@@ -163,7 +163,7 @@ describe('LeadProgressField', () => {
     );
     const progress = screen.getByRole('region', { name: 'Lead progress' });
     for (const step of within(progress).getAllByRole('button')) {
-      expect(step).not.toHaveTextContent(/Done|Current|Next|Book/);
+      expect(step).not.toHaveTextContent(/\b(Done|Current|Next|Book)\b/);
       expect(step).not.toHaveAttribute('aria-pressed', 'true');
     }
     expect(screen.getByRole('button', { name: /New/ })).toBeEnabled();
@@ -185,7 +185,7 @@ describe('LeadProgressField', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('runs the five steps, Appointment scheduled between Follow-up and Clinic visited', () => {
+  it('runs the five steps, Booked between Follow-up and Clinic visited', () => {
     render(<LeadProgressField status="new" onChange={() => {}} />);
     const progress = screen.getByRole('region', { name: 'Lead progress' });
     const steps = within(progress)
@@ -200,7 +200,7 @@ describe('LeadProgressField', () => {
     ]);
   });
 
-  it('books from the Appointment scheduled step — the booking moves the lead, not the press', async () => {
+  it('books from the Booked step — the booking moves the lead, not the press', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     const onBook = vi.fn();
@@ -215,23 +215,20 @@ describe('LeadProgressField', () => {
     expect(step).toHaveTextContent('Book');
     expect(step).toHaveAttribute(
       'title',
-      'Book an appointment · moves the lead to Appointment scheduled',
+      'Book an appointment · moves the lead to Booked',
     );
     await user.click(step);
     expect(onBook).toHaveBeenCalledOnce();
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('leaves Appointment scheduled to the bookings for a member who does not book, or a closed lead', () => {
+  it('leaves Booked to the bookings for a member who does not book, or a closed lead', () => {
     const { rerender } = render(
       <LeadProgressField status="contacted" onChange={() => {}} />,
     );
     const step = () => screen.getByTestId('lead-drawer-step-appointment_scheduled');
     expect(step()).toBeDisabled();
-    expect(step()).toHaveAttribute(
-      'title',
-      'Appointment scheduled · set when an appointment is booked',
-    );
+    expect(step()).toHaveAttribute('title', 'Booked · set when an appointment is booked');
     rerender(
       <LeadProgressField
         status="lost"

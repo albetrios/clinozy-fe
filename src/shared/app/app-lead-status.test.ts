@@ -17,7 +17,7 @@ describe('appLeadStatusKey (leads.md:398)', () => {
     ['new', 'New'],
     ['contacted', 'Contacted'],
     ['follow_up', 'Follow-up'],
-    ['appointment_scheduled', 'Appointment scheduled'],
+    ['appointment_scheduled', 'Booked'],
     ['clinic_visited', 'Clinic visited'],
     ['no_response', 'No response'],
     ['not_interested', 'Not interested'],

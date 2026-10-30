@@ -15,8 +15,6 @@ export interface DrawerChipOption<T extends string> {
   icon?: AppIcon;
   /** The chip's hint on hover — "20 minutes", "First visit or doctor review" (the design's `title`). */
   hint?: string;
-  /** This one chip is off (the group's `disabled` turns them all off). */
-  disabled?: boolean;
 }
 
 /**
@@ -196,7 +194,7 @@ export function DrawerChips<T extends string>(props: DrawerChipsProps<T>) {
             // A 32px button is not a pill: the Sharp shape leaves its corners be.
             data-slot={variant === 'button' ? 'button' : 'pill'}
             aria-pressed={picked}
-            disabled={disabled || option.disabled}
+            disabled={disabled}
             data-tone={option.tone}
             title={option.hint}
             data-testid={testId ? `${testId}-${option.value}` : undefined}

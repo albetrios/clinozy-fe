@@ -117,7 +117,7 @@ describe('LeadNextStep (D25)', () => {
     ).toBeInTheDocument();
   });
 
-  it('Appointment scheduled: the booking, moved or cancelled from here — no "No answer"', async () => {
+  it('Booked: the booking, moved or cancelled from here — no "No answer"', async () => {
     const user = userEvent.setup();
     const onReschedule = vi.fn();
     const onCancel = vi.fn();

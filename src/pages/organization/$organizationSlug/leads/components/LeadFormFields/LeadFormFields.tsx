@@ -170,7 +170,7 @@ const TRACK_TONES: Readonly<
 
 /**
  * Where a step of the track stands, and what a press does: `done` · `current` · `next` move the
- * lead there; `book` opens the booking (Appointment scheduled for a member who books);
+ * lead there; `book` opens the booking (Booked for a member who books);
  * `byBooking` and `byCheckIn` are the server's steps (the booking's, the check-in's); `locked` is
  * a booked lead's earlier step — the booking holds it (clinozy-be L11).
  */
@@ -325,8 +325,7 @@ function LeadTrackStep({
         // No borders between or around them (D25): tint and spacing set them apart.
         'relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 overflow-hidden rounded-lg px-3 py-2.5 text-start transition-colors',
         '@md:grid-cols-[auto_minmax(0,1fr)] @md:items-start @md:gap-y-2 @md:px-2.5 @md:pt-3 @md:pb-3.5',
-        // "Appointment scheduled" is the long name: its tile takes a little more of the row.
-        step === 'appointment_scheduled' ? '@md:flex-[1.3]' : '@md:flex-1',
+        '@md:flex-1',
         trackStepLook({ step, done, current }),
       )}
     >
@@ -382,7 +381,7 @@ export interface LeadBookedVisit {
 
 /** What Progress books and shows of the person's bookings (clinozy-be L11). */
 export interface LeadProgressBooking {
-  /** The Appointment scheduled step opens the booking — absent for a member who does not book. */
+  /** The Booked step opens the booking — absent for a member who does not book. */
   onBook?: () => void;
   /** The next booking still to happen: null for none, undefined while it loads. */
   visit?: LeadBookedVisit | null;
@@ -390,11 +389,11 @@ export interface LeadProgressBooking {
 
 /**
  * Progress (`leads.md:284`, H:1809–1811; D25): the 5-tile track New · Contacted · Follow-up ·
- * Appointment scheduled · Clinic visited — done tiles a light tint with a check, the current one in
+ * Booked · Clinic visited — done tiles a light tint with a check, the current one in
  * its full colour, the next ones muted with their number; no borders — then the Next step card the
  * drawer passes. No response sits on the Follow-up step ("No answer"); Not interested, Invalid and
  * Lost leave the steps without a state. Any status may follow any (Q-L4) but the server's two:
- * Appointment scheduled follows the person's bookings (clinozy-be L11) — its tile books ("Book")
+ * Booked follows the person's bookings (clinozy-be L11) — its tile books ("Book")
  * for a member who books, and while a booking is still to happen the earlier tiles wait for its
  * cancel — and Clinic visited is the check-in's, then final (L8).
  */

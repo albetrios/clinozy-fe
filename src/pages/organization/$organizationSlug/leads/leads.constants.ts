@@ -112,7 +112,7 @@ export const LEADS_KEYS = {
       done: 'drawer.steps.done',
       current: 'drawer.steps.current',
       next: 'drawer.steps.next',
-      /** Over Appointment scheduled for a member who books: the step opens the booking. */
+      /** Over Booked for a member who books: the step opens the booking. */
       book: 'drawer.steps.book',
     },
     stepTips: {

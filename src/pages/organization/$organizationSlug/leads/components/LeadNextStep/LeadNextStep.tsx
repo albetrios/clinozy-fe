@@ -303,7 +303,7 @@ function followParts(props: LeadNextStepProps, words: Words): NextStepParts {
   };
 }
 
-/** Appointment scheduled: the booking still to happen, moved or cancelled from here. */
+/** Booked: the booking still to happen, moved or cancelled from here. */
 function bookedParts(props: LeadNextStepProps, words: Words): NextStepParts {
   const { visit } = props;
   return {

@@ -32,7 +32,7 @@ export const LEAD_SOURCE_ICONS: Readonly<Record<LeadSource, AppIcon>> = {
 };
 
 /**
- * The progress track's steps, in order (H:1810): Appointment scheduled is the person's bookings'
+ * The progress track's steps, in order (H:1810): Booked is the person's bookings'
  * step (clinozy-be L11), Clinic visited the check-in's.
  */
 export const LEAD_TRACK_STATUSES = [
@@ -43,18 +43,16 @@ export const LEAD_TRACK_STATUSES = [
   'clinic_visited',
 ] as const satisfies readonly LeadStatus[];
 
-/** "Close as" (H:1811). */
-export const LEAD_CLOSING_STATUSES = [
+/**
+ * Every status in the pipeline's order (the Status filter): the track's steps, then No response
+ * and the closes (H:1811).
+ */
+export const LEAD_STATUS_ORDER = [
+  ...LEAD_TRACK_STATUSES,
   'no_response',
   'not_interested',
   'invalid',
   'lost',
-] as const satisfies readonly LeadStatus[];
-
-/** Every status in the pipeline's order — the track's steps, then "Close as" (the Status filter). */
-export const LEAD_STATUS_ORDER = [
-  ...LEAD_TRACK_STATUSES,
-  ...LEAD_CLOSING_STATUSES,
 ] as const satisfies readonly LeadStatus[];
 
 /** The source chips in the design's order (`LSRC`, H:3348). */

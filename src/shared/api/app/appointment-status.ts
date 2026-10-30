@@ -56,7 +56,7 @@ export function isAppointmentSlotLocked(status: AppointmentStatus): boolean {
 /**
  * The person's next booking still to happen — the earliest that is neither final (Completed,
  * Cancelled, No show) nor under way (checked in): a scheduled or confirmed one — or null. It is
- * what keeps their lead in Appointment scheduled (clinozy-be L11), and what Start visit names
+ * what keeps their lead in Booked (clinozy-be L11), and what Start visit names
  * after a walk-in (D20).
  */
 export function nextLiveBooking(rows: readonly AppointmentRow[]): AppointmentRow | null {

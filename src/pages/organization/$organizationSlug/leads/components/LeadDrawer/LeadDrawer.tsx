@@ -228,19 +228,6 @@ function useLeadChatAside({
 }
 
 /**
- * The lead drawer (KICKOFF §6.3; `leads.md:124–136`, H:1752–1867) — the record
- * drawer at `round(min(980, 0.94 × vw))`: the details form, then the chat in
- * its column with the resize handle, the form drawers' × floating outside; on
- * a phone the full screen with a Details · Chat switch under the header, one
- * pane at a time (the page keeps the pane between leads). The header: "Edit
- * lead", the ID to copy, "Re-target" and the sub line; the footer: Remove lead
- * · Discard (puts the draft back) or Cancel · Save lead. Focus moves to the
- * title and back; closing with an unsaved draft asks first (Q-P1). Progress's
- * Appointment scheduled step and the chat's "Book an appointment" open the
- * booking form over it; the person's booking still to happen shows on Progress
- * with Reschedule (the form again) and Cancel (its confirm) — clinozy-be L11.
- */
-/**
  * The Next step card's ways out of the details (D25): the chat's composer — asked for a mode, the
  * phone's chat pane brought forward — and the patient file a check-in opened.
  */
@@ -272,6 +259,19 @@ function useLeadDrawerLinks({
   };
 }
 
+/**
+ * The lead drawer (KICKOFF §6.3; `leads.md:124–136`, H:1752–1867) — the record
+ * drawer at `round(min(980, 0.94 × vw))`: the details form, then the chat in
+ * its column with the resize handle, the form drawers' × floating outside; on
+ * a phone the full screen with a Details · Chat switch under the header, one
+ * pane at a time (the page keeps the pane between leads). The header: "Edit
+ * lead", the ID to copy, "Re-target" and the sub line; the footer: Remove lead
+ * · Discard (puts the draft back) or Cancel · Save lead. Focus moves to the
+ * title and back; closing with an unsaved draft asks first (Q-P1). Progress's
+ * Booked step and the chat's "Book an appointment" open the
+ * booking form over it; the person's booking still to happen shows on the
+ * Next step card with Reschedule (the form again) and Cancel (its confirm) — clinozy-be L11.
+ */
 export function LeadDrawer({
   lead,
   members,

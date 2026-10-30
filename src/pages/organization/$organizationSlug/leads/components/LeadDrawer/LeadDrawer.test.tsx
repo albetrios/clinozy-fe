@@ -460,7 +460,7 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     );
   });
 
-  it('books from Progress: the Appointment scheduled step opens the form on the lead’s contact, locked', async () => {
+  it('books from Progress: the Booked step opens the form on the lead’s contact, locked', async () => {
     const user = userEvent.setup();
     const { drawer } = await openAnaya();
     const step = within(drawer).getByTestId('lead-drawer-step-appointment_scheduled');

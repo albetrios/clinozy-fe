@@ -12,7 +12,7 @@ export interface FollowUpParts {
 }
 
 /** The clock a follow-up takes when nobody chose one — the morning call. */
-export const FOLLOW_UP_DEFAULT_TIME = '11:00';
+const FOLLOW_UP_DEFAULT_TIME = '11:00';
 
 /** "Later today" — 5 pm, offered while it is still ahead. */
 const LATER_TODAY_TIME = '17:00';

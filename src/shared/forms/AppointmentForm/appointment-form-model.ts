@@ -51,7 +51,7 @@ export interface AppointmentFormPrefill {
   collapsed?: boolean;
   /**
    * From a lead: the person is fixed — no "Change contact" — so the booking is theirs and moves
-   * their lead to Appointment scheduled (clinozy-be L11). Someone else is booked from Appointments.
+   * their lead to Booked (clinozy-be L11). Someone else is booked from Appointments.
    */
   lockedWho?: boolean;
   type?: AppointmentType;

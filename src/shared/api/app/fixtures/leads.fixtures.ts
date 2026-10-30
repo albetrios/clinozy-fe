@@ -35,7 +35,7 @@ const STATUSES: Record<string, LeadStatus> = {
   New: 'new',
   Contacted: 'contacted',
   'Follow-up': 'follow_up',
-  'Appointment scheduled': 'appointment_scheduled',
+  Booked: 'appointment_scheduled',
   'Clinic visited': 'clinic_visited',
   'No response': 'no_response',
   'Not interested': 'not_interested',

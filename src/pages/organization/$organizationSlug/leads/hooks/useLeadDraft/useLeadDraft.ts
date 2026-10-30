@@ -27,7 +27,7 @@ const sameList = (a: readonly string[], b: readonly string[]) =>
 
 /**
  * The draft over a newer read of its lead: a field the member left as the draft found it takes
- * the read's value — a booking moved the status to Appointment scheduled, a cancel back to
+ * the read's value — a booking moved the status to Booked, a cancel back to
  * Follow-up — and a field they changed keeps their change.
  */
 export function rebaseLeadDraft({

@@ -69,9 +69,9 @@ export interface LeadBookingState {
 /**
  * The lead drawer's bookings (clinozy-be L11): the person's next booking still to happen — read
  * for a member who reads Appointments — shown on Progress as "Booked · <when>" with Reschedule
- * and Cancel for a member who edits them; the Appointment scheduled step and the chat's "Book an
+ * and Cancel for a member who edits them; the Booked step and the chat's "Book an
  * appointment" open a new booking for a member who books (`canBook`). The server moves the lead:
- * a booking to Appointment scheduled, a cancel back to Follow-up — every appointment write
+ * a booking to Booked, a cancel back to Follow-up — every appointment write
  * refetches the leads.
  */
 export function useLeadBooking({
