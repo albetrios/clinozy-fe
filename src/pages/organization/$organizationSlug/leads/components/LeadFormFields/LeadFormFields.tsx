@@ -155,15 +155,37 @@ export function LeadInterestsField({
   );
 }
 
-/** The track's tiles in each step's tone, as literals (`bg-tone-${tone}` is never generated). */
+/**
+ * The track's tiles in each step's tone, as literals (`bg-tone-${tone}` is never generated): a done
+ * step a light tint of its colour, the current one ringed in its dot colour (D21), the bar's track.
+ */
 const TRACK_TONES: Readonly<
-  Record<(typeof LEAD_TRACK_STATUSES)[number], { next: string; bar: string }>
+  Record<
+    (typeof LEAD_TRACK_STATUSES)[number],
+    { done: string; ring: string; bar: string }
+  >
 > = {
-  new: { next: 'bg-tone-sky/30', bar: 'bg-tone-sky' },
-  contacted: { next: 'bg-tone-lav/30', bar: 'bg-tone-lav' },
-  follow_up: { next: 'bg-tone-butter/30', bar: 'bg-tone-butter' },
-  appointment_scheduled: { next: 'bg-tone-peach/30', bar: 'bg-tone-peach' },
-  clinic_visited: { next: 'bg-tone-sage/30', bar: 'bg-tone-sage' },
+  new: { done: 'bg-tone-sky/40', ring: 'inset-ring-tone-sky-dot', bar: 'bg-tone-sky' },
+  contacted: {
+    done: 'bg-tone-lav/40',
+    ring: 'inset-ring-tone-lav-dot',
+    bar: 'bg-tone-lav',
+  },
+  follow_up: {
+    done: 'bg-tone-butter/40',
+    ring: 'inset-ring-tone-butter-dot',
+    bar: 'bg-tone-butter',
+  },
+  appointment_scheduled: {
+    done: 'bg-tone-peach/40',
+    ring: 'inset-ring-tone-peach-dot',
+    bar: 'bg-tone-peach',
+  },
+  clinic_visited: {
+    done: 'bg-tone-sage/40',
+    ring: 'inset-ring-tone-sage-dot',
+    bar: 'bg-tone-sage',
+  },
 };
 
 /**
@@ -283,9 +305,10 @@ function LeadTrackStep({
         '@md:grid-cols-[auto_minmax(0,1fr)] @md:items-start @md:gap-y-2 @md:border-e @md:border-b-0 @md:px-2.5 @md:pt-3 @md:pb-2.5 @md:last:border-e-0',
         // "Appointment scheduled" is the long name: its tile takes a little more of the row.
         step === 'appointment_scheduled' ? '@md:flex-[1.3]' : '@md:flex-1',
-        done && TONE_CLASSES[tone].fill,
-        current && TONE_CLASSES[tone].surface,
-        !(done || current) && cn(TRACK_TONES[step].next, TONE_CLASSES[tone].ink),
+        // Done: a light tint of its colour; current: its colour, ringed — the strongest (D21).
+        done && cn(TRACK_TONES[step].done, TONE_CLASSES[tone].ink),
+        current && cn(TONE_CLASSES[tone].surface, 'inset-ring-2', TRACK_TONES[step].ring),
+        !(done || current) && 'bg-card text-muted-foreground',
       )}
     >
       <StepMark done={done} current={current} number={index + 1} tone={tone} />
@@ -487,7 +510,7 @@ const TONE_BORDERS: Readonly<Partial<Record<Tone, string>>> = {
   sage: 'border-tone-sage-dot',
 };
 
-/** The tile's 18px mark: a check disc, the ringed dot, or the dashed number. */
+/** The tile's 18px mark: a solid check disc in the step's dot colour, the ringed dot, or the dashed number. */
 function StepMark({
   done,
   current,
@@ -505,11 +528,11 @@ function StepMark({
         aria-hidden="true"
         data-slot="pill"
         className={cn(
-          'bg-background flex size-4.5 flex-none items-center justify-center rounded-full',
-          TONE_CLASSES[tone].ink,
+          'text-background flex size-4.5 flex-none items-center justify-center rounded-full',
+          TONE_CLASSES[tone].dot,
         )}
       >
-        <Check className="size-3" />
+        <Check className="size-3" strokeWidth={3} />
       </span>
     );
   }

@@ -110,6 +110,21 @@ describe('LeadProgressField', () => {
     expect(onChange).toHaveBeenLastCalledWith('lost');
   });
 
+  it('shows a done step in a light tint of its colour, the current one ringed, the next plain (D21)', () => {
+    render(<LeadProgressField status="follow_up" onChange={vi.fn()} />);
+    const done = screen.getByRole('button', { name: /New/ });
+    expect(done).toHaveClass('bg-tone-sky/40', 'text-tone-sky-foreground');
+    expect(done).not.toHaveClass('bg-tone-sky-foreground');
+    const current = screen.getByRole('button', { name: /Follow-up/ });
+    expect(current).toHaveClass(
+      'bg-tone-butter',
+      'inset-ring-2',
+      'inset-ring-tone-butter-dot',
+    );
+    const next = screen.getByRole('button', { name: /Appointment scheduled/ });
+    expect(next).toHaveClass('bg-card', 'text-muted-foreground');
+  });
+
   it('never picks Clinic visited — a check-in sets it', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
