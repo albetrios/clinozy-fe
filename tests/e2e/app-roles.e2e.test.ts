@@ -12,12 +12,13 @@ import {
   expectRoomReady,
   hideDevtools,
   seedData,
+  seedRequests,
 } from '@/tests/utils/e2e-app.ts';
 import { establishSessionInPage, navigateInApp } from '@/tests/utils/e2e-auth.ts';
 import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import { byTestId, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
 import { createSessionViaEmailCode } from '@/tests/utils/e2e-session.ts';
-import { bearerHeaders, createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
+import { createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
 
 /**
  * Role QA (L-60, D157): a member sees the clinic their permission codes allow — no more, no less.
@@ -37,8 +38,6 @@ import { bearerHeaders, createTeamOrganization } from '@/tests/utils/e2e-tenancy
  *
  * Local only: it needs clinozy-be on :3000 with team organizations on.
  */
-
-const API = '/api/v1';
 
 /** What one preset role should meet in the clinic. */
 interface RoleExpectation {
@@ -197,33 +196,28 @@ interface Clinic {
 
 /** The clinic's main branch and one patient in it, made by the owner. */
 async function seedPatient(api: APIRequestContext, ownerToken: string): Promise<string> {
+  const { write } = seedRequests(api, ownerToken);
   const branch = await seedData<{ id: string }>(
-    await api.post(`${API}/app/branches`, {
-      headers: bearerHeaders(ownerToken, true),
-      data: {
-        name: 'Role QA',
-        address_line_one: '12, Ocean Arcade',
-        area: 'Vesu',
-        city: 'Surat',
-        postal_code: '395007',
-        phone: '+919876543210',
-        email: 'role-qa@example.com',
-      },
+    await write('/app/branches', {
+      name: 'Role QA',
+      address_line_one: '12, Ocean Arcade',
+      area: 'Vesu',
+      city: 'Surat',
+      postal_code: '395007',
+      phone: '+919876543210',
+      email: 'role-qa@example.com',
     }),
     'branch',
   );
   const patient = await seedData<{ id: string }>(
-    await api.post(`${API}/app/patients`, {
-      headers: bearerHeaders(ownerToken, true),
-      data: {
-        home_branch_id: branch.id,
-        contact: {
-          first_name: 'Role',
-          last_name: 'Check',
-          phones: [{ phone: '+919825044120', is_primary: true }],
-        },
-        allergies: ['Penicillin'],
+    await write('/app/patients', {
+      home_branch_id: branch.id,
+      contact: {
+        first_name: 'Role',
+        last_name: 'Check',
+        phones: [{ phone: '+919825044120', is_primary: true }],
       },
+      allergies: ['Penicillin'],
     }),
     'patient',
   );
@@ -238,9 +232,7 @@ async function openClinic(api: APIRequestContext): Promise<Clinic | null> {
   const { org, teamToken } = await createTeamOrganization(api, accessToken);
   if (!org?.slug) throw new Error('the clinic was not created');
   const roles = await seedData<{ id: string; name: string }[]>(
-    await api.get(`${API}/tenancy/organization/roles`, {
-      headers: bearerHeaders(teamToken),
-    }),
+    await seedRequests(api, teamToken).read('/tenancy/organization/roles'),
     'roles',
   );
   const patientId = await seedPatient(api, teamToken);
