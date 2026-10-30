@@ -1,5 +1,6 @@
 import {
   type APIRequestContext,
+  type APIResponse,
   expect,
   type Locator,
   type Page,
@@ -128,6 +129,38 @@ export interface ClinicSeed {
 /** Backoff for the seed's calls: 1 s, 2 s … 5 s between six attempts, past a rate-limit window. */
 const SEED_RETRY = { attempts: 6, baseDelayMs: 1_000 } as const;
 
+/** A new clinic's seed calls as one member, each under {@link SEED_RETRY}. */
+export interface SeedRequests {
+  /** A POST (or PATCH) under the API base path, with the bearer and an idempotency key. */
+  write: (path: string, data: unknown, method?: 'post' | 'patch') => Promise<APIResponse>;
+  /** A GET under the API base path, with the bearer. */
+  read: (path: string) => Promise<APIResponse>;
+}
+
+/**
+ * The seed's requests as `token`. A seeded clinic is a dozen calls in a row, and the full suite
+ * seeds dozens of clinics: a 429 from the backend's rate limit backs off and retries (a refused
+ * request did nothing). Every seed call goes through it, so none fails on the first 429.
+ */
+export function seedRequests(api: APIRequestContext, token: string): SeedRequests {
+  return {
+    write: (path, data, method = 'post') =>
+      withApiRetry(
+        () =>
+          api[method](`${API_BASE_PATH}${path}`, {
+            headers: bearerHeaders(token, true),
+            data,
+          }),
+        SEED_RETRY,
+      ),
+    read: (path) =>
+      withApiRetry(
+        () => api.get(`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token) }),
+        SEED_RETRY,
+      ),
+  };
+}
+
 /** A `data` answer, or a thrown error naming the call. */
 export async function seedData<T>(
   response: Awaited<ReturnType<APIRequestContext['post']>>,
@@ -160,22 +193,7 @@ export async function seedClinic(
   api: APIRequestContext,
   token: string,
 ): Promise<ClinicSeed> {
-  // A seeded clinic is a dozen calls in a row, and the full suite seeds dozens of clinics: a 429
-  // from the backend's rate limit backs off and retries (a refused request did nothing).
-  const write = (path: string, data: unknown, method: 'post' | 'patch' = 'post') =>
-    withApiRetry(
-      () =>
-        api[method](`${API_BASE_PATH}${path}`, {
-          headers: bearerHeaders(token, true),
-          data,
-        }),
-      SEED_RETRY,
-    );
-  const read = (path: string) =>
-    withApiRetry(
-      () => api.get(`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token) }),
-      SEED_RETRY,
-    );
+  const { write, read } = seedRequests(api, token);
 
   const ownerId = (await fetchMeContextWire(api, token)).membership_id;
   await seedData(
