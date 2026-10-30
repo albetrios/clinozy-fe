@@ -7,6 +7,7 @@
     "created": "Prospecto {{id}} creado",
     "saved": "Prospecto guardado",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "Ahora {{name}} es tuyo · {{owner}} sigue involucrado",
     "claimedUnowned": "Ahora {{name}} es tuyo",
     "released": "Liberado al equipo · cualquiera puede tomarlo",
@@ -116,13 +117,71 @@
       "byBooking": "{{status}} · se marca al reservar una cita",
       "locked": "{{status}} · cancela la cita para volver atrás"
     },
-    "closeAs": "Cerrar como",
     "booking": {
-      "aria": "Cita reservada",
-      "label": "Reservada · {{when}}",
       "reschedule": "Reprogramar",
-      "cancel": "Cancelar cita",
-      "lockedHint": "Reservada · cancela primero la cita"
+      "cancel": "Cancelar cita"
+    },
+    "nextStep": {
+      "aria": "Siguiente paso",
+      "labels": {
+        "next": "Siguiente",
+        "when": "Cuándo",
+        "outcome": "Resultado"
+      },
+      "headline": {
+        "new": "Saluda a {{name}}",
+        "contacted": "Haz seguimiento con {{name}}",
+        "follow_up": "Haz seguimiento con {{name}}",
+        "no_response": "Vuelve a intentar con {{name}}",
+        "appointment_scheduled": "Visita reservada para {{name}}",
+        "clinic_visited": "{{name}} ya es paciente",
+        "not_interested": "{{name}} dijo que no",
+        "invalid": "Número equivocado o spam",
+        "lost": "{{name}} se fue a otro sitio"
+      },
+      "since": {
+        "created": "Creado {{when}}",
+        "since": "Desde {{when}}",
+        "noAnswer": "Sin respuesta {{when}}"
+      },
+      "actions": {
+        "whatsapp": "Enviar WhatsApp",
+        "call": "Registrar llamada",
+        "book": "Reservar cita",
+        "openFile": "Abrir ficha del paciente",
+        "reopen": "Reabrir",
+        "noAnswer": "Sin respuesta",
+        "noAnswerAgain": "Otra vez sin respuesta",
+        "more": "Más"
+      },
+      "when": {
+        "notContacted": "Aún sin contactar",
+        "replyNow": "Escribió {{when}} · responde ahora",
+        "setTime": "Fijar hora",
+        "nextTry": "Próximo intento {{when}}",
+        "visited": "Visitó {{when}}",
+        "closed": "Cerrado {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "Leyendo la reserva…"
+      },
+      "notes": {
+        "contactFirst": "«Sin respuesta» aparece tras el primer contacto",
+        "checkIn": "El check-in los hace avanzar",
+        "final": "Final, lo marca el check-in",
+        "winBack": "Vuelve si hace check-in antes del {{date}}",
+        "never": "Nunca vuelve por sí solo"
+      },
+      "picker": {
+        "title": "¿Cuándo hacer seguimiento?",
+        "laterToday": "Más tarde hoy",
+        "tomorrow": "Mañana",
+        "inThreeDays": "En 3 días",
+        "nextWeek": "La próxima semana",
+        "date": "Fecha",
+        "time": "Hora",
+        "cancel": "Cancelar",
+        "set": "Fijar seguimiento"
+      }
     },
     "info": {
       "created": "Creado",

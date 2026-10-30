@@ -221,9 +221,12 @@ describe('the catalogue', () => {
       write: { type: 'resolve', outcome: 'done' },
       opens: 'appointmentNew',
     });
-    expect(findTaskOutcome('follow_up', 'callBackTomorrow')?.steps).toEqual([
-      { type: 'leadFollowUpTomorrow', at: '11:00' },
+    expect(findTaskOutcome('follow_up', 'noAnswer')?.steps).toEqual([
+      { type: 'leadNoAnswer' },
       { type: 'logCall' },
+    ]);
+    expect(findTaskOutcome('follow_up', 'lost')?.steps).toEqual([
+      { type: 'leadStatus', status: 'lost' },
     ]);
     expect(findTaskOutcome('confirm', 'cancelledByPatient')?.steps).toEqual([
       { type: 'appointment', action: 'cancel' },

@@ -7,6 +7,7 @@
     "created": "Lead {{id}} criado",
     "saved": "Lead salvo",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "Agora {{name}} é seu · {{owner}} continua envolvido",
     "claimedUnowned": "Agora {{name}} é seu",
     "released": "Liberado para a equipe · qualquer pessoa pode assumir",
@@ -116,13 +117,71 @@
       "byBooking": "{{status}} · definido ao agendar uma consulta",
       "locked": "{{status}} · cancele a consulta para voltar"
     },
-    "closeAs": "Encerrar como",
     "booking": {
-      "aria": "Consulta agendada",
-      "label": "Agendada · {{when}}",
       "reschedule": "Reagendar",
-      "cancel": "Cancelar consulta",
-      "lockedHint": "Agendada · cancele a consulta primeiro"
+      "cancel": "Cancelar consulta"
+    },
+    "nextStep": {
+      "aria": "Próximo passo",
+      "labels": {
+        "next": "Próximo",
+        "when": "Quando",
+        "outcome": "Resultado"
+      },
+      "headline": {
+        "new": "Diga olá para {{name}}",
+        "contacted": "Faça o acompanhamento com {{name}}",
+        "follow_up": "Faça o acompanhamento com {{name}}",
+        "no_response": "Tente {{name}} de novo",
+        "appointment_scheduled": "Visita marcada para {{name}}",
+        "clinic_visited": "{{name}} agora é paciente",
+        "not_interested": "{{name}} disse não",
+        "invalid": "Número errado ou spam",
+        "lost": "{{name}} foi para outro lugar"
+      },
+      "since": {
+        "created": "Criado {{when}}",
+        "since": "Desde {{when}}",
+        "noAnswer": "Sem resposta {{when}}"
+      },
+      "actions": {
+        "whatsapp": "Enviar WhatsApp",
+        "call": "Registrar ligação",
+        "book": "Agendar consulta",
+        "openFile": "Abrir ficha do paciente",
+        "reopen": "Reabrir",
+        "noAnswer": "Sem resposta",
+        "noAnswerAgain": "Sem resposta de novo",
+        "more": "Mais"
+      },
+      "when": {
+        "notContacted": "Ainda sem contato",
+        "replyNow": "Escreveu {{when}} · responda agora",
+        "setTime": "Definir horário",
+        "nextTry": "Próxima tentativa {{when}}",
+        "visited": "Visitou {{when}}",
+        "closed": "Encerrado {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "Lendo o agendamento…"
+      },
+      "notes": {
+        "contactFirst": "“Sem resposta” aparece depois do primeiro contato",
+        "checkIn": "O check-in os faz avançar",
+        "final": "Final, definido pelo check-in",
+        "winBack": "Volta se fizer check-in até {{date}}",
+        "never": "Nunca volta sozinho"
+      },
+      "picker": {
+        "title": "Quando fazer o acompanhamento?",
+        "laterToday": "Mais tarde hoje",
+        "tomorrow": "Amanhã",
+        "inThreeDays": "Em 3 dias",
+        "nextWeek": "Semana que vem",
+        "date": "Data",
+        "time": "Hora",
+        "cancel": "Cancelar",
+        "set": "Definir acompanhamento"
+      }
     },
     "info": {
       "created": "Criado",

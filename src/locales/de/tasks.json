@@ -49,17 +49,21 @@
           "label": "Besuch gebucht",
           "effect": "Terminformular öffnet sich"
         },
-        "callBackTomorrow": {
-          "label": "Morgen zurückrufen",
-          "effect": "Nachfassdatum → morgen 11:00"
-        },
         "noAnswer": {
           "label": "Keine Antwort",
-          "effect": "Anruf protokolliert · Aufgabe pausiert 3 Stunden"
+          "effect": "Anruf erfasst · Lead → Keine Reaktion · nächster Versuch morgen zur selben Zeit"
         },
         "notInterested": {
           "label": "Kein Interesse",
           "effect": "Lead-Status → Kein Interesse"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam oder falsche Nummer",
+          "effect": "Lead-Status → Ungültig"
+        },
+        "lost": {
+          "label": "Woanders hingegangen",
+          "effect": "Lead-Status → Verloren"
         }
       }
     },

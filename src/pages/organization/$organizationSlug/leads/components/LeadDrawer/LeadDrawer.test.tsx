@@ -253,26 +253,48 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     );
   });
 
-  it('saves a status move with the read’s `updated_at` — "<name> → <status>", no Undo', async () => {
+  it('moves the lead at once from Progress: Contacted asks when to follow up, then saves with Undo (D25)', async () => {
     const user = userEvent.setup();
     const { drawer } = await openAnaya();
     const progress = within(drawer).getByRole('region', { name: 'Progress' });
     await user.click(within(progress).getByRole('button', { name: /Contacted/ }));
-    expect(within(drawer).getByRole('button', { name: 'Discard' })).toBeInTheDocument();
-    await user.click(within(drawer).getByRole('button', { name: 'Save lead' }));
-    await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith('Anaya Desai → Contacted'),
-    );
-    expect(updateLead).toHaveBeenCalledExactlyOnceWith({
+    const picker = await screen.findByTestId('lead-drawer-follow-up');
+    await user.click(within(picker).getByTestId('lead-drawer-follow-up-pick-tomorrow'));
+    await user.click(within(picker).getByTestId('lead-drawer-follow-up-set'));
+    await waitFor(() => expect(updateLead).toHaveBeenCalledOnce());
+    expect(updateLead).toHaveBeenCalledWith({
       leadId: ANAYA.id,
-      fields: { status: 'contacted' },
+      fields: { status: 'contacted', followUpAt: expect.any(String) },
       expectedUpdatedAt: ANAYA.updatedAt,
       idempotencyKey: expect.any(String),
     });
-    expect(notifyMock.undo).not.toHaveBeenCalled();
-    expect(world.leads[0]?.status).toBe('contacted');
     await waitFor(() =>
-      expect(within(drawer).getByRole('button', { name: 'Save lead' })).toBeDisabled(),
+      expect(notifyMock.undo).toHaveBeenCalledWith(
+        expect.stringMatching(/^Anaya Desai → Contacted · /),
+        expect.objectContaining({ onUndo: expect.any(Function) }),
+      ),
+    );
+    expect(world.leads[0]?.status).toBe('contacted');
+    // Nothing waits for Save.
+    expect(within(drawer).getByRole('button', { name: 'Save lead' })).toBeDisabled();
+  });
+
+  it('closes the lead from the Next step card at once — Not interested — with Undo (D25)', async () => {
+    const user = userEvent.setup();
+    const { drawer } = await openAnaya();
+    const card = within(drawer).getByTestId('lead-drawer-next-step');
+    expect(card).toHaveTextContent('Say hello to Anaya');
+    await user.click(within(card).getByTestId('lead-drawer-outcome-not_interested'));
+    await waitFor(() =>
+      expect(updateLead).toHaveBeenCalledWith(
+        expect.objectContaining({ fields: { status: 'not_interested' } }),
+      ),
+    );
+    await waitFor(() =>
+      expect(notifyMock.undo).toHaveBeenCalledWith(
+        'Anaya Desai → Not interested',
+        expect.anything(),
+      ),
     );
   });
 
@@ -473,11 +495,12 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
       }),
     ];
     const { drawer } = await openAnaya();
-    const booked = await within(drawer).findByRole('region', {
-      name: 'Booked appointment',
-    });
-    expect(booked).toHaveTextContent(/Booked · Tomorrow · 11:00/i);
-    expect(booked).toHaveTextContent('Consultation');
+    const booked = within(drawer).getByTestId('lead-drawer-next-step');
+    await waitFor(() =>
+      expect(within(booked).getByTestId('lead-drawer-booking')).toHaveTextContent(
+        /Tomorrow · 11:00.*Consultation/i,
+      ),
+    );
     // Booked: the earlier steps wait for the cancel (clinozy-be L11).
     expect(within(drawer).getByTestId('lead-drawer-step-follow_up')).toBeDisabled();
 

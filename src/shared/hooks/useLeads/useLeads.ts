@@ -1,6 +1,6 @@
 import i18n from '@/lib/i18n/i18n.ts';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
-import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
+import type { DeleteReason, LeadStatus } from '@/shared/api/app/app-schema.ts';
 import { contactQueryKeys } from '@/shared/api/app/contacts-api.ts';
 import {
   claimLead,
@@ -24,11 +24,13 @@ import type {
 import { messageQueryKeys } from '@/shared/api/app/messages-api.ts';
 import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { LEAD_TOASTS_KEYS, LEAD_TOASTS_NS } from './leads-toasts.constants.ts';
@@ -161,6 +163,61 @@ export function useUpdateLead(
     },
     ...options,
   });
+}
+
+/** What a Progress move sends: the lead as read, its new status and the follow-up time it carries. */
+export interface LeadMoveVars {
+  lead: LeadRecord;
+  status: LeadStatus;
+  /** The follow-up time to store with it; left alone when absent. */
+  followUpAt?: string | null;
+  /** The move back an Undo makes — its toast has no Undo of its own. */
+  undo?: boolean;
+}
+
+/**
+ * A move from the lead drawer's Progress (D25) — saved at once, not through the drawer's Save, and
+ * refused when someone saved the lead meanwhile (`409 record_changed`): "<name> → <status>", with
+ * the follow-up time when the move carries one, and Undo — which puts the status and the
+ * follow-up time back as they were.
+ */
+export function useMoveLead() {
+  const clock = useAppClock();
+  const mutation = useAppMutation<LeadRecord, LeadMoveVars>({
+    mutationFn: ({ lead, status, followUpAt }, action) =>
+      updateLead({
+        leadId: lead.id,
+        fields: { status, ...(followUpAt === undefined ? {} : { followUpAt }) },
+        expectedUpdatedAt: lead.updatedAt,
+        ...action,
+      }),
+    invalidateKeys: LEAD_WRITE_KEYS,
+    onSuccess: (saved, vars) => {
+      const status = i18n.t(APP_KEYS.leads.statuses[saved.status], { ns: APP_NS });
+      const message =
+        vars.followUpAt && saved.followUpAt
+          ? leadToast(LEAD_TOASTS_KEYS.movedAt, {
+              name: saved.name,
+              status,
+              when: clock.moment(saved.followUpAt),
+            })
+          : leadToast(LEAD_TOASTS_KEYS.statusChanged, { name: saved.name, status });
+      if (vars.undo) {
+        notify.success(message);
+        return;
+      }
+      notify.undo(message, {
+        onUndo: () =>
+          mutation.mutate({
+            lead: saved,
+            status: vars.lead.status,
+            followUpAt: vars.lead.followUpAt,
+            undo: true,
+          }),
+      });
+    },
+  });
+  return mutation;
 }
 
 /** What a claim sends: the lead as the row shows it. */

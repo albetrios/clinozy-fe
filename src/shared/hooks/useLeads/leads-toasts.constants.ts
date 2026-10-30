@@ -15,6 +15,8 @@ export const LEAD_TOASTS_KEYS = {
   saved: 'toasts.saved',
   /** "Rhea Shah → Follow-up". */
   statusChanged: 'toasts.statusChanged',
+  /** "Rhea Shah → Follow-up · Tomorrow 11:00 am" — a move that sets the follow-up time (D25). */
+  movedAt: 'toasts.movedAt',
   /** A claim from the row, or a take-over. */
   claimed: 'toasts.claimed',
   /** A claim of a lead nobody held. */

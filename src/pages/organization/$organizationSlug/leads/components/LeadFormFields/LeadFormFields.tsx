@@ -17,12 +17,10 @@ import {
   TONE_CLASSES,
 } from '@/shared/app/app-tones.ts';
 import { DrawerChips } from '@/shared/components/DrawerField/index.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
 import { Calendar, Check } from '@/shared/icons/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
 import {
-  LEAD_CLOSING_STATUSES,
   LEAD_INTEREST_CHIPS,
   LEAD_SOURCE_ICONS,
   LEAD_SOURCE_ORDER,
@@ -157,35 +155,17 @@ export function LeadInterestsField({
 
 /**
  * The track's tiles in each step's tone, as literals (`bg-tone-${tone}` is never generated): a done
- * step a light tint of its colour, the current one ringed in its dot colour (D21), the bar's track.
+ * step a light tint of its colour (D21), and the bar's track. No borders (D25): the current step is
+ * its full colour.
  */
 const TRACK_TONES: Readonly<
-  Record<
-    (typeof LEAD_TRACK_STATUSES)[number],
-    { done: string; ring: string; bar: string }
-  >
+  Record<(typeof LEAD_TRACK_STATUSES)[number], { done: string; bar: string }>
 > = {
-  new: { done: 'bg-tone-sky/40', ring: 'inset-ring-tone-sky-dot', bar: 'bg-tone-sky' },
-  contacted: {
-    done: 'bg-tone-lav/40',
-    ring: 'inset-ring-tone-lav-dot',
-    bar: 'bg-tone-lav',
-  },
-  follow_up: {
-    done: 'bg-tone-butter/40',
-    ring: 'inset-ring-tone-butter-dot',
-    bar: 'bg-tone-butter',
-  },
-  appointment_scheduled: {
-    done: 'bg-tone-peach/40',
-    ring: 'inset-ring-tone-peach-dot',
-    bar: 'bg-tone-peach',
-  },
-  clinic_visited: {
-    done: 'bg-tone-sage/40',
-    ring: 'inset-ring-tone-sage-dot',
-    bar: 'bg-tone-sage',
-  },
+  new: { done: 'bg-tone-sky/40', bar: 'bg-tone-sky' },
+  contacted: { done: 'bg-tone-lav/40', bar: 'bg-tone-lav' },
+  follow_up: { done: 'bg-tone-butter/40', bar: 'bg-tone-butter' },
+  appointment_scheduled: { done: 'bg-tone-peach/40', bar: 'bg-tone-peach' },
+  clinic_visited: { done: 'bg-tone-sage/40', bar: 'bg-tone-sage' },
 };
 
 /**
@@ -257,6 +237,39 @@ function stepLabelKey(state: StepState, done: boolean): string {
   return LEADS_KEYS.drawer.steps.next;
 }
 
+/** A tile's look by where it stands (D21, D25): a done tint, the current colour, the next muted. */
+function trackStepLook({
+  step,
+  done,
+  current,
+}: {
+  step: (typeof LEAD_TRACK_STATUSES)[number];
+  done: boolean;
+  current: boolean;
+}): string {
+  const tone = TONE_OF[step];
+  if (done) return cn(TRACK_TONES[step].done, TONE_CLASSES[tone].ink);
+  if (current) return TONE_CLASSES[tone].surface;
+  return 'bg-muted/50 text-muted-foreground';
+}
+
+/** The small label over a tile's name: none on a closed lead, the current step's own, else its state. */
+function trackStepLabel({
+  closed,
+  current,
+  currentLabel,
+  label,
+}: {
+  closed: boolean;
+  current: boolean;
+  currentLabel: string | undefined;
+  label: string;
+}): string | null {
+  if (closed) return null;
+  if (current && currentLabel) return currentLabel;
+  return label;
+}
+
 /** One tile of the track: its mark, its label and name, its bar — and what a press does. */
 function LeadTrackStep({
   step,
@@ -264,6 +277,9 @@ function LeadTrackStep({
   at,
   status,
   booked,
+  closed,
+  currentLabel,
+  readOnly,
   onBook,
   onChange,
 }: {
@@ -273,6 +289,11 @@ function LeadTrackStep({
   at: number;
   status: LeadStatus;
   booked: boolean;
+  /** Not interested, Invalid or Lost: the steps carry no state — the Next step card names it. */
+  closed: boolean;
+  /** The current step's small label in place of "Current" — its follow-up time, "No answer". */
+  currentLabel?: string;
+  readOnly: boolean;
   onBook?: () => void;
   onChange: (status: LeadStatus) => void;
 }) {
@@ -290,7 +311,7 @@ function LeadTrackStep({
     booked,
     canBook: onBook !== undefined,
   });
-  const off = status === 'clinic_visited' || STATE_OFF.has(state);
+  const off = readOnly || status === 'clinic_visited' || STATE_OFF.has(state);
   return (
     <button
       type="button"
@@ -301,20 +322,25 @@ function LeadTrackStep({
       onClick={state === 'book' ? onBook : () => onChange(step)}
       className={cn(
         // Narrow (a phone): one row per step — mark, name, state. From 28rem: the row of tiles.
-        'relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 border-b px-3 py-2.5 text-start transition-colors last:border-b-0',
-        '@md:grid-cols-[auto_minmax(0,1fr)] @md:items-start @md:gap-y-2 @md:border-e @md:border-b-0 @md:px-2.5 @md:pt-3 @md:pb-2.5 @md:last:border-e-0',
+        // No borders between or around them (D25): tint and spacing set them apart.
+        'relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 overflow-hidden rounded-lg px-3 py-2.5 text-start transition-colors',
+        '@md:grid-cols-[auto_minmax(0,1fr)] @md:items-start @md:gap-y-2 @md:px-2.5 @md:pt-3 @md:pb-3.5',
         // "Appointment scheduled" is the long name: its tile takes a little more of the row.
         step === 'appointment_scheduled' ? '@md:flex-[1.3]' : '@md:flex-1',
-        // Done: a light tint of its colour; current: its colour, ringed — the strongest (D21).
-        done && cn(TRACK_TONES[step].done, TONE_CLASSES[tone].ink),
-        current && cn(TONE_CLASSES[tone].surface, 'inset-ring-2', TRACK_TONES[step].ring),
-        !(done || current) && 'bg-card text-muted-foreground',
+        trackStepLook({ step, done, current }),
       )}
     >
       <StepMark done={done} current={current} number={index + 1} tone={tone} />
       <span className="text-tiny col-start-3 row-start-1 flex items-center gap-1 self-center font-medium tracking-[0.02em] whitespace-nowrap @md:col-start-2">
-        {state === 'book' ? <Calendar aria-hidden="true" className="size-3" /> : null}
-        {t(stepLabelKey(state, done))}
+        {state === 'book' && !closed ? (
+          <Calendar aria-hidden="true" className="size-3" />
+        ) : null}
+        {trackStepLabel({
+          closed,
+          current,
+          currentLabel,
+          label: t(stepLabelKey(state, done)),
+        })}
       </span>
       <span
         className={cn(
@@ -362,95 +388,48 @@ export interface LeadProgressBooking {
   visit?: LeadBookedVisit | null;
 }
 
-/** "Booked · Tomorrow · 11:00 am", what and with whom, Reschedule and Cancel. */
-function LeadBookedVisitRow({ visit }: { visit: LeadBookedVisit }) {
-  const { t } = useTranslation(LEADS_NS);
-  return (
-    <section
-      aria-label={t(LEADS_KEYS.drawer.booking.aria)}
-      data-testid={LEADS_TEST_IDS.drawerBooking}
-      className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b px-3 py-2.5"
-    >
-      <span
-        aria-hidden="true"
-        className={cn(
-          'flex size-8 flex-none items-center justify-center rounded-lg',
-          TONE_CLASSES.peach.surface,
-        )}
-      >
-        <Calendar className="size-4" />
-      </span>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span className="text-body font-medium [overflow-wrap:anywhere]">
-          {t(LEADS_KEYS.drawer.booking.label, { when: visit.when })}
-        </span>
-        <span className="text-caption text-muted-foreground [overflow-wrap:anywhere]">
-          {visit.what}
-        </span>
-      </div>
-      <div className="flex flex-none items-center gap-1.5">
-        {visit.onReschedule ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            data-testid={`${LEADS_TEST_IDS.drawerBooking}-reschedule`}
-            onClick={visit.onReschedule}
-          >
-            {t(LEADS_KEYS.drawer.booking.reschedule)}
-          </Button>
-        ) : null}
-        {visit.onCancel ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            data-testid={`${LEADS_TEST_IDS.drawerBooking}-cancel`}
-            onClick={visit.onCancel}
-          >
-            {t(LEADS_KEYS.drawer.booking.cancel)}
-          </Button>
-        ) : null}
-      </div>
-    </section>
-  );
-}
-
 /**
- * Progress (`leads.md:284`, H:1809–1811): the 5-tile track New · Contacted ·
- * Follow-up · Appointment scheduled · Clinic visited — done tiles in the tone's
- * ink with a check, the current one tinted with a ringed dot, the next ones at
- * 30% with a dashed number — then the booking still to happen, then "Close as"
- * No response · Not interested · Invalid · Lost. Any status may follow any
- * (Q-L4) but the server's two: Appointment scheduled follows the person's
- * bookings (clinozy-be L11) — its tile books ("Book") for a member who books,
- * and while a booking is still to happen the earlier tiles and No response wait
- * for its cancel — and Clinic visited is the check-in's, then final (L8).
+ * Progress (`leads.md:284`, H:1809–1811; D25): the 5-tile track New · Contacted · Follow-up ·
+ * Appointment scheduled · Clinic visited — done tiles a light tint with a check, the current one in
+ * its full colour, the next ones muted with their number; no borders — then the Next step card the
+ * drawer passes. No response sits on the Follow-up step ("No answer"); Not interested, Invalid and
+ * Lost leave the steps without a state. Any status may follow any (Q-L4) but the server's two:
+ * Appointment scheduled follows the person's bookings (clinozy-be L11) — its tile books ("Book")
+ * for a member who books, and while a booking is still to happen the earlier tiles wait for its
+ * cancel — and Clinic visited is the check-in's, then final (L8).
  */
 export function LeadProgressField({
   status,
   onChange,
   booking = {},
+  currentLabel,
+  nextStep,
+  readOnly = false,
 }: {
   status: LeadStatus;
   onChange: (status: LeadStatus) => void;
+  /** Without Edit the track only shows. */
+  readOnly?: boolean;
   booking?: LeadProgressBooking;
+  /** The current step's label in place of "Current" — the follow-up time, "No answer". */
+  currentLabel?: string;
+  /** The Next step card under the track (D25). */
+  nextStep?: ReactNode;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tApp } = useTranslation(APP_NS);
-  const at = (LEAD_TRACK_STATUSES as readonly LeadStatus[]).indexOf(status);
-  const visited = status === 'clinic_visited';
+  // No response is still being followed up: it sits on the Follow-up step.
+  const place = status === 'no_response' ? 'follow_up' : status;
+  const at = (LEAD_TRACK_STATUSES as readonly LeadStatus[]).indexOf(place);
   // Booked: a booking is still to happen (or still loading) — the server holds the status.
   const booked = status === 'appointment_scheduled' && booking.visit !== null;
-  const label = (value: LeadStatus) => tApp(APP_KEYS.leads.statuses[value]);
+  const closed = at === -1;
   return (
     <section
       aria-label={t(LEADS_KEYS.drawer.progressAria)}
-      data-slot="surface"
-      className="bg-card flex-none overflow-hidden rounded-xl border"
+      className="flex flex-none flex-col gap-2.5"
     >
-      <div className="@container border-b">
-        <div className="flex flex-col @md:flex-row @md:items-stretch">
+      <div className="@container">
+        <div className="flex flex-col gap-1 @md:flex-row @md:items-stretch">
           {LEAD_TRACK_STATUSES.map((step, index) => (
             <LeadTrackStep
               key={step}
@@ -459,58 +438,23 @@ export function LeadProgressField({
               at={at}
               status={status}
               booked={booked}
+              closed={closed}
+              currentLabel={currentLabel}
+              readOnly={readOnly}
               onBook={booking.onBook}
               onChange={onChange}
             />
           ))}
         </div>
       </div>
-      {booking.visit ? <LeadBookedVisitRow visit={booking.visit} /> : null}
-      <div className="flex flex-wrap items-center gap-1.5 px-3 py-2.5">
-        <span className="text-caption text-muted-foreground">
-          {t(LEADS_KEYS.drawer.closeAs)}
-        </span>
-        <DrawerChips
-          label={t(LEADS_KEYS.drawer.closeAs)}
-          disabled={visited}
-          options={LEAD_CLOSING_STATUSES.map((value) => {
-            // No response is a working status: a booked lead waits for its cancel (L11).
-            const held = booked && value === 'no_response';
-            return {
-              value,
-              label: label(value),
-              tone: LEAD_STATUS_TONES[value],
-              ...(held
-                ? { disabled: true, hint: t(LEADS_KEYS.drawer.booking.lockedHint) }
-                : {}),
-            };
-          })}
-          value={
-            (LEAD_CLOSING_STATUSES as readonly LeadStatus[]).includes(status)
-              ? (status as (typeof LEAD_CLOSING_STATUSES)[number])
-              : null
-          }
-          onChange={(value) => {
-            if (value) onChange(value);
-          }}
-        />
-      </div>
+      {nextStep}
     </section>
   );
 }
 
 const TONE_OF = LEAD_STATUS_TONES;
 
-/** The track's dot-coloured edges (the ringed dot, the dashed number), as literals. */
-const TONE_BORDERS: Readonly<Partial<Record<Tone, string>>> = {
-  sky: 'border-tone-sky-dot',
-  lav: 'border-tone-lav-dot',
-  butter: 'border-tone-butter-dot',
-  peach: 'border-tone-peach-dot',
-  sage: 'border-tone-sage-dot',
-};
-
-/** The tile's 18px mark: a solid check disc in the step's dot colour, the ringed dot, or the dashed number. */
+/** The tile's 18px mark — filled, never outlined (D25): a check disc, the dot, or the number. */
 function StepMark({
   done,
   current,
@@ -522,7 +466,7 @@ function StepMark({
   number: number;
   tone: Tone;
 }) {
-  if (done) {
+  if (done || current) {
     return (
       <span
         aria-hidden="true"
@@ -532,22 +476,11 @@ function StepMark({
           TONE_CLASSES[tone].dot,
         )}
       >
-        <Check className="size-3" strokeWidth={3} />
-      </span>
-    );
-  }
-  if (current) {
-    return (
-      <span
-        aria-hidden="true"
-        data-slot="pill"
-        className={cn(
-          'bg-background flex size-4.5 flex-none items-center justify-center rounded-full border-2',
-          TONE_CLASSES[tone].halo,
-          TONE_BORDERS[tone],
+        {done ? (
+          <Check className="size-3" strokeWidth={3} />
+        ) : (
+          <span data-slot="pill" className="bg-background size-1.5 rounded-full" />
         )}
-      >
-        <span className={cn('size-2 rounded-full', TONE_CLASSES[tone].dot)} />
       </span>
     );
   }
@@ -555,10 +488,7 @@ function StepMark({
     <span
       aria-hidden="true"
       data-slot="pill"
-      className={cn(
-        'bg-background text-tiny flex size-4.5 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed font-semibold tabular-nums',
-        TONE_BORDERS[tone],
-      )}
+      className="bg-muted text-muted-foreground text-tiny flex size-4.5 flex-none items-center justify-center rounded-full font-semibold tabular-nums"
     >
       {number}
     </span>

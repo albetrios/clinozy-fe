@@ -49,17 +49,21 @@
           "label": "방문 예약함",
           "effect": "예약 양식이 열림"
         },
-        "callBackTomorrow": {
-          "label": "내일 다시 전화",
-          "effect": "후속 조치 날짜 → 내일 11:00"
-        },
         "noAnswer": {
           "label": "응답 없음",
-          "effect": "통화 기록됨 · 작업 3시간 미룸"
+          "effect": "통화 기록 · 리드 → 응답 없음 · 다음 시도는 내일 같은 시간"
         },
         "notInterested": {
           "label": "관심 없음",
           "effect": "리드 상태 → 관심 없음"
+        },
+        "spamOrWrongNumber": {
+          "label": "스팸 또는 잘못된 번호",
+          "effect": "리드 상태 → 유효하지 않음"
+        },
+        "lost": {
+          "label": "다른 곳으로 감",
+          "effect": "리드 상태 → 이탈"
         }
       }
     },

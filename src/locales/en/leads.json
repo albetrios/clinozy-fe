@@ -7,6 +7,7 @@
     "created": "Lead {{id}} created",
     "saved": "Lead saved",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "You now own {{name}} · {{owner}} stays involved",
     "claimedUnowned": "You now own {{name}}",
     "released": "Released to the team · anyone can claim",
@@ -113,13 +114,71 @@
       "byBooking": "{{status}} · set when an appointment is booked",
       "locked": "{{status}} · cancel the appointment to move back"
     },
-    "closeAs": "Close as",
     "booking": {
-      "aria": "Booked appointment",
-      "label": "Booked · {{when}}",
       "reschedule": "Reschedule",
-      "cancel": "Cancel appointment",
-      "lockedHint": "Booked · cancel the appointment first"
+      "cancel": "Cancel appointment"
+    },
+    "nextStep": {
+      "aria": "Next step",
+      "labels": {
+        "next": "Next",
+        "when": "When",
+        "outcome": "Outcome"
+      },
+      "headline": {
+        "new": "Say hello to {{name}}",
+        "contacted": "Follow up with {{name}}",
+        "follow_up": "Follow up with {{name}}",
+        "no_response": "Try {{name}} again",
+        "appointment_scheduled": "Visit booked for {{name}}",
+        "clinic_visited": "{{name}} is a patient now",
+        "not_interested": "{{name}} said no",
+        "invalid": "Wrong number or spam",
+        "lost": "{{name}} went elsewhere"
+      },
+      "since": {
+        "created": "Created {{when}}",
+        "since": "Since {{when}}",
+        "noAnswer": "No answer {{when}}"
+      },
+      "actions": {
+        "whatsapp": "Send WhatsApp",
+        "call": "Log a call",
+        "book": "Book appointment",
+        "openFile": "Open patient file",
+        "reopen": "Reopen",
+        "noAnswer": "No answer",
+        "noAnswerAgain": "No answer again",
+        "more": "More"
+      },
+      "when": {
+        "notContacted": "Not contacted yet",
+        "replyNow": "They wrote {{when}} · reply now",
+        "setTime": "Set a time",
+        "nextTry": "Next try {{when}}",
+        "visited": "Visited {{when}}",
+        "closed": "Closed {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "Reading the booking…"
+      },
+      "notes": {
+        "contactFirst": "No answer appears once they’re contacted",
+        "checkIn": "Check-in moves them on",
+        "final": "Final, set by the check-in",
+        "winBack": "Comes back if they check in by {{date}}",
+        "never": "Never comes back on its own"
+      },
+      "picker": {
+        "title": "When to follow up?",
+        "laterToday": "Later today",
+        "tomorrow": "Tomorrow",
+        "inThreeDays": "In 3 days",
+        "nextWeek": "Next week",
+        "date": "Date",
+        "time": "Time",
+        "cancel": "Cancel",
+        "set": "Set follow-up"
+      }
     },
     "info": {
       "created": "Created",

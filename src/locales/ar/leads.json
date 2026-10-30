@@ -7,6 +7,7 @@
     "created": "تم إنشاء العميل المحتمل {{id}}",
     "saved": "تم حفظ العميل المحتمل",
     "statusChanged": "{{name}} ← {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "أصبحت مسؤولاً عن {{name}} · يبقى {{owner}} مشاركاً",
     "claimedUnowned": "أصبحت مسؤولاً عن {{name}}",
     "released": "أُتيح للفريق · يمكن لأي شخص استلامه",
@@ -125,13 +126,71 @@
       "byBooking": "{{status}} · يُضبط عند حجز موعد",
       "locked": "{{status}} · ألغِ الموعد للرجوع"
     },
-    "closeAs": "إغلاق بحالة",
     "booking": {
-      "aria": "الموعد المحجوز",
-      "label": "محجوز · {{when}}",
       "reschedule": "إعادة الجدولة",
-      "cancel": "إلغاء الموعد",
-      "lockedHint": "محجوز · ألغِ الموعد أولًا"
+      "cancel": "إلغاء الموعد"
+    },
+    "nextStep": {
+      "aria": "الخطوة التالية",
+      "labels": {
+        "next": "التالي",
+        "when": "متى",
+        "outcome": "النتيجة"
+      },
+      "headline": {
+        "new": "رحّب بـ{{name}}",
+        "contacted": "تابع مع {{name}}",
+        "follow_up": "تابع مع {{name}}",
+        "no_response": "حاول مع {{name}} مجددًا",
+        "appointment_scheduled": "تم حجز زيارة لـ{{name}}",
+        "clinic_visited": "{{name}} مريض الآن",
+        "not_interested": "{{name}} رفض",
+        "invalid": "رقم خاطئ أو رسائل مزعجة",
+        "lost": "{{name}} ذهب إلى مكان آخر"
+      },
+      "since": {
+        "created": "أُنشئ {{when}}",
+        "since": "منذ {{when}}",
+        "noAnswer": "لا رد {{when}}"
+      },
+      "actions": {
+        "whatsapp": "أرسل واتساب",
+        "call": "سجّل مكالمة",
+        "book": "احجز موعدًا",
+        "openFile": "افتح ملف المريض",
+        "reopen": "أعد الفتح",
+        "noAnswer": "لا رد",
+        "noAnswerAgain": "لا رد مجددًا",
+        "more": "المزيد"
+      },
+      "when": {
+        "notContacted": "لم يتم التواصل بعد",
+        "replyNow": "كتب {{when}} · ردّ الآن",
+        "setTime": "حدّد وقتًا",
+        "nextTry": "المحاولة التالية {{when}}",
+        "visited": "زار {{when}}",
+        "closed": "أُغلق {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "جارٍ قراءة الحجز…"
+      },
+      "notes": {
+        "contactFirst": "يظهر «لا رد» بعد التواصل معهم",
+        "checkIn": "تسجيل الوصول ينقلهم للخطوة التالية",
+        "final": "نهائي، يحدده تسجيل الوصول",
+        "winBack": "يعود إذا سجّل وصوله قبل {{date}}",
+        "never": "لا يعود تلقائيًا أبدًا"
+      },
+      "picker": {
+        "title": "متى تتم المتابعة؟",
+        "laterToday": "لاحقًا اليوم",
+        "tomorrow": "غدًا",
+        "inThreeDays": "بعد 3 أيام",
+        "nextWeek": "الأسبوع القادم",
+        "date": "التاريخ",
+        "time": "الوقت",
+        "cancel": "إلغاء",
+        "set": "حدّد المتابعة"
+      }
     },
     "info": {
       "created": "تاريخ الإنشاء",

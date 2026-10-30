@@ -7,6 +7,7 @@
     "created": "लीड {{id}} बनाई गई",
     "saved": "लीड सेव हुई",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "अब {{name}} आपकी है · {{owner}} जुड़े रहेंगे",
     "claimedUnowned": "अब {{name}} आपकी है",
     "released": "टीम के लिए खोली गई · कोई भी ले सकता है",
@@ -113,13 +114,71 @@
       "byBooking": "{{status}} · अपॉइंटमेंट बुक होने पर तय होता है",
       "locked": "{{status}} · वापस जाने के लिए अपॉइंटमेंट रद्द करें"
     },
-    "closeAs": "इस रूप में बंद करें",
     "booking": {
-      "aria": "बुक किया गया अपॉइंटमेंट",
-      "label": "बुक · {{when}}",
       "reschedule": "समय बदलें",
-      "cancel": "अपॉइंटमेंट रद्द करें",
-      "lockedHint": "बुक है · पहले अपॉइंटमेंट रद्द करें"
+      "cancel": "अपॉइंटमेंट रद्द करें"
+    },
+    "nextStep": {
+      "aria": "अगला कदम",
+      "labels": {
+        "next": "अगला",
+        "when": "कब",
+        "outcome": "नतीजा"
+      },
+      "headline": {
+        "new": "{{name}} से संपर्क करें",
+        "contacted": "{{name}} से फ़ॉलो-अप करें",
+        "follow_up": "{{name}} से फ़ॉलो-अप करें",
+        "no_response": "{{name}} से फिर कोशिश करें",
+        "appointment_scheduled": "{{name}} की विज़िट बुक है",
+        "clinic_visited": "{{name}} अब मरीज़ हैं",
+        "not_interested": "{{name}} ने मना किया",
+        "invalid": "गलत नंबर या स्पैम",
+        "lost": "{{name}} कहीं और चले गए"
+      },
+      "since": {
+        "created": "बनाया गया {{when}}",
+        "since": "{{when}} से",
+        "noAnswer": "कोई जवाब नहीं {{when}}"
+      },
+      "actions": {
+        "whatsapp": "WhatsApp भेजें",
+        "call": "कॉल दर्ज करें",
+        "book": "अपॉइंटमेंट बुक करें",
+        "openFile": "मरीज़ फ़ाइल खोलें",
+        "reopen": "फिर से खोलें",
+        "noAnswer": "कोई जवाब नहीं",
+        "noAnswerAgain": "फिर से कोई जवाब नहीं",
+        "more": "और"
+      },
+      "when": {
+        "notContacted": "अभी संपर्क नहीं हुआ",
+        "replyNow": "{{when}} संदेश आया · अभी जवाब दें",
+        "setTime": "समय तय करें",
+        "nextTry": "अगली कोशिश {{when}}",
+        "visited": "विज़िट {{when}}",
+        "closed": "बंद किया {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "बुकिंग पढ़ी जा रही है…"
+      },
+      "notes": {
+        "contactFirst": "संपर्क के बाद “कोई जवाब नहीं” दिखेगा",
+        "checkIn": "चेक-इन से आगे बढ़ेंगे",
+        "final": "अंतिम, चेक-इन से तय",
+        "winBack": "{{date}} तक चेक-इन करने पर वापस आएगा",
+        "never": "अपने आप कभी वापस नहीं आता"
+      },
+      "picker": {
+        "title": "कब फ़ॉलो-अप करें?",
+        "laterToday": "आज बाद में",
+        "tomorrow": "कल",
+        "inThreeDays": "3 दिन में",
+        "nextWeek": "अगले हफ़्ते",
+        "date": "तारीख",
+        "time": "समय",
+        "cancel": "रद्द करें",
+        "set": "फ़ॉलो-अप तय करें"
+      }
     },
     "info": {
       "created": "बनाया गया",

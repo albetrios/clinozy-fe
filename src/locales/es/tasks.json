@@ -49,17 +49,21 @@
           "label": "Visita reservada",
           "effect": "Se abre el formulario de cita"
         },
-        "callBackTomorrow": {
-          "label": "Volver a llamar mañana",
-          "effect": "Fecha de seguimiento → mañana 11:00"
-        },
         "noAnswer": {
           "label": "Sin respuesta",
-          "effect": "Llamada registrada · la tarea se pospone 3 horas"
+          "effect": "Llamada registrada · lead → Sin respuesta · próximo intento mañana a la misma hora"
         },
         "notInterested": {
           "label": "No le interesa",
           "effect": "Estado del prospecto → No le interesa"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam o número equivocado",
+          "effect": "Estado del prospecto → No válido"
+        },
+        "lost": {
+          "label": "Se fue a otro sitio",
+          "effect": "Estado del prospecto → Perdido"
         }
       }
     },

@@ -49,17 +49,21 @@
           "label": "Booked a visit",
           "effect": "Appointment form opens"
         },
-        "callBackTomorrow": {
-          "label": "Call back tomorrow",
-          "effect": "Follow-up date → tomorrow 11:00"
-        },
         "noAnswer": {
           "label": "No answer",
-          "effect": "Call logged · task snoozes 3 hours"
+          "effect": "Call logged · lead → No response · next try tomorrow, same time"
         },
         "notInterested": {
           "label": "Not interested",
           "effect": "Lead status → Not interested"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam or wrong number",
+          "effect": "Lead status → Invalid"
+        },
+        "lost": {
+          "label": "Went elsewhere",
+          "effect": "Lead status → Lost"
         }
       }
     },

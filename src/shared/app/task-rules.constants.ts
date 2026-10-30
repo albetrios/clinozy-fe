@@ -86,10 +86,6 @@ export const TASK_RULE_KEYS = {
           label: 'rules.follow.outcomes.bookedVisit.label',
           effect: 'rules.follow.outcomes.bookedVisit.effect',
         },
-        callBackTomorrow: {
-          label: 'rules.follow.outcomes.callBackTomorrow.label',
-          effect: 'rules.follow.outcomes.callBackTomorrow.effect',
-        },
         noAnswer: {
           label: 'rules.follow.outcomes.noAnswer.label',
           effect: 'rules.follow.outcomes.noAnswer.effect',
@@ -97,6 +93,14 @@ export const TASK_RULE_KEYS = {
         notInterested: {
           label: 'rules.follow.outcomes.notInterested.label',
           effect: 'rules.follow.outcomes.notInterested.effect',
+        },
+        spamOrWrongNumber: {
+          label: 'rules.follow.outcomes.spamOrWrongNumber.label',
+          effect: 'rules.follow.outcomes.spamOrWrongNumber.effect',
+        },
+        lost: {
+          label: 'rules.follow.outcomes.lost.label',
+          effect: 'rules.follow.outcomes.lost.effect',
         },
       },
     },

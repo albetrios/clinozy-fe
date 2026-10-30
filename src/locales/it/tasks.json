@@ -49,17 +49,21 @@
           "label": "Visita prenotata",
           "effect": "Si apre il modulo appuntamento"
         },
-        "callBackTomorrow": {
-          "label": "Richiamare domani",
-          "effect": "Data di ricontatto → domani 11:00"
-        },
         "noAnswer": {
           "label": "Nessuna risposta",
-          "effect": "Chiamata registrata · attività posticipata di 3 ore"
+          "effect": "Chiamata registrata · lead → Nessuna risposta · prossimo tentativo domani alla stessa ora"
         },
         "notInterested": {
           "label": "Non interessato",
           "effect": "Stato del lead → Non interessato"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam o numero errato",
+          "effect": "Stato del lead → Non valido"
+        },
+        "lost": {
+          "label": "Andato altrove",
+          "effect": "Stato del lead → Perso"
         }
       }
     },

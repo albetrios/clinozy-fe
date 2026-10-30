@@ -7,6 +7,7 @@
     "created": "Prospect {{id}} créé",
     "saved": "Prospect enregistré",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "{{name}} est maintenant à vous · {{owner}} reste impliqué",
     "claimedUnowned": "{{name}} est maintenant à vous",
     "released": "Libéré pour l’équipe · tout le monde peut le prendre",
@@ -116,13 +117,71 @@
       "byBooking": "{{status}} · défini à la réservation d’un rendez-vous",
       "locked": "{{status}} · annulez le rendez-vous pour revenir en arrière"
     },
-    "closeAs": "Clore comme",
     "booking": {
-      "aria": "Rendez-vous réservé",
-      "label": "Réservé · {{when}}",
       "reschedule": "Reporter",
-      "cancel": "Annuler le rendez-vous",
-      "lockedHint": "Réservé · annulez d’abord le rendez-vous"
+      "cancel": "Annuler le rendez-vous"
+    },
+    "nextStep": {
+      "aria": "Prochaine étape",
+      "labels": {
+        "next": "Ensuite",
+        "when": "Quand",
+        "outcome": "Résultat"
+      },
+      "headline": {
+        "new": "Dites bonjour à {{name}}",
+        "contacted": "Relancez {{name}}",
+        "follow_up": "Relancez {{name}}",
+        "no_response": "Réessayez avec {{name}}",
+        "appointment_scheduled": "Visite réservée pour {{name}}",
+        "clinic_visited": "{{name}} est maintenant patient",
+        "not_interested": "{{name}} a dit non",
+        "invalid": "Mauvais numéro ou spam",
+        "lost": "{{name}} est allé ailleurs"
+      },
+      "since": {
+        "created": "Créé {{when}}",
+        "since": "Depuis {{when}}",
+        "noAnswer": "Pas de réponse {{when}}"
+      },
+      "actions": {
+        "whatsapp": "Envoyer un WhatsApp",
+        "call": "Noter un appel",
+        "book": "Prendre rendez-vous",
+        "openFile": "Ouvrir le dossier patient",
+        "reopen": "Rouvrir",
+        "noAnswer": "Pas de réponse",
+        "noAnswerAgain": "Toujours pas de réponse",
+        "more": "Plus"
+      },
+      "when": {
+        "notContacted": "Pas encore contacté",
+        "replyNow": "Message reçu {{when}} · répondez maintenant",
+        "setTime": "Choisir une heure",
+        "nextTry": "Prochain essai {{when}}",
+        "visited": "Venu {{when}}",
+        "closed": "Clôturé {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "Lecture du rendez-vous…"
+      },
+      "notes": {
+        "contactFirst": "« Pas de réponse » apparaît après le premier contact",
+        "checkIn": "L’arrivée les fait avancer",
+        "final": "Définitif, fixé par l’arrivée",
+        "winBack": "Revient s’il arrive d’ici le {{date}}",
+        "never": "Ne revient jamais de lui-même"
+      },
+      "picker": {
+        "title": "Quand relancer ?",
+        "laterToday": "Plus tard aujourd’hui",
+        "tomorrow": "Demain",
+        "inThreeDays": "Dans 3 jours",
+        "nextWeek": "La semaine prochaine",
+        "date": "Date",
+        "time": "Heure",
+        "cancel": "Annuler",
+        "set": "Fixer la relance"
+      }
     },
     "info": {
       "created": "Créé",

@@ -39,8 +39,7 @@ The toolbar (`RoomToolbar`, layout `leads`) over the shared `DataTable`:
 ## Progress and the bookings (clinozy-be L11)
 
 The drawer's Progress card is the lead's journey — **New · Contacted · Follow-up ·
-Appointment scheduled · Clinic visited**, then "Close as" No response · Not interested ·
-Invalid · Lost:
+Appointment scheduled · Clinic visited** — and under it the **Next step** card (D25):
 
 ```text
 New → Contacted → Follow-up ──Book──▶ Appointment scheduled ──check-in──▶ Clinic visited
@@ -48,20 +47,31 @@ New → Contacted → Follow-up ──Book──▶ Appointment scheduled ──
                       └── cancel / no-show / removed (the last booking) ──┘
 ```
 
+- **Progress acts at once (D25).** A step, the follow-up time and every outcome save straight
+  away with "<name> → <status>" and Undo (`useLeadProgress` → `useMoveLead`); Lead details still
+  wait for Save. A move into Contacted or Follow-up, and Reopen, first ask **when to follow up**
+  (Later today · Tomorrow · In 3 days · Next week, or a day and a clock — Tomorrow 11:00 by
+  default), so the follow-up task opens at that time.
+- **The Next step card** names the lead's own status (its pill, in its tone — never a generic
+  "Closed") with a headline, then the same three parts: **Next** (the one main action), **When**
+  (the time that matters) and **Outcome** (what happened, named as the status it moves to): New —
+  Send WhatsApp · Log a call (they open the chat's composer); Contacted / Follow-up — Book
+  appointment, the follow-up time, No answer · Not interested · More (Invalid, Lost); No response
+  — "Next try …", No answer again; Appointment scheduled — the booking still to happen with
+  Reschedule and Cancel appointment; Clinic visited — Open patient file; Not interested · Invalid ·
+  Lost — when it closed, Reopen, and whether a check-in wins it back (D2). **No answer** appears
+  once the person was contacted and moves the next try to tomorrow at the same clock.
 - **Appointment scheduled is the bookings' step.** Its tile reads "Book" for a member who books
   (`appointment:create`) and opens the shared booking form on the person — locked to them, with
-  no "Change contact" (D24); the server moves the
-  lead once the booking saves (and every appointment write refetches the leads). Without the
-  right to book, or on a closed lead, the tile only shows.
-- **While a booking is still to happen** Progress shows "Booked · <when>" with what and with
-  whom, Reschedule (the form in Reschedule mode — the lead stays) and Cancel (the reason
-  confirm — the lead goes back to Follow-up, its follow-up date now). The earlier steps and No
-  response wait for that cancel; Not interested, Invalid and Lost stay open.
+  no "Change contact" (D24); the server moves the lead once the booking saves (and every
+  appointment write refetches the leads). While a booking is still to happen the earlier steps
+  wait for its cancel (the lead goes back to Follow-up, its follow-up date now).
 - **Clinic visited** stays the check-in's, then final (L8) — the open lead's, or a lead closed
   as Lost or Not interested in the last 90 days, won back at the person's check-in (D2).
-- **The track's look (D21):** a done step is a light tint of its own colour with a solid ✓ in
-  its dot colour and a full bar; the current step is its colour, ringed and semibold, with a half
-  bar; a next step is plain (`bg-card`, muted, its number dashed).
+- **The track's look (D21, D25):** no borders — a done step is a light tint of its own colour
+  with a filled ✓; the current step is its full colour, semibold, with a half bar; a next step is
+  muted with its number. No response sits on the Follow-up step ("No answer"); Not interested,
+  Invalid and Lost leave the steps without a state.
 - **Info › Closed (D22):** a closed lead shows when it last closed (`closedAt`, the server's
   `closed_at`, D10); an open lead has no close date.
 
@@ -109,6 +119,8 @@ record itself lives in `@/shared/api/app/leads-fixture-contracts.ts`, beside the
 | `components/LeadFormFields/` | The drawer's fields, shared with New lead (L-35): source and interest chips, the progress track (New · Contacted · Follow-up · Appointment scheduled · Clinic visited — the fourth step books, the fifth is the check-in's), "Assigned & involved" with its people popover (anyone with Edit assigns anyone), the person's strip.                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `hooks/useLeadDraft/`        | The drawer's draft — source, interests, status — its dirty check, save and discard; a newer read (the server moved the lead) carries into the fields left alone.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `hooks/useLeadBooking/`      | The drawer's bookings (clinozy-be L11): the person's next booking still to happen (`nextLiveBooking` in `@/shared/api/app/appointment-status.ts` — scheduled or confirmed), "Booked · <when>" with Reschedule and Cancel for Appointments Edit, and the booking form the Appointment scheduled step or the chat opens for a member who books.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `hooks/useLeadProgress/`     | Progress's moves (D25): a move saved at once with Undo (`useMoveLead`), and the status a follow-up time is being asked for — a move into Contacted or Follow-up asks first.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `components/LeadNextStep/`   | The Next step card under the track (D25): the status by name, Next · When · Outcome for each of the nine statuses, the follow-up time picker (`LeadFollowUpPicker`) and its time rules (`components/LeadNextStep/lead-follow-up.ts` — the quick picks, No answer's next try, the 90-day win-back date).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `hooks/useLeadsList/`        | The URL's view, search, filters and sort read against the viewer (`hooks/useLeadsList/lead-list-params.ts`, kept off the entry chunk); the list, the team, the Unreplied count; the URL writes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `hooks/useLeadsDialogRoute/` | Which dialog the URL opens: none, New lead with its prefill, or the lead (resolved by `useDialogRouteRecord`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `__tests__/integration/`     | The list and the dialog routes end to end on the page; `__tests__/integration/leads-test-router.tsx` mirrors the family's routes, `__tests__/integration/leads-test-data.ts` builds members, leads and contacts.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -116,7 +128,7 @@ record itself lives in `@/shared/api/app/leads-fixture-contracts.ts`, beside the
 
 ## Test ids
 
-`leads-page`; `leads-empty`, `leads-claim`, `leads-hold-dot`; the drawer's `lead-drawer-chat`, `lead-drawer-save`, `lead-drawer-remove`, `lead-drawer-people`, `lead-drawer-resize`, Progress's steps `lead-drawer-step-<status>` and the booking `lead-drawer-booking` (`-reschedule`, `-cancel`); New lead's `new-lead-search`, `new-lead-preset-<id>`, `new-lead-hit-<contact number>`, `new-lead-no-match`, `new-lead-new-contact` (the add row), `new-lead-change`, the picker's own `new-lead-contact-recent`, `-loading`, `-progress`, `-quick-add-name` · `-mobile` · `-submit` · `-more` (and the shared `contact-editor-…`); the shared toolbar's and
+`leads-page`; `leads-empty`, `leads-claim`, `leads-hold-dot`; the drawer's `lead-drawer-chat`, `lead-drawer-save`, `lead-drawer-remove`, `lead-drawer-people`, `lead-drawer-resize`, Progress's steps `lead-drawer-step-<status>`, the Next step card `lead-drawer-next-step` (`-when`, `-book`, `-whatsapp`, `-call`, `-reopen`, `-open-file`, `-more`), its outcomes `lead-drawer-outcome-<status>`, the follow-up picker `lead-drawer-follow-up` (`-pick-<id>`, `-set`) and the booking `lead-drawer-booking` (`-reschedule`, `-cancel`); New lead's `new-lead-search`, `new-lead-preset-<id>`, `new-lead-hit-<contact number>`, `new-lead-no-match`, `new-lead-new-contact` (the add row), `new-lead-change`, the picker's own `new-lead-contact-recent`, `-loading`, `-progress`, `-quick-add-name` · `-mobile` · `-submit` · `-more` (and the shared `contact-editor-…`); the shared toolbar's and
 table's under the `leads` table id (`leads-toolbar`, `leads-tab-<view>`, `leads-search`,
 `leads-filters-trigger`, `leads-columns-trigger`, `leads-new-lead`, `leads-fab`,
 `leads-table-row` …); the drawers the dialog routes open: `new-lead-drawer` (L-35),

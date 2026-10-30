@@ -7,6 +7,7 @@
     "created": "Lead {{id}} creato",
     "saved": "Lead salvato",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "Ora {{name}} è tuo · {{owner}} resta coinvolto",
     "claimedUnowned": "Ora {{name}} è tuo",
     "released": "Rilasciato al team · chiunque può prenderlo",
@@ -116,13 +117,71 @@
       "byBooking": "{{status}} · impostato quando si prenota un appuntamento",
       "locked": "{{status}} · annulla l’appuntamento per tornare indietro"
     },
-    "closeAs": "Chiudi come",
     "booking": {
-      "aria": "Appuntamento prenotato",
-      "label": "Prenotato · {{when}}",
       "reschedule": "Riprogramma",
-      "cancel": "Annulla appuntamento",
-      "lockedHint": "Prenotato · annulla prima l’appuntamento"
+      "cancel": "Annulla appuntamento"
+    },
+    "nextStep": {
+      "aria": "Prossimo passo",
+      "labels": {
+        "next": "Prossimo",
+        "when": "Quando",
+        "outcome": "Esito"
+      },
+      "headline": {
+        "new": "Saluta {{name}}",
+        "contacted": "Ricontatta {{name}}",
+        "follow_up": "Ricontatta {{name}}",
+        "no_response": "Riprova con {{name}}",
+        "appointment_scheduled": "Visita prenotata per {{name}}",
+        "clinic_visited": "{{name}} ora è un paziente",
+        "not_interested": "{{name}} ha detto di no",
+        "invalid": "Numero errato o spam",
+        "lost": "{{name}} è andato altrove"
+      },
+      "since": {
+        "created": "Creato {{when}}",
+        "since": "Da {{when}}",
+        "noAnswer": "Nessuna risposta {{when}}"
+      },
+      "actions": {
+        "whatsapp": "Invia WhatsApp",
+        "call": "Registra chiamata",
+        "book": "Prenota appuntamento",
+        "openFile": "Apri cartella paziente",
+        "reopen": "Riapri",
+        "noAnswer": "Nessuna risposta",
+        "noAnswerAgain": "Ancora nessuna risposta",
+        "more": "Altro"
+      },
+      "when": {
+        "notContacted": "Non ancora contattato",
+        "replyNow": "Ha scritto {{when}} · rispondi ora",
+        "setTime": "Imposta un orario",
+        "nextTry": "Prossimo tentativo {{when}}",
+        "visited": "Visita {{when}}",
+        "closed": "Chiuso {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "Lettura della prenotazione…"
+      },
+      "notes": {
+        "contactFirst": "«Nessuna risposta» compare dopo il primo contatto",
+        "checkIn": "Il check-in li porta avanti",
+        "final": "Definitivo, impostato dal check-in",
+        "winBack": "Torna se fa check-in entro il {{date}}",
+        "never": "Non torna mai da solo"
+      },
+      "picker": {
+        "title": "Quando ricontattare?",
+        "laterToday": "Più tardi oggi",
+        "tomorrow": "Domani",
+        "inThreeDays": "Tra 3 giorni",
+        "nextWeek": "La prossima settimana",
+        "date": "Data",
+        "time": "Ora",
+        "cancel": "Annulla",
+        "set": "Imposta ricontatto"
+      }
     },
     "info": {
       "created": "Creato",

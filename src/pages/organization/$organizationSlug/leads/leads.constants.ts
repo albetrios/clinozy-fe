@@ -128,16 +128,81 @@ export const LEADS_KEYS = {
       /** "<status> · cancel the appointment to move back" — a booked lead's earlier steps. */
       locked: 'drawer.stepTips.locked',
     },
-    closeAs: 'drawer.closeAs',
-    /** The person's booking still to happen, on the Progress card (clinozy-be L11). */
+    /** The person's booking still to happen — its actions on the Next step card (clinozy-be L11). */
     booking: {
-      aria: 'drawer.booking.aria',
-      /** "Booked · <when>". */
-      label: 'drawer.booking.label',
       reschedule: 'drawer.booking.reschedule',
       cancel: 'drawer.booking.cancel',
-      /** A closing status the server refuses while booked (No response). */
-      lockedHint: 'drawer.booking.lockedHint',
+    },
+    /**
+     * The Next step card under the track (D25): the status and a headline, then Next · When ·
+     * Outcome — the same four parts for every status.
+     */
+    nextStep: {
+      aria: 'drawer.nextStep.aria',
+      labels: {
+        next: 'drawer.nextStep.labels.next',
+        when: 'drawer.nextStep.labels.when',
+        outcome: 'drawer.nextStep.labels.outcome',
+      },
+      headline: {
+        new: 'drawer.nextStep.headline.new',
+        contacted: 'drawer.nextStep.headline.contacted',
+        follow_up: 'drawer.nextStep.headline.follow_up',
+        no_response: 'drawer.nextStep.headline.no_response',
+        appointment_scheduled: 'drawer.nextStep.headline.appointment_scheduled',
+        clinic_visited: 'drawer.nextStep.headline.clinic_visited',
+        not_interested: 'drawer.nextStep.headline.not_interested',
+        invalid: 'drawer.nextStep.headline.invalid',
+        lost: 'drawer.nextStep.headline.lost',
+      },
+      since: {
+        created: 'drawer.nextStep.since.created',
+        since: 'drawer.nextStep.since.since',
+        noAnswer: 'drawer.nextStep.since.noAnswer',
+      },
+      actions: {
+        whatsapp: 'drawer.nextStep.actions.whatsapp',
+        call: 'drawer.nextStep.actions.call',
+        book: 'drawer.nextStep.actions.book',
+        openFile: 'drawer.nextStep.actions.openFile',
+        reopen: 'drawer.nextStep.actions.reopen',
+        noAnswer: 'drawer.nextStep.actions.noAnswer',
+        noAnswerAgain: 'drawer.nextStep.actions.noAnswerAgain',
+        more: 'drawer.nextStep.actions.more',
+      },
+      when: {
+        notContacted: 'drawer.nextStep.when.notContacted',
+        /** "They wrote <moment> · reply now". */
+        replyNow: 'drawer.nextStep.when.replyNow',
+        setTime: 'drawer.nextStep.when.setTime',
+        /** "Next try <moment>". */
+        nextTry: 'drawer.nextStep.when.nextTry',
+        visited: 'drawer.nextStep.when.visited',
+        closed: 'drawer.nextStep.when.closed',
+        /** "<when> · <what>" — the booking still to happen. */
+        booking: 'drawer.nextStep.when.booking',
+        bookingPending: 'drawer.nextStep.when.bookingPending',
+      },
+      notes: {
+        contactFirst: 'drawer.nextStep.notes.contactFirst',
+        checkIn: 'drawer.nextStep.notes.checkIn',
+        final: 'drawer.nextStep.notes.final',
+        /** "Comes back if they check in by <date>" (clinozy-be D2). */
+        winBack: 'drawer.nextStep.notes.winBack',
+        never: 'drawer.nextStep.notes.never',
+      },
+      /** The follow-up time picker. */
+      picker: {
+        title: 'drawer.nextStep.picker.title',
+        laterToday: 'drawer.nextStep.picker.laterToday',
+        tomorrow: 'drawer.nextStep.picker.tomorrow',
+        inThreeDays: 'drawer.nextStep.picker.inThreeDays',
+        nextWeek: 'drawer.nextStep.picker.nextWeek',
+        date: 'drawer.nextStep.picker.date',
+        time: 'drawer.nextStep.picker.time',
+        cancel: 'drawer.nextStep.picker.cancel',
+        set: 'drawer.nextStep.picker.set',
+      },
     },
     info: {
       created: 'drawer.info.created',
@@ -252,6 +317,14 @@ export const LEADS_TEST_IDS = {
   drawerStep: 'lead-drawer-step',
   /** The booking still to happen on Progress, and its `-reschedule` and `-cancel`. */
   drawerBooking: 'lead-drawer-booking',
+  /**
+   * The Next step card (D25): `lead-drawer-next-step`, its `-when`, `-book`, `-whatsapp`, `-call`,
+   * `-reopen`, `-open-file`, `-more`; an outcome `lead-drawer-outcome-<status>`.
+   */
+  drawerNextStep: 'lead-drawer-next-step',
+  drawerOutcome: 'lead-drawer-outcome',
+  /** The follow-up time picker: `lead-drawer-follow-up`, its `-pick-<id>` and `-set`. */
+  drawerFollowUp: 'lead-drawer-follow-up',
   /** New lead — the drawer's own parts derive theirs from it (`new-lead-drawer-save` …). */
   newLead: 'new-lead-drawer',
   /** The root of the contact picker's own ids (`new-lead-contact-recent`, `-quick-add-name` …). */

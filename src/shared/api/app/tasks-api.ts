@@ -9,7 +9,7 @@ import { apiErrorReason } from '@/shared/errors/errorHandler.ts';
 import { isHttpError, isNotFound } from '@/shared/errors/HttpError.ts';
 
 import type { DeleteReason } from './app-schema.ts';
-import { addCivilDays, appInstant, appToday } from './app-time.ts';
+import { addCivilDays, appClockTime, appInstant, appToday } from './app-time.ts';
 import {
   cancelAppointment,
   fetchAppointment,
@@ -399,11 +399,17 @@ async function runStep(
         idempotencyKey: at.idempotencyKey,
       });
       return;
-    case 'leadFollowUpTomorrow':
+    case 'leadNoAnswer':
       if (!leadId) return;
       await updateLead({
         leadId,
-        fields: { followUpAt: appInstant(addCivilDays(at.today, 1), step.at) },
+        fields: {
+          status: 'no_response',
+          followUpAt: appInstant(
+            addCivilDays(at.today, 1),
+            appClockTime(new Date(at.task.dueAt)),
+          ),
+        },
         idempotencyKey: at.idempotencyKey,
       });
       return;

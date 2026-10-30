@@ -49,17 +49,21 @@
           "label": "来院を予約した",
           "effect": "予約フォームが開きます"
         },
-        "callBackTomorrow": {
-          "label": "明日かけ直す",
-          "effect": "フォローアップ日 → 明日 11:00"
-        },
         "noAnswer": {
           "label": "応答なし",
-          "effect": "通話を記録 · タスクを3時間スヌーズ"
+          "effect": "通話を記録 · リード → 応答なし · 次回は明日の同じ時刻"
         },
         "notInterested": {
           "label": "興味なし",
           "effect": "リードのステータス → 興味なし"
+        },
+        "spamOrWrongNumber": {
+          "label": "スパムまたは番号違い",
+          "effect": "リードのステータス → 無効"
+        },
+        "lost": {
+          "label": "他院へ",
+          "effect": "リードのステータス → 失注"
         }
       }
     },

@@ -34,6 +34,7 @@ import { Copy, RefreshCw } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import type { LeadDraftState } from '../../hooks/useLeadDraft/index.ts';
+import type { LeadProgressState } from '../../hooks/useLeadProgress/index.ts';
 import { LEADS_KEYS, LEADS_NS } from '../../leads.constants.ts';
 import { leadContactCardData } from '../LeadFields/lead-contact.ts';
 import {
@@ -46,6 +47,7 @@ import {
   LeadProgressField,
   LeadSourceField,
 } from '../LeadFormFields/index.ts';
+import { type LeadComposeMode, LeadNextStep } from '../LeadNextStep/index.ts';
 
 /** What the lead drawer's body reads and does beyond the draft. */
 export interface LeadDetailsBodyProps {
@@ -62,6 +64,23 @@ export interface LeadDetailsBodyProps {
   contactActions?: ContactCardActions;
   /** Progress's booking — the step that books and the booking still to happen (clinozy-be L11). */
   booking?: LeadProgressBooking;
+  /** Progress's moves — saved at once, with Undo (D25). */
+  progress: LeadProgressState;
+  /** The Next step card's "Send WhatsApp" and "Log a call" — absent without the chat to write in. */
+  onCompose?: (mode: LeadComposeMode) => void;
+  /** "Open patient file" — absent without the file a check-in opened. */
+  onOpenPatient?: () => void;
+}
+
+/** The current step's own label (D25): Follow-up's time, No response's "No answer". */
+function currentStepLabel(
+  lead: LeadRecord,
+  words: { moment: (instant: string) => string; noAnswer: string },
+): string | undefined {
+  if (lead.status === 'no_response') return words.noAnswer;
+  if (lead.status === 'follow_up' && lead.followUpAt)
+    return words.moment(lead.followUpAt);
+  return undefined;
 }
 
 /**
@@ -363,9 +382,13 @@ export function LeadDetailsBody({
   canEdit,
   canEditContact,
   contactActions = {},
-  booking,
+  booking = {},
+  progress,
+  onCompose,
+  onOpenPatient,
 }: LeadDetailsBodyProps) {
   const { t } = useTranslation(LEADS_NS);
+  const clock = useAppClock();
   const { draft: values, update } = draft;
   const detailsDone = values.source !== null && values.interests.length > 0;
   return (
@@ -401,9 +424,27 @@ export function LeadDetailsBody({
       </LeadCard>
       <LeadCard label={t(LEADS_KEYS.drawer.cards.progress)} number={2} done>
         <LeadProgressField
-          status={values.status}
-          onChange={(status) => update({ status })}
+          status={lead.status}
+          onChange={progress.press}
+          readOnly={!canEdit}
           booking={booking}
+          currentLabel={currentStepLabel(lead, {
+            moment: clock.moment,
+            noAnswer: t(LEADS_KEYS.drawer.nextStep.actions.noAnswer),
+          })}
+          nextStep={
+            <LeadNextStep
+              lead={lead}
+              visit={booking.visit}
+              canEdit={canEdit}
+              onBook={booking.onBook}
+              onMove={progress.move}
+              asking={progress.asking}
+              onAsk={progress.ask}
+              onCompose={onCompose}
+              onOpenPatient={onOpenPatient}
+            />
+          }
         />
       </LeadCard>
       <LeadInfoCard lead={lead} />
