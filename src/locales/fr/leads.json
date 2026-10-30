@@ -127,6 +127,7 @@
     "info": {
       "created": "Créé",
       "lastActivity": "Dernière activité",
+      "closed": "Clôturé",
       "none": "Aucun pour l’instant",
       "patient": "Patient",
       "linked": "Lié",

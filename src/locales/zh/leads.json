@@ -121,6 +121,7 @@
     "info": {
       "created": "创建时间",
       "lastActivity": "最近动态",
+      "closed": "关闭时间",
       "none": "暂无",
       "patient": "患者",
       "linked": "已关联",

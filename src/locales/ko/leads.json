@@ -121,6 +121,7 @@
     "info": {
       "created": "생성일",
       "lastActivity": "최근 활동",
+      "closed": "종료일",
       "none": "아직 없음",
       "patient": "환자",
       "linked": "연결됨",

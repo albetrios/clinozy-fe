@@ -11561,6 +11561,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11682,6 +11684,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11755,6 +11759,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11877,6 +11883,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11953,6 +11961,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -12029,6 +12039,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -12105,6 +12117,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */

@@ -32,6 +32,7 @@ import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 import {
   contactRecord,
   type ContactsWorld,
+  daysAgo,
   leadRecord,
   type LeadsWorld,
   NOW,
@@ -234,6 +235,22 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
       /^Last activityNone yet$/,
     );
     expect(infoCell(drawer, 'Patient')).toHaveTextContent(/^PatientLinked$/);
+  });
+
+  it('reads when a closed lead closed, and no close date while it is open (clinozy-be D10)', async () => {
+    const open = await openAnaya();
+    expect(
+      within(within(open.drawer).getByRole('region', { name: 'Info' })).queryByText(
+        'Closed',
+      ),
+    ).not.toBeInTheDocument();
+    open.unmount();
+
+    world.leads = [leadRecord({ status: 'lost', closedAt: daysAgo(1) })];
+    const { drawer } = await openAnaya();
+    expect(infoCell(drawer, 'Closed')).toHaveTextContent(
+      /^ClosedYesterday \W?10:00\sAM\W?$/i,
+    );
   });
 
   it('saves a status move with the read’s `updated_at` — "<name> → <status>", no Undo', async () => {

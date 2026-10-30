@@ -121,6 +121,7 @@
     "info": {
       "created": "作成日",
       "lastActivity": "最新のアクティビティ",
+      "closed": "クローズ日",
       "none": "まだありません",
       "patient": "患者",
       "linked": "リンク済み",

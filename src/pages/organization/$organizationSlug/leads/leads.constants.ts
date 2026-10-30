@@ -143,6 +143,8 @@ export const LEADS_KEYS = {
       created: 'drawer.info.created',
       /** The person's latest activity, on any record. */
       lastActivity: 'drawer.info.lastActivity',
+      /** When the lead last closed — shown on a closed lead only. */
+      closed: 'drawer.info.closed',
       none: 'drawer.info.none',
       patient: 'drawer.info.patient',
       linked: 'drawer.info.linked',

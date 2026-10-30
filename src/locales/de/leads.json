@@ -124,6 +124,7 @@
     "info": {
       "created": "Erstellt",
       "lastActivity": "Letzte Aktivität",
+      "closed": "Geschlossen",
       "none": "Noch keine",
       "patient": "Patient",
       "linked": "Verknüpft",

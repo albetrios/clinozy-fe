@@ -199,7 +199,8 @@ interface LeadFact {
 }
 
 /**
- * Info (H:1813): Created · Last activity (the person's latest, on any record) · Patient —
+ * Info (H:1813): Created · Last activity (the person's latest, on any record) · Closed — when a
+ * closed lead last closed (clinozy-be D10, D22) · Patient —
  * linked once a check-in opened their file; the design's "Convert to patient" went with the
  * backend (route map §4 #5) · Open tasks, for a member who reads tasks (`task:read` — a role
  * without it would get a 403, research-tasks §7 flag 4) · Re-target reason.
@@ -223,6 +224,16 @@ function LeadInfoCard({ lead }: { lead: LeadRecord }) {
         ? clock.moment(lead.lastActivityAt)
         : t(LEADS_KEYS.drawer.info.none),
     },
+    // A closed lead's close date (clinozy-be D10) — none while it is open.
+    ...(lead.closedAt
+      ? [
+          {
+            key: 'closed',
+            label: t(LEADS_KEYS.drawer.info.closed),
+            value: clock.moment(lead.closedAt),
+          },
+        ]
+      : []),
     {
       key: 'patient',
       label: t(LEADS_KEYS.drawer.info.patient),

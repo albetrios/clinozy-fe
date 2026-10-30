@@ -82,6 +82,7 @@ export function leadRecord(overrides: Partial<LeadRecord> = {}): LeadRecord {
     involvedIds: [],
     heldUntil: daysAhead(2),
     followUpAt: null,
+    closedAt: null,
     branchId: null,
     notes: null,
     lastActivityAt: daysAgo(1),

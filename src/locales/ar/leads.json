@@ -136,6 +136,7 @@
     "info": {
       "created": "تاريخ الإنشاء",
       "lastActivity": "آخر نشاط",
+      "closed": "أُغلق",
       "none": "لا يوجد بعد",
       "patient": "المريض",
       "linked": "مرتبط",
