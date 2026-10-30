@@ -438,16 +438,22 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     );
   });
 
-  it('books from Progress: the Appointment scheduled step opens the form on the lead’s contact', async () => {
+  it('books from Progress: the Appointment scheduled step opens the form on the lead’s contact, locked', async () => {
     const user = userEvent.setup();
     const { drawer } = await openAnaya();
     const step = within(drawer).getByTestId('lead-drawer-step-appointment_scheduled');
     expect(step).toHaveTextContent('Book');
     await user.click(step);
     const booking = await screen.findByTestId('new-appointment-drawer');
+    const who = await within(booking).findByTestId('appointment-form-who-card');
+    expect(who).toHaveTextContent('Anaya Desai');
+    // The person is the lead's: the booking moves this lead, so the card offers no Change.
+    await user.hover(within(who).getByRole('button', { name: /Anaya Desai/ }));
+    const card = await screen.findByRole('dialog', { name: 'Contact' });
     expect(
-      await within(booking).findByTestId('appointment-form-who-card'),
-    ).toHaveTextContent('Anaya Desai');
+      within(card).getByRole('button', { name: 'Edit contact' }),
+    ).toBeInTheDocument();
+    expect(within(card).queryByRole('button', { name: 'Change contact' })).toBeNull();
   });
 
   it('shows the booking still to happen on Progress — Cancel asks why, Reschedule opens it', async () => {

@@ -49,7 +49,8 @@ New → Contacted → Follow-up ──Book──▶ Appointment scheduled ──
 ```
 
 - **Appointment scheduled is the bookings' step.** Its tile reads "Book" for a member who books
-  (`appointment:create`) and opens the shared booking form on the person; the server moves the
+  (`appointment:create`) and opens the shared booking form on the person — locked to them, with
+  no "Change contact" (D24); the server moves the
   lead once the booking saves (and every appointment write refetches the leads). Without the
   right to book, or on a closed lead, the tile only shows.
 - **While a booking is still to happen** Progress shows "Booked · <when>" with what and with

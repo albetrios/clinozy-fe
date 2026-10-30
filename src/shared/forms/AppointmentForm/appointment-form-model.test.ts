@@ -200,6 +200,7 @@ describe('starting a draft', () => {
     ).toEqual({
       whoId: 'con_riya00000000000000000',
       collapsed: true,
+      lockedWho: true,
       type: 'treatment',
       serviceLabel: 'LHR Treatment',
       durationMin: 20,
@@ -213,6 +214,7 @@ describe('starting a draft', () => {
     ).toEqual({
       whoId: 'con_dev000000000000000000',
       collapsed: true,
+      lockedWho: true,
       type: 'consultation',
       durationMin: 20,
     });

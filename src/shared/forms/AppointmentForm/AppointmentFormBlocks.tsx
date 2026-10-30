@@ -142,7 +142,7 @@ export function WhoBlock({
         if (next.kind === 'who') pickWho(next.who);
         else state.change(next);
       }}
-      canChange={state.mode === 'create' && !state.readOnly}
+      canChange={state.mode === 'create' && !state.readOnly && !state.prefill.lockedWho}
       disabled={state.inert}
       onOpenLead={exits.openLead}
       onSaveContact={saveContact}
