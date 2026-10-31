@@ -59,14 +59,14 @@ By Intake mode `brief`: `BRIEF.md:69` — unit tests for the drawer's GST fields
 
 ## 8. The route — the ordered ledger
 
-| #   | Work item                                                                          | Kind       | Depends on | Skill/driver           | Acceptance        | Assignee | Status  |
-| --- | ---------------------------------------------------------------------------------- | ---------- | ---------- | ---------------------- | ----------------- | -------- | ------- |
-| L-1 | Contracts: the line's GST, the totals, the summary (OpenAPI types from clinozy-be) | api        | BE         | fe-resource-crud       | types compile     | Claude   | planned |
-| L-2 | Purchase-order drawer: GST % per line, inclusive switch, totals                    | structural | L-1        | fe-code-structure      | criterion A-8     | Claude   | planned |
-| L-3 | Order view (and print): GST per line, totals                                       | structural | L-1        | fe-code-structure      | criterion A-8     | Claude   | planned |
-| L-4 | GST summary page + CSV                                                             | structural | L-1        | fe-resource-crud       | criterion A-8     | Claude   | planned |
-| L-5 | Copy in every locale, docs                                                         | copy       | L-2–L-4    | fe-i18n-constants      | `pnpm sync:check` | Claude   | planned |
-| L-6 | Gates; close: `AS-BUILT.md`, `done`                                                | gate       | L-5        | fe-before-commit-guard | `pnpm health`     | Claude   | planned |
+| #   | Work item                                                                          | Kind       | Depends on | Skill/driver           | Acceptance        | Assignee | Status |
+| --- | ---------------------------------------------------------------------------------- | ---------- | ---------- | ---------------------- | ----------------- | -------- | ------ |
+| L-1 | Contracts: the line's GST, the totals, the summary (OpenAPI types from clinozy-be) | api        | BE         | fe-resource-crud       | types compile     | Claude   | done   |
+| L-2 | Purchase-order drawer: GST % per line, inclusive switch, totals                    | structural | L-1        | fe-code-structure      | criterion A-8     | Claude   | done   |
+| L-3 | Order view (and print): GST per line, totals                                       | structural | L-1        | fe-code-structure      | criterion A-8     | Claude   | done   |
+| L-4 | GST summary page + CSV                                                             | structural | L-1        | fe-resource-crud       | criterion A-8     | Claude   | done   |
+| L-5 | Copy in every locale, docs                                                         | copy       | L-2–L-4    | fe-i18n-constants      | `pnpm sync:check` | Claude   | done   |
+| L-6 | Gates; close: `AS-BUILT.md`, `done`                                                | gate       | L-5        | fe-before-commit-guard | `pnpm health`     | Claude   | done   |
 
 ## Appendix A — Coverage matrix
 
