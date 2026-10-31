@@ -5,6 +5,7 @@ export {
   roomToolbarTestIds,
 } from './room-toolbar.constants.ts';
 export {
+  ageFilterSection,
   automaticSection,
   type AutomaticSectionValue,
   RoomDateFilter,

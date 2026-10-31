@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  AGE_BANDS,
+  ageBandQueryOf,
   ALL_BRANCHES,
   CREATED_PRESETS,
   dateRangeOf,
@@ -78,5 +80,21 @@ describe('reading a Branches filter from the URL', () => {
     expect(readBranchFilter('3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f')).toBeUndefined();
     expect(readBranchFilter('')).toBeUndefined();
     expect(readBranchFilter(undefined)).toBeUndefined();
+  });
+});
+
+describe('ageBandQueryOf (feat-approximate-age FE5)', () => {
+  it('reads each band as whole years, inclusive, the ends open', () => {
+    expect(AGE_BANDS.map((band) => ageBandQueryOf(band))).toEqual([
+      { age_to: 17 },
+      { age_from: 18, age_to: 29 },
+      { age_from: 30, age_to: 44 },
+      { age_from: 45, age_to: 59 },
+      { age_from: 60 },
+    ]);
+  });
+
+  it('filters nothing without a band', () => {
+    expect(ageBandQueryOf(undefined)).toEqual({});
   });
 });

@@ -305,6 +305,14 @@
       "gender": "Geschlecht",
       "birthDate": "Geburtsdatum",
       "age": "Alter {{age}}",
+      "birthMode": "Geburtsdatum oder Alter",
+      "birthModes": {
+        "date": "Geburtsdatum",
+        "age": "Alter"
+      },
+      "ageYears": "Alter (Jahre)",
+      "agePlaceholder": "z. B. 34",
+      "ageHint": "ca. · zählt jedes Jahr hoch",
       "types": "Patiententyp",
       "typesHint": "beliebig viele",
       "status": "Status",
@@ -338,6 +346,7 @@
     },
     "missing": "Geben Sie Name und Mobilnummer ein",
     "mobileInvalid": "Geben Sie eine 10-stellige Mobilnummer ein",
+    "ageInvalid": "Gib ein Alter von 0 bis 120 ein",
     "created": "Patient {{id}} angelegt",
     "openFile": "Akte öffnen",
     "saved": "{{name}} gespeichert",
@@ -441,6 +450,8 @@
     },
     "genderAge": "{{gender}} · {{age}} J.",
     "age": "{{age}} J.",
+    "approximate": "ca.",
+    "approximateHint": "Alter bei der Anmeldung angegeben — das Geburtsdatum ist geschätzt",
     "cameVia": "Kam über {{source}}",
     "owedToThem": "{{amount}} an sie zurückzuzahlen",
     "owedByThem": "{{amount}} schulden sie der Klinik",
@@ -557,6 +568,15 @@
       "nextSevenDays": "Nächste 7 Tage",
       "notSet": "Nicht festgelegt",
       "range": "Eigener Zeitraum"
+    },
+    "age": {
+      "label": "Alter",
+      "any": "Beliebig",
+      "child": "Unter 18",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60+"
     }
   },
   "commandMenu": {

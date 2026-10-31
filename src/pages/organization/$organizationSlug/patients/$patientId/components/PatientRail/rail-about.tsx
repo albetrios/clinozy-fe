@@ -32,21 +32,26 @@ function AboutRow({ icon, children }: { icon: ReactNode; children: ReactNode }) 
   );
 }
 
-/** "Female · 30 yrs", "Female", "30 yrs" — or nothing (the person card's words). */
+/**
+ * "Female · 30 yrs", "Female", "30 yrs" — or nothing (the person card's words); "· approx." after
+ * an age the desk typed.
+ */
 function useGenderAge(file: PatientFile, today: string): string | null {
   const { t } = useTranslation(PERSON_CARD_NS);
   const { formatNumber } = useLocaleFormat();
-  const { gender, dateOfBirth } = file.patient;
+  const { gender, dateOfBirth, dateOfBirthIsApproximate } = file.patient;
   const age = dateOfBirth ? formatNumber(civilYearsBetween(dateOfBirth, today)) : null;
   const genderLabel = gender ? t(PERSON_CARD_KEYS.gender[gender]) : null;
-  if (genderLabel && age)
-    return t(PERSON_CARD_KEYS.genderAge, { gender: genderLabel, age });
-  if (genderLabel) return genderLabel;
-  return age ? t(PERSON_CARD_KEYS.age, { age }) : null;
+  if (!age) return genderLabel;
+  const line = genderLabel
+    ? t(PERSON_CARD_KEYS.genderAge, { gender: genderLabel, age })
+    : t(PERSON_CARD_KEYS.age, { age });
+  return dateOfBirthIsApproximate ? `${line} · ${t(PERSON_CARD_KEYS.approximate)}` : line;
 }
 
 /**
- * About (H:720): gender and age; the birth date with the birthday chip within
+ * About (H:720): gender and age ("approx." after a typed age, whose estimated date and birthday
+ * are not shown — feat-approximate-age FE4); the birth date with the birthday chip within
  * 45 days ("🎂 in 24 days" / "🎂 today", lav); the language the person asked
  * for (their language tag); the address or "No address"; the consent chips
  * (the person card's).
@@ -57,7 +62,11 @@ export function RailAbout({ file }: { file: PatientFile }) {
   const { formatDate } = useLocaleFormat();
   const today = appToday();
   const genderAge = useGenderAge(file, today);
-  const { dateOfBirth, address, consents } = file.patient;
+  const { address, consents } = file.patient;
+  // A date estimated from a typed age is no birthday
+  const dateOfBirth = file.patient.dateOfBirthIsApproximate
+    ? null
+    : file.patient.dateOfBirth;
   const birthday = birthdayInDays(dateOfBirth, today);
 
   return (

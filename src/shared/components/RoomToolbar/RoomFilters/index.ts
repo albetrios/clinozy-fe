@@ -1,4 +1,5 @@
 export {
+  ageFilterSection,
   automaticSection,
   type AutomaticSectionValue,
   type RoomFilterSection,

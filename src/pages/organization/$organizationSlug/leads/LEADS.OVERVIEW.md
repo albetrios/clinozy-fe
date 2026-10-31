@@ -21,7 +21,7 @@ The toolbar (`RoomToolbar`, layout `leads`) over the shared `DataTable`:
   chip; both wait for the membership, and a caller off the team has none.
 - **Search** a name, a number's digits, `#ID` or `C-12345`; **Filters** Status (one) ·
   Source · Ownership (`ownership` open, releasing today, held) · Team (one member, owner or
-  involved — `team_membership_id`) · Created · Follow-up date (no "Not set" — the API has no
+  involved — `team_membership_id`) · Age (one band — `age_from` / `age_to`) · Created · Follow-up date (no "Not set" — the API has no
   such filter), applied on "Apply filter" to the URL; Leads keeps no saved views;
   **Columns** Lead (always shown) · Status · Source · Interests · Team · Updated.
 - **Rows** (53px; the phone `wrap` layout below `md`): the person card on the name

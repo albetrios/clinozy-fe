@@ -1,4 +1,5 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+import { AGE_BANDS } from '@/shared/api/app/app-list-filters.ts';
 import type { RoomFilterFields } from '@/shared/components/RoomToolbar/index.ts';
 
 import { PATIENT_FILTER_VALUES } from './patients.search.ts';
@@ -72,6 +73,7 @@ export const PATIENT_FILTER_FIELDS = {
     values: PATIENT_FILTER_VALUES.conversion,
     single: true,
   },
+  age: { kind: 'options', values: AGE_BANDS, single: true },
   created: { kind: 'date', presets: 'created' },
   followUp: { kind: 'date', presets: 'followUp', without: ['not_set'] },
 } as const satisfies RoomFilterFields;

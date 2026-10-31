@@ -305,6 +305,14 @@
       "gender": "性別",
       "birthDate": "生年月日",
       "age": "{{age}}歳",
+      "birthMode": "生年月日または年齢",
+      "birthModes": {
+        "date": "生年月日",
+        "age": "年齢"
+      },
+      "ageYears": "年齢（歳）",
+      "agePlaceholder": "例：34",
+      "ageHint": "推定 · 毎年増えます",
       "types": "患者の種別",
       "typesHint": "複数選択可",
       "status": "ステータス",
@@ -338,6 +346,7 @@
     },
     "missing": "氏名と携帯番号を入力してください",
     "mobileInvalid": "10桁の携帯番号を入力してください",
+    "ageInvalid": "0〜120の年齢を入力してください",
     "created": "患者 {{id}} を作成しました",
     "openFile": "ファイルを開く",
     "saved": "{{name}} を保存しました",
@@ -438,6 +447,8 @@
     },
     "genderAge": "{{gender}} · {{age}}歳",
     "age": "{{age}}歳",
+    "approximate": "推定",
+    "approximateHint": "登録時に伝えられた年齢 — 生年月日は推定です",
     "cameVia": "{{source}}経由",
     "owedToThem": "返金予定 {{amount}}",
     "owedByThem": "クリニックへの未払い {{amount}}",
@@ -553,6 +564,15 @@
       "nextSevenDays": "今後 7 日間",
       "notSet": "未設定",
       "range": "期間を指定"
+    },
+    "age": {
+      "label": "年齢",
+      "any": "すべて",
+      "child": "18歳未満",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60歳以上"
     }
   },
   "commandMenu": {
