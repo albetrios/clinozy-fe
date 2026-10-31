@@ -5,6 +5,8 @@ vi.mock('@/shared/errors/errorHandler.ts', () => ({
   reportError: vi.fn(),
   notifyError: vi.fn(),
   notifyQueryError: notifyQueryErrorMock,
+  apiErrorReason: (error: unknown) =>
+    (error as { data?: { error?: { reason?: string } } }).data?.error?.reason,
 }));
 
 vi.mock('@/core/http/fetch-client.ts', () => ({
@@ -20,7 +22,12 @@ vi.mock('@/core/http/fetch-client.ts', () => ({
 import { reportError } from '@/shared/errors/errorHandler.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
-import { keyHead, queryClient } from './queryClient.ts';
+import {
+  isOrganizationAccessRefusal,
+  keyHead,
+  onOrganizationAccessRefused,
+  queryClient,
+} from './queryClient.ts';
 
 /** A query object shaped the way the cache callback reads it. */
 function fakeQuery(meta?: Record<string, unknown>) {
@@ -147,5 +154,47 @@ describe('queryClient', () => {
     expect(retryFn(1, answer(500))).toBe(true);
     expect(retryFn(2, answer(500))).toBe(false);
     expect(retryFn(0, answer(0))).toBe(true);
+  });
+
+  // E-3: the tenancy layer hears the 403s that question the caller's access to the clinic.
+  describe('organization-access refusals', () => {
+    const refusal = (status: number, reason?: string) =>
+      new HttpError('Forbidden', status, '/api/v1/app/patients', 'GET', {
+        error: reason ? { reason } : {},
+      });
+
+    it('knows a refused access from any other refusal', () => {
+      expect(isOrganizationAccessRefusal(refusal(403, 'missing_permission'))).toBe(true);
+      expect(isOrganizationAccessRefusal(refusal(403, 'not_a_member'))).toBe(true);
+      for (const reason of ['mfa_required', 'organization_read_only', undefined]) {
+        expect(isOrganizationAccessRefusal(refusal(403, reason))).toBe(false);
+      }
+      expect(isOrganizationAccessRefusal(refusal(404, 'missing_permission'))).toBe(false);
+    });
+
+    it('tells the one listener about a refused read and a refused write', () => {
+      const listener = vi.fn();
+      const stop = onOrganizationAccessRefused(listener);
+      const denied = refusal(403, 'missing_permission');
+
+      queryClient.getQueryCache().config.onError?.(denied, fakeQuery());
+      queryClient
+        .getMutationCache()
+        .config.onError?.(
+          denied,
+          undefined,
+          undefined,
+          { options: {} } as never,
+          {} as never,
+        );
+      queryClient
+        .getQueryCache()
+        .config.onError?.(refusal(403, 'mfa_required'), fakeQuery());
+      stop();
+      queryClient.getQueryCache().config.onError?.(denied, fakeQuery());
+
+      expect(listener).toHaveBeenCalledTimes(2);
+      expect(listener).toHaveBeenCalledWith(denied);
+    });
   });
 });

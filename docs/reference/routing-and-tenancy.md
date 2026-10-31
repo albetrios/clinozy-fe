@@ -189,7 +189,10 @@ Implemented chain for `/organization/acme/…` (shell guards on `$organizationSl
 6. **Resource scope is NOT a frontend guard** — the route loader's data fetch _is_ the check:
    the API returns the resource scoped to the organization (and parent resource), and a
    standardized error mapping turns API 404/403 into the NotFound/Unauthorized islands.
-   One fetch, no guard-then-fetch waterfall.
+   One fetch, no guard-then-fetch waterfall. A 403 that questions the access itself
+   (`missing_permission`, `not_a_member`) also makes the tab re-read me/context and the membership
+   list; when the access changed, that clinic's cache is dropped and the guards run again
+   (`shared/tenancy/organization-access.ts`).
 
 Frontend guards are UX only; the backend/RLS enforces authority.
 

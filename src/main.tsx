@@ -46,6 +46,7 @@ import {
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 import { startViewAsWriteHold } from '@/shared/store/useUIStore/index.ts';
+import { startOrganizationAccessFollow } from '@/shared/tenancy/organization-access.ts';
 import { resolveOrganizationFromSubdomain } from '@/shared/tenancy/tenancy-service.ts';
 
 import App from './App.tsx';
@@ -185,6 +186,11 @@ startConsentFollow();
 // View-as previews what a role sees; the clinic's writes stay here while it runs, since they
 // would go out as the signed-in member.
 startViewAsWriteHold();
+
+// A role downgraded or a membership ended elsewhere: on clinozy-be's first 403 that questions the
+// caller's access to the clinic, read the access again and, when it changed, drop that clinic's
+// cache and run the guards again — never the old role's records from cache.
+startOrganizationAccessFollow({ revalidate: () => router.invalidate() });
 
 // Recover from a lazy chunk that a newer deploy has already renamed away: one
 // reload onto the current build per buildId, never over a field being typed in.

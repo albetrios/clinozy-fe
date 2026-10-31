@@ -45,6 +45,17 @@ tests.
 widening access in the UI.
 **Enforced by:** `organization-membership.ts` (`ensurePermissionsFor`).
 
+## A refused access is re-read, never served from cache
+
+**Must:** a 403 whose `error.reason` questions the caller's access to the active clinic
+(`missing_permission`, `not_a_member`) makes the tab read me/context and the membership list
+again; when the access changed, that clinic's cached queries are dropped and the guards run
+again.
+**Because:** a role downgraded or a membership ended elsewhere otherwise leaves the old
+permission set and the old role's cache (patient files) on screen for the stale time.
+**Enforced by:** `organization-access.ts` (`startOrganizationAccessFollow`, started in
+`main.tsx`) + `core/http/queryClient.ts` (`onOrganizationAccessRefused`) and their tests.
+
 ## `switchToPersonal` gates on `personalOrganizationId`, not the flag
 
 **Must:** only POST `/auth/switch-to-personal` when `me/context` carries a

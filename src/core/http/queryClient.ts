@@ -4,11 +4,62 @@ import { HTTP } from '@/core/config/constants.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import { isUnauthorized } from '@/core/http/fetch-client.ts';
 import {
+  apiErrorReason,
   notifyError,
   notifyQueryError,
   reportError,
 } from '@/shared/errors/errorHandler.ts';
-import { isClientRefusal } from '@/shared/errors/HttpError.ts';
+import {
+  type HttpError,
+  isClientRefusal,
+  isHttpError,
+} from '@/shared/errors/HttpError.ts';
+
+/**
+ * The `error.reason`s of a clinozy-be 403 that question the caller's access to the active
+ * organization itself: a permission the member's role does not hold (any more), or no
+ * membership at all. A step-up, an MFA policy or a read-only plan is not one.
+ */
+const ORGANIZATION_ACCESS_REFUSALS = new Set(['missing_permission', 'not_a_member']);
+
+/** Whether clinozy-be refused this read or write for the caller's access to the organization. */
+export function isOrganizationAccessRefusal(error: unknown): error is HttpError {
+  return (
+    isHttpError(error) &&
+    error.status === 403 &&
+    ORGANIZATION_ACCESS_REFUSALS.has(apiErrorReason(error) ?? '')
+  );
+}
+
+type OrganizationAccessRefusedListener = (error: HttpError) => void;
+
+let accessRefusedListener: OrganizationAccessRefusedListener | null = null;
+
+/**
+ * Hear every query or mutation clinozy-be refuses with an organization-access 403
+ * ({@link isOrganizationAccessRefusal}) — the one listener, set by the tenancy layer, which
+ * the kernel may not import (`shared/tenancy/organization-access.ts`).
+ *
+ * @returns A function that stops listening.
+ */
+export function onOrganizationAccessRefused(
+  listener: OrganizationAccessRefusedListener,
+): () => void {
+  accessRefusedListener = listener;
+  return () => {
+    if (accessRefusedListener === listener) accessRefusedListener = null;
+  };
+}
+
+/** Tell the listener, if the error is an organization-access refusal. Never throws. */
+function noticeAccessRefusal(error: unknown): void {
+  if (!isOrganizationAccessRefusal(error)) return;
+  try {
+    accessRefusedListener?.(error);
+  } catch {
+    /* the cache's own error handling must run regardless */
+  }
+}
 
 /**
  * What Sentry hears of a query or mutation key: its leading words (`app,contacts`), never
@@ -51,6 +102,8 @@ export const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError: (error, query) => {
+      // A role downgraded or a membership ended since this screen loaded (E-3).
+      noticeAccessRefusal(error);
       // Only handle non-auth errors here — fetch client owns 401s
       if (!isUnauthorized(error)) {
         if (platformConfig.debugLogging) {
@@ -75,6 +128,7 @@ export const queryClient = new QueryClient({
   }),
   mutationCache: new MutationCache({
     onError: (error, _variables, _context, mutation) => {
+      noticeAccessRefusal(error);
       if (!isUnauthorized(error)) {
         if (platformConfig.debugLogging) {
           const key = mutation.options.mutationKey?.toString() ?? 'unknown';
