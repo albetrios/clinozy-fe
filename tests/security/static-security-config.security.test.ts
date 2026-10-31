@@ -160,6 +160,18 @@ describe('content security policy (index.html meta)', () => {
     expect(match?.[1]).not.toMatch(/script-src[^;]*unsafe-(inline|eval)/);
   });
 
+  it('runs no script from PostHog’s CDN in the meta CSP either — the header’s script-src exactly', () => {
+    const meta = indexHtml.match(
+      /http-equiv="Content-Security-Policy"[\s\S]*?content="([^"]*)"/,
+    );
+    const metaScript = /script-src ([^;]*);/.exec(meta?.[1] ?? '')?.[1]?.trim();
+    const headerScript = /script-src ([^;]*)/.exec(
+      buildContentSecurityPolicy(undefined),
+    )?.[1];
+    expect(metaScript).toBe(headerScript);
+    expect(metaScript).not.toMatch(/posthog/);
+  });
+
   it('does NOT carry a frame-ancestors directive in the meta CSP (header-only directive — it lives in public/_headers)', () => {
     expect(indexHtml).not.toMatch(/frame-ancestors\s+'/);
   });

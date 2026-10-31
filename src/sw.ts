@@ -10,20 +10,13 @@ import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 
 declare const self: ServiceWorkerGlobalScope;
 
-/** Heavy deferred chunks — precache shell only; fetch at runtime when needed. */
-const DEFERRED_PRECACH_PATTERN =
-  /\/(sentry|posthog|SettingsModal|CommandPalette|AppearanceDialog)-/;
-
-function shouldPrecache(entry: string | { url: string }): boolean {
-  const url = typeof entry === 'string' ? entry : entry.url;
-  return !DEFERRED_PRECACH_PATTERN.test(url);
-}
-
 // Clean old caches on SW update
 cleanupOutdatedCaches();
 
-const manifest = self.__WB_MANIFEST.filter(shouldPrecache);
-precacheAndRoute(manifest);
+// The manifest is the app shell alone, chosen at build time (`plugins/app-shell-precache.ts`,
+// F-8) — the heavy deferred chunks (Sentry, PostHog, the Settings and command-palette trees)
+// are never in it, so nothing is filtered here.
+precacheAndRoute(self.__WB_MANIFEST);
 
 // Version-update handshake (core/version/check.ts): index.html is precached, so
 // while an OLD worker controls the page a plain reload re-serves the OLD shell

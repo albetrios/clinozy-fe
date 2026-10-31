@@ -119,6 +119,12 @@ describe('buildContentSecurityPolicy', () => {
     expect(policy).toContain('frame-src https://challenges.cloudflare.com');
   });
 
+  it('lets PostHog fetch its config from its CDN, never run a script from it', () => {
+    // `disable_external_dependency_loading` (src/app/analytics/posthog.ts): no CDN script loads.
+    expect(policy).toMatch(/connect-src [^;]*https:\/\/us-assets\.i\.posthog\.com/);
+    expect(policy).not.toMatch(/script-src[^;]*posthog/);
+  });
+
   it('allowlists Stripe.js in script-src, frame-src, and connect-src', () => {
     expect(policy).toContain('https://js.stripe.com');
     expect(policy).toContain('https://hooks.stripe.com');

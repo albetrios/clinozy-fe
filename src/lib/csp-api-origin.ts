@@ -87,10 +87,12 @@ const STRIPE_ORIGINS = [
 ] as const;
 
 /**
- * PostHog serves its analytics API from us.i.posthog.com and lazy-loads
- * additional scripts (array/config.js, surveys.js, …) from us-assets — so this
- * host must be in BOTH connect-src and script-src, or the browser blocks the
- * script loads (a real CSP violation seen on the deployed login page).
+ * PostHog serves its analytics API from us.i.posthog.com and its remote config from
+ * us-assets (`/array/<key>/config`) — fetched, so this host is in `connect-src`. It is not in
+ * `script-src`: the app sets `disable_external_dependency_loading` (`src/app/analytics/posthog.ts`),
+ * so PostHog loads no script from its CDN — the `config.js` it would try first is refused before
+ * any request and it reads the same config as JSON — and a CDN script host is one less origin able
+ * to run code in the page.
  */
 const POSTHOG_ASSETS_ORIGIN = 'https://us-assets.i.posthog.com';
 
@@ -173,7 +175,7 @@ export function buildContentSecurityPolicy(
     "default-src 'self'",
     // Cloudflare Turnstile: the challenge script is loaded from challenges.cloudflare.com
     // and renders inside an iframe from the same origin (frame-src below).
-    `script-src 'self' ${TURNSTILE_ORIGIN} ${STRIPE_ORIGINS[0]} ${POSTHOG_ASSETS_ORIGIN}`,
+    `script-src 'self' ${TURNSTILE_ORIGIN} ${STRIPE_ORIGINS[0]}`,
     "style-src 'self' 'unsafe-inline'",
     `connect-src ${connectSrc.join(' ')}`,
     `img-src 'self' data: blob: ${storedFiles.join(' ')}`,
