@@ -1317,6 +1317,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/app/medical-purchase-orders/gst-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Summarize purchase GST for a month */
+        get: operations["getAppMedicalPurchaseOrdersGstSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/app/medical-purchase-orders/gst-summary/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export the purchase GST summary */
+        get: operations["getAppMedicalPurchaseOrdersGstSummaryExports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/app/medical-reps": {
         parameters: {
             query?: never;
@@ -12964,6 +12998,7 @@ export interface operations {
                             deleted_at?: string | null;
                             due_amount?: number;
                             free_count?: number;
+                            gst_total?: number;
                             id?: string;
                             item_count?: number;
                             items?: {
@@ -12971,13 +13006,18 @@ export interface operations {
                                 batch_number?: string | null;
                                 expiry_month?: string | null;
                                 free_quantity?: number;
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
                                 id?: string;
+                                is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                taxable_amount?: number;
                             }[];
                             /** Format: date */
                             order_date?: string;
@@ -12996,6 +13036,7 @@ export interface operations {
                                 phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
+                            taxable_total?: number;
                             total?: number;
                             /** Format: date-time */
                             updated_at?: string;
@@ -13034,6 +13075,9 @@ export interface operations {
                 "application/json": {
                     items: {
                         free_quantity?: number;
+                        /** @enum {number} */
+                        gst_percent?: 0 | 5 | 12 | 18 | 28;
+                        is_gst_inclusive?: boolean;
                         medicine_id?: string;
                         mrp?: number | null;
                         new_medicine_name?: string;
@@ -13067,6 +13111,7 @@ export interface operations {
                             deleted_at?: string | null;
                             due_amount?: number;
                             free_count?: number;
+                            gst_total?: number;
                             id?: string;
                             item_count?: number;
                             items?: {
@@ -13074,13 +13119,18 @@ export interface operations {
                                 batch_number?: string | null;
                                 expiry_month?: string | null;
                                 free_quantity?: number;
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
                                 id?: string;
+                                is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                taxable_amount?: number;
                             }[];
                             /** Format: date */
                             order_date?: string;
@@ -13099,6 +13149,7 @@ export interface operations {
                                 phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
+                            taxable_total?: number;
                             total?: number;
                             /** Format: date-time */
                             updated_at?: string;
@@ -13149,6 +13200,7 @@ export interface operations {
                             deleted_at?: string | null;
                             due_amount?: number;
                             free_count?: number;
+                            gst_total?: number;
                             id?: string;
                             item_count?: number;
                             items?: {
@@ -13156,13 +13208,18 @@ export interface operations {
                                 batch_number?: string | null;
                                 expiry_month?: string | null;
                                 free_quantity?: number;
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
                                 id?: string;
+                                is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                taxable_amount?: number;
                             }[];
                             /** Format: date */
                             order_date?: string;
@@ -13181,6 +13238,7 @@ export interface operations {
                                 phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
+                            taxable_total?: number;
                             total?: number;
                             /** Format: date-time */
                             updated_at?: string;
@@ -13249,6 +13307,9 @@ export interface operations {
                     expected_updated_at?: string;
                     items?: {
                         free_quantity?: number;
+                        /** @enum {number} */
+                        gst_percent?: 0 | 5 | 12 | 18 | 28;
+                        is_gst_inclusive?: boolean;
                         medicine_id?: string;
                         mrp?: number | null;
                         new_medicine_name?: string;
@@ -13282,6 +13343,7 @@ export interface operations {
                             deleted_at?: string | null;
                             due_amount?: number;
                             free_count?: number;
+                            gst_total?: number;
                             id?: string;
                             item_count?: number;
                             items?: {
@@ -13289,13 +13351,18 @@ export interface operations {
                                 batch_number?: string | null;
                                 expiry_month?: string | null;
                                 free_quantity?: number;
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
                                 id?: string;
+                                is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                taxable_amount?: number;
                             }[];
                             /** Format: date */
                             order_date?: string;
@@ -13314,6 +13381,7 @@ export interface operations {
                                 phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
+                            taxable_total?: number;
                             total?: number;
                             /** Format: date-time */
                             updated_at?: string;
@@ -13360,6 +13428,9 @@ export interface operations {
                         batch_number?: string;
                         expiry_month?: string;
                         free_quantity?: number;
+                        /** @enum {number} */
+                        gst_percent?: 0 | 5 | 12 | 18 | 28;
+                        is_gst_inclusive?: boolean;
                         medicine_id?: string;
                         mrp?: number | null;
                         new_medicine_name?: string;
@@ -13390,6 +13461,7 @@ export interface operations {
                             deleted_at?: string | null;
                             due_amount?: number;
                             free_count?: number;
+                            gst_total?: number;
                             id?: string;
                             item_count?: number;
                             items?: {
@@ -13397,13 +13469,18 @@ export interface operations {
                                 batch_number?: string | null;
                                 expiry_month?: string | null;
                                 free_quantity?: number;
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
                                 id?: string;
+                                is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                taxable_amount?: number;
                             }[];
                             /** Format: date */
                             order_date?: string;
@@ -13422,6 +13499,7 @@ export interface operations {
                                 phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
+                            taxable_total?: number;
                             total?: number;
                             /** Format: date-time */
                             updated_at?: string;
@@ -13475,6 +13553,7 @@ export interface operations {
                             deleted_at?: string | null;
                             due_amount?: number;
                             free_count?: number;
+                            gst_total?: number;
                             id?: string;
                             item_count?: number;
                             items?: {
@@ -13482,13 +13561,18 @@ export interface operations {
                                 batch_number?: string | null;
                                 expiry_month?: string | null;
                                 free_quantity?: number;
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
                                 id?: string;
+                                is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                taxable_amount?: number;
                             }[];
                             /** Format: date */
                             order_date?: string;
@@ -13507,6 +13591,7 @@ export interface operations {
                                 phone?: string | null;
                             };
                             supplier_bill_number?: string | null;
+                            taxable_total?: number;
                             total?: number;
                             /** Format: date-time */
                             updated_at?: string;
@@ -13544,6 +13629,103 @@ export interface operations {
                 sort?: "order_date" | "purchase_order_number" | "total" | "created_at";
                 stage?: string;
                 supplier_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            content?: string;
+                            /** @enum {string} */
+                            content_type?: "text/csv";
+                            file_name?: string;
+                            is_truncated?: boolean;
+                            row_count?: number;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    getAppMedicalPurchaseOrdersGstSummary: {
+        parameters: {
+            query: {
+                month: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            by_hsn?: {
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
+                                hsn_code?: string | null;
+                                line_count?: number;
+                                taxable_amount?: number;
+                                total_amount?: number;
+                            }[];
+                            by_rate?: {
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
+                                line_count?: number;
+                                taxable_amount?: number;
+                                total_amount?: number;
+                            }[];
+                            month?: string;
+                            totals?: {
+                                gst_amount?: number;
+                                line_count?: number;
+                                order_count?: number;
+                                taxable_amount?: number;
+                                total_amount?: number;
+                            };
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    getAppMedicalPurchaseOrdersGstSummaryExports: {
+        parameters: {
+            query: {
+                month: string;
             };
             header?: never;
             path?: never;
@@ -32447,6 +32629,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    former_owner_role_id?: string;
                     new_owner_user_id: string;
                 };
             };
