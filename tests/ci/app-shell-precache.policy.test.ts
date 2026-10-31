@@ -38,7 +38,8 @@ const CHUNKS: Record<string, string> = {
   'assets/DataTable-y8.js': 'export const d=1;',
 };
 
-const ENTRIES = [
+/** Every file the build emitted — the URLs Workbox would precache before the transform. */
+const ASSET_FILES = [
   'index.html',
   'offline.html',
   'theme-init.js',
@@ -47,7 +48,12 @@ const ENTRIES = [
   'assets/inter-latin-400.woff2',
   'assets/patients-route-m4.css',
   ...Object.keys(CHUNKS),
-].map((url) => ({ url, revision: null, size: 1 }));
+];
+
+const ENTRIES = ASSET_FILES.map((url) => ({ url, revision: null, size: 1 }));
+
+/** The files the transform reads off `dist/`: the shell's HTML and every chunk. */
+const DIST_FILES: Record<string, string> = { 'index.html': INDEX_HTML, ...CHUNKS };
 
 const readChunk = (file: string) => CHUNKS[file] ?? '';
 
@@ -64,7 +70,7 @@ describe('the service worker precaches the app shell, not the whole app (F-8)', 
   it('adds each boot-lazy shell chunk with every chunk it imports statically — never a lazy one', () => {
     const shell = appShellFiles({
       indexHtml: INDEX_HTML,
-      assetFiles: ENTRIES.map((entry) => entry.url),
+      assetFiles: ASSET_FILES,
       readChunk,
     });
     expect([...shell].sort()).toEqual(
@@ -89,9 +95,7 @@ describe('the service worker precaches the app shell, not the whole app (F-8)', 
       expect(() =>
         appShellFiles({
           indexHtml: INDEX_HTML,
-          assetFiles: ENTRIES.map((entry) => entry.url).filter(
-            (url) => !url.startsWith(`assets/${name}-`),
-          ),
+          assetFiles: ASSET_FILES.filter((url) => !url.startsWith(`assets/${name}-`)),
           readChunk,
         }),
       ).toThrow(new RegExp(`assets/${name}-`));
@@ -102,8 +106,7 @@ describe('the service worker precaches the app shell, not the whole app (F-8)', 
     const outDir = mkdtempSync(join(tmpdir(), 'app-shell-precache-'));
     try {
       mkdirSync(join(outDir, 'assets'));
-      writeFileSync(join(outDir, 'index.html'), INDEX_HTML);
-      for (const [file, text] of Object.entries(CHUNKS))
+      for (const [file, text] of Object.entries(DIST_FILES))
         writeFileSync(join(outDir, file), text);
 
       const { manifest } = await appShellPrecache(outDir)(ENTRIES);

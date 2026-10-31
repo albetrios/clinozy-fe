@@ -72,8 +72,14 @@ const escapeForPattern = (text: string) => text.replace(/[.*+?^${}()|[\]\\/]/g, 
 export function sentryTracePropagationTargets(apiBaseUrl: string): RegExp[] {
   const targets = [/^\/api\//];
   const origin = getCspConnectSrcOrigin(apiBaseUrl);
-  // eslint-disable-next-line security/detect-non-literal-regexp -- an escaped origin from our own build env
-  if (origin) targets.push(new RegExp(`^${escapeForPattern(origin)}/`));
+  if (!origin) return targets;
+  // Linear on any URL, so no ReDoS: an anchor, the origin with every metacharacter escaped, a
+  // slash — no quantifier, group or alternation. The origin is the deploy's own `API_BASE_URL`,
+  // of which `getCspConnectSrcOrigin` keeps only an http(s) URL's origin.
+  /* eslint-disable security/detect-non-literal-regexp -- the linear pattern described above */
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp — the linear pattern described above
+  targets.push(new RegExp(`^${escapeForPattern(origin)}/`));
+  /* eslint-enable security/detect-non-literal-regexp */
   return targets;
 }
 
