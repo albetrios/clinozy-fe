@@ -1,5 +1,5 @@
 import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
-import { type CSSProperties, type ReactNode, type RefObject, useRef } from 'react';
+import { type CSSProperties, type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
@@ -164,11 +164,15 @@ function EmptyLine({ tab }: { tab: TaskTab }) {
   );
 }
 
-/** What {@link GroupedRows} draws: the list's rows and how each reads, and its scroller. */
+/**
+ * What {@link GroupedRows} draws: the list's rows and how each reads, and its scroller — the
+ * element itself, not a ref: the scroller is the parent's, attached only after this child's
+ * layout effects ran, so a ref would leave the virtualizer without it until some later render.
+ */
 type GroupedRowsProps = Pick<
   TaskListProps,
   'tab' | 'rows' | 'refreshing' | 'now' | 'handled' | 'team' | 'onOpen' | 'contactActions'
-> & { scrollerRef: RefObject<HTMLDivElement | null> };
+> & { scroller: HTMLDivElement | null };
 
 /** Space the rows out of view hold while the list virtualises (px, `--task-gap`). */
 function Gap({ height }: { height: number }) {
@@ -189,7 +193,7 @@ function Gap({ height }: { height: number }) {
  */
 function useGroupWindows(
   layout: TaskListLayout,
-  scrollerRef: RefObject<HTMLDivElement | null>,
+  scroller: HTMLDivElement | null,
 ): { windows: GroupWindow[]; measure: (node: HTMLDivElement | null) => void } | null {
   const virtualizing = layout.entries.length > VIRTUALIZE_ABOVE;
   const estimate = (index: number) =>
@@ -199,7 +203,7 @@ function useGroupWindows(
   // eslint-disable-next-line react-hooks/incompatible-library -- see above
   const virtualizer = useVirtualizer<HTMLDivElement, HTMLDivElement>({
     count: layout.entries.length,
-    getScrollElement: () => scrollerRef.current,
+    getScrollElement: () => scroller,
     estimateSize: estimate,
     // An unlaid-out entry reads 0 tall; keep the estimate instead.
     measureElement: (element) =>
@@ -243,14 +247,14 @@ function GroupedRows({
   team,
   onOpen,
   contactActions,
-  scrollerRef,
+  scroller,
 }: GroupedRowsProps) {
   const { t } = useTranslation(TASKS_NS);
   // Rows sit under "Due today" / "Coming up": today's due times read bare.
   const dueLabel = useTaskDueLabel({ sameDay: true });
   const groups = groupTasks(rows, tab, now);
   const layout = taskListLayout(groups);
-  const windowing = useGroupWindows(layout, scrollerRef);
+  const windowing = useGroupWindows(layout, scroller);
   const renderRow = (row: TaskRowRecord, index?: number) => (
     <TaskRow
       key={row.id}
@@ -344,7 +348,8 @@ function GroupedRows({
  * type turns the rows on screen to bars until the next arrive; a read that
  * fails with nothing to show is the error with Retry, in place. Cursor pages
  * of 50 (`GET /app/tasks`, the server's due order) load as the end scrolls in
- * (D7) — no end line.
+ * (D7) — no end line. Above 60 entries only the rows in view render, each group
+ * keeping its rowgroup and sticky header (`task-list-window.ts`, G-2).
  */
 export function TaskList({
   tab,
@@ -366,7 +371,7 @@ export function TaskList({
   const { t } = useTranslation(TASKS_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [scroller, setScroller] = useState<HTMLDivElement | null>(null);
   useLoadMoreSentinel(sentinelRef, {
     hasNextPage: hasNextPage && !loading && !refreshing && !failed,
     isFetchingNextPage,
@@ -401,7 +406,7 @@ export function TaskList({
         team={team}
         onOpen={onOpen}
         contactActions={contactActions}
-        scrollerRef={scrollerRef}
+        scroller={scroller}
       />
     );
   }
@@ -414,7 +419,7 @@ export function TaskList({
         className,
       )}
     >
-      <div ref={scrollerRef} className="flex min-h-0 flex-1 flex-col overflow-auto">
+      <div ref={setScroller} className="flex min-h-0 flex-1 flex-col overflow-auto">
         {body}
         {isFetchingNextPage ? (
           <SkeletonRows rows={LOADING_MORE_ROWS} avatar rowClassName={SKELETON_ROW} />
