@@ -74,10 +74,10 @@ export interface PatientDrawerPrefill {
 export const PATIENT_BIRTH_MODES = ['date', 'age'] as const;
 
 /** One of {@link PATIENT_BIRTH_MODES}. */
-export type PatientBirthMode = (typeof PATIENT_BIRTH_MODES)[number];
+type PatientBirthMode = (typeof PATIENT_BIRTH_MODES)[number];
 
 /** The oldest age the desk can type — the API's bound. */
-export const PATIENT_AGE_MAX = 120;
+const PATIENT_AGE_MAX = 120;
 
 /** The form's own limits (`patients.md:44–58`): the contract allows more for address and notes. */
 export const PATIENT_FORM_LIMITS = {
