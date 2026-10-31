@@ -9,7 +9,7 @@
 export const VIRTUALIZE_ABOVE = 60;
 
 /** One entry as the virtualizer counts it: a group's header, or one of its rows. */
-export interface TaskListEntry {
+interface TaskListEntry {
   kind: 'header' | 'row';
   /** The group it belongs to, by index. */
   group: number;
