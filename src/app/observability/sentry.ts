@@ -2,7 +2,12 @@ import type * as SentryReact from '@sentry/react';
 import type { AnyRouter } from '@tanstack/react-router';
 
 import { platformConfig } from '@/core/config/env.ts';
-import { scrubEventUrls } from '@/lib/telemetry-scrub.ts';
+import { getCspConnectSrcOrigin } from '@/lib/csp-api-origin.ts';
+import {
+  scrubEventUrls,
+  scrubRecordingEventUrls,
+  scrubReplayEventUrls,
+} from '@/lib/telemetry-scrub.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
@@ -34,12 +39,42 @@ function syncOrganizationTags(Sentry: SentryModule): void {
   }
 }
 
-/** Session recording, masked: no text, no media. */
+/**
+ * The attributes Session Replay masks: the SDK's own three, plus `href` — a link's target carries
+ * the page's query (a room's search `?q=`), and `maskAllText` leaves attributes as they are.
+ */
+const REPLAY_MASKED_ATTRIBUTES = ['title', 'placeholder', 'aria-label', 'href'];
+
+/**
+ * Session recording, masked: no text, no media, no link targets, and no query string in a
+ * recorded breadcrumb's or span's URL (`scrubRecordingEventUrls`).
+ */
 function sessionReplayIntegration(Sentry: SentryModule) {
   return Sentry.replayIntegration({
     maskAllText: true,
     blockAllMedia: true,
+    maskAttributes: REPLAY_MASKED_ATTRIBUTES,
+    beforeAddRecordingEvent: scrubRecordingEventUrls,
   });
+}
+
+/** Escape a string for use inside a regular expression. */
+const escapeForPattern = (text: string) => text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+
+/**
+ * Where Sentry may send trace headers (`sentry-trace`, `baggage`): clinozy-be alone — a
+ * same-origin `/api/` path (the dev proxy, a same-origin deploy) and the configured API origin,
+ * matched exactly up to its first `/`. Never another host: a third-party API would learn the
+ * trace and release, and a CORS preflight it never expected would fail.
+ *
+ * @param apiBaseUrl - `platformConfig.apiBaseUrl` (`VITE_API_BASE_URL`); empty = same-origin.
+ */
+export function sentryTracePropagationTargets(apiBaseUrl: string): RegExp[] {
+  const targets = [/^\/api\//];
+  const origin = getCspConnectSrcOrigin(apiBaseUrl);
+  // eslint-disable-next-line security/detect-non-literal-regexp -- an escaped origin from our own build env
+  if (origin) targets.push(new RegExp(`^${escapeForPattern(origin)}/`));
+  return targets;
 }
 
 function buildIntegrations(
@@ -155,7 +190,7 @@ export async function initSentry(router: AnyRouter): Promise<void> {
     // (browserProfilingIntegration defaults to 'manual', which never profiles on its own.)
     profileSessionSampleRate: platformConfig.sentryProfilesSampleRate,
     profileLifecycle: 'trace',
-    tracePropagationTargets: ['localhost', /^https:\/\/api\./, /^\/api\//],
+    tracePropagationTargets: sentryTracePropagationTargets(platformConfig.apiBaseUrl),
 
     replaysSessionSampleRate: platformConfig.sentryReplaysSessionSampleRate,
     replaysOnErrorSampleRate: platformConfig.sentryReplaysOnErrorSampleRate,
@@ -200,6 +235,9 @@ export async function initSentry(router: AnyRouter): Promise<void> {
       return scrubEventUrls(event);
     },
   });
+
+  // Replay events skip beforeSend: their page URLs are scrubbed here.
+  Sentry.addEventProcessor((event) => scrubReplayEventUrls(event));
 
   if (platformConfig.appBuildId) {
     Sentry.setTag('app.build_id', platformConfig.appBuildId);

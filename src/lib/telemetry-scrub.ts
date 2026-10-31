@@ -9,7 +9,8 @@
  * names missed every param added after it (`q`, SEC-01), so nothing after the
  * path is kept: `$pathname` and `route_viewed`'s `route_id` still say where the
  * person was. Every outgoing event passes through here (Sentry `request.url`,
- * breadcrumbs, spans, extras and contexts; PostHog `properties`, `$set` and
+ * breadcrumbs, spans, extras and contexts; a Session Replay segment's `urls` and
+ * its recording's breadcrumbs and spans; PostHog `properties`, `$set` and
  * `$set_once`).
  */
 
@@ -78,4 +79,61 @@ export function scrubEventUrls<E extends ScrubbableEvent>(event: E): E {
   if (event.extra) scrubObjectUrls(event.extra);
   if (event.contexts) scrubObjectUrls(event.contexts);
   return event;
+}
+
+/** Structural slice of a Sentry Session Replay event: the pages one segment visited. */
+type ScrubbableReplayEvent = ScrubbableEvent & { type?: string; urls?: string[] };
+
+/**
+ * Scrub a Session Replay event (`type: 'replay_event'`), in place: `urls` — every page the
+ * segment visited, a room's search `?q=` among them — and `request.url`, which the browser SDK
+ * stamps on every event from `location.href`. Replay events skip `beforeSend`, so this runs as an
+ * event processor; any other event comes back untouched (`beforeSend` scrubs those).
+ */
+export function scrubReplayEventUrls<E extends ScrubbableReplayEvent>(event: E): E {
+  if (event.type !== 'replay_event') return event;
+  event.urls?.forEach((url, index, urls) => {
+    urls[index] = scrubSensitiveUrl(url);
+  });
+  return scrubEventUrls(event);
+}
+
+/**
+ * The fields of a Session Replay recording event that carry a URL: a navigation breadcrumb's
+ * `from`/`to`, a slow- or multi-click breadcrumb's `url`, a span's `description` (the page or
+ * request URL) and a link's `href` / an element's `src`.
+ */
+const RECORDING_URL_KEYS: ReadonlySet<string> = new Set([
+  'href',
+  'src',
+  'url',
+  'to',
+  'from',
+  'description',
+]);
+
+/**
+ * Scrub the URLs in one Session Replay recording event, in place — its `beforeAddRecordingEvent`
+ * (the SDK hands it the breadcrumb and span events). Only the {@link RECORDING_URL_KEYS} fields
+ * are rewritten, so recorded text and styles are left as they are.
+ */
+export function scrubRecordingEventUrls<E extends object>(event: E): E {
+  const pending: object[] = [event];
+  for (let next = pending.pop(); next !== undefined; next = pending.pop()) {
+    pending.push(...scrubRecordingFields(next));
+  }
+  return event;
+}
+
+/** Scrub one object's URL fields in place; returns its nested objects, still to visit. */
+function scrubRecordingFields(record: object): object[] {
+  const nested: object[] = [];
+  for (const [key, value] of Object.entries(record)) {
+    if (value && typeof value === 'object') nested.push(value);
+    else if (typeof value === 'string' && RECORDING_URL_KEYS.has(key)) {
+      const scrubbed = scrubSensitiveUrl(value);
+      if (scrubbed !== value) Reflect.set(record, key, scrubbed);
+    }
+  }
+  return nested;
 }

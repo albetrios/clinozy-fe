@@ -157,21 +157,26 @@ Use this table when configuring Sentry dashboards, alerts, and sampling.
 
 **Sampling (production defaults in `sentry.ts`):**
 
-| Setting                    | Value                                                                             | Sentry UI                                                 |
-| -------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `tracesSampleRate`         | `0.1` (10%)                                                                       | Performance → Transactions                                |
-| `profileSessionSampleRate` | `1.0` of sessions, `profileLifecycle: 'trace'` (profiles while a trace is active) | Performance → Profiles                                    |
-| `tracePropagationTargets`  | `localhost`, `https://api.*`, `/api/`                                             | Distributed traces to clinozy-be when BE also uses Sentry |
+| Setting                    | Value                                                                                                               | Sentry UI                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `tracesSampleRate`         | `0.1` (10%)                                                                                                         | Performance → Transactions                                |
+| `profileSessionSampleRate` | `1.0` of sessions, `profileLifecycle: 'trace'` (profiles while a trace is active)                                   | Performance → Profiles                                    |
+| `tracePropagationTargets`  | same-origin `/api/` and the exact `VITE_API_BASE_URL` origin — never another host (`sentryTracePropagationTargets`) | Distributed traces to clinozy-be when BE also uses Sentry |
 
 ### Session Replay (production)
 
-| Setting                    | Value                                      | Sentry UI                           |
-| -------------------------- | ------------------------------------------ | ----------------------------------- |
-| `replaysSessionSampleRate` | `0.1`                                      | Replays → normal sessions           |
-| `replaysOnErrorSampleRate` | `1.0`                                      | Replays → 100% when an error occurs |
-| Privacy                    | `maskAllText: true`, `blockAllMedia: true` | All text masked, media blocked      |
+| Setting                    | Value                                                                                                                                                                                                                             | Sentry UI                                               |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `replaysSessionSampleRate` | `0.1`                                                                                                                                                                                                                             | Replays → normal sessions                               |
+| `replaysOnErrorSampleRate` | `1.0`                                                                                                                                                                                                                             | Replays → 100% when an error occurs                     |
+| Privacy                    | `maskAllText: true`, `blockAllMedia: true`, `maskAttributes` adds `href`; `beforeAddRecordingEvent` and an event processor drop the query from every recorded and segment URL (`scrubRecordingEventUrls`, `scrubReplayEventUrls`) | All text masked, media blocked, no search term in a URL |
 
 Use replays to reproduce UI bugs with masked DOM — no readable user input.
+
+One URL the SDK offers no hook for: rrweb's meta event records `location.href` (query
+included) at each full snapshot. Keep `VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE` and
+`VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE` at `0` in an environment whose search terms must
+never reach Sentry at all.
 
 ### Logs (production)
 
