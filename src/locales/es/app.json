@@ -305,6 +305,14 @@
       "gender": "Género",
       "birthDate": "Fecha de nacimiento",
       "age": "Edad {{age}}",
+      "birthMode": "Fecha de nacimiento o edad",
+      "birthModes": {
+        "date": "Fecha de nacimiento",
+        "age": "Edad"
+      },
+      "ageYears": "Edad (años)",
+      "agePlaceholder": "p. ej. 34",
+      "ageHint": "aprox. · sube cada año",
       "types": "Tipo de paciente",
       "typesHint": "elige los que quieras",
       "status": "Estado",
@@ -338,6 +346,7 @@
     },
     "missing": "Añade nombre y móvil",
     "mobileInvalid": "Introduce un móvil de 10 dígitos",
+    "ageInvalid": "Escribe una edad de 0 a 120",
     "created": "Paciente {{id}} creado",
     "openFile": "Abrir ficha",
     "saved": "Se guardó {{name}}",
@@ -444,6 +453,8 @@
     },
     "genderAge": "{{gender}} · {{age}} años",
     "age": "{{age}} años",
+    "approximate": "aprox.",
+    "approximateHint": "Edad indicada al registrarse — la fecha de nacimiento es estimada",
     "cameVia": "Llegó por {{source}}",
     "owedToThem": "{{amount}} por devolverle",
     "owedByThem": "{{amount}} que debe a la clínica",
@@ -561,6 +572,15 @@
       "nextSevenDays": "Próximos 7 días",
       "notSet": "Sin fecha",
       "range": "Rango personalizado"
+    },
+    "age": {
+      "label": "Edad",
+      "any": "Cualquiera",
+      "child": "Menos de 18",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60+"
     }
   },
   "commandMenu": {

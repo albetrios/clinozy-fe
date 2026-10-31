@@ -4,6 +4,7 @@ import { api } from '@/core/http/api.ts';
 import { pageOf } from '@/core/http/pagination.ts';
 
 import { createdRangeOf, followUpRangeOf } from './app-filter-ranges.ts';
+import { ageBandQueryOf } from './app-list-filters.ts';
 import type { DeleteReason } from './app-schema.ts';
 import { appToday } from './app-time.ts';
 import type { ContactFields } from './contacts-contracts.ts';
@@ -75,6 +76,7 @@ export function leadListQuery(params: LeadListParams, today: string = appToday()
     source: params.source?.length ? params.source.join(',') : undefined,
     ownership: params.hold ? OWNERSHIP[params.hold] : undefined,
     team_membership_id: params.member,
+    ...ageBandQueryOf(params.age),
     created_from: created.from,
     created_to: created.to,
     follow_up_at_from: followUp.from,

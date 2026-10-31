@@ -116,6 +116,14 @@ afterEach(() => {
 });
 
 describe('leadListQuery', () => {
+  it("reads an age band as the person's age range (feat-approximate-age)", () => {
+    expect(
+      leadListQuery({ view: 'all', viewerId: RIYA, age: 'senior' }, TODAY),
+    ).toMatchObject({
+      age_from: 60,
+    });
+  });
+
   it('reads everyone’s leads, newest first, fifty a page, for All', () => {
     expect(leadListQuery({ view: 'all', viewerId: RIYA }, TODAY)).toEqual({ limit: 50 });
   });

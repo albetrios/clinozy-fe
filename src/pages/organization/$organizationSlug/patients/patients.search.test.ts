@@ -115,6 +115,7 @@ describe('validatePatientsSearch (S:30)', () => {
       'types',
       'status',
       'conversion',
+      'age',
       'created',
       'followUp',
     ]);

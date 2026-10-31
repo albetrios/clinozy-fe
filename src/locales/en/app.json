@@ -305,6 +305,14 @@
       "gender": "Gender",
       "birthDate": "Birth date",
       "age": "Age {{age}}",
+      "birthMode": "Birth date or age",
+      "birthModes": {
+        "date": "Birth date",
+        "age": "Age"
+      },
+      "ageYears": "Age (years)",
+      "agePlaceholder": "e.g. 34",
+      "ageHint": "approx. · counts up each year",
       "types": "Patient type",
       "typesHint": "pick any",
       "status": "Status",
@@ -338,6 +346,7 @@
     },
     "missing": "Add name and mobile",
     "mobileInvalid": "Enter a 10-digit mobile",
+    "ageInvalid": "Enter an age from 0 to 120",
     "created": "Patient {{id}} created",
     "openFile": "Open file",
     "saved": "{{name}} saved",
@@ -441,6 +450,8 @@
     },
     "genderAge": "{{gender}} · {{age}} yrs",
     "age": "{{age}} yrs",
+    "approximate": "approx.",
+    "approximateHint": "Age given at registration — the birth date is estimated",
     "cameVia": "Came via {{source}}",
     "owedToThem": "{{amount}} to return to them",
     "owedByThem": "{{amount}} they owe the clinic",
@@ -557,6 +568,15 @@
       "nextSevenDays": "Next 7 days",
       "notSet": "Not set",
       "range": "Custom range"
+    },
+    "age": {
+      "label": "Age",
+      "any": "Any",
+      "child": "Under 18",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60+"
     }
   },
   "commandMenu": {

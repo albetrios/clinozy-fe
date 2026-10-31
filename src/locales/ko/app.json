@@ -305,6 +305,14 @@
       "gender": "성별",
       "birthDate": "생년월일",
       "age": "{{age}}세",
+      "birthMode": "생년월일 또는 나이",
+      "birthModes": {
+        "date": "생년월일",
+        "age": "나이"
+      },
+      "ageYears": "나이(세)",
+      "agePlaceholder": "예: 34",
+      "ageHint": "추정 · 매년 늘어남",
       "types": "환자 유형",
       "typesHint": "여러 개 선택 가능",
       "status": "상태",
@@ -338,6 +346,7 @@
     },
     "missing": "이름과 휴대폰 번호를 입력하세요",
     "mobileInvalid": "10자리 휴대폰 번호를 입력하세요",
+    "ageInvalid": "0~120 사이의 나이를 입력하세요",
     "created": "환자 {{id}} 생성됨",
     "openFile": "파일 열기",
     "saved": "{{name}} 저장됨",
@@ -438,6 +447,8 @@
     },
     "genderAge": "{{gender}} · {{age}}세",
     "age": "{{age}}세",
+    "approximate": "추정",
+    "approximateHint": "등록 시 알려준 나이 — 생년월일은 추정값입니다",
     "cameVia": "{{source}} 통해 유입",
     "owedToThem": "돌려줄 금액 {{amount}}",
     "owedByThem": "클리닉에 갚을 금액 {{amount}}",
@@ -553,6 +564,15 @@
       "nextSevenDays": "다음 7일",
       "notSet": "미설정",
       "range": "사용자 지정 기간"
+    },
+    "age": {
+      "label": "나이",
+      "any": "전체",
+      "child": "18세 미만",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60세 이상"
     }
   },
   "commandMenu": {

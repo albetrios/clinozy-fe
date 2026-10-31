@@ -37,8 +37,12 @@ export interface PatientFormValues {
   /** Picked in the Home branch chips; `null` keeps the default branch. */
   homeBranchId: string | null;
   gender: Gender | null;
-  /** `YYYY-MM-DD`. */
+  /** Whether the desk picks a birth date or types an age (`date` · `age`). */
+  birthMode: PatientBirthMode;
+  /** `YYYY-MM-DD` — the Birth date mode's value. */
   dateOfBirth: string | null;
+  /** The Age mode's whole years, as typed (`34`); empty clears the birth. */
+  age: string;
   types: PatientType[];
   status: PatientStatus;
   conversion: PatientConversion | null;
@@ -65,6 +69,15 @@ export interface PatientDrawerPrefill {
   /** Notes to start with — the booking's Reason (H:6039). */
   notes?: string;
 }
+
+/** How the drawer takes the birth: a picked date, or an age in whole years — in the chips' order. */
+export const PATIENT_BIRTH_MODES = ['date', 'age'] as const;
+
+/** One of {@link PATIENT_BIRTH_MODES}. */
+export type PatientBirthMode = (typeof PATIENT_BIRTH_MODES)[number];
+
+/** The oldest age the desk can type — the API's bound. */
+export const PATIENT_AGE_MAX = 120;
 
 /** The form's own limits (`patients.md:44–58`): the contract allows more for address and notes. */
 export const PATIENT_FORM_LIMITS = {
@@ -104,7 +117,9 @@ export function emptyPatientForm(prefill: PatientDrawerPrefill = {}): PatientFor
     address: '',
     homeBranchId: null,
     gender: null,
+    birthMode: 'date',
     dateOfBirth: null,
+    age: '',
     types: [...(prefill.types ?? NEW_PATIENT_TYPES)],
     status: 'new',
     conversion: null,
@@ -128,7 +143,11 @@ export function patientFormOf(patient: PatientRecord): PatientFormValues {
     address: patient.address ?? '',
     homeBranchId: patient.homeBranchId,
     gender: patient.gender,
-    dateOfBirth: patient.dateOfBirth,
+    // An age the desk typed opens as that age, counted up to today; a real date as the date
+    birthMode: patient.dateOfBirthIsApproximate ? 'age' : 'date',
+    dateOfBirth: patient.dateOfBirthIsApproximate ? null : patient.dateOfBirth,
+    age:
+      patient.dateOfBirthIsApproximate && patient.age !== null ? String(patient.age) : '',
     types: [...patient.types],
     status: patient.status,
     conversion: patient.conversion,
@@ -142,6 +161,20 @@ export function patientFormOf(patient: PatientRecord): PatientFormValues {
 }
 
 const textOrNull = (value: string) => value.trim() || null;
+
+/**
+ * The birth a form saves: the picked date in Birth date mode; in Age mode the typed whole years
+ * (the server stores today minus them, flagged approximate) — or nothing when the age is empty.
+ */
+function birthInputOf(
+  values: PatientFormValues,
+): Pick<PatientFields, 'dateOfBirth' | 'age'> {
+  if (values.birthMode === 'date') return { dateOfBirth: values.dateOfBirth, age: null };
+  const age = values.age.trim();
+  return age === ''
+    ? { dateOfBirth: null, age: null }
+    : { dateOfBirth: null, age: Number(age) };
+}
 
 /** A mobile field's digits as the contract stores them; the server answers a bad one with a 422. */
 const storedPhone = (digits: string) => toAppPhone(digits) ?? digits;
@@ -164,7 +197,7 @@ export function patientInputOf(
     address: textOrNull(values.address),
     homeBranchId: values.homeBranchId ?? context.defaultBranchId ?? '',
     gender: values.gender,
-    dateOfBirth: values.dateOfBirth,
+    ...birthInputOf(values),
     types: values.types,
     status: values.status,
     conversion: values.conversion,
@@ -195,6 +228,15 @@ export function invalidPatientPhones(
   return (['phone', 'phone2'] as const).filter(
     (field) => values[field] !== '' && toAppPhone(values[field]) === null,
   );
+}
+
+/** Whether the Age mode holds an age the API refuses — anything but a whole number from 0 to 120. */
+export function isInvalidPatientAge(
+  values: Pick<PatientFormValues, 'birthMode' | 'age'>,
+): boolean {
+  const age = values.age.trim();
+  if (values.birthMode !== 'age' || age === '') return false;
+  return !/^\d{1,3}$/.test(age) || Number(age) > PATIENT_AGE_MAX;
 }
 
 /** A patient's display name from the form: First and Last, as typed. */

@@ -27,6 +27,7 @@ export function leadListParamsOf(
     source: search.source,
     hold: search.hold,
     member: search.member,
+    age: search.age,
     created: search.created,
     followUp: search.followUp,
     sort,

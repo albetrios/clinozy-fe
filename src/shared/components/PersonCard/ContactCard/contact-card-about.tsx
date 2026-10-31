@@ -29,12 +29,12 @@ import {
 
 const keys = PERSON_CARD_KEYS;
 
-/** "Female · 29 yrs", "Female", "29 yrs" — or nothing. */
+/** "Female · 29 yrs", "Female", "29 yrs" — or nothing; "· approx." after a typed age. */
 function genderAgeLine(about: ContactAbout, age: string | null, t: TFunction) {
   const gender = about.gender ? t(keys.gender[about.gender]) : null;
-  if (gender && age) return t(keys.genderAge, { gender, age });
-  if (gender) return gender;
-  return age ? t(keys.age, { age }) : null;
+  if (!age) return gender;
+  const line = gender ? t(keys.genderAge, { gender, age }) : t(keys.age, { age });
+  return about.ageIsApproximate ? `${line} · ${t(keys.approximate)}` : line;
 }
 
 /** "<₹> to return to them · <₹> they owe the clinic", each half only when owed. */
