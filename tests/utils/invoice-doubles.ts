@@ -160,6 +160,7 @@ export function invoicePreview(
       lineNumber: index + 1,
       medicineId: null,
       packSize: null,
+      hsnCode: null,
       discountPct,
       discountAmount,
       gstPct,

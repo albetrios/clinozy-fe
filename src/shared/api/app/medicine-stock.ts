@@ -6,7 +6,9 @@ import { civilDayOffset } from './app-time.ts';
  * Medicines list, the medicine drawer, New sale and the Rx hand-off read one
  * set of rules — and clinozy-be mirrors them (FEFO deduction and the stock
  * checks are server rules; the fixture server runs these). Quantities are
- * whole packs; money is integer paise.
+ * units — a pack while a medicine sells whole packs, the loose strip or tablet
+ * when its `unitsPerPack` is above 1 (change-pharmacy-record-fields D5); money
+ * is integer paise.
  */
 
 /** A medicine's stock on the list: Out at 0, Low at or below its reorder level, else OK. */
@@ -61,6 +63,42 @@ export function medicineStockHealth(
 /** How many to order to fill up to `maxStock` — at least one (H:5436). */
 export function reorderQuantity(stock: number, maxStock: number): number {
   return Math.max(1, maxStock - stock);
+}
+
+/** A pack's loose units as a whole number of at least one — 1 sells whole packs only. */
+const perPack = (unitsPerPack: number) => Math.max(1, Math.floor(unitsPerPack));
+
+/**
+ * Units as whole packs and the loose rest (D5): 34 units of a strip of 10 are 3 packs + 4. A
+ * medicine that sells whole packs has no loose rest.
+ */
+export function packsAndLoose(
+  units: number,
+  unitsPerPack: number,
+): { packs: number; loose: number } {
+  const per = perPack(unitsPerPack);
+  const whole = Math.max(0, Math.floor(units));
+  return { packs: Math.floor(whole / per), loose: whole % per };
+}
+
+/**
+ * The packs to order to fill up to `maxStock` units (H:5436): an order buys whole packs, so the
+ * units still wanted are rounded up — at least one pack.
+ */
+export function reorderPacks(
+  stock: number,
+  maxStock: number,
+  unitsPerPack: number,
+): number {
+  return Math.max(1, Math.ceil(reorderQuantity(stock, maxStock) / perPack(unitsPerPack)));
+}
+
+/**
+ * One unit's purchase rate, paise: a pack's rate over its units, to the paisa — what a supplier
+ * credit and a sale's cost price read for a loose-selling medicine (D5).
+ */
+export function unitRatePaise(packPaise: number, unitsPerPack: number): number {
+  return Math.round(packPaise / perPack(unitsPerPack));
 }
 
 /** The last calendar day of a batch's expiry month (`MM/YY` → `20YY-MM-<last day>`). */

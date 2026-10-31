@@ -17,6 +17,7 @@ import {
   DrawerInput,
   DrawerPhoneInput,
   DrawerStepBody,
+  DrawerTextarea,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
@@ -46,7 +47,11 @@ import {
 } from '../../hooks/useMedicalPickers/index.ts';
 import type { OpenMedicalChild } from '../../hooks/useMedicalStack/index.ts';
 import type { SupplierRow } from '../../medical-contracts.ts';
-import { textOrNull, useMedicalDrawerAccess } from '../../medical-drawer-form.ts';
+import {
+  emailIsInvalid,
+  textOrNull,
+  useMedicalDrawerAccess,
+} from '../../medical-drawer-form.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWER_TEST_IDS,
@@ -59,19 +64,27 @@ import { SupplierAccountRows } from './SupplierAccountRows.tsx';
 
 const K = MEDICAL_DRAWER_KEYS.supplier;
 
-/** A new supplier: four light fields, 560px (`medical.md:336`). */
-const CREATE_PROFILE = { fieldCount: 4 } as const;
+/** A new supplier: six light fields, 560px (`medical.md:336`). */
+const CREATE_PROFILE = { fieldCount: 6 } as const;
 /** Editing adds the Account rows: an items table, 840px. */
-const EDIT_PROFILE = { fieldCount: 6, hasItems: true } as const;
+const EDIT_PROFILE = { fieldCount: 8, hasItems: true } as const;
 
 const NAME_MAX = 120;
 const GST_MAX = 20;
+/** clinozy-be's limits on a supplier's email and address (change-pharmacy-record-fields D9). */
+const EMAIL_MAX = 120;
+const ADDRESS_MAX = 240;
 
-/** The form: the agency's name, its mobile's digits, its GSTIN, the makers it distributes. */
+/**
+ * The form: the agency's name, its mobile's digits, its GSTIN, its email and address, the makers
+ * it distributes.
+ */
 interface SupplierFormValues {
   name: string;
   phone: string;
   gstNumber: string;
+  email: string;
+  address: string;
   manufacturerIds: string[];
 }
 
@@ -115,6 +128,8 @@ function emptyForm(prefill: SupplierPrefill = {}): SupplierFormValues {
     name: (prefill.name ?? '').trim().slice(0, NAME_MAX),
     phone: '',
     gstNumber: '',
+    email: '',
+    address: '',
     manufacturerIds: [...(prefill.manufacturerIds ?? [])],
   };
 }
@@ -125,6 +140,8 @@ function formOf(supplier: SupplierRow): SupplierFormValues {
     name: supplier.name,
     phone: phoneDigitsOf(supplier.phone),
     gstNumber: supplier.gstNumber ?? '',
+    email: supplier.email ?? '',
+    address: supplier.address ?? '',
     manufacturerIds: [...supplier.manufacturerIds],
   };
 }
@@ -135,6 +152,8 @@ function inputOf(values: SupplierFormValues): SupplierInput {
     name: values.name.trim(),
     phone: storedPhoneOf(values.phone),
     gstNumber: textOrNull(values.gstNumber),
+    email: textOrNull(values.email),
+    address: textOrNull(values.address),
     manufacturerIds: values.manufacturerIds,
   };
 }
@@ -148,13 +167,18 @@ interface BodyProps {
   openChild?: OpenMedicalChild;
 }
 
-/** SUPPLIER: Agency name* · Phone · GST number (`medical.md:194–196`). */
+/**
+ * SUPPLIER: Agency name* · Phone · GST number (`medical.md:194–196`) · Email · Address
+ * (change-pharmacy-record-fields D9).
+ */
 function SupplierFields({ form, idPrefix, testId }: BodyProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const name = field('name');
   const phone = field('phone');
   const gst = field('gstNumber');
+  const email = field('email');
+  const address = field('address');
   return (
     <DrawerFieldGrid>
       <DrawerField
@@ -203,6 +227,33 @@ function SupplierFields({ form, idPrefix, testId }: BodyProps) {
           maxLength={GST_MAX}
           autoComplete="off"
           data-testid={`${testId}-gst`}
+        />
+      </DrawerField>
+      <DrawerField
+        span="half"
+        label={t(K.fields.email)}
+        htmlFor={email.id}
+        error={email.error}
+      >
+        <DrawerInput
+          {...email.control}
+          {...form.register('email')}
+          type="email"
+          capitalize={false}
+          maxLength={EMAIL_MAX}
+          placeholder={t(K.fields.emailPlaceholder)}
+          autoComplete="off"
+          data-testid={`${testId}-email`}
+        />
+      </DrawerField>
+      <DrawerField span="full" label={t(K.fields.address)} htmlFor={address.id}>
+        <DrawerTextarea
+          {...address.control}
+          {...form.register('address')}
+          rows={2}
+          maxLength={ADDRESS_MAX}
+          autoComplete="off"
+          data-testid={`${testId}-address`}
         />
       </DrawerField>
     </DrawerFieldGrid>
@@ -308,11 +359,16 @@ function useSteps(
   const phone = storedPhoneOf(values.phone);
   const phoneText = phone ? formatAppPhone(phone) : '';
   const gst = values.gstNumber.trim();
+  const email = values.email.trim();
+  const address = values.address.trim();
   const { t: tPatient } = useTranslation(PATIENT_DRAWER_NS);
-  // The save's own phone check, so the step never reads done while Save would stop on it.
-  const problems = phoneIsInvalid(values.phone)
-    ? [tPatient(PATIENT_DRAWER_KEYS.mobileInvalid)]
-    : [];
+  // The save's own checks, so the step never reads done while Save would stop on one.
+  const problems = [
+    ...(phoneIsInvalid(values.phone)
+      ? [tPatient(PATIENT_DRAWER_KEYS.mobileInvalid)]
+      : []),
+    ...(emailIsInvalid(values.email) ? [t(K.fields.emailInvalid)] : []),
+  ];
   const makers = makerPills(body.pickers, values.manufacturerIds);
   const account = useAccountWords(supplier);
   const steps: DrawerStep[] = [
@@ -323,6 +379,8 @@ function useSteps(
         { kind: 'value', label: t(K.fields.name), value: name },
         { kind: 'value', label: t(K.fields.phone), value: phoneText },
         { kind: 'value', label: t(K.fields.gst), value: gst },
+        { kind: 'value', label: t(K.fields.email), value: email },
+        { kind: 'value', label: t(K.fields.address), value: address },
       ],
       missing: name ? [] : [t(K.fields.name)],
       problems,
@@ -429,12 +487,19 @@ function SupplierSession({
   const update = useUpdateSupplier({ notifyOnError: false, successMessage: t(K.saved) });
   const { saveState, save } = useDrawerSave<SupplierFormValues, SupplierRow>({
     form,
-    fieldOrder: ['name', 'phone', 'gstNumber', 'manufacturerIds'],
+    fieldOrder: ['name', 'phone', 'gstNumber', 'email', 'address', 'manufacturerIds'],
     toastId: 'supplier-save-failed',
-    check: (current) =>
-      phoneIsInvalid(current.phone)
-        ? { fields: ['phone'], message: tPatient(PATIENT_DRAWER_KEYS.mobileInvalid) }
-        : null,
+    check: (current) => {
+      if (phoneIsInvalid(current.phone)) {
+        return {
+          fields: ['phone'],
+          message: tPatient(PATIENT_DRAWER_KEYS.mobileInvalid),
+        };
+      }
+      return emailIsInvalid(current.email)
+        ? { fields: ['email'], message: t(K.fields.emailInvalid) }
+        : null;
+    },
     onField: (field) => setOpenStep(stepOfField(field)),
     write: () => {
       const input = inputOf(form.getValues());
@@ -505,8 +570,8 @@ function SupplierSession({
 
 /**
  * New / Edit supplier (KICKOFF §6.7 Drawers; `medical.md:190–206`) on the
- * shared record drawer: "Supplier" — Agency name*, a "+91" mobile, the GSTIN —
- * then "Distributes", the makers it supplies (pickable, quick-added or created
+ * shared record drawer: "Supplier" — Agency name*, a "+91" mobile, the GSTIN,
+ * the email and the address — then "Distributes", the makers it supplies (pickable, quick-added or created
  * in full on top). Editing widens to 840px for "Account": what it is owed and
  * for how long, its orders, and every order and credit as rows; Quick fill
  * offers "New purchase order". Delete only with nothing due and no order left

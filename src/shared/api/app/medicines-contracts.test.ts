@@ -53,6 +53,9 @@ describe('the input schema', () => {
     composition: null,
     manufacturerId: TEST_MAKER_ID,
     prescriptionOnly: false,
+    hsnCode: null,
+    packLabel: null,
+    unitsPerPack: 1,
     mrp: 650,
     gstPct: 12,
     minStock: 2,
@@ -76,6 +79,19 @@ describe('the input schema', () => {
       issues({ supplierRates: [{ supplierId: 'sup_a', rate: 0, free: 0, leadDays: 2 }] }),
     ).toContain('Enter a rate for every supplier price');
     expect(issues({ minStock: 30 })).toContain('Reorder at can’t be above Fill up to');
+  });
+
+  it('takes an HSN code of 4, 6 or 8 digits, a pack label and 1–1000 units per pack', () => {
+    const ok = (fields: object) =>
+      medicineInputSchema.safeParse({ ...valid, ...fields }).success;
+    expect(ok({ hsnCode: '3004', packLabel: '1*10', unitsPerPack: 10 })).toBe(true);
+    expect(ok({ hsnCode: '300490' })).toBe(true);
+    expect(ok({ hsnCode: '30049099' })).toBe(true);
+    expect(ok({ hsnCode: '30049' })).toBe(false);
+    expect(ok({ hsnCode: '3004AB' })).toBe(false);
+    expect(ok({ unitsPerPack: 0 })).toBe(false);
+    expect(ok({ unitsPerPack: 1001 })).toBe(false);
+    expect(ok({ packLabel: 'x'.repeat(31) })).toBe(false);
   });
 });
 

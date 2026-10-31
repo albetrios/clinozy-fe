@@ -331,6 +331,7 @@ const previewWire = {
       medicine_id: null,
       name: 'Hydrafacial',
       pack_size: null,
+      hsn_code: null,
       quantity: 1,
       rate: 3500,
       discount_percent: 0,

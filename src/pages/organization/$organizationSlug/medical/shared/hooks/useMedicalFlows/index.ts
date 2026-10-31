@@ -1,6 +1,7 @@
 export {
   type CollectVars,
   type FlowReasonVars,
+  type OrderNoteVars,
   type OrderUpdateVars,
   type ReceiveVars,
   type SaleReturnVars,
@@ -17,6 +18,7 @@ export {
   useReturnExpiringStock,
   useReturnSale,
   useUpdatePurchaseOrder,
+  useUpdatePurchaseOrderNote,
   useVoidSale,
   useVoidSupplierCredit,
 } from './useMedicalFlows.ts';

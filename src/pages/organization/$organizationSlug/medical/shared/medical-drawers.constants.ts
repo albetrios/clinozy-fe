@@ -107,6 +107,11 @@ export const MEDICAL_DRAWER_KEYS = {
       phone: 'drawers.supplier.fields.phone',
       phoneHint: 'drawers.supplier.fields.phoneHint',
       gst: 'drawers.supplier.fields.gst',
+      email: 'drawers.supplier.fields.email',
+      emailPlaceholder: 'drawers.supplier.fields.emailPlaceholder',
+      /** "Enter a valid email" — clinozy-be's 400 on `email`. */
+      emailInvalid: 'drawers.supplier.fields.emailInvalid',
+      address: 'drawers.supplier.fields.address',
       manufacturers: 'drawers.supplier.fields.manufacturers',
       manufacturersHint: 'drawers.supplier.fields.manufacturersHint',
       payable: 'drawers.supplier.fields.payable',

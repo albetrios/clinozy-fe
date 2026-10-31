@@ -43,6 +43,7 @@ import {
   purchaseOrderChangeOf,
   purchaseOrderCreateBodyOf,
   type PurchaseOrderInput,
+  purchaseOrderNoteChangeOf,
   receiveBodyOf,
   type ReceiveInput,
   saleBodyOf,
@@ -111,6 +112,8 @@ export function quickCreateSupplier({
       name,
       phone: null,
       gstNumber: null,
+      email: null,
+      address: null,
       manufacturerIds: [...manufacturerIds],
       isQuick: true,
     },
@@ -324,6 +327,31 @@ export async function updatePurchaseOrder({
   input: PurchaseOrderInput;
 }): Promise<PurchaseOrderRow> {
   const change = purchaseOrderChangeOf(record, input);
+  if (change === null) return record;
+  const response = await api.patch(
+    '/app/medical-purchase-orders/{medical_purchase_order_id}',
+    {
+      params: { medical_purchase_order_id: record.id },
+      body: change,
+      idempotencyKey,
+    },
+  );
+  return orderOf(response.data);
+}
+
+/**
+ * Save a received order's note — the one change a received order takes (D10), with the read's
+ * `updated_at`. An unchanged note answers the order with no write.
+ */
+export async function updatePurchaseOrderNote({
+  record,
+  note,
+  idempotencyKey,
+}: Action & {
+  record: PurchaseOrderRow;
+  note: string | null;
+}): Promise<PurchaseOrderRow> {
+  const change = purchaseOrderNoteChangeOf(record, note);
   if (change === null) return record;
   const response = await api.patch(
     '/app/medical-purchase-orders/{medical_purchase_order_id}',
