@@ -109,11 +109,34 @@ describe('E2E against the backend image', () => {
     }
   });
 
+  it('runs the backend image by the digest clinozy-be signed, never by tag (H-12)', () => {
+    const resolve = WORKFLOW.indexOf(
+      '- name: Resolve the backend image to a signed digest',
+    );
+    const pull = WORKFLOW.indexOf('docker pull "$BACKEND_IMAGE"');
+    expect(resolve).toBeGreaterThan(-1);
+    expect(resolve).toBeLessThan(pull);
+    const step = WORKFLOW.slice(resolve, pull);
+    // clinozy-be's own signing identity: its image build on main or a release tag.
+    expect(step).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: shell expansion, asserted verbatim
+      'identity="^https://github\\.com/${BACKEND_REPOSITORY}/\\.github/workflows/reusable-docker-build-trivy\\.yml@refs/(heads/main|tags/v.+)$"',
+    );
+    expect(step).toContain(
+      '--certificate-oidc-issuer https://token.actions.githubusercontent.com',
+    );
+    expect(step).toContain(
+      'echo "BACKEND_IMAGE=${BACKEND_IMAGE_REPOSITORY}@${digest}" >> "$GITHUB_ENV"',
+    );
+    // BACKEND_IMAGE is never set from a tag anywhere else.
+    expect(WORKFLOW.match(/BACKEND_IMAGE[=:]/g)).toHaveLength(1);
+  });
+
   it("boots the backend's latest image, never the shared development environment", () => {
     // The name clinozy-be pushes: ghcr.io/<owner>/<repository>/<image>. Without the repository
     // segment the pull fails with "manifest unknown" before the backend boots.
     expect(WORKFLOW).toContain(
-      'BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api:latest',
+      'BACKEND_IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api',
     );
     expect(WORKFLOW).toContain('packages: read');
     // clinozy-be's one database step, compiled (create, migrate, permissions and plans).

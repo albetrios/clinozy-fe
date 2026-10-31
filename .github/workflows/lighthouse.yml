@@ -54,7 +54,7 @@ jobs:
 
       # @lhci/cli is installed ad-hoc (heavy, only needed here);
       # configuration lives in .lighthouserc.cjs.
-      - run: pnpm dlx @lhci/cli@0.15.x autorun
+      - run: pnpm dlx @lhci/cli@0.15.1 autorun
 
       # Every run's reports (lhr-*.json/.html) and assertion-results.json.
       # `.lighthouseci/` is a dot-folder, and upload-artifact skips hidden files

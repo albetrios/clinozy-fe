@@ -29,18 +29,31 @@ LOG_TAG="install-headroom"
   *) export PATH="${HOME}/.local/bin:${PATH}" ;;
 esac
 
+# uv from its pinned GitHub release, checksum-verified (H-12) — never astral.sh's install.sh, a
+# script fetched at its latest and run unseen (and a host the default network policy blocks).
 if ! have uvx; then
-  log "uv not found — installing from astral.sh (official installer)."
-  installer="$(mktemp)"
-  trap 'rm -f "${installer}"' EXIT
-  if fetch "https://astral.sh/uv/install.sh" "${installer}"; then
-    # UV_NO_MODIFY_PATH: we manage PATH via persist_path / $CLAUDE_ENV_FILE
-    # rather than letting the installer edit shell rc files a Setup script's
-    # session never sources.
-    UV_NO_MODIFY_PATH=1 sh "${installer}" >/dev/null 2>&1 || log "uv installer returned an error."
-    [ -d "${HOME}/.local/bin" ] && export PATH="${HOME}/.local/bin:${PATH}"
+  uv_version="$(pinned_version UV_VERSION)"
+  case "$(uname -m)" in
+    x86_64 | amd64) uv_target="x86_64-unknown-linux-gnu" uv_key="X64" ;;
+    aarch64 | arm64) uv_target="aarch64-unknown-linux-gnu" uv_key="ARM64" ;;
+    *) uv_target="" uv_key="" ;;
+  esac
+  if [ -z "${uv_target}" ] || [ "$(uname -s)" != "Linux" ]; then
+    log "uv not found and no pinned uv build for $(uname -s) $(uname -m) — install uv ${uv_version} yourself."
   else
-    log "could not download the uv installer — is astral.sh allowed by the network policy?"
+    log "uv not found — installing uv ${uv_version} from its GitHub release."
+    uv_directory="$(mktemp -d)"
+    trap 'rm -rf "${uv_directory}"' EXIT
+    uv_archive="uv-${uv_target}.tar.gz"
+    if download_verified "https://github.com/astral-sh/uv/releases/download/${uv_version}/${uv_archive}" \
+      "${uv_directory}/${uv_archive}" "$(pinned_version "UV_SHA256_LINUX_${uv_key}")" &&
+      tar -xzf "${uv_directory}/${uv_archive}" -C "${uv_directory}"; then
+      mkdir -p "${HOME}/.local/bin"
+      install -m 0755 "${uv_directory}/uv-${uv_target}/uv" "${uv_directory}/uv-${uv_target}/uvx" "${HOME}/.local/bin/"
+      export PATH="${HOME}/.local/bin:${PATH}"
+    else
+      log "could not install the pinned uv — is github.com allowed by the network policy?"
+    fi
   fi
 fi
 

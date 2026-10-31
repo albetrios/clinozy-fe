@@ -10,7 +10,8 @@
 # fail on a locked-down image) and ships an older build.
 #
 # Usage:  bash tooling/setup/agent/install-gh.sh
-# Env:    GH_VERSION (default: latest release) — e.g. 2.63.2, no leading "v"
+# Version: GH_VERSION in tool-versions.sh (an environment variable of that name wins, a trial),
+# never the latest release, and the tarball must match its pinned SHA-256 (H-12).
 #
 # BEST-EFFORT: exits non-zero on failure; bootstrap.sh logs and carries on.
 set -uo pipefail
@@ -28,15 +29,12 @@ arch="$(arch_for go)" || {
   exit 1
 }
 
-version="${GH_VERSION:-}"
+version="$(pinned_version GH_VERSION)"
 if [ -z "${version}" ]; then
-  tag="$(github_latest_tag cli/cli || true)"
-  version="${tag#v}"
-fi
-if [ -z "${version}" ]; then
-  log "could not resolve the latest gh release (api.github.com unreachable?) — set GH_VERSION to pin one."
+  log "no GH_VERSION pinned in tool-versions.sh."
   exit 1
 fi
+arch_key="$(printf '%s' "${arch}" | tr '[:lower:]' '[:upper:]')"
 
 tarball="gh_${version}_linux_${arch}.tar.gz"
 url="https://github.com/cli/cli/releases/download/v${version}/${tarball}"
@@ -49,8 +47,8 @@ log "downloading ${url}"
 tmp="$(mktemp -d)"
 trap 'rm -rf "${tmp}"' EXIT
 
-fetch "${url}" "${tmp}/${tarball}" || {
-  log "download failed — is github.com allowed by the network policy?"
+download_verified "${url}" "${tmp}/${tarball}" "$(pinned_version "GH_SHA256_LINUX_${arch_key}")" || {
+  log "download failed or did not match its pinned checksum — is github.com allowed by the network policy?"
   exit 1
 }
 tar -xzf "${tmp}/${tarball}" -C "${tmp}" || {
