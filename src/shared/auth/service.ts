@@ -12,10 +12,18 @@ import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { broadcastLogout } from '@/shared/auth/auth-channel.ts';
 import { skipAutoGoogleSignIn } from '@/shared/auth/auto-google-sign-in.ts';
+import {
+  clearActivity,
+  IDLE_LOGOUT_AFTER_MS,
+  idleFor,
+  markActivity,
+} from '@/shared/auth/idle-timeout.ts';
+import { clearReturnTo } from '@/shared/auth/redirect-safety.ts';
 import { cancelTokenRefresh, scheduleTokenRefresh } from '@/shared/auth/refresh-timer.ts';
 import {
   clearSessionStart,
   hasSessionHint,
+  isSessionExpired,
   markSessionStart,
 } from '@/shared/auth/session-lifetime.ts';
 import {
@@ -88,6 +96,10 @@ function endSessionOffScreen(): void {
     cancelTokenRefresh();
     clearAccessToken();
     clearSessionStart();
+    clearActivity();
+    // A deep link stashed for an OAuth round trip is this session's: the next
+    // person to sign in on this tab must not be sent to it (F-9).
+    clearReturnTo();
     // The wizard's saved progress holds PII (names, invite emails); the next
     // load must not find it. Its in-memory copy goes with the screen.
     useOnboardingStore.persist.clearStorage();
@@ -305,6 +317,14 @@ export function startAuthBootstrap(): Promise<void> {
        * the same outcome the old code produced whenever the refresh failed.
        */
       if (!hasSessionHint()) throw new Error('No session hint');
+      // A session this browser left past its idle limit or its absolute cap is
+      // not restored: refreshing first and checking afterwards handed a browser
+      // left alone for hours its session back, every page load (E-2).
+      const lapsed = lapsedSessionReason();
+      if (lapsed) {
+        endLapsedSessionAtBoot(lapsed, generation);
+        throw new Error('Session lapsed');
+      }
       await silentRefresh();
     } catch (error) {
       if (generation !== authGeneration) return;
@@ -326,6 +346,42 @@ export function startAuthBootstrap(): Promise<void> {
     }
   })();
   return authBootstrapPromise;
+}
+
+/**
+ * Why the session this browser holds may not be restored at boot, if it may not: older than the
+ * absolute cap (`session_expired`), or no activity in any tab for the idle limit
+ * (`idle_timeout`) — read from the stored stamps, before anything records new activity.
+ */
+function lapsedSessionReason(): 'idle_timeout' | 'session_expired' | null {
+  if (isSessionExpired()) return 'session_expired';
+  const idle = idleFor();
+  return idle !== null && idle >= IDLE_LOGOUT_AFTER_MS ? 'idle_timeout' : null;
+}
+
+/**
+ * End, at boot, a session the app's own clocks have already ended — the boot-time half of
+ * {@link logout}.
+ *
+ * @remarks
+ * Ending a session is a server-side act, but a page load has no access token to revoke it
+ * with (it lives in memory only), and {@link logout} would send the revoke without one and
+ * then reload the tab onto `/login`, dropping the deep link. So it is ended the way a sign-out
+ * whose revoke never landed is: the revoke is marked pending and finished behind the login
+ * screen ({@link finishPendingRevoke} — a refresh only to mint the token the revoke needs, the
+ * session never hydrated). The boot stays a guest's, the guards send the user to `/login` with
+ * the deep link, and the end is deliberate, so auto-Google may not undo it.
+ */
+function endLapsedSessionAtBoot(
+  reason: 'idle_timeout' | 'session_expired',
+  generation: number,
+): void {
+  captureAnalyticsEvent(ANALYTICS_EVENTS.sessionEnded, { reason });
+  skipAutoGoogleSignIn();
+  clearSessionStart();
+  clearActivity();
+  markRevokePending();
+  pendingRevoke ??= finishPendingRevoke(generation);
 }
 
 /**
@@ -598,6 +654,9 @@ export async function establishSession(accessToken: string): Promise<void> {
   clearRevokePending();
   setAccessToken(accessToken);
   markSessionStart();
+  // Signing in is activity: the idle clock a load or the dialog reads starts here, not at a
+  // stamp the previous session left.
+  markActivity();
   try {
     await hydrateSessionFromContext(generation);
     if (generation === authGeneration) scheduleTokenRefresh();

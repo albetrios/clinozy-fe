@@ -70,6 +70,15 @@ export function stashReturnTo(value: unknown): void {
   }
 }
 
+/** Forget a stashed `returnTo` without reading it — the session it was for has ended. */
+export function clearReturnTo(): void {
+  try {
+    sessionStorage.removeItem(RETURN_TO_KEY);
+  } catch {
+    // sessionStorage unavailable — nothing was stashed.
+  }
+}
+
 /** Read **and clear** the stashed `returnTo`; returns a safe path or `undefined`. */
 export function popReturnTo(): string | undefined {
   try {

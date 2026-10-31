@@ -152,7 +152,7 @@ session would sign the user back in without a click. A dead session
 ## The idle timer
 
 `startIdleTimeout()` returns a handle — `extend()` ("Stay signed in") and
-`stop()` — and guarantees three things, each of which was once a bug:
+`stop()` — and guarantees four things, each of which was once a bug:
 
 1. **The warning is not dismissed by activity in this tab.** The activity
    listeners sit on `document`, so a press on the dialog's own "Sign out" button
@@ -170,6 +170,13 @@ session would sign the user back in without a click. A dead session
    unshared, a background tab counts itself idle and signs the user out of the
    tab they are working in. `onActive` now fires **only** for activity in another
    tab.
+4. **A page load is not activity.** The timer starts from the stored stamp (from
+   now only when there is none), and `startAuthBootstrap` reads that stamp and the
+   12 h session start **before** it refreshes. Recording "now" first handed a
+   browser left alone for hours its session back on every load. A lapsed session
+   is ended as `idle_timeout` / `session_expired` through the pending-revoke path
+   (a refresh only to mint the revoke's token, never hydrated); a sign-in
+   (`establishSession`) stamps activity, a sign-out clears it.
 
 Browser proof: `tests/e2e/session-timeout.e2e.test.ts` (virtual clock). The unit
 suite that mocks the timer cannot see bug 1 — it lived _between_ the two modules;
