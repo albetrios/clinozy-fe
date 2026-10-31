@@ -6,3 +6,8 @@
 # `gitleaks:allow`, or take the secret out.
 104512fe28859835601a263222c735df02aabc3a:src/lib/password-breach.test.ts:generic-api-key:7
 7bc155032ba40be90324bf172c4a99877daf244f:src/lib/password-breach.test.ts:generic-api-key:7
+# Scanned since the allowlist was anchored (H-5, 31 Oct 2026): before it, `\.git` skipped every
+# .github/ path. The fake CI JWT keypair clinozy-be refuses on every hosted deploy. The file is a
+# byte-identical copy of clinozy-be's (tests/ci/mirrored-files.policy.test.ts), so its line
+# carries no inline marker; it changes only together with clinozy-be's copy.
+f19b0119514ef1ff0b7361f921e0b6a909abc01b:.github/actions/test-env/action.yml:private-key:71
