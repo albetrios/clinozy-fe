@@ -23,6 +23,8 @@ import {
   readFollowUpFilter,
 } from '@/shared/api/app/app-list-filters.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
+import { savedViewsKey } from '@/shared/hooks/useSavedViews/index.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   LEAD_CHAT_WIDTH,
   useDevicePrefsStore,
@@ -130,6 +132,10 @@ const chip = (panel: HTMLElement, name: string) =>
 beforeEach(() => {
   tier.current = 'desktop';
   notify.success.mockReset();
+  // Saved views are the signed-in person's (F-9).
+  useAuthStore
+    .getState()
+    .setUser({ id: 'usr_ada', email: 'ada@clinic.test', role: 'user' });
   useDevicePrefsStore.setState({
     hiddenColumns: {},
     savedViews: {},
@@ -274,7 +280,9 @@ describe('RoomFilters — saved views', () => {
 
     expect(notify.success).toHaveBeenCalledWith('View “Female + Aesthetic” saved');
     await waitFor(() => expect(screen.queryByTestId('patients-filters')).toBeNull());
-    expect(useDevicePrefsStore.getState().savedViews.patients).toEqual([
+    expect(
+      useDevicePrefsStore.getState().savedViews[savedViewsKey('usr_ada', 'patients')],
+    ).toEqual([
       expect.objectContaining({
         name: 'Female + Aesthetic',
         filters: { gender: ['female'], status: ['vip'], type: ['aesthetic'] },
@@ -287,7 +295,9 @@ describe('RoomFilters — saved views', () => {
     expect(saved).toHaveAttribute('aria-pressed', 'true');
     await user.click(saved);
     expect(notify.success).toHaveBeenLastCalledWith('View removed');
-    expect(useDevicePrefsStore.getState().savedViews.patients).toEqual([]);
+    expect(
+      useDevicePrefsStore.getState().savedViews[savedViewsKey('usr_ada', 'patients')],
+    ).toEqual([]);
   });
 
   it('names a view of date presets by their labels, and offers no save without filters', async () => {

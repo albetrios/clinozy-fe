@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { savedViewsKey } from '@/shared/hooks/useSavedViews/index.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   LEAD_CHAT_WIDTH,
   useDevicePrefsStore,
@@ -20,11 +22,17 @@ const DUES = {
   filters: { due: ['yes'], status: ['new'] },
 };
 
+/** The signed-in person's views of the patients table. */
+const PATIENTS_VIEWS = savedViewsKey('usr_ada', 'patients');
+
 beforeEach(() => {
   notify.success.mockReset();
+  useAuthStore
+    .getState()
+    .setUser({ id: 'usr_ada', email: 'ada@clinic.test', role: 'user' });
   useDevicePrefsStore.setState({
     hiddenColumns: {},
-    savedViews: { patients: [VIP, DUES] },
+    savedViews: { [PATIENTS_VIEWS]: [VIP, DUES] },
     photoSize: 'medium',
     leadChatWidth: LEAD_CHAT_WIDTH.initial,
   });
@@ -74,7 +82,7 @@ describe('DataTableSavedViews', () => {
     const [remove] = screen.getAllByRole('button', { name: 'Remove view' });
     await user.click(remove as HTMLElement);
 
-    expect(useDevicePrefsStore.getState().savedViews.patients).toEqual([DUES]);
+    expect(useDevicePrefsStore.getState().savedViews[PATIENTS_VIEWS]).toEqual([DUES]);
     expect(notify.success).toHaveBeenCalledWith('View removed');
   });
 

@@ -35,7 +35,10 @@ export const LEAD_CHAT_WIDTH = { min: 360, max: 680, initial: 420 } as const;
 interface DevicePrefsStore {
   /** Columns the user hid, per table id. */
   hiddenColumns: Readonly<Record<string, readonly string[]>>;
-  /** Saved filter views, per table id. */
+  /**
+   * Saved filter views, per signed-in user and table — keyed `<user id>:<table id>`
+   * (`savedViewsKey` in `useSavedViews`), so the next person on this device never finds them.
+   */
   savedViews: Readonly<Record<string, readonly SavedView[]>>;
   photoSize: PhotoSize;
   leadChatWidth: number;
@@ -93,10 +96,19 @@ function rememberedComparisons(
 }
 
 /**
+ * Version of the persisted shape. Version 2 keys saved views per user: the
+ * views a version-1 store kept per table belonged to whoever saved them on this
+ * device, so they are dropped rather than handed to the next person (F-9).
+ */
+const DEVICE_PREFS_VERSION = 2;
+
+/**
  * Layout choices that belong to THIS DEVICE, not to the user (KICKOFF §3.3):
- * hidden columns, saved views, the photo grid size, the lead chat width and the
- * photo comparison's mode, layout and framings (change-photo-compare-zoom D8 —
- * photo ids and numbers only, never patient data).
+ * hidden columns, the photo grid size, the lead chat width and the photo
+ * comparison's mode, layout and framings (change-photo-compare-zoom D8 — photo
+ * ids and numbers only, never patient data). The one exception is saved views:
+ * they name what one person filters by, so they are kept per signed-in user
+ * on this device (`savedViewsKey`, F-9).
  * Per-user preferences (pins, branch filter, recent picks) are server state —
  * `usePreferences`, never this store.
  */
@@ -149,6 +161,14 @@ export const useDevicePrefsStore = create<DevicePrefsStore>()(
           ),
         })),
     }),
-    { name: `${PRODUCT_NAMESPACE}-clinic-device-prefs`, version: 1 },
+    {
+      name: `${PRODUCT_NAMESPACE}-clinic-device-prefs`,
+      version: DEVICE_PREFS_VERSION,
+      migrate: (persisted, version) => {
+        const kept = { ...(persisted as Partial<DevicePrefsStore>) };
+        if (version < 2) kept.savedViews = {};
+        return kept as DevicePrefsStore;
+      },
+    },
   ),
 );
