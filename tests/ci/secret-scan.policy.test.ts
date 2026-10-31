@@ -47,19 +47,37 @@ describe('.gitleaks.toml (the secret scan has rules)', () => {
   });
 });
 
-/** The `[allowlist] paths` entries of .gitleaks.toml, as written (Go RE2, which these share with JS). */
+/** The `[allowlist] paths` entries of .gitleaks.toml, as written (Go RE2 regular expressions). */
 const allowlistPaths = [
   ...(/^paths = \[\n([\s\S]*?)^\]/m.exec(config)?.[1] ?? '').matchAll(/'''(.+?)'''/g),
 ].map((match) => match[1] ?? '');
 
-/** True when one allowlist entry skips `path`. */
-const skipped = (path: string) =>
-  allowlistPaths.some((pattern) => new RegExp(pattern).test(path));
+/** Paths the scan must read: the ones the unanchored entries skipped. */
+const SCANNED = [
+  '.github/workflows/canary.yml',
+  '.github/actions/setup-node-pnpm/action.yml',
+  'src/build-tools/config.ts',
+  'tooling/ci/build.mjs',
+  'docs/deployment/coverage-report.md',
+  'src/distance.ts',
+];
+
+/** Paths the allowlist skips: installed, built and generated files. */
+const SKIPPED = [
+  'node_modules/planted/canary.js',
+  'packages/app/node_modules/x/index.js',
+  'dist/assets/index.js',
+  'build/index.html',
+  'coverage/lcov.info',
+  '.env.example',
+  'pnpm-lock.yaml',
+];
 
 /**
  * H-5: an allowlist path entry is a regular expression matched anywhere in the path, so an
  * unanchored `\.git` skipped every file under .github/ and `build` every path holding the word.
- * Every entry names whole path segments.
+ * Every entry names whole path segments. The binary check runs where gitleaks is installed (the
+ * pre-commit guard needs it on every machine); the PR CI canary plants the same key in CI.
  */
 describe('.gitleaks.toml (the allowlist skips whole path segments only)', () => {
   it('reads the allowlist (parser sanity)', () => {
@@ -73,36 +91,13 @@ describe('.gitleaks.toml (the allowlist skips whole path segments only)', () => 
     }
   });
 
-  it.each([
-    '.github/workflows/preview.yml',
-    '.github/actions/setup-node-pnpm/action.yml',
-    'src/build-tools/config.ts',
-    'tooling/ci/build.mjs',
-    'docs/deployment/coverage-report.md',
-    'src/distance.ts',
-  ])('scans %s', (path) => {
-    expect(skipped(path)).toBe(false);
-  });
-
-  it.each([
-    'node_modules/left-pad/index.js',
-    'packages/app/node_modules/x/index.js',
-    'dist/assets/index.js',
-    'build/index.html',
-    'coverage/lcov.info',
-    '.git/config',
-    '.env.example',
-    'pnpm-lock.yaml',
-  ])('skips %s', (path) => {
-    expect(skipped(path)).toBe(true);
-  });
-
   // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'gitleaks' binary, no user input
   const gitleaks = spawnSync('gitleaks', ['version'], { encoding: 'utf8' });
   it.skipIf(gitleaks.status !== 0)(
-    'the gitleaks binary finds a key planted under .github/workflows/ and skips one under node_modules/',
+    'the gitleaks binary finds a key under .github/ and src/build-tools/, and skips one under node_modules/',
     () => {
       const root = mkdtempSync(join(tmpdir(), 'gitleaks-canary-'));
+      const reports = mkdtempSync(join(tmpdir(), 'gitleaks-report-'));
       try {
         // A random tail each run, so no fixed fake key sits in the repository.
         const tail = Array.from({ length: 32 }, () =>
@@ -111,14 +106,11 @@ describe('.gitleaks.toml (the allowlist skips whole path segments only)', () => 
           ),
         ).join('');
         const line = `export const STRIPE_SECRET_KEY = "${['sk', 'live', tail].join('_')}";\n`;
-        for (const file of [
-          '.github/workflows/canary.yml',
-          'node_modules/planted/canary.js',
-        ]) {
+        for (const file of [...SCANNED, ...SKIPPED]) {
           mkdirSync(join(root, file, '..'), { recursive: true });
           writeFileSync(join(root, file), line);
         }
-        const report = join(root, 'report.json');
+        const report = join(reports, 'report.json');
         const scan = spawnSync(
           // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'gitleaks' binary, no user input
           'gitleaks',
@@ -141,12 +133,13 @@ describe('.gitleaks.toml (the allowlist skips whole path segments only)', () => 
           { encoding: 'utf8' },
         );
         expect(scan.status, scan.stderr).toBe(0);
-        const files = (
-          JSON.parse(readFileSync(report, 'utf8')) as { File: string }[]
-        ).map((finding) => finding.File.slice(root.length + 1));
-        expect(files).toEqual(['.github/workflows/canary.yml']);
+        const files = (JSON.parse(readFileSync(report, 'utf8')) as { File: string }[])
+          .map((finding) => finding.File.slice(root.length + 1))
+          .sort();
+        expect(files).toEqual([...SCANNED].sort());
       } finally {
         rmSync(root, { recursive: true, force: true });
+        rmSync(reports, { recursive: true, force: true });
       }
     },
   );

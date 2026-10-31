@@ -63,7 +63,12 @@ function toolVersion(key: string): string {
     join(PROJECT_ROOT, 'tooling/setup/agent/tool-versions.sh'),
     'utf-8',
   );
-  return new RegExp(`^${key}=(\\S+)$`, 'm').exec(pins)?.[1] ?? '';
+  return (
+    pins
+      .split('\n')
+      .find((line) => line.startsWith(`${key}=`))
+      ?.slice(key.length + 1) ?? ''
+  );
 }
 
 /** The binary each `pnpm exec` server runs → the devDependency that installs it. */

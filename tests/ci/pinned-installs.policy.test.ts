@@ -36,7 +36,12 @@ const pins = readFileSync('tooling/setup/agent/tool-versions.sh', 'utf8');
 
 /** The pinned value of `key` in tool-versions.sh. */
 function pin(key: string): string {
-  return new RegExp(`^${key}=(\\S+)$`, 'm').exec(pins)?.[1] ?? '';
+  return (
+    pins
+      .split('\n')
+      .find((line) => line.startsWith(`${key}=`))
+      ?.slice(key.length + 1) ?? ''
+  );
 }
 
 /** A package runner (`npx`, `pnpm dlx`, …) and where it starts in a line. */
