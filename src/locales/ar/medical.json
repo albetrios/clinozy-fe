@@ -472,7 +472,11 @@
         "ordersValue_few": "{{count}} طلبات · {{amount}}",
         "ordersValue_many": "{{count}} طلبًا · {{amount}}",
         "ordersValue_other": "{{count}} طلب · {{amount}}",
-        "noOrders": "لا طلبات بعد"
+        "noOrders": "لا طلبات بعد",
+        "email": "البريد الإلكتروني",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
+        "address": "العنوان"
       },
       "account": {
         "label": "الحساب",
@@ -560,7 +564,18 @@
         "compositionPlaceholder": "مثلًا Tretinoin 0.025%",
         "soldWith": "البيع",
         "prescriptionOnly": "بوصفة طبية فقط",
-        "overTheCounter": "بدون وصفة"
+        "overTheCounter": "بدون وصفة",
+        "hsnCode": "رمز HSN",
+        "hsnCodeHint": "4 أو 6 أو 8 أرقام",
+        "hsnCodeInvalid": "أدخل رمز HSN من 4 أو 6 أو 8 أرقام",
+        "pack": "العبوة",
+        "packHint": "كما هو مطبوع",
+        "packPlaceholder": "مثل 1*10",
+        "unitsPerPack": "الوحدات في العبوة",
+        "unitsPerPackHint": "1 = عبوات كاملة فقط",
+        "unitsPerPackLocked": "بِع مخزونه أو أرجعه أولًا",
+        "decreaseUnits": "وحدات أقل في العبوة",
+        "increaseUnits": "وحدات أكثر في العبوة"
       },
       "price": {
         "mrp": "السعر الأقصى",
@@ -588,7 +603,18 @@
         "decreaseFill": "خفض مستوى التعبئة",
         "increaseFill": "رفع مستوى التعبئة",
         "hintAlert": "تنبيه إعادة الطلب عندما ينخفض المخزون إلى {{count}}.",
-        "hintOrder": "اطلب {{qty}} للوصول إلى {{max}}. يظهر في المخزون › مخزون منخفض."
+        "hintOrder": "اطلب {{qty}} للوصول إلى {{max}}. يظهر في المخزون › مخزون منخفض.",
+        "nowLoose": "{{stock}} في المخزون · {{state}}",
+        "reorderAtUnits": "إعادة الطلب عند (وحدات)",
+        "fillUpToUnits": "التعبئة حتى (وحدات)",
+        "hintAlertUnits_zero": "تنبيه إعادة الطلب عندما ينخفض المخزون إلى {{count}} وحدات.",
+        "hintAlertUnits_one": "تنبيه إعادة الطلب عندما ينخفض المخزون إلى {{count}} وحدة.",
+        "hintAlertUnits_two": "تنبيه إعادة الطلب عندما ينخفض المخزون إلى {{count}} وحدات.",
+        "hintAlertUnits_few": "تنبيه إعادة الطلب عندما ينخفض المخزون إلى {{count}} وحدات.",
+        "hintAlertUnits_many": "تنبيه إعادة الطلب عندما ينخفض المخزون إلى {{count}} وحدات.",
+        "hintAlertUnits_other": "تنبيه إعادة الطلب عندما ينخفض المخزون إلى {{count}} وحدات.",
+        "hintOrderPacks": "اطلب {{packs}} للوصول إلى {{max}} وحدة. يظهر في المخزون › مخزون منخفض.",
+        "unitsNote": "يُحسب بالوحدات · {{perPack}}"
       },
       "batches": {
         "title": "التشغيلات",
@@ -600,7 +626,9 @@
         "add": "إضافة تشغيلة",
         "total": "{{count}} في المخزون",
         "expiryInvalid": "أدخل تاريخ الانتهاء بصيغة MM/YY",
-        "batchMissing": "أدخل رقم التشغيلة"
+        "batchMissing": "أدخل رقم التشغيلة",
+        "mrp": "السعر الأقصى",
+        "qtyUnits": "الوحدات"
       },
       "rates": {
         "title": "أسعار الموردين",
@@ -672,7 +700,10 @@
         "quickLine": "اكتب الدواء والكمية والمجاني والسعر · مثال: azel 20 +2 @180",
         "quickHint": "20 = الكمية · +2 = مجاني · @180 = السعر",
         "lowStockChip": "{{name}} · متبقٍ {{quantity}}",
-        "newMedicineName": "اسم دواء جديد"
+        "newMedicineName": "اسم دواء جديد",
+        "note": "ملاحظة",
+        "notePlaceholder": "مثل: الدفع خلال 30 يومًا",
+        "mrp": "السعر الأقصى"
       },
       "quickFill": {
         "reorder": "إعادة طلب المخزون المنخفض"
@@ -706,7 +737,9 @@
       "addUnexpected": "إضافة صنف غير متوقع",
       "enterQuantity": "أدخل كمية",
       "save": "تعليم كمستلم",
-      "saved": "تم استلام البضاعة · أُضيف المخزون والكمية المجانية"
+      "saved": "تم استلام البضاعة · أُضيف المخزون والكمية المجانية",
+      "mrp": "السعر الأقصى",
+      "note": "ملاحظة"
     },
     "orderView": {
       "title": "أمر الشراء",
@@ -717,7 +750,10 @@
       "paidOf": "مدفوع {{paid}} من {{total}}",
       "paidWithCredits": "مدفوع {{paid}} + {{credited}} من أرصدة المورد",
       "pay": "ادفع {{amount}}",
-      "print": "طباعة"
+      "print": "طباعة",
+      "note": "ملاحظة",
+      "saveNote": "حفظ الملاحظة",
+      "noteSaved": "تم حفظ الملاحظة"
     },
     "sale": {
       "title": "البيع",
@@ -797,7 +833,8 @@
       },
       "summary": "يقلّل الرصيد ما تدين به لـ {{supplier}}",
       "save": "إرجاع وأخذ الرصيد",
-      "saved": "تم إرجاع {{count}} · رصيد {{amount}} من {{supplier}}"
+      "saved": "تم إرجاع {{count}} · رصيد {{amount}} من {{supplier}}",
+      "quantityUnits": "الكمية (وحدات)"
     },
     "prescriptions": {
       "sub": "وصفة {{rx}} · {{date}} · {{medicines}}"

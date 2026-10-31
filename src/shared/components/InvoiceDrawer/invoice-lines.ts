@@ -4,6 +4,7 @@ import {
   type MedicineForm,
   medicineForm,
   type MedicineRow,
+  saleUnitPaise,
 } from '@/shared/api/app/medicines-contracts.ts';
 import type {
   OfferingRecord,
@@ -40,8 +41,10 @@ export interface InvoiceCatalogItem extends QuickLineSearchable {
   price: number;
   /** Sessions a unit covers — a package's, plus a live extra-sessions offer's. */
   sessions: number;
-  /** A medicine's stock; null for an offering. */
+  /** A medicine's stock, in units; null for an offering. */
   stock: number | null;
+  /** A medicine's loose units per pack (1 sells whole packs); 1 for an offering. */
+  unitsPerPack: number;
   /** The live price offer the list names ("Navratri glow"), if any. */
   promo: string | null;
   /** The offering's category, or the medicine's composition — the sub line's words. */
@@ -98,6 +101,7 @@ export function offeringCatalogItem(
     price: paiseOfRupees(billed.final),
     sessions: offering.sessions + billed.extraSessions,
     stock: null,
+    unitsPerPack: 1,
     promo: billed.priceOffer?.name ?? null,
     detail: offering.category,
     tone: offering.tone,
@@ -105,11 +109,13 @@ export function offeringCatalogItem(
 }
 
 /**
- * One medicine as a sale bills it (D45, Q-M3): its MRP (the API's rupees, in paise here), GST
- * 0% on top, the near-expiry discount, and the stock the server counts.
+ * One medicine as a sale bills it (D45, Q-M3): a unit's price — the MRP of the batch drawn first,
+ * over the units a pack holds, rounded down (change-pharmacy-record-fields D2, D6; the server
+ * prices the line itself) — GST 0% on top, the near-expiry discount, and the stock the server
+ * counts, in units.
  */
 export function medicineCatalogItem(medicine: MedicineRow): InvoiceCatalogItem {
-  const mrp = paiseOfRupees(medicine.mrp);
+  const mrp = saleUnitPaise(medicine);
   return {
     key: medicine.id,
     kind: 'medicine',
@@ -127,6 +133,7 @@ export function medicineCatalogItem(medicine: MedicineRow): InvoiceCatalogItem {
     price: mrp,
     sessions: 1,
     stock: medicine.stock,
+    unitsPerPack: Math.max(1, medicine.unitsPerPack),
     promo: null,
     detail: medicine.composition,
     tone: null,

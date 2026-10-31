@@ -8,6 +8,7 @@ import {
   emptyBatch,
   emptyMedicineForm,
   formStock,
+  hsnCodeIsInvalid,
   medicineFormOf,
   type MedicineFormValues,
   medicineInputOf,
@@ -16,6 +17,7 @@ import {
   mrpPaiseOf,
   nextSupplierRate,
   stockBarScale,
+  unitsPerPackLocked,
 } from './medicine-form.ts';
 
 const MAKER = '11111111-1111-4111-8111-111111111111';
@@ -35,6 +37,9 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
       manufacturerId: MAKER,
       composition: '',
       prescriptionOnly: false,
+      hsnCode: '',
+      packLabel: '',
+      unitsPerPack: 1,
       mrp: '',
       gstPct: 12,
       minStock: 2,
@@ -58,6 +63,7 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
           expiry: '11/26',
           qty: 3,
           purchaseRate: 123,
+          mrp: 165.5,
           supplierId: AKSHAR,
           expired: false,
         },
@@ -86,6 +92,7 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
         expiry: '11/26',
         qty: 3,
         purchaseRate: 12_300,
+        mrp: 16_550,
         supplierId: AKSHAR,
       },
     ]);
@@ -123,7 +130,7 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
             { supplierId: AKSHAR, rate: 0, free: 0, leadDays: 2 },
             { supplierId: '', rate: 0, free: 0, leadDays: 2 },
           ],
-          batches: [{ batchNo: '', expiry: '13/27', qty: 2, purchaseRate: 0 }],
+          batches: [{ batchNo: '', expiry: '13/27', qty: 2, purchaseRate: 0, mrp: 0 }],
         }),
       ),
     ).toEqual({ rule: 'rates', fields: ['supplierRates.0.rate'] });
@@ -132,7 +139,9 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
   it('flags a started batch without its number, then a bad expiry; a blank one passes', () => {
     expect(
       medicineRowProblem(
-        form({ batches: [{ batchNo: '', expiry: '11/26', qty: 2, purchaseRate: 0 }] }),
+        form({
+          batches: [{ batchNo: '', expiry: '11/26', qty: 2, purchaseRate: 0, mrp: 0 }],
+        }),
       ),
     ).toEqual({ rule: 'batchNo', fields: ['batches.0.batchNo'] });
     expect(
@@ -140,7 +149,7 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
         form({
           batches: [
             emptyBatch(),
-            { batchNo: 'B1', expiry: '13/27', qty: 2, purchaseRate: 0 },
+            { batchNo: 'B1', expiry: '13/27', qty: 2, purchaseRate: 0, mrp: 0 },
           ],
         }),
       ),
@@ -155,15 +164,25 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
           name: ' Azelan 20% Cream ',
           composition: '  ',
           mrp: '650.5',
+          hsnCode: ' 3004 ',
+          packLabel: ' 1*10 ',
+          unitsPerPack: 10,
           batches: [
             emptyBatch(),
-            { batchNo: ' B1 ', expiry: '11/27 ', qty: 4, purchaseRate: 30_000 },
+            {
+              batchNo: ' B1 ',
+              expiry: '11/27 ',
+              qty: 4,
+              purchaseRate: 30_000,
+              mrp: 12_555,
+            },
             {
               id: 'mbt_saved0000000000000000',
               batchNo: 'B0',
               expiry: '01/27',
               qty: 1,
               purchaseRate: 0,
+              mrp: 0,
             },
           ],
           supplierRates: [
@@ -177,18 +196,29 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
       composition: null,
       manufacturerId: MAKER,
       prescriptionOnly: false,
+      hsnCode: '3004',
+      packLabel: '1*10',
+      unitsPerPack: 10,
       mrp: 650.5,
       gstPct: 12,
       minStock: 2,
       maxStock: 10,
       batches: [
-        { batchNo: 'B1', expiry: '11/27', qty: 4, purchaseRate: 300, supplierId: null },
+        {
+          batchNo: 'B1',
+          expiry: '11/27',
+          qty: 4,
+          purchaseRate: 300,
+          mrp: 125.55,
+          supplierId: null,
+        },
         {
           id: 'mbt_saved0000000000000000',
           batchNo: 'B0',
           expiry: '01/27',
           qty: 1,
           purchaseRate: null,
+          mrp: null,
           supplierId: null,
         },
       ],
@@ -215,6 +245,18 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
       nextSupplierRate(priced, [{ id: AKSHAR, manufacturerIds: [MAKER] }], MAKER)
         .supplierId,
     ).toBe('');
+  });
+
+  it('takes an HSN code of 4, 6 or 8 digits; locks the units per pack while stocked (D7)', () => {
+    expect(hsnCodeIsInvalid(form())).toBe(false);
+    expect(hsnCodeIsInvalid(form({ hsnCode: '3004' }))).toBe(false);
+    expect(hsnCodeIsInvalid(form({ hsnCode: '300490' }))).toBe(false);
+    expect(hsnCodeIsInvalid(form({ hsnCode: '30049' }))).toBe(true);
+    expect(hsnCodeIsInvalid(form({ hsnCode: 'HSN' }))).toBe(true);
+    expect(unitsPerPackLocked(null)).toBe(false);
+    expect(unitsPerPackLocked(medicineRow({ stock: 0 }))).toBe(false);
+    expect(unitsPerPackLocked(medicineRow({ stock: 3 }))).toBe(true);
+    expect(medicineInputOf(form({ unitsPerPack: 0 })).unitsPerPack).toBe(1);
   });
 
   it('places the levels on a bar that reaches a quarter past the fill-up level', () => {

@@ -87,6 +87,30 @@ describe('what an invoice lists (KICKOFF §6.9 Items)', () => {
     expect(medicineForm('Admosh UV Sunscreen 60g')).toBe('topical');
   });
 
+  it('sells a loose-selling medicine by the unit: the first batch’s MRP over its units, rounded down (D2, D6)', () => {
+    const strip = medicineRow({
+      ...glycolac,
+      mrp: 130,
+      unitsPerPack: 10,
+      stock: 60,
+      batches: [
+        { ...glycolac.batches[0]!, id: 'mbt_old', qty: 0, mrp: 140 },
+        { ...glycolac.batches[0]!, id: 'mbt_now', qty: 60, mrp: 125.55 },
+      ],
+    });
+    expect(medicineCatalogItem(strip)).toMatchObject({
+      price: 1_255,
+      unitsPerPack: 10,
+      line: { rate: 1_255 },
+    });
+    // No MRP on the batch: the medicine's, per unit.
+    const unrecorded = medicineRow({
+      ...strip,
+      batches: [{ ...strip.batches[1]!, mrp: null }],
+    });
+    expect(medicineCatalogItem(unrecorded).price).toBe(1_300);
+  });
+
   it('counts the sessions the server prices as more than one a unit — "Covers 7 sessions" (H:5068)', () => {
     expect(
       coveredSessions([

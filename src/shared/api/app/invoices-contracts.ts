@@ -57,7 +57,10 @@ export interface InvoiceLine {
   medicineId: string | null;
   /** The offering's or medicine's name as billed. */
   name: string;
+  /** A medicine line's pack label when billed ("1*10"). */
   packSize: string | null;
+  /** A medicine line's HSN code when billed (change-pharmacy-record-fields D3). */
+  hsnCode: string | null;
   qty: number;
   /** The rate billed — the offering's price, its live offer's, never below the lowest price. */
   rate: number;
@@ -132,9 +135,19 @@ export interface InvoiceRecord {
 
 // ── The wire ──
 
-type ApiInvoiceRow = NonNullable<ApiData<'/app/invoices', 'get'>>[number];
-type ApiInvoice = NonNullable<ApiData<'/app/invoices/{invoice_id}', 'get'>>;
-type ApiInvoicePreview = NonNullable<ApiData<'/app/invoices/preview', 'post'>>;
+/**
+ * An answer with lines, plus the HSN code change-pharmacy-record-fields snapshots on each line
+ * (D3), which clinozy-be's OpenAPI response map does not list yet (F1). Once `pnpm api:types`
+ * carries it, this is the documented shape again.
+ */
+type WithLineHsn<Api extends { items?: readonly object[] }> = Omit<Api, 'items'> & {
+  items?: (NonNullable<Api['items']>[number] & { hsn_code?: string | null })[];
+};
+type ApiInvoiceRow = WithLineHsn<NonNullable<ApiData<'/app/invoices', 'get'>>[number]>;
+type ApiInvoice = WithLineHsn<NonNullable<ApiData<'/app/invoices/{invoice_id}', 'get'>>>;
+type ApiInvoicePreview = WithLineHsn<
+  NonNullable<ApiData<'/app/invoices/preview', 'post'>>
+>;
 type ApiInvoiceListMeta = NonNullable<
   operations['getAppInvoices']['responses'][200]['content']['application/json']['meta']
 >;
@@ -153,6 +166,7 @@ const invoiceLineFieldsWire = {
   medicine_id: z.string().nullable(),
   name: z.string(),
   pack_size: z.string().nullable(),
+  hsn_code: z.string().nullable(),
   quantity: z.number().int(),
   rate: z.number(),
   discount_percent: z.number(),
@@ -241,6 +255,7 @@ export function toInvoiceRecord(row: InvoiceWire): InvoiceRecord {
       medicineId: line.medicine_id,
       name: line.name,
       packSize: line.pack_size,
+      hsnCode: line.hsn_code,
       qty: line.quantity,
       rate: line.rate,
       discountPct: line.discount_percent,
@@ -347,6 +362,7 @@ export function toInvoicePreview(
       medicineId: line.medicine_id,
       name: line.name,
       packSize: line.pack_size,
+      hsnCode: line.hsn_code,
       qty: line.quantity,
       rate: line.rate,
       discountPct: line.discount_percent,

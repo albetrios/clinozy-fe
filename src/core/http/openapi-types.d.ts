@@ -10601,6 +10601,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -10677,6 +10678,7 @@ export interface operations {
                     invoice_date?: string;
                     items: {
                         batch_number?: string | null;
+                        description?: string | null;
                         discount_percent?: number;
                         medicine_id?: string;
                         offering_id?: string;
@@ -10734,6 +10736,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -10828,6 +10831,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -10931,6 +10935,7 @@ export interface operations {
                     invoice_date?: string;
                     items?: {
                         batch_number?: string | null;
+                        description?: string | null;
                         discount_percent?: number;
                         id?: string;
                         medicine_id?: string;
@@ -10977,6 +10982,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -11214,6 +11220,7 @@ export interface operations {
                     invoice_date?: string;
                     items?: {
                         batch_number?: string | null;
+                        description?: string | null;
                         discount_percent?: number;
                         id?: string;
                         medicine_id?: string;
@@ -11246,6 +11253,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -11335,6 +11343,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -11460,6 +11469,7 @@ export interface operations {
                     invoice_date?: string;
                     items: {
                         batch_number?: string | null;
+                        description?: string | null;
                         discount_percent?: number;
                         medicine_id?: string;
                         offering_id?: string;
@@ -11493,6 +11503,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -14217,6 +14228,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -14296,6 +14308,7 @@ export interface operations {
                     branch_id: string;
                     contact_id: string;
                     items: {
+                        description?: string | null;
                         discount_percent?: number;
                         medicine_id: string;
                         quantity: number;
@@ -14352,6 +14365,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -14458,6 +14472,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -14595,6 +14610,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -14718,6 +14734,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;

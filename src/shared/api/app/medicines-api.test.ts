@@ -56,6 +56,9 @@ const input = (fields: Partial<MedicineInput> = {}): MedicineInput => ({
   composition: 'Azelaic acid 15%',
   manufacturerId: TEST_MAKER_ID,
   prescriptionOnly: false,
+  hsnCode: null,
+  packLabel: null,
+  unitsPerPack: 1,
   mrp: 650,
   gstPct: 12,
   minStock: 2,
@@ -67,6 +70,7 @@ const input = (fields: Partial<MedicineInput> = {}): MedicineInput => ({
       expiry: '12/27',
       qty: 12,
       purchaseRate: 420,
+      mrp: null,
       supplierId: TEST_SUPPLIER_ID,
     },
   ],
@@ -211,6 +215,9 @@ describe('the writes', () => {
           composition: 'Azelaic acid 15%',
           manufacturer_id: TEST_MAKER_ID,
           is_prescription_only: false,
+          hsn_code: null,
+          pack_label: null,
+          units_per_pack: 1,
           mrp: 650,
           gst_percent: 12,
           min_stock: 2,
@@ -221,6 +228,7 @@ describe('the writes', () => {
               expiry_month: '2027-12',
               quantity: 12,
               purchase_rate: 420,
+              mrp: null,
               supplier_id: TEST_SUPPLIER_ID,
             },
           ],
@@ -246,6 +254,30 @@ describe('the writes', () => {
         idempotencyKey: 'key',
       },
     ]);
+  });
+
+  it('a save sends the HSN code, pack and units per pack, and a batch’s MRP (D5, D8)', async () => {
+    vi.mocked(api.patch).mockResolvedValue({ data: medicineWire() } as never);
+    const [batch] = input().batches;
+    await updateMedicine(
+      medicineRow(),
+      input({
+        hsnCode: '3004',
+        packLabel: '1*10',
+        batches: [{ ...batch!, mrp: 125.55 }],
+      }),
+      'key',
+    );
+    expect(vi.mocked(api.patch).mock.calls[0]?.[1]).toMatchObject({
+      body: {
+        hsn_code: '3004',
+        pack_label: '1*10',
+        batches: [expect.objectContaining({ id: TEST_BATCH_ID, mrp: 125.55 })],
+      },
+    });
+    expect(vi.mocked(api.patch).mock.calls[0]?.[1]).not.toHaveProperty(
+      'body.units_per_pack',
+    );
   });
 
   it('a save of nothing changed writes nothing; a quick record saved as it is turns full', async () => {

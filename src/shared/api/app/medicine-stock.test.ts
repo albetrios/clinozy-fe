@@ -16,8 +16,11 @@ import {
   medicineStockLevel,
   mrpSplit,
   nearestExpiry,
+  packsAndLoose,
+  reorderPacks,
   reorderQuantity,
   stockFillPercent,
+  unitRatePaise,
   withTakes,
 } from './medicine-stock.ts';
 
@@ -129,5 +132,23 @@ describe('margin', () => {
 
   it('splits an MRP that includes GST (D45)', () => {
     expect(mrpSplit(65_000, 18)).toEqual({ base: 55_085, gst: 9_915 });
+  });
+
+  it('splits units into whole packs and the loose rest (D5)', () => {
+    expect(packsAndLoose(34, 10)).toEqual({ packs: 3, loose: 4 });
+    expect(packsAndLoose(34, 1)).toEqual({ packs: 34, loose: 0 });
+    expect(packsAndLoose(-2, 10)).toEqual({ packs: 0, loose: 0 });
+  });
+
+  it('orders whole packs to fill up to the units wanted (F6)', () => {
+    expect(reorderPacks(4, 30, 10)).toBe(3);
+    expect(reorderPacks(25, 30, 10)).toBe(1);
+    expect(reorderPacks(2, 10, 1)).toBe(8);
+  });
+
+  it('prices one unit at the pack rate over its units, to the paisa', () => {
+    expect(unitRatePaise(9_000, 10)).toBe(900);
+    expect(unitRatePaise(12_555, 10)).toBe(1_256);
+    expect(unitRatePaise(12_300, 1)).toBe(12_300);
   });
 });

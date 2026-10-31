@@ -43,12 +43,17 @@ const textOrNull = (text: string | null) => (text?.trim() ? text.trim() : null);
 
 // ── Suppliers ──
 
-/** Supplier: Agency name* · Phone · GST number · the makers it distributes (`medical.md:190–200`). */
+/**
+ * Supplier: Agency name* · Phone · GST number · Email · Address · the makers it distributes
+ * (`medical.md:190–200`; change-pharmacy-record-fields D9).
+ */
 export interface SupplierInput {
   name: string;
   /** E.164, or none. */
   phone: string | null;
   gstNumber: string | null;
+  email: string | null;
+  address: string | null;
   manufacturerIds: string[];
   /** Added from a picker's stacked "New supplier" — set on create only. */
   isQuick?: boolean;
@@ -61,6 +66,8 @@ export const supplierCreateBodyOf = (
   name: input.name.trim(),
   phone: input.phone,
   gst_number: textOrNull(input.gstNumber),
+  email: textOrNull(input.email),
+  address: textOrNull(input.address),
   manufacturer_ids: input.manufacturerIds,
   is_quick: input.isQuick ?? false,
 });
@@ -75,6 +82,10 @@ export function supplierChangeOf(
   if (input.phone !== record.phone) change.phone = input.phone;
   if (textOrNull(input.gstNumber) !== record.gstNumber) {
     change.gst_number = textOrNull(input.gstNumber);
+  }
+  if (textOrNull(input.email) !== record.email) change.email = textOrNull(input.email);
+  if (textOrNull(input.address) !== record.address) {
+    change.address = textOrNull(input.address);
   }
   if (!sameIds(input.manufacturerIds, record.manufacturerIds)) {
     change.manufacturer_ids = input.manufacturerIds;
@@ -209,7 +220,8 @@ export const mrVisitBodyOf = (
 
 /**
  * One line of a purchase order: a medicine the store stocks — or a typed name the server adds as
- * a quick medicine (MD26) — how many, the free units and the rate, rupees.
+ * a quick medicine (MD26) — how many packs, the free packs and a pack's rate, rupees, and the MRP
+ * printed on the packs when known (D8).
  */
 export interface PurchaseOrderLineInput {
   medicineId: string | null;
@@ -218,21 +230,25 @@ export interface PurchaseOrderLineInput {
   qty: number;
   free: number;
   rate: number;
+  /** The MRP printed on the packs, rupees; none when not known. */
+  mrp?: number | null;
 }
 
 /**
- * New / Edit purchase order (`medical.md:254–267`): the supplier, its bill number, the order date
- * and the lines.
+ * New / Edit purchase order (`medical.md:254–267`): the supplier, its bill number, the order date,
+ * the desk's note (D10) and the lines.
  */
 export interface PurchaseOrderInput {
   supplierId: string;
   supplierBillNo: string | null;
   /** `YYYY-MM-DD`. */
   date: string;
+  /** "30 DAYS DUE", "without gst bill" — none when blank. */
+  note?: string | null;
   items: PurchaseOrderLineInput[];
 }
 
-/** A line in the API's words: the medicine, or the typed name of a new one. */
+/** A line in the API's words: the medicine, or the typed name of a new one, and its MRP. */
 function orderLineOf(line: PurchaseOrderLineInput) {
   return {
     ...(line.medicineId
@@ -241,6 +257,8 @@ function orderLineOf(line: PurchaseOrderLineInput) {
     quantity: line.qty,
     free_quantity: line.free,
     rate: line.rate,
+    // A line's list is replaced whole: a line without an MRP sends none and keeps none.
+    ...(line.mrp ? { mrp: line.mrp } : {}),
   };
 }
 
@@ -252,6 +270,9 @@ export const purchaseOrderCreateBodyOf = (
   items: input.items.map(orderLineOf),
   ...(textOrNull(input.supplierBillNo)
     ? { supplier_bill_number: textOrNull(input.supplierBillNo) ?? '' }
+    : {}),
+  ...(textOrNull(input.note ?? null)
+    ? { note: textOrNull(input.note ?? null) ?? '' }
     : {}),
   order_date: input.date,
 });
@@ -273,6 +294,9 @@ export function purchaseOrderChangeOf(
     change.supplier_bill_number = textOrNull(input.supplierBillNo);
   }
   if (input.date !== record.date) change.order_date = input.date;
+  if (textOrNull(input.note ?? null) !== record.note) {
+    change.note = textOrNull(input.note ?? null);
+  }
   const lines = input.items.map(orderLineOf);
   const saved = record.lines.map((line) =>
     orderLineOf({
@@ -280,6 +304,7 @@ export function purchaseOrderChangeOf(
       qty: line.qty,
       free: line.free,
       rate: line.rate,
+      mrp: line.mrp,
     }),
   );
   if (JSON.stringify(lines) !== JSON.stringify(saved)) change.items = lines;
@@ -287,7 +312,24 @@ export function purchaseOrderChangeOf(
   return { ...change, expected_updated_at: record.updatedAt };
 }
 
-/** One ordered line on Receive goods: whether it arrived, its batch and expiry (`medical.md:271–275`). */
+/**
+ * A received order's note as `PATCH /app/medical-purchase-orders/:id` takes it — the one change a
+ * received order accepts (D10): the note alone, with the read's `updated_at`; null when it did
+ * not change.
+ */
+export function purchaseOrderNoteChangeOf(
+  record: PurchaseOrderRow,
+  note: string | null,
+): ApiBody<'/app/medical-purchase-orders/{medical_purchase_order_id}', 'patch'> | null {
+  const next = textOrNull(note);
+  if (next === record.note) return null;
+  return { note: next, expected_updated_at: record.updatedAt };
+}
+
+/**
+ * One ordered line on Receive goods: whether it arrived, its batch and expiry
+ * (`medical.md:271–275`), and the MRP printed on its packs — none keeps the order line's (D8).
+ */
 interface ReceiveLineInput {
   /** The order line (`mpoi_…`). */
   id: string;
@@ -295,6 +337,8 @@ interface ReceiveLineInput {
   batchNo: string | null;
   /** "MM/YY", or none. */
   expiry: string | null;
+  /** Rupees; none keeps the order line's. */
+  mrp?: number | null;
 }
 
 /**
@@ -312,6 +356,8 @@ export interface ReceiveInput {
   extras?: ReceiveExtraInput[];
   /** The supplier's bill number, when it came with the goods. */
   supplierBillNo?: string | null;
+  /** The order's note, written as the goods arrive ("30 DAYS DUE"). */
+  note?: string | null;
 }
 
 /** A batch and expiry in the API's words — none when blank. */
@@ -334,6 +380,7 @@ export const receiveBodyOf = (
       id: line.id,
       is_received: line.arrived,
       ...(line.arrived ? batchOf(line.batchNo, line.expiry) : {}),
+      ...(line.arrived && line.mrp ? { mrp: line.mrp } : {}),
     })),
     ...(input.extras ?? []).map((extra) => ({
       ...orderLineOf(extra),
@@ -342,6 +389,9 @@ export const receiveBodyOf = (
   ],
   ...(textOrNull(input.supplierBillNo ?? null)
     ? { supplier_bill_number: textOrNull(input.supplierBillNo ?? null) ?? '' }
+    : {}),
+  ...(textOrNull(input.note ?? null)
+    ? { note: textOrNull(input.note ?? null) ?? '' }
     : {}),
 });
 
@@ -412,7 +462,10 @@ export const saleReturnBodyOf = (
 
 // ── Supplier credits ──
 
-/** Return expiring stock (`medical.md:297–309`, route 15): the supplier, the batch and how many packs. */
+/**
+ * Return expiring stock (`medical.md:297–309`, route 15): the supplier, the batch and how many
+ * units — packs while the medicine sells whole packs (D5).
+ */
 export interface ExpiringReturnInput {
   supplierId: string;
   /** The batch (`mbt_…`). */

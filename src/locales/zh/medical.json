@@ -382,7 +382,11 @@
         "nothingDue": "无应付款",
         "orders": "订单",
         "ordersValue_other": "{{count}} 张订单 · {{amount}}",
-        "noOrders": "暂无订单"
+        "noOrders": "暂无订单",
+        "email": "邮箱",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "请输入有效的邮箱",
+        "address": "地址"
       },
       "account": {
         "label": "账户",
@@ -470,7 +474,18 @@
         "compositionPlaceholder": "例如 维 A 酸 0.025%",
         "soldWith": "销售方式",
         "prescriptionOnly": "仅凭处方",
-        "overTheCounter": "非处方"
+        "overTheCounter": "非处方",
+        "hsnCode": "HSN 编码",
+        "hsnCodeHint": "4、6 或 8 位数字",
+        "hsnCodeInvalid": "请输入 4、6 或 8 位 HSN 编码",
+        "pack": "包装",
+        "packHint": "按包装印刷",
+        "packPlaceholder": "例如 1*10",
+        "unitsPerPack": "每盒单位数",
+        "unitsPerPackHint": "1 = 仅整盒销售",
+        "unitsPerPackLocked": "请先售出或退回其库存",
+        "decreaseUnits": "减少每盒单位数",
+        "increaseUnits": "增加每盒单位数"
       },
       "price": {
         "mrp": "零售价",
@@ -498,7 +513,13 @@
         "decreaseFill": "降低补货上限",
         "increaseFill": "提高补货上限",
         "hintAlert": "库存降至 {{count}} 时提醒补货。",
-        "hintOrder": "订购 {{qty}} 补至 {{max}}。显示在 库存 › 低库存。"
+        "hintOrder": "订购 {{qty}} 补至 {{max}}。显示在 库存 › 低库存。",
+        "nowLoose": "库存 {{stock}} · {{state}}",
+        "reorderAtUnits": "补货点（单位）",
+        "fillUpToUnits": "补至（单位）",
+        "hintAlertUnits_other": "库存降至 {{count}} 个单位时提醒补货。",
+        "hintOrderPacks": "订购 {{packs}} 补至 {{max}} 个单位。显示在 库存 › 低库存。",
+        "unitsNote": "按单位计 · {{perPack}}"
       },
       "batches": {
         "title": "批次",
@@ -510,7 +531,9 @@
         "add": "添加批次",
         "total": "库存 {{count}}",
         "expiryInvalid": "请按 MM/YY 填写有效期",
-        "batchMissing": "请填写批次"
+        "batchMissing": "请填写批次",
+        "mrp": "零售价",
+        "qtyUnits": "单位"
       },
       "rates": {
         "title": "供应商价格",
@@ -577,7 +600,10 @@
         "quickLine": "输入药品、数量、赠品、单价 · 例如 azel 20 +2 @180",
         "quickHint": "20 = 数量 · +2 = 赠品 · @180 = 单价",
         "lowStockChip": "{{name}} · 剩 {{quantity}}",
-        "newMedicineName": "新药品名称"
+        "newMedicineName": "新药品名称",
+        "note": "备注",
+        "notePlaceholder": "例如 30 天付款",
+        "mrp": "零售价"
       },
       "quickFill": {
         "reorder": "补货低库存"
@@ -606,7 +632,9 @@
       "addUnexpected": "添加意外到货品项",
       "enterQuantity": "请输入数量",
       "save": "标记为已收货",
-      "saved": "已收货 · 库存和赠品数量已添加"
+      "saved": "已收货 · 库存和赠品数量已添加",
+      "mrp": "零售价",
+      "note": "备注"
     },
     "orderView": {
       "title": "采购单",
@@ -617,7 +645,10 @@
       "paidOf": "已付 {{paid}} / {{total}}",
       "paidWithCredits": "已付 {{paid}} + 供应商抵扣 {{credited}}",
       "pay": "支付 {{amount}}",
-      "print": "打印"
+      "print": "打印",
+      "note": "备注",
+      "saveNote": "保存备注",
+      "noteSaved": "备注已保存"
     },
     "sale": {
       "title": "销售",
@@ -687,7 +718,8 @@
       },
       "summary": "抵扣会减少您欠 {{supplier}} 的金额",
       "save": "退回并获取抵扣",
-      "saved": "已退回 {{count}} · 来自 {{supplier}} 的 {{amount}} 抵扣"
+      "saved": "已退回 {{count}} · 来自 {{supplier}} 的 {{amount}} 抵扣",
+      "quantityUnits": "数量（单位）"
     },
     "prescriptions": {
       "sub": "处方 {{rx}} · {{date}} · {{medicines}}"

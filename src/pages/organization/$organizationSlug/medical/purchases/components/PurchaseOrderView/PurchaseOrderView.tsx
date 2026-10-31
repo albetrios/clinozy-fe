@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +11,7 @@ import {
   DrawerField,
   DrawerFieldGrid,
   DrawerInfo,
+  DrawerTextarea,
 } from '@/shared/components/DrawerField/index.ts';
 import {
   printDocument,
@@ -24,6 +26,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
 import {
   type ItemsColumn,
@@ -34,6 +37,7 @@ import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { useMedicalDates } from '../../../shared/components/MedicalCells/medical-dates.ts';
+import { useUpdatePurchaseOrderNote } from '../../../shared/hooks/useMedicalFlows/index.ts';
 import {
   fetchPurchaseOrderSheet,
   medicalQueryKeys,
@@ -48,6 +52,7 @@ import {
   MEDICAL_DRAWER_TEST_IDS,
   MEDICAL_DRAWERS_NS,
 } from '../../../shared/medical-drawers.constants.ts';
+import { ORDER_NOTE_MAX } from '../PurchaseOrderDrawer/purchase-order-form.ts';
 
 const K = MEDICAL_DRAWER_KEYS.orderView;
 const F = MEDICAL_DRAWER_KEYS.purchaseOrder.fields;
@@ -107,6 +112,16 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       cell: ({ row }) => <ItemsReadCell>{formatRupees(row.rate)}</ItemsReadCell>,
     },
     {
+      // The MRP printed on the packs (D8)
+      id: 'mrp',
+      header: t(F.mrp),
+      track: '90px',
+      align: 'end',
+      cell: ({ row }) => (
+        <ItemsReadCell>{row.mrp === null ? '—' : formatRupees(row.mrp)}</ItemsReadCell>
+      ),
+    },
+    {
       id: 'amount',
       header: t(F.amount),
       track: '100px',
@@ -114,6 +129,42 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       cell: ({ row }) => <ItemsReadCell strong>{formatRupees(row.amount)}</ItemsReadCell>,
     },
   ];
+}
+
+/**
+ * A received order's note — the one field it still changes (change-pharmacy-record-fields D10):
+ * the desk writes "30 DAYS DUE" after the goods arrive and saves it on its own.
+ */
+function OrderNote({ order, testId }: { order: PurchaseOrderRow; testId: string }) {
+  const { t } = useTranslation(MEDICAL_DRAWERS_NS);
+  const [note, setNote] = useState(order.note ?? '');
+  const save = useUpdatePurchaseOrderNote({ successMessage: t(K.noteSaved) });
+  const changed = note.trim() !== (order.note ?? '');
+  return (
+    <DrawerField span="full" label={t(K.note)} htmlFor={`${testId}-note-input`}>
+      <DrawerTextarea
+        id={`${testId}-note-input`}
+        value={note}
+        onChange={(event) => setNote(event.target.value)}
+        rows={2}
+        maxLength={ORDER_NOTE_MAX}
+        placeholder={t(F.notePlaceholder)}
+        autoComplete="off"
+        data-testid={`${testId}-note`}
+      />
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        className="mt-2"
+        disabled={!changed || save.isPending}
+        onClick={() => save.mutate({ record: order, note: note.trim() || null })}
+        data-testid={`${testId}-save-note`}
+      >
+        {t(K.saveNote)}
+      </Button>
+    </DrawerField>
+  );
 }
 
 /** The order's lines as read-only item rows. */
@@ -273,6 +324,7 @@ function OrderViewSession({
         <DrawerField span="third" label={t(F.date)}>
           <DrawerInfo testId={`${testId}-date`}>{dates.day(order.date)}</DrawerInfo>
         </DrawerField>
+        <OrderNote order={order} testId={testId} />
       </DrawerFieldGrid>
       <OrderLines order={order} testId={testId} />
     </RecordDrawer>
