@@ -8,7 +8,11 @@
  */
 import { z } from 'zod';
 
-import { enabledOAuthProviders, resolveOAuthProviderFlags } from './env-resolvers.ts';
+import {
+  enabledOAuthProviders,
+  resolveBooleanFlag,
+  resolveOAuthProviderFlags,
+} from './env-resolvers.ts';
 
 const booleanString = (defaultValue: 'true' | 'false') =>
   z
@@ -79,6 +83,8 @@ export const envSchemaBase = z.object({
   // the real value lives in GitHub repository secrets (gh secret set --repo).
   RELEASE_PLEASE_TOKEN: z.string().min(1).optional(),
   CONTEXT7_API_KEY: z.string().min(1).optional(),
+  // The hosted-deploy marker (clinozy-be's A-4): set by the deploy workflows only, never in a file.
+  HOSTED_DEPLOYMENT: booleanString('false'),
 
   // --- Local tooling only (never bundled / never set in CI) ---
   // SonarQube local quality gate — auto-managed in .env.local by tooling/sonar/sonar-gate.mjs.
@@ -155,7 +161,7 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   VITE_TURNSTILE_SITE_KEY:
     'Cloudflare Turnstile site key; required in production unless VITE_CAPTCHA_DISABLED is true.',
   VITE_DEBUG_LOGGING:
-    '"true" emits [Module] diagnostic console logs (on locally and in the development deploy, off in production).',
+    '"true" emits [Module] diagnostic console logs (on locally; refused on every hosted deploy).',
   VITE_DEVTOOLS: '"true" mounts React Query Devtools + the localhost debug panel.',
   VITE_E2E_HOOKS:
     '"true" installs Playwright E2E hooks on globalThis (navigateInApp, establishSession).',
@@ -171,6 +177,8 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
     'GitHub Actions PAT (environment secret on `development`) for release-please, dependabot-auto-merge, and the weekly PAT canary — all three jobs select `environment: development` to read it. Managed deploy secret on `development`: clinozy-infra (`pnpm setup:infra`) writes it into `.env.development` and `pnpm github:sync` pushes it; CI only — never bundled or read locally.',
   CONTEXT7_API_KEY:
     'Context7 docs-MCP API key; consumed by .mcp.json for the docs MCP (local tooling).',
+  HOSTED_DEPLOYMENT:
+    '"true" marks a hosted deploy build (set by the deploy workflows, never in a file): validate:client-env then refuses every test-only switch (VITE_TEST_MODE, VITE_E2E_HOOKS, VITE_DEVTOOLS, VITE_DEBUG_LOGGING). Default false.',
   SONAR_ADMIN_PASSWORD:
     'Local SonarQube admin password; auto-managed by tooling/sonar/sonar-gate.mjs (never in CI).',
   SONAR_TOKEN:
@@ -430,12 +438,13 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
       { ...STORED_FILES_ORIGIN_RULE, level: 'warn' },
     ],
     allowed: { ...devLikeContract.allowed, VITE_APP_ENV: ['development'] },
-    // Development deploy: diagnostics on for debugging, version-check on (a real
-    // deploy), E2E hooks off (not a test runner).
+    // Development deploy: a hosted deploy, so every test-only switch is off (the
+    // HOSTED_DEPLOYMENT marker refuses them — hostedDeploymentRefusals); version-check
+    // on (a real deploy).
     defaults: {
       VITE_APP_ENV: 'development',
-      VITE_DEBUG_LOGGING: 'true',
-      VITE_DEVTOOLS: 'true',
+      VITE_DEBUG_LOGGING: 'false',
+      VITE_DEVTOOLS: 'false',
       VITE_E2E_HOOKS: 'false',
       VITE_VERSION_CHECK: 'true',
     },
@@ -486,6 +495,55 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
     },
   },
 };
+
+/**
+ * The hosted-deploy marker, mirroring clinozy-be's `HOSTED_DEPLOYMENT` (A-4). Every workflow that
+ * builds a hosted bundle — the governed Netlify deploy and the PR preview build — sets it `true`
+ * for its client-env check and build; local machines and CI runners (the e2e and Lighthouse
+ * builds) never do. It is never written in an env file.
+ */
+const HOSTED_DEPLOYMENT_VARIABLE = 'HOSTED_DEPLOYMENT';
+
+/**
+ * The test-only switches a hosted deploy refuses, whatever its environment profile allows, and
+ * what each would expose on a reachable site.
+ */
+export const HOSTED_DEPLOYMENT_REFUSED_SWITCHES: Readonly<Record<string, string>> = {
+  VITE_TEST_MODE: 'marks a test run, which only plugins/test-env.ts sets',
+  VITE_E2E_HOOKS:
+    'installs the Playwright hooks (establishSession, navigateInApp) on globalThis',
+  VITE_DEVTOOLS:
+    'mounts React Query Devtools and the debug panel over cached server data',
+  VITE_DEBUG_LOGGING: 'writes the [Module] diagnostic logs to every visitor console',
+};
+
+/**
+ * Errors for a hosted deploy (`HOSTED_DEPLOYMENT=true`) whose env turns a test-only switch on, or
+ * names the `local` environment; `[]` for any other build. A switch is on as the app reads it
+ * ({@link resolveBooleanFlag}: any value but empty or `false`), and a marker that is neither
+ * `true` nor `false` is an error itself, so a typo never passes as "not hosted".
+ */
+export function hostedDeploymentRefusals(
+  get: (key: string) => string | undefined,
+): string[] {
+  const marker = get(HOSTED_DEPLOYMENT_VARIABLE);
+  if (marker === undefined || marker === '' || marker === 'false') return [];
+  if (marker !== 'true') {
+    return [`${HOSTED_DEPLOYMENT_VARIABLE}=${marker} must be true or false`];
+  }
+  const errors = Object.entries(HOSTED_DEPLOYMENT_REFUSED_SWITCHES)
+    .filter(([key]) => resolveBooleanFlag(get(key), false))
+    .map(
+      ([key, why]) =>
+        `${key}=${get(key)} is refused on a hosted deploy (${HOSTED_DEPLOYMENT_VARIABLE}=true) — it ${why}`,
+    );
+  if (get('VITE_APP_ENV') === 'local') {
+    errors.push(
+      `${HOSTED_DEPLOYMENT_VARIABLE}=true names a deploy, so VITE_APP_ENV must be development or production, not local`,
+    );
+  }
+  return errors;
+}
 
 /**
  * Conditionally required keys surfaced in deploy validators — derived from the

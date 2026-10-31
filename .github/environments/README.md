@@ -50,13 +50,16 @@ variables verbatim. Full key catalog (kind, default, description):
 | Variable                               | development          | production           |
 | -------------------------------------- | -------------------- | -------------------- |
 | `VITE_CAPTCHA_DISABLED`                | `false`              | per captcha rollout  |
-| `VITE_DEBUG_LOGGING` / `VITE_DEVTOOLS` | `true` (diagnostics) | `false` (enforced)   |
-| `VITE_E2E_HOOKS`                       | `false`              | `false` (enforced)   |
+| `VITE_DEBUG_LOGGING` / `VITE_DEVTOOLS` | `false` (refused on) | `false` (enforced)   |
+| `VITE_E2E_HOOKS`                       | `false` (refused on) | `false` (enforced)   |
 | `VITE_VERSION_CHECK`                   | `true`               | `true` (enforced)    |
 | `VITE_SENTRY_*_SAMPLE_RATE` (4 keys)   | optional             | optional             |
 | `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`   | repo-level, optional | repo-level, optional |
 
-An unset variable falls back to the runtime schema default at build time; `VITE_APP_ENV`
+"Refused on": both deploy workflows set the hosted-deploy marker `HOSTED_DEPLOYMENT=true` (clinozy-be's
+A-4), and with it `pnpm validate:client-env` refuses `VITE_TEST_MODE`, `VITE_E2E_HOOKS`, `VITE_DEVTOOLS`
+and `VITE_DEBUG_LOGGING` on, whatever the profile allows — set them `false` (or leave them unset) in
+`.env.development` too. An unset variable falls back to the runtime schema default at build time; `VITE_APP_ENV`
 is **not** a managed variable — the workflows derive it from the resolved environment
 name (and a local `pnpm build --env <environment>` fills it the same way). A new
 `.env.<environment>` scaffolded by `pnpm github:sync` starts from

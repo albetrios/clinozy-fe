@@ -119,6 +119,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     environment: ${{ needs.resolve-environment.outputs.environment }}
+    env:
+      # The hosted-deploy marker (clinozy-be's A-4): this job builds a hosted bundle, so
+      # validate:client-env refuses every test-only switch (VITE_TEST_MODE, VITE_E2E_HOOKS,
+      # VITE_DEVTOOLS, VITE_DEBUG_LOGGING) for development and production alike.
+      HOSTED_DEPLOYMENT: 'true'
     # id-token/attestations: mint a build-provenance attestation for the exact
     # production bundle before it ships (production deploys only — see the
     # prod-gated attest step). contents:read is kept for checkout.

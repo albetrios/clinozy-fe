@@ -196,7 +196,14 @@ code. Each flag is read via `platformConfig`; defaults are production-safe and t
 declares the permitted value set per key per environment. `pnpm validate:client-env`
 **fails** if `.env.<env>` (locally) or the injected GitHub Environment (CI) holds a value
 out of range — e.g. `VITE_DEBUG_LOGGING=true` in production is rejected. Development permits
-either boolean (typos still rejected).
+either boolean (typos still rejected) for a build on a developer's machine.
+
+**Hosted deploys refuse every test-only switch** (clinozy-be's A-4). The workflows that build a
+hosted bundle — `reusable-netlify-deploy.yml` (development and production) and the PR preview build
+(`preview.yml`) — set `HOSTED_DEPLOYMENT=true`, and with it `pnpm validate:client-env` refuses
+`VITE_TEST_MODE`, `VITE_E2E_HOOKS`, `VITE_DEVTOOLS` and `VITE_DEBUG_LOGGING` on, whatever the
+environment's profile allows (`hostedDeploymentRefusals` in `env-schema.ts`). Local machines and CI
+runners (the e2e and Lighthouse builds) never set it; no env file does.
 
 The only remaining raw env read is the config bootstrap (`env.config.ts`, allowlisted by
 `pnpm validate:vite-env`). Tests are **hermetic by construction**: the runner loads no env

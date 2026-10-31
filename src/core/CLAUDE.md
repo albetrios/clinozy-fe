@@ -76,7 +76,7 @@ read via `platformConfig.testMode`), the single home for any test-only behavior.
 ```text
 .env.example         # Reference for all env vars — the ONLY committed file
 .env.local           # Local dev file (gitignored, NODE_ENV=local — the default): flags + secrets
-.env.development     # `development` deploy-env file (gitignored): dev-tooling ON
+.env.development     # `development` deploy-env file (gitignored): test-only switches OFF (a hosted deploy)
 .env.production      # `production` deploy-env file (gitignored): dev-tooling OFF (prod-safe)
 ```
 
@@ -102,9 +102,14 @@ read via `platformConfig.testMode`), the single home for any test-only behavior.
 - **Strict allowed values per environment.** `envProfiles.<env>.allowed` in `env-schema.ts`
   declares the permitted value set per key; `pnpm validate:client-env` **hard-fails** on
   a value out of range (e.g. production requires the diagnostics flags off, version-check on).
+- **Hosted deploys refuse test-only switches** (clinozy-be's A-4). Every workflow that builds a
+  hosted bundle (`reusable-netlify-deploy.yml`, the preview build) sets `HOSTED_DEPLOYMENT=true`;
+  with it, `pnpm validate:client-env` refuses `VITE_TEST_MODE`, `VITE_E2E_HOOKS`, `VITE_DEVTOOLS`
+  and `VITE_DEBUG_LOGGING` on, in development and production alike (`hostedDeploymentRefusals`).
+  Local machines and CI runners never set it; nor does any env file.
 - **Per-environment defaults.** `envProfiles.<env>.defaults` in `env-schema.ts` is the single
-  source of truth for each environment's starting values (local + development: dev-tooling on;
-  production: safe). `pnpm setup:local` writes `envProfiles.local.defaults` into `.env.local`
+  source of truth for each environment's starting values (local: dev-tooling on; development and
+  production: test-only switches off). `pnpm setup:local` writes `envProfiles.local.defaults` into `.env.local`
   (via `injectEnvDefaults`); every default must be ⊆ that key's `allowed` (test-enforced). NOT
   applied by the runtime — defaults reach the app through the env layer, never a mode branch.
 - **Tests are hermetic by construction — two halves, both required.** (1) The Vitest `envDir`
