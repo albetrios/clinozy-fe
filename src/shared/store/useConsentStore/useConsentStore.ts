@@ -212,7 +212,7 @@ export function selectAnalyticsAllowed(state: AnswerState): boolean {
  * Control answering for it.
  */
 export function selectShouldAsk(state: AnswerState): boolean {
-  return !answerStands(state) && !isGlobalPrivacyControlOn();
+  return !(answerStands(state) || isGlobalPrivacyControlOn());
 }
 
 /** The card is up: asking on its own, or reopened from Privacy choices. */
