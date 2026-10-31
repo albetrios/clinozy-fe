@@ -241,9 +241,12 @@ function tokenOrganization(): string | null {
   return token === null ? null : organizationClaimOf(token);
 }
 
-/** What a cancelled upload rejects with: the signal's reason, else an `AbortError`. */
-function abortReasonOf(signal: AbortSignal): unknown {
-  return signal.reason ?? new DOMException('The upload was aborted', 'AbortError');
+/** What a cancelled upload rejects with: the signal's reason when an error, else an `AbortError`. */
+function abortReasonOf(signal: AbortSignal): Error {
+  const reason: unknown = signal.reason;
+  return reason instanceof Error || reason instanceof DOMException
+    ? reason
+    : new DOMException('The upload was aborted', 'AbortError');
 }
 
 /** The file must be appended last — S3 ignores any form field that follows it. */

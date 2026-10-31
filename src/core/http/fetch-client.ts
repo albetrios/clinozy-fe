@@ -118,9 +118,15 @@ function buildHeaders(
   return headers;
 }
 
-/** What a request the caller aborted rejects with: its signal's reason, else an `AbortError`. */
-function abortErrorOf(signal: AbortSignal): unknown {
-  return signal.reason ?? new DOMException('The request was aborted', 'AbortError');
+/**
+ * What a request the caller aborted rejects with: its signal's reason when that is an error (the
+ * `AbortError` or `TimeoutError` DOMException `abort()` gives), else an `AbortError`.
+ */
+function abortErrorOf(signal: AbortSignal): Error {
+  const reason: unknown = signal.reason;
+  return reason instanceof Error || reason instanceof DOMException
+    ? reason
+    : new DOMException('The request was aborted', 'AbortError');
 }
 
 /**

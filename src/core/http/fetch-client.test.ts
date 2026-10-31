@@ -522,6 +522,17 @@ describe('fetch-client', () => {
       expect(fetchMock).not.toHaveBeenCalled();
     });
 
+    it('rejects with an error whatever the abort reason — a string one reads as an AbortError', async () => {
+      const controller = new AbortController();
+      controller.abort('left the page');
+      const failure = await apiClient
+        .get('/app/patients', { signal: controller.signal })
+        .catch((error: unknown) => error);
+      expect(failure).toBeInstanceOf(DOMException);
+      expect(failure).toMatchObject({ name: 'AbortError' });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
     it('stops a retry’s wait at once, and sends nothing after it', async () => {
       vi.useFakeTimers();
       try {

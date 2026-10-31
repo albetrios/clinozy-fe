@@ -22,7 +22,9 @@ let lastChecked: { organizationId: string; at: number } | null = null;
 
 /** The permission set the store holds, order-free, to compare before and after a re-read. */
 function heldPermissions(): string {
-  return [...useOrganizationStore.getState().permissions].sort().join(',');
+  return [...useOrganizationStore.getState().permissions]
+    .sort((left, right) => left.localeCompare(right))
+    .join(',');
 }
 
 /**
@@ -42,7 +44,7 @@ async function recheckAccess(
       throw error;
     }),
     // Fresh, whatever the cache holds: the list a guard trusts is the one being questioned.
-    queryClient.fetchQuery({
+    queryClient.query({
       queryKey: myOrganizationsQueryKey,
       queryFn: fetchMyOrganizationSummaries,
       staleTime: 0,

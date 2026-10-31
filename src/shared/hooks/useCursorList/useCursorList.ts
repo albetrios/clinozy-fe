@@ -153,7 +153,7 @@ export function useCursorList<T, TPage extends ListPage<T> = ListPage<T>>(args: 
     try {
       // A query of its own, so a failed poll is reported, toasted and retried like any read,
       // and a workspace switch cancels it with the rest of the organization's reads.
-      head = await queryClient.fetchQuery({
+      head = await queryClient.query({
         queryKey: [...queryKey, FIRST_PAGE_POLL],
         queryFn: () => args.queryFn(undefined),
         staleTime: 0,

@@ -25,7 +25,8 @@ Claude Code loads this file when it works in `src/core/`. It holds sections move
   clocks (`error.reason` `idle_timeout` / `session_expired`): that end is deliberate,
   `logout({ reason })` (`endRefusedSession`). A caller's `signal` (`RequestOptions.signal`,
   `api.*` init) cancels a request — the fetch, a retry's wait, a replay — and it rejects with
-  the signal's reason, never retried. The session's one token names the organization
+  the signal's reason (an `AbortError` when that reason is no error), never retried. The
+  session's one token names the organization
   it was last switched to, so a refresh answering for **another** organization than this tab's
   `me/context` (another tab switched) switches the tab back before any request carries it —
   never another clinic's records under this tab's screen. A switch waits for a refresh in
