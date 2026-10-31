@@ -146,6 +146,7 @@ const ORDERED: ReceiveLineValues = {
   qty: 10,
   free: 2,
   rate: 21_200,
+  mrp: 0,
   arrived: true,
   batchNo: ' ',
   expiry: '',
@@ -183,13 +184,15 @@ describe('receive-form (medical.md:269–279)', () => {
           { ...line, arrived: true, expiry: '12/27' },
           { ...line, arrived: false, expiry: '12/27' },
         ],
+        note: '',
       }),
     ).toEqual({
       lines: [
-        { id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27' },
-        { id: EPRIVA_LINE_ID, arrived: false, batchNo: null, expiry: null },
+        { id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27', mrp: null },
+        { id: EPRIVA_LINE_ID, arrived: false, batchNo: null, expiry: null, mrp: null },
       ],
       extras: [],
+      note: null,
     });
   });
 
@@ -204,14 +207,18 @@ describe('receive-form (medical.md:269–279)', () => {
     });
     const typed = { ...AZELAN, medicineId: typedMedicineKey('Azel cream'), name: '' };
     const lines = [{ ...ORDERED, expiry: '12/27' }, AZELAN, typed, blank];
-    expect(receiveInputOf({ lines })).toEqual({
-      lines: [{ id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27' }],
+    expect(receiveInputOf({ lines, note: ' 30 DAYS DUE ' })).toEqual({
+      note: '30 DAYS DUE',
+      lines: [
+        { id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27', mrp: null },
+      ],
       extras: [
         {
           medicineId: AZELAN_ID,
           qty: 2,
           free: 0,
           rate: 190,
+          mrp: null,
           batchNo: 'AZ900',
           expiry: '06/28',
         },
@@ -221,6 +228,7 @@ describe('receive-form (medical.md:269–279)', () => {
           qty: 2,
           free: 0,
           rate: 190,
+          mrp: null,
           batchNo: 'AZ900',
           expiry: '06/28',
         },
@@ -231,7 +239,9 @@ describe('receive-form (medical.md:269–279)', () => {
       { index: 1, problem: 'missing' },
     ]);
     // Ticked ✗, an unexpected line is not sent either.
-    expect(receiveInputOf({ lines: [{ ...AZELAN, arrived: false }] }).extras).toEqual([]);
+    expect(
+      receiveInputOf({ lines: [{ ...AZELAN, arrived: false }], note: '' }).extras,
+    ).toEqual([]);
   });
 
   it('names an unexpected line with no count or no rate, and bills what comes in', () => {
@@ -306,10 +316,23 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
         id: ORDER.id,
         input: {
           lines: [
-            { id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27' },
-            { id: GLYCOLAC_LINE_ID, arrived: false, batchNo: null, expiry: null },
+            {
+              id: EPRIVA_LINE_ID,
+              arrived: true,
+              batchNo: null,
+              expiry: '12/27',
+              mrp: null,
+            },
+            {
+              id: GLYCOLAC_LINE_ID,
+              arrived: false,
+              batchNo: null,
+              expiry: null,
+              mrp: null,
+            },
           ],
           extras: [],
+          note: null,
         },
       }),
     );
@@ -390,6 +413,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
               qty: 2,
               free: 0,
               rate: 190,
+              mrp: 650,
               batchNo: 'AZ900',
               expiry: '06/28',
             },

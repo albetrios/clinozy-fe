@@ -1,4 +1,4 @@
-import { paiseOfRupees } from '@/lib/number-text.ts';
+import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
 import { expiryMonthSchema } from '@/shared/api/app/app-schema.ts';
 
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
@@ -29,6 +29,8 @@ export interface ReceiveLineValues {
   free: number;
   /** The purchase rate per unit, paise — the order's on an ordered line. */
   rate: number;
+  /** The MRP printed on the packs, paise — the order line's until changed; 0 when not known (D8). */
+  mrp: number;
   arrived: boolean;
   batchNo: string;
   /** "MM/YY". */
@@ -40,6 +42,8 @@ export interface ReceiveLineValues {
 /** The drawer's form: the order's lines in its order, then the unexpected ones. */
 export interface ReceiveFormValues {
   lines: ReceiveLineValues[];
+  /** The order's note, written as the goods arrive (D10). */
+  note: string;
 }
 
 /** Every line of the order, ticked as arrived, with no batch or expiry yet. */
@@ -52,11 +56,13 @@ export function receiveFormOf(order: PurchaseOrderRow): ReceiveFormValues {
       qty: line.qty,
       free: line.free,
       rate: paiseOfRupees(line.rate),
+      mrp: paiseOfRupees(line.mrp ?? 0),
       arrived: true,
       batchNo: '',
       expiry: '',
       unexpected: false,
     })),
+    note: order.note ?? '',
   };
 }
 
@@ -68,6 +74,7 @@ export const emptyUnexpectedLine = (): ReceiveLineValues => ({
   qty: 1,
   free: 0,
   rate: 0,
+  mrp: 0,
   arrived: true,
   batchNo: '',
   expiry: '',
@@ -165,6 +172,7 @@ export function receiveInputOf(values: ReceiveFormValues): ReceiveInput {
         arrived: line.arrived,
         batchNo: line.arrived ? trimmed(line.batchNo) : null,
         expiry: line.arrived ? trimmed(line.expiry) : null,
+        mrp: line.arrived && line.mrp > 0 ? rupeesOfPaise(line.mrp) : null,
       })),
     extras: values.lines
       .filter((line) => line.unexpected && comesIn(line))
@@ -173,5 +181,6 @@ export function receiveInputOf(values: ReceiveFormValues): ReceiveInput {
         batchNo: trimmed(line.batchNo),
         expiry: trimmed(line.expiry),
       })),
+    note: trimmed(values.note),
   };
 }

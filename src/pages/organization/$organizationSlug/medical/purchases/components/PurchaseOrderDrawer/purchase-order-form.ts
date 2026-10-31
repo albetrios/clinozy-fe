@@ -2,7 +2,7 @@ import type { FieldPath } from 'react-hook-form';
 
 import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
-import { reorderQuantity } from '@/shared/api/app/medicine-stock.ts';
+import { reorderPacks } from '@/shared/api/app/medicine-stock.ts';
 import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
@@ -37,14 +37,19 @@ export function typedMedicineName(medicineId: string | null): string | null {
   return medicineId.slice(TYPED_MEDICINE_PREFIX.length) || null;
 }
 
-/** One line of the order: the medicine (or a typed one's key), how many, the free units and the rate. */
+/**
+ * One line of the order: the medicine (or a typed one's key), how many packs, the free packs, the
+ * rate and the MRP printed on the packs.
+ */
 export interface OrderLineValues {
   /** A medicine's id, or {@link typedMedicineKey} for one typed on the line. */
   medicineId: string | null;
   qty: number;
   free: number;
-  /** The purchase rate per unit, paise. */
+  /** The purchase rate per pack, paise. */
   rate: number;
+  /** The MRP printed on the packs, paise — 0 when not known (change-pharmacy-record-fields D8). */
+  mrp: number;
 }
 
 /** The drawer's form. */
@@ -52,8 +57,13 @@ export interface PurchaseOrderFormValues {
   supplierId: string | null;
   billNo: string;
   date: string;
+  /** The desk's note on the order — "30 DAYS DUE" (D10). */
+  note: string;
   lines: OrderLineValues[];
 }
+
+/** clinozy-be's limit on an order's note (change-pharmacy-record-fields D9). */
+export const ORDER_NOTE_MAX = 500;
 
 /** A blank line: "+ Add medicine". */
 export const emptyOrderLine = (): OrderLineValues => ({
@@ -61,6 +71,7 @@ export const emptyOrderLine = (): OrderLineValues => ({
   qty: 1,
   free: 0,
   rate: 0,
+  mrp: 0,
 });
 
 /** A line with no medicine yet: the quick line's next add fills it. */
@@ -104,20 +115,27 @@ export const lowStockMedicines = <T extends Pick<MedicineRow, 'stockLevel'>>(
 
 /**
  * A medicine's line as the quick line, Browse and "Reorder low stock" add it
- * (H:5389 `addP`, H:5436): the typed quantity, else what fills it up to its
- * fill-up level (at least one); the typed free units; the typed rate, else
- * the supplier's.
+ * (H:5389 `addP`, H:5436): the typed quantity, else the packs that fill it up
+ * to its fill-up level — stock counts units, an order buys packs (D5); the
+ * typed free units; the typed rate, else the supplier's; the medicine's MRP as
+ * the packs' printed MRP until the desk changes it (D8).
  */
 export function orderLineFor(
-  medicine: Pick<MedicineRow, 'id' | 'stock' | 'maxStock' | 'supplierRates' | 'bestRate'>,
+  medicine: Pick<
+    MedicineRow,
+    'id' | 'stock' | 'maxStock' | 'unitsPerPack' | 'mrp' | 'supplierRates' | 'bestRate'
+  >,
   supplierId: string | null,
   values: { qty?: number; free?: number; rate?: number } = {},
 ): OrderLineValues {
   return {
     medicineId: medicine.id,
-    qty: values.qty ?? reorderQuantity(medicine.stock, medicine.maxStock),
+    qty:
+      values.qty ??
+      reorderPacks(medicine.stock, medicine.maxStock, medicine.unitsPerPack),
     free: values.free ?? 0,
     rate: values.rate ?? supplierRateOf(medicine, supplierId),
+    mrp: paiseOfRupees(medicine.mrp),
   };
 }
 
@@ -156,7 +174,7 @@ export function newOrderForm(
   supplierId: string | null,
   lines: OrderLineValues[] = [],
 ): PurchaseOrderFormValues {
-  return { supplierId, billNo: '', date: appToday(), lines };
+  return { supplierId, billNo: '', date: appToday(), note: '', lines };
 }
 
 /** A saved order's form — its rupees as the rate cells' paise. */
@@ -165,11 +183,13 @@ export function orderFormOf(order: PurchaseOrderRow): PurchaseOrderFormValues {
     supplierId: order.supplier.id,
     billNo: order.supplierBillNo ?? '',
     date: order.date,
+    note: order.note ?? '',
     lines: order.lines.map((line) => ({
       medicineId: line.medicineId,
       qty: line.qty,
       free: line.free,
       rate: paiseOfRupees(line.rate),
+      mrp: paiseOfRupees(line.mrp ?? 0),
     })),
   };
 }
@@ -202,7 +222,7 @@ export function orderLinesProblem(
  * name, which the server adds (MD26).
  */
 export function orderLineInputOf(
-  line: Pick<OrderLineValues, 'medicineId' | 'qty' | 'free' | 'rate'>,
+  line: Pick<OrderLineValues, 'medicineId' | 'qty' | 'free' | 'rate' | 'mrp'>,
 ): PurchaseOrderLineInput {
   const typed = typedMedicineName(line.medicineId);
   return {
@@ -211,6 +231,7 @@ export function orderLineInputOf(
     qty: line.qty,
     free: line.free,
     rate: rupeesOfPaise(line.rate),
+    mrp: line.mrp > 0 ? rupeesOfPaise(line.mrp) : null,
   };
 }
 
@@ -220,6 +241,7 @@ export function orderInputOf(values: PurchaseOrderFormValues): PurchaseOrderInpu
     supplierId: values.supplierId ?? '',
     supplierBillNo: values.billNo.trim() || null,
     date: values.date,
+    note: values.note.trim() || null,
     items: pickedLines(values.lines).map(orderLineInputOf),
   };
 }
@@ -239,6 +261,7 @@ export function orderServerFields(
     supplierId: 'supplierId',
     supplierBillNumber: 'billNo',
     orderDate: 'date',
+    note: 'note',
     items: 'lines',
   };
   const sent = lines.flatMap((line, row) => (line.medicineId === null ? [] : [row]));
@@ -249,6 +272,7 @@ export function orderServerFields(
     fields[`items.${index}.quantity`] = `lines.${row}.qty`;
     fields[`items.${index}.freeQuantity`] = `lines.${row}.free`;
     fields[`items.${index}.rate`] = `lines.${row}.rate`;
+    fields[`items.${index}.mrp`] = `lines.${row}.mrp`;
   });
   return fields;
 }

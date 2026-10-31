@@ -98,14 +98,14 @@ const TRICHOSPIRE = medicineRow({
 describe('the purchase order’s form (medical.md:254–267)', () => {
   it('totals qty × rate in paise — free units cost nothing — over the picked lines', () => {
     const lines = [
-      { medicineId: 'a', qty: 4, free: 2, rate: 52_900 },
+      { medicineId: 'a', qty: 4, free: 2, rate: 52_900, mrp: 0 },
       { ...emptyOrderLine(), rate: 10_000 },
     ];
     expect(lineAmount(lines[0] ?? emptyOrderLine())).toBe(211_600);
     expect(orderTotal(lines)).toBe(211_600);
     expect(pickedLines(lines)).toHaveLength(1);
     expect(
-      linesMissingRate([...lines, { medicineId: 'b', qty: 1, free: 0, rate: 0 }]),
+      linesMissingRate([...lines, { medicineId: 'b', qty: 1, free: 0, rate: 0, mrp: 0 }]),
     ).toEqual([2]);
   });
 
@@ -118,12 +118,13 @@ describe('the purchase order’s form (medical.md:254–267)', () => {
       qty: 1,
       free: 0,
       rate: 100,
+      mrp: 0,
     }));
     expect(orderLinesProblem(many)).toBe('tooMany');
     expect(orderLinesProblem(many.slice(0, ORDER_LINES_MAX))).toBeNull();
-    expect(orderLinesProblem([{ medicineId: 'a', qty: 1, free: 0, rate: 0 }])).toBe(
-      'rate',
-    );
+    expect(
+      orderLinesProblem([{ medicineId: 'a', qty: 1, free: 0, rate: 0, mrp: 0 }]),
+    ).toBe('rate');
   });
 
   it('prices a medicine at the order’s supplier, else its best rate, else nothing — the API’s rupees as paise', () => {
@@ -155,7 +156,8 @@ describe('the purchase order’s form (medical.md:254–267)', () => {
       supplierId: TEST_SUPPLIER_ID,
       supplierBillNo: 'T-82370',
       date: '2026-10-04',
-      items: [{ medicineId: TEST_MEDICINE_ID, qty: 10, free: 1, rate: 423.6 }],
+      note: null,
+      items: [{ medicineId: TEST_MEDICINE_ID, qty: 10, free: 1, rate: 423.6, mrp: null }],
     });
     const fresh = newOrderForm(TEST_SUPPLIER_ID, [emptyOrderLine()]);
     expect(orderInputOf({ ...fresh, billNo: '  ' })).toMatchObject({
@@ -172,18 +174,25 @@ describe('the purchase order’s form (medical.md:254–267)', () => {
     expect(typedMedicineName(TEST_MEDICINE_ID)).toBeNull();
     expect(typedMedicineName(null)).toBeNull();
     const form = newOrderForm(TEST_SUPPLIER_ID, [
-      { medicineId: key, qty: 20, free: 2, rate: 18_000 },
+      { medicineId: key, qty: 20, free: 2, rate: 18_000, mrp: 0 },
     ]);
     expect(orderInputOf(form).items).toEqual([
-      { medicineId: null, newMedicineName: 'Azel cream', qty: 20, free: 2, rate: 180 },
+      {
+        medicineId: null,
+        newMedicineName: 'Azel cream',
+        qty: 20,
+        free: 2,
+        rate: 180,
+        mrp: null,
+      },
     ]);
   });
 
   it('maps a refused save’s fields onto the rows it sent — a blank row is not sent', () => {
     const fields = orderServerFields([
-      { medicineId: TEST_MEDICINE_ID, qty: 1, free: 0, rate: 100 },
+      { medicineId: TEST_MEDICINE_ID, qty: 1, free: 0, rate: 100, mrp: 0 },
       emptyOrderLine(),
-      { medicineId: typedMedicineKey('Azel cream'), qty: 1, free: 0, rate: 0 },
+      { medicineId: typedMedicineKey('Azel cream'), qty: 1, free: 0, rate: 0, mrp: 0 },
     ]);
     expect(fields).toMatchObject({
       supplierBillNumber: 'billNo',

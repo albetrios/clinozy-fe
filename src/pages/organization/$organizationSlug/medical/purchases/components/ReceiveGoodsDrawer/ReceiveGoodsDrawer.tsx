@@ -5,7 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import { SECTION_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
-import { DrawerFieldGrid } from '@/shared/components/DrawerField/index.ts';
+import {
+  DrawerField,
+  DrawerFieldGrid,
+  DrawerTextarea,
+} from '@/shared/components/DrawerField/index.ts';
 import {
   type DrawerBadge,
   RecordDrawer,
@@ -41,6 +45,7 @@ import {
   useMedicineOptions,
 } from '../PurchaseOrderDrawer/order-medicine.ts';
 import { OrderMedicineCell } from '../PurchaseOrderDrawer/OrderMedicineCell.tsx';
+import { ORDER_NOTE_MAX } from '../PurchaseOrderDrawer/purchase-order-form.ts';
 import {
   anyArrived,
   emptyUnexpectedLine,
@@ -229,6 +234,7 @@ function useColumns({
               form.setValue(`${line}.medicineId`, medicine.id, { shouldDirty: true });
               form.setValue(`${line}.name`, medicine.name);
               form.setValue(`${line}.rate`, medicine.rate, { shouldDirty: true });
+              form.setValue(`${line}.mrp`, medicine.mrp, { shouldDirty: true });
             }}
           />
         ) : (
@@ -238,6 +244,21 @@ function useColumns({
     { id: 'qty', header: t(K.qty), track: '56px', align: 'end', cell: count('qty') },
     { id: 'free', header: t(K.free), track: '56px', align: 'end', cell: count('free') },
     ...(priced ? [rate] : []),
+    {
+      // The MRP printed on the packs — the batch they go into takes it (D8)
+      id: 'mrp',
+      header: t(K.mrp),
+      track: '90px',
+      align: 'end',
+      cell: (row) => (
+        <ItemsNumberCell
+          {...row.bind('mrp')}
+          money
+          placeholder={t(K.mrp)}
+          readOnly={locked(row)}
+        />
+      ),
+    },
     {
       id: 'batch',
       header: t(K.batch),
@@ -387,6 +408,18 @@ function ReceiveSession({
           removable={(line) => line.unexpected}
           testId={`${testId}-lines`}
         />
+        <DrawerField span="full" label={t(K.note)} htmlFor={`${testId}-note-input`}>
+          <DrawerTextarea
+            id={`${testId}-note-input`}
+            {...form.register('note')}
+            rows={2}
+            maxLength={ORDER_NOTE_MAX}
+            placeholder={t(F.notePlaceholder)}
+            autoComplete="off"
+            readOnly={readOnly}
+            data-testid={`${testId}-note`}
+          />
+        </DrawerField>
       </DrawerFieldGrid>
     </RecordDrawer>
   );
