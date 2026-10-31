@@ -1,4 +1,5 @@
-import { type ReactNode, useRef } from 'react';
+import { defaultRangeExtractor, useVirtualizer } from '@tanstack/react-virtual';
+import { type CSSProperties, type ReactNode, type RefObject, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
@@ -26,6 +27,14 @@ import { type AppIcon, CheckCircle, Clock, SquareCheck } from '@/shared/icons/in
 
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import { TaskRow, type TaskRowTeam } from '../TaskRow/index.ts';
+import {
+  type GroupWindow,
+  groupWindows,
+  type TaskListLayout,
+  taskListLayout,
+  VIRTUALIZE_ABOVE,
+  withGroupHeaders,
+} from './task-list-window.ts';
 
 /** The rows a first load stands in for, at the row's 56px. */
 const SKELETON_ROWS = 8;
@@ -43,6 +52,12 @@ const SKELETON_ROW = 'h-14 border-b border-b-muted px-(--table-pad-x)';
 
 /** The five columns a group header or an empty line spans. */
 const COLUMNS = 5;
+/** A row's height before it is measured (the row's 56px). */
+const ROW_HEIGHT = 56;
+/** A group header's height before it is measured. */
+const HEADER_HEIGHT = 33;
+/** Entries rendered beyond the ones in view while the list virtualises. */
+const OVERSCAN = 10;
 
 /** Props for {@link TaskList}. */
 export interface TaskListProps extends LoadMorePaging {
@@ -68,14 +83,26 @@ export interface TaskListProps extends LoadMorePaging {
   className?: string;
 }
 
+/** While the list virtualises: an entry's place in the whole list and the ref that measures it. */
+type Windowed = { index: number; measure: (node: HTMLDivElement | null) => void };
+
 /** A group's sticky header: an 8px square in the group's tone (none for Snoozed and Resolved) and the label. */
-function GroupHeader({ group }: { group: TaskGroup<TaskRowRecord> }) {
+function GroupHeader({
+  group,
+  windowed,
+}: {
+  group: TaskGroup<TaskRowRecord>;
+  windowed?: Windowed;
+}) {
   const { t } = useTranslation(TASKS_NS);
   const tone = TASK_GROUP_TONES[group.id];
   return (
     <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
+      ref={windowed?.measure}
       role="row"
       tabIndex={-1}
+      data-index={windowed?.index}
+      aria-rowindex={windowed ? windowed.index + 1 : undefined}
       className="sticky top-0 z-2"
     >
       <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
@@ -137,11 +164,74 @@ function EmptyLine({ tab }: { tab: TaskTab }) {
   );
 }
 
-/** What {@link GroupedRows} draws: the list's rows and how each reads. */
+/** What {@link GroupedRows} draws: the list's rows and how each reads, and its scroller. */
 type GroupedRowsProps = Pick<
   TaskListProps,
   'tab' | 'rows' | 'refreshing' | 'now' | 'handled' | 'team' | 'onOpen' | 'contactActions'
->;
+> & { scrollerRef: RefObject<HTMLDivElement | null> };
+
+/** Space the rows out of view hold while the list virtualises (px, `--task-gap`). */
+function Gap({ height }: { height: number }) {
+  if (height <= 0) return null;
+  return (
+    <div
+      aria-hidden="true"
+      style={{ '--task-gap': `${height}px` } as CSSProperties}
+      className="h-(--task-gap)"
+    />
+  );
+}
+
+/**
+ * Above {@link VIRTUALIZE_ABOVE} entries (headers counted) only the rows in view, plus
+ * {@link OVERSCAN}, render — measured as they mount — each group keeping its rowgroup and its
+ * sticky header (`task-list-window.ts`, G-2). `null` while every row renders.
+ */
+function useGroupWindows(
+  layout: TaskListLayout,
+  scrollerRef: RefObject<HTMLDivElement | null>,
+): { windows: GroupWindow[]; measure: (node: HTMLDivElement | null) => void } | null {
+  const virtualizing = layout.entries.length > VIRTUALIZE_ABOVE;
+  const estimate = (index: number) =>
+    layout.entries[index]?.kind === 'header' ? HEADER_HEIGHT : ROW_HEIGHT;
+  // The virtualizer re-renders this component as it scrolls; its stable
+  // `measureElement` is all that leaves the component.
+  // eslint-disable-next-line react-hooks/incompatible-library -- see above
+  const virtualizer = useVirtualizer<HTMLDivElement, HTMLDivElement>({
+    count: layout.entries.length,
+    getScrollElement: () => scrollerRef.current,
+    estimateSize: estimate,
+    // An unlaid-out entry reads 0 tall; keep the estimate instead.
+    measureElement: (element) =>
+      element.getBoundingClientRect().height ||
+      estimate(Number(element.dataset.index ?? 0)),
+    // The first render draws a window before the scroller is measured.
+    initialRect: { width: 0, height: ROW_HEIGHT * OVERSCAN },
+    overscan: OVERSCAN,
+    enabled: virtualizing,
+    getItemKey: (index) => layout.entries[index]?.key ?? index,
+    rangeExtractor: (range) => withGroupHeaders(defaultRangeExtractor(range), layout),
+  });
+  if (!virtualizing) return null;
+  const inView = virtualizer.getVirtualItems().map((item) => item.index);
+  // A scroller with no height yet (hidden, not laid out) gets a first window rather than nothing.
+  const rendered = new Set(
+    inView.length > 0
+      ? inView
+      : withGroupHeaders(
+          layout.entries.slice(0, OVERSCAN * 2).map((_, index) => index),
+          layout,
+        ),
+  );
+  const spans = virtualizer.measurementsCache;
+  return {
+    windows: groupWindows(layout, rendered, (index) => {
+      const span = spans[index];
+      return span ? { start: span.start, end: span.end } : { start: 0, end: 0 };
+    }),
+    measure: virtualizer.measureElement,
+  };
+}
 
 /** The view's groups, each under its sticky header, or the view's empty line. */
 function GroupedRows({
@@ -153,46 +243,85 @@ function GroupedRows({
   team,
   onOpen,
   contactActions,
+  scrollerRef,
 }: GroupedRowsProps) {
   const { t } = useTranslation(TASKS_NS);
   // Rows sit under "Due today" / "Coming up": today's due times read bare.
   const dueLabel = useTaskDueLabel({ sameDay: true });
   const groups = groupTasks(rows, tab, now);
+  const layout = taskListLayout(groups);
+  const windowing = useGroupWindows(layout, scrollerRef);
+  const renderRow = (row: TaskRowRecord, index?: number) => (
+    <TaskRow
+      key={row.id}
+      row={row}
+      due={dueLabel(row, now)}
+      now={now}
+      handled={handled(row)}
+      team={team}
+      onOpen={onOpen}
+      contactActions={contactActions?.(row)}
+      windowed={
+        windowing && index !== undefined
+          ? { index, measure: windowing.measure }
+          : undefined
+      }
+    />
+  );
   return (
     <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
       role="table"
       aria-label={t(TASKS_KEYS.views[tab])}
       aria-busy={refreshing || undefined}
+      aria-rowcount={windowing ? layout.entries.length : undefined}
       data-testid={TASKS_TEST_IDS.list}
       data-tab={tab}
       // An empty view grows into the card, so its empty state centres there.
       className={cn(rows.length === 0 && 'flex flex-1 flex-col')}
     >
-      {groups.map((group) => (
-        <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
-          key={group.id}
-          role="rowgroup"
-          // Bars in place while a new view loads — the rooms' one skeleton (index.css).
-          data-refreshing={refreshing || undefined}
-          data-testid={TASKS_TEST_IDS.group(group.id)}
-          className={cn(group.rows.length === 0 && 'flex flex-1 flex-col')}
-        >
-          <GroupHeader group={group} />
-          {group.rows.map((row) => (
-            <TaskRow
-              key={row.id}
-              row={row}
-              due={dueLabel(row, now)}
-              now={now}
-              handled={handled(row)}
-              team={team}
-              onOpen={onOpen}
-              contactActions={contactActions?.(row)}
-            />
-          ))}
-          {group.rows.length === 0 ? <EmptyLine tab={tab} /> : null}
-        </div>
-      ))}
+      {groups.map((group, groupIndex) => {
+        const shown = windowing?.windows[groupIndex];
+        const header = layout.headerAt[groupIndex] ?? 0;
+        let body: ReactNode;
+        if (shown?.hiddenHeight != null) {
+          body = <Gap height={shown.hiddenHeight} />;
+        } else if (shown && windowing) {
+          body = (
+            <>
+              <GroupHeader
+                group={group}
+                windowed={{ index: header, measure: windowing.measure }}
+              />
+              <Gap height={shown.padBefore} />
+              {shown.rows.map((index) => {
+                const row = group.rows[index - header - 1];
+                return row ? renderRow(row, index) : null;
+              })}
+              <Gap height={shown.padAfter} />
+            </>
+          );
+        } else {
+          body = (
+            <>
+              <GroupHeader group={group} />
+              {group.rows.map((row) => renderRow(row))}
+              {group.rows.length === 0 ? <EmptyLine tab={tab} /> : null}
+            </>
+          );
+        }
+        return (
+          <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
+            key={group.id}
+            role="rowgroup"
+            // Bars in place while a new view loads — the rooms' one skeleton (index.css).
+            data-refreshing={refreshing || undefined}
+            data-testid={TASKS_TEST_IDS.group(group.id)}
+            className={cn(group.rows.length === 0 && 'flex flex-1 flex-col')}
+          >
+            {body}
+          </div>
+        );
+      })}
       {groups.length === 0 ? (
         <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
           role="rowgroup"
@@ -237,6 +366,7 @@ export function TaskList({
   const { t } = useTranslation(TASKS_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
   useLoadMoreSentinel(sentinelRef, {
     hasNextPage: hasNextPage && !loading && !refreshing && !failed,
     isFetchingNextPage,
@@ -271,6 +401,7 @@ export function TaskList({
         team={team}
         onOpen={onOpen}
         contactActions={contactActions}
+        scrollerRef={scrollerRef}
       />
     );
   }
@@ -283,7 +414,7 @@ export function TaskList({
         className,
       )}
     >
-      <div className="flex min-h-0 flex-1 flex-col overflow-auto">
+      <div ref={scrollerRef} className="flex min-h-0 flex-1 flex-col overflow-auto">
         {body}
         {isFetchingNextPage ? (
           <SkeletonRows rows={LOADING_MORE_ROWS} avatar rowClassName={SKELETON_ROW} />
