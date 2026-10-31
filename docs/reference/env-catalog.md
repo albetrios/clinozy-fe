@@ -25,6 +25,7 @@ build-time or local-only, never synced to a GitHub Environment.
 | `SENTRY_PROJECT` | secret | — | — | — | Sentry project slug (source-map upload). |
 | `SONAR_ADMIN_PASSWORD` | build·local | — | — | — | Local SonarQube admin password; auto-managed by tooling/sonar/sonar-gate.mjs (never in CI). |
 | `SONAR_TOKEN` | build·local | — | — | — | Local SonarQube scanner token; auto-managed by the sonar gate (never in CI). |
+| `STORED_FILES_ORIGIN` | variable | — | — | — | Origin of clinozy-be's file store, its S3 bucket (e.g. https://<bucket>.s3.<region>.amazonaws.com). Build-time CSP only: uploads go to it (connect-src) and stored images load from it (img-src). Required in production; empty elsewhere allows any https://*.amazonaws.com bucket. |
 | `VITE_API_BASE_URL` | secret | — | — | — | Production API base URL (e.g. https://api.example.com); empty = same-origin. Required in production when the API is not same-origin. |
 | `VITE_APP_ENV` | build·local | `local` | `development` | `production` | Reported environment: local (default) \| development \| production. The env vocabulary, not the Vite mode; reported-only (Sentry/PostHog tag), never branched on. |
 | `VITE_APP_VERSION` | build·local | — | — | — | App version string; read by vite.config.ts (names the Sentry release, fallback 0.0.0) and the client. CI-set; blank locally. |
@@ -81,6 +82,7 @@ runtime schema default (the env-independent Zod fallback) is not pushed and is p
 from GitHub (the runtime falls back to the identical default). The per-env columns
 above are scaffold values, which may differ. Preview with `pnpm github:sync <env> --diff`.
 
+- `STORED_FILES_ORIGIN`
 - `VITE_CAPTCHA_DISABLED`
 - `VITE_DEBUG_LOGGING`
 - `VITE_DEVTOOLS`

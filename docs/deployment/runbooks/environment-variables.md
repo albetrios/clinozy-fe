@@ -37,6 +37,12 @@ src/core/config/env-schema.ts   ← Zod + envSchemaKeys
 | **Runtime public**  | `VITE_*`   | Client bundle; overridable via `window.__CONFIG__` | `VITE_AUTH_*`, `VITE_DISABLED_MODULES`    |
 | **Runtime private** | no `VITE_` | CI / build scripts only                            | `SENTRY_AUTH_TOKEN`, `NETLIFY_AUTH_TOKEN` |
 
+`STORED_FILES_ORIGIN` is a build-time Variable (no `VITE_`, never bundled): the file store's bucket
+origin, named in the CSP's `connect-src` and `img-src` (`plugins/csp-api-origin.ts`). Production
+requires it — `validate:client-env` fails a release without an https origin there — and a
+development deploy is warned; set it in both GitHub Environments (`pnpm github:sync` pushes it from
+`.env.<environment>`).
+
 **Client resolution order:** `window.__CONFIG__[key]` → `import.meta.env.VITE_${key}` → Zod default.
 The build-only keys (`BUILD_ONLY_CONFIG_KEYS` in `env.config.ts`: `APP_ENV`, `DEBUG_LOGGING`,
 `DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK` — every switch `envProfiles.production.allowed` pins — and

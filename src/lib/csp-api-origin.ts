@@ -24,6 +24,42 @@ export function formatCspApiConnectSrcFragment(apiBaseUrl: string | undefined): 
   return `\n               ${origin}`;
 }
 
+/** `index.html`'s meta-CSP placeholders, each replaced at build with the sources it names. */
+export const CSP_META_PLACEHOLDERS = {
+  apiConnectSrc: '<!-- CSP_API_CONNECT_SRC -->',
+  sentryConnectSrc: '<!-- CSP_SENTRY_CONNECT_SRC -->',
+  storedFileSrc: '<!-- CSP_STORED_FILE_SRC -->',
+} as const;
+
+/** Sources as a meta fragment: each on its own indented line, as `index.html` writes them. */
+const metaFragment = (sources: readonly string[]) =>
+  sources.map((source) => `\n               ${source}`).join('');
+
+/**
+ * `index.html` with its meta-CSP placeholders filled the way {@link buildContentSecurityPolicy}
+ * fills the header for the same inputs — the plugin's `transformIndexHtml`, and what the
+ * meta ↔ header parity test compares.
+ */
+export function fillCspMetaPlaceholders(
+  html: string,
+  apiBaseUrl: string | undefined,
+  named: CspNamedOrigins = {},
+): string {
+  return html
+    .replace(
+      CSP_META_PLACEHOLDERS.apiConnectSrc,
+      formatCspApiConnectSrcFragment(apiBaseUrl),
+    )
+    .replace(
+      CSP_META_PLACEHOLDERS.sentryConnectSrc,
+      metaFragment(cspSentrySources(named.sentryDsn)),
+    )
+    .replaceAll(
+      CSP_META_PLACEHOLDERS.storedFileSrc,
+      metaFragment(cspStoredFileSources(named.storedFilesOrigin)),
+    );
+}
+
 /**
  * Third-party origins the app must reach (observability + analytics). Kept in
  * lock step with the connect-src list in index.html's meta CSP — the static
@@ -59,20 +95,44 @@ const STRIPE_ORIGINS = [
 const POSTHOG_ASSETS_ORIGIN = 'https://us-assets.i.posthog.com';
 
 /**
- * Where clinozy-be's stored files live: `<bucket>.s3[.<region>].amazonaws.com`. The browser sends
- * every upload's bytes there itself — the presigned POST or PUT (`connect-src`; the API never
- * sees them) — and reads them back from there — `file_url` on a patient photo or report file
- * (clinozy-be D86), the signed avatar and organization logo (`img-src`). The bucket and region
- * differ per deployment, so the allowance is AWS's host suffix (CSP3: `*.` matches any number of
- * labels), in those two directives only; a report file opens in its own tab, outside this
- * document's policy. Kept in lock step with the meta CSP in index.html. An S3-compatible store on
- * another host (`S3_ENDPOINT`) needs its origin here too.
+ * Where clinozy-be's stored files live: its S3 bucket, `<bucket>.s3[.<region>].amazonaws.com`.
+ * The browser sends every upload's bytes there itself — the presigned POST or PUT (`connect-src`;
+ * the API never sees them) — and reads them back from there — `file_url` on a patient photo or
+ * report file (clinozy-be D86), the signed avatar and organization logo (`img-src`). A build names
+ * the bucket exactly ({@link CspNamedOrigins.storedFilesOrigin}, `STORED_FILES_ORIGIN` —
+ * required in production by `validate:client-env`, F-7); without it (local, an unconfigured
+ * development deploy) the allowance falls back to AWS's host suffix (CSP3: `*.` matches any number
+ * of labels), in those two directives only. A report file opens in its own tab, outside this
+ * document's policy. An S3-compatible store on another host is named the same way.
  */
-const STORED_FILE_ORIGIN = 'https://*.amazonaws.com';
+const STORED_FILE_FALLBACK = 'https://*.amazonaws.com';
+
+/**
+ * The third-party hosts a build names exactly instead of by wildcard (F-7), from its env.
+ */
+export interface CspNamedOrigins {
+  /** `STORED_FILES_ORIGIN` — clinozy-be's file store; unset: any `https://*.amazonaws.com`. */
+  storedFilesOrigin?: string;
+  /** `VITE_SENTRY_DSN` — its host is the one Sentry ingest the app reports to; unset: none. */
+  sentryDsn?: string;
+}
+
+/** The file store's sources for `connect-src` and `img-src`: the named origin, else the fallback. */
+export function cspStoredFileSources(storedFilesOrigin: string | undefined): string[] {
+  return [getCspConnectSrcOrigin(storedFilesOrigin) ?? STORED_FILE_FALLBACK];
+}
+
+/**
+ * Sentry's source for `connect-src`: the DSN's own host (`https://o1.ingest.sentry.io`), never
+ * every `*.sentry.io` project; none without a DSN (Sentry is off). A `window.__CONFIG__`
+ * `SENTRY_DSN` on another host is refused by this policy — name it in the build's env instead.
+ */
+export function cspSentrySources(sentryDsn: string | undefined): string[] {
+  const origin = getCspConnectSrcOrigin(sentryDsn);
+  return origin ? [origin] : [];
+}
 
 const CONNECT_SRC_THIRD_PARTY = [
-  'https://*.ingest.sentry.io',
-  'https://*.sentry.io',
   'https://us.i.posthog.com',
   POSTHOG_ASSETS_ORIGIN,
   // Have I Been Pwned range API — k-anonymity password breach check on the
@@ -80,7 +140,6 @@ const CONNECT_SRC_THIRD_PARTY = [
   // `lib/password-breach.ts`.
   'https://api.pwnedpasswords.com',
   ...STRIPE_ORIGINS,
-  STORED_FILE_ORIGIN,
 ] as const;
 
 /**
@@ -93,16 +152,21 @@ const CONNECT_SRC_THIRD_PARTY = [
  *
  * @param apiBaseUrl - VITE_API_BASE_URL; its origin is added to connect-src.
  * @param reportUri - optional CSP violation collector; adds report-uri + report-to.
+ * @param named - the file store and Sentry ingest this build names ({@link CspNamedOrigins}).
  */
 export function buildContentSecurityPolicy(
   apiBaseUrl: string | undefined,
   reportUri?: string,
+  named: CspNamedOrigins = {},
 ): string {
   const apiOrigin = getCspConnectSrcOrigin(apiBaseUrl);
+  const storedFiles = cspStoredFileSources(named.storedFilesOrigin);
   const connectSrc = [
     "'self'",
     ...(apiOrigin ? [apiOrigin] : []),
+    ...cspSentrySources(named.sentryDsn),
     ...CONNECT_SRC_THIRD_PARTY,
+    ...storedFiles,
   ];
 
   const directives = [
@@ -112,7 +176,7 @@ export function buildContentSecurityPolicy(
     `script-src 'self' ${TURNSTILE_ORIGIN} ${STRIPE_ORIGINS[0]} ${POSTHOG_ASSETS_ORIGIN}`,
     "style-src 'self' 'unsafe-inline'",
     `connect-src ${connectSrc.join(' ')}`,
-    `img-src 'self' data: blob: ${STORED_FILE_ORIGIN}`,
+    `img-src 'self' data: blob: ${storedFiles.join(' ')}`,
     "font-src 'self'",
     // Cloudflare Turnstile runs its challenge in a Web Worker created from a `blob:` URL.
     // With `worker-src 'self'` the browser blocks that worker and the challenge cannot

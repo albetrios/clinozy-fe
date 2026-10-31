@@ -104,6 +104,37 @@ describe('envProfiles required keys', () => {
     ).toBe(false);
   });
 
+  it('requires production to name its file-store bucket as an https origin; warns development (F-7)', () => {
+    const production = envProfiles.production.required.find(
+      (r) => r.key === 'STORED_FILES_ORIGIN',
+    );
+    expect(production?.level).toBe('error');
+    expect(
+      production?.satisfiedBy?.('https://clinozy-files.s3.ap-south-1.amazonaws.com'),
+    ).toBe(true);
+    expect(production?.satisfiedBy?.('https://clinozy-files.s3.amazonaws.com/')).toBe(
+      true,
+    );
+    for (const wrong of [
+      'https://*.amazonaws.com',
+      // eslint-disable-next-line sonarjs/no-clear-text-protocols -- asserting http:// is rejected
+      'http://clinozy-files.s3.amazonaws.com',
+      'https://clinozy-files.s3.amazonaws.com/uploads',
+      'clinozy-files',
+    ]) {
+      expect(production?.satisfiedBy?.(wrong), wrong).toBe(false);
+    }
+    const development = envProfiles.development.required.find(
+      (r) => r.key === 'STORED_FILES_ORIGIN',
+    );
+    expect(development?.level).toBe('warn');
+    expect(
+      envProfiles.local.required.some(
+        (candidate) => candidate.key === 'STORED_FILES_ORIGIN',
+      ),
+    ).toBe(false);
+  });
+
   it('derives the conditionally-required list from the production profile', () => {
     const keys = envSchemaConditionallyRequiredKeys.map((entry) => entry.key);
     expect(keys).toEqual([

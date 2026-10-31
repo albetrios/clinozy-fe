@@ -6,7 +6,12 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { buildContentSecurityPolicy } from '@/lib/csp-api-origin.ts';
+import {
+  buildContentSecurityPolicy,
+  CSP_META_PLACEHOLDERS,
+  type CspNamedOrigins,
+  fillCspMetaPlaceholders,
+} from '@/lib/csp-api-origin.ts';
 
 import indexHtml from '../../index.html?raw';
 import netlifyToml from '../../netlify.toml?raw';
@@ -131,6 +136,18 @@ describe('content security policy (index.html meta)', () => {
       'connect-src API origin placeholder (injected at build)',
       /<!-- CSP_API_CONNECT_SRC -->/,
     ],
+    [
+      'connect-src Sentry ingest placeholder (the DSN host, injected at build — F-7)',
+      /connect-src[^;]*<!-- CSP_SENTRY_CONNECT_SRC -->/,
+    ],
+    [
+      'connect-src file-store placeholder (STORED_FILES_ORIGIN, injected at build — F-7)',
+      /connect-src[^;]*<!-- CSP_STORED_FILE_SRC -->;/,
+    ],
+    [
+      'img-src file-store placeholder (STORED_FILES_ORIGIN, injected at build — F-7)',
+      /img-src 'self' data: blob:<!-- CSP_STORED_FILE_SRC -->;/,
+    ],
   ])('keeps %s', (_name, pattern) => {
     expect(indexHtml).toMatch(pattern);
   });
@@ -202,12 +219,14 @@ describe('content security policy (meta ↔ canonical header parity)', () => {
     return parsed;
   }
 
-  // No API base URL on either side: the meta placeholder is unsubstituted at
-  // rest, so the canonical policy is built without one too.
+  // The meta's placeholders are filled the way the plugin fills them at build; the
+  // canonical policy is built from the same inputs — none here, the named ones below.
+  const metaFor = (apiBaseUrl: string | undefined, named: CspNamedOrigins = {}) =>
+    fillCspMetaPlaceholders(indexHtml, apiBaseUrl, named).match(
+      /http-equiv="Content-Security-Policy"[\s\S]*?content="([^"]*)"/,
+    )?.[1];
   const canonical = parseDirectives(buildContentSecurityPolicy(undefined));
-  const metaContent = indexHtml
-    .match(/http-equiv="Content-Security-Policy"[\s\S]*?content="([^"]*)"/)?.[1]
-    ?.replace('<!-- CSP_API_CONNECT_SRC -->', ' ');
+  const metaContent = metaFor(undefined);
   const meta = parseDirectives(metaContent ?? '');
 
   const sharedDirectives = [...canonical.keys()].filter(
@@ -236,6 +255,26 @@ describe('content security policy (meta ↔ canonical header parity)', () => {
       .filter((origin) => !META_CONNECT_SRC_GAP.has(origin))
       .sort();
     expect(meta.get('connect-src')).toEqual(expected);
+  });
+
+  it('stays in parity when the build names its API, Sentry ingest and file store (F-7)', () => {
+    const named: CspNamedOrigins = {
+      storedFilesOrigin: 'https://clinozy-files.s3.ap-south-1.amazonaws.com',
+      sentryDsn: 'https://k@o42.ingest.us.sentry.io/7',
+    };
+    const header = parseDirectives(
+      buildContentSecurityPolicy('https://api.example.com', undefined, named),
+    );
+    const filled = parseDirectives(metaFor('https://api.example.com', named) ?? '');
+    expect(filled.get('img-src')).toEqual(header.get('img-src'));
+    expect(filled.get('connect-src')).toEqual(
+      (header.get('connect-src') ?? []).filter(
+        (origin) => !META_CONNECT_SRC_GAP.has(origin),
+      ),
+    );
+    for (const placeholder of Object.values(CSP_META_PLACEHOLDERS)) {
+      expect(metaFor('https://api.example.com', named)).not.toContain(placeholder);
+    }
   });
 
   it('every documented gap entry is actually in the canonical policy (prunes stale entries)', () => {

@@ -6,22 +6,23 @@ import type { Plugin } from 'vite';
 import {
   buildContentSecurityPolicy,
   buildTrustedTypesReportOnlyPolicy,
-  formatCspApiConnectSrcFragment,
+  CSP_META_PLACEHOLDERS,
+  type CspNamedOrigins,
+  fillCspMetaPlaceholders,
 } from '../src/lib/csp-api-origin.ts';
-
-/** Replaced in index.html connect-src with the API origin from VITE_API_BASE_URL. */
-const CSP_API_CONNECT_SRC_PLACEHOLDER = '<!-- CSP_API_CONNECT_SRC -->';
 
 /** The minimal CSP line committed to public/_headers, upgraded at build time. */
 const HEADERS_CSP_PLACEHOLDER = "Content-Security-Policy: frame-ancestors 'none'";
 
 /**
- * Injects the production API origin into the Content-Security-Policy in two places:
+ * Injects the build's named origins into the Content-Security-Policy in two places:
  *
  *  - `index.html`'s meta CSP (transformIndexHtml) — the parse-time fallback.
- *    ONLY the API origin is injected here; every other token is hand-written in
- *    `index.html`, so parity with the canonical policy is not automatic — it is
- *    asserted by `tests/security/static-security-config.security.test.ts`.
+ *    ONLY the placeholders are filled here — the API origin, the Sentry ingest
+ *    (`VITE_SENTRY_DSN`'s host) and the file store (`STORED_FILES_ORIGIN`, F-7);
+ *    every other token is hand-written in `index.html`, so parity with the
+ *    canonical policy is not automatic — it is asserted by
+ *    `tests/security/static-security-config.security.test.ts`.
  *  - `dist/_headers`'s `Content-Security-Policy` line (writeBundle) — the
  *    authoritative, header-delivered policy, generated in full from
  *    `buildContentSecurityPolicy`.
@@ -30,9 +31,12 @@ const HEADERS_CSP_PLACEHOLDER = "Content-Security-Policy: frame-ancestors 'none'
  * carries `report-uri`/`report-to` + a `Reporting-Endpoints` header so
  * production CSP violations are collected.
  */
-export function cspApiOrigin(apiBaseUrl: string | undefined, reportUri?: string): Plugin {
-  const metaFragment = formatCspApiConnectSrcFragment(apiBaseUrl);
-  const headerPolicy = buildContentSecurityPolicy(apiBaseUrl, reportUri);
+export function cspApiOrigin(
+  apiBaseUrl: string | undefined,
+  reportUri?: string,
+  named: CspNamedOrigins = {},
+): Plugin {
+  const headerPolicy = buildContentSecurityPolicy(apiBaseUrl, reportUri, named);
   const trustedTypesReportOnly = buildTrustedTypesReportOnlyPolicy(reportUri);
   let outDir = 'dist';
 
@@ -42,10 +46,10 @@ export function cspApiOrigin(apiBaseUrl: string | undefined, reportUri?: string)
       outDir = resolved.build.outDir;
     },
     transformIndexHtml(html) {
-      if (!html.includes(CSP_API_CONNECT_SRC_PLACEHOLDER)) {
+      if (!html.includes(CSP_META_PLACEHOLDERS.apiConnectSrc)) {
         return html;
       }
-      return html.replace(CSP_API_CONNECT_SRC_PLACEHOLDER, metaFragment);
+      return fillCspMetaPlaceholders(html, apiBaseUrl, named);
     },
     writeBundle() {
       const headersPath = resolve(outDir, '_headers');

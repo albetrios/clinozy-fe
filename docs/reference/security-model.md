@@ -200,16 +200,19 @@ not fail) on a deploy environment that leaves it unset. Steps:
    the server exactly. A super_admin needing access inside an organization gets
    it the normal way: a membership with a role.
 
-6. **`connect-src` and `img-src` allow `https://*.amazonaws.com`.** Uploads go from the
+6. **`connect-src` and `img-src` name the file store's bucket.** Uploads go from the
    browser straight to S3 (a presigned POST or PUT — clinozy-be never sees the bytes), and
    stored files come back from it: a patient photo's `file_url`, a report file, the signed
-   avatar and organization logo. The bucket and region differ per deployment, so the allowance
-   is AWS's host suffix rather than one bucket. Without it every upload was refused by
-   `connect-src` and every stored image by `img-src` (found in the D86 live check). The
-   residual risk is a script that already runs here sending data to some other AWS-hosted
-   endpoint — `script-src 'self'` is what keeps such a script out; no script, frame or
-   default source is widened. A report file opens in its own tab, outside this policy. Narrow
-   it to the bucket's host if one deployment's storage ever needs it.
+   avatar and organization logo. The build names the bucket exactly from
+   `STORED_FILES_ORIGIN` (F-7; `validate:client-env` requires it — an https origin, no
+   wildcard — in production and warns in development); without it (local, an unconfigured
+   development deploy) the allowance falls back to AWS's host suffix `https://*.amazonaws.com`.
+   Sentry's `connect-src` entry is likewise the DSN's own ingest host, not every
+   `*.sentry.io` project — a `window.__CONFIG__` DSN on another host is refused. No script,
+   frame or default source is widened. A report file opens in its own tab, outside this
+   policy. Trusted Types stays report-only (`require-trusted-types-for 'script'` in a
+   `Content-Security-Policy-Report-Only` header) until a collector shows a clean stream —
+   enforcing it is a separate step.
 
 7. **`Permissions-Policy: microphone=(self)`.** "Report a bug" (iteration
    `feat-bug-report-2026-10-13-dgnx`) and every field built on the common `VoiceField` — drawer

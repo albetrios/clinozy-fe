@@ -261,13 +261,13 @@ When creating or tuning the Sentry project for this app:
 
 ## Troubleshooting
 
-| Symptom            | Likely cause                                                     |
-| ------------------ | ---------------------------------------------------------------- |
-| No events in dev   | `VITE_SENTRY_DSN` blank in `.env.local` — on purpose, see above  |
-| No events in prod  | Missing `VITE_SENTRY_DSN` on Netlify / GitHub env                |
-| Minified stacks    | Maps not uploaded — check the deploy's `SENTRY_*` secrets        |
-| No replays         | Replay not enabled on Sentry plan or sample rate = 0 in non-prod |
-| CSP console errors | Check `connect-src` includes `https://*.ingest.sentry.io`        |
+| Symptom            | Likely cause                                                                   |
+| ------------------ | ------------------------------------------------------------------------------ |
+| No events in dev   | `VITE_SENTRY_DSN` blank in `.env.local` — on purpose, see above                |
+| No events in prod  | Missing `VITE_SENTRY_DSN` on Netlify / GitHub env                              |
+| Minified stacks    | Maps not uploaded — check the deploy's `SENTRY_*` secrets                      |
+| No replays         | Replay not enabled on Sentry plan or sample rate = 0 in non-prod               |
+| CSP console errors | Check `connect-src` names the DSN's ingest host (built from `VITE_SENTRY_DSN`) |
 
 ---
 

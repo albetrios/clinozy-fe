@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   buildContentSecurityPolicy,
   buildTrustedTypesReportOnlyPolicy,
+  CSP_META_PLACEHOLDERS,
+  fillCspMetaPlaceholders,
   formatCspApiConnectSrcFragment,
   getCspConnectSrcOrigin,
 } from './csp-api-origin.ts';
@@ -61,6 +63,41 @@ describe('buildContentSecurityPolicy', () => {
     'upgrade-insecure-requests',
   ])('carries the locked directive %s', (directive) => {
     expect(policy).toContain(directive);
+  });
+
+  it('names the build’s own bucket and Sentry ingest — no other bucket or project (F-7)', () => {
+    const named = buildContentSecurityPolicy('https://api.example.com', undefined, {
+      storedFilesOrigin: 'https://clinozy-files.s3.ap-south-1.amazonaws.com/',
+      sentryDsn: 'https://publickey@o42.ingest.us.sentry.io/7',
+    });
+    expect(named).toContain(
+      "img-src 'self' data: blob: https://clinozy-files.s3.ap-south-1.amazonaws.com;",
+    );
+    expect(named).toMatch(
+      /connect-src [^;]*https:\/\/clinozy-files\.s3\.ap-south-1\.amazonaws\.com/,
+    );
+    expect(named).toMatch(/connect-src [^;]*https:\/\/o42\.ingest\.us\.sentry\.io/);
+    expect(named).not.toContain('*.amazonaws.com');
+    expect(named).not.toContain('*.sentry.io');
+    expect(named).not.toContain('publickey');
+  });
+
+  it('allows no Sentry host at all without a DSN — Sentry is off', () => {
+    expect(policy).not.toMatch(/sentry\.io/);
+  });
+
+  it('fills the meta placeholders exactly as the header names the same origins', () => {
+    const html = `connect-src 'self'${CSP_META_PLACEHOLDERS.apiConnectSrc}${CSP_META_PLACEHOLDERS.sentryConnectSrc} x${CSP_META_PLACEHOLDERS.storedFileSrc}; img-src 'self'${CSP_META_PLACEHOLDERS.storedFileSrc};`;
+    const filled = fillCspMetaPlaceholders(html, 'https://api.example.com', {
+      storedFilesOrigin: 'https://b.s3.amazonaws.com',
+      sentryDsn: 'https://k@o1.ingest.sentry.io/2',
+    });
+    expect(filled.replace(/\s+/g, ' ')).toBe(
+      "connect-src 'self' https://api.example.com https://o1.ingest.sentry.io x https://b.s3.amazonaws.com; img-src 'self' https://b.s3.amazonaws.com;",
+    );
+    expect(fillCspMetaPlaceholders(html, undefined).replace(/\s+/g, ' ')).toBe(
+      "connect-src 'self' x https://*.amazonaws.com; img-src 'self' https://*.amazonaws.com;",
+    );
   });
 
   it('lets the browser send uploads to S3 and show stored files from it — nothing else (D86)', () => {

@@ -84,7 +84,10 @@ export default defineConfig(({ command, mode }) => {
       // Substitutes {{PRODUCT_*}} in index.html; runs `pre` so the CSP pass below
       // sees final markup. Keeps branding out of the rebrand surface entirely.
       productIdentityHtml(),
-      cspApiOrigin(env.VITE_API_BASE_URL, env.VITE_CSP_REPORT_URI),
+      cspApiOrigin(env.VITE_API_BASE_URL, env.VITE_CSP_REPORT_URI, {
+        storedFilesOrigin: env.STORED_FILES_ORIGIN,
+        sentryDsn: env.VITE_SENTRY_DSN,
+      }),
 
       // PWA — injectManifest mode avoids workbox-build/terser race condition in Vite 7
       VitePWA({

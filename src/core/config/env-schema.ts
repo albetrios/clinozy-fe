@@ -22,6 +22,8 @@ export const envSchemaBase = z.object({
   // --- Build-time (Vite / CI — not VITE_ prefixed) ---
   BUILD_I18N_MODE: z.enum(['single', 'multi']).optional().default('single'),
   BUILD_I18N_LOCALE: z.string().min(1).optional().default('en-US'),
+  // The file store's origin, named in the build's CSP (plugins/csp-api-origin.ts) — never bundled.
+  STORED_FILES_ORIGIN: z.string().optional(),
 
   // --- Runtime public (VITE_* — bundled client) ---
   // Reported environment identity — the app's environment vocabulary, NOT the Vite mode
@@ -107,6 +109,8 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   BUILD_I18N_MODE:
     'i18n build mode: single (inline one locale into JS) or multi (lazy JSON per locale).',
   BUILD_I18N_LOCALE: 'Primary i18n build locale, BCP-47 (e.g. en-US).',
+  STORED_FILES_ORIGIN:
+    "Origin of clinozy-be's file store, its S3 bucket (e.g. https://<bucket>.s3.<region>.amazonaws.com). Build-time CSP only: uploads go to it (connect-src) and stored images load from it (img-src). Required in production; empty elsewhere allows any https://*.amazonaws.com bucket.",
   VITE_APP_ENV:
     'Reported environment: local (default) | development | production. The env vocabulary, not the Vite mode; reported-only (Sentry/PostHog tag), never branched on.',
   VITE_APP_VERSION:
@@ -327,6 +331,31 @@ const CSP_REPORT_URI_RULE: RequiredKeyRule = {
   level: 'warn',
 };
 
+/**
+ * The file store's bucket, named exactly in the CSP's `connect-src` and `img-src` (F-7). Without it
+ * the policy allows any `https://*.amazonaws.com` bucket — a page with an injected script could
+ * then upload to, or load from, a bucket of the attacker's. Production must name it (and as an
+ * origin: https, one host — no wildcard — and no path); a development deploy is warned.
+ */
+function isHttpsOrigin(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === 'https:' &&
+      !url.hostname.includes('*') &&
+      value.replace(/\/$/, '') === url.origin
+    );
+  } catch {
+    return false;
+  }
+}
+
+const STORED_FILES_ORIGIN_RULE: RequiredKeyRule = {
+  key: 'STORED_FILES_ORIGIN',
+  level: 'error',
+  satisfiedBy: isHttpsOrigin,
+};
+
 const devLikeContract: Omit<EnvProfile, 'defaults'> = {
   required: [],
   forbidden: [
@@ -395,7 +424,11 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
     // Unlike `local`, development IS a deploy target: the deploy workflow must
     // inject VITE_APP_ENV so the shipped bundle self-reports its environment
     // (Sentry/PostHog tag) instead of falling back to the schema default `local`.
-    required: [{ key: 'VITE_APP_ENV', level: 'error' }, CSP_REPORT_URI_RULE],
+    required: [
+      { key: 'VITE_APP_ENV', level: 'error' },
+      CSP_REPORT_URI_RULE,
+      { ...STORED_FILES_ORIGIN_RULE, level: 'warn' },
+    ],
     allowed: { ...devLikeContract.allowed, VITE_APP_ENV: ['development'] },
     // Development deploy: diagnostics on for debugging, version-check on (a real
     // deploy), E2E hooks off (not a test runner).
@@ -425,6 +458,7 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
         level: 'warn',
       },
       CSP_REPORT_URI_RULE,
+      STORED_FILES_ORIGIN_RULE,
     ],
     forbidden: [
       ...SONAR_LOCAL_ONLY,

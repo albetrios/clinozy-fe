@@ -86,6 +86,7 @@ jobs:
           VITE_PERSONAL_ORGANIZATIONS: ${{ vars.VITE_PERSONAL_ORGANIZATIONS }}
           VITE_TEAM_ORGANIZATIONS: ${{ vars.VITE_TEAM_ORGANIZATIONS }}
           VITE_DISABLED_MODULES: ${{ vars.VITE_DISABLED_MODULES }}
+          STORED_FILES_ORIGIN: ${{ vars.STORED_FILES_ORIGIN }}
         run: pnpm validate:client-env --env "$DEPLOY_ENV"
 
       - name: Resolve app version from release-please manifest
@@ -123,6 +124,7 @@ jobs:
           VITE_PERSONAL_ORGANIZATIONS: ${{ vars.VITE_PERSONAL_ORGANIZATIONS }}
           VITE_TEAM_ORGANIZATIONS: ${{ vars.VITE_TEAM_ORGANIZATIONS }}
           VITE_DISABLED_MODULES: ${{ vars.VITE_DISABLED_MODULES }}
+          STORED_FILES_ORIGIN: ${{ vars.STORED_FILES_ORIGIN }}
         run: |
           set -euo pipefail
           : > .env.production.local
@@ -130,7 +132,8 @@ jobs:
             VITE_TURNSTILE_SITE_KEY VITE_STRIPE_PUBLISHABLE_KEY VITE_POSTHOG_KEY VITE_POSTHOG_HOST \
             VITE_PRIVACY_POLICY_URL VITE_CSP_REPORT_URI \
             VITE_DEBUG_LOGGING VITE_DEVTOOLS VITE_E2E_HOOKS VITE_VERSION_CHECK \
-            VITE_PERSONAL_ORGANIZATIONS VITE_TEAM_ORGANIZATIONS VITE_DISABLED_MODULES; do
+            VITE_PERSONAL_ORGANIZATIONS VITE_TEAM_ORGANIZATIONS VITE_DISABLED_MODULES \
+            STORED_FILES_ORIGIN; do
             value="${!key}"
             if [ -n "$value" ]; then
               printf '%s=%s\n' "$key" "$value" >> .env.production.local
