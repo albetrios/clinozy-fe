@@ -9,15 +9,15 @@ import {
 
 import {
   emptyOrderLine,
-  lineAmount,
+  lineMoney,
   linesMissingRate,
   newOrderForm,
   ORDER_LINES_MAX,
   orderFormOf,
   orderInputOf,
   orderLinesProblem,
+  orderMoney,
   orderServerFields,
-  orderTotal,
   pickedLines,
   reorderLines,
   reorderSupplier,
@@ -98,15 +98,39 @@ const TRICHOSPIRE = medicineRow({
 describe('the purchase order’s form (medical.md:254–267)', () => {
   it('totals qty × rate in paise — free units cost nothing — over the picked lines', () => {
     const lines = [
-      { medicineId: 'a', qty: 4, free: 2, rate: 52_900 },
+      { medicineId: 'a', qty: 4, free: 2, rate: 52_900, gst: '0' },
       { ...emptyOrderLine(), rate: 10_000 },
     ];
-    expect(lineAmount(lines[0] ?? emptyOrderLine())).toBe(211_600);
-    expect(orderTotal(lines)).toBe(211_600);
+    expect(lineMoney(lines[0] ?? emptyOrderLine(), true).amount).toBe(211_600);
+    expect(orderMoney(lines, true).amount).toBe(211_600);
     expect(pickedLines(lines)).toHaveLength(1);
     expect(
-      linesMissingRate([...lines, { medicineId: 'b', qty: 1, free: 0, rate: 0 }]),
+      linesMissingRate([
+        ...lines,
+        { medicineId: 'b', qty: 1, free: 0, rate: 0, gst: '' },
+      ]),
     ).toEqual([2]);
+  });
+
+  // clinozy-be feat-purchase-line-gst A-1, A-2: the invoice calculation, per line to the paisa.
+  it('splits a line into taxable and GST — inside an inclusive rate, on top of an exclusive one', () => {
+    const line = { medicineId: 'a', qty: 10, free: 0, rate: 11_200, gst: '12' };
+    expect(lineMoney(line, true)).toEqual({
+      taxable: 100_000,
+      gst: 12_000,
+      amount: 112_000,
+    });
+    expect(lineMoney(line, false)).toEqual({
+      taxable: 112_000,
+      gst: 13_440,
+      amount: 125_440,
+    });
+    const zero = { ...line, gst: '0' };
+    expect(orderMoney([line, zero], true)).toEqual({
+      taxable: 212_000,
+      gst: 12_000,
+      amount: 224_000,
+    });
   });
 
   // The Items step's head and the save's check read this one rule (QA-04's pattern).
@@ -149,14 +173,33 @@ describe('the purchase order’s form (medical.md:254–267)', () => {
     const form = orderFormOf(order);
     expect(form).toMatchObject({ supplierId: TEST_SUPPLIER_ID, billNo: 'T-82370' });
     expect(
-      form.lines.map((line) => [line.medicineId, line.qty, line.free, line.rate]),
-    ).toEqual([[TEST_MEDICINE_ID, 10, 1, 42_360]]);
+      form.lines.map((line) => [
+        line.medicineId,
+        line.qty,
+        line.free,
+        line.rate,
+        line.gst,
+      ]),
+    ).toEqual([[TEST_MEDICINE_ID, 10, 1, 42_360, '12']]);
+    expect(form.gstInclusive).toBe(true);
     expect(orderInputOf(form)).toEqual({
       supplierId: TEST_SUPPLIER_ID,
       supplierBillNo: 'T-82370',
       date: '2026-10-04',
-      items: [{ medicineId: TEST_MEDICINE_ID, qty: 10, free: 1, rate: 423.6 }],
+      items: [
+        {
+          medicineId: TEST_MEDICINE_ID,
+          qty: 10,
+          free: 1,
+          rate: 423.6,
+          gstPercent: 12,
+          gstInclusive: true,
+        },
+      ],
     });
+    expect(orderInputOf({ ...form, gstInclusive: false }).items[0]?.gstInclusive).toBe(
+      false,
+    );
     const fresh = newOrderForm(TEST_SUPPLIER_ID, [emptyOrderLine()]);
     expect(orderInputOf({ ...fresh, billNo: '  ' })).toMatchObject({
       supplierId: TEST_SUPPLIER_ID,
@@ -172,10 +215,18 @@ describe('the purchase order’s form (medical.md:254–267)', () => {
     expect(typedMedicineName(TEST_MEDICINE_ID)).toBeNull();
     expect(typedMedicineName(null)).toBeNull();
     const form = newOrderForm(TEST_SUPPLIER_ID, [
-      { medicineId: key, qty: 20, free: 2, rate: 18_000 },
+      { medicineId: key, qty: 20, free: 2, rate: 18_000, gst: '12' },
     ]);
     expect(orderInputOf(form).items).toEqual([
-      { medicineId: null, newMedicineName: 'Azel cream', qty: 20, free: 2, rate: 180 },
+      {
+        medicineId: null,
+        newMedicineName: 'Azel cream',
+        qty: 20,
+        free: 2,
+        rate: 180,
+        gstPercent: 12,
+        gstInclusive: true,
+      },
     ]);
   });
 

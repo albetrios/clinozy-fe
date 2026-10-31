@@ -200,18 +200,22 @@ export function belowFloor(item: LineFields, floor: number | null): boolean {
   return floor !== null && invoiceLineAmounts(item).net + FLOOR_TOLERANCE < floor;
 }
 
-/** A purchase line's amount, in paise: qty × rate — free units cost nothing (`S:830`). */
-export function purchaseLineAmount(item: Pick<PurchaseItem, 'qty' | 'rate'>): number {
-  return item.qty * item.rate;
+/** A purchase line as the money reads it: qty and rate, and the server's amount when known. */
+type PurchaseLineMoney = Pick<PurchaseItem, 'qty' | 'rate'> & { amount?: number };
+
+/**
+ * A purchase line's amount, in paise: the server's when given (GST on top of an exclusive rate,
+ * clinozy-be feat-purchase-line-gst), else qty × rate — free units cost nothing (`S:830`).
+ */
+export function purchaseLineAmount(item: PurchaseLineMoney): number {
+  return item.amount ?? item.qty * item.rate;
 }
 
 /**
  * A Medical purchase order's bill, in paise (`S:830`, "bill → Σ qty × rate"):
  * free units cost nothing. What is due is this less the order's `paid`.
  */
-export function purchaseOrderTotal(
-  items: readonly Pick<PurchaseItem, 'qty' | 'rate'>[],
-): number {
+export function purchaseOrderTotal(items: readonly PurchaseLineMoney[]): number {
   return items.reduce((sum, item) => sum + purchaseLineAmount(item), 0);
 }
 
@@ -223,7 +227,7 @@ export function purchaseOrderTotal(
  */
 export function purchaseOrderDue(
   order: Pick<MedicalPurchaseOrder, 'stage' | 'paid'> & {
-    items: readonly Pick<PurchaseItem, 'qty' | 'rate'>[];
+    items: readonly PurchaseLineMoney[];
   },
 ): number {
   if (order.stage !== 'received') return 0;

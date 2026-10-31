@@ -38,7 +38,8 @@
     "removeDiscount": "Rimuovi lo sconto per scadenza",
     "prescriptions": "Ricette da evadere",
     "paymentReminders": "Invia promemoria di pagamento",
-    "payAllReceived": "Paga tutto il ricevuto · {{amount}}"
+    "payAllReceived": "Paga tutto il ricevuto · {{amount}}",
+    "gstSummary": "Riepilogo GST"
   },
   "filters": {
     "all": "Tutti",
@@ -615,7 +616,12 @@
         "quickLine": "Scrivi farmaco, quantità, omaggio, prezzo · es. azel 20 +2 @180",
         "quickHint": "20 = quantità · +2 = omaggio · @180 = prezzo",
         "lowStockChip": "{{name}} · ne restano {{quantity}}",
-        "newMedicineName": "Nome del nuovo farmaco"
+        "newMedicineName": "Nome del nuovo farmaco",
+        "gst": "GST",
+        "gstRate": "{{value}}%",
+        "ratesIncludeGst": "Le tariffe includono la GST",
+        "gstOnTop": "GST in aggiunta",
+        "gstTotals": "Imponibile {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "Riordina le scorte basse"
@@ -657,7 +663,8 @@
       "paidOf": "Pagato {{paid}} di {{total}}",
       "paidWithCredits": "Pagato {{paid}} + {{credited}} in crediti fornitore",
       "pay": "Paga {{amount}}",
-      "print": "Stampa"
+      "print": "Stampa",
+      "gstOnTopRate": "{{value}}% in aggiunta"
     },
     "sale": {
       "title": "Vendita",
@@ -752,6 +759,24 @@
       "copy": "Copia il promemoria per {{name}}",
       "copied": "Promemoria per {{name}} copiato",
       "message": "Ciao {{name}}, le ricordiamo da {{clinic}} che restano da pagare {{amount}} per i suoi farmaci. Risponda qui per qualsiasi domanda. Grazie!"
+    },
+    "gstSummary": {
+      "title": "GST sugli acquisti",
+      "month": "Mese",
+      "summary": "Ordini ricevuti: {{orders}} · righe: {{lines}}",
+      "byRate": "Per aliquota GST",
+      "byHsn": "Per codice HSN",
+      "rate": "Aliquota",
+      "hsn": "Codice HSN",
+      "noHsn": "Senza HSN",
+      "lines": "Righe",
+      "taxable": "Imponibile",
+      "gst": "GST",
+      "total": "Totale",
+      "totals": "Imponibile {{taxable}} · GST {{gst}} · Totale {{total}}",
+      "empty": "Nulla è stato ricevuto questo mese",
+      "download": "Scarica CSV",
+      "downloaded": "Riepilogo GST scaricato"
     }
   }
 }

@@ -51,8 +51,12 @@ export interface PurchaseOrderPrintProps {
    */
   order: Pick<
     MedicalPurchaseOrder,
-    'seq' | 'date' | 'stage' | 'supplierBillNo' | 'items' | 'paid'
-  > & { credited?: number };
+    'seq' | 'date' | 'stage' | 'supplierBillNo' | 'paid'
+  > & {
+    /** The lines — each with the server's `amount` (paise, GST included) when it has one. */
+    items: readonly (MedicalPurchaseOrder['items'][number] & { amount?: number })[];
+    credited?: number;
+  };
   /** Each line's medicine name, in the order's order. */
   itemNames: readonly string[];
   /** Who the order is to: the supplier's name, phone and GSTIN. */

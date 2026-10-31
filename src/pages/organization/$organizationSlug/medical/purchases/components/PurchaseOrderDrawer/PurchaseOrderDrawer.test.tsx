@@ -143,6 +143,10 @@ const ORDERED = purchaseOrderRow({
       free: 1,
       rate: 423.6,
       amount: 4236,
+      gstPercent: 12,
+      gstInclusive: true,
+      taxable: 3782.14,
+      gst: 453.86,
       received: null,
       batchNo: null,
       expiry: null,
@@ -216,9 +220,30 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
         input: expect.objectContaining({
           supplierId: AKSHAR_ID,
           items: [
-            { medicineId: 'med_arganlif0000000000000', qty: 8, free: 0, rate: 700 },
-            { medicineId: 'med_admosh000000000000000', qty: 8, free: 0, rate: 240 },
-            { medicineId: 'med_trichospire0000000000', qty: 10, free: 0, rate: 320 },
+            {
+              medicineId: 'med_arganlif0000000000000',
+              qty: 8,
+              free: 0,
+              rate: 700,
+              gstPercent: 12,
+              gstInclusive: true,
+            },
+            {
+              medicineId: 'med_admosh000000000000000',
+              qty: 8,
+              free: 0,
+              rate: 240,
+              gstPercent: 12,
+              gstInclusive: true,
+            },
+            {
+              medicineId: 'med_trichospire0000000000',
+              qty: 10,
+              free: 0,
+              rate: 320,
+              gstPercent: 12,
+              gstInclusive: true,
+            },
           ],
         }),
       }),
@@ -331,14 +356,30 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
       expect.objectContaining({
         input: expect.objectContaining({
           items: [
-            { medicineId: 'med_azelan000000000000000', qty: 20, free: 2, rate: 180 },
-            { medicineId: 'med_arganlif0000000000000', qty: 8, free: 0, rate: 677 },
+            {
+              medicineId: 'med_azelan000000000000000',
+              qty: 20,
+              free: 2,
+              rate: 180,
+              gstPercent: 12,
+              gstInclusive: true,
+            },
+            {
+              medicineId: 'med_arganlif0000000000000',
+              qty: 8,
+              free: 0,
+              rate: 677,
+              gstPercent: 12,
+              gstInclusive: true,
+            },
             {
               medicineId: null,
               newMedicineName: 'Azel cream',
               qty: 1,
               free: 0,
               rate: 150,
+              gstPercent: 12,
+              gstInclusive: true,
             },
           ],
         }),
@@ -387,6 +428,14 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
     );
     expect(within(drawer).getByTestId(`${D}-tag`)).toHaveTextContent('#430');
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,236');
+    // The line's GST and the order's split (feat-purchase-line-gst D3); "GST on top" adds it.
+    await user.click(within(drawer).getByTestId(`${D}-step-items-trigger`));
+    const totals = await within(drawer).findByTestId(`${D}-gst-totals`);
+    expect(totals).toHaveTextContent('Taxable ₹3,782.14 · GST ₹453.86');
+    await user.click(within(drawer).getByTestId(`${D}-gst-inclusive`));
+    expect(totals).toHaveTextContent('Taxable ₹4,236 · GST ₹508.32');
+    await user.click(within(drawer).getByTestId(`${D}-gst-inclusive`));
+    await user.click(within(drawer).getByTestId(`${D}-step-order-trigger`));
     await user.click(within(drawer).getByTestId(`${D}-delete`));
     const dialog = await screen.findByRole('alertdialog');
     expect(within(dialog).getByText('Cancel this purchase order?')).toBeInTheDocument();
@@ -403,7 +452,16 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
         record: ORDERED,
         input: expect.objectContaining({
           supplierBillNo: 'T-90000',
-          items: [{ medicineId: TEST_MEDICINE_ID, qty: 10, free: 1, rate: 423.6 }],
+          items: [
+            {
+              medicineId: TEST_MEDICINE_ID,
+              qty: 10,
+              free: 1,
+              rate: 423.6,
+              gstPercent: 12,
+              gstInclusive: true,
+            },
+          ],
         }),
       }),
     );

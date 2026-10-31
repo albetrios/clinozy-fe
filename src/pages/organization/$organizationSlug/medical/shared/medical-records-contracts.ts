@@ -1,6 +1,7 @@
 import type { ApiBody } from '@/core/http/api.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { wireExpiryOf } from '@/shared/api/app/medicines-contracts.ts';
+import type { GstPercent } from '@/shared/api/app/offerings-contracts.ts';
 import type { MoneySplit } from '@/shared/api/app/payments-contracts.ts';
 
 import type {
@@ -218,6 +219,10 @@ export interface PurchaseOrderLineInput {
   qty: number;
   free: number;
   rate: number;
+  /** The line's GST rate (0, 5, 12, 18, 28); unset — the medicine's. */
+  gstPercent?: GstPercent | null;
+  /** Whether the rate includes GST; unset — it does. */
+  gstInclusive?: boolean;
 }
 
 /**
@@ -232,7 +237,7 @@ export interface PurchaseOrderInput {
   items: PurchaseOrderLineInput[];
 }
 
-/** A line in the API's words: the medicine, or the typed name of a new one. */
+/** A line in the API's words: the medicine, or the typed name of a new one, and its GST. */
 function orderLineOf(line: PurchaseOrderLineInput) {
   return {
     ...(line.medicineId
@@ -241,6 +246,8 @@ function orderLineOf(line: PurchaseOrderLineInput) {
     quantity: line.qty,
     free_quantity: line.free,
     rate: line.rate,
+    ...(line.gstPercent == null ? {} : { gst_percent: line.gstPercent }),
+    ...(line.gstInclusive === undefined ? {} : { is_gst_inclusive: line.gstInclusive }),
   };
 }
 
@@ -280,6 +287,8 @@ export function purchaseOrderChangeOf(
       qty: line.qty,
       free: line.free,
       rate: line.rate,
+      gstPercent: line.gstPercent,
+      gstInclusive: line.gstInclusive,
     }),
   );
   if (JSON.stringify(lines) !== JSON.stringify(saved)) change.items = lines;

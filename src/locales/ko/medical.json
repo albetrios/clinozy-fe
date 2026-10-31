@@ -38,7 +38,8 @@
     "removeDiscount": "유효기간 임박 할인 해제",
     "prescriptions": "조제할 처방전",
     "paymentReminders": "결제 알림 보내기",
-    "payAllReceived": "입고분 모두 지불 · {{amount}}"
+    "payAllReceived": "입고분 모두 지불 · {{amount}}",
+    "gstSummary": "GST 요약"
   },
   "filters": {
     "all": "전체",
@@ -577,7 +578,12 @@
         "quickLine": "의약품, 수량, 무상, 단가 입력 · 예: azel 20 +2 @180",
         "quickHint": "20 = 수량 · +2 = 무상 · @180 = 단가",
         "lowStockChip": "{{name}} · {{quantity}}개 남음",
-        "newMedicineName": "새 의약품 이름"
+        "newMedicineName": "새 의약품 이름",
+        "gst": "GST",
+        "gstRate": "{{value}}%",
+        "ratesIncludeGst": "단가에 GST 포함",
+        "gstOnTop": "GST 별도",
+        "gstTotals": "과세 금액 {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "재고 부족 재주문"
@@ -617,7 +623,8 @@
       "paidOf": "{{total}} 중 {{paid}} 지급",
       "paidWithCredits": "{{paid}} 지급 + 공급업체 크레딧 {{credited}}",
       "pay": "{{amount}} 지불",
-      "print": "인쇄"
+      "print": "인쇄",
+      "gstOnTopRate": "{{value}}% 별도"
     },
     "sale": {
       "title": "판매",
@@ -704,6 +711,24 @@
       "copy": "{{name}}님에게 보낼 알림 복사",
       "copied": "{{name}}님에게 보낼 알림을 복사했습니다",
       "message": "{{name}}님, 안녕하세요. {{clinic}}에서 알려 드립니다. 의약품 대금 {{amount}}이(가) 아직 결제되지 않았습니다. 궁금한 점이 있으시면 여기로 답장해 주세요. 감사합니다!"
+    },
+    "gstSummary": {
+      "title": "매입 GST",
+      "month": "월",
+      "summary": "입고된 주문: {{orders}} · 품목: {{lines}}",
+      "byRate": "GST 세율별",
+      "byHsn": "HSN 코드별",
+      "rate": "세율",
+      "hsn": "HSN 코드",
+      "noHsn": "HSN 없음",
+      "lines": "품목",
+      "taxable": "과세 금액",
+      "gst": "GST",
+      "total": "합계",
+      "totals": "과세 금액 {{taxable}} · GST {{gst}} · 합계 {{total}}",
+      "empty": "이번 달에 입고된 것이 없습니다",
+      "download": "CSV 다운로드",
+      "downloaded": "GST 요약을 다운로드했습니다"
     }
   }
 }

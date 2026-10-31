@@ -38,7 +38,8 @@
     "removeDiscount": "एक्सपायरी छूट हटाएँ",
     "prescriptions": "भरने वाले प्रिस्क्रिप्शन",
     "paymentReminders": "भुगतान रिमाइंडर भेजें",
-    "payAllReceived": "सभी प्राप्त का भुगतान · {{amount}}"
+    "payAllReceived": "सभी प्राप्त का भुगतान · {{amount}}",
+    "gstSummary": "GST सारांश"
   },
   "filters": {
     "all": "सभी",
@@ -596,7 +597,12 @@
         "quickLine": "दवा, मात्रा, मुफ़्त, रेट लिखें · जैसे azel 20 +2 @180",
         "quickHint": "20 = मात्रा · +2 = मुफ़्त · @180 = रेट",
         "lowStockChip": "{{name}} · {{quantity}} बचे",
-        "newMedicineName": "नई दवा का नाम"
+        "newMedicineName": "नई दवा का नाम",
+        "gst": "GST",
+        "gstRate": "{{value}}%",
+        "ratesIncludeGst": "दरों में GST शामिल है",
+        "gstOnTop": "GST अलग से",
+        "gstTotals": "कर योग्य {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "कम स्टॉक फिर से मँगाएँ"
@@ -637,7 +643,8 @@
       "paidOf": "{{total}} में से {{paid}} का भुगतान",
       "paidWithCredits": "{{paid}} का भुगतान + {{credited}} सप्लायर क्रेडिट में",
       "pay": "{{amount}} का भुगतान करें",
-      "print": "प्रिंट करें"
+      "print": "प्रिंट करें",
+      "gstOnTopRate": "{{value}}% अलग से"
     },
     "sale": {
       "title": "बिक्री",
@@ -728,6 +735,24 @@
       "copy": "{{name}} के लिए रिमाइंडर कॉपी करें",
       "copied": "{{name}} के लिए रिमाइंडर कॉपी हो गया",
       "message": "नमस्ते {{name}}, {{clinic}} की ओर से याद दिला रहे हैं कि आपकी दवाओं के {{amount}} बकाया हैं। कोई सवाल हो तो यहीं जवाब दें। धन्यवाद!"
+    },
+    "gstSummary": {
+      "title": "ख़रीद GST",
+      "month": "महीना",
+      "summary": "प्राप्त ऑर्डर: {{orders}} · पंक्तियाँ: {{lines}}",
+      "byRate": "GST दर के अनुसार",
+      "byHsn": "HSN कोड के अनुसार",
+      "rate": "दर",
+      "hsn": "HSN कोड",
+      "noHsn": "HSN नहीं",
+      "lines": "पंक्तियाँ",
+      "taxable": "कर योग्य",
+      "gst": "GST",
+      "total": "कुल",
+      "totals": "कर योग्य {{taxable}} · GST {{gst}} · कुल {{total}}",
+      "empty": "इस महीने कुछ प्राप्त नहीं हुआ",
+      "download": "CSV डाउनलोड करें",
+      "downloaded": "GST सारांश डाउनलोड हुआ"
     }
   }
 }

@@ -238,6 +238,14 @@ export const MEDICAL_DRAWER_KEYS = {
       lowStockChip: 'drawers.purchaseOrder.fields.lowStockChip',
       /** Browse's inline field for a medicine the list lacks (`medical.md:413`). */
       newMedicineName: 'drawers.purchaseOrder.fields.newMedicineName',
+      /** The line's GST column, and a rate in its picker ("12%"). */
+      gst: 'drawers.purchaseOrder.fields.gst',
+      gstRate: 'drawers.purchaseOrder.fields.gstRate',
+      /** The order's one switch: on "Rates include GST", off "GST on top". */
+      ratesIncludeGst: 'drawers.purchaseOrder.fields.ratesIncludeGst',
+      gstOnTop: 'drawers.purchaseOrder.fields.gstOnTop',
+      /** "Taxable ₹3,782.14 · GST ₹453.86". */
+      gstTotals: 'drawers.purchaseOrder.fields.gstTotals',
     },
     quickFill: { reorder: 'drawers.purchaseOrder.quickFill.reorder' },
     /** "Enter the rate for Epriva Tab". */
@@ -274,7 +282,30 @@ export const MEDICAL_DRAWER_KEYS = {
     saved: 'drawers.receive.saved',
   },
   /** Purchase order (view) (`medical.md:333–334`; H:5418–5421). */
+  /** Purchases › GST summary (feat-purchase-line-gst). */
+  gstSummary: {
+    title: 'drawers.gstSummary.title',
+    month: 'drawers.gstSummary.month',
+    /** "Received orders · 3 orders · 14 lines". */
+    summary: 'drawers.gstSummary.summary',
+    byRate: 'drawers.gstSummary.byRate',
+    byHsn: 'drawers.gstSummary.byHsn',
+    rate: 'drawers.gstSummary.rate',
+    hsn: 'drawers.gstSummary.hsn',
+    /** A medicine without an HSN code. */
+    noHsn: 'drawers.gstSummary.noHsn',
+    lines: 'drawers.gstSummary.lines',
+    taxable: 'drawers.gstSummary.taxable',
+    gst: 'drawers.gstSummary.gst',
+    total: 'drawers.gstSummary.total',
+    totals: 'drawers.gstSummary.totals',
+    empty: 'drawers.gstSummary.empty',
+    download: 'drawers.gstSummary.download',
+    downloaded: 'drawers.gstSummary.downloaded',
+  },
   orderView: {
+    /** A line's GST when its rate excludes it: "12% extra". */
+    gstOnTopRate: 'drawers.orderView.gstOnTopRate',
     title: 'drawers.orderView.title',
     /** "Shree Ramdev Medical Agency · received, stock added · items locked". */
     subReceived: 'drawers.orderView.subReceived',
@@ -539,6 +570,7 @@ export const MEDICAL_DRAWER_TEST_IDS = {
   expiring: 'expiring-return-drawer',
   prescriptions: 'prescriptions-to-fill',
   reminders: 'payment-reminders',
+  gstSummary: 'purchase-gst-summary',
 } as const;
 
 /** A drawer stacked on another takes its kind's id with this suffix (`supplier-drawer-stacked`). */

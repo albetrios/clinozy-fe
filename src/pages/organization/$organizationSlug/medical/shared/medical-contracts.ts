@@ -10,6 +10,10 @@ import {
   type MedicineMaker,
   screenExpiryOf,
 } from '@/shared/api/app/medicines-contracts.ts';
+import {
+  GST_PERCENT_VALUES,
+  type GstPercent,
+} from '@/shared/api/app/offerings-contracts.ts';
 
 /*
  * The Medical store on clinozy-be (`/app/medical-sales`, `/app/medical-purchase-orders`,
@@ -36,6 +40,9 @@ type ApiSale = NonNullable<ApiData<'/app/medical-sales/{medical_sale_id}', 'get'
 type ApiSaleDue = NonNullable<ApiData<'/app/medical-sales/dues', 'get'>>[number];
 type ApiPurchaseOrder = NonNullable<
   ApiData<'/app/medical-purchase-orders/{medical_purchase_order_id}', 'get'>
+>;
+type ApiPurchaseGstSummary = NonNullable<
+  ApiData<'/app/medical-purchase-orders/gst-summary', 'get'>
 >;
 type ApiSupplier = NonNullable<ApiData<'/app/suppliers/{supplier_id}', 'get'>>;
 type ApiManufacturer = NonNullable<
@@ -218,6 +225,10 @@ export const purchaseOrderWire = wireSchema<ApiPurchaseOrder>()(
         free_quantity: z.number().int(),
         rate: z.number(),
         amount: z.number(),
+        gst_percent: z.literal(GST_PERCENT_VALUES),
+        is_gst_inclusive: z.boolean(),
+        taxable_amount: z.number(),
+        gst_amount: z.number(),
         is_received: z.boolean().nullable(),
         batch_number: z.string().nullable(),
         expiry_month: z.string().nullable(),
@@ -226,6 +237,8 @@ export const purchaseOrderWire = wireSchema<ApiPurchaseOrder>()(
     item_count: z.number().int(),
     free_count: z.number().int(),
     total: z.number(),
+    taxable_total: z.number(),
+    gst_total: z.number(),
     paid_amount: z.number(),
     credited_amount: z.number(),
     due_amount: z.number(),
@@ -607,7 +620,14 @@ export interface PurchaseOrderLine {
   qty: number;
   free: number;
   rate: number;
+  /** Taxable + GST — qty × rate when the rate includes GST, GST on top when not. */
   amount: number;
+  /** The line's GST rate: 0, 5, 12, 18 or 28. */
+  gstPercent: GstPercent;
+  /** Whether the rate includes GST. */
+  gstInclusive: boolean;
+  taxable: number;
+  gst: number;
   /** Ticked on Receive goods; null until the order is received. */
   received: boolean | null;
   batchNo: string | null;
@@ -632,7 +652,10 @@ export interface PurchaseOrderRow {
   lines: PurchaseOrderLine[];
   itemCount: number;
   freeCount: number;
+  /** Taxable total + GST total — its lines', the received ones' once received. */
   total: number;
+  taxableTotal: number;
+  gstTotal: number;
   paid: number;
   /** Set off by the supplier's credits (MD11). */
   credited: number;
@@ -670,6 +693,10 @@ export function toPurchaseOrderRow(
       free: item.free_quantity,
       rate: item.rate,
       amount: item.amount,
+      gstPercent: item.gst_percent,
+      gstInclusive: item.is_gst_inclusive,
+      taxable: item.taxable_amount,
+      gst: item.gst_amount,
       received: item.is_received,
       batchNo: item.batch_number,
       expiry: item.expiry_month ? screenExpiryOf(item.expiry_month) : null,
@@ -677,12 +704,92 @@ export function toPurchaseOrderRow(
     itemCount: wire.item_count,
     freeCount: wire.free_count,
     total: wire.total,
+    taxableTotal: wire.taxable_total,
+    gstTotal: wire.gst_total,
     paid: wire.paid_amount,
     credited: wire.credited_amount,
     due: wire.due_amount,
     paymentStatus: wire.payment_status,
     createdAt: wire.created_at,
     updatedAt: wire.updated_at,
+  };
+}
+
+/** What one group of the purchase GST summary came to — rupees. */
+const gstAmountsWire = {
+  line_count: z.number().int(),
+  taxable_amount: z.number(),
+  gst_amount: z.number(),
+  total_amount: z.number(),
+};
+
+/** The purchase GST summary of a month as `GET /app/medical-purchase-orders/gst-summary` answers it. */
+export const purchaseGstSummaryWire = wireSchema<ApiPurchaseGstSummary>()(
+  z.object({
+    month: z.string(),
+    by_rate: z.array(
+      z.object({ gst_percent: z.literal(GST_PERCENT_VALUES), ...gstAmountsWire }),
+    ),
+    by_hsn: z.array(
+      z.object({
+        hsn_code: z.string().nullable(),
+        gst_percent: z.literal(GST_PERCENT_VALUES),
+        ...gstAmountsWire,
+      }),
+    ),
+    totals: z.object({ order_count: z.number().int(), ...gstAmountsWire }),
+  }),
+);
+
+/** One group of the purchase GST summary. Money in rupees. */
+export interface PurchaseGstGroup {
+  lines: number;
+  taxable: number;
+  gst: number;
+  total: number;
+}
+
+/**
+ * A month's purchase GST (feat-purchase-line-gst): the received lines of the orders received that
+ * month — by GST rate, by HSN code and rate (a code-less medicine's `hsn` null), and in total.
+ */
+export interface PurchaseGstSummary {
+  /** `YYYY-MM`. */
+  month: string;
+  byRate: (PurchaseGstGroup & { gstPercent: GstPercent })[];
+  byHsn: (PurchaseGstGroup & { hsn: string | null; gstPercent: GstPercent })[];
+  totals: PurchaseGstGroup & { orders: number };
+}
+
+/** A group in the room's words. */
+const gstGroupOf = (wire: {
+  line_count: number;
+  taxable_amount: number;
+  gst_amount: number;
+  total_amount: number;
+}): PurchaseGstGroup => ({
+  lines: wire.line_count,
+  taxable: wire.taxable_amount,
+  gst: wire.gst_amount,
+  total: wire.total_amount,
+});
+
+/** The summary in the room's words. */
+export function toPurchaseGstSummary(
+  wire: z.infer<typeof purchaseGstSummaryWire>,
+): PurchaseGstSummary {
+  return {
+    month: wire.month,
+    byRate: wire.by_rate.map((row) => ({
+      gstPercent: row.gst_percent,
+      ...gstGroupOf(row),
+    })),
+    byHsn: wire.by_hsn.map((row) => ({
+      hsn: row.hsn_code,
+      gstPercent: row.gst_percent,
+      ...gstGroupOf(row),
+    })),
+    totals: { orders: wire.totals.order_count, ...gstGroupOf(wire.totals) },
   };
 }
 

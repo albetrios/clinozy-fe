@@ -48,6 +48,8 @@ export const MEDICAL_KEYS = {
     paymentReminders: 'viewActions.paymentReminders',
     /** "Pay all received · ₹2,980". */
     payAllReceived: 'viewActions.payAllReceived',
+    /** Purchases: the month's purchase GST (feat-purchase-line-gst). */
+    gstSummary: 'viewActions.gstSummary',
   },
   filters: {
     all: 'filters.all',

@@ -68,6 +68,8 @@ export interface OrderLineMedicine {
   name: string;
   /** The supplier's rate for it, else its best rate, paise; 0 for a medicine just typed or made. */
   rate: number;
+  /** Its GST rate — a typed or just-made one's is the quick medicine's (12). */
+  gstPercent: number;
 }
 
 /**

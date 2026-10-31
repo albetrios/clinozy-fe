@@ -33,6 +33,7 @@ import {
   type OrderLineValues,
   pricedBy,
   type PurchaseOrderFormValues,
+  TYPED_MEDICINE_GST,
   typedMedicineKey,
 } from './purchase-order-form.ts';
 
@@ -119,6 +120,7 @@ export function useOrderQuickLine({
       qty: values.qty ?? 1,
       free: values.free ?? 0,
       rate: values.rate ?? 0,
+      gst: String(TYPED_MEDICINE_GST),
     });
   const countOf = (item: QuickLineItem<MedicineRow>) =>
     quickLineCount(lines, (line) => line.medicineId === item.key);

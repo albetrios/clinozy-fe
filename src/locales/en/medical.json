@@ -38,7 +38,8 @@
     "removeDiscount": "Remove near-expiry discount",
     "prescriptions": "Prescriptions to fill",
     "paymentReminders": "Send payment reminders",
-    "payAllReceived": "Pay all received · {{amount}}"
+    "payAllReceived": "Pay all received · {{amount}}",
+    "gstSummary": "GST summary"
   },
   "filters": {
     "all": "All",
@@ -596,7 +597,12 @@
         "quickLine": "Type medicine, qty, free, rate · e.g. azel 20 +2 @180",
         "quickHint": "20 = qty · +2 = free · @180 = rate",
         "lowStockChip": "{{name}} · {{quantity}} left",
-        "newMedicineName": "New medicine name"
+        "newMedicineName": "New medicine name",
+        "gst": "GST",
+        "gstRate": "{{value}}%",
+        "ratesIncludeGst": "Rates include GST",
+        "gstOnTop": "GST on top",
+        "gstTotals": "Taxable {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "Reorder low stock"
@@ -637,7 +643,8 @@
       "paidOf": "Paid {{paid}} of {{total}}",
       "paidWithCredits": "Paid {{paid}} + {{credited}} in supplier credits",
       "pay": "Pay {{amount}}",
-      "print": "Print"
+      "print": "Print",
+      "gstOnTopRate": "{{value}}% extra"
     },
     "sale": {
       "title": "Sale",
@@ -728,6 +735,24 @@
       "copy": "Copy the reminder for {{name}}",
       "copied": "Reminder for {{name}} copied",
       "message": "Hi {{name}}, this is a reminder from {{clinic}} that {{amount}} is due for your medicines. Reply here if you have any questions. Thank you!"
+    },
+    "gstSummary": {
+      "title": "Purchase GST",
+      "month": "Month",
+      "summary": "Received orders: {{orders}} · lines: {{lines}}",
+      "byRate": "By GST rate",
+      "byHsn": "By HSN code",
+      "rate": "Rate",
+      "hsn": "HSN code",
+      "noHsn": "No HSN",
+      "lines": "Lines",
+      "taxable": "Taxable",
+      "gst": "GST",
+      "total": "Total",
+      "totals": "Taxable {{taxable}} · GST {{gst}} · Total {{total}}",
+      "empty": "Nothing was received this month",
+      "download": "Download CSV",
+      "downloaded": "GST summary downloaded"
     }
   }
 }
