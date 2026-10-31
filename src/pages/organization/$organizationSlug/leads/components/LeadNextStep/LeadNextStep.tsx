@@ -462,18 +462,30 @@ function Part({
  * time opens the picker) and Outcome (what happened, named as the status it moves the lead to,
  * saved at once). No answer appears once the person was contacted.
  */
-export function LeadNextStep(props: LeadNextStepProps) {
+export function LeadNextStep({
+  lead,
+  visit,
+  canEdit,
+  onBook,
+  onMove,
+  asking,
+  onAsk,
+  onCompose,
+  onOpenPatient,
+}: LeadNextStepProps) {
   const { t } = useTranslation(LEADS_NS);
   const { t: tApp } = useTranslation(APP_NS);
   const clock = useAppClock();
-  const { lead } = props;
   const tone = LEAD_STATUS_TONES[lead.status];
   const words: Words = {
     t: (key, values) => t(key, values),
     moment: (instant) => clock.moment(instant),
     date: (date) => clock.date(date),
   };
-  const parts = partsOf(props, words);
+  const parts = partsOf(
+    { lead, visit, canEdit, onBook, onMove, asking, onAsk, onCompose, onOpenPatient },
+    words,
+  );
   const ink = TONE_CLASSES[tone].ink;
   return (
     <section
