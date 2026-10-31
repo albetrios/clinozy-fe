@@ -93,6 +93,8 @@ English (`lang: en-US`) unless product explicitly adds localized manifests.
 - `includeAssets` must list: `app-icon.svg`, `pwa-192x192.png`, `pwa-512x512.png`,
   plus other offline-critical assets (`offline.html`, etc.).
 - Do not duplicate manifest JSON inside `vite.config.ts`.
+- The precache is the app shell only (`plugins/app-shell-precache.ts`) — see
+  [frontend-platform.md → Offline stance](./frontend-platform.md#offline-stance).
 
 ### 6. Validation
 

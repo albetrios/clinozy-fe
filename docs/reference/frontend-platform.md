@@ -175,6 +175,14 @@ write path for API calls.
   Precached files sit under revisioned cache keys (`?__WB_REVISION__=…`): look them
   up with `matchPrecache('<file>')`, never `caches.match('/<file>')`, which misses.
   Pinned by `src/sw.test.ts`.
+- **The precache is the app shell**, not the whole app (`plugins/app-shell-precache.ts`,
+  `injectManifest.manifestTransforms`): the root files (`index.html`, `offline.html`, the
+  init scripts, `config.js`, icons), `index.html`'s first paint (entry, modulepreloads,
+  stylesheet), the fonts, and the chunks the root route loads lazily at boot
+  (`AppSplashSlot`, `CriticalUpdateNotice`, `ConsentBanner`) with their static imports. Every
+  room, form and drawer chunk is fetched when first used and kept by the `app-assets` runtime
+  cache. A renamed shell chunk fails the build; `tests/ci/app-shell-precache.policy.test.ts`
+  pins the selection.
 - TanStack Query retries skip 401 (auth interceptor owns refresh); other failures
   surface via `QueryBoundary` / `RetryError` on read paths.
 - Below that, `apiClient` retries idempotent requests (GET, HEAD, OPTIONS, PUT,

@@ -1,16 +1,14 @@
 /**
- * Env Zod schema and key list only. Safe to import from scripts that must not run
- * full client bootstrap (e.g. sync-env-example). Application code should use
- * {@link env.config.ts} + {@link platform-config.ts}.
+ * The whole env contract — every key (client, build, deploy and local tooling), its
+ * description, and the per-environment profiles `validate:client-env` enforces. TOOLING ONLY:
+ * the app never imports this module, so the deploy and tooling key names, the forbidden-value
+ * rules and the profiles stay out of the shipped bundle (F-8). The client's own slice —
+ * `clientEnvSchema` and the boot invariants — lives in {@link client-env-schema.ts}, which is
+ * what `env.config.ts` reads; `env-schema.test.ts` keeps the two in step.
  */
 import { z } from 'zod';
 
-import {
-  enabledOAuthProviders,
-  hasAnyAuthSurface,
-  resolveBooleanFlag,
-  resolveOAuthProviderFlags,
-} from './env-resolvers.ts';
+import { enabledOAuthProviders, resolveOAuthProviderFlags } from './env-resolvers.ts';
 
 const booleanString = (defaultValue: 'true' | 'false') =>
   z
@@ -174,83 +172,6 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   SONAR_TOKEN:
     'Local SonarQube scanner token; auto-managed by the sonar gate (never in CI).',
 };
-
-/** Client `import.meta.env` subset validated at app boot. */
-export const clientEnvSchema = z.object({
-  VITE_API_BASE_URL: z.string().optional(),
-  VITE_DEV_API_URL: z.string().optional(),
-  VITE_SENTRY_DSN: z.string().optional(),
-  VITE_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
-  VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: z.string().optional(),
-  VITE_SENTRY_PROFILES_SAMPLE_RATE: z.string().optional(),
-  VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: z.string().optional(),
-  VITE_POSTHOG_KEY: z.string().optional(),
-  VITE_POSTHOG_HOST: z.string().optional(),
-  VITE_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  VITE_LAYOUT_WIDTH: z.enum(['contained', 'full', 'reading']).optional(),
-  VITE_THEME_LOCK: z.string().optional(),
-  VITE_PRIVACY_POLICY_URL: z.string().optional(),
-  VITE_CSP_REPORT_URI: z.string().optional(),
-  VITE_DISABLED_MODULES: z.string().optional(),
-  VITE_PERSONAL_ORGANIZATIONS: z.string().optional(),
-  VITE_TEAM_ORGANIZATIONS: z.string().optional(),
-  VITE_AUTH_EMAIL: z.string().optional(),
-  VITE_AUTH_OAUTH_GOOGLE: z.string().optional(),
-  VITE_AUTH_OAUTH_GITHUB: z.string().optional(),
-  VITE_AUTH_OAUTH_APPLE: z.string().optional(),
-  VITE_AUTH_OAUTH_AUTO_GOOGLE: z.string().optional(),
-  VITE_AUTH_PASSKEY: z.string().optional(),
-  VITE_CAPTCHA_DISABLED: z.string().optional(),
-  VITE_TURNSTILE_SITE_KEY: z.string().optional(),
-  VITE_DEBUG_LOGGING: z.string().optional(),
-  VITE_DEVTOOLS: z.string().optional(),
-  VITE_E2E_HOOKS: z.string().optional(),
-  VITE_VERSION_CHECK: z.string().optional(),
-  // Test-runner flag (test.env-injected by plugins/test-env.ts, never in a .env file
-  // or committed to .env.example). `"true"` marks the Vitest run — the single home for
-  // test-only behavior. Read via `platformConfig.testMode`; never mode-sniffed in app code.
-  VITE_TEST_MODE: z.string().optional(),
-  // Reported environment identity: exactly `local | development | production` (no 'staging',
-  // no 'test'). This is the app's environment vocabulary, mirroring clinozy-be's `NODE_ENV`, and
-  // is DECOUPLED from the Vite build mode — Vite 8 forbids a mode literally named `local`, so
-  // the environment name is carried by this env variable (default `local`), not by the Vite
-  // MODE constant. `development` / `production` are the two DEPLOY targets (DeployEnvironment);
-  // you never deploy to `local`. Vite's own mode stays a mechanism detail (dev → `dev-server`,
-  // build → `production`, Vitest → its default `test` mode). Reported name only, never branched
-  // on — the raw Vite DEV/PROD booleans are intentionally unused (behavior is driven by named
-  // flags). An out-of-enum value fails loudly at load (env.config.ts throws).
-  VITE_APP_ENV: z.enum(['local', 'development', 'production']).default('local'),
-});
-
-export type ClientEnv = z.infer<typeof clientEnvSchema>;
-
-/** Cross-field invariants for auth platform switches. */
-export function assertAuthPlatformInvariants(
-  get: (key: string) => string | undefined,
-): void {
-  const oauthAutoGoogle = get('AUTH_OAUTH_AUTO_GOOGLE') === 'true';
-  const oauthGoogleOff = get('AUTH_OAUTH_GOOGLE') === 'false';
-  if (oauthAutoGoogle && oauthGoogleOff) {
-    throw new Error(
-      '[Config] VITE_AUTH_OAUTH_AUTO_GOOGLE=true requires VITE_AUTH_OAUTH_GOOGLE not false.',
-    );
-  }
-
-  // The production Turnstile requirement is enforced at deploy time by
-  // `validate:client-env` (envProfiles.production.required) — not a runtime
-  // isProduction branch.
-
-  const email = get('AUTH_EMAIL') !== 'false';
-  const passkey = get('AUTH_PASSKEY') !== 'false';
-  const oauth = resolveOAuthProviderFlags(get);
-  if (!hasAnyAuthSurface({ email, passkey, oauth })) {
-    if (resolveBooleanFlag(get('DEBUG_LOGGING'), false)) {
-      console.warn(
-        '[Config] No auth methods enabled (email, oauth providers, passkey). /login will show an empty state.',
-      );
-    }
-  }
-}
 
 /** Ordered list of env var names from the schema (for .env.example sync). */
 export const envSchemaKeys = Object.keys(envSchemaBase.shape) as (keyof z.infer<

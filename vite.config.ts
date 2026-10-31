@@ -9,6 +9,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, loadEnv, type PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import { appShellPrecache } from './plugins/app-shell-precache.ts';
 import { applyBuildEnvironment } from './plugins/build-environment.ts';
 import { cspApiOrigin } from './plugins/csp-api-origin.ts';
 import { devServerMode } from './plugins/dev-server-mode.ts';
@@ -122,6 +123,12 @@ export default defineConfig(({ command, mode }) => {
             // the clinic setup, then kept offline by the `app-assets` runtime cache — not
             // downloaded by every install (feat-clinic-setup G6).
             '**/pin-[0-9][0-9]-*.js',
+          ],
+          // Then down to the app shell — the first paint, the fonts, the root files and the
+          // chunks the shell loads lazily at boot; every other chunk is fetched when first used
+          // and kept by the `app-assets` runtime cache (plugins/app-shell-precache.ts, F-8).
+          manifestTransforms: [
+            appShellPrecache(path.resolve(import.meta.dirname, 'dist')),
           ],
         },
       }),

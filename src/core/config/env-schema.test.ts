@@ -1,7 +1,6 @@
+import { assertAuthPlatformInvariants, clientEnvSchema } from './client-env-schema.ts';
 import {
-  assertAuthPlatformInvariants,
   branchEnvironmentMap,
-  clientEnvSchema,
   type DeployEnvironment,
   envFieldDescriptions,
   environmentForBranch,

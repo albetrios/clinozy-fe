@@ -8,7 +8,7 @@ import {
   assertAuthPlatformInvariants,
   type ClientEnv,
   clientEnvSchema,
-} from './env-schema.ts';
+} from './client-env-schema.ts';
 
 export type { ClientEnv };
 

@@ -61,7 +61,7 @@ Steps 11 and 12 are **early checks** (`tooling/ci/early-checks.mjs`, as is Semgr
 
 **Error:** "Missing required files in public/: ..."
 
-**Fix:** Add the missing file to `public/`. See `public/README.md` for the full list.
+**Fix:** Add the missing file to `public/`. See `docs/reference/public-assets.md` for the full list.
 
 ### lint-staged / ESLint fails
 

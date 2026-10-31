@@ -208,7 +208,7 @@ Run `npx skills check` / `npx skills update` to update them; re-append the local
 
 ## Public static assets (frontend)
 
-All files in **`public/`** are served from the root of the built site. See **[public/README.md](../../public/README.md)** and **`docs/reference/pwa-manifest-and-app-icon.md`** for manifest/icon rules. Skill: **`agent-os/skills/fe-pwa-manifest/SKILL.md`**.
+All files in **`public/`** are served from the root of the built site. See **[public-assets.md](public-assets.md)** and **`docs/reference/pwa-manifest-and-app-icon.md`** for manifest/icon rules. Skill: **`agent-os/skills/fe-pwa-manifest/SKILL.md`**.
 
 | Asset                                    | Purpose                                                                                              |
 | ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
