@@ -65,6 +65,8 @@ function forgetStoredAnalyticsIdentifiers(): void {
  */
 export function purgeAnalyticsOnConsentRevoked(): void {
   forgetStoredAnalyticsIdentifiers();
+  // PostHog is `reset` below: a later grant must identify the user and the clinic again.
+  forgetSyncedIdentity();
   if (!postHogActive) return;
   postHogActive = false;
   import('posthog-js')
@@ -152,32 +154,66 @@ export function registerPostHogSuperProperties(ph: PostHogClient): void {
   });
 }
 
-/** Identify the signed-in user (id only) and attach org group analytics. */
+/**
+ * What PostHog was last told — the identity and the organization group, each as the exact values
+ * sent — so a store change that does not change them sends nothing. `identify` and `group` are not
+ * free: each one asks PostHog for the feature flags again, and the stores change on every
+ * navigation (G-1).
+ */
+let syncedIdentity: string | null = null;
+let syncedGroup: string | null = null;
+
+/** Forget what PostHog was told, so the next sync tells it again (after a `reset`). */
+function forgetSyncedIdentity(): void {
+  syncedIdentity = null;
+  syncedGroup = null;
+}
+
+/**
+ * Identify the signed-in user (id only) and attach org group analytics — each only when it
+ * differs from what PostHog was last told.
+ */
 function syncPostHogIdentity(ph: PostHogClient): void {
   const user = useAuthStore.getState().user;
   const org = useOrganizationStore.getState();
 
   if (user) {
-    ph.identify(user.id, {
-      role: user.role,
-      has_organization: Boolean(org.organizationId),
-    });
+    const traits = { role: user.role, has_organization: Boolean(org.organizationId) };
+    const identity = JSON.stringify([user.id, traits]);
+    if (identity !== syncedIdentity) {
+      syncedIdentity = identity;
+      ph.identify(user.id, traits);
+    }
   }
 
   if (org.organizationId) {
-    ph.group(ANALYTICS_ORG_GROUP_TYPE, org.organizationId, {
+    const traits = {
       slug: org.organizationSlug,
       type: org.organizationType,
       status: org.organizationStatus,
-    });
+    };
+    const group = JSON.stringify([org.organizationId, traits]);
+    if (group !== syncedGroup) {
+      syncedGroup = group;
+      ph.group(ANALYTICS_ORG_GROUP_TYPE, org.organizationId, traits);
+    }
   }
 }
 
-/** Subscribe auth/org stores so identity + groups stay in sync. */
-export function attachPostHogIdentitySync(ph: PostHogClient): void {
+/**
+ * Subscribe auth/org stores so identity + groups stay in sync.
+ *
+ * @returns A function that stops following them (tests).
+ */
+export function attachPostHogIdentitySync(ph: PostHogClient): () => void {
+  forgetSyncedIdentity();
   syncPostHogIdentity(ph);
-  useAuthStore.subscribe(() => syncPostHogIdentity(ph));
-  useOrganizationStore.subscribe(() => syncPostHogIdentity(ph));
+  const stopAuth = useAuthStore.subscribe(() => syncPostHogIdentity(ph));
+  const stopOrganization = useOrganizationStore.subscribe(() => syncPostHogIdentity(ph));
+  return () => {
+    stopAuth();
+    stopOrganization();
+  };
 }
 
 /** Scrub pathname for SPA route analytics (no query string secrets). */
