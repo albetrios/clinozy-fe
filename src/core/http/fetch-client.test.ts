@@ -12,11 +12,13 @@ import { HttpError, isUnauthorized } from '@/shared/errors/HttpError.ts';
 // behaviour of refreshAccessToken is service's contract, proven in
 // shared/auth/service.test.ts — here we only assert fetch-client DELEGATES.
 vi.mock('@/shared/auth/service.ts', () => ({
+  endRefusedSession: vi.fn(),
   forceLogout: vi.fn(),
   isRefreshUnanswered: vi.fn(),
   refreshAccessToken: vi.fn(),
 }));
 import {
+  endRefusedSession,
   forceLogout,
   isRefreshUnanswered,
   refreshAccessToken,
@@ -462,13 +464,16 @@ describe('fetch-client', () => {
       expect(forceLogout).not.toHaveBeenCalled();
     });
 
-    it('refresh failure clears the session via forceLogout', async () => {
-      vi.mocked(refreshAccessToken).mockRejectedValueOnce(new Error('session revoked'));
+    it('a refused refresh hands the refusal to the session end (E-2)', async () => {
+      const refusal = new Error('session revoked');
+      vi.mocked(refreshAccessToken).mockRejectedValueOnce(refusal);
       fetchMock.mockResolvedValueOnce(unauthorized()); // original request
 
-      // The refresh error surfaces to the caller after the local logout.
+      // The refresh error surfaces to the caller after the session has ended; WHICH end — a
+      // deliberate idle or age end, or a dead session — is service.ts's (service.test.ts).
       await expect(apiClient.get('/protected')).rejects.toThrow('session revoked');
-      expect(forceLogout).toHaveBeenCalledTimes(1);
+      expect(endRefusedSession).toHaveBeenCalledExactlyOnceWith(refusal);
+      expect(forceLogout).not.toHaveBeenCalled();
     });
 
     it('a refresh that got no answer keeps the session and fails the request as unreachable', async () => {

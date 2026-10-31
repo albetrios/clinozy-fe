@@ -21,7 +21,9 @@ Claude Code loads this file when it works in `src/core/`. It holds sections move
   you switched clinic.", never "Your session has expired");
   a refresh that waited for the lock while a newer token arrived does
   not rotate again. Only a refused refresh, or a token still rejected after two refreshes,
-  means the session is dead → `forceLogout()`. A caller's `signal` (`RequestOptions.signal`,
+  means the session is dead → `forceLogout()` — except a refresh clinozy-be refuses at its own
+  clocks (`error.reason` `idle_timeout` / `session_expired`): that end is deliberate,
+  `logout({ reason })` (`endRefusedSession`). A caller's `signal` (`RequestOptions.signal`,
   `api.*` init) cancels a request — the fetch, a retry's wait, a replay — and it rejects with
   the signal's reason, never retried. The session's one token names the organization
   it was last switched to, so a refresh answering for **another** organization than this tab's

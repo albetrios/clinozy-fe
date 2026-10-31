@@ -10,6 +10,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import type { MeContext } from '@/shared/tenancy/me-context.ts';
 import { hydrateSessionContext } from '@/shared/tenancy/session-context.ts';
 
+import { shouldAttemptAutoGoogleSignIn } from './auto-google-sign-in.ts';
 import { cancelTokenRefresh } from './refresh-timer.ts';
 import { clearAccessToken, getAccessToken, setAccessToken } from './token.ts';
 import type { AuthUser } from './types.ts';
@@ -123,6 +124,7 @@ describe('auth/service', () => {
   let isRefreshUnanswered: AuthServiceModule['isRefreshUnanswered'];
   let establishSession: AuthServiceModule['establishSession'];
   let startAuthBootstrap: AuthServiceModule['startAuthBootstrap'];
+  let endRefusedSession: AuthServiceModule['endRefusedSession'];
 
   beforeAll(async () => {
     const mod = await import('./service.ts');
@@ -134,6 +136,7 @@ describe('auth/service', () => {
     isRefreshUnanswered = mod.isRefreshUnanswered;
     establishSession = mod.establishSession;
     startAuthBootstrap = mod.startAuthBootstrap;
+    endRefusedSession = mod.endRefusedSession;
   });
 
   beforeEach(() => {
@@ -1041,6 +1044,75 @@ describe('auth/service', () => {
 
       expect(service.startAuthBootstrap()).toBe(first);
       expect(fetchMock).toHaveBeenCalledOnce();
+    });
+
+    it('a boot the server refuses at its idle limit lands on a login that does not sign back in (E-2)', async () => {
+      sessionStorage.clear();
+      const { service } = await freshService();
+      const autoGoogle = await import('./auto-google-sign-in.ts');
+      fetchMock.mockResolvedValue(
+        mockFetchResponse({ error: { reason: 'idle_timeout', detail: 'Idle' } }, 401),
+      );
+
+      await service.startAuthBootstrap();
+
+      expect(autoGoogle.shouldAttemptAutoGoogleSignIn()).toBe(false);
+    });
+  });
+
+  describe('a refresh clinozy-be refuses (E-2)', () => {
+    /** Refuse the next refresh with `reason`, answer the revoke, and hand back the refusal. */
+    async function refusedWith(reason: string | undefined) {
+      fetchMock.mockImplementation((url: string) =>
+        Promise.resolve(
+          String(url).includes('/auth/refresh')
+            ? mockFetchResponse({ error: { reason, detail: 'Refused' } }, 401)
+            : mockFetchResponse({}),
+        ),
+      );
+      setAccessToken(VALID_TOKEN);
+      return refreshAccessToken().catch((caught: unknown) => caught);
+    }
+    const revokes = () =>
+      fetchMock.mock.calls.filter(([url]) => String(url).includes('/auth/logout')).length;
+
+    beforeEach(() => {
+      sessionStorage.clear();
+      localStorage.clear();
+    });
+
+    it.each(['idle_timeout', 'session_expired'])(
+      'at %s ends the session deliberately — revoked, and no auto-Google sign-in back',
+      async (reason) => {
+        const refusal = await refusedWith(reason);
+
+        endRefusedSession(refusal);
+
+        expect(revokes()).toBe(1);
+        expect(shouldAttemptAutoGoogleSignIn()).toBe(false);
+        expect(getAccessToken()).toBeNull();
+        expect(window.location.href).toBe('/login');
+      },
+    );
+
+    it('for any other reason is a dead session: cleared locally, auto-Google left as it was', async () => {
+      const refusal = await refusedWith('session_revoked');
+
+      endRefusedSession(refusal);
+
+      expect(revokes()).toBe(0);
+      expect(shouldAttemptAutoGoogleSignIn()).toBe(true);
+      expect(getAccessToken()).toBeNull();
+      expect(window.location.href).toBe('/login');
+    });
+
+    it('with no reason at all is a dead session too', async () => {
+      const refusal = await refusedWith(undefined);
+
+      endRefusedSession(refusal);
+
+      expect(revokes()).toBe(0);
+      expect(shouldAttemptAutoGoogleSignIn()).toBe(true);
     });
   });
 

@@ -54,9 +54,13 @@ The current-session state itself (the `user` + `isAuthenticated`) lives in `src/
   fails the request as unreachable. The org store is not the source — before `me/context` it
   holds the URL's placeholder. And a workspace switch waits for a refresh already in flight
   (`settleInFlightRefresh`), so the refresh's later answer cannot put the left workspace back.
-- A refresh the server **refused** (401/403) means the session is gone: callers run
-  `forceLogout()`, which clears local auth state, broadcasts logout to every tab via
-  `auth-channel.ts`, and hard-redirects to `/login`.
+- A refresh the server **refused** (401/403) means the session is gone: the fetch client hands
+  the refusal to `endRefusedSession()`. A refusal whose `error.reason` is clinozy-be's own clock —
+  `idle_timeout` (30 minutes idle) or `session_expired` (the 12-hour cap) — is a deliberate end:
+  `logout({ reason })`, so auto-Google sign-in does not sign the user straight back in (a boot
+  refused that way suppresses it too). Any other refusal is a dead session: `forceLogout()`,
+  which clears local auth state, broadcasts logout to every tab via `auth-channel.ts`, and
+  hard-redirects to `/login` (E-2).
 - A refresh that got **no usable answer** — offline, timed out (`HTTP.REFRESH_TIMEOUT`, 5 s),
   throttled (429) or a server fault (5xx) — says nothing about the session. It is retried
   **once** after 600 ms, inside clinozy-be's 10-second grace for the just-superseded refresh

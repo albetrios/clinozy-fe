@@ -341,6 +341,10 @@ export function startAuthBootstrap(): Promise<void> {
       // the next guard to wait on the bootstrap — the login page's — asks again instead of
       // settling for this attempt.
       if (saidNothingAboutSession(error)) authBootstrapPromise = null;
+      // The server's own clocks ended it while the browser was away (E-2): as deliberate an end
+      // as the app's, so the login screen this boot lands on must not sign straight back in.
+      const serverEnd = serverSessionEndOf(error);
+      if (serverEnd) noteSessionEndedAtBoot(serverEnd);
       const { isAuthenticated } = useAuthStore.getState();
       if (!(isAuthenticated || getAccessToken())) {
         if (platformConfig.debugLogging) {
@@ -369,6 +373,15 @@ function lapsedSessionReason(): 'idle_timeout' | 'session_expired' | null {
 }
 
 /**
+ * Say that a session ended by a clock — the app's or clinozy-be's — before this boot could restore
+ * it: the `session_ended` event, and no auto-Google sign-in to undo it.
+ */
+function noteSessionEndedAtBoot(reason: 'idle_timeout' | 'session_expired'): void {
+  captureAnalyticsEvent(ANALYTICS_EVENTS.sessionEnded, { reason });
+  skipAutoGoogleSignIn();
+}
+
+/**
  * End, at boot, a session the app's own clocks have already ended — the boot-time half of
  * {@link logout}.
  *
@@ -385,8 +398,7 @@ function endLapsedSessionAtBoot(
   reason: 'idle_timeout' | 'session_expired',
   generation: number,
 ): void {
-  captureAnalyticsEvent(ANALYTICS_EVENTS.sessionEnded, { reason });
-  skipAutoGoogleSignIn();
+  noteSessionEndedAtBoot(reason);
   clearSessionStart();
   clearActivity();
   markRevokePending();
@@ -534,7 +546,46 @@ async function onThisTabsOrganization({
  * never got an answer (offline, timeout). Only the former proves there is no
  * session left to revoke; see {@link finishPendingRevoke}.
  */
-class RefreshRejectedError extends Error {}
+class RefreshRejectedError extends Error {
+  /** The refusal's `error.reason`, when clinozy-be gave one ({@link serverSessionEndOf}). */
+  readonly reason: string | undefined;
+
+  constructor(message: string, reason: string | undefined) {
+    super(message);
+    this.reason = reason;
+  }
+}
+
+/**
+ * The session end a refused refresh names, if it names one: clinozy-be refuses `/auth/refresh`
+ * with a `401` whose `error.reason` is `idle_timeout` past its idle limit (30 minutes) and
+ * `session_expired` past its absolute cap (12 hours) — the server's own clocks, the same two
+ * ends the app's clocks keep (E-2). Anything else is `null`: a dead session.
+ */
+function serverSessionEndOf(error: unknown): 'idle_timeout' | 'session_expired' | null {
+  if (!(error instanceof RefreshRejectedError)) return null;
+  const { reason } = error;
+  return reason === 'idle_timeout' || reason === 'session_expired' ? reason : null;
+}
+
+/**
+ * End the session a refused refresh says is over — the fetch client's 401 handler hands every
+ * refusal here.
+ *
+ * @remarks
+ * At the server's idle limit or age cap the end is as deliberate as the app's own clocks make
+ * it, so it goes the same way: {@link logout} with that reason — revoked, and auto-Google
+ * sign-in suppressed, so `/login` does not sign the user straight back in. Any other refusal
+ * (revoked, signed out everywhere, an unknown reason) is a dead session: {@link forceLogout}.
+ */
+export function endRefusedSession(refusal: unknown): void {
+  const reason = serverSessionEndOf(refusal);
+  if (reason) {
+    void logout({ reason });
+    return;
+  }
+  forceLogout();
+}
 
 /**
  * The refresh got no usable answer: no response at all (offline, timed out), a throttle (429) or a
@@ -598,6 +649,12 @@ function refusalMessage(data: unknown, status: number): string {
   return envelope?.error?.detail ?? envelope?.message ?? `Refresh failed (${status})`;
 }
 
+/** The refusal's machine `error.reason`, when the envelope carries one. */
+function refusalReason(data: unknown): string | undefined {
+  const reason = (data as { error?: { reason?: unknown } } | null)?.error?.reason;
+  return typeof reason === 'string' ? reason : undefined;
+}
+
 /** The access token in a refresh answer (enveloped or bare, snake or camel case). */
 function accessTokenOf(data: unknown): string | undefined {
   const payload =
@@ -614,7 +671,12 @@ async function fetchRefreshToken(): Promise<string> {
     throw new RefreshUnansweredError(`Refresh failed (${response.status})`);
   }
   const data = (await response.json()) as unknown;
-  if (!response.ok) throw new RefreshRejectedError(refusalMessage(data, response.status));
+  if (!response.ok) {
+    throw new RefreshRejectedError(
+      refusalMessage(data, response.status),
+      refusalReason(data),
+    );
+  }
 
   const token = accessTokenOf(data);
   if (typeof token !== 'string' || token.length === 0) {

@@ -105,7 +105,7 @@ Component (useUsers hook)
 
 ## Error Handling
 
-- **401 errors**: Handled exclusively by the fetch client. clinozy-be keeps one live access token per session (a refresh or workspace switch retires the one before it), so a 401 for a token replaced while the request was in flight is replayed with the current token, no refresh. Otherwise single-flight refresh + replay, at most twice per request; a refused refresh, or a token still rejected after two refreshes, means the session is dead → `forceLogout()`
+- **401 errors**: Handled exclusively by the fetch client. clinozy-be keeps one live access token per session (a refresh or workspace switch retires the one before it), so a 401 for a token replaced while the request was in flight is replayed with the current token, no refresh. Otherwise single-flight refresh + replay, at most twice per request; a refused refresh, or a token still rejected after two refreshes, means the session is dead → `forceLogout()` (a refresh refused with `error.reason` `idle_timeout` / `session_expired` is a deliberate end → `logout({ reason })`, `endRefusedSession`)
 - **Network/5xx/429 errors**: Retried by the fetch client (exponential backoff + `Retry-After`, max 3)
 - **Validation errors**: Returned in response body, handled by mutation onError
 - **Query errors**: Logged by QueryCache.onError (non-401 only)

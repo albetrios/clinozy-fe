@@ -3,6 +3,7 @@ import { platformConfig } from '@/core/config/env.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { scrubSensitiveUrl } from '@/lib/telemetry-scrub.ts';
 import {
+  endRefusedSession,
   forceLogout,
   isRefreshUnanswered,
   refreshAccessToken,
@@ -328,7 +329,9 @@ async function doRefreshAndReplay<T>(
         undefined,
       );
     }
-    forceLogout();
+    // Refused: the session is over — at the server's idle limit or age cap a deliberate end
+    // (no auto-Google sign-in back), any other refusal a dead session (E-2).
+    endRefusedSession(refreshError);
     throw refreshError;
   }
   return replay();
