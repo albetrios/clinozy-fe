@@ -113,7 +113,7 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(within(stage).getByTestId(IDS.lens)).toHaveAttribute('data-chapter', 'leads');
   });
 
-  it('moves on every chapter, rests on the last, and loops', async () => {
+  it('moves on every chapter, rests on the last, then stops on the first — Play runs it again', async () => {
     const { getByTestId } = renderStage();
     const stage = getByTestId(IDS.stage);
     expect(currentStep(stage)).toBe(0);
@@ -129,6 +129,48 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(currentStep(stage), 'the last chapter rests longer').toBe(7);
     await play(TOUR_END_REST_MS);
     expect(currentStep(stage)).toBe(0);
+    expect(within(stage).getByTestId(IDS.toggle)).toHaveAccessibleName(
+      'Play the product tour',
+    );
+
+    // One round only (G-5): it stays on the first chapter …
+    await play(TOUR_CHAPTER_MS * 2);
+    expect(currentStep(stage)).toBe(0);
+    // … until Play runs it again.
+    fireEvent.click(within(stage).getByTestId(IDS.toggle));
+    await play(TOUR_CHAPTER_MS + 50);
+    expect(currentStep(stage)).toBe(1);
+  });
+
+  /** Frames asked for while `body` runs — the tour's loop is the stage's only frame user. */
+  async function framesDuring(body: () => Promise<void>): Promise<number> {
+    const frames = vi.spyOn(window, 'requestAnimationFrame');
+    try {
+      await body();
+      return frames.mock.calls.length;
+    } finally {
+      frames.mockRestore();
+    }
+  }
+
+  it('asks for no frames while it holds still, nor once its round is over (G-5)', async () => {
+    const { getByTestId } = renderStage();
+    const stage = getByTestId(IDS.stage);
+    expect(await framesDuring(() => play(1_000)), 'playing').toBeGreaterThan(30);
+
+    fireEvent.pointerEnter(stage);
+    await play(50);
+    expect(await framesDuring(() => play(5_000)), 'held').toBe(0);
+    fireEvent.pointerLeave(stage);
+    expect(await framesDuring(() => play(1_000)), 'released').toBeGreaterThan(30);
+
+    fireEvent.click(within(stage).getByTestId(IDS.toggle));
+    expect(await framesDuring(() => play(5_000)), 'paused').toBe(0);
+    fireEvent.click(within(stage).getByTestId(IDS.toggle));
+
+    await play(TOUR_CHAPTER_MS * TOUR_CHAPTERS.length + TOUR_END_REST_MS);
+    expect(currentStep(stage)).toBe(0);
+    expect(await framesDuring(() => play(10_000)), 'round over').toBe(0);
   });
 
   it('never narrates an automatic change, and does narrate a picked one', async () => {

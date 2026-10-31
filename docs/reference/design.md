@@ -191,8 +191,9 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   lens shows the chapter's feature at work: her message typing in, a slot picked, the
   wait counting, a prescription writing itself, a session filling, the bill settling,
   a follow-up dropping in, the branch picker turning to every branch. It plays on its own only on `/login`, never under reduced
-  motion, and holds still while the pointer is on it, the viewer types, the tab is
-  hidden or it is scrolled away; its pause button answers WCAG 2.2.2, and only a
+  motion, plays once round and then rests on its first chapter (Play runs it again), and
+  holds still while the pointer is on it, the viewer types, the tab is hidden or it is
+  scrolled away — its frame loop parked, not idling; its pause button answers WCAG 2.2.2, and only a
   picked chapter is narrated (`aria-live`). Its keyframes ship with the lazy auth
   chunk (`AuthShowcase/auth-showcase.css`), not with `index.css`; the engine is
   `AuthShowcase/useTour.ts`, pinned in `AuthShowcase.test.tsx`.

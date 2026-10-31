@@ -207,7 +207,7 @@ export const TOUR_CHAPTERS: readonly TourChapter[] = [
 
 /** How long a chapter plays before the next. */
 export const TOUR_CHAPTER_MS = 5200;
-/** The last chapter's extra rest before the tour loops. */
+/** The last chapter's extra rest before the tour ends its round. */
 export const TOUR_END_REST_MS = 2400;
 /** Below this share of the stage on screen (a phone scrolled to the form), the tour holds. */
 export const TOUR_VISIBLE_SHARE = 0.35;
