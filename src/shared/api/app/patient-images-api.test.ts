@@ -34,8 +34,11 @@ const imageRow = (patch: Record<string, unknown> = {}) => ({
   album: 'lhr',
   stage: 'before',
   file_key: 'organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-img-5101.png',
+  thumbnail_key: null,
   file_name: 'IMG_5101.png',
   file_url: SIGNED_LINK,
+  // No thumbnail yet: the grid's link is the photo's
+  thumbnail_url: SIGNED_LINK,
   display_name: null,
   caption: 'Upper lip, session one',
   body_part: 'upper_lip',
@@ -112,6 +115,7 @@ describe('listPatientPhotos', () => {
           fileKey: 'organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-img-5101.png',
           fileName: 'IMG_5101.png',
           fileUrl: SIGNED_LINK,
+          thumbnailUrl: SIGNED_LINK,
           displayName: null,
           caption: 'Upper lip, session one',
           bodyPart: 'upper_lip',
@@ -190,6 +194,26 @@ describe('one photo and its writes', () => {
       { params: { patient_id: PATIENT_ID, patient_image_id: IMAGE_ID } },
     );
     expect(photo.caption).toBe('Upper lip, session one');
+  });
+
+  it('shows the thumbnail in a grid once it exists, and keeps the full photo for opening it', async () => {
+    const thumbnailKey =
+      'organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-img-5102.thumb.webp';
+    const thumbnailLink = `https://clinozy-uploads.s3.amazonaws.com/${thumbnailKey}?X-Amz-Expires=900&X-Amz-Signature=b2`;
+    const photoLink = SIGNED_LINK.replace('5101', '5102');
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: imageRow({
+        file_key: 'organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-img-5102.png',
+        file_url: photoLink,
+        thumbnail_key: thumbnailKey,
+        thumbnail_url: thumbnailLink,
+      }),
+    } as never);
+
+    const photo = await fetchPatientPhoto({ patientId: PATIENT_ID, imageId: IMAGE_ID });
+
+    expect(photo.thumbnailUrl).toBe(thumbnailLink);
+    expect(photo.fileUrl).toBe(photoLink);
   });
 
   it('files an uploaded photo under its file’s name, cut to 60, its key the stored object’s', async () => {

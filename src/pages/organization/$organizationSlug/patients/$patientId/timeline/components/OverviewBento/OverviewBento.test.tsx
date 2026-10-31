@@ -278,6 +278,8 @@ const PHOTO: PatientPhoto = {
   fileKey: 'organization-files/org_test/one.png',
   fileName: 'one.png',
   fileUrl: 'https://uploads.test/organization-files/org_test/one.png?X-Amz-Expires=900',
+  thumbnailUrl:
+    'https://uploads.test/organization-files/org_test/one.thumb.webp?X-Amz-Expires=900',
   displayName: 'Face before',
   caption: null,
   bodyPart: null,
@@ -484,14 +486,14 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     // "Use a session" goes — a recorded treatment spends one (§6 #20).
     expect(within(packages).queryByText('Use session')).not.toBeInTheDocument();
 
-    // Each thumb shows its photo from its link (D86), named by the album chip it shows, then the
+    // Each thumb shows its photo's thumbnail from its link (D86), named by the album chip it shows, then the
     // photo (WCAG 2.5.3); the server's count.
     const photos = await card('photos');
     const [thumb] = await within(photos).findAllByTestId('overview-card-photos-thumb');
     expect(thumb).toHaveAccessibleName('LHR · Face before');
     expect(thumb).toHaveAttribute('title', 'Face before');
     expect(within(photos).getByText('9')).toBeInTheDocument();
-    expect(thumb?.querySelector('img')).toHaveAttribute('src', PHOTO.fileUrl);
+    expect(thumb?.querySelector('img')).toHaveAttribute('src', PHOTO.thumbnailUrl);
     expect(listPatientPhotos).toHaveBeenCalledWith(
       TEST_PATIENT_ID,
       { limit: 8 },
