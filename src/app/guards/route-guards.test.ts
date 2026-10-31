@@ -2,12 +2,19 @@ import { isNotFound, isRedirect } from '@tanstack/react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { queryClient } from '@/core/http/queryClient.ts';
+import {
+  clearAccessToken,
+  getAccessToken,
+  organizationClaimOf,
+  setAccessToken,
+} from '@/shared/auth/token.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { type MeContext, meContextQueryKey } from '@/shared/tenancy/me-context.ts';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 import { myOrganizationsQueryKey } from '@/shared/tenancy/my-organization-summaries.ts';
+import { deriveOrgContext } from '@/shared/tenancy/organization-context.ts';
 import { resetPermissionCacheForTests } from '@/shared/tenancy/organization-membership.ts';
 
 import {
@@ -72,14 +79,34 @@ vi.mock('@/shared/api/organization-api.ts', () => ({
   toOrganizationPermissions: (codes: string[]) => codes,
 }));
 
-const { switchToOrganizationMock } = vi.hoisted(() => ({
+const { switchToOrganizationMock, switchInFlightToMock } = vi.hoisted(() => ({
   switchToOrganizationMock: vi.fn(),
+  switchInFlightToMock: vi.fn((): string | null => null),
 }));
 vi.mock('@/shared/tenancy/switch.ts', () => ({
   switchToOrganization: switchToOrganizationMock,
+  switchInFlightTo: switchInFlightToMock,
 }));
 
+/** A JWT-shaped access token whose signed `org` claim names `organizationId`. */
+function tokenFor(organizationId: string): string {
+  const encode = (value: Record<string, unknown>) =>
+    btoa(JSON.stringify(value))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/={1,2}$/, '');
+  return `${encode({ alg: 'RS256' })}.${encode({ org: organizationId })}.c2ln`;
+}
+
+/** What a switch that lands does: the token is re-minted for the organization. */
+function landSwitch(organizationId: string): void {
+  setAccessToken(tokenFor(organizationId));
+}
+
 function seedActiveOrg(id: string) {
+  // The token carries the active organization, and the guard chain's
+  // `ensureSessionContext()` has derived the store from me/context.
+  setAccessToken(tokenFor(id));
   queryClient.setQueryData(meContextQueryKey, {
     activeOrganization: { id, slug: null, type: 'PERSONAL', status: 'ACTIVE' },
     myPermissions: [],
@@ -99,6 +126,8 @@ function seedActiveOrg(id: string) {
       },
     ],
   } as unknown as MeContext);
+  const context = queryClient.getQueryData<MeContext>(meContextQueryKey);
+  if (context) deriveOrgContext(context);
 }
 
 function thrownBy(fn: () => void): unknown {
@@ -116,7 +145,10 @@ describe('requireOrganizationContext', () => {
     useOrganizationStore.getState().clearOrganization();
     queryClient.removeQueries({ queryKey: meContextQueryKey });
     switchToOrganizationMock.mockReset();
-    switchToOrganizationMock.mockResolvedValue(undefined);
+    switchToOrganizationMock.mockImplementation(async (id: string) => landSwitch(id));
+    switchInFlightToMock.mockReset();
+    switchInFlightToMock.mockReturnValue(null);
+    clearAccessToken();
     localStorage.clear();
   });
 
@@ -147,6 +179,88 @@ describe('requireOrganizationContext', () => {
     seedActiveOrg('org_acme');
     await requireOrganizationContext('acme');
     expect(switchToOrganizationMock).not.toHaveBeenCalled();
+  });
+
+  /*
+   * E-1: every organization-scoped query key takes its organization from the
+   * store. Written before the switch, the store made the mounted screens fetch
+   * clinic B's keys with clinic A's still-valid token, and cache A's patients
+   * under B's name.
+   */
+  describe('the store names the new clinic only once the switch has landed (E-1)', () => {
+    it('keeps the store on the old clinic while the switch is in flight', async () => {
+      seedActiveOrg('org_personal');
+      let land: () => void = () => undefined;
+      switchToOrganizationMock.mockImplementation(
+        (id: string) =>
+          new Promise<void>((resolve) => {
+            land = () => {
+              landSwitch(id);
+              resolve();
+            };
+          }),
+      );
+
+      const guard = requireOrganizationContext('acme');
+      await vi.waitFor(() => expect(switchToOrganizationMock).toHaveBeenCalled());
+
+      expect(useOrganizationStore.getState().organizationId).toBe('org_personal');
+      land();
+      await guard;
+      expect(useOrganizationStore.getState().organizationId).toBe('org_acme');
+    });
+
+    it('never names the new clinic in the store while the token carries the old one', async () => {
+      seedActiveOrg('org_personal');
+      // What the token named each time the store named a clinic — the token
+      // every query keyed from the store goes out with.
+      const tokenWhenStoreMoved: Array<[string | null, string | null]> = [];
+      const unsubscribe = useOrganizationStore.subscribe((state, previous) => {
+        if (state.organizationId === previous.organizationId) return;
+        const token = getAccessToken();
+        tokenWhenStoreMoved.push([
+          state.organizationId,
+          token ? organizationClaimOf(token) : null,
+        ]);
+      });
+
+      await requireOrganizationContext('acme');
+      unsubscribe();
+
+      expect(tokenWhenStoreMoved).toEqual([['org_acme', 'org_acme']]);
+    });
+
+    it('leaves the store on the old clinic when the switch fails', async () => {
+      seedActiveOrg('org_personal');
+      switchToOrganizationMock.mockRejectedValue(
+        new HttpError('Unavailable', 503, '/api/v1/auth/switch-to-organization', 'POST'),
+      );
+
+      await expect(requireOrganizationContext('acme')).rejects.toBeInstanceOf(HttpError);
+
+      expect(useOrganizationStore.getState().organizationId).toBe('org_personal');
+    });
+
+    it('404s, store untouched, when a newer switch superseded this one', async () => {
+      seedActiveOrg('org_personal');
+      // Superseded: the switch resolves without its token ever being applied.
+      switchToOrganizationMock.mockResolvedValue(undefined);
+
+      await expect(requireOrganizationContext('acme')).rejects.toSatisfy(isNotFound);
+
+      expect(useOrganizationStore.getState().organizationId).toBe('org_personal');
+    });
+
+    it('switches back when a switch away from the URL clinic is still in flight', async () => {
+      // me/context still names Acme, but a switch to another clinic is out: its
+      // late answer would leave the token on a clinic the URL no longer shows.
+      seedActiveOrg('org_acme');
+      switchInFlightToMock.mockReturnValue('org_elsewhere');
+
+      await requireOrganizationContext('acme');
+
+      expect(switchToOrganizationMock).toHaveBeenCalledWith('org_acme');
+    });
   });
 
   describe('when clinozy-be refuses the switch', () => {

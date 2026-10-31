@@ -292,6 +292,78 @@ describe('fetch-client', () => {
       expect(forceLogout).not.toHaveBeenCalled();
     });
 
+    describe('a request never goes out again with another organization’s token (E-1)', () => {
+      /** A token scoped to one organization (its `org` claim), told apart by its subject. */
+      const tokenFor = (organization: string, name = organization): string =>
+        makeJwt({ sub: name, org: organization, exp: 9999999999 });
+
+      it('a 401 for a token a switch to another clinic retired is not replayed', async () => {
+        setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+        fetchMock.mockImplementationOnce(() => {
+          // The switch to clinic B landed while this clinic-A read was out.
+          setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb'));
+          return Promise.resolve(unauthorized());
+        });
+
+        const failure = await apiClient.get('/app/patients').catch((error) => error);
+
+        // Replayed, clinic B's patients would have been cached under clinic A's key.
+        expect(isUnauthorized(failure)).toBe(true);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(refreshAccessToken).not.toHaveBeenCalled();
+        expect(forceLogout).not.toHaveBeenCalled();
+      });
+
+      it('a write is not replayed into the clinic switched to', async () => {
+        setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+        fetchMock.mockImplementationOnce(() => {
+          setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb'));
+          return Promise.resolve(unauthorized());
+        });
+
+        await expect(apiClient.post('/app/patients', { name: 'Ada' })).rejects.toSatisfy(
+          isUnauthorized,
+        );
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('a retry after a 5xx is not sent with the clinic switched to', async () => {
+        vi.useFakeTimers();
+        try {
+          setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+          fetchMock.mockImplementationOnce(() => {
+            setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb'));
+            return Promise.resolve(new Response('oops', { status: 503 }));
+          });
+
+          const outcome = apiClient.get('/app/patients').catch((error) => error);
+          await vi.runAllTimersAsync();
+
+          expect(isUnauthorized(await outcome)).toBe(true);
+          expect(fetchMock).toHaveBeenCalledTimes(1);
+        } finally {
+          vi.useRealTimers();
+        }
+      });
+
+      it('a token rotated within the same clinic is still replayed', async () => {
+        setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa', 'first'));
+        fetchMock
+          .mockImplementationOnce(() => {
+            setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa', 'rotated'));
+            return Promise.resolve(unauthorized());
+          })
+          .mockResolvedValueOnce(ok());
+
+        const { data } = await apiClient.get<{ ok: boolean }>('/app/patients');
+
+        expect(data).toEqual({ ok: true });
+        expect(bearerOf(fetchMock.mock.calls[1] as unknown[])).toBe(
+          `Bearer ${tokenFor('org_clinicaaaaaaaaaaaaaaaa', 'rotated')}`,
+        );
+      });
+    });
+
     it('a replay retired by another rotation replays again instead of signing out', async () => {
       setAccessToken(tokenNamed('token-first'));
       vi.mocked(refreshAccessToken).mockImplementationOnce(async () => {

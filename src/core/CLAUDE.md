@@ -15,7 +15,9 @@ Claude Code loads this file when it works in `src/core/`. It holds sections move
   (concurrent 401s share ONE refresh) + replay. clinozy-be keeps ONE live access token per
   session — every refresh, workspace switch or other tab's refresh retires the one before it —
   so a 401 for a token replaced while the request was in flight is replayed with the current
-  token, no new refresh; a refresh that waited for the lock while a newer token arrived does
+  token, no new refresh — unless that token names **another organization** (a workspace switch):
+  no replay or retry ever goes out with another clinic's token, the request fails 401 instead;
+  a refresh that waited for the lock while a newer token arrived does
   not rotate again. Only a refused refresh, or a token still rejected after two refreshes,
   means the session is dead → `forceLogout()`. The session's one token names the organization
   it was last switched to, so a refresh answering for **another** organization than this tab's

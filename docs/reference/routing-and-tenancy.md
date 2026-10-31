@@ -175,6 +175,9 @@ Implemented chain for `/organization/acme/…` (shell guards on `$organizationSl
    mode allows the team space and the workspace is provisioned
 3. `resolveActiveOrg` / `requireOrganizationContext` (`app/guards/route-guards.ts`) — slug is
    well-formed; user is a member; switch-on-navigation syncs context → else **404** (don't leak existence).
+   The switch lands **before** the store names the organization — every org-scoped query key reads
+   it, so a store written first fetched the new clinic's keys with the old clinic's token; a failed
+   or superseded switch leaves the store where it was (a superseded one 404s)
    Membership is read from the cached list, so a membership revoked since can still pass it; the
    switch then gets clinozy-be's 403, which the guard answers with the same **404**, dropping the
    stale list (a 403 with reason `mfa_required` is not a membership answer and propagates)

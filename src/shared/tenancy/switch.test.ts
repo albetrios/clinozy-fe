@@ -26,7 +26,7 @@ vi.mock('@/shared/auth/refresh-timer.ts', () => ({ scheduleTokenRefresh: vi.fn()
 vi.mock('@/shared/auth/service.ts', () => ({ settleInFlightRefresh: settleRefreshMock }));
 vi.mock('@/shared/analytics/capture.ts', () => ({ captureAnalyticsEvent: captureMock }));
 
-import { switchToOrganization, switchToPersonal } from './switch.ts';
+import { switchInFlightTo, switchToOrganization, switchToPersonal } from './switch.ts';
 
 const TEAM_ID = 'org_abcdefghij0123456789x';
 const PERSONAL_ID = 'org_personalij0123456789x';
@@ -328,6 +328,118 @@ describe('tenancy/switch', () => {
       expect.stringContaining('/auth/switch-to-organization'),
       { organization_id: TEAM_ID },
     );
+  });
+
+  /*
+   * E-1: a read of the workspace being left that is still out when the switch lands — or one
+   * retried after it — would go out with the new token and be cached under the old key.
+   */
+  describe('what the workspace being left still has out (E-1)', () => {
+    const TEAM_PATIENTS = ['app', 'patients', TEAM_ID, 'list'] as const;
+    const PERSONAL_SWITCH = {
+      data: {
+        access_token: 'personal_tok',
+        active_organization: PERSONAL_WIRE,
+        my_permissions: [],
+        global_role: null,
+      },
+    };
+
+    /** A read of the team's patients that answers only when told to. */
+    function startTeamRead(): (rows: string[]) => void {
+      let answer: (rows: string[]) => void = (_rows) => undefined;
+      void queryClient
+        .fetchQuery({
+          queryKey: TEAM_PATIENTS,
+          queryFn: () =>
+            new Promise<string[]>((resolve) => {
+              answer = resolve;
+            }),
+        })
+        .catch(() => undefined);
+      return (rows) => answer(rows);
+    }
+
+    beforeEach(() => {
+      useOrganizationStore
+        .getState()
+        .setActiveOrganization(BASE_CTX.activeOrganization, []);
+    });
+
+    it('cancels them when the switch starts — their answer is never cached', async () => {
+      const answerRead = startTeamRead();
+      postMock.mockResolvedValue(PERSONAL_SWITCH);
+
+      const switching = switchToPersonal();
+      answerRead(['answered for the team']);
+      await switching;
+
+      expect(queryClient.getQueryData(TEAM_PATIENTS)).toBeUndefined();
+    });
+
+    it('cancels what was started while the POST was out, before the token flips', async () => {
+      let answerSwitch: (value: unknown) => void = (_value) => undefined;
+      postMock.mockReturnValue(
+        new Promise((resolve) => {
+          answerSwitch = resolve;
+        }),
+      );
+      let fetchingAtFlip: string | undefined;
+      setAccessTokenMock.mockImplementation(() => {
+        fetchingAtFlip = queryClient.getQueryState(TEAM_PATIENTS)?.fetchStatus;
+      });
+
+      const switching = switchToPersonal();
+      await vi.waitFor(() => expect(postMock).toHaveBeenCalled());
+      const answerRead = startTeamRead();
+      answerSwitch(PERSONAL_SWITCH);
+      await switching;
+      answerRead(['answered with the new token']);
+      await Promise.resolve();
+
+      expect(fetchingAtFlip).toBe('idle');
+      expect(queryClient.getQueryData(TEAM_PATIENTS)).toBeUndefined();
+    });
+
+    it('leaves the reads of the organization being entered alone', async () => {
+      const answerRead = startTeamRead();
+      postMock.mockResolvedValue({
+        data: {
+          access_token: 'team_tok',
+          active_organization: {
+            ...PERSONAL_WIRE,
+            id: TEAM_ID,
+            type: 'TEAM',
+            slug: 'acme',
+          },
+          my_permissions: [],
+          global_role: null,
+        },
+      });
+
+      await switchToOrganization(TEAM_ID);
+      answerRead(['still the team']);
+
+      await vi.waitFor(() =>
+        expect(queryClient.getQueryData(TEAM_PATIENTS)).toEqual(['still the team']),
+      );
+    });
+
+    it('reports the organization a switch is moving to until it lands', async () => {
+      let answerSwitch: (value: unknown) => void = (_value) => undefined;
+      postMock.mockReturnValue(
+        new Promise((resolve) => {
+          answerSwitch = resolve;
+        }),
+      );
+
+      const switching = switchToPersonal();
+      expect(switchInFlightTo()).toBe(PERSONAL_ID);
+      answerSwitch(PERSONAL_SWITCH);
+      await switching;
+
+      expect(switchInFlightTo()).toBeNull();
+    });
   });
 
   it('drops a superseded switch so the latest org wins the token (race guard)', async () => {

@@ -92,7 +92,10 @@ Switching organization goes through `switchToOrganization()` (`shared/tenancy/sw
 re-mints the token and updates the `me/context` and organization-list caches **in place** with
 `setQueryData`. It deliberately purges **nothing**: every organization-scoped query key carries the
 active organization id, so two tenants can never share a cache entry, and switching back to a
-recently-visited organization is served instantly. Do not re-add a `removeQueries` purge.
+recently-visited organization is served instantly. Do not re-add a `removeQueries` purge. What it
+does do is **cancel** the reads the workspace being left still has out (at its start and at the
+token flip — cancelled, not removed), and the URL guard writes the store only once the switch has
+landed: a store that named the new clinic first fetched its keys with the old clinic's token.
 
 Auth bootstrap (`shared/auth/service.ts`) calls `hydrateSessionContext()` after refresh.
 Guards and `/` resolver share the same helper — do not fork a second `me/context` path.

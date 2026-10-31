@@ -7,7 +7,7 @@ import {
   isRefreshUnanswered,
   refreshAccessToken,
 } from '@/shared/auth/service.ts';
-import { getAccessToken } from '@/shared/auth/token.ts';
+import { getAccessToken, organizationClaimOf } from '@/shared/auth/token.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
 // ------------------------------------------------------------------
@@ -347,6 +347,21 @@ interface AttemptState {
 
 const FIRST_ATTEMPT: AttemptState = { attempt: 0, refreshes: 0, rotationReplays: 0 };
 
+/** The organization a token is scoped to (its `org` claim); `null` without a token or a claim. */
+function organizationOf(token: string | null): string | null {
+  return token === null ? null : organizationClaimOf(token);
+}
+
+/**
+ * Whether the token a retry or replay would carry names another organization than the request was
+ * issued for. A request issued with no organization, or about to go out with no token (the 401 path
+ * then refreshes onto this tab's organization), is not one.
+ */
+function switchedOrganization(issuedFor: string | null, token: string | null): boolean {
+  const current = organizationOf(token);
+  return issuedFor !== null && current !== null && current !== issuedFor;
+}
+
 /** Write methods carry an auto-generated X-Idempotency-Key (server de-dupes). */
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -397,6 +412,8 @@ async function request<T>(
   const idempotencyKey = WRITE_METHODS.has(method)
     ? (options?.idempotencyKey ?? crypto.randomUUID())
     : undefined;
+  // The organization this request is for: the one the token it first goes out with names.
+  const issuedFor = organizationOf(getAccessToken());
 
   function fetchOnce(): Promise<Response> {
     const headers = buildHeaders(url, idempotencyKey);
@@ -468,6 +485,12 @@ async function request<T>(
   const run = async (state: AttemptState = FIRST_ATTEMPT): Promise<HttpResponse<T>> => {
     // `buildHeaders` reads the same token synchronously when `fetchOnce` starts.
     const sentToken = getAccessToken();
+    if (state !== FIRST_ATTEMPT && switchedOrganization(issuedFor, sentToken)) {
+      // A workspace switch replaced the token while this request was out. Sent again, it would
+      // be answered for the OTHER organization — its records cached under the key of the one this
+      // request was for, a write made in it. The token it went out with is retired: say so.
+      throw new HttpError('Workspace switched', 401, url, method, undefined);
+    }
     let response: Response;
     try {
       response = await fetchOnce();

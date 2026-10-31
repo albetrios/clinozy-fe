@@ -4,6 +4,7 @@ import { platformConfig } from '@/core/config/env.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { parseOrganizationSlugParam } from '@/lib/routes/params.ts';
+import { getAccessToken, organizationClaimOf } from '@/shared/auth/token.ts';
 import { apiErrorReason } from '@/shared/errors/errorHandler.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
@@ -16,10 +17,7 @@ import {
 } from '@/shared/tenancy/me-context.ts';
 import { invalidateMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';
 import type { Organization } from '@/shared/tenancy/my-organizations.ts';
-import {
-  deriveOrgContext,
-  syncOrganizationFromRoute,
-} from '@/shared/tenancy/organization-context.ts';
+import { syncOrganizationFromRoute } from '@/shared/tenancy/organization-context.ts';
 import {
   ensurePermissionsFor,
   findMembershipBySlug,
@@ -31,7 +29,7 @@ import {
   workspaceRedirectForTeamEntry,
 } from '@/shared/tenancy/organization-resolver.ts';
 import { ensureSessionContext } from '@/shared/tenancy/session-context.ts';
-import { switchToOrganization } from '@/shared/tenancy/switch.ts';
+import { switchInFlightTo, switchToOrganization } from '@/shared/tenancy/switch.ts';
 
 function throwWorkspaceRedirect(target: RootTarget, redirectFrom?: string): never {
   if (target.to === '/onboarding') {
@@ -77,17 +75,48 @@ export async function requireOrganizationContext(
   const organization = await findMembershipBySlug(slug);
   if (!organization) throw notFound();
 
-  syncOrganizationFromRoute(organization.id, organization.slug, organization.status);
-  // Switch-on-navigation: when the URL targets a different org than the cached
-  // active one, switch the active-org context (me/context cache + access token)
-  // so the switcher, the rooms, and RBAC all reflect the org in the URL.
-  const activeId =
-    queryClient.getQueryData<MeContext>(meContextQueryKey)?.activeOrganization?.id;
-  if (activeId !== organization.id) {
+  // Switch-on-navigation: when the URL targets a different org than the active
+  // one, switch the active-org context (me/context cache + access token) so the
+  // switcher, the rooms, and RBAC all reflect the org in the URL.
+  //
+  // The switch comes FIRST and the store after. Every organization-scoped query
+  // key takes its organization from the store, so writing the new clinic there
+  // while the token still carried the old one made the mounted screens fetch
+  // the new clinic's keys with the old clinic's token — and cache the old
+  // clinic's patients under the new clinic's name. Until the switch lands the
+  // store keeps naming the clinic the token carries; a refused switch never
+  // moves it at all.
+  if (needsSwitch(organization.id)) {
     await switchOrNotFound(organization.id);
+    // A newer switch (a later navigation, the switcher) superseded this one, so
+    // the token is not this clinic's: never let the store say it is.
+    if (!tokenCarries(organization.id)) throw notFound();
   }
+  syncOrganizationFromRoute(organization.id, organization.slug, organization.status);
   await ensurePermissionsFor(organization.id);
   return organization;
+}
+
+/**
+ * Whether the URL's organization needs a switch: me/context (the token's
+ * organization) names another one, or a switch to another one is still in
+ * flight — me/context moves only once it lands, so a navigation back to the
+ * workspace being left would otherwise skip the switch and the late answer would
+ * leave the token on a clinic the URL no longer shows.
+ */
+function needsSwitch(organizationId: string): boolean {
+  const activeId =
+    queryClient.getQueryData<MeContext>(meContextQueryKey)?.activeOrganization?.id;
+  const inFlightTo = switchInFlightTo();
+  return (
+    activeId !== organizationId || (inFlightTo !== null && inFlightTo !== organizationId)
+  );
+}
+
+/** Whether the access token carries `organizationId` (its signed `org` claim). */
+function tokenCarries(organizationId: string): boolean {
+  const token = getAccessToken();
+  return token !== null && organizationClaimOf(token) === organizationId;
 }
 
 /**
@@ -98,9 +127,10 @@ export async function requireOrganizationContext(
  * since that list was fetched still passes it — and clinozy-be then refuses the
  * switch with a 403. Re-thrown as-is, that 403 rendered an error page naming a
  * clinic the user no longer belongs to, and the stale list kept offering it in
- * the switcher. Instead: put the store back on the organization the token still
- * carries, drop the stale list, and 404. A 403 with reason `mfa_required` is
- * not a refusal of membership and keeps propagating, as does any other failure.
+ * the switcher. Instead: drop the stale list and 404. The store stays on the
+ * organization the token still carries — the guard writes it only once a switch
+ * lands. A 403 with reason `mfa_required` is not a refusal of membership and
+ * keeps propagating, as does any other failure.
  */
 async function switchOrNotFound(organizationId: string): Promise<void> {
   try {
@@ -111,8 +141,6 @@ async function switchOrNotFound(organizationId: string): Promise<void> {
       error.status === 403 &&
       apiErrorReason(error) !== 'mfa_required';
     if (!membershipRefused) throw error;
-    const context = queryClient.getQueryData<MeContext>(meContextQueryKey);
-    if (context) deriveOrgContext(context);
     invalidateMyOrganizationSummaries();
     throw notFound();
   }
