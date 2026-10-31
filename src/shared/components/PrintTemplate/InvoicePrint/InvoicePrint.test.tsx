@@ -17,6 +17,7 @@ const PEEL_LINE: InvoiceRecord['items'][number] = {
   offeringId: TEST_PEEL_ID,
   medicineId: null,
   name: 'Research Peel',
+  description: null,
   packSize: null,
   qty: 2,
   rate: 1650.5,
@@ -180,6 +181,32 @@ describe('InvoicePrint', () => {
     expect(screen.getByText('Sale Details')).toBeInTheDocument();
     expect(field('Invoice #:')).toHaveTextContent('2026-27/0005');
     expect(screen.queryByText('Sale #:')).not.toBeInTheDocument();
+  });
+
+  it('prints a line’s description under its name, as written, and nothing for a line without one', () => {
+    render(
+      <InvoicePrint
+        {...propsFor(
+          peelInvoice({
+            items: [
+              {
+                ...PEEL_LINE,
+                id: 'iitm_a',
+                description: 'LHR Axilla 10 sessions =10*550',
+              },
+              { ...PEEL_LINE, id: 'iitm_b' },
+            ],
+          }),
+        )}
+      />,
+    );
+    const descriptions = screen.getAllByTestId(
+      PRINT_TEMPLATE_TEST_IDS.invoiceLineDescription,
+    );
+    expect(descriptions).toHaveLength(1);
+    expect(descriptions[0]).toHaveTextContent('LHR Axilla 10 sessions =10*550');
+    expect(descriptions[0]).not.toHaveClass('uppercase');
+    expect(tableRows()[1]?.[0]).toBe('Research PeelLHR Axilla 10 sessions =10*550');
   });
 
   it('prints a line’s own pack size, else the one in its name', () => {

@@ -1335,6 +1335,8 @@
       "belowFloor": "Below the lowest price {{amount}} for {{name}}",
       "newMedicineName": "New medicine name",
       "medicineAdded": "{{name}} added · set MRP later in Stock",
+      "description": "Description",
+      "descriptionPlaceholder": "Add a description · e.g. +2 sessions free",
       "hintInvoice": "2 = qty · 10% = discount",
       "belowLowest": "Below the lowest price for {{name}}",
       "offerApplied": "Offer applied: {{offer}}"

@@ -118,6 +118,7 @@ export const saleWire = wireSchema<ApiSale>()(
         invoice_item_id: z.string(),
         medicine_id: z.string().nullable(),
         name: z.string(),
+        description: z.string().nullable(),
         batch_number: z.string().nullable(),
         expiry_month: z.string().nullable(),
         quantity: z.number().int(),
@@ -364,6 +365,8 @@ export interface SaleLine {
   invoiceItemId: string;
   medicineId: string | null;
   name: string;
+  /** The free text under the name, from the sale or its bill; null for none. */
+  description: string | null;
   qty: number;
   batchNo: string | null;
   /** "MM/YY". */
@@ -469,6 +472,7 @@ export function toSaleRow(wire: z.infer<typeof saleWire>): SaleRow {
       invoiceItemId: item.invoice_item_id,
       medicineId: item.medicine_id,
       name: item.name,
+      description: item.description,
       qty: item.quantity,
       batchNo: item.batch_number,
       expiry: item.expiry_month ? screenExpiryOf(item.expiry_month) : null,

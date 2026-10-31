@@ -1335,6 +1335,8 @@
       "belowFloor": "{{name}} के न्यूनतम मूल्य {{amount}} से कम",
       "newMedicineName": "नई दवा का नाम",
       "medicineAdded": "{{name}} जोड़ा गया · एमआरपी बाद में स्टॉक में भरें",
+      "description": "विवरण",
+      "descriptionPlaceholder": "विवरण जोड़ें · जैसे +2 सत्र मुफ़्त",
       "hintInvoice": "2 = मात्रा · 10% = छूट",
       "belowLowest": "{{name}} के न्यूनतम मूल्य से कम",
       "offerApplied": "ऑफ़र लागू: {{offer}}"

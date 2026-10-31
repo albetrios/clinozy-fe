@@ -1317,6 +1317,8 @@
       "belowFloor": "{{name}} の最低価格 {{amount}} を下回っています",
       "newMedicineName": "新しい医薬品名",
       "medicineAdded": "{{name}} を追加しました · 希望小売価格は後で在庫で設定",
+      "description": "説明",
+      "descriptionPlaceholder": "説明を追加 · 例: +2回無料",
       "hintInvoice": "2 = 数量 · 10% = 割引",
       "belowLowest": "{{name}} の最低価格を下回っています",
       "offerApplied": "適用中のオファー：{{offer}}"

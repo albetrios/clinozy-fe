@@ -1407,6 +1407,8 @@
       "belowFloor": "أقل من أدنى سعر {{amount}} لـ {{name}}",
       "newMedicineName": "اسم دواء جديد",
       "medicineAdded": "تمت إضافة {{name}} · حدّد السعر الأقصى لاحقًا في المخزون",
+      "description": "الوصف",
+      "descriptionPlaceholder": "أضف وصفًا · مثل جلستان مجانيتان",
       "hintInvoice": "2 = الكمية · 10% = الخصم",
       "belowLowest": "أقل من أدنى سعر لـ {{name}}",
       "offerApplied": "عرض مطبّق: {{offer}}"

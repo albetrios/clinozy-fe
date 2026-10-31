@@ -56,7 +56,10 @@ interface LinesForm {
   lines: SaleLine[];
 }
 
-/** Medicine · Batch · Qty · Amount (H:5423) — the batches the server drew, its amounts. */
+/**
+ * Medicine (its description under it) · Batch · Qty · Amount (H:5423) — the batches the server
+ * drew, its amounts.
+ */
 function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatRupees = useRupeeFormat();
@@ -65,7 +68,17 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       id: 'medicine',
       header: t(K.medicine),
       track: 'minmax(0,2fr)',
-      cell: ({ row }) => <ItemsReadCell strong>{row.name}</ItemsReadCell>,
+      // The line's description, when it has one, under its name — muted, wrapping.
+      cell: ({ row }) => (
+        <span className="flex min-w-0 flex-col">
+          <ItemsReadCell strong>{row.name}</ItemsReadCell>
+          {row.description ? (
+            <span className="text-detail text-muted-foreground break-words">
+              {row.description}
+            </span>
+          ) : null}
+        </span>
+      ),
     },
     {
       id: 'batch',

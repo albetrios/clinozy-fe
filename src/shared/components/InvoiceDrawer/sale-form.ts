@@ -69,7 +69,13 @@ export interface SaleDraft {
   branchId: string;
   /** The buyer's contact (`con_…`). */
   contactId: string;
-  items: { medicineId: string; qty: number; discountPct: number }[];
+  /** Each medicine once; its description lands on every batch line it draws. */
+  items: {
+    medicineId: string;
+    qty: number;
+    discountPct: number;
+    description: string | null;
+  }[];
   /** Off the whole bill, rupees. */
   overallDiscount: number;
   memberIds: string[];
@@ -93,24 +99,38 @@ export interface InvoiceSaleWrite {
  * The sale's lines, one per medicine — clinozy-be takes each medicine once (`eachMedicineOnce`),
  * while the quick line, Browse and a prescription can each add a medicine's row again. Rows of
  * one medicine add up their packs; their discount is the packs-weighted one, so the bill stays
- * what the rows showed.
+ * what the rows showed; their description is the first one typed (trimmed), none when none is.
  */
 function oneLinePerMedicine(
-  lines: readonly { medicineId: string | null; qty: number; discountPct: number }[],
+  lines: readonly {
+    medicineId: string | null;
+    qty: number;
+    discountPct: number;
+    description: string;
+  }[],
 ): SaleDraft['items'] {
-  const merged = new Map<string, { qty: number; discounted: number }>();
+  const merged = new Map<
+    string,
+    { qty: number; discounted: number; description: string | null }
+  >();
   for (const line of lines) {
     if (!line.medicineId) continue;
-    const held = merged.get(line.medicineId) ?? { qty: 0, discounted: 0 };
+    const held = merged.get(line.medicineId) ?? {
+      qty: 0,
+      discounted: 0,
+      description: null,
+    };
     merged.set(line.medicineId, {
       qty: held.qty + line.qty,
       discounted: held.discounted + line.qty * line.discountPct,
+      description: held.description ?? (line.description.trim() || null),
     });
   }
-  return [...merged].map(([medicineId, { qty, discounted }]) => ({
+  return [...merged].map(([medicineId, { qty, discounted, description }]) => ({
     medicineId,
     qty,
     discountPct: qty > 0 ? Math.round((discounted / qty) * 100) / 100 : 0,
+    description,
   }));
 }
 
