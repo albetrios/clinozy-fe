@@ -55,6 +55,21 @@ const COLUMN_WIDTHS = [
   undefined,
 ] as const;
 
+/**
+ * A pharmacy bill's columns: the name gives 15mm to an HSN column after the pack size
+ * (change-pharmacy-record-fields D3), so the page keeps its width.
+ */
+const MEDICAL_COLUMN_WIDTHS = [
+  'w-[45.3mm]',
+  'w-[16.9mm]',
+  'w-[14.9mm]',
+  'w-[15mm]',
+  'w-[17.2mm]',
+  'w-[21.1mm]',
+  'w-[15.9mm]',
+  undefined,
+] as const;
+
 /** The pack units a name can carry (H:4416), longest first so "gm" wins over "g". */
 const PACK_UNITS = ['caps', 'tabs', 'tab', 'gm', 'ml', 'mg', 'g'] as const;
 
@@ -182,7 +197,12 @@ export function InvoicePrint({
       <div className="mt-[2.44mm] h-[3.9mm] leading-[3.9mm] font-bold">
         {t(form.items)}
       </div>
-      <InvoiceItemsTable invoice={invoice} itemNameKey={form.itemName} format={format} />
+      <InvoiceItemsTable
+        invoice={invoice}
+        itemNameKey={form.itemName}
+        format={format}
+        medical={medical}
+      />
 
       <div className="mt-[4.55mm] grid grid-cols-[80.5mm_80.2mm] gap-x-[8.8mm]">
         <PrintBox
@@ -215,10 +235,12 @@ function InvoiceItemsTable({
   invoice,
   itemNameKey,
   format,
+  medical,
 }: {
   invoice: InvoiceRecord;
   itemNameKey: string;
   format: PrintFormat;
+  medical: boolean;
 }) {
   const { t } = usePrintTranslation();
   return (
@@ -228,7 +250,7 @@ function InvoiceItemsTable({
         className="w-full table-fixed border-separate border-spacing-0"
       >
         <colgroup>
-          {COLUMN_WIDTHS.map((width) => (
+          {(medical ? MEDICAL_COLUMN_WIDTHS : COLUMN_WIDTHS).map((width) => (
             <col key={width ?? 'rest'} className={width} />
           ))}
         </colgroup>
@@ -241,6 +263,11 @@ function InvoiceItemsTable({
               {/* "Pack" over "Size" (H:442): as narrow as its longest word. */}
               <span className="inline-block w-min">{t(keys.packSize)}</span>
             </th>
+            {medical ? (
+              <th scope="col" className="text-center">
+                {t(keys.hsn)}
+              </th>
+            ) : null}
             <th scope="col" className="text-center">
               {t(keys.qty)}
             </th>
@@ -271,6 +298,7 @@ function InvoiceItemsTable({
             >
               <td className="ps-[4.4mm] pe-[1mm] uppercase">{line.name}</td>
               <td className="text-center uppercase">{packSize(line)}</td>
+              {medical ? <td className="text-center">{line.hsnCode ?? ''}</td> : null}
               <td className="text-center">{format.count(line.qty)}</td>
               {/* The line's gross — its quantity at the rate the server billed. */}
               <td className="text-center">
@@ -288,7 +316,7 @@ function InvoiceItemsTable({
             totals print once, at the end. */}
         <tfoot className="table-row-group">
           <tr className="*:border-border-strong h-[8.8mm] font-bold *:border-t">
-            <td colSpan={3} />
+            <td colSpan={medical ? 4 : 3} />
             <td className="text-center">
               {format.money(paiseOfRupees(invoice.subtotal))}
             </td>
