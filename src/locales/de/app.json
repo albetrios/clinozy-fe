@@ -1639,5 +1639,17 @@
     "hint": "Füllt Gebiet, Stadt und Bundesland aus",
     "unknown": "Diese PLZ kennen wir nicht — geben Sie Gebiet, Stadt und Bundesland ein.",
     "areaPick": "Wählen Sie Ihr Gebiet"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} Packung",
+    "packs_other": "{{count}} Packungen",
+    "packsAndLoose_one": "{{count}} Packung + {{loose}}",
+    "packsAndLoose_other": "{{count}} Packungen + {{loose}}",
+    "loose": "{{count}} einzeln",
+    "perPack": "{{count}} pro Packung",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} pro Einheit",
+    "inStock": "{{stock}} auf Lager",
+    "packEquivalent": "= {{packs}}"
   }
 }

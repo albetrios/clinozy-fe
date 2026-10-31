@@ -1660,5 +1660,19 @@
     "hint": "Preenche o bairro, a cidade e o estado",
     "unknown": "Não conhecemos este CEP — digite o bairro, a cidade e o estado.",
     "areaPick": "Escolha seu bairro"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} embalagem",
+    "packs_many": "{{count}} embalagens",
+    "packs_other": "{{count}} embalagens",
+    "packsAndLoose_one": "{{count}} embalagem + {{loose}}",
+    "packsAndLoose_many": "{{count}} embalagens + {{loose}}",
+    "packsAndLoose_other": "{{count}} embalagens + {{loose}}",
+    "loose": "{{count}} avulsos",
+    "perPack": "{{count}} por embalagem",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} por unidade",
+    "inStock": "{{stock}} em estoque",
+    "packEquivalent": "= {{packs}}"
   }
 }

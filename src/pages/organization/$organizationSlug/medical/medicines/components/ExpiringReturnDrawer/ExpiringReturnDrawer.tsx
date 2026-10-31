@@ -2,7 +2,8 @@ import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
-import { expiryTone } from '@/shared/api/app/medicine-stock.ts';
+import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
+import { expiryTone, unitRatePaise } from '@/shared/api/app/medicine-stock.ts';
 import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
@@ -60,8 +61,9 @@ function useSupplierOptions(medicine: MedicineRow): PickerOption[] {
 }
 
 /**
- * The credit a return previews, rupees: the packs × the batch's purchase rate,
- * else the picked supplier's price for a batch bought without one. The server
+ * The credit a return previews, rupees: the units × one unit's purchase rate — the
+ * batch's pack rate, else the picked supplier's price for a batch bought without one,
+ * over the medicine's units per pack (change-pharmacy-record-fields D5). The server
  * works out the credit it records.
  */
 function creditOf(
@@ -74,7 +76,8 @@ function creditOf(
     batch.purchaseRate ??
     medicine.supplierRates.find((price) => price.supplierId === supplierId)?.rate ??
     0;
-  return Math.round(qty * rate * 100) / 100;
+  const unitPaise = unitRatePaise(paiseOfRupees(rate), medicine.unitsPerPack);
+  return rupeesOfPaise(qty * unitPaise);
 }
 
 /** One opening of the drawer on an expiring batch. */

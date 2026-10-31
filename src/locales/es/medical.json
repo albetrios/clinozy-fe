@@ -418,7 +418,11 @@
         "ordersValue_one": "{{count}} orden · {{amount}}",
         "ordersValue_many": "{{count}} órdenes · {{amount}}",
         "ordersValue_other": "{{count}} órdenes · {{amount}}",
-        "noOrders": "Aún no hay órdenes"
+        "noOrders": "Aún no hay órdenes",
+        "email": "Correo",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "Introduce un correo válido",
+        "address": "Dirección"
       },
       "account": {
         "label": "Cuenta",
@@ -506,7 +510,18 @@
         "compositionPlaceholder": "p. ej. Tretinoína 0,025 %",
         "soldWith": "Se vende",
         "prescriptionOnly": "Solo con receta",
-        "overTheCounter": "Sin receta"
+        "overTheCounter": "Sin receta",
+        "hsnCode": "Código HSN",
+        "hsnCodeHint": "4, 6 u 8 dígitos",
+        "hsnCodeInvalid": "Introduce el código HSN con 4, 6 u 8 dígitos",
+        "pack": "Envase",
+        "packHint": "como viene impreso",
+        "packPlaceholder": "p. ej. 1*10",
+        "unitsPerPack": "Unidades por envase",
+        "unitsPerPackHint": "1 = solo envases completos",
+        "unitsPerPackLocked": "Primero vende o devuelve su stock",
+        "decreaseUnits": "Menos unidades por envase",
+        "increaseUnits": "Más unidades por envase"
       },
       "price": {
         "mrp": "PVP",
@@ -534,7 +549,15 @@
         "decreaseFill": "Bajar el nivel de llenado",
         "increaseFill": "Subir el nivel de llenado",
         "hintAlert": "Aviso de reposición cuando queden {{count}}.",
-        "hintOrder": "Pide {{qty}} para llegar a {{max}}. Aparece en Existencias › Existencias bajas."
+        "hintOrder": "Pide {{qty}} para llegar a {{max}}. Aparece en Existencias › Existencias bajas.",
+        "nowLoose": "{{stock}} en existencia · {{state}}",
+        "reorderAtUnits": "Reponer en (unid.)",
+        "fillUpToUnits": "Reponer hasta (unid.)",
+        "hintAlertUnits_one": "Aviso de reposición cuando quede {{count}} unidad.",
+        "hintAlertUnits_many": "Aviso de reposición cuando queden {{count}} unidades.",
+        "hintAlertUnits_other": "Aviso de reposición cuando queden {{count}} unidades.",
+        "hintOrderPacks": "Pide {{packs}} para llegar a {{max}} unidades. Aparece en Existencias › Existencias bajas.",
+        "unitsNote": "Se cuenta en unidades · {{perPack}}"
       },
       "batches": {
         "title": "Lotes",
@@ -546,7 +569,9 @@
         "add": "Añadir lote",
         "total": "{{count}} en existencia",
         "expiryInvalid": "Introduce la caducidad como MM/AA",
-        "batchMissing": "Introduce el lote"
+        "batchMissing": "Introduce el lote",
+        "mrp": "PVP",
+        "qtyUnits": "Unid."
       },
       "rates": {
         "title": "Precios de proveedores",
@@ -615,7 +640,10 @@
         "quickLine": "Escribe medicamento, cantidad, bonificación, precio · p. ej. azel 20 +2 @180",
         "quickHint": "20 = cantidad · +2 = bonificación · @180 = precio",
         "lowStockChip": "{{name}} · quedan {{quantity}}",
-        "newMedicineName": "Nombre del nuevo medicamento"
+        "newMedicineName": "Nombre del nuevo medicamento",
+        "note": "Nota",
+        "notePlaceholder": "p. ej. 30 DÍAS DE PLAZO",
+        "mrp": "PVP"
       },
       "quickFill": {
         "reorder": "Reponer existencias bajas"
@@ -646,7 +674,9 @@
       "addUnexpected": "Añadir artículo no previsto",
       "enterQuantity": "Introduce una cantidad",
       "save": "Marcar como recibido",
-      "saved": "Mercancía recibida · existencias y bonificación añadidas"
+      "saved": "Mercancía recibida · existencias y bonificación añadidas",
+      "mrp": "PVP",
+      "note": "Nota"
     },
     "orderView": {
       "title": "Orden de compra",
@@ -657,7 +687,10 @@
       "paidOf": "Pagado {{paid}} de {{total}}",
       "paidWithCredits": "Pagado {{paid}} + {{credited}} en créditos del proveedor",
       "pay": "Pagar {{amount}}",
-      "print": "Imprimir"
+      "print": "Imprimir",
+      "note": "Nota",
+      "saveNote": "Guardar nota",
+      "noteSaved": "Nota guardada"
     },
     "sale": {
       "title": "Venta",
@@ -731,7 +764,8 @@
       },
       "summary": "El crédito reduce lo que debes a {{supplier}}",
       "save": "Devolver y tomar crédito",
-      "saved": "{{count}} devueltos · {{amount}} de crédito de {{supplier}}"
+      "saved": "{{count}} devueltos · {{amount}} de crédito de {{supplier}}",
+      "quantityUnits": "Cantidad (unid.)"
     },
     "prescriptions": {
       "sub": "Receta {{rx}} · {{date}} · {{medicines}}"

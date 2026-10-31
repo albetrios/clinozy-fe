@@ -216,9 +216,27 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
         input: expect.objectContaining({
           supplierId: AKSHAR_ID,
           items: [
-            { medicineId: 'med_arganlif0000000000000', qty: 8, free: 0, rate: 700 },
-            { medicineId: 'med_admosh000000000000000', qty: 8, free: 0, rate: 240 },
-            { medicineId: 'med_trichospire0000000000', qty: 10, free: 0, rate: 320 },
+            {
+              medicineId: 'med_arganlif0000000000000',
+              qty: 8,
+              free: 0,
+              rate: 700,
+              mrp: 650,
+            },
+            {
+              medicineId: 'med_admosh000000000000000',
+              qty: 8,
+              free: 0,
+              rate: 240,
+              mrp: 650,
+            },
+            {
+              medicineId: 'med_trichospire0000000000',
+              qty: 10,
+              free: 0,
+              rate: 320,
+              mrp: 650,
+            },
           ],
         }),
       }),
@@ -331,14 +349,27 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
       expect.objectContaining({
         input: expect.objectContaining({
           items: [
-            { medicineId: 'med_azelan000000000000000', qty: 20, free: 2, rate: 180 },
-            { medicineId: 'med_arganlif0000000000000', qty: 8, free: 0, rate: 677 },
+            {
+              medicineId: 'med_azelan000000000000000',
+              qty: 20,
+              free: 2,
+              rate: 180,
+              mrp: 650,
+            },
+            {
+              medicineId: 'med_arganlif0000000000000',
+              qty: 8,
+              free: 0,
+              rate: 677,
+              mrp: 650,
+            },
             {
               medicineId: null,
               newMedicineName: 'Azel cream',
               qty: 1,
               free: 0,
               rate: 150,
+              mrp: null,
             },
           ],
         }),
@@ -403,7 +434,9 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
         record: ORDERED,
         input: expect.objectContaining({
           supplierBillNo: 'T-90000',
-          items: [{ medicineId: TEST_MEDICINE_ID, qty: 10, free: 1, rate: 423.6 }],
+          items: [
+            { medicineId: TEST_MEDICINE_ID, qty: 10, free: 1, rate: 423.6, mrp: null },
+          ],
         }),
       }),
     );

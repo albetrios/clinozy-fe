@@ -1,6 +1,7 @@
 import { type FieldValues, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { paiseOfRupees } from '@/lib/number-text.ts';
 import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import {
@@ -70,7 +71,7 @@ export function OrderMedicineCell<TForm extends FieldValues>({
           ...options,
         ];
   const made = (medicine: { id: string; name: string }) =>
-    onMedicine({ id: medicine.id, name: medicine.name, rate: 0 });
+    onMedicine({ id: medicine.id, name: medicine.name, rate: 0, mrp: 0 });
   return (
     <ItemsPickerCell<TForm, MedicineRow>
       {...binding}
@@ -85,6 +86,7 @@ export function OrderMedicineCell<TForm extends FieldValues>({
             id: option.data.id,
             name: option.data.name,
             rate: supplierRateOf(option.data, supplierId),
+            mrp: paiseOfRupees(option.data.mrp),
           });
         }
       }}

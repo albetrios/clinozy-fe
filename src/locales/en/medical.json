@@ -400,7 +400,11 @@
         "orders": "Orders",
         "ordersValue_one": "{{count}} order · {{amount}}",
         "ordersValue_other": "{{count}} orders · {{amount}}",
-        "noOrders": "No orders yet"
+        "noOrders": "No orders yet",
+        "email": "Email",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "Enter a valid email",
+        "address": "Address"
       },
       "account": {
         "label": "Account",
@@ -488,7 +492,18 @@
         "compositionPlaceholder": "e.g. Tretinoin 0.025%",
         "soldWith": "Sold with",
         "prescriptionOnly": "Prescription only",
-        "overTheCounter": "Over the counter"
+        "overTheCounter": "Over the counter",
+        "hsnCode": "HSN code",
+        "hsnCodeHint": "4, 6 or 8 digits",
+        "hsnCodeInvalid": "Enter the HSN code as 4, 6 or 8 digits",
+        "pack": "Pack",
+        "packHint": "as printed",
+        "packPlaceholder": "e.g. 1*10",
+        "unitsPerPack": "Units per pack",
+        "unitsPerPackHint": "1 = whole packs only",
+        "unitsPerPackLocked": "Sell or return its stock first",
+        "decreaseUnits": "Fewer units per pack",
+        "increaseUnits": "More units per pack"
       },
       "price": {
         "mrp": "MRP",
@@ -516,7 +531,14 @@
         "decreaseFill": "Decrease fill level",
         "increaseFill": "Increase fill level",
         "hintAlert": "Reorder alert when stock falls to {{count}}.",
-        "hintOrder": "Order {{qty}} to fill up to {{max}}. Shows under Stock › Low stock."
+        "hintOrder": "Order {{qty}} to fill up to {{max}}. Shows under Stock › Low stock.",
+        "nowLoose": "{{stock}} in stock · {{state}}",
+        "reorderAtUnits": "Reorder at (units)",
+        "fillUpToUnits": "Fill up to (units)",
+        "hintAlertUnits_one": "Reorder alert when stock falls to {{count}} unit.",
+        "hintAlertUnits_other": "Reorder alert when stock falls to {{count}} units.",
+        "hintOrderPacks": "Order {{packs}} to fill up to {{max}} units. Shows under Stock › Low stock.",
+        "unitsNote": "Counted in units · {{perPack}}"
       },
       "batches": {
         "title": "Batches",
@@ -528,7 +550,9 @@
         "add": "Add batch",
         "total": "{{count}} in stock",
         "expiryInvalid": "Enter the expiry as MM/YY",
-        "batchMissing": "Enter the batch"
+        "batchMissing": "Enter the batch",
+        "mrp": "MRP",
+        "qtyUnits": "Units"
       },
       "rates": {
         "title": "Supplier prices",
@@ -596,7 +620,10 @@
         "quickLine": "Type medicine, qty, free, rate · e.g. azel 20 +2 @180",
         "quickHint": "20 = qty · +2 = free · @180 = rate",
         "lowStockChip": "{{name}} · {{quantity}} left",
-        "newMedicineName": "New medicine name"
+        "newMedicineName": "New medicine name",
+        "note": "Note",
+        "notePlaceholder": "e.g. 30 DAYS DUE",
+        "mrp": "MRP"
       },
       "quickFill": {
         "reorder": "Reorder low stock"
@@ -626,7 +653,9 @@
       "addUnexpected": "Add unexpected item",
       "enterQuantity": "Enter a quantity",
       "save": "Mark received",
-      "saved": "Goods received · stock and free quantity added"
+      "saved": "Goods received · stock and free quantity added",
+      "mrp": "MRP",
+      "note": "Note"
     },
     "orderView": {
       "title": "Purchase order",
@@ -637,7 +666,10 @@
       "paidOf": "Paid {{paid}} of {{total}}",
       "paidWithCredits": "Paid {{paid}} + {{credited}} in supplier credits",
       "pay": "Pay {{amount}}",
-      "print": "Print"
+      "print": "Print",
+      "note": "Note",
+      "saveNote": "Save note",
+      "noteSaved": "Note saved"
     },
     "sale": {
       "title": "Sale",
@@ -709,7 +741,8 @@
       },
       "summary": "Credit reduces what you owe {{supplier}}",
       "save": "Return & take credit",
-      "saved": "{{count}} returned · {{amount}} credit from {{supplier}}"
+      "saved": "{{count}} returned · {{amount}} credit from {{supplier}}",
+      "quantityUnits": "Quantity (units)"
     },
     "prescriptions": {
       "sub": "Rx {{rx}} · {{date}} · {{medicines}}"

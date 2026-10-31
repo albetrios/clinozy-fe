@@ -1618,5 +1618,15 @@
     "hint": "自动填写区域、城市和邦/省",
     "unknown": "无法识别此邮政编码——请输入区域、城市和邦/省。",
     "areaPick": "选择您的区域"
+  },
+  "medicineUnits": {
+    "packs_other": "{{count}} 盒",
+    "packsAndLoose_other": "{{count}} 盒 + {{loose}}",
+    "loose": "散装 {{count}}",
+    "perPack": "每盒 {{count}}",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "每单位 {{price}}",
+    "inStock": "库存 {{stock}}",
+    "packEquivalent": "= {{packs}}"
   }
 }

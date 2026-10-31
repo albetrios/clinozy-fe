@@ -20,6 +20,7 @@ import {
   ItemsReadCell,
 } from '@/shared/forms/ItemsField/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useMedicineUnits } from '@/shared/hooks/useMedicineUnits/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { useMedicalDates } from '../../../shared/components/MedicalCells/medical-dates.ts';
@@ -57,28 +58,38 @@ interface LinesForm {
 }
 
 /**
- * Medicine (its description under it) · Batch · Qty · Amount (H:5423) — the batches the server
- * drew, its amounts.
+ * Medicine · Batch · Qty · Amount (H:5423) — the batches the server drew, its amounts; under a
+ * line's name its pack and HSN code as billed, then its description, and a loose line's units as
+ * packs (change-pharmacy-record-fields D3, D5; feat-bill-line-description).
  */
 function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatRupees = useRupeeFormat();
+  const units = useMedicineUnits();
   return [
     {
       id: 'medicine',
       header: t(K.medicine),
       track: 'minmax(0,2fr)',
-      // The line's description, when it has one, under its name — muted, wrapping.
-      cell: ({ row }) => (
-        <span className="flex min-w-0 flex-col">
-          <ItemsReadCell strong>{row.name}</ItemsReadCell>
-          {row.description ? (
-            <span className="text-detail text-muted-foreground break-words">
-              {row.description}
-            </span>
-          ) : null}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const details = units.details({ pack: row.packSize, hsnCode: row.hsnCode });
+        return (
+          <ItemsReadCell strong>
+            {row.name}
+            {details ? (
+              <span className="text-caption text-muted-foreground block font-normal">
+                {details}
+              </span>
+            ) : null}
+            {/* The line's description, when it has one — muted, wrapping. */}
+            {row.description ? (
+              <span className="text-detail text-muted-foreground block font-normal break-words">
+                {row.description}
+              </span>
+            ) : null}
+          </ItemsReadCell>
+        );
+      },
     },
     {
       id: 'batch',
@@ -91,7 +102,16 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       header: t(K.qty),
       track: '70px',
       align: 'end',
-      cell: ({ row }) => <ItemsReadCell>{String(row.qty)}</ItemsReadCell>,
+      cell: ({ row }) => (
+        <ItemsReadCell>
+          {String(row.qty)}
+          {units.packEquivalent(row.qty, row.unitsPerPack) ? (
+            <span className="text-caption text-muted-foreground block">
+              {units.packEquivalent(row.qty, row.unitsPerPack)}
+            </span>
+          ) : null}
+        </ItemsReadCell>
+      ),
     },
     {
       id: 'amount',

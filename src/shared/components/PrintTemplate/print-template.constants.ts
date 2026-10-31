@@ -63,6 +63,8 @@ export const PRINT_TEMPLATE_KEYS = {
     item: 'invoice.item',
     medicineName: 'invoice.medicineName',
     packSize: 'invoice.packSize',
+    /** The GST HSN code a pharmacy line was billed with (change-pharmacy-record-fields D3). */
+    hsn: 'invoice.hsn',
     qty: 'invoice.qty',
     amount: 'invoice.amount',
     discount: 'invoice.discount',

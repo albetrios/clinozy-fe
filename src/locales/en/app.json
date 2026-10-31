@@ -1639,5 +1639,17 @@
     "hint": "Fills in the area, city and state",
     "unknown": "We don't know this PIN — type the area, city and state.",
     "areaPick": "Pick your area"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} pack",
+    "packs_other": "{{count}} packs",
+    "packsAndLoose_one": "{{count}} pack + {{loose}}",
+    "packsAndLoose_other": "{{count}} packs + {{loose}}",
+    "loose": "{{count}} loose",
+    "perPack": "{{count}} per pack",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} a unit",
+    "inStock": "{{stock}} in stock",
+    "packEquivalent": "= {{packs}}"
   }
 }

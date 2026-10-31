@@ -6,6 +6,7 @@ import {
   DrawerField,
   DrawerFieldGrid,
   DrawerInput,
+  DrawerTextarea,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import { CalendarPicker } from '@/shared/components/Picker/CalendarPicker/index.ts';
@@ -31,6 +32,7 @@ import { OrderMedicineCell } from './OrderMedicineCell.tsx';
 import {
   emptyOrderLine,
   lineAmount,
+  ORDER_NOTE_MAX,
   orderTotal,
   type PurchaseOrderFormValues,
 } from './purchase-order-form.ts';
@@ -65,6 +67,7 @@ export function OrderFields({
   const supplier = field('supplierId');
   const billNo = field('billNo');
   const date = field('date');
+  const note = field('note');
   return (
     <DrawerFieldGrid>
       <DrawerField
@@ -121,11 +124,23 @@ export function OrderFields({
           )}
         />
       </DrawerField>
+      <DrawerField span="full" label={t(K.note)} htmlFor={note.id}>
+        <DrawerTextarea
+          {...note.control}
+          {...form.register('note')}
+          rows={2}
+          maxLength={ORDER_NOTE_MAX}
+          placeholder={t(K.notePlaceholder)}
+          autoComplete="off"
+          readOnly={readOnly}
+          data-testid={`${testId}-note`}
+        />
+      </DrawerField>
     </DrawerFieldGrid>
   );
 }
 
-/** The rows: Medicine · Qty · Free · Rate* · Amount (`medical.md:261`; H:5389). */
+/** The rows: Medicine · Qty · Free · Rate* · MRP · Amount (`medical.md:261`; H:5389; D8). */
 function useLineColumns(
   { form, openChild }: OrderFieldsProps,
   supplierId: string | null,
@@ -149,6 +164,9 @@ function useLineColumns(
               shouldDirty: true,
             });
             form.setValue(`lines.${row.index}.rate`, medicine.rate, {
+              shouldDirty: true,
+            });
+            form.setValue(`lines.${row.index}.mrp`, medicine.mrp, {
               shouldDirty: true,
             });
           }}
@@ -183,6 +201,21 @@ function useLineColumns(
           {...row.bind('rate')}
           money
           placeholder={t(K.rate)}
+          readOnly={!row.editable}
+        />
+      ),
+    },
+    {
+      // The MRP printed on the packs — the batch they fill takes it (D8)
+      id: 'mrp',
+      header: t(K.mrp),
+      track: '90px',
+      align: 'end',
+      cell: (row) => (
+        <ItemsNumberCell
+          {...row.bind('mrp')}
+          money
+          placeholder={t(K.mrp)}
           readOnly={!row.editable}
         />
       ),

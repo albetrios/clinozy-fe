@@ -107,6 +107,11 @@ export const MEDICAL_DRAWER_KEYS = {
       phone: 'drawers.supplier.fields.phone',
       phoneHint: 'drawers.supplier.fields.phoneHint',
       gst: 'drawers.supplier.fields.gst',
+      email: 'drawers.supplier.fields.email',
+      emailPlaceholder: 'drawers.supplier.fields.emailPlaceholder',
+      /** "Enter a valid email" — clinozy-be's 400 on `email`. */
+      emailInvalid: 'drawers.supplier.fields.emailInvalid',
+      address: 'drawers.supplier.fields.address',
       manufacturers: 'drawers.supplier.fields.manufacturers',
       manufacturersHint: 'drawers.supplier.fields.manufacturersHint',
       payable: 'drawers.supplier.fields.payable',
@@ -216,6 +221,11 @@ export const MEDICAL_DRAWER_KEYS = {
       amount: 'drawers.purchaseOrder.fields.amount',
       add: 'drawers.purchaseOrder.fields.add',
       total: 'drawers.purchaseOrder.fields.total',
+      /** The MRP printed on the packs ordered (D8). */
+      mrp: 'drawers.purchaseOrder.fields.mrp',
+      /** The order's note ("30 DAYS DUE", D10). */
+      note: 'drawers.purchaseOrder.fields.note',
+      notePlaceholder: 'drawers.purchaseOrder.fields.notePlaceholder',
       /** "From K R Medical Agency" — the medicine picker's first group. */
       fromSupplier: 'drawers.purchaseOrder.fields.fromSupplier',
       otherMedicines: 'drawers.purchaseOrder.fields.otherMedicines',
@@ -270,6 +280,10 @@ export const MEDICAL_DRAWER_KEYS = {
     addUnexpected: 'drawers.receive.addUnexpected',
     /** An unexpected line's count left at 0. */
     enterQuantity: 'drawers.receive.enterQuantity',
+    /** Each line's MRP, stored on the batch it fills (D8). */
+    mrp: 'drawers.receive.mrp',
+    /** The order's note, written as the goods arrive (D10). */
+    note: 'drawers.receive.note',
     save: 'drawers.receive.save',
     saved: 'drawers.receive.saved',
   },
@@ -292,6 +306,10 @@ export const MEDICAL_DRAWER_KEYS = {
     pay: 'drawers.orderView.pay',
     /** A paid order's primary: its A4 purchase order (`medical.md:339`, Q-M7). */
     print: 'drawers.orderView.print',
+    /** The order's note — the one field a received order still changes (D10). */
+    note: 'drawers.orderView.note',
+    saveNote: 'drawers.orderView.saveNote',
+    noteSaved: 'drawers.orderView.noteSaved',
   },
   /** Sale (view) (`medical.md:333–338`; H:5422–5426). */
   sale: {
@@ -374,6 +392,8 @@ export const MEDICAL_DRAWER_KEYS = {
     /** "Bought at ₹123". */
     boughtAt: 'drawers.expiring.boughtAt',
     quantity: 'drawers.expiring.quantity',
+    /** A loose-selling medicine's: "Quantity (units)" (D5). */
+    quantityUnits: 'drawers.expiring.quantityUnits',
     /** "of 3". */
     of: 'drawers.expiring.of',
     creditNote: 'drawers.expiring.creditNote',
@@ -445,6 +465,22 @@ export const MEDICAL_DRAWER_KEYS = {
       soldWith: 'drawers.medicine.fields.soldWith',
       prescriptionOnly: 'drawers.medicine.fields.prescriptionOnly',
       overTheCounter: 'drawers.medicine.fields.overTheCounter',
+      /** The GST HSN code (change-pharmacy-record-fields D9). */
+      hsnCode: 'drawers.medicine.fields.hsnCode',
+      hsnCodeHint: 'drawers.medicine.fields.hsnCodeHint',
+      /** "Enter the HSN code as 4, 6 or 8 digits" — clinozy-be's 400 on `hsn_code`. */
+      hsnCodeInvalid: 'drawers.medicine.fields.hsnCodeInvalid',
+      /** The pack as printed ("1*10"). */
+      pack: 'drawers.medicine.fields.pack',
+      packHint: 'drawers.medicine.fields.packHint',
+      packPlaceholder: 'drawers.medicine.fields.packPlaceholder',
+      /** Loose units in a pack (D1, D5). */
+      unitsPerPack: 'drawers.medicine.fields.unitsPerPack',
+      unitsPerPackHint: 'drawers.medicine.fields.unitsPerPackHint',
+      /** "Sell or return its stock first" — locked while it holds stock (D7). */
+      unitsPerPackLocked: 'drawers.medicine.fields.unitsPerPackLocked',
+      decreaseUnits: 'drawers.medicine.fields.decreaseUnits',
+      increaseUnits: 'drawers.medicine.fields.increaseUnits',
     },
     /** The price panel (H:2916). */
     price: {
@@ -479,6 +515,16 @@ export const MEDICAL_DRAWER_KEYS = {
       hintAlert: 'drawers.medicine.stock.hintAlert',
       /** "Order 10 to fill up to 10. Shows under Stock › Low stock." */
       hintOrder: 'drawers.medicine.stock.hintOrder',
+      /** A loose-selling medicine's: "3 packs + 4 in stock · Healthy". */
+      nowLoose: 'drawers.medicine.stock.nowLoose',
+      reorderAtUnits: 'drawers.medicine.stock.reorderAtUnits',
+      fillUpToUnits: 'drawers.medicine.stock.fillUpToUnits',
+      /** "Reorder alert when stock falls to 20 units." (plural). */
+      hintAlertUnits: 'drawers.medicine.stock.hintAlertUnits',
+      /** "Order 3 packs to fill up to 30 units. Shows under Stock › Low stock." */
+      hintOrderPacks: 'drawers.medicine.stock.hintOrderPacks',
+      /** "Counted in units · 10 per pack". */
+      unitsNote: 'drawers.medicine.stock.unitsNote',
     },
     batches: {
       title: 'drawers.medicine.batches.title',
@@ -486,7 +532,11 @@ export const MEDICAL_DRAWER_KEYS = {
       expiry: 'drawers.medicine.batches.expiry',
       expiryPlaceholder: 'drawers.medicine.batches.expiryPlaceholder',
       qty: 'drawers.medicine.batches.qty',
+      /** The Qty column of a loose-selling medicine: "Units". */
+      qtyUnits: 'drawers.medicine.batches.qtyUnits',
       rate: 'drawers.medicine.batches.rate',
+      /** The MRP printed on the batch, a pack's (D8). */
+      mrp: 'drawers.medicine.batches.mrp',
       add: 'drawers.medicine.batches.add',
       /** "8 in stock" — the batches' total. */
       total: 'drawers.medicine.batches.total',

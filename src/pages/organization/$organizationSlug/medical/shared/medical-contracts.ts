@@ -32,12 +32,38 @@ interface NamedRef {
 
 // ── The wire ──
 
-type ApiSale = NonNullable<ApiData<'/app/medical-sales/{medical_sale_id}', 'get'>>;
+type ApiSaleDocumented = NonNullable<
+  ApiData<'/app/medical-sales/{medical_sale_id}', 'get'>
+>;
 type ApiSaleDue = NonNullable<ApiData<'/app/medical-sales/dues', 'get'>>[number];
-type ApiPurchaseOrder = NonNullable<
+type ApiPurchaseOrderDocumented = NonNullable<
   ApiData<'/app/medical-purchase-orders/{medical_purchase_order_id}', 'get'>
 >;
-type ApiSupplier = NonNullable<ApiData<'/app/suppliers/{supplier_id}', 'get'>>;
+type ApiSupplierDocumented = NonNullable<ApiData<'/app/suppliers/{supplier_id}', 'get'>>;
+
+/*
+ * What change-pharmacy-record-fields added to these answers — a sale line's pack, HSN code and
+ * units per pack, an order's note and each line's MRP, a supplier's email and address — which
+ * clinozy-be's OpenAPI response map does not list yet (F1). Once `pnpm api:types` carries them,
+ * each is its documented shape again.
+ */
+type ApiSaleLine = NonNullable<ApiSaleDocumented['items']>[number];
+type ApiSale = Omit<ApiSaleDocumented, 'items'> & {
+  items?: (ApiSaleLine & {
+    pack_size?: string | null;
+    hsn_code?: string | null;
+    units_per_pack?: number;
+  })[];
+};
+type ApiPurchaseOrderLine = NonNullable<ApiPurchaseOrderDocumented['items']>[number];
+type ApiPurchaseOrder = Omit<ApiPurchaseOrderDocumented, 'items'> & {
+  note?: string | null;
+  items?: (ApiPurchaseOrderLine & { mrp?: number | null })[];
+};
+type ApiSupplier = ApiSupplierDocumented & {
+  email?: string | null;
+  address?: string | null;
+};
 type ApiManufacturer = NonNullable<
   ApiData<'/app/manufacturers/{manufacturer_id}', 'get'>
 >;
@@ -119,6 +145,9 @@ export const saleWire = wireSchema<ApiSale>()(
         medicine_id: z.string().nullable(),
         name: z.string(),
         description: z.string().nullable(),
+        pack_size: z.string().nullable(),
+        hsn_code: z.string().nullable(),
+        units_per_pack: z.number().int(),
         batch_number: z.string().nullable(),
         expiry_month: z.string().nullable(),
         quantity: z.number().int(),
@@ -209,6 +238,7 @@ export const purchaseOrderWire = wireSchema<ApiPurchaseOrder>()(
     order_date: z.string(),
     stage: z.enum(['ordered', 'received']),
     received_at: z.string().nullable(),
+    note: z.string().nullable(),
     items: z.array(
       z.object({
         id: z.string(),
@@ -218,6 +248,7 @@ export const purchaseOrderWire = wireSchema<ApiPurchaseOrder>()(
         quantity: z.number().int(),
         free_quantity: z.number().int(),
         rate: z.number(),
+        mrp: z.number().nullable(),
         amount: z.number(),
         is_received: z.boolean().nullable(),
         batch_number: z.string().nullable(),
@@ -246,6 +277,8 @@ export const supplierWire = wireSchema<ApiSupplier>()(
     name: z.string(),
     phone: z.string().nullable(),
     gst_number: z.string().nullable(),
+    email: z.string().nullable(),
+    address: z.string().nullable(),
     is_quick: z.boolean(),
     manufacturers: z.array(makerWire),
     payable: z.number(),
@@ -360,18 +393,27 @@ interface SaleCustomer {
   patientId: string | null;
 }
 
-/** One sold line: the medicine from its batch, at its rate less its discount, and what came back. */
+/**
+ * One sold line: the medicine from its batch, at its rate less its discount, and what came back.
+ * Its quantity counts units — packs while the medicine sells whole packs (D5).
+ */
 export interface SaleLine {
   invoiceItemId: string;
   medicineId: string | null;
   name: string;
   /** The free text under the name, from the sale or its bill; null for none. */
   description: string | null;
+  /** The medicine's pack label when billed ("1*10"). */
+  packSize: string | null;
+  /** The medicine's HSN code when billed. */
+  hsnCode: string | null;
+  /** The medicine's units per pack — above 1 the line sold loose units. */
+  unitsPerPack: number;
   qty: number;
   batchNo: string | null;
   /** "MM/YY". */
   expiry: string | null;
-  /** The MRP the line sold at, rupees. */
+  /** What one unit sold at — the batch's MRP over its units per pack, rupees. */
   rate: number;
   discountPct: number;
   /** What the line comes to, rupees. */
@@ -473,6 +515,9 @@ export function toSaleRow(wire: z.infer<typeof saleWire>): SaleRow {
       medicineId: item.medicine_id,
       name: item.name,
       description: item.description,
+      packSize: item.pack_size,
+      hsnCode: item.hsn_code,
+      unitsPerPack: item.units_per_pack,
       qty: item.quantity,
       batchNo: item.batch_number,
       expiry: item.expiry_month ? screenExpiryOf(item.expiry_month) : null,
@@ -602,7 +647,7 @@ export function toSaleReminder(wire: z.infer<typeof saleDueWire>): SaleReminder 
 /** An order's stage as the room shows it: Ordered, Received, or Paid once received and paid in full. */
 type PurchaseStage = 'ordered' | 'received' | 'paid';
 
-/** One line of a purchase order. Money in rupees. */
+/** One line of a purchase order: packs, as the supplier sells them. Money in rupees. */
 export interface PurchaseOrderLine {
   id: string;
   lineNo: number;
@@ -610,7 +655,10 @@ export interface PurchaseOrderLine {
   medicineName: string;
   qty: number;
   free: number;
+  /** A pack's purchase rate. */
   rate: number;
+  /** The MRP printed on the packs; the batch it fills takes it (D8). */
+  mrp: number | null;
   amount: number;
   /** Ticked on Receive goods; null until the order is received. */
   received: boolean | null;
@@ -633,6 +681,8 @@ export interface PurchaseOrderRow {
   /** What the Stage chip shows — Paid once received and paid in full. */
   stage: PurchaseStage;
   receivedAt: string | null;
+  /** What the desk noted ("30 DAYS DUE") — the one field a received order still changes (D10). */
+  note: string | null;
   lines: PurchaseOrderLine[];
   itemCount: number;
   freeCount: number;
@@ -665,6 +715,7 @@ export function toPurchaseOrderRow(
     stage:
       wire.stage === 'received' && wire.payment_status === 'paid' ? 'paid' : wire.stage,
     receivedAt: wire.received_at,
+    note: wire.note,
     lines: wire.items.map((item) => ({
       id: item.id,
       lineNo: item.line_number,
@@ -673,6 +724,7 @@ export function toPurchaseOrderRow(
       qty: item.quantity,
       free: item.free_quantity,
       rate: item.rate,
+      mrp: item.mrp,
       amount: item.amount,
       received: item.is_received,
       batchNo: item.batch_number,
@@ -724,6 +776,8 @@ export interface SupplierRow {
   name: string;
   phone: string | null;
   gstNumber: string | null;
+  email: string | null;
+  address: string | null;
   isQuick: boolean;
   manufacturers: MedicineMaker[];
   manufacturerIds: string[];
@@ -743,6 +797,8 @@ export function toSupplierRow(wire: z.infer<typeof supplierWire>): SupplierRow {
     name: wire.name,
     phone: wire.phone,
     gstNumber: wire.gst_number,
+    email: wire.email,
+    address: wire.address,
     isQuick: wire.is_quick,
     manufacturers: wire.manufacturers,
     manufacturerIds: wire.manufacturers.map((maker) => maker.id),
@@ -806,7 +862,9 @@ export interface SupplierCreditRow {
   medicineName: string;
   batchId: string;
   batchNo: string;
+  /** Units — packs while the medicine sells whole packs. */
   qty: number;
+  /** One unit's purchase rate: the pack's over its units per pack (D5). */
   rate: number;
   amount: number;
   /** Set against the supplier's orders. */

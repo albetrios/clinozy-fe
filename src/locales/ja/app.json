@@ -1618,5 +1618,15 @@
     "hint": "エリア、市区町村、州・県を自動入力します",
     "unknown": "この郵便番号は見つかりません。エリア、市区町村、州・県を入力してください。",
     "areaPick": "エリアを選択"
+  },
+  "medicineUnits": {
+    "packs_other": "{{count}} パック",
+    "packsAndLoose_other": "{{count}} パック + {{loose}}",
+    "loose": "バラ {{count}}",
+    "perPack": "1パック {{count}}",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "1単位 {{price}}",
+    "inStock": "在庫 {{stock}}",
+    "packEquivalent": "= {{packs}}"
   }
 }

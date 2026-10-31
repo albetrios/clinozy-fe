@@ -1723,5 +1723,25 @@
     "hint": "يملأ المنطقة والمدينة والولاية تلقائيًا",
     "unknown": "لا نعرف هذا الرمز البريدي — اكتب المنطقة والمدينة والولاية.",
     "areaPick": "اختر منطقتك"
+  },
+  "medicineUnits": {
+    "packs_zero": "{{count}} عبوات",
+    "packs_one": "{{count}} عبوة",
+    "packs_two": "{{count}} عبوات",
+    "packs_few": "{{count}} عبوات",
+    "packs_many": "{{count}} عبوات",
+    "packs_other": "{{count}} عبوات",
+    "packsAndLoose_zero": "{{count}} عبوات + {{loose}}",
+    "packsAndLoose_one": "{{count}} عبوة + {{loose}}",
+    "packsAndLoose_two": "{{count}} عبوات + {{loose}}",
+    "packsAndLoose_few": "{{count}} عبوات + {{loose}}",
+    "packsAndLoose_many": "{{count}} عبوات + {{loose}}",
+    "packsAndLoose_other": "{{count}} عبوات + {{loose}}",
+    "loose": "{{count}} مفرد",
+    "perPack": "{{count}} في العبوة",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} للوحدة",
+    "inStock": "متوفر {{stock}}",
+    "packEquivalent": "= {{packs}}"
   }
 }

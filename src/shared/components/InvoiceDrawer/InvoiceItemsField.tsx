@@ -32,6 +32,7 @@ import {
   ItemsQtyCell,
 } from '@/shared/forms/ItemsField/index.ts';
 import { useQuickCreateMedicine } from '@/shared/hooks/useMedicines/index.ts';
+import { useMedicineUnits } from '@/shared/hooks/useMedicineUnits/index.ts';
 
 import {
   INVOICE_DRAWER_KEYS,
@@ -231,6 +232,35 @@ function RateCell({ figures }: { figures: InvoiceRowFigures }) {
   );
 }
 
+/**
+ * Under a loose-selling medicine's quantity, the units as packs — "= 1 pack + 2"
+ * (change-pharmacy-record-fields D5): the quantity counts tablets or strips, the stock too.
+ */
+function PackEquivalent({
+  catalog,
+  medicineId,
+  qty,
+}: {
+  catalog: InvoiceCatalog;
+  medicineId: string | null;
+  qty: number;
+}) {
+  const units = useMedicineUnits();
+  const unitsPerPack = medicineId
+    ? (catalog.byKey.get(medicineId)?.unitsPerPack ?? 1)
+    : 1;
+  const equal = units.packEquivalent(qty, unitsPerPack);
+  if (equal === null) return null;
+  return (
+    <span
+      className="text-caption text-muted-foreground block"
+      data-testid="invoice-line-packs"
+    >
+      {equal}
+    </span>
+  );
+}
+
 /** The table's columns (H:5059): Offering · Qty · Rate · Disc % · GST · Final, then the ×. */
 function useItemColumns({
   form,
@@ -267,7 +297,14 @@ function useItemColumns({
       track: '88px',
       align: 'end',
       cell: (row) => (
-        <ItemsQtyCell {...row.bind('qty')} max={INVOICE_QTY_MAX} readOnly={!editable} />
+        <>
+          <ItemsQtyCell {...row.bind('qty')} max={INVOICE_QTY_MAX} readOnly={!editable} />
+          <PackEquivalent
+            catalog={catalog}
+            medicineId={row.row.medicineId}
+            qty={row.row.qty}
+          />
+        </>
       ),
     },
     {

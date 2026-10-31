@@ -389,4 +389,27 @@ export const APP_KEYS = {
       offerResumed: 'offerings.toasts.offerResumed',
     },
   },
+  /**
+   * A medicine's units (change-pharmacy-record-fields D5), shared by the Medical room and the
+   * Invoice drawer's New sale: a loose-selling medicine's stock as packs and loose units, its
+   * pack, its HSN code and its unit price.
+   */
+  medicineUnits: {
+    /** "3 packs + 4" — whole packs and the loose rest (plural on the packs). */
+    packsAndLoose: 'medicineUnits.packsAndLoose',
+    /** "3 packs" — no loose rest (plural). */
+    packs: 'medicineUnits.packs',
+    /** "4 loose" — under one pack. */
+    loose: 'medicineUnits.loose',
+    /** "10 per pack". */
+    perPack: 'medicineUnits.perPack',
+    /** "HSN 3004". */
+    hsn: 'medicineUnits.hsn',
+    /** "₹12.55 a unit". */
+    unitPrice: 'medicineUnits.unitPrice',
+    /** "3 packs + 4 in stock" — a loose-selling medicine's stock. */
+    inStock: 'medicineUnits.inStock',
+    /** "= 1 pack + 2" — a quantity of units as packs. */
+    packEquivalent: 'medicineUnits.packEquivalent',
+  },
 } as const;

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  medicineRow,
   medicineWire as medicineWireDouble,
   TEST_MAKER_ID,
 } from '@/tests/utils/medical-doubles.ts';
@@ -10,6 +11,7 @@ import {
   medicineInputSchema,
   medicineWire,
   quickMedicineBodyOf,
+  saleUnitPaise,
   screenExpiryOf,
   toMedicineRow,
   wireExpiryOf,
@@ -53,6 +55,9 @@ describe('the input schema', () => {
     composition: null,
     manufacturerId: TEST_MAKER_ID,
     prescriptionOnly: false,
+    hsnCode: null,
+    packLabel: null,
+    unitsPerPack: 1,
     mrp: 650,
     gstPct: 12,
     minStock: 2,
@@ -76,6 +81,62 @@ describe('the input schema', () => {
       issues({ supplierRates: [{ supplierId: 'sup_a', rate: 0, free: 0, leadDays: 2 }] }),
     ).toContain('Enter a rate for every supplier price');
     expect(issues({ minStock: 30 })).toContain('Reorder at can’t be above Fill up to');
+  });
+
+  it('takes an HSN code of 4, 6 or 8 digits, a pack label and 1–1000 units per pack', () => {
+    const ok = (fields: object) =>
+      medicineInputSchema.safeParse({ ...valid, ...fields }).success;
+    expect(ok({ hsnCode: '3004', packLabel: '1*10', unitsPerPack: 10 })).toBe(true);
+    expect(ok({ hsnCode: '300490' })).toBe(true);
+    expect(ok({ hsnCode: '30049099' })).toBe(true);
+    expect(ok({ hsnCode: '30049' })).toBe(false);
+    expect(ok({ hsnCode: '3004AB' })).toBe(false);
+    expect(ok({ unitsPerPack: 0 })).toBe(false);
+    expect(ok({ unitsPerPack: 1001 })).toBe(false);
+    expect(ok({ packLabel: 'x'.repeat(31) })).toBe(false);
+  });
+});
+
+describe('the new record fields (change-pharmacy-record-fields)', () => {
+  it('reads the HSN code, pack, units per pack and each batch’s MRP', () => {
+    const row = toMedicineRow(
+      medicineWire.parse(
+        medicineWireDouble({
+          hsn_code: '3004',
+          pack_label: '1*10',
+          units_per_pack: 10,
+          batches: [
+            {
+              id: 'mbt_strip0000000000000000',
+              batch_number: 'B1',
+              expiry_month: '2027-12',
+              quantity: 34,
+              purchase_rate: 90,
+              mrp: 125.55,
+              supplier_id: null,
+              is_expired: false,
+            },
+          ],
+        }),
+      ),
+    );
+    expect(row).toMatchObject({ hsnCode: '3004', packLabel: '1*10', unitsPerPack: 10 });
+    expect(row.batches[0]?.mrp).toBeCloseTo(125.55, 2);
+  });
+
+  it('prices a unit at the first batch’s MRP over its units, rounded down (D2, D6)', () => {
+    const batch = medicineRow().batches[0]!;
+    const strip = medicineRow({
+      mrp: 120,
+      unitsPerPack: 10,
+      batches: [
+        { ...batch, id: 'mbt_old', qty: 0, mrp: 99 },
+        { ...batch, id: 'mbt_new', mrp: 125.55 },
+      ],
+    });
+    expect(saleUnitPaise(strip)).toBe(1_255);
+    expect(saleUnitPaise({ ...strip, batches: [{ ...batch, mrp: null }] })).toBe(1_200);
+    expect(saleUnitPaise(medicineRow())).toBe(65_000);
   });
 });
 

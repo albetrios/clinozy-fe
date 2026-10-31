@@ -1660,5 +1660,19 @@
     "hint": "Remplit le quartier, la ville et l’État",
     "unknown": "Code postal inconnu — saisissez le quartier, la ville et l’État.",
     "areaPick": "Choisissez votre quartier"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} boîte",
+    "packs_many": "{{count}} boîtes",
+    "packs_other": "{{count}} boîtes",
+    "packsAndLoose_one": "{{count}} boîte + {{loose}}",
+    "packsAndLoose_many": "{{count}} boîtes + {{loose}}",
+    "packsAndLoose_other": "{{count}} boîtes + {{loose}}",
+    "loose": "{{count}} à l’unité",
+    "perPack": "{{count}} par boîte",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} l’unité",
+    "inStock": "{{stock}} en stock",
+    "packEquivalent": "= {{packs}}"
   }
 }

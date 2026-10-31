@@ -124,6 +124,8 @@ describe('SupplierDrawer (medical.md:190–206)', () => {
         name: 'Om Pharma',
         phone: '+919876543210',
         gstNumber: '24AAACO1234A1Z5',
+        email: null,
+        address: null,
         manufacturerIds: [TEST_MAKER_ID],
       },
       idempotencyKey: expect.any(String),

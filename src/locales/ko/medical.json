@@ -382,7 +382,11 @@
         "nothingDue": "미지급 없음",
         "orders": "주문",
         "ordersValue_other": "주문 {{count}}건 · {{amount}}",
-        "noOrders": "아직 주문 없음"
+        "noOrders": "아직 주문 없음",
+        "email": "이메일",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "올바른 이메일을 입력하세요",
+        "address": "주소"
       },
       "account": {
         "label": "거래 내역",
@@ -470,7 +474,18 @@
         "compositionPlaceholder": "예: 트레티노인 0.025%",
         "soldWith": "판매 구분",
         "prescriptionOnly": "처방전 필요",
-        "overTheCounter": "일반 판매"
+        "overTheCounter": "일반 판매",
+        "hsnCode": "HSN 코드",
+        "hsnCodeHint": "4, 6 또는 8자리",
+        "hsnCodeInvalid": "HSN 코드를 4, 6 또는 8자리로 입력하세요",
+        "pack": "포장",
+        "packHint": "인쇄된 그대로",
+        "packPlaceholder": "예: 1*10",
+        "unitsPerPack": "팩당 단위 수",
+        "unitsPerPackHint": "1 = 팩 단위로만",
+        "unitsPerPackLocked": "먼저 재고를 판매하거나 반품하세요",
+        "decreaseUnits": "팩당 단위 줄이기",
+        "increaseUnits": "팩당 단위 늘리기"
       },
       "price": {
         "mrp": "최대 소매가",
@@ -498,7 +513,13 @@
         "decreaseFill": "채울 수량 낮추기",
         "increaseFill": "채울 수량 높이기",
         "hintAlert": "재고가 {{count}}개가 되면 재주문 알림.",
-        "hintOrder": "{{max}}개까지 채우려면 {{qty}}개 주문하세요. 재고 › 재고 부족에 표시됩니다."
+        "hintOrder": "{{max}}개까지 채우려면 {{qty}}개 주문하세요. 재고 › 재고 부족에 표시됩니다.",
+        "nowLoose": "재고 {{stock}} · {{state}}",
+        "reorderAtUnits": "재주문 기준(단위)",
+        "fillUpToUnits": "채울 수량(단위)",
+        "hintAlertUnits_other": "재고가 {{count}}단위가 되면 재주문 알림.",
+        "hintOrderPacks": "{{max}}단위까지 채우려면 {{packs}} 주문하세요. 재고 › 재고 부족에 표시됩니다.",
+        "unitsNote": "단위로 셉니다 · {{perPack}}"
       },
       "batches": {
         "title": "배치",
@@ -510,7 +531,9 @@
         "add": "배치 추가",
         "total": "재고 {{count}}",
         "expiryInvalid": "유효기간을 MM/YY로 입력하세요",
-        "batchMissing": "배치 번호를 입력하세요"
+        "batchMissing": "배치 번호를 입력하세요",
+        "mrp": "최대 소매가",
+        "qtyUnits": "단위"
       },
       "rates": {
         "title": "공급업체 가격",
@@ -577,7 +600,10 @@
         "quickLine": "의약품, 수량, 무상, 단가 입력 · 예: azel 20 +2 @180",
         "quickHint": "20 = 수량 · +2 = 무상 · @180 = 단가",
         "lowStockChip": "{{name}} · {{quantity}}개 남음",
-        "newMedicineName": "새 의약품 이름"
+        "newMedicineName": "새 의약품 이름",
+        "note": "메모",
+        "notePlaceholder": "예: 30일 후 결제",
+        "mrp": "최대 소매가"
       },
       "quickFill": {
         "reorder": "재고 부족 재주문"
@@ -606,7 +632,9 @@
       "addUnexpected": "예상치 못한 품목 추가",
       "enterQuantity": "수량을 입력하세요",
       "save": "입고 완료로 표시",
-      "saved": "입고 완료 · 재고와 무상 수량 추가됨"
+      "saved": "입고 완료 · 재고와 무상 수량 추가됨",
+      "mrp": "최대 소매가",
+      "note": "메모"
     },
     "orderView": {
       "title": "구매 주문",
@@ -617,7 +645,10 @@
       "paidOf": "{{total}} 중 {{paid}} 지급",
       "paidWithCredits": "{{paid}} 지급 + 공급업체 크레딧 {{credited}}",
       "pay": "{{amount}} 지불",
-      "print": "인쇄"
+      "print": "인쇄",
+      "note": "메모",
+      "saveNote": "메모 저장",
+      "noteSaved": "메모를 저장했습니다"
     },
     "sale": {
       "title": "판매",
@@ -687,7 +718,8 @@
       },
       "summary": "크레딧으로 {{supplier}}에 대한 미지급금이 줄어듭니다",
       "save": "반품하고 크레딧 받기",
-      "saved": "{{count}}개 반품 · {{supplier}}에서 {{amount}} 크레딧"
+      "saved": "{{count}}개 반품 · {{supplier}}에서 {{amount}} 크레딧",
+      "quantityUnits": "수량(단위)"
     },
     "prescriptions": {
       "sub": "처방 {{rx}} · {{date}} · {{medicines}}"
