@@ -16,6 +16,11 @@ import { useConsumedSearchToken } from '@/shared/hooks/useConsumedSearchToken/in
 import { CheckCircle, XCircle } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { acceptInvitationAndOpenClinic } from '@/shared/tenancy/accept-invitation.ts';
+import {
+  clearStashedInviteToken,
+  readStashedInviteToken,
+  stashInviteToken,
+} from '@/shared/tenancy/invite-token-stash.ts';
 
 import {
   ACCEPT_INVITE_REDIRECT_MS,
@@ -137,7 +142,11 @@ function InviteStatusCard({
 export function AcceptInvitePage() {
   const { t } = useTranslation(AUTH_NS);
   const { invitationId } = useParams({ strict: false });
-  const invitationToken = useConsumedSearchToken();
+  const linkToken = useConsumedSearchToken();
+  // Back from signing in: the link's token waited in this tab, not in the redirect URL (E-5).
+  const [invitationToken] = useState(
+    () => linkToken || readStashedInviteToken(invitationId),
+  );
   const navigate = useNavigate();
   const [status, setStatus] = useState<Status>('accepting');
   const [error, setError] = useState<string | null>(null);
@@ -162,24 +171,27 @@ export function AcceptInvitePage() {
 
   const acceptInvite = useCallback(async () => {
     if (!invitationId) return;
-    const loginRecovery = {
-      to: '/login' as const,
-      search: {
-        redirect: `/accept-invite/${invitationId}?token=${encodeURIComponent(invitationToken)}`,
-      },
-      replace: true,
+    // The token stays in this tab (`shared/tenancy/invite-token-stash.ts`) — never in the redirect URL.
+    const recoverThroughLogin = () => {
+      stashInviteToken(invitationId, invitationToken);
+      void navigate({
+        to: '/login',
+        search: { redirect: `/accept-invite/${invitationId}` },
+        replace: true,
+      });
     };
 
     try {
       // Accepting requires a signed-in session whose email matches the
       // invite — and the email recipient is usually NOT signed in yet. Send
-      // them to login first, carrying this page (token included) as the
-      // post-login redirect, instead of firing a doomed accept that renders
-      // an "Invitation problem: Unauthorized" card for the happy path.
+      // them to login first, carrying this page as the post-login redirect
+      // (the token waits in the tab), instead of firing a doomed accept that
+      // renders an "Invitation problem: Unauthorized" card for the happy path.
       if (!getAccessToken()) {
-        void navigate(loginRecovery);
+        recoverThroughLogin();
         return;
       }
+      clearStashedInviteToken();
       // A link without its token still works: clinozy-be lets the signed-in
       // owner of the invited, verified email accept on their own (D84).
       const accepted = await acceptInvitationAndOpenClinic(
@@ -220,7 +232,7 @@ export function AcceptInvitePage() {
       // invitation itself is fine, so recover through login, not the card.
       if (!aliveRef.current) return;
       if (err instanceof HttpError && err.status === 401) {
-        void navigate(loginRecovery);
+        recoverThroughLogin();
         return;
       }
       setError(mapFrontendError(err));

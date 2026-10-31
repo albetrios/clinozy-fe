@@ -2,9 +2,10 @@
 
 Route: `/accept-invite/$invitationId`. Reached from an invite email link, and
 **auth-required** (`requireAuth` in the route's `beforeLoad`, INV-4): the recipient is
-usually not signed in yet, so a guest goes to sign-in first with the whole link — token
-included — carried as the post-login redirect. The error card below is a signed-in state;
-a guest never sees it.
+usually not signed in yet, so a guest goes to sign-in first with `/accept-invite/<id>` as the
+post-login redirect — never the token: it waits in this tab (`sessionStorage`,
+`shared/tenancy/invite-token-stash.ts`) and the page reads it back on return (E-5). The error
+card below is a signed-in state; a guest never sees it.
 
 ## Files
 
@@ -16,8 +17,9 @@ a guest never sees it.
 
 ## Flow
 
-1. Read `invitationId` from the route params and the single-use `?token=`.
-2. No session yet → `/login` carrying this page (token included) as the redirect.
+1. Read `invitationId` from the route params and the single-use `?token=` — or, back from
+   signing in, the token stashed for this invitation.
+2. No session yet → stash the token, then `/login` carrying this page (no token) as the redirect.
 3. Accept the invitation (server resolves the org + role). The token is optional since
    clinozy-be launch D84: the signed-in owner of the invited, verified email accepts without it,
    so a link missing its token still works; a token that is sent must match.

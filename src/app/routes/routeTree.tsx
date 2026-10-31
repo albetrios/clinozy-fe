@@ -136,6 +136,7 @@ import { SettingsModalLazy } from '@/shared/components/SettingsModal/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { AppToaster } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { inviteTokenOf, stashInviteToken } from '@/shared/tenancy/invite-token-stash.ts';
 import { resolveRootRedirect } from '@/shared/tenancy/organization-resolver.ts';
 
 import type { DialogRoute } from './dialog-routes.ts';
@@ -611,9 +612,15 @@ const acceptInviteRoute = createRoute({
     // the edge case. The page used to check this in a passive effect, so the
     // "Joining…" card painted first and then vanished (INV-4). `requireAuth`
     // awaits the auth bootstrap before deciding, so a cold load of an emailed
-    // link does not bounce an already-signed-in user, and `location.href`
-    // carries the token back through login.
-    await requireAuth(location.href);
+    // link does not bounce an already-signed-in user. The login redirect names
+    // the page alone: the single-use token waits in this tab, never in a
+    // redirect URL (E-5, `shared/tenancy/invite-token-stash.ts`).
+    try {
+      await requireAuth(location.pathname);
+    } catch (toLogin) {
+      stashInviteToken(params.invitationId, inviteTokenOf(location.search));
+      throw toLogin;
+    }
   },
   component: AcceptInvitePage,
   errorComponent: RouteErrorBoundary,

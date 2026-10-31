@@ -24,6 +24,10 @@ import { manifest as taskCreateManifest } from '@/pages/organization/$organizati
 import { validateTasksSearch } from '@/pages/organization/$organizationSlug/tasks/tasks.search.ts';
 import type * as AppHomeModule from '@/shared/app/app-home.ts';
 import { navCandidates } from '@/shared/hooks/useAppNav/index.ts';
+import {
+  clearStashedInviteToken,
+  readStashedInviteToken,
+} from '@/shared/tenancy/invite-token-stash.ts';
 
 import {
   BOOT_PENDING_POLICY,
@@ -457,14 +461,40 @@ describe('guard wiring in beforeLoad', () => {
   // vanished — for the COMMON case, since an invite recipient is usually not
   // signed in yet. Deciding it in beforeLoad costs zero frames, and passing
   // location.href carries the invite token back through login.
-  it('accept-invite requires auth before it renders, carrying the invite link', async () => {
-    const href = '/accept-invite/inv_abc?token=tok_123';
+  it('accept-invite requires auth before it renders, carrying the invite page back', async () => {
+    const location = {
+      href: '/accept-invite/inv_abc?token=tok_123',
+      pathname: '/accept-invite/inv_abc',
+      search: { token: 'tok_123' },
+    };
     await beforeLoadOf('/public-shell/accept-invite/$invitationId')({
-      location: { href },
+      location,
       params: { invitationId: 'inv_abc' },
       preload: false,
     });
-    expect(requireAuth).toHaveBeenCalledWith(href);
+    // The page alone — the single-use token never rides in the login redirect (E-5).
+    expect(requireAuth).toHaveBeenCalledWith('/accept-invite/inv_abc');
+    expect(readStashedInviteToken('inv_abc')).toBe('');
+  });
+
+  it('accept-invite keeps a guest’s token in the tab while they sign in (E-5)', async () => {
+    const toLogin = { redirect: '/login' };
+    requireAuth.mockRejectedValueOnce(toLogin);
+    const thrown = await thrownBy(() =>
+      beforeLoadOf('/public-shell/accept-invite/$invitationId')({
+        location: {
+          href: '/accept-invite/inv_abc?token=tok_123',
+          pathname: '/accept-invite/inv_abc',
+          search: { token: 'tok_123' },
+        },
+        params: { invitationId: 'inv_abc' },
+        preload: false,
+      }),
+    );
+    expect(thrown).toBe(toLogin);
+    expect(requireAuth).toHaveBeenCalledWith('/accept-invite/inv_abc');
+    expect(readStashedInviteToken('inv_abc')).toBe('tok_123');
+    clearStashedInviteToken();
   });
 });
 
