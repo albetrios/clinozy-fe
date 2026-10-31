@@ -118,7 +118,7 @@ export interface CspNamedOrigins {
 }
 
 /** The file store's sources for `connect-src` and `img-src`: the named origin, else the fallback. */
-export function cspStoredFileSources(storedFilesOrigin: string | undefined): string[] {
+function cspStoredFileSources(storedFilesOrigin: string | undefined): string[] {
   return [getCspConnectSrcOrigin(storedFilesOrigin) ?? STORED_FILE_FALLBACK];
 }
 
@@ -127,7 +127,7 @@ export function cspStoredFileSources(storedFilesOrigin: string | undefined): str
  * every `*.sentry.io` project; none without a DSN (Sentry is off). A `window.__CONFIG__`
  * `SENTRY_DSN` on another host is refused by this policy — name it in the build's env instead.
  */
-export function cspSentrySources(sentryDsn: string | undefined): string[] {
+function cspSentrySources(sentryDsn: string | undefined): string[] {
   const origin = getCspConnectSrcOrigin(sentryDsn);
   return origin ? [origin] : [];
 }
