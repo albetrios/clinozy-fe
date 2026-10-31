@@ -1,3 +1,5 @@
+import { platformConfig } from '@/core/config/env.ts';
+
 import { CAPTCHA_TOKEN_HEADER, DEV_CAPTCHA_TOKEN } from './captcha.constants.ts';
 import { isCaptchaEnabled, resolveCaptchaProvider } from './captcha-config.ts';
 import { consumeTurnstileToken } from './turnstile-token-store.ts';
@@ -6,9 +8,10 @@ import { consumeTurnstileToken } from './turnstile-token-store.ts';
  * Optional captcha header for public auth POSTs (`X-Captcha-Token`).
  *
  * Resolution order: an explicit token (callers that already hold one), then the background
- * Turnstile token kept fresh by the invisible widget, then the fixed dev token when Turnstile
- * is not configured. Returns `undefined` (header omitted) when captcha is disabled or no token
- * is available.
+ * Turnstile token kept fresh by the invisible widget, then — under the test runner only
+ * (`platformConfig.testMode`) — the fixed dev token when Turnstile is not configured. Returns
+ * `undefined` (header omitted) when captcha is disabled or no token is available: a build
+ * without a site key never sends a made-up token.
  */
 export function authCaptchaHeaders(
   captchaToken?: string,
@@ -25,7 +28,8 @@ function resolveBackgroundCaptchaToken(): string | undefined {
     case 'turnstile':
       return consumeTurnstileToken();
     case 'dev':
-      return DEV_CAPTCHA_TOKEN;
+      // A fixed, public token is a test fixture, never a deploy's captcha (F-5).
+      return platformConfig.testMode ? DEV_CAPTCHA_TOKEN : undefined;
     default:
       return undefined;
   }

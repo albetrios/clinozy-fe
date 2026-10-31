@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // Mutable so the captcha suite can switch the Turnstile provider on; with no site
-// key the captcha resolves to the `dev` provider (captcha enabled, fixed token).
+// key the captcha resolves to the `dev` provider (captcha enabled, fixed token — sent
+// under the test runner only, `testMode`).
 const platformConfig = vi.hoisted(() => ({
   apiBaseUrl: '',
   turnstileSiteKey: undefined as string | undefined,
+  testMode: true,
 }));
 vi.mock('@/core/config/env.ts', () => ({ platformConfig }));
 
