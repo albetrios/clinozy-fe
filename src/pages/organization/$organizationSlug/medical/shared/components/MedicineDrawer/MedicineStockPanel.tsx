@@ -6,11 +6,13 @@ import { cn } from '@/lib/utils.ts';
 import {
   MEDICINE_STOCK_HEALTH_TONES,
   medicineStockHealth,
+  reorderPacks,
   reorderQuantity,
 } from '@/shared/api/app/medicine-stock.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { DrawerStepper } from '@/shared/components/DrawerField/index.ts';
 import { Label } from '@/shared/components/ui/label.tsx';
+import { useMedicineUnits } from '@/shared/hooks/useMedicineUnits/index.ts';
 
 import {
   MEDICAL_DRAWER_KEYS,
@@ -47,13 +49,54 @@ function LevelLabel({
 }
 
 /**
+ * The panel's words: a medicine sold in whole packs reads as before; a loose-selling one
+ * (`unitsPerPack` above 1) shows its stock as packs and loose units, labels the levels as units,
+ * and its reorder hint orders whole packs (change-pharmacy-record-fields D5, F6).
+ */
+function useStockWords(
+  values: Pick<MedicineFormValues, 'unitsPerPack' | 'minStock' | 'maxStock'>,
+  now: number,
+) {
+  const { t } = useTranslation(MEDICAL_DRAWERS_NS);
+  const units = useMedicineUnits();
+  const perPack = values.unitsPerPack;
+  const loose = perPack > 1;
+  const min = values.minStock;
+  const max = values.maxStock;
+  const health = medicineStockHealth(now, min, max);
+  const state = t(K.states[health]);
+  const stock = units.packs(now, perPack);
+  let hint: string;
+  if (now > min) {
+    hint = loose ? t(K.hintAlertUnits, { count: min }) : t(K.hintAlert, { count: min });
+  } else if (loose) {
+    const packs = units.packCount(reorderPacks(now, max, perPack));
+    hint = t(K.hintOrderPacks, { packs, max });
+  } else {
+    hint = t(K.hintOrder, { qty: reorderQuantity(now, max), max });
+  }
+  return {
+    health,
+    now:
+      stock === null ? t(K.now, { count: now, state }) : t(K.nowLoose, { stock, state }),
+    reorderAt: t(loose ? K.reorderAtUnits : K.reorderAt),
+    fillUpTo: t(loose ? K.fillUpToUnits : K.fillUpTo),
+    hint,
+    note: loose ? t(K.unitsNote, { perPack: units.perPack(perPack) }) : null,
+  };
+}
+
+/**
  * The medicine drawer's stock levels (`medical.md:180`; H:2917): the status pill
  * ("8 in stock · Healthy" / "Reorder" / "Overstocked" / "Out"), a bar of the
  * reorder zone (blush) and the healthy zone (sage) with a marker at today's
  * stock (moving in 200ms), and the two steppers — "Reorder at", never above
  * "Fill up to", and "Fill up to", never below it, at most 9,999 — then the
  * hint ("Reorder alert when stock falls to 2." / "Order 10 to fill up to 10.
- * Shows under Stock › Low stock."). On a phone the steppers stack.
+ * Shows under Stock › Low stock."). On a phone the steppers stack. A
+ * loose-selling medicine counts in units: "3 packs + 4 in stock", "Reorder at
+ * (units)", "Order 3 packs to fill up to 30 units." and "Counted in units ·
+ * 10 per pack" (D5).
  */
 export function MedicineStockPanel({
   form,
@@ -70,8 +113,8 @@ export function MedicineStockPanel({
   const now = formStock(values);
   const min = values.minStock;
   const max = values.maxStock;
-  const health = medicineStockHealth(now, min, max);
-  const tone = MEDICINE_STOCK_HEALTH_TONES[health];
+  const words = useStockWords(values, now);
+  const tone = MEDICINE_STOCK_HEALTH_TONES[words.health];
   const at = stockBarScale(now, min, max);
   const zones = {
     '--low': at(min),
@@ -79,10 +122,6 @@ export function MedicineStockPanel({
     '--fill': at(max),
     '--now': at(now),
   } as CSSProperties;
-  const hint =
-    now <= min
-      ? t(K.hintOrder, { qty: reorderQuantity(now, max), max })
-      : t(K.hintAlert, { count: min });
 
   return (
     <div
@@ -101,7 +140,7 @@ export function MedicineStockPanel({
             TONE_CLASSES[tone].surface,
           )}
         >
-          {t(K.now, { count: now, state: t(K.states[health]) })}
+          {words.now}
         </span>
       </div>
       <div
@@ -144,7 +183,7 @@ export function MedicineStockPanel({
       <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
         <div className="flex flex-col gap-1">
           <LevelLabel htmlFor={`${idPrefix}-minStock`} ink={TONE_CLASSES.blush.ink}>
-            {t(K.reorderAt)}
+            {words.reorderAt}
           </LevelLabel>
           <Controller
             control={form.control}
@@ -166,7 +205,7 @@ export function MedicineStockPanel({
         </div>
         <div className="flex flex-col gap-1">
           <LevelLabel htmlFor={`${idPrefix}-maxStock`} ink={TONE_CLASSES.sage.ink}>
-            {t(K.fillUpTo)}
+            {words.fillUpTo}
           </LevelLabel>
           <Controller
             control={form.control}
@@ -191,7 +230,12 @@ export function MedicineStockPanel({
         className="text-muted-foreground text-xs text-pretty"
         data-testid={`${testId}-stock-hint`}
       >
-        {hint}
+        {words.hint}
+        {words.note ? (
+          <span className="block" data-testid={`${testId}-stock-units`}>
+            {words.note}
+          </span>
+        ) : null}
       </span>
     </div>
   );

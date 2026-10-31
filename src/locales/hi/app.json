@@ -1617,5 +1617,17 @@
     "hint": "क्षेत्र, शहर और राज्य अपने-आप भर जाते हैं",
     "unknown": "हमें यह पिन कोड नहीं मिला — क्षेत्र, शहर और राज्य लिखें।",
     "areaPick": "अपना क्षेत्र चुनें"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} पैक",
+    "packs_other": "{{count}} पैक",
+    "packsAndLoose_one": "{{count}} पैक + {{loose}}",
+    "packsAndLoose_other": "{{count}} पैक + {{loose}}",
+    "loose": "{{count}} खुले",
+    "perPack": "प्रति पैक {{count}}",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} प्रति यूनिट",
+    "inStock": "स्टॉक में {{stock}}",
+    "packEquivalent": "= {{packs}}"
   }
 }

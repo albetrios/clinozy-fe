@@ -382,7 +382,11 @@
         "nothingDue": "未払いなし",
         "orders": "発注",
         "ordersValue_other": "発注 {{count}} 件 · {{amount}}",
-        "noOrders": "まだ発注はありません"
+        "noOrders": "まだ発注はありません",
+        "email": "メール",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "有効なメールアドレスを入力してください",
+        "address": "住所"
       },
       "account": {
         "label": "取引",
@@ -470,7 +474,18 @@
         "compositionPlaceholder": "例：トレチノイン 0.025%",
         "soldWith": "販売区分",
         "prescriptionOnly": "処方箋のみ",
-        "overTheCounter": "市販"
+        "overTheCounter": "市販",
+        "hsnCode": "HSN コード",
+        "hsnCodeHint": "4・6・8 桁",
+        "hsnCodeInvalid": "HSN コードを 4・6・8 桁で入力してください",
+        "pack": "包装",
+        "packHint": "印字どおり",
+        "packPlaceholder": "例: 1*10",
+        "unitsPerPack": "1パックの単位数",
+        "unitsPerPackHint": "1 = 箱単位のみ",
+        "unitsPerPackLocked": "先に在庫を販売または返品してください",
+        "decreaseUnits": "1パックの単位数を減らす",
+        "increaseUnits": "1パックの単位数を増やす"
       },
       "price": {
         "mrp": "希望小売価格",
@@ -498,7 +513,13 @@
         "decreaseFill": "補充上限を下げる",
         "increaseFill": "補充上限を上げる",
         "hintAlert": "在庫が {{count}} になると発注アラート。",
-        "hintOrder": "{{qty}} 個発注して {{max}} まで補充。在庫 › 在庫少 に表示。"
+        "hintOrder": "{{qty}} 個発注して {{max}} まで補充。在庫 › 在庫少 に表示。",
+        "nowLoose": "在庫 {{stock}} · {{state}}",
+        "reorderAtUnits": "発注点（単位）",
+        "fillUpToUnits": "補充上限（単位）",
+        "hintAlertUnits_other": "在庫が {{count}} 単位になると発注アラート。",
+        "hintOrderPacks": "{{packs}} を発注して {{max}} 単位まで補充。在庫 › 在庫少 に表示。",
+        "unitsNote": "単位で数えます · {{perPack}}"
       },
       "batches": {
         "title": "ロット",
@@ -510,7 +531,9 @@
         "add": "ロットを追加",
         "total": "在庫 {{count}}",
         "expiryInvalid": "有効期限を MM/YY で入力してください",
-        "batchMissing": "ロット番号を入力してください"
+        "batchMissing": "ロット番号を入力してください",
+        "mrp": "希望小売価格",
+        "qtyUnits": "単位数"
       },
       "rates": {
         "title": "仕入先価格",
@@ -577,7 +600,10 @@
         "quickLine": "医薬品・数量・無償・単価を入力 · 例: azel 20 +2 @180",
         "quickHint": "20 = 数量 · +2 = 無償 · @180 = 単価",
         "lowStockChip": "{{name}} · 残り {{quantity}}",
-        "newMedicineName": "新しい医薬品名"
+        "newMedicineName": "新しい医薬品名",
+        "note": "メモ",
+        "notePlaceholder": "例: 30日後払い",
+        "mrp": "希望小売価格"
       },
       "quickFill": {
         "reorder": "在庫少を再発注"
@@ -606,7 +632,9 @@
       "addUnexpected": "予定外の品目を追加",
       "enterQuantity": "数量を入力してください",
       "save": "入荷済みにする",
-      "saved": "入荷しました · 在庫と無償数量を追加"
+      "saved": "入荷しました · 在庫と無償数量を追加",
+      "mrp": "希望小売価格",
+      "note": "メモ"
     },
     "orderView": {
       "title": "発注",
@@ -617,7 +645,10 @@
       "paidOf": "{{total}} のうち {{paid}} 支払済み",
       "paidWithCredits": "{{paid}} 支払済み + 仕入先クレジット {{credited}}",
       "pay": "{{amount}} を支払う",
-      "print": "印刷"
+      "print": "印刷",
+      "note": "メモ",
+      "saveNote": "メモを保存",
+      "noteSaved": "メモを保存しました"
     },
     "sale": {
       "title": "販売",
@@ -687,7 +718,8 @@
       },
       "summary": "クレジットで {{supplier}} への買掛金が減ります",
       "save": "返品してクレジットを受け取る",
-      "saved": "{{count}} 個を返品 · {{supplier}} から {{amount}} のクレジット"
+      "saved": "{{count}} 個を返品 · {{supplier}} から {{amount}} のクレジット",
+      "quantityUnits": "数量（単位）"
     },
     "prescriptions": {
       "sub": "処方 {{rx}} · {{date}} · {{medicines}}"

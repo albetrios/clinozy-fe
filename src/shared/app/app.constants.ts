@@ -407,5 +407,9 @@ export const APP_KEYS = {
     hsn: 'medicineUnits.hsn',
     /** "₹12.55 a unit". */
     unitPrice: 'medicineUnits.unitPrice',
+    /** "3 packs + 4 in stock" — a loose-selling medicine's stock. */
+    inStock: 'medicineUnits.inStock',
+    /** "= 1 pack + 2" — a quantity of units as packs. */
+    packEquivalent: 'medicineUnits.packEquivalent',
   },
 } as const;

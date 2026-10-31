@@ -21,8 +21,16 @@ export interface MedicineUnitsFormat {
    * own words for a count of packs.
    */
   packs: (units: number, unitsPerPack: number) => string | null;
+  /** "3 packs + 4 in stock"; `null` while it sells whole packs. */
+  inStock: (units: number, unitsPerPack: number) => string | null;
+  /** "= 1 pack + 2" — a line's units as packs; `null` while it sells whole packs. */
+  packEquivalent: (units: number, unitsPerPack: number) => string | null;
+  /** "2 packs" — whole packs, as an order counts them. */
+  packCount: (packs: number) => string;
   /** "10 per pack"; `null` while it sells whole packs. */
   perPack: (unitsPerPack: number) => string | null;
+  /** "₹12.55 a unit", from the price already formatted. */
+  unitPrice: (price: string) => string;
   /** "1*10 · HSN 3004" — what a line shows under its name; empty when it has neither. */
   details: (details: MedicineDetails) => string;
   /** "HSN 3004". */
@@ -40,16 +48,27 @@ export function useMedicineUnits(): MedicineUnitsFormat {
   const { t } = useTranslation(APP_NS);
   return useMemo(() => {
     const hsn = (code: string) => t(K.hsn, { code });
+    const packs = (units: number, unitsPerPack: number) => {
+      if (unitsPerPack <= 1) return null;
+      const split = packsAndLoose(units, unitsPerPack);
+      if (split.packs === 0) return t(K.loose, { count: split.loose });
+      if (split.loose === 0) return t(K.packs, { count: split.packs });
+      return t(K.packsAndLoose, { count: split.packs, loose: split.loose });
+    };
     return {
-      packs: (units, unitsPerPack) => {
-        if (unitsPerPack <= 1) return null;
-        const { packs, loose } = packsAndLoose(units, unitsPerPack);
-        if (packs === 0) return t(K.loose, { count: loose });
-        if (loose === 0) return t(K.packs, { count: packs });
-        return t(K.packsAndLoose, { count: packs, loose });
+      packs,
+      inStock: (units, unitsPerPack) => {
+        const stock = packs(units, unitsPerPack);
+        return stock === null ? null : t(K.inStock, { stock });
       },
+      packEquivalent: (units, unitsPerPack) => {
+        const equal = packs(units, unitsPerPack);
+        return equal === null ? null : t(K.packEquivalent, { packs: equal });
+      },
+      packCount: (count) => t(K.packs, { count }),
       perPack: (unitsPerPack) =>
         unitsPerPack > 1 ? t(K.perPack, { count: unitsPerPack }) : null,
+      unitPrice: (price) => t(K.unitPrice, { price }),
       details: ({ pack, hsnCode }) =>
         [pack?.trim(), hsnCode ? hsn(hsnCode) : ''].filter(Boolean).join(' · '),
       hsn,

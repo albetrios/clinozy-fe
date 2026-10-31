@@ -400,7 +400,11 @@
         "orders": "ऑर्डर",
         "ordersValue_one": "{{count}} ऑर्डर · {{amount}}",
         "ordersValue_other": "{{count}} ऑर्डर · {{amount}}",
-        "noOrders": "अभी कोई ऑर्डर नहीं"
+        "noOrders": "अभी कोई ऑर्डर नहीं",
+        "email": "ईमेल",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "मान्य ईमेल दर्ज करें",
+        "address": "पता"
       },
       "account": {
         "label": "खाता",
@@ -488,7 +492,18 @@
         "compositionPlaceholder": "जैसे Tretinoin 0.025%",
         "soldWith": "किस तरह बिकती है",
         "prescriptionOnly": "सिर्फ़ प्रिस्क्रिप्शन पर",
-        "overTheCounter": "बिना प्रिस्क्रिप्शन"
+        "overTheCounter": "बिना प्रिस्क्रिप्शन",
+        "hsnCode": "एचएसएन कोड",
+        "hsnCodeHint": "4, 6 या 8 अंक",
+        "hsnCodeInvalid": "एचएसएन कोड 4, 6 या 8 अंकों में दर्ज करें",
+        "pack": "पैक",
+        "packHint": "जैसा छपा है",
+        "packPlaceholder": "जैसे 1*10",
+        "unitsPerPack": "प्रति पैक यूनिट",
+        "unitsPerPackHint": "1 = केवल पूरे पैक",
+        "unitsPerPackLocked": "पहले इसका स्टॉक बेचें या लौटाएँ",
+        "decreaseUnits": "प्रति पैक कम यूनिट",
+        "increaseUnits": "प्रति पैक अधिक यूनिट"
       },
       "price": {
         "mrp": "एमआरपी",
@@ -516,7 +531,14 @@
         "decreaseFill": "भरने का लेवल घटाएँ",
         "increaseFill": "भरने का लेवल बढ़ाएँ",
         "hintAlert": "स्टॉक {{count}} रहने पर रीऑर्डर अलर्ट।",
-        "hintOrder": "{{max}} तक भरने के लिए {{qty}} मँगाएँ। स्टॉक › कम स्टॉक में दिखता है।"
+        "hintOrder": "{{max}} तक भरने के लिए {{qty}} मँगाएँ। स्टॉक › कम स्टॉक में दिखता है।",
+        "nowLoose": "{{stock}} स्टॉक में · {{state}}",
+        "reorderAtUnits": "इस पर मँगाएँ (यूनिट)",
+        "fillUpToUnits": "इतने तक भरें (यूनिट)",
+        "hintAlertUnits_one": "स्टॉक {{count}} यूनिट रहने पर रीऑर्डर अलर्ट।",
+        "hintAlertUnits_other": "स्टॉक {{count}} यूनिट रहने पर रीऑर्डर अलर्ट।",
+        "hintOrderPacks": "{{max}} यूनिट तक भरने के लिए {{packs}} मँगाएँ। स्टॉक › कम स्टॉक में दिखता है।",
+        "unitsNote": "यूनिट में गिना जाता है · {{perPack}}"
       },
       "batches": {
         "title": "बैच",
@@ -528,7 +550,9 @@
         "add": "बैच जोड़ें",
         "total": "{{count}} स्टॉक में",
         "expiryInvalid": "एक्सपायरी MM/YY में लिखें",
-        "batchMissing": "बैच लिखें"
+        "batchMissing": "बैच लिखें",
+        "mrp": "एमआरपी",
+        "qtyUnits": "यूनिट"
       },
       "rates": {
         "title": "सप्लायर रेट",
@@ -596,7 +620,10 @@
         "quickLine": "दवा, मात्रा, मुफ़्त, रेट लिखें · जैसे azel 20 +2 @180",
         "quickHint": "20 = मात्रा · +2 = मुफ़्त · @180 = रेट",
         "lowStockChip": "{{name}} · {{quantity}} बचे",
-        "newMedicineName": "नई दवा का नाम"
+        "newMedicineName": "नई दवा का नाम",
+        "note": "नोट",
+        "notePlaceholder": "जैसे 30 दिन में भुगतान",
+        "mrp": "एमआरपी"
       },
       "quickFill": {
         "reorder": "कम स्टॉक फिर से मँगाएँ"
@@ -626,7 +653,9 @@
       "addUnexpected": "अनपेक्षित आइटम जोड़ें",
       "enterQuantity": "मात्रा दर्ज करें",
       "save": "प्राप्त के रूप में चिह्नित करें",
-      "saved": "सामान प्राप्त हुआ · स्टॉक और मुफ़्त मात्रा जोड़ी गई"
+      "saved": "सामान प्राप्त हुआ · स्टॉक और मुफ़्त मात्रा जोड़ी गई",
+      "mrp": "एमआरपी",
+      "note": "नोट"
     },
     "orderView": {
       "title": "परचेज़ ऑर्डर",
@@ -637,7 +666,10 @@
       "paidOf": "{{total}} में से {{paid}} का भुगतान",
       "paidWithCredits": "{{paid}} का भुगतान + {{credited}} सप्लायर क्रेडिट में",
       "pay": "{{amount}} का भुगतान करें",
-      "print": "प्रिंट करें"
+      "print": "प्रिंट करें",
+      "note": "नोट",
+      "saveNote": "नोट सहेजें",
+      "noteSaved": "नोट सहेजा गया"
     },
     "sale": {
       "title": "बिक्री",
@@ -709,7 +741,8 @@
       },
       "summary": "क्रेडिट से {{supplier}} का बकाया घटता है",
       "save": "लौटाएँ और क्रेडिट लें",
-      "saved": "{{count}} लौटाए गए · {{supplier}} से {{amount}} क्रेडिट"
+      "saved": "{{count}} लौटाए गए · {{supplier}} से {{amount}} क्रेडिट",
+      "quantityUnits": "मात्रा (यूनिट)"
     },
     "prescriptions": {
       "sub": "पर्चा {{rx}} · {{date}} · {{medicines}}"

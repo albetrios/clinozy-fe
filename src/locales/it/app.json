@@ -1638,5 +1638,19 @@
     "hint": "Compila zona, città e stato",
     "unknown": "Non conosciamo questo CAP — inserisci zona, città e stato.",
     "areaPick": "Scegli la tua zona"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} confezione",
+    "packs_many": "{{count}} confezioni",
+    "packs_other": "{{count}} confezioni",
+    "packsAndLoose_one": "{{count}} confezione + {{loose}}",
+    "packsAndLoose_many": "{{count}} confezioni + {{loose}}",
+    "packsAndLoose_other": "{{count}} confezioni + {{loose}}",
+    "loose": "{{count}} sfusi",
+    "perPack": "{{count}} per confezione",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} all’unità",
+    "inStock": "{{stock}} in magazzino",
+    "packEquivalent": "= {{packs}}"
   }
 }

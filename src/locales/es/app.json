@@ -1638,5 +1638,19 @@
     "hint": "Rellena la zona, la ciudad y el estado",
     "unknown": "No conocemos este código postal — escribe la zona, la ciudad y el estado.",
     "areaPick": "Elige tu zona"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} envase",
+    "packs_many": "{{count}} envases",
+    "packs_other": "{{count}} envases",
+    "packsAndLoose_one": "{{count}} envase + {{loose}}",
+    "packsAndLoose_many": "{{count}} envases + {{loose}}",
+    "packsAndLoose_other": "{{count}} envases + {{loose}}",
+    "loose": "{{count}} sueltos",
+    "perPack": "{{count}} por envase",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} por unidad",
+    "inStock": "{{stock}} en stock",
+    "packEquivalent": "= {{packs}}"
   }
 }

@@ -418,7 +418,11 @@
         "ordersValue_one": "{{count}} ordine · {{amount}}",
         "ordersValue_many": "{{count}} ordini · {{amount}}",
         "ordersValue_other": "{{count}} ordini · {{amount}}",
-        "noOrders": "Ancora nessun ordine"
+        "noOrders": "Ancora nessun ordine",
+        "email": "Email",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "Inserisci un’email valida",
+        "address": "Indirizzo"
       },
       "account": {
         "label": "Conto",
@@ -506,7 +510,18 @@
         "compositionPlaceholder": "es. Tretinoina 0,025%",
         "soldWith": "Vendita",
         "prescriptionOnly": "Solo con ricetta",
-        "overTheCounter": "Da banco"
+        "overTheCounter": "Da banco",
+        "hsnCode": "Codice HSN",
+        "hsnCodeHint": "4, 6 o 8 cifre",
+        "hsnCodeInvalid": "Inserisci il codice HSN di 4, 6 o 8 cifre",
+        "pack": "Confezione",
+        "packHint": "come stampato",
+        "packPlaceholder": "es. 1*10",
+        "unitsPerPack": "Unità per confezione",
+        "unitsPerPackHint": "1 = solo confezioni intere",
+        "unitsPerPackLocked": "Prima vendi o restituisci la scorta",
+        "decreaseUnits": "Meno unità per confezione",
+        "increaseUnits": "Più unità per confezione"
       },
       "price": {
         "mrp": "Prezzo max.",
@@ -534,7 +549,15 @@
         "decreaseFill": "Riduci il livello di riempimento",
         "increaseFill": "Aumenta il livello di riempimento",
         "hintAlert": "Avviso di riordino quando la scorta scende a {{count}}.",
-        "hintOrder": "Ordina {{qty}} per arrivare a {{max}}. Compare in Scorte › Scorte basse."
+        "hintOrder": "Ordina {{qty}} per arrivare a {{max}}. Compare in Scorte › Scorte basse.",
+        "nowLoose": "{{stock}} in magazzino · {{state}}",
+        "reorderAtUnits": "Riordina a (unità)",
+        "fillUpToUnits": "Riempi fino a (unità)",
+        "hintAlertUnits_one": "Avviso di riordino quando la scorta scende a {{count}} unità.",
+        "hintAlertUnits_many": "Avviso di riordino quando la scorta scende a {{count}} unità.",
+        "hintAlertUnits_other": "Avviso di riordino quando la scorta scende a {{count}} unità.",
+        "hintOrderPacks": "Ordina {{packs}} per arrivare a {{max}} unità. Compare in Scorte › Scorte basse.",
+        "unitsNote": "Contato in unità · {{perPack}}"
       },
       "batches": {
         "title": "Lotti",
@@ -546,7 +569,9 @@
         "add": "Aggiungi lotto",
         "total": "{{count}} in magazzino",
         "expiryInvalid": "Inserisci la scadenza come MM/AA",
-        "batchMissing": "Inserisci il lotto"
+        "batchMissing": "Inserisci il lotto",
+        "mrp": "Prezzo max.",
+        "qtyUnits": "Unità"
       },
       "rates": {
         "title": "Prezzi dei fornitori",
@@ -615,7 +640,10 @@
         "quickLine": "Scrivi farmaco, quantità, omaggio, prezzo · es. azel 20 +2 @180",
         "quickHint": "20 = quantità · +2 = omaggio · @180 = prezzo",
         "lowStockChip": "{{name}} · ne restano {{quantity}}",
-        "newMedicineName": "Nome del nuovo farmaco"
+        "newMedicineName": "Nome del nuovo farmaco",
+        "note": "Nota",
+        "notePlaceholder": "es. 30 GIORNI",
+        "mrp": "Prezzo max."
       },
       "quickFill": {
         "reorder": "Riordina le scorte basse"
@@ -646,7 +674,9 @@
       "addUnexpected": "Aggiungi articolo imprevisto",
       "enterQuantity": "Inserisci una quantità",
       "save": "Segna come ricevuto",
-      "saved": "Merce ricevuta · scorte e quantità omaggio aggiunte"
+      "saved": "Merce ricevuta · scorte e quantità omaggio aggiunte",
+      "mrp": "Prezzo max.",
+      "note": "Nota"
     },
     "orderView": {
       "title": "Ordine d’acquisto",
@@ -657,7 +687,10 @@
       "paidOf": "Pagato {{paid}} di {{total}}",
       "paidWithCredits": "Pagato {{paid}} + {{credited}} in crediti fornitore",
       "pay": "Paga {{amount}}",
-      "print": "Stampa"
+      "print": "Stampa",
+      "note": "Nota",
+      "saveNote": "Salva nota",
+      "noteSaved": "Nota salvata"
     },
     "sale": {
       "title": "Vendita",
@@ -731,7 +764,8 @@
       },
       "summary": "Il credito riduce quanto devi a {{supplier}}",
       "save": "Restituisci e prendi il credito",
-      "saved": "{{count}} restituiti · {{amount}} di credito da {{supplier}}"
+      "saved": "{{count}} restituiti · {{amount}} di credito da {{supplier}}",
+      "quantityUnits": "Quantità (unità)"
     },
     "prescriptions": {
       "sub": "Ricetta {{rx}} · {{date}} · {{medicines}}"
