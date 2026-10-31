@@ -3,11 +3,10 @@
 //
 // BLOCK (deny): reading or writing secret files (.env*, not .env.example), secret content,
 //   destructive shell commands, skipping the git hooks (--no-verify, `git commit -n`, HUSKY=0).
-// ASK: `gh pr create` — a PR only when the user asked (fe-no-unrequested-pr.mjs covers the MCP tool),
-//   except in a turn the user started with /fe-ship or /fe-open-pr (fe-prompt-skill-router.mjs marks it);
-//   `git push` of auth, token, CSP, routeTree or guard changes with no clean /fe-pre-merge-review
-//   recorded for HEAD (`pnpm agent-os:review-clean` records it).
-// WARN (systemMessage): edits to protected/vendored paths.
+// WARN (systemMessage): edits to protected/vendored paths, and a `git push` of auth, token, CSP,
+//   routeTree or guard changes with no clean /fe-pre-merge-review recorded for HEAD
+//   (`pnpm agent-os:review-clean` records it).
+// Nothing here asks: the permission mode decides every call no rule blocks.
 //
 // Reads the PreToolUse payload on stdin (_fe-hook.mjs). Fail-open by design: any parse/read
 // error allows the tool (exit 0) so a guardrail bug can never brick the agent.
@@ -20,7 +19,6 @@ import {
   withoutQuotedText,
 } from './_fe-guard-rules.mjs';
 import {
-  askBeforeToolCall,
   denyToolCall,
   isInsideRepository,
   readHookPayload,
@@ -29,19 +27,14 @@ import {
 } from './_fe-hook.mjs';
 import { pushDirectory } from './_fe-push-target.mjs';
 import { recordTelemetry } from './_fe-telemetry.mjs';
-import { isTurnMarked } from './_fe-turn-once.mjs';
 
 const payload = readHookPayload();
 if (!payload) process.exit(0);
 
-/** Ends the hook with a block or an ask, recorded as fired (clinozy-be's `decide`). */
+/** Ends the hook with a block, recorded as fired (clinozy-be's `deny`). */
 function deny(reason) {
   recordTelemetry('fe-guardrails', 'PreToolUse', 'fired', 'deny');
   denyToolCall(reason);
-}
-function ask(reason) {
-  recordTelemetry('fe-guardrails', 'PreToolUse', 'fired', 'ask');
-  askBeforeToolCall(reason);
 }
 
 const tool = payload.tool_name || '';
@@ -98,8 +91,8 @@ function gitIn(directory, args) {
 }
 
 /**
- * Why a push needs the user's yes: it changes auth, tokens, CSP, routeTree or the guards and no
- * clean /fe-pre-merge-review is recorded for HEAD — or '' when it does not. Fails open.
+ * Why a push should have had a review: it changes auth, tokens, CSP, routeTree or the guards and
+ * no clean /fe-pre-merge-review is recorded for HEAD — or '' when it does not. Fails open.
  */
 function unreviewedSensitivePush(scan) {
   const directory = pushDirectory({ command: scan, cwd: payload.cwd || repositoryRoot });
@@ -127,9 +120,9 @@ function unreviewedSensitivePush(scan) {
   if (sensitive.length === 0) return '';
   const examples = sensitive.slice(0, 3).join(', ');
   return (
-    `clinozy-fe review gate: this push changes auth, tokens, CSP, routeTree or the guards (${sensitive.length} file(s): ${examples}` +
+    `push review gate: this push changes auth, tokens, CSP, routeTree or the guards (${sensitive.length} file(s): ${examples}` +
     `${sensitive.length > 3 ? ', …' : ''}) and /fe-pre-merge-review has no clean result for HEAD ${head.slice(0, 7)}. ` +
-    'Run /fe-pre-merge-review first (a clean review records itself with pnpm agent-os:review-clean), or confirm to push anyway.'
+    'Run /fe-pre-merge-review before the PR merges (a clean review records itself with pnpm agent-os:review-clean).'
   );
 }
 
@@ -144,13 +137,6 @@ if (tool === 'Bash' && command) {
       `Blocked by clinozy-fe guardrail: ${why}. Command: "${command.slice(0, 160)}". If you truly intend this, run it yourself in a terminal.`,
     );
   }
-  // The mark fe-prompt-skill-router.mjs records for a /fe-ship or /fe-open-pr turn.
-  const prRequested = isTurnMarked({ session: payload.session_id, mark: 'pr-requested' });
-  if (/\bgh\s+pr\s+create\b/.test(scan) && !prRequested) {
-    ask(
-      'clinozy-fe policy: open a PR only when the user explicitly asked for one (Bash(gh pr*) is allowlisted, so this hook is the check). Confirm this was requested before proceeding.',
-    );
-  }
   if (/\bgit\s+(?:-C\s+\S+\s+)?push\b/i.test(scan)) {
     let reason = '';
     try {
@@ -158,7 +144,7 @@ if (tool === 'Bash' && command) {
     } catch {
       /* fail-open */
     }
-    if (reason) ask(reason);
+    if (reason) warnings.push(reason);
   }
   if (/\bgit\s+reset\s+--hard\b/i.test(scan) || /\bgit\s+clean\s+-[a-z]*f/i.test(scan)) {
     warnings.push(

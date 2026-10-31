@@ -16,7 +16,7 @@ import {
 const HOOKS = join(process.cwd(), 'agent-os', 'hooks');
 
 // The guard's push review gate reads the repository's unpushed diff, so a look-alike `git push`
-// would turn into an ask whenever this checkout holds unpushed auth or guard changes (a merge of
+// would turn into a warning whenever this checkout holds unpushed auth or guard changes (a merge of
 // main does). The cases run in a throwaway repository with one empty commit instead.
 const REPOSITORY = createThrowawayRepository({ prefix: 'fe-hook-skip-' }).root;
 afterAll(removeThrowawayRepositories);

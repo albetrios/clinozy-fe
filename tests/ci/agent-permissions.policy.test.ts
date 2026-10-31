@@ -1,15 +1,17 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
 // The agent permission rules: named scripts, `pnpm exec` (a binary already installed) and the
-// chain's git commands run without a prompt, a new dependency or a downloaded tool asks, GitHub stays read-only without one, and the
-// destructive commands are denied outright. clinozy-be pins its own in
+// chain's git commands run without a prompt, GitHub stays read-only without one, the destructive
+// commands are denied outright, and nothing asks — neither an `ask` rule nor a hook — so every
+// other call is the permission mode's to decide. clinozy-be pins its own in
 // src/tests/unit/tooling/agent-permissions.policy.unit.test.ts.
 
 const permissions = (
   JSON.parse(readFileSync('agent-os/platforms/claude/settings.json', 'utf8')) as {
-    permissions: Record<'allow' | 'ask' | 'deny', string[]>;
+    permissions: Partial<Record<'ask', string[]>> & Record<'allow' | 'deny', string[]>;
   }
 ).permissions;
 
@@ -50,12 +52,23 @@ describe('Claude Code permission rules', () => {
     ]) {
       expect(covered(command), command).toBe(false);
     }
-    // One policy for both repositories (clinozy-be pins the same three asks): a session that
-    // holds both merges their rules, and an ask outranks every allow.
-    expect([...permissions.ask].sort()).toEqual(
-      ['Bash(gh pr create *)', 'Bash(pnpm add *)', 'Bash(pnpm dlx *)'].sort(),
-    );
     expect(covered('pnpm exec tsx x.ts')).toBe(true);
+  });
+
+  it('declares no ask rule, the same as clinozy-be', () => {
+    // One policy for both repositories: a session that holds both merges their rules, and an ask
+    // outranks every allow.
+    expect(permissions.ask ?? []).toEqual([]);
+  });
+
+  it('no hook script asks the user (permissionDecision "ask")', () => {
+    const hooksDirectory = join('agent-os', 'hooks');
+    for (const file of readdirSync(hooksDirectory).filter((name) =>
+      name.endsWith('.mjs'),
+    )) {
+      const source = readFileSync(join(hooksDirectory, file), 'utf8');
+      expect(source, file).not.toMatch(/decision:\s*["']ask["']|decide\(\s*["']ask["']/);
+    }
   });
 
   it('git writes and gh run run without a prompt', () => {
@@ -83,8 +96,7 @@ describe('Claude Code permission rules', () => {
     }
   });
 
-  it('opening a PR asks, and destructive commands are denied', () => {
-    expect(permissions.ask).toContain('Bash(gh pr create *)');
+  it('destructive commands are denied', () => {
     for (const rule of [
       'Bash(git push --force *)',
       'Bash(git push -f *)',
@@ -96,7 +108,7 @@ describe('Claude Code permission rules', () => {
   });
 
   it('no rule sits in two lists', () => {
-    const all = [...permissions.allow, ...permissions.ask, ...permissions.deny];
+    const all = [...permissions.allow, ...(permissions.ask ?? []), ...permissions.deny];
     expect(new Set(all).size).toBe(all.length);
   });
 });

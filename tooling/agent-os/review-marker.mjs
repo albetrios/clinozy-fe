@@ -3,7 +3,7 @@
  * `pnpm agent-os:review-clean [--note "<summary>"]` — records that `/fe-pre-merge-review` found no
  * critical or major finding on HEAD (clinozy-be's review marker). The push review gate
  * (`agent-os/hooks/fe-guardrails.mjs`) reads it: a `git push` of auth, token, CSP, routeTree or guard
- * changes asks the user first unless HEAD has this record.
+ * changes warns the agent to run the review unless HEAD has this record.
  *
  * The record is `<git dir>/fe-pre-merge-review/<HEAD sha>.clean` — this clone only, never
  * committed. A new commit is a new HEAD, so it needs a new review.

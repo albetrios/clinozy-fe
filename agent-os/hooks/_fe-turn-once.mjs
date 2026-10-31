@@ -1,12 +1,10 @@
 // The once-per-turn record of clinozy-fe's hooks: a reminder reaches the model through
 // PostToolUse additionalContext the first time it applies in a turn (fe-edit-hooks.mjs), and not
-// again on every later edit of that turn; a turn the user started with /fe-ship or /fe-open-pr is
-// marked as the PR request (fe-prompt-skill-router.mjs marks it, fe-no-unrequested-pr.mjs and
-// fe-guardrails.mjs read it). fe-prompt-skill-router.mjs (UserPromptSubmit) starts each turn by
-// clearing the record.
+// again on every later edit of that turn. fe-prompt-skill-router.mjs (UserPromptSubmit) starts
+// each turn by clearing the record.
 //
 // The record is one empty file per entry under $TMPDIR/clinozy-fe-hooks/<session_id>/. Fails open:
-// when the directory cannot be written, every reminder counts as new and nothing is marked.
+// when the directory cannot be written, every reminder counts as new.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -33,21 +31,6 @@ export function turnOnce({ session, key }) {
     /* every reminder counts as new when the record cannot be written */
   }
   return true;
-}
-
-/** Records `mark` (lowercase letters and dashes) for the rest of `session`'s turn. */
-export function markTurn({ session, mark }) {
-  try {
-    mkdirSync(turnDirectory(session), { recursive: true });
-    writeFileSync(join(turnDirectory(session), `mark.${mark}`), '');
-  } catch {
-    /* not marked: the confirmation it would skip is asked again */
-  }
-}
-
-/** True when `mark` was recorded in `session`'s turn. */
-export function isTurnMarked({ session, mark }) {
-  return existsSync(join(turnDirectory(session), `mark.${mark}`));
 }
 
 /** Clears `session`'s turn record: a new prompt starts a new turn. */
