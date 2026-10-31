@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { API_BASE_PATH } from '@/core/config/constants.ts';
 import { apiClient } from '@/core/http/fetch-client.ts';
+import { getAccessToken, organizationClaimOf } from '@/shared/auth/token.ts';
 import { AppError } from '@/shared/errors/AppError.ts';
 import { FRONTEND_ERROR_CODES } from '@/shared/errors/frontend-error-codes.ts';
 
@@ -91,34 +92,55 @@ function assertSafeFileName(fileName: string): void {
  *   confirm that comes back anything other than `UPLOADED` (`UPLOAD_NOT_CONFIRMED`) all throw,
  *   each said in words by `mapApiError`. Nothing is attached until confirm succeeds, so a
  *   failure leaves the existing logo/avatar in place.
+ * - **Cancelling and switching (G-4):** `signal` cancels every step — the presign, the storage
+ *   write (its XHR is aborted) and the confirm — and the call rejects with the signal's reason.
+ *   An upload never confirms under another organization than the one it started under: when a
+ *   workspace switch has moved the token's `org` claim by the time the bytes are stored, it
+ *   stops with `WORKSPACE_SWITCHED` ("not saved because you switched clinic") instead.
  *
  * @param input - The file, its clinozy-be purpose (an organization-owned purpose also needs
- *   `organizationId`), and an optional `onProgress` that receives the storage write's
- *   progress as a fraction from 0 to 1.
+ *   `organizationId`), an optional `onProgress` that receives the storage write's
+ *   progress as a fraction from 0 to 1, and an optional `signal` that cancels it.
  */
 export async function uploadFile(input: {
   file: File;
   purpose: UploadPurpose;
   organizationId?: string;
   onProgress?: (fraction: number) => void;
+  signal?: AbortSignal;
 }): Promise<{ key: string }> {
   assertSafeFileName(input.file.name);
+  const { signal } = input;
+  // The organization the upload is made in: the one the token it starts with names.
+  const startedUnder = tokenOrganization();
 
-  const presignRes = await apiClient.post<unknown>(UPLOADS_API, {
-    purpose: input.purpose,
-    for: UPLOAD_PURPOSE_OWNER[input.purpose],
-    ...(input.organizationId ? { organization_id: input.organizationId } : {}),
-    content_type: input.file.type,
-    file_name: input.file.name,
-    file_size: input.file.size,
-  });
+  const presignRes = await apiClient.post<unknown>(
+    UPLOADS_API,
+    {
+      purpose: input.purpose,
+      for: UPLOAD_PURPOSE_OWNER[input.purpose],
+      ...(input.organizationId ? { organization_id: input.organizationId } : {}),
+      content_type: input.file.type,
+      file_name: input.file.name,
+      file_size: input.file.size,
+    },
+    { signal },
+  );
   const presign = presignWire.parse(presignRes.data);
 
-  await putBytes(presign, input.file, input.onProgress);
+  await putBytes(presign, input.file, { onProgress: input.onProgress, signal });
 
+  if (tokenOrganization() !== startedUnder) {
+    throw new AppError(
+      FRONTEND_ERROR_CODES.WORKSPACE_SWITCHED,
+      409,
+      FRONTEND_ERROR_CODES.WORKSPACE_SWITCHED,
+    );
+  }
   const confirmRes = await apiClient.post<unknown>(
     `${UPLOADS_API}/${encodeURIComponent(presign.id)}/confirm`,
     {},
+    { signal },
   );
   const confirmed = confirmWire.parse(confirmRes.data);
   if (confirmed.status !== 'UPLOADED') {
@@ -143,15 +165,28 @@ export async function uploadFile(input: {
  * host. A write that never answers — the connection dropped, or the bucket's CORS refused this
  * origin, which the page cannot tell apart — rejects with `UPLOAD_STORAGE_UNREACHABLE`.
  * An `upload` progress listener makes the browser preflight a cross-origin POST, so it is
- * registered only when someone is listening.
+ * registered only when someone is listening. The caller's `signal` aborts the XHR, and the write
+ * rejects with the signal's reason.
  */
 function putBytes(
   presign: z.infer<typeof presignWire>,
   file: File,
-  onProgress?: (fraction: number) => void,
+  {
+    onProgress,
+    signal,
+  }: { onProgress?: (fraction: number) => void; signal?: AbortSignal },
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(abortReasonOf(signal));
+      return;
+    }
     const request = new XMLHttpRequest();
+    const abortRequest = () => request.abort();
+    signal?.addEventListener('abort', abortRequest, { once: true });
+    request.addEventListener('loadend', () =>
+      signal?.removeEventListener('abort', abortRequest),
+    );
     request.open(presign.upload_method, presign.upload_url);
     if (onProgress) {
       request.upload.addEventListener('progress', (event) => {
@@ -183,7 +218,11 @@ function putBytes(
       );
     });
     request.addEventListener('abort', () => {
-      reject(new DOMException('The upload was aborted', 'AbortError'));
+      reject(
+        signal?.aborted
+          ? abortReasonOf(signal)
+          : new DOMException('The upload was aborted', 'AbortError'),
+      );
     });
     if (presign.upload_method === 'POST') {
       request.send(toMultipart(presign.fields ?? {}, file));
@@ -194,6 +233,17 @@ function putBytes(
       request.setRequestHeader(name, value);
     request.send(file);
   });
+}
+
+/** The organization the current token names (its `org` claim); `null` without one. */
+function tokenOrganization(): string | null {
+  const token = getAccessToken();
+  return token === null ? null : organizationClaimOf(token);
+}
+
+/** What a cancelled upload rejects with: the signal's reason, else an `AbortError`. */
+function abortReasonOf(signal: AbortSignal): unknown {
+  return signal.reason ?? new DOMException('The upload was aborted', 'AbortError');
 }
 
 /** The file must be appended last — S3 ignores any form field that follows it. */

@@ -21,6 +21,7 @@ import {
   isRefreshUnanswered,
   refreshAccessToken,
 } from '@/shared/auth/service.ts';
+import { mapApiError } from '@/shared/errors/errorHandler.ts';
 
 import { apiClient, setWriteHold } from './fetch-client.ts';
 
@@ -327,6 +328,25 @@ describe('fetch-client', () => {
         expect(fetchMock).toHaveBeenCalledTimes(1);
       });
 
+      it('a write the switch overtook says it was not saved, never that the session expired', async () => {
+        setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+        fetchMock.mockImplementationOnce(() => {
+          setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb'));
+          return Promise.resolve(unauthorized());
+        });
+
+        const failure = await apiClient
+          .patch('/app/patients/pat_1', { name: 'Ada' })
+          .catch((error: unknown) => error);
+
+        expect((failure as HttpError).data).toEqual({
+          error: { reason: 'WORKSPACE_SWITCHED' },
+        });
+        expect(mapApiError(failure)).toBe(
+          'This change was not saved because you switched clinic.',
+        );
+      });
+
       it('a retry after a 5xx is not sent with the clinic switched to', async () => {
         vi.useFakeTimers();
         try {
@@ -463,6 +483,78 @@ describe('fetch-client', () => {
       expect((error as HttpError).status).toBe(0);
       // A slow or failing network says nothing about the session: nobody is signed out.
       expect(forceLogout).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('a caller signal (G-4)', () => {
+    /** A fetch that answers only when its signal aborts — rejecting with the signal's reason. */
+    const hangUntilAborted = (_url: string, init: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+      });
+
+    it('cancels the request in flight: it rejects with the signal’s reason, never retried', async () => {
+      fetchMock.mockImplementation(hangUntilAborted);
+      const controller = new AbortController();
+
+      const outcome = apiClient
+        .get('/app/patients', { signal: controller.signal })
+        .catch((error: unknown) => error);
+      controller.abort();
+
+      const failure = await outcome;
+      expect(failure).toMatchObject({ name: 'AbortError' });
+      expect(failure).not.toBeInstanceOf(HttpError);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('never sends a request whose signal has already aborted', async () => {
+      const controller = new AbortController();
+      controller.abort();
+      await expect(
+        apiClient.post('/app/patients', { name: 'Ada' }, { signal: controller.signal }),
+      ).rejects.toMatchObject({ name: 'AbortError' });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('stops a retry’s wait at once, and sends nothing after it', async () => {
+      vi.useFakeTimers();
+      try {
+        fetchMock.mockResolvedValue(new Response('oops', { status: 503 }));
+        const controller = new AbortController();
+        const outcome = apiClient
+          .get('/app/patients', { signal: controller.signal })
+          .catch((error: unknown) => error);
+        await vi.advanceTimersByTimeAsync(10);
+        controller.abort();
+        await vi.runAllTimersAsync();
+
+        expect(await outcome).toMatchObject({ name: 'AbortError' });
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('still times out on its own, and leaves no listener on the caller’s signal', async () => {
+      vi.useFakeTimers();
+      try {
+        fetchMock.mockImplementation(hangUntilAborted);
+        const controller = new AbortController();
+        const listen = vi.spyOn(controller.signal, 'addEventListener');
+        const unlisten = vi.spyOn(controller.signal, 'removeEventListener');
+        const outcome = apiClient
+          .get('/app/patients', { signal: controller.signal })
+          .catch((error: unknown) => error);
+        await vi.advanceTimersByTimeAsync(HTTP.TIMEOUT);
+
+        const failure = await outcome;
+        expect(failure).toBeInstanceOf(HttpError);
+        expect((failure as HttpError).status).toBe(0);
+        expect(unlisten).toHaveBeenCalledTimes(listen.mock.calls.length);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

@@ -61,9 +61,9 @@ type BodyOption<O> = O extends { requestBody: unknown }
     : { body?: BodyOf<O> };
 
 /**
- * What a call takes besides its path: path parameters, query, body, the per-action key, and
+ * What a call takes besides its path: path parameters, query, body, the per-action key,
  * `skip401` for a call whose 401 is an answer rather than an expired token
- * (an invitation's accept, a step-up credential check).
+ * (an invitation's accept, a step-up credential check), and a `signal` that cancels it.
  */
 export type ApiInit<P extends ApiPath, M extends HttpMethod> = RequiredWhenPresent<
   'params',
@@ -71,7 +71,7 @@ export type ApiInit<P extends ApiPath, M extends HttpMethod> = RequiredWhenPrese
 > &
   RequiredWhenPresent<'query', QueryOf<Operation<P, M>>> &
   BodyOption<Operation<P, M>> &
-  Pick<RequestOptions, 'idempotencyKey' | 'skip401'>;
+  Pick<RequestOptions, 'idempotencyKey' | 'skip401' | 'signal'>;
 
 /** The init is optional when nothing in it is required (a list with no required filter). */
 type InitArguments<Init> = Partial<Init> extends Init ? [init?: Init] : [init: Init];
@@ -138,15 +138,17 @@ interface LooseInit {
   body?: unknown;
   idempotencyKey?: string;
   skip401?: boolean;
+  signal?: AbortSignal;
   reason?: string;
   note?: string;
 }
 
 function optionsOf(init: LooseInit): RequestOptions | undefined {
-  if (!(init.idempotencyKey || init.skip401)) return undefined;
+  if (!(init.idempotencyKey || init.skip401 || init.signal)) return undefined;
   return {
     ...(init.idempotencyKey ? { idempotencyKey: init.idempotencyKey } : {}),
     ...(init.skip401 ? { skip401: true } : {}),
+    ...(init.signal ? { signal: init.signal } : {}),
   };
 }
 
@@ -166,7 +168,10 @@ export const api = {
     ...[init]: InitArguments<ApiInit<P, 'get'>>
   ): Promise<HttpResponse<ApiData<P, 'get'>>> {
     const loose = (init as LooseInit | undefined) ?? {};
-    return apiClient.get(buildApiPath(path, loose.params, loose.query));
+    const options = optionsOf(loose);
+    const fullPath = buildApiPath(path, loose.params, loose.query);
+    // A read with nothing to pass keeps the one-argument call.
+    return options ? apiClient.get(fullPath, options) : apiClient.get(fullPath);
   },
   post<P extends ApiPathFor<'post'>>(
     path: P,

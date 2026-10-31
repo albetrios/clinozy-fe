@@ -16,10 +16,14 @@ Claude Code loads this file when it works in `src/core/`. It holds sections move
   session — every refresh, workspace switch or other tab's refresh retires the one before it —
   so a 401 for a token replaced while the request was in flight is replayed with the current
   token, no new refresh — unless that token names **another organization** (a workspace switch):
-  no replay or retry ever goes out with another clinic's token, the request fails 401 instead;
+  no replay or retry ever goes out with another clinic's token, the request fails 401 instead,
+  its `error.reason` `WORKSPACE_SWITCHED` (a write then says "This change was not saved because
+  you switched clinic.", never "Your session has expired");
   a refresh that waited for the lock while a newer token arrived does
   not rotate again. Only a refused refresh, or a token still rejected after two refreshes,
-  means the session is dead → `forceLogout()`. The session's one token names the organization
+  means the session is dead → `forceLogout()`. A caller's `signal` (`RequestOptions.signal`,
+  `api.*` init) cancels a request — the fetch, a retry's wait, a replay — and it rejects with
+  the signal's reason, never retried. The session's one token names the organization
   it was last switched to, so a refresh answering for **another** organization than this tab's
   `me/context` (another tab switched) switches the tab back before any request carries it —
   never another clinic's records under this tab's screen. A switch waits for a refresh in

@@ -108,6 +108,9 @@
     "viewAs": {
       "readOnly": "预览为只读，因此未保存任何内容。请退出预览后再进行更改。"
     },
+    "workspaceSwitched": {
+      "notSaved": "由于你切换了诊所，此更改未保存。"
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "无法添加通行密钥",

@@ -108,6 +108,9 @@
     "viewAs": {
       "readOnly": "Die Vorschau ist schreibgeschützt, daher wurde nichts gespeichert. Beenden Sie die Vorschau, um Änderungen vorzunehmen."
     },
+    "workspaceSwitched": {
+      "notSaved": "Diese Änderung wurde nicht gespeichert, weil Sie die Klinik gewechselt haben."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Passkey konnte nicht hinzugefügt werden",

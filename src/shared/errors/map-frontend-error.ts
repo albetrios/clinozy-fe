@@ -45,6 +45,11 @@ const CODE_TO_AUTH_KEY: Record<string, string> = {
     ERRORS_KEYS.frontend.upload.invalidFileName,
   // A clinic write held while View-as previews a role (`startViewAsWriteHold`): never sent.
   [FRONTEND_ERROR_CODES.VIEW_AS_READ_ONLY]: ERRORS_KEYS.frontend.viewAs.readOnly,
+  // A write a clinic switch overtook (`core/http/fetch-client.ts`, `uploads-api.ts`): it was
+  // refused under the token the switch retired, never sent again under the next clinic's — said
+  // as such, not as the 401's "Your session has expired" (E-1).
+  [FRONTEND_ERROR_CODES.WORKSPACE_SWITCHED]:
+    ERRORS_KEYS.frontend.workspaceSwitched.notSaved,
 };
 
 /**

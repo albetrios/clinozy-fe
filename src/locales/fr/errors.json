@@ -108,6 +108,9 @@
     "viewAs": {
       "readOnly": "L’aperçu est en lecture seule : rien n’a été enregistré. Quittez l’aperçu pour faire des modifications."
     },
+    "workspaceSwitched": {
+      "notSaved": "Cette modification n’a pas été enregistrée, car vous avez changé de clinique."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Impossible d'ajouter la clé d'accès",

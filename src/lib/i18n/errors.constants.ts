@@ -133,6 +133,9 @@ export const ERRORS_KEYS = {
     viewAs: {
       readOnly: 'frontend.viewAs.readOnly',
     },
+    workspaceSwitched: {
+      notSaved: 'frontend.workspaceSwitched.notSaved',
+    },
     profileUpdated: 'frontend.profileUpdated',
     hooks: {
       passkeys: {

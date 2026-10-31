@@ -22,6 +22,7 @@ interface PendingUpload {
   organizationId: string | undefined;
   purpose: string;
   onProgress: (fraction: number) => void;
+  signal: AbortSignal;
   succeed: (key: string) => void;
   fail: (error: unknown) => void;
 }
@@ -372,10 +373,22 @@ describe('useUploadQueueStore', () => {
       'Uploads stopped · you switched workspace',
     );
 
-    // The bytes still land, but nothing is handed over under the new workspace.
+    // The bytes stop moving — the upload is cancelled, never confirmed under the new workspace
+    // (G-4) — and should they land anyway, nothing is handed over.
+    expect(upload(0).signal.aborted).toBe(true);
     upload(0).succeed('k1');
     await flush();
     expect(onUploaded).not.toHaveBeenCalled();
+  });
+
+  it('cancels every upload in flight when the queue is cleared (a sign-out)', () => {
+    useUploadQueueStore
+      .getState()
+      .add([photo('a.jpg'), photo('b.jpg')], { onUploaded: vi.fn() }, 'org_a');
+    expect(uploads.map((pending) => pending.signal.aborted)).toEqual([false, false]);
+
+    useUploadQueueStore.getState().clear();
+    expect(uploads.map((pending) => pending.signal.aborted)).toEqual([true, true]);
   });
 
   it('keeps the uploads of the workspace switched to, and stays quiet for finished rows', async () => {

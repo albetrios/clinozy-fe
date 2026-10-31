@@ -13,4 +13,6 @@ export const FRONTEND_ERROR_CODES = {
   UPLOAD_STORAGE_REJECTED: 'UPLOAD_STORAGE_REJECTED',
   UPLOAD_STORAGE_UNREACHABLE: 'UPLOAD_STORAGE_UNREACHABLE',
   VIEW_AS_READ_ONLY: 'VIEW_AS_READ_ONLY',
+  /** A request whose token a workspace switch retired before it was answered (E-1). */
+  WORKSPACE_SWITCHED: 'WORKSPACE_SWITCHED',
 } as const;
