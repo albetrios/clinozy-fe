@@ -38,6 +38,9 @@ src/core/config/env-schema.ts   ← Zod + envSchemaKeys
 | **Runtime private** | no `VITE_` | CI / build scripts only                            | `SENTRY_AUTH_TOKEN`, `NETLIFY_AUTH_TOKEN` |
 
 **Client resolution order:** `window.__CONFIG__[key]` → `import.meta.env.VITE_${key}` → Zod default.
+The build-only keys (`BUILD_ONLY_CONFIG_KEYS` in `env.config.ts`: `APP_ENV`, `DEBUG_LOGGING`,
+`DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK` — every switch `envProfiles.production.allowed` pins — and
+`TEST_MODE`) skip `window.__CONFIG__`: only the build's own env sets them.
 
 ### Which env files each command reads
 
@@ -217,7 +220,8 @@ A deploy may inject `public/config.js` with `window.__CONFIG__` (no Docker in th
 repo — the Netlify deploy serves the static file as-built unless you edit it):
 
 - Strip `VITE_` prefix for keys (e.g. `AUTH_OAUTH_GOOGLE`, not `VITE_AUTH_OAUTH_GOOGLE`)
-- Same keys as bundled client env
+- Same keys as bundled client env, except the build-only ones (`APP_ENV`, `DEBUG_LOGGING`,
+  `DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK`, `TEST_MODE`), which are ignored here
 - See comments in [`public/config.js`](../../../public/config.js)
 
 ## 5. Adding or changing a key

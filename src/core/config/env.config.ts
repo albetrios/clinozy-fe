@@ -41,13 +41,32 @@ const runtimeConfig: Record<string, string> =
         Record<string, string> | undefined) ?? {})
     : {};
 
-/** Read a config value: runtime (`window.__CONFIG__`) → `import.meta.env.VITE_*`. */
+/**
+ * Keys only the build's own env sets — a deployed `config.js` (`window.__CONFIG__`) naming one is
+ * ignored. They are the switches `envProfiles.production.allowed` pins to one value (the
+ * environment name, diagnostics, devtools, E2E hooks, version polling) and the test runner's mark,
+ * so no runtime file can switch on in a production build what `validate:client-env` holds off
+ * there — `establishSession` on `globalThis`, the devtools panel. One rule for every
+ * environment, never a mode branch: a build that needs one of them on sets it in its own env.
+ * Declared here, not read from `env-schema.ts` (the tooling-side contract stays off the entry
+ * chunk); `env.config.test.ts` pins it to the production profile.
+ */
+export const BUILD_ONLY_CONFIG_KEYS: ReadonlySet<string> = new Set([
+  'APP_ENV',
+  'DEBUG_LOGGING',
+  'DEVTOOLS',
+  'E2E_HOOKS',
+  'VERSION_CHECK',
+  'TEST_MODE',
+]);
+
+/**
+ * Read a config value: runtime (`window.__CONFIG__`) → `import.meta.env.VITE_*`. A
+ * {@link BUILD_ONLY_CONFIG_KEYS} key skips the runtime layer.
+ */
 export function getRuntimeConfigValue(key: string): string | undefined {
-  return (
-    runtimeConfig[key] ??
-    (import.meta.env[`VITE_${key}`] as string | undefined) ??
-    undefined
-  );
+  const runtime = BUILD_ONLY_CONFIG_KEYS.has(key) ? undefined : runtimeConfig[key];
+  return runtime ?? (import.meta.env[`VITE_${key}`] as string | undefined) ?? undefined;
 }
 
 /** Run cross-field auth/platform invariant checks once at boot. */
