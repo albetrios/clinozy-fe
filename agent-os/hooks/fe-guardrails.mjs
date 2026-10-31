@@ -6,29 +6,38 @@
 // WARN (systemMessage): edits to protected/vendored paths, and a `git push` of auth, token, CSP,
 //   routeTree or guard changes with no clean /fe-pre-merge-review recorded for HEAD
 //   (`pnpm agent-os:review-clean` records it).
-// Nothing here asks: the permission mode decides every call no rule blocks.
+// Nothing here asks (the settings ask before a push or a merge); the permission mode decides
+// every call no rule blocks.
 //
-// Reads the PreToolUse payload on stdin (_fe-hook.mjs). Fail-open by design: any parse/read
-// error allows the tool (exit 0) so a guardrail bug can never brick the agent.
+// Reads the PreToolUse payload on stdin (_fe-hook.mjs). Fails CLOSED (H-6): a payload it cannot
+// read, a rule module it cannot load, or an error while it checks blocks the call (exit 2, the
+// reason on stderr) — a guard that lets the call through whenever it breaks guards nothing. Only
+// _fe-hook.mjs (Node built-ins alone) is imported statically; the rest loads after failClosed().
+// The WARN path (the push review gate) still fails open: a warning is advice, not a block.
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  destructiveShellReason,
-  isSecretEnvPath,
-  withoutQuotedText,
-} from './_fe-guard-rules.mjs';
-import {
   denyToolCall,
+  failClosed,
   isInsideRepository,
-  readHookPayload,
+  readGuardPayload,
   repositoryRoot,
   showSystemMessage,
 } from './_fe-hook.mjs';
-import { pushDirectory } from './_fe-push-target.mjs';
-import { recordTelemetry } from './_fe-telemetry.mjs';
 
-const payload = readHookPayload();
+const blockUnchecked = failClosed('fe-guardrails');
+const [
+  { destructiveShellReason, isSecretEnvPath, withoutQuotedText },
+  { pushDirectory },
+  { recordTelemetry },
+] = await Promise.all([
+  import('./_fe-guard-rules.mjs'),
+  import('./_fe-push-target.mjs'),
+  import('./_fe-telemetry.mjs'),
+]).catch(blockUnchecked);
+
+const payload = readGuardPayload('fe-guardrails');
 if (!payload) process.exit(0);
 
 /** Ends the hook with a block, recorded as fired (clinozy-be's `deny`). */
