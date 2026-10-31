@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import * as contactActivitiesApi from '@/shared/api/app/contact-activities-api.ts';
+import { fixtureContactStream } from '@/shared/api/app/fixtures/chat.fixtures.ts';
 import { setFixtureWhatsAppOutage } from '@/shared/api/app/fixtures/messages.fixtures.ts';
 import { patientRef } from '@/shared/api/app/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
@@ -13,70 +14,60 @@ import {
   appFixtures,
   resetAppFixtures,
 } from '@/shared/api/app/fixtures/world.fixtures.ts';
-import * as messagesApi from '@/shared/api/app/messages-api.ts';
 import type { ChatPerson } from '@/shared/api/app/messages-contracts.ts';
 import { resetOutboxes } from '@/shared/hooks/useThread/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { CHAT_COLUMN_TEST_IDS as ids } from './chat-column.constants.ts';
 import type { ChatContact } from './chat-composer.ts';
 import { clearDrafts } from './chat-drafts.ts';
 import { ChatColumn, type ChatColumnProps } from './ChatColumn.tsx';
 
-vi.mock('@/shared/api/app/messages-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof messagesApi>();
-  return { ...actual, sendMessage: vi.fn(actual.sendMessage) };
-});
-// A contact's stream is clinozy-be's (`/app/contacts/:contact_id/activities`).
+/*
+ * A contact's stream is clinozy-be's (`/app/contacts/:contact_id/activities`). Here the fixture
+ * world answers it (`fixtureContactStream`): each person's contact id is a seeded lead's or
+ * patient's id, so the column reads and writes a real conversation; a test may answer a call
+ * itself.
+ */
 vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof contactActivitiesApi>()),
   fetchContactThread: vi.fn(),
-  fetchContactMessagingStatus: vi.fn(async () => ({
-    whatsappDown: false,
-    isConnected: false,
-  })),
-  fetchContactTemplateValues: vi.fn(async () => ({
-    clinicName: 'Cresence Skin',
-    address: '',
-    mapsLink: '',
-    reviewLink: '',
-    freeSlots: [],
-  })),
+  sendContactActivity: vi.fn(),
+  resendContactActivity: vi.fn(),
+  fetchContactMessagingStatus: vi.fn(),
+  fetchContactTemplateValues: vi.fn(),
 }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: vi.fn(() => 'desktop'),
   readViewportTier: vi.fn(() => 'desktop'),
 }));
 
-const ANAYA: ChatPerson = { kind: 'lead', leadId: ref.lead(2363) };
+/** A seeded lead's or patient's thread, as the contact stream the column reads. */
+const streamOf = (id: string): ChatPerson => ({ kind: 'contact', contactId: id });
+
+const ANAYA = streamOf(ref.lead(2363));
 const ANAYA_CONTACT: ChatContact = {
   name: 'Anaya Desai',
   phone: '+919879521034',
   isPatient: false,
   interests: ['clinical'],
 };
-const KABIR: ChatPerson = { kind: 'lead', leadId: ref.lead(2364) };
+const KABIR = streamOf(ref.lead(2364));
 const KABIR_CONTACT: ChatContact = {
   name: 'Kabir Mehta',
   phone: '+919925044710',
   isPatient: false,
   instagram: '@kabir.m',
 };
-const MEHUL: ChatPerson = { kind: 'lead', leadId: ref.lead(2356) };
+const MEHUL = streamOf(ref.lead(2356));
 const MEHUL_CONTACT: ChatContact = {
   name: 'Mehul Solanki',
   phone: '+918780891089',
   isPatient: false,
-};
-const DHARTI: ChatPerson = { kind: 'patient', patientId: patientRef('Dharti Galani') };
-const DHARTI_CONTACT: ChatContact = {
-  name: 'Dharti Galani',
-  phone: '+918200603212',
-  isPatient: true,
 };
 
 let client: QueryClient;
@@ -118,12 +109,33 @@ beforeEach(() => {
   resetAppFixtures();
   resetOutboxes();
   clearDrafts();
+  const api = vi.mocked(contactActivitiesApi);
+  api.fetchContactThread.mockImplementation(fixtureContactStream.fetchContactThread);
+  api.sendContactActivity.mockImplementation(fixtureContactStream.sendContactActivity);
+  api.resendContactActivity.mockImplementation(
+    fixtureContactStream.resendContactActivity,
+  );
+  api.fetchContactMessagingStatus.mockImplementation(
+    fixtureContactStream.fetchContactMessagingStatus,
+  );
+  api.fetchContactTemplateValues.mockImplementation(
+    fixtureContactStream.fetchContactTemplateValues,
+  );
 });
 afterEach(() => {
   // Unmount before the stores reset, so no column re-renders on the way out.
   cleanup();
   vi.useRealTimers();
-  vi.mocked(messagesApi.sendMessage).mockClear();
+  const api = vi.mocked(contactActivitiesApi);
+  for (const call of [
+    api.fetchContactThread,
+    api.sendContactActivity,
+    api.resendContactActivity,
+    api.fetchContactMessagingStatus,
+    api.fetchContactTemplateValues,
+  ]) {
+    call.mockReset();
+  }
   useAuthStore.setState({ user: null });
   useLocaleStore.getState().setFormatLocale('en-US');
   client.clear();
@@ -171,45 +183,6 @@ describe('the conversation', () => {
     // Let the history, status and template reads land before the async axe pass.
     await waitFor(() => expect(client.isFetching()).toBe(0));
     expect(await axe(container)).toHaveNoViolations();
-  });
-
-  it('merges a patient’s contact history in, oldest first, and opens a chip’s record', async () => {
-    const onOpenHistory = vi.fn();
-    const user = userEvent.setup();
-    renderChat({ person: DHARTI, contact: DHARTI_CONTACT, onOpenHistory });
-    expect(
-      within(screen.getByTestId(ids.header)).getByTestId('patient-badge'),
-    ).toBeVisible();
-    await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(12));
-    // The parts are isolated and a time's own space is unbreakable (U+00A0):
-    // read the words and their order.
-    const chips = screen
-      .getAllByTestId(ids.history)
-      .map((chip) => withoutBidiMarks(chip.textContent).replace(/\u00a0/gu, ' '));
-    expect(chips[0]).toBe('Appointment #2740 · Peel · Completed · Dr. NishaWed 2:50 pm');
-    expect(chips).toContain('Clinic invoice #787 · ₹4,800 · ₹4,800 dueWed');
-    expect(chips.at(-1)).toBe(
-      'Appointment #2859 · Peel · Confirmed · Dr. Nisha14 Oct 11:00 am',
-    );
-    expect(screen.getByTestId(ids.divider)).toHaveTextContent(
-      `Lead created · ${fsi('22 Aug')} ${fsi('10:00 am')} · via Instagram`,
-    );
-
-    await user.click(screen.getAllByTestId(ids.history)[0] as HTMLElement);
-    expect(onOpenHistory).toHaveBeenCalledWith({
-      kind: 'appointment',
-      appointmentId: ref.appointment(2740),
-    });
-  });
-
-  it('masks every ₹ behind the patient file’s privacy', async () => {
-    renderChat({ person: DHARTI, contact: DHARTI_CONTACT, maskMoney: true });
-    await waitFor(() => expect(screen.getAllByTestId(ids.history)).toHaveLength(12));
-    const chips = screen
-      .getAllByTestId(ids.history)
-      .map((chip) => withoutBidiMarks(chip.textContent).replace(/\u00a0/gu, ' '));
-    expect(chips).toContain('Clinic invoice #787 · ₹ •••• · ₹ •••• dueWed');
-    expect(chips.join(' ')).not.toMatch(/₹\d/);
   });
 
   it('reads a contact’s stream, its divider from the lead the host shows it for', async () => {
@@ -282,6 +255,10 @@ describe('the conversation', () => {
   });
 
   it('holds a contact’s queued messages "Queued", and says they wait for messaging to be connected', async () => {
+    vi.mocked(contactActivitiesApi.fetchContactMessagingStatus).mockResolvedValue({
+      whatsappDown: false,
+      isConnected: false,
+    });
     vi.mocked(contactActivitiesApi.fetchContactThread).mockResolvedValue({
       thread: null,
       messages: [
@@ -348,7 +325,7 @@ describe('no conversation yet', () => {
 
   it('reads "Patient · chat only · no lead" for a patient without a thread', async () => {
     renderChat({
-      person: { kind: 'patient', patientId: patientRef('Kiran Desai') },
+      person: streamOf(patientRef('Kiran Desai')),
       contact: { name: 'Kiran Desai', phone: '+919879521034', isPatient: true },
     });
     expect(await screen.findByTestId(ids.divider)).toHaveTextContent(
@@ -446,12 +423,12 @@ describe('sending', () => {
     const held = new Promise<void>((resolve) => {
       release = resolve;
     });
-    const actual = vi.mocked(messagesApi.sendMessage).getMockImplementation();
-    vi.mocked(messagesApi.sendMessage).mockImplementationOnce(async (input) => {
-      await held;
-      if (!actual) throw new Error('no implementation');
-      return actual(input);
-    });
+    vi.mocked(contactActivitiesApi.sendContactActivity).mockImplementationOnce(
+      async (input) => {
+        await held;
+        return fixtureContactStream.sendContactActivity(input);
+      },
+    );
     const user = userEvent.setup();
     renderChat({ person: ANAYA, contact: ANAYA_CONTACT });
     await screen.findByTestId(ids.textarea);
@@ -474,10 +451,11 @@ describe('sending', () => {
     const sent = bubbles().at(-1);
     expect(sent).toHaveTextContent(`${fsi('Riya S.')}·WhatsApp`);
     expect(sent).toHaveTextContent('·Sent');
-    expect(messagesApi.sendMessage).toHaveBeenCalledWith({
-      leadId: ref.lead(2363),
+    expect(contactActivitiesApi.sendContactActivity).toHaveBeenCalledWith({
+      contactId: ref.lead(2363),
       channel: 'whatsapp',
       body: 'Hi Anaya, Saturday 11:30 works.',
+      idempotencyKey: expect.any(String),
     });
   });
 
@@ -490,11 +468,13 @@ describe('sending', () => {
     await user.clear(textarea());
     await user.type(textarea(), '   {Enter}');
     await user.click(screen.getByTestId(ids.send));
-    expect(messagesApi.sendMessage).not.toHaveBeenCalled();
+    expect(contactActivitiesApi.sendContactActivity).not.toHaveBeenCalled();
   });
 
   it('marks a failed send "Not sent" and sends it again on Retry', async () => {
-    vi.mocked(messagesApi.sendMessage).mockRejectedValueOnce(new Error('offline'));
+    vi.mocked(contactActivitiesApi.sendContactActivity).mockRejectedValueOnce(
+      new Error('offline'),
+    );
     const user = userEvent.setup();
     renderChat({ person: ANAYA, contact: ANAYA_CONTACT });
     await screen.findByTestId(ids.textarea);
@@ -507,7 +487,7 @@ describe('sending', () => {
     await user.click(failed);
     await waitFor(() => expect(screen.queryByText('Not sent')).not.toBeInTheDocument());
     await waitFor(() => expect(bubbles().at(-1)).toHaveTextContent('·Sent'));
-    expect(messagesApi.sendMessage).toHaveBeenCalledTimes(2);
+    expect(contactActivitiesApi.sendContactActivity).toHaveBeenCalledTimes(2);
   });
 
   it('resends a message its provider could not deliver', async () => {

@@ -6,9 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import * as contactActivitiesApi from '@/shared/api/app/contact-activities-api.ts';
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
-import * as messagesApi from '@/shared/api/app/messages-api.ts';
 import type { ChatMessage, ChatPerson } from '@/shared/api/app/messages-contracts.ts';
 import { resetOutboxes } from '@/shared/hooks/useThread/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -20,22 +17,12 @@ import { clearDrafts } from './chat-drafts.ts';
 import { ChatColumn, type ChatColumnProps } from './ChatColumn.tsx';
 
 /*
- * Which world the chat column reads: a fixture lead's or patient's thread (`messages-api.ts`,
- * connected, the fixture's WhatsApp switch) or a contact's stream on clinozy-be
- * (`contact-activities-api.ts` — no messaging service yet, so every message waits queued), and
- * the edges around them: a thread that cannot be read, a status that cannot be read, a header
- * with no mobile or with the host's contact card.
+ * What the chat column reads: a contact's stream on clinozy-be (`contact-activities-api.ts` —
+ * no messaging service yet, so every message waits queued), and the edges around it: a thread
+ * that cannot be read, a status that cannot be read, a header with no mobile or with the host's
+ * contact card.
  */
 
-vi.mock('@/shared/api/app/messages-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof messagesApi>();
-  return {
-    ...actual,
-    sendMessage: vi.fn(actual.sendMessage),
-    fetchMessagingStatus: vi.fn(actual.fetchMessagingStatus),
-    fetchContactHistory: vi.fn(actual.fetchContactHistory),
-  };
-});
 vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof contactActivitiesApi>()),
   fetchContactThread: vi.fn(),
@@ -56,7 +43,6 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
 
 const CONTACT_ID = 'con_anaya0000000000000000';
 const ANAYA_STREAM: ChatPerson = { kind: 'contact', contactId: CONTACT_ID };
-const ANAYA_LEAD: ChatPerson = { kind: 'lead', leadId: ref.lead(2363) };
 const ANAYA: ChatContact = {
   name: 'Anaya Desai',
   phone: '+919879521034',
@@ -111,27 +97,22 @@ beforeEach(() => {
     isConnected: false,
   });
   vi.mocked(contactActivitiesApi.sendContactActivity).mockReset();
-  resetAppFixtures();
   resetOutboxes();
   clearDrafts();
 });
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
-  vi.mocked(messagesApi.sendMessage).mockClear();
-  vi.mocked(messagesApi.fetchContactHistory).mockClear();
-  vi.mocked(messagesApi.fetchMessagingStatus).mockClear();
   vi.mocked(contactActivitiesApi.fetchContactThread).mockReset();
   useAuthStore.setState({ user: null });
   useLocaleStore.getState().setFormatLocale('en-US');
   client.clear();
-  resetAppFixtures();
   resetOutboxes();
   clearDrafts();
 });
 
 describe('a contact’s stream on clinozy-be (the live reader)', () => {
-  it('sends through clinozy-be — never the fixture world — and holds the reply "Queued"', async () => {
+  it('sends through clinozy-be and holds the reply "Queued"', async () => {
     const user = userEvent.setup();
     // The stream is empty, then holds what was sent once clinozy-be took it.
     vi.mocked(contactActivitiesApi.fetchContactThread)
@@ -153,7 +134,6 @@ describe('a contact’s stream on clinozy-be (the live reader)', () => {
         idempotencyKey: expect.any(String),
       }),
     );
-    expect(messagesApi.sendMessage).not.toHaveBeenCalled();
     await waitFor(() =>
       expect(screen.getByTestId(ids.bubble)).toHaveTextContent('Queued'),
     );
@@ -196,36 +176,6 @@ describe('a contact’s stream on clinozy-be (the live reader)', () => {
     expect(screen.getByTestId(ids.bubble)).toHaveTextContent('See you');
     expect(contactActivitiesApi.fetchContactThread).toHaveBeenCalledTimes(2);
     expect(screen.queryByTestId('retry-error')).toBeNull();
-  });
-
-  it('asks the fixture world for no history of a contact — the stream holds it', async () => {
-    emptyStream();
-    renderChat({ person: ANAYA_STREAM, contact: ANAYA });
-    await screen.findByTestId(ids.textarea);
-    expect(messagesApi.fetchContactHistory).not.toHaveBeenCalled();
-  });
-});
-
-describe('a fixture lead’s thread (the fixture reader)', () => {
-  it('is connected — no queue note — and reads the fixture’s status, not clinozy-be’s', async () => {
-    renderChat({ person: ANAYA_LEAD, contact: ANAYA });
-
-    await screen.findByTestId(ids.textarea);
-    await waitFor(() => expect(messagesApi.fetchMessagingStatus).toHaveBeenCalled());
-    expect(contactActivitiesApi.fetchContactMessagingStatus).not.toHaveBeenCalled();
-    expect(contactActivitiesApi.fetchContactThread).not.toHaveBeenCalled();
-    expect(messagesApi.fetchContactHistory).toHaveBeenCalledWith(ANAYA_LEAD);
-    expect(screen.queryByText(NOT_CONNECTED)).toBeNull();
-  });
-
-  it('sends on the fixture world, never clinozy-be', async () => {
-    const user = userEvent.setup();
-    renderChat({ person: ANAYA_LEAD, contact: ANAYA });
-
-    await user.type(await screen.findByTestId(ids.textarea), 'Hi Anaya{Enter}');
-
-    await waitFor(() => expect(messagesApi.sendMessage).toHaveBeenCalledOnce());
-    expect(contactActivitiesApi.sendContactActivity).not.toHaveBeenCalled();
   });
 });
 

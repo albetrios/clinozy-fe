@@ -3,9 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '@/lib/i18n/i18n.ts';
 import type { LeadMessage } from '@/shared/api/app/app-schema.ts';
 import { appClockTime, appToday, localDateOf } from '@/shared/api/app/app-time.ts';
+import { fetchContactHistory } from '@/shared/api/app/fixtures/chat.fixtures.ts';
 import { patientRef } from '@/shared/api/app/fixtures/patients.fixtures.ts';
 import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
-import { fetchContactHistory } from '@/shared/api/app/messages-api.ts';
 import type { ContactHistoryEntry } from '@/shared/api/app/messages-contracts.ts';
 import { appClockOf } from '@/shared/hooks/useAppClock/index.ts';
 import {

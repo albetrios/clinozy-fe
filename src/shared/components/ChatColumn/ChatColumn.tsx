@@ -7,6 +7,7 @@ import {
   type ChatThread as ChatThreadRecord,
   type ChatThreadRead,
   type ComposerMode,
+  type ContactHistoryEntry,
   type MessagingStatus,
 } from '@/shared/api/app/messages-contracts.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
@@ -22,7 +23,6 @@ import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import {
-  useContactHistory,
   useMessagingStatus,
   useResendMessage,
   useSendMessage,
@@ -59,9 +59,16 @@ import { ChatThread } from './ChatThread/index.ts';
 const keys = CHAT_COLUMN_KEYS;
 const ids = CHAT_COLUMN_TEST_IDS;
 
+/**
+ * The person's contact history merged into the thread as chips (Appendix F's merged feed): none
+ * yet — clinozy-be serves no such feed, and the contact's stream carries its own `system` entries.
+ * REPLACE_WITH_API: read the feed here once clinozy-be serves it.
+ */
+const NO_CONTACT_HISTORY: readonly ContactHistoryEntry[] = [];
+
 /** Props for {@link ChatColumn}: whose conversation, how the host shows it, and where its links lead. */
 export interface ChatColumnProps {
-  /** Whose conversation: a lead (its thread), or a patient (their lead or contact thread). */
+  /** Whose conversation: a contact, by their stream on clinozy-be. */
   person: ChatPerson;
   /** The person as the host's record has them: name, phone, reach and preferences. */
   contact: ChatContact;
@@ -199,12 +206,11 @@ function ChatLoaded({
   const tier = useViewportTier();
   const format = useChatFormat(maskMoney);
   const { t, clock } = format;
-  const history = useContactHistory(person).data;
   const { whatsappDown, isMessagingConnected } = messagingFlags(
-    useMessagingStatus(person).data,
+    useMessagingStatus().data,
   );
   const outbox = useThreadOutbox(person);
-  const { send, retry } = useSendMessage(person, contact, { onSent });
+  const { send, retry } = useSendMessage(person, { onSent });
   const resend = useResendMessage(person);
 
   const options = composerModes(contact);
@@ -219,10 +225,10 @@ function ChatLoaded({
   };
 
   const entries = useMemo(
-    () => threadEntries(read.messages, outbox, history ?? [], format),
-    [read.messages, outbox, history, format],
+    () => threadEntries(read.messages, outbox, NO_CONTACT_HISTORY, format),
+    [read.messages, outbox, format],
   );
-  const visits = visitSummary(history ?? [], clock);
+  const visits = visitSummary(NO_CONTACT_HISTORY, clock);
   const { ctx, fill } = useMessageContext({
     person,
     contact,

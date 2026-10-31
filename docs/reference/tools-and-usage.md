@@ -127,6 +127,11 @@ Further gates, all mirroring clinozy-be:
   The same gate keeps route weight off the entry (`tooling/ci/check-entry-routes.mjs`): no path a
   dialog route's manifest or a room's builder module spells may reach the first-paint chunks —
   dialog manifests load with `src/app/routes/dialog-routes.ts`, room builders by their own path.
+- **No fixtures in the bundle** (`pnpm build:check` → `tooling/ci/check-no-fixtures.mjs`) — the
+  clinic fixture world (`src/shared/api/app/fixtures/`, patient and staff seeds) is test support:
+  the build fails on any `*.fixtures-<hash>.js` chunk, a reference to one (the service worker's
+  precache manifest lists every chunk) or a fixture seed string anywhere under `dist/`. A lazy
+  `import('./fixtures/…')` still emits a public, precached chunk — shipped code never imports it.
 - **Icon barrel** (`@/shared/icons`) — every app icon import flows through one file (eslint
   `no-restricted-imports`), so swapping the icon library is a one-file change.
 - **Contract drift** (`pnpm contracts:drift`) — every backend endpoint this app references

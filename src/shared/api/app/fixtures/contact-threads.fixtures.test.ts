@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { appInstant } from '@/shared/api/app/app-time.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 
-import { appInstant } from './app-time.ts';
-import { ensureContactThread } from './contact-threads-api.ts';
 import {
+  ensureContactThreadInWorld as ensureContactThread,
   findPersonThread,
   interestsForService,
-} from './fixtures/contact-threads.fixtures.ts';
-import { patientRef } from './fixtures/patients.fixtures.ts';
-import { ref } from './fixtures/refs.fixtures.ts';
-import { FIXTURE_VIEWER_ID } from './fixtures/staff.fixtures.ts';
-import { appFixtures, resetAppFixtures } from './fixtures/world.fixtures.ts';
+} from './contact-threads.fixtures.ts';
+import { patientRef } from './patients.fixtures.ts';
+import { ref } from './refs.fixtures.ts';
+import { FIXTURE_VIEWER_ID } from './staff.fixtures.ts';
+import { appFixtures, resetAppFixtures } from './world.fixtures.ts';
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
