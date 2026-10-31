@@ -34,6 +34,8 @@ export function photoDouble(overrides: Partial<PatientPhoto> = {}): PatientPhoto
     fileName: 'IMG_5100.png',
     fileUrl:
       'https://uploads.test/organization-files/org_test/img-5100.png?X-Amz-Expires=900',
+    thumbnailUrl:
+      'https://uploads.test/organization-files/org_test/img-5100.thumb.webp?X-Amz-Expires=900',
     displayName: 'IMG_5100',
     caption: null,
     bodyPart: null,

@@ -91,7 +91,7 @@ function TileBar({
         'from-overlay/78 via-overlay/35 text-canvas pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-linear-to-t via-70% to-transparent',
         // Over the photo it fades in on hover where hover exists, always shown on touch
         // (H:414); with no image to uncover (its upload is gone) the name and day are the tile.
-        photo.fileUrl &&
+        photo.thumbnailUrl &&
           'transition-opacity duration-150 group-focus-within/tile:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/tile:opacity-100',
         look.bar,
       )}
@@ -243,7 +243,7 @@ function PhotoTile({
         aria-pressed={selecting ? picked : undefined}
         className="absolute inset-0 size-full"
       >
-        <PhotoThumb src={photo.fileUrl} />
+        <PhotoThumb src={photo.thumbnailUrl} />
       </button>
       <TilePills photo={photo} />
       {selection ? <TileCheck photo={photo} selection={selection} /> : null}
@@ -265,7 +265,7 @@ function PhotoTile({
  * photos (change-patient-overview-photos `BRIEF.md:30–31`), so a run of
  * single-photo visits sits in one row; the day's heading never widens its
  * group. A tile is a square on a muted fill (10px corners): the photo from its
- * `file_url` (clinozy-be D86; the image glyph when its upload is gone), the
+ * `thumbnail_url` (its 320 px thumbnail, else the full photo — clinozy-be D86; the image glyph when its upload is gone), the
  * body-part and stage pills at the top start, the check circle at the top end,
  * and the caption bar — the name over the day — on a dark scrim, fading in on
  * hover over a photo. A tile opens the viewer; while selecting it is picked

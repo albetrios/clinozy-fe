@@ -99,7 +99,7 @@ function PhotosDropZone({ onClick, testId }: { onClick: () => void; testId: stri
 
 /**
  * Photos (H:772, H:4992): the newest eight (`GET …/images`, one page) — each the
- * photo from its `file_url` (D86), named for the reader, with its album's pill,
+ * photo from its `thumbnail_url` (the thumbnail, else the full photo — D86), named for the reader, with its album's pill,
  * opening Photos on that album — and the server's count. For a member who
  * uploads it is an upload target too (change-patient-overview-photos): "Upload"
  * in the head, an "Add photos" tile before the thumbnails, files dropped on the
@@ -170,7 +170,7 @@ export function PhotosBentoCard({
                   data-testid={`${testId}-thumb`}
                   className="bg-muted hover:border-muted-foreground relative aspect-square overflow-hidden rounded-lg border transition-colors"
                 >
-                  <PhotoThumb src={photo.fileUrl} />
+                  <PhotoThumb src={photo.thumbnailUrl} />
                   <span
                     data-slot="pill"
                     className="bg-card/90 text-tiny text-muted-foreground-strong absolute start-1 bottom-1 flex h-4.5 items-center rounded-full px-1.5 font-medium"

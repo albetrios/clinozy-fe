@@ -13003,10 +13003,12 @@ export interface operations {
                     items: {
                         free_quantity?: number;
                         medicine_id?: string;
+                        mrp?: number | null;
                         new_medicine_name?: string;
                         quantity: number;
                         rate: number;
                     }[];
+                    note?: string;
                     /** Format: date */
                     order_date?: string;
                     supplier_bill_number?: string;
@@ -13216,10 +13218,12 @@ export interface operations {
                     items?: {
                         free_quantity?: number;
                         medicine_id?: string;
+                        mrp?: number | null;
                         new_medicine_name?: string;
                         quantity: number;
                         rate: number;
                     }[];
+                    note?: string | null;
                     /** Format: date */
                     order_date?: string;
                     supplier_bill_number?: string | null;
@@ -13319,15 +13323,18 @@ export interface operations {
                         expiry_month?: string;
                         id: string;
                         is_received?: boolean;
+                        mrp?: number | null;
                     } | {
                         batch_number?: string;
                         expiry_month?: string;
                         free_quantity?: number;
                         medicine_id?: string;
+                        mrp?: number | null;
                         new_medicine_name?: string;
                         quantity: number;
                         rate: number;
                     })[];
+                    note?: string;
                     supplier_bill_number?: string;
                 };
             };
@@ -14975,6 +14982,7 @@ export interface operations {
                         batch_number: string;
                         expiry_month: string;
                         id?: string;
+                        mrp?: number | null;
                         purchase_rate?: number | null;
                         quantity: number;
                         supplier_id?: string | null;
@@ -14982,6 +14990,7 @@ export interface operations {
                     composition?: string | null;
                     /** @enum {number} */
                     gst_percent?: 0 | 5 | 12 | 18 | 28;
+                    hsn_code?: string | null;
                     is_prescription_only?: boolean;
                     is_quick?: boolean;
                     manufacturer_id?: string;
@@ -14990,12 +14999,14 @@ export interface operations {
                     mrp?: number;
                     name: string;
                     near_expiry_discount_percent?: number | null;
+                    pack_label?: string | null;
                     supplier_prices?: {
                         free_quantity?: number;
                         lead_days?: number;
                         rate: number;
                         supplier_id: string;
                     }[];
+                    units_per_pack?: number;
                 };
             };
         };
@@ -15216,6 +15227,7 @@ export interface operations {
                         batch_number: string;
                         expiry_month: string;
                         id?: string;
+                        mrp?: number | null;
                         purchase_rate?: number | null;
                         quantity: number;
                         supplier_id?: string | null;
@@ -15225,6 +15237,7 @@ export interface operations {
                     expected_updated_at?: string;
                     /** @enum {number} */
                     gst_percent?: 0 | 5 | 12 | 18 | 28;
+                    hsn_code?: string | null;
                     is_prescription_only?: boolean;
                     manufacturer_id?: string;
                     max_stock?: number;
@@ -15232,12 +15245,14 @@ export interface operations {
                     mrp?: number;
                     name?: string;
                     near_expiry_discount_percent?: number | null;
+                    pack_label?: string | null;
                     supplier_prices?: {
                         free_quantity?: number;
                         lead_days?: number;
                         rate: number;
                         supplier_id: string;
                     }[];
+                    units_per_pack?: number;
                 };
             };
         };
@@ -18920,6 +18935,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         }[];
@@ -19008,6 +19026,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -19069,6 +19090,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -19181,6 +19205,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -19245,6 +19272,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -25860,6 +25890,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    address?: string | null;
+                    /** Format: email */
+                    email?: string | null;
                     gst_number?: string | null;
                     is_quick?: boolean;
                     manufacturer_ids?: string[];
@@ -26013,6 +26046,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    address?: string | null;
+                    /** Format: email */
+                    email?: string | null;
                     /** Format: date-time */
                     expected_updated_at?: string;
                     gst_number?: string | null;
