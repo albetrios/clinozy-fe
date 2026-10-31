@@ -53,8 +53,11 @@ capture settings are part of the threat model — verified:
   does not initialize until the user accepts the cookie banner
   (`shared/components/ConsentBanner`, `shared/store/useConsentStore`; `main.tsx`
   reacts to the decision and `initPostHog` refuses without consent). Beyond that:
-  `autocapture: false` and `disable_session_recording: true` keep passive
-  DOM/network capture off in code; only explicitly-coded events are sent;
+  every capture PostHog's dashboard could switch on remotely (autocapture, heatmaps,
+  dead and rage clicks, exceptions, recording, surveys, conversations, tours, web
+  experiments, CDN-loaded extensions) is pinned off in code, text and attributes are
+  masked, and `before_send` drops element text and heatmap data; only
+  explicitly-coded events are sent;
   `before_send` drops the query string and fragment from every URL in
   `properties`, `$set` and `$set_once` (a room's `?q=` search, create-drawer prefills,
   `?token=`, Stripe `*_client_secret`); and

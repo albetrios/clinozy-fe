@@ -137,3 +137,51 @@ function scrubRecordingFields(record: object): object[] {
   }
   return nested;
 }
+
+/**
+ * PostHog event properties that carry what a screen showed or where a pointer went: an element's
+ * text and chain (autocapture, dead and rage clicks) and heatmap coordinates. Every capture that
+ * writes them is pinned off at init; this drops them should one ever be switched back on.
+ */
+const POSTHOG_SCREEN_KEYS: readonly string[] = [
+  '$el_text',
+  '$elements',
+  '$elements_chain',
+  '$heatmap_data',
+];
+
+/** PostHog events that exist only to report the screen (see {@link POSTHOG_SCREEN_KEYS}). */
+const POSTHOG_SCREEN_EVENTS: ReadonlySet<string> = new Set([
+  '$autocapture',
+  '$rageclick',
+  '$dead_click',
+  '$$heatmap',
+  '$exception',
+]);
+
+/** Structural slice of a posthog-js `CaptureResult`: lib/ never imports posthog-js. */
+type ScrubbablePostHogEvent = {
+  event?: string;
+  properties?: Record<string, unknown>;
+  $set?: Record<string, unknown>;
+  $set_once?: Record<string, unknown>;
+};
+
+/**
+ * PostHog's `before_send`: drop a screen-reporting event outright, then strip element text and
+ * heatmap data from the properties and the query from every URL in `properties`, `$set` and
+ * `$set_once` (posthog-js carries person properties — `$initial_current_url` — beside
+ * `properties`, not inside it). `null` passes through.
+ */
+export function scrubPostHogEvent<E extends ScrubbablePostHogEvent>(
+  event: E | null,
+): E | null {
+  if (!event) return event;
+  if (event.event !== undefined && POSTHOG_SCREEN_EVENTS.has(event.event)) return null;
+  for (const key of POSTHOG_SCREEN_KEYS)
+    Reflect.deleteProperty(event.properties ?? {}, key);
+  for (const bag of [event.properties, event.$set, event.$set_once]) {
+    if (bag) scrubObjectUrls(bag);
+  }
+  return event;
+}

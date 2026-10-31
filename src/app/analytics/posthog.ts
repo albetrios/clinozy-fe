@@ -1,8 +1,8 @@
 import type { AnyRouter } from '@tanstack/react-router';
-import posthog from 'posthog-js';
+import posthog, { type PostHogConfig } from 'posthog-js';
 
 import { platformConfig } from '@/core/config/env.ts';
-import { scrubObjectUrls } from '@/lib/telemetry-scrub.ts';
+import { scrubPostHogEvent } from '@/lib/telemetry-scrub.ts';
 import {
   attachPostHogIdentitySync,
   attachPostHogRouter,
@@ -15,6 +15,38 @@ import { hasAnalyticsConsent } from '@/shared/store/useConsentStore/index.ts';
 
 let initialized = false;
 let routerAttached = false;
+
+/**
+ * PostHog's init options. Every capture PostHog can switch on from its own dashboard (remote
+ * config) is pinned off here, so the project's settings can never start reading screen text,
+ * clicks or exceptions from a clinic screen: no autocapture, heatmaps, dead or rage clicks,
+ * exception capture or session recording; no surveys, conversations, product tours or web
+ * experiments; and no script loaded from PostHog's CDN (`disable_external_dependency_loading`
+ * — the extensions those features need). Text and attributes are masked should anything still
+ * read an element, and `before_send` drops element text, heatmap data and the query of every URL
+ * (`scrubPostHogEvent`). What is left: page views, page leaves and the app's own named events.
+ */
+export const postHogInitOptions = (host: string | undefined) =>
+  ({
+    api_host: host?.length ? host : 'https://us.i.posthog.com',
+    capture_pageview: true,
+    capture_pageleave: true,
+    persistence: 'localStorage+cookie',
+    autocapture: false,
+    capture_heatmaps: false,
+    capture_dead_clicks: false,
+    capture_exceptions: false,
+    rageclick: false,
+    disable_session_recording: true,
+    disable_surveys: true,
+    disable_conversations: true,
+    disable_product_tours: true,
+    disable_web_experiments: true,
+    disable_external_dependency_loading: true,
+    mask_all_text: true,
+    mask_all_element_attributes: true,
+    before_send: scrubPostHogEvent,
+  }) satisfies Partial<PostHogConfig>;
 
 /**
  * Initialize PostHog analytics.
@@ -51,22 +83,7 @@ export function initPostHog(router?: AnyRouter): void {
   }
 
   try {
-    posthog.init(key, {
-      api_host: host?.length ? host : 'https://us.i.posthog.com',
-      capture_pageview: true,
-      capture_pageleave: true,
-      persistence: 'localStorage+cookie',
-      autocapture: false,
-      disable_session_recording: true,
-      before_send: (event) => {
-        // posthog-js carries person properties (`$set`, `$set_once` with
-        // `$initial_current_url`) beside `properties`, not inside it.
-        for (const bag of [event?.properties, event?.$set, event?.$set_once]) {
-          if (bag) scrubObjectUrls(bag);
-        }
-        return event;
-      },
-    });
+    posthog.init(key, postHogInitOptions(host));
     initialized = true;
     markPostHogActive();
 
