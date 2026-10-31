@@ -7,6 +7,7 @@
     "created": "Lead {{id}} erstellt",
     "saved": "Lead gespeichert",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "{{name}} gehört jetzt Ihnen · {{owner}} bleibt beteiligt",
     "claimedUnowned": "{{name}} gehört jetzt Ihnen",
     "released": "Für das Team freigegeben · jeder kann übernehmen",
@@ -101,18 +102,88 @@
     "steps": {
       "done": "Erledigt",
       "current": "Aktuell",
-      "next": "Als Nächstes"
+      "next": "Als Nächstes",
+      "book": "Buchen"
     },
     "stepTips": {
       "done": "{{status}} · abgeschlossen",
       "current": "{{status}} · aktueller Schritt",
       "next": "Zu {{status}} wechseln",
-      "byCheckIn": "Klinik besucht · wird beim Check-in gesetzt"
+      "byCheckIn": "Klinik besucht · wird beim Check-in gesetzt",
+      "book": "Termin buchen · setzt den Lead auf {{status}}",
+      "byBooking": "{{status}} · wird beim Buchen eines Termins gesetzt",
+      "locked": "{{status}} · Termin stornieren, um zurückzugehen"
     },
-    "closeAs": "Schließen als",
+    "booking": {
+      "reschedule": "Verschieben",
+      "cancel": "Termin stornieren"
+    },
+    "nextStep": {
+      "aria": "Nächster Schritt",
+      "labels": {
+        "next": "Als Nächstes",
+        "when": "Wann",
+        "outcome": "Ergebnis"
+      },
+      "headline": {
+        "new": "Sag {{name}} Hallo",
+        "contacted": "Bei {{name}} nachfassen",
+        "follow_up": "Bei {{name}} nachfassen",
+        "no_response": "{{name}} erneut versuchen",
+        "appointment_scheduled": "Termin für {{name}} gebucht",
+        "clinic_visited": "{{name}} ist jetzt Patient",
+        "not_interested": "{{name}} hat abgesagt",
+        "invalid": "Falsche Nummer oder Spam",
+        "lost": "{{name}} ist woanders hingegangen"
+      },
+      "since": {
+        "created": "Erstellt {{when}}",
+        "since": "Seit {{when}}",
+        "noAnswer": "Keine Antwort {{when}}"
+      },
+      "actions": {
+        "whatsapp": "WhatsApp senden",
+        "call": "Anruf erfassen",
+        "book": "Termin buchen",
+        "openFile": "Patientenakte öffnen",
+        "reopen": "Wieder öffnen",
+        "noAnswer": "Keine Antwort",
+        "noAnswerAgain": "Wieder keine Antwort",
+        "more": "Mehr"
+      },
+      "when": {
+        "notContacted": "Noch nicht kontaktiert",
+        "replyNow": "Geschrieben {{when}} · jetzt antworten",
+        "setTime": "Zeit festlegen",
+        "nextTry": "Nächster Versuch {{when}}",
+        "visited": "Besucht {{when}}",
+        "closed": "Geschlossen {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "Termin wird geladen…"
+      },
+      "notes": {
+        "contactFirst": "„Keine Antwort“ erscheint nach dem ersten Kontakt",
+        "checkIn": "Der Check-in bringt sie weiter",
+        "final": "Endgültig, durch den Check-in gesetzt",
+        "winBack": "Kommt zurück, wenn bis {{date}} eingecheckt wird",
+        "never": "Kommt nie von selbst zurück"
+      },
+      "picker": {
+        "title": "Wann nachfassen?",
+        "laterToday": "Heute später",
+        "tomorrow": "Morgen",
+        "inThreeDays": "In 3 Tagen",
+        "nextWeek": "Nächste Woche",
+        "date": "Datum",
+        "time": "Uhrzeit",
+        "cancel": "Abbrechen",
+        "set": "Nachfassen festlegen"
+      }
+    },
     "info": {
       "created": "Erstellt",
       "lastActivity": "Letzte Aktivität",
+      "closed": "Geschlossen",
       "none": "Noch keine",
       "patient": "Patient",
       "linked": "Verknüpft",

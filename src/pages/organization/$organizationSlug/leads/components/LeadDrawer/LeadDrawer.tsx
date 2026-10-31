@@ -1,9 +1,12 @@
+import { useParams } from '@tanstack/react-router';
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
 import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PATIENT_FILE_DEFAULT_SECTION } from '@/shared/app/patient-file-sections.ts';
 import {
   ChatColumn,
   chatContactOfContact,
@@ -22,9 +25,9 @@ import {
 } from '@/shared/components/ui/tooltip.tsx';
 import {
   AppointmentForm,
-  type AppointmentFormPrefill,
-  leadBookingPrefill,
+  CancelVisitConfirm,
 } from '@/shared/forms/AppointmentForm/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -32,10 +35,13 @@ import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
 import { Users, WhatsAppMark } from '@/shared/icons/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
+import { useLeadBooking } from '../../hooks/useLeadBooking/index.ts';
 import { useLeadDraft } from '../../hooks/useLeadDraft/index.ts';
+import { useLeadProgress } from '../../hooks/useLeadProgress/index.ts';
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
 import { leadContactCardData } from '../LeadFields/lead-contact.ts';
 import type { LeadPeopleFieldProps } from '../LeadFormFields/index.ts';
+import type { LeadComposeMode } from '../LeadNextStep/index.ts';
 import {
   CHAT_WIDTH_STEP,
   clampChatWidth,
@@ -145,10 +151,13 @@ function useLeadChatAside({
   pane,
   onPaneChange,
   onBook,
+  compose,
 }: Pick<LeadDrawerProps, 'lead' | 'team' | 'pane' | 'onPaneChange'> & {
   /** "Book an appointment" with the reason from their last message — absent without it. */
   onBook?: (reason: string | null) => void;
-}): { panelWidth: number; aside: RecordDrawerProps['aside'] } {
+  /** The Next step card's ask for the composer (D25). */
+  compose?: { mode: LeadComposeMode; at: number };
+}): { panelWidth: number; aside: RecordDrawerProps['aside']; canCompose: boolean } {
   const { t } = useTranslation(LEADS_NS);
   const { t: tApp } = useTranslation(APP_NS);
   const phone = useViewportTier() === 'phone';
@@ -157,7 +166,9 @@ function useLeadChatAside({
   const widths = leadDrawerWidths(viewport, chatWidth);
   const stream = useContactActivityAccess();
   const contact = useContact(lead.contactId).data;
-  if (!stream.reads) return { panelWidth: widths.details, aside: undefined };
+  if (!stream.reads) {
+    return { panelWidth: widths.details, aside: undefined, canCompose: false };
+  }
   const content = (
     <div
       data-testid={LEADS_TEST_IDS.drawerChat}
@@ -194,11 +205,13 @@ function useLeadChatAside({
           ),
         }}
         onBookAppointment={onBook ? ({ reason }) => onBook(reason) : undefined}
+        compose={compose}
       />
     </div>
   );
   return {
     panelWidth: widths.total,
+    canCompose: stream.writes,
     aside: {
       content,
       width: widths.chat,
@@ -215,6 +228,38 @@ function useLeadChatAside({
 }
 
 /**
+ * The Next step card's ways out of the details (D25): the chat's composer — asked for a mode, the
+ * phone's chat pane brought forward — and the patient file a check-in opened.
+ */
+function useLeadDrawerLinks({
+  lead,
+  onPaneChange,
+}: Pick<LeadDrawerProps, 'lead' | 'onPaneChange'>) {
+  const [asked, setAsked] = useState<{ mode: LeadComposeMode; at: number }>();
+  const navigate = useAppNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  const patientId = lead.patientId;
+  return {
+    /** The composer's last ask — each a new `at`. */
+    asked,
+    ask: (mode: LeadComposeMode) => {
+      setAsked({ mode, at: Date.now() });
+      onPaneChange('chat');
+    },
+    openPatient: patientId
+      ? () =>
+          void navigate(
+            organizationPatientSection(
+              organizationSlug,
+              patientId,
+              PATIENT_FILE_DEFAULT_SECTION,
+            ),
+          )
+      : undefined,
+  };
+}
+
+/**
  * The lead drawer (KICKOFF §6.3; `leads.md:124–136`, H:1752–1867) — the record
  * drawer at `round(min(980, 0.94 × vw))`: the details form, then the chat in
  * its column with the resize handle, the form drawers' × floating outside; on
@@ -222,7 +267,10 @@ function useLeadChatAside({
  * pane at a time (the page keeps the pane between leads). The header: "Edit
  * lead", the ID to copy, "Re-target" and the sub line; the footer: Remove lead
  * · Discard (puts the draft back) or Cancel · Save lead. Focus moves to the
- * title and back; closing with an unsaved draft asks first (Q-P1).
+ * title and back; closing with an unsaved draft asks first (Q-P1). Progress's
+ * Booked step and the chat's "Book an appointment" open the
+ * booking form over it; the person's booking still to happen shows on the
+ * Next step card with Reschedule (the form again) and Cancel (its confirm) — clinozy-be L11.
  */
 export function LeadDrawer({
   lead,
@@ -240,16 +288,17 @@ export function LeadDrawer({
 }: LeadDrawerProps) {
   const { t } = useTranslation(LEADS_NS);
   const draft = useLeadDraft(lead);
+  const progress = useLeadProgress(lead);
   const [removing, setRemoving] = useState(false);
-  const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
+  const links = useLeadDrawerLinks({ lead, onPaneChange });
+  const booking = useLeadBooking({ lead, canBook });
   const chat = useLeadChatAside({
     lead,
     team,
     pane,
     onPaneChange,
-    onBook: canBook
-      ? (reason) => setBooking(leadBookingPrefill(lead, reason))
-      : undefined,
+    onBook: booking.book,
+    compose: links.asked,
   });
 
   return (
@@ -288,6 +337,10 @@ export function LeadDrawer({
           canEdit={canEdit}
           canEditContact={canEditContact}
           contactActions={contactActions}
+          booking={booking.progress}
+          progress={progress}
+          onCompose={chat.canCompose ? links.ask : undefined}
+          onOpenPatient={links.openPatient}
         />
       </RecordDrawer>
       <LeadRemoveConfirm
@@ -296,12 +349,25 @@ export function LeadDrawer({
         onOpenChange={setRemoving}
         onRemoved={onClose}
       />
-      <AppointmentForm
-        open={booking !== null}
-        mode="create"
-        prefill={booking ?? undefined}
-        onClose={() => setBooking(null)}
-      />
+      {booking.form?.mode === 'reschedule' ? (
+        <AppointmentForm
+          open
+          mode="reschedule"
+          appointmentId={booking.form.appointment.id}
+          appointment={booking.form.appointment}
+          onClose={booking.closeForm}
+        />
+      ) : (
+        <AppointmentForm
+          open={booking.form !== null}
+          mode="create"
+          prefill={booking.form?.prefill}
+          onClose={booking.closeForm}
+        />
+      )}
+      {booking.cancelling ? (
+        <CancelVisitConfirm row={booking.cancelling} open onClose={booking.closeCancel} />
+      ) : null}
     </TooltipProvider>
   );
 }

@@ -49,6 +49,11 @@ export interface AppointmentFormPrefill {
   copyOf?: string;
   /** From a chat or a task (`source=`): step 1 collapsed, Date & time open. */
   collapsed?: boolean;
+  /**
+   * From a lead: the person is fixed — no "Change contact" — so the booking is theirs and moves
+   * their lead to Booked (clinozy-be L11). Someone else is booked from Appointments.
+   */
+  lockedWho?: boolean;
   type?: AppointmentType;
   serviceLabel?: string;
   durationMin?: number;
@@ -64,7 +69,8 @@ const LEAD_BOOKING_REASON = 80;
  * The lead drawer's "Book an appointment" (KICKOFF §6.3; H:5751): this lead;
  * Treatment "LHR Treatment" when an interest matches `/lhr|laser/i`, else
  * Consultation; 20 min; today; no time; step 1 collapsed with Date & time
- * open; Reason the first 80 characters of their last inbound message.
+ * open; the person locked to the lead's; Reason the first 80 characters of
+ * their last inbound message.
  */
 export function leadBookingPrefill(
   lead: { contactId: string; interests: readonly string[] },
@@ -74,6 +80,7 @@ export function leadBookingPrefill(
   return {
     whoId: lead.contactId,
     collapsed: true,
+    lockedWho: true,
     ...(laser
       ? { type: 'treatment' as const, serviceLabel: 'LHR Treatment' }
       : { type: 'consultation' as const }),

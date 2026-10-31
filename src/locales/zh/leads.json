@@ -7,6 +7,7 @@
     "created": "已创建潜在客户 {{id}}",
     "saved": "潜在客户已保存",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "你现在负责 {{name}} · {{owner}} 仍参与其中",
     "claimedUnowned": "你现在负责 {{name}}",
     "released": "已释放给团队 · 任何人都可以认领",
@@ -98,18 +99,88 @@
     "steps": {
       "done": "已完成",
       "current": "当前",
-      "next": "下一步"
+      "next": "下一步",
+      "book": "预约"
     },
     "stepTips": {
       "done": "{{status}} · 已完成",
       "current": "{{status}} · 当前步骤",
       "next": "移至{{status}}",
-      "byCheckIn": "已到诊 · 签到时设置"
+      "byCheckIn": "已到诊 · 签到时设置",
+      "book": "预约就诊 · 线索将进入{{status}}",
+      "byBooking": "{{status}} · 预约后自动设置",
+      "locked": "{{status}} · 取消预约后才能退回"
     },
-    "closeAs": "关闭为",
+    "booking": {
+      "reschedule": "改期",
+      "cancel": "取消预约"
+    },
+    "nextStep": {
+      "aria": "下一步",
+      "labels": {
+        "next": "下一步",
+        "when": "时间",
+        "outcome": "结果"
+      },
+      "headline": {
+        "new": "向{{name}}打个招呼",
+        "contacted": "跟进{{name}}",
+        "follow_up": "跟进{{name}}",
+        "no_response": "再次联系{{name}}",
+        "appointment_scheduled": "已为{{name}}预约到访",
+        "clinic_visited": "{{name}}已成为患者",
+        "not_interested": "{{name}}拒绝了",
+        "invalid": "号码错误或垃圾信息",
+        "lost": "{{name}}去了别处"
+      },
+      "since": {
+        "created": "创建于 {{when}}",
+        "since": "自 {{when}}",
+        "noAnswer": "未接听 {{when}}"
+      },
+      "actions": {
+        "whatsapp": "发送 WhatsApp",
+        "call": "记录通话",
+        "book": "预约",
+        "openFile": "打开患者档案",
+        "reopen": "重新打开",
+        "noAnswer": "未接听",
+        "noAnswerAgain": "仍未接听",
+        "more": "更多"
+      },
+      "when": {
+        "notContacted": "尚未联系",
+        "replyNow": "{{when}}来信 · 请立即回复",
+        "setTime": "设定时间",
+        "nextTry": "下次尝试 {{when}}",
+        "visited": "到访 {{when}}",
+        "closed": "关闭于 {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "正在读取预约…"
+      },
+      "notes": {
+        "contactFirst": "联系后才会出现“未接听”",
+        "checkIn": "签到后自动推进",
+        "final": "最终状态，由签到设定",
+        "winBack": "若在{{date}}前签到将自动恢复",
+        "never": "不会自动恢复"
+      },
+      "picker": {
+        "title": "何时跟进？",
+        "laterToday": "今天稍晚",
+        "tomorrow": "明天",
+        "inThreeDays": "3天后",
+        "nextWeek": "下周",
+        "date": "日期",
+        "time": "时间",
+        "cancel": "取消",
+        "set": "设定跟进"
+      }
+    },
     "info": {
       "created": "创建时间",
       "lastActivity": "最近动态",
+      "closed": "关闭时间",
       "none": "暂无",
       "patient": "患者",
       "linked": "已关联",

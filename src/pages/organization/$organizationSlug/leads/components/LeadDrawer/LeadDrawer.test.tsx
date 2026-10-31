@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import type * as ContactActivitiesApiModule from '@/shared/api/app/contact-activities-api.ts';
 import { fetchContactThread } from '@/shared/api/app/contact-activities-api.ts';
 import type * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
@@ -26,10 +27,12 @@ import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
 import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 
 import {
   contactRecord,
   type ContactsWorld,
+  daysAgo,
   leadRecord,
   type LeadsWorld,
   NOW,
@@ -105,7 +108,9 @@ vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
     ...directoryApiDouble(),
   };
 });
-// The stacked appointment form's reads: the day's free starts, no treatments.
+/** The person's bookings, as `GET /app/appointments?contact_id=` answers them — none by default. */
+const bookings = vi.hoisted(() => ({ rows: [] as AppointmentRow[] }));
+// The stacked appointment form's reads: the day's free starts, no treatments; the person's bookings.
 vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { slotDay } = await import('@/tests/utils/appointment-doubles.ts');
   return {
@@ -113,6 +118,7 @@ vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
     fetchAppointmentSlots: vi.fn(async ({ date }: { date: string }) =>
       slotDay(date, ['10:00', '10:30']),
     ),
+    fetchPersonAppointments: vi.fn(async () => bookings.rows),
   };
 });
 // The one offerings catalogue — the booking step's "From offerings": empty here.
@@ -140,6 +146,7 @@ beforeEach(() => {
   Object.assign(people, { contacts: [contactRecord()] });
   vi.resetAllMocks();
   access.book = true;
+  bookings.rows = [];
   access.tasks = true;
   access.read = true;
   access.write = true;
@@ -230,26 +237,64 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     expect(infoCell(drawer, 'Patient')).toHaveTextContent(/^PatientLinked$/);
   });
 
-  it('saves a status move with the read’s `updated_at` — "<name> → <status>", no Undo', async () => {
+  it('reads when a closed lead closed, and no close date while it is open (clinozy-be D10)', async () => {
+    const open = await openAnaya();
+    expect(
+      within(within(open.drawer).getByRole('region', { name: 'Info' })).queryByText(
+        'Closed',
+      ),
+    ).not.toBeInTheDocument();
+    open.unmount();
+
+    world.leads = [leadRecord({ status: 'lost', closedAt: daysAgo(1) })];
+    const { drawer } = await openAnaya();
+    expect(infoCell(drawer, 'Closed')).toHaveTextContent(
+      /^ClosedYesterday \W?10:00\sAM\W?$/i,
+    );
+  });
+
+  it('moves the lead at once from Progress: Contacted asks when to follow up, then saves with Undo (D25)', async () => {
     const user = userEvent.setup();
     const { drawer } = await openAnaya();
     const progress = within(drawer).getByRole('region', { name: 'Progress' });
     await user.click(within(progress).getByRole('button', { name: /Contacted/ }));
-    expect(within(drawer).getByRole('button', { name: 'Discard' })).toBeInTheDocument();
-    await user.click(within(drawer).getByRole('button', { name: 'Save lead' }));
-    await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith('Anaya Desai → Contacted'),
-    );
-    expect(updateLead).toHaveBeenCalledExactlyOnceWith({
+    const picker = await screen.findByTestId('lead-drawer-follow-up');
+    await user.click(within(picker).getByTestId('lead-drawer-follow-up-pick-tomorrow'));
+    await user.click(within(picker).getByTestId('lead-drawer-follow-up-set'));
+    await waitFor(() => expect(updateLead).toHaveBeenCalledOnce());
+    expect(updateLead).toHaveBeenCalledWith({
       leadId: ANAYA.id,
-      fields: { status: 'contacted' },
+      fields: { status: 'contacted', followUpAt: expect.any(String) },
       expectedUpdatedAt: ANAYA.updatedAt,
       idempotencyKey: expect.any(String),
     });
-    expect(notifyMock.undo).not.toHaveBeenCalled();
-    expect(world.leads[0]?.status).toBe('contacted');
     await waitFor(() =>
-      expect(within(drawer).getByRole('button', { name: 'Save lead' })).toBeDisabled(),
+      expect(notifyMock.undo).toHaveBeenCalledWith(
+        expect.stringMatching(/^Anaya Desai → Contacted · /),
+        expect.objectContaining({ onUndo: expect.any(Function) }),
+      ),
+    );
+    expect(world.leads[0]?.status).toBe('contacted');
+    // Nothing waits for Save.
+    expect(within(drawer).getByRole('button', { name: 'Save lead' })).toBeDisabled();
+  });
+
+  it('closes the lead from the Next step card at once — Not interested — with Undo (D25)', async () => {
+    const user = userEvent.setup();
+    const { drawer } = await openAnaya();
+    const card = within(drawer).getByTestId('lead-drawer-next-step');
+    expect(card).toHaveTextContent('Say hello to Anaya');
+    await user.click(within(card).getByTestId('lead-drawer-outcome-not_interested'));
+    await waitFor(() =>
+      expect(updateLead).toHaveBeenCalledWith(
+        expect.objectContaining({ fields: { status: 'not_interested' } }),
+      ),
+    );
+    await waitFor(() =>
+      expect(notifyMock.undo).toHaveBeenCalledWith(
+        'Anaya Desai → Not interested',
+        expect.anything(),
+      ),
     );
   });
 
@@ -415,6 +460,61 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     );
   });
 
+  it('books from Progress: the Booked step opens the form on the lead’s contact, locked', async () => {
+    const user = userEvent.setup();
+    const { drawer } = await openAnaya();
+    const step = within(drawer).getByTestId('lead-drawer-step-appointment_scheduled');
+    expect(step).toHaveTextContent('Book');
+    await user.click(step);
+    const booking = await screen.findByTestId('new-appointment-drawer');
+    const who = await within(booking).findByTestId('appointment-form-who-card');
+    expect(who).toHaveTextContent('Anaya Desai');
+    // The person is the lead's: the booking moves this lead, so the card offers no Change.
+    await user.hover(within(who).getByRole('button', { name: /Anaya Desai/ }));
+    const card = await screen.findByRole('dialog', { name: 'Contact' });
+    expect(
+      within(card).getByRole('button', { name: 'Edit contact' }),
+    ).toBeInTheDocument();
+    expect(within(card).queryByRole('button', { name: 'Change contact' })).toBeNull();
+  });
+
+  it('shows the booking still to happen on Progress — Cancel asks why, Reschedule opens it', async () => {
+    const user = userEvent.setup();
+    world.leads = [leadRecord({ status: 'appointment_scheduled' })];
+    bookings.rows = [
+      appointmentRow({
+        contactId: ANAYA.contactId,
+        leadId: ANAYA.id,
+        status: 'cancelled',
+      }),
+      appointmentRow({
+        id: 'appt_anaya0000000000000000',
+        contactId: ANAYA.contactId,
+        leadId: ANAYA.id,
+        startTime: '11:00',
+      }),
+    ];
+    const { drawer } = await openAnaya();
+    const booked = within(drawer).getByTestId('lead-drawer-next-step');
+    await waitFor(() =>
+      expect(within(booked).getByTestId('lead-drawer-booking')).toHaveTextContent(
+        /Tomorrow · 11:00.*Consultation/i,
+      ),
+    );
+    // Booked: the earlier steps wait for the cancel (clinozy-be L11).
+    expect(within(drawer).getByTestId('lead-drawer-step-follow_up')).toBeDisabled();
+
+    await user.click(within(booked).getByRole('button', { name: 'Cancel appointment' }));
+    expect(await screen.findByText('Cancel this appointment?')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByText('Cancel this appointment?')).not.toBeInTheDocument(),
+    );
+
+    await user.click(within(booked).getByRole('button', { name: 'Reschedule' }));
+    expect(await screen.findByTestId('appointment-drawer')).toBeInTheDocument();
+  });
+
   it('offers no booking from the chat without the right to book', async () => {
     access.book = false;
     const { drawer } = await openAnaya();
@@ -422,6 +522,9 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
     await within(chat).findByText(/^Lead created/);
     expect(within(chat).queryByTestId('chat-book')).not.toBeInTheDocument();
     expect(screen.queryByTestId('new-appointment-drawer')).not.toBeInTheDocument();
+    expect(
+      within(drawer).getByTestId('lead-drawer-step-appointment_scheduled'),
+    ).toBeDisabled();
   });
 
   // QA-07's pattern: a member who reads the stream but may not write it had a composer the server

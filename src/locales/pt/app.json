@@ -74,6 +74,7 @@
       "new": "Novo",
       "contacted": "Contatado",
       "follow_up": "Acompanhamento",
+      "appointment_scheduled": "Agendado",
       "clinic_visited": "Visitou a clínica",
       "no_response": "Sem resposta",
       "not_interested": "Sem interesse",
@@ -186,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · lembrete na fila",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · horário liberado, lembretes parados",
       "cancelled": "Consulta {{id}} cancelada",
-      "restored": "Consulta restaurada · o lembrete é enviado novamente"
+      "restored": "Consulta restaurada · o lembrete é enviado novamente",
+      "alsoBooked": "Também agendado · {{day}} · {{time}}",
+      "openBooking": "Abrir"
     }
   },
   "offerings": {

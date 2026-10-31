@@ -7,6 +7,7 @@
     "created": "리드 {{id}} 생성됨",
     "saved": "리드 저장됨",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "이제 {{name}} 담당입니다 · {{owner}} 님은 계속 참여합니다",
     "claimedUnowned": "이제 {{name}} 담당입니다",
     "released": "팀에 공개됨 · 누구나 가져갈 수 있습니다",
@@ -98,18 +99,88 @@
     "steps": {
       "done": "완료",
       "current": "현재",
-      "next": "다음"
+      "next": "다음",
+      "book": "예약"
     },
     "stepTips": {
       "done": "{{status}} · 완료",
       "current": "{{status}} · 현재 단계",
       "next": "{{status}}(으)로 이동",
-      "byCheckIn": "내원함 · 체크인할 때 설정됩니다"
+      "byCheckIn": "내원함 · 체크인할 때 설정됩니다",
+      "book": "예약 잡기 · 리드가 {{status}}(으)로 이동합니다",
+      "byBooking": "{{status}} · 예약하면 설정됩니다",
+      "locked": "{{status}} · 되돌리려면 예약을 취소하세요"
     },
-    "closeAs": "종료 사유",
+    "booking": {
+      "reschedule": "일정 변경",
+      "cancel": "예약 취소"
+    },
+    "nextStep": {
+      "aria": "다음 단계",
+      "labels": {
+        "next": "다음",
+        "when": "언제",
+        "outcome": "결과"
+      },
+      "headline": {
+        "new": "{{name}}님에게 인사하기",
+        "contacted": "{{name}}님 후속 연락",
+        "follow_up": "{{name}}님 후속 연락",
+        "no_response": "{{name}}님에게 다시 연락",
+        "appointment_scheduled": "{{name}}님 방문 예약됨",
+        "clinic_visited": "{{name}}님은 이제 환자입니다",
+        "not_interested": "{{name}}님이 거절했습니다",
+        "invalid": "잘못된 번호 또는 스팸",
+        "lost": "{{name}}님은 다른 곳으로 갔습니다"
+      },
+      "since": {
+        "created": "생성 {{when}}",
+        "since": "{{when}}부터",
+        "noAnswer": "응답 없음 {{when}}"
+      },
+      "actions": {
+        "whatsapp": "WhatsApp 보내기",
+        "call": "통화 기록",
+        "book": "예약하기",
+        "openFile": "환자 파일 열기",
+        "reopen": "다시 열기",
+        "noAnswer": "응답 없음",
+        "noAnswerAgain": "또 응답 없음",
+        "more": "더보기"
+      },
+      "when": {
+        "notContacted": "아직 연락 안 함",
+        "replyNow": "{{when}}에 메시지 · 지금 답장",
+        "setTime": "시간 설정",
+        "nextTry": "다음 시도 {{when}}",
+        "visited": "방문 {{when}}",
+        "closed": "종료 {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "예약을 불러오는 중…"
+      },
+      "notes": {
+        "contactFirst": "연락한 뒤에 ‘응답 없음’이 표시됩니다",
+        "checkIn": "체크인하면 다음 단계로 이동합니다",
+        "final": "최종 (체크인으로 설정됨)",
+        "winBack": "{{date}}까지 체크인하면 다시 열립니다",
+        "never": "자동으로 다시 열리지 않습니다"
+      },
+      "picker": {
+        "title": "언제 후속 연락할까요?",
+        "laterToday": "오늘 늦게",
+        "tomorrow": "내일",
+        "inThreeDays": "3일 후",
+        "nextWeek": "다음 주",
+        "date": "날짜",
+        "time": "시간",
+        "cancel": "취소",
+        "set": "후속 연락 설정"
+      }
+    },
     "info": {
       "created": "생성일",
       "lastActivity": "최근 활동",
+      "closed": "종료일",
       "none": "아직 없음",
       "patient": "환자",
       "linked": "연결됨",

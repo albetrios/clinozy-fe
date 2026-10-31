@@ -74,6 +74,7 @@
       "new": "新线索",
       "contacted": "已联系",
       "follow_up": "跟进",
+      "appointment_scheduled": "已预约",
       "clinic_visited": "已到诊",
       "no_response": "无回应",
       "not_interested": "无意向",
@@ -186,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · 提醒已排队",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · 时段已释放，提醒已停止",
       "cancelled": "预约 {{id}} 已取消",
-      "restored": "预约已恢复 · 提醒将再次发送"
+      "restored": "预约已恢复 · 提醒将再次发送",
+      "alsoBooked": "另有预约 · {{day}} · {{time}}",
+      "openBooking": "打开"
     }
   },
   "offerings": {

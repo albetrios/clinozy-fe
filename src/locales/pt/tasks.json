@@ -49,17 +49,21 @@
           "label": "Visita agendada",
           "effect": "O formulário de consulta abre"
         },
-        "callBackTomorrow": {
-          "label": "Ligar de volta amanhã",
-          "effect": "Data de acompanhamento → amanhã 11:00"
-        },
         "noAnswer": {
           "label": "Sem resposta",
-          "effect": "Ligação registrada · tarefa adiada por 3 horas"
+          "effect": "Ligação registrada · lead → Sem resposta · próxima tentativa amanhã no mesmo horário"
         },
         "notInterested": {
           "label": "Sem interesse",
           "effect": "Status do lead → Sem interesse"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam ou número errado",
+          "effect": "Status do lead → Inválido"
+        },
+        "lost": {
+          "label": "Foi para outro lugar",
+          "effect": "Status do lead → Perdido"
         }
       }
     },

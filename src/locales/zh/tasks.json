@@ -49,17 +49,21 @@
           "label": "已预约到访",
           "effect": "打开预约表单"
         },
-        "callBackTomorrow": {
-          "label": "明天回电",
-          "effect": "跟进日期 → 明天 11:00"
-        },
         "noAnswer": {
           "label": "无人接听",
-          "effect": "已记录通话 · 任务暂缓 3 小时"
+          "effect": "已记录通话 · 线索 → 未回应 · 明天同一时间再试"
         },
         "notInterested": {
           "label": "不感兴趣",
           "effect": "潜在客户状态 → 不感兴趣"
+        },
+        "spamOrWrongNumber": {
+          "label": "垃圾信息或号码错误",
+          "effect": "潜在客户状态 → 无效"
+        },
+        "lost": {
+          "label": "去了别处",
+          "effect": "潜在客户状态 → 流失"
         }
       }
     },

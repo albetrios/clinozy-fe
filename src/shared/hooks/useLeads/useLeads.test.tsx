@@ -31,6 +31,7 @@ import {
   useDeleteLead,
   useLead,
   useLeadList,
+  useMoveLead,
   useOpenLeadTasks,
   useReleaseLead,
   useRestoreLead,
@@ -352,6 +353,47 @@ describe('useCreateLead', () => {
     expect(notify.error).toHaveBeenCalledTimes(1);
     expect(notify.success).not.toHaveBeenCalled();
     expect(server.leads).toHaveLength(3);
+  });
+});
+
+describe('useMoveLead (D25)', () => {
+  it('moves at once with the follow-up time, and Undo puts both back', async () => {
+    const { result } = renderHook(() => useMoveLead(), { wrapper });
+    const followUpAt = '2026-10-04T05:30:00.000Z';
+    await act(() =>
+      result.current.mutateAsync({ lead: ANAYA, status: 'follow_up', followUpAt }),
+    );
+    expect(updateLead).toHaveBeenCalledWith({
+      leadId: ANAYA.id,
+      fields: { status: 'follow_up', followUpAt },
+      expectedUpdatedAt: ANAYA.updatedAt,
+      idempotencyKey: expect.any(String),
+    });
+    expect(notify.undo).toHaveBeenCalledWith(
+      expect.stringMatching(/^Anaya Desai → Follow-up · /),
+      expect.objectContaining({ onUndo: expect.any(Function) }),
+    );
+    const undo = vi.mocked(notify.undo).mock.calls[0]?.[1];
+    await act(async () => {
+      undo?.onUndo();
+    });
+    await waitFor(() =>
+      expect(updateLead).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          fields: { status: ANAYA.status, followUpAt: ANAYA.followUpAt },
+        }),
+      ),
+    );
+    await waitFor(() => expect(notify.success).toHaveBeenCalledWith('Anaya Desai → New'));
+  });
+
+  it('names a move with no time "<name> → <status>"', async () => {
+    const { result } = renderHook(() => useMoveLead(), { wrapper });
+    await act(() => result.current.mutateAsync({ lead: ANAYA, status: 'lost' }));
+    expect(updateLead).toHaveBeenCalledWith(
+      expect.objectContaining({ fields: { status: 'lost' } }),
+    );
+    expect(notify.undo).toHaveBeenCalledWith('Anaya Desai → Lost', expect.anything());
   });
 });
 

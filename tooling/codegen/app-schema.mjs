@@ -29,6 +29,8 @@ export const SCHEMA_TARGET = 'src/shared/api/app/app-schema.ts';
 export const ENUM_AMENDMENTS = {
   // change-branches-in-navbar-2026-10-14-zrml: Branches is its own section, after Users.
   section: ['branches'],
+  // Leads follow their bookings (clinozy-be L11): a booked lead waits on its visit.
+  lead_status: ['appointment_scheduled'],
 };
 
 /** Embedded shapes the markdown spells inline in a Constraints cell. */

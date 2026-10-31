@@ -90,6 +90,7 @@ describe('clinic tones', () => {
       new: 'sky',
       contacted: 'lav',
       follow_up: 'butter',
+      appointment_scheduled: 'peach',
       clinic_visited: 'sage',
       no_response: 'stone',
       not_interested: 'blush',

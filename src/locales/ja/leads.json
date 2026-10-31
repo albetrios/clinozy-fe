@@ -7,6 +7,7 @@
     "created": "リード {{id}} を作成しました",
     "saved": "リードを保存しました",
     "statusChanged": "{{name}} → {{status}}",
+    "movedAt": "{{name}} → {{status}} · {{when}}",
     "claimed": "{{name}} の担当になりました · {{owner}} は引き続き関与します",
     "claimedUnowned": "{{name}} の担当になりました",
     "released": "チームに開放しました · 誰でも引き受けられます",
@@ -98,18 +99,88 @@
     "steps": {
       "done": "完了",
       "current": "現在",
-      "next": "次"
+      "next": "次",
+      "book": "予約"
     },
     "stepTips": {
       "done": "{{status}} · 完了",
       "current": "{{status}} · 現在のステップ",
       "next": "{{status}} に進める",
-      "byCheckIn": "来院済み · チェックイン時に設定されます"
+      "byCheckIn": "来院済み · チェックイン時に設定されます",
+      "book": "予約を入れる · リードが{{status}}になります",
+      "byBooking": "{{status}} · 予約を入れると設定されます",
+      "locked": "{{status}} · 戻すには予約をキャンセルしてください"
     },
-    "closeAs": "終了理由",
+    "booking": {
+      "reschedule": "日時を変更",
+      "cancel": "予約をキャンセル"
+    },
+    "nextStep": {
+      "aria": "次のステップ",
+      "labels": {
+        "next": "次に",
+        "when": "いつ",
+        "outcome": "結果"
+      },
+      "headline": {
+        "new": "{{name}}さんに挨拶する",
+        "contacted": "{{name}}さんにフォローアップ",
+        "follow_up": "{{name}}さんにフォローアップ",
+        "no_response": "{{name}}さんにもう一度連絡",
+        "appointment_scheduled": "{{name}}さんの来院を予約済み",
+        "clinic_visited": "{{name}}さんは患者になりました",
+        "not_interested": "{{name}}さんは断りました",
+        "invalid": "番号違いまたはスパム",
+        "lost": "{{name}}さんは他院へ"
+      },
+      "since": {
+        "created": "作成 {{when}}",
+        "since": "{{when}}から",
+        "noAnswer": "応答なし {{when}}"
+      },
+      "actions": {
+        "whatsapp": "WhatsAppを送る",
+        "call": "通話を記録",
+        "book": "予約する",
+        "openFile": "患者ファイルを開く",
+        "reopen": "再開する",
+        "noAnswer": "応答なし",
+        "noAnswerAgain": "今回も応答なし",
+        "more": "その他"
+      },
+      "when": {
+        "notContacted": "まだ未連絡",
+        "replyNow": "{{when}}にメッセージ · 今すぐ返信",
+        "setTime": "時間を設定",
+        "nextTry": "次回 {{when}}",
+        "visited": "来院 {{when}}",
+        "closed": "クローズ {{when}}",
+        "booking": "{{when}} · {{what}}",
+        "bookingPending": "予約を読み込み中…"
+      },
+      "notes": {
+        "contactFirst": "連絡後に「応答なし」が表示されます",
+        "checkIn": "チェックインで次へ進みます",
+        "final": "確定（チェックインで設定）",
+        "winBack": "{{date}}までにチェックインすると戻ります",
+        "never": "自動では戻りません"
+      },
+      "picker": {
+        "title": "いつフォローアップしますか？",
+        "laterToday": "今日の後ほど",
+        "tomorrow": "明日",
+        "inThreeDays": "3日後",
+        "nextWeek": "来週",
+        "date": "日付",
+        "time": "時刻",
+        "cancel": "キャンセル",
+        "set": "フォローアップを設定"
+      }
+    },
     "info": {
       "created": "作成日",
       "lastActivity": "最新のアクティビティ",
+      "closed": "クローズ日",
       "none": "まだありません",
       "patient": "患者",
       "linked": "リンク済み",

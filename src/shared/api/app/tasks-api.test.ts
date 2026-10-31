@@ -292,17 +292,21 @@ describe('recordTaskOutcome (research-tasks §2.1)', () => {
     });
   });
 
-  it('moves the follow-up to 11:00 tomorrow in the clinic', async () => {
+  it('No answer moves the lead to No response, the next try tomorrow at the task’s clock (D25)', async () => {
     await recordTaskOutcome({
       ...base,
-      task: taskRow({ ruleKey: 'follow_up', type: 'follow_up' }),
-      outcomeId: 'callBackTomorrow',
-      words: 'Call back tomorrow',
+      task: taskRow({
+        ruleKey: 'follow_up',
+        type: 'follow_up',
+        dueAt: appInstant('2026-10-10', '18:00'),
+      }),
+      outcomeId: 'noAnswer',
+      words: 'No answer',
     });
     expect(updateLead).toHaveBeenCalledWith({
       leadId: TEST_TASK_LEAD_ID,
-      fields: { followUpAt: appInstant('2026-10-11', '11:00') },
-      idempotencyKey: `${KEY}:leadFollowUpTomorrow`,
+      fields: { status: 'no_response', followUpAt: appInstant('2026-10-11', '18:00') },
+      idempotencyKey: `${KEY}:leadNoAnswer`,
     });
   });
 

@@ -11561,6 +11561,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11593,7 +11595,7 @@ export interface operations {
                             /** @enum {string|null} */
                             source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                             /** @enum {string} */
-                            status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                            status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                             /** Format: date-time */
                             updated_at?: string;
                         }[];
@@ -11668,7 +11670,7 @@ export interface operations {
                     /** @enum {string|null} */
                     source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                     /** @enum {string} */
-                    status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                    status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                 };
             };
         };
@@ -11682,6 +11684,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11714,7 +11718,7 @@ export interface operations {
                             /** @enum {string|null} */
                             source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                             /** @enum {string} */
-                            status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                            status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -11755,6 +11759,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11787,7 +11793,7 @@ export interface operations {
                             /** @enum {string|null} */
                             source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                             /** @enum {string} */
-                            status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                            status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -11863,7 +11869,7 @@ export interface operations {
                     /** @enum {string|null} */
                     source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                     /** @enum {string} */
-                    status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                    status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                 };
             };
         };
@@ -11877,6 +11883,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11909,7 +11917,7 @@ export interface operations {
                             /** @enum {string|null} */
                             source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                             /** @enum {string} */
-                            status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                            status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -11953,6 +11961,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -11985,7 +11995,7 @@ export interface operations {
                             /** @enum {string|null} */
                             source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                             /** @enum {string} */
-                            status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                            status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -12029,6 +12039,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -12061,7 +12073,7 @@ export interface operations {
                             /** @enum {string|null} */
                             source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                             /** @enum {string} */
-                            status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                            status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -12105,6 +12117,8 @@ export interface operations {
                     "application/json": {
                         data?: {
                             branch_id?: string | null;
+                            /** Format: date-time */
+                            closed_at?: string | null;
                             contact?: {
                                 contact_number?: number;
                                 /** @enum {string} */
@@ -12137,7 +12151,7 @@ export interface operations {
                             /** @enum {string|null} */
                             source?: "instagram" | "google" | "whatsapp" | "facebook" | "walk_in" | "referral" | "retarget" | null;
                             /** @enum {string} */
-                            status?: "new" | "contacted" | "follow_up" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
+                            status?: "new" | "contacted" | "follow_up" | "appointment_scheduled" | "no_response" | "not_interested" | "invalid" | "lost" | "clinic_visited";
                             /** Format: date-time */
                             updated_at?: string;
                         };

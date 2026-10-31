@@ -225,8 +225,11 @@ export type TaskTimeSpan =
 export type TaskOutcomeStep =
   /** `PATCH /app/leads/:lead_id { status }`. */
   | { readonly type: 'leadStatus'; readonly status: LeadStatus }
-  /** `PATCH /app/leads/:lead_id { follow_up_at }` — tomorrow at a clinic-local time. */
-  | { readonly type: 'leadFollowUpTomorrow'; readonly at: string }
+  /**
+   * `PATCH /app/leads/:lead_id { status: no_response, follow_up_at }` — "No answer": the next try is
+   * tomorrow at the clock the task was due (D25).
+   */
+  | { readonly type: 'leadNoAnswer' }
   /** `POST /app/contacts/:contact_id/activities/log-call { direction: sent, body }` — the outcome's words. */
   | { readonly type: 'logCall' }
   /** The person's newest undelivered message, queued again (`…/activities/:id/resend`). */
@@ -352,14 +355,13 @@ export const TASK_TYPES = {
     type: 'follow_up',
     group: 'leads',
     tone: 'butter',
+    // The lead drawer's outcomes (D25): Booked · No answer · Not interested · Invalid · Lost.
     outcomes: [
       closes('bookedVisit', DONE, [], 'appointmentNew'),
-      closes('callBackTomorrow', DONE, [
-        { type: 'leadFollowUpTomorrow', at: '11:00' },
-        LOG_CALL,
-      ]),
-      defers('noAnswer', NO_ANSWER, [LOG_CALL]),
+      defers('noAnswer', NO_ANSWER, [{ type: 'leadNoAnswer' }, LOG_CALL]),
       closes('notInterested', DONE, [{ type: 'leadStatus', status: 'not_interested' }]),
+      closes('spamOrWrongNumber', DONE, [{ type: 'leadStatus', status: 'invalid' }]),
+      closes('lost', DONE, [{ type: 'leadStatus', status: 'lost' }]),
     ],
   },
   claim: {
@@ -530,7 +532,7 @@ export function findTaskOutcome(
 /** The permission code each record write needs. */
 const STEP_CODES: Readonly<Record<TaskOutcomeStep['type'], string>> = {
   leadStatus: 'lead:update',
-  leadFollowUpTomorrow: 'lead:update',
+  leadNoAnswer: 'lead:update',
   logCall: 'contact_activity:create',
   resendFailedMessage: 'contact_activity:update',
   appointment: 'appointment:update',

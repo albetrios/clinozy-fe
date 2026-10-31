@@ -74,6 +74,7 @@
       "new": "新規",
       "contacted": "連絡済み",
       "follow_up": "フォローアップ",
+      "appointment_scheduled": "予約済み",
       "clinic_visited": "来院済み",
       "no_response": "応答なし",
       "not_interested": "関心なし",
@@ -186,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · リマインダーを予約しました",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · 枠を解放し、リマインダーを停止しました",
       "cancelled": "予約 {{id}} をキャンセルしました",
-      "restored": "予約を復元しました · リマインダーを再送します"
+      "restored": "予約を復元しました · リマインダーを再送します",
+      "alsoBooked": "ほかにも予約あり · {{day}} · {{time}}",
+      "openBooking": "開く"
     }
   },
   "offerings": {

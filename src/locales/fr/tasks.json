@@ -49,17 +49,21 @@
           "label": "Visite réservée",
           "effect": "Le formulaire de rendez-vous s’ouvre"
         },
-        "callBackTomorrow": {
-          "label": "Rappeler demain",
-          "effect": "Date de relance → demain 11:00"
-        },
         "noAnswer": {
           "label": "Pas de réponse",
-          "effect": "Appel enregistré · la tâche est reportée de 3 heures"
+          "effect": "Appel noté · prospect → Pas de réponse · prochain essai demain à la même heure"
         },
         "notInterested": {
           "label": "Pas intéressé",
           "effect": "Statut du prospect → Pas intéressé"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam ou mauvais numéro",
+          "effect": "Statut du prospect → Invalide"
+        },
+        "lost": {
+          "label": "Est allé ailleurs",
+          "effect": "Statut du prospect → Perdu"
         }
       }
     },

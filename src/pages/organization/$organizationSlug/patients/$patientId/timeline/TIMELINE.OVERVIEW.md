@@ -67,7 +67,8 @@ activity. The
   the patient has an open visit — on clinozy-be a visit is their booking checked in today, there is
   no Visit resource (`@/shared/hooks/useVisits/`). The file bar's "Start visit" checks in today's
   booking, else books a walk-in (their usual doctor, else the signed-in member), and opens the
-  flow; its "Visit in progress · Resume" pill returns to it. One column up to 880px: "Visit in
+  flow — after a walk-in, a booking the person still has on a later day stays (clinozy-be D3) and
+  a heads-up names it, "Also booked · <day> · <time>", with Open to it in Appointments (D20); its "Visit in progress · Resume" pill returns to it. One column up to 880px: "Visit in
   progress" (or paused), Pause (`…/pause`, back to the Overview, the visit open), Resume
   (`…/resume`) and "✓ Complete visit" (`…/complete` — "Visit completed · …", naming a package
   session used and the Rx's follow-up when there was one) — the booking's own routes — then five

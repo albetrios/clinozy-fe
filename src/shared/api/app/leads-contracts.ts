@@ -71,6 +71,8 @@ export interface LeadRecord {
   /** Until when the owner holds it; past it, anyone may claim it. */
   heldUntil: string | null;
   followUpAt: string | null;
+  /** When it last closed (Not interested, Invalid, Lost, Clinic visited) — null while open; the server's. */
+  closedAt: string | null;
   branchId: string | null;
   notes: string | null;
   /** The person's latest activity on any record. */
@@ -125,6 +127,7 @@ const leadFieldsWire = {
   involved_membership_ids: z.array(z.string()),
   held_until: z.string().nullable(),
   follow_up_at: z.string().nullable(),
+  closed_at: z.string().nullable(),
   branch_id: z.string().nullable(),
   notes: z.string().nullable(),
   last_activity_at: z.string().nullable(),
@@ -171,6 +174,7 @@ export function toLeadRecord(row: LeadWire): LeadRecord {
     involvedIds: row.involved_membership_ids,
     heldUntil: row.held_until,
     followUpAt: row.follow_up_at,
+    closedAt: row.closed_at,
     branchId: row.branch_id,
     notes: row.notes,
     lastActivityAt: row.last_activity_at,

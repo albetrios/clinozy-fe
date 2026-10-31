@@ -25,6 +25,33 @@ const draftOf = (lead: LeadRecord): LeadDraft => ({
 const sameList = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((item, index) => item === b[index]);
 
+/**
+ * The draft over a newer read of its lead: a field the member left as the draft found it takes
+ * the read's value — a booking moved the status to Booked, a cancel back to
+ * Follow-up — and a field they changed keeps their change.
+ */
+export function rebaseLeadDraft({
+  draft,
+  base,
+  read,
+}: {
+  draft: LeadDraft;
+  /** What the draft started from. */
+  base: LeadDraft;
+  read: LeadDraft;
+}): LeadDraft {
+  return {
+    source: draft.source === base.source ? read.source : draft.source,
+    interests: sameList(draft.interests, base.interests)
+      ? read.interests
+      : draft.interests,
+    status: draft.status === base.status ? read.status : draft.status,
+  };
+}
+
+const sameDraft = (a: LeadDraft, b: LeadDraft) =>
+  a.source === b.source && a.status === b.status && sameList(a.interests, b.interests);
+
 /** The draft's changes from the saved lead — empty when nothing changed. */
 export function leadDraftFields(lead: LeadRecord, draft: LeadDraft): Partial<LeadFields> {
   const fields: Partial<LeadFields> = {};
@@ -55,18 +82,32 @@ const newerOf = (read: LeadRecord, saved: LeadRecord | null): LeadRecord =>
  * "Discard" drops it. A draft belongs to one lead — another lead starts from
  * its own record. A save's answer stands for the record until the refetch brings
  * it: the draft is clean at once, and the next save carries the new `updated_at`.
+ * A newer read — the server moved the lead, as a booking or a cancel does —
+ * carries into the fields the member left alone ({@link rebaseLeadDraft}).
  */
 export function useLeadDraft(lead: LeadRecord): LeadDraftState {
   const [state, setState] = useState(() => ({
     id: lead.id,
     draft: draftOf(lead),
+    base: draftOf(lead),
     saved: null as LeadRecord | null,
   }));
   const [saveState, setSaveState] = useState<DrawerSaveState>('idle');
   const save = useUpdateLead();
   // Another lead: the draft starts again from its record.
-  if (state.id !== lead.id) setState({ id: lead.id, draft: draftOf(lead), saved: null });
+  if (state.id !== lead.id) {
+    setState({ id: lead.id, draft: draftOf(lead), base: draftOf(lead), saved: null });
+  }
   const record = newerOf(lead, state.saved);
+  // The server moved the lead meanwhile (a booking, a cancel): what the member left follows it.
+  const read = draftOf(record);
+  if (state.id === lead.id && !sameDraft(read, state.base)) {
+    setState((previous) => ({
+      ...previous,
+      draft: rebaseLeadDraft({ draft: previous.draft, base: previous.base, read }),
+      base: read,
+    }));
+  }
   const draft = state.id === lead.id ? state.draft : draftOf(lead);
   const fields = leadDraftFields(record, draft);
   const dirty = Object.keys(fields).length > 0;
@@ -85,14 +126,23 @@ export function useLeadDraft(lead: LeadRecord): LeadDraftState {
         {
           onSuccess: (saved) => {
             setSaveState('idle');
-            setState({ id: saved.id, draft: draftOf(saved), saved });
+            setState({
+              id: saved.id,
+              draft: draftOf(saved),
+              base: draftOf(saved),
+              saved,
+            });
           },
           onError: () => setSaveState('failed'),
         },
       );
     },
     discard: () => {
-      setState((previous) => ({ ...previous, draft: draftOf(record) }));
+      setState((previous) => ({
+        ...previous,
+        draft: draftOf(record),
+        base: draftOf(record),
+      }));
       setSaveState('idle');
     },
   };

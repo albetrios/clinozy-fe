@@ -242,7 +242,7 @@ describe('startVisit — the open visit, else today’s booking checked in, else
 
   it('leaves a visit already open as it is', async () => {
     today({ checkedIn: [visitWireRow()] });
-    await startVisit(start);
+    await expect(startVisit(start)).resolves.toBe('open');
     expect(moveAppointment).not.toHaveBeenCalled();
     expect(api.post).not.toHaveBeenCalled();
   });
@@ -262,7 +262,7 @@ describe('startVisit — the open visit, else today’s booking checked in, else
         }),
       ],
     });
-    await startVisit(start);
+    await expect(startVisit(start)).resolves.toBe('checked_in');
     expect(api.get).toHaveBeenLastCalledWith('/app/appointments', {
       query: expect.objectContaining({
         contact_id: TEST_CONTACT_ID,
@@ -282,7 +282,7 @@ describe('startVisit — the open visit, else today’s booking checked in, else
     vi.mocked(api.post).mockResolvedValue({
       data: visitWireRow({ is_walk_in: true }),
     } as never);
-    await startVisit(start);
+    await expect(startVisit(start)).resolves.toBe('walk_in');
     expect(moveAppointment).not.toHaveBeenCalled();
     expect(api.post).toHaveBeenCalledWith('/app/appointments', {
       body: {

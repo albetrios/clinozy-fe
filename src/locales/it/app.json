@@ -74,6 +74,7 @@
       "new": "Nuovo",
       "contacted": "Contattato",
       "follow_up": "Follow-up",
+      "appointment_scheduled": "Prenotato",
       "clinic_visited": "Visita in clinica",
       "no_response": "Nessuna risposta",
       "not_interested": "Non interessato",
@@ -186,7 +187,9 @@
       "statusConfirmed": "{{name}} → {{status}} · promemoria in coda",
       "statusCancelled": "{{name}} → {{status}} · {{reason}} · orario liberato, promemoria fermati",
       "cancelled": "Appuntamento {{id}} annullato",
-      "restored": "Appuntamento ripristinato · il promemoria riparte"
+      "restored": "Appuntamento ripristinato · il promemoria riparte",
+      "alsoBooked": "Anche prenotato · {{day}} · {{time}}",
+      "openBooking": "Apri"
     }
   },
   "offerings": {

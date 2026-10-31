@@ -28,19 +28,22 @@ import { usePatientFileContext } from '../../shared/patient-file-context.ts';
 
 /**
  * Start visit (D18): checks in the patient's booking today, else books a walk-in with their usual
- * doctor (else the signed-in member), then opens the flow. Undefined — hidden — unless `shown`:
- * the Overview is the member's, no visit is open and they may move a booking.
+ * doctor (else the signed-in member), then opens the flow — and after a walk-in names a booking
+ * still to come, whose Open goes to it in Appointments (clinozy-be D3, D20). Undefined — hidden —
+ * unless `shown`: the Overview is the member's, no visit is open and they may move a booking.
  */
 function useStartVisitAction({
   file,
   shown,
   onStarted,
+  openBooking,
 }: {
   file: PatientFile | undefined;
   shown: boolean;
   onStarted: () => void;
+  openBooking: (appointmentId: string) => void;
 }) {
-  const start = useStartVisit();
+  const start = useStartVisit({ openBooking });
   const doctor = useDefaultStaff('doctor', file?.patient.doctorId);
   if (!(file && shown)) return undefined;
   const patientId = file.patient.id;
@@ -151,6 +154,11 @@ export function usePatientFileNavigation(): PatientFileNavigation {
         !openVisit &&
         can('appointments', 'edit'),
       onStarted: toFlow,
+      openBooking: (appointmentId) =>
+        void navigate({
+          ...organizationAppointment(organizationSlug, appointmentId),
+          search: from,
+        }),
     }),
     resumeVisit: openVisit && !flowShowing ? toFlow : undefined,
     editContact: can('patients', 'edit') ? editContact : undefined,

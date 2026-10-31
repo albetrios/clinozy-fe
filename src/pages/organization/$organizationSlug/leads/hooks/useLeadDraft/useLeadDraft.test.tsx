@@ -110,6 +110,47 @@ describe('useLeadDraft', () => {
     expect(result.current.draft.status).toBe('contacted');
   });
 
+  it('follows the server’s move of a field left alone — a booking, then a cancel', () => {
+    const lead = leadRecord({ status: 'follow_up' });
+    const { result, rerender } = renderDraft(lead);
+    act(() => result.current.update({ source: 'google' }));
+    rerender({
+      lead: {
+        ...lead,
+        status: 'appointment_scheduled',
+        updatedAt: '2026-10-03T06:00:00.000Z',
+      },
+    });
+    expect(result.current.draft).toEqual({
+      source: 'google',
+      interests: lead.interests,
+      status: 'appointment_scheduled',
+    });
+    act(() => result.current.update({ source: lead.source }));
+    expect(result.current.dirty).toBe(false);
+
+    rerender({
+      lead: { ...lead, status: 'follow_up', updatedAt: '2026-10-03T07:00:00.000Z' },
+    });
+    expect(result.current.draft.status).toBe('follow_up');
+    expect(result.current.dirty).toBe(false);
+  });
+
+  it('keeps the member’s own status over the server’s move', () => {
+    const lead = leadRecord({ status: 'contacted' });
+    const { result, rerender } = renderDraft(lead);
+    act(() => result.current.update({ status: 'lost' }));
+    rerender({
+      lead: {
+        ...lead,
+        status: 'appointment_scheduled',
+        updatedAt: '2026-10-03T06:00:00.000Z',
+      },
+    });
+    expect(result.current.draft.status).toBe('lost');
+    expect(result.current.dirty).toBe(true);
+  });
+
   it('saves the changes with the read’s updated_at, then is clean on the saved record', async () => {
     const lead = leadRecord();
     const { result, rerender } = renderDraft(lead);

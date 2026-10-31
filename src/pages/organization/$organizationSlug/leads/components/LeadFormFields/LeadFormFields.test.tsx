@@ -84,7 +84,7 @@ describe('LeadInterestsField', () => {
 });
 
 describe('LeadProgressField', () => {
-  it('marks done, current and next on the track, and closes as any closing status', async () => {
+  it('marks done, current and next on the track, and moves from any step', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<LeadProgressField status="contacted" onChange={onChange} />);
@@ -106,8 +106,40 @@ describe('LeadProgressField', () => {
     expect(onChange).toHaveBeenLastCalledWith('follow_up');
     await user.click(screen.getByRole('button', { name: /New/ }));
     expect(onChange).toHaveBeenLastCalledWith('new');
-    await user.click(screen.getByRole('button', { name: 'Lost' }));
-    expect(onChange).toHaveBeenLastCalledWith('lost');
+  });
+
+  it('shows a done step in a light tint, the current one in its full colour, the next muted — no borders (D21, D25)', () => {
+    render(<LeadProgressField status="follow_up" onChange={vi.fn()} />);
+    const done = screen.getByRole('button', { name: /New/ });
+    expect(done).toHaveClass('bg-tone-sky/40', 'text-tone-sky-foreground');
+    expect(done).not.toHaveClass('bg-tone-sky-foreground');
+    const current = screen.getByRole('button', { name: /Follow-up/ });
+    expect(current).toHaveClass('bg-tone-butter');
+    expect(current.className).not.toMatch(/\b(inset-ring|border)/);
+    const next = screen.getByRole('button', { name: /Booked/ });
+    expect(next).toHaveClass('bg-muted/50', 'text-muted-foreground');
+    expect(next.className).not.toMatch(/\bborder/);
+  });
+
+  it('keeps No response on the Follow-up step, its label the one given — "No answer" (D25)', () => {
+    render(
+      <LeadProgressField
+        status="no_response"
+        onChange={vi.fn()}
+        currentLabel="No answer"
+      />,
+    );
+    const followUp = screen.getByTestId('lead-drawer-step-follow_up');
+    expect(followUp).toHaveAttribute('aria-pressed', 'true');
+    expect(followUp).toHaveTextContent(/No answer/);
+    expect(screen.getByTestId('lead-drawer-step-contacted')).toHaveTextContent(/Done/);
+  });
+
+  it('only shows the track to a member who does not edit the lead', () => {
+    render(<LeadProgressField status="contacted" onChange={vi.fn()} readOnly />);
+    const progress = screen.getByRole('region', { name: 'Lead progress' });
+    for (const button of within(progress).getAllByRole('button'))
+      expect(button).toBeDisabled();
   });
 
   it('never picks Clinic visited — a check-in sets it', async () => {
@@ -121,16 +153,24 @@ describe('LeadProgressField', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('shows a closed lead’s status picked under "Close as", the track still open', () => {
-    render(<LeadProgressField status="not_interested" onChange={() => {}} />);
-    const closeAs = screen.getByRole('group', { name: 'Close as' });
-    expect(
-      within(closeAs).getByRole('button', { name: 'Not interested' }),
-    ).toHaveAttribute('aria-pressed', 'true');
+  it('leaves a closed lead’s steps without a state — the Next step card names it — the track still open', () => {
+    render(
+      <LeadProgressField
+        status="not_interested"
+        onChange={() => {}}
+        nextStep={<p>the card</p>}
+      />,
+    );
+    const progress = screen.getByRole('region', { name: 'Lead progress' });
+    for (const step of within(progress).getAllByRole('button')) {
+      expect(step).not.toHaveTextContent(/\b(Done|Current|Next|Book)\b/);
+      expect(step).not.toHaveAttribute('aria-pressed', 'true');
+    }
     expect(screen.getByRole('button', { name: /New/ })).toBeEnabled();
+    expect(within(progress).getByText('the card')).toBeInTheDocument();
   });
 
-  it('only shows a visited lead’s track and "Close as"', async () => {
+  it('only shows a visited lead’s track', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(<LeadProgressField status="clinic_visited" onChange={onChange} />);
@@ -142,8 +182,99 @@ describe('LeadProgressField', () => {
       'true',
     );
     await user.click(screen.getByRole('button', { name: /Contacted/ }));
-    await user.click(screen.getByRole('button', { name: 'Lost' }));
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('runs the five steps, Booked between Follow-up and Clinic visited', () => {
+    render(<LeadProgressField status="new" onChange={() => {}} />);
+    const progress = screen.getByRole('region', { name: 'Lead progress' });
+    const steps = within(progress)
+      .getAllByRole('button')
+      .filter((button) => button.dataset.testid?.startsWith('lead-drawer-step-'));
+    expect(steps.map((step) => step.dataset.testid)).toEqual([
+      'lead-drawer-step-new',
+      'lead-drawer-step-contacted',
+      'lead-drawer-step-follow_up',
+      'lead-drawer-step-appointment_scheduled',
+      'lead-drawer-step-clinic_visited',
+    ]);
+  });
+
+  it('books from the Booked step — the booking moves the lead, not the press', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onBook = vi.fn();
+    render(
+      <LeadProgressField
+        status="follow_up"
+        onChange={onChange}
+        booking={{ onBook, visit: null }}
+      />,
+    );
+    const step = screen.getByTestId('lead-drawer-step-appointment_scheduled');
+    expect(step).toHaveTextContent('Book');
+    expect(step).toHaveAttribute(
+      'title',
+      'Book an appointment · moves the lead to Booked',
+    );
+    await user.click(step);
+    expect(onBook).toHaveBeenCalledOnce();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('leaves Booked to the bookings for a member who does not book, or a closed lead', () => {
+    const { rerender } = render(
+      <LeadProgressField status="contacted" onChange={() => {}} />,
+    );
+    const step = () => screen.getByTestId('lead-drawer-step-appointment_scheduled');
+    expect(step()).toBeDisabled();
+    expect(step()).toHaveAttribute('title', 'Booked · set when an appointment is booked');
+    rerender(
+      <LeadProgressField
+        status="lost"
+        onChange={() => {}}
+        booking={{ onBook: () => {} }}
+      />,
+    );
+    expect(step()).toBeDisabled();
+  });
+
+  it('holds a booked lead: earlier steps wait for the cancel', () => {
+    const onChange = vi.fn();
+    render(
+      <LeadProgressField
+        status="appointment_scheduled"
+        onChange={onChange}
+        booking={{
+          onBook: () => {},
+          visit: { when: 'Tomorrow · 11:00 am', what: 'Consultation · Dr Mehta' },
+        }}
+      />,
+    );
+    for (const status of ['new', 'contacted', 'follow_up']) {
+      const step = screen.getByTestId(`lead-drawer-step-${status}`);
+      expect(step).toBeDisabled();
+      expect(step.title).toMatch(/· cancel the appointment to move back$/);
+    }
+    expect(screen.getByTestId('lead-drawer-step-appointment_scheduled')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('lets a booked lead move once no booking is left to happen', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <LeadProgressField
+        status="appointment_scheduled"
+        onChange={onChange}
+        booking={{ visit: null }}
+      />,
+    );
+    await user.click(screen.getByTestId('lead-drawer-step-follow_up'));
+    expect(onChange).toHaveBeenLastCalledWith('follow_up');
   });
 });
 

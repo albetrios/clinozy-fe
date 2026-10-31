@@ -95,19 +95,23 @@ interface StartVisitInput {
   idempotencyKey: string;
 }
 
+/** What a Start visit did: the visit was already open, today's booking checked in, or a walk-in booked. */
+export type StartVisitOutcome = 'open' | 'checked_in' | 'walk_in';
+
 /**
  * "Start visit": the visit already open stays as it is; else the person's first booking of today
  * still to come (scheduled or confirmed) is checked in; else a walk-in is booked — today at now
  * and checked in at once by the server — as a consultation with the doctor at the branch. The
- * check-in also opens the person's lead's visit on the server (`clinic_visited`).
+ * check-in also moves the person's lead to `clinic_visited` on the server — the open one, or one
+ * closed as Lost or Not interested in the last 90 days (clinozy-be D2). Answers what it did.
  */
 export async function startVisit({
   contactId,
   branchId,
   doctorId,
   idempotencyKey,
-}: StartVisitInput): Promise<void> {
-  if (await fetchOpenVisit(contactId)) return;
+}: StartVisitInput): Promise<StartVisitOutcome> {
+  if (await fetchOpenVisit(contactId)) return 'open';
   const [booked] = z
     .array(appointmentRowWire)
     .parse(await readTodaysBookings(contactId, 'scheduled,confirmed'));
@@ -117,7 +121,7 @@ export async function startVisit({
       route: 'check-in',
       idempotencyKey,
     });
-    return;
+    return 'checked_in';
   }
   await api.post('/app/appointments', {
     body: {
@@ -131,6 +135,7 @@ export async function startVisit({
     },
     idempotencyKey,
   });
+  return 'walk_in';
 }
 
 /** Pause a running visit, or resume a paused one — `409 transition_not_allowed` when it already is. */

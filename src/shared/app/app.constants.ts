@@ -71,6 +71,7 @@ export const APP_KEYS = {
       new: 'leads.statuses.new',
       contacted: 'leads.statuses.contacted',
       follow_up: 'leads.statuses.follow_up',
+      appointment_scheduled: 'leads.statuses.appointment_scheduled',
       clinic_visited: 'leads.statuses.clinic_visited',
       no_response: 'leads.statuses.no_response',
       not_interested: 'leads.statuses.not_interested',
@@ -296,6 +297,10 @@ export const APP_KEYS = {
       statusCancelled: 'appointments.toasts.statusCancelled',
       cancelled: 'appointments.toasts.cancelled',
       restored: 'appointments.toasts.restored',
+      /** Start visit's heads-up after a walk-in: the person's later booking stays (clinozy-be D3). */
+      alsoBooked: 'appointments.toasts.alsoBooked',
+      /** The heads-up's action — the later booking, in Appointments. */
+      openBooking: 'appointments.toasts.openBooking',
     },
   },
   /**

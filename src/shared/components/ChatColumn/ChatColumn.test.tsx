@@ -374,6 +374,34 @@ describe('a member who may read but not write (QA-07)', () => {
   });
 });
 
+describe('the host’s compose ask (D25)', () => {
+  it('opens the mode it asks for and focuses the composer — each ask anew', async () => {
+    const view = renderChat({
+      person: ANAYA,
+      contact: ANAYA_CONTACT,
+      compose: { mode: 'call', at: 1 },
+    });
+    await screen.findByTestId(ids.textarea);
+    await waitFor(() => expect(textarea()).toHaveFocus());
+    expect(screen.getByTestId(`${ids.mode}-call`)).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+
+    view.show({
+      person: ANAYA,
+      contact: ANAYA_CONTACT,
+      compose: { mode: 'whatsapp', at: 2 },
+    });
+    await waitFor(() =>
+      expect(screen.getByRole('tab', { name: 'WhatsApp' })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      ),
+    );
+  });
+});
+
 describe('drafts (KICKOFF §3.5)', () => {
   it('keeps each person’s unsent text and brings it back on return', async () => {
     const user = userEvent.setup();

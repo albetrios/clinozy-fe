@@ -1,4 +1,4 @@
-import { useId, useMemo, useRef, useState } from 'react';
+import { type RefObject, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils.ts';
 import {
@@ -6,6 +6,7 @@ import {
   chatPersonKey,
   type ChatThread as ChatThreadRecord,
   type ChatThreadRead,
+  type ComposerMode,
   type MessagingStatus,
 } from '@/shared/api/app/messages-contracts.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
@@ -34,6 +35,7 @@ import { CHAT_COLUMN_KEYS, CHAT_COLUMN_TEST_IDS } from './chat-column.constants.
 import {
   bookingReason,
   type ChatContact,
+  type ComposerModeOption,
   composerModes,
   composerSuggestions,
   composerTemplates,
@@ -94,6 +96,11 @@ export interface ChatColumnProps {
   onOpenHistory?: (target: ChatHistoryTarget) => void;
   /** A message went out — the server took it (the task drawer reads its task again, D81 T7). */
   onSent?: () => void;
+  /**
+   * The host asks for a composer mode and the focus — the lead drawer's "Send WhatsApp" and "Log a
+   * call" (D25). Each ask is a new `at`; a mode this person cannot take leaves the mode as it is.
+   */
+  compose?: { mode: ComposerMode; at: number };
   /** The header's contact card on hover (or a tap on touch): its data or loader and its actions. */
   contactCard?: Omit<
     ContactCardProps,
@@ -184,6 +191,7 @@ function ChatLoaded({
   onBookAppointment,
   onOpenHistory,
   onSent,
+  compose,
 }: ChatConversationProps & { read: ChatThreadRead }) {
   const personKey = chatPersonKey(person);
   // Only an explicit `false` takes the composer away (the default writes).
@@ -204,6 +212,7 @@ function ChatLoaded({
   // The draft this person was left with comes back (KICKOFF §3.5 Drafts).
   const [text, setText] = useState(() => readDraft(personKey));
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  useComposeAsk({ compose, options, setMode, textareaRef });
   const changeText = (next: string) => {
     setText(next);
     writeDraft(personKey, next);
@@ -291,6 +300,33 @@ function ChatLoaded({
       )}
     </>
   );
+}
+
+/**
+ * The host's ask for the composer (D25): its mode when the person can take it — each ask once, by
+ * its `at` — then the focus.
+ */
+function useComposeAsk({
+  compose,
+  options,
+  setMode,
+  textareaRef,
+}: {
+  compose: ChatColumnProps['compose'];
+  options: readonly ComposerModeOption[];
+  setMode: (mode: ComposerMode) => void;
+  textareaRef: RefObject<HTMLTextAreaElement | null>;
+}) {
+  const [askedAt, setAskedAt] = useState<number | null>(null);
+  if (compose && compose.at !== askedAt) {
+    setAskedAt(compose.at);
+    if (options.some((option) => option.mode === compose.mode && !option.disabled)) {
+      setMode(compose.mode);
+    }
+  }
+  useEffect(() => {
+    if (compose) textareaRef.current?.focus();
+  }, [compose, textareaRef]);
 }
 
 /** Loads the person's thread: the skeleton, a retry on failure, then the conversation. */
