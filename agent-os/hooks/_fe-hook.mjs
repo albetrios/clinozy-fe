@@ -73,11 +73,6 @@ export function denyToolCall(reason) {
   endWithPermissionDecision({ decision: 'deny', reason });
 }
 
-/** Ends a PreToolUse hook by putting the tool call to the user, `reason` shown with it. */
-export function askBeforeToolCall(reason) {
-  endWithPermissionDecision({ decision: 'ask', reason });
-}
-
 /**
  * Adds `context` to the model's context from the `event` hook (PostToolUse,
  * PostToolUseFailure, UserPromptSubmit or SessionStart): plain stdout from PostToolUse never

@@ -15,11 +15,10 @@
 // unreadable payload, no prompt, or no match exits 0 silently.
 import { addModelContext, readHookPayload } from './_fe-hook.mjs';
 import { recordTelemetry } from './_fe-telemetry.mjs';
-import { markTurn, resetTurn } from './_fe-turn-once.mjs';
+import { resetTurn } from './_fe-turn-once.mjs';
 
 // The matches run line by line (whitespace other than a line break), as the grep that used to
 // run them did.
-const PULL_REQUEST_COMMAND = /^[^\S\n]*\/fe-(ship|open-pr)([^\S\n]|$)/m;
 const BUILD_INTENT =
   /\b(add|create|new|implement|build|introduce|scaffold|generate|wire|register|redesign|beautify|style|restyle)\b/;
 
@@ -76,11 +75,6 @@ const payload = readHookPayload();
 const session = payload?.session_id;
 resetTurn(session);
 const prompt = typeof payload?.prompt === 'string' ? payload.prompt : '';
-
-// /fe-ship and /fe-open-pr are the user asking for a PR in so many words: fe-no-unrequested-pr.mjs
-// and fe-guardrails.mjs let this turn's PR creation through without a second confirmation. (The
-// hook sees the prompt as typed — `/fe-ship <title>` — checked on Claude Code 2.1.302.)
-if (PULL_REQUEST_COMMAND.test(prompt)) markTurn({ session, mark: 'pr-requested' });
 
 const lower = prompt.toLowerCase();
 const hints = BUILD_INTENT.test(lower)

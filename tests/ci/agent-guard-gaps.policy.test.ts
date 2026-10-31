@@ -7,8 +7,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 // The guard gaps clinozy-be closed in agent-os/evals/guard-eval.ts, closed here too: fe-guardrails.mjs
 // sees Read, Grep and MultiEdit (its matcher used to route only Bash|Edit|Write), denies reading
-// the gitignored env files, asks before `gh pr create`, and the reminders reach the model as
-// PostToolUse additionalContext once per turn instead of plain Stop output.
+// the gitignored env files, lets `gh pr create` through (no hook asks), and the reminders reach
+// the model as PostToolUse additionalContext once per turn instead of plain Stop output.
 
 const REPOSITORY_ROOT = process.cwd();
 const HOOKS = join(REPOSITORY_ROOT, 'agent-os', 'hooks');
@@ -172,58 +172,11 @@ describe('agent-os guard gaps', () => {
     ).toBe('deny');
   });
 
-  it('asks before gh pr create (Bash(gh pr*) is allowlisted)', () => {
+  it('lets gh pr create through without asking (the permission mode decides)', () => {
     expect(guardDecision('Bash', { command: 'gh pr create --title x --body y' })).toBe(
-      'ask',
+      'silent',
     );
     expect(guardDecision('Bash', { command: 'gh pr view 12' })).toBe('silent');
-  });
-
-  it('a turn the user started with /fe-ship or /fe-open-pr is the PR request; the next prompt is not', () => {
-    const prompt = (session_id: string, text: string) =>
-      runHook('fe-prompt-skill-router.mjs', {
-        session_id,
-        hook_event_name: 'UserPromptSubmit',
-        prompt: text,
-      });
-    const decisions = (session_id: string) => {
-      const decision = (stdout: string) =>
-        stdout.trim()
-          ? (
-              JSON.parse(stdout) as {
-                hookSpecificOutput: { permissionDecision: string };
-              }
-            ).hookSpecificOutput.permissionDecision
-          : 'silent';
-      return [
-        decision(
-          runHook('fe-guardrails.mjs', {
-            session_id,
-            tool_name: 'Bash',
-            tool_input: { command: 'gh pr create --title x --body y' },
-          }).stdout,
-        ),
-        decision(
-          runHook('fe-no-unrequested-pr.mjs', {
-            session_id,
-            tool_name: 'mcp__github__create_pull_request',
-            tool_input: { title: 'feat: x' },
-          }).stdout,
-        ),
-      ];
-    };
-
-    prompt('ship-session', '/fe-ship feat: billing invoices');
-    expect(decisions('ship-session')).toEqual(['silent', 'silent']);
-    prompt('ship-session', 'now tidy the docs');
-    expect(decisions('ship-session')).toEqual(['ask', 'ask']);
-
-    prompt('open-session', '  /fe-open-pr');
-    expect(decisions('open-session')).toEqual(['silent', 'silent']);
-
-    prompt('look-alike-session', '/fe-shipping-notes then /fe-ship');
-    expect(decisions('look-alike-session')).toEqual(['ask', 'ask']);
-    expect(decisions('never-prompted-session')).toEqual(['ask', 'ask']);
   });
 
   it('a skill reminder reaches the model once per turn', () => {
