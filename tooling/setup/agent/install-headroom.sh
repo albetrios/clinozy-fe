@@ -2,9 +2,10 @@
 # Ensure the `headroom` MCP server can start in a cloud-agent session.
 #
 # Why: agent-os/mcp/mcp.json runs headroom as
-#   uvx --from headroom-ai[mcp] headroom mcp serve
+#   uvx --from headroom-ai[mcp]==<HEADROOM_VERSION> headroom mcp serve
 # so the prerequisite is `uv`/`uvx` (Astral), not a global headroom install —
-# uvx resolves the package into an ephemeral env on first use. This script makes
+# uvx resolves the package into an ephemeral env on first use. The version is the pin in
+# tool-versions.sh, never the latest release (H-7). This script makes
 # sure uv is on PATH and pre-warms the
 # headroom env so the first MCP call in a session is not a cold download, then
 # registers that command once at user level for a session that holds both repositories.
@@ -51,10 +52,11 @@ fi
 persist_path "${HOME}/.local/bin"
 log "uv $(uv --version 2>/dev/null | awk '{print $2}') ready ($(command -v uvx))"
 
-# Pre-warm: resolve + cache headroom-ai[mcp] now so the first MCP call in the
+# Pre-warm: resolve + cache the pinned headroom-ai[mcp] now so the first MCP call in the
 # session is instant. --help exits 0 without starting a server.
-log "pre-warming headroom-ai[mcp] via uvx (first call in a session is otherwise a cold download)"
-if uvx --from 'headroom-ai[mcp]' headroom --help >/dev/null 2>&1; then
+headroom_spec="headroom-ai[mcp]==$(pinned_version HEADROOM_VERSION)"
+log "pre-warming ${headroom_spec} via uvx (first call in a session is otherwise a cold download)"
+if uvx --from "${headroom_spec}" headroom --help >/dev/null 2>&1; then
   log "headroom ready via uvx."
 else
   log "pre-warm failed — headroom will try again on first MCP use (needs pypi.org)."

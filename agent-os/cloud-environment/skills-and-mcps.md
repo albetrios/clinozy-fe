@@ -9,10 +9,10 @@ stack notes are in [`agents-cloud.md`](agents-cloud.md).
 `bootstrap.sh` (its agent tools, `install-agent-tools.sh`) installs the **default pair** and scaffolds
 [`.mcp.json`](../../.mcp.json) via `pnpm mcp:setup:default`:
 
-| Server         | Command                                          | Notes                                                    |
-| -------------- | ------------------------------------------------ | -------------------------------------------------------- |
-| `fe-codegraph` | `pnpm exec codegraph serve --mcp`                | Code intelligence (devDependency)                        |
-| `fe-headroom`  | `uvx --from headroom-ai[mcp] headroom mcp serve` | Context compression (`install-headroom.sh` pre-warms it) |
+| Server         | Command                                                  | Notes                                                    |
+| -------------- | -------------------------------------------------------- | -------------------------------------------------------- |
+| `fe-codegraph` | `pnpm exec codegraph serve --mcp`                        | Code intelligence (devDependency)                        |
+| `fe-headroom`  | `uvx --from headroom-ai[mcp]==0.40.0 headroom mcp serve` | Context compression (`install-headroom.sh` pre-warms it) |
 
 A session that holds both repos runs from their parent (`/home/user`), where neither
 `.mcp.json` is read, so its servers are user-level (`~/.claude.json`): `pnpm agent-os:session-hooks`

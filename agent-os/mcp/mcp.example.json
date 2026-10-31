@@ -6,7 +6,7 @@
     },
     "fe-headroom": {
       "command": "uvx",
-      "args": ["--from", "headroom-ai[mcp]", "headroom", "mcp", "serve"]
+      "args": ["--from", "headroom-ai[mcp]==0.40.0", "headroom", "mcp", "serve"]
     },
     "fe-context7": {
       "command": "pnpm",
@@ -23,7 +23,10 @@
     "clinozy-be-api": {
       "url": "http://localhost:3000/api/v1/mcp"
     },
-    "fe-semgrep": { "command": "uvx", "args": ["--from", "semgrep", "semgrep", "mcp"] },
+    "fe-semgrep": {
+      "command": "uvx",
+      "args": ["--from", "semgrep==1.179.0", "semgrep", "mcp"]
+    },
     "chrome-devtools": {
       "command": "node",
       "args": ["tooling/dev/chrome-devtools-mcp.mjs"]
