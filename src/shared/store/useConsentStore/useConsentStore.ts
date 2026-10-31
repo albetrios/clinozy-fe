@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
 /**
  * The answer per optional cookie category. Necessary cookies are not a choice, so they have no
@@ -45,12 +46,15 @@ interface StoredConsent {
   analytics: boolean;
   version: number;
   decidedAt: string;
+  /** Who answered: the signed-in user's id, `null` signed out (absent on a launch-era cookie). */
+  decidedBy?: string | null;
 }
 
 /** This browser's standing answer, or `null` while there is none. */
 interface StandingAnswer {
   preferences: ConsentPreferences;
   decidedAt: string;
+  decidedBy: string | null;
 }
 
 function isStoredConsent(value: unknown): value is StoredConsent {
@@ -60,7 +64,10 @@ function isStoredConsent(value: unknown): value is StoredConsent {
     typeof candidate.analytics === 'boolean' &&
     typeof candidate.version === 'number' &&
     typeof candidate.decidedAt === 'string' &&
-    !Number.isNaN(Date.parse(candidate.decidedAt))
+    !Number.isNaN(Date.parse(candidate.decidedAt)) &&
+    (candidate.decidedBy === undefined ||
+      candidate.decidedBy === null ||
+      typeof candidate.decidedBy === 'string')
   );
 }
 
@@ -85,7 +92,11 @@ function readStandingAnswer(): StandingAnswer | null {
     const stored: unknown = JSON.parse(decodeURIComponent(raw));
     if (!isStoredConsent(stored) || stored.version !== CONSENT_POLICY_VERSION)
       return null;
-    return { preferences: { analytics: stored.analytics }, decidedAt: stored.decidedAt };
+    return {
+      preferences: { analytics: stored.analytics },
+      decidedAt: stored.decidedAt,
+      decidedBy: stored.decidedBy ?? null,
+    };
   } catch {
     return null;
   }
@@ -108,6 +119,13 @@ interface ConsentState {
   preferences: ConsentPreferences | null;
   /** When the answer was given (ISO 8601); `null` with `preferences`. */
   decidedAt: string | null;
+  /** Who gave it: the user signed in then, `null` signed out (or with `preferences`). */
+  decidedBy: string | null;
+  /**
+   * Who is signed in now (`useAuthStore`'s user id), `null` signed out — kept in step by this
+   * module, so the selectors below stay pure on this store and re-run when someone signs in.
+   */
+  viewerId: string | null;
   /** The card was reopened from Privacy choices, whatever the answer. */
   preferencesOpen: boolean;
   /** Reopen the card (Privacy choices). */
@@ -116,13 +134,20 @@ interface ConsentState {
   reloadFromCookie: () => void;
 }
 
-function stateFromCookie(): Pick<ConsentState, 'preferences' | 'decidedAt'> {
+function stateFromCookie(): Pick<
+  ConsentState,
+  'preferences' | 'decidedAt' | 'decidedBy'
+> {
   const answer = readStandingAnswer();
   return {
     preferences: answer?.preferences ?? null,
     decidedAt: answer?.decidedAt ?? null,
+    decidedBy: answer?.decidedBy ?? null,
   };
 }
+
+/** The signed-in user's id, or `null`. */
+const currentViewerId = (): string | null => useAuthStore.getState().user?.id ?? null;
 
 /**
  * This browser's cookie-consent answer (D1, claude.com's model). PostHog (and its web-vitals) and
@@ -131,41 +156,68 @@ function stateFromCookie(): Pick<ConsentState, 'preferences' | 'decidedAt'> {
  * interest and are not gated here.
  *
  * @remarks
- * - **The browser's, not the person's.** One first-party cookie ({@link CONSENT_COOKIE_NAME}, one
- *   year, `SameSite=Lax`, `Secure` on https) holds it. Signing out never forgets it and signing in
- *   never replaces it; an answer given while signed in is also sent to the account as a receipt
+ * - **The person's who gave it.** One first-party cookie ({@link CONSENT_COOKIE_NAME}, one
+ *   year, `SameSite=Lax`, `Secure` on https) holds it, with `decidedBy` — the user signed in when it
+ *   was given (F-4). A clinic PC is shared: an answer stands for that person alone, so when someone
+ *   else signs in (or the answer was given signed out) the card asks again and nothing optional
+ *   runs until they answer. Signed out, the browser's last answer stands. An answer given while
+ *   signed in is also sent to the account as a receipt
  *   (`shared/analytics/record-consent-decision.ts`), never read back.
  * - **Read here, written by the card.** This store only reads the cookie: it is on every first
  *   paint, and only the card and Settings answer — through
  *   `shared/components/ConsentBanner/save-consent-preferences.ts`, which writes the cookie and
  *   sets this store.
- * - **Asked again** when the cookie expires, is unreadable, or answers another
- *   {@link CONSENT_POLICY_VERSION}.
+ * - **Asked again** when the cookie expires, is unreadable, answers another
+ *   {@link CONSENT_POLICY_VERSION}, or was given by someone other than the signed-in user.
  * - **Global Privacy Control** overrides the answer: {@link hasAnalyticsConsent} is false while
  *   the browser sends it.
  */
 export const useConsentStore = create<ConsentState>()((set) => ({
   ...stateFromCookie(),
+  viewerId: currentViewerId(),
   preferencesOpen: false,
   openPreferences: () => set({ preferencesOpen: true }),
   reloadFromCookie: () => set(stateFromCookie()),
 }));
 
-/** Analytics may run: an answer that allows it, and no Global Privacy Control. */
-export function selectAnalyticsAllowed(
-  state: Pick<ConsentState, 'preferences'>,
-): boolean {
-  return !isGlobalPrivacyControlOn() && state.preferences?.analytics === true;
+// Who is signed in decides whose answer stands (F-4): follow every sign-in and sign-out.
+useAuthStore.subscribe((state, previous) => {
+  if (state.user?.id === previous.user?.id) return;
+  useConsentStore.setState({ viewerId: state.user?.id ?? null });
+});
+
+/** The parts of the state that decide whether an answer stands. */
+type AnswerState = Pick<ConsentState, 'preferences' | 'decidedBy' | 'viewerId'>;
+
+/**
+ * The answer stands for whoever is here: there is one, and either nobody is signed in or the
+ * signed-in user is who gave it.
+ */
+function answerStands(state: AnswerState): boolean {
+  if (state.preferences === null) return false;
+  return state.viewerId === null || state.viewerId === state.decidedBy;
 }
 
-/** The card asks on its own: no standing answer, and no Global Privacy Control answering for it. */
-export function selectShouldAsk(state: Pick<ConsentState, 'preferences'>): boolean {
-  return state.preferences === null && !isGlobalPrivacyControlOn();
+/** Analytics may run: a standing answer that allows it, and no Global Privacy Control. */
+export function selectAnalyticsAllowed(state: AnswerState): boolean {
+  return (
+    !isGlobalPrivacyControlOn() &&
+    answerStands(state) &&
+    state.preferences?.analytics === true
+  );
+}
+
+/**
+ * The card asks on its own: no answer that stands for whoever is here, and no Global Privacy
+ * Control answering for it.
+ */
+export function selectShouldAsk(state: AnswerState): boolean {
+  return !answerStands(state) && !isGlobalPrivacyControlOn();
 }
 
 /** The card is up: asking on its own, or reopened from Privacy choices. */
 export function selectConsentCardOpen(
-  state: Pick<ConsentState, 'preferences' | 'preferencesOpen'>,
+  state: AnswerState & Pick<ConsentState, 'preferencesOpen'>,
 ): boolean {
   return state.preferencesOpen || selectShouldAsk(state);
 }

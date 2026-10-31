@@ -76,8 +76,8 @@ function startAnalytics(): void {
  * analytics only with consent. Keeps auth funnels off the critical path.
  */
 function initObservabilityWhenIdle(): void {
-  // Follow this browser's answer, from whichever source it changes — the card, Privacy choices,
-  // Settings, another tab. Signing in or out never changes it.
+  // Follow the answer, from whichever source it changes — the card, Privacy choices, Settings,
+  // another tab — and whose it is: someone signing in who did not give it stops what it allowed.
   useConsentStore.subscribe((state, previous) => {
     const granted = selectAnalyticsAllowed(state);
     const wasGranted = selectAnalyticsAllowed(previous);

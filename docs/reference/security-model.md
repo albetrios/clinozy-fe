@@ -66,14 +66,16 @@ capture settings are part of the threat model — verified:
   single `analytics_consent_decision` event (`shared/analytics/record-consent-decision.ts`).
   ([`app/analytics/posthog.ts`](../../src/app/analytics/posthog.ts)) Sentry's error
   reports are **not** gated — no tracking cookies, legitimate interest.
-- **Consent is the browser's, as on claude.com** (iteration
-  `change-cookie-consent-2026-10-13-fmal`) — one first-party cookie,
-  `clinozy-consent-preferences` (`{analytics, version, decidedAt}`, one year, `Path=/`,
+- **Consent is the person's who gave it** (iteration
+  `change-cookie-consent-2026-10-13-fmal`, narrowed by F-4) — one first-party cookie,
+  `clinozy-consent-preferences` (`{analytics, version, decidedAt, decidedBy}`, one year, `Path=/`,
   `SameSite=Lax`, `Secure` on https), holds the answer per category: Necessary is always on,
   Analytics is the choice. A missing, unreadable or older-policy (`CONSENT_POLICY_VERSION`)
-  cookie counts as not answered and the card asks again. **Signing out never forgets it and
-  signing in never replaces it**, so a shared clinic computer is not asked at every sign-out;
-  PostHog's identity is still reset at sign-out (above). Escape inside the card is Reject all;
+  cookie counts as not answered and the card asks again. `decidedBy` is the user signed in when
+  the answer was given (`null` signed out): on a shared clinic computer, **a member who signs in
+  after someone else answered is asked again**, and nothing optional runs for them until they
+  answer; signed out, the browser's last answer stands. PostHog's identity is still reset at
+  sign-out (above). Escape inside the card is Reject all;
   Global Privacy Control is Reject all and is never asked. Signed in, each new answer is also
   sent to the account as a **receipt** (`PATCH /users/me/settings` with the policy version;
   clinozy-be audits it as the proof of consent) — never read back. Refusing Analytics purges

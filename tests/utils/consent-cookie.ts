@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   CONSENT_COOKIE_NAME,
   CONSENT_POLICY_VERSION,
@@ -49,6 +50,8 @@ export function answerConsentForTests(preferences: ConsentPreferences): void {
     analytics: preferences.analytics,
     version: CONSENT_POLICY_VERSION,
     decidedAt: new Date().toISOString(),
+    // Given by whoever is signed in now — as the card records it.
+    decidedBy: useAuthStore.getState().user?.id ?? null,
   });
   useConsentStore.getState().reloadFromCookie();
   useConsentStore.setState({ preferencesOpen: false });
