@@ -31,7 +31,7 @@ function heldPermissions(): string {
  */
 async function recheckAccess(
   organizationId: string,
-  revalidate: () => Promise<unknown> | void,
+  revalidate: () => unknown,
 ): Promise<void> {
   const before = heldPermissions();
   const [context, memberships] = await Promise.all([
@@ -76,7 +76,7 @@ async function recheckAccess(
 export function startOrganizationAccessFollow({
   revalidate,
 }: {
-  revalidate: () => Promise<unknown> | void;
+  revalidate: () => unknown;
 }): () => void {
   return onOrganizationAccessRefused(() => {
     const organizationId = getActiveOrganizationId();

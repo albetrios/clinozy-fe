@@ -280,6 +280,51 @@ async function settleSignInAtBoot(signIn: Promise<void>): Promise<void> {
   }
 }
 
+/**
+ * Throw unless this boot has a session to ask the server for — the checks that come before any
+ * `/auth/refresh`: a sign-out still owed to the server, no session hint, a session lapsed while
+ * the browser was closed.
+ */
+function assertSessionToRestore(generation: number): void {
+  // A sign-out the server never heard about comes first: restoring that
+  // session is exactly what the user asked not to happen. This boot is a
+  // guest's whatever the server answers, so the login screen does not wait
+  // for the revoke — it finishes behind it, and a sign-in waits for it
+  // instead (`settlePendingRevoke`).
+  if (isRevokePending()) {
+    pendingRevoke ??= finishPendingRevoke(generation);
+    throw new Error('Signed out');
+  }
+  /*
+   * No session hint: this browser has never signed in, or it signed out.
+   * Either way there is nothing on the server to restore, and asking is a
+   * round trip on the critical path of the login screen that can only ever
+   * answer 401 — measured on a fresh visit, `/auth/refresh` was the single
+   * backend call the login page made, and in production it is cross-origin
+   * and over TLS.
+   *
+   * This is NOT authorizing on the hint, which the hint may never be used
+   * for: it grants nothing and trusts nothing. It declines to ASK when the
+   * answer is already known, and every interactive sign-in writes the hint
+   * (`establishSession` → `markSessionStart`, reached by the email, OAuth
+   * callback and MFA paths alike) while logout clears it.
+   *
+   * The one false negative is a browser whose localStorage was cleared
+   * while its HttpOnly cookie survived — a selective wipe, not a normal
+   * one. That visitor sees the login screen and signs in again, which is
+   * the same outcome the old code produced whenever the refresh failed.
+   */
+  if (!hasSessionHint()) throw new Error('No session hint');
+  // A session this browser left past its idle limit or its absolute cap is
+  // not restored: refreshing first and checking afterwards handed a browser
+  // left alone for hours its session back, every page load (E-2).
+  const lapsed = lapsedSessionReason();
+  if (lapsed) {
+    endLapsedSessionAtBoot(lapsed, generation);
+    throw new Error('Session lapsed');
+  }
+}
+
 export function startAuthBootstrap(): Promise<void> {
   if (signInAtBoot) {
     authBootstrapPromise ??= settleSignInAtBoot(signInAtBoot);
@@ -288,43 +333,7 @@ export function startAuthBootstrap(): Promise<void> {
   authBootstrapPromise ??= (async () => {
     const generation = authGeneration;
     try {
-      // A sign-out the server never heard about comes first: restoring that
-      // session is exactly what the user asked not to happen. This boot is a
-      // guest's whatever the server answers, so the login screen does not wait
-      // for the revoke — it finishes behind it, and a sign-in waits for it
-      // instead (`settlePendingRevoke`).
-      if (isRevokePending()) {
-        pendingRevoke ??= finishPendingRevoke(generation);
-        throw new Error('Signed out');
-      }
-      /*
-       * No session hint: this browser has never signed in, or it signed out.
-       * Either way there is nothing on the server to restore, and asking is a
-       * round trip on the critical path of the login screen that can only ever
-       * answer 401 — measured on a fresh visit, `/auth/refresh` was the single
-       * backend call the login page made, and in production it is cross-origin
-       * and over TLS.
-       *
-       * This is NOT authorizing on the hint, which the hint may never be used
-       * for: it grants nothing and trusts nothing. It declines to ASK when the
-       * answer is already known, and every interactive sign-in writes the hint
-       * (`establishSession` → `markSessionStart`, reached by the email, OAuth
-       * callback and MFA paths alike) while logout clears it.
-       *
-       * The one false negative is a browser whose localStorage was cleared
-       * while its HttpOnly cookie survived — a selective wipe, not a normal
-       * one. That visitor sees the login screen and signs in again, which is
-       * the same outcome the old code produced whenever the refresh failed.
-       */
-      if (!hasSessionHint()) throw new Error('No session hint');
-      // A session this browser left past its idle limit or its absolute cap is
-      // not restored: refreshing first and checking afterwards handed a browser
-      // left alone for hours its session back, every page load (E-2).
-      const lapsed = lapsedSessionReason();
-      if (lapsed) {
-        endLapsedSessionAtBoot(lapsed, generation);
-        throw new Error('Session lapsed');
-      }
+      assertSessionToRestore(generation);
       await silentRefresh();
     } catch (error) {
       if (generation !== authGeneration) return;
