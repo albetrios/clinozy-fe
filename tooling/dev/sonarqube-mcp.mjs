@@ -6,8 +6,10 @@
  * (minted by `pnpm sonar:scan`, see tooling/sonar/sonar-gate.mjs) and serves SonarQube on
  * the host at SONAR_HOST_URL (default http://localhost:9001). So the container started
  * with nothing and the MCP connection closed. This wrapper loads `.env.local` (a value
- * already in the shell wins), maps the two keys, and rewrites a `localhost` URL to
- * `host.docker.internal` — inside the container, `localhost` is the container itself.
+ * already in the shell wins), maps the two keys, and runs the container on the host
+ * network: the server publishes its port on the host's loopback only
+ * (docker-compose.sonar.yml), which `host.docker.internal` — the bridge gateway — does not
+ * reach, so the container addresses the server by the URL the host uses.
  *
  * Environment overrides:
  *   SONARQUBE_TOKEN / SONARQUBE_URL  used as given when set (e.g. a remote SonarQube)
@@ -28,12 +30,6 @@ if (!token) {
   process.exit(1);
 }
 
-/** The host's SonarQube as the container must address it. */
-const containerUrl = hostUrl.replace(
-  /^(https?:\/\/)(localhost|127\.0\.0\.1)(?=[:/]|$)/,
-  '$1host.docker.internal',
-);
-
 const child = spawn(
   'docker',
   [
@@ -41,6 +37,8 @@ const child = spawn(
     '--init',
     '--rm',
     '-i',
+    '--network',
+    'host',
     '-e',
     'SONARQUBE_TOKEN',
     '-e',
@@ -49,7 +47,7 @@ const child = spawn(
   ],
   {
     stdio: 'inherit',
-    env: { ...process.env, SONARQUBE_TOKEN: token, SONARQUBE_URL: containerUrl },
+    env: { ...process.env, SONARQUBE_TOKEN: token, SONARQUBE_URL: hostUrl },
   },
 );
 child.on('exit', (code, signal) => process.exit(signal ? 1 : (code ?? 1)));

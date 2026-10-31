@@ -38,8 +38,9 @@ forbidden-secret validator `pnpm validate:client-env` checks only git-tracked en
 Both repos use `localhost:9000`. If clinozy-be's SonarQube is already running, the gate **reuses it**
 (one server, two projects — `clinozy-fe` appears next to `clinozy-be` in the same UI). For the gate to
 mint a `clinozy-fe` token there, copy `SONAR_ADMIN_PASSWORD` from `clinozy-be/.env.local` into this
-repo's `.env.local`. The scanner container always targets the host port (`host.docker.internal:9000`),
-so it reaches whichever server owns it.
+repo's `.env.local`. The server publishes its port on the host's loopback only (`127.0.0.1`), so the
+scanner container runs on the host network and targets the host port (`localhost:9001`): it reaches
+whichever server owns it.
 
 ## How the pre-push gate works
 
