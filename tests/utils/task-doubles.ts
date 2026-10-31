@@ -73,6 +73,8 @@ export function taskContactWireRow(patch: Record<string, unknown> = {}) {
     last_name: 'Desai',
     gender: null,
     date_of_birth: null,
+    date_of_birth_is_approximate: false,
+    age: null,
     primary_phone: '+919826005869',
     email: null,
     address: null,

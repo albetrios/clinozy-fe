@@ -12,7 +12,7 @@ without Edit the row Edit goes, without Delete the row Delete goes.
 
 The shared room toolbar (`RoomToolbar`): h1 · the three view tabs (All · Follow-up due ·
 Recall) · search "Name, mobile or #ID" · saved views · Filters (Type · Status (one) ·
-Conversion (one) · Created · Follow-up date) · Columns · "New patient", which floats as a
+Conversion (one) · Age (one band — the person's age, `age_from` / `age_to`) · Created · Follow-up date) · Columns · "New patient", which floats as a
 52px pill on a phone. Under it the shared `DataTable`: ID · Patient (contact card on hover)
 · Gender · Type · Status · Conversion · Age · Follow-up · Updated (the time), Gender /
 Conversion / Age hidden by default (a device pref); only ID and Follow-up sort; folds on a

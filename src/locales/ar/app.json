@@ -305,6 +305,14 @@
       "gender": "الجنس",
       "birthDate": "تاريخ الميلاد",
       "age": "العمر {{age}}",
+      "birthMode": "تاريخ الميلاد أو العمر",
+      "birthModes": {
+        "date": "تاريخ الميلاد",
+        "age": "العمر"
+      },
+      "ageYears": "العمر (بالسنوات)",
+      "agePlaceholder": "مثلًا 34",
+      "ageHint": "تقريبي · يزيد كل سنة",
       "types": "نوع المريض",
       "typesHint": "اختر ما تشاء",
       "status": "الحالة",
@@ -338,6 +346,7 @@
     },
     "missing": "أضف الاسم والجوال",
     "mobileInvalid": "أدخل رقم جوال من 10 أرقام",
+    "ageInvalid": "أدخل عمرًا من 0 إلى 120",
     "created": "تم إنشاء المريض {{id}}",
     "openFile": "فتح الملف",
     "saved": "تم حفظ {{name}}",
@@ -453,6 +462,8 @@
     },
     "genderAge": "{{gender}} · {{age}} سنة",
     "age": "{{age}} سنة",
+    "approximate": "تقريبي",
+    "approximateHint": "عمر ذُكر عند التسجيل — تاريخ الميلاد تقديري",
     "cameVia": "جاء عبر {{source}}",
     "owedToThem": "{{amount}} مستحقة لهم",
     "owedByThem": "{{amount}} مستحقة عليهم للعيادة",
@@ -573,6 +584,15 @@
       "nextSevenDays": "الأيام السبعة القادمة",
       "notSet": "غير محدد",
       "range": "نطاق مخصص"
+    },
+    "age": {
+      "label": "العمر",
+      "any": "أي",
+      "child": "أقل من 18",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60+"
     }
   },
   "commandMenu": {

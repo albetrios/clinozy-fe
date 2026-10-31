@@ -1,5 +1,9 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { CreatedPreset, FollowUpPreset } from '@/shared/api/app/app-list-filters.ts';
+import type {
+  AgeBand,
+  CreatedPreset,
+  FollowUpPreset,
+} from '@/shared/api/app/app-list-filters.ts';
 
 /**
  * The room toolbar's copy lives in `app` (`APP_NS`): that namespace
@@ -58,6 +62,19 @@ export const DATE_FILTER_KEYS = {
       not_set: 'filters.followUp.notSet',
     } satisfies Record<FollowUpPreset, string>,
   },
+} as const;
+
+/** The Age section (a list of people): its label, "Any", and each band's chip ("30–44"). */
+export const AGE_FILTER_KEYS = {
+  label: 'filters.age.label',
+  any: 'filters.age.any',
+  bands: {
+    child: 'filters.age.child',
+    young: 'filters.age.young',
+    adult: 'filters.age.adult',
+    middle: 'filters.age.middle',
+    senior: 'filters.age.senior',
+  } satisfies Record<AgeBand, string>,
 } as const;
 
 /** `data-testid`s of a room's toolbar, prefixed by its `tableId`. */

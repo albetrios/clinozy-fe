@@ -17,6 +17,8 @@ import {
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
+  ageFilterSection,
+  ROOM_TOOLBAR_NS,
   type RoomFilterCopy,
   RoomToolbar,
   type RoomViewTab,
@@ -50,10 +52,11 @@ export interface PatientsToolbarProps {
   onNewPatient?: () => void;
 }
 
-/** The Filters popover's sections (`patients.md:133`): Type · Status · Conversion, each value in its badge's tone. */
+/** The Filters popover's sections (`patients.md:133`): Type · Status · Conversion, each value in its badge's tone — then Age. */
 function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
   const { t } = useTranslation(PATIENTS_NS);
   const { t: tApp } = useTranslation(APP_NS);
+  const { t: tToolbar } = useTranslation(ROOM_TOOLBAR_NS);
   const labelled = <T extends string>(
     values: readonly T[],
     labelOf: (value: T) => string,
@@ -87,13 +90,14 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
         PATIENT_CONVERSION_TONES,
       ),
     },
+    age: ageFilterSection(tToolbar).copy,
   };
 }
 
 /**
  * The Patients toolbar (KICKOFF §6.5 Toolbar; `patients.md:17`) on the shared
  * room toolbar: h1 "Patients" · the three view tabs · search "Name, mobile or
- * #ID" · saved views · Filters (Type · Status · Conversion · Created ·
+ * #ID" · saved views · Filters (Type · Status · Conversion · Age · Created ·
  * Follow-up date) · Columns · "New patient" — a floating pill on a phone.
  */
 export function PatientsToolbar({

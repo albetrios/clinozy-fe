@@ -45,6 +45,9 @@ export const PERSON_CARD_KEYS = {
   },
   genderAge: 'personCard.genderAge',
   age: 'personCard.age',
+  /** The mark after an age the desk typed ("34 yrs · approx.") and its tooltip (feat-approximate-age FE3). */
+  approximate: 'personCard.approximate',
+  approximateHint: 'personCard.approximateHint',
   cameVia: 'personCard.cameVia',
   owedToThem: 'personCard.owedToThem',
   owedByThem: 'personCard.owedByThem',

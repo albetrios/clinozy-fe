@@ -305,6 +305,14 @@
       "gender": "性别",
       "birthDate": "出生日期",
       "age": "{{age}} 岁",
+      "birthMode": "出生日期或年龄",
+      "birthModes": {
+        "date": "出生日期",
+        "age": "年龄"
+      },
+      "ageYears": "年龄（岁）",
+      "agePlaceholder": "例如 34",
+      "ageHint": "约 · 每年自动增长",
       "types": "患者类型",
       "typesHint": "可多选",
       "status": "状态",
@@ -338,6 +346,7 @@
     },
     "missing": "请填写姓名和手机号",
     "mobileInvalid": "请输入 10 位手机号",
+    "ageInvalid": "请输入 0 到 120 的年龄",
     "created": "已创建患者 {{id}}",
     "openFile": "打开档案",
     "saved": "已保存 {{name}}",
@@ -438,6 +447,8 @@
     },
     "genderAge": "{{gender}} · {{age}} 岁",
     "age": "{{age}} 岁",
+    "approximate": "约",
+    "approximateHint": "登记时提供的年龄——出生日期为估算",
     "cameVia": "来源：{{source}}",
     "owedToThem": "需退还 {{amount}}",
     "owedByThem": "欠诊所 {{amount}}",
@@ -553,6 +564,15 @@
       "nextSevenDays": "未来 7 天",
       "notSet": "未设置",
       "range": "自定义范围"
+    },
+    "age": {
+      "label": "年龄",
+      "any": "不限",
+      "child": "18 岁以下",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60 岁以上"
     }
   },
   "commandMenu": {
