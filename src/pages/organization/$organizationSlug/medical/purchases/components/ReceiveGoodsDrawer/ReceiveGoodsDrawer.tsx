@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useController, useForm, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -26,6 +26,7 @@ import {
 } from '@/shared/forms/ItemsField/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useMedicineCatalogue } from '@/shared/hooks/useMedicines/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { Check, X } from '@/shared/icons/index.ts';
@@ -50,6 +51,7 @@ import {
   anyArrived,
   emptyUnexpectedLine,
   expiryProblems,
+  medicineMrpPrefills,
   receiveFormOf,
   type ReceiveFormValues,
   receiveInputOf,
@@ -360,6 +362,19 @@ function ReceiveSession({
   const { readOnly } = useMedicalDrawerAccess(true);
   const form = useForm<ReceiveFormValues>({ defaultValues: receiveFormOf(order) });
   const lines = useWatch({ control: form.control, name: 'lines' });
+  const catalogue = useMedicineCatalogue().data;
+  // An ordered line without an MRP starts at its medicine's once the catalogue is read (F5);
+  // a cell the user already touched keeps what they typed.
+  useEffect(() => {
+    if (!catalogue) return;
+    const mrps = new Map(catalogue.map((medicine) => [medicine.id, medicine.mrp]));
+    const prefills = medicineMrpPrefills(form.getValues('lines'), (id) => mrps.get(id));
+    for (const { index, mrp } of prefills) {
+      if (!form.getFieldState(`lines.${index}.mrp`).isDirty) {
+        form.setValue(`lines.${index}.mrp`, mrp);
+      }
+    }
+  }, [catalogue, form]);
   const { saveState, save } = useReceiveSave(form, order, onClose);
   const columns = useColumns({
     form,

@@ -26,6 +26,7 @@ import { typedMedicineKey } from '../PurchaseOrderDrawer/purchase-order-form.ts'
 import {
   emptyUnexpectedLine,
   expiryProblems,
+  medicineMrpPrefills,
   receiveInputOf,
   type ReceiveLineValues,
   receiveTotal,
@@ -196,6 +197,21 @@ describe('receive-form (medical.md:269–279)', () => {
     });
   });
 
+  it('starts an ordered line without an MRP at its medicine’s; one with an MRP, an unexpected one or an unknown medicine keeps its own (F5)', () => {
+    const mrps = new Map([[EPRIVA_ID, 125.55]]);
+    expect(
+      medicineMrpPrefills(
+        [
+          ORDERED,
+          { ...ORDERED, mrp: 13_000 },
+          { ...AZELAN, medicineId: EPRIVA_ID },
+          { ...ORDERED, medicineId: AZELAN_ID },
+        ],
+        (id) => mrps.get(id),
+      ),
+    ).toEqual([{ index: 0, mrp: 12_555 }]);
+  });
+
   it('sends an unexpected line once its medicine is picked, without an id, in rupees; a blank one is left out (H:5388, MD26)', () => {
     const blank = emptyUnexpectedLine();
     expect(blank).toMatchObject({
@@ -321,7 +337,8 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
               arrived: true,
               batchNo: null,
               expiry: '12/27',
-              mrp: null,
+              // The order gave no MRP: the line started at Epriva's ₹650 (F5).
+              mrp: 650,
             },
             {
               id: GLYCOLAC_LINE_ID,

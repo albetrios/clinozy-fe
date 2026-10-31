@@ -66,6 +66,22 @@ export function receiveFormOf(order: PurchaseOrderRow): ReceiveFormValues {
   };
 }
 
+/**
+ * The ordered lines whose MRP starts at their medicine's (F5), paise: a line the order gave no MRP
+ * takes the medicine's current one, so the batch it goes into records the price printed on it. A
+ * line with an MRP, an unexpected line and a medicine not in the catalogue keep what they have.
+ */
+export function medicineMrpPrefills(
+  lines: readonly ReceiveLineValues[],
+  mrpOf: (medicineId: string) => number | undefined,
+): { index: number; mrp: number }[] {
+  return lines.flatMap((line, index) => {
+    if (line.unexpected || line.mrp > 0 || !line.medicineId) return [];
+    const mrp = paiseOfRupees(mrpOf(line.medicineId) ?? 0);
+    return mrp > 0 ? [{ index, mrp }] : [];
+  });
+}
+
 /** "+ Add unexpected item": a line with no medicine yet, one unit, arrived. */
 export const emptyUnexpectedLine = (): ReceiveLineValues => ({
   lineId: null,
