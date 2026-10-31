@@ -53,8 +53,18 @@ function previewInputOf(
 ): InvoiceInput | null {
   const input = invoiceInputOf(values, fallbackBranchId);
   if (input.items.length === 0 || input.branchId === '') return null;
-  // Neither moves a figure: leaving them out keeps the preview from asking again as they change.
-  return { ...input, paidNow: [], remark: invoice?.remark ?? null };
+  // None moves a figure (a line's description neither, K1): leaving them as saved keeps the
+  // preview from asking again as they change.
+  const saved = new Map(invoice?.items.map((line) => [line.id, line.description]) ?? []);
+  return {
+    ...input,
+    items: input.items.map((line) => ({
+      ...line,
+      description: (line.id ? saved.get(line.id) : null) ?? null,
+    })),
+    paidNow: [],
+    remark: invoice?.remark ?? null,
+  };
 }
 
 /** The input a debounced text holds again. */

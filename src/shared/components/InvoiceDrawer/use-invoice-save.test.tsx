@@ -422,7 +422,7 @@ describe('useInvoiceSave — the Invoice drawer’s save', () => {
         expect.objectContaining({
           branchId: TEST_VESU_BRANCH_ID,
           contactId: PRIYA.contactId,
-          items: [{ medicineId: GLYCOLAC, qty: 2, discountPct: 0 }],
+          items: [{ medicineId: GLYCOLAC, qty: 2, discountPct: 0, description: null }],
           payment: null,
         }),
       );

@@ -152,6 +152,7 @@ export function lineFromCatalog(
     qty: values.qty ?? 1,
     rate: values.rate ?? item.line.rate,
     discountPct: values.discountPct ?? item.line.discountPct,
+    description: '',
     batchNo: null,
     suggestionId: null,
     treatmentIds: [],

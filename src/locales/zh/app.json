@@ -1337,6 +1337,8 @@
       "belowFloor": "低于 {{name}} 的最低价 {{amount}}",
       "newMedicineName": "新药品名称",
       "medicineAdded": "已添加 {{name}} · 稍后在库存中设置零售价",
+      "description": "说明",
+      "descriptionPlaceholder": "添加说明 · 例如 +2 次免费",
       "hintInvoice": "2 = 数量 · 10% = 折扣",
       "belowLowest": "低于 {{name}} 的最低价",
       "offerApplied": "已应用优惠：{{offer}}"

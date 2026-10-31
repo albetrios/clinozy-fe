@@ -59,8 +59,8 @@ interface LinesForm {
 
 /**
  * Medicine · Batch · Qty · Amount (H:5423) — the batches the server drew, its amounts; under a
- * line's name its pack and HSN code as billed, and a loose line's units as packs
- * (change-pharmacy-record-fields D3, D5).
+ * line's name its pack and HSN code as billed, then its description, and a loose line's units as
+ * packs (change-pharmacy-record-fields D3, D5; feat-bill-line-description).
  */
 function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
@@ -79,6 +79,12 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
             {details ? (
               <span className="text-caption text-muted-foreground block font-normal">
                 {details}
+              </span>
+            ) : null}
+            {/* The line's description, when it has one — muted, wrapping. */}
+            {row.description ? (
+              <span className="text-detail text-muted-foreground block font-normal break-words">
+                {row.description}
               </span>
             ) : null}
           </ItemsReadCell>

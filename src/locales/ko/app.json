@@ -1337,6 +1337,8 @@
       "belowFloor": "{{name}}의 최저가 {{amount}}보다 낮습니다",
       "newMedicineName": "새 의약품 이름",
       "medicineAdded": "{{name}} 추가됨 · 최대 소매가는 나중에 재고에서 설정",
+      "description": "설명",
+      "descriptionPlaceholder": "설명 추가 · 예: +2회 무료",
       "hintInvoice": "2 = 수량 · 10% = 할인",
       "belowLowest": "{{name}}의 최저가보다 낮음",
       "offerApplied": "적용된 오퍼: {{offer}}"

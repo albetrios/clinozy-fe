@@ -394,7 +394,9 @@ describe('sales', () => {
       input: {
         branchId: TEST_MEDICAL_BRANCH_ID,
         contactId: TEST_BUYER_CONTACT_ID,
-        items: [{ medicineId: TEST_MEDICINE_ID, qty: 2, discountPct: 0 }],
+        items: [
+          { medicineId: TEST_MEDICINE_ID, qty: 2, discountPct: 0, description: null },
+        ],
         overallDiscount: 0,
         memberIds: [],
         prescriptionId: 'rx_rx5800000000000000000',
@@ -411,6 +413,47 @@ describe('sales', () => {
       patient_prescription_id: 'rx_rx5800000000000000000',
       payment: { splits: [{ mode: 'upi', amount: 1300 }] },
     });
+  });
+
+  it('a new sale sends a medicine’s description trimmed, and reads it on the sale’s lines', async () => {
+    const answered = saleWire();
+    vi.mocked(api.post).mockResolvedValue({
+      data: {
+        ...answered,
+        items: answered.items.map((item) => ({ ...item, description: 'Apply at night' })),
+      },
+    } as never);
+    const sale = await createSale({
+      input: {
+        branchId: TEST_MEDICAL_BRANCH_ID,
+        contactId: TEST_BUYER_CONTACT_ID,
+        items: [
+          {
+            medicineId: TEST_MEDICINE_ID,
+            qty: 2,
+            discountPct: 0,
+            description: ' Apply at night ',
+          },
+        ],
+        overallDiscount: 0,
+        memberIds: [],
+        prescriptionId: null,
+        remark: null,
+        payment: null,
+      },
+      ...KEY,
+    });
+    expect(bodyOf(vi.mocked(api.post).mock.calls[0])).toMatchObject({
+      items: [
+        {
+          medicine_id: TEST_MEDICINE_ID,
+          quantity: 2,
+          discount_percent: 0,
+          description: 'Apply at night',
+        },
+      ],
+    });
+    expect(sale.lines[0]?.description).toBe('Apply at night');
   });
 
   it('Collect is one receipt for the whole due, against the invoice', async () => {

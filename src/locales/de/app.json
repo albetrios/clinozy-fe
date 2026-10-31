@@ -1355,6 +1355,8 @@
       "belowFloor": "Unter dem Mindestpreis {{amount}} für {{name}}",
       "newMedicineName": "Name des neuen Medikaments",
       "medicineAdded": "{{name}} hinzugefügt · UVP später unter Bestand setzen",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung hinzufügen · z. B. +2 Sitzungen gratis",
       "hintInvoice": "2 = Menge · 10% = Rabatt",
       "belowLowest": "Unter dem Mindestpreis für {{name}}",
       "offerApplied": "Angebot angewendet: {{offer}}"

@@ -296,7 +296,18 @@ function InvoiceItemsTable({
                 lineIndex > 0 && '*:border-border *:border-t *:pt-[calc(1.7mm-1px)]',
               )}
             >
-              <td className="ps-[4.4mm] pe-[1mm] uppercase">{line.name}</td>
+              <td className="ps-[4.4mm] pe-[1mm]">
+                <span className="uppercase">{line.name}</span>
+                {/* The line's description, under its name as written (BD1: up to 280). */}
+                {line.description ? (
+                  <span
+                    data-testid={PRINT_TEMPLATE_TEST_IDS.invoiceLineDescription}
+                    className="text-muted-foreground block text-[2.9mm] leading-[3.6mm] break-words"
+                  >
+                    {line.description}
+                  </span>
+                ) : null}
+              </td>
               <td className="text-center uppercase">{packSize(line)}</td>
               {medical ? <td className="text-center">{line.hsnCode ?? ''}</td> : null}
               <td className="text-center">{format.count(line.qty)}</td>

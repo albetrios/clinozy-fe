@@ -169,6 +169,8 @@ export const PRINT_TEMPLATE_TEST_IDS = {
   root: 'print-root',
   invoice: 'invoice-print',
   invoiceItems: 'invoice-print-items',
+  /** A line's description under its name on the invoice sheet. */
+  invoiceLineDescription: 'invoice-print-line-description',
   invoiceSummary: 'invoice-print-summary',
   prescription: 'prescription-print',
   prescriptionItems: 'prescription-print-items',

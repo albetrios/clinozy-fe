@@ -1373,6 +1373,8 @@
       "belowFloor": "Abaixo do preço mínimo de {{amount}} para {{name}}",
       "newMedicineName": "Nome do novo medicamento",
       "medicineAdded": "{{name}} adicionado · defina o PMC depois em Estoque",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Adicione uma descrição · ex.: +2 sessões grátis",
       "hintInvoice": "2 = quantidade · 10% = desconto",
       "belowLowest": "Abaixo do preço mínimo de {{name}}",
       "offerApplied": "Oferta aplicada: {{offer}}"

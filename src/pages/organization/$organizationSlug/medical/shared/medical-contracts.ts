@@ -144,6 +144,7 @@ export const saleWire = wireSchema<ApiSale>()(
         invoice_item_id: z.string(),
         medicine_id: z.string().nullable(),
         name: z.string(),
+        description: z.string().nullable(),
         pack_size: z.string().nullable(),
         hsn_code: z.string().nullable(),
         units_per_pack: z.number().int(),
@@ -400,6 +401,8 @@ export interface SaleLine {
   invoiceItemId: string;
   medicineId: string | null;
   name: string;
+  /** The free text under the name, from the sale or its bill; null for none. */
+  description: string | null;
   /** The medicine's pack label when billed ("1*10"). */
   packSize: string | null;
   /** The medicine's HSN code when billed. */
@@ -511,6 +514,7 @@ export function toSaleRow(wire: z.infer<typeof saleWire>): SaleRow {
       invoiceItemId: item.invoice_item_id,
       medicineId: item.medicine_id,
       name: item.name,
+      description: item.description,
       packSize: item.pack_size,
       hsnCode: item.hsn_code,
       unitsPerPack: item.units_per_pack,

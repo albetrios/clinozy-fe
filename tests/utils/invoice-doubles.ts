@@ -170,6 +170,7 @@ export function invoicePreview(
       amount: taxableAmount + gstAmount,
       suggestionId: null,
       batchNo: null,
+      description: null,
       offerIds: [],
       sessionsTotal: spec.qty,
       ...spec,

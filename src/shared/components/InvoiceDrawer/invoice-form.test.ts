@@ -105,6 +105,7 @@ describe('the Invoice drawer’s form (KICKOFF §6.9)', () => {
           offeringId: TEST_PEEL_ID,
           qty: 2,
           discountPct: 12.345,
+          description: '',
           suggestionId: null,
           treatmentIds: [],
         },
@@ -149,6 +150,24 @@ describe('the Invoice drawer’s form (KICKOFF §6.9)', () => {
         discountPct: 0,
       }),
     ]);
+  });
+
+  it('opens a line’s description to edit, sends it as typed and a cleared one as none', () => {
+    const saved = invoiceRecord();
+    const detail = invoiceDetail(
+      invoiceRecord({
+        items: [{ ...saved.items[0]!, description: '+2 sessions free' }],
+      }),
+    );
+    const form = invoiceFormOf(detail);
+    expect(form.items[0]?.description).toBe('+2 sessions free');
+    expect(invoiceFormOf(invoiceDetail(saved)).items[0]?.description).toBe('');
+
+    const cleared = invoiceInputOf(
+      { ...form, items: [{ ...form.items[0]!, description: '' }] },
+      'brn_fallback',
+    );
+    expect(cleared.items[0]?.description).toBe('');
   });
 
   it('copies what a saved invoice bills — lines, discounts, party, team, remark — today, nothing paid (Copy invoice)', () => {
@@ -233,7 +252,14 @@ describe('a Medical sale’s form (MD19: the server draws and prices it)', () =>
       branchId: TEST_MONEY_BRANCH_ID,
       contactId: TEST_MONEY_CONTACT_ID,
       // No rate, no name, no free line: the server prices each medicine (MD19).
-      items: [{ medicineId: 'med_azel00000000000000000', qty: 2, discountPct: 0 }],
+      items: [
+        {
+          medicineId: 'med_azel00000000000000000',
+          qty: 2,
+          discountPct: 0,
+          description: null,
+        },
+      ],
       overallDiscount: 100,
       memberIds: [TEST_DOCTOR_ID],
       prescriptionId: 'rx_rx5800000000000000000',
@@ -254,7 +280,28 @@ describe('a Medical sale’s form (MD19: the server draws and prices it)', () =>
       { contactId: TEST_MONEY_CONTACT_ID, fallbackBranchId: 'fallback' },
     );
     expect(draft.items).toEqual([
-      { medicineId: 'med_azel00000000000000000', qty: 3, discountPct: 6.67 },
+      {
+        medicineId: 'med_azel00000000000000000',
+        qty: 3,
+        discountPct: 6.67,
+        description: null,
+      },
+    ]);
+  });
+
+  it('carries a medicine’s description — the first one its rows typed, trimmed', () => {
+    const draft = saleDraftOf(
+      sale({
+        items: [
+          { ...azel, qty: 1, description: '   ' },
+          { ...azel, qty: 1, description: ' Apply at night ' },
+          { ...azel, qty: 1, description: 'Twice a day' },
+        ],
+      }),
+      { contactId: TEST_MONEY_CONTACT_ID, fallbackBranchId: 'fallback' },
+    );
+    expect(draft.items).toEqual([
+      expect.objectContaining({ qty: 3, description: 'Apply at night' }),
     ]);
   });
 

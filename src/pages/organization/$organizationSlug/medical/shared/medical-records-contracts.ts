@@ -402,7 +402,13 @@ export interface SaleInput {
   branchId: string;
   /** The buyer's contact (`con_…`). */
   contactId: string;
-  items: { medicineId: string; qty: number; discountPct: number }[];
+  /** Each medicine once; its description (none when null) lands on every batch line it draws. */
+  items: {
+    medicineId: string;
+    qty: number;
+    discountPct: number;
+    description: string | null;
+  }[];
   /** Off the whole bill, rupees. */
   overallDiscount: number;
   memberIds: string[];
@@ -423,6 +429,9 @@ export const saleBodyOf = (input: SaleInput): ApiBody<'/app/medical-sales', 'pos
     // Always sent: left out, the server applies the medicine's near-expiry discount, so a
     // pharmacist's 0% would come back as that discount.
     discount_percent: item.discountPct,
+    ...(textOrNull(item.description)
+      ? { description: textOrNull(item.description) }
+      : {}),
   })),
   ...(input.overallDiscount > 0 ? { overall_discount: input.overallDiscount } : {}),
   ...(input.memberIds.length > 0 ? { member_ids: input.memberIds } : {}),

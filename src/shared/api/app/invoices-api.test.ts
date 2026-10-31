@@ -111,6 +111,7 @@ const invoiceInput = (patch: Partial<InvoiceInput> = {}): InvoiceInput => ({
       offeringId: CONSULTATION,
       qty: 1,
       discountPct: 0,
+      description: null,
       suggestionId: null,
       treatmentIds: [],
     },
@@ -343,6 +344,7 @@ const previewWire = {
       amount: 4130,
       patient_offering_suggestion_id: null,
       batch_number: null,
+      description: '+2 sessions free',
       offer_ids: ['ofr_diwali00000000000000'],
       sessions_total: null,
     },
@@ -370,6 +372,7 @@ describe('the previews', () => {
           offeringId: HYDRAFACIAL,
           qty: 1,
           discountPct: 12.345,
+          description: null,
           suggestionId: null,
           treatmentIds: [],
         },
@@ -402,7 +405,14 @@ describe('the previews', () => {
     expect(preview).toMatchObject({
       total: 4130,
       due: 4130,
-      items: [{ id: null, rate: 3500, offerIds: ['ofr_diwali00000000000000'] }],
+      items: [
+        {
+          id: null,
+          rate: 3500,
+          description: '+2 sessions free',
+          offerIds: ['ofr_diwali00000000000000'],
+        },
+      ],
     });
   });
 
@@ -445,6 +455,7 @@ describe('the writes', () => {
             offeringId: CONSULTATION,
             qty: 1,
             discountPct: 0,
+            description: null,
             suggestionId: 'psug_peel00000000000000000',
             treatmentIds: ['ptrt_peel0000000000000000'],
           },
@@ -496,6 +507,7 @@ describe('the writes', () => {
             offeringId: CONSULTATION,
             qty: 2,
             discountPct: 0,
+            description: null,
             suggestionId: null,
             treatmentIds: [],
           },
@@ -504,6 +516,7 @@ describe('the writes', () => {
             offeringId: HYDRAFACIAL,
             qty: 1,
             discountPct: 10,
+            description: null,
             suggestionId: null,
             treatmentIds: [],
           },
@@ -523,6 +536,7 @@ describe('the writes', () => {
             offering_id: CONSULTATION,
             quantity: 2,
             discount_percent: 0,
+            description: null,
             patient_offering_suggestion_id: null,
             patient_treatment_ids: [],
           },
@@ -539,6 +553,81 @@ describe('the writes', () => {
       },
       idempotencyKey: 'key-change',
     });
+  });
+
+  it('sends a new line’s description trimmed, and none for a blank one', async () => {
+    answer({ '/app/payments': () => page([]), ...SHEET_ANSWERS });
+    vi.mocked(api.post).mockResolvedValue(one(invoiceWire()) as never);
+    const line = invoiceInput().items[0]!;
+
+    await createInvoice({
+      input: invoiceInput({
+        items: [
+          { ...line, id: null, description: '  LHR Axilla 10 sessions =10*550 ' },
+          { ...line, id: null, offeringId: HYDRAFACIAL, description: '   ' },
+        ],
+      }),
+      idempotencyKey: 'key-described',
+    });
+
+    const body = vi.mocked(api.post).mock.calls[0]?.[1] as {
+      body: { items: Record<string, unknown>[] };
+    };
+    expect(body.body.items[0]).toMatchObject({
+      description: 'LHR Axilla 10 sessions =10*550',
+    });
+    expect(body.body.items[1]).not.toHaveProperty('description');
+  });
+
+  it('changes a kept line’s description alone, and clears it with null', async () => {
+    answer({ '/app/payments': () => page([]), ...SHEET_ANSWERS });
+    vi.mocked(api.patch).mockResolvedValue(one(invoiceWire()) as never);
+    const saved = invoiceRecord();
+    const described = invoiceRecord({
+      items: [{ ...saved.items[0]!, description: '+2 sessions free' }],
+    });
+    const line = invoiceInput().items[0]!;
+
+    await updateInvoice({
+      invoice: saved,
+      input: invoiceInput({ items: [{ ...line, description: '+2 sessions free' }] }),
+      idempotencyKey: 'key-describe',
+    });
+    await updateInvoice({
+      invoice: described,
+      input: invoiceInput({ items: [{ ...line, description: '' }] }),
+      idempotencyKey: 'key-clear',
+    });
+
+    const bodies = vi
+      .mocked(api.patch)
+      .mock.calls.map((call) => (call[1] as { body: Record<string, unknown> }).body);
+    expect(bodies[0]?.items).toEqual([
+      expect.objectContaining({ id: line.id, description: '+2 sessions free' }),
+    ]);
+    expect(bodies[1]?.items).toEqual([
+      expect.objectContaining({ id: line.id, description: null }),
+    ]);
+  });
+
+  it('reads each line’s description', async () => {
+    answer({ '/app/payments': () => page([]), ...SHEET_ANSWERS });
+    vi.mocked(api.patch).mockResolvedValue(
+      one(
+        invoiceWire({
+          items: [{ ...invoiceWire().items[0]!, description: 'Left side only' }],
+        }),
+      ) as never,
+    );
+    const line = invoiceInput().items[0]!;
+
+    const result = await updateInvoice({
+      invoice: invoiceRecord(),
+      input: invoiceInput({ items: [{ ...line, qty: 2 }] }),
+      idempotencyKey: 'key-read',
+    });
+
+    expect(result.detail.invoice.items[0]?.description).toBe('Left side only');
   });
 
   it('sends nothing when nothing changed', async () => {

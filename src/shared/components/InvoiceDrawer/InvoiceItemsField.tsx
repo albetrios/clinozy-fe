@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { OfferingCategory } from '@/shared/api/app/app-schema.ts';
-import { INVOICE_QTY_MAX } from '@/shared/api/app/invoices-contracts.ts';
+import {
+  INVOICE_LINE_DESCRIPTION_MAX,
+  INVOICE_QTY_MAX,
+} from '@/shared/api/app/invoices-contracts.ts';
 import { APP_KEYS } from '@/shared/app/app.constants.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
@@ -399,7 +402,9 @@ function useMedicineDraft(
  * Disc %, GST read-only (0% on a medicine: its MRP includes it, D45) and the
  * Final, whose typing back-solves the discount and which turns red under the
  * floor — "Below the lowest price ₹4,000 for LHR Full Face · B4G7" for a role
- * that sees floors, else "Too much discount on … · ask an admin".
+ * that sees floors, else "Too much discount on … · ask an admin". Under each
+ * row a dashed Description line takes the free text the bill prints under the
+ * line's name (up to 280).
  */
 export function InvoiceItemsField({
   form,
@@ -473,6 +478,17 @@ export function InvoiceItemsField({
       total={<MoneyCell paise={total} />}
       totalLabel={t(K.total)}
       readOnly={!editable}
+      note={
+        // A view shows the line only when a row has a description to read.
+        editable || rows.some((row) => row.description.trim() !== '')
+          ? {
+              key: 'description',
+              tag: t(K.description),
+              placeholder: t(K.descriptionPlaceholder),
+              maxLength: INVOICE_LINE_DESCRIPTION_MAX,
+            }
+          : undefined
+      }
       testId={INVOICE_DRAWER_TEST_IDS.items}
       toolbar={
         editable ? (

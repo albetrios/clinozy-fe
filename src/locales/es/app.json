@@ -1373,6 +1373,8 @@
       "belowFloor": "Por debajo del precio mínimo de {{amount}} para {{name}}",
       "newMedicineName": "Nombre del nuevo medicamento",
       "medicineAdded": "{{name}} añadido · fija el PVP luego en Existencias",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Añade una descripción · p. ej. +2 sesiones gratis",
       "hintInvoice": "2 = cantidad · 10% = descuento",
       "belowLowest": "Por debajo del precio mínimo de {{name}}",
       "offerApplied": "Oferta aplicada: {{offer}}"

@@ -73,6 +73,8 @@ export interface ItemsRowNote<
 > {
   /** The row field the note writes. */
   key: ItemsRowKey<TForm, TName>;
+  /** The uppercase tag before the input; "Note" by default. */
+  tag?: string;
   /** Placeholder and accessible name; "Remarks" by default. */
   placeholder?: string;
   /** 200 characters by default. */

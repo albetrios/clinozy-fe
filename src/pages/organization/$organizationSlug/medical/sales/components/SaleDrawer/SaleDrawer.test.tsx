@@ -215,6 +215,25 @@ describe('SaleDrawer (medical.md:333–338)', () => {
     expect(within(drawer).getByTestId(`${D}-dismiss`)).toHaveTextContent('Close');
   });
 
+  it('shows a line’s description under its medicine', async () => {
+    const sale = saleRow();
+    renderMedicalDrawer(
+      <SaleDrawer
+        open
+        sale={{
+          ...sale,
+          lines: sale.lines.map((line) => ({ ...line, description: 'Apply at night' })),
+        }}
+        onClose={vi.fn()}
+        onReturn={vi.fn()}
+      />,
+    );
+    const drawer = await screen.findByTestId(D);
+    const [line] = within(drawer).getAllByTestId(`${D}-lines-row`);
+    expect(line).toHaveTextContent('Azelaic gel 15g');
+    expect(line).toHaveTextContent('Apply at night');
+  });
+
   it('shimmers until the sale is read', async () => {
     renderMedicalDrawer(
       <SaleDrawer open sale={undefined} onClose={vi.fn()} onReturn={vi.fn()} />,
