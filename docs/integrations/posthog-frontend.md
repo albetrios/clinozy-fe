@@ -46,12 +46,12 @@ flowchart TB
   end
 ```
 
-| Layer         | Path                                      | Role                                              |
-| ------------- | ----------------------------------------- | ------------------------------------------------- |
-| Event catalog | `shared/analytics/analytics.constants.ts` | Event names + super-property keys                 |
-| Capture API   | `shared/analytics/capture.ts`             | Consent gate, context enrichment, URL scrub       |
-| Bootstrap     | `app/analytics/posthog.ts`                | `posthog.init`, identity, router, reset on logout |
-| Web Vitals    | `app/observability/performance.ts`        | `web_vital` events                                |
+| Layer         | Path                                      | Role                                                                                                                                                 |
+| ------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Event catalog | `shared/analytics/analytics.constants.ts` | Event names + super-property keys                                                                                                                    |
+| Capture API   | `shared/analytics/capture.ts`             | Consent gate, context enrichment, URL scrub; `identify` / `group` sent only when the user or the clinic changes (each one reloads the feature flags) |
+| Bootstrap     | `app/analytics/posthog.ts`                | `posthog.init`, identity, router, reset on logout                                                                                                    |
+| Web Vitals    | `app/observability/performance.ts`        | `web_vital` events                                                                                                                                   |
 
 **Privacy:** `autocapture: false`, `disable_session_recording: true`, no emails in
 `identify()`. Every URL in an event — `properties`, `$set` and `$set_once` — loses its query
