@@ -8746,6 +8746,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 created_from?: string;
                 created_to?: string;
                 has_open_lead?: "true" | "false";
@@ -8775,11 +8777,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -8854,6 +8858,7 @@ export interface operations {
             content: {
                 "application/json": {
                     address?: string | null;
+                    age?: number;
                     /** Format: date */
                     date_of_birth?: string | null;
                     /** @enum {string} */
@@ -8892,11 +8897,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -8975,11 +8982,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -9082,6 +9091,7 @@ export interface operations {
             content: {
                 "application/json": {
                     address?: string | null;
+                    age?: number;
                     /** Format: date */
                     date_of_birth?: string | null;
                     /** @enum {string} */
@@ -9122,11 +9132,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -9841,11 +9853,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -9948,11 +9962,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -11538,6 +11554,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 branch_id?: string;
                 branch_ids?: string;
                 contact_id?: string;
@@ -11645,6 +11663,7 @@ export interface operations {
                     branch_id?: string | null;
                     contact?: {
                         address?: string | null;
+                        age?: number;
                         /** Format: date */
                         date_of_birth?: string | null;
                         /** @enum {string} */
@@ -12188,6 +12207,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 branch_id?: string;
                 branch_ids?: string;
                 contact_id?: string;
@@ -13014,10 +13035,12 @@ export interface operations {
                     items: {
                         free_quantity?: number;
                         medicine_id?: string;
+                        mrp?: number | null;
                         new_medicine_name?: string;
                         quantity: number;
                         rate: number;
                     }[];
+                    note?: string;
                     /** Format: date */
                     order_date?: string;
                     supplier_bill_number?: string;
@@ -13227,10 +13250,12 @@ export interface operations {
                     items?: {
                         free_quantity?: number;
                         medicine_id?: string;
+                        mrp?: number | null;
                         new_medicine_name?: string;
                         quantity: number;
                         rate: number;
                     }[];
+                    note?: string | null;
                     /** Format: date */
                     order_date?: string;
                     supplier_bill_number?: string | null;
@@ -13330,15 +13355,18 @@ export interface operations {
                         expiry_month?: string;
                         id: string;
                         is_received?: boolean;
+                        mrp?: number | null;
                     } | {
                         batch_number?: string;
                         expiry_month?: string;
                         free_quantity?: number;
                         medicine_id?: string;
+                        mrp?: number | null;
                         new_medicine_name?: string;
                         quantity: number;
                         rate: number;
                     })[];
+                    note?: string;
                     supplier_bill_number?: string;
                 };
             };
@@ -14992,6 +15020,7 @@ export interface operations {
                         batch_number: string;
                         expiry_month: string;
                         id?: string;
+                        mrp?: number | null;
                         purchase_rate?: number | null;
                         quantity: number;
                         supplier_id?: string | null;
@@ -14999,6 +15028,7 @@ export interface operations {
                     composition?: string | null;
                     /** @enum {number} */
                     gst_percent?: 0 | 5 | 12 | 18 | 28;
+                    hsn_code?: string | null;
                     is_prescription_only?: boolean;
                     is_quick?: boolean;
                     manufacturer_id?: string;
@@ -15007,12 +15037,14 @@ export interface operations {
                     mrp?: number;
                     name: string;
                     near_expiry_discount_percent?: number | null;
+                    pack_label?: string | null;
                     supplier_prices?: {
                         free_quantity?: number;
                         lead_days?: number;
                         rate: number;
                         supplier_id: string;
                     }[];
+                    units_per_pack?: number;
                 };
             };
         };
@@ -15233,6 +15265,7 @@ export interface operations {
                         batch_number: string;
                         expiry_month: string;
                         id?: string;
+                        mrp?: number | null;
                         purchase_rate?: number | null;
                         quantity: number;
                         supplier_id?: string | null;
@@ -15242,6 +15275,7 @@ export interface operations {
                     expected_updated_at?: string;
                     /** @enum {number} */
                     gst_percent?: 0 | 5 | 12 | 18 | 28;
+                    hsn_code?: string | null;
                     is_prescription_only?: boolean;
                     manufacturer_id?: string;
                     max_stock?: number;
@@ -15249,12 +15283,14 @@ export interface operations {
                     mrp?: number;
                     name?: string;
                     near_expiry_discount_percent?: number | null;
+                    pack_label?: string | null;
                     supplier_prices?: {
                         free_quantity?: number;
                         lead_days?: number;
                         rate: number;
                         supplier_id: string;
                     }[];
+                    units_per_pack?: number;
                 };
             };
         };
@@ -17761,6 +17797,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 contact_id?: string;
                 conversion?: "converted" | "not_converted";
                 created_from?: string;
@@ -17847,6 +17885,7 @@ export interface operations {
                     allergies?: string[];
                     contact?: {
                         address?: string | null;
+                        age?: number;
                         /** Format: date */
                         date_of_birth?: string | null;
                         /** @enum {string} */
@@ -21839,6 +21878,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 contact_id?: string;
                 conversion?: "converted" | "not_converted";
                 created_from?: string;
@@ -25877,6 +25918,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    address?: string | null;
+                    /** Format: email */
+                    email?: string | null;
                     gst_number?: string | null;
                     is_quick?: boolean;
                     manufacturer_ids?: string[];
@@ -26030,6 +26074,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    address?: string | null;
+                    /** Format: email */
+                    email?: string | null;
                     /** Format: date-time */
                     expected_updated_at?: string;
                     gst_number?: string | null;
