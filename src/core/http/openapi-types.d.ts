@@ -8780,6 +8780,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 created_from?: string;
                 created_to?: string;
                 has_open_lead?: "true" | "false";
@@ -8809,11 +8811,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -8888,6 +8892,7 @@ export interface operations {
             content: {
                 "application/json": {
                     address?: string | null;
+                    age?: number;
                     /** Format: date */
                     date_of_birth?: string | null;
                     /** @enum {string} */
@@ -8926,11 +8931,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -9009,11 +9016,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -9116,6 +9125,7 @@ export interface operations {
             content: {
                 "application/json": {
                     address?: string | null;
+                    age?: number;
                     /** Format: date */
                     date_of_birth?: string | null;
                     /** @enum {string} */
@@ -9156,11 +9166,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -9875,11 +9887,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -9982,11 +9996,13 @@ export interface operations {
                     "application/json": {
                         data?: {
                             address?: string | null;
+                            age?: number | null;
                             contact_number?: number;
                             /** Format: date-time */
                             created_at?: string;
                             /** Format: date */
                             date_of_birth?: string | null;
+                            date_of_birth_is_approximate?: boolean;
                             /** @enum {string} */
                             default_channel?: "whatsapp" | "call" | "instagram";
                             email?: string | null;
@@ -10619,6 +10635,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -10695,6 +10712,7 @@ export interface operations {
                     invoice_date?: string;
                     items: {
                         batch_number?: string | null;
+                        description?: string | null;
                         discount_percent?: number;
                         medicine_id?: string;
                         offering_id?: string;
@@ -10752,6 +10770,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -10846,6 +10865,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -10949,6 +10969,7 @@ export interface operations {
                     invoice_date?: string;
                     items?: {
                         batch_number?: string | null;
+                        description?: string | null;
                         discount_percent?: number;
                         id?: string;
                         medicine_id?: string;
@@ -10995,6 +11016,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -11232,6 +11254,7 @@ export interface operations {
                     invoice_date?: string;
                     items?: {
                         batch_number?: string | null;
+                        description?: string | null;
                         discount_percent?: number;
                         id?: string;
                         medicine_id?: string;
@@ -11264,6 +11287,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -11353,6 +11377,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -11478,6 +11503,7 @@ export interface operations {
                     invoice_date?: string;
                     items: {
                         batch_number?: string | null;
+                        description?: string | null;
                         discount_percent?: number;
                         medicine_id?: string;
                         offering_id?: string;
@@ -11511,6 +11537,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_amount?: number;
                                 discount_percent?: number;
                                 gst_amount?: number;
@@ -11561,6 +11588,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 branch_id?: string;
                 branch_ids?: string;
                 contact_id?: string;
@@ -11668,6 +11697,7 @@ export interface operations {
                     branch_id?: string | null;
                     contact?: {
                         address?: string | null;
+                        age?: number;
                         /** Format: date */
                         date_of_birth?: string | null;
                         /** @enum {string} */
@@ -12211,6 +12241,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 branch_id?: string;
                 branch_ids?: string;
                 contact_id?: string;
@@ -14378,6 +14410,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -14457,6 +14490,7 @@ export interface operations {
                     branch_id: string;
                     contact_id: string;
                     items: {
+                        description?: string | null;
                         discount_percent?: number;
                         medicine_id: string;
                         quantity: number;
@@ -14513,6 +14547,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -14619,6 +14654,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -14756,6 +14792,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -14879,6 +14916,7 @@ export interface operations {
                             items?: {
                                 amount?: number;
                                 batch_number?: string | null;
+                                description?: string | null;
                                 discount_percent?: number;
                                 expiry_month?: string | null;
                                 invoice_item_id?: string;
@@ -17941,6 +17979,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 contact_id?: string;
                 conversion?: "converted" | "not_converted";
                 created_from?: string;
@@ -18027,6 +18067,7 @@ export interface operations {
                     allergies?: string[];
                     contact?: {
                         address?: string | null;
+                        age?: number;
                         /** Format: date */
                         date_of_birth?: string | null;
                         /** @enum {string} */
@@ -22019,6 +22060,8 @@ export interface operations {
         parameters: {
             query?: {
                 after?: string;
+                age_from?: number;
+                age_to?: number;
                 contact_id?: string;
                 conversion?: "converted" | "not_converted";
                 created_from?: string;
