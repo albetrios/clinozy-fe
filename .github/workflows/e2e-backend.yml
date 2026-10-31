@@ -13,8 +13,9 @@ name: E2E against the backend image
 # a person's dependency change is reviewed with the code that needs it, and main's run follows.
 #
 # The organization mode follows the variable settings: the job reads the development
-# environment's VITE_PERSONAL_ORGANIZATIONS / VITE_TEAM_ORGANIZATIONS (as preview.yml does; only
-# its variables, the backend stays this job's own container), builds the app with them, and boots
+# environment's VITE_PERSONAL_ORGANIZATIONS / VITE_TEAM_ORGANIZATIONS (on a pull request, the
+# repository-level copies, as preview.yml does; only variables, the backend stays this job's own
+# container), builds the app with them, and boots
 # the backend in the same mode. clinozy-be no longer sends deployment flags, so without this the
 # app and the backend could each run a different mode, and the team-only specs never ran.
 #
@@ -59,8 +60,10 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    # For its variables only (no protection → no gate, no branch policy): the organization mode.
-    environment: development
+    # For its variables only: the organization mode. The development environment allows the main
+    # branch only (H-1), so a Dependabot pull request runs with no environment and reads the
+    # repository-level copies of the two variables (.github/environments/README.md).
+    environment: ${{ github.event_name != 'pull_request' && 'development' || '' }}
     permissions:
       contents: read
       packages: read

@@ -8,7 +8,8 @@ organizations independently.
 > and `GET /users/me` carry no `capabilities` — so the build decides: `VITE_PERSONAL_ORGANIZATIONS` /
 > `VITE_TEAM_ORGANIZATIONS`, set to match the backend's `PERSONAL_ORGANIZATION_ENABLED` /
 > `TEAM_ORGANIZATION_ENABLED`. Unset, the client assumes both kinds (hybrid). Deployed and preview builds
-> take them from the GitHub Environment's variables (`reusable-netlify-deploy.yml`, `preview.yml`); Clinozy
+> take them from the GitHub Environment's variables (`reusable-netlify-deploy.yml`; `preview.yml` from their
+> repository-level copies, since a pull-request job selects no environment); Clinozy
 > runs team-only (`false` / `true`).
 >
 > **Implemented naming:** the proposed `capabilities` API shipped as

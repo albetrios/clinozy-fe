@@ -41,9 +41,10 @@ describe('post-merge CI policy (single trunk)', () => {
 
   it('selects the `development` environment on release-please — and NEVER `production`', () => {
     // RELEASE_PLEASE_TOKEN is an environment secret, so the job must select an
-    // environment to read it at all. `development` has an empty protection block
-    // (.github/environments/development.json), so this grants secret access
-    // without gating. `production` carries requiredReviewers — selecting it here
+    // environment to read it at all. `development` has no reviewers and allows the
+    // main branch only (.github/environments/development.json, H-1), which this
+    // push-to-main job runs on, so it grants secret access without gating.
+    // `production` carries requiredReviewers — selecting it here
     // would pause post-merge CI for manual approval on EVERY merge to main.
     const releaseBlock = jobBlock(workflow, 'release-please');
     expect(releaseBlock).not.toBe('');

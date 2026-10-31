@@ -126,6 +126,7 @@ describe('E2E against the backend image', () => {
       '--certificate-oidc-issuer https://token.actions.githubusercontent.com',
     );
     expect(step).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: shell expansion, asserted verbatim
       'echo "BACKEND_IMAGE=${BACKEND_IMAGE_REPOSITORY}@${digest}" >> "$GITHUB_ENV"',
     );
     // BACKEND_IMAGE is never set from a tag anywhere else.
@@ -136,6 +137,7 @@ describe('E2E against the backend image', () => {
     // The name clinozy-be pushes: ghcr.io/<owner>/<repository>/<image>. Without the repository
     // segment the pull fails with "manifest unknown" before the backend boots.
     expect(WORKFLOW).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax, asserted verbatim
       'BACKEND_IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api',
     );
     expect(WORKFLOW).toContain('packages: read');
@@ -168,8 +170,12 @@ describe('E2E against the backend image', () => {
     // clinozy-be no longer sends deployment flags, so the app's mode is VITE_PERSONAL_ORGANIZATIONS
     // / VITE_TEAM_ORGANIZATIONS alone. Before this the job set neither: the app and the backend
     // each ran their default, and the team-only specs never ran. It reads development's
-    // variables (as preview.yml does) and boots the backend in the same mode.
-    expect(WORKFLOW).toMatch(/^ {4}environment: development$/m);
+    // variables and boots the backend in the same mode. On a pull request the development
+    // environment (main only, H-1) is not selected: the repository-level copies are read.
+    expect(WORKFLOW).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax, asserted verbatim
+      "    environment: ${{ github.event_name != 'pull_request' && 'development' || '' }}",
+    );
     for (const key of ['VITE_PERSONAL_ORGANIZATIONS', 'VITE_TEAM_ORGANIZATIONS']) {
       expect(WORKFLOW).toMatch(new RegExp(`${key}: \\$\\{\\{ vars\\.${key} \\}\\}`));
     }
