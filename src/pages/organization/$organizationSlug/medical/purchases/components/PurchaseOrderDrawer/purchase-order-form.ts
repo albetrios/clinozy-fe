@@ -4,6 +4,10 @@ import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
 import { reorderPacks } from '@/shared/api/app/medicine-stock.ts';
 import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
+import {
+  GST_PERCENT_VALUES,
+  type GstPercent,
+} from '@/shared/api/app/offerings-contracts.ts';
 
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
 import type {
@@ -50,6 +54,8 @@ export interface OrderLineValues {
   rate: number;
   /** The MRP printed on the packs, paise — 0 when not known (change-pharmacy-record-fields D8). */
   mrp: number;
+  /** The line's GST rate as the picker keeps it (`'12'`); blank until a medicine is picked. */
+  gst: string;
 }
 
 /** The drawer's form. */
@@ -60,6 +66,19 @@ export interface PurchaseOrderFormValues {
   /** The desk's note on the order — "30 DAYS DUE" (D10). */
   note: string;
   lines: OrderLineValues[];
+  /** "Rates include GST" — one switch for the order, sent on every line (D3). */
+  gstInclusive: boolean;
+}
+
+/**
+ * The GST rate a medicine added as typed gets — clinozy-be's `MEDICINE_DEFAULT_GST_PERCENT`, the
+ * rate the server gives a quick medicine.
+ */
+export const TYPED_MEDICINE_GST: GstPercent = 12;
+
+/** A GST picker key as the rate it names; null for a blank or unknown key. */
+function gstPercentOf(key: string): GstPercent | null {
+  return GST_PERCENT_VALUES.find((value) => String(value) === key) ?? null;
 }
 
 /** clinozy-be's limit on an order's note (change-pharmacy-record-fields D9). */
@@ -72,18 +91,53 @@ export const emptyOrderLine = (): OrderLineValues => ({
   free: 0,
   rate: 0,
   mrp: 0,
+  gst: '',
 });
 
 /** A line with no medicine yet: the quick line's next add fills it. */
 export const isBlankOrderLine = (line: OrderLineValues) => line.medicineId === null;
 
-/** A line's amount, paise: qty × rate — free units cost nothing (`S:830`). */
-export const lineAmount = (line: OrderLineValues) =>
-  line.medicineId ? Math.round(line.qty * line.rate) : 0;
+/** A line's (or an order's) money, paise. */
+export interface OrderMoney {
+  taxable: number;
+  gst: number;
+  /** Taxable + GST. */
+  amount: number;
+}
 
-/** The order's total, paise — the summary "₹4,236". */
-export const orderTotal = (lines: readonly OrderLineValues[]) =>
-  lines.reduce((sum, line) => sum + lineAmount(line), 0);
+/**
+ * A line's money, paise — clinozy-be's invoice calculation (PG4): qty × rate (free units cost
+ * nothing, `S:830`); inclusive, the taxable value is that ÷ (1 + GST ÷ 100) to the paisa and GST
+ * the rest; exclusive, GST on top. A preview — a saved order's figures are the server's.
+ */
+export function lineMoney(line: OrderLineValues, inclusive: boolean): OrderMoney {
+  const gross = line.medicineId ? Math.round(line.qty * line.rate) : 0;
+  const percent = gstPercentOf(line.gst) ?? 0;
+  if (inclusive) {
+    const taxable = Math.round((gross * 100) / (100 + percent));
+    return { taxable, gst: gross - taxable, amount: gross };
+  }
+  const gst = Math.round((gross * percent) / 100);
+  return { taxable: gross, gst, amount: gross + gst };
+}
+
+/** The order's totals, paise — its lines' sums: "Taxable ₹3,782 · GST ₹454", total "₹4,236". */
+export function orderMoney(
+  lines: readonly OrderLineValues[],
+  inclusive: boolean,
+): OrderMoney {
+  return lines.reduce<OrderMoney>(
+    (sum, line) => {
+      const money = lineMoney(line, inclusive);
+      return {
+        taxable: sum.taxable + money.taxable,
+        gst: sum.gst + money.gst,
+        amount: sum.amount + money.amount,
+      };
+    },
+    { taxable: 0, gst: 0, amount: 0 },
+  );
+}
 
 /** The lines with a medicine picked or typed. */
 export const pickedLines = (lines: readonly OrderLineValues[]) =>
@@ -123,7 +177,14 @@ export const lowStockMedicines = <T extends Pick<MedicineRow, 'stockLevel'>>(
 export function orderLineFor(
   medicine: Pick<
     MedicineRow,
-    'id' | 'stock' | 'maxStock' | 'unitsPerPack' | 'mrp' | 'supplierRates' | 'bestRate'
+    | 'id'
+    | 'stock'
+    | 'maxStock'
+    | 'unitsPerPack'
+    | 'mrp'
+    | 'supplierRates'
+    | 'bestRate'
+    | 'gstPct'
   >,
   supplierId: string | null,
   values: { qty?: number; free?: number; rate?: number } = {},
@@ -136,6 +197,7 @@ export function orderLineFor(
     free: values.free ?? 0,
     rate: values.rate ?? supplierRateOf(medicine, supplierId),
     mrp: paiseOfRupees(medicine.mrp),
+    gst: String(medicine.gstPct),
   };
 }
 
@@ -174,7 +236,14 @@ export function newOrderForm(
   supplierId: string | null,
   lines: OrderLineValues[] = [],
 ): PurchaseOrderFormValues {
-  return { supplierId, billNo: '', date: appToday(), note: '', lines };
+  return {
+    supplierId,
+    billNo: '',
+    date: appToday(),
+    note: '',
+    lines,
+    gstInclusive: true,
+  };
 }
 
 /** A saved order's form — its rupees as the rate cells' paise. */
@@ -190,7 +259,11 @@ export function orderFormOf(order: PurchaseOrderRow): PurchaseOrderFormValues {
       free: line.free,
       rate: paiseOfRupees(line.rate),
       mrp: paiseOfRupees(line.mrp ?? 0),
+      gst: String(line.gstPercent),
     })),
+    // One switch for the order: inclusive unless every line was saved exclusive
+    gstInclusive:
+      order.lines.length === 0 || order.lines.some((line) => line.gstInclusive),
   };
 }
 
@@ -222,9 +295,13 @@ export function orderLinesProblem(
  * name, which the server adds (MD26).
  */
 export function orderLineInputOf(
-  line: Pick<OrderLineValues, 'medicineId' | 'qty' | 'free' | 'rate' | 'mrp'>,
+  line: Pick<OrderLineValues, 'medicineId' | 'qty' | 'free' | 'rate' | 'mrp'> & {
+    gst?: string;
+  },
+  gstInclusive?: boolean,
 ): PurchaseOrderLineInput {
   const typed = typedMedicineName(line.medicineId);
+  const gstPercent = gstPercentOf(line.gst ?? '');
   return {
     medicineId: typed === null ? line.medicineId : null,
     ...(typed === null ? {} : { newMedicineName: typed }),
@@ -232,6 +309,8 @@ export function orderLineInputOf(
     free: line.free,
     rate: rupeesOfPaise(line.rate),
     mrp: line.mrp > 0 ? rupeesOfPaise(line.mrp) : null,
+    ...(gstPercent === null ? {} : { gstPercent }),
+    ...(gstInclusive === undefined ? {} : { gstInclusive }),
   };
 }
 
@@ -242,7 +321,9 @@ export function orderInputOf(values: PurchaseOrderFormValues): PurchaseOrderInpu
     supplierBillNo: values.billNo.trim() || null,
     date: values.date,
     note: values.note.trim() || null,
-    items: pickedLines(values.lines).map(orderLineInputOf),
+    items: pickedLines(values.lines).map((line) =>
+      orderLineInputOf(line, values.gstInclusive),
+    ),
   };
 }
 
@@ -273,6 +354,7 @@ export function orderServerFields(
     fields[`items.${index}.freeQuantity`] = `lines.${row}.free`;
     fields[`items.${index}.rate`] = `lines.${row}.rate`;
     fields[`items.${index}.mrp`] = `lines.${row}.mrp`;
+    fields[`items.${index}.gstPercent`] = `lines.${row}.gst`;
   });
   return fields;
 }

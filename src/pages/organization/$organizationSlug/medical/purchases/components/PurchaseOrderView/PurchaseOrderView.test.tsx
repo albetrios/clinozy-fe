@@ -107,6 +107,11 @@ describe('PurchaseOrderView (medical.md:333–334)', () => {
     expect(line).toHaveTextContent('Azelaic gel 15g');
     expect(line).toHaveTextContent('₹423.60');
     expect(line).toHaveTextContent('₹4,236');
+    // Its GST rate, and the order's taxable and GST totals (feat-purchase-line-gst A-4).
+    expect(line).toHaveTextContent('12%');
+    expect(within(drawer).getByTestId(`${D}-gst-totals`)).toHaveTextContent(
+      'Taxable ₹3,782.14 · GST ₹453.86',
+    );
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('Payable ₹827');
     expect(within(drawer).getByTestId(`${D}-save`)).toHaveTextContent('Pay ₹827');
     expect(within(drawer).getByTestId(`${D}-dismiss`)).toHaveTextContent('Close');

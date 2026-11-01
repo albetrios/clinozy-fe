@@ -1,6 +1,7 @@
 import type { ApiBody } from '@/core/http/api.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { wireExpiryOf } from '@/shared/api/app/medicines-contracts.ts';
+import type { GstPercent } from '@/shared/api/app/offerings-contracts.ts';
 import type { MoneySplit } from '@/shared/api/app/payments-contracts.ts';
 
 import type {
@@ -232,6 +233,10 @@ export interface PurchaseOrderLineInput {
   rate: number;
   /** The MRP printed on the packs, rupees; none when not known. */
   mrp?: number | null;
+  /** The line's GST rate (0, 5, 12, 18, 28); unset — the medicine's. */
+  gstPercent?: GstPercent | null;
+  /** Whether the rate includes GST; unset — it does. */
+  gstInclusive?: boolean;
 }
 
 /**
@@ -248,7 +253,7 @@ export interface PurchaseOrderInput {
   items: PurchaseOrderLineInput[];
 }
 
-/** A line in the API's words: the medicine, or the typed name of a new one, and its MRP. */
+/** A line in the API's words: the medicine, or the typed name of a new one, its MRP and GST. */
 function orderLineOf(line: PurchaseOrderLineInput) {
   return {
     ...(line.medicineId
@@ -259,6 +264,8 @@ function orderLineOf(line: PurchaseOrderLineInput) {
     rate: line.rate,
     // A line's list is replaced whole: a line without an MRP sends none and keeps none.
     ...(line.mrp ? { mrp: line.mrp } : {}),
+    ...(line.gstPercent == null ? {} : { gst_percent: line.gstPercent }),
+    ...(line.gstInclusive === undefined ? {} : { is_gst_inclusive: line.gstInclusive }),
   };
 }
 
@@ -305,6 +312,8 @@ export function purchaseOrderChangeOf(
       free: line.free,
       rate: line.rate,
       mrp: line.mrp,
+      gstPercent: line.gstPercent,
+      gstInclusive: line.gstInclusive,
     }),
   );
   if (JSON.stringify(lines) !== JSON.stringify(saved)) change.items = lines;

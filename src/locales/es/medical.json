@@ -38,7 +38,8 @@
     "removeDiscount": "Quitar el descuento por caducidad",
     "prescriptions": "Recetas por surtir",
     "paymentReminders": "Enviar recordatorios de pago",
-    "payAllReceived": "Pagar todo lo recibido · {{amount}}"
+    "payAllReceived": "Pagar todo lo recibido · {{amount}}",
+    "gstSummary": "Resumen de GST"
   },
   "filters": {
     "all": "Todos",
@@ -643,7 +644,12 @@
         "newMedicineName": "Nombre del nuevo medicamento",
         "note": "Nota",
         "notePlaceholder": "p. ej. 30 DÍAS DE PLAZO",
-        "mrp": "PVP"
+        "mrp": "PVP",
+        "gst": "GST",
+        "gstRate": "{{value}} %",
+        "ratesIncludeGst": "Las tarifas incluyen GST",
+        "gstOnTop": "GST adicional",
+        "gstTotals": "Base imponible {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "Reponer existencias bajas"
@@ -690,7 +696,8 @@
       "print": "Imprimir",
       "note": "Nota",
       "saveNote": "Guardar nota",
-      "noteSaved": "Nota guardada"
+      "noteSaved": "Nota guardada",
+      "gstOnTopRate": "{{value}} % adicional"
     },
     "sale": {
       "title": "Venta",
@@ -786,6 +793,24 @@
       "copy": "Copiar el recordatorio para {{name}}",
       "copied": "Recordatorio para {{name}} copiado",
       "message": "Hola {{name}}, le recordamos desde {{clinic}} que tiene {{amount}} pendientes por sus medicamentos. Responda aquí si tiene alguna pregunta. ¡Gracias!"
+    },
+    "gstSummary": {
+      "title": "GST de compras",
+      "month": "Mes",
+      "summary": "Pedidos recibidos: {{orders}} · líneas: {{lines}}",
+      "byRate": "Por tasa de GST",
+      "byHsn": "Por código HSN",
+      "rate": "Tasa",
+      "hsn": "Código HSN",
+      "noHsn": "Sin HSN",
+      "lines": "Líneas",
+      "taxable": "Base imponible",
+      "gst": "GST",
+      "total": "Total",
+      "totals": "Base imponible {{taxable}} · GST {{gst}} · Total {{total}}",
+      "empty": "No se recibió nada este mes",
+      "download": "Descargar CSV",
+      "downloaded": "Resumen de GST descargado"
     }
   }
 }

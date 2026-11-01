@@ -38,7 +38,8 @@
     "removeDiscount": "取消临期折扣",
     "prescriptions": "待配处方",
     "paymentReminders": "发送付款提醒",
-    "payAllReceived": "支付全部已收货 · {{amount}}"
+    "payAllReceived": "支付全部已收货 · {{amount}}",
+    "gstSummary": "GST 汇总"
   },
   "filters": {
     "all": "全部",
@@ -603,7 +604,12 @@
         "newMedicineName": "新药品名称",
         "note": "备注",
         "notePlaceholder": "例如 30 天付款",
-        "mrp": "零售价"
+        "mrp": "零售价",
+        "gst": "GST",
+        "gstRate": "{{value}}%",
+        "ratesIncludeGst": "单价含 GST",
+        "gstOnTop": "GST 另计",
+        "gstTotals": "应税金额 {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "补货低库存"
@@ -648,7 +654,8 @@
       "print": "打印",
       "note": "备注",
       "saveNote": "保存备注",
-      "noteSaved": "备注已保存"
+      "noteSaved": "备注已保存",
+      "gstOnTopRate": "{{value}}% 另计"
     },
     "sale": {
       "title": "销售",
@@ -736,6 +743,24 @@
       "copy": "复制给{{name}}的提醒",
       "copied": "已复制给{{name}}的提醒",
       "message": "{{name}}您好，这是来自{{clinic}}的提醒：您的药品费用还有 {{amount}} 未付。如有任何疑问，请直接在此回复。谢谢！"
+    },
+    "gstSummary": {
+      "title": "采购 GST",
+      "month": "月份",
+      "summary": "已收货订单：{{orders}} · 明细：{{lines}}",
+      "byRate": "按 GST 税率",
+      "byHsn": "按 HSN 编码",
+      "rate": "税率",
+      "hsn": "HSN 编码",
+      "noHsn": "无 HSN",
+      "lines": "明细",
+      "taxable": "应税金额",
+      "gst": "GST",
+      "total": "合计",
+      "totals": "应税金额 {{taxable}} · GST {{gst}} · 合计 {{total}}",
+      "empty": "本月没有收货",
+      "download": "下载 CSV",
+      "downloaded": "GST 汇总已下载"
     }
   }
 }

@@ -38,7 +38,8 @@
     "removeDiscount": "Ablaufrabatt entfernen",
     "prescriptions": "Offene Rezepte",
     "paymentReminders": "Zahlungserinnerungen senden",
-    "payAllReceived": "Alle erhaltenen zahlen · {{amount}}"
+    "payAllReceived": "Alle erhaltenen zahlen · {{amount}}",
+    "gstSummary": "GST-Übersicht"
   },
   "filters": {
     "all": "Alle",
@@ -623,7 +624,12 @@
         "newMedicineName": "Name des neuen Arzneimittels",
         "note": "Notiz",
         "notePlaceholder": "z. B. 30 TAGE ZIEL",
-        "mrp": "UVP"
+        "mrp": "UVP",
+        "gst": "GST",
+        "gstRate": "{{value}} %",
+        "ratesIncludeGst": "Preise inkl. GST",
+        "gstOnTop": "GST zusätzlich",
+        "gstTotals": "Netto {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "Niedrigen Bestand nachbestellen"
@@ -669,7 +675,8 @@
       "print": "Drucken",
       "note": "Notiz",
       "saveNote": "Notiz speichern",
-      "noteSaved": "Notiz gespeichert"
+      "noteSaved": "Notiz gespeichert",
+      "gstOnTopRate": "{{value}} % zusätzlich"
     },
     "sale": {
       "title": "Verkauf",
@@ -761,6 +768,24 @@
       "copy": "Erinnerung für {{name}} kopieren",
       "copied": "Erinnerung für {{name}} kopiert",
       "message": "Hallo {{name}}, dies ist eine Erinnerung von {{clinic}}: Für Ihre Medikamente sind noch {{amount}} offen. Antworten Sie gern hier, wenn Sie Fragen haben. Vielen Dank!"
+    },
+    "gstSummary": {
+      "title": "Einkaufs-GST",
+      "month": "Monat",
+      "summary": "Eingegangene Bestellungen: {{orders}} · Positionen: {{lines}}",
+      "byRate": "Nach GST-Satz",
+      "byHsn": "Nach HSN-Code",
+      "rate": "Satz",
+      "hsn": "HSN-Code",
+      "noHsn": "Ohne HSN",
+      "lines": "Positionen",
+      "taxable": "Netto",
+      "gst": "GST",
+      "total": "Gesamt",
+      "totals": "Netto {{taxable}} · GST {{gst}} · Gesamt {{total}}",
+      "empty": "In diesem Monat ist nichts eingegangen",
+      "download": "CSV herunterladen",
+      "downloaded": "GST-Übersicht heruntergeladen"
     }
   }
 }

@@ -38,7 +38,8 @@
     "removeDiscount": "إزالة خصم قرب انتهاء الصلاحية",
     "prescriptions": "وصفات بانتظار الصرف",
     "paymentReminders": "إرسال تذكيرات الدفع",
-    "payAllReceived": "ادفع كل المستلم · {{amount}}"
+    "payAllReceived": "ادفع كل المستلم · {{amount}}",
+    "gstSummary": "ملخص GST"
   },
   "filters": {
     "all": "الكل",
@@ -703,7 +704,12 @@
         "newMedicineName": "اسم دواء جديد",
         "note": "ملاحظة",
         "notePlaceholder": "مثل: الدفع خلال 30 يومًا",
-        "mrp": "السعر الأقصى"
+        "mrp": "السعر الأقصى",
+        "gst": "GST",
+        "gstRate": "‎{{value}}%",
+        "ratesIncludeGst": "الأسعار تشمل GST",
+        "gstOnTop": "GST إضافية",
+        "gstTotals": "الخاضع للضريبة {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "إعادة طلب المخزون المنخفض"
@@ -753,7 +759,8 @@
       "print": "طباعة",
       "note": "ملاحظة",
       "saveNote": "حفظ الملاحظة",
-      "noteSaved": "تم حفظ الملاحظة"
+      "noteSaved": "تم حفظ الملاحظة",
+      "gstOnTopRate": "‎{{value}}% إضافية"
     },
     "sale": {
       "title": "البيع",
@@ -861,6 +868,24 @@
       "copy": "نسخ التذكير لـ{{name}}",
       "copied": "تم نسخ التذكير لـ{{name}}",
       "message": "مرحبًا {{name}}، هذا تذكير من {{clinic}} بأن مبلغ {{amount}} مستحق عن أدويتك. يمكنك الرد هنا إن كانت لديك أي أسئلة. شكرًا لك!"
+    },
+    "gstSummary": {
+      "title": "GST المشتريات",
+      "month": "الشهر",
+      "summary": "الطلبات المستلمة: {{orders}} · البنود: {{lines}}",
+      "byRate": "حسب نسبة GST",
+      "byHsn": "حسب رمز HSN",
+      "rate": "النسبة",
+      "hsn": "رمز HSN",
+      "noHsn": "بدون HSN",
+      "lines": "البنود",
+      "taxable": "الخاضع للضريبة",
+      "gst": "GST",
+      "total": "الإجمالي",
+      "totals": "الخاضع للضريبة {{taxable}} · GST {{gst}} · الإجمالي {{total}}",
+      "empty": "لم يُستلم شيء هذا الشهر",
+      "download": "تنزيل CSV",
+      "downloaded": "تم تنزيل ملخص GST"
     }
   }
 }

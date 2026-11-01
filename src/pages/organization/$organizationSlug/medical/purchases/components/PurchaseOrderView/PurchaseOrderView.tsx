@@ -122,6 +122,17 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       ),
     },
     {
+      id: 'gst',
+      header: t(F.gst),
+      track: '72px',
+      align: 'end',
+      cell: ({ row }) => (
+        <ItemsReadCell>
+          {t(row.gstInclusive ? F.gstRate : K.gstOnTopRate, { value: row.gstPercent })}
+        </ItemsReadCell>
+      ),
+    },
+    {
       id: 'amount',
       header: t(F.amount),
       track: '100px',
@@ -173,17 +184,28 @@ function OrderLines({ order, testId }: { order: PurchaseOrderRow; testId: string
   const formatRupees = useRupeeFormat();
   const form = useForm<LinesForm>({ values: { lines: order.lines } });
   return (
-    <ItemsField
-      control={form.control}
-      name="lines"
-      label={t(F.items)}
-      columns={useColumns()}
-      total={formatRupees(order.total)}
-      totalLabel={t(F.total)}
-      readOnly
-      removable={false}
-      testId={`${testId}-lines`}
-    />
+    <>
+      <ItemsField
+        control={form.control}
+        name="lines"
+        label={t(F.items)}
+        columns={useColumns()}
+        total={formatRupees(order.total)}
+        totalLabel={t(F.total)}
+        readOnly
+        removable={false}
+        testId={`${testId}-lines`}
+      />
+      <p
+        className="text-caption text-muted-foreground text-end tabular-nums"
+        data-testid={`${testId}-gst-totals`}
+      >
+        {t(F.gstTotals, {
+          taxable: formatRupees(order.taxableTotal),
+          gst: formatRupees(order.gstTotal),
+        })}
+      </p>
+    </>
   );
 }
 
@@ -231,6 +253,7 @@ function purchaseOrderPrintOf({
         qty: line.qty,
         free: line.free,
         rate: paiseOfRupees(line.rate),
+        amount: paiseOfRupees(line.amount),
         batchNo: line.batchNo,
         expiry: line.expiry,
         received: line.received ?? false,

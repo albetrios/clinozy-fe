@@ -1,12 +1,14 @@
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { GST_PERCENT_VALUES } from '@/shared/api/app/offerings-contracts.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
 import {
   DrawerField,
   DrawerFieldGrid,
   DrawerInput,
   DrawerTextarea,
+  DrawerToggle,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import { CalendarPicker } from '@/shared/components/Picker/CalendarPicker/index.ts';
@@ -15,6 +17,7 @@ import {
   type ItemsColumn,
   ItemsField,
   ItemsNumberCell,
+  ItemsPickerCell,
   ItemsQtyCell,
 } from '@/shared/forms/ItemsField/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
@@ -31,9 +34,9 @@ import { useMedicineOptions } from './order-medicine.ts';
 import { OrderMedicineCell } from './OrderMedicineCell.tsx';
 import {
   emptyOrderLine,
-  lineAmount,
+  lineMoney,
   ORDER_NOTE_MAX,
-  orderTotal,
+  orderMoney,
   type PurchaseOrderFormValues,
 } from './purchase-order-form.ts';
 import { useOrderQuickLine } from './use-order-quick-line.ts';
@@ -140,13 +143,27 @@ export function OrderFields({
   );
 }
 
-/** The rows: Medicine · Qty · Free · Rate* · MRP · Amount (`medical.md:261`; H:5389; D8). */
+/** The GST picker's options: 0 % · 5 % · 12 % · 18 % · 28 %. */
+function useGstOptions() {
+  const { t } = useTranslation(MEDICAL_DRAWERS_NS);
+  return GST_PERCENT_VALUES.map((value) => ({
+    key: String(value),
+    label: t(K.gstRate, { value }),
+  }));
+}
+
+/**
+ * The rows: Medicine · Qty · Free · Rate* · MRP · GST · Amount (`medical.md:261`; H:5389; D8) — GST the
+ * line's rate, the picked medicine's until changed (feat-purchase-line-gst D3).
+ */
 function useLineColumns(
   { form, openChild }: OrderFieldsProps,
   supplierId: string | null,
   options: ReturnType<typeof useMedicineOptions>,
+  gstInclusive: boolean,
 ): ItemsColumn<PurchaseOrderFormValues, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
+  const gstOptions = useGstOptions();
   return [
     {
       id: 'medicine',
@@ -167,6 +184,9 @@ function useLineColumns(
               shouldDirty: true,
             });
             form.setValue(`lines.${row.index}.mrp`, medicine.mrp, {
+              shouldDirty: true,
+            });
+            form.setValue(`lines.${row.index}.gst`, String(medicine.gstPercent), {
               shouldDirty: true,
             });
           }}
@@ -221,12 +241,28 @@ function useLineColumns(
       ),
     },
     {
+      id: 'gst',
+      header: t(K.gst),
+      track: '84px',
+      cell: (row) => (
+        <ItemsPickerCell<PurchaseOrderFormValues>
+          {...row.bind('gst')}
+          options={gstOptions}
+          placeholder={t(K.gst)}
+          disabled={!row.editable}
+        />
+      ),
+    },
+    {
       id: 'amount',
       header: t(K.amount),
       track: '96px',
       align: 'end',
       cell: ({ row }) => (
-        <MoneyCell paise={lineAmount(row)} className="text-body font-medium" />
+        <MoneyCell
+          paise={lineMoney(row, gstInclusive).amount}
+          className="text-body font-medium"
+        />
       ),
     },
   ];
@@ -238,13 +274,16 @@ function useLineColumns(
  * (grouped by the supplier's price list; "Add medicine “q”" keeps the typed
  * name for the save to add, "New medicine · “q”" opens it in full on top), its
  * quantity, the free units, the purchase rate (required once a medicine is
- * picked) and the amount — "+ Add medicine" and the total.
+ * picked), its GST rate and the amount — "+ Add medicine" and the total; under them "Rates
+ * include GST" (one switch for the order) and "Taxable ₹x · GST ₹y".
  */
 export function ItemsFields(props: OrderFieldsProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
   const lines = useWatch({ control: props.form.control, name: 'lines' });
   const supplierId = useWatch({ control: props.form.control, name: 'supplierId' });
+  const gstInclusive = useWatch({ control: props.form.control, name: 'gstInclusive' });
+  const money = orderMoney(lines, gstInclusive);
   const supplierName = useSupplierCatalogue().data?.find(
     (row) => row.id === supplierId,
   )?.name;
@@ -257,19 +296,48 @@ export function ItemsFields(props: OrderFieldsProps) {
     supplierName,
     testId: props.testId,
   });
+  const columns = useLineColumns(props, supplierId, options, gstInclusive);
   return (
-    <ItemsField
-      control={props.form.control}
-      name="lines"
-      label={t(K.items)}
-      columns={useLineColumns(props, supplierId, options)}
-      newRow={emptyOrderLine}
-      addLabel={t(K.add)}
-      total={formatPaise(orderTotal(lines))}
-      totalLabel={t(K.total)}
-      readOnly={props.readOnly}
-      testId={`${props.testId}-lines`}
-      toolbar={props.readOnly ? undefined : <QuickLine {...quickLine} />}
-    />
+    <>
+      <ItemsField
+        control={props.form.control}
+        name="lines"
+        label={t(K.items)}
+        columns={columns}
+        newRow={emptyOrderLine}
+        addLabel={t(K.add)}
+        total={formatPaise(money.amount)}
+        totalLabel={t(K.total)}
+        readOnly={props.readOnly}
+        testId={`${props.testId}-lines`}
+        toolbar={props.readOnly ? undefined : <QuickLine {...quickLine} />}
+      />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Controller
+          control={props.form.control}
+          name="gstInclusive"
+          render={({ field: control }) => (
+            <DrawerToggle
+              aria-label={t(K.ratesIncludeGst)}
+              checked={control.value}
+              onCheckedChange={control.onChange}
+              onLabel={t(K.ratesIncludeGst)}
+              offLabel={t(K.gstOnTop)}
+              disabled={props.readOnly}
+              data-testid={`${props.testId}-gst-inclusive`}
+            />
+          )}
+        />
+        <p
+          className="text-caption text-muted-foreground tabular-nums"
+          data-testid={`${props.testId}-gst-totals`}
+        >
+          {t(K.gstTotals, {
+            taxable: formatPaise(money.taxable),
+            gst: formatPaise(money.gst),
+          })}
+        </p>
+      </div>
+    </>
   );
 }

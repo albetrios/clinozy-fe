@@ -17,6 +17,7 @@ import {
 import type { OrderLineMedicine } from './order-medicine.ts';
 import {
   supplierRateOf,
+  TYPED_MEDICINE_GST,
   typedMedicineKey,
   typedMedicineName,
 } from './purchase-order-form.ts';
@@ -71,7 +72,13 @@ export function OrderMedicineCell<TForm extends FieldValues>({
           ...options,
         ];
   const made = (medicine: { id: string; name: string }) =>
-    onMedicine({ id: medicine.id, name: medicine.name, rate: 0, mrp: 0 });
+    onMedicine({
+      id: medicine.id,
+      name: medicine.name,
+      rate: 0,
+      mrp: 0,
+      gstPercent: TYPED_MEDICINE_GST,
+    });
   return (
     <ItemsPickerCell<TForm, MedicineRow>
       {...binding}
@@ -87,6 +94,7 @@ export function OrderMedicineCell<TForm extends FieldValues>({
             name: option.data.name,
             rate: supplierRateOf(option.data, supplierId),
             mrp: paiseOfRupees(option.data.mrp),
+            gstPercent: option.data.gstPct,
           });
         }
       }}

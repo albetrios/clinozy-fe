@@ -21,6 +21,8 @@ import {
   type MrVisitRow,
   type PrescriptionToFill,
   prescriptionToFillWire,
+  type PurchaseGstSummary,
+  purchaseGstSummaryWire,
   type PurchaseOrderListParams,
   type PurchaseOrderRow,
   type PurchaseOrderSheet,
@@ -42,6 +44,7 @@ import {
   toMrRow,
   toMrVisitRow,
   toPrescriptionToFill,
+  toPurchaseGstSummary,
   toPurchaseOrderRow,
   toSaleReminder,
   toSaleRow,
@@ -79,6 +82,13 @@ export const medicalQueryKeys = {
     ] as const,
   purchaseOrder: (organizationId: string | null, id: string) =>
     [...medicalQueryKeys.organization(organizationId), 'purchase-order', id] as const,
+  /** A month's purchase GST summary (`YYYY-MM`). */
+  purchaseGstSummary: (organizationId: string | null, month: string) =>
+    [
+      ...medicalQueryKeys.organization(organizationId),
+      'purchase-gst-summary',
+      month,
+    ] as const,
   /** What an order's A4 sheet prints beyond the order. */
   purchaseOrderSheet: (organizationId: string | null, id: string) =>
     [
@@ -335,6 +345,29 @@ export async function fetchPurchaseOrder(id: string): Promise<PurchaseOrderRow> 
     { params: { medical_purchase_order_id: id } },
   );
   return toPurchaseOrderRow(purchaseOrderWire.parse(response.data));
+}
+
+/** A month's purchase GST — by rate, by HSN code, in total (`medicine:read`). */
+export async function fetchPurchaseGstSummary(
+  month: string,
+): Promise<PurchaseGstSummary> {
+  const response = await api.get('/app/medical-purchase-orders/gst-summary', {
+    query: { month },
+  });
+  return toPurchaseGstSummary(purchaseGstSummaryWire.parse(response.data));
+}
+
+/** The month's purchase GST summary as the server's CSV (`medicine:export`). */
+export async function exportPurchaseGstSummary(
+  month: string,
+): Promise<{ fileName: string; content: string }> {
+  const response = await api.get('/app/medical-purchase-orders/gst-summary/exports', {
+    query: { month },
+  });
+  const file = z
+    .object({ file_name: z.string(), content: z.string() })
+    .parse(response.data);
+  return { fileName: file.file_name, content: file.content };
 }
 
 /**

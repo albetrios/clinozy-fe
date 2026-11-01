@@ -9,7 +9,7 @@ import {
   RoomViewAction,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { canExportRows, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
@@ -46,6 +46,7 @@ import type {
 } from '../shared/medical-contracts.ts';
 import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
 import { PURCHASE_STAGE_TONES } from '../shared/medical-tones.ts';
+import { PurchaseGstSummary } from './components/PurchaseGstSummary/index.ts';
 import { PurchaseOrderDrawer } from './components/PurchaseOrderDrawer/index.ts';
 import { PurchaseOrderView } from './components/PurchaseOrderView/index.ts';
 import { ReceiveGoodsDrawer } from './components/ReceiveGoodsDrawer/index.ts';
@@ -291,7 +292,12 @@ export function PurchasesPage() {
             },
           },
         }}
-        viewAction={search.stage === 'received' && canPay ? <PayAllReceived /> : null}
+        viewAction={
+          <>
+            <PurchaseGstSummary canExport={canExportRows(access, 'medicine:export')} />
+            {search.stage === 'received' && canPay ? <PayAllReceived /> : null}
+          </>
+        }
       />
       <MedicalTable
         tab="purchases"
