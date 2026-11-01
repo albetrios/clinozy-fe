@@ -63,7 +63,7 @@ jobs:
     # For its variables only: the organization mode. The development environment allows the main
     # branch only (H-1), so a Dependabot pull request runs with no environment and reads the
     # repository-level copies of the two variables (.github/environments/README.md).
-    environment: ${{ github.event_name != 'pull_request' && 'development' || '' }}
+    environment: ${{ github.event_name != 'pull_request' && 'development' || null }}
     permissions:
       contents: read
       packages: read

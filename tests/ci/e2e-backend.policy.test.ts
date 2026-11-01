@@ -174,7 +174,7 @@ describe('E2E against the backend image', () => {
     // environment (main only, H-1) is not selected: the repository-level copies are read.
     expect(WORKFLOW).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax, asserted verbatim
-      "    environment: ${{ github.event_name != 'pull_request' && 'development' || '' }}",
+      "    environment: ${{ github.event_name != 'pull_request' && 'development' || null }}",
     );
     for (const key of ['VITE_PERSONAL_ORGANIZATIONS', 'VITE_TEAM_ORGANIZATIONS']) {
       expect(WORKFLOW).toMatch(new RegExp(`${key}: \\$\\{\\{ vars\\.${key} \\}\\}`));

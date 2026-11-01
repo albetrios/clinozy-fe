@@ -57,10 +57,12 @@ jobs:
     # RELEASE_PLEASE_TOKEN is an environment secret, so this job selects the `development`
     # environment to read it; a workflow_run job runs on main, which that environment allows.
     environment: development
+    # actions: read — the e2e run. contents and pull-requests: write — the squash merge, which the
+    # PAT performs; GITHUB_TOKEN is only the fallback when the PAT is absent, and it needs both.
     permissions:
       actions: read
-      contents: read
-      pull-requests: read
+      contents: write
+      pull-requests: write
     if: >-
       github.event.workflow_run.event == 'pull_request_review' &&
       github.event.workflow_run.conclusion == 'success' &&

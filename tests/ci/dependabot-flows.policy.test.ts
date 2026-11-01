@@ -144,6 +144,9 @@ describe('dependabot auto-merge policy', () => {
     expect(autoMerge).toContain('--workflow e2e-backend.yml');
     expect(autoMerge).toMatch(/gh run watch [^\n]*--exit-status/);
     expect(autoMerge).toMatch(/^ {6}actions: read$/m);
+    // The merge needs both writes when GITHUB_TOKEN is the fallback (see the job's permissions).
+    expect(autoMerge).toMatch(/^ {6}contents: write$/m);
+    expect(autoMerge).toMatch(/^ {6}pull-requests: write$/m);
     // `gh pr diff | grep -q` under pipefail reads a match as "no match" once grep stops early.
     expect(autoMerge).not.toMatch(/gh pr diff[^\n]*\|\s*grep/);
   });

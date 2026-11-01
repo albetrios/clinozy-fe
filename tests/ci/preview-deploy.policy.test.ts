@@ -85,7 +85,7 @@ describe('PR previews and the development environment (H-1)', () => {
           if (
             /development/.test(environment) &&
             !environment.includes(
-              "github.event_name != 'pull_request' && 'development' || ''",
+              "github.event_name != 'pull_request' && 'development' || null",
             )
           ) {
             problems.push(`${file} job '${name}' selects ${environment}`);
