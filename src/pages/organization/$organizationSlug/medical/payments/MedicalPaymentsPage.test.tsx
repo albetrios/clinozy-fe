@@ -15,6 +15,7 @@ vi.mock('@/lib/csv.ts', async (importOriginal) => ({
 
 import { downloadCsv } from '@/lib/csv.ts';
 import { exportStoreLedger, listStoreLedger } from '@/shared/api/app/payments-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { ledgerRow, TEST_PAYMENT_ID } from '@/tests/utils/payments-doubles.ts';
 
 import {
@@ -163,6 +164,52 @@ describe('MedicalPaymentsPage', () => {
     await waitFor(() => expect(rows()).toHaveLength(2));
     await user.click(screen.getByTestId('medical-payments-view-action-export'));
     await waitFor(() => expect(notifyMock.warning).toHaveBeenCalled());
+  });
+
+  it('Export tells a busy clinic how many seconds to wait (Retry-After)', async () => {
+    const user = setup();
+    vi.mocked(exportStoreLedger).mockRejectedValue(
+      new HttpError(
+        'Your clinic is already preparing other downloads',
+        429,
+        '/app/medical-payments/exports',
+        'GET',
+        { error: { reason: 'export_busy' } },
+        15,
+      ),
+    );
+    renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage });
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    await user.click(screen.getByTestId('medical-payments-view-action-export'));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        'Too many exports right now — try again in 15 seconds',
+      ),
+    );
+    expect(downloadCsv).not.toHaveBeenCalled();
+  });
+
+  it('Export says the exports are unavailable when the server answers 503', async () => {
+    const user = setup();
+    vi.mocked(exportStoreLedger).mockRejectedValue(
+      new HttpError(
+        'Service temporarily unavailable',
+        503,
+        '/app/medical-payments/exports',
+        'GET',
+        undefined,
+        15,
+      ),
+    );
+    renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage });
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    await user.click(screen.getByTestId('medical-payments-view-action-export'));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        'Exports are temporarily unavailable. Try again shortly.',
+      ),
+    );
+    expect(downloadCsv).not.toHaveBeenCalled();
   });
 
   it('offers no Export without medicine:export', async () => {

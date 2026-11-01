@@ -247,7 +247,12 @@
     "export": "Exporter",
     "exportTitle": "Exporter ces paiements en CSV",
     "exported": "Paiements exportés en CSV",
-    "exportTruncated": "Les 10 000 premiers paiements ont été exportés — affinez les filtres pour le reste"
+    "exportTruncated": "Les 10 000 premiers paiements ont été exportés — affinez les filtres pour le reste",
+    "exportRetryIn_one": "Trop d’exportations en cours — réessayez dans {{count}} seconde",
+    "exportRetryIn_many": "Trop d’exportations en cours — réessayez dans {{count}} secondes",
+    "exportRetryIn_other": "Trop d’exportations en cours — réessayez dans {{count}} secondes",
+    "exportRetryLater": "Trop d’exportations en cours — réessayez dans un instant",
+    "exportUnavailable": "Les exportations sont temporairement indisponibles. Réessayez dans un instant."
   },
   "credits": {
     "records": "avoirs pharmacie",

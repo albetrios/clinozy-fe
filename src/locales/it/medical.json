@@ -247,7 +247,12 @@
     "export": "Esporta",
     "exportTitle": "Esporta questi pagamenti in CSV",
     "exported": "Pagamenti esportati in CSV",
-    "exportTruncated": "Esportati i primi 10.000 pagamenti: restringi i filtri per il resto"
+    "exportTruncated": "Esportati i primi 10.000 pagamenti: restringi i filtri per il resto",
+    "exportRetryIn_one": "Troppe esportazioni in corso — riprova tra {{count}} secondo",
+    "exportRetryIn_many": "Troppe esportazioni in corso — riprova tra {{count}} secondi",
+    "exportRetryIn_other": "Troppe esportazioni in corso — riprova tra {{count}} secondi",
+    "exportRetryLater": "Troppe esportazioni in corso — riprova tra poco",
+    "exportUnavailable": "Le esportazioni non sono disponibili al momento. Riprova tra poco."
   },
   "credits": {
     "records": "crediti della farmacia",

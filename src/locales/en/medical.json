@@ -237,7 +237,11 @@
     "export": "Export",
     "exportTitle": "Export these payments as CSV",
     "exported": "Payments exported as CSV",
-    "exportTruncated": "Exported the first 10,000 payments — narrow the filters for the rest"
+    "exportTruncated": "Exported the first 10,000 payments — narrow the filters for the rest",
+    "exportRetryIn_one": "Too many exports right now — try again in {{count}} second",
+    "exportRetryIn_other": "Too many exports right now — try again in {{count}} seconds",
+    "exportRetryLater": "Too many exports right now — try again shortly",
+    "exportUnavailable": "Exports are temporarily unavailable. Try again shortly."
   },
   "credits": {
     "records": "Medical credits",
