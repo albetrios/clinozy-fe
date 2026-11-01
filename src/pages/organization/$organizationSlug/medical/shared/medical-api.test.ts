@@ -28,10 +28,12 @@ import {
 } from '@/tests/utils/medical-doubles.ts';
 
 import {
+  exportPurchaseGstSummary,
   fetchAllManufacturers,
   fetchMedicalSale,
   fetchMrVisits,
   fetchOldestOpenPurchaseOrder,
+  fetchPurchaseGstSummary,
   fetchPurchaseOrderSheet,
   fetchSupplierAccount,
   listManufacturers,
@@ -472,5 +474,62 @@ describe('Manufacturers and MRs', () => {
       order: 'desc',
     });
     expect(visits[0]).toMatchObject({ mrId: TEST_MR_ID, date: '2026-10-01' });
+  });
+});
+
+// clinozy-be feat-purchase-line-gst: the month's purchase GST and its CSV.
+describe('the purchase GST summary', () => {
+  const amounts = {
+    line_count: 1,
+    taxable_amount: 1000,
+    gst_amount: 120,
+    total_amount: 1120,
+  };
+  beforeEach(() => {
+    vi.mocked(api.get).mockReset();
+  });
+
+  it('reads a month by rate, by HSN code and in total, in the room’s words', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        month: '2026-10',
+        by_rate: [{ gst_percent: 12, ...amounts }],
+        by_hsn: [{ hsn_code: null, gst_percent: 12, ...amounts }],
+        totals: { order_count: 1, ...amounts },
+      },
+    } as never);
+    await expect(fetchPurchaseGstSummary('2026-10')).resolves.toEqual({
+      month: '2026-10',
+      byRate: [{ gstPercent: 12, lines: 1, taxable: 1000, gst: 120, total: 1120 }],
+      byHsn: [
+        { hsn: null, gstPercent: 12, lines: 1, taxable: 1000, gst: 120, total: 1120 },
+      ],
+      totals: { orders: 1, lines: 1, taxable: 1000, gst: 120, total: 1120 },
+    });
+    expect(api.get).toHaveBeenCalledWith('/app/medical-purchase-orders/gst-summary', {
+      query: { month: '2026-10' },
+    });
+  });
+
+  it('downloads the month’s CSV as the server names it', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        file_name: 'purchase-gst-summary-2026-10.csv',
+        content_type: 'text/csv',
+        row_count: 3,
+        is_truncated: false,
+        content: 'section\n',
+      },
+    } as never);
+    await expect(exportPurchaseGstSummary('2026-10')).resolves.toEqual({
+      fileName: 'purchase-gst-summary-2026-10.csv',
+      content: 'section\n',
+    });
+    expect(api.get).toHaveBeenCalledWith(
+      '/app/medical-purchase-orders/gst-summary/exports',
+      {
+        query: { month: '2026-10' },
+      },
+    );
   });
 });
