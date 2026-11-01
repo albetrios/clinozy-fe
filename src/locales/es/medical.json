@@ -687,7 +687,10 @@
       "save": "Marcar como recibido",
       "saved": "Mercancía recibida · existencias y bonificación añadidas",
       "mrp": "PVP",
-      "note": "Nota"
+      "note": "Nota",
+      "overOrdered": "Más de lo pedido: añade el exceso como artículo no esperado",
+      "ordered": "Pedido {{qty}}",
+      "orderedWithFree": "Pedido {{qty}} + {{free}} gratis"
     },
     "orderView": {
       "title": "Orden de compra",
@@ -702,7 +705,9 @@
       "note": "Nota",
       "saveNote": "Guardar nota",
       "noteSaved": "Nota guardada",
-      "gstOnTopRate": "{{value}} % adicional"
+      "gstOnTopRate": "{{value}} % adicional",
+      "short": "Faltante · {{received}} de {{ordered}}",
+      "shortCount": "Líneas incompletas: {{count}}"
     },
     "sale": {
       "title": "Venta",

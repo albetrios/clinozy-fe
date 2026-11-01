@@ -643,7 +643,10 @@
       "save": "입고 완료로 표시",
       "saved": "입고 완료 · 재고와 무상 수량 추가됨",
       "mrp": "최대 소매가",
-      "note": "메모"
+      "note": "메모",
+      "overOrdered": "주문 수량을 넘었습니다 — 초과분은 예정 외 품목으로 추가하세요",
+      "ordered": "주문 {{qty}}",
+      "orderedWithFree": "주문 {{qty}} + 무료 {{free}}"
     },
     "orderView": {
       "title": "구매 주문",
@@ -658,7 +661,9 @@
       "note": "메모",
       "saveNote": "메모 저장",
       "noteSaved": "메모를 저장했습니다",
-      "gstOnTopRate": "{{value}}% 별도"
+      "gstOnTopRate": "{{value}}% 별도",
+      "short": "부족 · {{ordered}} 중 {{received}}",
+      "shortCount": "부족한 품목: {{count}}"
     },
     "sale": {
       "title": "판매",

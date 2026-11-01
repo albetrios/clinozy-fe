@@ -687,7 +687,10 @@
       "save": "Segna come ricevuto",
       "saved": "Merce ricevuta · scorte e quantità omaggio aggiunte",
       "mrp": "Prezzo max.",
-      "note": "Nota"
+      "note": "Nota",
+      "overOrdered": "Più di quanto ordinato — aggiungi l’eccedenza come articolo imprevisto",
+      "ordered": "Ordinati {{qty}}",
+      "orderedWithFree": "Ordinati {{qty}} + {{free}} omaggio"
     },
     "orderView": {
       "title": "Ordine d’acquisto",
@@ -702,7 +705,9 @@
       "note": "Nota",
       "saveNote": "Salva nota",
       "noteSaved": "Nota salvata",
-      "gstOnTopRate": "{{value}}% in aggiunta"
+      "gstOnTopRate": "{{value}}% in aggiunta",
+      "short": "Mancante · {{received}} su {{ordered}}",
+      "shortCount": "Righe incomplete: {{count}}"
     },
     "sale": {
       "title": "Vendita",

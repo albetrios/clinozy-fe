@@ -51,12 +51,12 @@ By `BRIEF.md:58`: unit tests for the drawer's cells and body, the view's marks; 
 
 ## 8. The route — the ordered ledger
 
-| #   | Work item                     | Kind       | Depends on | Skill/driver           | Acceptance    | Assignee | Status  |
-| --- | ----------------------------- | ---------- | ---------- | ---------------------- | ------------- | -------- | ------- |
-| L-1 | Contracts and types           | api        | BE         | fe-resource-crud       | types compile | Claude   | planned |
-| L-2 | Receive goods: received cells | structural | L-1        | fe-code-structure      | A-7           | Claude   | planned |
-| L-3 | Order view: short lines       | structural | L-1        | fe-code-structure      | A-7           | Claude   | planned |
-| L-4 | Copy, docs, gates, close      | gate       | L-2, L-3   | fe-before-commit-guard | `pnpm health` | Claude   | planned |
+| #   | Work item                     | Kind       | Depends on | Skill/driver           | Acceptance    | Assignee | Status |
+| --- | ----------------------------- | ---------- | ---------- | ---------------------- | ------------- | -------- | ------ |
+| L-1 | Contracts and types           | api        | BE         | fe-resource-crud       | types compile | Claude   | done   |
+| L-2 | Receive goods: received cells | structural | L-1        | fe-code-structure      | A-7           | Claude   | done   |
+| L-3 | Order view: short lines       | structural | L-1        | fe-code-structure      | A-7           | Claude   | done   |
+| L-4 | Copy, docs, gates, close      | gate       | L-2, L-3   | fe-before-commit-guard | `pnpm health` | Claude   | done   |
 
 ## Appendix A — Coverage matrix
 

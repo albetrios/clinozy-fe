@@ -120,6 +120,29 @@ describe('PurchaseOrderView (medical.md:333–334)', () => {
     expect(onPay).toHaveBeenCalledWith(expect.objectContaining({ id: order.id }));
   });
 
+  it('marks a line that came short and counts the short lines (feat-short-delivery A-6)', async () => {
+    const [item] = RECEIVED.lines;
+    const order = {
+      ...RECEIVED,
+      shortCount: 1,
+      lines: [{ ...(item as NonNullable<typeof item>), receivedQty: 8, short: true }],
+    };
+    renderMedicalDrawer(<PurchaseOrderView open order={order} onClose={vi.fn()} />);
+    const drawer = await screen.findByTestId(D);
+    const [line] = within(drawer).getAllByTestId(`${D}-lines-row`);
+    expect(line).toHaveTextContent('Short · 8 of 10');
+    expect(within(drawer).getByTestId(`${D}-short-count`)).toHaveTextContent(
+      'Lines that came short: 1',
+    );
+  });
+
+  it('shows no short marks on an order that came in full', async () => {
+    renderMedicalDrawer(<PurchaseOrderView open order={RECEIVED} onClose={vi.fn()} />);
+    const drawer = await screen.findByTestId(D);
+    expect(drawer).not.toHaveTextContent('Short ·');
+    expect(within(drawer).queryByTestId(`${D}-short-count`)).toBeNull();
+  });
+
   it('a paid order is locked with what was paid, and offers no payment', async () => {
     const order = PAID;
     const onPay = vi.fn();
