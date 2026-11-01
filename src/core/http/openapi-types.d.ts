@@ -13012,11 +13012,14 @@ export interface operations {
                                 id?: string;
                                 is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
+                                is_short?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                received_free_quantity?: number | null;
+                                received_quantity?: number | null;
                                 taxable_amount?: number;
                             }[];
                             /** Format: date */
@@ -13027,6 +13030,7 @@ export interface operations {
                             purchase_order_number?: number;
                             /** Format: date-time */
                             received_at?: string | null;
+                            short_line_count?: number;
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
@@ -13125,11 +13129,14 @@ export interface operations {
                                 id?: string;
                                 is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
+                                is_short?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                received_free_quantity?: number | null;
+                                received_quantity?: number | null;
                                 taxable_amount?: number;
                             }[];
                             /** Format: date */
@@ -13140,6 +13147,7 @@ export interface operations {
                             purchase_order_number?: number;
                             /** Format: date-time */
                             received_at?: string | null;
+                            short_line_count?: number;
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
@@ -13214,11 +13222,14 @@ export interface operations {
                                 id?: string;
                                 is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
+                                is_short?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                received_free_quantity?: number | null;
+                                received_quantity?: number | null;
                                 taxable_amount?: number;
                             }[];
                             /** Format: date */
@@ -13229,6 +13240,7 @@ export interface operations {
                             purchase_order_number?: number;
                             /** Format: date-time */
                             received_at?: string | null;
+                            short_line_count?: number;
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
@@ -13357,11 +13369,14 @@ export interface operations {
                                 id?: string;
                                 is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
+                                is_short?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                received_free_quantity?: number | null;
+                                received_quantity?: number | null;
                                 taxable_amount?: number;
                             }[];
                             /** Format: date */
@@ -13372,6 +13387,7 @@ export interface operations {
                             purchase_order_number?: number;
                             /** Format: date-time */
                             received_at?: string | null;
+                            short_line_count?: number;
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
@@ -13424,6 +13440,8 @@ export interface operations {
                         id: string;
                         is_received?: boolean;
                         mrp?: number | null;
+                        received_free_quantity?: number;
+                        received_quantity?: number;
                     } | {
                         batch_number?: string;
                         expiry_month?: string;
@@ -13475,11 +13493,14 @@ export interface operations {
                                 id?: string;
                                 is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
+                                is_short?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                received_free_quantity?: number | null;
+                                received_quantity?: number | null;
                                 taxable_amount?: number;
                             }[];
                             /** Format: date */
@@ -13490,6 +13511,7 @@ export interface operations {
                             purchase_order_number?: number;
                             /** Format: date-time */
                             received_at?: string | null;
+                            short_line_count?: number;
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
@@ -13567,11 +13589,14 @@ export interface operations {
                                 id?: string;
                                 is_gst_inclusive?: boolean;
                                 is_received?: boolean | null;
+                                is_short?: boolean | null;
                                 line_number?: number;
                                 medicine_id?: string;
                                 medicine_name?: string;
                                 quantity?: number;
                                 rate?: number;
+                                received_free_quantity?: number | null;
+                                received_quantity?: number | null;
                                 taxable_amount?: number;
                             }[];
                             /** Format: date */
@@ -13582,6 +13607,7 @@ export interface operations {
                             purchase_order_number?: number;
                             /** Format: date-time */
                             received_at?: string | null;
+                            short_line_count?: number;
                             /** @enum {string} */
                             stage?: "ordered" | "received";
                             supplier?: {
@@ -32629,7 +32655,6 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    former_owner_role_id?: string;
                     new_owner_user_id: string;
                 };
             };

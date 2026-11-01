@@ -665,7 +665,10 @@
       "save": "Mark received",
       "saved": "Goods received · stock and free quantity added",
       "mrp": "MRP",
-      "note": "Note"
+      "note": "Note",
+      "overOrdered": "More than ordered — add the extra as an unexpected item",
+      "ordered": "Ordered {{qty}}",
+      "orderedWithFree": "Ordered {{qty}} + {{free}} free"
     },
     "orderView": {
       "title": "Purchase order",
@@ -680,7 +683,9 @@
       "note": "Note",
       "saveNote": "Save note",
       "noteSaved": "Note saved",
-      "gstOnTopRate": "{{value}}% extra"
+      "gstOnTopRate": "{{value}}% extra",
+      "short": "Short · {{received}} of {{ordered}}",
+      "shortCount": "Lines that came short: {{count}}"
     },
     "sale": {
       "title": "Sale",

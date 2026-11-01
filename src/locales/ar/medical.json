@@ -753,7 +753,10 @@
       "save": "تعليم كمستلم",
       "saved": "تم استلام البضاعة · أُضيف المخزون والكمية المجانية",
       "mrp": "السعر الأقصى",
-      "note": "ملاحظة"
+      "note": "ملاحظة",
+      "overOrdered": "أكثر من المطلوب — أضف الزيادة كعنصر غير متوقع",
+      "ordered": "المطلوب {{qty}}",
+      "orderedWithFree": "المطلوب {{qty}} + {{free}} مجانًا"
     },
     "orderView": {
       "title": "أمر الشراء",
@@ -768,7 +771,9 @@
       "note": "ملاحظة",
       "saveNote": "حفظ الملاحظة",
       "noteSaved": "تم حفظ الملاحظة",
-      "gstOnTopRate": "‎{{value}}% إضافية"
+      "gstOnTopRate": "‎{{value}}% إضافية",
+      "short": "ناقص · {{received}} من {{ordered}}",
+      "shortCount": "البنود الناقصة: {{count}}"
     },
     "sale": {
       "title": "البيع",

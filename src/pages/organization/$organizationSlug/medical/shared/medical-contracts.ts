@@ -262,11 +262,15 @@ export const purchaseOrderWire = wireSchema<ApiPurchaseOrder>()(
         taxable_amount: z.number(),
         gst_amount: z.number(),
         is_received: z.boolean().nullable(),
+        received_quantity: z.number().int().nullable(),
+        received_free_quantity: z.number().int().nullable(),
+        is_short: z.boolean().nullable(),
         batch_number: z.string().nullable(),
         expiry_month: z.string().nullable(),
       }),
     ),
     item_count: z.number().int(),
+    short_line_count: z.number().int(),
     free_count: z.number().int(),
     total: z.number(),
     taxable_total: z.number(),
@@ -682,6 +686,11 @@ export interface PurchaseOrderLine {
   gst: number;
   /** Ticked on Receive goods; null until the order is received. */
   received: boolean | null;
+  /** The packs and free packs that came — null until received (feat-short-delivery). */
+  receivedQty: number | null;
+  receivedFree: number | null;
+  /** Received with fewer packs (or free packs) than ordered. */
+  short: boolean;
   batchNo: string | null;
   /** "MM/YY". */
   expiry: string | null;
@@ -705,6 +714,8 @@ export interface PurchaseOrderRow {
   note: string | null;
   lines: PurchaseOrderLine[];
   itemCount: number;
+  /** How many lines came short. */
+  shortCount: number;
   freeCount: number;
   /** Taxable total + GST total — its lines', the received ones' once received. */
   total: number;
@@ -754,10 +765,14 @@ export function toPurchaseOrderRow(
       taxable: item.taxable_amount,
       gst: item.gst_amount,
       received: item.is_received,
+      receivedQty: item.received_quantity,
+      receivedFree: item.received_free_quantity,
+      short: item.is_short === true,
       batchNo: item.batch_number,
       expiry: item.expiry_month ? screenExpiryOf(item.expiry_month) : null,
     })),
     itemCount: wire.item_count,
+    shortCount: wire.short_line_count,
     freeCount: wire.free_count,
     total: wire.total,
     taxableTotal: wire.taxable_total,

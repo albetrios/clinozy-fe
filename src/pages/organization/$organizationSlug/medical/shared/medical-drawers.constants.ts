@@ -278,6 +278,11 @@ export const MEDICAL_DRAWER_KEYS = {
     notArrived: 'drawers.receive.notArrived',
     medicine: 'drawers.receive.medicine',
     qty: 'drawers.receive.qty',
+    /** A count above what was ordered — the extra is an unexpected item (feat-short-delivery). */
+    overOrdered: 'drawers.receive.overOrdered',
+    /** Under an ordered line: "Ordered 10" / "Ordered 10 + 2 free" — what the counts start at. */
+    ordered: 'drawers.receive.ordered',
+    orderedWithFree: 'drawers.receive.orderedWithFree',
     free: 'drawers.receive.free',
     batch: 'drawers.receive.batch',
     expiry: 'drawers.receive.expiry',
@@ -318,6 +323,10 @@ export const MEDICAL_DRAWER_KEYS = {
     downloaded: 'drawers.gstSummary.downloaded',
   },
   orderView: {
+    /** A line that came short: "Short · 8 of 10" (feat-short-delivery D4). */
+    short: 'drawers.orderView.short',
+    /** "Lines that came short: 2". */
+    shortCount: 'drawers.orderView.shortCount',
     /** A line's GST when its rate excludes it: "12% extra". */
     gstOnTopRate: 'drawers.orderView.gstOnTopRate',
     title: 'drawers.orderView.title',

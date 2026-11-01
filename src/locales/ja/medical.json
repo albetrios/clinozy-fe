@@ -643,7 +643,10 @@
       "save": "入荷済みにする",
       "saved": "入荷しました · 在庫と無償数量を追加",
       "mrp": "希望小売価格",
-      "note": "メモ"
+      "note": "メモ",
+      "overOrdered": "注文数を超えています — 超過分は予定外の品目として追加してください",
+      "ordered": "注文 {{qty}}",
+      "orderedWithFree": "注文 {{qty}} + 無償 {{free}}"
     },
     "orderView": {
       "title": "発注",
@@ -658,7 +661,9 @@
       "note": "メモ",
       "saveNote": "メモを保存",
       "noteSaved": "メモを保存しました",
-      "gstOnTopRate": "{{value}}% 別"
+      "gstOnTopRate": "{{value}}% 別",
+      "short": "不足 · {{ordered}} 中 {{received}}",
+      "shortCount": "不足のある明細: {{count}}"
     },
     "sale": {
       "title": "販売",

@@ -27,6 +27,12 @@ export interface ReceiveLineValues {
   name: string;
   qty: number;
   free: number;
+  /** The packs that came — an ordered line's, the ordered `qty` until changed (feat-short-delivery D3). */
+  received: number;
+  /** The free packs that came — the ordered `free` until changed. */
+  receivedFree: number;
+  /** What the ordered line comes to as ordered, paise (GST included) — the preview's base. */
+  amount: number;
   /** The purchase rate per unit, paise — the order's on an ordered line. */
   rate: number;
   /** The MRP printed on the packs, paise — the order line's until changed; 0 when not known (D8). */
@@ -55,6 +61,9 @@ export function receiveFormOf(order: PurchaseOrderRow): ReceiveFormValues {
       name: line.medicineName,
       qty: line.qty,
       free: line.free,
+      received: line.qty,
+      receivedFree: line.free,
+      amount: paiseOfRupees(line.amount),
       rate: paiseOfRupees(line.rate),
       mrp: paiseOfRupees(line.mrp ?? 0),
       arrived: true,
@@ -89,6 +98,9 @@ export const emptyUnexpectedLine = (): ReceiveLineValues => ({
   name: '',
   qty: 1,
   free: 0,
+  received: 0,
+  receivedFree: 0,
+  amount: 0,
   rate: 0,
   mrp: 0,
   arrived: true,
@@ -147,21 +159,38 @@ export const anyArrived = (lines: readonly ReceiveLineValues[]) => lines.some(co
 export const receiveLineCount = (lines: readonly ReceiveLineValues[]) =>
   lines.filter((line) => !line.unexpected || comesIn(line)).length;
 
+/** Whether an ordered line came short: fewer packs, or fewer free packs (feat-short-delivery). */
+export const isShortLine = (line: ReceiveLineValues) =>
+  !line.unexpected &&
+  line.arrived &&
+  (line.received < line.qty || line.receivedFree < line.free);
+
 /**
- * The bill once received (the summary, `medical.md:277`), paise: the order's
- * total and each unexpected line coming in, qty × rate — free units cost
- * nothing. A preview: the server bills the receipt.
+ * The indexes of the ordered lines whose count is more than was ordered (feat-short-delivery D3):
+ * the extra is an unexpected line.
  */
-export function receiveTotal(
-  order: Pick<PurchaseOrderRow, 'total'>,
-  lines: readonly ReceiveLineValues[],
-): number {
-  return lines
-    .filter((line) => line.unexpected && comesIn(line))
-    .reduce(
-      (sum, line) => sum + Math.round(line.qty * line.rate),
-      paiseOfRupees(order.total),
+export const overOrderedLines = (lines: readonly ReceiveLineValues[]) =>
+  lines.flatMap((line, index) =>
+    !line.unexpected &&
+    line.arrived &&
+    (line.received > line.qty || line.receivedFree > line.free)
+      ? [index]
+      : [],
+  );
+
+/**
+ * The bill once received (the summary, `medical.md:277`), paise: each ordered line that came, its
+ * amount for the packs that came (the server bills received × rate — feat-short-delivery), and each
+ * unexpected line coming in, qty × rate — free units cost nothing. A preview: the server bills the
+ * receipt.
+ */
+export function receiveTotal(lines: readonly ReceiveLineValues[]): number {
+  return lines.filter(comesIn).reduce((sum, line) => {
+    if (line.unexpected) return sum + Math.round(line.qty * line.rate);
+    return (
+      sum + (line.qty > 0 ? Math.round((line.amount * line.received) / line.qty) : 0)
     );
+  }, 0);
 }
 
 /** A line's medicine as the checks name it: its name, or a typed one's. */
@@ -186,6 +215,9 @@ export function receiveInputOf(values: ReceiveFormValues): ReceiveInput {
       .map((line) => ({
         id: line.lineId ?? '',
         arrived: line.arrived,
+        ...(line.arrived
+          ? { received: line.received, receivedFree: line.receivedFree }
+          : {}),
         batchNo: line.arrived ? trimmed(line.batchNo) : null,
         expiry: line.arrived ? trimmed(line.expiry) : null,
         mrp: line.arrived && line.mrp > 0 ? rupeesOfPaise(line.mrp) : null,

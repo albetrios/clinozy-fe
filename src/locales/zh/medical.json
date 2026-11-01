@@ -643,7 +643,10 @@
       "save": "标记为已收货",
       "saved": "已收货 · 库存和赠品数量已添加",
       "mrp": "零售价",
-      "note": "备注"
+      "note": "备注",
+      "overOrdered": "超过订购数量——请将多出部分添加为意外到货",
+      "ordered": "订购 {{qty}}",
+      "orderedWithFree": "订购 {{qty}} + 赠品 {{free}}"
     },
     "orderView": {
       "title": "采购单",
@@ -658,7 +661,9 @@
       "note": "备注",
       "saveNote": "保存备注",
       "noteSaved": "备注已保存",
-      "gstOnTopRate": "{{value}}% 另计"
+      "gstOnTopRate": "{{value}}% 另计",
+      "short": "短缺 · {{received}} / {{ordered}}",
+      "shortCount": "短缺明细：{{count}}"
     },
     "sale": {
       "title": "销售",

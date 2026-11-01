@@ -26,7 +26,9 @@ import { typedMedicineKey } from '../PurchaseOrderDrawer/purchase-order-form.ts'
 import {
   emptyUnexpectedLine,
   expiryProblems,
+  isShortLine,
   medicineMrpPrefills,
+  overOrderedLines,
   receiveInputOf,
   type ReceiveLineValues,
   receiveTotal,
@@ -88,6 +90,9 @@ const ORDER = purchaseOrderRow({
       taxable: 1892.86,
       gst: 227.14,
       received: null,
+      receivedQty: null,
+      receivedFree: null,
+      short: false,
       batchNo: null,
       expiry: null,
     },
@@ -105,6 +110,9 @@ const ORDER = purchaseOrderRow({
       taxable: 1889.29,
       gst: 226.71,
       received: null,
+      receivedQty: null,
+      receivedFree: null,
+      short: false,
       batchNo: null,
       expiry: null,
     },
@@ -154,6 +162,9 @@ const ORDERED: ReceiveLineValues = {
   name: 'Epriva Tab',
   qty: 10,
   free: 2,
+  received: 10,
+  receivedFree: 2,
+  amount: 212_000,
   rate: 21_200,
   mrp: 0,
   arrived: true,
@@ -197,7 +208,15 @@ describe('receive-form (medical.md:269–279)', () => {
       }),
     ).toEqual({
       lines: [
-        { id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27', mrp: null },
+        {
+          id: EPRIVA_LINE_ID,
+          arrived: true,
+          batchNo: null,
+          expiry: '12/27',
+          mrp: null,
+          received: 10,
+          receivedFree: 2,
+        },
         { id: EPRIVA_LINE_ID, arrived: false, batchNo: null, expiry: null, mrp: null },
       ],
       extras: [],
@@ -234,7 +253,15 @@ describe('receive-form (medical.md:269–279)', () => {
     expect(receiveInputOf({ lines, note: ' 30 DAYS DUE ' })).toEqual({
       note: '30 DAYS DUE',
       lines: [
-        { id: EPRIVA_LINE_ID, arrived: true, batchNo: null, expiry: '12/27', mrp: null },
+        {
+          id: EPRIVA_LINE_ID,
+          arrived: true,
+          batchNo: null,
+          expiry: '12/27',
+          mrp: null,
+          received: 10,
+          receivedFree: 2,
+        },
       ],
       extras: [
         {
@@ -276,11 +303,24 @@ describe('receive-form (medical.md:269–279)', () => {
       emptyUnexpectedLine(),
     ];
     expect(unexpectedProblems(lines)).toEqual({ qty: [1], rate: [2] });
-    // #430's ₹4,236 (the API's rupees) and 2 × ₹190, in paise; free units cost nothing.
-    expect(receiveTotal({ total: 4236 }, [ORDERED, { ...AZELAN, free: 3 }])).toBe(
-      423_600 + 38_000,
-    );
-    expect(receiveTotal({ total: 4236 }, [{ ...AZELAN, arrived: false }])).toBe(423_600);
+    // The ordered line's ₹2,120 and 2 × ₹190, in paise; free units cost nothing.
+    expect(receiveTotal([ORDERED, { ...AZELAN, free: 3 }])).toBe(212_000 + 38_000);
+    expect(receiveTotal([{ ...AZELAN, arrived: false }])).toBe(0);
+  });
+
+  // feat-short-delivery A-7: the packs that came, never more than ordered; the bill follows them.
+  it('bills an ordered line for what came, marks it short, and names a count above the order', () => {
+    const short = { ...ORDERED, received: 8, receivedFree: 1 };
+    expect(receiveTotal([short])).toBe(169_600);
+    expect(isShortLine(short)).toBe(true);
+    expect(isShortLine(ORDERED)).toBe(false);
+    expect(overOrderedLines([ORDERED, { ...ORDERED, received: 11 }, AZELAN])).toEqual([
+      1,
+    ]);
+    expect(receiveInputOf({ lines: [short], note: '' }).lines[0]).toMatchObject({
+      received: 8,
+      receivedFree: 1,
+    });
   });
 });
 
@@ -347,6 +387,9 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
               expiry: '12/27',
               // The order gave no MRP: the line started at Epriva's ₹650 (F5).
               mrp: 650,
+              // What came — what was ordered until changed (feat-short-delivery).
+              received: 10,
+              receivedFree: 2,
             },
             {
               id: GLYCOLAC_LINE_ID,
@@ -406,7 +449,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
       await screen.findByTestId(`${D}-lines-medicine-option-${AZELAN_ID}`),
     );
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,426');
-    const qty = within(drawer).getByTestId(`${D}-lines-qty`);
+    const qty = within(drawer).getAllByTestId(`${D}-lines-qty`).at(-1) as HTMLElement;
     await user.clear(qty);
     await user.type(qty, '2');
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent('₹4,616');
@@ -462,11 +505,16 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
       await user.type(expiry, '12/27');
     }
 
-    await user.clear(within(drawer).getByTestId(`${D}-lines-qty`));
+    await user.clear(
+      within(drawer).getAllByTestId(`${D}-lines-qty`).at(-1) as HTMLElement,
+    );
     await user.click(within(drawer).getByTestId(`${D}-save`));
     expect(notifyMock.warning).toHaveBeenLastCalledWith('Enter a quantity');
 
-    await user.type(within(drawer).getByTestId(`${D}-lines-qty`), '1');
+    await user.type(
+      within(drawer).getAllByTestId(`${D}-lines-qty`).at(-1) as HTMLElement,
+      '1',
+    );
     await user.clear(within(drawer).getByTestId(`${D}-lines-rate`));
     await user.click(within(drawer).getByTestId(`${D}-save`));
     expect(notifyMock.warning).toHaveBeenLastCalledWith(
@@ -503,9 +551,9 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
       expect(row.getByRole('textbox', { name })).toBeInTheDocument();
     }
     expect(row.getByRole('textbox', { name: 'Qty' })).toHaveClass('max-md:w-14');
-    // The ordered lines keep the design's bare figures.
+    // An ordered line takes the packs that came under the same captions, and says what was ordered.
     const [ordered] = within(drawer).getAllByTestId(`${D}-lines-row`);
-    expect(within(ordered as HTMLElement).queryByText('Qty')).toBeNull();
+    expect(within(ordered as HTMLElement).getByText('Ordered 10 + 2 free')).toBeVisible();
     expect(await axeForDialog(drawer)).toHaveNoViolations();
     viewport.tier = 'desktop';
   });

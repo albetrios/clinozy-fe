@@ -348,6 +348,9 @@ interface ReceiveLineInput {
   expiry: string | null;
   /** Rupees; none keeps the order line's. */
   mrp?: number | null;
+  /** The packs and free packs that came (feat-short-delivery); none — what was ordered. */
+  received?: number;
+  receivedFree?: number;
 }
 
 /**
@@ -390,6 +393,12 @@ export const receiveBodyOf = (
       is_received: line.arrived,
       ...(line.arrived ? batchOf(line.batchNo, line.expiry) : {}),
       ...(line.arrived && line.mrp ? { mrp: line.mrp } : {}),
+      ...(line.arrived && line.received !== undefined
+        ? { received_quantity: line.received }
+        : {}),
+      ...(line.arrived && line.receivedFree !== undefined
+        ? { received_free_quantity: line.receivedFree }
+        : {}),
     })),
     ...(input.extras ?? []).map((extra) => ({
       ...orderLineOf(extra),

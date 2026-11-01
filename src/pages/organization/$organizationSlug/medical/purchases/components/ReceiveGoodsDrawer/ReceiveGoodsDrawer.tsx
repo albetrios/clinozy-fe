@@ -52,6 +52,7 @@ import {
   emptyUnexpectedLine,
   expiryProblems,
   medicineMrpPrefills,
+  overOrderedLines,
   receiveFormOf,
   type ReceiveFormValues,
   receiveInputOf,
@@ -171,20 +172,22 @@ function useColumns({
   const options = useMedicineOptions(order.supplier.id, order.supplier.name);
   // A line that did not come takes no batch, expiry or figures.
   const locked = (row: LineContext) => readOnly || !row.row.arrived;
-  const count = (key: 'qty' | 'free') => (row: LineContext) =>
-    row.row.unexpected ? (
+  // An unexpected line types its counts; an ordered one the packs that came, the ordered ones
+  // until changed and never more (feat-short-delivery D3).
+  const count = (key: 'qty' | 'free') => (row: LineContext) => {
+    const came = key === 'qty' ? 'received' : 'receivedFree';
+    return (
       <PhoneCaption label={row.label}>
         <ItemsNumberCell
-          {...row.bind(key)}
-          max={ITEMS_QTY_MAX}
+          {...row.bind(row.row.unexpected ? key : came)}
+          max={row.row.unexpected ? ITEMS_QTY_MAX : row.row[key]}
           maxLength={4}
           readOnly={locked(row)}
           className="max-md:w-14"
         />
       </PhoneCaption>
-    ) : (
-      <ItemsReadCell>{String(row.row[key])}</ItemsReadCell>
     );
+  };
   const rate: ItemsColumn<ReceiveFormValues, 'lines'> = {
     id: 'rate',
     header: t(F.rate),
@@ -240,7 +243,17 @@ function useColumns({
             }}
           />
         ) : (
-          <ItemsReadCell strong>{row.row.name}</ItemsReadCell>
+          <div className="flex min-w-0 flex-col">
+            <ItemsReadCell strong>{row.row.name}</ItemsReadCell>
+            <span
+              className="text-caption text-muted-foreground tabular-nums"
+              data-testid={`${row.testId}-ordered`}
+            >
+              {row.row.free > 0
+                ? t(K.orderedWithFree, { qty: row.row.qty, free: row.row.free })
+                : t(K.ordered, { qty: row.row.qty })}
+            </span>
+          </div>
         ),
     },
     { id: 'qty', header: t(K.qty), track: '56px', align: 'end', cell: count('qty') },
@@ -320,8 +333,14 @@ function useReceiveSave(
         problem === 'missing'
           ? t(K.enterExpiry)
           : t(MEDICAL_DRAWER_KEYS.medicine.batches.expiryInvalid);
-      const flag = (field: 'expiry' | 'qty' | 'rate', index: number, message: string) =>
-        form.setError(`lines.${index}.${field}`, { type: 'client', message });
+      const flag = (
+        field: 'expiry' | 'qty' | 'rate' | 'received',
+        index: number,
+        message: string,
+      ) => form.setError(`lines.${index}.${field}`, { type: 'client', message });
+      const over = overOrderedLines(current.lines);
+      for (const index of over) flag('received', index, t(K.overOrdered));
+      if (over.length) return { fields: [], message: t(K.overOrdered) };
       for (const { index, problem } of expiry)
         flag('expiry', index, expiryMessage(problem));
       for (const index of unexpected.qty) flag('qty', index, t(K.enterQuantity));
@@ -383,7 +402,7 @@ function ReceiveSession({
     openChild,
     priced: lines.some((line) => line.unexpected),
   });
-  const total = formatPaise(receiveTotal(order, lines));
+  const total = formatPaise(receiveTotal(lines));
   // The supplier, the lines and their bill, which follow the unexpected ones (H:5394).
   const badges: DrawerBadge[] = [
     { id: 'supplier', label: order.supplier.name, tone: 'sky' },

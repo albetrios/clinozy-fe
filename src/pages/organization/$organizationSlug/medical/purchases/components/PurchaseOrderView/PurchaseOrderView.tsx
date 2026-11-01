@@ -88,7 +88,19 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       id: 'medicine',
       header: t(F.medicine),
       track: 'minmax(0,2fr)',
-      cell: ({ row }) => <ItemsReadCell strong>{row.medicineName}</ItemsReadCell>,
+      cell: ({ row, testId }) => (
+        <div className="flex min-w-0 flex-col">
+          <ItemsReadCell strong>{row.medicineName}</ItemsReadCell>
+          {row.short ? (
+            <span
+              className="text-caption text-warning tabular-nums"
+              data-testid={`${testId}-short`}
+            >
+              {t(K.short, { received: row.receivedQty ?? 0, ordered: row.qty })}
+            </span>
+          ) : null}
+        </div>
+      ),
     },
     {
       id: 'qty',
@@ -196,6 +208,14 @@ function OrderLines({ order, testId }: { order: PurchaseOrderRow; testId: string
         removable={false}
         testId={`${testId}-lines`}
       />
+      {order.shortCount > 0 ? (
+        <p
+          className="text-caption text-warning text-end"
+          data-testid={`${testId}-short-count`}
+        >
+          {t(K.shortCount, { count: order.shortCount })}
+        </p>
+      ) : null}
       <p
         className="text-caption text-muted-foreground text-end tabular-nums"
         data-testid={`${testId}-gst-totals`}

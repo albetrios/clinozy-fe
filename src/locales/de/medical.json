@@ -665,7 +665,10 @@
       "save": "Als erhalten markieren",
       "saved": "Ware erhalten · Bestand und Gratismenge hinzugefügt",
       "mrp": "UVP",
-      "note": "Notiz"
+      "note": "Notiz",
+      "overOrdered": "Mehr als bestellt — den Überschuss als unerwarteten Artikel hinzufügen",
+      "ordered": "Bestellt {{qty}}",
+      "orderedWithFree": "Bestellt {{qty}} + {{free}} gratis"
     },
     "orderView": {
       "title": "Bestellung",
@@ -680,7 +683,9 @@
       "note": "Notiz",
       "saveNote": "Notiz speichern",
       "noteSaved": "Notiz gespeichert",
-      "gstOnTopRate": "{{value}} % zusätzlich"
+      "gstOnTopRate": "{{value}} % zusätzlich",
+      "short": "Fehlmenge · {{received}} von {{ordered}}",
+      "shortCount": "Unvollständige Positionen: {{count}}"
     },
     "sale": {
       "title": "Verkauf",

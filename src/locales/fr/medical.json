@@ -687,7 +687,10 @@
       "save": "Marquer comme reçu",
       "saved": "Marchandise reçue · stock et quantité gratuite ajoutés",
       "mrp": "Prix max.",
-      "note": "Note"
+      "note": "Note",
+      "overOrdered": "Plus que commandé — ajoutez l’excédent comme article imprévu",
+      "ordered": "Commandé {{qty}}",
+      "orderedWithFree": "Commandé {{qty}} + {{free}} gratuits"
     },
     "orderView": {
       "title": "Bon de commande",
@@ -702,7 +705,9 @@
       "note": "Note",
       "saveNote": "Enregistrer la note",
       "noteSaved": "Note enregistrée",
-      "gstOnTopRate": "{{value}} % en sus"
+      "gstOnTopRate": "{{value}} % en sus",
+      "short": "Manquant · {{received}} sur {{ordered}}",
+      "shortCount": "Lignes incomplètes : {{count}}"
     },
     "sale": {
       "title": "Vente",
