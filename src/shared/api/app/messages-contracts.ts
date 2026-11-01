@@ -25,9 +25,9 @@ import { leadRecordSourceSchema } from './leads-fixture-contracts.ts';
  * §3.6; `S:268–286`, `S:1589`, `S:1595`): whose thread a chat column shows, what
  * the composer sends, and the reads the column needs — the thread with its
  * messages and their authors, the person's contact history, the channel
- * status and the template values. Every read the contract lacks is a backend
- * request (Appendix F "Messaging", "Leads and contact threads") served by the
- * fixture world until clinozy-be has it — REPLACE_WITH_API.
+ * status and the template values. A chat reads a contact's stream on
+ * clinozy-be; the contact-history feed is a backend request (Appendix F
+ * "Messaging") the column draws once clinozy-be serves it — REPLACE_WITH_API.
  */
 
 // ── Who and what ──
@@ -49,24 +49,20 @@ const composerModeSchema = z.enum(COMPOSER_MODES);
 export type ComposerMode = z.infer<typeof composerModeSchema>;
 
 /**
- * Whose conversation a chat column shows — one thread per person (D32): a lead
- * is its own thread; a patient's thread is their lead, or a contact thread
- * opened by their first message.
+ * Whose conversation a chat column shows — one thread per person (D32): a
+ * contact's stream on clinozy-be (`/app/contacts/:contact_id/activities`).
  * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
  */
-export const chatPersonSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('lead'), leadId: z.uuid() }),
-  z.object({ kind: z.literal('patient'), patientId: z.uuid() }),
-  /** A person on clinozy-be: their stream (`/app/contacts/:contact_id/activities`). */
-  z.object({ kind: z.literal('contact'), contactId: z.string() }),
-]);
-/** A fixture lead or patient, or a contact on clinozy-be, by id. */
+export const chatPersonSchema = z.object({
+  kind: z.literal('contact'),
+  contactId: z.string(),
+});
+/** A contact on clinozy-be, by id. */
 export type ChatPerson = z.infer<typeof chatPersonSchema>;
 
 /** A stable key per person — the thread's query keys, its draft and its outbox. */
 export function chatPersonKey(person: ChatPerson): string {
-  if (person.kind === 'contact') return `contact:${person.contactId}`;
-  return person.kind === 'lead' ? `lead:${person.leadId}` : `patient:${person.patientId}`;
+  return `contact:${person.contactId}`;
 }
 
 /** The composer's limit (`S:279`, the textarea's `maxLength`). */

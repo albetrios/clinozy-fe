@@ -108,6 +108,9 @@
     "viewAs": {
       "readOnly": "La vista previa es de solo lectura, así que no se guardó nada. Sal de la vista previa para hacer cambios."
     },
+    "workspaceSwitched": {
+      "notSaved": "Este cambio no se guardó porque cambiaste de clínica."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "No se pudo añadir la llave de acceso",

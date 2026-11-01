@@ -203,7 +203,7 @@ describe('useCursorList', () => {
     expect(seen).toEqual([true, false]);
   });
 
-  it('polls every loaded page at the given interval, and not without one', async () => {
+  it('polls a one-page list at the given interval, and not without one', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {
       const queryFn = vi
@@ -235,6 +235,102 @@ describe('useCursorList', () => {
       });
       await waitFor(() => expect(queryFn).toHaveBeenCalledTimes(2));
       expect(still).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  /** Three pages loaded under a 60s poll; `pages` answers each cursor (`undefined` = the first). */
+  async function threePagesPolled(pages: Map<string | undefined, ListPage<Row>>) {
+    const queryFn = vi.fn<(after: string | undefined) => Promise<ListPage<Row>>>(
+      async (after) => pages.get(after) ?? { rows: [], next: null, hasMore: false },
+    );
+    const view = renderHook(
+      () =>
+        useCursorList<Row>({
+          queryKey: ['list', 'deep'],
+          queryFn,
+          refetchInterval: 60_000,
+        }),
+      { wrapper },
+    );
+    await waitFor(() => expect(view.result.current.rows).toHaveLength(2));
+    act(() => view.result.current.fetchNextPage());
+    await waitFor(() => expect(view.result.current.rows).toHaveLength(4));
+    act(() => view.result.current.fetchNextPage());
+    await waitFor(() => expect(view.result.current.rows).toHaveLength(5));
+    queryFn.mockClear();
+    return { ...view, queryFn };
+  }
+
+  const firstPage = (...ids: string[]): ListPage<Row> => ({
+    rows: ids.map((id) => ({ id })),
+    next: 'cur_2',
+    hasMore: true,
+  });
+
+  it('reads the first page alone on a poll tick, however many pages are loaded (G-2)', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const pages = new Map<string | undefined, ListPage<Row>>([
+        [undefined, firstPage('a', 'b')],
+        ['cur_2', { rows: [{ id: 'c' }, { id: 'd' }], next: 'cur_3', hasMore: true }],
+        ['cur_3', { rows: [{ id: 'e' }], next: null, hasMore: false }],
+      ]);
+      const { result, queryFn } = await threePagesPolled(pages);
+
+      // The same rows come back, one of them changed: one request, the change on screen.
+      pages.set(undefined, {
+        ...firstPage('a', 'b'),
+        rows: [{ id: 'a' }, { id: 'b', seen: true } as Row],
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60_000);
+      });
+      await waitFor(() =>
+        expect(result.current.rows[1]).toEqual({ id: 'b', seen: true }),
+      );
+      expect(queryFn).toHaveBeenCalledTimes(1);
+      expect(queryFn).toHaveBeenCalledWith(undefined);
+      expect(result.current.rows.map((row) => row.id)).toEqual(['a', 'b', 'c', 'd', 'e']);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('reads the loaded pages again when the first page moved — a row crossed its end', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const pages = new Map<string | undefined, ListPage<Row>>([
+        [undefined, firstPage('a', 'b')],
+        ['cur_2', { rows: [{ id: 'c' }, { id: 'd' }], next: 'cur_3', hasMore: true }],
+        ['cur_3', { rows: [{ id: 'e' }], next: null, hasMore: false }],
+      ]);
+      const { result, queryFn } = await threePagesPolled(pages);
+
+      // `a` was resolved elsewhere: `c` moves up, every page after the first starts one later.
+      pages.set(undefined, {
+        rows: [{ id: 'b' }, { id: 'c' }],
+        next: 'cur_2b',
+        hasMore: true,
+      });
+      pages.set('cur_2b', {
+        rows: [{ id: 'd' }, { id: 'e' }],
+        next: null,
+        hasMore: false,
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60_000);
+      });
+      await waitFor(() =>
+        expect(result.current.rows.map((row) => row.id)).toEqual(['b', 'c', 'd', 'e']),
+      );
+      // The poll's own read of the first page, then the loaded pages read again.
+      expect(queryFn.mock.calls.map(([after]) => after)).toEqual([
+        undefined,
+        undefined,
+        'cur_2b',
+      ]);
     } finally {
       vi.useRealTimers();
     }

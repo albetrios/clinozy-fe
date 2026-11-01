@@ -13,8 +13,9 @@ name: E2E against the backend image
 # a person's dependency change is reviewed with the code that needs it, and main's run follows.
 #
 # The organization mode follows the variable settings: the job reads the development
-# environment's VITE_PERSONAL_ORGANIZATIONS / VITE_TEAM_ORGANIZATIONS (as preview.yml does; only
-# its variables, the backend stays this job's own container), builds the app with them, and boots
+# environment's VITE_PERSONAL_ORGANIZATIONS / VITE_TEAM_ORGANIZATIONS (on a pull request, the
+# repository-level copies, as preview.yml does; only variables, the backend stays this job's own
+# container), builds the app with them, and boots
 # the backend in the same mode. clinozy-be no longer sends deployment flags, so without this the
 # app and the backend could each run a different mode, and the team-only specs never ran.
 #
@@ -59,8 +60,10 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    # For its variables only (no protection → no gate, no branch policy): the organization mode.
-    environment: development
+    # For its variables only: the organization mode. The development environment allows the main
+    # branch only (H-1), so a Dependabot pull request runs with no environment and reads the
+    # repository-level copies of the two variables (.github/environments/README.md).
+    environment: ${{ github.event_name != 'pull_request' && 'development' || null }}
     permissions:
       contents: read
       packages: read
@@ -70,7 +73,11 @@ jobs:
       VITE_TEAM_ORGANIZATIONS: ${{ vars.VITE_TEAM_ORGANIZATIONS }}
       # clinozy-be pushes ghcr.io/<owner>/<repository>/<image> (reusable-docker-build-trivy.yml:
       # "ghcr.io/${repository_lowercase}/${API_IMAGE}"), so the repository is part of the name.
-      BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api:latest
+      BACKEND_IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api
+      # The tag that follows clinozy-be's main. Never run by tag (H-12): the step "Resolve the
+      # backend image to a signed digest" checks clinozy-be's cosign signature and sets
+      # BACKEND_IMAGE to <repository>@sha256:<digest>, which every later step runs.
+      BACKEND_IMAGE_CHANNEL: latest
       SUITE: ${{ github.event_name == 'schedule' && 'full' || inputs.suite || 'smoke' }}
       # The services below, for the backend container and the suite's email-code helpers (they
       # read the verification codes from auth.mail_outbox).
@@ -120,6 +127,29 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      # The image clinozy-be's main build signed (keyless, its reusable-docker-build-trivy.yml on
+      # main or a release tag — the identity its own release-deploy.yml verifies), run by digest:
+      # a re-pointed tag, or an image nobody signed, stops here.
+      - name: Resolve the backend image to a signed digest
+        env:
+          BACKEND_REPOSITORY: ${{ github.repository_owner }}/clinozy-be
+        run: |
+          set -euo pipefail
+          identity="^https://github\.com/${BACKEND_REPOSITORY}/\.github/workflows/reusable-docker-build-trivy\.yml@refs/(heads/main|tags/v.+)$"
+          cosign verify --certificate-identity-regexp "${identity}" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            "${BACKEND_IMAGE_REPOSITORY}:${BACKEND_IMAGE_CHANNEL}" > verified-backend-image.json
+          digest="$(jq -r '.[0].critical.image["docker-manifest-digest"] // empty' verified-backend-image.json)"
+          if ! printf '%s' "$digest" | grep -Eq '^sha256:[0-9a-f]{64}$'; then
+            echo "::error title=Backend image unverified::cosign returned no digest for ${BACKEND_IMAGE_REPOSITORY}:${BACKEND_IMAGE_CHANNEL}"
+            exit 1
+          fi
+          echo "BACKEND_IMAGE=${BACKEND_IMAGE_REPOSITORY}@${digest}" >> "$GITHUB_ENV"
+          echo "::notice title=Backend image::${BACKEND_IMAGE_REPOSITORY}@${digest} (signed by clinozy-be's main build)"
 
       - name: Migrate, seed the reference data and boot the backend
         run: |

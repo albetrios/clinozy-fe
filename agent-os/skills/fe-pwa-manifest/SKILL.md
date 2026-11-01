@@ -45,7 +45,7 @@ rsvg-convert -w 512 -h 512 public/app-icon.svg -o public/pwa-512x512.png
 ```
 
 6. **VitePWA** — ensure `vite.config.ts` `includeAssets` lists all icon paths.
-7. **Inventory** — update `public/README.md` if assets added/removed.
+7. **Inventory** — update `docs/reference/public-assets.md` if assets added/removed.
 8. **Validate:**
 
 ```bash

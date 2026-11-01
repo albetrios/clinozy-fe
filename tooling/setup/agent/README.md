@@ -73,7 +73,7 @@ daemon to apply the registry mirror would take clinozy-be's Postgres and Redis d
 | Variable              | Effect                                                                                |
 | --------------------- | ------------------------------------------------------------------------------------- |
 | `NODE_INSTALL_PREFIX` | Parent dir for `node<major>` (default `/opt`)                                         |
-| `GH_VERSION`          | Pin the `gh` release instead of resolving latest                                      |
+| `GH_VERSION`          | Try another `gh` release than the pin in `tool-versions.sh` (its `GH_SHA256_*` too)   |
 | `GITLEAKS_VERSION`    | Trial another gitleaks than `tool-versions.sh` pins (set its `GITLEAKS_SHA256_*` too) |
 | `HEALTHCHECK_URL`     | Override the probe URL (default `http://localhost:5173/`)                             |
 
@@ -99,15 +99,15 @@ Never set in a cloud session: `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJE
 Cloud environments restrict egress. Each host maps to one capability, and a
 blocked host degrades exactly one step:
 
-| Host                            | Needed for              | If blocked                   |
-| ------------------------------- | ----------------------- | ---------------------------- |
-| `nodejs.org`                    | Pinned Node download    | **Bring-up fails** on step 2 |
-| `registry.npmjs.org`            | `pnpm install`          | **Bring-up fails** on step 2 |
-| `github.com` / `api.github.com` | `gh`, gitleaks releases | Those tools are skipped      |
-| Distro apt mirrors              | Distro CLI tools        | Those tools are skipped      |
-| `astral.sh` / `pypi.org`        | `uv` + headroom         | headroom MCP unavailable     |
-| `cdn.playwright.dev`            | E2E browsers            | E2E unavailable              |
-| `challenges.cloudflare.com`     | The Turnstile widget    | `/login` shows no captcha    |
+| Host                        | Needed for           | If blocked                   |
+| --------------------------- | -------------------- | ---------------------------- |
+| `nodejs.org`                | Pinned Node download | **Bring-up fails** on step 2 |
+| `registry.npmjs.org`        | `pnpm install`       | **Bring-up fails** on step 2 |
+| `github.com`                | `gh`, gitleaks, uv   | Those tools are skipped      |
+| Distro apt mirrors          | Distro CLI tools     | Those tools are skipped      |
+| `pypi.org`                  | headroom             | headroom MCP unavailable     |
+| `cdn.playwright.dev`        | E2E browsers         | E2E unavailable              |
+| `challenges.cloudflare.com` | The Turnstile widget | `/login` shows no captcha    |
 
 Only the first two are required. In the Claude Code web UI: set Network access
 to **Custom**, add the hosts you want, and keep "Also include default list of

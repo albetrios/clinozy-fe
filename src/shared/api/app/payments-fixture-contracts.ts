@@ -9,7 +9,7 @@ import {
 
 /*
  * The fixture world's ledger entries — what the chat column's lead and patient history still
- * reads (`messages-api.ts`: "Received ₹9,000 · UPI · #782"). Money is paise here. Every room
+ * reads (`fixtures/chat.fixtures.ts`, test support: "Received ₹9,000 · UPI · #782"). Money is paise here. Every room
  * reads clinozy-be's ledger (`payments-contracts.ts`); this goes with the chat's fixture path.
  */
 

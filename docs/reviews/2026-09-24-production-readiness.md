@@ -77,9 +77,9 @@
 - [ ] **Deploy docs describe a laptop / Netlify-build path** that bypasses the release gates and
       environment validation: `docs/deployment/netlify-cli-setup.md`, `deployment-and-pre-launch.md`,
       `runbook-local-to-production.md` and `README.md`.
-- [ ] **A latent CORS break.** Sentry's `tracePropagationTargets` matches `https://api.*`, but clinozy-be's
-      CORS doesn't allow the `sentry-trace` and `baggage` headers. Derive the target from the API URL, and
-      allow both headers in clinozy-be.
+- [ ] **A latent CORS break.** Sentry's `tracePropagationTargets` matched `https://api.*`; it is now
+      derived from the API URL (`sentryTracePropagationTargets`). Still to do: allow the `sentry-trace`
+      and `baggage` headers in clinozy-be's CORS.
 - [ ] **Nice to have:**
   - The offline page is never served (the cache key in `sw.ts`).
   - The security headers are set in both `netlify.toml` and `public/_headers`.

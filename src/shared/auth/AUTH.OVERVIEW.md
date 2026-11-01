@@ -54,9 +54,13 @@ The current-session state itself (the `user` + `isAuthenticated`) lives in `src/
   fails the request as unreachable. The org store is not the source — before `me/context` it
   holds the URL's placeholder. And a workspace switch waits for a refresh already in flight
   (`settleInFlightRefresh`), so the refresh's later answer cannot put the left workspace back.
-- A refresh the server **refused** (401/403) means the session is gone: callers run
-  `forceLogout()`, which clears local auth state, broadcasts logout to every tab via
-  `auth-channel.ts`, and hard-redirects to `/login`.
+- A refresh the server **refused** (401/403) means the session is gone: the fetch client hands
+  the refusal to `endRefusedSession()`. A refusal whose `error.reason` is clinozy-be's own clock —
+  `idle_timeout` (30 minutes idle) or `session_expired` (the 12-hour cap) — is a deliberate end:
+  `logout({ reason })`, so auto-Google sign-in does not sign the user straight back in (a boot
+  refused that way suppresses it too). Any other refusal is a dead session: `forceLogout()`,
+  which clears local auth state, broadcasts logout to every tab via `auth-channel.ts`, and
+  hard-redirects to `/login` (E-2).
 - A refresh that got **no usable answer** — offline, timed out (`HTTP.REFRESH_TIMEOUT`, 5 s),
   throttled (429) or a server fault (5xx) — says nothing about the session. It is retried
   **once** after 600 ms, inside clinozy-be's 10-second grace for the just-superseded refresh
@@ -152,7 +156,7 @@ session would sign the user back in without a click. A dead session
 ## The idle timer
 
 `startIdleTimeout()` returns a handle — `extend()` ("Stay signed in") and
-`stop()` — and guarantees three things, each of which was once a bug:
+`stop()` — and guarantees four things, each of which was once a bug:
 
 1. **The warning is not dismissed by activity in this tab.** The activity
    listeners sit on `document`, so a press on the dialog's own "Sign out" button
@@ -170,6 +174,13 @@ session would sign the user back in without a click. A dead session
    unshared, a background tab counts itself idle and signs the user out of the
    tab they are working in. `onActive` now fires **only** for activity in another
    tab.
+4. **A page load is not activity.** The timer starts from the stored stamp (from
+   now only when there is none), and `startAuthBootstrap` reads that stamp and the
+   12 h session start **before** it refreshes. Recording "now" first handed a
+   browser left alone for hours its session back on every load. A lapsed session
+   is ended as `idle_timeout` / `session_expired` through the pending-revoke path
+   (a refresh only to mint the revoke's token, never hydrated); a sign-in
+   (`establishSession`) stamps activity, a sign-out clears it.
 
 Browser proof: `tests/e2e/session-timeout.e2e.test.ts` (virtual clock). The unit
 suite that mocks the timer cannot see bug 1 — it lived _between_ the two modules;

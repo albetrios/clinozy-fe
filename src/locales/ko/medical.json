@@ -228,7 +228,10 @@
     "export": "내보내기",
     "exportTitle": "이 결제를 CSV로 내보내기",
     "exported": "결제를 CSV로 내보냈습니다",
-    "exportTruncated": "처음 10,000건의 결제를 내보냈습니다 — 나머지는 필터를 좁혀 주세요"
+    "exportTruncated": "처음 10,000건의 결제를 내보냈습니다 — 나머지는 필터를 좁혀 주세요",
+    "exportRetryIn_other": "지금은 내보내기 요청이 많습니다 — {{count}}초 후에 다시 시도해 주세요",
+    "exportRetryLater": "지금은 내보내기 요청이 많습니다 — 잠시 후 다시 시도해 주세요",
+    "exportUnavailable": "내보내기를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해 주세요."
   },
   "credits": {
     "records": "약국 크레딧",

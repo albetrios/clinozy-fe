@@ -6,4 +6,4 @@ args = ["exec", "codegraph", "serve", "--mcp"]
 
 [mcp_servers.fe-headroom]
 command = "uvx"
-args = ["--from", "headroom-ai[mcp]", "headroom", "mcp", "serve"]
+args = ["--from", "headroom-ai[mcp]==0.40.0", "headroom", "mcp", "serve"]

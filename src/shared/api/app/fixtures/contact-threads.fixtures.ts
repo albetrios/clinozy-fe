@@ -1,16 +1,17 @@
+import { z } from 'zod';
+
 import {
   appHttpError,
   type FixtureChange,
   recordFixtureChange,
   validateAppInput,
 } from '@/shared/api/app/app-fixture-store.ts';
-import type { Appointment, LeadInterest, Patient } from '@/shared/api/app/app-schema.ts';
 import {
-  type ContactThreadContext,
-  type EnsureContactThreadInput,
-  ensureContactThreadInputSchema,
-  type EnsureContactThreadResult,
-} from '@/shared/api/app/contact-threads-api.ts';
+  type Appointment,
+  type LeadInterest,
+  type Patient,
+  phoneSchema,
+} from '@/shared/api/app/app-schema.ts';
 import type { LeadRecord } from '@/shared/api/app/leads-fixture-contracts.ts';
 
 import { systemLine } from './messages.fixtures.ts';
@@ -19,10 +20,47 @@ import { FIXTURE_VIEWER_ID } from './staff.fixtures.ts';
 import { appFixtures } from './world.fixtures.ts';
 
 /**
- * The fixture server's contact threads (REPLACE_WITH_API, Appendix F): the
- * lookup that binds a person to their thread — by id, never by name — and the
- * lookup-or-create behind `ensureContactThread`.
+ * The fixture server's contact threads (Appendix F) — TEST SUPPORT ONLY, like the
+ * rest of this folder: the lookup that binds a fixture person to their thread — by
+ * id, never by name — and the lookup-or-create the fixture chat opens a patient's
+ * first thread with (`chat.fixtures.ts`).
  */
+
+/** What opens the thread — it seeds the first system line. */
+const contactThreadContextSchema = z.discriminatedUnion('kind', [
+  /** "Appointment #<seq> · <service>"; its service becomes the thread's interest. */
+  z.object({ kind: z.literal('appointment'), appointmentId: z.uuid() }),
+  /** "Task · <title>" (an appointment task seeds its appointment's line). */
+  z.object({ kind: z.literal('task'), taskId: z.uuid() }),
+]);
+/** What opens a thread. */
+type ContactThreadContext = z.infer<typeof contactThreadContextSchema>;
+
+/**
+ * The person, by id — their own lead or thread, their patient record, or (for
+ * a contact with neither) their mobile. Never by name.
+ */
+const ensureContactThreadInputSchema = z
+  .object({
+    name: z.string().trim().min(1).max(120),
+    patientId: z.uuid().nullable().default(null),
+    leadId: z.uuid().nullable().default(null),
+    phone: phoneSchema.nullable().default(null),
+    context: contactThreadContextSchema.nullable().default(null),
+  })
+  .refine(
+    (person) =>
+      person.patientId !== null || person.leadId !== null || person.phone !== null,
+    { message: 'Name the patient, the lead or a mobile number', path: ['phone'] },
+  );
+/** A lookup-or-create as callers write it. */
+export type EnsureContactThreadInput = z.input<typeof ensureContactThreadInputSchema>;
+
+/** The person's thread, and whether this call opened it. */
+export interface EnsureContactThreadResult {
+  lead: LeadRecord;
+  created: boolean;
+}
 
 /** Whom to look up: their own lead or thread, their patient record, or their mobile. */
 export interface PersonThreadLookup {

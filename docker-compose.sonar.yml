@@ -19,10 +19,13 @@ name: clinozy-fe
 
 services:
   sonarqube:
-    image: sonarqube:25.5.0.107428-community
+    # Pinned by digest (H-12): a tag can be re-pointed at other bytes; the digest cannot.
+    image: sonarqube:25.5.0.107428-community@sha256:26b5a4f25bc6cb27bffa3f6c6b737254b0ffea7168c379921070b7b769315f2c
     container_name: clinozy-fe-sonarqube
+    # Loopback only (H-8): published on every interface, the server (admin / admin until the gate
+    # changes it) answered anyone on the network.
     ports:
-      - '${SONAR_HOST_PORT:-9001}:9000'
+      - '127.0.0.1:${SONAR_HOST_PORT:-9001}:9000'
     environment:
       SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: 'true'
     volumes:
@@ -43,28 +46,29 @@ services:
       retries: 12
       start_period: 120s
 
-  # The scanner targets the HOST port (host.docker.internal:9001), not the
-  # compose-network hostname, so it reaches whichever server owns :9000 —
-  # this repo's or clinozy-be's. No depends_on: the gate script (sonar-gate.mjs)
+  # The scanner targets the HOST port (localhost:9001 on the host network), not the
+  # compose-network hostname, so it reaches whichever server owns the port —
+  # this repo's or clinozy-be's. The host network because the server publishes on
+  # the host's loopback only: host.docker.internal is the bridge gateway, which a
+  # 127.0.0.1 port does not answer. No depends_on: the gate script (sonar-gate.mjs)
   # guarantees a healthy server before invoking the scanner.
   scanner:
-    image: sonarsource/sonar-scanner-cli:11
+    image: sonarsource/sonar-scanner-cli:11@sha256:46341f2c2dc560381414e90347885f5cddc716db080adcbafc1cac13e1473094
     container_name: clinozy-fe-sonar-scanner
     profiles: ['scan']
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    network_mode: host
     volumes:
       - .:/usr/src
     working_dir: /usr/src
     environment:
-      SONAR_HOST_URL: http://host.docker.internal:9001
+      SONAR_HOST_URL: http://localhost:9001
       SONAR_TOKEN: ${SONAR_TOKEN:-}
     command: >
       sonar-scanner
         -Dsonar.projectKey=clinozy-fe
         -Dsonar.projectName="clinozy-fe"
         -Dsonar.projectVersion=1.0.0-alpha.0
-        -Dsonar.host.url=http://host.docker.internal:9001
+        -Dsonar.host.url=http://localhost:9001
         -Dsonar.token=${SONAR_TOKEN:-admin:admin@}
 
 volumes:

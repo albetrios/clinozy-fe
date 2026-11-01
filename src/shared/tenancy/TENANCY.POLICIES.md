@@ -23,12 +23,38 @@ the last _response_ must not win over the last _intent_, or the global token end
 up on org A while the URL says org B → org-B queries fetch with org A's token.
 **Enforced by:** `switch.ts` (`liveSwitch` generation guard) + `switch.test.ts`.
 
+## The store names an organization only once the token carries it
+
+**Must:** the `$organizationSlug` guard awaits the switch before it writes the URL's
+organization into the store; a refused, failed or superseded switch leaves the store where
+it was. A switch cancels the reads the workspace being left still has out (at its start and
+at the token flip), and the fetch client never replays or retries a request with a token for
+another organization.
+**Because:** every org-scoped query key takes its organization from the store. Written
+first, the store made mounted screens fetch org B's keys with org A's still-valid token — A's
+patients cached under B's name for the stale time. A replay after the switch had the mirror
+effect: B's records under A's key, or an A write landing in B.
+**Enforced by:** `app/guards/route-guards.ts` (`requireOrganizationContext`), `switch.ts`
+(`cancelReadsOfWorkspaceLeft`), `core/http/fetch-client.ts` (`switchedOrganization`) and their
+tests.
+
 ## Permissions must be refetched when the active org changes
 
 **Must:** resolve permissions per active org, not once-if-empty.
 **Because:** a lazy cache leaks org A's permission set into org B, silently
 widening access in the UI.
 **Enforced by:** `organization-membership.ts` (`ensurePermissionsFor`).
+
+## A refused access is re-read, never served from cache
+
+**Must:** a 403 whose `error.reason` questions the caller's access to the active clinic
+(`missing_permission`, `not_a_member`) makes the tab read me/context and the membership list
+again; when the access changed, that clinic's cached queries are dropped and the guards run
+again.
+**Because:** a role downgraded or a membership ended elsewhere otherwise leaves the old
+permission set and the old role's cache (patient files) on screen for the stale time.
+**Enforced by:** `organization-access.ts` (`startOrganizationAccessFollow`, started in
+`main.tsx`) + `core/http/queryClient.ts` (`onOrganizationAccessRefused`) and their tests.
 
 ## `switchToPersonal` gates on `personalOrganizationId`, not the flag
 

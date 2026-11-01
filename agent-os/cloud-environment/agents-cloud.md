@@ -160,11 +160,11 @@ every other host degrades exactly one best-effort step:
   without it the install is blocked and every later step fails on the wrong
   Node major.
 - `registry.npmjs.org` — **required**; `pnpm install`.
-- `github.com` + `api.github.com` — `gh` and gitleaks release downloads.
-  Blocked → those two tools are skipped (the pre-commit secret scan then
-  silently no-ops).
+- `github.com` — the pinned, checksum-verified `gh`, gitleaks and `uv` release downloads
+  (`tooling/setup/agent/tool-versions.sh`). Blocked → those tools are skipped (the pre-commit
+  secret scan then stops the commit until gitleaks is installed).
 - Distro apt mirrors — `jq`, `ripgrep`, `shellcheck`, `librsvg2-bin`, `xz-utils`.
-- `astral.sh` + `pypi.org` — `uv`/`uvx`, needed by the `headroom` MCP server.
+- `pypi.org` — the pinned `headroom-ai[mcp]` the `headroom` MCP server runs under `uvx`.
   Blocked → headroom does not start; `codegraph` is unaffected (it is a
   devDependency).
 - `cdn.playwright.dev` — whenever the image's browsers are not the build the

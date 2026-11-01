@@ -16,7 +16,7 @@ import { notify } from '@/shared/notify/index.ts';
 import type { SavedView } from '@/shared/store/useDevicePrefsStore/index.ts';
 
 interface DataTableSavedViewsProps {
-  /** The table whose views to list (`useDevicePrefsStore.savedViews[tableId]`). */
+  /** The table whose views to list — the signed-in person's own (`useSavedViews`). */
   tableId: string;
   /** The filters applied now — the view that matches them shows pressed. */
   activeFilters?: SavedViewFilters;

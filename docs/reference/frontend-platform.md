@@ -175,13 +175,23 @@ write path for API calls.
   Precached files sit under revisioned cache keys (`?__WB_REVISION__=…`): look them
   up with `matchPrecache('<file>')`, never `caches.match('/<file>')`, which misses.
   Pinned by `src/sw.test.ts`.
+- **The precache is the app shell**, not the whole app (`plugins/app-shell-precache.ts`,
+  `injectManifest.manifestTransforms`): the root files (`index.html`, `offline.html`, the
+  init scripts, `config.js`, icons), `index.html`'s first paint (entry, modulepreloads,
+  stylesheet), the fonts, and the chunks the root route loads lazily at boot
+  (`AppSplashSlot`, `CriticalUpdateNotice`, `ConsentBanner`) with their static imports. Every
+  room, form and drawer chunk is fetched when first used and kept by the `app-assets` runtime
+  cache. A renamed shell chunk fails the build; `tests/ci/app-shell-precache.policy.test.ts`
+  pins the selection.
 - TanStack Query retries skip 401 (auth interceptor owns refresh); other failures
   surface via `QueryBoundary` / `RetryError` on read paths.
 - Below that, `apiClient` retries idempotent requests (GET, HEAD, OPTIONS, PUT,
   DELETE) after a dropped connection or a 5xx, with exponential backoff (1 s, 2 s,
   4 s) that never undercuts a 5xx `Retry-After`: clinozy-be's 503s send 1 s (overload
   guard) or 5 s (pooled-connection deadline). A `Retry-After` beyond
-  `HTTP.MAX_RETRY_AFTER_MS` (5 s) surfaces the error instead, as a 429's does.
+  `HTTP.MAX_RETRY_AFTER_MS` (5 s) surfaces the error instead, as a 429's does. The error
+  keeps the header's seconds on `HttpError.retryAfterSeconds` (clinozy-be sends the wait only
+  there); `getRateLimitRetryAfterSeconds` and `RateLimitNotice` count down from it.
 - Users should not lose in-progress **local** drafts: onboarding uses
   `useUnsavedChangesGuard` + persisted `useOnboardingStore`; settings panels
   register dirty state via `SettingsDirtyProvider`. The record drawer

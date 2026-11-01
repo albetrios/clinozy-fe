@@ -41,6 +41,7 @@ import {
   restoreTask,
   saveTaskRuleSettings,
   snoozeTask,
+  TASK_SIDE_EFFECT_KEYS,
   taskQueryKeys,
 } from '@/shared/api/app/tasks-api.ts';
 import { TASKS_REFETCH_MS } from '@/shared/api/app/tasks-contracts.ts';
@@ -102,23 +103,34 @@ async function listed<T>(hook: () => T) {
 }
 
 describe('useTaskList', () => {
-  it('reads a view’s pages under the organization and polls them every 60s', async () => {
-    vi.mocked(listTasks)
-      .mockResolvedValueOnce({ rows: [taskRow()], next: 'cur_2', total: 2 })
-      .mockResolvedValueOnce({ rows: [OTHER], next: null, total: 2 });
-    const { result } = renderHook(() => useTaskList({ tab: 'snoozed' }), { wrapper });
+  it('reads a view’s pages under the organization and polls the first one every 60s', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      vi.mocked(listTasks).mockImplementation(async (_query, after) =>
+        after === undefined
+          ? { rows: [taskRow()], next: 'cur_2', total: 2 }
+          : { rows: [OTHER], next: null, total: 2 },
+      );
+      const { result } = renderHook(() => useTaskList({ tab: 'snoozed' }), { wrapper });
 
-    await waitFor(() => expect(result.current.rows).toHaveLength(1));
-    expect(listTasks).toHaveBeenCalledWith({ tab: 'snoozed' }, undefined);
-    expect(result.current.hasNextPage).toBe(true);
-    await act(() => result.current.fetchNextPage());
-    await waitFor(() => expect(result.current.rows).toHaveLength(2));
-    expect(listTasks).toHaveBeenLastCalledWith({ tab: 'snoozed' }, 'cur_2');
+      await waitFor(() => expect(result.current.rows).toHaveLength(1));
+      expect(listTasks).toHaveBeenCalledWith({ tab: 'snoozed' }, undefined);
+      expect(result.current.hasNextPage).toBe(true);
+      await act(() => result.current.fetchNextPage());
+      await waitFor(() => expect(result.current.rows).toHaveLength(2));
+      expect(listTasks).toHaveBeenLastCalledWith({ tab: 'snoozed' }, 'cur_2');
 
-    const query = client
-      .getQueryCache()
-      .find({ queryKey: taskQueryKeys.list('org_test', { tab: 'snoozed' }) });
-    expect(query?.observers[0]?.options.refetchInterval).toBe(TASKS_REFETCH_MS);
+      // A tick reads one page — the first — not both (G-2).
+      vi.mocked(listTasks).mockClear();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(TASKS_REFETCH_MS);
+      });
+      await waitFor(() => expect(listTasks).toHaveBeenCalledTimes(1));
+      expect(listTasks).toHaveBeenCalledWith({ tab: 'snoozed' }, undefined);
+      expect(result.current.rows).toHaveLength(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('waits for an organization', () => {
@@ -216,6 +228,32 @@ describe('useTaskOutcome', () => {
     await act(async () => {
       finish(null);
     });
+  });
+
+  it('refreshes the records it wrote at once and the task reads once, after the rules ran (G-2)', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      vi.mocked(recordTaskOutcome).mockResolvedValue(null);
+      const { result } = await listed(() => useTaskOutcome());
+      const invalidate = vi.spyOn(client, 'invalidateQueries');
+      await act(async () => {
+        await result.current.hook.mutateAsync(vars);
+        await result.current.hook.mutateAsync({ ...vars, task: OTHER });
+      });
+      const keysNow = invalidate.mock.calls.map(([filters]) => filters?.queryKey);
+      expect(keysNow).toEqual(expect.arrayContaining([...TASK_SIDE_EFFECT_KEYS]));
+      expect(keysNow).not.toContainEqual(taskQueryKeys.all);
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1_500);
+      });
+      const taskRefreshes = invalidate.mock.calls.filter(
+        ([filters]) => filters?.queryKey === taskQueryKeys.all,
+      );
+      expect(taskRefreshes, 'two outcomes, one task refresh').toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('puts the row back and toasts when the write fails; "Fix the number" leaves it', async () => {

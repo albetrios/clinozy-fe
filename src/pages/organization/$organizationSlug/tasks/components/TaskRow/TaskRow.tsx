@@ -101,6 +101,11 @@ export interface TaskRowProps {
   onOpen: (row: TaskRowRecord) => void;
   /** The contact card's actions for this row's person. */
   contactActions?: ContactCardActions;
+  /**
+   * While the list renders only the rows in view (TaskList, G-2): the row's place in the whole
+   * list (`aria-rowindex` and the virtualizer's `data-index`) and the ref that measures it.
+   */
+  windowed?: { index: number; measure: (node: HTMLDivElement | null) => void };
 }
 
 /**
@@ -315,6 +320,7 @@ export function TaskRow({
   team,
   onOpen,
   contactActions,
+  windowed,
 }: TaskRowProps) {
   const Icon = TASK_RULE_ICONS[row.type];
   const overdue = isTaskOverdue(row, now);
@@ -335,8 +341,11 @@ export function TaskRow({
 
   return (
     <div // NOSONAR(S6819): grid ARIA table, see the note in TaskList
+      ref={windowed?.measure}
       role="row"
       tabIndex={0}
+      data-index={windowed?.index}
+      aria-rowindex={windowed ? windowed.index + 1 : undefined}
       // The focus personality's ring reaches a slotted element; the preset fills it.
       data-slot="task-row"
       data-testid={TASKS_TEST_IDS.row}

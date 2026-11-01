@@ -343,7 +343,7 @@ export function derivedSurfaces(identity, _root = ROOT) {
           .replace(/(mint a )[\w-]+( token)/g, `$1${name}$2`),
     },
     {
-      file: '.github/workflows/preview.yml',
+      file: '.github/workflows/preview-deploy.yml',
       label: 'PR preview hostname',
       apply: (text) =>
         text.replace(

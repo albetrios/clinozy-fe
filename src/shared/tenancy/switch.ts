@@ -17,7 +17,8 @@ import {
   organizationWire,
   toOrganization,
 } from './me-context.ts';
-import { deriveOrgContext } from './organization-context.ts';
+import { deriveOrgContext, getActiveOrganizationId } from './organization-context.ts';
+import { cancelOrganizationQueries } from './organization-queries.ts';
 
 const switchWire = z.object({
   access_token: z.string().min(1),
@@ -57,27 +58,67 @@ function applyActiveOrg(
  */
 let switchGeneration = 0;
 
+/** The organization the latest switch still in flight is moving to; `null` when none is. */
+let switchTarget: string | null = null;
+
+/**
+ * The organization a switch still in flight is moving to, or `null` when none is.
+ *
+ * @remarks
+ * me/context names the organization the token carries, and it moves only once a switch has
+ * landed. While one is out it still names the workspace being left, so the URL guard asks this
+ * too: a navigation back to that workspace before the switch answers must switch again, or the
+ * switch landing afterwards would put the token on a clinic the URL no longer shows.
+ */
+export function switchInFlightTo(): string | null {
+  return switchTarget;
+}
+
+/**
+ * Cancel what the workspace being left still has out, unless it is the one being entered.
+ *
+ * @remarks
+ * The org store names the workspace being left until the switch lands (`deriveOrgContext`
+ * below), so its reads are the ones keyed to the token about to be retired.
+ */
+function cancelReadsOfWorkspaceLeft(target: string | null): void {
+  const leaving = getActiveOrganizationId();
+  if (leaving !== target) cancelOrganizationQueries(leaving);
+}
+
 async function liveSwitch(
   path: string,
   body: Record<string, unknown>,
+  target: string | null,
 ): Promise<MeContext | undefined> {
   switchGeneration += 1;
   const generation = switchGeneration;
-  // A refresh answered after the switch would put back a token for the workspace being left.
-  await settleInFlightRefresh();
-  if (generation !== switchGeneration) return undefined;
-  const res = await apiClient.post<unknown>(`${API_BASE_PATH}${path}`, body);
-  // A newer switch superseded this one while the POST was in flight — discard
-  // its token + context so it cannot clobber the active org.
-  if (generation !== switchGeneration) return undefined;
-  const wire = switchWire.parse(res.data);
-  setAccessToken(wire.access_token);
-  scheduleTokenRefresh();
-  return applyActiveOrg(
-    wire.active_organization ? toOrganization(wire.active_organization) : null,
-    wire.my_permissions,
-    wire.global_role,
-  );
+  switchTarget = target;
+  // Reads of the workspace being left that are still out would land, or be retried, around a
+  // token that is about to be retired.
+  cancelReadsOfWorkspaceLeft(target);
+  try {
+    // A refresh answered after the switch would put back a token for the workspace being left.
+    await settleInFlightRefresh();
+    if (generation !== switchGeneration) return undefined;
+    const res = await apiClient.post<unknown>(`${API_BASE_PATH}${path}`, body);
+    // A newer switch superseded this one while the POST was in flight — discard
+    // its token + context so it cannot clobber the active org.
+    if (generation !== switchGeneration) return undefined;
+    const wire = switchWire.parse(res.data);
+    // Again at the token flip, in the same task as it: a read the workspace being left started
+    // while the POST was out must not be retried with the new token and cached under its key.
+    cancelReadsOfWorkspaceLeft(target);
+    setAccessToken(wire.access_token);
+    scheduleTokenRefresh();
+    return applyActiveOrg(
+      wire.active_organization ? toOrganization(wire.active_organization) : null,
+      wire.my_permissions,
+      wire.global_role,
+    );
+  } finally {
+    if (generation === switchGeneration) switchTarget = null;
+  }
 }
 
 /**
@@ -89,16 +130,23 @@ async function liveSwitch(
  * instant — its cache is served immediately and `staleTime` governs any
  * background refetch, instead of forcing a cold reload every time. Access is
  * still re-validated on entry: the org guard awaits this switch before the
- * route renders, so no cached view shows until clinozy-be has accepted it, and
- * a membership revoked since the cached list was fetched is refused here and
- * answered with the non-member 404 (`switchOrNotFound` in route-guards.ts).
+ * route renders AND before the org store names the organization, so no cached
+ * view shows until clinozy-be has accepted it and no key of the new
+ * organization exists while the token still carries the old one; a membership
+ * revoked since the cached list was fetched is refused here and answered with
+ * the non-member 404 (`switchOrNotFound` in route-guards.ts). What the
+ * workspace being left still has out is cancelled at the start and again at
+ * the token flip (`cancelReadsOfWorkspaceLeft`), so none of it is cached under
+ * its key with the new token.
  */
 export async function switchToOrganization(
   organizationId: string,
 ): Promise<MeContext | undefined> {
-  const result = await liveSwitch('/auth/switch-to-organization', {
-    organization_id: organizationId,
-  });
+  const result = await liveSwitch(
+    '/auth/switch-to-organization',
+    { organization_id: organizationId },
+    organizationId,
+  );
   if (result) {
     deriveOrgContext(result);
     captureAnalyticsEvent(ANALYTICS_EVENTS.organizationSwitched, {
@@ -122,7 +170,11 @@ export async function switchToPersonal(): Promise<MeContext | undefined> {
   const cached = queryClient.getQueryData<MeContext>(meContextQueryKey);
   if (cached && !cached.personalOrganizationId) return undefined;
 
-  const result = await liveSwitch('/auth/switch-to-personal', {});
+  const result = await liveSwitch(
+    '/auth/switch-to-personal',
+    {},
+    cached?.personalOrganizationId ?? null,
+  );
   if (result) {
     deriveOrgContext(result);
     captureAnalyticsEvent(ANALYTICS_EVENTS.organizationSwitched, {

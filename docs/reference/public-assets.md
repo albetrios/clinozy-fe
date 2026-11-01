@@ -1,6 +1,6 @@
 # Public static assets
 
-All files here are copied as-is to the build output (`dist/`). Required and optional assets are listed below.
+Every file in `public/` is copied as-is to the build output (`dist/`) — a public URL on the deployed site, so this inventory lives here, in `docs/`, not beside them (F-8: a `public/README.md` shipped as `/README.md`). Required and optional assets are listed below.
 
 **Manifest / icon rules:** `docs/reference/pwa-manifest-and-app-icon.md`  
 **Skill:** `agent-os/skills/fe-pwa-manifest/SKILL.md`
@@ -38,7 +38,7 @@ rsvg-convert -w 512 -h 512 public/app-icon.svg -o public/pwa-512x512.png
 
 ## Validation
 
-Run **`pnpm validate:public`** to ensure all required files exist. The script fails if any required asset is missing (see [tooling/validate/public-assets.sh](../tooling/validate/public-assets.sh)).
+Run **`pnpm validate:public`** to ensure all required files exist. The script fails if any required asset is missing (see [tooling/validate/public-assets.sh](../../tooling/validate/public-assets.sh)).
 
 Also run **`pnpm test:unit src/core/config/app-manifest.test.ts`** after manifest changes.
 

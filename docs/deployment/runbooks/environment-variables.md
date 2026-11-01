@@ -37,7 +37,16 @@ src/core/config/env-schema.ts   ← Zod + envSchemaKeys
 | **Runtime public**  | `VITE_*`   | Client bundle; overridable via `window.__CONFIG__` | `VITE_AUTH_*`, `VITE_DISABLED_MODULES`    |
 | **Runtime private** | no `VITE_` | CI / build scripts only                            | `SENTRY_AUTH_TOKEN`, `NETLIFY_AUTH_TOKEN` |
 
+`STORED_FILES_ORIGIN` is a build-time Variable (no `VITE_`, never bundled): the file store's bucket
+origin, named in the CSP's `connect-src` and `img-src` (`plugins/csp-api-origin.ts`). Production
+requires it — `validate:client-env` fails a release without an https origin there — and a
+development deploy is warned; set it in both GitHub Environments (`pnpm github:sync` pushes it from
+`.env.<environment>`).
+
 **Client resolution order:** `window.__CONFIG__[key]` → `import.meta.env.VITE_${key}` → Zod default.
+The build-only keys (`BUILD_ONLY_CONFIG_KEYS` in `env.config.ts`: `APP_ENV`, `DEBUG_LOGGING`,
+`DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK` — every switch `envProfiles.production.allowed` pins — and
+`TEST_MODE`) skip `window.__CONFIG__`: only the build's own env sets them.
 
 ### Which env files each command reads
 
@@ -187,7 +196,14 @@ code. Each flag is read via `platformConfig`; defaults are production-safe and t
 declares the permitted value set per key per environment. `pnpm validate:client-env`
 **fails** if `.env.<env>` (locally) or the injected GitHub Environment (CI) holds a value
 out of range — e.g. `VITE_DEBUG_LOGGING=true` in production is rejected. Development permits
-either boolean (typos still rejected).
+either boolean (typos still rejected) for a build on a developer's machine.
+
+**Hosted deploys refuse every test-only switch** (clinozy-be's A-4). The workflows that build a
+hosted bundle — `reusable-netlify-deploy.yml` (development and production) and the PR preview build
+(`preview.yml`) — set `HOSTED_DEPLOYMENT=true`, and with it `pnpm validate:client-env` refuses
+`VITE_TEST_MODE`, `VITE_E2E_HOOKS`, `VITE_DEVTOOLS` and `VITE_DEBUG_LOGGING` on, whatever the
+environment's profile allows (`hostedDeploymentRefusals` in `env-schema.ts`). Local machines and CI
+runners (the e2e and Lighthouse builds) never set it; no env file does.
 
 The only remaining raw env read is the config bootstrap (`env.config.ts`, allowlisted by
 `pnpm validate:vite-env`). Tests are **hermetic by construction**: the runner loads no env
@@ -217,7 +233,8 @@ A deploy may inject `public/config.js` with `window.__CONFIG__` (no Docker in th
 repo — the Netlify deploy serves the static file as-built unless you edit it):
 
 - Strip `VITE_` prefix for keys (e.g. `AUTH_OAUTH_GOOGLE`, not `VITE_AUTH_OAUTH_GOOGLE`)
-- Same keys as bundled client env
+- Same keys as bundled client env, except the build-only ones (`APP_ENV`, `DEBUG_LOGGING`,
+  `DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK`, `TEST_MODE`), which are ignored here
 - See comments in [`public/config.js`](../../../public/config.js)
 
 ## 5. Adding or changing a key

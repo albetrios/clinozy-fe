@@ -1,7 +1,6 @@
+import { assertAuthPlatformInvariants, clientEnvSchema } from './client-env-schema.ts';
 import {
-  assertAuthPlatformInvariants,
   branchEnvironmentMap,
-  clientEnvSchema,
   type DeployEnvironment,
   envFieldDescriptions,
   environmentForBranch,
@@ -9,6 +8,8 @@ import {
   envSchemaConditionallyRequiredKeys,
   envSchemaKeys,
   type ForbiddenKeyRule,
+  HOSTED_DEPLOYMENT_REFUSED_SWITCHES,
+  hostedDeploymentRefusals,
   isSecretNamedClientKey,
 } from './env-schema.ts';
 
@@ -102,6 +103,37 @@ describe('envProfiles required keys', () => {
     expect(rule?.when?.(() => undefined)).toBe(true);
     expect(
       rule?.when?.((key) => (key === 'VITE_CAPTCHA_DISABLED' ? 'true' : undefined)),
+    ).toBe(false);
+  });
+
+  it('requires production to name its file-store bucket as an https origin; warns development (F-7)', () => {
+    const production = envProfiles.production.required.find(
+      (r) => r.key === 'STORED_FILES_ORIGIN',
+    );
+    expect(production?.level).toBe('error');
+    expect(
+      production?.satisfiedBy?.('https://clinozy-files.s3.ap-south-1.amazonaws.com'),
+    ).toBe(true);
+    expect(production?.satisfiedBy?.('https://clinozy-files.s3.amazonaws.com/')).toBe(
+      true,
+    );
+    for (const wrong of [
+      'https://*.amazonaws.com',
+      // eslint-disable-next-line sonarjs/no-clear-text-protocols -- asserting http:// is rejected
+      'http://clinozy-files.s3.amazonaws.com',
+      'https://clinozy-files.s3.amazonaws.com/uploads',
+      'clinozy-files',
+    ]) {
+      expect(production?.satisfiedBy?.(wrong), wrong).toBe(false);
+    }
+    const development = envProfiles.development.required.find(
+      (r) => r.key === 'STORED_FILES_ORIGIN',
+    );
+    expect(development?.level).toBe('warn');
+    expect(
+      envProfiles.local.required.some(
+        (candidate) => candidate.key === 'STORED_FILES_ORIGIN',
+      ),
     ).toBe(false);
   });
 
@@ -224,6 +256,67 @@ describe('envProfiles defaults (per-environment starting values)', () => {
     expect(defaults?.VITE_DEBUG_LOGGING).toBe('true');
     expect(defaults?.VITE_DEVTOOLS).toBe('true');
     expect(defaults?.VITE_DEV_API_URL).toBe('http://localhost:3000');
+  });
+});
+
+// clinozy-be's A-4: test-only switches are refused on every hosted deploy — the deploy workflows
+// set HOSTED_DEPLOYMENT=true — and stay allowed on local machines and CI runners.
+describe('hostedDeploymentRefusals (the hosted-deploy marker)', () => {
+  const hosted = (env: Record<string, string>) => (key: string) =>
+    ({ HOSTED_DEPLOYMENT: 'true', VITE_APP_ENV: 'development', ...env })[key];
+
+  it.each(Object.keys(HOSTED_DEPLOYMENT_REFUSED_SWITCHES))(
+    'refuses %s on a hosted deploy, whatever value turns it on',
+    (key) => {
+      for (const value of ['true', '1', 'yes']) {
+        const [error] = hostedDeploymentRefusals(hosted({ [key]: value }));
+        expect(error).toContain(`${key}=${value} is refused on a hosted deploy`);
+      }
+      expect(hostedDeploymentRefusals(hosted({ [key]: 'false' }))).toEqual([]);
+      expect(hostedDeploymentRefusals(hosted({ [key]: '' }))).toEqual([]);
+    },
+  );
+
+  it('names the test-only switches clinozy-be refuses the counterparts of', () => {
+    expect(Object.keys(HOSTED_DEPLOYMENT_REFUSED_SWITCHES).sort()).toEqual([
+      'VITE_DEBUG_LOGGING',
+      'VITE_DEVTOOLS',
+      'VITE_E2E_HOOKS',
+      'VITE_TEST_MODE',
+    ]);
+  });
+
+  it('allows every switch off a hosted deploy (local machines, CI runners)', () => {
+    const all = Object.fromEntries(
+      Object.keys(HOSTED_DEPLOYMENT_REFUSED_SWITCHES).map((key) => [key, 'true']),
+    );
+    for (const marker of [undefined, '', 'false']) {
+      const get = (key: string) =>
+        key === 'HOSTED_DEPLOYMENT' ? marker : (all as Record<string, string>)[key];
+      expect(hostedDeploymentRefusals(get)).toEqual([]);
+    }
+  });
+
+  it('reads a marker that is neither true nor false as an error, never as "not hosted"', () => {
+    expect(hostedDeploymentRefusals(hosted({ HOSTED_DEPLOYMENT: 'yes' }))).toEqual([
+      'HOSTED_DEPLOYMENT=yes must be true or false',
+    ]);
+  });
+
+  it('refuses the marker on the local environment (a deploy names a deploy target)', () => {
+    expect(hostedDeploymentRefusals(hosted({ VITE_APP_ENV: 'local' }))).toEqual([
+      'HOSTED_DEPLOYMENT=true names a deploy, so VITE_APP_ENV must be development or production, not local',
+    ]);
+  });
+
+  it('every deploy environment starts with each refused switch off', () => {
+    for (const environment of ['development', 'production'] as const) {
+      const defaults = envProfiles[environment].defaults ?? {};
+      expect(
+        hostedDeploymentRefusals(hosted({ ...defaults, VITE_APP_ENV: environment })),
+        environment,
+      ).toEqual([]);
+    }
   });
 });
 

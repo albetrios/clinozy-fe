@@ -1,5 +1,5 @@
 {
-  "description": "Single source of truth for clinozy-fe agent hook wiring. tooling/agent-os/generate.ts derives agent-os/platforms/claude/settings.json (hooks block), agent-os/platforms/cursor/hooks.json, and agent-os/platforms/codex/hooks.json from this manifest + agent-os/platforms/targets.json. Tool dirs (.claude/, .cursor/, .codex/) symlink into agent-os/platforms/ — edit here only. Every hook is a Node script (node agent-os/hooks/<script>) on the shared _fe-hook.mjs helper. All hooks FAIL OPEN.",
+  "description": "Single source of truth for clinozy-fe agent hook wiring. tooling/agent-os/generate.ts derives agent-os/platforms/claude/settings.json (hooks block), agent-os/platforms/cursor/hooks.json, and agent-os/platforms/codex/hooks.json from this manifest + agent-os/platforms/targets.json. Tool dirs (.claude/, .cursor/, .codex/) symlink into agent-os/platforms/ — edit here only. Every hook is a Node script (node agent-os/hooks/<script>) on the shared _fe-hook.mjs helper. Every hook FAILS OPEN except fe-guardrails (the destructive-command and secret guard), which fails CLOSED: an error in it blocks the call (H-6).",
   "hooks": [
     {
       "id": "fe-session-start",

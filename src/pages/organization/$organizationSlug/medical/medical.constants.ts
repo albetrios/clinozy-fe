@@ -250,6 +250,12 @@ export const MEDICAL_KEYS = {
     exportTitle: 'payments.exportTitle',
     exported: 'payments.exported',
     exportTruncated: 'payments.exportTruncated',
+    /** A busy or rate-limited export: the server's `Retry-After` wait, in seconds (a plural key). */
+    exportRetryIn: 'payments.exportRetryIn',
+    /** The same refusal when the server named no wait. */
+    exportRetryLater: 'payments.exportRetryLater',
+    /** An export the server cannot serve right now (a 503). */
+    exportUnavailable: 'payments.exportUnavailable',
   },
   /** Medical › Credits (clinozy-be D90): from suppliers and with customers. */
   credits: {

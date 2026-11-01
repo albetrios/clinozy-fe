@@ -50,13 +50,16 @@ variables verbatim. Full key catalog (kind, default, description):
 | Variable                               | development          | production           |
 | -------------------------------------- | -------------------- | -------------------- |
 | `VITE_CAPTCHA_DISABLED`                | `false`              | per captcha rollout  |
-| `VITE_DEBUG_LOGGING` / `VITE_DEVTOOLS` | `true` (diagnostics) | `false` (enforced)   |
-| `VITE_E2E_HOOKS`                       | `false`              | `false` (enforced)   |
+| `VITE_DEBUG_LOGGING` / `VITE_DEVTOOLS` | `false` (refused on) | `false` (enforced)   |
+| `VITE_E2E_HOOKS`                       | `false` (refused on) | `false` (enforced)   |
 | `VITE_VERSION_CHECK`                   | `true`               | `true` (enforced)    |
 | `VITE_SENTRY_*_SAMPLE_RATE` (4 keys)   | optional             | optional             |
 | `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`   | repo-level, optional | repo-level, optional |
 
-An unset variable falls back to the runtime schema default at build time; `VITE_APP_ENV`
+"Refused on": both deploy workflows set the hosted-deploy marker `HOSTED_DEPLOYMENT=true` (clinozy-be's
+A-4), and with it `pnpm validate:client-env` refuses `VITE_TEST_MODE`, `VITE_E2E_HOOKS`, `VITE_DEVTOOLS`
+and `VITE_DEBUG_LOGGING` on, whatever the profile allows — set them `false` (or leave them unset) in
+`.env.development` too. An unset variable falls back to the runtime schema default at build time; `VITE_APP_ENV`
 is **not** a managed variable — the workflows derive it from the resolved environment
 name (and a local `pnpm build --env <environment>` fills it the same way). A new
 `.env.<environment>` scaffolded by `pnpm github:sync` starts from
@@ -78,7 +81,8 @@ deploy job → **environment secrets** (github:sync uploads them).
 **There are no repository secrets.** `RELEASE_PLEASE_TOKEN` is an **environment
 secret on `development`**, read by `release-please` (post-merge-ci), the
 `pat-canary` (scheduled-release-guards), and `dependabot-auto-merge`. All three
-jobs therefore declare `environment: development`:
+jobs therefore declare `environment: development`, and all three run on `main`
+(a push, a schedule, a `workflow_run`):
 
 It is a **managed deploy secret on `development`** (listed in that environment's
 `deploySecrets`): clinozy-infra's `pnpm setup:infra` writes it into `.env.development`
@@ -94,16 +98,44 @@ gh secret set RELEASE_PLEASE_TOKEN --env development --repo albetrios/clinozy-fe
 The token needs Contents + Pull requests + Workflows (read/write) on this repo.
 
 > **`development`, never `production`.** These three are automation jobs, not
-> deploys. `development` has an empty `protection` block, so selecting it grants
-> secret access without gating anything. `production` carries `requiredReviewers`
-> and a `protectedBranches` deployment policy — selecting it would pause
-> post-merge CI for approval on every merge to `main`, and would reject
-> `dependabot-auto-merge` outright (it runs on unprotected PR branches).
+> deploys. `production` carries `requiredReviewers` and would pause post-merge CI
+> for approval on every merge to `main`.
 >
-> **Consequence to keep in mind:** adding _any_ protection rule to `development`
-> now silently blocks all three automation jobs. Pinned by
-> `tests/ci/post-merge-ci.policy.test.ts`, `tests/ci/dependabot-flows.policy.test.ts`,
-> and `tests/ci/release-guards.policy.test.ts`.
+> **`development` allows the `main` branch only** (`deploymentBranchPolicy`
+> `protectedBranches: true`, H-1): it holds an account-wide Netlify token for the
+> site production also serves, and the release PAT, so no job a pull request or a
+> pushed branch starts may select it. A job that must react to a pull request and
+> needs one of those secrets is split: the pull-request half holds nothing, and a
+> `workflow_run` half (which runs main's copy of its file, and runs on `main`) reads
+> the secret and runs no code from the PR — `preview.yml` → `preview-deploy.yml`,
+> `dependabot-approval.yml` → `dependabot-auto-merge.yml`. `e2e-backend.yml` selects
+> the environment only off pull requests. Pinned by
+> `tests/ci/preview-deploy.policy.test.ts`, `tests/ci/dependabot-flows.policy.test.ts`,
+> `tests/ci/post-merge-ci.policy.test.ts` and `tests/ci/release-guards.policy.test.ts`.
+>
+> **Moving the PAT out of `development`** into an environment of its own (only those
+> three jobs selecting it) is not expressible here yet: `pnpm github:sync`'s
+> consistency pre-flight requires every environment to be a Netlify deploy target
+> (`tooling/setup/github/sync-consistency.mjs`). Until then, or until releases move to
+> a GitHub App, the main-only branch policy is what keeps the PAT from a PR.
+
+## Repository variables for pull-request jobs
+
+A job a pull request starts selects no environment, so it sees **repository-level**
+variables only. Two kinds, both public values (a browser sees them in the bundle) and
+both **hand-managed** (`gh variable set <NAME> --repo albetrios/clinozy-fe --body …`):
+
+| Variable                                                                                                                  | Read by                          | Value                                                 |
+| ------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ----------------------------------------------------- |
+| `PREVIEW_VITE_API_BASE_URL`                                                                                               | `preview.yml` (required)         | development's `VITE_API_BASE_URL`; unset → no preview |
+| `PREVIEW_VITE_TURNSTILE_SITE_KEY`, `PREVIEW_VITE_STRIPE_PUBLISHABLE_KEY`                                                  | `preview.yml`                    | development's site / publishable keys                 |
+| `PREVIEW_VITE_POSTHOG_KEY`, `PREVIEW_VITE_POSTHOG_HOST`, `PREVIEW_VITE_PRIVACY_POLICY_URL`, `PREVIEW_VITE_CSP_REPORT_URI` | `preview.yml` (optional)         | development's values                                  |
+| `VITE_PERSONAL_ORGANIZATIONS`, `VITE_TEAM_ORGANIZATIONS`, `VITE_DISABLED_MODULES`, `STORED_FILES_ORIGIN`, …               | `preview.yml`, `e2e-backend.yml` | a repository-level copy of development's variable     |
+
+`PREVIEW_<KEY>` names a value development keeps as a **Secret**: a job may not read a
+synced Secret's name through `vars.*` (`tests/ci/github-actions-hardening.policy.test.ts`).
+A synced **Variable** is read under its own name; with no environment it resolves at
+repository level, and an unset one falls back to the schema default.
 
 ## Commands
 

@@ -32,7 +32,7 @@ dialog stack behind, and a ci-policy guard fails on them (see [One copy of Radix
 ## Node.js (runtime)
 
 - **`package.json` → `engines.node`:** `>=24.15` — **Active LTS** only (currently the **24.x** line). Do not target odd/current non-LTS releases for CI or deploy defaults.
-- **`.nvmrc`** (the one Node pin): `24.21.0` (latest 24 LTS) — use `nvm install` / your version manager so local, CI (`actions/setup-node` reads `.nvmrc`) and agent sandboxes run the same release.
+- **`.nvmrc`** (the one Node pin): `24.21.0` (latest 24 LTS) — use `nvm install` / your version manager so local, CI (`actions/setup-node` reads `.nvmrc`) and agent sandboxes run the same release. A bump also moves `NODE_VERSION` and its `NODE_SHA256_*` checksums in `tooling/setup/agent/tool-versions.sh` (the cloud installer refuses a tarball that does not match; `tests/ci/pinned-installs.policy.test.ts` holds the two versions equal).
 
 ## pnpm overrides (transitive CVEs)
 

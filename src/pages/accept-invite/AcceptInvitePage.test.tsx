@@ -15,6 +15,7 @@ const {
   notifyWarningMock,
   reportErrorMock,
   checkIconMock,
+  useSearchMock,
 } = vi.hoisted(() => ({
   navigateMock: vi.fn(),
   getAccessTokenMock: vi.fn(),
@@ -24,6 +25,7 @@ const {
   notifyWarningMock: vi.fn(),
   reportErrorMock: vi.fn(),
   checkIconMock: vi.fn(),
+  useSearchMock: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
@@ -31,7 +33,7 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
   return {
     ...actual,
     useParams: () => ({ invitationId: 'inv_test' }),
-    useSearch: () => ({ token: 'test-token' }),
+    useSearch: () => useSearchMock() as unknown,
     useNavigate: () => navigateMock,
   };
 });
@@ -65,9 +67,10 @@ vi.mock('@/shared/icons/index.ts', async (importOriginal) => {
 import { ACCEPT_INVITE_REDIRECT_MS } from './accept-invite.constants.ts';
 import { AcceptInvitePage } from './AcceptInvitePage.tsx';
 
+// The token never rides in the redirect URL — it waits in this tab (E-5).
 const LOGIN_REDIRECT = {
   to: '/login',
-  search: { redirect: '/accept-invite/inv_test?token=test-token' },
+  search: { redirect: '/accept-invite/inv_test' },
   replace: true,
 };
 /** Long enough for the post-success redirect timer to have fired. */
@@ -75,6 +78,8 @@ const AFTER_REDIRECT_MS = ACCEPT_INVITE_REDIRECT_MS + 400;
 
 beforeEach(() => {
   vi.resetAllMocks();
+  sessionStorage.clear();
+  useSearchMock.mockReturnValue({ token: 'test-token' });
   getAccessTokenMock.mockReturnValue('token');
   acceptInvitationMock.mockResolvedValue({ organizationId: 'org_1' });
   // The accept names the organization only; its slug comes from the switch.
@@ -99,6 +104,36 @@ describe('AcceptInvitePage', () => {
 
     await waitFor(() => expect(navigateMock).toHaveBeenCalledWith(LOGIN_REDIRECT));
     expect(acceptInvitationMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the token out of the login redirect and accepts with it after sign-in (E-5)', async () => {
+    getAccessTokenMock.mockReturnValue(null);
+    const first = renderWithProviders(<AcceptInvitePage />);
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith(LOGIN_REDIRECT));
+    expect(JSON.stringify(navigateMock.mock.calls)).not.toContain('test-token');
+    first.unmount();
+
+    // Back from signing in: the redirect named the page alone, no `?token=`.
+    useSearchMock.mockReturnValue({});
+    getAccessTokenMock.mockReturnValue('token');
+    renderWithProviders(<AcceptInvitePage />);
+    await waitFor(() =>
+      expect(acceptInvitationMock).toHaveBeenCalledWith('inv_test', 'test-token'),
+    );
+    // Accepting drops the stash: nothing of the token is left in the tab.
+    expect(JSON.stringify({ ...sessionStorage })).not.toContain('test-token');
+  });
+
+  it('never accepts with another invitation’s stashed token', async () => {
+    sessionStorage.setItem(
+      'clinozy:accept-invite-token',
+      JSON.stringify({ invitationId: 'inv_other', token: 'other-token' }),
+    );
+    useSearchMock.mockReturnValue({});
+    renderWithProviders(<AcceptInvitePage />);
+    await waitFor(() =>
+      expect(acceptInvitationMock).toHaveBeenCalledWith('inv_test', undefined),
+    );
   });
 
   it('accepts immediately when a session is present', async () => {

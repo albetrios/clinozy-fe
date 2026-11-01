@@ -2,6 +2,7 @@ import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type * as IdleTimeoutModule from '@/shared/auth/idle-timeout.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -26,7 +27,8 @@ const { viewport, startIdleTimeoutMock, logoutMock } = vi.hoisted(() => {
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => viewport.tier,
 }));
-vi.mock('@/shared/auth/idle-timeout.ts', () => ({
+vi.mock('@/shared/auth/idle-timeout.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof IdleTimeoutModule>()),
   startIdleTimeout: startIdleTimeoutMock,
 }));
 vi.mock('@/shared/auth/service.ts', () => ({

@@ -15,9 +15,18 @@ Claude Code loads this file when it works in `src/core/`. It holds sections move
   (concurrent 401s share ONE refresh) + replay. clinozy-be keeps ONE live access token per
   session — every refresh, workspace switch or other tab's refresh retires the one before it —
   so a 401 for a token replaced while the request was in flight is replayed with the current
-  token, no new refresh; a refresh that waited for the lock while a newer token arrived does
+  token, no new refresh — unless that token names **another organization** (a workspace switch):
+  no replay or retry ever goes out with another clinic's token, the request fails 401 instead,
+  its `error.reason` `WORKSPACE_SWITCHED` (a write then says "This change was not saved because
+  you switched clinic.", never "Your session has expired");
+  a refresh that waited for the lock while a newer token arrived does
   not rotate again. Only a refused refresh, or a token still rejected after two refreshes,
-  means the session is dead → `forceLogout()`. The session's one token names the organization
+  means the session is dead → `forceLogout()` — except a refresh clinozy-be refuses at its own
+  clocks (`error.reason` `idle_timeout` / `session_expired`): that end is deliberate,
+  `logout({ reason })` (`endRefusedSession`). A caller's `signal` (`RequestOptions.signal`,
+  `api.*` init) cancels a request — the fetch, a retry's wait, a replay — and it rejects with
+  the signal's reason (an `AbortError` when that reason is no error), never retried. The
+  session's one token names the organization
   it was last switched to, so a refresh answering for **another** organization than this tab's
   `me/context` (another tab switched) switches the tab back before any request carries it —
   never another clinic's records under this tab's screen. A switch waits for a refresh in
@@ -67,7 +76,7 @@ read via `platformConfig.testMode`), the single home for any test-only behavior.
 ```text
 .env.example         # Reference for all env vars — the ONLY committed file
 .env.local           # Local dev file (gitignored, NODE_ENV=local — the default): flags + secrets
-.env.development     # `development` deploy-env file (gitignored): dev-tooling ON
+.env.development     # `development` deploy-env file (gitignored): test-only switches OFF (a hosted deploy)
 .env.production      # `production` deploy-env file (gitignored): dev-tooling OFF (prod-safe)
 ```
 
@@ -93,9 +102,14 @@ read via `platformConfig.testMode`), the single home for any test-only behavior.
 - **Strict allowed values per environment.** `envProfiles.<env>.allowed` in `env-schema.ts`
   declares the permitted value set per key; `pnpm validate:client-env` **hard-fails** on
   a value out of range (e.g. production requires the diagnostics flags off, version-check on).
+- **Hosted deploys refuse test-only switches** (clinozy-be's A-4). Every workflow that builds a
+  hosted bundle (`reusable-netlify-deploy.yml`, the preview build) sets `HOSTED_DEPLOYMENT=true`;
+  with it, `pnpm validate:client-env` refuses `VITE_TEST_MODE`, `VITE_E2E_HOOKS`, `VITE_DEVTOOLS`
+  and `VITE_DEBUG_LOGGING` on, in development and production alike (`hostedDeploymentRefusals`).
+  Local machines and CI runners never set it; nor does any env file.
 - **Per-environment defaults.** `envProfiles.<env>.defaults` in `env-schema.ts` is the single
-  source of truth for each environment's starting values (local + development: dev-tooling on;
-  production: safe). `pnpm setup:local` writes `envProfiles.local.defaults` into `.env.local`
+  source of truth for each environment's starting values (local: dev-tooling on; development and
+  production: test-only switches off). `pnpm setup:local` writes `envProfiles.local.defaults` into `.env.local`
   (via `injectEnvDefaults`); every default must be ⊆ that key's `allowed` (test-enforced). NOT
   applied by the runtime — defaults reach the app through the env layer, never a mode branch.
 - **Tests are hermetic by construction — two halves, both required.** (1) The Vitest `envDir`

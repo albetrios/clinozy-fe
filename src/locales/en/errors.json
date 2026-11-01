@@ -108,6 +108,9 @@
     "viewAs": {
       "readOnly": "Previews are read-only, so nothing was saved. Exit preview to make changes."
     },
+    "workspaceSwitched": {
+      "notSaved": "This change was not saved because you switched clinic."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Could not add passkey",

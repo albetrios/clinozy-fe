@@ -68,8 +68,10 @@
   // External CLIs invoked from tooling/workflows but not npm dependencies:
   // gitleaks/semgrep (security scanners),
   // stryker (installed ad-hoc by mutation-test.yml),
-  // rg (ripgrep, used by tooling/reports/code-review-report.mjs).
+  // rg (ripgrep, used by tooling/reports/code-review-report.mjs),
+  // jq (the runner's JSON tool; tests/ci/dependabot-flows.policy.test.ts runs the
+  //  auto-merge workflow's review check through it).
   // (gh + python3 removed — knip resolves them via its default binary set,
   //  so listing them here is redundant; re-adding reintroduces a knip hint.)
-  "ignoreBinaries": ["gitleaks", "semgrep", "stryker", "rg"],
+  "ignoreBinaries": ["gitleaks", "semgrep", "stryker", "rg", "jq"],
 }

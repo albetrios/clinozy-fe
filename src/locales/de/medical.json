@@ -238,7 +238,11 @@
     "export": "Exportieren",
     "exportTitle": "Diese Zahlungen als CSV exportieren",
     "exported": "Zahlungen als CSV exportiert",
-    "exportTruncated": "Die ersten 10.000 Zahlungen exportiert — grenze die Filter für den Rest ein"
+    "exportTruncated": "Die ersten 10.000 Zahlungen exportiert — grenze die Filter für den Rest ein",
+    "exportRetryIn_one": "Gerade laufen zu viele Exporte — versuch es in {{count}} Sekunde erneut",
+    "exportRetryIn_other": "Gerade laufen zu viele Exporte — versuch es in {{count}} Sekunden erneut",
+    "exportRetryLater": "Gerade laufen zu viele Exporte — versuch es gleich erneut",
+    "exportUnavailable": "Exporte sind vorübergehend nicht verfügbar. Versuch es gleich noch einmal."
   },
   "credits": {
     "records": "Apothekengutschriften",

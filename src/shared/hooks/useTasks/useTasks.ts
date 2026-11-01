@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { type QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
@@ -46,9 +46,10 @@ import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts'
 
 /*
  * Tasks' server state on clinozy-be (KICKOFF §6.10, one model with Today's queue, Q-T3): the list
- * and the drawer read again every 60s; every write refreshes the task reads and the records it
- * may have changed — and once more after the server's rules have run on it (D81 T7). Writes toast
- * only their errors — the rooms toast success themselves.
+ * and the drawer read again every 60s (the list its first page, G-2); every write refreshes the
+ * task reads and the records it may have changed — a write the server's rules run on, the task
+ * reads only once they have (D81 T7). Writes toast only their errors — the rooms toast success
+ * themselves.
  */
 
 /** What every task write may have changed. */
@@ -61,17 +62,30 @@ const TASK_WRITE_KEYS = [taskQueryKeys.all, ...TASK_SIDE_EFFECT_KEYS];
  */
 const TASK_RULES_SETTLE_MS = 1_500;
 
+/** The one task refresh each query client has waiting for the rules ({@link useRefreshTasksAfterRules}). */
+const rulesRefreshes = new WeakMap<QueryClient, ReturnType<typeof setTimeout>>();
+
 /**
  * The task reads, refreshed once the rules a write asked for have run (D81 T7) — call it after a
  * message sent from a task's chat, or a booking's status moved where a task list shows, so the
  * task it settles leaves without waiting for the 60s poll.
+ *
+ * @remarks
+ * One refresh, however many writes ask (G-2): each call moves the waiting one to
+ * {@link TASK_RULES_SETTLE_MS} after itself, so three outcomes in a row read the task lists —
+ * every loaded page of each — once, after the last one's rules have run.
  */
 export function useRefreshTasksAfterRules(): () => void {
   const queryClient = useQueryClient();
   return useCallback(() => {
-    setTimeout(() => {
-      void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all });
-    }, TASK_RULES_SETTLE_MS);
+    clearTimeout(rulesRefreshes.get(queryClient));
+    rulesRefreshes.set(
+      queryClient,
+      setTimeout(() => {
+        rulesRefreshes.delete(queryClient);
+        void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all });
+      }, TASK_RULES_SETTLE_MS),
+    );
   }, [queryClient]);
 }
 
@@ -86,7 +100,7 @@ export interface TaskQueryOptions {
 
 /**
  * One view of the list — To do, Snoozed or Done — scoped, filtered by type, searched, 50 a page
- * (`GET /app/tasks`, each page joined with its people), read again every 60s.
+ * (`GET /app/tasks`, each page joined with its people), its first page read again every 60s.
  */
 export function useTaskList(
   query: TaskListQueryInput,
@@ -186,9 +200,10 @@ const withoutTask = (rows: TaskRow[], taskId: string): TaskRow[] =>
 /**
  * Record one of a task's outcomes — its record writes, then the task's resolve or snooze (the one
  * write Tasks and Today's queue share). A closing or snoozing outcome takes the row out of every
- * list at once and puts it back if the write fails; the reads refresh, and again once the rules
- * have run (a "Doing well" writes a check-in, an "Unhappy" opens a call-back). Answers the task
- * after, or null for an outcome that writes nothing.
+ * list at once and puts it back if the write fails; the records it wrote refresh at once, the
+ * task reads once the rules have run (a "Doing well" writes a check-in, an "Unhappy" opens a
+ * call-back) — once, not also at once, since that read would be overtaken 1.5s later (G-2).
+ * Answers the task after, or null for an outcome that writes nothing.
  */
 export function useTaskOutcome(
   options: CrudMutationOptions<TaskRecord | null, TaskOutcomeInput> = {},
@@ -197,7 +212,7 @@ export function useTaskOutcome(
   const refreshAfterRules = useRefreshTasksAfterRules();
   return useAppMutation<TaskRecord | null, TaskOutcomeInput, unknown, TaskRow>({
     mutationFn: (input, action) => recordTaskOutcome({ ...input, ...action }),
-    invalidateKeys: TASK_WRITE_KEYS,
+    invalidateKeys: [...TASK_SIDE_EFFECT_KEYS],
     optimisticInfinite: {
       queryKey: taskQueryKeys.lists(organizationId),
       update: (rows, { task, outcomeId }) =>

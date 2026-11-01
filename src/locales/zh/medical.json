@@ -228,7 +228,10 @@
     "export": "导出",
     "exportTitle": "将这些付款导出为 CSV",
     "exported": "付款已导出为 CSV",
-    "exportTruncated": "已导出前 10,000 笔付款——请缩小筛选范围导出其余部分"
+    "exportTruncated": "已导出前 10,000 笔付款——请缩小筛选范围导出其余部分",
+    "exportRetryIn_other": "当前导出请求过多——请在 {{count}} 秒后重试",
+    "exportRetryLater": "当前导出请求过多——请稍后重试",
+    "exportUnavailable": "导出功能暂时不可用，请稍后重试。"
   },
   "credits": {
     "records": "药房抵扣",

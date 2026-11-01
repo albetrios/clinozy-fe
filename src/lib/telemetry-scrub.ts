@@ -9,7 +9,8 @@
  * names missed every param added after it (`q`, SEC-01), so nothing after the
  * path is kept: `$pathname` and `route_viewed`'s `route_id` still say where the
  * person was. Every outgoing event passes through here (Sentry `request.url`,
- * breadcrumbs, spans, extras and contexts; PostHog `properties`, `$set` and
+ * breadcrumbs, spans, extras and contexts; a Session Replay segment's `urls` and
+ * its recording's breadcrumbs and spans; PostHog `properties`, `$set` and
  * `$set_once`).
  */
 
@@ -77,5 +78,110 @@ export function scrubEventUrls<E extends ScrubbableEvent>(event: E): E {
   }
   if (event.extra) scrubObjectUrls(event.extra);
   if (event.contexts) scrubObjectUrls(event.contexts);
+  return event;
+}
+
+/** Structural slice of a Sentry Session Replay event: the pages one segment visited. */
+type ScrubbableReplayEvent = ScrubbableEvent & { type?: string; urls?: string[] };
+
+/**
+ * Scrub a Session Replay event (`type: 'replay_event'`), in place: `urls` — every page the
+ * segment visited, a room's search `?q=` among them — and `request.url`, which the browser SDK
+ * stamps on every event from `location.href`. Replay events skip `beforeSend`, so this runs as an
+ * event processor; any other event comes back untouched (`beforeSend` scrubs those).
+ */
+export function scrubReplayEventUrls<E extends ScrubbableReplayEvent>(event: E): E {
+  if (event.type !== 'replay_event') return event;
+  event.urls?.forEach((url, index, urls) => {
+    urls[index] = scrubSensitiveUrl(url);
+  });
+  return scrubEventUrls(event);
+}
+
+/**
+ * The fields of a Session Replay recording event that carry a URL: a navigation breadcrumb's
+ * `from`/`to`, a slow- or multi-click breadcrumb's `url`, a span's `description` (the page or
+ * request URL) and a link's `href` / an element's `src`.
+ */
+const RECORDING_URL_KEYS: ReadonlySet<string> = new Set([
+  'href',
+  'src',
+  'url',
+  'to',
+  'from',
+  'description',
+]);
+
+/**
+ * Scrub the URLs in one Session Replay recording event, in place — its `beforeAddRecordingEvent`
+ * (the SDK hands it the breadcrumb and span events). Only the {@link RECORDING_URL_KEYS} fields
+ * are rewritten, so recorded text and styles are left as they are.
+ */
+export function scrubRecordingEventUrls<E extends object>(event: E): E {
+  const pending: object[] = [event];
+  for (let next = pending.pop(); next !== undefined; next = pending.pop()) {
+    pending.push(...scrubRecordingFields(next));
+  }
+  return event;
+}
+
+/** Scrub one object's URL fields in place; returns its nested objects, still to visit. */
+function scrubRecordingFields(record: object): object[] {
+  const nested: object[] = [];
+  for (const [key, value] of Object.entries(record)) {
+    if (value && typeof value === 'object') nested.push(value);
+    else if (typeof value === 'string' && RECORDING_URL_KEYS.has(key)) {
+      const scrubbed = scrubSensitiveUrl(value);
+      if (scrubbed !== value) Reflect.set(record, key, scrubbed);
+    }
+  }
+  return nested;
+}
+
+/**
+ * PostHog event properties that carry what a screen showed or where a pointer went: an element's
+ * text and chain (autocapture, dead and rage clicks) and heatmap coordinates. Every capture that
+ * writes them is pinned off at init; this drops them should one ever be switched back on.
+ */
+const POSTHOG_SCREEN_KEYS: readonly string[] = [
+  '$el_text',
+  '$elements',
+  '$elements_chain',
+  '$heatmap_data',
+];
+
+/** PostHog events that exist only to report the screen (see {@link POSTHOG_SCREEN_KEYS}). */
+const POSTHOG_SCREEN_EVENTS: ReadonlySet<string> = new Set([
+  '$autocapture',
+  '$rageclick',
+  '$dead_click',
+  '$$heatmap',
+  '$exception',
+]);
+
+/** Structural slice of a posthog-js `CaptureResult`: lib/ never imports posthog-js. */
+type ScrubbablePostHogEvent = {
+  event?: string;
+  properties?: Record<string, unknown>;
+  $set?: Record<string, unknown>;
+  $set_once?: Record<string, unknown>;
+};
+
+/**
+ * PostHog's `before_send`: drop a screen-reporting event outright, then strip element text and
+ * heatmap data from the properties and the query from every URL in `properties`, `$set` and
+ * `$set_once` (posthog-js carries person properties — `$initial_current_url` — beside
+ * `properties`, not inside it). `null` passes through.
+ */
+export function scrubPostHogEvent<E extends ScrubbablePostHogEvent>(
+  event: E | null,
+): E | null {
+  if (!event) return event;
+  if (event.event !== undefined && POSTHOG_SCREEN_EVENTS.has(event.event)) return null;
+  for (const key of POSTHOG_SCREEN_KEYS)
+    Reflect.deleteProperty(event.properties ?? {}, key);
+  for (const bag of [event.properties, event.$set, event.$set_once]) {
+    if (bag) scrubObjectUrls(bag);
+  }
   return event;
 }

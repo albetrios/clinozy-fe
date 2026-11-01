@@ -46,15 +46,20 @@ flowchart TB
   end
 ```
 
-| Layer         | Path                                      | Role                                              |
-| ------------- | ----------------------------------------- | ------------------------------------------------- |
-| Event catalog | `shared/analytics/analytics.constants.ts` | Event names + super-property keys                 |
-| Capture API   | `shared/analytics/capture.ts`             | Consent gate, context enrichment, URL scrub       |
-| Bootstrap     | `app/analytics/posthog.ts`                | `posthog.init`, identity, router, reset on logout |
-| Web Vitals    | `app/observability/performance.ts`        | `web_vital` events                                |
+| Layer         | Path                                      | Role                                                                                                                                                 |
+| ------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Event catalog | `shared/analytics/analytics.constants.ts` | Event names + super-property keys                                                                                                                    |
+| Capture API   | `shared/analytics/capture.ts`             | Consent gate, context enrichment, URL scrub; `identify` / `group` sent only when the user or the clinic changes (each one reloads the feature flags) |
+| Bootstrap     | `app/analytics/posthog.ts`                | `posthog.init`, identity, router, reset on logout                                                                                                    |
+| Web Vitals    | `app/observability/performance.ts`        | `web_vital` events                                                                                                                                   |
 
-**Privacy:** `autocapture: false`, `disable_session_recording: true`, no emails in
-`identify()`. Every URL in an event — `properties`, `$set` and `$set_once` — loses its query
+**Privacy:** every capture PostHog can switch on from its own dashboard is pinned off in
+`postHogInitOptions` — `autocapture`, `capture_heatmaps`, `capture_dead_clicks`,
+`capture_exceptions`, `rageclick` false; session recording, surveys, conversations, product tours
+and web experiments disabled; `disable_external_dependency_loading: true` (no script from
+PostHog's CDN); `mask_all_text` and `mask_all_element_attributes` on — and `before_send`
+(`scrubPostHogEvent`) drops `$autocapture`, `$rageclick`, `$dead_click`, `$$heatmap` and
+`$exception` events and the element-text and heatmap keys. No emails in `identify()`. Every URL in an event — `properties`, `$set` and `$set_once` — loses its query
 string and fragment in `before_send` (`lib/telemetry-scrub.ts`): the rooms write a search
 (`?q=` — a patient's name, mobile or #ID) and create-drawer prefills into the query.
 

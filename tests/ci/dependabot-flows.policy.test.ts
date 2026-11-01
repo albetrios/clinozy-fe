@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -9,6 +10,10 @@ const autoMerge = readFileSync(
   join(ROOT, '.github/workflows/dependabot-auto-merge.yml'),
   'utf8',
 );
+const approval = readFileSync(
+  join(ROOT, '.github/workflows/dependabot-approval.yml'),
+  'utf8',
+);
 const triage = readFileSync(
   join(ROOT, '.github/workflows/dependabot-ci-triage.yml'),
   'utf8',
@@ -18,20 +23,102 @@ const dependabotConfig = readFileSync(join(ROOT, '.github/dependabot.yml'), 'utf
 // The approval IS the manual gate: only the low-risk npm-non-major group may
 // auto-merge, and only after a maintainer approves, and, for a dependency bump, only
 // once its @smoke e2e against the backend image is green. Everything else is manual.
+//
+// H-1 / H-3: the approval runs dependabot-approval.yml, which holds nothing (a PR can rewrite
+// it); dependabot-auto-merge.yml runs main's copy (workflow_run), checks every condition again
+// from the API — an approval of the head by an OWNER / MEMBER / COLLABORATOR among them — and
+// only then reads the PAT from the main-only development environment.
 describe('dependabot auto-merge policy', () => {
-  it('arms only on a submitted approval review', () => {
-    expect(autoMerge).toContain('pull_request_review:');
-    expect(autoMerge).toContain('types: [submitted]');
-    expect(autoMerge).toContain("github.event.review.state == 'approved'");
-    expect(autoMerge).not.toContain('pull_request_target');
+  it('a submitted approval signals, from a job that holds nothing', () => {
+    expect(approval).toContain('pull_request_review:');
+    expect(approval).toContain('types: [submitted]');
+    expect(approval).toContain("github.event.review.state == 'approved'");
+    expect(approval).not.toMatch(/\$\{\{\s*secrets\./);
+    expect(approval).not.toMatch(/^ +environment:/m);
+    expect(approval).toMatch(/^ {4}permissions: \{\}$/m);
+    expect(approval).toMatch(/^permissions:\n {2}contents: read\n\n/m);
+  });
+
+  it('arms from main only, on the approval signal, never on a pull_request trigger', () => {
+    expect(autoMerge).toContain("workflows: ['Dependabot approval']");
+    expect(autoMerge).toContain('types: [completed]');
+    expect(autoMerge).not.toMatch(/^ {2}pull_request(?:_review|_target)?:/m);
+    expect(autoMerge).not.toContain('actions/checkout');
+    expect(autoMerge).toContain(
+      'github.event.workflow_run.head_repository.full_name == github.repository',
+    );
   });
 
   it('matches only Dependabot-authored PRs in the npm-non-major group', () => {
-    expect(autoMerge).toContain(
+    expect(approval).toContain(
       "github.event.pull_request.user.login == 'dependabot[bot]'",
     );
-    expect(autoMerge).toContain("'npm-non-major'");
+    expect(approval).toContain("'npm-non-major'");
+    // …and checks both again from the API, on the open PR whose head is the approved commit.
+    expect(autoMerge).toContain(
+      '.author.login == "app/dependabot" or .author.login == "dependabot[bot]"',
+    );
+    expect(autoMerge).toContain('contains("npm-non-major")');
+    expect(autoMerge).toContain(
+      'select(.headRefOid == $sha and (.isCrossRepository | not))',
+    );
     expect(autoMerge).not.toContain("'npm-major'");
+  });
+
+  it('counts only an approval of the head by an owner, member or collaborator (H-3)', () => {
+    expect(approval).toContain(
+      `contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.review.author_association)`,
+    );
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: shell expansion, asserted verbatim
+    expect(autoMerge).toContain('repos/${REPOSITORY}/pulls/${number}/reviews');
+    expect(autoMerge).toContain(
+      'select(.commit_id == $sha and (.author_association | IN("OWNER", "MEMBER", "COLLABORATOR"))',
+    );
+    // A reviewer's later "changes requested" withdraws that reviewer's approval.
+    expect(autoMerge).toContain('group_by(.user.login) | map(max_by(.submitted_at))');
+    expect(autoMerge).toContain('--match-head-commit "$HEAD_SHA"');
+  });
+
+  it('the review check reads a trusted approval of the head, and nothing else, as approved', () => {
+    const program =
+      /approvals="\$\(jq -s --arg sha "\$HEAD_SHA" '([\s\S]*?)' reviews\.jsonl\)"/.exec(
+        autoMerge,
+      )?.[1];
+    expect(program).toBeDefined();
+    const review = (
+      login: string,
+      state: string,
+      association: string,
+      commit: string,
+      at: string,
+    ) =>
+      JSON.stringify({
+        user: { login },
+        state,
+        author_association: association,
+        commit_id: commit,
+        submitted_at: at,
+      });
+    const count = (reviews: string[]) => {
+      // eslint-disable-next-line sonarjs/no-os-command-from-path -- fixed 'jq' binary, no user input
+      const result = spawnSync('jq', ['-s', '--arg', 'sha', 'head', program ?? ''], {
+        input: reviews.join('\n'),
+        encoding: 'utf8',
+      });
+      return Number(result.stdout.trim());
+    };
+    expect(count([review('owner', 'APPROVED', 'OWNER', 'head', '1')])).toBe(1);
+    expect(count([review('stranger', 'APPROVED', 'NONE', 'head', '1')])).toBe(0);
+    expect(count([review('contributor', 'APPROVED', 'CONTRIBUTOR', 'head', '1')])).toBe(
+      0,
+    );
+    expect(count([review('member', 'APPROVED', 'MEMBER', 'older', '1')])).toBe(0);
+    expect(
+      count([
+        review('owner', 'APPROVED', 'OWNER', 'head', '1'),
+        review('owner', 'CHANGES_REQUESTED', 'OWNER', 'head', '2'),
+      ]),
+    ).toBe(0);
   });
 
   it('waits for the @smoke e2e on the head before arming auto-merge when a dependency file changed', () => {
@@ -56,7 +143,10 @@ describe('dependabot auto-merge policy', () => {
     expect(wait).toBeLessThan(autoMerge.indexOf('gh pr merge --auto --squash'));
     expect(autoMerge).toContain('--workflow e2e-backend.yml');
     expect(autoMerge).toMatch(/gh run watch [^\n]*--exit-status/);
-    expect(autoMerge).toMatch(/^ {2}actions: read$/m);
+    expect(autoMerge).toMatch(/^ {6}actions: read$/m);
+    // The merge needs both writes when GITHUB_TOKEN is the fallback (see the job's permissions).
+    expect(autoMerge).toMatch(/^ {6}contents: write$/m);
+    expect(autoMerge).toMatch(/^ {6}pull-requests: write$/m);
     // `gh pr diff | grep -q` under pipefail reads a match as "no match" once grep stops early.
     expect(autoMerge).not.toMatch(/gh pr diff[^\n]*\|\s*grep/);
   });
@@ -64,19 +154,24 @@ describe('dependabot auto-merge policy', () => {
   it('uses squash auto-merge with no third-party actions', () => {
     expect(autoMerge).toContain('gh pr merge --auto --squash');
     expect(autoMerge).not.toContain('uses:');
+    expect(approval).not.toContain('uses:');
   });
 
   it('merges with the PAT (github.token fallback) so the merge push triggers post-merge CI', () => {
     // A GITHUB_TOKEN-attributed merge starts no workflows (no post-merge run for
     // that commit). The PAT is an ENVIRONMENT secret, so the job selects the
-    // `development` environment to read it — an environment with no protection
-    // rules. It must never select `production`: this job runs on Dependabot PR
-    // branches, which production's protectedBranches policy would reject.
+    // `development` environment to read it — main only, which a workflow_run job runs
+    // on. It must never select `production`, whose reviewers would gate every merge.
     expect(autoMerge).toMatch(
       /GH_TOKEN:\s*\$\{\{\s*secrets\.RELEASE_PLEASE_TOKEN \|\| secrets\.GITHUB_TOKEN\s*\}\}/,
     );
     expect(autoMerge).toContain('environment: development');
     expect(autoMerge).not.toContain('environment: production');
+    // The PAT reaches the one step that merges, after every check.
+    expect(autoMerge.match(/secrets\.RELEASE_PLEASE_TOKEN/g)).toHaveLength(1);
+    expect(autoMerge.indexOf('secrets.RELEASE_PLEASE_TOKEN')).toBeGreaterThan(
+      autoMerge.indexOf('- name: Enable squash auto-merge'),
+    );
   });
 });
 

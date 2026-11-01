@@ -78,6 +78,8 @@ interface UploadJob {
   organizationId: string | undefined;
   /** Set once storage confirms, so a retry after a failed attach reuses it. */
   key: string | null;
+  /** Cancels the upload in flight — its XHR and its confirm — when the job is dropped (G-4). */
+  cancel: AbortController;
 }
 
 /** The files and callbacks behind the rows, kept out of the store. */
@@ -100,9 +102,15 @@ function patchRow(id: string, patch: Partial<UploadRow>): void {
   }));
 }
 
+/** Forget a job, cancelling whatever of it is still in flight. */
+function dropJob(id: string): void {
+  jobs.get(id)?.cancel.abort();
+  jobs.delete(id);
+}
+
 /** Remove a row; the tray closes — and forgets its batch — once nothing is left. */
 function removeRow(id: string, { departed }: { departed: boolean }): void {
-  jobs.delete(id);
+  dropJob(id);
   useUploadQueueStore.setState((state) => {
     if (!state.rows.some((row) => row.id === id)) return state;
     const rows = state.rows.filter((row) => row.id !== id);
@@ -157,6 +165,7 @@ async function storeBytes(id: string, job: UploadJob): Promise<string | null> {
       purpose: 'organization-file',
       organizationId: job.organizationId,
       onProgress: (fraction) => reportProgress(id, fraction),
+      signal: job.cancel.signal,
     });
     job.key = key;
     return key;
@@ -213,7 +222,13 @@ export const useUploadQueueStore = create<UploadQueueState>((set, get) => ({
     const added = files.map((file): UploadRow => {
       sequence += 1;
       const id = `upload-${sequence}`;
-      jobs.set(id, { file, target, organizationId, key: null });
+      jobs.set(id, {
+        file,
+        target,
+        organizationId,
+        key: null,
+        cancel: new AbortController(),
+      });
       return {
         id,
         name: file.name,
@@ -247,7 +262,7 @@ export const useUploadQueueStore = create<UploadQueueState>((set, get) => ({
   clear: () => {
     for (const timer of leaveTimers.values()) clearTimeout(timer);
     leaveTimers.clear();
-    jobs.clear();
+    for (const id of [...jobs.keys()]) dropJob(id);
     set({ rows: [], departed: 0, collapsed: false });
   },
 }));
@@ -256,7 +271,8 @@ export const useUploadQueueStore = create<UploadQueueState>((set, get) => ({
  * Drop every row queued for another organization and say so when unfinished work went
  * with them. A workspace switch ends the uploads of the workspace being left: their attach
  * would run under the new workspace's token (the API scopes by its `org` claim) against a
- * record of the old one. A dropped job is never attached — `runRow` checks its job first.
+ * record of the old one. A dropped job is never attached — `runRow` checks its job first —
+ * and its bytes stop moving: the XHR is aborted and the confirm never sent (G-4).
  */
 function dropOtherOrganizations(organizationId: string | null): void {
   const { rows } = useUploadQueueStore.getState();
@@ -267,7 +283,7 @@ function dropOtherOrganizations(organizationId: string | null): void {
   for (const row of dropped) {
     clearTimeout(leaveTimers.get(row.id));
     leaveTimers.delete(row.id);
-    jobs.delete(row.id);
+    dropJob(row.id);
   }
   const kept = rows.filter((row) => !dropped.includes(row));
   useUploadQueueStore.setState(

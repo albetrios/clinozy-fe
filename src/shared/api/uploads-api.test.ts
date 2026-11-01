@@ -5,6 +5,9 @@ vi.mock('@/core/http/fetch-client.ts', () => ({
   apiClient: { post: postMock },
 }));
 
+import { clearAccessToken, setAccessToken } from '@/shared/auth/token.ts';
+import { FRONTEND_ERROR_CODES } from '@/shared/errors/frontend-error-codes.ts';
+
 import { uploadFile } from './uploads-api.ts';
 
 const PRESIGN = {
@@ -23,8 +26,10 @@ interface StorageReply {
   status?: number;
   /** Bytes reported through `upload` progress events, out of 100, before the answer. */
   progress?: number[];
-  /** The connection drops instead of answering. */
-  outcome?: 'error' | 'abort';
+  /** The connection drops instead of answering — or never answers at all (`hang`). */
+  outcome?: 'error' | 'abort' | 'hang';
+  /** Runs just before the answer — a workspace switch landing while the bytes moved. */
+  beforeAnswer?: () => void;
 }
 
 /** Every write the fake storage host received, oldest first. */
@@ -42,6 +47,8 @@ class FakeStorageRequest {
   body: unknown = null;
   status = 0;
   withCredentials = false;
+  /** `abort()` was called — the caller let the upload go. */
+  aborted = false;
   readonly headers: Record<string, string> = {};
   readonly upload = new EventTarget();
   private readonly events = new EventTarget();
@@ -59,22 +66,31 @@ class FakeStorageRequest {
     this.events.addEventListener(type, listener);
   }
 
+  abort() {
+    this.aborted = true;
+    this.events.dispatchEvent(new Event('abort'));
+    this.events.dispatchEvent(new Event('loadend'));
+  }
+
   send(body: unknown) {
     this.body = body;
     storageWrites.push(this);
     const reply = nextReply;
     queueMicrotask(() => {
+      if (this.aborted || reply.outcome === 'hang') return;
       for (const loaded of reply.progress ?? []) {
         this.upload.dispatchEvent(
           new ProgressEvent('progress', { lengthComputable: true, loaded, total: 100 }),
         );
       }
+      reply.beforeAnswer?.();
       if (reply.outcome) {
         this.events.dispatchEvent(new Event(reply.outcome));
-        return;
+      } else {
+        this.status = reply.status ?? 200;
+        this.events.dispatchEvent(new Event('load'));
       }
-      this.status = reply.status ?? 200;
-      this.events.dispatchEvent(new Event('load'));
+      this.events.dispatchEvent(new Event('loadend'));
     });
   }
 }
@@ -100,7 +116,18 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  clearAccessToken();
 });
+
+/** An access token scoped to one organization (its `org` claim). */
+function tokenFor(organization: string): string {
+  const encode = (value: object) =>
+    btoa(JSON.stringify(value))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/={1,2}$/, '');
+  return `${encode({ alg: 'HS256' })}.${encode({ sub: 'usr_1', org: organization, exp: 9999999999 })}.c2ln`;
+}
 
 describe('uploadFile', () => {
   it('presigns, writes the bytes to storage, confirms, and returns the FINAL key', async () => {
@@ -122,6 +149,7 @@ describe('uploadFile', () => {
         content_type: 'image/png',
         file_name: 'logo.png',
       }),
+      { signal: undefined },
     );
     expect(storageWrite()).toMatchObject({ method: 'PUT', url: PRESIGN.upload_url });
     expect(storageWrite().headers).toEqual({ 'Content-Type': 'image/png' });
@@ -129,6 +157,7 @@ describe('uploadFile', () => {
       2,
       expect.stringContaining('/uploads/upl_x/confirm'),
       {},
+      { signal: undefined },
     );
     // The attach routes want the promoted key, never the `pending/` path the presigned URL
     // points at — handing them the latter is a 400.
@@ -228,6 +257,61 @@ describe('uploadFile', () => {
     expect(postMock).toHaveBeenCalledTimes(1);
   });
 
+  it('cancels with the caller’s signal: the presign and confirm carry it, the XHR is aborted (G-4)', async () => {
+    postMock.mockResolvedValueOnce({ data: PRESIGN });
+    nextReply = { outcome: 'hang' };
+    const controller = new AbortController();
+
+    const upload = uploadFile({
+      file: logoFile(),
+      purpose: 'organization-logo',
+      organizationId: 'org_a',
+      signal: controller.signal,
+    }).catch((error: unknown) => error);
+    await vi.waitFor(() => expect(storageWrites).toHaveLength(1));
+    controller.abort();
+
+    expect(await upload).toMatchObject({ name: 'AbortError' });
+    expect(storageWrite().aborted).toBe(true);
+    expect(postMock).toHaveBeenCalledTimes(1);
+    expect(postMock.mock.calls[0]?.[2]).toEqual({ signal: controller.signal });
+  });
+
+  it('never starts the write for a signal that has already aborted', async () => {
+    postMock.mockResolvedValueOnce({ data: PRESIGN });
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(
+      uploadFile({
+        file: logoFile(),
+        purpose: 'organization-logo',
+        organizationId: 'org_a',
+        signal: controller.signal,
+      }),
+    ).rejects.toMatchObject({ name: 'AbortError' });
+    expect(storageWrites).toHaveLength(0);
+  });
+
+  it('never confirms under another clinic than the one it started under (G-4)', async () => {
+    setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+    postMock.mockResolvedValueOnce({ data: PRESIGN });
+    nextReply = {
+      // The switch to clinic B lands while the bytes are moving.
+      beforeAnswer: () => setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb')),
+    };
+
+    await expect(
+      uploadFile({
+        file: logoFile(),
+        purpose: 'organization-file',
+        organizationId: 'org_clinicaaaaaaaaaaaaaaaa',
+      }),
+    ).rejects.toMatchObject({ code: FRONTEND_ERROR_CODES.WORKSPACE_SWITCHED });
+    // Presign only: the confirm would have promoted clinic A's file under clinic B's token.
+    expect(postMock).toHaveBeenCalledTimes(1);
+  });
+
   it('throws when confirm comes back as anything other than UPLOADED', async () => {
     confirmsAs('FAILED');
 
@@ -318,6 +402,7 @@ describe('uploadFile', () => {
         organization_id: 'org_a',
         content_type: 'application/pdf',
       }),
+      { signal: undefined },
     );
   });
 

@@ -1,6 +1,11 @@
 import { vi } from 'vitest';
 
-import { startIdleTimeout } from './idle-timeout.ts';
+import {
+  clearActivity,
+  idleFor,
+  markActivity,
+  startIdleTimeout,
+} from './idle-timeout.ts';
 
 const WARN = 5000;
 const LOGOUT = 10_000;
@@ -271,6 +276,37 @@ describe('idle-timeout', () => {
       expect(localStorage).toHaveLength(0);
     });
 
+    // E-2: a load is no proof anyone is there — recording "now" first gave a
+    // browser left alone for hours a fresh grace period on its next load.
+    it('starts from the stored stamp, not from the load', () => {
+      localStorage.setItem(KEY, String(Date.now() - 3 * 60 * 60 * 1000));
+
+      const { onLogout } = start({ storageKey: KEY });
+
+      expect(onLogout).toHaveBeenCalledOnce();
+    });
+
+    it('warns at once, with the remaining grace, when the stamp is inside the warning window', () => {
+      const lastActive = Date.now() - (WARN + 1000);
+      localStorage.setItem(KEY, String(lastActive));
+
+      const { onWarn, onLogout } = start({ storageKey: KEY });
+
+      expect(onWarn).toHaveBeenCalledWith({ logoutAt: lastActive + LOGOUT });
+      expect(onLogout).not.toHaveBeenCalled();
+      // The load did not overwrite the stamp: it is not activity.
+      expect(localStorage.getItem(KEY)).toBe(String(lastActive));
+    });
+
+    it('starts from now when the stored stamp is from the future', () => {
+      localStorage.setItem(KEY, String(Date.now() + 60_000));
+
+      const { onWarn } = start({ storageKey: KEY });
+      vi.advanceTimersByTime(WARN - 1);
+
+      expect(onWarn).not.toHaveBeenCalled();
+    });
+
     it('survives unavailable storage', () => {
       const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
         throw new Error('QuotaExceededError');
@@ -285,6 +321,28 @@ describe('idle-timeout', () => {
       expect(onWarn).toHaveBeenCalledOnce();
       setItem.mockRestore();
       getItem.mockRestore();
+    });
+  });
+
+  describe('the shared stamp, read before a load restores the session', () => {
+    it('reports how long ago any tab was last active', () => {
+      localStorage.setItem(KEY, String(Date.now() - 4000));
+
+      expect(idleFor(KEY)).toBe(4000);
+    });
+
+    it('reports nothing without a usable stamp', () => {
+      expect(idleFor(KEY)).toBeNull();
+      localStorage.setItem(KEY, String(Date.now() + 1000));
+      expect(idleFor(KEY)).toBeNull();
+    });
+
+    it('is stamped by a sign-in and forgotten by a sign-out', () => {
+      markActivity(KEY);
+      expect(idleFor(KEY)).toBe(0);
+
+      clearActivity(KEY);
+      expect(localStorage.getItem(KEY)).toBeNull();
     });
   });
 });

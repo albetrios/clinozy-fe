@@ -20,4 +20,10 @@ describe('RateLimitNotice', () => {
     expect(screen.getByTestId('rate-limit-notice')).toHaveTextContent('12');
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it('shows the countdown from the Retry-After header clinozy-be sends', () => {
+    const err = new HttpError('HTTP 429', 429, '/x', 'GET', undefined, 15);
+    render(<RateLimitNotice error={err} />);
+    expect(screen.getByTestId('rate-limit-notice')).toHaveTextContent('15');
+  });
 });

@@ -100,7 +100,7 @@ describe('product identity', () => {
       'public/robots.txt',
       'catalog-info.yaml',
       '.github/CODEOWNERS',
-      '.github/workflows/preview.yml',
+      '.github/workflows/preview-deploy.yml',
       '.github/workflows/reusable-netlify-deploy.yml',
       'sonar-project.properties',
       'docker-compose.sonar.yml',

@@ -1,6 +1,6 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type { TaskRow } from '@/shared/api/app/tasks-contracts.ts';
@@ -192,6 +192,115 @@ describe('TaskList (tasks.md:18–38)', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = renderList();
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe('TaskList — a long list renders only the rows in view (G-2)', () => {
+  /** A minute past `NOW`, `minutes` later (negative: earlier). */
+  const at = (minutes: number) =>
+    new Date(NOW.getTime() + minutes * 60_000).toISOString();
+  const tasks = (label: string, count: number, dueAt: (index: number) => string) =>
+    Array.from({ length: count }, (_, index) =>
+      taskRow({
+        id: `task_${label.toLowerCase()}_${index + 1}`,
+        title: `${label} task ${index + 1}`,
+        dueAt: dueAt(index),
+      }),
+    );
+  /*
+   * 30 overdue, 40 due later today and 80 on Monday: 150 rows under three headers, 153 entries —
+   * Overdue's header is entry 0, Due today's 31 and Coming up's 72.
+   */
+  const LONG = [
+    ...tasks('Overdue', 30, (index) => at(index - 30)),
+    ...tasks('Today', 40, (index) => at(index + 1)),
+    ...tasks('Monday', 80, (index) => at(2 * 24 * 60 + index)),
+  ];
+  /** The scroller's height in px: ten rows' worth. */
+  const VIEWPORT = 560;
+  /** Where Coming up's 38th row (entry 110) starts: two groups, its header and 37 rows above. */
+  const MONDAY_ROW_THIRTY_EIGHT = 33 + 30 * 56 + 33 + 40 * 56 + 33 + 37 * 56;
+
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(VIEWPORT);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const group = (id: string) => screen.getByTestId(`tasks-group-${id}`);
+  const rowsIn = (id: string) => within(group(id)).queryAllByTestId('tasks-row');
+  const rowIndexes = (id: string) =>
+    rowsIn(id).map((row) => Number(row.getAttribute('aria-rowindex')));
+
+  it('draws the first screen of rows, every group still its own rowgroup', () => {
+    renderList({ rows: LONG });
+    const table = screen.getByRole('table', { name: 'To do' });
+    expect(table).toHaveAttribute('aria-rowcount', '153');
+    expect(
+      within(table)
+        .getAllByRole('rowgroup')
+        .map((rowgroup) => rowgroup.dataset.testid),
+    ).toEqual(['tasks-group-overdue', 'tasks-group-today', 'tasks-group-later']);
+
+    // Ten rows in view plus ten overscan — never the 150.
+    const rendered = screen.getAllByTestId('tasks-row');
+    expect(rendered.length).toBeGreaterThan(0);
+    expect(rendered.length).toBeLessThanOrEqual(20);
+    expect(rowIndexes('overdue')).toEqual(
+      Array.from({ length: rendered.length }, (_, index) => index + 2),
+    );
+    // The groups below are one spacer each: no header, no row.
+    for (const id of ['today', 'later']) {
+      expect(within(group(id)).queryAllByRole('row')).toHaveLength(0);
+      expect(group(id).firstElementChild).toHaveAttribute('aria-hidden', 'true');
+    }
+  });
+
+  it('keeps a group’s header stuck over its rows after the header scrolls past', () => {
+    renderList({ rows: LONG });
+    const scroller = screen.getByTestId('tasks-list').parentElement as HTMLElement;
+    scroller.scrollTop = MONDAY_ROW_THIRTY_EIGHT;
+    fireEvent.scroll(scroller);
+
+    expect(rowsIn('overdue')).toHaveLength(0);
+    expect(rowsIn('today')).toHaveLength(0);
+    const header = within(group('later')).getAllByRole('row')[0];
+    expect(header).toHaveTextContent('Coming up');
+    expect(header).toHaveClass('sticky', 'top-0');
+    expect(header).toHaveAttribute('aria-rowindex', '73');
+    // The rows Coming up starts with sit above the window: a spacer holds their height.
+    expect(header?.nextElementSibling).toHaveAttribute('aria-hidden', 'true');
+    const indexes = rowIndexes('later');
+    expect(indexes).toContain(111);
+    expect(indexes.length).toBeLessThanOrEqual(30);
+    expect(indexes).toEqual(
+      Array.from({ length: indexes.length }, (_, index) => (indexes[0] ?? 0) + index),
+    );
+    expect(within(group('later')).getByText('Monday task 38')).toBeInTheDocument();
+  });
+
+  it('opens a windowed row from the keyboard, the header staying out of the tab order', async () => {
+    const { onOpen } = renderList({ rows: LONG });
+    const [header, first] = within(group('overdue')).getAllByRole('row');
+    expect(header).toHaveAttribute('tabindex', '-1');
+    expect(first).toHaveAttribute('tabindex', '0');
+    first?.focus();
+    await userEvent.setup().keyboard('{Enter}');
+    expect(onOpen).toHaveBeenCalledWith(LONG[0]);
+  });
+
+  it('renders every row, unindexed, at 60 entries and under', () => {
+    // 30 overdue and 28 due today: 58 rows under two headers.
+    renderList({ rows: LONG.slice(0, 58) });
+    expect(screen.getAllByTestId('tasks-row')).toHaveLength(58);
+    expect(screen.getByRole('table')).not.toHaveAttribute('aria-rowcount');
+    expect(screen.getAllByTestId('tasks-row')[0]).not.toHaveAttribute('aria-rowindex');
+  });
+
+  it('has no accessibility violations while it virtualises', async () => {
+    const { container } = renderList({ rows: LONG });
     expect(await axe(container)).toHaveNoViolations();
   });
 });

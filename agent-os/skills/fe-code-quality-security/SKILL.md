@@ -134,7 +134,8 @@ Runs on every PR to `main`. Multiple parallel jobs across several workflows.
 | Workflow      | File                                  | Purpose                         |
 | ------------- | ------------------------------------- | ------------------------------- |
 | CI            | `.github/workflows/pr-ci.yml`         | Core quality + security checks  |
-| Preview       | `.github/workflows/preview.yml`       | PR preview builds               |
+| Preview       | `.github/workflows/preview.yml`       | PR preview builds (no secrets)  |
+| Preview       | `.github/workflows/preview-deploy.yml`| PR preview publish, from main   |
 | Post-merge CI | `.github/workflows/post-merge-ci.yml` | release-please + Netlify deploy |
 | Mutation Test | `.github/workflows/mutation-test.yml` | Stryker mutation tests (weekly) |
 
@@ -172,7 +173,8 @@ Runs on every PR to `main`. Multiple parallel jobs across several workflows.
 | `.gitleaks.toml`                      | 2     | Gitleaks secret scan allowlist           |
 | `package.json` (lint-staged)          | 2     | Staged file patterns for ESLint/Prettier |
 | `.github/workflows/pr-ci.yml`         | 3     | CI workflow with quality + security jobs |
-| `.github/workflows/preview.yml`       | 3     | PR preview builds                        |
+| `.github/workflows/preview.yml`       | 3     | PR preview builds (no secrets)           |
+| `.github/workflows/preview-deploy.yml`| 3     | PR preview publish + teardown, from main |
 | `.github/workflows/post-merge-ci.yml` | 3     | release-please + Netlify deploy          |
 | `.github/workflows/mutation-test.yml` | 3     | Stryker mutation tests                   |
 | `.semgrepignore`                      | 3     | Semgrep ignore patterns for CI           |

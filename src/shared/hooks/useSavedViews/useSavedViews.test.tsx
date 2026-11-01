@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   LEAD_CHAT_WIDTH,
   useDevicePrefsStore,
@@ -10,10 +11,17 @@ import {
   sameSavedViewFilters,
   savedViewFilters,
   savedViewName,
+  savedViewsKey,
   useSavedViews,
 } from './useSavedViews.ts';
 
+/** Sign a person in on this device. */
+function signIn(id: string): void {
+  useAuthStore.getState().setUser({ id, email: `${id}@clinic.test`, role: 'user' });
+}
+
 beforeEach(() => {
+  signIn('usr_ada');
   useDevicePrefsStore.setState({
     hiddenColumns: {},
     savedViews: {},
@@ -73,9 +81,9 @@ describe('useSavedViews', () => {
     act(() => {
       id = result.current.save({ status: ['vip'], q: ['priya'] }, 'VIP').id;
     });
-    expect(useDevicePrefsStore.getState().savedViews.patients).toEqual([
-      { id, name: 'VIP', filters: { status: ['vip'] } },
-    ]);
+    expect(
+      useDevicePrefsStore.getState().savedViews[savedViewsKey('usr_ada', 'patients')],
+    ).toEqual([{ id, name: 'VIP', filters: { status: ['vip'] } }]);
     expect(result.current.find({ status: ['vip'] })?.id).toBe(id);
     expect(result.current.find({ status: ['new'] })).toBeUndefined();
 
@@ -84,6 +92,34 @@ describe('useSavedViews', () => {
 
     act(() => result.current.remove(id));
     expect(result.current.views).toEqual([]);
+  });
+
+  // F-9: a clinic PC is shared — the next person to sign in must not find these views.
+  it('keeps each person’s views to them on a shared device', () => {
+    const ada = renderHook(() => useSavedViews('patients'));
+    act(() => {
+      ada.result.current.save({ status: ['vip'] }, 'VIP');
+    });
+
+    act(() => signIn('usr_bob'));
+    expect(renderHook(() => useSavedViews('patients')).result.current.views).toEqual([]);
+
+    act(() => signIn('usr_ada'));
+    expect(renderHook(() => useSavedViews('patients')).result.current.views).toHaveLength(
+      1,
+    );
+  });
+
+  it('keeps and saves nothing with nobody signed in', () => {
+    act(() => useAuthStore.getState().clearAuth());
+    const { result } = renderHook(() => useSavedViews('patients'));
+
+    act(() => {
+      result.current.save({ status: ['vip'] }, 'VIP');
+    });
+
+    expect(result.current.views).toEqual([]);
+    expect(useDevicePrefsStore.getState().savedViews).toEqual({});
   });
 
   it('keeps a stable empty list across renders', () => {

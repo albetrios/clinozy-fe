@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
+import type * as IdleTimeoutModule from '@/shared/auth/idle-timeout.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -20,7 +21,8 @@ const { startIdleTimeoutMock, idleHandle, logoutMock, forceLogoutMock } = vi.hoi
     };
   },
 );
-vi.mock('@/shared/auth/idle-timeout.ts', () => ({
+vi.mock('@/shared/auth/idle-timeout.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof IdleTimeoutModule>()),
   startIdleTimeout: startIdleTimeoutMock,
 }));
 
