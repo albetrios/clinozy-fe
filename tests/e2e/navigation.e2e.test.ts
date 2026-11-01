@@ -41,12 +41,17 @@ test.describe('Navigation', () => {
     page,
   }) => {
     // Auth-required since INV-4 (`requireAuth` in `beforeLoad`). What must survive
-    // the detour is the invite itself: path AND single-use token.
+    // the detour is the invite itself: the invite page carried as the post-login
+    // redirect. The single-use token never rides in that URL: it waits in the tab's
+    // sessionStorage (E-5).
     await page.goto('/accept-invite/inv_expired?token=tok_e2e_guest');
     await expect(page).toHaveURL(/\/login\?redirect=/, { timeout: 10000 });
     const redirect = new URL(page.url()).searchParams.get('redirect') ?? '';
     expect(redirect).toContain('/accept-invite/inv_expired');
-    expect(redirect).toContain('token=tok_e2e_guest');
+    expect(page.url()).not.toContain('tok_e2e_guest');
+    expect(
+      await page.evaluate(() => sessionStorage.getItem('clinozy:accept-invite-token')),
+    ).toContain('tok_e2e_guest');
     await expectLoginFormReady(page);
   });
 

@@ -168,6 +168,13 @@ shared `storageState` pre-answers cookie consent so the card never sits on anoth
 spec's button. `test.use({ storageState: { cookies: [], origins: [] } })` starts
 undecided (`consent-card.e2e.test.ts`).
 
+**Signed in, the card asks again — the sign-in helpers answer it.** An answer stands only
+for the user who gave it, and the pre-answer is a signed-out one, so the card returns once
+a test signs in. `establishSessionInPage` and `loginViaEmailCodeUI` (`tests/utils/e2e-auth.ts`)
+register a `page.addLocatorHandler` that clicks "Reject all" whenever the card stands over an
+action. A spec that asserts on the card after sign-in calls `keepConsentCardForTheTest(page)`
+before signing in.
+
 **CSS contracts — sweep computed styles, and ship a control.** jsdom resolves neither
 `@theme` nor `calc()`, so a unit test can only pin the stylesheet's _text_. When the
 claim is "nothing on this screen still has X", ask the browser: one `page.evaluate` over

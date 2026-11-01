@@ -1,6 +1,9 @@
 import { type BrowserContext, expect, type Page, test } from '@playwright/test';
 
-import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
+import {
+  keepConsentCardForTheTest,
+  registerNewUserAndGoToToday,
+} from '@/tests/utils/e2e-auth.ts';
 import {
   byTestId,
   expectLoginFormReady,
@@ -295,6 +298,7 @@ test.describe('Cookie card', () => {
       'DATABASE_URL must reach clinozy-be Postgres (auth.mail_outbox)',
     ).toBe(true);
     await page.setViewportSize({ width: 1440, height: 900 });
+    keepConsentCardForTheTest(page);
     await registerNewUserAndGoToToday(page);
 
     // Answered while signed in: kept in the cookie, and sent to the account as a receipt
@@ -331,6 +335,7 @@ test.describe('Cookie card', () => {
     // The whole sign-up runs with the card still up — including the onboarding wizard, whose
     // Continue button sits at the very end of the page, exactly where a full-width card lands.
     // The page reserves the card's height at its end, so every step can be scrolled clear of it.
+    keepConsentCardForTheTest(page);
     await registerNewUserAndGoToToday(page);
     await expect(byTestId(page, 'consent-banner')).toBeVisible();
 
