@@ -54,6 +54,37 @@ export async function navigateInApp(page: Page, path: string): Promise<void> {
   }, path);
 }
 
+/** Pages whose test is about the cookie card itself: no sign-in helper answers it there. */
+const pagesThatKeepTheConsentCard = new WeakSet<Page>();
+/** Pages a sign-in helper has already set to answer the cookie card. */
+const pagesThatAnswerTheConsentCard = new WeakSet<Page>();
+
+/**
+ * Leaves the cookie card to the test — call it before signing in, in a spec that asserts on the
+ * card a signed-in user sees (`consent-card.e2e.test.ts`).
+ */
+export function keepConsentCardForTheTest(page: Page): void {
+  pagesThatKeepTheConsentCard.add(page);
+}
+
+/**
+ * Answers the cookie card "Reject all" whenever it stands over something the test acts on.
+ *
+ * The shared storage state pre-answers the card signed out, and an answer stands only for the
+ * user who gave it (`useConsentStore`, F-4) — so the card asks again once a test signs in, and the
+ * user is new every run, so no seeded cookie can name them. Answering through the card itself
+ * does what a person does: the cookie then carries this user's `decidedBy`, and the card stays
+ * closed for the rest of the test.
+ */
+async function answerConsentCardWhenItBlocks(page: Page): Promise<void> {
+  if (pagesThatKeepTheConsentCard.has(page) || pagesThatAnswerTheConsentCard.has(page))
+    return;
+  pagesThatAnswerTheConsentCard.add(page);
+  await page.addLocatorHandler(page.getByTestId('consent-banner'), async () => {
+    await byTestId(page, 'consent-reject').click();
+  });
+}
+
 /**
  * Hands the page a session's access token through the dev-only
  * `__clinozyFeEstablishSession` hook (`src/main.tsx`): the app holds it in
@@ -64,6 +95,7 @@ export async function establishSessionInPage(
   page: Page,
   accessToken: string,
 ): Promise<void> {
+  await answerConsentCardWhenItBlocks(page);
   // A session opened this way lands in clinics as an owner who chose "Explore first".
   await exploreClinicSetupFirst(page);
   await page.waitForFunction(() => globalThis.__clinozyFeEstablishSession != null, null, {
@@ -174,6 +206,7 @@ export async function loginViaEmailCodeUI(
   email = uniqueE2eEmail('e2e-ui'),
 ): Promise<{ email: string }> {
   requireDatabaseUrl();
+  await answerConsentCardWhenItBlocks(page);
   await gotoApp(page, '/login');
   await installE2eCaptchaHeadersOnAuthApi(page);
   await fillTestId(page, 'auth-email', email);

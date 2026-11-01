@@ -46,12 +46,17 @@ test.describe('Live routes integration', () => {
       page,
     }) => {
       // Not a public page any more (INV-4): the accept needs a session whose email
-      // matches the invite, so the guard asks for one before the page renders.
+      // matches the invite, so the guard asks for one before the page renders. The
+      // single-use token never rides in the redirect: it waits in the tab's
+      // sessionStorage (E-5).
       await gotoApp(page, '/accept-invite/inv_expired?token=tok_e2e_guest');
       await expect(page).toHaveURL(/\/login\?redirect=/, { timeout: 10000 });
       const redirect = new URL(page.url()).searchParams.get('redirect') ?? '';
       expect(redirect).toContain('/accept-invite/inv_expired');
-      expect(redirect).toContain('token=tok_e2e_guest');
+      expect(page.url()).not.toContain('tok_e2e_guest');
+      expect(
+        await page.evaluate(() => sessionStorage.getItem('clinozy:accept-invite-token')),
+      ).toContain('tok_e2e_guest');
       await expectLoginFormReady(page);
     });
 

@@ -15,8 +15,10 @@ const E2E_BASE_URL = EXTERNAL_BASE_URL ?? `http://localhost:${E2E_PORT}`;
 
 /**
  * The shared storage state pre-answers the cookie card (Reject all, in the consent cookie) so it
- * never sits over another spec's button. A cookie is keyed by host, so it is re-pointed at the host
- * under test. It is a session cookie: nothing ages it during a run.
+ * never sits over another spec's button while signed out. That answer is a signed-out one, so the
+ * card asks again once a test signs in — the sign-in helpers answer it then
+ * (`tests/utils/e2e-auth.ts`). A cookie is keyed by host, so it is re-pointed at the host under
+ * test. It is a session cookie: nothing ages it during a run.
  */
 const storageState = {
   ...committedState,
