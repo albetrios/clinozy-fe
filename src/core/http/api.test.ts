@@ -75,6 +75,26 @@ describe('api', () => {
     expect(apiClient.get).toHaveBeenCalledWith('/api/v1/app/branches/my');
   });
 
+  it('get and post hand a caller’s signal to apiClient, so the read or write can be cancelled (G-4)', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({ data: [] });
+    vi.mocked(apiClient.post).mockResolvedValue({ data: {} });
+    const { signal } = new AbortController();
+
+    await api.get('/app/branches/my', { signal });
+    await api.post('/app/appointments/{appointment_id}/cancel', {
+      params: { appointment_id: 'appt_x' },
+      body: { cancel_reason: 'patient_asked' },
+      signal,
+    });
+
+    expect(apiClient.get).toHaveBeenCalledWith('/api/v1/app/branches/my', { signal });
+    expect(apiClient.post).toHaveBeenCalledWith(
+      '/api/v1/app/appointments/appt_x/cancel',
+      { cancel_reason: 'patient_asked' },
+      { signal },
+    );
+  });
+
   it("post sends the body and the action's idempotency key", async () => {
     vi.mocked(apiClient.post).mockResolvedValue({ data: {} });
 

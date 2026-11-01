@@ -3,6 +3,7 @@ import type { AnyRouter } from '@tanstack/react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { platformConfig } from '@/core/config/env.ts';
+import { scrubRecordingEventUrls } from '@/lib/telemetry-scrub.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -16,7 +17,7 @@ import {
   resetConsentForTests,
 } from '@/tests/utils/consent-cookie.ts';
 
-import { initSentry } from './sentry.ts';
+import { initSentry, sentryTracePropagationTargets } from './sentry.ts';
 
 vi.mock('@sentry/react', () => ({
   init: vi.fn(),
@@ -32,6 +33,7 @@ vi.mock('@sentry/react', () => ({
   consoleLoggingIntegration: vi.fn(() => ({ name: 'logs' })),
   feedbackIntegration: vi.fn(() => ({ name: 'feedback' })),
   addIntegration: vi.fn(),
+  addEventProcessor: vi.fn(),
   getReplay: vi.fn(),
 }));
 
@@ -96,10 +98,58 @@ describe('initSentry', () => {
     expect(Sentry.replayIntegration).toHaveBeenCalledWith({
       maskAllText: true,
       blockAllMedia: true,
+      // A link's target carries the page's query; the SDK's own three stay masked too.
+      maskAttributes: ['title', 'placeholder', 'aria-label', 'href'],
+      beforeAddRecordingEvent: scrubRecordingEventUrls,
     });
     // Signed-out boot: user context cleared, org tags cleared.
     expect(Sentry.setUser).toHaveBeenCalledWith(null);
     expect(Sentry.setTag).toHaveBeenCalledWith('organization_id', undefined);
+  });
+
+  it('scrubs the page URLs of every Session Replay segment — replay events skip beforeSend (F-1)', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    await initSentry(ROUTER);
+
+    expect(Sentry.addEventProcessor).toHaveBeenCalledTimes(1);
+    const processor = vi.mocked(Sentry.addEventProcessor).mock.calls[0]?.[0];
+    const segment = {
+      type: 'replay_event' as const,
+      urls: ['https://app.x.dev/o/clinic/patients?q=Priya%20Shah'],
+      request: { url: 'https://app.x.dev/o/clinic/patients?q=Priya%20Shah' },
+    };
+    const out = (await processor?.(segment, {})) as typeof segment;
+    expect(JSON.stringify(out)).not.toMatch(/Priya/);
+    expect(out.urls).toEqual(['https://app.x.dev/o/clinic/patients']);
+  });
+
+  it('sends trace headers to clinozy-be alone — its exact origin and same-origin /api (F-6)', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    await initSentry(ROUTER);
+    expect(initConfig().tracePropagationTargets).toEqual(
+      sentryTracePropagationTargets(platformConfig.apiBaseUrl),
+    );
+
+    const matches = (targets: RegExp[], url: string) =>
+      targets.some((target) => target.test(url));
+    const deployed = sentryTracePropagationTargets('https://api.clinozy.example/');
+    expect(matches(deployed, 'https://api.clinozy.example/api/v1/app/contacts')).toBe(
+      true,
+    );
+    expect(matches(deployed, '/api/v1/auth/me/context')).toBe(true);
+    // Any other host — another `api.` subdomain, a look-alike, a page naming the origin.
+    expect(matches(deployed, 'https://api.stripe.com/v1/tokens')).toBe(false);
+    expect(matches(deployed, 'https://api.pwnedpasswords.com/range/ABCDE')).toBe(false);
+    expect(matches(deployed, 'https://api.clinozy.example.evil.dev/api/v1')).toBe(false);
+    expect(matches(deployed, 'https://evil.dev/?u=https://api.clinozy.example/')).toBe(
+      false,
+    );
+    expect(matches(deployed, 'http://localhost:4000/anything')).toBe(false);
+
+    const sameOrigin = sentryTracePropagationTargets('');
+    expect(sameOrigin).toHaveLength(1);
+    expect(matches(sameOrigin, '/api/v1/app/patients')).toBe(true);
+    expect(matches(sameOrigin, 'https://api.example.com/api/v1')).toBe(false);
   });
 
   it('keeps session recording and profiling off without the analytics consent', async () => {

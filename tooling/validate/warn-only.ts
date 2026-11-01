@@ -59,14 +59,14 @@ export const WARN_ONLY_CHECKS: readonly WarnOnlyCheck[] = [
       'the nightly runs it to write the incremental build info for the next PRs; the PR type-check lane is the gate',
   },
   {
-    workflow: '.github/workflows/preview.yml',
+    workflow: '.github/workflows/preview-deploy.yml',
     step: 'Preview smoke (best-effort)',
     mechanism: 'continue-on-error',
     reason:
       'a preview deploy is a review aid, not a release; the governed deploys run the same smoke as a blocking step',
   },
   {
-    workflow: '.github/workflows/preview.yml',
+    workflow: '.github/workflows/preview-deploy.yml',
     step: 'Probe live CSP and HSTS (best-effort)',
     mechanism: 'continue-on-error',
     reason:

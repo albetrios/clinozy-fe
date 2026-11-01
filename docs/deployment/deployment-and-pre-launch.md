@@ -50,7 +50,7 @@ Single trunk (`main`) drives both GitHub environments by **purpose**, not by bra
 - **Feature branches**
   - Branch from `main`, open a PR back into `main`, squash-merge (auto-deletes the branch on merge).
   - The **PR CI workflow** (`.github/workflows/pr-ci.yml`) runs on PRs to `main` (lint, type-check, tests, build, security).
-  - The **Preview workflow** (`.github/workflows/preview.yml`) uploads a `dist/` artifact for manual testing.
+  - The **Preview build** (`.github/workflows/preview.yml`) builds `dist/` with no secret and uploads it; **Preview deploy** (`.github/workflows/preview-deploy.yml`, from `main`) publishes it to the PR's `pr-<n>` alias for manual testing.
 
 - **After merge to `main`**
   - **Post-merge CI** (`.github/workflows/post-merge-ci.yml`) runs on push to `main`:

@@ -75,6 +75,60 @@ describe('initPostHog', () => {
     );
   });
 
+  it('pins off every capture PostHog could switch on remotely, and masks what is left (F-3)', async () => {
+    const { initPostHog, phMock } = await loadFreshPostHog();
+    initPostHog();
+    expect(phMock.init).toHaveBeenCalledWith(
+      'phc_test',
+      expect.objectContaining({
+        autocapture: false,
+        capture_heatmaps: false,
+        capture_dead_clicks: false,
+        capture_exceptions: false,
+        rageclick: false,
+        disable_session_recording: true,
+        disable_surveys: true,
+        disable_conversations: true,
+        disable_product_tours: true,
+        disable_web_experiments: true,
+        disable_external_dependency_loading: true,
+        mask_all_text: true,
+        mask_all_element_attributes: true,
+      }),
+    );
+  });
+
+  it('before_send drops screen-reporting events and element text (F-3)', async () => {
+    const { initPostHog, phMock } = await loadFreshPostHog();
+    initPostHog();
+    const options = vi.mocked(phMock.init).mock.calls[0]?.[1] as unknown as {
+      before_send: (event: unknown) => unknown;
+    };
+    for (const name of [
+      '$autocapture',
+      '$rageclick',
+      '$dead_click',
+      '$$heatmap',
+      '$exception',
+    ]) {
+      expect(options.before_send({ event: name, properties: {} })).toBeNull();
+    }
+    const out = options.before_send({
+      event: 'route_viewed',
+      properties: {
+        $el_text: 'Priya Shah · 98765 43210',
+        $elements: [{ $el_text: 'Priya Shah' }],
+        $elements_chain: 'a:text="Priya Shah"',
+        $heatmap_data: { '/patients': [{ x: 1, y: 2 }] },
+        route_id: '/organization/$organizationSlug/patients',
+      },
+    }) as { properties: Record<string, unknown> };
+    expect(JSON.stringify(out)).not.toMatch(/Priya|98765/);
+    expect(out.properties).toEqual({
+      route_id: '/organization/$organizationSlug/patients',
+    });
+  });
+
   it('does NOT initialize without analytics consent', async () => {
     const { initPostHog, phMock } = await loadFreshPostHog({ consent: false });
     initPostHog();

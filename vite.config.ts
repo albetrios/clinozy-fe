@@ -9,6 +9,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, loadEnv, type PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import { appShellPrecache } from './plugins/app-shell-precache.ts';
 import { applyBuildEnvironment } from './plugins/build-environment.ts';
 import { cspApiOrigin } from './plugins/csp-api-origin.ts';
 import { devServerMode } from './plugins/dev-server-mode.ts';
@@ -83,7 +84,10 @@ export default defineConfig(({ command, mode }) => {
       // Substitutes {{PRODUCT_*}} in index.html; runs `pre` so the CSP pass below
       // sees final markup. Keeps branding out of the rebrand surface entirely.
       productIdentityHtml(),
-      cspApiOrigin(env.VITE_API_BASE_URL, env.VITE_CSP_REPORT_URI),
+      cspApiOrigin(env.VITE_API_BASE_URL, env.VITE_CSP_REPORT_URI, {
+        storedFilesOrigin: env.STORED_FILES_ORIGIN,
+        sentryDsn: env.VITE_SENTRY_DSN,
+      }),
 
       // PWA — injectManifest mode avoids workbox-build/terser race condition in Vite 7
       VitePWA({
@@ -122,6 +126,12 @@ export default defineConfig(({ command, mode }) => {
             // the clinic setup, then kept offline by the `app-assets` runtime cache — not
             // downloaded by every install (feat-clinic-setup G6).
             '**/pin-[0-9][0-9]-*.js',
+          ],
+          // Then down to the app shell — the first paint, the fonts, the root files and the
+          // chunks the shell loads lazily at boot; every other chunk is fetched when first used
+          // and kept by the `app-assets` runtime cache (plugins/app-shell-precache.ts, F-8).
+          manifestTransforms: [
+            appShellPrecache(path.resolve(import.meta.dirname, 'dist')),
           ],
         },
       }),

@@ -11,14 +11,18 @@ test.describe('Accept invite', () => {
     // `/accept-invite/$invitationId` is auth-required (INV-4, `requireAuth` in the
     // route's `beforeLoad`): the recipient of an invite email is usually NOT signed
     // in, and that is the common path — so a guest goes to sign-in FIRST, with the
-    // whole link (token included) carried as the post-login redirect. The page's
+    // invite page carried as the post-login redirect. The single-use token never
+    // rides in that URL: it waits in the tab's sessionStorage (E-5). The page's
     // error card is for a signed-in user; a guest never sees it.
     await gotoApp(page, '/accept-invite/inv_expired?token=tok_e2e_guest');
 
     await expect(page).toHaveURL(/\/login\?redirect=/, { timeout: 10000 });
     const redirect = new URL(page.url()).searchParams.get('redirect') ?? '';
     expect(redirect).toContain('/accept-invite/inv_expired');
-    expect(redirect).toContain('token=tok_e2e_guest');
+    expect(page.url()).not.toContain('tok_e2e_guest');
+    expect(
+      await page.evaluate(() => sessionStorage.getItem('clinozy:accept-invite-token')),
+    ).toContain('tok_e2e_guest');
     await expectLoginFormReady(page);
   });
 

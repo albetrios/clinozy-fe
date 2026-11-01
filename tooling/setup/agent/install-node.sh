@@ -35,6 +35,9 @@
 # Fails FAST (set -euo pipefail): a setup-time install error should surface, not
 # leave a half-broken toolchain. Idempotent: re-running is a no-op once the
 # pinned version is present (Setup scripts re-run on cache rebuilds).
+#
+# Verified (H-12): the tarball must match the SHA-256 tool-versions.sh pins for this version
+# (NODE_SHA256_LINUX_<ARCH>, for NODE_VERSION — .nvmrc's version); anything else is refused.
 set -euo pipefail
 
 readonly DIST_INDEX="https://nodejs.org/dist/index.json"
@@ -42,7 +45,9 @@ readonly INSTALL_PREFIX="${NODE_INSTALL_PREFIX:-/opt}"
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 
-log() { printf 'install-node: %s\n' "$*" >&2; }
+LOG_TAG="install-node"
+# shellcheck source=tooling/setup/agent/lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 
 # .nvmrc may pin a bare major (`24`), a major.minor (`24.19`), or an exact
 # major.minor.patch (`24.21.0` — what this repo pins today, the latest 24 LTS).
@@ -130,24 +135,32 @@ case "$(uname -m)" in
 esac
 readonly arch
 
-readonly tarball="node-v${version}-linux-${arch}.tar.xz"
-readonly url="https://nodejs.org/dist/v${version}/${tarball}"
+readonly node_tarball="node-v${version}-linux-${arch}.tar.xz"
+readonly node_url="https://nodejs.org/dist/v${version}/${node_tarball}"
 
 if ! mkdir -p "${INSTALL_PREFIX}" 2>/dev/null || [ ! -w "${INSTALL_PREFIX}" ]; then
   log "cannot write to ${INSTALL_PREFIX} — run as root or set NODE_INSTALL_PREFIX to a writable dir."
   exit 1
 fi
 
-log "downloading ${url}"
+log "downloading ${node_url}"
 # Stage inside INSTALL_PREFIX so the final swap is a same-filesystem rename.
 staging_dir="$(mktemp -d "${INSTALL_PREFIX}/.node-install.XXXXXX")"
 cleanup() { rm -rf "${staging_dir}"; }
 trap cleanup EXIT
 
-curl -fsSL --max-time 300 "${url}" -o "${staging_dir}/${tarball}"
+if [ "${version}" != "$(pinned_version NODE_VERSION)" ]; then
+  log "ERROR: tool-versions.sh pins checksums for Node $(pinned_version NODE_VERSION), not ${version} — update NODE_VERSION and its NODE_SHA256_* lines with .nvmrc."
+  exit 1
+fi
+arch_key="$(printf '%s' "${arch}" | tr '[:lower:]' '[:upper:]')"
+if ! download_verified "${node_url}" "${staging_dir}/${node_tarball}" "$(pinned_version "NODE_SHA256_LINUX_${arch_key}")"; then
+  log "ERROR: the Node tarball could not be downloaded or did not match its pinned SHA-256."
+  exit 1
+fi
 
 mkdir -p "${staging_dir}/unpacked"
-tar -xJf "${staging_dir}/${tarball}" -C "${staging_dir}/unpacked" --strip-components=1
+tar -xJf "${staging_dir}/${node_tarball}" -C "${staging_dir}/unpacked" --strip-components=1
 
 # Replace atomically-ish rather than untarring over the old tree, so a version
 # change never leaves stale files from the previous install behind.

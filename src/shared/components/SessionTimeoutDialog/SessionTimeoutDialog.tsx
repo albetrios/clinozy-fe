@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SESSION } from '@/core/config/constants.ts';
 import { formatCountdown, secondsUntil } from '@/lib/countdown.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
-import { type IdleTimeoutHandle, startIdleTimeout } from '@/shared/auth/idle-timeout.ts';
+import {
+  IDLE_ACTIVITY_STORAGE_KEY,
+  IDLE_LOGOUT_AFTER_MS,
+  type IdleTimeoutHandle,
+  startIdleTimeout,
+} from '@/shared/auth/idle-timeout.ts';
 import { forceLogout, logout, type SessionEndReason } from '@/shared/auth/service.ts';
 import { startSessionLifetimeWatch } from '@/shared/auth/session-lifetime.ts';
 import {
@@ -18,19 +23,14 @@ import { reportError } from '@/shared/errors/errorHandler.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
-/** Warn after 5 minutes idle, auto-logout after grace (90 s) */
-const WARN_AFTER_MS = 5 * 60 * 1000;
-const GRACE_MS = 90 * 1000;
-const LOGOUT_AFTER_MS = WARN_AFTER_MS + GRACE_MS;
-
 /**
- * Last-activity timestamp shared by every tab (a number, never a token). The
- * session is one per browser but this dialog mounts once per tab: unshared, a
- * tab left in the background counts itself idle and signs the user out of the
- * tab they are working in. Derived from `PRODUCT_NAMESPACE`, like the other
- * auth storage keys.
+ * Warn after 5 minutes idle, auto-logout after grace (90 s) — `SESSION` in
+ * `core/config/constants.ts`, the limits a page load checks too. Activity is
+ * shared by every tab through {@link IDLE_ACTIVITY_STORAGE_KEY}: the session is
+ * one per browser but this dialog mounts once per tab.
  */
-const IDLE_ACTIVITY_STORAGE_KEY = `${PRODUCT_NAMESPACE}:last-activity`;
+const WARN_AFTER_MS = SESSION.IDLE_WARN_AFTER_MS;
+const GRACE_MS = SESSION.IDLE_GRACE_MS;
 
 /**
  * - `idle` — nothing to show.
@@ -138,7 +138,7 @@ function SessionTimeoutDialogBody() {
 
     const idle = startIdleTimeout({
       warnAfterMs: WARN_AFTER_MS,
-      logoutAfterMs: LOGOUT_AFTER_MS,
+      logoutAfterMs: IDLE_LOGOUT_AFTER_MS,
       storageKey: IDLE_ACTIVITY_STORAGE_KEY,
       onWarn: ({ logoutAt }) => {
         setPhase('warning');

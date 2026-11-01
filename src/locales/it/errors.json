@@ -108,6 +108,9 @@
     "viewAs": {
       "readOnly": "L’anteprima è di sola lettura, quindi non è stato salvato nulla. Esci dall’anteprima per apportare modifiche."
     },
+    "workspaceSwitched": {
+      "notSaved": "Questa modifica non è stata salvata perché hai cambiato clinica."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Impossibile aggiungere la passkey",

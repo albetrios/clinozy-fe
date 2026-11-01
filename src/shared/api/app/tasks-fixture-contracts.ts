@@ -4,7 +4,7 @@ import { type TaskKind, taskSchema } from './app-schema.ts';
 
 /**
  * The fixture world's task record — what `world.tasks` holds for the chat column's fixture path:
- * the fixture chat history (`messages-api.ts`) and the fixture contact threads
+ * the fixture chat history (`fixtures/chat.fixtures.ts`, test support) and the fixture contact threads
  * (`fixtures/contact-threads.fixtures.ts`). The Tasks room and Today's work queue read clinozy-be
  * (`tasks-contracts.ts`, D155) — no fixture server or rule job runs on these any more; this goes
  * with the chat's fixture path.

@@ -12,10 +12,18 @@ import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { broadcastLogout } from '@/shared/auth/auth-channel.ts';
 import { skipAutoGoogleSignIn } from '@/shared/auth/auto-google-sign-in.ts';
+import {
+  clearActivity,
+  IDLE_LOGOUT_AFTER_MS,
+  idleFor,
+  markActivity,
+} from '@/shared/auth/idle-timeout.ts';
+import { clearReturnTo } from '@/shared/auth/redirect-safety.ts';
 import { cancelTokenRefresh, scheduleTokenRefresh } from '@/shared/auth/refresh-timer.ts';
 import {
   clearSessionStart,
   hasSessionHint,
+  isSessionExpired,
   markSessionStart,
 } from '@/shared/auth/session-lifetime.ts';
 import {
@@ -88,6 +96,10 @@ function endSessionOffScreen(): void {
     cancelTokenRefresh();
     clearAccessToken();
     clearSessionStart();
+    clearActivity();
+    // A deep link stashed for an OAuth round trip is this session's: the next
+    // person to sign in on this tab must not be sent to it (F-9).
+    clearReturnTo();
     // The wizard's saved progress holds PII (names, invite emails); the next
     // load must not find it. Its in-memory copy goes with the screen.
     useOnboardingStore.persist.clearStorage();
@@ -268,6 +280,51 @@ async function settleSignInAtBoot(signIn: Promise<void>): Promise<void> {
   }
 }
 
+/**
+ * Throw unless this boot has a session to ask the server for — the checks that come before any
+ * `/auth/refresh`: a sign-out still owed to the server, no session hint, a session lapsed while
+ * the browser was closed.
+ */
+function assertSessionToRestore(generation: number): void {
+  // A sign-out the server never heard about comes first: restoring that
+  // session is exactly what the user asked not to happen. This boot is a
+  // guest's whatever the server answers, so the login screen does not wait
+  // for the revoke — it finishes behind it, and a sign-in waits for it
+  // instead (`settlePendingRevoke`).
+  if (isRevokePending()) {
+    pendingRevoke ??= finishPendingRevoke(generation);
+    throw new Error('Signed out');
+  }
+  /*
+   * No session hint: this browser has never signed in, or it signed out.
+   * Either way there is nothing on the server to restore, and asking is a
+   * round trip on the critical path of the login screen that can only ever
+   * answer 401 — measured on a fresh visit, `/auth/refresh` was the single
+   * backend call the login page made, and in production it is cross-origin
+   * and over TLS.
+   *
+   * This is NOT authorizing on the hint, which the hint may never be used
+   * for: it grants nothing and trusts nothing. It declines to ASK when the
+   * answer is already known, and every interactive sign-in writes the hint
+   * (`establishSession` → `markSessionStart`, reached by the email, OAuth
+   * callback and MFA paths alike) while logout clears it.
+   *
+   * The one false negative is a browser whose localStorage was cleared
+   * while its HttpOnly cookie survived — a selective wipe, not a normal
+   * one. That visitor sees the login screen and signs in again, which is
+   * the same outcome the old code produced whenever the refresh failed.
+   */
+  if (!hasSessionHint()) throw new Error('No session hint');
+  // A session this browser left past its idle limit or its absolute cap is
+  // not restored: refreshing first and checking afterwards handed a browser
+  // left alone for hours its session back, every page load (E-2).
+  const lapsed = lapsedSessionReason();
+  if (lapsed) {
+    endLapsedSessionAtBoot(lapsed, generation);
+    throw new Error('Session lapsed');
+  }
+}
+
 export function startAuthBootstrap(): Promise<void> {
   if (signInAtBoot) {
     authBootstrapPromise ??= settleSignInAtBoot(signInAtBoot);
@@ -276,35 +333,7 @@ export function startAuthBootstrap(): Promise<void> {
   authBootstrapPromise ??= (async () => {
     const generation = authGeneration;
     try {
-      // A sign-out the server never heard about comes first: restoring that
-      // session is exactly what the user asked not to happen. This boot is a
-      // guest's whatever the server answers, so the login screen does not wait
-      // for the revoke — it finishes behind it, and a sign-in waits for it
-      // instead (`settlePendingRevoke`).
-      if (isRevokePending()) {
-        pendingRevoke ??= finishPendingRevoke(generation);
-        throw new Error('Signed out');
-      }
-      /*
-       * No session hint: this browser has never signed in, or it signed out.
-       * Either way there is nothing on the server to restore, and asking is a
-       * round trip on the critical path of the login screen that can only ever
-       * answer 401 — measured on a fresh visit, `/auth/refresh` was the single
-       * backend call the login page made, and in production it is cross-origin
-       * and over TLS.
-       *
-       * This is NOT authorizing on the hint, which the hint may never be used
-       * for: it grants nothing and trusts nothing. It declines to ASK when the
-       * answer is already known, and every interactive sign-in writes the hint
-       * (`establishSession` → `markSessionStart`, reached by the email, OAuth
-       * callback and MFA paths alike) while logout clears it.
-       *
-       * The one false negative is a browser whose localStorage was cleared
-       * while its HttpOnly cookie survived — a selective wipe, not a normal
-       * one. That visitor sees the login screen and signs in again, which is
-       * the same outcome the old code produced whenever the refresh failed.
-       */
-      if (!hasSessionHint()) throw new Error('No session hint');
+      assertSessionToRestore(generation);
       await silentRefresh();
     } catch (error) {
       if (generation !== authGeneration) return;
@@ -312,6 +341,10 @@ export function startAuthBootstrap(): Promise<void> {
       // the next guard to wait on the bootstrap — the login page's — asks again instead of
       // settling for this attempt.
       if (saidNothingAboutSession(error)) authBootstrapPromise = null;
+      // The server's own clocks ended it while the browser was away (E-2): as deliberate an end
+      // as the app's, so the login screen this boot lands on must not sign straight back in.
+      const serverEnd = serverSessionEndOf(error);
+      if (serverEnd) noteSessionEndedAtBoot(serverEnd);
       const { isAuthenticated } = useAuthStore.getState();
       if (!(isAuthenticated || getAccessToken())) {
         if (platformConfig.debugLogging) {
@@ -326,6 +359,50 @@ export function startAuthBootstrap(): Promise<void> {
     }
   })();
   return authBootstrapPromise;
+}
+
+/**
+ * Why the session this browser holds may not be restored at boot, if it may not: older than the
+ * absolute cap (`session_expired`), or no activity in any tab for the idle limit
+ * (`idle_timeout`) — read from the stored stamps, before anything records new activity.
+ */
+function lapsedSessionReason(): 'idle_timeout' | 'session_expired' | null {
+  if (isSessionExpired()) return 'session_expired';
+  const idle = idleFor();
+  return idle !== null && idle >= IDLE_LOGOUT_AFTER_MS ? 'idle_timeout' : null;
+}
+
+/**
+ * Say that a session ended by a clock — the app's or clinozy-be's — before this boot could restore
+ * it: the `session_ended` event, and no auto-Google sign-in to undo it.
+ */
+function noteSessionEndedAtBoot(reason: 'idle_timeout' | 'session_expired'): void {
+  captureAnalyticsEvent(ANALYTICS_EVENTS.sessionEnded, { reason });
+  skipAutoGoogleSignIn();
+}
+
+/**
+ * End, at boot, a session the app's own clocks have already ended — the boot-time half of
+ * {@link logout}.
+ *
+ * @remarks
+ * Ending a session is a server-side act, but a page load has no access token to revoke it
+ * with (it lives in memory only), and {@link logout} would send the revoke without one and
+ * then reload the tab onto `/login`, dropping the deep link. So it is ended the way a sign-out
+ * whose revoke never landed is: the revoke is marked pending and finished behind the login
+ * screen ({@link finishPendingRevoke} — a refresh only to mint the token the revoke needs, the
+ * session never hydrated). The boot stays a guest's, the guards send the user to `/login` with
+ * the deep link, and the end is deliberate, so auto-Google may not undo it.
+ */
+function endLapsedSessionAtBoot(
+  reason: 'idle_timeout' | 'session_expired',
+  generation: number,
+): void {
+  noteSessionEndedAtBoot(reason);
+  clearSessionStart();
+  clearActivity();
+  markRevokePending();
+  pendingRevoke ??= finishPendingRevoke(generation);
 }
 
 /**
@@ -469,7 +546,46 @@ async function onThisTabsOrganization({
  * never got an answer (offline, timeout). Only the former proves there is no
  * session left to revoke; see {@link finishPendingRevoke}.
  */
-class RefreshRejectedError extends Error {}
+class RefreshRejectedError extends Error {
+  /** The refusal's `error.reason`, when clinozy-be gave one ({@link serverSessionEndOf}). */
+  readonly reason: string | undefined;
+
+  constructor(message: string, reason: string | undefined) {
+    super(message);
+    this.reason = reason;
+  }
+}
+
+/**
+ * The session end a refused refresh names, if it names one: clinozy-be refuses `/auth/refresh`
+ * with a `401` whose `error.reason` is `idle_timeout` past its idle limit (30 minutes) and
+ * `session_expired` past its absolute cap (12 hours) — the server's own clocks, the same two
+ * ends the app's clocks keep (E-2). Anything else is `null`: a dead session.
+ */
+function serverSessionEndOf(error: unknown): 'idle_timeout' | 'session_expired' | null {
+  if (!(error instanceof RefreshRejectedError)) return null;
+  const { reason } = error;
+  return reason === 'idle_timeout' || reason === 'session_expired' ? reason : null;
+}
+
+/**
+ * End the session a refused refresh says is over — the fetch client's 401 handler hands every
+ * refusal here.
+ *
+ * @remarks
+ * At the server's idle limit or age cap the end is as deliberate as the app's own clocks make
+ * it, so it goes the same way: {@link logout} with that reason — revoked, and auto-Google
+ * sign-in suppressed, so `/login` does not sign the user straight back in. Any other refusal
+ * (revoked, signed out everywhere, an unknown reason) is a dead session: {@link forceLogout}.
+ */
+export function endRefusedSession(refusal: unknown): void {
+  const reason = serverSessionEndOf(refusal);
+  if (reason) {
+    void logout({ reason });
+    return;
+  }
+  forceLogout();
+}
 
 /**
  * The refresh got no usable answer: no response at all (offline, timed out), a throttle (429) or a
@@ -533,6 +649,12 @@ function refusalMessage(data: unknown, status: number): string {
   return envelope?.error?.detail ?? envelope?.message ?? `Refresh failed (${status})`;
 }
 
+/** The refusal's machine `error.reason`, when the envelope carries one. */
+function refusalReason(data: unknown): string | undefined {
+  const reason = (data as { error?: { reason?: unknown } } | null)?.error?.reason;
+  return typeof reason === 'string' ? reason : undefined;
+}
+
 /** The access token in a refresh answer (enveloped or bare, snake or camel case). */
 function accessTokenOf(data: unknown): string | undefined {
   const payload =
@@ -549,7 +671,12 @@ async function fetchRefreshToken(): Promise<string> {
     throw new RefreshUnansweredError(`Refresh failed (${response.status})`);
   }
   const data = (await response.json()) as unknown;
-  if (!response.ok) throw new RefreshRejectedError(refusalMessage(data, response.status));
+  if (!response.ok) {
+    throw new RefreshRejectedError(
+      refusalMessage(data, response.status),
+      refusalReason(data),
+    );
+  }
 
   const token = accessTokenOf(data);
   if (typeof token !== 'string' || token.length === 0) {
@@ -598,6 +725,9 @@ export async function establishSession(accessToken: string): Promise<void> {
   clearRevokePending();
   setAccessToken(accessToken);
   markSessionStart();
+  // Signing in is activity: the idle clock a load or the dialog reads starts here, not at a
+  // stamp the previous session left.
+  markActivity();
   try {
     await hydrateSessionFromContext(generation);
     if (generation === authGeneration) scheduleTokenRefresh();

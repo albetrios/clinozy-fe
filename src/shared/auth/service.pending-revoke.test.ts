@@ -23,6 +23,10 @@ const REVOKE_PENDING_KEY = `${PRODUCT_NAMESPACE}:logout-pending`;
 const SKIP_AUTO_GOOGLE_KEY = `${PRODUCT_NAMESPACE}-auth-skip-auto-google`;
 const SESSION_STARTED_AT_KEY = `${PRODUCT_NAMESPACE}:session-started-at`;
 
+const LAST_ACTIVITY_KEY = `${PRODUCT_NAMESPACE}:last-activity`;
+const RETURN_TO_KEY = `${PRODUCT_NAMESPACE}-auth:return-to`;
+const HOUR_MS = 60 * 60 * 1000;
+
 /** Put the browser in the state a returning, previously signed-in one is in. */
 function markPreviouslySignedIn(): void {
   localStorage.setItem(SESSION_STARTED_AT_KEY, String(Date.now()));
@@ -324,6 +328,93 @@ describe('auth/service — sign-outs that stay signed out', () => {
       expect(token.getAccessToken()).toBeNull();
       expect(useAuthStore.getState().isAuthenticated).toBe(false);
       expect(useAuthStore.getState().isLoading).toBe(false);
+    });
+  });
+
+  /*
+   * E-2: the load recorded "now" as the last activity and then refreshed silently, so a
+   * browser left alone for hours got its session back on every page load. The stored stamps
+   * are read first; a lapsed session is ended server-side, never restored.
+   */
+  describe('a page load after the session lapsed (E-2)', () => {
+    function answerRefreshThenRevoke(): void {
+      fetchMock
+        .mockResolvedValueOnce(json({ data: { access_token: TOKEN } })) // the revoke's token
+        .mockResolvedValueOnce(json({})); // POST /auth/logout
+    }
+
+    it('idle for 3 hours: revoked behind the login screen, never restored', async () => {
+      markPreviouslySignedIn();
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now() - 3 * HOUR_MS));
+      answerRefreshThenRevoke();
+
+      await service.startAuthBootstrap();
+      await service.settlePendingRevoke();
+
+      // The one refresh mints the token the revoke needs; the session is never hydrated.
+      expect(requests(fetchMock)).toEqual(['POST /auth/refresh', 'POST /auth/logout']);
+      expect(fetchMeContextMock).not.toHaveBeenCalled();
+      expect(token.getAccessToken()).toBeNull();
+      expect(useAuthStore.getState().isAuthenticated).toBe(false);
+      expect(captureMock).toHaveBeenCalledWith(expect.anything(), {
+        reason: 'idle_timeout',
+      });
+      // A deliberate end: the login screen may not sign the user straight back in.
+      expect(sessionStorage.getItem(SKIP_AUTO_GOOGLE_KEY)).toBe('1');
+      expect(localStorage.getItem(SESSION_STARTED_AT_KEY)).toBeNull();
+      expect(localStorage.getItem(REVOKE_PENDING_KEY)).toBeNull();
+    });
+
+    it('past the 12-hour cap: ended as session_expired, not refreshed back', async () => {
+      localStorage.setItem(SESSION_STARTED_AT_KEY, String(Date.now() - 13 * HOUR_MS));
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+      answerRefreshThenRevoke();
+
+      await service.startAuthBootstrap();
+      await service.settlePendingRevoke();
+
+      expect(requests(fetchMock)).toEqual(['POST /auth/refresh', 'POST /auth/logout']);
+      expect(fetchMeContextMock).not.toHaveBeenCalled();
+      expect(captureMock).toHaveBeenCalledWith(expect.anything(), {
+        reason: 'session_expired',
+      });
+    });
+
+    it('a recent stamp restores the session as before', async () => {
+      markPreviouslySignedIn();
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now() - 60_000));
+      fetchMock.mockResolvedValueOnce(json({ data: { access_token: TOKEN } }));
+      fetchMeContextMock.mockResolvedValue(SAMPLE_CTX);
+
+      await service.startAuthBootstrap();
+
+      expect(requests(fetchMock)).toEqual(['POST /auth/refresh']);
+      expect(useAuthStore.getState().isAuthenticated).toBe(true);
+      expect(captureMock).not.toHaveBeenCalled();
+    });
+
+    it('a sign-in stamps activity, so the next load is not read as idle', async () => {
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now() - 3 * HOUR_MS));
+      fetchMeContextMock.mockResolvedValue(SAMPLE_CTX);
+
+      await service.establishSession(TOKEN);
+
+      expect(Number(localStorage.getItem(LAST_ACTIVITY_KEY))).toBeGreaterThan(
+        Date.now() - 1000,
+      );
+    });
+  });
+
+  // F-9: what this session left in storage is not the next person's on this browser.
+  describe('what a sign-out leaves behind', () => {
+    it('forgets the stashed deep link and the activity stamp', () => {
+      sessionStorage.setItem(RETURN_TO_KEY, '/organization/acme/patients/pat_1');
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+
+      service.forceLogout({ reason: 'logout' });
+
+      expect(sessionStorage.getItem(RETURN_TO_KEY)).toBeNull();
+      expect(localStorage.getItem(LAST_ACTIVITY_KEY)).toBeNull();
     });
   });
 

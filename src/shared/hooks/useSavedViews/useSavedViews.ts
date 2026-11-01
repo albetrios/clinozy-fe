@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   type SavedView,
   useDevicePrefsStore,
@@ -47,10 +48,23 @@ export function savedViewName(
 }
 
 /**
- * Saved filter views of one table, kept on this device
- * (`useDevicePrefsStore.savedViews[tableId]`, KICKOFF §3.3): filter values
- * only, never the search text. Toasts are the caller's — the Filters popover
- * says "View “…” saved", the chips track "View removed".
+ * Where one person's views of one table live in `useDevicePrefsStore.savedViews`.
+ *
+ * @remarks
+ * Per signed-in user, not per device: a clinic PC is shared, and a view names
+ * what one person filters by (their staff, their tags) — the next person to sign
+ * in on it must not find it, and the first must find theirs again (F-9).
+ */
+export function savedViewsKey(userId: string, tableId: string): string {
+  return `${userId}:${tableId}`;
+}
+
+/**
+ * The signed-in user's saved filter views of one table, kept on this device
+ * (`useDevicePrefsStore.savedViews[savedViewsKey(user, tableId)]`, KICKOFF §3.3):
+ * filter values only, never the search text. Nobody signed in: no views, and
+ * nothing is saved. Toasts are the caller's — the Filters popover says "View
+ * “…” saved", the chips track "View removed".
  */
 export function useSavedViews(tableId: string): {
   views: readonly SavedView[];
@@ -59,7 +73,11 @@ export function useSavedViews(tableId: string): {
   /** The saved view with exactly these filters, if any. */
   find: (filters: SavedViewFilters) => SavedView | undefined;
 } {
-  const views = useDevicePrefsStore((state) => state.savedViews[tableId] ?? NO_VIEWS);
+  const userId = useAuthStore((state) => state.user?.id ?? null);
+  const key = userId === null ? null : savedViewsKey(userId, tableId);
+  const views = useDevicePrefsStore(
+    (state) => (key === null ? undefined : state.savedViews[key]) ?? NO_VIEWS,
+  );
   const saveView = useDevicePrefsStore((state) => state.saveView);
   const removeView = useDevicePrefsStore((state) => state.removeView);
 
@@ -70,15 +88,17 @@ export function useSavedViews(tableId: string): {
         name,
         filters: savedViewFilters(filters),
       };
-      saveView(tableId, view);
+      if (key !== null) saveView(key, view);
       return view;
     },
-    [saveView, tableId],
+    [saveView, key],
   );
 
   const remove = useCallback(
-    (viewId: string) => removeView(tableId, viewId),
-    [removeView, tableId],
+    (viewId: string) => {
+      if (key !== null) removeView(key, viewId);
+    },
+    [removeView, key],
   );
 
   const find = useCallback(

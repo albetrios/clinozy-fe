@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { scrubEventUrls, scrubObjectUrls, scrubSensitiveUrl } from './telemetry-scrub.ts';
+import {
+  scrubEventUrls,
+  scrubObjectUrls,
+  scrubRecordingEventUrls,
+  scrubReplayEventUrls,
+  scrubSensitiveUrl,
+} from './telemetry-scrub.ts';
 
 describe('scrubSensitiveUrl — single-use secrets', () => {
   it('drops ?token= with the rest of the query', () => {
@@ -132,5 +138,98 @@ describe('scrubEventUrls', () => {
     const event = { type: 'transaction' };
     expect(() => scrubEventUrls(event)).not.toThrow();
     expect(scrubEventUrls(event)).toBe(event);
+  });
+});
+
+describe('scrubReplayEventUrls — Session Replay segments (F-1)', () => {
+  it('drops the query from every page a segment visited and from its request URL', () => {
+    const event = {
+      type: 'replay_event',
+      urls: [
+        'https://app.x.dev/o/clinic/patients?q=Priya%20Shah',
+        '/o/clinic/leads?q=98765',
+      ],
+      request: { url: 'https://app.x.dev/o/clinic/patients?q=Priya%20Shah' },
+    };
+
+    expect(scrubReplayEventUrls(event)).toBe(event);
+
+    expect(JSON.stringify(event)).not.toMatch(/Priya|98765/);
+    expect(event.urls).toEqual([
+      'https://app.x.dev/o/clinic/patients',
+      '/o/clinic/leads',
+    ]);
+    expect(event.request.url).toBe('https://app.x.dev/o/clinic/patients');
+  });
+
+  it('leaves an event that is not a replay segment as it is — beforeSend owns those', () => {
+    const event = { request: { url: 'https://app.x.dev/patients?q=Priya' } };
+    scrubReplayEventUrls(event);
+    expect(event.request.url).toBe('https://app.x.dev/patients?q=Priya');
+  });
+
+  it('copes with a segment that names no page', () => {
+    const event = { type: 'replay_event' };
+    expect(() => scrubReplayEventUrls(event)).not.toThrow();
+  });
+});
+
+describe('scrubRecordingEventUrls — the recording’s breadcrumbs and spans (F-1)', () => {
+  it('drops the query from a navigation breadcrumb, a span and a click breadcrumb', () => {
+    const navigation = {
+      type: 5,
+      data: {
+        tag: 'breadcrumb',
+        payload: {
+          category: 'navigation',
+          data: { from: '/o/clinic/patients?q=Priya', to: '/o/clinic/leads?q=98765' },
+        },
+      },
+    };
+    const span = {
+      type: 5,
+      data: {
+        tag: 'performanceSpan',
+        payload: {
+          op: 'resource.fetch',
+          description: 'https://api.x.dev/api/v1/app/contacts?q=98765',
+          data: { request: { url: 'https://api.x.dev/api/v1/app/contacts?q=98765' } },
+        },
+      },
+    };
+    const click = {
+      type: 5,
+      data: {
+        tag: 'breadcrumb',
+        payload: {
+          category: 'ui.multiClick',
+          data: { url: 'https://app.x.dev/a?q=Priya' },
+        },
+      },
+    };
+
+    for (const event of [navigation, span, click]) {
+      expect(scrubRecordingEventUrls(event)).toBe(event);
+      expect(JSON.stringify(event)).not.toMatch(/Priya|98765/);
+    }
+    expect(navigation.data.payload.data.to).toBe('/o/clinic/leads');
+    expect(span.data.payload.description).toBe('https://api.x.dev/api/v1/app/contacts');
+  });
+
+  it('rewrites only URL fields — a message or recorded text with a "/" stays whole', () => {
+    const event = {
+      type: 5,
+      data: {
+        tag: 'breadcrumb',
+        payload: {
+          category: 'ui.click',
+          message: '/patients?q=selector#id',
+          href: '/p?q=1',
+        },
+      },
+    };
+    scrubRecordingEventUrls(event);
+    expect(event.data.payload.message).toBe('/patients?q=selector#id');
+    expect(event.data.payload.href).toBe('/p');
   });
 });

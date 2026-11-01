@@ -28,6 +28,11 @@ import {
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
+import { isHttpError } from '@/shared/errors/HttpError.ts';
+import {
+  getRateLimitRetryAfterSeconds,
+  isRateLimitError,
+} from '@/shared/errors/rate-limit.ts';
 import { canExportRows, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
@@ -118,7 +123,22 @@ function ExportAction({ params }: { params: LedgerListParams }) {
         if (file.truncated) notify.warning(t(MEDICAL_KEYS.payments.exportTruncated));
         else notify.success(t(MEDICAL_KEYS.payments.exported));
       })
-      .catch((error: unknown) => notifyError(error))
+      .catch((error: unknown) => {
+        // A busy or rate-limited clinic is told when to come back (the server's Retry-After);
+        // a 503 means the exports are down for now. Anything else is the error's own message.
+        if (isRateLimitError(error)) {
+          const seconds = getRateLimitRetryAfterSeconds(error);
+          notify.error(
+            seconds === undefined
+              ? t(MEDICAL_KEYS.payments.exportRetryLater)
+              : t(MEDICAL_KEYS.payments.exportRetryIn, { count: seconds }),
+          );
+        } else if (isHttpError(error) && error.status === 503) {
+          notify.error(t(MEDICAL_KEYS.payments.exportUnavailable));
+        } else {
+          notifyError(error);
+        }
+      })
       .finally(() => setBusy(false));
   };
   return (

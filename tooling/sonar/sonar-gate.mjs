@@ -17,6 +17,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import { parse } from 'dotenv';
 
 import { requireTool } from '../ci/require-tool.mjs';
+import { isMain } from '../ci/script.mjs';
 
 const PROJECT_KEY = 'clinozy-fe';
 const COMPOSE_FILE = 'docker-compose.sonar.yml';
@@ -334,44 +335,98 @@ async function fetchOpenIssues(token) {
   return issues;
 }
 
-/** @param {string} token */
+/**
+ * @typedef {{ ruleKey: string, component: string, line?: number, message: string, vulnerabilityProbability?: string }} SonarHotspot
+ */
+
+/**
+ * Every security hotspot still to review. A failed query stops the gate (it used to count as zero
+ * hotspots, so an unreachable hotspot API passed the push).
+ * @param {string} token
+ * @returns {Promise<SonarHotspot[]>}
+ */
 async function fetchOpenHotspots(token) {
-  const response = await sonarApi(
-    `/api/hotspots/search?projectKey=${PROJECT_KEY}&status=TO_REVIEW&ps=1`,
-    { basicAuth: `${token}:` },
-  );
-  if (!response.ok) return 0;
-  return (await response.json()).paging?.total ?? 0;
+  /** @type {SonarHotspot[]} */
+  const hotspots = [];
+  for (let page = 1; page <= 20; page += 1) {
+    const response = await sonarApi(
+      `/api/hotspots/search?projectKey=${PROJECT_KEY}&status=TO_REVIEW&ps=100&p=${page}`,
+      { basicAuth: `${token}:` },
+    );
+    if (!response.ok)
+      die(`failed to query SonarQube hotspots (HTTP ${response.status}).`);
+    const parsed = await response.json();
+    hotspots.push(...(parsed.hotspots ?? []));
+    if (
+      hotspots.length >= (parsed.paging?.total ?? 0) ||
+      (parsed.hotspots ?? []).length === 0
+    )
+      break;
+  }
+  return hotspots;
+}
+
+/** A finding's file, without the `<project>:` prefix SonarQube puts on its component. */
+function fileOf(component) {
+  return component.includes(':') ? component.split(':').slice(1).join(':') : component;
+}
+
+/** `file:line`, or the file alone when SonarQube gives no line. */
+function locationOf(finding) {
+  const file = fileOf(finding.component);
+  return finding.line ? `${file}:${finding.line}` : file;
+}
+
+/** The most findings of each kind the report lists, the rest counted. */
+const LISTED_FINDINGS = 50;
+
+/**
+ * The gate's failure report: each issue, and each hotspot to review, with its rule, file and line
+ * — from SonarQube's findings only, so no token or credential can reach it.
+ * @param {{ issues: SonarIssue[], hotspots: SonarHotspot[], dashboard: string }} findings
+ * @returns {string}
+ */
+export function formatFindings({ issues, hotspots, dashboard }) {
+  const lines = [
+    `\n[sonar-gate] ✗ SonarQube found ${issues.length} issue(s)` +
+      `${hotspots.length > 0 ? ` and ${hotspots.length} security hotspot(s) to review` : ''} — fix them before pushing.\n`,
+  ];
+  for (const issue of issues.slice(0, LISTED_FINDINGS)) {
+    lines.push(
+      `  ${issue.severity.padEnd(8)} ${issue.rule.padEnd(22)} ${locationOf(issue)}`,
+      `      ${issue.message}`,
+    );
+  }
+  if (issues.length > LISTED_FINDINGS) {
+    lines.push(`  … and ${issues.length - LISTED_FINDINGS} more issue(s).`);
+  }
+  if (hotspots.length > 0) lines.push('', '  Security hotspots to review:');
+  for (const hotspot of hotspots.slice(0, LISTED_FINDINGS)) {
+    const probability = (hotspot.vulnerabilityProbability ?? 'HOTSPOT').padEnd(8);
+    lines.push(
+      `  ${probability} ${hotspot.ruleKey.padEnd(22)} ${locationOf(hotspot)}`,
+      `      ${hotspot.message}`,
+    );
+  }
+  if (hotspots.length > LISTED_FINDINGS) {
+    lines.push(`  … and ${hotspots.length - LISTED_FINDINGS} more hotspot(s).`);
+  }
+  lines.push('', `  Full report: ${dashboard}`, '');
+  return lines.join('\n');
 }
 
 /**
  * @param {SonarIssue[]} issues
- * @param {number} hotspots
+ * @param {SonarHotspot[]} hotspots
  * @returns {never}
  */
 function reportAndExit(issues, hotspots) {
-  if (issues.length === 0 && hotspots === 0) {
-    log(
-      `✓ SonarQube clean — 0 issues / 0 hotspots. Dashboard: ${SONAR_URL}/dashboard?id=${PROJECT_KEY}`,
-    );
+  const dashboard = `${SONAR_URL}/dashboard?id=${PROJECT_KEY}`;
+  if (issues.length === 0 && hotspots.length === 0) {
+    log(`✓ SonarQube clean — 0 issues / 0 hotspots. Dashboard: ${dashboard}`);
     process.exit(0);
   }
-
-  process.stderr.write(
-    `\n[sonar-gate] ✗ SonarQube found ${issues.length} issue(s)` +
-      `${hotspots > 0 ? ` and ${hotspots} security hotspot(s) to review` : ''} — fix them before pushing.\n\n`,
-  );
-  for (const issue of issues.slice(0, 50)) {
-    const file = issue.component.includes(':')
-      ? issue.component.split(':').slice(1).join(':')
-      : issue.component;
-    const where = issue.line ? `${file}:${issue.line}` : file;
-    process.stderr.write(
-      `  ${issue.severity.padEnd(8)} ${issue.rule.padEnd(22)} ${where}\n      ${issue.message}\n`,
-    );
-  }
-  if (issues.length > 50) process.stderr.write(`  … and ${issues.length - 50} more.\n`);
-  process.stderr.write(`\n  Full report: ${SONAR_URL}/dashboard?id=${PROJECT_KEY}\n`);
+  process.stderr.write(formatFindings({ issues, hotspots, dashboard }));
   process.exit(1);
 }
 
@@ -387,6 +442,8 @@ async function main() {
   reportAndExit(issues, hotspots);
 }
 
-main().catch((error) => {
-  die(error instanceof Error ? error.message : String(error));
-});
+if (isMain(import.meta.url)) {
+  main().catch((error) => {
+    die(error instanceof Error ? error.message : String(error));
+  });
+}

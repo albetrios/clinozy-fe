@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
+import type { AuthUser } from '@/shared/auth/types.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   answerConsentForTests,
   resetConsentForTests,
@@ -28,7 +30,13 @@ describe('useConsentStore', () => {
 
   afterEach(() => {
     setGlobalPrivacyControlForTests(false);
+    useAuthStore.setState({ user: null });
   });
+
+  const signIn = (id: string) =>
+    useAuthStore.setState({
+      user: { id, email: `${id}@clinic.test`, role: 'user', name: id } as AuthUser,
+    });
 
   it('starts undecided: the card asks and analytics stays off', () => {
     const state = useConsentStore.getState();
@@ -47,6 +55,54 @@ describe('useConsentStore', () => {
     answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
     expect(hasAnalyticsConsent()).toBe(false);
     expect(selectShouldAsk(useConsentStore.getState())).toBe(false);
+  });
+
+  it('an answer stands for the person who gave it — someone else signing in is asked again (F-4)', () => {
+    writeConsentCookieForTests({
+      analytics: true,
+      version: CONSENT_POLICY_VERSION,
+      decidedAt: '2026-10-01T09:00:00.000Z',
+      decidedBy: 'usr_asha',
+    });
+    useConsentStore.getState().reloadFromCookie();
+    signIn('usr_asha');
+    expect(hasAnalyticsConsent()).toBe(true);
+    expect(selectShouldAsk(useConsentStore.getState())).toBe(false);
+
+    // The next member at the shared front-desk PC.
+    signIn('usr_ravi');
+    expect(useConsentStore.getState().viewerId).toBe('usr_ravi');
+    expect(hasAnalyticsConsent()).toBe(false);
+    expect(selectShouldAsk(useConsentStore.getState())).toBe(true);
+
+    // Signed out, the browser's last answer stands.
+    useAuthStore.setState({ user: null });
+    expect(hasAnalyticsConsent()).toBe(true);
+  });
+
+  it('asks a member who signs in after an answer given signed out', () => {
+    writeConsentCookieForTests({
+      analytics: true,
+      version: CONSENT_POLICY_VERSION,
+      decidedAt: '2026-10-01T09:00:00.000Z',
+    });
+    useConsentStore.getState().reloadFromCookie();
+    expect(useConsentStore.getState().decidedBy).toBeNull();
+    expect(hasAnalyticsConsent()).toBe(true);
+    signIn('usr_asha');
+    expect(hasAnalyticsConsent()).toBe(false);
+    expect(selectConsentCardOpen(useConsentStore.getState())).toBe(true);
+  });
+
+  it('reads a cookie whose decidedBy is not an id as no answer', () => {
+    writeConsentCookieForTests({
+      analytics: true,
+      version: CONSENT_POLICY_VERSION,
+      decidedAt: '2026-10-01T09:00:00.000Z',
+      decidedBy: 42,
+    });
+    useConsentStore.getState().reloadFromCookie();
+    expect(useConsentStore.getState().preferences).toBeNull();
   });
 
   it('reads a standing answer back from the cookie (a reload, another tab)', () => {

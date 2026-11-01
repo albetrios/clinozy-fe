@@ -12,15 +12,18 @@ import { HttpError, isUnauthorized } from '@/shared/errors/HttpError.ts';
 // behaviour of refreshAccessToken is service's contract, proven in
 // shared/auth/service.test.ts — here we only assert fetch-client DELEGATES.
 vi.mock('@/shared/auth/service.ts', () => ({
+  endRefusedSession: vi.fn(),
   forceLogout: vi.fn(),
   isRefreshUnanswered: vi.fn(),
   refreshAccessToken: vi.fn(),
 }));
 import {
+  endRefusedSession,
   forceLogout,
   isRefreshUnanswered,
   refreshAccessToken,
 } from '@/shared/auth/service.ts';
+import { mapApiError } from '@/shared/errors/errorHandler.ts';
 
 import { apiClient, setWriteHold } from './fetch-client.ts';
 
@@ -292,6 +295,97 @@ describe('fetch-client', () => {
       expect(forceLogout).not.toHaveBeenCalled();
     });
 
+    describe('a request never goes out again with another organization’s token (E-1)', () => {
+      /** A token scoped to one organization (its `org` claim), told apart by its subject. */
+      const tokenFor = (organization: string, name = organization): string =>
+        makeJwt({ sub: name, org: organization, exp: 9999999999 });
+
+      it('a 401 for a token a switch to another clinic retired is not replayed', async () => {
+        setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+        fetchMock.mockImplementationOnce(() => {
+          // The switch to clinic B landed while this clinic-A read was out.
+          setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb'));
+          return Promise.resolve(unauthorized());
+        });
+
+        const failure = await apiClient.get('/app/patients').catch((error) => error);
+
+        // Replayed, clinic B's patients would have been cached under clinic A's key.
+        expect(isUnauthorized(failure)).toBe(true);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(refreshAccessToken).not.toHaveBeenCalled();
+        expect(forceLogout).not.toHaveBeenCalled();
+      });
+
+      it('a write is not replayed into the clinic switched to', async () => {
+        setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+        fetchMock.mockImplementationOnce(() => {
+          setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb'));
+          return Promise.resolve(unauthorized());
+        });
+
+        await expect(apiClient.post('/app/patients', { name: 'Ada' })).rejects.toSatisfy(
+          isUnauthorized,
+        );
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('a write the switch overtook says it was not saved, never that the session expired', async () => {
+        setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+        fetchMock.mockImplementationOnce(() => {
+          setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb'));
+          return Promise.resolve(unauthorized());
+        });
+
+        const failure = await apiClient
+          .patch('/app/patients/pat_1', { name: 'Ada' })
+          .catch((error: unknown) => error);
+
+        expect((failure as HttpError).data).toEqual({
+          error: { reason: 'WORKSPACE_SWITCHED' },
+        });
+        expect(mapApiError(failure)).toBe(
+          'This change was not saved because you switched clinic.',
+        );
+      });
+
+      it('a retry after a 5xx is not sent with the clinic switched to', async () => {
+        vi.useFakeTimers();
+        try {
+          setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa'));
+          fetchMock.mockImplementationOnce(() => {
+            setAccessToken(tokenFor('org_clinicbbbbbbbbbbbbbbbb'));
+            return Promise.resolve(new Response('oops', { status: 503 }));
+          });
+
+          const outcome = apiClient.get('/app/patients').catch((error) => error);
+          await vi.runAllTimersAsync();
+
+          expect(isUnauthorized(await outcome)).toBe(true);
+          expect(fetchMock).toHaveBeenCalledTimes(1);
+        } finally {
+          vi.useRealTimers();
+        }
+      });
+
+      it('a token rotated within the same clinic is still replayed', async () => {
+        setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa', 'first'));
+        fetchMock
+          .mockImplementationOnce(() => {
+            setAccessToken(tokenFor('org_clinicaaaaaaaaaaaaaaaa', 'rotated'));
+            return Promise.resolve(unauthorized());
+          })
+          .mockResolvedValueOnce(ok());
+
+        const { data } = await apiClient.get<{ ok: boolean }>('/app/patients');
+
+        expect(data).toEqual({ ok: true });
+        expect(bearerOf(fetchMock.mock.calls[1] as unknown[])).toBe(
+          `Bearer ${tokenFor('org_clinicaaaaaaaaaaaaaaaa', 'rotated')}`,
+        );
+      });
+    });
+
     it('a replay retired by another rotation replays again instead of signing out', async () => {
       setAccessToken(tokenNamed('token-first'));
       vi.mocked(refreshAccessToken).mockImplementationOnce(async () => {
@@ -370,13 +464,16 @@ describe('fetch-client', () => {
       expect(forceLogout).not.toHaveBeenCalled();
     });
 
-    it('refresh failure clears the session via forceLogout', async () => {
-      vi.mocked(refreshAccessToken).mockRejectedValueOnce(new Error('session revoked'));
+    it('a refused refresh hands the refusal to the session end (E-2)', async () => {
+      const refusal = new Error('session revoked');
+      vi.mocked(refreshAccessToken).mockRejectedValueOnce(refusal);
       fetchMock.mockResolvedValueOnce(unauthorized()); // original request
 
-      // The refresh error surfaces to the caller after the local logout.
+      // The refresh error surfaces to the caller after the session has ended; WHICH end — a
+      // deliberate idle or age end, or a dead session — is service.ts's (service.test.ts).
       await expect(apiClient.get('/protected')).rejects.toThrow('session revoked');
-      expect(forceLogout).toHaveBeenCalledTimes(1);
+      expect(endRefusedSession).toHaveBeenCalledExactlyOnceWith(refusal);
+      expect(forceLogout).not.toHaveBeenCalled();
     });
 
     it('a refresh that got no answer keeps the session and fails the request as unreachable', async () => {
@@ -391,6 +488,89 @@ describe('fetch-client', () => {
       expect((error as HttpError).status).toBe(0);
       // A slow or failing network says nothing about the session: nobody is signed out.
       expect(forceLogout).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('a caller signal (G-4)', () => {
+    /** A fetch that answers only when its signal aborts — rejecting with the signal's reason. */
+    const hangUntilAborted = (_url: string, init: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+      });
+
+    it('cancels the request in flight: it rejects with the signal’s reason, never retried', async () => {
+      fetchMock.mockImplementation(hangUntilAborted);
+      const controller = new AbortController();
+
+      const outcome = apiClient
+        .get('/app/patients', { signal: controller.signal })
+        .catch((error: unknown) => error);
+      controller.abort();
+
+      const failure = await outcome;
+      expect(failure).toMatchObject({ name: 'AbortError' });
+      expect(failure).not.toBeInstanceOf(HttpError);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('never sends a request whose signal has already aborted', async () => {
+      const controller = new AbortController();
+      controller.abort();
+      await expect(
+        apiClient.post('/app/patients', { name: 'Ada' }, { signal: controller.signal }),
+      ).rejects.toMatchObject({ name: 'AbortError' });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('rejects with an error whatever the abort reason — a string one reads as an AbortError', async () => {
+      const controller = new AbortController();
+      controller.abort('left the page');
+      const failure = await apiClient
+        .get('/app/patients', { signal: controller.signal })
+        .catch((error: unknown) => error);
+      expect(failure).toBeInstanceOf(DOMException);
+      expect(failure).toMatchObject({ name: 'AbortError' });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('stops a retry’s wait at once, and sends nothing after it', async () => {
+      vi.useFakeTimers();
+      try {
+        fetchMock.mockResolvedValue(new Response('oops', { status: 503 }));
+        const controller = new AbortController();
+        const outcome = apiClient
+          .get('/app/patients', { signal: controller.signal })
+          .catch((error: unknown) => error);
+        await vi.advanceTimersByTimeAsync(10);
+        controller.abort();
+        await vi.runAllTimersAsync();
+
+        expect(await outcome).toMatchObject({ name: 'AbortError' });
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('still times out on its own, and leaves no listener on the caller’s signal', async () => {
+      vi.useFakeTimers();
+      try {
+        fetchMock.mockImplementation(hangUntilAborted);
+        const controller = new AbortController();
+        const listen = vi.spyOn(controller.signal, 'addEventListener');
+        const unlisten = vi.spyOn(controller.signal, 'removeEventListener');
+        const outcome = apiClient
+          .get('/app/patients', { signal: controller.signal })
+          .catch((error: unknown) => error);
+        await vi.advanceTimersByTimeAsync(HTTP.TIMEOUT);
+
+        const failure = await outcome;
+        expect(failure).toBeInstanceOf(HttpError);
+        expect((failure as HttpError).status).toBe(0);
+        expect(unlisten).toHaveBeenCalledTimes(listen.mock.calls.length);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -619,6 +799,15 @@ describe('fetch-client', () => {
     it('429 with a Retry-After beyond the cap is not auto-retried (3.1)', async () => {
       fetchMock.mockResolvedValueOnce(errJson(429, { 'Retry-After': '60' }));
       await expect(apiClient.get('/x')).rejects.toBeInstanceOf(HttpError);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('a 429 keeps its Retry-After seconds on the HttpError for the screen to show', async () => {
+      fetchMock.mockResolvedValueOnce(errJson(429, { 'Retry-After': '15' }));
+      await expect(apiClient.get('/x')).rejects.toMatchObject({
+        status: 429,
+        retryAfterSeconds: 15,
+      });
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 

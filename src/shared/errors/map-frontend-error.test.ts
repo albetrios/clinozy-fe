@@ -45,6 +45,21 @@ describe('mapFrontendError', () => {
     expect(mapFrontendError(new AppError(code, 400, code))).toBe(message);
   });
 
+  // A write a clinic switch overtook — the fetch client's 401 or an upload stopped before its
+  // confirm — used to read "Your session has expired. Please sign in again." (E-1).
+  it('says a write the clinic switch overtook was not saved, from either source', () => {
+    const notSaved = 'This change was not saved because you switched clinic.';
+    const code = FRONTEND_ERROR_CODES.WORKSPACE_SWITCHED;
+    expect(mapFrontendError(new AppError(code, 409, code))).toBe(notSaved);
+    expect(
+      mapFrontendError(
+        new HttpError('Workspace switched', 401, '/api/v1/app/x', 'PATCH', {
+          error: { reason: code },
+        }),
+      ),
+    ).toBe(notSaved);
+  });
+
   it('maps invalid credentials AppError to localized auth message', () => {
     const err = new AppError(
       FRONTEND_ERROR_CODES.AUTH_INVALID_CREDENTIALS,

@@ -9,10 +9,10 @@ name: Cleanup caches
 #   - pull_request closed (merged or not)          -> drop every cache scoped
 #                                                    to the PR ref. PR caches
 #                                                    have no use once the PR
-#                                                    is closed. Also tears down
-#                                                    the PR's Netlify preview
-#                                                    alias (pr-<n>) from
-#                                                    preview.yml (separate job).
+#                                                    is closed. (The PR's Netlify
+#                                                    preview is torn down by
+#                                                    preview-deploy.yml, which
+#                                                    runs on main, H-1.)
 #   - workflow_run completed for our top-level CI  -> for PR runs, drop all
 #                                                    caches on that PR ref;
 #                                                    for main runs, keep
@@ -24,8 +24,8 @@ name: Cleanup caches
 #   - workflow_dispatch                            -> manual prune (defaults
 #                                                    to the dispatching ref).
 
-# workflow_run never checks out or runs PR code here — the cleanup job only deletes caches by key,
-# with the run's branch passed through env (preview-teardown runs on pull_request only).
+# workflow_run never checks out or runs PR code here — the one job only deletes caches by key,
+# with the run's branch passed through env. It holds no environment and no secret.
 on: # zizmor: ignore[dangerous-triggers]
   pull_request:
     types: [closed]
@@ -47,7 +47,7 @@ on: # zizmor: ignore[dangerous-triggers]
         required: false
         default: ''
 
-# Read-only by default; the cleanup job alone gets actions: write (deleting caches).
+# Read-only by default (H-14); the cleanup job alone gets actions: write (deleting caches).
 permissions:
   contents: read
 
@@ -235,117 +235,3 @@ jobs:
             done
             echo "Scheduled LRU prune complete for ${ref}."
           done
-
-  preview-teardown:
-    name: Teardown preview deploys
-    # Only on PR close — delete the pr-<number> Netlify preview alias's deploys so
-    # closed PRs don't accumulate previews (Netlify keeps every deploy forever).
-    # The other triggers (workflow_run/schedule/dispatch) are cache-only. Declares
-    # environment: development to read the Netlify secrets; fork/Dependabot PRs get
-    # no environment secrets → HAS_NETLIFY empty → skipped. Best-effort: a failure
-    # to reach Netlify never fails PR-close cleanup.
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: development
-    # Job-level permissions REPLACE the workflow-level (read-only) set — this job needs
-    # pull-requests: write for the comment, not cache access.
-    permissions:
-      contents: read
-      pull-requests: write
-    env:
-      # secrets.* is not readable in a step `if:` — hoist presence to job env.
-      HAS_NETLIFY: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
-    steps:
-      - name: Preview teardown unavailable (no deploy secrets)
-        if: env.HAS_NETLIFY != 'true'
-        run: echo "::notice title=Preview teardown skipped::No Netlify environment secrets (fork/Dependabot PR); nothing to tear down."
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.HAS_NETLIFY == 'true'
-        with:
-          fetch-depth: 1
-
-      - uses: ./.github/actions/setup-node-pnpm
-        if: env.HAS_NETLIFY == 'true'
-
-      - name: Delete pr-<number> preview deploys
-        if: env.HAS_NETLIFY == 'true'
-        id: teardown
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          set -euo pipefail
-          alias="pr-${PR_NUMBER}"
-          site_data=$(jq -nc --arg s "$NETLIFY_SITE_ID" '{site_id:$s}')
-          if ! deploys_json=$(pnpm exec netlify api listSiteDeploys --data "$site_data"); then
-            echo "::warning title=Preview teardown::Could not list Netlify deploys; leaving previews to age out."
-            echo "deleted=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # Match deploys whose alias URL carries this PR's alias (pr-<n>--<site>).
-          # The alias lives in links.alias; the immutable deploy_ssl_url does not,
-          # so check every URL field. Best-effort — under-matching just leaves a
-          # preview to age out, never fails the close.
-          mapfile -t ids < <(ALIAS="$alias" DEPLOYS_JSON="$deploys_json" node -e '
-            const alias = process.env.ALIAS;
-            const deploys = JSON.parse(process.env.DEPLOYS_JSON);
-            for (const d of deploys) {
-              const urls = [
-                d.deploy_ssl_url, d.deploy_url, d.ssl_url, d.url,
-                d.links && d.links.alias,
-              ].filter(Boolean);
-              if (urls.some((u) => String(u).includes(alias + "--")) && d.id) {
-                process.stdout.write(d.id + "\n");
-              }
-            }
-          ')
-          if [ "${#ids[@]}" -eq 0 ]; then
-            echo "No preview deploys found for alias ${alias}."
-            echo "deleted=0" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          deleted=0
-          for id in "${ids[@]}"; do
-            [ -n "$id" ] || continue
-            data=$(jq -nc --arg d "$id" '{deploy_id:$d}')
-            if pnpm exec netlify api deleteDeploy --data "$data"; then
-              deleted=$((deleted + 1))
-            else
-              echo "Could not delete deploy ${id} (already gone?)."
-            fi
-          done
-          echo "Deleted ${deleted} preview deploy(s) for alias ${alias}."
-          echo "deleted=${deleted}" >> "$GITHUB_OUTPUT"
-
-      - name: Mark preview comment torn down
-        if: env.HAS_NETLIFY == 'true'
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          PR_ALIAS: pr-${{ github.event.pull_request.number }}
-        with:
-          script: |
-            const marker = '<!-- preview-deploy -->';
-            const { owner, repo } = context.repo;
-            const issue_number = context.issue.number;
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              owner,
-              repo,
-              issue_number,
-              per_page: 100,
-            });
-            const existing = comments.find((comment) => (comment.body || '').includes(marker));
-            if (!existing) {
-              core.notice('No preview comment to update.');
-              return;
-            }
-            const body = [
-              marker,
-              '## 🔎 Preview deploy',
-              '',
-              `_Torn down — the \`${process.env.PR_ALIAS}\` preview alias was removed when this PR closed._`,
-            ].join('\n');
-            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
-            core.notice(`Updated preview comment #${existing.id} (torn down).`);

@@ -6,7 +6,7 @@ import { patientSchema } from './app-schema.ts';
  * The fixture patients beyond the generated contract (KICKOFF §6.5, §3.6, D22): the plan-only
  * fields — each a fixture field until clinozy-be serves it (Appendix F › Patients,
  * REPLACE_WITH_API). Read by the fixture world's patients — the chat column's patient threads
- * (`messages-api.ts`); every room reads `patients-contracts.ts`.
+ * (`fixtures/chat.fixtures.ts`, test support); every room reads `patients-contracts.ts`.
  */
 
 // ── Records ──

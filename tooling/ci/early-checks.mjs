@@ -19,6 +19,7 @@ export const EARLY_CHECKS_FALSE_POSITIVE_LOG = 'agent-os/evals/false-positives.m
 /** The staged files that make the client env allowlist run at commit. */
 export const CLIENT_ENV_TRIGGERS = [
   'src/core/config/env-schema.ts',
+  'src/core/config/client-env-schema.ts',
   '.env.example',
   'tooling/validate/client-env.ts',
 ];

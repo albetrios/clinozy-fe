@@ -1,13 +1,15 @@
 /**
- * Env Zod schema and key list only. Safe to import from scripts that must not run
- * full client bootstrap (e.g. sync-env-example). Application code should use
- * {@link env.config.ts} + {@link platform-config.ts}.
+ * The whole env contract — every key (client, build, deploy and local tooling), its
+ * description, and the per-environment profiles `validate:client-env` enforces. TOOLING ONLY:
+ * the app never imports this module, so the deploy and tooling key names, the forbidden-value
+ * rules and the profiles stay out of the shipped bundle (F-8). The client's own slice —
+ * `clientEnvSchema` and the boot invariants — lives in {@link client-env-schema.ts}, which is
+ * what `env.config.ts` reads; `env-schema.test.ts` keeps the two in step.
  */
 import { z } from 'zod';
 
 import {
   enabledOAuthProviders,
-  hasAnyAuthSurface,
   resolveBooleanFlag,
   resolveOAuthProviderFlags,
 } from './env-resolvers.ts';
@@ -24,6 +26,8 @@ export const envSchemaBase = z.object({
   // --- Build-time (Vite / CI — not VITE_ prefixed) ---
   BUILD_I18N_MODE: z.enum(['single', 'multi']).optional().default('single'),
   BUILD_I18N_LOCALE: z.string().min(1).optional().default('en-US'),
+  // The file store's origin, named in the build's CSP (plugins/csp-api-origin.ts) — never bundled.
+  STORED_FILES_ORIGIN: z.string().optional(),
 
   // --- Runtime public (VITE_* — bundled client) ---
   // Reported environment identity — the app's environment vocabulary, NOT the Vite mode
@@ -79,6 +83,8 @@ export const envSchemaBase = z.object({
   // the real value lives in GitHub repository secrets (gh secret set --repo).
   RELEASE_PLEASE_TOKEN: z.string().min(1).optional(),
   CONTEXT7_API_KEY: z.string().min(1).optional(),
+  // The hosted-deploy marker (clinozy-be's A-4): set by the deploy workflows only, never in a file.
+  HOSTED_DEPLOYMENT: booleanString('false'),
 
   // --- Local tooling only (never bundled / never set in CI) ---
   // SonarQube local quality gate — auto-managed in .env.local by tooling/sonar/sonar-gate.mjs.
@@ -109,6 +115,8 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   BUILD_I18N_MODE:
     'i18n build mode: single (inline one locale into JS) or multi (lazy JSON per locale).',
   BUILD_I18N_LOCALE: 'Primary i18n build locale, BCP-47 (e.g. en-US).',
+  STORED_FILES_ORIGIN:
+    "Origin of clinozy-be's file store, its S3 bucket (e.g. https://<bucket>.s3.<region>.amazonaws.com). Build-time CSP only: uploads go to it (connect-src) and stored images load from it (img-src). Required in production; empty elsewhere allows any https://*.amazonaws.com bucket.",
   VITE_APP_ENV:
     'Reported environment: local (default) | development | production. The env vocabulary, not the Vite mode; reported-only (Sentry/PostHog tag), never branched on.',
   VITE_APP_VERSION:
@@ -153,7 +161,7 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   VITE_TURNSTILE_SITE_KEY:
     'Cloudflare Turnstile site key; required in production unless VITE_CAPTCHA_DISABLED is true.',
   VITE_DEBUG_LOGGING:
-    '"true" emits [Module] diagnostic console logs (on locally and in the development deploy, off in production).',
+    '"true" emits [Module] diagnostic console logs (on locally; refused on every hosted deploy).',
   VITE_DEVTOOLS: '"true" mounts React Query Devtools + the localhost debug panel.',
   VITE_E2E_HOOKS:
     '"true" installs Playwright E2E hooks on globalThis (navigateInApp, establishSession).',
@@ -169,88 +177,13 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
     'GitHub Actions PAT (environment secret on `development`) for release-please, dependabot-auto-merge, and the weekly PAT canary — all three jobs select `environment: development` to read it. Managed deploy secret on `development`: clinozy-infra (`pnpm setup:infra`) writes it into `.env.development` and `pnpm github:sync` pushes it; CI only — never bundled or read locally.',
   CONTEXT7_API_KEY:
     'Context7 docs-MCP API key; consumed by .mcp.json for the docs MCP (local tooling).',
+  HOSTED_DEPLOYMENT:
+    '"true" marks a hosted deploy build (set by the deploy workflows, never in a file): validate:client-env then refuses every test-only switch (VITE_TEST_MODE, VITE_E2E_HOOKS, VITE_DEVTOOLS, VITE_DEBUG_LOGGING). Default false.',
   SONAR_ADMIN_PASSWORD:
     'Local SonarQube admin password; auto-managed by tooling/sonar/sonar-gate.mjs (never in CI).',
   SONAR_TOKEN:
     'Local SonarQube scanner token; auto-managed by the sonar gate (never in CI).',
 };
-
-/** Client `import.meta.env` subset validated at app boot. */
-export const clientEnvSchema = z.object({
-  VITE_API_BASE_URL: z.string().optional(),
-  VITE_DEV_API_URL: z.string().optional(),
-  VITE_SENTRY_DSN: z.string().optional(),
-  VITE_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
-  VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: z.string().optional(),
-  VITE_SENTRY_PROFILES_SAMPLE_RATE: z.string().optional(),
-  VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: z.string().optional(),
-  VITE_POSTHOG_KEY: z.string().optional(),
-  VITE_POSTHOG_HOST: z.string().optional(),
-  VITE_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  VITE_LAYOUT_WIDTH: z.enum(['contained', 'full', 'reading']).optional(),
-  VITE_THEME_LOCK: z.string().optional(),
-  VITE_PRIVACY_POLICY_URL: z.string().optional(),
-  VITE_CSP_REPORT_URI: z.string().optional(),
-  VITE_DISABLED_MODULES: z.string().optional(),
-  VITE_PERSONAL_ORGANIZATIONS: z.string().optional(),
-  VITE_TEAM_ORGANIZATIONS: z.string().optional(),
-  VITE_AUTH_EMAIL: z.string().optional(),
-  VITE_AUTH_OAUTH_GOOGLE: z.string().optional(),
-  VITE_AUTH_OAUTH_GITHUB: z.string().optional(),
-  VITE_AUTH_OAUTH_APPLE: z.string().optional(),
-  VITE_AUTH_OAUTH_AUTO_GOOGLE: z.string().optional(),
-  VITE_AUTH_PASSKEY: z.string().optional(),
-  VITE_CAPTCHA_DISABLED: z.string().optional(),
-  VITE_TURNSTILE_SITE_KEY: z.string().optional(),
-  VITE_DEBUG_LOGGING: z.string().optional(),
-  VITE_DEVTOOLS: z.string().optional(),
-  VITE_E2E_HOOKS: z.string().optional(),
-  VITE_VERSION_CHECK: z.string().optional(),
-  // Test-runner flag (test.env-injected by plugins/test-env.ts, never in a .env file
-  // or committed to .env.example). `"true"` marks the Vitest run — the single home for
-  // test-only behavior. Read via `platformConfig.testMode`; never mode-sniffed in app code.
-  VITE_TEST_MODE: z.string().optional(),
-  // Reported environment identity: exactly `local | development | production` (no 'staging',
-  // no 'test'). This is the app's environment vocabulary, mirroring clinozy-be's `NODE_ENV`, and
-  // is DECOUPLED from the Vite build mode — Vite 8 forbids a mode literally named `local`, so
-  // the environment name is carried by this env variable (default `local`), not by the Vite
-  // MODE constant. `development` / `production` are the two DEPLOY targets (DeployEnvironment);
-  // you never deploy to `local`. Vite's own mode stays a mechanism detail (dev → `dev-server`,
-  // build → `production`, Vitest → its default `test` mode). Reported name only, never branched
-  // on — the raw Vite DEV/PROD booleans are intentionally unused (behavior is driven by named
-  // flags). An out-of-enum value fails loudly at load (env.config.ts throws).
-  VITE_APP_ENV: z.enum(['local', 'development', 'production']).default('local'),
-});
-
-export type ClientEnv = z.infer<typeof clientEnvSchema>;
-
-/** Cross-field invariants for auth platform switches. */
-export function assertAuthPlatformInvariants(
-  get: (key: string) => string | undefined,
-): void {
-  const oauthAutoGoogle = get('AUTH_OAUTH_AUTO_GOOGLE') === 'true';
-  const oauthGoogleOff = get('AUTH_OAUTH_GOOGLE') === 'false';
-  if (oauthAutoGoogle && oauthGoogleOff) {
-    throw new Error(
-      '[Config] VITE_AUTH_OAUTH_AUTO_GOOGLE=true requires VITE_AUTH_OAUTH_GOOGLE not false.',
-    );
-  }
-
-  // The production Turnstile requirement is enforced at deploy time by
-  // `validate:client-env` (envProfiles.production.required) — not a runtime
-  // isProduction branch.
-
-  const email = get('AUTH_EMAIL') !== 'false';
-  const passkey = get('AUTH_PASSKEY') !== 'false';
-  const oauth = resolveOAuthProviderFlags(get);
-  if (!hasAnyAuthSurface({ email, passkey, oauth })) {
-    if (resolveBooleanFlag(get('DEBUG_LOGGING'), false)) {
-      console.warn(
-        '[Config] No auth methods enabled (email, oauth providers, passkey). /login will show an empty state.',
-      );
-    }
-  }
-}
 
 /** Ordered list of env var names from the schema (for .env.example sync). */
 export const envSchemaKeys = Object.keys(envSchemaBase.shape) as (keyof z.infer<
@@ -406,6 +339,31 @@ const CSP_REPORT_URI_RULE: RequiredKeyRule = {
   level: 'warn',
 };
 
+/**
+ * The file store's bucket, named exactly in the CSP's `connect-src` and `img-src` (F-7). Without it
+ * the policy allows any `https://*.amazonaws.com` bucket — a page with an injected script could
+ * then upload to, or load from, a bucket of the attacker's. Production must name it (and as an
+ * origin: https, one host — no wildcard — and no path); a development deploy is warned.
+ */
+function isHttpsOrigin(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === 'https:' &&
+      !url.hostname.includes('*') &&
+      value.replace(/\/$/, '') === url.origin
+    );
+  } catch {
+    return false;
+  }
+}
+
+const STORED_FILES_ORIGIN_RULE: RequiredKeyRule = {
+  key: 'STORED_FILES_ORIGIN',
+  level: 'error',
+  satisfiedBy: isHttpsOrigin,
+};
+
 const devLikeContract: Omit<EnvProfile, 'defaults'> = {
   required: [],
   forbidden: [
@@ -474,14 +432,19 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
     // Unlike `local`, development IS a deploy target: the deploy workflow must
     // inject VITE_APP_ENV so the shipped bundle self-reports its environment
     // (Sentry/PostHog tag) instead of falling back to the schema default `local`.
-    required: [{ key: 'VITE_APP_ENV', level: 'error' }, CSP_REPORT_URI_RULE],
+    required: [
+      { key: 'VITE_APP_ENV', level: 'error' },
+      CSP_REPORT_URI_RULE,
+      { ...STORED_FILES_ORIGIN_RULE, level: 'warn' },
+    ],
     allowed: { ...devLikeContract.allowed, VITE_APP_ENV: ['development'] },
-    // Development deploy: diagnostics on for debugging, version-check on (a real
-    // deploy), E2E hooks off (not a test runner).
+    // Development deploy: a hosted deploy, so every test-only switch is off (the
+    // HOSTED_DEPLOYMENT marker refuses them — hostedDeploymentRefusals); version-check
+    // on (a real deploy).
     defaults: {
       VITE_APP_ENV: 'development',
-      VITE_DEBUG_LOGGING: 'true',
-      VITE_DEVTOOLS: 'true',
+      VITE_DEBUG_LOGGING: 'false',
+      VITE_DEVTOOLS: 'false',
       VITE_E2E_HOOKS: 'false',
       VITE_VERSION_CHECK: 'true',
     },
@@ -504,6 +467,7 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
         level: 'warn',
       },
       CSP_REPORT_URI_RULE,
+      STORED_FILES_ORIGIN_RULE,
     ],
     forbidden: [
       ...SONAR_LOCAL_ONLY,
@@ -531,6 +495,55 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
     },
   },
 };
+
+/**
+ * The hosted-deploy marker, mirroring clinozy-be's `HOSTED_DEPLOYMENT` (A-4). Every workflow that
+ * builds a hosted bundle — the governed Netlify deploy and the PR preview build — sets it `true`
+ * for its client-env check and build; local machines and CI runners (the e2e and Lighthouse
+ * builds) never do. It is never written in an env file.
+ */
+const HOSTED_DEPLOYMENT_VARIABLE = 'HOSTED_DEPLOYMENT';
+
+/**
+ * The test-only switches a hosted deploy refuses, whatever its environment profile allows, and
+ * what each would expose on a reachable site.
+ */
+export const HOSTED_DEPLOYMENT_REFUSED_SWITCHES: Readonly<Record<string, string>> = {
+  VITE_TEST_MODE: 'marks a test run, which only plugins/test-env.ts sets',
+  VITE_E2E_HOOKS:
+    'installs the Playwright hooks (establishSession, navigateInApp) on globalThis',
+  VITE_DEVTOOLS:
+    'mounts React Query Devtools and the debug panel over cached server data',
+  VITE_DEBUG_LOGGING: 'writes the [Module] diagnostic logs to every visitor console',
+};
+
+/**
+ * Errors for a hosted deploy (`HOSTED_DEPLOYMENT=true`) whose env turns a test-only switch on, or
+ * names the `local` environment; `[]` for any other build. A switch is on as the app reads it
+ * ({@link resolveBooleanFlag}: any value but empty or `false`), and a marker that is neither
+ * `true` nor `false` is an error itself, so a typo never passes as "not hosted".
+ */
+export function hostedDeploymentRefusals(
+  get: (key: string) => string | undefined,
+): string[] {
+  const marker = get(HOSTED_DEPLOYMENT_VARIABLE);
+  if (marker === undefined || marker === '' || marker === 'false') return [];
+  if (marker !== 'true') {
+    return [`${HOSTED_DEPLOYMENT_VARIABLE}=${marker} must be true or false`];
+  }
+  const errors = Object.entries(HOSTED_DEPLOYMENT_REFUSED_SWITCHES)
+    .filter(([key]) => resolveBooleanFlag(get(key), false))
+    .map(
+      ([key, why]) =>
+        `${key}=${get(key)} is refused on a hosted deploy (${HOSTED_DEPLOYMENT_VARIABLE}=true) — it ${why}`,
+    );
+  if (get('VITE_APP_ENV') === 'local') {
+    errors.push(
+      `${HOSTED_DEPLOYMENT_VARIABLE}=true names a deploy, so VITE_APP_ENV must be development or production, not local`,
+    );
+  }
+  return errors;
+}
 
 /**
  * Conditionally required keys surfaced in deploy validators — derived from the

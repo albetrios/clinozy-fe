@@ -38,7 +38,8 @@
     "removeDiscount": "Retirer la remise avant expiration",
     "prescriptions": "Ordonnances à délivrer",
     "paymentReminders": "Envoyer des rappels de paiement",
-    "payAllReceived": "Payer tout le reçu · {{amount}}"
+    "payAllReceived": "Payer tout le reçu · {{amount}}",
+    "gstSummary": "Récapitulatif GST"
   },
   "filters": {
     "all": "Tous",
@@ -247,7 +248,12 @@
     "export": "Exporter",
     "exportTitle": "Exporter ces paiements en CSV",
     "exported": "Paiements exportés en CSV",
-    "exportTruncated": "Les 10 000 premiers paiements ont été exportés — affinez les filtres pour le reste"
+    "exportTruncated": "Les 10 000 premiers paiements ont été exportés — affinez les filtres pour le reste",
+    "exportRetryIn_one": "Trop d’exportations en cours — réessayez dans {{count}} seconde",
+    "exportRetryIn_many": "Trop d’exportations en cours — réessayez dans {{count}} secondes",
+    "exportRetryIn_other": "Trop d’exportations en cours — réessayez dans {{count}} secondes",
+    "exportRetryLater": "Trop d’exportations en cours — réessayez dans un instant",
+    "exportUnavailable": "Les exportations sont temporairement indisponibles. Réessayez dans un instant."
   },
   "credits": {
     "records": "avoirs pharmacie",
@@ -643,7 +649,12 @@
         "newMedicineName": "Nom du nouveau médicament",
         "note": "Note",
         "notePlaceholder": "ex. 30 JOURS",
-        "mrp": "Prix max."
+        "mrp": "Prix max.",
+        "gst": "GST",
+        "gstRate": "{{value}} %",
+        "ratesIncludeGst": "Les tarifs incluent la GST",
+        "gstOnTop": "GST en sus",
+        "gstTotals": "Montant HT {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "Réapprovisionner le stock faible"
@@ -690,7 +701,8 @@
       "print": "Imprimer",
       "note": "Note",
       "saveNote": "Enregistrer la note",
-      "noteSaved": "Note enregistrée"
+      "noteSaved": "Note enregistrée",
+      "gstOnTopRate": "{{value}} % en sus"
     },
     "sale": {
       "title": "Vente",
@@ -786,6 +798,24 @@
       "copy": "Copier le rappel pour {{name}}",
       "copied": "Rappel pour {{name}} copié",
       "message": "Bonjour {{name}}, ceci est un rappel de {{clinic}} : {{amount}} restent dus pour vos médicaments. Répondez ici si vous avez des questions. Merci !"
+    },
+    "gstSummary": {
+      "title": "GST sur achats",
+      "month": "Mois",
+      "summary": "Commandes reçues : {{orders}} · lignes : {{lines}}",
+      "byRate": "Par taux de GST",
+      "byHsn": "Par code HSN",
+      "rate": "Taux",
+      "hsn": "Code HSN",
+      "noHsn": "Sans HSN",
+      "lines": "Lignes",
+      "taxable": "Montant HT",
+      "gst": "GST",
+      "total": "Total",
+      "totals": "Montant HT {{taxable}} · GST {{gst}} · Total {{total}}",
+      "empty": "Rien n’a été reçu ce mois-ci",
+      "download": "Télécharger le CSV",
+      "downloaded": "Récapitulatif GST téléchargé"
     }
   }
 }

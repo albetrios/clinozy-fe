@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  clearReturnTo,
   isSafeExternalHttpsUrl,
   isSafeRedirectPath,
   popReturnTo,
@@ -68,6 +69,12 @@ describe('stashReturnTo / popReturnTo', () => {
 
   it('never stashes an unsafe value', () => {
     stashReturnTo('//evil.example.com');
+    expect(popReturnTo()).toBeUndefined();
+  });
+
+  it('forgets a stashed path the session it was for has ended (F-9)', () => {
+    stashReturnTo('/organization/acme/patients/pat_x');
+    clearReturnTo();
     expect(popReturnTo()).toBeUndefined();
   });
 });

@@ -8,6 +8,10 @@
  * - Both templates are mirrored under `agent-os/mcp/` (the agent-os source of truth);
  *   the root file and its mirror must be equal.
  *
+ * - H-7: every server runs a pinned version — a `uvx` package spec names `==<version>` (headroom
+ *   and semgrep equal to tooling/setup/agent/tool-versions.sh), a `pnpm exec` binary comes from a
+ *   devDependency (the lockfile pins it), and nothing names `@latest`, `npx` or an unpinned image.
+ *
  * See CLAUDE.md (MCP servers) and agent-os/mcp/.
  */
 import { readFileSync } from 'node:fs';
@@ -51,4 +55,86 @@ describe('MCP template consistency', () => {
       );
     }
   });
+});
+
+/** The pinned value of `key` in tooling/setup/agent/tool-versions.sh. */
+function toolVersion(key: string): string {
+  const pins = readFileSync(
+    join(PROJECT_ROOT, 'tooling/setup/agent/tool-versions.sh'),
+    'utf-8',
+  );
+  return (
+    pins
+      .split('\n')
+      .find((line) => line.startsWith(`${key}=`))
+      ?.slice(key.length + 1) ?? ''
+  );
+}
+
+/** The binary each `pnpm exec` server runs → the devDependency that installs it. */
+const PNPM_EXEC_PACKAGES: Readonly<Record<string, string>> = {
+  codegraph: '@colbymchenry/codegraph',
+  'context7-mcp': '@upstash/context7-mcp',
+  shadcn: 'shadcn',
+  'tailwindcss-server': 'tailwindcss-mcp-server',
+};
+
+describe('MCP servers run pinned versions (H-7)', () => {
+  const templates = ['.mcp.example.json', '.mcp.default.json'];
+  const devDependencies = (
+    JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8')) as {
+      devDependencies: Record<string, string>;
+    }
+  ).devDependencies;
+
+  it.each(templates)('%s pins every uvx package spec to an exact version', (file) => {
+    const servers = Object.entries(readMcpServers(file)).filter(
+      ([, definition]) => definition.command === 'uvx',
+    );
+    expect(servers.length).toBeGreaterThan(0);
+    for (const [name, definition] of servers) {
+      const args = definition.args as string[];
+      const spec = args[args.indexOf('--from') + 1] ?? '';
+      expect(spec, name).toMatch(/^[\w.-]+(?:\[[\w,-]+\])?==\d+\.\d+\.\d+$/);
+    }
+  });
+
+  it('runs headroom and semgrep at the tool-versions.sh pins', () => {
+    const fullSet = readMcpServers('.mcp.example.json');
+    expect(String(fullSet['fe-headroom']?.args ?? '')).toContain(
+      `headroom-ai[mcp]==${toolVersion('HEADROOM_VERSION')}`,
+    );
+    expect(String(fullSet['fe-semgrep']?.args ?? '')).toContain(
+      `semgrep==${toolVersion('SEMGREP_VERSION')}`,
+    );
+    expect(toolVersion('HEADROOM_VERSION')).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
+  it.each(templates)('%s runs every pnpm exec server from a devDependency', (file) => {
+    for (const [name, definition] of Object.entries(readMcpServers(file))) {
+      if (definition.command !== 'pnpm') continue;
+      const args = definition.args as string[];
+      expect(args[0], name).toBe('exec');
+      const binary = args[1] ?? '';
+      const dependency = PNPM_EXEC_PACKAGES[binary];
+      expect(dependency, `${name}: unknown binary ${binary}`).toBeDefined();
+      expect(devDependencies, name).toHaveProperty(dependency ?? '');
+    }
+  });
+
+  it.each(templates)(
+    '%s names no floating version, npx launcher or unpinned image',
+    (file) => {
+      const raw = readFileSync(join(PROJECT_ROOT, file), 'utf-8');
+      expect(raw).not.toMatch(/@latest\b/);
+      expect(raw).not.toMatch(/"npx"/);
+      for (const [name, definition] of Object.entries(readMcpServers(file))) {
+        if (definition.command !== 'docker') continue;
+        const image = (definition.args as string[]).find(
+          (arg) => /[/:]/.test(arg) && !arg.startsWith('-'),
+        );
+        expect(image, name).toMatch(/@sha256:[0-9a-f]{64}$/);
+      }
+    },
+  );
 });

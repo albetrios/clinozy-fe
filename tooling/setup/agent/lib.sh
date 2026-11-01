@@ -75,55 +75,6 @@ fetch() {
   fi
 }
 
-# Resolve the latest release tag of a GitHub repo (e.g. "v8.30.0"), or fail.
-# Kept dependency-free (no jq) so it works on a bare image.
-#
-# Two independent paths, because allowlists routinely permit one host and not
-# the other: the REST API on api.github.com, then the /releases/latest redirect
-# on github.com (which lands on .../releases/tag/<tag>). Callers can bypass both
-# by pinning a version, which is what a locked-down environment should do.
-github_latest_tag() {
-  local repo="$1" body tag final
-
-  body="$(
-    if have curl; then
-      curl -fsSL --max-time 30 "https://api.github.com/repos/${repo}/releases/latest" 2>/dev/null
-    else
-      wget -qO- "https://api.github.com/repos/${repo}/releases/latest" 2>/dev/null
-    fi
-  )" || body=""
-  if [ -n "${body}" ]; then
-    tag="$(
-      printf '%s' "${body}" |
-        grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' |
-        head -n 1 |
-        sed -E 's/.*"([^"]*)"$/\1/'
-    )"
-    if [ -n "${tag}" ]; then
-      printf '%s' "${tag}"
-      return 0
-    fi
-  fi
-
-  have curl || return 1
-  final="$(curl -fsSL --max-time 30 -o /dev/null -w '%{url_effective}' \
-    "https://github.com/${repo}/releases/latest" 2>/dev/null)" || return 1
-  case "${final}" in
-    */releases/tag/*)
-      tag="${final##*/releases/tag/}"
-      # Reject anything that is not version-shaped, so a login/interstitial
-      # redirect cannot become a bogus download URL.
-      case "${tag}" in
-        v[0-9]*.[0-9]* | [0-9]*.[0-9]*)
-          printf '%s' "${tag}"
-          return 0
-          ;;
-      esac
-      ;;
-  esac
-  return 1
-}
-
 # Where user-scope binaries go. /usr/local/bin when writable (the cloud-image
 # case: we are root), otherwise ~/.local/bin, which bootstrap puts on PATH.
 bin_dir() {

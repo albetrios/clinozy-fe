@@ -51,6 +51,40 @@ interface OrganizationStore {
   clearOrganization: () => void;
 }
 
+/** Same permission codes in the same order. */
+function samePermissions(
+  current: readonly OrganizationPermission[],
+  next: readonly OrganizationPermission[],
+): boolean {
+  return current.length === next.length && current.every((code, i) => code === next[i]);
+}
+
+/** Whether every field of `next` already holds that value in `state`. */
+function holdsAlready(
+  state: OrganizationStore,
+  next: Partial<OrganizationStore>,
+): boolean {
+  return (Object.keys(next) as Array<keyof OrganizationStore>).every((key) => {
+    const value = next[key];
+    const current = state[key];
+    if (key === 'permissions') {
+      return samePermissions(
+        current as OrganizationPermission[],
+        value as OrganizationPermission[],
+      );
+    }
+    if (key === 'deploymentFlags') {
+      const flags = value as DeploymentFlags;
+      const held = current as DeploymentFlags;
+      return (
+        held.personalOrganizations === flags.personalOrganizations &&
+        held.teamOrganizations === flags.teamOrganizations
+      );
+    }
+    return Object.is(current, value);
+  });
+}
+
 /**
  * Derived cache of organization context (canonical value: the URL) (active organization + its
  * permissions).
@@ -58,50 +92,61 @@ interface OrganizationStore {
  * Accessible outside React via `useOrganizationStore.getState()` — used by the HTTP
  * RBAC
  * guards to resolve org-scoped permissions.
+ *
+ * Every setter is a no-op when the store already holds those values: the guard chain
+ * re-derives the same context on every navigation, and a write that changes nothing still
+ * woke every subscriber — analytics re-identified the clinic and reloaded its flags on each
+ * page change, and a fresh `permissions` array re-rendered everything gated on it (G-1).
  */
-export const useOrganizationStore = create<OrganizationStore>((set) => ({
-  organizationId: null,
-  organizationSlug: null,
-  organizationStatus: null,
-  organizationType: null,
-  permissions: [],
-  permissionsResolved: false,
-  deploymentFlags: DEFAULT_DEPLOYMENT_FLAGS,
-  personalOrganizationId: null,
+export const useOrganizationStore = create<OrganizationStore>((set) => {
+  /** Write `next` unless the store already holds it — then nobody is notified. */
+  const write = (next: Partial<OrganizationStore>) =>
+    set((state) => (holdsAlready(state, next) ? state : next));
 
-  setActiveOrganization: (org, permissions) =>
-    set({
-      organizationId: org?.id ?? null,
-      organizationSlug: org?.slug ?? null,
-      organizationStatus: toStoreStatus(org),
-      organizationType: org?.type ?? null,
-      permissions,
-      permissionsResolved: true,
-    }),
+  return {
+    organizationId: null,
+    organizationSlug: null,
+    organizationStatus: null,
+    organizationType: null,
+    permissions: [],
+    permissionsResolved: false,
+    deploymentFlags: DEFAULT_DEPLOYMENT_FLAGS,
+    personalOrganizationId: null,
 
-  setDeploymentContext: (deploymentFlags, personalOrganizationId) =>
-    set({ deploymentFlags, personalOrganizationId }),
+    setActiveOrganization: (org, permissions) =>
+      write({
+        organizationId: org?.id ?? null,
+        organizationSlug: org?.slug ?? null,
+        organizationStatus: toStoreStatus(org),
+        organizationType: org?.type ?? null,
+        permissions,
+        permissionsResolved: true,
+      }),
 
-  setOrganization: (organizationId, organizationSlug, organizationStatus) =>
-    set({
-      organizationId,
-      organizationSlug,
-      organizationStatus: organizationStatus ?? null,
-    }),
-  setPermissions: (permissions) => set({ permissions, permissionsResolved: true }),
-  clearPermissions: () => set({ permissions: [], permissionsResolved: false }),
-  clearOrganization: () =>
-    set({
-      organizationId: null,
-      organizationSlug: null,
-      organizationStatus: null,
-      organizationType: null,
-      permissions: [],
-      permissionsResolved: false,
-      deploymentFlags: DEFAULT_DEPLOYMENT_FLAGS,
-      personalOrganizationId: null,
-    }),
-}));
+    setDeploymentContext: (deploymentFlags, personalOrganizationId) =>
+      write({ deploymentFlags, personalOrganizationId }),
+
+    setOrganization: (organizationId, organizationSlug, organizationStatus) =>
+      write({
+        organizationId,
+        organizationSlug,
+        organizationStatus: organizationStatus ?? null,
+      }),
+    setPermissions: (permissions) => write({ permissions, permissionsResolved: true }),
+    clearPermissions: () => write({ permissions: [], permissionsResolved: false }),
+    clearOrganization: () =>
+      write({
+        organizationId: null,
+        organizationSlug: null,
+        organizationStatus: null,
+        organizationType: null,
+        permissions: [],
+        permissionsResolved: false,
+        deploymentFlags: DEFAULT_DEPLOYMENT_FLAGS,
+        personalOrganizationId: null,
+      }),
+  };
+});
 
 /**
  * The active organization's id — what every organization-scoped query key carries,

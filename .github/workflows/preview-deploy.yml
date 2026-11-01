@@ -1,0 +1,298 @@
+name: Preview deploy
+
+# Per-PR Netlify preview, step 2 of 2: publish (or tear down). Triggered when a `Preview build`
+# run (preview.yml) completes; a workflow_run job always runs the copy of this file on main, and
+# this one runs NO code from the PR (H-1):
+#   - it never checks out the PR — only main's netlify.toml (the SPA rewrite and the headers) and,
+#     in the probe job, main's tooling/ci;
+#   - it publishes the `preview-dist` artifact the unprivileged build uploaded, with netlify-cli
+#     installed by exact version (NETLIFY_CLI_VERSION below, --ignore-scripts, before any secret
+#     is in reach), never the PR's node_modules;
+#   - the deploy is always `--alias pr-<number>` (pr-<number>--clinozy-fe.netlify.app), never
+#     --prod, the number read from the GitHub API (the pull request whose head is the build's
+#     commit), never from the artifact.
+# The development environment it reads its Netlify secrets from allows the main branch only
+# (.github/environments/development.json), which a workflow_run job runs on.
+#
+# A run for a closed PR (preview.yml's `closed` job) tears the pr-<number> deploys down and marks
+# the comment. Fork and Dependabot PRs get no preview, as before the split. Advisory — NOT a
+# required check.
+
+on: # zizmor: ignore[dangerous-triggers] -- runs no PR code: the artifact is deployed as data, never executed
+  workflow_run:
+    # Must match preview.yml's `name:` exactly (tests/ci/workflow-run-triggers.policy.test.ts).
+    workflows: ['Preview build']
+    types: [completed]
+
+permissions:
+  contents: read
+
+# One preview at a time per branch, in order: a teardown queues behind the deploy before it.
+concurrency:
+  group: preview-deploy-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: ${{ vars.FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 || 'true' }}
+  # The netlify-cli the preview is published with (tests/ci/preview-deploy.policy.test.ts holds it
+  # to package.json's major); installed from the registry by this exact version.
+  NETLIFY_CLI_VERSION: '27.13.0'
+
+jobs:
+  deploy:
+    name: Deploy or tear down the preview
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.actor.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: development
+    permissions:
+      actions: read # the build run's artifact
+      contents: read
+      pull-requests: write # the preview comment
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      # secrets.* is not readable in a step `if:` — hoist presence to job env.
+      HAS_NETLIFY: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
+    steps:
+      - name: Find the pull request
+        id: pull-request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          # The pull request from this repository whose head is the build's commit, from the API.
+          gh pr list --repo "$REPOSITORY" --state all --head "$HEAD_BRANCH" --limit 20 \
+            --json number,state,headRefOid,isCrossRepository,baseRefName > pulls.json
+          match="$(jq -c --arg sha "$HEAD_SHA" \
+            '[.[] | select(.headRefOid == $sha and (.isCrossRepository | not) and .baseRefName == "main")] | first // empty' pulls.json)"
+          if [ -z "$match" ]; then
+            echo "::notice title=Preview skipped::No pull request from this repository has head ${HEAD_SHA}."
+            echo "action=none" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          number="$(jq -r '.number' <<<"$match")"
+          state="$(jq -r '.state' <<<"$match")"
+          case "$number" in
+            '' | *[!0-9]*) echo "::error::Unexpected pull request number: ${number}" && exit 1 ;;
+          esac
+          if [ "$state" = "OPEN" ]; then action=deploy; else action=teardown; fi
+          {
+            echo "number=${number}"
+            echo "alias=pr-${number}"
+            echo "action=${action}"
+          } >> "$GITHUB_OUTPUT"
+          echo "Pull request #${number} (${state}) → ${action}"
+
+      - name: Preview unavailable (no deploy secrets)
+        if: env.HAS_NETLIFY != 'true' && steps.pull-request.outputs.action != 'none'
+        run: echo "::notice title=Preview skipped::The development environment holds no Netlify secrets."
+
+      # main's netlify.toml (the SPA rewrite, the /assets 404, the headers) and .nvmrc — never
+      # the PR's.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.HAS_NETLIFY == 'true' && steps.pull-request.outputs.action != 'none'
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: |
+            netlify.toml
+            .nvmrc
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+          path: site
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        if: env.HAS_NETLIFY == 'true' && steps.pull-request.outputs.action != 'none'
+        with:
+          node-version-file: site/.nvmrc
+
+      # Before any secret is in reach: the exact version, no lifecycle scripts.
+      - name: Install netlify-cli
+        if: env.HAS_NETLIFY == 'true' && steps.pull-request.outputs.action != 'none'
+        run: npm install --global --ignore-scripts --no-audit --no-fund "netlify-cli@${NETLIFY_CLI_VERSION}"
+
+      - name: Download the preview build
+        if: env.HAS_NETLIFY == 'true' && steps.pull-request.outputs.action == 'deploy'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: preview-dist
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: site/dist
+
+      - name: Deploy preview to Netlify alias
+        if: env.HAS_NETLIFY == 'true' && steps.pull-request.outputs.action == 'deploy'
+        id: deploy
+        working-directory: site
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          PREVIEW_ALIAS: ${{ steps.pull-request.outputs.alias }}
+        run: |
+          set -euo pipefail
+          test -f dist/index.html || { echo "::error::The preview artifact has no index.html." && exit 1; }
+          # --no-build: publish the artifact as is. Always the PR's alias — this job never passes --prod.
+          netlify deploy --alias "$PREVIEW_ALIAS" --dir=dist --no-build --json > deploy-result.json
+          # Prefer the URL that actually carries the alias (pr-<n>--…), which is the reviewable
+          # preview; fall back across netlify's URL fields.
+          url="$(jq -r --arg alias "${PREVIEW_ALIAS}--" \
+            '[.deploy_ssl_url, .deploy_url, .ssl_url, .url] | map(select(. != null)) | (map(select(contains($alias))) + .) | first // ""' deploy-result.json)"
+          permalink="$(jq -r '.deploy_url // .deploy_ssl_url // ""' deploy-result.json)"
+          if [ -z "$url" ]; then
+            echo "Could not read the preview URL from netlify's output." >&2
+            exit 1
+          fi
+          echo "Preview deployed to $url"
+          {
+            echo "url=$url"
+            echo "permalink=$permalink"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Preview smoke (best-effort)
+        if: steps.deploy.outputs.url != ''
+        id: smoke
+        continue-on-error: true
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          set -euo pipefail
+          build_id="$(curl -fsS --retry 3 --retry-delay 5 "$DEPLOY_URL/version.json" | jq -r '.buildId // ""')"
+          echo "build_id=${build_id}" >> "$GITHUB_OUTPUT"
+          echo "Preview smoke OK — buildId ${build_id}."
+
+      - name: Upsert preview comment
+        if: steps.deploy.outputs.url != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+          PREVIEW_PERMALINK: ${{ steps.deploy.outputs.permalink }}
+          PREVIEW_ALIAS: ${{ steps.pull-request.outputs.alias }}
+          PULL_REQUEST: ${{ steps.pull-request.outputs.number }}
+          BUILD_ID: ${{ steps.smoke.outputs.build_id }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const marker = '<!-- preview-deploy -->';
+            const { owner, repo } = context.repo;
+            const issue_number = Number(process.env.PULL_REQUEST);
+            const buildId = process.env.BUILD_ID || '_pending_';
+            const permalink = process.env.PREVIEW_PERMALINK;
+            const body = [
+              marker,
+              '## 🔎 Preview deploy ready',
+              '',
+              '| | |',
+              '| --- | --- |',
+              `| **Preview** | ${process.env.PREVIEW_URL} |`,
+              permalink ? `| **Permalink** | ${permalink} |` : '',
+              `| **Alias** | \`${process.env.PREVIEW_ALIAS}\` |`,
+              `| **Commit** | \`${process.env.HEAD_SHA}\` |`,
+              `| **Build ID** | \`${buildId}\` |`,
+              '',
+              '_Built with the development client env — not a production build._',
+            ].filter(Boolean).join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => (comment.body || '').includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              core.notice(`Updated preview comment #${existing.id}`);
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              core.notice('Created preview comment');
+            }
+
+      # Closed PR: delete the pr-<number> deploys so closed PRs don't accumulate previews (Netlify
+      # keeps every deploy forever). Best-effort — under-matching leaves a preview to age out.
+      - name: Delete pr-<number> preview deploys
+        if: env.HAS_NETLIFY == 'true' && steps.pull-request.outputs.action == 'teardown'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          PREVIEW_ALIAS: ${{ steps.pull-request.outputs.alias }}
+        run: |
+          set -euo pipefail
+          site_data="$(jq -nc --arg s "$NETLIFY_SITE_ID" '{site_id:$s}')"
+          if ! netlify api listSiteDeploys --data "$site_data" > deploys.json; then
+            echo "::warning title=Preview teardown::Could not list Netlify deploys; leaving previews to age out."
+            exit 0
+          fi
+          # The alias lives in links.alias; the immutable deploy_ssl_url does not, so check every URL field.
+          mapfile -t ids < <(jq -r --arg alias "${PREVIEW_ALIAS}--" \
+            '.[] | select([.deploy_ssl_url, .deploy_url, .ssl_url, .url, .links.alias] | map(select(. != null) | tostring) | any(contains($alias))) | .id // empty' deploys.json)
+          deleted=0
+          for id in "${ids[@]}"; do
+            [ -n "$id" ] || continue
+            if netlify api deleteDeploy --data "$(jq -nc --arg d "$id" '{deploy_id:$d}')"; then
+              deleted=$((deleted + 1))
+            else
+              echo "Could not delete deploy ${id} (already gone?)."
+            fi
+          done
+          echo "Deleted ${deleted} preview deploy(s) for alias ${PREVIEW_ALIAS}."
+
+      - name: Mark preview comment torn down
+        if: env.HAS_NETLIFY == 'true' && steps.pull-request.outputs.action == 'teardown'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PREVIEW_ALIAS: ${{ steps.pull-request.outputs.alias }}
+          PULL_REQUEST: ${{ steps.pull-request.outputs.number }}
+        with:
+          script: |
+            const marker = '<!-- preview-deploy -->';
+            const { owner, repo } = context.repo;
+            const issue_number = Number(process.env.PULL_REQUEST);
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => (comment.body || '').includes(marker));
+            if (!existing) {
+              core.notice('No preview comment to update.');
+              return;
+            }
+            const body = [
+              marker,
+              '## 🔎 Preview deploy',
+              '',
+              `_Torn down — the \`${process.env.PREVIEW_ALIAS}\` preview alias was removed when this PR closed._`,
+            ].join('\n');
+            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            core.notice(`Updated preview comment #${existing.id} (torn down).`);
+
+  # The same live CSP and HSTS check as every governed deploy (tooling/ci/probe-live-site.mjs),
+  # from main's copy, in a job that holds no secret; best-effort here, like the smoke.
+  probe:
+    name: Probe live CSP and HSTS
+    needs: [deploy]
+    if: needs.deploy.outputs.url != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: tooling/ci
+          persist-credentials: false
+
+      - name: Probe live CSP and HSTS (best-effort)
+        continue-on-error: true
+        env:
+          DEPLOY_URL: ${{ needs.deploy.outputs.url }}
+        run: node tooling/ci/probe-live-site.mjs --url "$DEPLOY_URL"

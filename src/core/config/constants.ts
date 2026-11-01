@@ -56,6 +56,14 @@ export const SESSION = {
   MAX_AGE_MS: 12 * 60 * 60 * 1000, // 12 hours
   /** How often the watchdog re-checks the absolute cap. */
   LIFETIME_CHECK_INTERVAL_MS: 60_000,
+  /** Idle time (no click, key or touch in any tab) before the inactivity warning shows. */
+  IDLE_WARN_AFTER_MS: 5 * 60 * 1000, // 5 minutes
+  /**
+   * How long the warning waits for an answer before the session ends. Warn + grace is the idle
+   * limit — also the one a page load checks the stored last activity against before it restores
+   * the session (`startAuthBootstrap`).
+   */
+  IDLE_GRACE_MS: 90 * 1000, // 90 seconds
 } as const;
 
 // No HEADER entry: the backend scopes organization context from the signed `org`

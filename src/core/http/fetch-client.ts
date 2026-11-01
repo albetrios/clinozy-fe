@@ -3,11 +3,13 @@ import { platformConfig } from '@/core/config/env.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { scrubSensitiveUrl } from '@/lib/telemetry-scrub.ts';
 import {
+  endRefusedSession,
   forceLogout,
   isRefreshUnanswered,
   refreshAccessToken,
 } from '@/shared/auth/service.ts';
-import { getAccessToken } from '@/shared/auth/token.ts';
+import { getAccessToken, organizationClaimOf } from '@/shared/auth/token.ts';
+import { FRONTEND_ERROR_CODES } from '@/shared/errors/frontend-error-codes.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
 // ------------------------------------------------------------------
@@ -116,13 +118,48 @@ function buildHeaders(
   return headers;
 }
 
+/**
+ * What a request the caller aborted rejects with: its signal's reason when that is an error (the
+ * `AbortError` or `TimeoutError` DOMException `abort()` gives), else an `AbortError`.
+ */
+function abortErrorOf(signal: AbortSignal): Error {
+  const reason: unknown = signal.reason;
+  return reason instanceof Error || reason instanceof DOMException
+    ? reason
+    : new DOMException('The request was aborted', 'AbortError');
+}
+
+/**
+ * Abort `controller` when the caller's `signal` does (G-4) — the caller's abort and the timeout
+ * then end the one fetch, whichever comes first. A listener rather than `AbortSignal.any`
+ * (Safari 17.4+): the same on every engine, and removed again when the request settles, so a
+ * long-lived caller signal does not collect one per request.
+ *
+ * @returns Removes the listener.
+ */
+function followCallerAbort(
+  signal: AbortSignal | undefined,
+  controller: AbortController,
+): () => void {
+  if (!signal) return () => undefined;
+  const onAbort = () => controller.abort(abortErrorOf(signal));
+  if (signal.aborted) {
+    onAbort();
+    return () => undefined;
+  }
+  signal.addEventListener('abort', onAbort, { once: true });
+  return () => signal.removeEventListener('abort', onAbort);
+}
+
 async function fetchWithTimeout(
   url: string,
   init: RequestInit,
   timeoutMs: number,
+  callerSignal?: AbortSignal,
 ): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const stopFollowing = followCallerAbort(callerSignal, controller);
   try {
     const res = await fetch(url, {
       ...init,
@@ -132,7 +169,27 @@ async function fetchWithTimeout(
     return res;
   } finally {
     clearTimeout(timeoutId);
+    stopFollowing();
   }
+}
+
+/** Wait `ms` before a retry — or stop at once, rejecting, when the caller aborts meanwhile. */
+function pauseBeforeRetry(ms: number, signal: AbortSignal | undefined): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(abortErrorOf(signal));
+      return;
+    }
+    const onAbort = () => {
+      clearTimeout(timer);
+      if (signal) reject(abortErrorOf(signal));
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
 }
 
 async function parseErrorResponse(
@@ -155,7 +212,16 @@ async function parseErrorResponse(
   const message =
     (data as { message?: string } | undefined)?.message ??
     (response.statusText || `HTTP ${response.status}`);
-  return new HttpError(message, response.status, url, method, data);
+  // Kept on the error: a 429 or 503 names its wait only in this header (see HttpError).
+  const retryAfterMs = parseRetryAfterMs(response);
+  return new HttpError(
+    message,
+    response.status,
+    url,
+    method,
+    data,
+    retryAfterMs === null ? undefined : Math.ceil(retryAfterMs / 1000),
+  );
 }
 
 /** Idempotent methods: safe to retry on connection/5xx (no body or same body). */
@@ -278,7 +344,9 @@ async function doRefreshAndReplay<T>(
         undefined,
       );
     }
-    forceLogout();
+    // Refused: the session is over — at the server's idle limit or age cap a deliberate end
+    // (no auto-Google sign-in back), any other refusal a dead session (E-2).
+    endRefusedSession(refreshError);
     throw refreshError;
   }
   return replay();
@@ -347,6 +415,21 @@ interface AttemptState {
 
 const FIRST_ATTEMPT: AttemptState = { attempt: 0, refreshes: 0, rotationReplays: 0 };
 
+/** The organization a token is scoped to (its `org` claim); `null` without a token or a claim. */
+function organizationOf(token: string | null): string | null {
+  return token === null ? null : organizationClaimOf(token);
+}
+
+/**
+ * Whether the token a retry or replay would carry names another organization than the request was
+ * issued for. A request issued with no organization, or about to go out with no token (the 401 path
+ * then refreshes onto this tab's organization), is not one.
+ */
+function switchedOrganization(issuedFor: string | null, token: string | null): boolean {
+  const current = organizationOf(token);
+  return issuedFor !== null && current !== null && current !== issuedFor;
+}
+
 /** Write methods carry an auto-generated X-Idempotency-Key (server de-dupes). */
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -375,10 +458,25 @@ export function setWriteHold(hold: WriteHold | null): () => void {
  * Per-call options. `idempotencyKey` is the caller's key for ONE user action: pass the same key
  * when the user retries that action, so clinozy-be replays its first answer instead of acting twice
  * (a create that landed but lost its response is not made again). Omitted, the call mints its own.
+ * `signal` cancels the request (G-4) — the fetch in flight, a retry's wait and any replay: the
+ * call then rejects with the signal's reason, never retried and never a status-0 error.
  */
 export interface RequestOptions {
   skip401?: boolean;
   idempotencyKey?: string;
+  signal?: AbortSignal;
+}
+
+/**
+ * The refusal a request meets when a workspace switch retired the token it went out with: a `401`
+ * whose `error.reason` is {@link FRONTEND_ERROR_CODES.WORKSPACE_SWITCHED}. A 401, so the query
+ * layer neither retries it under the new token nor toasts it (the screen is being left); a write
+ * says in words that it was not saved because of the switch — never "Your session has expired".
+ */
+function workspaceSwitchedError(url: string, method: string): HttpError {
+  return new HttpError('Workspace switched', 401, url, method, {
+    error: { reason: FRONTEND_ERROR_CODES.WORKSPACE_SWITCHED },
+  });
 }
 
 async function request<T>(
@@ -397,6 +495,9 @@ async function request<T>(
   const idempotencyKey = WRITE_METHODS.has(method)
     ? (options?.idempotencyKey ?? crypto.randomUUID())
     : undefined;
+  // The organization this request is for: the one the token it first goes out with names.
+  const issuedFor = organizationOf(getAccessToken());
+  const signal = options?.signal;
 
   function fetchOnce(): Promise<Response> {
     const headers = buildHeaders(url, idempotencyKey);
@@ -405,7 +506,7 @@ async function request<T>(
       headers,
       ...(body !== undefined && { body: JSON.stringify(body) }),
     };
-    return fetchWithTimeout(url, init, defaultConfig.timeout);
+    return fetchWithTimeout(url, init, defaultConfig.timeout, signal);
   }
 
   /** A dropped connection: retried on the shared budget, or surfaced as a status-0 HttpError. */
@@ -413,6 +514,8 @@ async function request<T>(
     err: unknown,
     state: AttemptState,
   ): Promise<HttpResponse<T>> {
+    // The caller let go: not a dropped connection, nothing to retry or report.
+    if (signal?.aborted) throw abortErrorOf(signal);
     const message = (err as Error)?.message;
     const errorKind = classifyFetchError(err);
     const delay = nextRetryDelay({
@@ -424,7 +527,7 @@ async function request<T>(
     if (delay === null) {
       throw new HttpError(message ?? 'Network error', 0, url, method, undefined);
     }
-    await new Promise((r) => setTimeout(r, delay));
+    await pauseBeforeRetry(delay, signal);
     logRetry(state.attempt, url, `: ${message ?? ''}`);
     return run({ ...state, attempt: state.attempt + 1 });
   }
@@ -466,8 +569,16 @@ async function request<T>(
 
   // Single attempt budget shared by connection-error AND bad-status retries.
   const run = async (state: AttemptState = FIRST_ATTEMPT): Promise<HttpResponse<T>> => {
+    // A replay after a refresh, or a retry, the caller has let go of in the meantime.
+    if (signal?.aborted) throw abortErrorOf(signal);
     // `buildHeaders` reads the same token synchronously when `fetchOnce` starts.
     const sentToken = getAccessToken();
+    if (state !== FIRST_ATTEMPT && switchedOrganization(issuedFor, sentToken)) {
+      // A workspace switch replaced the token while this request was out. Sent again, it would
+      // be answered for the OTHER organization — its records cached under the key of the one this
+      // request was for, a write made in it. The token it went out with is retired: say so.
+      throw workspaceSwitchedError(url, method);
+    }
     let response: Response;
     try {
       response = await fetchOnce();
@@ -488,7 +599,7 @@ async function request<T>(
         response,
       });
       if (delay !== null) {
-        await new Promise((r) => setTimeout(r, delay));
+        await pauseBeforeRetry(delay, signal);
         logRetry(state.attempt, url, ` (${response.status})`);
         return run({ ...state, attempt: state.attempt + 1 });
       }

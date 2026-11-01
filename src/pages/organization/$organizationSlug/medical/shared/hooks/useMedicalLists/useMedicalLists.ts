@@ -14,6 +14,7 @@ import {
   fetchAllManufacturers,
   fetchAllMedicalReps,
   fetchAllSuppliers,
+  fetchPurchaseGstSummary,
   listManufacturers,
   listMedicalReps,
   listMedicalSales,
@@ -74,6 +75,17 @@ export function useSaleReminders(params: SaleListParams) {
     queryFn: () => listSaleReminders(params),
     notifyOnError: false,
     enabled: organizationId !== null,
+  });
+}
+
+/** A month's purchase GST summary (`GET /app/medical-purchase-orders/gst-summary`). */
+export function usePurchaseGstSummary(month: string) {
+  const organizationId = useOrganizationId();
+  return useAppQuery({
+    queryKey: medicalQueryKeys.purchaseGstSummary(organizationId, month),
+    queryFn: () => fetchPurchaseGstSummary(month),
+    notifyOnError: false,
+    enabled: organizationId !== null && month !== '',
   });
 }
 

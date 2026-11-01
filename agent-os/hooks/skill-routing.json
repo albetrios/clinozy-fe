@@ -175,6 +175,7 @@
     {
       "globs": [
         "src/core/config/env-schema.ts",
+        "src/core/config/client-env-schema.ts",
         ".env.example",
         "**/platform-config.ts",
         "**/build-env.ts",

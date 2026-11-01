@@ -3,10 +3,10 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-// The agent permission rules: named scripts, `pnpm exec` (a binary already installed) and the
-// chain's git commands run without a prompt, GitHub stays read-only without one, the destructive
-// commands are denied outright, and nothing asks — neither an `ask` rule nor a hook — so every
-// other call is the permission mode's to decide. clinozy-be pins its own in
+// The agent permission rules: named scripts, `pnpm exec` of a named dev binary and the chain's
+// local git commands run without a prompt, GitHub stays read-only without one, the destructive
+// commands are denied outright, and the two that publish — `git push` and a merge — ask (H-6).
+// No hook asks; every other call is the permission mode's to decide. clinozy-be pins its own in
 // src/tests/unit/tooling/agent-permissions.policy.unit.test.ts.
 
 const permissions = (
@@ -21,9 +21,10 @@ describe('Claude Code permission rules', () => {
     for (const rule of permissions.allow.filter((entry) =>
       entry.startsWith('Bash(pnpm '),
     )) {
-      // `pnpm <script>…`, `pnpm exec *` or the exact no-argument install, never a bare wildcard.
+      // `pnpm <script>…`, `pnpm exec <named binary> *` or the exact no-argument install, never
+      // a bare wildcard: `pnpm exec *` ran any binary on PATH (`netlify deploy --prod`, `rm`) (H-6).
       expect(rule).toMatch(
-        /^Bash\(pnpm (?:[a-z][a-z:-]*\*|exec \*|install(?: --[a-z-]+)?)\)$/,
+        /^Bash\(pnpm (?:[a-z][a-z:-]*\*|exec [a-z][a-z0-9-]* \*|install(?: --[a-z-]+)?)\)$/,
       );
     }
     for (const rule of [
@@ -49,16 +50,28 @@ describe('Claude Code permission rules', () => {
       'pnpm install left-pad',
       'pnpm deploy',
       'pnpm rebrand Acme',
+      'pnpm exec netlify deploy --prod',
+      'pnpm exec tsx -e "anything"',
+      'pnpm exec rm -rf dist',
     ]) {
       expect(covered(command), command).toBe(false);
     }
-    expect(covered('pnpm exec tsx x.ts')).toBe(true);
+    expect(covered('pnpm exec vitest run src/x.test.ts')).toBe(true);
+    expect(covered('pnpm exec playwright test')).toBe(true);
   });
 
-  it('declares no ask rule, the same as clinozy-be', () => {
+  it('asks before a push or a merge, the same as clinozy-be (H-6)', () => {
     // One policy for both repositories: a session that holds both merges their rules, and an ask
-    // outranks every allow.
-    expect(permissions.ask ?? []).toEqual([]);
+    // outranks every allow (`Bash(gh pr*)` reads PRs without a prompt; a merge asks).
+    expect(permissions.ask).toEqual([
+      'Bash(git push)',
+      'Bash(git push *)',
+      'Bash(gh pr merge*)',
+      'mcp__github__merge_pull_request',
+    ]);
+    expect(permissions.allow.filter((rule) => rule.startsWith('Bash(git push'))).toEqual(
+      [],
+    );
   });
 
   it('no hook script asks the user (permissionDecision "ask")', () => {
@@ -71,11 +84,10 @@ describe('Claude Code permission rules', () => {
     }
   });
 
-  it('git writes and gh run run without a prompt', () => {
+  it('local git writes and gh run run without a prompt', () => {
     for (const rule of [
       'Bash(git add *)',
       'Bash(git commit *)',
-      'Bash(git push *)',
       'Bash(git switch *)',
       'Bash(gh run *)',
       // The project's own server (`.mcp.json`) and the user-level one (install-headroom.sh).

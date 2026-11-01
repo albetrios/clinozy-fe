@@ -108,6 +108,9 @@
     "viewAs": {
       "readOnly": "미리 보기는 읽기 전용이라 아무것도 저장되지 않았습니다. 변경하려면 미리 보기를 종료하세요."
     },
+    "workspaceSwitched": {
+      "notSaved": "클리닉을 전환했기 때문에 이 변경 사항은 저장되지 않았습니다."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "패스키를 추가할 수 없습니다",

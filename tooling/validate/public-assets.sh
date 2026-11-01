@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # Ensure required public/ assets exist. Run before build or in CI.
-# See public/README.md for the full inventory.
+# See docs/reference/public-assets.md for the full inventory.
 set -e
 
 cd "$(dirname "$0")/../.."
@@ -16,7 +16,7 @@ done
 
 if [ -n "$MISSING" ]; then
   echo "[validate-public-assets] ERROR: Missing required files in $PUBLIC/:$MISSING"
-  echo "See public/README.md for the list of required assets."
+  echo "See docs/reference/public-assets.md for the list of required assets."
   echo "Generate PWA PNGs from app-icon.svg: sips -s format png public/app-icon.svg --out public/pwa-192x192.png -z 192 192"
   exit 1
 fi

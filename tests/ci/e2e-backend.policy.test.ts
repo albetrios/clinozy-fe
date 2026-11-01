@@ -109,11 +109,36 @@ describe('E2E against the backend image', () => {
     }
   });
 
+  it('runs the backend image by the digest clinozy-be signed, never by tag (H-12)', () => {
+    const resolve = WORKFLOW.indexOf(
+      '- name: Resolve the backend image to a signed digest',
+    );
+    const pull = WORKFLOW.indexOf('docker pull "$BACKEND_IMAGE"');
+    expect(resolve).toBeGreaterThan(-1);
+    expect(resolve).toBeLessThan(pull);
+    const step = WORKFLOW.slice(resolve, pull);
+    // clinozy-be's own signing identity: its image build on main or a release tag.
+    expect(step).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: shell expansion, asserted verbatim
+      'identity="^https://github\\.com/${BACKEND_REPOSITORY}/\\.github/workflows/reusable-docker-build-trivy\\.yml@refs/(heads/main|tags/v.+)$"',
+    );
+    expect(step).toContain(
+      '--certificate-oidc-issuer https://token.actions.githubusercontent.com',
+    );
+    expect(step).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: shell expansion, asserted verbatim
+      'echo "BACKEND_IMAGE=${BACKEND_IMAGE_REPOSITORY}@${digest}" >> "$GITHUB_ENV"',
+    );
+    // BACKEND_IMAGE is never set from a tag anywhere else.
+    expect(WORKFLOW.match(/BACKEND_IMAGE[=:]/g)).toHaveLength(1);
+  });
+
   it("boots the backend's latest image, never the shared development environment", () => {
     // The name clinozy-be pushes: ghcr.io/<owner>/<repository>/<image>. Without the repository
     // segment the pull fails with "manifest unknown" before the backend boots.
     expect(WORKFLOW).toContain(
-      'BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api:latest',
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax, asserted verbatim
+      'BACKEND_IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/clinozy-be/clinozy-be-api',
     );
     expect(WORKFLOW).toContain('packages: read');
     // clinozy-be's one database step, compiled (create, migrate, permissions and plans).
@@ -145,8 +170,12 @@ describe('E2E against the backend image', () => {
     // clinozy-be no longer sends deployment flags, so the app's mode is VITE_PERSONAL_ORGANIZATIONS
     // / VITE_TEAM_ORGANIZATIONS alone. Before this the job set neither: the app and the backend
     // each ran their default, and the team-only specs never ran. It reads development's
-    // variables (as preview.yml does) and boots the backend in the same mode.
-    expect(WORKFLOW).toMatch(/^ {4}environment: development$/m);
+    // variables and boots the backend in the same mode. On a pull request the development
+    // environment (main only, H-1) is not selected: the repository-level copies are read.
+    expect(WORKFLOW).toContain(
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: GitHub Actions expression syntax, asserted verbatim
+      "    environment: ${{ github.event_name != 'pull_request' && 'development' || null }}",
+    );
     for (const key of ['VITE_PERSONAL_ORGANIZATIONS', 'VITE_TEAM_ORGANIZATIONS']) {
       expect(WORKFLOW).toMatch(new RegExp(`${key}: \\$\\{\\{ vars\\.${key} \\}\\}`));
     }

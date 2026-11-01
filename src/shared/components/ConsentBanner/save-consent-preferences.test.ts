@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { AuthUser } from '@/shared/auth/types.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   ACCEPT_ALL_CONSENT_PREFERENCES,
   CONSENT_POLICY_VERSION,
@@ -25,8 +27,28 @@ vi.mock('@/shared/analytics/record-consent-decision.ts', () => ({
 describe('saveConsentPreferences', () => {
   beforeEach(() => {
     setGlobalPrivacyControlForTests(false);
+    useAuthStore.setState({ user: null });
     resetConsentForTests();
     recordConsentDecision.mockClear();
+  });
+
+  it('records who answered — the signed-in member, or nobody signed out (F-4)', () => {
+    useAuthStore.setState({
+      user: {
+        id: 'usr_asha',
+        email: 'a@clinic.test',
+        role: 'user',
+        name: 'Asha',
+      } as AuthUser,
+    });
+    saveConsentPreferences(ACCEPT_ALL_CONSENT_PREFERENCES, 'consent_banner');
+    expect(readConsentCookieForTests()).toMatchObject({ decidedBy: 'usr_asha' });
+    expect(useConsentStore.getState().decidedBy).toBe('usr_asha');
+    expect(hasAnalyticsConsent()).toBe(true);
+
+    useAuthStore.setState({ user: null });
+    saveConsentPreferences(REJECT_ALL_CONSENT_PREFERENCES, 'consent_banner');
+    expect(readConsentCookieForTests()).toMatchObject({ decidedBy: null });
   });
 
   it('Accept all keeps the answer in the cookie, with the policy version and the time', () => {

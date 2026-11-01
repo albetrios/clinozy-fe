@@ -110,7 +110,28 @@ describe('useDevicePrefsStore', () => {
   it('persists to a versioned, product-namespaced key on this device', () => {
     useDevicePrefsStore.getState().setPhotoSize('large');
     const stored = JSON.parse(localStorage.getItem(KEY) ?? '{}');
-    expect(stored.version).toBe(1);
+    expect(stored.version).toBe(2);
     expect(stored.state.photoSize).toBe('large');
+  });
+
+  // F-9: version 1 kept saved views per device — whoever saved them, the next person found them.
+  it('drops the views a device-wide store kept, keeping the device’s layout choices', async () => {
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        version: 1,
+        state: {
+          photoSize: 'large',
+          savedViews: {
+            patients: [{ id: 'v1', name: 'VIP', filters: { status: ['vip'] } }],
+          },
+        },
+      }),
+    );
+
+    await useDevicePrefsStore.persist.rehydrate();
+
+    expect(useDevicePrefsStore.getState().savedViews).toEqual({});
+    expect(useDevicePrefsStore.getState().photoSize).toBe('large');
   });
 });

@@ -7,7 +7,7 @@
  * IdleTimeoutHandle.extend} ("Stay signed in") or a sign-out — before
  * `onLogout` fires.
  *
- * Three properties this module guarantees, each of which was once a bug:
+ * Four properties this module guarantees, each of which was once a bug:
  *
  * 1. **The warning is not dismissed by activity in this tab.** The activity
  *    listeners sit on `document`, so a press on the warning dialog's own
@@ -22,12 +22,15 @@
  * 3. **Activity is shared across tabs** (`storageKey`). The session is one per
  *    browser but the timer is one per tab: without this, a tab left in the
  *    background signs the user out of the tab they are actively working in.
+ * 4. **A page load is not activity.** The clock starts from the stored stamp
+ *    ({@link idleFor} reads it for the boot, before any refresh); recording "now"
+ *    first handed a browser left alone for hours a fresh grace period.
  *
  * Usage:
  *   const idle = startIdleTimeout({
  *     warnAfterMs: 5 * 60 * 1000,
  *     logoutAfterMs: 6.5 * 60 * 1000,
- *     storageKey: 'clinozy:last-activity',
+ *     storageKey: IDLE_ACTIVITY_STORAGE_KEY,
  *     onWarn: ({ logoutAt }) => showWarningDialog(logoutAt),
  *     onLogout: () => logout(),
  *     onActive: () => hideWarningDialog(),
@@ -36,6 +39,22 @@
  *   idle.extend(); // "Stay signed in"
  *   idle.stop(); // on unmount or logout
  */
+
+import { SESSION } from '@/core/config/constants.ts';
+import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
+
+/**
+ * The last-activity stamp every tab of this origin shares (a timestamp, never a token).
+ *
+ * @remarks
+ * The session is one per browser but the idle timer is one per tab: unshared, a tab left in the
+ * background counts itself idle and signs the user out of the tab they are working in. Derived
+ * from `PRODUCT_NAMESPACE`, like the other auth storage keys.
+ */
+export const IDLE_ACTIVITY_STORAGE_KEY = `${PRODUCT_NAMESPACE}:last-activity`;
+
+/** The idle limit: warning after {@link SESSION.IDLE_WARN_AFTER_MS}, then its grace. */
+export const IDLE_LOGOUT_AFTER_MS = SESSION.IDLE_WARN_AFTER_MS + SESSION.IDLE_GRACE_MS;
 
 interface IdleTimeoutOptions {
   /** Milliseconds of idle time before showing warning */
@@ -106,10 +125,43 @@ function writeSharedActivity(storageKey: string | undefined, at: number): void {
   }
 }
 
+/** The shared stamp, unless it is from the future (a skewed or tampered value keeps nothing alive). */
+function readPastActivity(storageKey: string | undefined): number | null {
+  const shared = readSharedActivity(storageKey);
+  return shared !== null && shared <= Date.now() ? shared : null;
+}
+
+/** Record "the user is here now" in the shared stamp — an interactive sign-in is activity. */
+export function markActivity(storageKey: string = IDLE_ACTIVITY_STORAGE_KEY): void {
+  writeSharedActivity(storageKey, Date.now());
+}
+
+/** Forget the shared stamp (the session ended). */
+export function clearActivity(storageKey: string = IDLE_ACTIVITY_STORAGE_KEY): void {
+  try {
+    localStorage.removeItem(storageKey);
+  } catch {
+    /* storage unavailable — nothing was stored */
+  }
+}
+
 /**
- * Start the idle timer — see the module docs above for its three guarantees.
- * Counts from now (mounting is itself proof of presence); returns the handle
- * that continues or tears down the watch.
+ * How long ago any tab last recorded activity, in ms — `null` with no usable stamp (never
+ * recorded, storage unavailable, a value from the future).
+ *
+ * @remarks
+ * Read before anything records new activity: a page load is no proof that anyone is there (a
+ * browser restoring its tabs, the reload the update check defers until the user is idle).
+ */
+export function idleFor(storageKey: string = IDLE_ACTIVITY_STORAGE_KEY): number | null {
+  const stamp = readPastActivity(storageKey);
+  return stamp === null ? null : Date.now() - stamp;
+}
+
+/**
+ * Start the idle timer — see the module docs above for its four guarantees.
+ * Counts from the last activity any tab recorded (`storageKey`), or from now when
+ * none is stored; returns the handle that continues or tears down the watch.
  */
 export function startIdleTimeout(options: IdleTimeoutOptions): IdleTimeoutHandle {
   const { warnAfterMs, logoutAfterMs, onWarn, onLogout, onActive, storageKey } = options;
@@ -128,8 +180,8 @@ export function startIdleTimeout(options: IdleTimeoutOptions): IdleTimeoutHandle
 
   /** Fold in activity from sibling tabs. A clock that ran backwards is ignored. */
   function syncSharedActivity() {
-    const shared = readSharedActivity(storageKey);
-    if (shared !== null && shared > lastActivity && shared <= Date.now()) {
+    const shared = readPastActivity(storageKey);
+    if (shared !== null && shared > lastActivity) {
       lastActivity = shared;
     }
   }
@@ -213,8 +265,14 @@ export function startIdleTimeout(options: IdleTimeoutOptions): IdleTimeoutHandle
     window.addEventListener('storage', handleStorage, { signal: controller.signal });
   }
 
-  // Mounting is itself proof of presence (a page load or a fresh sign-in).
-  recordActivity();
+  // The clock starts where the tabs left it. Mounting is NOT proof of presence: recording "now"
+  // first handed a browser left alone for hours a fresh grace period on its next load (E-2). So
+  // the stored stamp is read before anything is recorded, and a session idle past the limit is
+  // signed out on this first evaluation. A fresh sign-in has just stamped it (`markActivity`);
+  // with no stamp at all (first load, a tab-local timer) the clock starts now.
+  const stored = readPastActivity(storageKey);
+  if (stored === null) recordActivity();
+  else lastActivity = stored;
   evaluate();
 
   return {

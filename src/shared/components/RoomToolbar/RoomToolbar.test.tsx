@@ -4,6 +4,8 @@ import { useSyncExternalStore } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { savedViewsKey } from '@/shared/hooks/useSavedViews/index.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   LEAD_CHAT_WIDTH,
   useDevicePrefsStore,
@@ -94,6 +96,10 @@ const fab = () => document.querySelector<HTMLElement>('[data-slot="fab"]');
 beforeEach(() => {
   tier.current = 'desktop';
   onNew.mockReset();
+  // Saved views are the signed-in person's (F-9).
+  useAuthStore
+    .getState()
+    .setUser({ id: 'usr_ada', email: 'ada@clinic.test', role: 'user' });
   useDevicePrefsStore.setState({
     hiddenColumns: {},
     savedViews: {},
@@ -348,7 +354,9 @@ describe('RoomToolbar — saved views', () => {
   it('shows the saved views once one exists, and applies one into the URL', async () => {
     useDevicePrefsStore.setState({
       savedViews: {
-        patients: [{ id: 'v1', name: 'VIP', filters: { status: ['vip'] } }],
+        [savedViewsKey('usr_ada', 'patients')]: [
+          { id: 'v1', name: 'VIP', filters: { status: ['vip'] } },
+        ],
       },
     });
     const user = userEvent.setup();
@@ -371,7 +379,11 @@ describe('RoomToolbar — saved views', () => {
 
   it('has no saved views or "Save as view" when the room turns them off', async () => {
     useDevicePrefsStore.setState({
-      savedViews: { patients: [{ id: 'v1', name: 'VIP', filters: { status: ['vip'] } }] },
+      savedViews: {
+        [savedViewsKey('usr_ada', 'patients')]: [
+          { id: 'v1', name: 'VIP', filters: { status: ['vip'] } },
+        ],
+      },
     });
     const user = userEvent.setup();
     renderToolbar(

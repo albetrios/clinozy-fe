@@ -38,7 +38,8 @@
     "removeDiscount": "期限間近の割引を解除",
     "prescriptions": "未調剤の処方",
     "paymentReminders": "支払いリマインダーを送信",
-    "payAllReceived": "受領分をすべて支払う · {{amount}}"
+    "payAllReceived": "受領分をすべて支払う · {{amount}}",
+    "gstSummary": "GST サマリー"
   },
   "filters": {
     "all": "すべて",
@@ -227,7 +228,10 @@
     "export": "エクスポート",
     "exportTitle": "これらの支払いを CSV でエクスポート",
     "exported": "支払いを CSV でエクスポートしました",
-    "exportTruncated": "最初の 10,000 件の支払いをエクスポートしました — 残りはフィルターを絞ってください"
+    "exportTruncated": "最初の 10,000 件の支払いをエクスポートしました — 残りはフィルターを絞ってください",
+    "exportRetryIn_other": "ただいまエクスポートが混み合っています — {{count}} 秒後にもう一度お試しください",
+    "exportRetryLater": "ただいまエクスポートが混み合っています — しばらくしてからもう一度お試しください",
+    "exportUnavailable": "エクスポートは一時的にご利用いただけません。しばらくしてからもう一度お試しください。"
   },
   "credits": {
     "records": "薬局のクレジット",
@@ -603,7 +607,12 @@
         "newMedicineName": "新しい医薬品名",
         "note": "メモ",
         "notePlaceholder": "例: 30日後払い",
-        "mrp": "希望小売価格"
+        "mrp": "希望小売価格",
+        "gst": "GST",
+        "gstRate": "{{value}}%",
+        "ratesIncludeGst": "単価は GST 込み",
+        "gstOnTop": "GST 別",
+        "gstTotals": "課税対象 {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "在庫少を再発注"
@@ -648,7 +657,8 @@
       "print": "印刷",
       "note": "メモ",
       "saveNote": "メモを保存",
-      "noteSaved": "メモを保存しました"
+      "noteSaved": "メモを保存しました",
+      "gstOnTopRate": "{{value}}% 別"
     },
     "sale": {
       "title": "販売",
@@ -736,6 +746,24 @@
       "copy": "{{name}} さん宛てのリマインダーをコピー",
       "copied": "{{name}} さん宛てのリマインダーをコピーしました",
       "message": "{{name}} 様、{{clinic}} よりお知らせです。お薬代 {{amount}} が未払いとなっております。ご不明な点がございましたら、こちらにご返信ください。よろしくお願いいたします。"
+    },
+    "gstSummary": {
+      "title": "仕入 GST",
+      "month": "月",
+      "summary": "入荷済み注文: {{orders}} · 明細: {{lines}}",
+      "byRate": "GST 税率別",
+      "byHsn": "HSN コード別",
+      "rate": "税率",
+      "hsn": "HSN コード",
+      "noHsn": "HSN なし",
+      "lines": "明細",
+      "taxable": "課税対象",
+      "gst": "GST",
+      "total": "合計",
+      "totals": "課税対象 {{taxable}} · GST {{gst}} · 合計 {{total}}",
+      "empty": "今月の入荷はありません",
+      "download": "CSV をダウンロード",
+      "downloaded": "GST サマリーをダウンロードしました"
     }
   }
 }

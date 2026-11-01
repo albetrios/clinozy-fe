@@ -47,8 +47,8 @@ import {
   orderInputOf,
   type OrderLinesProblem,
   orderLinesProblem,
+  orderMoney,
   orderServerFields,
-  orderTotal,
   pickedLines,
   type PurchaseOrderFormValues,
   reorderLines,
@@ -138,7 +138,9 @@ function useSteps(
             picked.length > 0
               ? t(K.fields.peek, {
                   count: picked.length,
-                  amount: formatPaise(orderTotal(values.lines)),
+                  amount: formatPaise(
+                    orderMoney(values.lines, values.gstInclusive).amount,
+                  ),
                 })
               : undefined,
         },
@@ -272,7 +274,7 @@ function OrderSession({
     values,
     supplierName,
   );
-  const total = formatPaise(orderTotal(values.lines));
+  const total = formatPaise(orderMoney(values.lines, values.gstInclusive).amount);
 
   return (
     <>

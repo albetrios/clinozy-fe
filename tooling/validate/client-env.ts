@@ -12,6 +12,8 @@
  *   - `allowed` values are enforced strictly (HARD FAIL) against the per-env
  *     `.env.<env>` file (locally) or the injected GitHub Environment (CI) — e.g.
  *     production permits only the safe value for each diagnostics flag.
+ *   - on a hosted deploy (`HOSTED_DEPLOYMENT=true`, set by the deploy workflows), every
+ *     test-only switch is refused, whatever the profile allows (`hostedDeploymentRefusals`).
  *
  * Environment resolution (first match wins):
  *   1. `--env <local|development|production>`
@@ -36,6 +38,7 @@ import {
   environmentForBranch,
   envProfiles,
   envSchemaKeys,
+  hostedDeploymentRefusals,
   isSecretNamedClientKey,
 } from '../../src/core/config/env-schema.ts';
 import { tryGit } from '../ci/git-environment.mjs';
@@ -225,7 +228,10 @@ function report(environment: AppEnvironment, errors: string[], warnings: string[
 function main(): void {
   const environment = resolveEnvironment();
   if (!environment) {
-    const nameErrors = secretNameErrors(undefined);
+    const nameErrors = [
+      ...secretNameErrors(undefined),
+      ...hostedDeploymentRefusals(runtimeGet),
+    ];
     if (nameErrors.length > 0) report('local', nameErrors, []);
     console.log(
       'client-env: skipped (no deploy environment — pass --env, --production, or run on `main`)',
@@ -240,11 +246,13 @@ function main(): void {
   );
 
   const required = requiredIssues(environment);
+  const fileValues = envFileValues(environment);
   const errors = [
     ...required.errors,
     ...forbiddenErrors(environment, committedEnv(environment)),
     ...allowedErrors(environment),
     ...secretNameErrors(environment),
+    ...hostedDeploymentRefusals((key) => runtimeGet(key) ?? fileValues[key]),
   ];
   report(environment, errors, required.warnings);
 }

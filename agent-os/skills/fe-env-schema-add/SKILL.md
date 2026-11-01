@@ -1,7 +1,7 @@
 ---
 name: fe-env-schema-add
 description: Add, rename or remove an env var safely — Secret vs Variable, the .env.example section, schema, validators and GitHub Environments in sync. Use when env-schema.ts or .env.example changes.
-trigger: src/core/config/env-schema.ts, .env.example, **/platform-config.ts, **/build-env.ts, knip.jsonc
+trigger: src/core/config/env-schema.ts, src/core/config/client-env-schema.ts, .env.example, **/platform-config.ts, **/build-env.ts, knip.jsonc
 triggerNote: If an env key changed
 ---
 
@@ -66,6 +66,12 @@ Every key sits under exactly one half. Sub-sections (`# --- Title ---`) group re
 | `BUILD_*` | `envSchemaBase` only                | No (build plugins) |
 | No prefix | `envSchemaBase` only                | No (CI/scripts)    |
 
+`envSchemaBase` (with the descriptions and `envProfiles`) is in `src/core/config/env-schema.ts`,
+which is **tooling-only** — the app never imports it, so deploy and tooling key names stay out of
+the bundle (`tests/ci/env-contract-off-bundle.policy.test.ts`). `clientEnvSchema` is in
+`src/core/config/client-env-schema.ts`, the one env-schema module `env.config.ts` reads; the same
+policy test fails when a `VITE_` key is in one schema and not the other.
+
 **Platform-facing `VITE_*` keys** also need wiring in:
 
 - `src/core/config/env-resolvers.ts` (if parsed/transformed)
@@ -74,7 +80,7 @@ Every key sits under exactly one half. Sub-sections (`# --- Title ---`) group re
 
 ## Checklist — add a key
 
-1. **Schema** — add Zod field to `src/core/config/env-schema.ts`.
+1. **Schema** — add Zod field to `src/core/config/env-schema.ts` (and, for a `VITE_*` key, to `clientEnvSchema` in `src/core/config/client-env-schema.ts`).
 2. **Runtime** — wire `env.config.ts` / `platform-config.ts` if app reads it.
    - **Behavior flag?** Read it via `platformConfig` (never `import.meta.env.DEV/PROD/MODE`).
 3. **Per-environment allowed values (strict) — MANDATORY for security/behaviour flags.**

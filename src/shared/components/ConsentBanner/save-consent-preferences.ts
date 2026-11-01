@@ -1,4 +1,5 @@
 import type { ConsentDecisionSource } from '@/shared/analytics/record-consent-decision.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   CONSENT_COOKIE_MAX_AGE_SECONDS,
   CONSENT_COOKIE_NAME,
@@ -10,9 +11,9 @@ import {
 /**
  * Give this browser's answer — from the card or from Settings › Account › Privacy.
  *
- * At once: the answer goes to the consent cookie (one year, `SameSite=Lax`, `Secure` on https)
- * and to {@link useConsentStore}, which closes the card and starts or stops PostHog and Sentry's
- * recording. Then, off the critical path, `record-consent-decision.ts` (loaded on demand) sends the
+ * At once: the answer — with `decidedBy`, the user signed in now — goes to the consent cookie
+ * (one year, `SameSite=Lax`, `Secure` on https) and to {@link useConsentStore}, which closes the
+ * card and starts or stops PostHog and Sentry's recording. Then, off the critical path, `record-consent-decision.ts` (loaded on demand) sends the
  * analytics event or purges what an earlier grant stored, and the account's receipt while signed
  * in; it never fails the answer.
  *
@@ -25,10 +26,13 @@ export function saveConsentPreferences(
   source: ConsentDecisionSource,
 ): void {
   const decidedAt = new Date().toISOString();
+  // Who answered: on a shared PC the next person to sign in is asked again (F-4).
+  const decidedBy = useAuthStore.getState().user?.id ?? null;
   const stored = {
     analytics: preferences.analytics,
     version: CONSENT_POLICY_VERSION,
     decidedAt,
+    decidedBy,
   };
   const attributes = [
     `${CONSENT_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(stored))}`,
@@ -43,6 +47,8 @@ export function saveConsentPreferences(
   useConsentStore.setState({
     preferences: { analytics: preferences.analytics },
     decidedAt,
+    decidedBy,
+    viewerId: decidedBy,
     preferencesOpen: false,
   });
   import('@/shared/analytics/record-consent-decision.ts')

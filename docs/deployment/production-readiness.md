@@ -32,12 +32,11 @@ The frontend **shell** is solid:
 
 - [x] **clinozy-be deployed** — Railway, production released from a tagged release with a manual
       approval (clinozy-be `release-deploy.yml`).
-- [ ] **Messaging off sample data.** `src/shared/api/app/messages-api.ts` and
-      `contact-threads-api.ts` read the in-memory world in
-      `src/shared/api/app/fixtures/world.fixtures.ts`, so the chat column in Leads, Tasks, the
-      patient file and Medical reminders shows prototype threads, and nothing is sent. Needs
-      clinozy-be's WhatsApp Cloud API client first. `REPLACE_WITH_API` marks the remaining
-      spots (37 in 18 files under `src/shared/api/app`, plus `PurchaseOrderPrint`).
+- [ ] **Messaging delivered.** The chat column reads and writes each contact's stream on
+      clinozy-be (`contact-activities-api.ts`); the fixture world under
+      `src/shared/api/app/fixtures/` is test support only and `pnpm build:check` fails a build
+      that carries it. Messages wait `queued` until clinozy-be's WhatsApp Cloud API client
+      delivers them; `REPLACE_WITH_API` marks the remaining spots under `src/shared/api/app`.
 - [ ] **Settle the open backend requests** — clinozy-be issue #34 (120 requests: 79 covered,
       40 partial, 1 conflict — the Tasks "Everyone" view).
 - [ ] **Confirm the auth contract** (not re-verified 2026-10-17): HttpOnly refresh cookie

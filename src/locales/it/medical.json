@@ -38,7 +38,8 @@
     "removeDiscount": "Rimuovi lo sconto per scadenza",
     "prescriptions": "Ricette da evadere",
     "paymentReminders": "Invia promemoria di pagamento",
-    "payAllReceived": "Paga tutto il ricevuto · {{amount}}"
+    "payAllReceived": "Paga tutto il ricevuto · {{amount}}",
+    "gstSummary": "Riepilogo GST"
   },
   "filters": {
     "all": "Tutti",
@@ -247,7 +248,12 @@
     "export": "Esporta",
     "exportTitle": "Esporta questi pagamenti in CSV",
     "exported": "Pagamenti esportati in CSV",
-    "exportTruncated": "Esportati i primi 10.000 pagamenti: restringi i filtri per il resto"
+    "exportTruncated": "Esportati i primi 10.000 pagamenti: restringi i filtri per il resto",
+    "exportRetryIn_one": "Troppe esportazioni in corso — riprova tra {{count}} secondo",
+    "exportRetryIn_many": "Troppe esportazioni in corso — riprova tra {{count}} secondi",
+    "exportRetryIn_other": "Troppe esportazioni in corso — riprova tra {{count}} secondi",
+    "exportRetryLater": "Troppe esportazioni in corso — riprova tra poco",
+    "exportUnavailable": "Le esportazioni non sono disponibili al momento. Riprova tra poco."
   },
   "credits": {
     "records": "crediti della farmacia",
@@ -643,7 +649,12 @@
         "newMedicineName": "Nome del nuovo farmaco",
         "note": "Nota",
         "notePlaceholder": "es. 30 GIORNI",
-        "mrp": "Prezzo max."
+        "mrp": "Prezzo max.",
+        "gst": "GST",
+        "gstRate": "{{value}}%",
+        "ratesIncludeGst": "Le tariffe includono la GST",
+        "gstOnTop": "GST in aggiunta",
+        "gstTotals": "Imponibile {{taxable}} · GST {{gst}}"
       },
       "quickFill": {
         "reorder": "Riordina le scorte basse"
@@ -690,7 +701,8 @@
       "print": "Stampa",
       "note": "Nota",
       "saveNote": "Salva nota",
-      "noteSaved": "Nota salvata"
+      "noteSaved": "Nota salvata",
+      "gstOnTopRate": "{{value}}% in aggiunta"
     },
     "sale": {
       "title": "Vendita",
@@ -786,6 +798,24 @@
       "copy": "Copia il promemoria per {{name}}",
       "copied": "Promemoria per {{name}} copiato",
       "message": "Ciao {{name}}, le ricordiamo da {{clinic}} che restano da pagare {{amount}} per i suoi farmaci. Risponda qui per qualsiasi domanda. Grazie!"
+    },
+    "gstSummary": {
+      "title": "GST sugli acquisti",
+      "month": "Mese",
+      "summary": "Ordini ricevuti: {{orders}} · righe: {{lines}}",
+      "byRate": "Per aliquota GST",
+      "byHsn": "Per codice HSN",
+      "rate": "Aliquota",
+      "hsn": "Codice HSN",
+      "noHsn": "Senza HSN",
+      "lines": "Righe",
+      "taxable": "Imponibile",
+      "gst": "GST",
+      "total": "Totale",
+      "totals": "Imponibile {{taxable}} · GST {{gst}} · Totale {{total}}",
+      "empty": "Nulla è stato ricevuto questo mese",
+      "download": "Scarica CSV",
+      "downloaded": "Riepilogo GST scaricato"
     }
   }
 }

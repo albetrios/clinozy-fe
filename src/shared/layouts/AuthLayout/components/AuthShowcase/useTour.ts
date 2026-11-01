@@ -39,17 +39,21 @@ const TYPING_TARGETS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
 
 /**
  * The tour's engine: one chapter every {@link TOUR_CHAPTER_MS} (the last rests
- * {@link TOUR_END_REST_MS} more), then round again. Progress lives in a
+ * {@link TOUR_END_REST_MS} more), once round — then it rests on the first
+ * chapter, paused, and Play runs it again. Progress lives in a
  * `requestAnimationFrame` loop and is painted into each step's `--fill`, so a
  * frame never re-renders React; only a new chapter does.
  *
  * @remarks
  * It holds still while the viewer is busy elsewhere: the pointer is over the
  * stage, they are typing in a field outside it, the tab is hidden, or the stage
- * is mostly scrolled away (a phone reading the form). The pause button stops it
- * outright (WCAG 2.2.2). `autoplay: false` — the code, MFA and hand-off screens
- * — or reduced motion means it never moves on its own; a click still changes
- * chapter, and is then announced, which an automatic change never is.
+ * is mostly scrolled away (a phone reading the form). A hold parks the frame
+ * loop — no frame runs until the last hold lifts — and so do the pause button
+ * (WCAG 2.2.2) and the end of the round: a login screen left open no longer
+ * paints 60 frames a second for nothing (G-5). `autoplay: false` — the code,
+ * MFA and hand-off screens — or reduced motion means it never moves on its own;
+ * a click still changes chapter, and is then announced, which an automatic
+ * change never is.
  */
 export function useTour({ autoplay: autoplayAsked }: { autoplay: boolean }): TourState {
   const [reducedMotion] = useState(prefersReducedMotion);
@@ -63,6 +67,8 @@ export function useTour({ autoplay: autoplayAsked }: { autoplay: boolean }): Tou
   const chapterRef = useRef(0);
   const elapsedRef = useRef(0);
   const holds = useRef(new Set<TourHold>());
+  /** Starts the parked frame loop again; a no-op while none is running ({@link release}). */
+  const wakeRef = useRef<() => void>(() => undefined);
   const steps = useRef<(HTMLButtonElement | null)[]>([]);
   const [stage, setStage] = useState<HTMLElement | null>(null);
 
@@ -98,38 +104,62 @@ export function useTour({ autoplay: autoplayAsked }: { autoplay: boolean }): Tou
 
   useEffect(() => {
     if (!(autoplay && playing)) return;
-    let frame = 0;
+    let frame: number | null = null;
     let last = 0;
     const tick = (now: number) => {
+      // Held: park — the hold's release wakes the loop, its time not counted.
+      if (holds.current.size > 0) {
+        frame = null;
+        return;
+      }
       const delta = last ? now - last : 0;
       last = now;
-      if (holds.current.size === 0) {
-        elapsedRef.current += delta;
-        const length = chapterLength(chapterRef.current);
-        paintFills(chapterRef.current, Math.min(1, elapsedRef.current / length));
-        if (elapsedRef.current >= length) {
-          show((chapterRef.current + 1) % TOUR_CHAPTERS.length, { byViewer: false });
+      elapsedRef.current += delta;
+      const length = chapterLength(chapterRef.current);
+      paintFills(chapterRef.current, Math.min(1, elapsedRef.current / length));
+      if (elapsedRef.current >= length) {
+        const next = chapterRef.current + 1;
+        if (next >= TOUR_CHAPTERS.length) {
+          // Once round: back to the first chapter, at rest; Play runs it again.
+          frame = null;
+          show(0, { byViewer: false });
+          setPlaying(false);
+          return;
         }
+        show(next, { byViewer: false });
       }
       frame = requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    const start = () => {
+      if (frame !== null) return;
+      last = 0;
+      frame = requestAnimationFrame(tick);
+    };
+    wakeRef.current = start;
+    start();
+    return () => {
+      wakeRef.current = () => undefined;
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = null;
+    };
   }, [autoplay, playing, paintFills, show]);
 
   // The holds: typing anywhere outside the stage, a hidden tab, a stage scrolled away.
   useEffect(() => {
     if (!autoplay) return;
     const held = holds.current;
+    /** Lift a hold; the last one to go wakes the parked loop. */
+    const release = (hold: TourHold) => {
+      if (held.delete(hold) && held.size === 0) wakeRef.current();
+    };
     const onFocusIn = (event: FocusEvent) => {
       const target = event.target as HTMLElement | null;
       if (target && TYPING_TARGETS.has(target.tagName) && !stage?.contains(target)) {
         held.add('typing');
       }
     };
-    const onFocusOut = () => held.delete('typing');
-    const onVisibility = () =>
-      document.hidden ? held.add('hidden') : held.delete('hidden');
+    const onFocusOut = () => release('typing');
+    const onVisibility = () => (document.hidden ? held.add('hidden') : release('hidden'));
     document.addEventListener('focusin', onFocusIn);
     document.addEventListener('focusout', onFocusOut);
     document.addEventListener('visibilitychange', onVisibility);
@@ -140,14 +170,14 @@ export function useTour({ autoplay: autoplayAsked }: { autoplay: boolean }): Tou
         ([entry]) => {
           if (entry && entry.intersectionRatio < TOUR_VISIBLE_SHARE)
             held.add('offscreen');
-          else held.delete('offscreen');
+          else release('offscreen');
         },
         { threshold: [0, TOUR_VISIBLE_SHARE, 1] },
       );
       observer.observe(stage);
     }
     const onEnter = () => held.add('hover');
-    const onLeave = () => held.delete('hover');
+    const onLeave = () => release('hover');
     stage?.addEventListener('pointerenter', onEnter);
     stage?.addEventListener('pointerleave', onLeave);
     return () => {
@@ -157,7 +187,10 @@ export function useTour({ autoplay: autoplayAsked }: { autoplay: boolean }): Tou
       observer?.disconnect();
       stage?.removeEventListener('pointerenter', onEnter);
       stage?.removeEventListener('pointerleave', onLeave);
+      // The holds go with their listeners: a loop they parked runs on.
+      const wasHeld = held.size > 0;
       held.clear();
+      if (wasHeld) wakeRef.current();
     };
   }, [autoplay, stage]);
 

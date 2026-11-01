@@ -151,7 +151,7 @@ flowchart TB
 | [e2e-testids-inventory.md](reference/e2e-testids-inventory.md)               | Playwright `data-testid` inventory by route (skill: `agent-os/skills/fe-e2e-testids/`)                           |
 | [internationalization.md](reference/internationalization.md)                 | Client-side i18n (react-i18next) + backend message contract                                                      |
 | [constants-and-i18n.md](reference/constants-and-i18n.md)                     | Constants file placement, locale namespaces, rollout waves                                                       |
-| **[public/README.md](../public/README.md)** (project root)                   | **Static assets** in `public/`: manifest, robots.txt, icons, \_headers; required list and maintenance            |
+| **[reference/public-assets.md](reference/public-assets.md)**                 | **Static assets** in `public/`: manifest, robots.txt, icons, \_headers; required list and maintenance            |
 
 ---
 

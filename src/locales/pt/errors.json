@@ -108,6 +108,9 @@
     "viewAs": {
       "readOnly": "A visualização é somente leitura, então nada foi salvo. Saia da visualização para fazer alterações."
     },
+    "workspaceSwitched": {
+      "notSaved": "Esta alteração não foi salva porque você trocou de clínica."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Não foi possível adicionar a passkey",

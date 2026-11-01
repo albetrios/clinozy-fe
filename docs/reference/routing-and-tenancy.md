@@ -175,6 +175,9 @@ Implemented chain for `/organization/acme/…` (shell guards on `$organizationSl
    mode allows the team space and the workspace is provisioned
 3. `resolveActiveOrg` / `requireOrganizationContext` (`app/guards/route-guards.ts`) — slug is
    well-formed; user is a member; switch-on-navigation syncs context → else **404** (don't leak existence).
+   The switch lands **before** the store names the organization — every org-scoped query key reads
+   it, so a store written first fetched the new clinic's keys with the old clinic's token; a failed
+   or superseded switch leaves the store where it was (a superseded one 404s)
    Membership is read from the cached list, so a membership revoked since can still pass it; the
    switch then gets clinozy-be's 403, which the guard answers with the same **404**, dropping the
    stale list (a 403 with reason `mfa_required` is not a membership answer and propagates)
@@ -186,7 +189,10 @@ Implemented chain for `/organization/acme/…` (shell guards on `$organizationSl
 6. **Resource scope is NOT a frontend guard** — the route loader's data fetch _is_ the check:
    the API returns the resource scoped to the organization (and parent resource), and a
    standardized error mapping turns API 404/403 into the NotFound/Unauthorized islands.
-   One fetch, no guard-then-fetch waterfall.
+   One fetch, no guard-then-fetch waterfall. A 403 that questions the access itself
+   (`missing_permission`, `not_a_member`) also makes the tab re-read me/context and the membership
+   list; when the access changed, that clinic's cache is dropped and the guards run again
+   (`shared/tenancy/organization-access.ts`).
 
 Frontend guards are UX only; the backend/RLS enforces authority.
 
