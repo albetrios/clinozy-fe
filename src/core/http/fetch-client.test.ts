@@ -802,6 +802,15 @@ describe('fetch-client', () => {
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
+    it('a 429 keeps its Retry-After seconds on the HttpError for the screen to show', async () => {
+      fetchMock.mockResolvedValueOnce(errJson(429, { 'Retry-After': '15' }));
+      await expect(apiClient.get('/x')).rejects.toMatchObject({
+        status: 429,
+        retryAfterSeconds: 15,
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
     it('a 503 with Retry-After waits at least that long before retrying', async () => {
       vi.useFakeTimers();
       try {

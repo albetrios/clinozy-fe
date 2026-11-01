@@ -212,7 +212,16 @@ async function parseErrorResponse(
   const message =
     (data as { message?: string } | undefined)?.message ??
     (response.statusText || `HTTP ${response.status}`);
-  return new HttpError(message, response.status, url, method, data);
+  // Kept on the error: a 429 or 503 names its wait only in this header (see HttpError).
+  const retryAfterMs = parseRetryAfterMs(response);
+  return new HttpError(
+    message,
+    response.status,
+    url,
+    method,
+    data,
+    retryAfterMs === null ? undefined : Math.ceil(retryAfterMs / 1000),
+  );
 }
 
 /** Idempotent methods: safe to retry on connection/5xx (no body or same body). */

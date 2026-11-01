@@ -189,7 +189,9 @@ write path for API calls.
   DELETE) after a dropped connection or a 5xx, with exponential backoff (1 s, 2 s,
   4 s) that never undercuts a 5xx `Retry-After`: clinozy-be's 503s send 1 s (overload
   guard) or 5 s (pooled-connection deadline). A `Retry-After` beyond
-  `HTTP.MAX_RETRY_AFTER_MS` (5 s) surfaces the error instead, as a 429's does.
+  `HTTP.MAX_RETRY_AFTER_MS` (5 s) surfaces the error instead, as a 429's does. The error
+  keeps the header's seconds on `HttpError.retryAfterSeconds` (clinozy-be sends the wait only
+  there); `getRateLimitRetryAfterSeconds` and `RateLimitNotice` count down from it.
 - Users should not lose in-progress **local** drafts: onboarding uses
   `useUnsavedChangesGuard` + persisted `useOnboardingStore`; settings panels
   register dirty state via `SettingsDirtyProvider`. The record drawer

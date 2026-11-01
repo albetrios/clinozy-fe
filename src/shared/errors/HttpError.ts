@@ -11,6 +11,12 @@ export class HttpError extends Error {
    * its event (Sentry's extraErrorData), and a body may echo what a person typed.
    */
   declare public readonly data: unknown;
+  /**
+   * The `Retry-After` the server sent, in whole seconds — set on a refusal that named a wait
+   * (a 429's rate limit, a 503). The header is the only place clinozy-be puts it, so a screen
+   * reads it here rather than from the body.
+   */
+  public readonly retryAfterSeconds: number | undefined;
 
   constructor(
     message: string,
@@ -18,12 +24,14 @@ export class HttpError extends Error {
     url: string,
     method: string,
     data?: unknown,
+    retryAfterSeconds?: number,
   ) {
     super(message);
     this.name = 'HttpError';
     this.status = status;
     this.url = url;
     this.method = method;
+    this.retryAfterSeconds = retryAfterSeconds;
     Object.defineProperty(this, 'data', { value: data, enumerable: false });
   }
 }
