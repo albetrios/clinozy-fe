@@ -1,5 +1,9 @@
+import type { TFunction } from 'i18next';
+
+import { AGE_BANDS } from '@/shared/api/app/app-list-filters.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 
+import { AGE_FILTER_KEYS } from '../room-toolbar.constants.ts';
 import {
   type RoomFilterField,
   type RoomFilterFields,
@@ -54,6 +58,23 @@ export function singlePickSection(
 ): RoomFilterSection | null {
   if (section?.field.kind !== 'options') return section;
   return { ...section, field: { ...section.field, single: true } };
+}
+
+/**
+ * The Age section of a list of people (Patients, Leads — feat-approximate-age FE5): one band at a
+ * time, "Any" while none is picked; `t` reads the room toolbar's namespace.
+ */
+export function ageFilterSection(t: TFunction): RoomFilterSection {
+  return {
+    field: { kind: 'options', values: AGE_BANDS, single: true },
+    copy: {
+      label: t(AGE_FILTER_KEYS.label),
+      anyLabel: t(AGE_FILTER_KEYS.any),
+      options: Object.fromEntries(
+        AGE_BANDS.map((band) => [band, { label: t(AGE_FILTER_KEYS.bands[band]) }]),
+      ),
+    },
+  };
 }
 
 /**

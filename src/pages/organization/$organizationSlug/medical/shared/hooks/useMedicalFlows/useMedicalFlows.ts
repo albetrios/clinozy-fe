@@ -32,6 +32,7 @@ import {
   restoreSupplierCredit,
   returnSale,
   updatePurchaseOrder,
+  updatePurchaseOrderNote,
   voidSale,
   voidSupplierCredit,
 } from '../../medical-records-api.ts';
@@ -56,6 +57,12 @@ import type {
 export interface OrderUpdateVars {
   record: PurchaseOrderRow;
   input: PurchaseOrderInput;
+}
+
+/** A received order's note: the order as read and the note to keep. */
+export interface OrderNoteVars {
+  record: PurchaseOrderRow;
+  note: string | null;
 }
 
 /** Receive goods: the order and what arrived. */
@@ -132,6 +139,17 @@ export function useUpdatePurchaseOrder(
 ) {
   return useAppMutation<PurchaseOrderRow, OrderUpdateVars>({
     mutationFn: (vars, action) => updatePurchaseOrder({ ...vars, ...action }),
+    invalidateKeys: [...STOCK_KEYS],
+    ...options,
+  });
+}
+
+/** Save a received order's note — the one change it takes (D10). */
+export function useUpdatePurchaseOrderNote(
+  options: CrudMutationOptions<PurchaseOrderRow, OrderNoteVars> = {},
+) {
+  return useAppMutation<PurchaseOrderRow, OrderNoteVars>({
+    mutationFn: (vars, action) => updatePurchaseOrderNote({ ...vars, ...action }),
     invalidateKeys: [...STOCK_KEYS],
     ...options,
   });

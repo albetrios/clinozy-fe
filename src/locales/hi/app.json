@@ -305,6 +305,14 @@
       "gender": "लिंग",
       "birthDate": "जन्म तिथि",
       "age": "उम्र {{age}}",
+      "birthMode": "जन्म तिथि या उम्र",
+      "birthModes": {
+        "date": "जन्म तिथि",
+        "age": "उम्र"
+      },
+      "ageYears": "उम्र (वर्ष)",
+      "agePlaceholder": "जैसे 34",
+      "ageHint": "लगभग · हर साल बढ़ती है",
       "types": "मरीज़ का प्रकार",
       "typesHint": "कितने भी चुनें",
       "status": "स्थिति",
@@ -338,6 +346,7 @@
     },
     "missing": "नाम और मोबाइल जोड़ें",
     "mobileInvalid": "10 अंकों का मोबाइल नंबर डालें",
+    "ageInvalid": "0 से 120 तक की उम्र लिखें",
     "created": "मरीज़ {{id}} बनाया गया",
     "openFile": "फ़ाइल खोलें",
     "saved": "{{name}} सहेजा गया",
@@ -441,6 +450,8 @@
     },
     "genderAge": "{{gender}} · {{age}} वर्ष",
     "age": "{{age}} वर्ष",
+    "approximate": "लगभग",
+    "approximateHint": "पंजीकरण पर बताई गई उम्र — जन्म तिथि अनुमानित है",
     "cameVia": "{{source}} से आए",
     "owedToThem": "{{amount}} उन्हें लौटाने हैं",
     "owedByThem": "{{amount}} उन पर क्लिनिक का बकाया",
@@ -557,6 +568,15 @@
       "nextSevenDays": "अगले 7 दिन",
       "notSet": "तय नहीं",
       "range": "कस्टम अवधि"
+    },
+    "age": {
+      "label": "उम्र",
+      "any": "कोई भी",
+      "child": "18 से कम",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60+"
     }
   },
   "commandMenu": {
@@ -1335,6 +1355,8 @@
       "belowFloor": "{{name}} के न्यूनतम मूल्य {{amount}} से कम",
       "newMedicineName": "नई दवा का नाम",
       "medicineAdded": "{{name}} जोड़ा गया · एमआरपी बाद में स्टॉक में भरें",
+      "description": "विवरण",
+      "descriptionPlaceholder": "विवरण जोड़ें · जैसे +2 सत्र मुफ़्त",
       "hintInvoice": "2 = मात्रा · 10% = छूट",
       "belowLowest": "{{name}} के न्यूनतम मूल्य से कम",
       "offerApplied": "ऑफ़र लागू: {{offer}}"
@@ -1617,5 +1639,17 @@
     "hint": "क्षेत्र, शहर और राज्य अपने-आप भर जाते हैं",
     "unknown": "हमें यह पिन कोड नहीं मिला — क्षेत्र, शहर और राज्य लिखें।",
     "areaPick": "अपना क्षेत्र चुनें"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} पैक",
+    "packs_other": "{{count}} पैक",
+    "packsAndLoose_one": "{{count}} पैक + {{loose}}",
+    "packsAndLoose_other": "{{count}} पैक + {{loose}}",
+    "loose": "{{count}} खुले",
+    "perPack": "प्रति पैक {{count}}",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} प्रति यूनिट",
+    "inStock": "स्टॉक में {{stock}}",
+    "packEquivalent": "= {{packs}}"
   }
 }

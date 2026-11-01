@@ -48,6 +48,8 @@ const contactWire = {
   updated_at: '2026-10-01T07:00:00.000Z',
   gender: 'female',
   date_of_birth: null,
+  date_of_birth_is_approximate: false,
+  age: null,
   address: null,
   referral_source: null,
   referred_by_contact_id: null,

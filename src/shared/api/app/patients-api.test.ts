@@ -67,6 +67,8 @@ const contactWireRow = (patch: Record<string, unknown> = {}) => ({
   updated_at: '2026-10-01T07:00:00.000Z',
   gender: 'female',
   date_of_birth: '1995-10-27',
+  date_of_birth_is_approximate: false,
+  age: 31,
   address: 'Adajan',
   referral_source: null,
   referred_by_contact_id: null,
@@ -94,6 +96,7 @@ const priyaFields = (patch: Partial<PatientFields> = {}): PatientFields => ({
   phone2: '+919876500000',
   gender: 'female',
   dateOfBirth: '1995-10-27',
+  age: null,
   address: 'Adajan',
   referralSource: null,
   referredByName: null,
@@ -130,6 +133,13 @@ describe('patientListQuery', () => {
       follow_up_at_to: undefined,
       sort: undefined,
       order: undefined,
+    });
+  });
+
+  it("reads an age band as the person's age range (feat-approximate-age)", () => {
+    expect(patientListQuery({ view: 'all', age: 'adult' }, TODAY)).toMatchObject({
+      age_from: 30,
+      age_to: 44,
     });
   });
 

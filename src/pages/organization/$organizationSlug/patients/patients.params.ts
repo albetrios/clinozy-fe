@@ -23,6 +23,7 @@ export function patientListParamsOf(search: PatientsSearch): PatientListParams {
     types: search.types,
     status: search.status,
     conversion: search.conversion,
+    age: search.age,
     created: search.created,
     followUp: search.followUp,
     sort,

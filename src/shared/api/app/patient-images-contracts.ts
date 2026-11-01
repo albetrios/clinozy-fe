@@ -15,7 +15,10 @@ import { stableFileUrl } from './file-links.ts';
  * each album, the Private album only for a member who holds `patient:private_album:read`.
  * Each read carries `file_url` (clinozy-be D86): a link that shows the photo, valid 15 minutes
  * and made fresh on every read — so the file reads the list again rather than keep a link — and
- * null when the stored upload is gone (the photo then shows by its name).
+ * null when the stored upload is gone (the photo then shows by its name). Each read also carries
+ * `thumbnail_url` (feat-patient-image-thumbnails): the 320 px thumbnail a grid shows, or the full
+ * photo's link while the background job has not made one — grids and tiles show it, an opened
+ * photo shows `file_url`.
  */
 
 /** The albums, in tab order (`album`). */
@@ -78,6 +81,11 @@ export interface PatientPhoto {
   fileName: string;
   /** A link that shows it, valid 15 minutes from the read (D86); null when its upload is gone. */
   fileUrl: string | null;
+  /**
+   * What a grid or tile shows: the 320 px thumbnail's link, else `fileUrl`'s while it has none
+   * (same lifetime, D86); null when its upload is gone. Open the photo with `fileUrl`.
+   */
+  thumbnailUrl: string | null;
   /** The name it was filed under (≤60). */
   displayName: string | null;
   caption: string | null;
@@ -110,8 +118,10 @@ export const patientImageWire = wireSchema<ApiPatientImage>()(
     album: z.enum(PATIENT_PHOTO_ALBUMS),
     stage: z.enum(PATIENT_PHOTO_STAGES).nullable(),
     file_key: z.string(),
+    thumbnail_key: z.string().nullable(),
     file_name: z.string(),
     file_url: z.string().nullable(),
+    thumbnail_url: z.string().nullable(),
     display_name: z.string().nullable(),
     caption: z.string().nullable(),
     body_part: z.enum(PATIENT_PHOTO_BODY_PARTS).nullable(),
@@ -137,6 +147,8 @@ export function toPatientPhoto(row: z.output<typeof patientImageWire>): PatientP
     fileKey: row.file_key,
     fileName: row.file_name,
     fileUrl: stableFileUrl(row.file_key, row.file_url),
+    // Kept under the thumbnail's own key once it exists — until then it is the photo's link
+    thumbnailUrl: stableFileUrl(row.thumbnail_key ?? row.file_key, row.thumbnail_url),
     displayName: row.display_name,
     caption: row.caption,
     bodyPart: row.body_part,

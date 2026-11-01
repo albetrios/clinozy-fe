@@ -88,6 +88,15 @@ describe('PatientCells', () => {
     expect(await screen.findByText('—')).toBeInTheDocument();
   });
 
+  it('marks an age the desk typed "approx." instead of its estimated date (feat-approximate-age)', async () => {
+    renderWithProviders(
+      <PatientAgeCell dateOfBirth="1992-10-03" approximate today={TODAY} />,
+    );
+    expect(await screen.findByText('34 yrs')).toBeInTheDocument();
+    expect(screen.getByTestId('patient-age-approximate')).toHaveTextContent('approx.');
+    expect(screen.queryByText(/1992/)).not.toBeInTheDocument();
+  });
+
   it('tones the follow-up badge butter today, blush past and sky ahead', async () => {
     renderWithProviders(
       <div>

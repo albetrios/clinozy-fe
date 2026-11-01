@@ -32,6 +32,7 @@
     "item": "البند",
     "medicineName": "اسم الدواء",
     "packSize": "حجم العبوة",
+    "hsn": "HSN",
     "qty": "الكمية",
     "amount": "المبلغ",
     "discount": "الخصم",

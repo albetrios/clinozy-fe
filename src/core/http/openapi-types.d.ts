@@ -19158,6 +19158,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         }[];
@@ -19246,6 +19249,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -19307,6 +19313,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -19419,6 +19428,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -19483,6 +19495,9 @@ export interface operations {
                             stage?: "before" | "after" | null;
                             /** Format: date */
                             taken_on?: string;
+                            thumbnail_key?: string | null;
+                            /** Format: uri */
+                            thumbnail_url?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };

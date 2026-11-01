@@ -187,6 +187,24 @@ describe('ExpiringReturnDrawer (medical.md:297–309)', () => {
     expect(within(drawer).getByTestId(`${D}-credit`)).toHaveTextContent('₹1,320');
   });
 
+  it('prices a loose-selling medicine per unit, as the server does (D5)', async () => {
+    const user = setup();
+    // A strip of 10 at ₹125.55: 60 units in stock, one unit ₹12.56 to the paisa.
+    const strip = medicineRow({
+      ...UNCAP,
+      unitsPerPack: 10,
+      stock: 60,
+      batches: [{ ...UNCAP.batches[0]!, qty: 60, purchaseRate: 125.55 }],
+    });
+    renderMedicalDrawer(<ExpiringReturnDrawer medicine={strip} onClose={vi.fn()} />);
+    const drawer = await screen.findByTestId(D);
+    expect(drawer).toHaveTextContent('of 60');
+    const qty = within(drawer).getByTestId(`${D}-qty`);
+    await user.clear(qty);
+    await user.type(qty, '6');
+    expect(within(drawer).getByTestId(`${D}-credit`)).toHaveTextContent('₹75.36');
+  });
+
   it('is closed without a medicine, and read-only for a viewer', async () => {
     const view = renderMedicalDrawer(
       <ExpiringReturnDrawer medicine={null} onClose={vi.fn()} />,

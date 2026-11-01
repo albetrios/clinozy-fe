@@ -32,6 +32,7 @@
     "item": "Articolo",
     "medicineName": "Farmaco",
     "packSize": "Confezione",
+    "hsn": "HSN",
     "qty": "Q.tà",
     "amount": "Importo",
     "discount": "Sconto",

@@ -305,6 +305,14 @@
       "gender": "Genere",
       "birthDate": "Data di nascita",
       "age": "Età {{age}}",
+      "birthMode": "Data di nascita o età",
+      "birthModes": {
+        "date": "Data di nascita",
+        "age": "Età"
+      },
+      "ageYears": "Età (anni)",
+      "agePlaceholder": "es. 34",
+      "ageHint": "circa · aumenta ogni anno",
       "types": "Tipo di paziente",
       "typesHint": "scegline quanti vuoi",
       "status": "Stato",
@@ -338,6 +346,7 @@
     },
     "missing": "Aggiungi nome e cellulare",
     "mobileInvalid": "Inserisci un cellulare di 10 cifre",
+    "ageInvalid": "Inserisci un’età da 0 a 120",
     "created": "Paziente {{id}} creato",
     "openFile": "Apri scheda",
     "saved": "Modifiche a {{name}} salvate",
@@ -444,6 +453,8 @@
     },
     "genderAge": "{{gender}} · {{age}} anni",
     "age": "{{age}} anni",
+    "approximate": "circa",
+    "approximateHint": "Età indicata alla registrazione — la data di nascita è stimata",
     "cameVia": "Arrivato tramite {{source}}",
     "owedToThem": "{{amount}} da restituire",
     "owedByThem": "{{amount}} dovuti alla clinica",
@@ -561,6 +572,15 @@
       "nextSevenDays": "Prossimi 7 giorni",
       "notSet": "Non impostata",
       "range": "Intervallo personalizzato"
+    },
+    "age": {
+      "label": "Età",
+      "any": "Qualsiasi",
+      "child": "Sotto i 18",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60+"
     }
   },
   "commandMenu": {
@@ -1353,6 +1373,8 @@
       "belowFloor": "Sotto il prezzo minimo di {{amount}} per {{name}}",
       "newMedicineName": "Nome del nuovo farmaco",
       "medicineAdded": "{{name}} aggiunto · imposta il prezzo max. più tardi in Scorte",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Aggiungi una descrizione · es. +2 sedute gratis",
       "hintInvoice": "2 = quantità · 10% = sconto",
       "belowLowest": "Sotto il prezzo minimo di {{name}}",
       "offerApplied": "Offerta applicata: {{offer}}"
@@ -1638,5 +1660,19 @@
     "hint": "Compila zona, città e stato",
     "unknown": "Non conosciamo questo CAP — inserisci zona, città e stato.",
     "areaPick": "Scegli la tua zona"
+  },
+  "medicineUnits": {
+    "packs_one": "{{count}} confezione",
+    "packs_many": "{{count}} confezioni",
+    "packs_other": "{{count}} confezioni",
+    "packsAndLoose_one": "{{count}} confezione + {{loose}}",
+    "packsAndLoose_many": "{{count}} confezioni + {{loose}}",
+    "packsAndLoose_other": "{{count}} confezioni + {{loose}}",
+    "loose": "{{count}} sfusi",
+    "perPack": "{{count}} per confezione",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} all’unità",
+    "inStock": "{{stock}} in magazzino",
+    "packEquivalent": "= {{packs}}"
   }
 }

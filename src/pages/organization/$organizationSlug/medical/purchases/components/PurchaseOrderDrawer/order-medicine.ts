@@ -62,7 +62,10 @@ export function useMedicineOptions(
   ];
 }
 
-/** The medicine a line takes: its id (or a typed one's key) and name, and the rate it starts at. */
+/**
+ * The medicine a line takes: its id (or a typed one's key) and name, the rate it starts at and the
+ * MRP the packs are taken to carry.
+ */
 export interface OrderLineMedicine {
   id: string;
   name: string;
@@ -70,6 +73,8 @@ export interface OrderLineMedicine {
   rate: number;
   /** Its GST rate — a typed or just-made one's is the quick medicine's (12). */
   gstPercent: number;
+  /** Its MRP, paise — the packs' printed MRP until the desk changes it (D8); 0 when not known. */
+  mrp: number;
 }
 
 /**

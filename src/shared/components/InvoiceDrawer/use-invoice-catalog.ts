@@ -6,6 +6,7 @@ import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
 import { APP_KEYS } from '@/shared/app/app.constants.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { useMedicineCatalogue } from '@/shared/hooks/useMedicines/index.ts';
+import { useMedicineUnits } from '@/shared/hooks/useMedicineUnits/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { useOffers } from '@/shared/hooks/useOffers/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
@@ -51,6 +52,7 @@ export function useInvoiceCatalog(
 ): InvoiceCatalog {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const formatPaise = usePaiseFormat();
+  const units = useMedicineUnits();
   const medical = type === 'medical';
   const offerings = useOfferings({ enabled: !medical, staleTime: CATALOGUE_STALE_MS });
   const offers = useOffers();
@@ -65,13 +67,18 @@ export function useInvoiceCatalog(
 
   const words = (item: InvoiceCatalogItem) => {
     if (item.kind === 'medicine') {
-      const stock =
+      // A loose-selling medicine reads its stock as packs + loose and its price a unit's (D5, D6)
+      const inStock =
         item.stock && item.stock > 0
-          ? t(K.inStock, { count: item.stock })
+          ? (units.inStock(item.stock, item.unitsPerPack) ??
+            t(K.inStock, { count: item.stock }))
           : t(K.outOfStock);
+      const price = formatPaise(item.price);
       return {
-        sub: [stock, item.detail].filter(Boolean).join(' · '),
-        meta: formatPaise(item.price),
+        sub: [inStock, units.perPack(item.unitsPerPack), item.detail]
+          .filter(Boolean)
+          .join(' · '),
+        meta: item.unitsPerPack > 1 ? units.unitPrice(price) : price,
       };
     }
     const parts = [

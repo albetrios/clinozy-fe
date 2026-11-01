@@ -184,7 +184,7 @@ function RowNote<TForm extends FieldValues, TName extends FieldArrayPath<TForm>>
           aria-hidden="true"
           className="text-micro shrink-0 font-semibold tracking-[0.04em] uppercase"
         >
-          {t(ITEMS_FIELD_KEYS.note)}
+          {note.tag ?? t(ITEMS_FIELD_KEYS.note)}
         </span>
         <input
           ref={ref}

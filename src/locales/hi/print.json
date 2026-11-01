@@ -32,6 +32,7 @@
     "item": "आइटम",
     "medicineName": "दवा का नाम",
     "packSize": "पैक साइज़",
+    "hsn": "HSN",
     "qty": "मात्रा",
     "amount": "राशि",
     "discount": "छूट",

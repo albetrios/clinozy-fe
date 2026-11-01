@@ -19,6 +19,8 @@ import {
   sortOf,
 } from '@/lib/routes/search-params.ts';
 import {
+  AGE_BANDS,
+  type AgeBand,
   type CreatedFilter,
   type FollowUpFilter,
   readCreatedFilter,
@@ -77,6 +79,8 @@ export interface LeadsSearch {
   hold?: LeadHoldFilter;
   /** Team: one member (`mem_…`), matched as the owner or one of the involved. */
   member?: string;
+  /** The person's age band (feat-approximate-age). */
+  age?: AgeBand;
   created?: CreatedFilter;
   /** Follow-up date — a preset or a range; the API has no "Not set" (G2). */
   followUp?: Exclude<FollowUpFilter, 'not_set'>;
@@ -107,6 +111,7 @@ export function validateLeadsSearch(search: Record<string, unknown>): LeadsSearc
       PUBLIC_ID,
       Array.isArray(search.member) ? search.member[0] : search.member,
     ),
+    age: oneOf(AGE_BANDS, search.age),
     created: readCreatedFilter(search.created),
     followUp: readLeadFollowUp(search.followUp),
     sort: sortOf(SORT_KEYS, search.sort),

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { ApiBody, ApiData } from '@/core/http/api.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 
-import type { CreatedFilter, FollowUpFilter } from './app-list-filters.ts';
+import type { AgeBand, CreatedFilter, FollowUpFilter } from './app-list-filters.ts';
 import {
   type Gender,
   PATIENT_CONVERSION_VALUES,
@@ -185,6 +185,8 @@ const UNKNOWN_PERSON: Omit<PatientPerson, 'consents'> = {
   email: null,
   gender: null,
   dateOfBirth: null,
+  dateOfBirthIsApproximate: false,
+  age: null,
   address: null,
   referralSource: null,
   referredByContactId: null,
@@ -208,6 +210,8 @@ function personOf(
     email: contact.email,
     gender: contact.gender,
     dateOfBirth: contact.dateOfBirth,
+    dateOfBirthIsApproximate: contact.dateOfBirthIsApproximate,
+    age: contact.age,
     address: contact.address,
     referralSource: contact.referralSource,
     referredByContactId: contact.referredByContactId,
@@ -259,6 +263,11 @@ export interface PatientFields {
   gender: Gender | null;
   /** `YYYY-MM-DD`. */
   dateOfBirth: string | null;
+  /**
+   * A typed age in whole years instead of a birth date — saved as `age`, which the server turns
+   * into an approximate birth date; null saves {@link PatientFields.dateOfBirth}.
+   */
+  age: number | null;
   address: string | null;
   referralSource: ReferralSource | null;
   referredByName: string | null;
@@ -278,13 +287,17 @@ export type PatientPersonInput = { contactId: string } | 'new';
 function personBodyOf(
   fields: PatientFields,
   phones: ApiContactCreate['phones'],
+  { withBirth = true }: { withBirth?: boolean } = {},
 ): Omit<ApiContactCreate, 'phones'> & { phones: ApiContactCreate['phones'] } {
+  const birth =
+    fields.age === null ? { date_of_birth: fields.dateOfBirth } : { age: fields.age };
   return {
     first_name: fields.firstName,
     last_name: fields.lastName,
     phones,
     gender: fields.gender,
-    date_of_birth: fields.dateOfBirth,
+    // An age or a birth date, never both — the server refuses the pair (400 `body.age`)
+    ...(withBirth ? birth : {}),
     address: fields.address,
     referral_source: fields.referralSource,
     referred_by_name: fields.referredByName,
@@ -343,6 +356,18 @@ function editedPhones(record: PatientRecord, fields: PatientFields) {
 }
 
 /**
+ * Whether an edit changes the birth: a typed age other than the saved approximate one, or a picked
+ * date other than the saved one — or the same date, when the saved one was approximate (picking it
+ * makes it real).
+ */
+function birthChangeOf(record: PatientRecord, fields: PatientFields): boolean {
+  if (fields.age !== null)
+    return !(record.dateOfBirthIsApproximate && record.age === fields.age);
+  if (fields.dateOfBirth !== record.dateOfBirth) return true;
+  return record.dateOfBirthIsApproximate && fields.dateOfBirth !== null;
+}
+
+/**
  * An edit as the two writes it makes — the file's change and the person's — each null when
  * nothing of it changed. The drawer edits the first two numbers; any others stay, after them.
  */
@@ -361,19 +386,24 @@ export function patientChangeOf(
     [file.has_data_consent, record.consents.includes('data')],
     [file.has_photo_consent, record.consents.includes('photos')],
   ]);
-  const person = personBodyOf(fields, editedPhones(record, fields));
-  const personChanged = anyChanged([
-    [person.first_name, record.firstName],
-    [person.last_name, record.lastName],
-    [fields.phone, record.phone],
-    [fields.phone2, record.phone2],
-    [person.gender, record.gender],
-    [person.date_of_birth, record.dateOfBirth],
-    [person.address, record.address],
-    [person.referral_source, record.referralSource],
-    [person.referred_by_name, record.referredByName],
-    [person.has_marketing_consent, record.hasMarketingConsent],
-  ]);
+  const birthChanged = birthChangeOf(record, fields);
+  // An unchanged birth is left out, so a saved approximate date never moves with the day of the edit
+  const person = personBodyOf(fields, editedPhones(record, fields), {
+    withBirth: birthChanged,
+  });
+  const personChanged =
+    birthChanged ||
+    anyChanged([
+      [person.first_name, record.firstName],
+      [person.last_name, record.lastName],
+      [fields.phone, record.phone],
+      [fields.phone2, record.phone2],
+      [person.gender, record.gender],
+      [person.address, record.address],
+      [person.referral_source, record.referralSource],
+      [person.referred_by_name, record.referredByName],
+      [person.has_marketing_consent, record.hasMarketingConsent],
+    ]);
   return { file: fileChanged ? file : null, person: personChanged ? person : null };
 }
 
@@ -404,6 +434,8 @@ export interface PatientListParams {
   types?: PatientType[];
   status?: PatientStatus;
   conversion?: PatientConversion;
+  /** The person's age band (`age_from` / `age_to`). */
+  age?: AgeBand;
   created?: CreatedFilter;
   followUp?: FollowUpFilter;
   sort?: PatientSortKey;

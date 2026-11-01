@@ -618,6 +618,7 @@ describe('InvoiceDrawer — New invoice on clinozy-be (KICKOFF §6.9)', () => {
             offeringId: TEST_PEEL_ID,
             qty: 1,
             discountPct: 0,
+            description: '',
             suggestionId: null,
             treatmentIds: [],
           },
@@ -956,6 +957,39 @@ describe('InvoiceDrawer — Edit invoice on clinozy-be', () => {
     expect(notifyMock.success).toHaveBeenCalledWith('Invoice #5 saved');
   });
 
+  it('edits a line’s description under its row — preloaded, and cleared on save', async () => {
+    const user = setUser();
+    signIn();
+    const saved = invoiceRecord();
+    const { detail, onSaved } = renderEdit(
+      invoiceDetail(
+        invoiceRecord({
+          items: [{ ...saved.items[0]!, description: '+2 sessions free' }],
+        }),
+      ),
+    );
+    await panel();
+    if (!screen.queryByTestId('invoice-drawer-items-note')) {
+      await user.click(screen.getByTestId('invoice-drawer-step-items-trigger'));
+    }
+    const description = await screen.findByTestId('invoice-drawer-items-note');
+    expect(description).toHaveValue('+2 sessions free');
+    expect(description).toHaveAttribute('maxLength', '280');
+    expect(description.closest('label')).toHaveTextContent('Description');
+    await user.clear(description);
+    await user.click(screen.getByTestId('invoice-drawer-save'));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+    expect(updateInvoice).toHaveBeenCalledWith({
+      invoice: detail.invoice,
+      input: expect.objectContaining({
+        items: [
+          expect.objectContaining({ id: detail.invoice.items[0]?.id, description: '' }),
+        ],
+      }),
+      idempotencyKey: expect.any(String),
+    });
+  });
+
   it('offers Reload when someone saved the invoice first (409 record_changed) and starts over on theirs', async () => {
     const user = setUser();
     signIn();
@@ -1248,7 +1282,7 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
     expect(saleWrite.create).toHaveBeenCalledWith(
       expect.objectContaining({
         contactId: TEST_MONEY_CONTACT_ID,
-        items: [{ medicineId: GLYCOLAC.id, qty: 2, discountPct: 0 }],
+        items: [{ medicineId: GLYCOLAC.id, qty: 2, discountPct: 0, description: null }],
         overallDiscount: 0,
         memberIds: [TEST_MONEY_AUTHOR_ID],
       }),

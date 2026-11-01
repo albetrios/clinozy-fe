@@ -1,0 +1,12 @@
+# feat-bill-line-description-2026-10-31-rjxx — acceptance (frontend)
+
+The BRIEF's criteria A-1 – A-6 are the API's, checked in clinozy-be's
+`clinozy-be/iterations/feat-bill-line-description-2026-10-31-rjxx/plans/acceptance.md`.
+
+| #   | Criterion                                                                                                                                                         | Check                                                                                                                                  | Result       |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| A-7 | The bill drawer edits a line's description; the bill view and print show it under the line name                                                                   | `InvoiceDrawer.test.tsx` (preloaded, cleared on save, 280), `InvoicePrint.test.tsx` (under the name, not uppercased, none without one) | pass         |
+| F-1 | Create sends a new line's description trimmed, none for a blank one; a change sends a kept line's, `null` when cleared; a description-only change sends the lines | `invoices-api.test.ts`                                                                                                                 | pass         |
+| F-2 | Every bill, preview and sale line reads `description`                                                                                                             | `invoices-api.test.ts`, `medical-records-api.test.ts`                                                                                  | pass         |
+| F-3 | New sale sends each medicine's description; the Sale drawer shows it under the medicine                                                                           | `invoice-form.test.ts`, `medical-records-api.test.ts`, `SaleDrawer.test.tsx`                                                           | pass         |
+| F-4 | Every shipped language has the two strings; the gates pass                                                                                                        | `pnpm health`                                                                                                                          | see AS-BUILT |

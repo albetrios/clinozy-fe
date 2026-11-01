@@ -32,6 +32,7 @@
     "item": "Artículo",
     "medicineName": "Medicamento",
     "packSize": "Tamaño del envase",
+    "hsn": "HSN",
     "qty": "Cant.",
     "amount": "Importe",
     "discount": "Descuento",

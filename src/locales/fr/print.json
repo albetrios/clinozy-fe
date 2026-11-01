@@ -32,6 +32,7 @@
     "item": "Article",
     "medicineName": "Médicament",
     "packSize": "Conditionnement",
+    "hsn": "HSN",
     "qty": "Qté",
     "amount": "Montant",
     "discount": "Remise",

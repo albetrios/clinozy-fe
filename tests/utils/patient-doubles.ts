@@ -41,6 +41,8 @@ export function patientRow(overrides: Partial<PatientRow> = {}): PatientRow {
     email: null,
     gender: 'female',
     dateOfBirth: '1995-10-27',
+    dateOfBirthIsApproximate: false,
+    age: 31,
     address: 'Adajan, Surat',
     referralSource: null,
     referredByContactId: null,

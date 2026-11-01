@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { ApiBody, ApiData } from '@/core/http/api.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 
-import type { CreatedFilter, FollowUpFilter } from './app-list-filters.ts';
+import type { AgeBand, CreatedFilter, FollowUpFilter } from './app-list-filters.ts';
 import {
   type LeadInterest,
   leadInterestSchema,
@@ -243,6 +243,8 @@ export interface LeadListParams {
   hold?: LeadHoldFilter;
   /** Team: one member, matched as owner or involved (the API takes one, M14). */
   member?: string;
+  /** The person's age band (`age_from` / `age_to`). */
+  age?: AgeBand;
   created?: CreatedFilter;
   followUp?: FollowUpFilter;
   sort?: LeadSortKey;

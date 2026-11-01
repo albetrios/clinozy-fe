@@ -51,6 +51,34 @@ export const FOLLOW_UP_PRESETS = [
 /** One Follow-up preset. */
 export type FollowUpPreset = (typeof FOLLOW_UP_PRESETS)[number];
 
+/**
+ * The age bands a list of people filters by (feat-approximate-age FE5): the person's age in whole
+ * years — a real birth date or one estimated from a typed age alike; someone without one never
+ * matches. "Any" is no filter.
+ */
+export const AGE_BANDS = ['child', 'young', 'adult', 'middle', 'senior'] as const;
+
+/** One age band. */
+export type AgeBand = (typeof AGE_BANDS)[number];
+
+/** Each band's inclusive bounds as the people lists take them (`age_from` / `age_to`). */
+const AGE_BAND_BOUNDS: Readonly<Record<AgeBand, { age_from?: number; age_to?: number }>> =
+  {
+    child: { age_to: 17 },
+    young: { age_from: 18, age_to: 29 },
+    adult: { age_from: 30, age_to: 44 },
+    middle: { age_from: 45, age_to: 59 },
+    senior: { age_from: 60 },
+  };
+
+/** A band's `age_from` / `age_to` for a list read — nothing without a band. */
+export function ageBandQueryOf(band: AgeBand | undefined): {
+  age_from?: number;
+  age_to?: number;
+} {
+  return band ? AGE_BAND_BOUNDS[band] : {};
+}
+
 /** A custom range, `from..to` (`YYYY-MM-DD`, clinic-local; either end may be empty). */
 export type DateRange = `${string}..${string}`;
 

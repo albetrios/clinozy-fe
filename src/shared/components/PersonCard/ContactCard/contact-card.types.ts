@@ -31,6 +31,8 @@ export interface ContactReviews {
 export interface ContactAbout {
   gender?: Gender | null;
   age?: number | null;
+  /** The age came from a typed age, not a birth date — shown with "approx.". */
+  ageIsApproximate?: boolean;
   language?: string | null;
   area?: string | null;
   household?: string | null;

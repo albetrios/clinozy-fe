@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import type { ApiBody, ApiData } from '@/core/http/api.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
+import { paiseOfRupees } from '@/lib/number-text.ts';
 
 import type { CreatedFilter } from './app-list-filters.ts';
 import type { Tone } from './app-schema.ts';
@@ -15,7 +16,8 @@ import { expiryDaysLeft } from './medicine-stock.ts';
  * Money is rupees as the API sends it; an expiry month is "MM/YY" on screen and `YYYY-MM` on the
  * wire, converted here and nowhere else. What the server derives — the stock and its level, the
  * nearest expiry, the best rate and the margin, "Needs MRP and composition" — is read, never
- * recomputed.
+ * recomputed. Stock counts units — a pack while `units_per_pack` is 1, the loose strip or tablet
+ * above it; every MRP and purchase rate stays a pack's (change-pharmacy-record-fields D5).
  */
 
 // ── Form ──
@@ -52,7 +54,21 @@ export function wireExpiryOf(screen: string): string {
 
 // ── The wire ──
 
-type ApiMedicine = NonNullable<ApiData<'/app/medicines/{medicine_id}', 'get'>>;
+type ApiMedicineDocumented = NonNullable<ApiData<'/app/medicines/{medicine_id}', 'get'>>;
+type ApiMedicineBatch = NonNullable<ApiMedicineDocumented['batches']>[number];
+
+/**
+ * A medicine as clinozy-be answers it: the documented shape plus what
+ * change-pharmacy-record-fields added — the HSN code, the pack label, the units per pack and each
+ * batch's MRP — which clinozy-be's OpenAPI response map does not list yet (F1). Once
+ * `pnpm api:types` carries them, this is the documented shape again.
+ */
+type ApiMedicine = Omit<ApiMedicineDocumented, 'batches'> & {
+  hsn_code?: string | null;
+  pack_label?: string | null;
+  units_per_pack?: number;
+  batches?: (ApiMedicineBatch & { mrp?: number | null })[];
+};
 
 /** The six swatches a manufacturer takes (clinozy-be 11.A). */
 export const MAKER_TONE_VALUES = [
@@ -80,6 +96,9 @@ export const medicineWire = wireSchema<ApiMedicine>()(
     composition: z.string().nullable(),
     manufacturer: makerWire.nullable(),
     is_prescription_only: z.boolean(),
+    hsn_code: z.string().nullable(),
+    pack_label: z.string().nullable(),
+    units_per_pack: z.number().int(),
     mrp: z.number(),
     gst_percent: z.union([
       z.literal(0),
@@ -110,6 +129,7 @@ export const medicineWire = wireSchema<ApiMedicine>()(
         expiry_month: z.string(),
         quantity: z.number().int(),
         purchase_rate: z.number().nullable(),
+        mrp: z.number().nullable(),
         supplier_id: z.string().nullable(),
         is_expired: z.boolean(),
       }),
@@ -137,15 +157,18 @@ export interface MedicineMaker {
   tone: Tone;
 }
 
-/** One batch of a medicine: its number, "MM/YY", whole packs, and what it was bought at. */
+/** One batch of a medicine: its number, "MM/YY", its units, what it was bought at and its MRP. */
 interface MedicineBatchRow {
   id: string;
   batchNo: string;
   /** "MM/YY". */
   expiry: string;
+  /** Units — packs while the medicine sells whole packs. */
   qty: number;
-  /** The purchase rate, rupees; null for an opening batch without one. */
+  /** A pack's purchase rate, rupees; null for an opening batch without one. */
   purchaseRate: number | null;
+  /** The MRP printed on the batch, a pack's, rupees; null = the medicine's (D8). */
+  mrp: number | null;
   supplierId: string | null;
   /** Its month has ended. */
   expired: boolean;
@@ -178,14 +201,22 @@ export interface MedicineRow {
   manufacturer: MedicineMaker | null;
   /** "Sold with": prescription only (blush) or over the counter (sage). */
   prescriptionOnly: boolean;
-  /** The MRP, GST included (D45), rupees. */
+  /** The GST HSN code — 4, 6 or 8 digits; a bill line snapshots it. */
+  hsnCode: string | null;
+  /** The pack as printed ("1*10", "30GM"); a bill line's pack size snapshots it. */
+  packLabel: string | null;
+  /** Loose units in a pack: 1 sells whole packs only, 10 a strip sold one tablet at a time. */
+  unitsPerPack: number;
+  /** A pack's MRP, GST included (D45), rupees. */
   mrp: number;
   gstPct: number;
   /** The MRP less its GST, rupees. */
   priceBeforeGst: number;
+  /** "Reorder at", in units. */
   minStock: number;
+  /** "Fill up to", in units. */
   maxStock: number;
-  /** Σ batch quantities. */
+  /** Σ batch quantities, in units. */
   stock: number;
   stockLevel: MedicineStockLevel;
   /** The batch in stock that expires first, with its days to the end of its month. */
@@ -221,6 +252,9 @@ export function toMedicineRow(
     composition: wire.composition,
     manufacturer: wire.manufacturer,
     prescriptionOnly: wire.is_prescription_only,
+    hsnCode: wire.hsn_code,
+    packLabel: wire.pack_label,
+    unitsPerPack: wire.units_per_pack,
     mrp: wire.mrp,
     gstPct: wire.gst_percent,
     priceBeforeGst: wire.price_before_gst,
@@ -253,6 +287,7 @@ export function toMedicineRow(
       expiry: screenExpiryOf(batch.expiry_month),
       qty: batch.quantity,
       purchaseRate: batch.purchase_rate,
+      mrp: batch.mrp,
       supplierId: batch.supplier_id,
       expired: batch.is_expired,
     })),
@@ -268,6 +303,21 @@ export function toMedicineRow(
   };
 }
 
+/**
+ * What one unit of a medicine sells at on a new sale, paise — a guide: the server prices the line
+ * from the batch it draws (D2, D6). The batch drawn first (the earliest expiry in stock) charges
+ * the MRP printed on it, else the medicine's; a loose-selling medicine charges that pack MRP over
+ * its units, rounded down to the paisa, never above the printed MRP.
+ */
+export function saleUnitPaise(
+  medicine: Pick<MedicineRow, 'mrp' | 'unitsPerPack' | 'batches'>,
+): number {
+  const first = medicine.batches.find((batch) => !batch.expired && batch.qty > 0);
+  const packPaise = paiseOfRupees(first?.mrp ?? medicine.mrp);
+  const unitsPerPack = Math.max(1, medicine.unitsPerPack);
+  return Math.floor(packPaise / unitsPerPack);
+}
+
 // ── Writes ──
 
 /** "Add a name" (`medical.md:174`). */
@@ -276,6 +326,18 @@ const MEDICINE_NAME_MESSAGE = 'Add a name';
 const MEDICINE_MRP_MESSAGE = 'Enter the MRP';
 /** "Enter a rate for every supplier price" (`medical.md:182`). */
 const MEDICINE_RATE_MESSAGE = 'Enter a rate for every supplier price';
+/** An HSN code is 4, 6 or 8 digits — the GST lengths (D9). */
+const HSN_CODE = /^(?:\d{4}|\d{6}|\d{8})$/;
+/** "Enter the HSN code as 4, 6 or 8 digits". */
+const HSN_CODE_MESSAGE = 'Enter the HSN code as 4, 6 or 8 digits';
+
+/** The most loose units one pack holds (clinozy-be's `MEDICINE_UNITS_PER_PACK_MAX`). */
+export const UNITS_PER_PACK_MAX = 1000;
+/** A pack label's longest text — the bill line's pack size (D9). */
+export const PACK_LABEL_MAX = 30;
+
+/** Whether a typed HSN code has a GST length: 4, 6 or 8 digits. */
+export const isHsnCode = (code: string) => HSN_CODE.test(code);
 
 /** The GST rates a medicine takes (clinozy-be 11.D). */
 const MEDICINE_GST_VALUES = [0, 5, 12, 18, 28] as const;
@@ -283,13 +345,15 @@ const MEDICINE_GST_VALUES = [0, 5, 12, 18, 28] as const;
 /** One GST rate. */
 export type MedicineGst = (typeof MEDICINE_GST_VALUES)[number];
 
-/** A batch as the drawer sends it: its id when saved, "MM/YY", whole packs, the rate in rupees. */
+/** A batch as the drawer sends it: its id when saved, "MM/YY", its units, the rate and MRP in rupees. */
 const medicineBatchInputSchema = z.object({
   id: z.string().optional(),
   batchNo: z.string().trim().min(1, 'Enter the batch').max(20),
   expiry: z.string().regex(SCREEN_EXPIRY, 'Enter the expiry'),
   qty: z.number().int().nonnegative().max(9999),
   purchaseRate: z.number().nonnegative().nullable(),
+  /** The MRP printed on the batch, a pack's; null = the medicine's. */
+  mrp: z.number().positive().nullable(),
   supplierId: z.string().nullable(),
 });
 
@@ -311,6 +375,9 @@ export const medicineInputSchema = z
     composition: z.string().trim().max(160).nullable(),
     manufacturerId: z.string(),
     prescriptionOnly: z.boolean(),
+    hsnCode: z.string().regex(HSN_CODE, HSN_CODE_MESSAGE).nullable(),
+    packLabel: z.string().trim().min(1).max(PACK_LABEL_MAX).nullable(),
+    unitsPerPack: z.number().int().min(1).max(UNITS_PER_PACK_MAX),
     mrp: z.number().refine((mrp) => mrp > 0, MEDICINE_MRP_MESSAGE),
     gstPct: z.union(MEDICINE_GST_VALUES.map((value) => z.literal(value))),
     minStock: z.number().int().min(0).max(9999),
@@ -338,6 +405,9 @@ function medicineFieldsOf(input: MedicineInput) {
     composition: input.composition,
     manufacturer_id: input.manufacturerId,
     is_prescription_only: input.prescriptionOnly,
+    hsn_code: input.hsnCode,
+    pack_label: input.packLabel,
+    units_per_pack: input.unitsPerPack,
     mrp: input.mrp,
     gst_percent: input.gstPct,
     min_stock: input.minStock,
@@ -348,6 +418,8 @@ function medicineFieldsOf(input: MedicineInput) {
       expiry_month: wireExpiryOf(batch.expiry),
       quantity: batch.qty,
       ...(batch.purchaseRate === null ? {} : { purchase_rate: batch.purchaseRate }),
+      // The whole list replaces the saved one: a cleared MRP is sent as null.
+      mrp: batch.mrp,
       ...(batch.supplierId === null ? {} : { supplier_id: batch.supplierId }),
     })),
     supplier_prices: input.supplierRates.map((rate) => ({
@@ -382,6 +454,9 @@ export function medicineChangeOf(
     composition: record.composition,
     manufacturerId: record.manufacturer?.id ?? '',
     prescriptionOnly: record.prescriptionOnly,
+    hsnCode: record.hsnCode,
+    packLabel: record.packLabel,
+    unitsPerPack: record.unitsPerPack,
     mrp: record.mrp,
     gstPct: record.gstPct as MedicineGst,
     minStock: record.minStock,

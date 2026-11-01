@@ -1,11 +1,15 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useController, useForm, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
 import { SECTION_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
-import { DrawerFieldGrid } from '@/shared/components/DrawerField/index.ts';
+import {
+  DrawerField,
+  DrawerFieldGrid,
+  DrawerTextarea,
+} from '@/shared/components/DrawerField/index.ts';
 import {
   type DrawerBadge,
   RecordDrawer,
@@ -22,6 +26,7 @@ import {
 } from '@/shared/forms/ItemsField/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useMedicineCatalogue } from '@/shared/hooks/useMedicines/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { Check, X } from '@/shared/icons/index.ts';
@@ -41,10 +46,12 @@ import {
   useMedicineOptions,
 } from '../PurchaseOrderDrawer/order-medicine.ts';
 import { OrderMedicineCell } from '../PurchaseOrderDrawer/OrderMedicineCell.tsx';
+import { ORDER_NOTE_MAX } from '../PurchaseOrderDrawer/purchase-order-form.ts';
 import {
   anyArrived,
   emptyUnexpectedLine,
   expiryProblems,
+  medicineMrpPrefills,
   receiveFormOf,
   type ReceiveFormValues,
   receiveInputOf,
@@ -229,6 +236,7 @@ function useColumns({
               form.setValue(`${line}.medicineId`, medicine.id, { shouldDirty: true });
               form.setValue(`${line}.name`, medicine.name);
               form.setValue(`${line}.rate`, medicine.rate, { shouldDirty: true });
+              form.setValue(`${line}.mrp`, medicine.mrp, { shouldDirty: true });
             }}
           />
         ) : (
@@ -238,6 +246,21 @@ function useColumns({
     { id: 'qty', header: t(K.qty), track: '56px', align: 'end', cell: count('qty') },
     { id: 'free', header: t(K.free), track: '56px', align: 'end', cell: count('free') },
     ...(priced ? [rate] : []),
+    {
+      // The MRP printed on the packs — the batch they go into takes it (D8)
+      id: 'mrp',
+      header: t(K.mrp),
+      track: '90px',
+      align: 'end',
+      cell: (row) => (
+        <ItemsNumberCell
+          {...row.bind('mrp')}
+          money
+          placeholder={t(K.mrp)}
+          readOnly={locked(row)}
+        />
+      ),
+    },
     {
       id: 'batch',
       header: t(K.batch),
@@ -339,6 +362,19 @@ function ReceiveSession({
   const { readOnly } = useMedicalDrawerAccess(true);
   const form = useForm<ReceiveFormValues>({ defaultValues: receiveFormOf(order) });
   const lines = useWatch({ control: form.control, name: 'lines' });
+  const catalogue = useMedicineCatalogue().data;
+  // An ordered line without an MRP starts at its medicine's once the catalogue is read (F5);
+  // a cell the user already touched keeps what they typed.
+  useEffect(() => {
+    if (!catalogue) return;
+    const mrps = new Map(catalogue.map((medicine) => [medicine.id, medicine.mrp]));
+    const prefills = medicineMrpPrefills(form.getValues('lines'), (id) => mrps.get(id));
+    for (const { index, mrp } of prefills) {
+      if (!form.getFieldState(`lines.${index}.mrp`).isDirty) {
+        form.setValue(`lines.${index}.mrp`, mrp);
+      }
+    }
+  }, [catalogue, form]);
   const { saveState, save } = useReceiveSave(form, order, onClose);
   const columns = useColumns({
     form,
@@ -387,6 +423,18 @@ function ReceiveSession({
           removable={(line) => line.unexpected}
           testId={`${testId}-lines`}
         />
+        <DrawerField span="full" label={t(K.note)} htmlFor={`${testId}-note-input`}>
+          <DrawerTextarea
+            id={`${testId}-note-input`}
+            {...form.register('note')}
+            rows={2}
+            maxLength={ORDER_NOTE_MAX}
+            placeholder={t(F.notePlaceholder)}
+            autoComplete="off"
+            readOnly={readOnly}
+            data-testid={`${testId}-note`}
+          />
+        </DrawerField>
       </DrawerFieldGrid>
     </RecordDrawer>
   );

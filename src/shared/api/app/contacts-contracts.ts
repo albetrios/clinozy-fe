@@ -86,6 +86,8 @@ const contactFieldsWire = {
   updated_at: z.string(),
   gender: genderSchema.nullable(),
   date_of_birth: z.string().nullable(),
+  date_of_birth_is_approximate: z.boolean(),
+  age: z.number().int().nullable(),
   address: z.string().nullable(),
   referral_source: referralSourceSchema.nullable(),
   referred_by_contact_id: z.string().nullable(),
@@ -143,8 +145,12 @@ export interface ContactSummary {
 /** What a person's record holds beyond their reach — the patient file's About and Edit patient. */
 export interface ContactProfile {
   gender: Gender | null;
-  /** `YYYY-MM-DD`. */
+  /** `YYYY-MM-DD` — estimated when {@link ContactProfile.dateOfBirthIsApproximate}. */
   dateOfBirth: string | null;
+  /** The birth date came from a typed age ("34 y · approx.") — the server's today minus it. */
+  dateOfBirthIsApproximate: boolean;
+  /** Whole years on the clinic's today, as the server counts them; none without a birth date. */
+  age: number | null;
   address: string | null;
   referralSource: ReferralSource | null;
   /** The contact who referred them, when it was someone the clinic knows. */
@@ -202,6 +208,8 @@ export function toContactProfile(row: z.output<typeof contactRowWire>): ContactP
   return {
     gender: row.gender,
     dateOfBirth: row.date_of_birth,
+    dateOfBirthIsApproximate: row.date_of_birth_is_approximate,
+    age: row.age,
     address: row.address,
     referralSource: row.referral_source,
     referredByContactId: row.referred_by_contact_id,

@@ -395,6 +395,7 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
         homeBranchId: expect.stringMatching(/.+/),
         gender: null,
         dateOfBirth: null,
+        age: null,
         types: ['aesthetic', 'lhr'],
         status: 'new',
         conversion: null,

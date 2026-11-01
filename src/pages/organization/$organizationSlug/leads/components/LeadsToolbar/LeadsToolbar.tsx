@@ -7,6 +7,8 @@ import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { LEAD_SOURCE_TONES, LEAD_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
+  ageFilterSection,
+  ROOM_TOOLBAR_NS,
   type RoomFilterCopy,
   RoomToolbar,
   RoomViewTabs,
@@ -48,6 +50,7 @@ function useFilterCopy(
 ): Record<string, RoomFilterCopy> {
   const { t } = useTranslation(LEADS_NS);
   const { t: tApp } = useTranslation(APP_NS);
+  const { t: tToolbar } = useTranslation(ROOM_TOOLBAR_NS);
   const keys = LEADS_KEYS.filters;
   return {
     status: {
@@ -104,6 +107,7 @@ function useFilterCopy(
         noMatch: t(keys.team.noMatch),
       },
     },
+    age: ageFilterSection(tToolbar).copy,
   };
 }
 

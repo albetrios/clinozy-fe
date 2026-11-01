@@ -19,6 +19,7 @@ import {
   TonePill,
 } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
+import { useMedicineUnits } from '@/shared/hooks/useMedicineUnits/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
@@ -29,19 +30,33 @@ const rowOf = (original: unknown) => original as MedicineRow;
 function useMedicineWords() {
   const { t } = useTranslation(MEDICAL_NS);
   const formatRupees = useRupeeFormat();
+  const units = useMedicineUnits();
   const keys = MEDICAL_KEYS.medicines;
   return {
     t,
     formatRupees,
-    // The level is the server's (Out at 0, Low at or below the reorder level).
-    stock: (row: MedicineRow) => ({
-      level: row.stockLevel,
-      tone: MEDICINE_STOCK_TONES[row.stockLevel],
-      label: t(keys.stockLine, {
-        count: row.stock,
-        level: t(keys.levels[row.stockLevel]),
-      }),
-    }),
+    // The level is the server's (Out at 0, Low at or below the reorder level). A loose-selling
+    // medicine's units read as packs and the loose rest (change-pharmacy-record-fields D5).
+    stock: (row: MedicineRow) => {
+      const level = t(keys.levels[row.stockLevel]);
+      const loose = units.inStock(row.stock, row.unitsPerPack);
+      return {
+        level: row.stockLevel,
+        tone: MEDICINE_STOCK_TONES[row.stockLevel],
+        label:
+          loose === null
+            ? t(keys.stockLine, { count: row.stock, level })
+            : [loose, level].join(' · '),
+      };
+    },
+    /** The name's muted line: its composition, then its pack and HSN code ("1*10 · HSN 3004"). */
+    sub: (row: MedicineRow) =>
+      [
+        row.composition ?? '',
+        units.details({ pack: row.packLabel, hsnCode: row.hsnCode }),
+      ]
+        .filter(Boolean)
+        .join(' · '),
     expiry: (row: MedicineRow) =>
       row.nearest
         ? {
@@ -93,11 +108,7 @@ export function useMedicineColumns(): ColumnDef<DataTableFeatures, MedicineRow>[
         <TextCell
           text={row.original.name}
           weight="medium"
-          sub={
-            row.original.needsDetails
-              ? t(keys.needsMrp)
-              : (row.original.composition ?? '')
-          }
+          sub={row.original.needsDetails ? t(keys.needsMrp) : words.sub(row.original)}
           subTone={row.original.needsDetails ? 'butter' : undefined}
         />
       ),

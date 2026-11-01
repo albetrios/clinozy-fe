@@ -101,6 +101,9 @@ export const INVOICE_DRAWER_KEYS = {
     newMedicineName: 'invoiceDrawer.items.newMedicineName',
     /** "Azel Cream added · set MRP later in Stock" — the quick draft's toast. */
     medicineAdded: 'invoiceDrawer.items.medicineAdded',
+    /** The dashed line under each row: the line's description, printed under its name. */
+    description: 'invoiceDrawer.items.description',
+    descriptionPlaceholder: 'invoiceDrawer.items.descriptionPlaceholder',
   },
   payment: {
     full: 'invoiceDrawer.payment.full',

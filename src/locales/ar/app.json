@@ -305,6 +305,14 @@
       "gender": "الجنس",
       "birthDate": "تاريخ الميلاد",
       "age": "العمر {{age}}",
+      "birthMode": "تاريخ الميلاد أو العمر",
+      "birthModes": {
+        "date": "تاريخ الميلاد",
+        "age": "العمر"
+      },
+      "ageYears": "العمر (بالسنوات)",
+      "agePlaceholder": "مثلًا 34",
+      "ageHint": "تقريبي · يزيد كل سنة",
       "types": "نوع المريض",
       "typesHint": "اختر ما تشاء",
       "status": "الحالة",
@@ -338,6 +346,7 @@
     },
     "missing": "أضف الاسم والجوال",
     "mobileInvalid": "أدخل رقم جوال من 10 أرقام",
+    "ageInvalid": "أدخل عمرًا من 0 إلى 120",
     "created": "تم إنشاء المريض {{id}}",
     "openFile": "فتح الملف",
     "saved": "تم حفظ {{name}}",
@@ -453,6 +462,8 @@
     },
     "genderAge": "{{gender}} · {{age}} سنة",
     "age": "{{age}} سنة",
+    "approximate": "تقريبي",
+    "approximateHint": "عمر ذُكر عند التسجيل — تاريخ الميلاد تقديري",
     "cameVia": "جاء عبر {{source}}",
     "owedToThem": "{{amount}} مستحقة لهم",
     "owedByThem": "{{amount}} مستحقة عليهم للعيادة",
@@ -573,6 +584,15 @@
       "nextSevenDays": "الأيام السبعة القادمة",
       "notSet": "غير محدد",
       "range": "نطاق مخصص"
+    },
+    "age": {
+      "label": "العمر",
+      "any": "أي",
+      "child": "أقل من 18",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60+"
     }
   },
   "commandMenu": {
@@ -1407,6 +1427,8 @@
       "belowFloor": "أقل من أدنى سعر {{amount}} لـ {{name}}",
       "newMedicineName": "اسم دواء جديد",
       "medicineAdded": "تمت إضافة {{name}} · حدّد السعر الأقصى لاحقًا في المخزون",
+      "description": "الوصف",
+      "descriptionPlaceholder": "أضف وصفًا · مثل جلستان مجانيتان",
       "hintInvoice": "2 = الكمية · 10% = الخصم",
       "belowLowest": "أقل من أدنى سعر لـ {{name}}",
       "offerApplied": "عرض مطبّق: {{offer}}"
@@ -1701,5 +1723,25 @@
     "hint": "يملأ المنطقة والمدينة والولاية تلقائيًا",
     "unknown": "لا نعرف هذا الرمز البريدي — اكتب المنطقة والمدينة والولاية.",
     "areaPick": "اختر منطقتك"
+  },
+  "medicineUnits": {
+    "packs_zero": "{{count}} عبوات",
+    "packs_one": "{{count}} عبوة",
+    "packs_two": "{{count}} عبوات",
+    "packs_few": "{{count}} عبوات",
+    "packs_many": "{{count}} عبوات",
+    "packs_other": "{{count}} عبوات",
+    "packsAndLoose_zero": "{{count}} عبوات + {{loose}}",
+    "packsAndLoose_one": "{{count}} عبوة + {{loose}}",
+    "packsAndLoose_two": "{{count}} عبوات + {{loose}}",
+    "packsAndLoose_few": "{{count}} عبوات + {{loose}}",
+    "packsAndLoose_many": "{{count}} عبوات + {{loose}}",
+    "packsAndLoose_other": "{{count}} عبوات + {{loose}}",
+    "loose": "{{count}} مفرد",
+    "perPack": "{{count}} في العبوة",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "{{price}} للوحدة",
+    "inStock": "متوفر {{stock}}",
+    "packEquivalent": "= {{packs}}"
   }
 }

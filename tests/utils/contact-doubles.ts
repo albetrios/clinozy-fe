@@ -8,6 +8,8 @@ import type { ContactProfile } from '@/shared/api/app/contacts-contracts.ts';
 export const EMPTY_CONTACT_PROFILE: ContactProfile = {
   gender: null,
   dateOfBirth: null,
+  dateOfBirthIsApproximate: false,
+  age: null,
   address: null,
   referralSource: null,
   referredByContactId: null,

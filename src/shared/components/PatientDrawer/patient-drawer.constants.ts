@@ -40,6 +40,16 @@ export const PATIENT_DRAWER_KEYS = {
     homeBranch: 'patientDrawer.fields.homeBranch',
     gender: 'patientDrawer.fields.gender',
     birthDate: 'patientDrawer.fields.birthDate',
+    /** The Birth date · Age switch's name, and its two chips. */
+    birthMode: 'patientDrawer.fields.birthMode',
+    birthModes: {
+      date: 'patientDrawer.fields.birthModes.date',
+      age: 'patientDrawer.fields.birthModes.age',
+    },
+    /** "Age (years)" — the field's label in Age mode, its placeholder and its hint. */
+    ageYears: 'patientDrawer.fields.ageYears',
+    agePlaceholder: 'patientDrawer.fields.agePlaceholder',
+    ageHint: 'patientDrawer.fields.ageHint',
     /** "Age 28" — the Birth date's hint once a date is set. */
     age: 'patientDrawer.fields.age',
     types: 'patientDrawer.fields.types',
@@ -79,6 +89,8 @@ export const PATIENT_DRAWER_KEYS = {
   missing: 'patientDrawer.missing',
   /** "Enter a 10-digit mobile" — a mobile that is not ten digits from 6–9. */
   mobileInvalid: 'patientDrawer.mobileInvalid',
+  /** A typed age that is not a whole number from 0 to 120. */
+  ageInvalid: 'patientDrawer.ageInvalid',
   /** "Patient #3509 created" (D28, Q-P6). */
   created: 'patientDrawer.created',
   openFile: 'patientDrawer.openFile',

@@ -31,6 +31,8 @@ import type { LedgerRow, MoneySplit } from './payments-contracts.ts';
 export const INVOICE_REMARK_MAX = 500;
 /** A line's quantity: the stepper's 1–999. */
 export const INVOICE_QTY_MAX = 999;
+/** A line's description — the free text under its name — 280 characters (BD1). */
+export const INVOICE_LINE_DESCRIPTION_MAX = 280;
 
 // ── Records ──
 
@@ -57,7 +59,12 @@ export interface InvoiceLine {
   medicineId: string | null;
   /** The offering's or medicine's name as billed. */
   name: string;
+  /** The free text under the name ("+2 sessions free"), up to 280; null for none. */
+  description: string | null;
+  /** A medicine line's pack label when billed ("1*10"). */
   packSize: string | null;
+  /** A medicine line's HSN code when billed (change-pharmacy-record-fields D3). */
+  hsnCode: string | null;
   qty: number;
   /** The rate billed — the offering's price, its live offer's, never below the lowest price. */
   rate: number;
@@ -132,9 +139,19 @@ export interface InvoiceRecord {
 
 // ── The wire ──
 
-type ApiInvoiceRow = NonNullable<ApiData<'/app/invoices', 'get'>>[number];
-type ApiInvoice = NonNullable<ApiData<'/app/invoices/{invoice_id}', 'get'>>;
-type ApiInvoicePreview = NonNullable<ApiData<'/app/invoices/preview', 'post'>>;
+/**
+ * An answer with lines, plus the HSN code change-pharmacy-record-fields snapshots on each line
+ * (D3), which clinozy-be's OpenAPI response map does not list yet (F1). Once `pnpm api:types`
+ * carries it, this is the documented shape again.
+ */
+type WithLineHsn<Api extends { items?: readonly object[] }> = Omit<Api, 'items'> & {
+  items?: (NonNullable<Api['items']>[number] & { hsn_code?: string | null })[];
+};
+type ApiInvoiceRow = WithLineHsn<NonNullable<ApiData<'/app/invoices', 'get'>>[number]>;
+type ApiInvoice = WithLineHsn<NonNullable<ApiData<'/app/invoices/{invoice_id}', 'get'>>>;
+type ApiInvoicePreview = WithLineHsn<
+  NonNullable<ApiData<'/app/invoices/preview', 'post'>>
+>;
 type ApiInvoiceListMeta = NonNullable<
   operations['getAppInvoices']['responses'][200]['content']['application/json']['meta']
 >;
@@ -152,7 +169,9 @@ const invoiceLineFieldsWire = {
   offering_id: z.string().nullable(),
   medicine_id: z.string().nullable(),
   name: z.string(),
+  description: z.string().nullable(),
   pack_size: z.string().nullable(),
+  hsn_code: z.string().nullable(),
   quantity: z.number().int(),
   rate: z.number(),
   discount_percent: z.number(),
@@ -240,7 +259,9 @@ export function toInvoiceRecord(row: InvoiceWire): InvoiceRecord {
       offeringId: line.offering_id,
       medicineId: line.medicine_id,
       name: line.name,
+      description: line.description,
       packSize: line.pack_size,
+      hsnCode: line.hsn_code,
       qty: line.quantity,
       rate: line.rate,
       discountPct: line.discount_percent,
@@ -346,7 +367,9 @@ export function toInvoicePreview(
       offeringId: line.offering_id,
       medicineId: line.medicine_id,
       name: line.name,
+      description: line.description,
       packSize: line.pack_size,
+      hsnCode: line.hsn_code,
       qty: line.quantity,
       rate: line.rate,
       discountPct: line.discount_percent,
@@ -507,6 +530,8 @@ export interface InvoiceLineInput {
   offeringId: string;
   qty: number;
   discountPct: number;
+  /** The free text under the line's name; blank or null sends none (a kept line's is cleared). */
+  description: string | null;
   suggestionId: string | null;
   treatmentIds: string[];
 }
@@ -534,21 +559,27 @@ export interface InvoiceInput {
 /** A percentage to the two places the API takes. */
 const twoPlaces = (value: number) => Math.round(value * 100) / 100;
 
-/** A remark as a write sends it: trimmed, a blank one as none. */
-const remarkOf = (remark: string | null) => {
-  const trimmed = remark?.trim() ?? '';
+/** A remark or a line's description as a write sends it: trimmed, a blank one as none. */
+const textOrNull = (text: string | null) => {
+  const trimmed = text?.trim() ?? '';
   return trimmed === '' ? null : trimmed;
 };
 
 type ApiInvoiceLine = NonNullable<ApiInvoiceChange['items']>[number];
 
-/** One line as a write sends it — with its id when it is kept. */
+/**
+ * One line as a write sends it — with its id when it is kept. A kept line always carries its
+ * description (null clears it; omitted the server would keep the saved one); a new line only
+ * when it has one.
+ */
 function lineBodyOf(line: InvoiceLineInput): ApiInvoiceLine {
+  const description = textOrNull(line.description);
   return {
     ...(line.id ? { id: line.id } : {}),
     offering_id: line.offeringId,
     quantity: line.qty,
     discount_percent: twoPlaces(line.discountPct),
+    ...(line.id || description !== null ? { description } : {}),
     patient_offering_suggestion_id: line.suggestionId,
     patient_treatment_ids: line.treatmentIds,
   };
@@ -570,7 +601,7 @@ export function invoicePreviewBodyOf(input: InvoiceInput): ApiInvoicePreviewBody
     member_ids: input.teamIds,
     items: input.items.map(newLineBodyOf),
     overall_discount: input.overallDiscount,
-    remark: remarkOf(input.remark),
+    remark: textOrNull(input.remark),
     patient_prescription_id: input.prescriptionId,
   };
 }
@@ -599,6 +630,7 @@ function sameLine(line: InvoiceLineInput, saved: InvoiceLine | undefined): boole
     line.offeringId === saved.offeringId &&
     line.qty === saved.qty &&
     twoPlaces(line.discountPct) === saved.discountPct &&
+    textOrNull(line.description) === saved.description &&
     line.suggestionId === saved.suggestionId &&
     sameSet(line.treatmentIds, saved.treatmentIds)
   );
@@ -634,7 +666,8 @@ export function invoiceChangeOf(
   if (input.overallDiscount !== invoice.overallDiscount) {
     change.overall_discount = input.overallDiscount;
   }
-  if (remarkOf(input.remark) !== invoice.remark) change.remark = remarkOf(input.remark);
+  if (textOrNull(input.remark) !== invoice.remark)
+    change.remark = textOrNull(input.remark);
   if (input.prescriptionId !== invoice.prescriptionId) {
     change.patient_prescription_id = input.prescriptionId;
   }

@@ -115,6 +115,28 @@ describe('SaleDrawer (medical.md:333–338)', () => {
     );
   });
 
+  it('names each line’s pack and HSN as billed, and a loose line’s units as packs (D3, D5)', async () => {
+    const base = saleRow();
+    const sale = saleRow({
+      lines: [
+        {
+          ...base.lines[0]!,
+          packSize: '1*10',
+          hsnCode: '3004',
+          unitsPerPack: 10,
+          qty: 13,
+        },
+      ],
+    });
+    renderMedicalDrawer(
+      <SaleDrawer open sale={sale} onClose={vi.fn()} onReturn={vi.fn()} />,
+    );
+    const drawer = await screen.findByTestId(D);
+    const [line] = within(drawer).getAllByTestId(`${D}-lines-row`);
+    expect(line).toHaveTextContent('1*10 · HSN 3004');
+    expect(line).toHaveTextContent('= 1 pack + 3');
+  });
+
   it('a Pharmacist collects without an Undo — deleting a payment is not theirs', async () => {
     const user = setup();
     renderMedicalDrawer(
@@ -191,6 +213,25 @@ describe('SaleDrawer (medical.md:333–338)', () => {
     expect(within(drawer).queryByTestId(`${D}-save`)).not.toBeInTheDocument();
     expect(within(drawer).queryByTestId(`${D}-delete`)).not.toBeInTheDocument();
     expect(within(drawer).getByTestId(`${D}-dismiss`)).toHaveTextContent('Close');
+  });
+
+  it('shows a line’s description under its medicine', async () => {
+    const sale = saleRow();
+    renderMedicalDrawer(
+      <SaleDrawer
+        open
+        sale={{
+          ...sale,
+          lines: sale.lines.map((line) => ({ ...line, description: 'Apply at night' })),
+        }}
+        onClose={vi.fn()}
+        onReturn={vi.fn()}
+      />,
+    );
+    const drawer = await screen.findByTestId(D);
+    const [line] = within(drawer).getAllByTestId(`${D}-lines-row`);
+    expect(line).toHaveTextContent('Azelaic gel 15g');
+    expect(line).toHaveTextContent('Apply at night');
   });
 
   it('shimmers until the sale is read', async () => {

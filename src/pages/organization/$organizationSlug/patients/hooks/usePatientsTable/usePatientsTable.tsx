@@ -192,7 +192,11 @@ function usePatientColumns(
       accessorFn: (patient) => patientAge(patient.dateOfBirth, today),
       header: t(PATIENTS_KEYS.columns.age),
       cell: ({ row }) => (
-        <PatientAgeCell dateOfBirth={row.original.dateOfBirth} today={today} />
+        <PatientAgeCell
+          dateOfBirth={row.original.dateOfBirth}
+          approximate={row.original.dateOfBirthIsApproximate}
+          today={today}
+        />
       ),
       meta: {
         track: '96px',

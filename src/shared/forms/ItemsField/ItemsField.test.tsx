@@ -455,6 +455,21 @@ describe('ItemsField — the note line (H:924)', () => {
   });
 });
 
+describe('ItemsField — the note line’s tag', () => {
+  it('reads "Note" by default, and the host’s own tag when it names one', () => {
+    const { unmount } = renderWithClient(<LinesHarness note={{ key: 'note' }} />);
+    expect(screen.getByTestId('lines-note').closest('label')).toHaveTextContent('Note');
+    unmount();
+
+    renderWithClient(
+      <LinesHarness note={{ key: 'note', tag: 'Description', placeholder: 'Add one' }} />,
+    );
+    const label = screen.getByTestId('lines-note').closest('label');
+    expect(label).toHaveTextContent('Description');
+    expect(label).not.toHaveTextContent('Note');
+  });
+});
+
 describe('ItemsField — the row footer (change-prescription-writing D7)', () => {
   it('puts a host’s full-width line under a row that has one, and none under the rest', () => {
     renderWithClient(

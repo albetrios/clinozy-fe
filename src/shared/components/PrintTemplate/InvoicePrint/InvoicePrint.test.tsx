@@ -17,7 +17,9 @@ const PEEL_LINE: InvoiceRecord['items'][number] = {
   offeringId: TEST_PEEL_ID,
   medicineId: null,
   name: 'Research Peel',
+  description: null,
   packSize: null,
+  hsnCode: null,
   qty: 2,
   rate: 1650.5,
   discountPct: 10,
@@ -180,6 +182,92 @@ describe('InvoicePrint', () => {
     expect(screen.getByText('Sale Details')).toBeInTheDocument();
     expect(field('Invoice #:')).toHaveTextContent('2026-27/0005');
     expect(screen.queryByText('Sale #:')).not.toBeInTheDocument();
+  });
+
+  it('prints a line’s description under its name, as written, and nothing for a line without one', () => {
+    render(
+      <InvoicePrint
+        {...propsFor(
+          peelInvoice({
+            items: [
+              {
+                ...PEEL_LINE,
+                id: 'iitm_a',
+                description: 'LHR Axilla 10 sessions =10*550',
+              },
+              { ...PEEL_LINE, id: 'iitm_b' },
+            ],
+          }),
+        )}
+      />,
+    );
+    const descriptions = screen.getAllByTestId(
+      PRINT_TEMPLATE_TEST_IDS.invoiceLineDescription,
+    );
+    expect(descriptions).toHaveLength(1);
+    expect(descriptions[0]).toHaveTextContent('LHR Axilla 10 sessions =10*550');
+    expect(descriptions[0]).not.toHaveClass('uppercase');
+    expect(tableRows()[1]?.[0]).toBe('Research PeelLHR Axilla 10 sessions =10*550');
+  });
+
+  it('prints a description under its line on a pharmacy bill, its HSN in its own column', () => {
+    render(
+      <InvoicePrint
+        {...propsFor(
+          peelInvoice({
+            type: 'medical',
+            items: [
+              {
+                ...PEEL_LINE,
+                id: 'iitm_a',
+                name: 'Glycolac Cream',
+                offeringId: null,
+                packSize: '1*10',
+                hsnCode: '30049099',
+                description: 'Twice a day after food',
+              },
+            ],
+          }),
+        )}
+      />,
+    );
+    const [, glycolac] = tableRows();
+    expect(glycolac?.slice(0, 3)).toEqual([
+      'Glycolac CreamTwice a day after food',
+      '1*10',
+      '30049099',
+    ]);
+  });
+
+  it('prints an HSN column on a pharmacy bill, each line its own code (change-pharmacy-record-fields D3)', () => {
+    const line = {
+      ...PEEL_LINE,
+      name: 'Glycolac Cream',
+      offeringId: null,
+      packSize: '1*10',
+    };
+    render(
+      <InvoicePrint
+        {...propsFor(
+          peelInvoice({
+            type: 'medical',
+            items: [
+              { ...line, id: 'iitm_a', hsnCode: '30049099' },
+              { ...line, id: 'iitm_b', name: 'Kojic soap', hsnCode: null },
+            ],
+          }),
+        )}
+      />,
+    );
+    const [header, glycolac, soap] = tableRows();
+    expect(header?.slice(0, 3)).toEqual(['Medicine Name', 'Pack Size', 'HSN']);
+    expect(glycolac?.slice(0, 3)).toEqual(['Glycolac Cream', '1*10', '30049099']);
+    expect(soap?.[2]).toBe('');
+  });
+
+  it('prints no HSN column on a clinic bill', () => {
+    render(<InvoicePrint {...propsFor()} />);
+    expect(tableRows()[0]).not.toContain('HSN');
   });
 
   it('prints a line’s own pack size, else the one in its name', () => {

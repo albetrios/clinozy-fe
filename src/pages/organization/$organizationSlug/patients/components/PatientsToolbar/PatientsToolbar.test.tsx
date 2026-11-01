@@ -93,6 +93,7 @@ describe('PatientsToolbar', () => {
       'Type',
       'Status',
       'Conversion',
+      'Age',
       'Created',
       'Follow-up date',
     ]);

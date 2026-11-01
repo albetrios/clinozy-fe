@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +48,7 @@ import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constan
 import {
   FOLLOW_UP_HOUR,
   followUpPresets,
+  PATIENT_BIRTH_MODES,
   PATIENT_FORM_LIMITS,
   type PatientFormValues,
 } from './patient-form.ts';
@@ -105,13 +107,11 @@ export function PatientContactFields({
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   const { t: tCard } = useTranslation(PERSON_CARD_NS);
   const field = useDrawerFieldIds(form, idPrefix);
-  const { dateOfBirth } = values;
   const first = field('firstName');
   const last = field('lastName');
   const mobile = field('phone');
   const second = field('phone2');
   const address = field('address');
-  const birth = field('dateOfBirth');
 
   return (
     <DrawerStepBody readOnly={readOnly}>
@@ -243,17 +243,85 @@ export function PatientContactFields({
             )}
           />
         </DrawerField>
-        <DrawerField
-          span="third"
-          label={t(K.birthDate)}
-          htmlFor={birth.id}
-          hint={
-            dateOfBirth
-              ? t(K.age, { age: civilYearsBetween(dateOfBirth, today) })
-              : undefined
-          }
-          error={birth.error}
-        >
+        <PatientBirthField
+          form={form}
+          values={values}
+          idPrefix={idPrefix}
+          testId={testId}
+          today={today}
+        />
+      </DrawerFieldGrid>
+    </DrawerStepBody>
+  );
+}
+
+/** The Birth date field's hint: "Age 28" under a picked date, the typed age's note in Age mode. */
+function birthHintOf({
+  values,
+  today,
+  t,
+}: {
+  values: PatientFormValues;
+  today: string;
+  t: TFunction;
+}): string | undefined {
+  if (values.birthMode === 'age') return t(K.ageHint);
+  if (!values.dateOfBirth) return undefined;
+  return t(K.age, { age: civilYearsBetween(values.dateOfBirth, today) });
+}
+
+/**
+ * Birth date or Age (feat-approximate-age FE1): the "Birth date · Age" chips, then the date picker,
+ * or the whole years when the person gives only their age — saved as an approximate birth date.
+ */
+function PatientBirthField({
+  form,
+  values,
+  idPrefix,
+  testId,
+  today,
+}: Omit<PatientFieldsProps, 'readOnly'> & { today: string }) {
+  const { t } = useTranslation(PATIENT_DRAWER_NS);
+  const field = useDrawerFieldIds(form, idPrefix);
+  const birth = field('dateOfBirth');
+  const age = field('age');
+  const byAge = values.birthMode === 'age';
+  return (
+    <DrawerField
+      span="third"
+      label={t(byAge ? K.ageYears : K.birthDate)}
+      htmlFor={byAge ? age.id : birth.id}
+      hint={birthHintOf({ values, today, t })}
+      error={byAge ? age.error : birth.error}
+    >
+      <div className="flex flex-col gap-2">
+        <Controller
+          control={form.control}
+          name="birthMode"
+          render={({ field: control }) => (
+            <DrawerChips
+              label={t(K.birthMode)}
+              options={PATIENT_BIRTH_MODES.map((mode) => ({
+                value: mode,
+                label: t(K.birthModes[mode]),
+              }))}
+              value={control.value}
+              onChange={(mode) => control.onChange(mode ?? 'date')}
+              testId={`${testId}-birth-mode`}
+            />
+          )}
+        />
+        {byAge ? (
+          <DrawerInput
+            {...age.control}
+            {...form.register('age')}
+            inputMode="numeric"
+            maxLength={3}
+            capitalize={false}
+            placeholder={t(K.agePlaceholder)}
+            data-testid={`${testId}-age`}
+          />
+        ) : (
           <Controller
             control={form.control}
             name="dateOfBirth"
@@ -269,9 +337,9 @@ export function PatientContactFields({
               />
             )}
           />
-        </DrawerField>
-      </DrawerFieldGrid>
-    </DrawerStepBody>
+        )}
+      </div>
+    </DrawerField>
   );
 }
 

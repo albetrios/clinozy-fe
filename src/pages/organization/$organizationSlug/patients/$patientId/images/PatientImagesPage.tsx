@@ -329,7 +329,7 @@ function SectionSelectionBar({
  * images". "Select" (or a tile's check) picks up to eight photos; the bar's
  * Compare opens two to eight side by side on `?compare=`. Every write is
  * `patient:update`; the Private album is `patient:private_album:read`. Each
- * tile shows the photo from its `file_url` (D86).
+ * tile shows the photo from its `thumbnail_url` (the thumbnail, else the full photo — D86).
  */
 export function PatientImagesPage() {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);

@@ -13,7 +13,11 @@ import { useCreatePatient, useUpdatePatient } from '@/shared/hooks/usePatients/i
 import { useUploadQueue } from '@/shared/hooks/useUploadQueue/index.ts';
 
 import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constants.ts';
-import { invalidPatientPhones, type PatientFormValues } from './patient-form.ts';
+import {
+  invalidPatientPhones,
+  isInvalidPatientAge,
+  type PatientFormValues,
+} from './patient-form.ts';
 
 /** The drawer's two steps. */
 type PatientDrawerStepId = 'contact' | 'clinic';
@@ -27,7 +31,9 @@ const FIELD_STEPS: Readonly<Record<keyof PatientFormValues, PatientDrawerStepId>
   address: 'contact',
   homeBranchId: 'contact',
   gender: 'contact',
+  birthMode: 'contact',
   dateOfBirth: 'contact',
+  age: 'contact',
   types: 'clinic',
   status: 'clinic',
   conversion: 'clinic',
@@ -55,6 +61,9 @@ const SERVER_FIELDS: Readonly<Record<string, keyof PatientFormValues>> = {
   'contact.phones.1.phone': 'phone2',
   'contact.gender': 'gender',
   'contact.dateOfBirth': 'dateOfBirth',
+  'contact.age': 'age',
+  'body.age': 'age',
+  'body.contact.age': 'age',
   'contact.address': 'address',
   'contact.referralSource': 'referralSource',
   'contact.referredByName': 'referredByName',
@@ -123,8 +132,11 @@ export function usePatientSave({
     toastId: 'patient-save-failed',
     check: (values) => {
       const invalid = invalidPatientPhones(values);
-      return invalid.length > 0
-        ? { fields: invalid, message: t(PATIENT_DRAWER_KEYS.mobileInvalid) }
+      if (invalid.length > 0) {
+        return { fields: invalid, message: t(PATIENT_DRAWER_KEYS.mobileInvalid) };
+      }
+      return isInvalidPatientAge(values)
+        ? { fields: ['age'], message: t(PATIENT_DRAWER_KEYS.ageInvalid) }
         : null;
     },
     onConflict: (error) => {

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 
 /*
@@ -9,6 +11,14 @@ import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 
 /** A trimmed text field, or `null` when empty. */
 export const textOrNull = (text: string): string | null => text.trim() || null;
+
+const EMAIL = z.email();
+
+/** A typed email that does not read as one (an empty one is no email) — clinozy-be's 400. */
+export function emailIsInvalid(text: string): boolean {
+  const email = text.trim();
+  return email.length > 0 && !EMAIL.safeParse(email).success;
+}
 
 /**
  * Who may do what in a Medical drawer (`medical.md:7`; Q-U8): view only

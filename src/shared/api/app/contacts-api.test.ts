@@ -38,6 +38,8 @@ const contactRow = (patch: Record<string, unknown> = {}) => ({
   updated_at: '2026-10-02T04:30:00.000Z',
   gender: 'female',
   date_of_birth: '1994-03-12',
+  date_of_birth_is_approximate: false,
+  age: 32,
   address: null,
   referral_source: 'instagram',
   referred_by_contact_id: null,
@@ -89,6 +91,8 @@ describe('fetchContact', () => {
       updatedAt: '2026-10-02T04:30:00.000Z',
       gender: 'female',
       dateOfBirth: '1994-03-12',
+      dateOfBirthIsApproximate: false,
+      age: 32,
       address: null,
       referralSource: 'instagram',
       referredByContactId: null,
@@ -332,6 +336,8 @@ describe('fetchContactsByIds', () => {
       name: 'Anaya Desai',
       gender: 'female',
       dateOfBirth: '1994-03-12',
+      dateOfBirthIsApproximate: false,
+      age: 32,
     });
     expect(people.size).toBe(2);
   });

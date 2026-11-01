@@ -305,6 +305,14 @@
       "gender": "性別",
       "birthDate": "生年月日",
       "age": "{{age}}歳",
+      "birthMode": "生年月日または年齢",
+      "birthModes": {
+        "date": "生年月日",
+        "age": "年齢"
+      },
+      "ageYears": "年齢（歳）",
+      "agePlaceholder": "例：34",
+      "ageHint": "推定 · 毎年増えます",
       "types": "患者の種別",
       "typesHint": "複数選択可",
       "status": "ステータス",
@@ -338,6 +346,7 @@
     },
     "missing": "氏名と携帯番号を入力してください",
     "mobileInvalid": "10桁の携帯番号を入力してください",
+    "ageInvalid": "0〜120の年齢を入力してください",
     "created": "患者 {{id}} を作成しました",
     "openFile": "ファイルを開く",
     "saved": "{{name}} を保存しました",
@@ -438,6 +447,8 @@
     },
     "genderAge": "{{gender}} · {{age}}歳",
     "age": "{{age}}歳",
+    "approximate": "推定",
+    "approximateHint": "登録時に伝えられた年齢 — 生年月日は推定です",
     "cameVia": "{{source}}経由",
     "owedToThem": "返金予定 {{amount}}",
     "owedByThem": "クリニックへの未払い {{amount}}",
@@ -553,6 +564,15 @@
       "nextSevenDays": "今後 7 日間",
       "notSet": "未設定",
       "range": "期間を指定"
+    },
+    "age": {
+      "label": "年齢",
+      "any": "すべて",
+      "child": "18歳未満",
+      "young": "18–29",
+      "adult": "30–44",
+      "middle": "45–59",
+      "senior": "60歳以上"
     }
   },
   "commandMenu": {
@@ -1317,6 +1337,8 @@
       "belowFloor": "{{name}} の最低価格 {{amount}} を下回っています",
       "newMedicineName": "新しい医薬品名",
       "medicineAdded": "{{name}} を追加しました · 希望小売価格は後で在庫で設定",
+      "description": "説明",
+      "descriptionPlaceholder": "説明を追加 · 例: +2回無料",
       "hintInvoice": "2 = 数量 · 10% = 割引",
       "belowLowest": "{{name}} の最低価格を下回っています",
       "offerApplied": "適用中のオファー：{{offer}}"
@@ -1596,5 +1618,15 @@
     "hint": "エリア、市区町村、州・県を自動入力します",
     "unknown": "この郵便番号は見つかりません。エリア、市区町村、州・県を入力してください。",
     "areaPick": "エリアを選択"
+  },
+  "medicineUnits": {
+    "packs_other": "{{count}} パック",
+    "packsAndLoose_other": "{{count}} パック + {{loose}}",
+    "loose": "バラ {{count}}",
+    "perPack": "1パック {{count}}",
+    "hsn": "HSN {{code}}",
+    "unitPrice": "1単位 {{price}}",
+    "inStock": "在庫 {{stock}}",
+    "packEquivalent": "= {{packs}}"
   }
 }

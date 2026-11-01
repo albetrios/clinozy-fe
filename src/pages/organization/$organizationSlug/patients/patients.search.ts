@@ -13,6 +13,8 @@
  */
 import { listIn, oneOf, queryOf, sortOf } from '@/lib/routes/search-params.ts';
 import {
+  AGE_BANDS,
+  type AgeBand,
   type CreatedFilter,
   type FollowUpFilter,
   readCreatedFilter,
@@ -67,6 +69,8 @@ export interface PatientsSearch {
   status?: PatientStatus;
   /** One conversion. */
   conversion?: PatientConversion;
+  /** The person's age band (feat-approximate-age). */
+  age?: AgeBand;
   created?: CreatedFilter;
   /** A follow-up range — every preset but "Not set", which the API cannot read. */
   followUp?: Exclude<FollowUpFilter, 'not_set'>;
@@ -93,6 +97,7 @@ export function validatePatientsSearch(search: Record<string, unknown>): Patient
     types: listIn(PATIENT_FILTER_VALUES.types, search.types),
     status: oneOf(PATIENT_FILTER_VALUES.status, search.status),
     conversion: oneOf(PATIENT_FILTER_VALUES.conversion, search.conversion),
+    age: oneOf(AGE_BANDS, search.age),
     created: readCreatedFilter(search.created),
     followUp: readPatientFollowUp(search.followUp),
     sort: sortOf(SORT_KEYS, search.sort),

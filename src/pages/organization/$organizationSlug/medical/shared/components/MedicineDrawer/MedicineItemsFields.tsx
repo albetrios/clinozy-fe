@@ -9,6 +9,7 @@ import {
   ItemsQtyCell,
   ItemsTextCell,
 } from '@/shared/forms/ItemsField/index.ts';
+import { useMedicineUnits } from '@/shared/hooks/useMedicineUnits/index.ts';
 
 import type { MedicalPickers } from '../../hooks/useMedicalPickers/index.ts';
 import type { OpenMedicalChild } from '../../hooks/useMedicalStack/index.ts';
@@ -36,8 +37,11 @@ interface ItemsProps {
   testId: string;
 }
 
-/** The batch rows: Batch · Expiry "MM/YY" · Qty · Rate (H:5372). */
-function useBatchColumns(): ItemsColumn<MedicineFormValues, 'batches'>[] {
+/**
+ * The batch rows: Batch · Expiry "MM/YY" · Qty · Rate (H:5372) · MRP (the one printed on the
+ * batch, a pack's — D8). A loose-selling medicine's Qty counts units ("Units", D5).
+ */
+function useBatchColumns(loose: boolean): ItemsColumn<MedicineFormValues, 'batches'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   return [
     {
@@ -68,13 +72,13 @@ function useBatchColumns(): ItemsColumn<MedicineFormValues, 'batches'>[] {
     },
     {
       id: 'qty',
-      header: t(B.qty),
+      header: t(loose ? B.qtyUnits : B.qty),
       track: '70px',
       align: 'end',
       cell: (row) => (
         <ItemsNumberCell
           {...row.bind('qty')}
-          placeholder={t(B.qty)}
+          placeholder={t(loose ? B.qtyUnits : B.qty)}
           max={MEDICINE_FORM_LIMITS.level}
           readOnly={!row.editable}
         />
@@ -94,21 +98,40 @@ function useBatchColumns(): ItemsColumn<MedicineFormValues, 'batches'>[] {
         />
       ),
     },
+    {
+      id: 'mrp',
+      header: t(B.mrp),
+      track: '90px',
+      align: 'end',
+      cell: (row) => (
+        <ItemsNumberCell
+          {...row.bind('mrp')}
+          money
+          placeholder={t(B.mrp)}
+          readOnly={!row.editable}
+        />
+      ),
+    },
   ];
 }
 
-/** BATCHES: what is in stock, batch by batch, and the total (`medical.md:181`). */
+/**
+ * BATCHES: what is in stock, batch by batch, and the total (`medical.md:181`) — "3 packs + 4 in
+ * stock" for a loose-selling medicine (D5).
+ */
 export function MedicineBatchesField({ form, values, readOnly, testId }: ItemsProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
+  const units = useMedicineUnits();
+  const stock = formStock(values);
   return (
     <ItemsField
       control={form.control}
       name="batches"
       label={t(B.title)}
-      columns={useBatchColumns()}
+      columns={useBatchColumns(values.unitsPerPack > 1)}
       newRow={emptyBatch}
       addLabel={t(B.add)}
-      total={t(B.total, { count: formStock(values) })}
+      total={units.inStock(stock, values.unitsPerPack) ?? t(B.total, { count: stock })}
       readOnly={readOnly}
       testId={`${testId}-batches`}
     />

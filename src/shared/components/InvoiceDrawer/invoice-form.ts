@@ -41,6 +41,8 @@ export interface InvoiceLineForm {
   medicineId: string | null;
   /** What the row bills, as the picker named it — empty for a blank row. */
   name: string;
+  /** The free text under the line's name, as typed — empty for none. */
+  description: string;
   packSize: string | null;
   qty: number;
   /** A sale's rate, in paise; an invoice's is the server's (0 here). */
@@ -101,6 +103,7 @@ export function blankLine(): InvoiceLineForm {
     offeringId: null,
     medicineId: null,
     name: '',
+    description: '',
     packSize: null,
     qty: 1,
     rate: 0,
@@ -152,7 +155,7 @@ function rupeesText(rupees: number): string {
   return rupees > 0 ? String(rupees) : '';
 }
 
-/** A saved line as a row: what it bills, how many, its discount and its links. */
+/** A saved line as a row: what it bills, its description, how many, its discount and its links. */
 function rowOfLine(line: InvoiceRecord['items'][number]): InvoiceLineForm {
   return {
     ...blankLine(),
@@ -160,6 +163,7 @@ function rowOfLine(line: InvoiceRecord['items'][number]): InvoiceLineForm {
     offeringId: line.offeringId,
     medicineId: line.medicineId,
     name: line.name,
+    description: line.description ?? '',
     packSize: line.packSize,
     qty: line.qty,
     discountPct: line.discountPct,
@@ -273,13 +277,17 @@ export function sentLines(
   );
 }
 
-/** One row as an invoice sends it: the offering, how many, the discount and its links. */
+/**
+ * One row as an invoice sends it: the offering, how many, the discount, the description (a
+ * cleared one as none, which clears a kept line's) and its links.
+ */
 function lineInputOf(line: InvoiceLineForm & { offeringId: string }): InvoiceLineInput {
   return {
     id: line.id,
     offeringId: line.offeringId,
     qty: line.qty,
     discountPct: line.discountPct,
+    description: line.description,
     suggestionId: line.suggestionId,
     treatmentIds: line.treatmentIds,
   };

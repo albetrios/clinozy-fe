@@ -5,7 +5,7 @@ import { ImageIcon } from '@/shared/icons/index.ts';
 
 /** Props of {@link PhotoThumb}. */
 export interface PhotoThumbProps {
-  /** The photo's link (`file_url`, D86); without one — or when it fails to load — the fallback shows. */
+  /** The photo's grid link (`thumbnail_url`, else `file_url` — D86); without one — or when it fails to load — the fallback shows. */
   src?: string | null;
   /** `cover` fills a square tile; `contain` shows the whole photo (the viewer's stage). */
   fit?: 'cover' | 'contain';
@@ -15,7 +15,7 @@ export interface PhotoThumbProps {
 }
 
 /**
- * A patient photo (H:829): its pixels from the read's `file_url` (clinozy-be D86), loaded lazily,
+ * A patient photo (H:829): its pixels from the read's `thumbnail_url` (clinozy-be D86 — the 320 px thumbnail, else the full photo), loaded lazily,
  * else — no link (the upload is gone) or one that fails to load — the muted image glyph centred
  * in the tile or the viewer's stage. A new link (the next read's) tries again. Decorative: the
  * control around it names the photo.

@@ -419,7 +419,11 @@
         "ordersValue_one": "{{count}} commande · {{amount}}",
         "ordersValue_many": "{{count}} commandes · {{amount}}",
         "ordersValue_other": "{{count}} commandes · {{amount}}",
-        "noOrders": "Aucune commande pour l’instant"
+        "noOrders": "Aucune commande pour l’instant",
+        "email": "E-mail",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "Saisissez un e-mail valide",
+        "address": "Adresse"
       },
       "account": {
         "label": "Compte",
@@ -507,7 +511,18 @@
         "compositionPlaceholder": "ex. Trétinoïne 0,025 %",
         "soldWith": "Délivrance",
         "prescriptionOnly": "Sur ordonnance",
-        "overTheCounter": "Sans ordonnance"
+        "overTheCounter": "Sans ordonnance",
+        "hsnCode": "Code HSN",
+        "hsnCodeHint": "4, 6 ou 8 chiffres",
+        "hsnCodeInvalid": "Saisissez le code HSN sur 4, 6 ou 8 chiffres",
+        "pack": "Conditionnement",
+        "packHint": "tel qu’imprimé",
+        "packPlaceholder": "ex. 1*10",
+        "unitsPerPack": "Unités par boîte",
+        "unitsPerPackHint": "1 = boîtes entières uniquement",
+        "unitsPerPackLocked": "Vendez ou retournez d’abord son stock",
+        "decreaseUnits": "Moins d’unités par boîte",
+        "increaseUnits": "Plus d’unités par boîte"
       },
       "price": {
         "mrp": "Prix max.",
@@ -535,7 +550,15 @@
         "decreaseFill": "Baisser le niveau de remplissage",
         "increaseFill": "Augmenter le niveau de remplissage",
         "hintAlert": "Alerte de commande quand le stock tombe à {{count}}.",
-        "hintOrder": "Commandez {{qty}} pour atteindre {{max}}. Apparaît dans Stock › Stock faible."
+        "hintOrder": "Commandez {{qty}} pour atteindre {{max}}. Apparaît dans Stock › Stock faible.",
+        "nowLoose": "{{stock}} en stock · {{state}}",
+        "reorderAtUnits": "Commander à (unités)",
+        "fillUpToUnits": "Remplir jusqu’à (unités)",
+        "hintAlertUnits_one": "Alerte de commande quand le stock tombe à {{count}} unité.",
+        "hintAlertUnits_many": "Alerte de commande quand le stock tombe à {{count}} unités.",
+        "hintAlertUnits_other": "Alerte de commande quand le stock tombe à {{count}} unités.",
+        "hintOrderPacks": "Commandez {{packs}} pour atteindre {{max}} unités. Apparaît dans Stock › Stock faible.",
+        "unitsNote": "Compté en unités · {{perPack}}"
       },
       "batches": {
         "title": "Lots",
@@ -547,7 +570,9 @@
         "add": "Ajouter un lot",
         "total": "{{count}} en stock",
         "expiryInvalid": "Saisissez l’expiration au format MM/AA",
-        "batchMissing": "Saisissez le lot"
+        "batchMissing": "Saisissez le lot",
+        "mrp": "Prix max.",
+        "qtyUnits": "Unités"
       },
       "rates": {
         "title": "Prix fournisseurs",
@@ -617,6 +642,9 @@
         "quickHint": "20 = quantité · +2 = gratuit · @180 = prix",
         "lowStockChip": "{{name}} · reste {{quantity}}",
         "newMedicineName": "Nom du nouveau médicament",
+        "note": "Note",
+        "notePlaceholder": "ex. 30 JOURS",
+        "mrp": "Prix max.",
         "gst": "GST",
         "gstRate": "{{value}} %",
         "ratesIncludeGst": "Les tarifs incluent la GST",
@@ -652,7 +680,9 @@
       "addUnexpected": "Ajouter un article imprévu",
       "enterQuantity": "Saisissez une quantité",
       "save": "Marquer comme reçu",
-      "saved": "Marchandise reçue · stock et quantité gratuite ajoutés"
+      "saved": "Marchandise reçue · stock et quantité gratuite ajoutés",
+      "mrp": "Prix max.",
+      "note": "Note"
     },
     "orderView": {
       "title": "Bon de commande",
@@ -664,6 +694,9 @@
       "paidWithCredits": "Payé {{paid}} + {{credited}} en avoirs fournisseur",
       "pay": "Payer {{amount}}",
       "print": "Imprimer",
+      "note": "Note",
+      "saveNote": "Enregistrer la note",
+      "noteSaved": "Note enregistrée",
       "gstOnTopRate": "{{value}} % en sus"
     },
     "sale": {
@@ -738,7 +771,8 @@
       },
       "summary": "L’avoir réduit ce que vous devez à {{supplier}}",
       "save": "Retourner et prendre l’avoir",
-      "saved": "{{count}} retournés · avoir de {{amount}} de {{supplier}}"
+      "saved": "{{count}} retournés · avoir de {{amount}} de {{supplier}}",
+      "quantityUnits": "Quantité (unités)"
     },
     "prescriptions": {
       "sub": "Ordonnance {{rx}} · {{date}} · {{medicines}}"

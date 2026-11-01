@@ -32,6 +32,7 @@
     "item": "항목",
     "medicineName": "의약품명",
     "packSize": "포장 단위",
+    "hsn": "HSN",
     "qty": "수량",
     "amount": "금액",
     "discount": "할인",

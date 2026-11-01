@@ -7,21 +7,29 @@ import {
 } from '@/lib/number-text.ts';
 import type { SupplierRate } from '@/shared/api/app/app-schema.ts';
 import { cheapestRate } from '@/shared/api/app/medicine-stock.ts';
-import type {
-  MedicineGst,
-  MedicineInput,
-  MedicineRow,
+import {
+  isHsnCode,
+  type MedicineGst,
+  type MedicineInput,
+  type MedicineRow,
+  PACK_LABEL_MAX,
+  UNITS_PER_PACK_MAX,
 } from '@/shared/api/app/medicines-contracts.ts';
 
 /*
  * The Medicine drawer's form (`medical.md:170–188`; KICKOFF §6.7): text as
- * typed — the MRP in rupees, as the field shows it — the GST rate, the two
- * levels as whole packs, and the batch and supplier-price rows with money in
- * paise (the items table's own unit). {@link medicineInputOf} turns it into
- * the contract's fields, in the API's rupees.
+ * typed — the MRP in rupees, as the field shows it, the HSN code and the pack
+ * label — the units per pack, the GST rate, the two levels in units (a pack
+ * while the medicine sells whole packs; change-pharmacy-record-fields D5), and
+ * the batch and supplier-price rows with money in paise (the items table's own
+ * unit). {@link medicineInputOf} turns it into the contract's fields, in the
+ * API's rupees.
  */
 
-/** One batch row: its id once saved, its number, "MM/YY", whole packs, the purchase rate in paise. */
+/**
+ * One batch row: its id once saved, its number, "MM/YY", its units, the purchase rate and the MRP
+ * printed on it in paise (a pack's; 0 = not recorded, the medicine's MRP applies — D8).
+ */
 export interface BatchFormRow {
   /** A saved batch's id — the API keeps the batch by it. */
   id?: string;
@@ -29,6 +37,8 @@ export interface BatchFormRow {
   expiry: string;
   qty: number;
   purchaseRate: number;
+  /** A pack's MRP printed on the batch, paise; 0 = not recorded. */
+  mrp: number;
   /** Who it was bought from, as saved. */
   supplierId?: string | null;
 }
@@ -47,12 +57,18 @@ export interface MedicineFormValues {
   manufacturerId: string | null;
   composition: string;
   prescriptionOnly: boolean;
+  /** The GST HSN code as typed — 4, 6 or 8 digits, or empty. */
+  hsnCode: string;
+  /** The pack as printed ("1*10", "30GM"), or empty. */
+  packLabel: string;
+  /** Loose units in a pack: 1 sells whole packs only (D1, D5). */
+  unitsPerPack: number;
   /** The MRP in rupees as typed ("650", "12.5"); GST included (D45). */
   mrp: string;
   gstPct: number;
-  /** "Reorder at": the stock level that raises Low stock. */
+  /** "Reorder at": the stock level that raises Low stock, in units. */
   minStock: number;
-  /** "Fill up to": what a reorder fills to. */
+  /** "Fill up to": what a reorder fills to, in units. */
   maxStock: number;
   batches: BatchFormRow[];
   supplierRates: SupplierRateFormRow[];
@@ -70,6 +86,10 @@ export const MEDICINE_FORM_LIMITS = {
   /** The levels take four digits. */
   level: 9999,
   batchNo: 40,
+  /** The longest HSN code: eight digits. */
+  hsnCode: 8,
+  packLabel: PACK_LABEL_MAX,
+  unitsPerPack: UNITS_PER_PACK_MAX,
 } as const;
 
 /** A new record's defaults (H:5312 `blankMed`): GST 12%, reorder at 2, fill up to 10. */
@@ -84,6 +104,7 @@ export const emptyBatch = (): BatchFormRow => ({
   expiry: '',
   qty: 0,
   purchaseRate: 0,
+  mrp: 0,
 });
 
 /** A new medicine's form: the typed name and the first manufacturer, over the defaults. */
@@ -95,6 +116,9 @@ export function emptyMedicineForm(
     manufacturerId: prefill.manufacturerId ?? null,
     composition: '',
     prescriptionOnly: false,
+    hsnCode: '',
+    packLabel: '',
+    unitsPerPack: 1,
     mrp: '',
     ...NEW_MEDICINE,
     batches: [],
@@ -109,6 +133,9 @@ export function medicineFormOf(medicine: MedicineRow): MedicineFormValues {
     manufacturerId: medicine.manufacturer?.id ?? null,
     composition: medicine.composition ?? '',
     prescriptionOnly: medicine.prescriptionOnly,
+    hsnCode: medicine.hsnCode ?? '',
+    packLabel: medicine.packLabel ?? '',
+    unitsPerPack: medicine.unitsPerPack,
     mrp: textFromNumber(paiseOfRupees(medicine.mrp), MONEY_SCALE),
     gstPct: medicine.gstPct,
     minStock: medicine.minStock,
@@ -119,6 +146,7 @@ export function medicineFormOf(medicine: MedicineRow): MedicineFormValues {
       expiry: batch.expiry,
       qty: batch.qty,
       purchaseRate: paiseOfRupees(batch.purchaseRate ?? 0),
+      mrp: paiseOfRupees(batch.mrp ?? 0),
       supplierId: batch.supplierId,
     })),
     supplierRates: medicine.supplierRates.map((rate) => ({
@@ -134,7 +162,7 @@ export function medicineFormOf(medicine: MedicineRow): MedicineFormValues {
 export const mrpPaiseOf = (values: Pick<MedicineFormValues, 'mrp'>): number =>
   numberFromText(values.mrp, MONEY_SCALE);
 
-/** Σ the batch rows' packs — what the medicine holds. */
+/** Σ the batch rows' units — what the medicine holds. */
 export const formStock = (values: Pick<MedicineFormValues, 'batches'>): number =>
   values.batches.reduce((sum, batch) => sum + batch.qty, 0);
 
@@ -153,6 +181,22 @@ const blankBatch = (batch: BatchFormRow) =>
 
 /** "MM/YY" — a batch's expiry month (`expiryMonthSchema`). */
 const EXPIRY = /^(0[1-9]|1[0-2])\/\d{2}$/;
+
+/** A typed HSN code that is not 4, 6 or 8 digits (an empty one is no code). */
+export const hsnCodeIsInvalid = (
+  values: Pick<MedicineFormValues, 'hsnCode'>,
+): boolean => {
+  const code = values.hsnCode.trim();
+  return code !== '' && !isHsnCode(code);
+};
+
+/**
+ * Whether the units per pack are locked (D7): a saved medicine that holds stock keeps them —
+ * clinozy-be refuses the change with a 409 `medicine_has_stock` — until it is sold or returned.
+ */
+export const unitsPerPackLocked = (
+  medicine: Pick<MedicineRow, 'stock'> | null,
+): boolean => medicine !== null && medicine.stock > 0;
 
 /** A required field of the medicine drawer. */
 export type MedicineRequiredField = 'name' | 'manufacturerId' | 'mrp';
@@ -211,6 +255,12 @@ export function medicineInputOf(values: MedicineFormValues): MedicineInput {
     composition: values.composition.trim() || null,
     manufacturerId: values.manufacturerId ?? '',
     prescriptionOnly: values.prescriptionOnly,
+    hsnCode: values.hsnCode.trim() || null,
+    packLabel: values.packLabel.trim() || null,
+    unitsPerPack: Math.min(
+      UNITS_PER_PACK_MAX,
+      Math.max(1, Math.floor(values.unitsPerPack || 1)),
+    ),
     mrp: rupeesOfPaise(mrpPaiseOf(values)),
     gstPct: values.gstPct as MedicineGst,
     minStock: values.minStock,
@@ -223,6 +273,7 @@ export function medicineInputOf(values: MedicineFormValues): MedicineInput {
         expiry: batch.expiry.trim(),
         qty: batch.qty,
         purchaseRate: batch.purchaseRate > 0 ? rupeesOfPaise(batch.purchaseRate) : null,
+        mrp: batch.mrp > 0 ? rupeesOfPaise(batch.mrp) : null,
         supplierId: batch.supplierId ?? null,
       })),
     supplierRates: pickedRates(values).map((rate) => ({

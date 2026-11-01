@@ -1007,18 +1007,19 @@ an `ItemsField`; the screen passes its own root id (`testId`, e.g. `invoice-item
 
 ## Clinic print templates (added 2026-10-03, L-22)
 
-| Test ID                        | Element                                                                              | Source                                                |
-| ------------------------------ | ------------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| `print-root`                   | Print-only host `printDocument()` mounts at the end of `<body>` until afterprint     | `shared/components/PrintTemplate/print-document.ts`   |
-| `invoice-print`                | A4 invoice / sale sheet                                                              | `shared/components/PrintTemplate/InvoicePrint/`       |
-| `invoice-print-items`          | Invoice items table (lines + totals row)                                             | `shared/components/PrintTemplate/InvoicePrint/`       |
-| `invoice-print-summary`        | Payment Summary (taxable amount, GST, bill, balance due)                             | `shared/components/PrintTemplate/InvoicePrint/`       |
-| `prescription-print`           | A4 prescription sheet                                                                | `shared/components/PrintTemplate/PrescriptionPrint/`  |
-| `prescription-print-items`     | Medicines & Dosage table                                                             | `shared/components/PrintTemplate/PrescriptionPrint/`  |
-| `purchase-order-print`         | A4 purchase order sheet (L-64, Q-M7)                                                 | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
-| `purchase-order-print-items`   | Purchase order lines table (lines + totals row)                                      | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
-| `purchase-order-print-summary` | Payment Summary (total, paid, balance due)                                           | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
-| `print-footer`                 | Sheet footer: thank-you line (a purchase order: who it is from), branch phone, GSTIN | `shared/components/PrintTemplate/PrintTemplate.tsx`   |
+| Test ID                          | Element                                                                              | Source                                                |
+| -------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| `print-root`                     | Print-only host `printDocument()` mounts at the end of `<body>` until afterprint     | `shared/components/PrintTemplate/print-document.ts`   |
+| `invoice-print`                  | A4 invoice / sale sheet                                                              | `shared/components/PrintTemplate/InvoicePrint/`       |
+| `invoice-print-items`            | Invoice items table (lines + totals row)                                             | `shared/components/PrintTemplate/InvoicePrint/`       |
+| `invoice-print-line-description` | A line's description under its name (when it has one)                                | `shared/components/PrintTemplate/InvoicePrint/`       |
+| `invoice-print-summary`          | Payment Summary (taxable amount, GST, bill, balance due)                             | `shared/components/PrintTemplate/InvoicePrint/`       |
+| `prescription-print`             | A4 prescription sheet                                                                | `shared/components/PrintTemplate/PrescriptionPrint/`  |
+| `prescription-print-items`       | Medicines & Dosage table                                                             | `shared/components/PrintTemplate/PrescriptionPrint/`  |
+| `purchase-order-print`           | A4 purchase order sheet (L-64, Q-M7)                                                 | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
+| `purchase-order-print-items`     | Purchase order lines table (lines + totals row)                                      | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
+| `purchase-order-print-summary`   | Payment Summary (total, paid, balance due)                                           | `shared/components/PrintTemplate/PurchaseOrderPrint/` |
+| `print-footer`                   | Sheet footer: thank-you line (a purchase order: who it is from), branch phone, GSTIN | `shared/components/PrintTemplate/PrintTemplate.tsx`   |
 
 ## Chat column (shared, launch L-34)
 

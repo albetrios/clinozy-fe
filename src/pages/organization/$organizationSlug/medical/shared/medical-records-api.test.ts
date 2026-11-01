@@ -58,6 +58,7 @@ import {
   updateManufacturer,
   updateMedicalRep,
   updatePurchaseOrder,
+  updatePurchaseOrderNote,
   updateSupplier,
   voidSale,
   voidSupplierCredit,
@@ -92,6 +93,8 @@ describe('suppliers, manufacturers and MRs', () => {
           name: 'Om Pharma',
           phone: null,
           gst_number: null,
+          email: null,
+          address: null,
           manufacturer_ids: [TEST_MAKER_ID],
           is_quick: true,
         },
@@ -107,6 +110,8 @@ describe('suppliers, manufacturers and MRs', () => {
       name: record.name,
       phone: record.phone,
       gstNumber: record.gstNumber,
+      email: record.email,
+      address: record.address,
       manufacturerIds: [...record.manufacturerIds],
     };
     expect(await updateSupplier({ record, input: same, ...KEY })).toBe(record);
@@ -114,6 +119,16 @@ describe('suppliers, manufacturers and MRs', () => {
     await updateSupplier({ record, input: { ...same, gstNumber: ' ' }, ...KEY });
     expect(bodyOf(vi.mocked(api.patch).mock.calls[0])).toEqual({
       gst_number: null,
+      expected_updated_at: record.updatedAt,
+    });
+    await updateSupplier({
+      record,
+      input: { ...same, email: ' orders@ankur.in ', address: 'Ring Road, Surat' },
+      ...KEY,
+    });
+    expect(bodyOf(vi.mocked(api.patch).mock.calls[1])).toEqual({
+      email: 'orders@ankur.in',
+      address: 'Ring Road, Surat',
       expected_updated_at: record.updatedAt,
     });
   });
@@ -252,6 +267,56 @@ describe('purchase orders', () => {
     });
   });
 
+  it('a line takes the MRP printed on its packs and the order its note (D8, D10)', async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: purchaseOrderWire() } as never);
+    await createPurchaseOrder({
+      input: {
+        supplierId: TEST_SUPPLIER_ID,
+        supplierBillNo: null,
+        date: '2026-10-10',
+        note: ' 30 DAYS DUE ',
+        items: [
+          { medicineId: TEST_MEDICINE_ID, qty: 10, free: 0, rate: 90, mrp: 125.55 },
+        ],
+      },
+      ...KEY,
+    });
+    expect(bodyOf(vi.mocked(api.post).mock.calls[0])).toEqual({
+      supplier_id: TEST_SUPPLIER_ID,
+      items: [
+        {
+          medicine_id: TEST_MEDICINE_ID,
+          quantity: 10,
+          free_quantity: 0,
+          rate: 90,
+          mrp: 125.55,
+        },
+      ],
+      note: '30 DAYS DUE',
+      order_date: '2026-10-10',
+    });
+  });
+
+  it('a received order changes its note alone; the same note writes nothing (D10)', async () => {
+    vi.mocked(api.patch).mockResolvedValue({ data: purchaseOrderWire() } as never);
+    const record = purchaseOrderRow({ note: 'without gst bill' });
+    expect(
+      await updatePurchaseOrderNote({ record, note: ' without gst bill ', ...KEY }),
+    ).toBe(record);
+    expect(api.patch).not.toHaveBeenCalled();
+    await updatePurchaseOrderNote({ record, note: '30 DAYS DUE', ...KEY });
+    expect(vi.mocked(api.patch).mock.calls[0]?.[1]).toEqual({
+      params: { medical_purchase_order_id: TEST_PURCHASE_ORDER_ID },
+      body: { note: '30 DAYS DUE', expected_updated_at: record.updatedAt },
+      idempotencyKey: 'key',
+    });
+    await updatePurchaseOrderNote({ record, note: ' ', ...KEY });
+    expect(bodyOf(vi.mocked(api.patch).mock.calls[1])).toEqual({
+      note: null,
+      expected_updated_at: record.updatedAt,
+    });
+  });
+
   it('a cancel is the delete with why', async () => {
     vi.mocked(api.delete).mockResolvedValue({} as never);
     await cancelPurchaseOrder(TEST_PURCHASE_ORDER_ID, 'other', 'Rates changed');
@@ -273,6 +338,7 @@ describe('purchase orders', () => {
             arrived: true,
             batchNo: '026-312',
             expiry: '12/27',
+            mrp: 125.55,
           },
           {
             id: 'mpoi_missing0000000000000',
@@ -292,6 +358,7 @@ describe('purchase orders', () => {
           },
         ],
         supplierBillNo: ' T-82370 ',
+        note: ' 30 DAYS DUE ',
       },
       ...KEY,
     });
@@ -302,6 +369,7 @@ describe('purchase orders', () => {
           is_received: true,
           batch_number: '026-312',
           expiry_month: '2027-12',
+          mrp: 125.55,
         },
         { id: 'mpoi_missing0000000000000', is_received: false },
         {
@@ -314,6 +382,7 @@ describe('purchase orders', () => {
         },
       ],
       supplier_bill_number: 'T-82370',
+      note: '30 DAYS DUE',
     });
   });
 });
@@ -325,7 +394,9 @@ describe('sales', () => {
       input: {
         branchId: TEST_MEDICAL_BRANCH_ID,
         contactId: TEST_BUYER_CONTACT_ID,
-        items: [{ medicineId: TEST_MEDICINE_ID, qty: 2, discountPct: 0 }],
+        items: [
+          { medicineId: TEST_MEDICINE_ID, qty: 2, discountPct: 0, description: null },
+        ],
         overallDiscount: 0,
         memberIds: [],
         prescriptionId: 'rx_rx5800000000000000000',
@@ -342,6 +413,47 @@ describe('sales', () => {
       patient_prescription_id: 'rx_rx5800000000000000000',
       payment: { splits: [{ mode: 'upi', amount: 1300 }] },
     });
+  });
+
+  it('a new sale sends a medicine’s description trimmed, and reads it on the sale’s lines', async () => {
+    const answered = saleWire();
+    vi.mocked(api.post).mockResolvedValue({
+      data: {
+        ...answered,
+        items: answered.items.map((item) => ({ ...item, description: 'Apply at night' })),
+      },
+    } as never);
+    const sale = await createSale({
+      input: {
+        branchId: TEST_MEDICAL_BRANCH_ID,
+        contactId: TEST_BUYER_CONTACT_ID,
+        items: [
+          {
+            medicineId: TEST_MEDICINE_ID,
+            qty: 2,
+            discountPct: 0,
+            description: ' Apply at night ',
+          },
+        ],
+        overallDiscount: 0,
+        memberIds: [],
+        prescriptionId: null,
+        remark: null,
+        payment: null,
+      },
+      ...KEY,
+    });
+    expect(bodyOf(vi.mocked(api.post).mock.calls[0])).toMatchObject({
+      items: [
+        {
+          medicine_id: TEST_MEDICINE_ID,
+          quantity: 2,
+          discount_percent: 0,
+          description: 'Apply at night',
+        },
+      ],
+    });
+    expect(sale.lines[0]?.description).toBe('Apply at night');
   });
 
   it('Collect is one receipt for the whole due, against the invoice', async () => {

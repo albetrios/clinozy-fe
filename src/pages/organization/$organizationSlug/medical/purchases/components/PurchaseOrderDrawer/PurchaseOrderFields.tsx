@@ -7,6 +7,7 @@ import {
   DrawerField,
   DrawerFieldGrid,
   DrawerInput,
+  DrawerTextarea,
   DrawerToggle,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
@@ -34,6 +35,7 @@ import { OrderMedicineCell } from './OrderMedicineCell.tsx';
 import {
   emptyOrderLine,
   lineMoney,
+  ORDER_NOTE_MAX,
   orderMoney,
   type PurchaseOrderFormValues,
 } from './purchase-order-form.ts';
@@ -68,6 +70,7 @@ export function OrderFields({
   const supplier = field('supplierId');
   const billNo = field('billNo');
   const date = field('date');
+  const note = field('note');
   return (
     <DrawerFieldGrid>
       <DrawerField
@@ -124,6 +127,18 @@ export function OrderFields({
           )}
         />
       </DrawerField>
+      <DrawerField span="full" label={t(K.note)} htmlFor={note.id}>
+        <DrawerTextarea
+          {...note.control}
+          {...form.register('note')}
+          rows={2}
+          maxLength={ORDER_NOTE_MAX}
+          placeholder={t(K.notePlaceholder)}
+          autoComplete="off"
+          readOnly={readOnly}
+          data-testid={`${testId}-note`}
+        />
+      </DrawerField>
     </DrawerFieldGrid>
   );
 }
@@ -138,7 +153,7 @@ function useGstOptions() {
 }
 
 /**
- * The rows: Medicine · Qty · Free · Rate* · GST · Amount (`medical.md:261`; H:5389) — GST the
+ * The rows: Medicine · Qty · Free · Rate* · MRP · GST · Amount (`medical.md:261`; H:5389; D8) — GST the
  * line's rate, the picked medicine's until changed (feat-purchase-line-gst D3).
  */
 function useLineColumns(
@@ -166,6 +181,9 @@ function useLineColumns(
               shouldDirty: true,
             });
             form.setValue(`lines.${row.index}.rate`, medicine.rate, {
+              shouldDirty: true,
+            });
+            form.setValue(`lines.${row.index}.mrp`, medicine.mrp, {
               shouldDirty: true,
             });
             form.setValue(`lines.${row.index}.gst`, String(medicine.gstPercent), {
@@ -203,6 +221,21 @@ function useLineColumns(
           {...row.bind('rate')}
           money
           placeholder={t(K.rate)}
+          readOnly={!row.editable}
+        />
+      ),
+    },
+    {
+      // The MRP printed on the packs — the batch they fill takes it (D8)
+      id: 'mrp',
+      header: t(K.mrp),
+      track: '90px',
+      align: 'end',
+      cell: (row) => (
+        <ItemsNumberCell
+          {...row.bind('mrp')}
+          money
+          placeholder={t(K.mrp)}
           readOnly={!row.editable}
         />
       ),

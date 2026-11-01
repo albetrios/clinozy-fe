@@ -121,6 +121,7 @@ export function useOrderQuickLine({
       free: values.free ?? 0,
       rate: values.rate ?? 0,
       gst: String(TYPED_MEDICINE_GST),
+      mrp: 0,
     });
   const countOf = (item: QuickLineItem<MedicineRow>) =>
     quickLineCount(lines, (line) => line.medicineId === item.key);

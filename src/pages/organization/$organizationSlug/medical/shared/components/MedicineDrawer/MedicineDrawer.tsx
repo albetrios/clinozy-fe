@@ -13,6 +13,7 @@ import {
   DrawerFieldGrid,
   DrawerInput,
   DrawerStepBody,
+  DrawerStepper,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
@@ -28,6 +29,7 @@ import {
   useCreateMedicine,
   useUpdateMedicine,
 } from '@/shared/hooks/useMedicines/index.ts';
+import { useMedicineUnits } from '@/shared/hooks/useMedicineUnits/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -49,6 +51,7 @@ import {
   bestFormRate,
   emptyMedicineForm,
   formStock,
+  hsnCodeIsInvalid,
   MEDICINE_FORM_LIMITS,
   medicineFormOf,
   type MedicineFormValues,
@@ -56,6 +59,7 @@ import {
   medicineRowProblem,
   missingMedicineFields,
   mrpPaiseOf,
+  unitsPerPackLocked,
 } from './medicine-form.ts';
 import { MedicineBatchesField, MedicineRatesField } from './MedicineItemsFields.tsx';
 import { MedicinePricePanel } from './MedicinePricePanel.tsx';
@@ -69,7 +73,7 @@ const F = K.fields;
  * step shows (`medical.md:336`). They sit in the second step, closed at first,
  * so the drawer says so itself.
  */
-const CONTENT_PROFILE = { fieldCount: 10, hasHeavyField: true, hasItems: true } as const;
+const CONTENT_PROFILE = { fieldCount: 13, hasHeavyField: true, hasItems: true } as const;
 
 /** "Sold with": prescription only (blush) or over the counter (sage). */
 type SoldWith = 'rx' | 'otc';
@@ -105,10 +109,85 @@ interface BodyProps {
   pickers: MedicalPickers;
   suppliers: readonly { id: string; manufacturerIds: readonly string[] }[];
   openChild?: OpenMedicalChild;
+  /** A saved medicine holding stock keeps its units per pack (D7). */
+  unitsLocked: boolean;
 }
 
-/** MEDICINE: Name* · Manufacturer* · Composition · Sold with (`medical.md:174–177`). */
-function IdentityFields({ form, idPrefix, testId, pickers, openChild }: BodyProps) {
+/**
+ * The pack: HSN code (4, 6 or 8 digits) · Pack ("1*10", as printed) · Units per pack (1 sells
+ * whole packs only; locked while a saved medicine holds stock, D7) — change-pharmacy-record-fields.
+ */
+function PackFields({ form, idPrefix, testId, unitsLocked }: BodyProps) {
+  const { t } = useTranslation(MEDICAL_DRAWERS_NS);
+  const field = useDrawerFieldIds(form, idPrefix);
+  const hsn = field('hsnCode');
+  const pack = field('packLabel');
+  const units = field('unitsPerPack');
+  return (
+    <>
+      <DrawerField
+        span="third"
+        label={t(F.hsnCode)}
+        hint={t(F.hsnCodeHint)}
+        htmlFor={hsn.id}
+        error={hsn.error}
+      >
+        <DrawerInput
+          {...hsn.control}
+          {...form.register('hsnCode')}
+          inputMode="numeric"
+          capitalize={false}
+          maxLength={MEDICINE_FORM_LIMITS.hsnCode}
+          autoComplete="off"
+          data-testid={`${testId}-hsn-code`}
+        />
+      </DrawerField>
+      <DrawerField span="third" label={t(F.pack)} hint={t(F.packHint)} htmlFor={pack.id}>
+        <DrawerInput
+          {...pack.control}
+          {...form.register('packLabel')}
+          capitalize={false}
+          maxLength={MEDICINE_FORM_LIMITS.packLabel}
+          placeholder={t(F.packPlaceholder)}
+          autoComplete="off"
+          data-testid={`${testId}-pack`}
+        />
+      </DrawerField>
+      <DrawerField
+        span="third"
+        label={t(F.unitsPerPack)}
+        hint={t(unitsLocked ? F.unitsPerPackLocked : F.unitsPerPackHint)}
+        htmlFor={units.id}
+        error={units.error}
+      >
+        <Controller
+          control={form.control}
+          name="unitsPerPack"
+          render={({ field: control }) => (
+            <DrawerStepper
+              id={units.id}
+              value={control.value}
+              onValueChange={control.onChange}
+              min={1}
+              max={MEDICINE_FORM_LIMITS.unitsPerPack}
+              disabled={unitsLocked}
+              decreaseLabel={t(F.decreaseUnits)}
+              increaseLabel={t(F.increaseUnits)}
+              testId={`${testId}-units-per-pack`}
+            />
+          )}
+        />
+      </DrawerField>
+    </>
+  );
+}
+
+/**
+ * MEDICINE: Name* · Manufacturer* · Composition · Sold with (`medical.md:174–177`), then the
+ * pack ({@link PackFields}).
+ */
+function IdentityFields(body: BodyProps) {
+  const { form, idPrefix, testId, pickers, openChild } = body;
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const name = field('name');
@@ -192,6 +271,7 @@ function IdentityFields({ form, idPrefix, testId, pickers, openChild }: BodyProp
           )}
         />
       </DrawerField>
+      <PackFields {...body} />
     </DrawerFieldGrid>
   );
 }
@@ -205,6 +285,7 @@ function makerOf(pickers: MedicalPickers, id: string | null) {
 function useSteps(body: BodyProps): DrawerStep[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
+  const units = useMedicineUnits();
   const { values, pickers, readOnly } = body;
   const name = values.name.trim();
   const maker = makerOf(pickers, values.manufacturerId);
@@ -238,12 +319,20 @@ function useSteps(body: BodyProps): DrawerStep[] {
           value: soldWith,
           tone: values.prescriptionOnly ? 'blush' : 'sage',
         },
+        { kind: 'value', label: t(F.hsnCode), value: values.hsnCode.trim() },
+        { kind: 'value', label: t(F.pack), value: values.packLabel.trim() },
+        {
+          kind: 'value',
+          label: t(F.unitsPerPack),
+          value: units.perPack(values.unitsPerPack) ?? undefined,
+        },
         { kind: 'value', label: t(K.price.mrp), value: mrpText },
         { kind: 'value', label: t(K.price.gst), value: `${values.gstPct}%` },
         { kind: 'value', label: t(K.stock.reorderAt), value: String(values.minStock) },
         { kind: 'value', label: t(K.stock.fillUpTo), value: String(values.maxStock) },
       ],
       missing,
+      problems: hsnCodeIsInvalid(values) ? [t(F.hsnCodeInvalid)] : [],
       content: (
         <DrawerStepBody readOnly={readOnly}>
           <IdentityFields {...body} />
@@ -289,9 +378,11 @@ function useSteps(body: BodyProps): DrawerStep[] {
 function useHeader(values: MedicineFormValues, pickers: MedicalPickers) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
+  const units = useMedicineUnits();
   const maker = makerOf(pickers, values.manufacturerId);
   const composition = values.composition.trim();
   const makerName = maker?.label ?? '';
+  const stock = formStock(values);
   // The header's sub keeps the page's direction; its maker and composition are isolated.
   const sub = composition
     ? t(K.sub, isolateValues({ maker: makerName, composition }))
@@ -302,7 +393,12 @@ function useHeader(values: MedicineFormValues, pickers: MedicalPickers) {
     : '';
   const badges: DrawerBadge[] = [
     ...(maker ? [{ id: 'maker', label: maker.label, tone: maker.tone }] : []),
-    { id: 'stock', label: t(K.badges.inStock, { count: formStock(values) }) },
+    {
+      id: 'stock',
+      label:
+        units.inStock(stock, values.unitsPerPack) ??
+        t(K.badges.inStock, { count: stock }),
+    },
     ...(best
       ? [
           {
@@ -380,6 +476,9 @@ function useMedicineSave(
       'name',
       'manufacturerId',
       'composition',
+      'hsnCode',
+      'packLabel',
+      'unitsPerPack',
       'mrp',
       'gstPct',
       'minStock',
@@ -390,6 +489,10 @@ function useMedicineSave(
     toastId: 'medicine-save-failed',
     check: (values) => {
       form.clearErrors(['batches', 'supplierRates']);
+      if (hsnCodeIsInvalid(values)) {
+        openStep('medicine');
+        return { fields: ['hsnCode'], message: t(F.hsnCodeInvalid) };
+      }
       const problem = medicineRowProblem(values);
       if (!problem) return null;
       const message = rowProblemMessage(problem.rule, t);
@@ -464,6 +567,7 @@ function MedicineSession({
     pickers,
     suppliers,
     openChild,
+    unitsLocked: unitsPerPackLocked(medicine),
   });
   const summary = values.name.trim();
 
@@ -519,7 +623,8 @@ function MedicineSession({
  * New / Edit medicine (KICKOFF §6.7 Drawers; `medical.md:170–188`) on the
  * shared record drawer, 840px. "Medicine, price & stock": Name*, the
  * manufacturer* (pill options with their counts; quick-added or created in
- * full on top), Composition ("used for substitutes"), Sold with; the price
+ * full on top), Composition ("used for substitutes"), Sold with, the HSN code,
+ * the pack and its units (locked while it holds stock, D7); the price
  * panel — MRP incl. GST, the GST rate, the live split and margin — and the
  * stock levels. "Batches & supplier prices": the batches with their total,
  * and who sells it at what. The header names the maker and composition, its

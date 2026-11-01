@@ -401,7 +401,11 @@
         "orders": "Bestellungen",
         "ordersValue_one": "{{count}} Bestellung · {{amount}}",
         "ordersValue_other": "{{count}} Bestellungen · {{amount}}",
-        "noOrders": "Noch keine Bestellungen"
+        "noOrders": "Noch keine Bestellungen",
+        "email": "E-Mail",
+        "emailPlaceholder": "orders@agency.in",
+        "emailInvalid": "Gib eine gültige E-Mail-Adresse ein",
+        "address": "Adresse"
       },
       "account": {
         "label": "Konto",
@@ -489,7 +493,18 @@
         "compositionPlaceholder": "z. B. Tretinoin 0,025 %",
         "soldWith": "Abgabe",
         "prescriptionOnly": "Nur auf Rezept",
-        "overTheCounter": "Rezeptfrei"
+        "overTheCounter": "Rezeptfrei",
+        "hsnCode": "HSN-Code",
+        "hsnCodeHint": "4, 6 oder 8 Ziffern",
+        "hsnCodeInvalid": "Gib den HSN-Code mit 4, 6 oder 8 Ziffern ein",
+        "pack": "Packung",
+        "packHint": "wie aufgedruckt",
+        "packPlaceholder": "z. B. 1*10",
+        "unitsPerPack": "Einheiten pro Packung",
+        "unitsPerPackHint": "1 = nur ganze Packungen",
+        "unitsPerPackLocked": "Verkaufe oder retourniere zuerst den Bestand",
+        "decreaseUnits": "Weniger Einheiten pro Packung",
+        "increaseUnits": "Mehr Einheiten pro Packung"
       },
       "price": {
         "mrp": "UVP",
@@ -517,7 +532,14 @@
         "decreaseFill": "Auffüllstufe verringern",
         "increaseFill": "Auffüllstufe erhöhen",
         "hintAlert": "Hinweis zum Nachbestellen, wenn der Bestand auf {{count}} fällt.",
-        "hintOrder": "{{qty}} bestellen, um auf {{max}} aufzufüllen. Erscheint unter Bestand › Niedriger Bestand."
+        "hintOrder": "{{qty}} bestellen, um auf {{max}} aufzufüllen. Erscheint unter Bestand › Niedriger Bestand.",
+        "nowLoose": "{{stock}} auf Lager · {{state}}",
+        "reorderAtUnits": "Nachbestellen bei (Einheiten)",
+        "fillUpToUnits": "Auffüllen auf (Einheiten)",
+        "hintAlertUnits_one": "Hinweis zum Nachbestellen, wenn der Bestand auf {{count}} Einheit fällt.",
+        "hintAlertUnits_other": "Hinweis zum Nachbestellen, wenn der Bestand auf {{count}} Einheiten fällt.",
+        "hintOrderPacks": "{{packs}} bestellen, um auf {{max}} Einheiten aufzufüllen. Erscheint unter Bestand › Niedriger Bestand.",
+        "unitsNote": "In Einheiten gezählt · {{perPack}}"
       },
       "batches": {
         "title": "Chargen",
@@ -529,7 +551,9 @@
         "add": "Charge hinzufügen",
         "total": "{{count}} auf Lager",
         "expiryInvalid": "Geben Sie den Ablauf als MM/JJ ein",
-        "batchMissing": "Geben Sie die Charge ein"
+        "batchMissing": "Geben Sie die Charge ein",
+        "mrp": "UVP",
+        "qtyUnits": "Einheiten"
       },
       "rates": {
         "title": "Lieferantenpreise",
@@ -598,6 +622,9 @@
         "quickHint": "20 = Menge · +2 = gratis · @180 = Preis",
         "lowStockChip": "{{name}} · noch {{quantity}}",
         "newMedicineName": "Name des neuen Arzneimittels",
+        "note": "Notiz",
+        "notePlaceholder": "z. B. 30 TAGE ZIEL",
+        "mrp": "UVP",
         "gst": "GST",
         "gstRate": "{{value}} %",
         "ratesIncludeGst": "Preise inkl. GST",
@@ -632,7 +659,9 @@
       "addUnexpected": "Unerwarteten Artikel hinzufügen",
       "enterQuantity": "Geben Sie eine Menge ein",
       "save": "Als erhalten markieren",
-      "saved": "Ware erhalten · Bestand und Gratismenge hinzugefügt"
+      "saved": "Ware erhalten · Bestand und Gratismenge hinzugefügt",
+      "mrp": "UVP",
+      "note": "Notiz"
     },
     "orderView": {
       "title": "Bestellung",
@@ -644,6 +673,9 @@
       "paidWithCredits": "{{paid}} bezahlt + {{credited}} Lieferantengutschriften",
       "pay": "{{amount}} zahlen",
       "print": "Drucken",
+      "note": "Notiz",
+      "saveNote": "Notiz speichern",
+      "noteSaved": "Notiz gespeichert",
       "gstOnTopRate": "{{value}} % zusätzlich"
     },
     "sale": {
@@ -716,7 +748,8 @@
       },
       "summary": "Die Gutschrift senkt, was Sie {{supplier}} schulden",
       "save": "Zurückgeben & Gutschrift nehmen",
-      "saved": "{{count}} zurückgegeben · {{amount}} Gutschrift von {{supplier}}"
+      "saved": "{{count}} zurückgegeben · {{amount}} Gutschrift von {{supplier}}",
+      "quantityUnits": "Menge (Einheiten)"
     },
     "prescriptions": {
       "sub": "Rezept {{rx}} · {{date}} · {{medicines}}"

@@ -21,6 +21,7 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constants.ts';
 import {
   invalidPatientPhones,
+  isInvalidPatientAge,
   missingPatientFields,
   patientFormName,
   type PatientFormValues,
@@ -43,6 +44,8 @@ interface PatientFormLabels {
   followUp?: string;
   consents: string[];
   age: number | null;
+  /** The age is the one the desk typed ("34 yrs · approx."). */
+  ageIsApproximate: boolean;
 }
 
 /** What the drawer shows of the form beyond the fields: header, footer and step heads. */
@@ -67,13 +70,30 @@ function formatFollowUp(values: PatientFormValues, formatDate: FormatDate) {
   return values.followUpTime ? `${day} · ${values.followUpTime}` : day;
 }
 
+/** The badge's age: the typed one, else the picked date's on `today`, else none. */
+function ageOf({
+  typedAge,
+  dateOfBirth,
+  today,
+}: {
+  typedAge: string;
+  dateOfBirth: string | null;
+  today: string;
+}): number | null {
+  if (typedAge) return Number(typedAge);
+  return dateOfBirth ? civilYearsBetween(dateOfBirth, today) : null;
+}
+
 function patientFormLabels(
   values: PatientFormValues,
   today: string,
   t: TFunction,
   formatDate: FormatDate,
 ): PatientFormLabels {
-  const { gender, dateOfBirth, conversion, referralSource } = values;
+  const { gender, conversion, referralSource } = values;
+  const dateOfBirth = values.birthMode === 'date' ? values.dateOfBirth : null;
+  const typedAge =
+    values.birthMode === 'age' && !isInvalidPatientAge(values) ? values.age.trim() : '';
   return {
     name: patientFormName(values),
     types: values.types.map((type) => t(APP_KEYS.patients.types[type])),
@@ -92,7 +112,8 @@ function patientFormLabels(
       : undefined,
     followUp: formatFollowUp(values, formatDate),
     consents: values.consents.map((consent) => t(PERSON_CARD_KEYS.consent[consent])),
-    age: dateOfBirth ? civilYearsBetween(dateOfBirth, today) : null,
+    age: ageOf({ typedAge, dateOfBirth, today }),
+    ageIsApproximate: typedAge !== '',
   };
 }
 
@@ -181,7 +202,14 @@ function drawerBadges(
     { id: 'status', label: labels.status, tone: PATIENT_STATUS_TONES[values.status] },
     ...(labels.age === null
       ? []
-      : [{ id: 'age', label: t(PERSON_CARD_KEYS.age, { age: labels.age }) }]),
+      : [
+          {
+            id: 'age',
+            label: labels.ageIsApproximate
+              ? `${t(PERSON_CARD_KEYS.age, { age: labels.age })} · ${t(PERSON_CARD_KEYS.approximate)}`
+              : t(PERSON_CARD_KEYS.age, { age: labels.age }),
+          },
+        ]),
   ];
 }
 

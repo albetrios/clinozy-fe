@@ -11,6 +11,8 @@ import {
   ContactCard,
   type ContactCardActions,
   type ContactCardData,
+  PERSON_CARD_KEYS,
+  PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/index.ts';
 import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -59,6 +61,7 @@ function useContactCardData(patient: PatientRow, today: string): ContactCardData
     about: {
       gender: patient.gender,
       age: patientAge(patient.dateOfBirth, today),
+      ageIsApproximate: patient.dateOfBirthIsApproximate,
       area: patient.address,
       source: patient.referralSource
         ? t(APP_KEYS.patients.referralSources[patient.referralSource])
@@ -99,15 +102,22 @@ export function PatientNameCell({
   );
 }
 
-/** The Age cell: "28 yrs" over the birth date "27 Oct 1995", or "—". */
+/**
+ * The Age cell: "28 yrs" over the birth date "27 Oct 1995", or "—"; over "approx." instead when the
+ * desk typed the age (the date is only an estimate — feat-approximate-age FE3, FE4).
+ */
 export function PatientAgeCell({
   dateOfBirth,
+  approximate = false,
   today,
 }: {
   dateOfBirth: string | null;
+  /** The birth date came from a typed age. */
+  approximate?: boolean;
   today: string;
 }) {
   const { t } = useTranslation(PATIENTS_NS);
+  const { t: tCard } = useTranslation(PERSON_CARD_NS);
   const { formatDate } = useLocaleFormat();
   const age = patientAge(dateOfBirth, today);
   if (age === null || !dateOfBirth) {
@@ -118,13 +128,23 @@ export function PatientAgeCell({
       <span className="truncate tabular-nums">
         {t(PATIENTS_KEYS.table.age, { count: age })}
       </span>
-      <span className="text-caption text-muted-foreground truncate tabular-nums">
-        {formatDate(
-          localDateOf(dateOfBirth),
-          { day: 'numeric', month: 'short', year: 'numeric' },
-          { civilDay: true },
-        )}
-      </span>
+      {approximate ? (
+        <span
+          className="text-caption text-muted-foreground truncate"
+          title={tCard(PERSON_CARD_KEYS.approximateHint)}
+          data-testid="patient-age-approximate"
+        >
+          {tCard(PERSON_CARD_KEYS.approximate)}
+        </span>
+      ) : (
+        <span className="text-caption text-muted-foreground truncate tabular-nums">
+          {formatDate(
+            localDateOf(dateOfBirth),
+            { day: 'numeric', month: 'short', year: 'numeric' },
+            { civilDay: true },
+          )}
+        </span>
+      )}
     </span>
   );
 }

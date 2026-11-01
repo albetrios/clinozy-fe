@@ -143,6 +143,7 @@ describe('LeadsToolbar (leads.md:17)', () => {
       'Source · pick any',
       'Ownership · held after a claim',
       'Team · assigned or involved',
+      'Age',
       'Created',
       'Follow-up date',
     ]);

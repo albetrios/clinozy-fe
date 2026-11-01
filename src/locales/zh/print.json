@@ -32,6 +32,7 @@
     "item": "项目",
     "medicineName": "药品名称",
     "packSize": "包装规格",
+    "hsn": "HSN",
     "qty": "数量",
     "amount": "金额",
     "discount": "折扣",
