@@ -32655,6 +32655,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    former_owner_role_id?: string;
                     new_owner_user_id: string;
                 };
             };
