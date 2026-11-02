@@ -38,7 +38,7 @@ build-time or local-only, never synced to a GitHub Environment.
 | `VITE_AUTH_OAUTH_GITHUB` | build·local | `true` | — | — | Enable GitHub OAuth on /login (default true). |
 | `VITE_AUTH_OAUTH_GOOGLE` | build·local | `true` | — | — | Enable Google OAuth on /login (default true). |
 | `VITE_AUTH_PASSKEY` | build·local | `true` | — | — | Enable passkey/WebAuthn auth on /login (default true). |
-| `VITE_CAPTCHA_DISABLED` | variable | — | — | — | "true" disables the Turnstile CAPTCHA (local dev; pair with the clinozy-be test secret). |
+| `VITE_CAPTCHA_DISABLED` | variable | — | `false` | — | "true" disables the Turnstile CAPTCHA (local dev; pair with the clinozy-be test secret). |
 | `VITE_DEBUG_LOGGING` | variable | `false` | `false` | `false` | "true" emits [Module] diagnostic console logs (on locally; refused on every hosted deploy). |
 | `VITE_DEVTOOLS` | variable | `false` | `false` | `false` | "true" mounts React Query Devtools + the localhost debug panel. |
 | `VITE_DISABLED_MODULES` | variable | — | — | — | Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are app-today … app-users and app-branches, every one on clinozy-be. |
