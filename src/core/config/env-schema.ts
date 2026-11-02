@@ -467,6 +467,7 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
     // on (a real deploy).
     defaults: {
       VITE_APP_ENV: 'development',
+      VITE_CAPTCHA_DISABLED: 'false',
       VITE_DEBUG_LOGGING: 'false',
       VITE_DEVTOOLS: 'false',
       VITE_E2E_HOOKS: 'false',

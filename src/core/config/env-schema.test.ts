@@ -294,6 +294,13 @@ describe('envProfiles defaults (per-environment starting values)', () => {
     expect(defaults?.VITE_VERSION_CHECK).toBe('true');
   });
 
+  it('development defaults keep test-only switches off and Turnstile on', () => {
+    const defaults = envProfiles.development.defaults;
+    expect(defaults?.VITE_CAPTCHA_DISABLED).toBe('false');
+    expect(defaults?.VITE_DEBUG_LOGGING).toBe('false');
+    expect(defaults?.VITE_DEVTOOLS).toBe('false');
+  });
+
   it('local defaults turn dev-tooling on and point at the localhost backend', () => {
     const defaults = envProfiles.local.defaults;
     expect(defaults?.VITE_DEBUG_LOGGING).toBe('true');
