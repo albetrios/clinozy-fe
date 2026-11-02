@@ -19,7 +19,7 @@ All values live in each repo's **`.env.local`** (gitignored dev file, `NODE_ENV=
   5 req/min per IP → `429 send-code failed` floods the suite), `DATABASE_TLS_ENFORCED=false`,
   `DATABASE_RLS_SAFETY_ENFORCED=false` (local Docker Postgres), and the
   `PERSONAL_ORGANIZATION_ENABLED` / `TEAM_ORGANIZATION_ENABLED` pair for the mode under test.
-- **clinozy-fe `.env.local`**: `VITE_DEV_API_URL=http://localhost:3000`, test Turnstile key
+- **clinozy-fe `.env.local`**: `DEV_API_URL=http://localhost:3000`, test Turnstile key
   `VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA` (do **not** set `VITE_CAPTCHA_DISABLED`).
 
 Then: boot clinozy-be (`pnpm dev`, wait for `GET /readyz` → 200), and run `pnpm test:e2e` from

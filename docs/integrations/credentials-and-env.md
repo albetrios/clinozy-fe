@@ -96,7 +96,7 @@ For deploy via GitHub Actions, set `VITE_API_BASE_URL`, `NETLIFY_AUTH_TOKEN`, `N
 
 - Use **`.env.local`** at project root (gitignored — your local dev file, one `.env.<NODE_ENV>` per environment mirroring clinozy-be). **`pnpm setup:local`** scaffolds it from `.env.example` and injects localhost defaults (including `VITE_APP_ENV=local`); `pnpm dev` loads it. The `local` environment is set by `VITE_APP_ENV`, not the Vite mode (Vite 8 forbids a mode named `local`).
 - It holds **both** behavior flags and machine secrets (SONAR_*, tokens). Deploys never read it — they inject env from GitHub Environments.
-- For local backend: `VITE_DEV_API_URL` (default `http://localhost:3000`) — Vite proxies `/api` in development (keep `VITE_API_BASE_URL` empty so the proxy is used).
+- For local backend: `DEV_API_URL` (default `http://localhost:3000`) — Vite proxies `/api` in development (keep `VITE_API_BASE_URL` empty so the proxy is used).
 - **MCP:** set `CONTEXT7_API_KEY` in `.env.local` for the Context7 MCP (`${CONTEXT7_API_KEY}` in `.mcp.json`).
 
 ### Auth method toggles (build-time, env-only)

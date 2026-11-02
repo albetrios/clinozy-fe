@@ -26,8 +26,8 @@ These must be present or post-merge Netlify deploy **fails** (no silent skip):
 - `NETLIFY_SITE_ID`
 
 Optional (warn only): `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`, `VITE_PRIVACY_POLICY_URL`,
-`VITE_TURNSTILE_SITE_KEY` (required by the production **client-env profile** unless
-`VITE_CAPTCHA_DISABLED=true`), `VITE_CSP_REPORT_URI`, and the Sentry keys —
+`VITE_TURNSTILE_SITE_KEY` (required by the production **client-env profile**, which also
+refuses `VITE_CAPTCHA_DISABLED=true`), and the Sentry keys —
 `VITE_SENTRY_DSN` (client reporting) plus build-time `SENTRY_AUTH_TOKEN` /
 `SENTRY_ORG` / `SENTRY_PROJECT` (source-map upload; the deploy build activates the
 upload plugin only when the token is set).
@@ -125,12 +125,12 @@ A job a pull request starts selects no environment, so it sees **repository-leve
 variables only. Two kinds, both public values (a browser sees them in the bundle) and
 both **hand-managed** (`gh variable set <NAME> --repo albetrios/clinozy-fe --body …`):
 
-| Variable                                                                                                                  | Read by                          | Value                                                 |
-| ------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ----------------------------------------------------- |
-| `PREVIEW_VITE_API_BASE_URL`                                                                                               | `preview.yml` (required)         | development's `VITE_API_BASE_URL`; unset → no preview |
-| `PREVIEW_VITE_TURNSTILE_SITE_KEY`, `PREVIEW_VITE_STRIPE_PUBLISHABLE_KEY`                                                  | `preview.yml`                    | development's site / publishable keys                 |
-| `PREVIEW_VITE_POSTHOG_KEY`, `PREVIEW_VITE_POSTHOG_HOST`, `PREVIEW_VITE_PRIVACY_POLICY_URL`, `PREVIEW_VITE_CSP_REPORT_URI` | `preview.yml` (optional)         | development's values                                  |
-| `VITE_PERSONAL_ORGANIZATIONS`, `VITE_TEAM_ORGANIZATIONS`, `VITE_DISABLED_MODULES`, `STORED_FILES_ORIGIN`, …               | `preview.yml`, `e2e-backend.yml` | a repository-level copy of development's variable     |
+| Variable                                                                                                             | Read by                          | Value                                                 |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ----------------------------------------------------- |
+| `PREVIEW_VITE_API_BASE_URL`                                                                                          | `preview.yml` (required)         | development's `VITE_API_BASE_URL`; unset → no preview |
+| `PREVIEW_VITE_TURNSTILE_SITE_KEY`, `PREVIEW_VITE_STRIPE_PUBLISHABLE_KEY`                                             | `preview.yml`                    | development's site / publishable keys                 |
+| `PREVIEW_VITE_POSTHOG_KEY`, `PREVIEW_VITE_POSTHOG_HOST`, `PREVIEW_VITE_PRIVACY_POLICY_URL`, `PREVIEW_CSP_REPORT_URI` | `preview.yml` (optional)         | development's values                                  |
+| `VITE_PERSONAL_ORGANIZATIONS`, `VITE_TEAM_ORGANIZATIONS`, `VITE_DISABLED_MODULES`, `STORED_FILES_ORIGIN`, …          | `preview.yml`, `e2e-backend.yml` | a repository-level copy of development's variable     |
 
 `PREVIEW_<KEY>` names a value development keeps as a **Secret**: a job may not read a
 synced Secret's name through `vars.*` (`tests/ci/github-actions-hardening.policy.test.ts`).

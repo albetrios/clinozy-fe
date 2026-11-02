@@ -16,4 +16,4 @@ Claude Code loads this file when it works in `tests/`. It holds sections moved o
 - **Gates:** `pnpm validate:structure` (colocation), `pnpm validate:testids` (page/form/shell testids), `pnpm validate:theme-axis`, `pnpm coverage:patch` (PR changed-lines ≥ 90%)
 - Unit/security: Vitest; E2E: Playwright (Chromium). Component tests require `vitest-axe`; portaled dialogs use `axeForDialog`; a control named by an `aria-label` must say the words it shows (`axeLabelInName`, WCAG 2.5.3).
 
-**Dev API:** In development, Vite proxies `/api` to `VITE_DEV_API_URL` (default `http://localhost:3000`). The FE always uses `apiClient` / `authFetch` against **clinozy-be**. Unit tests stub modules with `vi.mock()` — no HTTP server.
+**Dev API:** In development, Vite proxies `/api` to `DEV_API_URL` (default `http://localhost:3000`). The FE always uses `apiClient` / `authFetch` against **clinozy-be**. Unit tests stub modules with `vi.mock()` — no HTTP server.

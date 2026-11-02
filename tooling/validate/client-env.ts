@@ -6,9 +6,10 @@
  *   - `required` keys are checked against the resolved runtime env (process.env,
  *     as loaded/injected for the deploy job).
  *   - `forbidden` keys are checked against git-TRACKED `.env` + `.env.<env>` files
- *     only; gitignored local files (e.g. `.env.local` with auto-managed
- *     SONAR_* + machine secrets) are skipped, so local secrets never trip a guard.
- *     Deploy env comes from GitHub Environments and is covered by `required`.
+ *     and, for a deploy environment, what that deploy carries: the injected GitHub
+ *     Environment (CI) or its `.env.<env>` file (locally). `.env.local` is never read
+ *     here: it holds auto-managed SONAR_* + machine secrets on purpose and never deploys.
+ *   - `VITE_` keys a deploy's `.env.<env>` sets that the schema does not know are errors.
  *   - `allowed` values are enforced strictly (HARD FAIL) against the per-env
  *     `.env.<env>` file (locally) or the injected GitHub Environment (CI) — e.g.
  *     production permits only the safe value for each diagnostics flag.
@@ -140,14 +141,20 @@ function requiredIssues(environment: AppEnvironment): {
   return { errors, warnings };
 }
 
-/** Forbidden-key errors against the committed `.env` + `.env.<env>` layer. */
+/**
+ * Forbidden-key errors against the committed layer and, for a deploy environment, what that
+ * deploy carries. The committed layer alone left every rule dead (no `.env.<env>` is tracked,
+ * and CI has no file): a production deploy with a test Stripe key passed this check.
+ */
 function forbiddenErrors(
   environment: AppEnvironment,
   committed: Record<string, string>,
 ): string[] {
+  // `.env.local` stays out: it holds SONAR_* and machine secrets on purpose, and never deploys.
+  const deployed = environment === 'local' ? undefined : deployValues(environment);
   const errors: string[] = [];
   for (const rule of envProfiles[environment].forbidden) {
-    const value = committed[rule.key];
+    const value = committed[rule.key] ?? deployed?.(rule.key);
     if (value === undefined) continue;
     if (rule.valuePattern && !rule.valuePattern.test(value)) continue;
     errors.push(`${rule.key} must not be set in ${environment} — ${rule.reason}`);
@@ -188,18 +195,39 @@ function envFileValues(environment: AppEnvironment): Record<string, string> {
 }
 
 /**
- * Strict per-environment allowed-value errors (hard fail). Checks the `.env.<env>`
- * file (authoritative for that environment's config, locally) and — on CI, where
- * the file isn't checked out — the injected GitHub Environment (`process.env`).
+ * Reads what a deploy of `environment` carries: on CI the injected GitHub Environment
+ * (`process.env`) — the file isn't checked out there — and locally the `.env.<env>` file,
+ * authoritative for that environment's config.
  */
+function deployValues(environment: AppEnvironment): (key: string) => string | undefined {
+  const fileVals = envFileValues(environment);
+  const onCi = process.env.GITHUB_ACTIONS === 'true';
+  return (key) => (onCi ? runtimeGet(key) : undefined) ?? fileVals[key];
+}
+
+/**
+ * `VITE_` keys a deploy's env file sets that the schema does not know: a typo, or a key since
+ * renamed. Vite bundles every `VITE_` key it is given, so these would ship unvalidated.
+ */
+function unknownClientKeyErrors(environment: AppEnvironment): string[] {
+  if (environment === 'local') return [];
+  const known = new Set<string>(envSchemaKeys);
+  return Object.keys(envFileValues(environment))
+    .filter((key) => key.startsWith('VITE_') && !known.has(key))
+    .map(
+      (key) =>
+        `${key} is set in .env.${environment} but is not in the env schema — a VITE_ key ships to the browser; rename or remove it`,
+    );
+}
+
+/** Strict per-environment allowed-value errors (hard fail), against {@link deployValues}. */
 function allowedErrors(environment: AppEnvironment): string[] {
   const allowed = envProfiles[environment].allowed;
   if (!allowed) return [];
-  const fileVals = envFileValues(environment);
-  const onCi = process.env.GITHUB_ACTIONS === 'true';
+  const get = deployValues(environment);
   const errors: string[] = [];
   for (const [key, permitted] of Object.entries(allowed)) {
-    const value = fileVals[key] ?? (onCi ? runtimeGet(key) : undefined);
+    const value = get(key);
     if (value === undefined) continue;
     if (!permitted.includes(value)) {
       errors.push(
@@ -250,6 +278,7 @@ function main(): void {
   const errors = [
     ...required.errors,
     ...forbiddenErrors(environment, committedEnv(environment)),
+    ...unknownClientKeyErrors(environment),
     ...allowedErrors(environment),
     ...secretNameErrors(environment),
     ...hostedDeploymentRefusals((key) => runtimeGet(key) ?? fileValues[key]),

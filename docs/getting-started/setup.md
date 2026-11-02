@@ -73,7 +73,7 @@ Set at least:
 | ------------------- | ------------------------------------------------------------------------------ |
 | `VITE_API_BASE_URL` | Production API base (e.g. `https://your-api-domain.com`). Empty = same-origin. |
 
-For local dev with a backend on another port, you can use `VITE_DEV_API_URL` (e.g. `http://localhost:3000`) if your Vite config proxies API requests. See `.env.example` for the full list.
+For local dev with a backend on another port, you can use `DEV_API_URL` (e.g. `http://localhost:3000`) if your Vite config proxies API requests. See `.env.example` for the full list.
 
 **Where to get credentials:** [credentials-and-env.md](../integrations/credentials-and-env.md). **Full env runbook:** [environment-variables.md](../deployment/runbooks/environment-variables.md).
 

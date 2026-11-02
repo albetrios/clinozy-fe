@@ -26,7 +26,7 @@ The single source of truth for the model and accepted risks is `docs/reference/s
 
 For each item, verify against the actual code and mark **Satisfied** (file + reference) or **Gap** (file path + what to change).
 
-1. **CSP:** the build-generated header (`dist/_headers`, authoritative) and the `index.html` meta fallback both derive from `src/lib/csp-api-origin.ts` and agree; no `unsafe-inline`/`unsafe-eval` creep; `VITE_CSP_REPORT_URI` wired for violation collection.
+1. **CSP:** the build-generated header (`dist/_headers`, authoritative) and the `index.html` meta fallback both derive from `src/lib/csp-api-origin.ts` and agree; no `unsafe-inline`/`unsafe-eval` creep; `CSP_REPORT_URI` wired for violation collection.
 2. **Asset inlining:** `assetsInlineLimit: 0` holds in the Vite config (inlined assets break the CSP hash model).
 3. **Token storage:** the access token lives only in the module closure in `src/shared/auth/token.ts`; grep the tree for `localStorage`/`sessionStorage` token writes — there must be none. Refresh token is an HttpOnly cookie (never read in JS).
 4. **Single refresh path:** only `refreshAccessToken()` in `src/shared/auth/service.ts` calls `/auth/refresh`; the module-level single-flight and the `navigator.locks` Web Lock are intact; no second refresh caller has appeared.

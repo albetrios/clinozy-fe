@@ -31,11 +31,16 @@ src/core/config/env-schema.ts   ← Zod + envSchemaKeys
 
 ### Three env classes (FE)
 
-| Class               | Prefix     | Read where                                         | Examples                                  |
-| ------------------- | ---------- | -------------------------------------------------- | ----------------------------------------- |
-| **Build-time**      | `BUILD_*`  | Vite plugins / `vite.config.ts` only               | `BUILD_I18N_MODE`, `BUILD_I18N_LOCALE`    |
-| **Runtime public**  | `VITE_*`   | Client bundle; overridable via `window.__CONFIG__` | `VITE_AUTH_*`, `VITE_DISABLED_MODULES`    |
-| **Runtime private** | no `VITE_` | CI / build scripts only                            | `SENTRY_AUTH_TOKEN`, `NETLIFY_AUTH_TOKEN` |
+**The browser decides the prefix.** If code running in the browser reads a key, it takes `VITE_`; if
+not, it takes a plain name. Every key is read at build time either way, so "the build needs it" is
+never a reason for `VITE_`. The prefix only decides whether the value is also copied into the
+JavaScript sent to every visitor.
+
+| Class               | Prefix             | Read where                                         | Examples                                           |
+| ------------------- | ------------------ | -------------------------------------------------- | -------------------------------------------------- |
+| **Build-time**      | `BUILD_*` or plain | Vite plugins / `vite.config.ts` only               | `BUILD_I18N_MODE`, `CSP_REPORT_URI`, `DEV_API_URL` |
+| **Runtime public**  | `VITE_*`           | Client bundle; overridable via `window.__CONFIG__` | `VITE_AUTH_*`, `VITE_DISABLED_MODULES`             |
+| **Runtime private** | plain              | CI / build scripts only                            | `SENTRY_AUTH_TOKEN`, `NETLIFY_AUTH_TOKEN`          |
 
 `STORED_FILES_ORIGIN` is a build-time Variable (no `VITE_`, never bundled): the file store's bucket
 origin, named in the CSP's `connect-src` and `img-src` (`plugins/csp-api-origin.ts`). Production
@@ -44,8 +49,8 @@ development deploy is warned; set it in both GitHub Environments (`pnpm github:s
 `.env.<environment>`).
 
 **Client resolution order:** `window.__CONFIG__[key]` → `import.meta.env.VITE_${key}` → Zod default.
-The build-only keys (`BUILD_ONLY_CONFIG_KEYS` in `env.config.ts`: `APP_ENV`, `DEBUG_LOGGING`,
-`DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK` — every switch `envProfiles.production.allowed` pins — and
+The build-only keys (`BUILD_ONLY_CONFIG_KEYS` in `env.config.ts`: `APP_ENV`, `CAPTCHA_DISABLED`,
+`DEBUG_LOGGING`, `DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK` — every switch `envProfiles.production.allowed` pins — and
 `TEST_MODE`) skip `window.__CONFIG__`: only the build's own env sets them.
 
 ### Which env files each command reads
@@ -102,6 +107,32 @@ because an env file holds `SENTRY_AUTH_TOKEN` ([sentry-sourcemaps.md](../../inte
 **Not env:** live session and organization context from **`GET /auth/me/context`**.
 
 **Also not fetched at boot:** login auth surface (OAuth buttons, email OTP, passkey). Set matching `VITE_AUTH_*` on clinozy-fe and credential env on clinozy-be — no `GET /auth/oauth/providers`.
+
+### Local-only keys and what a deploy refuses
+
+`DEV_API_URL` and `VITE_API_BASE_URL` answer different questions. `VITE_API_BASE_URL` is where the
+**browser** sends API calls, set per environment. Left empty on a local machine, the browser calls
+same-origin `/api` on `localhost:5173`, and the dev server forwards those calls to `DEV_API_URL`, so
+local dev needs no CORS and its cookies stay same-site. A deploy has no dev server, so `DEV_API_URL`
+exists only for `local`: `pnpm dev` reads `.env.local` alone, and the value comes from
+`envProfiles.local.defaults`. It stays blank in `.env.example`, because new env files are seeded from
+that file.
+
+`pnpm validate:client-env` fails a deploy that carries a machine-only value:
+
+| Refused in                 | Key                                   | Value                             |
+| -------------------------- | ------------------------------------- | --------------------------------- |
+| `development`,`production` | `DEV_API_URL`                         | any                               |
+| `development`,`production` | `VITE_API_BASE_URL`                   | `localhost`, `127.0.0.1`, `[::1]` |
+| `development`,`production` | `SONAR_TOKEN`, `SONAR_ADMIN_PASSWORD` | any                               |
+| `production`               | `VITE_STRIPE_PUBLISHABLE_KEY`         | `pk_test_…`                       |
+| `development`              | `VITE_STRIPE_PUBLISHABLE_KEY`         | `pk_live_…`                       |
+| `production`               | `VITE_TURNSTILE_SITE_KEY`             | Cloudflare test keys              |
+| `production`               | `VITE_CAPTCHA_DISABLED`               | anything but `false`              |
+
+It reads the injected GitHub Environment on CI and `.env.<environment>` locally, and never reads
+`.env.local`, so machine secrets can stay there. A `VITE_` key in a deploy's env file that the schema
+does not know is refused too: it would ship to the browser unvalidated.
 
 ### `.env.example` halves
 
@@ -233,8 +264,8 @@ A deploy may inject `public/config.js` with `window.__CONFIG__` (no Docker in th
 repo — the Netlify deploy serves the static file as-built unless you edit it):
 
 - Strip `VITE_` prefix for keys (e.g. `AUTH_OAUTH_GOOGLE`, not `VITE_AUTH_OAUTH_GOOGLE`)
-- Same keys as bundled client env, except the build-only ones (`APP_ENV`, `DEBUG_LOGGING`,
-  `DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK`, `TEST_MODE`), which are ignored here
+- Same keys as bundled client env, except the build-only ones (`APP_ENV`, `CAPTCHA_DISABLED`,
+  `DEBUG_LOGGING`, `DEVTOOLS`, `E2E_HOOKS`, `VERSION_CHECK`, `TEST_MODE`), which are ignored here
 - See comments in [`public/config.js`](../../../public/config.js)
 
 ## 5. Adding or changing a key
@@ -250,18 +281,18 @@ Follow **`agent-os/skills/fe-env-schema-add/SKILL.md`** end-to-end:
 
 ## 6. Troubleshooting
 
-| Symptom                                              | Check                                                                                                                                                                                |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| OAuth button missing                                 | `VITE_AUTH_OAUTH_<PROVIDER>` not `false`; no backend provider fetch                                                                                                                  |
-| OAuth click fails                                    | clinozy-be may lack provider credentials — fix both sides                                                                                                                            |
-| Module route 404                                     | Key in `VITE_DISABLED_MODULES` or manifest `module` mismatch                                                                                                                         |
-| Production boot error on CAPTCHA                     | Set `VITE_TURNSTILE_SITE_KEY` or `VITE_CAPTCHA_DISABLED=true`                                                                                                                        |
-| `validate:client-env` warns on `VITE_CSP_REPORT_URI` | Expected with no CSP collector. Set it to start the violation stream the [Trusted Types runbook](./csp-trusted-types-production.md) needs, or leave it — `warn` never fails the gate |
-| `validate:env-example` fails                         | Run `pnpm tool:sync-env-example --fix`                                                                                                                                               |
-| MCP servers missing in Cursor                        | Run `pnpm setup:local --no-start` or `pnpm mcp:setup`                                                                                                                                |
-| Context7 MCP fails                                   | Set `CONTEXT7_API_KEY` in `.env.local` and reload Cursor                                                                                                                             |
-| `The dev server runs in mode "dev-server"` on start  | Vite was started bare or with `--mode`; run `pnpm dev` (see [Which env files each command reads](#which-env-files-each-command-reads))                                               |
-| Local dev errors show up in Sentry                   | `VITE_SENTRY_DSN` is set in `.env.local` — blank it ([Keeping local dev out of Sentry](../../integrations/sentry-frontend.md#keeping-local-dev-out-of-sentry))                       |
+| Symptom                                             | Check                                                                                                                                                                                |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| OAuth button missing                                | `VITE_AUTH_OAUTH_<PROVIDER>` not `false`; no backend provider fetch                                                                                                                  |
+| OAuth click fails                                   | clinozy-be may lack provider credentials — fix both sides                                                                                                                            |
+| Module route 404                                    | Key in `VITE_DISABLED_MODULES` or manifest `module` mismatch                                                                                                                         |
+| Production boot error on CAPTCHA                    | Set `VITE_TURNSTILE_SITE_KEY` or `VITE_CAPTCHA_DISABLED=true`                                                                                                                        |
+| `validate:client-env` warns on `CSP_REPORT_URI`     | Expected with no CSP collector. Set it to start the violation stream the [Trusted Types runbook](./csp-trusted-types-production.md) needs, or leave it — `warn` never fails the gate |
+| `validate:env-example` fails                        | Run `pnpm tool:sync-env-example --fix`                                                                                                                                               |
+| MCP servers missing in Cursor                       | Run `pnpm setup:local --no-start` or `pnpm mcp:setup`                                                                                                                                |
+| Context7 MCP fails                                  | Set `CONTEXT7_API_KEY` in `.env.local` and reload Cursor                                                                                                                             |
+| `The dev server runs in mode "dev-server"` on start | Vite was started bare or with `--mode`; run `pnpm dev` (see [Which env files each command reads](#which-env-files-each-command-reads))                                               |
+| Local dev errors show up in Sentry                  | `VITE_SENTRY_DSN` is set in `.env.local` — blank it ([Keeping local dev out of Sentry](../../integrations/sentry-frontend.md#keeping-local-dev-out-of-sentry))                       |
 
 ## 7. Related files
 

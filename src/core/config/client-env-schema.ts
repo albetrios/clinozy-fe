@@ -17,7 +17,6 @@ import {
 /** Client `import.meta.env` subset validated at app boot. */
 export const clientEnvSchema = z.object({
   VITE_API_BASE_URL: z.string().optional(),
-  VITE_DEV_API_URL: z.string().optional(),
   VITE_SENTRY_DSN: z.string().optional(),
   VITE_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
   VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: z.string().optional(),
@@ -29,7 +28,6 @@ export const clientEnvSchema = z.object({
   VITE_LAYOUT_WIDTH: z.enum(['contained', 'full', 'reading']).optional(),
   VITE_THEME_LOCK: z.string().optional(),
   VITE_PRIVACY_POLICY_URL: z.string().optional(),
-  VITE_CSP_REPORT_URI: z.string().optional(),
   VITE_DISABLED_MODULES: z.string().optional(),
   VITE_PERSONAL_ORGANIZATIONS: z.string().optional(),
   VITE_TEAM_ORGANIZATIONS: z.string().optional(),

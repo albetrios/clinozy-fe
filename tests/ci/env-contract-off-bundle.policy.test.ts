@@ -57,4 +57,24 @@ describe('the env contract is tooling-only', () => {
       Object.keys(clientEnvSchema.shape).filter((key) => !key.startsWith('VITE_')),
     ).toEqual([]);
   });
+
+  /**
+   * The browser decides the prefix: `VITE_` ships a value to every visitor, so a key no browser
+   * code reads takes a plain name. A key is read as `VITE_X`, or as `'X'` through the config
+   * kernel's `get()`. Comments are stripped: a key named only in prose has no reader.
+   */
+  it('every VITE_ key has a browser reader', () => {
+    const code = shippedSources()
+      .filter((path) => !path.endsWith('env-schema.ts'))
+      .map((path) =>
+        readFileSync(path, 'utf8')
+          .replaceAll(/\/\*[\s\S]*?\*\//g, '')
+          .replaceAll(/(^|\s)\/\/[^\n]*/g, ''),
+      )
+      .join('\n');
+    const unread = Object.keys(clientEnvSchema.shape).filter(
+      (key) => !code.includes(key) && !code.includes(`'${key.slice('VITE_'.length)}'`),
+    );
+    expect(unread).toEqual([]);
+  });
 });

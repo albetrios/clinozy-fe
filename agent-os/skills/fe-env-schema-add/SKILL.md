@@ -60,11 +60,18 @@ Every key sits under exactly one half. Sub-sections (`# --- Title ---`) group re
 
 ## FE-specific prefixes
 
-| Prefix    | Where to add in schema              | Bundled to client? |
-| --------- | ----------------------------------- | ------------------ |
-| `VITE_*`  | `envSchemaBase` + `clientEnvSchema` | Yes                |
-| `BUILD_*` | `envSchemaBase` only                | No (build plugins) |
-| No prefix | `envSchemaBase` only                | No (CI/scripts)    |
+**The browser decides the prefix: if code running in the browser reads the key, name it `VITE_*`;
+if not, use a plain name.** The prefix is what copies a value into the JavaScript sent to every
+visitor, and `env.config.ts` parses all of `import.meta.env`, so an unused `VITE_` key ships too.
+A key only `vite.config.ts`, a build plugin, CI or tooling reads stays plain
+(`STORED_FILES_ORIGIN`, `CSP_REPORT_URI`, `DEV_API_URL`); `loadEnv` still hands it to the build.
+Every key is read at build time either way, so "the build needs it" is never a reason for `VITE_`.
+
+| Prefix    | Where to add in schema              | Bundled to client?     |
+| --------- | ----------------------------------- | ---------------------- |
+| `VITE_*`  | `envSchemaBase` + `clientEnvSchema` | Yes                    |
+| `BUILD_*` | `envSchemaBase` only                | No (build plugins)     |
+| No prefix | `envSchemaBase` only                | No (build, CI/scripts) |
 
 `envSchemaBase` (with the descriptions and `envProfiles`) is in `src/core/config/env-schema.ts`,
 which is **tooling-only** — the app never imports it, so deploy and tooling key names stay out of
@@ -77,6 +84,23 @@ policy test fails when a `VITE_` key is in one schema and not the other.
 - `src/core/config/env-resolvers.ts` (if parsed/transformed)
 - `src/core/config/platform-config.ts` (if exposed on `PlatformConfig`)
 - `src/core/config/auth-methods.ts` (if auth surface)
+
+## Local-only keys — unable to reach a deploy
+
+A key only a developer's machine uses (`DEV_API_URL`) must fail the env check if someone puts it
+in a deploy:
+
+1. Put its value in `envProfiles.local.defaults`; `pnpm setup:local` writes that into `.env.local`.
+   Leave it blank in `.env.example`: new env files are seeded from that file, so a value there
+   lands in deploy files.
+2. Add it to `LOCAL_ONLY_VALUES` in `env-schema.ts`, which refuses it in both deploy profiles. Give
+   the rule a `valuePattern` when only some values are wrong (`VITE_API_BASE_URL` on localhost).
+
+`forbidden` rules read git-tracked env files and, for a deploy environment, the injected GitHub
+Environment (CI) or its `.env.<env>` file (locally). `.env.local` is never read, so `SONAR_*` belongs
+there. On CI a rule sees a key only if the workflow's `Validate client env` step injects it, so add
+the key there too. `tests/ci/client-env-gates.policy.test.ts` runs the real validator; a new gate
+goes there, because a test of the rule alone cannot tell whether the validator ever reads the value.
 
 ## Checklist — add a key
 
@@ -115,6 +139,8 @@ policy test fails when a `VITE_` key is in one schema and not the other.
 3. Run `pnpm tool:sync-env-example`.
 4. Grep repo for old name; update workflows and docs.
 5. Leave a release note if deploy envs must drop the old key.
+6. A key gaining or losing `VITE_` is a rename: update `clientEnvSchema` and `src/vite-env.d.ts`
+   too, and set the new name in GitHub Environments before merging.
 
 ## Auth vs modules (do not mix)
 

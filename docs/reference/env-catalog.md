@@ -17,6 +17,8 @@ build-time or local-only, never synced to a GitHub Environment.
 | `BUILD_I18N_LOCALE` | build·local | `en-US` | — | — | Primary i18n build locale, BCP-47 (e.g. en-US). |
 | `BUILD_I18N_MODE` | build·local | `single` | — | — | i18n build mode: single (inline one locale into JS) or multi (lazy JSON per locale). |
 | `CONTEXT7_API_KEY` | build·local | — | — | — | Context7 docs-MCP API key; consumed by .mcp.json for the docs MCP (local tooling). |
+| `CSP_REPORT_URI` | variable | — | — | — | CSP violation report collector URI (e.g. a Sentry CSP ingest URL); empty = violations reach each visitor console only. Warned on in both deploy environments. |
+| `DEV_API_URL` | build·local | — | — | — | Local dev server only: Vite proxy target for /api. Unset = http://localhost:3000. Refused in a deploy. |
 | `HOSTED_DEPLOYMENT` | build·local | `false` | — | — | "true" marks a hosted deploy build (set by the deploy workflows, never in a file): validate:client-env then refuses every test-only switch (VITE_TEST_MODE, VITE_E2E_HOOKS, VITE_DEVTOOLS, VITE_DEBUG_LOGGING). Default false. |
 | `NETLIFY_AUTH_TOKEN` | secret | — | — | — | Netlify CLI deploy token (CI only). |
 | `NETLIFY_SITE_ID` | secret | — | — | — | Netlify site ID (deploy target). |
@@ -37,9 +39,7 @@ build-time or local-only, never synced to a GitHub Environment.
 | `VITE_AUTH_OAUTH_GOOGLE` | build·local | `true` | — | — | Enable Google OAuth on /login (default true). |
 | `VITE_AUTH_PASSKEY` | build·local | `true` | — | — | Enable passkey/WebAuthn auth on /login (default true). |
 | `VITE_CAPTCHA_DISABLED` | variable | — | — | — | "true" disables the Turnstile CAPTCHA (local dev; pair with the clinozy-be test secret). |
-| `VITE_CSP_REPORT_URI` | secret | — | — | — | CSP violation report collector URI (e.g. a Sentry CSP ingest URL); empty = violations reach each visitor console only. Warned on in both deploy environments. |
 | `VITE_DEBUG_LOGGING` | variable | `false` | `false` | `false` | "true" emits [Module] diagnostic console logs (on locally; refused on every hosted deploy). |
-| `VITE_DEV_API_URL` | build·local | — | — | — | Dev server only: Vite proxy target for /api. |
 | `VITE_DEVTOOLS` | variable | `false` | `false` | `false` | "true" mounts React Query Devtools + the localhost debug panel. |
 | `VITE_DISABLED_MODULES` | variable | — | — | — | Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are app-today … app-users and app-branches, every one on clinozy-be. |
 | `VITE_E2E_HOOKS` | variable | `false` | `false` | `false` | "true" installs Playwright E2E hooks on globalThis (navigateInApp, establishSession). |
@@ -68,7 +68,6 @@ build-time or local-only, never synced to a GitHub Environment.
 - `SENTRY_ORG`
 - `SENTRY_PROJECT`
 - `VITE_API_BASE_URL`
-- `VITE_CSP_REPORT_URI`
 - `VITE_POSTHOG_HOST`
 - `VITE_POSTHOG_KEY`
 - `VITE_PRIVACY_POLICY_URL`
@@ -83,6 +82,7 @@ runtime schema default (the env-independent Zod fallback) is not pushed and is p
 from GitHub (the runtime falls back to the identical default). The per-env columns
 above are scaffold values, which may differ. Preview with `pnpm github:sync <env> --diff`.
 
+- `CSP_REPORT_URI`
 - `STORED_FILES_ORIGIN`
 - `VITE_CAPTCHA_DISABLED`
 - `VITE_DEBUG_LOGGING`

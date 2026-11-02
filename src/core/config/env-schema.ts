@@ -28,6 +28,10 @@ export const envSchemaBase = z.object({
   BUILD_I18N_LOCALE: z.string().min(1).optional().default('en-US'),
   // The file store's origin, named in the build's CSP (plugins/csp-api-origin.ts) — never bundled.
   STORED_FILES_ORIGIN: z.string().optional(),
+  // The collector the build's CSP reports to (plugins/csp-api-origin.ts) — never bundled.
+  CSP_REPORT_URI: z.string().optional(),
+  // The dev server's /api proxy target (vite.config.ts) — never bundled.
+  DEV_API_URL: z.string().optional(),
 
   // --- Runtime public (VITE_* — bundled client) ---
   // Reported environment identity — the app's environment vocabulary, NOT the Vite mode
@@ -38,7 +42,6 @@ export const envSchemaBase = z.object({
     .default('local'),
   VITE_APP_VERSION: z.string().optional(),
   VITE_API_BASE_URL: z.string().optional(),
-  VITE_DEV_API_URL: z.string().optional(),
   VITE_SENTRY_DSN: z.string().optional(),
   VITE_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
   VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: z.string().optional(),
@@ -50,7 +53,6 @@ export const envSchemaBase = z.object({
   VITE_LAYOUT_WIDTH: z.enum(['contained', 'full', 'reading']).optional(),
   VITE_THEME_LOCK: z.string().optional(),
   VITE_PRIVACY_POLICY_URL: z.string().optional(),
-  VITE_CSP_REPORT_URI: z.string().optional(),
   VITE_DISABLED_MODULES: z.string().optional(),
   VITE_PERSONAL_ORGANIZATIONS: z.string().optional(),
   VITE_TEAM_ORGANIZATIONS: z.string().optional(),
@@ -123,7 +125,8 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
     'App version string; read by vite.config.ts (names the Sentry release, fallback 0.0.0) and the client. CI-set; blank locally.',
   VITE_API_BASE_URL:
     'Production API base URL (e.g. https://api.example.com); empty = same-origin. Required in production when the API is not same-origin.',
-  VITE_DEV_API_URL: 'Dev server only: Vite proxy target for /api.',
+  DEV_API_URL:
+    'Local dev server only: Vite proxy target for /api. Unset = http://localhost:3000. Refused in a deploy.',
   VITE_SENTRY_DSN: 'Sentry DSN (public client key); empty disables Sentry.',
   VITE_SENTRY_TRACES_SAMPLE_RATE:
     'Sentry traces sample rate 0..1 (prod-safe default 0.1).',
@@ -141,7 +144,7 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
     '"true" pins the theme mode: the Account menu hides its Light / Dark / System pills and Appearance shows a note in place of its Mode card.',
   VITE_PRIVACY_POLICY_URL:
     'Privacy-policy URL shown in the consent banner/footer (optional).',
-  VITE_CSP_REPORT_URI:
+  CSP_REPORT_URI:
     'CSP violation report collector URI (e.g. a Sentry CSP ingest URL); empty = violations reach each visitor console only. Warned on in both deploy environments.',
   VITE_DISABLED_MODULES:
     'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are app-today … app-users and app-branches, every one on clinozy-be.',
@@ -317,11 +320,30 @@ const SONAR_LOCAL_ONLY: readonly ForbiddenKeyRule[] = [
 ];
 
 /**
- * `local` + `development` share one CONTRACT (identical required/forbidden/allowed):
- * both are dev-tooling-on environments that may toggle diagnostics either way. They
- * differ only in their `defaults` (below) — `local` is the default local machine
+ * What belongs to a developer's machine and must not reach a deploy, in either deploy
+ * environment. `.env.example` seeds new env files, so a key here keeps its value in
+ * `envProfiles.local.defaults` and stays blank there
+ * (tests/ci/client-env-gates.policy.test.ts).
+ */
+const LOCAL_ONLY_VALUES: readonly ForbiddenKeyRule[] = [
+  {
+    key: 'DEV_API_URL',
+    reason:
+      'only the local dev server reads it, from .env.local — a deploy has no dev server',
+  },
+  {
+    key: 'VITE_API_BASE_URL',
+    valuePattern: /\/\/(localhost|127\.0\.0\.1|\[::1\])([:/]|$)/,
+    reason: "every visitor's browser would call its own machine",
+  },
+];
+
+/**
+ * `local` + `development` share one base CONTRACT: both are dev-tooling-on environments
+ * that may toggle diagnostics either way. `local` is the default local machine
  * (`.env.local`, dev-server proxy to localhost), `development` the deploy environment
- * (`.env.development`). `local` is validated at load but is never a deploy target.
+ * (`.env.development`), which adds what a deploy must carry and must refuse. `local` is
+ * validated at load but is never a deploy target.
  */
 /**
  * Both deploy environments ship a `Content-Security-Policy-Report-Only` header
@@ -334,7 +356,7 @@ const SONAR_LOCAL_ONLY: readonly ForbiddenKeyRule[] = [
  * never `error`: a deploy without violation collection is degraded, not broken.
  */
 const CSP_REPORT_URI_RULE: RequiredKeyRule = {
-  key: 'VITE_CSP_REPORT_URI',
+  key: 'CSP_REPORT_URI',
   condition: 'deploy that collects CSP + Trusted-Types violations',
   level: 'warn',
 };
@@ -387,9 +409,10 @@ const devLikeContract: Omit<EnvProfile, 'defaults'> = {
 /**
  * Per-environment env contracts (keyed by {@link AppEnvironment}). `required` is
  * checked against the resolved runtime env; `forbidden` is checked against
- * git-TRACKED `.env` + `.env.<env>` files only (gitignored local files like
- * `.env.local` are skipped), so local secrets never trip a deploy guard. `defaults`
- * are each environment's starting values: `pnpm setup:local` writes `local`'s into
+ * git-TRACKED `.env` + `.env.<env>` files and, for a deploy environment, the injected
+ * GitHub Environment or its `.env.<env>` file. `.env.local` is never read for it, so
+ * local secrets never trip a deploy guard. On CI a rule sees a key only if the
+ * workflow's validate step injects it. `defaults` are each environment's starting values: `pnpm setup:local` writes `local`'s into
  * `.env.local`, and `pnpm github:sync` writes `development`'s / `production`'s into a NEW
  * `.env.<env>` (tooling/setup/github/scaffold-env-files.mjs). Existing files are never
  * rewritten.
@@ -402,7 +425,7 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
     // version-check off (nothing deployed to detect).
     defaults: {
       VITE_APP_ENV: 'local',
-      VITE_DEV_API_URL: 'http://localhost:3000',
+      DEV_API_URL: 'http://localhost:3000',
       VITE_API_BASE_URL: '',
       VITE_DEBUG_LOGGING: 'true',
       VITE_DEVTOOLS: 'true',
@@ -429,6 +452,7 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
   },
   development: {
     ...devLikeContract,
+    forbidden: [...devLikeContract.forbidden, ...LOCAL_ONLY_VALUES],
     // Unlike `local`, development IS a deploy target: the deploy workflow must
     // inject VITE_APP_ENV so the shipped bundle self-reports its environment
     // (Sentry/PostHog tag) instead of falling back to the schema default `local`.
@@ -471,15 +495,24 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
     ],
     forbidden: [
       ...SONAR_LOCAL_ONLY,
+      ...LOCAL_ONLY_VALUES,
       {
         key: 'VITE_STRIPE_PUBLISHABLE_KEY',
         valuePattern: /^pk_test_/,
         reason: 'test Stripe key must not ship to production — use a pk_live_… key',
       },
+      {
+        // Cloudflare's published test site keys: 1x… passes everyone, 2x… blocks everyone.
+        // Production only: a preview has no real key for its changing domain.
+        key: 'VITE_TURNSTILE_SITE_KEY',
+        valuePattern: /^[123]x0{10,}/,
+        reason: "a Cloudflare test key turns the CAPTCHA off — use the site's real key",
+      },
     ],
-    // Production is strict: diagnostics/devtools/e2e off, version polling on.
+    // Production is strict: diagnostics/devtools/e2e off, version polling on, CAPTCHA on.
     allowed: {
       VITE_APP_ENV: ['production'],
+      VITE_CAPTCHA_DISABLED: ['false'],
       VITE_DEBUG_LOGGING: ['false'],
       VITE_DEVTOOLS: ['false'],
       VITE_E2E_HOOKS: ['false'],

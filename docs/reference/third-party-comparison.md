@@ -54,4 +54,4 @@ Verdict summary for major libraries used in this repo. Full stack list: [tools-a
 
 ## API in dev and tests
 
-The FE always calls **clinozy-be** over HTTP. Local dev: Vite proxies `/api` → `VITE_DEV_API_URL` (default `:3000`). E2E and manual QA require clinozy-be (`/readyz`). Unit tests stub modules with `vi.mock()` — no HTTP server, no MSW.
+The FE always calls **clinozy-be** over HTTP. Local dev: Vite proxies `/api` → `DEV_API_URL` (default `:3000`). E2E and manual QA require clinozy-be (`/readyz`). Unit tests stub modules with `vi.mock()` — no HTTP server, no MSW.

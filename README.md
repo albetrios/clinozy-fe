@@ -272,7 +272,7 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for: documentation index (README, CLA
 | Variable                                            | Description                                                                                                             |
 | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `VITE_API_BASE_URL`                                 | Production API base URL                                                                                                 |
-| `VITE_DEV_API_URL`                                  | Dev proxy target (e.g. `http://localhost:3000`)                                                                         |
+| `DEV_API_URL`                                       | Dev proxy target (e.g. `http://localhost:3000`)                                                                         |
 | `VITE_SENTRY_DSN`                                   | Sentry DSN (client)                                                                                                     |
 | `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` | Source map upload (build/CI only). See [docs/integrations/sentry-sourcemaps.md](docs/integrations/sentry-sourcemaps.md) |
 | `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`             | PostHog analytics                                                                                                       |

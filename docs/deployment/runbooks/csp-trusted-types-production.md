@@ -21,7 +21,8 @@ into clinozy-fe. Source of truth for policy strings:
 
 1. Create a CSP ingest endpoint (Sentry → **Settings → Security Headers → CSP**,
    or your SIEM).
-2. Set `VITE_CSP_REPORT_URI` in the production environment / `config.js` payload.
+2. Set `CSP_REPORT_URI` in the production GitHub Environment. The build writes it
+   into the CSP header, so `config.js` cannot set it.
 3. Deploy and verify the build emits:
    - `report-uri` / `report-to` on the **enforcing** CSP header (`dist/_headers`)
    - `Reporting-Endpoints` header when report URI is set
@@ -44,12 +45,12 @@ require-trusted-types-for 'script'
 
 **Precondition — finish [CSP report URI](#csp-report-uri) first.** This header
 ships on every deploy whether or not a collector exists, but it carries
-`report-uri`/`report-to` only when `VITE_CSP_REPORT_URI` is set. Unset, each
+`report-uri`/`report-to` only when `CSP_REPORT_URI` is set. Unset, each
 violation goes to that one visitor's DevTools console and is never aggregated,
 so step 3 below has nothing to measure. `pnpm validate:client-env` warns (does
 not fail) on a deploy environment in that state.
 
-1. Monitor report-only violations through the same `VITE_CSP_REPORT_URI` stream.
+1. Monitor report-only violations through the same `CSP_REPORT_URI` stream.
 2. Triage third-party scripts (Sentry, PostHog) — upgrade or nonce-wrap if they
    emit violations.
 3. When the violation rate is **zero sustained** for a release window:

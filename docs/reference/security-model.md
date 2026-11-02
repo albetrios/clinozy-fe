@@ -104,7 +104,7 @@ The CSP ships **two ways**, both built from one source
   the per-environment API origin injected into `connect-src`.
 - **Meta** (`index.html`) — a parse-time fallback for hosts that drop the header.
 
-Set `VITE_CSP_REPORT_URI` (e.g. a Sentry CSP ingest URL) to turn on
+Set `CSP_REPORT_URI` (e.g. a Sentry CSP ingest URL) to turn on
 `report-uri`/`report-to` + a `Reporting-Endpoints` header, so production CSP
 violations — including blocked XSS attempts — are collected instead of silent.
 
@@ -118,7 +118,7 @@ because React 19 is Trusted-Types-aware but Sentry/PostHog may use sinks.
 Report-only is header-only — `http-equiv` can't carry it — so there is no meta
 fallback.
 
-The header ships on **every** deploy, but `VITE_CSP_REPORT_URI` decides whether
+The header ships on **every** deploy, but `CSP_REPORT_URI` decides whether
 anyone sees the result. Unset, the policy carries no `report-uri`/`report-to`:
 each violation lands in that one visitor's DevTools console and is never
 aggregated, so promoting `require-trusted-types-for 'script'` into the enforcing

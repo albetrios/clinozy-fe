@@ -8,7 +8,7 @@ import { selectOnlyEntries } from './sync-env-secrets.mjs';
 const declared = [
   { name: 'VITE_API_BASE_URL', value: 'https://api.example.test' },
   { name: 'SENTRY_AUTH_TOKEN', value: 'token' },
-  { name: 'VITE_CSP_REPORT_URI', value: '' },
+  { name: 'CSP_REPORT_URI', value: '' },
 ];
 
 it('selectOnlyEntries selects exactly the requested keys', () => {
@@ -19,7 +19,7 @@ it('selectOnlyEntries selects exactly the requested keys', () => {
 
 it('selectOnlyEntries reports a requested key that is absent or blank locally', () => {
   expect(
-    selectOnlyEntries(declared, ['VITE_API_BASE_URL', 'NOPE', 'VITE_CSP_REPORT_URI'])
+    selectOnlyEntries(declared, ['VITE_API_BASE_URL', 'NOPE', 'CSP_REPORT_URI'])
       .missing,
-  ).toStrictEqual(['NOPE', 'VITE_CSP_REPORT_URI']);
+  ).toStrictEqual(['NOPE', 'CSP_REPORT_URI']);
 });
