@@ -120,5 +120,6 @@ export function agendaCountsWindow(
   const last = rows.at(-1)?.date;
   if (!(first && last)) return null;
   const cap = addCivilDays(first, APPOINTMENT_COUNTS_MAX_DAYS - 1);
+  // biome-ignore lint/complexity/useMathMinMax: compares YYYY-MM-DD strings; Math.min would return NaN
   return { from: first, to: last < cap ? last : cap };
 }

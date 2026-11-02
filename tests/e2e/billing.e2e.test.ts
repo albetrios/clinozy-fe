@@ -310,7 +310,10 @@ test.describe('Billing & subscription', () => {
     // payment step — all of which update the header away from the current plan.
     await expect(page.getByTestId('billing-notice')).toBeVisible();
     await expect(page.getByTestId('billing-adjust-plan')).toHaveText('Adjust plan');
-    const beforeSummary = (await summary.innerText()).trim();
+    // textContent, the text toHaveText compares below: innerText puts newlines between
+    // the header's blocks (and applies text-transform), so it never equals that text and
+    // `not.toHaveText` would pass before anything changed.
+    const beforeSummary = ((await summary.textContent()) ?? '').trim();
     const picker = await openPlanPicker(page);
     const upgrade = picker.getByRole('button', { name: /^Upgrade to / }).first();
     test.skip((await upgrade.count()) === 0, 'no dearer plan seeded to upgrade to');

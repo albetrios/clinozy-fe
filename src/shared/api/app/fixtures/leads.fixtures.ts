@@ -575,6 +575,7 @@ function lastTouch(seq: number, createdAt: string, messages: readonly LeadMessag
   return messages
     .filter((message) => message.leadId === leadId)
     .reduce(
+      // biome-ignore lint/complexity/useMathMinMax: compares ISO-8601 instant strings; Math.max would return NaN
       (latest, message) => (message.sentAt > latest ? message.sentAt : latest),
       createdAt,
     );

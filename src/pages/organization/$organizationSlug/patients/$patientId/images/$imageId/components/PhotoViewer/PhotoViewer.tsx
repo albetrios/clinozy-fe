@@ -87,8 +87,10 @@ export function PhotoViewer({
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const rtl = direction === 'rtl';
     const keys: Readonly<Record<string, () => void>> = {
+      // biome-ignore-start lint/correctness/noComponentHookFactories: KeyboardEvent.key names mapped to key handlers, not components
       ArrowLeft: () => step(rtl ? 1 : -1),
       ArrowRight: () => step(rtl ? -1 : 1),
+      // biome-ignore-end lint/correctness/noComponentHookFactories: end of the key-name handlers
       '+': zoom.zoomIn,
       '=': zoom.zoomIn,
       '-': zoom.zoomOut,
