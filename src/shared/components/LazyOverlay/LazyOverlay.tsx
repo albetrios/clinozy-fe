@@ -361,10 +361,12 @@ function LazyOverlayPending({
 /**
  * Builds the boundary's fallback renderer. A module-level factory, not an inline
  * arrow inside `LazyOverlay`: a JSX-returning function declared in a component's
- * body is a component definition in that scope (sonar typescript:S6478).
+ * body is a component definition in that scope (sonar typescript:S6478). What it
+ * returns is a render function — `fallbackRender` is called, never mounted as a
+ * component — so it is named like one, not like a component.
  */
 function renderOverlayError(chrome: OverlayChrome) {
-  return function OverlayErrorFallback({ resetErrorBoundary }: FallbackProps) {
+  return function overlayErrorFallback({ resetErrorBoundary }: FallbackProps) {
     return <LazyOverlayError {...chrome} onRetry={resetErrorBoundary} />;
   };
 }

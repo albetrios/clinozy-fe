@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.3/schema.json",
   "files": {
     "includes": [
       "src/**",
@@ -20,6 +20,14 @@
   },
   "assist": {
     "enabled": false
+  },
+  "markdown": {
+    "formatter": { "enabled": false },
+    "linter": { "enabled": false }
+  },
+  "yaml": {
+    "formatter": { "enabled": false },
+    "linter": { "enabled": false }
   },
   "linter": {
     "enabled": true,
@@ -75,6 +83,14 @@
   },
   "overrides": [
     {
+      "includes": ["src/**"],
+      "linter": {
+        "domains": {
+          "playwright": "none"
+        }
+      }
+    },
+    {
       "includes": ["src/shared/components/DataTable/DataTable.tsx"],
       "linter": { "enabled": false }
     },
@@ -92,6 +108,9 @@
           },
           "complexity": {
             "noExcessiveCognitiveComplexity": "off"
+          },
+          "correctness": {
+            "noComponentHookFactories": "off"
           }
         }
       }
@@ -109,6 +128,16 @@
           },
           "nursery": {
             "noFloatingPromises": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["tooling/eslint/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noComponentHookFactories": "off"
           }
         }
       }

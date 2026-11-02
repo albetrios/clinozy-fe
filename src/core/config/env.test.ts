@@ -15,6 +15,13 @@ describe('resolveLayoutWidth', () => {
   it('returns full only for the explicit "full" flag', () => {
     expect(resolveLayoutWidth('full')).toBe('full');
   });
+
+  it('maps env flag to layout width ids', () => {
+    expect(resolveLayoutWidth(undefined)).toBe('contained');
+    expect(resolveLayoutWidth('full')).toBe('full');
+    expect(resolveLayoutWidth('reading')).toBe('reading');
+    expect(resolveLayoutWidth('bogus')).toBe('contained');
+  });
 });
 
 describe('resolveThemeLock', () => {
@@ -23,15 +30,6 @@ describe('resolveThemeLock', () => {
     expect(resolveThemeLock('false')).toBe(false);
     expect(resolveThemeLock(undefined)).toBe(false);
     expect(resolveThemeLock('1')).toBe(false);
-  });
-});
-
-describe('resolveLayoutWidth', () => {
-  it('maps env flag to layout width ids', () => {
-    expect(resolveLayoutWidth(undefined)).toBe('contained');
-    expect(resolveLayoutWidth('full')).toBe('full');
-    expect(resolveLayoutWidth('reading')).toBe('reading');
-    expect(resolveLayoutWidth('bogus')).toBe('contained');
   });
 });
 

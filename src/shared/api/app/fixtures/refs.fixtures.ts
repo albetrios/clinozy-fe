@@ -102,6 +102,7 @@ export function secondsLater(instant: string, seconds: number): string {
 export function bookedOn(visitDate: string): string {
   const ahead = addCivilDays(visitDate, -3);
   const yesterday = addCivilDays(PROTOTYPE_SEED_DAY, -1);
+  // biome-ignore lint/complexity/useMathMinMax: compares YYYY-MM-DD strings; Math.min would return NaN
   return ahead < yesterday ? ahead : yesterday;
 }
 
