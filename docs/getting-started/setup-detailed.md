@@ -426,7 +426,7 @@ Default values in `.env.local`:
 | Variable            | Default Value           | Description                      |
 | ------------------- | ----------------------- | -------------------------------- |
 | `VITE_API_BASE_URL` | `http://localhost:3000` | Backend API URL                  |
-| `VITE_DEV_API_URL`  | `http://localhost:3000` | Vite dev proxy target            |
+| `DEV_API_URL`       | `http://localhost:3000` | Vite dev proxy target            |
 | `VITE_SENTRY_DSN`   | (empty)                 | Sentry error tracking (optional) |
 | `VITE_POSTHOG_KEY`  | (empty)                 | PostHog analytics (optional)     |
 | `VITE_POSTHOG_HOST` | (empty)                 | PostHog host URL (optional)      |

@@ -7,7 +7,7 @@
  * probe throws and Zod falls back to the parser it runs without eval. The throw
  * is caught, but the browser still reports the blocked eval on every page load:
  * a DevTools issue that fails Lighthouse best-practices (`inspector-issues`) on
- * every route, and a violation report to `VITE_CSP_REPORT_URI` when one is set.
+ * every route, and a violation report to `CSP_REPORT_URI` when one is set.
  * `jitless` skips the probe; the parser is the one the CSP already forced, so
  * nothing about parsing changes.
  *

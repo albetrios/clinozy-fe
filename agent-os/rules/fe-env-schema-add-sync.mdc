@@ -11,6 +11,14 @@ alias, or `A || B` logic. Never add a second key that drives a behavior another 
 owns; to move flags together for a context, set each key at the env layer
 (`plugins/test-env.ts`, `.env.<environment>`), never by combining them in code.
 
+**The browser decides the prefix.** Browser code reads the key → `VITE_*`. Anything else
+(`vite.config.ts`, a build plugin, CI, tooling) → a plain name. Every `VITE_` key ships to every
+visitor, so "the build needs it" is never a reason for the prefix.
+
+**A local-only key cannot reach a deploy.** Its value goes in `envProfiles.local.defaults`, blank in
+`.env.example` (new env files are seeded from it), and `LOCAL_ONLY_VALUES` refuses it in both deploy
+profiles.
+
 When you change any of the matched files:
 
 1. **Read** `agent-os/skills/fe-env-schema-add/SKILL.md`.

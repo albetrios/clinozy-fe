@@ -91,6 +91,48 @@ describe('envProfiles forbidden keys', () => {
       forbiddenHits('development', { VITE_STRIPE_PUBLISHABLE_KEY: 'pk_test_1' }),
     ).toEqual([]);
   });
+
+  it('refuses the dev proxy target in every deploy, but not locally', () => {
+    for (const environment of ['development', 'production'] as const) {
+      expect(
+        forbiddenHits(environment, { DEV_API_URL: 'http://localhost:3000' }),
+      ).toEqual(['DEV_API_URL']);
+    }
+    expect(envProfiles.local.forbidden.map((rule) => rule.key)).not.toContain(
+      'DEV_API_URL',
+    );
+    expect(envProfiles.local.defaults?.DEV_API_URL).toBe('http://localhost:3000');
+  });
+
+  it('refuses an API base on the local machine in every deploy', () => {
+    for (const environment of ['development', 'production'] as const) {
+      for (const base of [
+        'http://localhost:3000',
+        'http://localhost',
+        'http://127.0.0.1:3000/api',
+        'http://[::1]:3000',
+      ]) {
+        expect(forbiddenHits(environment, { VITE_API_BASE_URL: base }), base).toEqual([
+          'VITE_API_BASE_URL',
+        ]);
+      }
+      for (const base of ['https://api.clinozy.com', 'https://localhost.clinozy.com']) {
+        expect(forbiddenHits(environment, { VITE_API_BASE_URL: base }), base).toEqual([]);
+      }
+    }
+  });
+
+  it("refuses Cloudflare's test Turnstile keys in production only", () => {
+    for (const key of ['1x00000000000000000000AA', '2x00000000000000000000AB']) {
+      expect(forbiddenHits('production', { VITE_TURNSTILE_SITE_KEY: key })).toEqual([
+        'VITE_TURNSTILE_SITE_KEY',
+      ]);
+      expect(forbiddenHits('development', { VITE_TURNSTILE_SITE_KEY: key })).toEqual([]);
+    }
+    expect(
+      forbiddenHits('production', { VITE_TURNSTILE_SITE_KEY: '0x4AAAAAAArealkey' }),
+    ).toEqual([]);
+  });
 });
 
 describe('envProfiles required keys', () => {
@@ -142,7 +184,7 @@ describe('envProfiles required keys', () => {
     expect(keys).toEqual([
       'VITE_TURNSTILE_SITE_KEY',
       'VITE_API_BASE_URL',
-      'VITE_CSP_REPORT_URI',
+      'CSP_REPORT_URI',
     ]);
     for (const entry of envSchemaConditionallyRequiredKeys) {
       expect(entry.condition.length).toBeGreaterThan(0);
@@ -184,7 +226,7 @@ describe('envProfiles required keys', () => {
       ['production', envProfiles.production],
     ] as const;
     for (const [env, profile] of deployProfiles) {
-      const rule = profile.required.find((r) => r.key === 'VITE_CSP_REPORT_URI');
+      const rule = profile.required.find((r) => r.key === 'CSP_REPORT_URI');
       expect(rule, `${env} must flag a missing CSP collector`).toBeDefined();
       expect(rule?.level).toBe('warn');
       expect(rule?.condition).toBeTruthy();
@@ -192,7 +234,7 @@ describe('envProfiles required keys', () => {
       expect(rule?.when).toBeUndefined();
     }
     // `local` never deploys, so it has no collector to miss.
-    expect(envProfiles.local.required.some((r) => r.key === 'VITE_CSP_REPORT_URI')).toBe(
+    expect(envProfiles.local.required.some((r) => r.key === 'CSP_REPORT_URI')).toBe(
       false,
     );
   });
@@ -202,6 +244,7 @@ describe('envProfiles allowed values (strict per-environment)', () => {
   it('production permits only the safe value for each diagnostics flag', () => {
     const allowed = envProfiles.production.allowed;
     expect(allowed).toBeDefined();
+    expect(allowed?.VITE_CAPTCHA_DISABLED).toEqual(['false']);
     expect(allowed?.VITE_DEBUG_LOGGING).toEqual(['false']);
     expect(allowed?.VITE_DEVTOOLS).toEqual(['false']);
     expect(allowed?.VITE_E2E_HOOKS).toEqual(['false']);
@@ -255,7 +298,7 @@ describe('envProfiles defaults (per-environment starting values)', () => {
     const defaults = envProfiles.local.defaults;
     expect(defaults?.VITE_DEBUG_LOGGING).toBe('true');
     expect(defaults?.VITE_DEVTOOLS).toBe('true');
-    expect(defaults?.VITE_DEV_API_URL).toBe('http://localhost:3000');
+    expect(defaults?.DEV_API_URL).toBe('http://localhost:3000');
   });
 });
 
@@ -350,7 +393,7 @@ describe('envProfiles.local.externalCredentials (keys .env.local takes from deve
   it('never takes a key whose local value differs on purpose, or a deploy secret', () => {
     for (const key of [
       'VITE_API_BASE_URL',
-      'VITE_DEV_API_URL',
+      'DEV_API_URL',
       'VITE_APP_ENV',
       'VITE_SENTRY_DSN',
       'VITE_TURNSTILE_SITE_KEY',

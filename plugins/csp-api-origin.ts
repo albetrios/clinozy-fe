@@ -27,7 +27,7 @@ const HEADERS_CSP_PLACEHOLDER = "Content-Security-Policy: frame-ancestors 'none'
  *    authoritative, header-delivered policy, generated in full from
  *    `buildContentSecurityPolicy`.
  *
- * `reportUri` (VITE_CSP_REPORT_URI) is optional: when set, the header policy
+ * `reportUri` (CSP_REPORT_URI) is optional: when set, the header policy
  * carries `report-uri`/`report-to` + a `Reporting-Endpoints` header so
  * production CSP violations are collected.
  */

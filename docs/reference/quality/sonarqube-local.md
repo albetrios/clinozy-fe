@@ -30,8 +30,8 @@ First run provisions an analysis token into `.env.local` (gitignored); after tha
 
 The server UI is at <http://localhost:9000>. Admin credentials are generated on first run and
 stored in `.env.local` as `SONAR_ADMIN_PASSWORD` / `SONAR_TOKEN` (gitignored — and the
-forbidden-secret validator `pnpm validate:client-env` checks only git-tracked env files, so these
-`SONAR_*` keys never trip it).
+forbidden-secret validator `pnpm validate:client-env` never reads `.env.local`, so these `SONAR_*`
+keys never trip it there; in `.env.development` or `.env.production` they fail it).
 
 ### Sharing port 9000 with clinozy-be
 

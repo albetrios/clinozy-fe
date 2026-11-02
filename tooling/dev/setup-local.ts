@@ -520,7 +520,7 @@ async function runDevServer(
   );
   logInfo(`App           ${ANSI.cyan}http://localhost:${DEFAULT_DEV_PORT}${ANSI.reset}`);
   logInfo(
-    `Backend API   ${ANSI.gray}Vite proxies /api → VITE_DEV_API_URL (default http://localhost:3000)${ANSI.reset}`,
+    `Backend API   ${ANSI.gray}Vite proxies /api → DEV_API_URL (default http://localhost:3000)${ANSI.reset}`,
   );
   logInfo(
     `MCP           ${ANSI.gray}full set in .mcp.json — set CONTEXT7_API_KEY in .env.local, reload Cursor${ANSI.reset}`,

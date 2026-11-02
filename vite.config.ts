@@ -84,7 +84,7 @@ export default defineConfig(({ command, mode }) => {
       // Substitutes {{PRODUCT_*}} in index.html; runs `pre` so the CSP pass below
       // sees final markup. Keeps branding out of the rebrand surface entirely.
       productIdentityHtml(),
-      cspApiOrigin(env.VITE_API_BASE_URL, env.VITE_CSP_REPORT_URI, {
+      cspApiOrigin(env.VITE_API_BASE_URL, env.CSP_REPORT_URI, {
         storedFilesOrigin: env.STORED_FILES_ORIGIN,
         sentryDsn: env.VITE_SENTRY_DSN,
       }),
@@ -186,7 +186,7 @@ export default defineConfig(({ command, mode }) => {
         mode !== 'production'
           ? {
               '/api': {
-                target: env.VITE_DEV_API_URL || 'http://localhost:3000',
+                target: env.DEV_API_URL || 'http://localhost:3000',
                 changeOrigin: true,
                 secure: false,
               },

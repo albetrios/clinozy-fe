@@ -123,7 +123,7 @@ database and Redis; see its `docs/integrations/claude-code-web-environment.md`):
   PostHog, OAuth flags, …) as the environment's **Variables**. Vite gives the process env priority
   over `.env.local`, and Node tooling (`tooling/load-env-files.mjs`) no longer lets a blank `KEY=`
   placeholder in `.env.local` delete them.
-- Leave `VITE_API_BASE_URL` blank and `VITE_DEV_API_URL` at `http://localhost:3000`: the API is the
+- Leave `VITE_API_BASE_URL` blank and `DEV_API_URL` at `http://localhost:3000`: the API is the
   clinozy-be running in the session, on its own Postgres + Redis — the frontend's equivalent of
   "everything except the database and Redis".
 - `pnpm dev` reads `.env.local` only; a `pnpm build` in the session is not asked and reads it too.

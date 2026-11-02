@@ -2,7 +2,7 @@
 
 Cross-page API helpers and domain schemas. Files here are imported by both `src/pages/*` and `src/shared/components/*`, so they must live outside both layers.
 
-All fetchers call **clinozy-be over HTTP** via `apiClient` (or raw `authFetch` for auth). Local dev proxies `/api` to `VITE_DEV_API_URL` (default `http://localhost:3000`). Test fixtures live under `tests/fixtures/`. The clinic launch's data layer, `app/`, is on clinozy-be too: every room left its fixtures as its endpoints landed — Medical last (D168) — so no room is kept off in production any more.
+All fetchers call **clinozy-be over HTTP** via `apiClient` (or raw `authFetch` for auth). Local dev proxies `/api` to `DEV_API_URL` (default `http://localhost:3000`). Test fixtures live under `tests/fixtures/`. The clinic launch's data layer, `app/`, is on clinozy-be too: every room left its fixtures as its endpoints landed — Medical last (D168) — so no room is kept off in production any more.
 
 ## Files
 

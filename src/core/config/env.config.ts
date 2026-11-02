@@ -44,15 +44,17 @@ const runtimeConfig: Record<string, string> =
 /**
  * Keys only the build's own env sets — a deployed `config.js` (`window.__CONFIG__`) naming one is
  * ignored. They are the switches `envProfiles.production.allowed` pins to one value (the
- * environment name, diagnostics, devtools, E2E hooks, version polling) and the test runner's mark,
- * so no runtime file can switch on in a production build what `validate:client-env` holds off
- * there — `establishSession` on `globalThis`, the devtools panel. One rule for every
+ * environment name, the CAPTCHA, diagnostics, devtools, E2E hooks, version polling) and the test
+ * runner's mark, so no runtime file can switch on in a production build what
+ * `validate:client-env` holds off there — `establishSession` on `globalThis`, the devtools panel,
+ * a sign-in with no CAPTCHA. One rule for every
  * environment, never a mode branch: a build that needs one of them on sets it in its own env.
  * Declared here, not read from `env-schema.ts` (the tooling-side contract stays off the entry
  * chunk); `env.config.test.ts` pins it to the production profile.
  */
 export const BUILD_ONLY_CONFIG_KEYS: ReadonlySet<string> = new Set([
   'APP_ENV',
+  'CAPTCHA_DISABLED',
   'DEBUG_LOGGING',
   'DEVTOOLS',
   'E2E_HOOKS',

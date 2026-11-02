@@ -53,7 +53,7 @@ Postgres/Redis and to survive a loopback test flood:
 
 | Key                       | Value                      | Why                                                                                                 |
 | ------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------- |
-| `VITE_DEV_API_URL`        | `http://localhost:3000`    | Vite proxies `/api` → local clinozy-be.                                                             |
+| `DEV_API_URL`             | `http://localhost:3000`    | Vite proxies `/api` → local clinozy-be.                                                             |
 | `VITE_TURNSTILE_SITE_KEY` | `1x00000000000000000000AA` | Cloudflare always-pass **test** key (already shipped). Do **not** set `VITE_CAPTCHA_DISABLED=true`. |
 
 **3. Run:**

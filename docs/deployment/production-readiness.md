@@ -43,7 +43,7 @@ The frontend **shell** is solid:
       (`SameSite=Lax`+), refresh-session rotation with reuse-detection, `X-Requested-With`
       rejection, CORS for the frontend origin.
 - [ ] **Production env / secrets** (not re-verified 2026-10-17) — `VITE_API_BASE_URL` (HTTPS),
-      `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`/`HOST`, `VITE_CSP_REPORT_URI`,
+      `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`/`HOST`, `CSP_REPORT_URI`,
       `VITE_PRIVACY_POLICY_URL`, and `config.js` runtime injection per environment.
 - [x] **Git remote + CI/CD** — `albetrios/clinozy-fe`; rulesets as code (`pnpm github:sync`).
 - [ ] **Custom domain, DNS / TLS.** Only `*.netlify.app` is configured; `netlify.toml` and

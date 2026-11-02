@@ -61,6 +61,6 @@ Family-shared is importable by the parent island and its descendants only — ne
 - **The idle timer** (`shared/auth/idle-timeout.ts`) is deaf to activity in its own tab while the warning is up (a press on the dialog's own button IS `document` activity), measures idle time on the wall clock (sleep/throttling cannot stretch it), and shares activity across tabs. A load is not activity: the timer starts from the stored stamp, and `startAuthBootstrap` checks that stamp and the 12 h cap **before** it refreshes — a lapsed session is revoked at boot (the pending-revoke path), never restored. A sign-in stamps activity (`establishSession`); a sign-out clears the stamp and the stashed OAuth return-to path.
 - `assetsInlineLimit: 0` in Vite config for CSP compliance.
 - CSP ships as a build-generated **header** (`dist/_headers`, authoritative) plus an
-  `index.html` meta fallback, both from `lib/csp-api-origin.ts`; set `VITE_CSP_REPORT_URI`
+  `index.html` meta fallback, both from `lib/csp-api-origin.ts`; set `CSP_REPORT_URI`
   to collect violations. Cross-tab logout (`shared/auth/auth-channel.ts`) kills every open
   tab when a session dies. Full model + accepted risks: **docs/reference/security-model.md**.

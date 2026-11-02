@@ -219,7 +219,7 @@ export function buildContentSecurityPolicy(
  * reports violations to the visitor's own DevTools console and nowhere else —
  * real-user violations are never aggregated, and "the stream is clean" cannot
  * be established. `validate:client-env` warns on a deploy that leaves
- * `VITE_CSP_REPORT_URI` unset for exactly this reason. Runbook:
+ * `CSP_REPORT_URI` unset for exactly this reason. Runbook:
  * `docs/deployment/runbooks/csp-trusted-types-production.md`.
  *
  * @param reportUri - optional collector; adds report-uri + report-to.
