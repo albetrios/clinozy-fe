@@ -236,11 +236,16 @@ describe('the ignoreGhsas policy (every run checks it before auditing)', () => {
 });
 
 describe('this repo', () => {
-  const { entries, problems } = readAcceptedAdvisories(read('pnpm-workspace.yaml'));
+  const workspace = read('pnpm-workspace.yaml');
+  const { entries, problems } = readAcceptedAdvisories(workspace);
 
   it('keeps pnpm-workspace.yaml within the policy', () => {
     expect(problems).toEqual([]);
-    expect(entries.length).toBeGreaterThan(0);
+    // The list may be empty, but the parser must read every `- GHSA-…` line the file holds.
+    const listed = workspace
+      .split('\n')
+      .filter((line) => line.trimStart().startsWith('- GHSA-'));
+    expect(entries).toHaveLength(listed.length);
   });
 
   it('documents exactly the accepted advisories in the accepted-risk table', () => {

@@ -31,17 +31,9 @@ allowBuilds:
 # accepted advisory, and FAILS once the package's newest release is outside the
 # vulnerable range — so an entry cannot outlive its reason. The accepted-risk
 # table in docs/reference/dependency-upgrades.md lists the same ids.
-auditConfig:
-  ignoreGhsas:
-    # Package: node-forge <=1.4.0 (high) — RSA PKCS#1 v1.5 signature verification
-    #   accepts extra nested DigestAlgorithm elements.
-    # Path: netlify-cli → @netlify/dev / @netlify/images → ipx@3 → listhen, which
-    #   only CREATES the self-signed certificate for `netlify dev` (dev CLI only).
-    # No fix: 1.4.0 is the newest release, and listhen 1.10.1 (its newest)
-    #   declares ^1.4.0 — nothing to override or bump to.
-    # Remove when: node-forge publishes a release above 1.4.0, or @netlify/images
-    #   moves to ipx 4 (which drops listhen).
-    - GHSA-86w9-cpqp-85rv
+# None is accepted today: node-forge (GHSA-86w9-cpqp-85rv), the last entry, left the
+# tree on 2026-11-03. The next accepted advisory goes under `auditConfig:` →
+# `ignoreGhsas:` as a block list, one `- GHSA-…` line under its comment.
 
 # Transitive pins: patched floors for advisories upstream has not picked up yet.
 # Prefer bounded ranges (>=x.y.z <nextMajor) so patches flow while the known-CVE
@@ -80,11 +72,17 @@ overrides:
   hono: '>=4.13.11 <5'
   axios: '>=1.20.0 <2'
   markdown-it@14: '>=14.3.1 <15'
-  seroval: '>=1.6.3 <2'
+  seroval: '>=1.6.11 <2'
   source-map-js: '>=1.2.2 <2'
   body-parser@2: '>=2.4.0 <3'
   fastify: '>=5.12.6 <6'
   serialize-javascript: '>=7.1.3 <8'
+  follow-redirects: '>=1.16.2 <2'
+  systeminformation: '>=5.33.16 <6'
+  # Across the parent's pin: markdownlint 0.42.0 (markdownlint-cli2, dev only) pins re2js
+  # 2.8.6 exactly, and GHSA-gg6h-894w-4m9c is fixed in the 2.8.7 patch — confined to that
+  # parent, as in clinozy-be. Remove when markdownlint moves past re2js 2.8.6.
+  'markdownlint>re2js': '>=2.8.7 <2.9'
   # Across the parent's cap: micromark-extension-math (markdownlint-cli2, dev only) declares
   # katex ^0.16, and GHSA-238p-pmpm-9mq7 is fixed only in 0.18.2 — confined to that parent, as
   # in clinozy-be. Remove when micromark-extension-math allows katex 0.18.
