@@ -114,7 +114,7 @@ pnpm build                    # PWA precache includes icons
 - [ ] `page-head.ts` `APP_DESCRIPTION` synced
 - [ ] PNGs regenerated if SVG changed
 - [ ] `vite.config.ts` `includeAssets` updated if paths changed
-- [ ] `public/README.md` inventory accurate
+- [ ] `docs/reference/public-assets.md` inventory accurate
 - [ ] `app-manifest.test.ts` passes
 
 ---

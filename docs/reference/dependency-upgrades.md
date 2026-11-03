@@ -172,21 +172,38 @@ second list:
 The table below lists the same GHSA ids as `auditConfig.ignoreGhsas`
 (`tests/ci/audit-accepted-advisories.policy.test.ts` keeps them equal).
 
-| Advisory                                                                                                                              | Path                                                                     | Why accepted                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `node-forge` **<=1.4.0** — RSA PKCS#1 v1.5 signature verification accepts extra nested DigestAlgorithm elements (GHSA-86w9-cpqp-85rv) | `netlify-cli` → `@netlify/dev` / `@netlify/images` → `ipx@3` → `listhen` | **1.4.0 is the newest published version**, and `listhen` 1.10.1 — its newest — declares `"node-forge": "^1.4.0"`: there is nothing to upgrade or pin to. `listhen` uses `node-forge` only to **create** a self-signed HTTPS certificate for the local `netlify dev` image server (`pki.createCertificate`, `rsa.generateKeyPair`); nothing on this path verifies a third-party signature, which is where the flaw lies. Dev/deploy-CLI only: `pnpm deps:audit:prod` is clean. `netlify-cli` cannot simply be dropped — `pnpm exec netlify deploy` in `reusable-netlify-deploy.yml` **is** the production deploy path, and moving it to `pnpm dlx` would unpin a deploy-critical tool to silence a dev-only finding. Re-check when `node-forge` publishes >1.4.0, or when `@netlify/images` moves to `ipx` 4 (which drops `listhen`). |
+| Advisory                                          | Path | Why accepted |
+| ------------------------------------------------- | ---- | ------------ |
+| _None today_ — `auditConfig.ignoreGhsas` is empty | —    | —            |
 
 `image-size` <=2.0.2 (GHSA-w3rx-r6r6-pgpr, GHSA-5p2g-fcmc-qvqq) and `extract-zip` <=2.0.1
 (GHSA-jmr9-qjv8-65gv), the two earlier entries, left the tree with later `netlify-cli`
 releases — neither is in `pnpm-lock.yaml` any more. `braces` <=3.0.3 (GHSA-vfj7-8cjw-p6xm)
 left the accepted list on 2026-10-24: the advisory endpoint no longer reports the locked 3.0.3,
-so the full-tree run failed the entry as unused.
+so the full-tree run failed the entry as unused. `node-forge` <=1.4.0 (GHSA-86w9-cpqp-85rv) left on
+2026-11-03 the same way: no locked package reports it any more, and 1.4.2 carries the fix.
 
 The weekly `scheduled-deps-audit.yml` run is blocking on both steps, because a scheduled
 run blocks no merge and a red run is how a finding stays visible: a new advisory, or an
 accepted one that now has a fix.
 
 ## Upgrade decisions log
+
+### Advisory floors — follow-redirects, systeminformation, re2js, seroval (2026-11-03) — ADOPTED
+
+- **What:** the weekly full-tree audit failed (clinozy-fe#225) on three HIGH advisories and an
+  accepted entry that no longer applied. `overrides` floors in `pnpm-workspace.yaml`:
+  - `follow-redirects` **>=1.16.2 <2** — HIGH GHSA-mrwp-f3q8-3g9p, through `axios` ←
+    `tailwindcss-mcp-server` and `http-proxy` ← `netlify-cli` (dev only).
+  - `systeminformation` **>=5.33.16 <6** — HIGH GHSA-3f7j-7jwc-fxfj (Windows only), low
+    GHSA-4vjg-vx72-qq4g, moderate GHSA-7648-jmwf-vw7j, through `@dotenvx/dotenvx` ← `shadcn`.
+  - `markdownlint>re2js` **>=2.8.7 <2.9** — HIGH GHSA-gg6h-894w-4m9c. `markdownlint` 0.42.0 pins
+    `re2js` 2.8.6 exactly, so the patch is confined to that parent, as in clinozy-be.
+  - `seroval` **>=1.6.11 <2** (was `>=1.6.3`) — moderate GHSA-f86p-h4j2-7qgj / GHSA-9wx9-5pv9-3349,
+    in the shipped bundle through `@tanstack/router-core` (`^1.6.7`); resolves 1.7.6.
+- **Accepted list:** `node-forge` removed — no locked package reports it, and 1.4.2 is fixed.
+  `auditConfig.ignoreGhsas` is empty, so `pnpm-workspace.yaml` keeps only the rule's comment.
+- **Result:** `pnpm deps:audit` — none at high+; `pnpm deps:audit:prod` — 0 advisories.
 
 ### Advisory floors — undici, body-parser, fast-uri, hono, fastify, serialize-javascript, katex (2026-10-24) — ADOPTED
 

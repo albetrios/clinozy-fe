@@ -1,6 +1,6 @@
 # Public static assets
 
-Every file in `public/` is copied as-is to the build output (`dist/`) — a public URL on the deployed site, so this inventory lives here, in `docs/`, not beside them (F-8: a `public/README.md` shipped as `/README.md`). Required and optional assets are listed below.
+Every file in `public/` is copied as-is to the build output (`dist/`) — a public URL on the deployed site, so this inventory lives here, in `docs/`, not beside them (F-8: a README kept in `public/` shipped as `/README.md`). Required and optional assets are listed below.
 
 **Manifest / icon rules:** `docs/reference/pwa-manifest-and-app-icon.md`  
 **Skill:** `agent-os/skills/fe-pwa-manifest/SKILL.md`
