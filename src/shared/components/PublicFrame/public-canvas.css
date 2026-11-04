@@ -14,9 +14,17 @@
    .agent-orb          the turning pastel sphere above a heading
    ```
 
-   The palette is `--pastel-*` and `--public-canvas-base` (index.css, re-toned
-   under `.dark`), so both themes follow. Insets are logical. Reduced motion:
-   the aurora, the pool, the orb and the shimmer hold still.
+   The palette is `--pastel-*` and `--public-canvas-base`, re-toned under
+   `.dark`, so both themes follow: index.css keeps the three the boot frame in
+   `index.html` reads (the base, lavender, peach); the four only this canvas
+   reads live below, off the first paint's stylesheet. Insets are logical.
+
+   Motion stays off the main thread and calm at rest: the aurora drifts one
+   slow pass on arrival and holds where it lands (a running animation costs
+   the compositor a frame every vsync however slowly it moves, so only
+   stopping it makes the idle page idle); the orb's spectrum is a still conic
+   layer the compositor turns. Reduced motion: the aurora, the pool, the orb
+   and the shimmer hold still.
 
    While a button on a stage is busy (`aria-busy` on the shared Button, its
    `isLoading` — a loading list alone does not count), every OTHER button and
@@ -24,10 +32,18 @@
    a time, visibly — and the busy one carries a shimmer over its own 80%
    (button.tsx). */
 
-@property --agent-halo-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
+/* The pastels only this canvas reads (the aurora, the orb's spectrum). */
+:root {
+  --pastel-sky: oklch(0.88 0.06 235);
+  --pastel-mint: oklch(0.9 0.07 165);
+  --pastel-butter: oklch(0.95 0.075 95);
+  --pastel-rose: oklch(0.88 0.07 5);
+}
+.dark {
+  --pastel-sky: oklch(0.55 0.11 235);
+  --pastel-mint: oklch(0.58 0.1 165);
+  --pastel-butter: oklch(0.62 0.1 95);
+  --pastel-rose: oklch(0.58 0.12 5);
 }
 
 /* ── The page ─────────────────────────────────────────────────────────── */
@@ -67,8 +83,8 @@
     color-mix(in oklab, var(--blob-hue) 40%, transparent) 55%,
     transparent
   );
-  animation: public-aurora-drift 30s ease-in-out infinite alternate;
-  will-change: transform;
+  /* One pass, then rest where it lands (the header above). */
+  animation: public-aurora-drift 30s ease-in-out forwards;
 }
 .public-aurora-blob[data-hue='lavender'] {
   --blob-hue: var(--pastel-lavender);
@@ -112,7 +128,7 @@
   position: absolute;
   inset: 0;
   background-image: radial-gradient(
-    color-mix(in oklab, var(--color-foreground) 11%, transparent) 1px,
+    color-mix(in oklab, var(--color-foreground) var(--aurora-dot, 11%), transparent) 1px,
     transparent 1.5px
   );
   background-size: 22px 22px;
@@ -125,10 +141,7 @@
   opacity: 0.22;
 }
 .dark .public-aurora-grid {
-  background-image: radial-gradient(
-    color-mix(in oklab, var(--color-foreground) 9%, transparent) 1px,
-    transparent 1.5px
-  );
+  --aurora-dot: 9%;
 }
 
 @keyframes public-aurora-drift {
@@ -156,32 +169,24 @@
   border-radius: 50%;
   background: radial-gradient(
     closest-side,
-    color-mix(in oklab, var(--color-background) 88%, transparent),
-    color-mix(in oklab, var(--color-background) 55%, transparent) 55%,
+    color-mix(in oklab, var(--color-background) var(--pool-core, 88%), transparent),
+    color-mix(in oklab, var(--color-background) var(--pool-mid, 55%), transparent) 55%,
     transparent
   );
   pointer-events: none;
   transition: background 400ms var(--ease-out-strong);
 }
 .dark .public-stage::before {
-  background: radial-gradient(
-    closest-side,
-    color-mix(in oklab, var(--color-background) 80%, transparent),
-    color-mix(in oklab, var(--color-background) 45%, transparent) 55%,
-    transparent
-  );
-}
-
-@keyframes agent-halo-spin {
-  to {
-    --agent-halo-angle: 360deg;
-  }
+  --pool-core: 80%;
+  --pool-mid: 45%;
 }
 
 /* ── The agent orb ────────────────────────────────────────────────────── */
 
+/* Three layers: the halo (the orb's own outer shadows), the spectrum (::before,
+   a still conic gradient the compositor turns — a transform, never a repaint)
+   and the glass over it (::after: the highlights and the rim, still). */
 .agent-orb {
-  --agent-halo-angle: 0deg;
   --orb-size: 2.5rem;
   position: relative;
   display: block;
@@ -189,31 +194,47 @@
   inline-size: var(--orb-size);
   block-size: var(--orb-size);
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 26%, oklch(1 0 0 / 0.95), oklch(1 0 0 / 0) 36%),
-    radial-gradient(circle at 70% 82%, oklch(1 0 0 / 0.35), oklch(1 0 0 / 0) 40%),
-    conic-gradient(
-      from var(--agent-halo-angle),
-      var(--pastel-lavender),
-      var(--pastel-sky),
-      var(--pastel-mint),
-      var(--pastel-butter),
-      var(--pastel-peach),
-      var(--pastel-rose),
-      var(--pastel-lavender)
-    );
   box-shadow:
-    inset 0 0 0 1px oklch(1 0 0 / 0.55),
-    inset 0 -6px 14px color-mix(in oklab, var(--pastel-lavender) 70%, transparent),
     0 0 0 6px color-mix(in oklab, var(--pastel-lavender) 22%, transparent),
     0 10px 26px -8px color-mix(in oklab, var(--pastel-lavender) 95%, transparent),
     0 6px 18px -6px color-mix(in oklab, var(--pastel-peach) 90%, transparent);
-  animation:
-    agent-halo-spin 9s linear infinite,
-    agent-orb-breathe 4.8s ease-in-out infinite;
+  animation: agent-orb-breathe 4.8s ease-in-out infinite;
 }
 .agent-orb[data-size='lg'] {
   --orb-size: 3.5rem;
+}
+.agent-orb::before,
+.agent-orb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.agent-orb::before {
+  background: conic-gradient(
+    var(--pastel-lavender),
+    var(--pastel-sky),
+    var(--pastel-mint),
+    var(--pastel-butter),
+    var(--pastel-peach),
+    var(--pastel-rose),
+    var(--pastel-lavender)
+  );
+  animation: agent-orb-spin 9s linear infinite;
+}
+.agent-orb::after {
+  background:
+    radial-gradient(circle at 32% 26%, oklch(1 0 0 / 0.95), oklch(1 0 0 / 0) 36%),
+    radial-gradient(circle at 70% 82%, oklch(1 0 0 / 0.35), oklch(1 0 0 / 0) 40%);
+  box-shadow:
+    inset 0 0 0 1px oklch(1 0 0 / 0.55),
+    inset 0 -6px 14px color-mix(in oklab, var(--pastel-lavender) 70%, transparent);
+}
+
+@keyframes agent-orb-spin {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 @keyframes agent-orb-breathe {
@@ -306,7 +327,10 @@
   animation: public-pool-breathe 1.6s ease-in-out infinite;
 }
 .public-stage:has([data-slot='button'][aria-busy='true']) .agent-orb {
-  animation-duration: 1.6s, 1.2s;
+  animation-duration: 1.2s;
+}
+.public-stage:has([data-slot='button'][aria-busy='true']) .agent-orb::before {
+  animation-duration: 1.6s;
 }
 
 @keyframes public-pool-breathe {
@@ -362,6 +386,7 @@
 @media (prefers-reduced-motion: reduce) {
   .public-aurora-blob,
   .agent-orb,
+  .agent-orb::before,
   .public-stage:has([data-slot='button'][aria-busy='true'])::before,
   .public-stage [data-slot='button'][aria-busy='true']::after {
     animation: none;

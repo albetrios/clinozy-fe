@@ -4,7 +4,9 @@ Route: `/accept-invite/$invitationId`. Reached from an invite email link, and
 **auth-required** (`requireAuth` in the route's `beforeLoad`, INV-4): the recipient is
 usually not signed in yet, so a guest goes to sign-in first with `/accept-invite/<id>` as the
 post-login redirect — never the token: it waits in this tab (`sessionStorage`,
-`shared/tenancy/invite-token-stash.ts`) and the page reads it back on return (E-5). The error
+`shared/tenancy/invite-token-stash.ts`) and the page reads it back on return (E-5); a
+sign-out drops it (`endSessionOffScreen`), so the next person to sign in on the tab cannot
+accept with it. The error
 card below is a signed-in state; a guest never sees it.
 
 ## Files

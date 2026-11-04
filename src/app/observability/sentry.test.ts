@@ -3,7 +3,7 @@ import type { AnyRouter } from '@tanstack/react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { platformConfig } from '@/core/config/env.ts';
-import { scrubRecordingEventUrls } from '@/lib/telemetry-scrub.ts';
+import { scrubRecordingEvent } from '@/lib/telemetry-scrub.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -35,6 +35,8 @@ vi.mock('@sentry/react', () => ({
   addIntegration: vi.fn(),
   addEventProcessor: vi.fn(),
   getReplay: vi.fn(),
+  // A plain function, not vi.fn: resetAllMocks would otherwise drop the callback.
+  withStaticSpan: <T>(callback: T) => callback,
 }));
 
 type MutableConfig = { sentryDsn: string | undefined };
@@ -47,8 +49,17 @@ function initConfig() {
   >[0] & {
     beforeSend: (event: unknown, hint?: unknown) => unknown;
     beforeSendTransaction: (event: unknown) => unknown;
+    beforeBreadcrumb: (breadcrumb: unknown) => unknown;
+    beforeSendSpan: (span: unknown) => unknown;
   };
 }
+
+/**
+ * A click on the patient rail as Sentry's `htmlTreeAsString` names it: PatientRail's
+ * `aria-label` is the patient's name, and a rail button's `title` names them too.
+ */
+const PATIENT_RAIL_CLICK =
+  'main.flex > aside.bg-card.w-72[aria-label="Priya Sharma"] > div.flex > button.rounded-full[type="button"][title="Call Priya Sharma"]';
 
 describe('initSentry', () => {
   const originalDsn = config.sentryDsn;
@@ -100,7 +111,7 @@ describe('initSentry', () => {
       blockAllMedia: true,
       // A link's target carries the page's query; the SDK's own three stay masked too.
       maskAttributes: ['title', 'placeholder', 'aria-label', 'href'],
-      beforeAddRecordingEvent: scrubRecordingEventUrls,
+      beforeAddRecordingEvent: scrubRecordingEvent,
     });
     // Signed-out boot: user context cleared, org tags cleared.
     expect(Sentry.setUser).toHaveBeenCalledWith(null);
@@ -311,6 +322,54 @@ describe('initSentry', () => {
     }) as { breadcrumbs: Array<{ message: string }> };
 
     expect(sent.breadcrumbs[0]?.message).toBe('[Filtered]');
+  });
+
+  // Regression: a click's element path carried the patient's name to Sentry (aria-label, title).
+  it('a realistic patient-rail click keeps nothing of the patient’s name, on every path out', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
+    await initSentry(ROUTER);
+    const { beforeBreadcrumb, beforeSend, beforeSendTransaction, beforeSendSpan } =
+      initConfig();
+    const click = () => ({ category: 'ui.click', message: PATIENT_RAIL_CLICK });
+
+    const recorded = beforeBreadcrumb(click());
+    const error = beforeSend(
+      { breadcrumbs: [click()] },
+      { originalException: new HttpError('boom', 500, '/api/v1/x', 'GET') },
+    );
+    const transaction = beforeSendTransaction({
+      breadcrumbs: [click()],
+      spans: [{ op: 'ui.interaction.click', description: PATIENT_RAIL_CLICK, data: {} }],
+      contexts: {
+        trace: { op: 'pageload', data: { 'lcp.element': PATIENT_RAIL_CLICK } },
+      },
+    });
+    const inpSpan = beforeSendSpan({
+      op: 'ui.interaction.click',
+      description: PATIENT_RAIL_CLICK,
+      data: { 'browser.web_vital.inp.target': PATIENT_RAIL_CLICK },
+    });
+    const replayOptions = vi.mocked(Sentry.replayIntegration).mock.calls[0]?.[0];
+    const replayClick = replayOptions?.beforeAddRecordingEvent?.({
+      type: 5,
+      timestamp: 1,
+      data: {
+        tag: 'breadcrumb',
+        payload: {
+          ...click(),
+          data: { node: { id: 1, attributes: { 'aria-label': 'Priya Sharma' } } },
+        },
+      },
+    });
+
+    for (const sent of [recorded, error, transaction, inpSpan, replayClick]) {
+      expect(sent).toBeTruthy();
+      expect(JSON.stringify(sent)).not.toMatch(/Priya|Sharma/);
+    }
+    expect((recorded as { message: string }).message).toBe(
+      'main.flex > aside.bg-card.w-72[aria-label="[Filtered]"] > div.flex > button.rounded-full[type="button"][title="[Filtered]"]',
+    );
   });
 
   it('keeps user and organization tags in sync with the stores', async () => {

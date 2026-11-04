@@ -165,11 +165,11 @@ Use this table when configuring Sentry dashboards, alerts, and sampling.
 
 ### Session Replay (production)
 
-| Setting                    | Value                                                                                                                                                                                                                             | Sentry UI                                               |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `replaysSessionSampleRate` | `0.1`                                                                                                                                                                                                                             | Replays → normal sessions                               |
-| `replaysOnErrorSampleRate` | `1.0`                                                                                                                                                                                                                             | Replays → 100% when an error occurs                     |
-| Privacy                    | `maskAllText: true`, `blockAllMedia: true`, `maskAttributes` adds `href`; `beforeAddRecordingEvent` and an event processor drop the query from every recorded and segment URL (`scrubRecordingEventUrls`, `scrubReplayEventUrls`) | All text masked, media blocked, no search term in a URL |
+| Setting                    | Value                                                                                                                                                                                                                                                                     | Sentry UI                                               |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `replaysSessionSampleRate` | `0.1`                                                                                                                                                                                                                                                                     | Replays → normal sessions                               |
+| `replaysOnErrorSampleRate` | `1.0`                                                                                                                                                                                                                                                                     | Replays → 100% when an error occurs                     |
+| Privacy                    | `maskAllText: true`, `blockAllMedia: true`, `maskAttributes` adds `href`; `beforeAddRecordingEvent` and an event processor drop the query from every recorded and segment URL, and the element text from a recorded click (`scrubRecordingEvent`, `scrubReplayEventUrls`) | All text masked, media blocked, no search term in a URL |
 
 Use replays to reproduce UI bugs with masked DOM — no readable user input.
 
@@ -213,6 +213,16 @@ All outgoing events pass through scrubbers in `lib/telemetry-scrub.ts`:
 - **Query and mutation keys** are reported by their leading words only (`app,contacts`): a
   people search's key ends with what was typed
 - **UI input breadcrumbs** → message replaced with `[Filtered]`
+- **Element text in a clicked element's path** → `[Filtered]`. Sentry names a clicked or
+  measured element by a CSS-like path that spells its `aria-label`, `title`, `alt` and `name`
+  — the patient rail's `aria-label` is the patient's name. `beforeBreadcrumb` scrubs every
+  `ui.*` breadcrumb as it is recorded; `beforeSend` / `beforeSendTransaction` scrub the
+  event's breadcrumbs, `ui.*` span descriptions and the selector attributes
+  (`lcp.element`, `cls.source.<n>`, `browser.web_vital.inp.target`); a static
+  `beforeSendSpan` covers INP's standalone `ui.interaction` span, which skips
+  `beforeSendTransaction`; and `beforeAddRecordingEvent` scrubs Replay's recorded clicks and
+  the attributes it copies beside them (`scrubUiBreadcrumb`, `scrubEventElementText`,
+  `scrubSpanElementText`, `scrubRecordingEvent`)
 - **No PII in user object** — id only
 - **No API response bodies** in error extras or contexts: `HttpError.data` is not enumerable
 - **`dataCollection` — every category off**: no IP inference (`userInfo`), cookies,
@@ -253,7 +263,7 @@ When creating or tuning the Sentry project for this app:
 | `src/shared/errors/errorHandler.ts`    | `reportError` with user/org/HTTP context             |
 | `src/core/http/queryClient.ts`         | Query/mutation error → `reportError`                 |
 | `src/app/observability/performance.ts` | Web Vitals → PostHog + Sentry warnings               |
-| `src/lib/telemetry-scrub.ts`           | URL + breadcrumb scrubbing                           |
+| `src/lib/telemetry-scrub.ts`           | URL, breadcrumb and element-text scrubbing           |
 | `vite.config.ts`                       | Source map upload plugin                             |
 | `index.html`                           | DNS prefetch + CSP allowlist for Sentry ingest       |
 

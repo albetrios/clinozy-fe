@@ -36,6 +36,7 @@ import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { clearStashedInviteToken } from '@/shared/tenancy/invite-token-stash.ts';
 import { type MeContext, meContextQueryKey } from '@/shared/tenancy/me-context.ts';
 import {
   hydrateSessionContext,
@@ -88,7 +89,8 @@ function beginAuthGeneration(): number {
 /**
  * End the session in everything the screen does not show: the work in flight
  * for it, the token and its refresh timer, and what the next page load would
- * read from storage — the session hint and the onboarding wizard's progress.
+ * read from storage — the session hint, the stashed return-to path and invite
+ * token, and the onboarding wizard's progress.
  */
 function endSessionOffScreen(): void {
   supersedeSessionWork();
@@ -100,6 +102,9 @@ function endSessionOffScreen(): void {
     // A deep link stashed for an OAuth round trip is this session's: the next
     // person to sign in on this tab must not be sent to it (F-9).
     clearReturnTo();
+    // So is an invitation's single-use token stashed across the sign-in hop:
+    // the next person to sign in on this tab must not accept with it.
+    clearStashedInviteToken();
     // The wizard's saved progress holds PII (names, invite emails); the next
     // load must not find it. Its in-memory copy goes with the screen.
     useOnboardingStore.persist.clearStorage();

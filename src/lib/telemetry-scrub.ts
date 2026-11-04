@@ -12,7 +12,19 @@
  * breadcrumbs, spans, extras and contexts; a Session Replay segment's `urls` and
  * its recording's breadcrumbs and spans; PostHog `properties`, `$set` and
  * `$set_once`).
+ *
+ * The second leak is the clicked element. Sentry names it by a CSS-like path (its
+ * `htmlTreeAsString`) that appends the element's `aria-label`, `title`, `alt` and `name` — and
+ * those carry what the screen shows: a patient rail labelled with the patient's name, a chip's
+ * "Remove <diagnosis>", a contact pick titled with the contact's name. That path is the message
+ * of every `ui.*` breadcrumb (the SDK's and Session Replay's), the description of every
+ * `ui.interaction` / `ui.webvital` span and the value of their selector attributes
+ * (`browser.web_vital.inp.target`, `lcp.element`, `cls.source.<n>`), so each of those keeps the
+ * attribute's name and loses its value ({@link scrubElementSelector}).
  */
+
+/** What a removed value is replaced with — the placeholder Sentry's own scrubbing uses. */
+const FILTERED = '[Filtered]';
 
 /** A URL(-ish) string: absolute (`https://…`) or root-relative (`/…`). */
 const URL_LIKE = /^(?:[a-z][a-z\d+.-]*:\/\/|\/)/i;
@@ -31,17 +43,105 @@ export function scrubSensitiveUrl(url: string): string {
  * `$initial_current_url`, and of Sentry breadcrumb `data`.
  */
 export function scrubObjectUrls(record: Record<string, unknown> | unknown[]): void {
+  scrubObjectStrings(record, scrubSensitiveUrl);
+}
+
+/** Rewrite every string in a JSON-ish value with `scrub`, in place — objects and arrays, nested. */
+function scrubObjectStrings(
+  record: Record<string, unknown> | unknown[],
+  scrub: (value: string) => string,
+): void {
   for (const [key, value] of Object.entries(record)) {
     if (typeof value === 'string') {
-      const scrubbed = scrubSensitiveUrl(value);
+      const scrubbed = scrub(value);
       // Reflect.set instead of record[key]: keys come from Object.entries
       // (never attacker-chosen paths), and this shape keeps the static
       // object-injection lint quiet without a disable.
       if (scrubbed !== value) Reflect.set(record, key, scrubbed);
     } else if (value && typeof value === 'object') {
-      scrubObjectUrls(value as Record<string, unknown> | unknown[]);
+      scrubObjectStrings(value as Record<string, unknown> | unknown[], scrub);
     }
   }
+}
+
+/**
+ * The element attributes whose values are words the screen shows. Sentry's `htmlTreeAsString`
+ * appends `aria-label`, `type`, `name`, `title` and `alt` after an element's tag, id and classes;
+ * `type` (`button`, `submit`) is the one that never carries what a person reads.
+ */
+const ELEMENT_TEXT_ATTRIBUTES: readonly string[] = ['aria-label', 'name', 'title', 'alt'];
+
+/**
+ * One `[attribute="value"]` of an {@link ELEMENT_TEXT_ATTRIBUTES} attribute in a Sentry element
+ * path. The SDK does not escape the value, so it ends at the first `"]` followed by what can
+ * follow it — the next appended attribute (`type`, `name`, `title`, `alt`, in that order), the
+ * ` > ` before the child element, or the end — and a value cut off without its `"]` runs to the
+ * end. Lazy, one quantifier, anchored on a literal: linear in the path's length.
+ */
+const ELEMENT_TEXT_SELECTOR =
+  /\[(aria-label|name|title|alt)="[\s\S]*?(?:"\](?=\[(?:type|name|title|alt)="|\s>\s|$)|$)/g;
+
+/**
+ * Strip the values of the {@link ELEMENT_TEXT_ATTRIBUTES} from a Sentry element path, keeping
+ * each attribute's name: `aside.bg-card[aria-label="Priya Sharma"]` →
+ * `aside.bg-card[aria-label="[Filtered]"]`. A string with no such attribute comes back unchanged.
+ */
+export function scrubElementSelector(selector: string): string {
+  return selector.replace(ELEMENT_TEXT_SELECTOR, `[$1="${FILTERED}"]`);
+}
+
+/** Structural slice of a Sentry breadcrumb — the SDK's, or one Session Replay records. */
+type ScrubbableBreadcrumb = {
+  category?: string;
+  message?: string;
+  data?: Record<string, unknown>;
+};
+
+/**
+ * Scrub one `ui.*` breadcrumb, in place: a `ui.input`'s message is `[Filtered]` outright; any
+ * other's message (`ui.click`, `ui.keyDown`, Replay's `ui.slowClickDetected` / `ui.multiClick`)
+ * loses its element-text values ({@link scrubElementSelector}), and the attributes Session Replay
+ * copies beside it (`data.node.attributes`) lose those same values. Every other breadcrumb comes
+ * back untouched. Sentry's `beforeBreadcrumb`, and the error and transaction events' breadcrumbs.
+ */
+export function scrubUiBreadcrumb<B extends ScrubbableBreadcrumb>(breadcrumb: B): B {
+  if (!breadcrumb.category?.startsWith('ui.')) return breadcrumb;
+  if (typeof breadcrumb.message === 'string') {
+    breadcrumb.message =
+      breadcrumb.category === 'ui.input'
+        ? FILTERED
+        : scrubElementSelector(breadcrumb.message);
+  }
+  const node = breadcrumb.data?.node;
+  const attributes =
+    node && typeof node === 'object' ? Reflect.get(node, 'attributes') : null;
+  if (attributes && typeof attributes === 'object') {
+    for (const name of ELEMENT_TEXT_ATTRIBUTES) {
+      if (typeof Reflect.get(attributes, name) === 'string')
+        Reflect.set(attributes, name, FILTERED);
+    }
+  }
+  return breadcrumb;
+}
+
+/** Structural slice of a Sentry span — a transaction's child, its root, or a standalone span. */
+type ScrubbableSpan = {
+  op?: string;
+  description?: string;
+  data?: Record<string, unknown>;
+};
+
+/**
+ * Scrub the element paths on one span, in place: a `ui.*` span's description (an interaction's or
+ * a web vital's target) and every element path in its data. Sentry's static `beforeSendSpan`,
+ * which INP's standalone `ui.interaction` spans reach instead of `beforeSendTransaction`.
+ */
+export function scrubSpanElementText<S extends ScrubbableSpan>(span: S): S {
+  if (span.op?.startsWith('ui.') && typeof span.description === 'string') {
+    span.description = scrubElementSelector(span.description);
+  }
+  if (span.data) scrubObjectStrings(span.data, scrubElementSelector);
+  return span;
 }
 
 /** Anything on a Sentry event that carries a `data` bag: breadcrumbs and spans. */
@@ -81,6 +181,28 @@ export function scrubEventUrls<E extends ScrubbableEvent>(event: E): E {
   return event;
 }
 
+/** Structural slice of a Sentry event for {@link scrubEventElementText}: errors and transactions. */
+type ElementTextEvent = {
+  breadcrumbs?: ScrubbableBreadcrumb[];
+  spans?: ScrubbableSpan[];
+  contexts?: Record<string, unknown>;
+};
+
+/**
+ * Scrub the clicked and measured elements on a Sentry-shaped event, in place: every `ui.*`
+ * breadcrumb ({@link scrubUiBreadcrumb}), every span and the transaction's root span
+ * (`contexts.trace` — a pageload's `lcp.element` and `cls.source.<n>`) via
+ * {@link scrubSpanElementText}. `beforeSend` and `beforeSendTransaction`, beside
+ * {@link scrubEventUrls}.
+ */
+export function scrubEventElementText<E extends ElementTextEvent>(event: E): E {
+  event.breadcrumbs?.forEach(scrubUiBreadcrumb);
+  event.spans?.forEach(scrubSpanElementText);
+  const trace = event.contexts?.trace;
+  if (trace && typeof trace === 'object') scrubSpanElementText(trace as ScrubbableSpan);
+  return event;
+}
+
 /** Structural slice of a Sentry Session Replay event: the pages one segment visited. */
 type ScrubbableReplayEvent = ScrubbableEvent & { type?: string; urls?: string[] };
 
@@ -113,11 +235,13 @@ const RECORDING_URL_KEYS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * Scrub the URLs in one Session Replay recording event, in place — its `beforeAddRecordingEvent`
- * (the SDK hands it the breadcrumb and span events). Only the {@link RECORDING_URL_KEYS} fields
- * are rewritten, so recorded text and styles are left as they are.
+ * Scrub one Session Replay recording event, in place — its `beforeAddRecordingEvent` (the SDK
+ * hands it the breadcrumb and span events): the query leaves every {@link RECORDING_URL_KEYS}
+ * field, and a recorded `ui.*` breadcrumb — a click's element path and the attributes Replay
+ * copies beside it — loses its element text ({@link scrubUiBreadcrumb}). Nothing else is
+ * rewritten, so recorded text and styles are left as they are.
  */
-export function scrubRecordingEventUrls<E extends object>(event: E): E {
+export function scrubRecordingEvent<E extends object>(event: E): E {
   const pending: object[] = [event];
   for (let next = pending.pop(); next !== undefined; next = pending.pop()) {
     pending.push(...scrubRecordingFields(next));
@@ -125,8 +249,11 @@ export function scrubRecordingEventUrls<E extends object>(event: E): E {
   return event;
 }
 
-/** Scrub one object's URL fields in place; returns its nested objects, still to visit. */
+/** Scrub one object's URL fields and, on a `ui.*` breadcrumb, its element text in place; returns its nested objects, still to visit. */
 function scrubRecordingFields(record: object): object[] {
+  if (typeof Reflect.get(record, 'category') === 'string') {
+    scrubUiBreadcrumb(record as ScrubbableBreadcrumb);
+  }
   const nested: object[] = [];
   for (const [key, value] of Object.entries(record)) {
     if (value && typeof value === 'object') nested.push(value);

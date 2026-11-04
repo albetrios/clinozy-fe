@@ -50,6 +50,48 @@ async function settled(page: Page): Promise<void> {
   await page.addStyleTag({ content: HIDE_TRANSIENT });
 }
 
+/**
+ * The sign-in methods CI's screen offers: the env schema's defaults, as CI's dev server runs with
+ * no `.env.local` (`resolveOAuthProviderFlags`, `resolveAuthMethodsFromPlatform`) — Google on, so
+ * "Continue with Google" shows. They are env-only, never asked of clinozy-be; the one request
+ * that carries them is the deploy's runtime config, whose `window.__CONFIG__` outranks the
+ * build's `VITE_AUTH_*` (`getRuntimeConfigValue`). Answering it pins the shot to CI's screen
+ * whatever a developer's `.env.local` turns off.
+ */
+const CI_SIGN_IN_METHODS = {
+  AUTH_EMAIL: 'true',
+  AUTH_PASSKEY: 'true',
+  AUTH_OAUTH_GOOGLE: 'true',
+  AUTH_OAUTH_GITHUB: 'true',
+  AUTH_OAUTH_APPLE: 'false',
+  AUTH_OAUTH_AUTO_GOOGLE: 'false',
+};
+
+async function offerCiSignInMethods(page: Page): Promise<void> {
+  await page.route(
+    (url) => url.pathname === '/config.js',
+    (route) =>
+      route.fulfill({
+        contentType: 'text/javascript',
+        body: `window.__CONFIG__ = ${JSON.stringify(CI_SIGN_IN_METHODS)};`,
+      }),
+  );
+}
+
+/**
+ * CI's dev server is single-locale (`BUILD_I18N_MODE` defaults to `single`), where the header
+ * holds the theme toggle alone; a developer's `.env.local` sets `multi`, which adds the language
+ * picker (and its placeholder while it loads) before the toggle. Hidden, a multi-locale build
+ * draws CI's header; in a single-locale build there is nothing to hide.
+ */
+const SINGLE_LOCALE_HEADER =
+  "[data-testid='public-frame-controls'] > * > :not(:last-child) { display: none !important; }";
+
+async function settledSignIn(page: Page): Promise<void> {
+  await settled(page);
+  await page.addStyleTag({ content: SINGLE_LOCALE_HEADER });
+}
+
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
@@ -59,11 +101,16 @@ test.describe('Visual Regression', () => {
     // The tour's clock reads in the viewer's zone: the clinic's, wherever CI runs.
     test.use({ timezoneId: 'Asia/Kolkata' });
 
+    // CI's screen on every machine: its sign-in methods and its single-locale header.
+    test.beforeEach(async ({ page }) => {
+      await offerCiSignInMethods(page);
+    });
+
     test('login page (light mode)', async ({ page }) => {
       await pinTheTourClock(page);
       await gotoApp(page, '/login');
       await expectAuthScreenReady(page);
-      await settled(page);
+      await settledSignIn(page);
       await expect(page).toHaveScreenshot('login-light.png', {
         fullPage: true,
         maxDiffPixelRatio: 0.02,
@@ -76,7 +123,7 @@ test.describe('Visual Regression', () => {
       await seedDarkMode(page);
       await gotoApp(page, '/login');
       await expectAuthScreenReady(page);
-      await settled(page);
+      await settledSignIn(page);
       await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
       await expect(page).toHaveScreenshot('login-dark.png', {
         fullPage: true,
@@ -95,7 +142,7 @@ test.describe('Visual Regression', () => {
         document.documentElement.dataset.focus = 'glow';
       });
       await expectAuthScreenReady(page);
-      await settled(page);
+      await settledSignIn(page);
       await expect(page).toHaveScreenshot('login-theme-extremes.png', {
         fullPage: true,
         maxDiffPixelRatio: 0.02,
@@ -112,7 +159,7 @@ test.describe('Visual Regression', () => {
         document.documentElement.dataset.menu = 'glass';
       });
       await expectAuthScreenReady(page);
-      await settled(page);
+      await settledSignIn(page);
       await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
       await expect(page).toHaveScreenshot('login-dark-glass-hairline.png', {
         fullPage: true,
