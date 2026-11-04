@@ -9,13 +9,20 @@
  * `Early failure alert` status (red, with the lane's name and a link to it) on the PR head commit.
  * It posts nothing when every lane passes. It is not a required check.
  *
- * Environment: GITHUB_TOKEN (actions: read, statuses: write), GITHUB_REPOSITORY, GITHUB_RUN_ID,
- * HEAD_SHA, optional GITHUB_API_URL. It reads the run's jobs every 15 s and gives up after 40 min.
+ * The alert posts once, from the attempt that started it: re-running the failed jobs never re-runs
+ * the watcher, so a re-run whose lanes all pass would leave the red status on the head commit.
+ * `--clear` (the `Quality gate` job's last step, reached only when every lane passed) turns that
+ * stale red alert green, and posts nothing when the head commit carries no red alert.
  *
- * Usage (pr-ci.yml `early-failure-alert` job; the same script as clinozy-be): `node tooling/ci/early-failure-alert.mjs`.
+ * Environment: GITHUB_TOKEN (actions: read, statuses: write), GITHUB_REPOSITORY, GITHUB_RUN_ID,
+ * HEAD_SHA, optional GITHUB_API_URL; `--clear` also reads GITHUB_RUN_ATTEMPT and GITHUB_SERVER_URL.
+ * It reads the run's jobs every 15 s and gives up after 40 min.
+ *
+ * Usage (pr-ci.yml `early-failure-alert` job; the same script as clinozy-be): `node tooling/ci/early-failure-alert.mjs`;
+ * (pr-ci.yml `quality-gate` job): `node tooling/ci/early-failure-alert.mjs --clear`.
  */
 
-import { isMain } from './script.mjs';
+import { isMain, parseCommandLine } from './script.mjs';
 
 export const ALERT_CONTEXT = 'Early failure alert';
 
@@ -51,6 +58,23 @@ export function alertStatus(lane) {
   };
 }
 
+/** Whether the head commit's alert is red (the combined status lists each context's latest). */
+export function alertIsRed(statuses) {
+  return statuses.some(
+    (status) => status.context === ALERT_CONTEXT && status.state === 'failure',
+  );
+}
+
+/** The commit status that turns a stale alert green once every lane of a later attempt passed. */
+export function clearedStatus({ runAttempt, runUrl }) {
+  return {
+    state: 'success',
+    context: ALERT_CONTEXT,
+    description: `Cleared: every lane passed on run attempt ${runAttempt}`,
+    target_url: runUrl,
+  };
+}
+
 async function github({ path, method = 'GET', body }) {
   const response = await fetch(
     `${process.env.GITHUB_API_URL ?? 'https://api.github.com'}${path}`,
@@ -69,7 +93,8 @@ async function github({ path, method = 'GET', body }) {
   return response.json();
 }
 
-async function main() {
+/** Watches the run's lanes and posts the alert on the first failure. */
+async function watch() {
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
   const headSha = process.env.HEAD_SHA;
@@ -109,9 +134,37 @@ async function main() {
   }
 }
 
+/** `--clear`: turns a red alert left by an earlier attempt green, now that every lane passed. */
+async function clear() {
+  const repository = process.env.GITHUB_REPOSITORY;
+  const headSha = process.env.HEAD_SHA;
+  const { statuses } = await github({
+    path: `/repos/${repository}/commits/${headSha}/status?per_page=100`,
+  });
+  if (!alertIsRed(statuses)) {
+    console.log('early-failure-alert: no red alert on the head commit; nothing to clear');
+    return;
+  }
+  await github({
+    path: `/repos/${repository}/statuses/${headSha}`,
+    method: 'POST',
+    body: clearedStatus({
+      runAttempt: process.env.GITHUB_RUN_ATTEMPT ?? '1',
+      runUrl: `${process.env.GITHUB_SERVER_URL ?? 'https://github.com'}/${repository}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+    }),
+  });
+  console.log(
+    `early-failure-alert: every lane passed — the red alert on ${headSha} is cleared`,
+  );
+}
+
 if (isMain(import.meta.url)) {
-  main().catch((error) => {
-    // An alert that cannot post must not fail the run; the lanes and Quality gate still gate.
+  // An unknown option is a broken workflow step, not an alert that could not post: it stops here.
+  const { values } = parseCommandLine(process.argv.slice(2), {
+    options: { clear: { type: 'boolean' } },
+  });
+  (values.clear ? clear() : watch()).catch((error) => {
+    // An alert that cannot post or clear must not fail the run; the lanes and Quality gate gate.
     console.log(`early-failure-alert: ${error.message}`);
   });
 }

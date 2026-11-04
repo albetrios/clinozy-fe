@@ -135,6 +135,7 @@ const SCRIPTS = [
   'tooling/ci/check-doc-staleness.mjs',
   'tooling/ci/check-patch-coverage.mjs',
   'tooling/ci/early-checks.mjs',
+  'tooling/ci/early-failure-alert.mjs',
   'tooling/ci/git-environment.mjs',
   'tooling/ci/pre-push-tests.mjs',
   'tooling/ci/probe-live-site.mjs',

@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ALERT_CONTEXT,
+  alertIsRed,
   alertStatus,
+  clearedStatus,
   findFailedLane,
   lanesFinished,
   type RunJob,
@@ -16,6 +18,8 @@ import {
 
 const prCi = readFileSync('.github/workflows/pr-ci.yml', 'utf8');
 const prePush = readFileSync('.husky/pre-push', 'utf8');
+/** quality-gate is the last job in pr-ci.yml, so it runs to the end of the file. */
+const gateJob = prCi.slice(prCi.indexOf('\n  quality-gate:'));
 
 const job = (name: string, status: string, conclusion: string | null = null): RunJob => ({
   name,
@@ -75,6 +79,35 @@ describe('PR CI early failure alert', () => {
     expect(gate.slice(0, gate.indexOf('if: always()'))).not.toContain(
       'early-failure-alert',
     );
+  });
+
+  it('sees a red alert only in the alert context, by its latest state', () => {
+    expect(alertIsRed([{ context: ALERT_CONTEXT, state: 'failure' }])).toBe(true);
+    expect(alertIsRed([{ context: ALERT_CONTEXT, state: 'success' }])).toBe(false);
+    expect(alertIsRed([{ context: 'Quality gate', state: 'failure' }])).toBe(false);
+    expect(alertIsRed([])).toBe(false);
+  });
+
+  it('clears a stale alert with a green status that names the attempt and links the run', () => {
+    const runUrl = 'https://github.com/example/actions/runs/7';
+    expect(clearedStatus({ runAttempt: '2', runUrl })).toEqual({
+      state: 'success',
+      context: ALERT_CONTEXT,
+      description: 'Cleared: every lane passed on run attempt 2',
+      target_url: runUrl,
+    });
+  });
+
+  it('clears from the Quality gate, only after the lane evaluation passed', () => {
+    expect(gateJob).toContain('statuses: write');
+    // The script and its ./script.mjs import both live in tooling/ci, the gate's sparse checkout.
+    expect(gateJob).toContain('sparse-checkout: tooling/ci');
+    const evaluate = gateJob.indexOf('- name: Evaluate lane results');
+    const clear = gateJob.indexOf('run: node tooling/ci/early-failure-alert.mjs --clear');
+    expect(evaluate).toBeGreaterThan(-1);
+    expect(clear).toBeGreaterThan(evaluate);
+    // A step with no `if:` runs only when every step before it succeeded.
+    expect(gateJob.slice(evaluate, clear)).not.toMatch(/^ {8}if:/m);
   });
 
   it('pre-push runs Knip and the size budget, after the build it measures', () => {
