@@ -89,6 +89,29 @@ and dark-mode variants stay balanced.
   blocks stay in `index.css`; nothing sets the attribute since the studio retired,
   and the one look's own neutrals sit after them anyway.
 
+- **The signed-out canvas ("agent glow").** Every page before the clinic shell —
+  sign-in, MFA, the OAuth hand-off, onboarding, an invitation, the organization
+  picker, the 403 and the 404 — sits on one pastel canvas, the product's one
+  place for colour beyond the accent. The palette is `--public-canvas-base` and
+  six `--pastel-*` hues (lavender, sky, mint, butter, peach, rose) in
+  `index.css`, re-toned under `.dark`; plain properties, not `@theme`, so the
+  first paint carries no utilities for them. `public-canvas.css` (lazy, with
+  `PublicFrame`) draws four layers:
+
+  ```text
+  .public-canvas    the page: the pastel base
+  .public-aurora    fixed behind it: five drifting blobs + a dot grid fading from the centre
+  .public-glass     a card: frosted fill in an iridescent hairline, over a blurred
+                    conic halo that turns slowly (16s) — fast (2.4s) while busy
+  .agent-orb        the turning sphere above each public card's heading
+  ```
+
+  Ink stays ink: headings, body copy and the primary button keep their neutral
+  tokens, so every text pair still clears AA. The pastels only tint surfaces,
+  shadows and glows. The halo hides under the `flat` elevation; reduced motion
+  holds the aurora, halo, orb and shimmer still. `index.html`'s boot frame paints
+  the same base and first two hues, so a cold load does not change colour.
+
 Contrast is non-negotiable: every `*-foreground` token is chosen to clear WCAG AA
 on its surface, in both modes.
 
@@ -292,12 +315,18 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   faint ring in the text colour, an arc turning round it, the `brand-mark` dot at
   rest in the centre — at one tempo (900ms a turn; 2.4s under reduced motion,
   never still, since a loader that stops reads as a hang). A busy button is
-  `Button` `isLoading` (its label stays as it is), any other busy glyph — a row,
+  `Button` `isLoading` (its label stays as it is; the button is disabled and
+  dims to 80%, softer than the 50% of a plain `disabled`), any other busy glyph — a row,
   chip, search field or overlay — is `Spinner` (`ui/spinner.tsx`), and a screen
   that waits whole is `BrandLoader`: the mark over the wordmark, its own "o"
   turning, as the boot splash's does. index.css turns it by
   `data-slot="spinner"`, so no app code spins anything: ESLint rejects
   `animate-spin`. Content waits as skeletons, never under a spinner.
+- **One action at a time.** While an action runs, every other button that could
+  start a second one is disabled — at the plain `disabled` 50%. On the signed-out
+  canvas the glass card enforces it: while one of its buttons is `aria-busy`,
+  `public-canvas.css` dims every other button and button-link in that card and
+  takes them off the pointer, and the busy button carries a shimmer.
 - Render known interface structure immediately: dialog titles, navigation, search,
   close controls, widget headings, and section labels are real UI, not skeletons.
   Keep lazy boundaries inside that structure, around dynamic content only.

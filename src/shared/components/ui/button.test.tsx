@@ -47,8 +47,8 @@ describe('Button — busy', () => {
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-busy', 'true');
     expect(button.firstElementChild).toHaveAttribute('data-slot', 'spinner');
-    // Working, not unavailable: aria-busy lifts the disabled dim.
-    expect(button).toHaveClass('disabled:opacity-50', 'aria-busy:disabled:opacity-100');
+    // Working, and not pressable again: aria-busy softens the disabled dim to 80%.
+    expect(button).toHaveClass('disabled:opacity-50', 'aria-busy:disabled:opacity-80');
   });
 
   it('draws no loader while idle', () => {

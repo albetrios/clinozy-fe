@@ -1,0 +1,385 @@
+/* The signed-out canvas — "agent glow" (PublicFrame, AuthLayout). Loaded with
+   the lazy public chunks, never on the first paint (the initial-CSS budget):
+   the same split as `auth-layout.css`.
+
+   Four layers, back to front:
+
+   ```text
+   .public-canvas      the page: the pastel base colour
+   .public-aurora      fixed, behind everything: five drifting pastel blobs
+                       and a dot grid that fades out from the centre
+   .public-glass       a card: frosted glass (::after) inside an iridescent
+                       hairline, over a blurred conic halo (::before) that
+                       turns slowly — and fast while an action is in flight
+   .agent-orb          the small turning sphere above a card's heading
+   ```
+
+   The palette is `--pastel-*` and `--public-canvas-base` (index.css, re-toned
+   under `.dark`), so both themes follow. Corners are radius steps, so the
+   Corner radius axis reaches the glass; the halo hides under the flat
+   elevation (border-only by design). Insets are logical. Reduced motion: the
+   aurora, the halo, the orb and the shimmer hold still.
+
+   While a button inside a glass card is busy (`aria-busy` on the shared
+   Button, its `isLoading` — a loading list alone does not count), every OTHER button and button-link in that card dims
+   and stops taking the pointer — one action at a time, visibly — and the busy
+   one carries a shimmer over its own 80% (button.tsx). */
+
+@property --agent-halo-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* ── The page ─────────────────────────────────────────────────────────── */
+
+.public-canvas {
+  position: relative;
+  isolation: isolate;
+  background: var(--public-canvas-base);
+}
+
+/* ── The aurora ───────────────────────────────────────────────────────── */
+
+.public-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.public-aurora-blob {
+  --blob-size: 46vmax;
+  position: absolute;
+  inline-size: var(--blob-size);
+  block-size: var(--blob-size);
+  border-radius: 50%;
+  opacity: 0.85;
+  background: radial-gradient(
+    closest-side,
+    var(--blob-hue),
+    color-mix(in oklab, var(--blob-hue) 40%, transparent) 55%,
+    transparent
+  );
+  animation: public-aurora-drift 30s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.public-aurora-blob[data-hue='lavender'] {
+  --blob-hue: var(--pastel-lavender);
+  inset-block-start: -16vmax;
+  inset-inline-start: -12vmax;
+}
+.public-aurora-blob[data-hue='sky'] {
+  --blob-hue: var(--pastel-sky);
+  --blob-size: 40vmax;
+  inset-block-start: -12vmax;
+  inset-inline-end: -6vmax;
+  animation-duration: 36s;
+  animation-delay: -9s;
+}
+.public-aurora-blob[data-hue='peach'] {
+  --blob-hue: var(--pastel-peach);
+  --blob-size: 44vmax;
+  inset-block-end: -20vmax;
+  inset-inline-end: -10vmax;
+  animation-duration: 33s;
+  animation-delay: -4s;
+}
+.public-aurora-blob[data-hue='mint'] {
+  --blob-hue: var(--pastel-mint);
+  --blob-size: 38vmax;
+  inset-block-end: -16vmax;
+  inset-inline-start: 6vmax;
+  animation-duration: 38s;
+  animation-delay: -15s;
+}
+.public-aurora-blob[data-hue='butter'] {
+  --blob-hue: var(--pastel-butter);
+  --blob-size: 28vmax;
+  inset-block-start: 34%;
+  inset-inline-start: 40%;
+  opacity: 0.6;
+  animation-duration: 42s;
+  animation-delay: -21s;
+}
+.public-aurora-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--color-foreground) 11%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 72% 62% at 50% 42%, #000 20%, transparent 80%);
+}
+.dark .public-aurora-blob {
+  opacity: 0.42;
+}
+.dark .public-aurora-blob[data-hue='butter'] {
+  opacity: 0.22;
+}
+.dark .public-aurora-grid {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--color-foreground) 9%, transparent) 1px,
+    transparent 1.5px
+  );
+}
+
+@keyframes public-aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(5vmax, 3vmax, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-3vmax, 6vmax, 0) scale(0.95);
+  }
+}
+
+/* ── The glass card ───────────────────────────────────────────────────── */
+
+.public-glass {
+  --glass-fill: color-mix(in oklab, var(--color-card) 84%, transparent);
+  --glass-spectrum: conic-gradient(
+    from var(--agent-halo-angle),
+    var(--pastel-lavender),
+    var(--pastel-sky),
+    var(--pastel-mint),
+    var(--pastel-butter),
+    var(--pastel-peach),
+    var(--pastel-rose),
+    var(--pastel-lavender)
+  );
+  position: relative;
+  border-color: transparent;
+  background: transparent;
+}
+.dark .public-glass {
+  --glass-fill: color-mix(in oklab, var(--color-card) 82%, transparent);
+}
+
+/* The halo: the spectrum, blurred, spilling past the card's edge. */
+.public-glass::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--glass-spectrum);
+  filter: blur(28px);
+  opacity: 0.75;
+  pointer-events: none;
+  animation: agent-halo-spin 16s linear infinite;
+  transition:
+    opacity 400ms var(--ease-out-strong),
+    filter 400ms var(--ease-out-strong);
+}
+.dark .public-glass::before {
+  opacity: 0.45;
+}
+
+/* The glass: a frosted fill inside a 1px iridescent hairline (the spectrum
+   on the border box, the fill on the padding box). */
+.public-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  background:
+    linear-gradient(var(--glass-fill), var(--glass-fill)) padding-box,
+    var(--glass-spectrum) border-box;
+  backdrop-filter: blur(22px) saturate(1.5);
+  pointer-events: none;
+  animation: agent-halo-spin 16s linear infinite;
+}
+
+[data-elevation='flat'] .public-glass::before {
+  display: none;
+}
+
+@keyframes agent-halo-spin {
+  to {
+    --agent-halo-angle: 360deg;
+  }
+}
+
+/* ── The agent orb ────────────────────────────────────────────────────── */
+
+.agent-orb {
+  --agent-halo-angle: 0deg;
+  --orb-size: 2.5rem;
+  position: relative;
+  display: block;
+  flex: none;
+  inline-size: var(--orb-size);
+  block-size: var(--orb-size);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, oklch(1 0 0 / 0.95), oklch(1 0 0 / 0) 36%),
+    radial-gradient(circle at 70% 82%, oklch(1 0 0 / 0.35), oklch(1 0 0 / 0) 40%),
+    conic-gradient(
+      from var(--agent-halo-angle),
+      var(--pastel-lavender),
+      var(--pastel-sky),
+      var(--pastel-mint),
+      var(--pastel-butter),
+      var(--pastel-peach),
+      var(--pastel-rose),
+      var(--pastel-lavender)
+    );
+  box-shadow:
+    inset 0 0 0 1px oklch(1 0 0 / 0.55),
+    inset 0 -6px 14px color-mix(in oklab, var(--pastel-lavender) 70%, transparent),
+    0 0 0 6px color-mix(in oklab, var(--pastel-lavender) 22%, transparent),
+    0 10px 26px -8px color-mix(in oklab, var(--pastel-lavender) 95%, transparent),
+    0 6px 18px -6px color-mix(in oklab, var(--pastel-peach) 90%, transparent);
+  animation:
+    agent-halo-spin 9s linear infinite,
+    agent-orb-breathe 4.8s ease-in-out infinite;
+}
+.agent-orb[data-size='lg'] {
+  --orb-size: 3.5rem;
+}
+
+@keyframes agent-orb-breathe {
+  0%,
+  100% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.06;
+  }
+}
+
+/* ── Buttons, fields and controls on the canvas ───────────────────────── */
+
+.public-canvas [data-slot='button'][data-variant='default'] {
+  background-image: linear-gradient(180deg, oklch(1 0 0 / 0.16), oklch(1 0 0 / 0) 60%);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.22),
+    0 1px 2px color-mix(in oklab, var(--color-foreground) 18%, transparent),
+    0 10px 24px -12px var(--pastel-lavender),
+    0 16px 34px -18px var(--pastel-peach);
+}
+.public-canvas [data-slot='button'][data-variant='default']:hover:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.22),
+    0 1px 2px color-mix(in oklab, var(--color-foreground) 18%, transparent),
+    0 14px 30px -10px var(--pastel-lavender),
+    0 20px 40px -16px var(--pastel-peach);
+}
+.dark .public-canvas [data-slot='button'][data-variant='default'] {
+  background-image: linear-gradient(180deg, oklch(1 0 0 / 0.5), oklch(1 0 0 / 0) 70%);
+}
+
+.public-canvas [data-slot='button'][data-variant='outline'] {
+  background-color: color-mix(in oklab, var(--color-background) 70%, transparent);
+  border-color: color-mix(in oklab, var(--color-foreground) 11%, transparent);
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--color-foreground) 5%, transparent),
+    0 8px 18px -12px var(--pastel-sky);
+  backdrop-filter: blur(10px);
+}
+.public-canvas [data-slot='button'][data-variant='outline']:hover:not(:disabled) {
+  background-color: color-mix(
+    in oklab,
+    var(--pastel-lavender) 26%,
+    var(--color-background)
+  );
+  border-color: color-mix(
+    in oklab,
+    var(--pastel-lavender) 70%,
+    var(--color-foreground) 8%
+  );
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--color-foreground) 5%, transparent),
+    0 10px 22px -12px var(--pastel-lavender);
+}
+
+.public-glass [data-slot='input'] {
+  background-color: color-mix(in oklab, var(--color-background) 76%, transparent);
+}
+
+.public-controls [data-slot='button'],
+.public-controls [role='combobox'] {
+  background-color: color-mix(in oklab, var(--color-background) 62%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+/* ── One action at a time ─────────────────────────────────────────────── */
+
+.public-glass:has([data-slot='button'][aria-busy='true']) {
+  cursor: progress;
+}
+.public-glass:has([data-slot='button'][aria-busy='true'])
+  :is(button, a[data-slot='button']):not([aria-busy='true']) {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: saturate(0.6);
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease;
+}
+/* The agent works: the halo brightens and turns fast, the orb with it. */
+.public-glass:has([data-slot='button'][aria-busy='true'])::before {
+  opacity: 0.95;
+  filter: blur(30px);
+  animation-duration: 2.4s;
+}
+.public-glass:has([data-slot='button'][aria-busy='true'])::after {
+  animation-duration: 2.4s;
+}
+.public-glass:has([data-slot='button'][aria-busy='true']) .agent-orb {
+  animation-duration: 1.6s, 1.2s;
+}
+
+.public-glass [data-slot='button'][aria-busy='true'] {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.public-glass [data-slot='button'][aria-busy='true']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    oklch(1 0 0 / 0.38) 50%,
+    transparent 80%
+  );
+  translate: -100% 0;
+  animation: agent-shimmer 1.4s var(--ease-in-out-strong) infinite;
+  pointer-events: none;
+}
+[dir='rtl'] .public-glass [data-slot='button'][aria-busy='true']::after {
+  animation-direction: reverse;
+}
+
+@keyframes agent-shimmer {
+  to {
+    translate: 100% 0;
+  }
+}
+
+/* ── Status emblems (the 404, the 403) ────────────────────────────────── */
+
+.public-canvas [data-emblem] {
+  filter: drop-shadow(0 10px 18px var(--pastel-lavender))
+    drop-shadow(0 4px 10px var(--pastel-peach));
+}
+
+/* ── Reduced motion: everything holds still ───────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .public-aurora-blob,
+  .public-glass::before,
+  .public-glass::after,
+  .agent-orb,
+  .public-glass [data-slot='button'][aria-busy='true']::after {
+    animation: none;
+  }
+}

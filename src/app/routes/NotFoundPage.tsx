@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { composePageTitle } from '@/lib/routes/page-head.ts';
 import { CaptchaSlot } from '@/shared/auth/captcha/CaptchaSlot.tsx';
-import { PublicFrame } from '@/shared/components/PublicFrame/index.ts';
+import { PublicCard, PublicFrame } from '@/shared/components/PublicFrame/index.ts';
 import {
   FALLBACK_BUTTON_CLASS,
   FallbackState,
@@ -42,33 +42,35 @@ export function Component() {
       mainId="not-found-main"
       controls={<ThemeModeToggle surface="frame" />}
     >
-      <FallbackState
-        headingLevel={1}
-        tone="stone"
-        icon={<Compass />}
-        emblem="missing"
-        label={t(ERRORS_KEYS.public.status, { status: 404 })}
-        title={t(ERRORS_KEYS.public.missingTitle)}
-        description={t(ERRORS_KEYS.route.notFound)}
-        actions={
-          <>
-            <Button asChild className={FALLBACK_BUTTON_CLASS}>
-              <Link to="/">{t(ERRORS_KEYS.route.goHome)}</Link>
-            </Button>
-            {canGoBack() ? (
-              <Button
-                type="button"
-                variant="outline"
-                className={FALLBACK_BUTTON_CLASS}
-                onClick={() => router.history.back()}
-                data-testid="not-found-back"
-              >
-                {t(ERRORS_KEYS.public.goBack)}
+      <PublicCard width="wizard" className="items-center py-10">
+        <FallbackState
+          headingLevel={1}
+          tone="stone"
+          icon={<Compass />}
+          emblem="missing"
+          label={t(ERRORS_KEYS.public.status, { status: 404 })}
+          title={t(ERRORS_KEYS.public.missingTitle)}
+          description={t(ERRORS_KEYS.route.notFound)}
+          actions={
+            <>
+              <Button asChild className={FALLBACK_BUTTON_CLASS}>
+                <Link to="/">{t(ERRORS_KEYS.route.goHome)}</Link>
               </Button>
-            ) : null}
-          </>
-        }
-      />
+              {canGoBack() ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={FALLBACK_BUTTON_CLASS}
+                  onClick={() => router.history.back()}
+                  data-testid="not-found-back"
+                >
+                  {t(ERRORS_KEYS.public.goBack)}
+                </Button>
+              ) : null}
+            </>
+          }
+        />
+      </PublicCard>
 
       {/* An escalated background Turnstile challenge renders here, below the action,
           instead of floating anywhere on its own. */}

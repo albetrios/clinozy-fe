@@ -176,12 +176,26 @@
       /* Below every box #root paints (z-index -1: above only the page's own
          background), so whichever screen arrives covers it with no stacking to
          arrange. */
+      /* The signed-out canvas (public-canvas.css): its pastel base, with the
+         aurora's first two hues where its blobs sit, so the screen that lands
+         on top of it (sign-in, 404, an invitation) does not change colour. */
       .app-boot-frame #app-boot-frame {
         display: block;
         position: fixed;
         inset: 0;
         z-index: -1;
-        background: var(--color-canvas);
+        background:
+          radial-gradient(
+            closest-side at 8% 6%,
+            color-mix(in oklab, var(--pastel-lavender) 70%, transparent),
+            transparent
+          ) 0 0 / 70vmax 70vmax no-repeat,
+          radial-gradient(
+            closest-side at 92% 94%,
+            color-mix(in oklab, var(--pastel-peach) 70%, transparent),
+            transparent
+          ) 100% 100% / 70vmax 70vmax no-repeat,
+          var(--public-canvas-base);
       }
       .app-boot-frame-logo {
         position: absolute;
@@ -221,13 +235,10 @@
         }
       }
       /* The sign-in screen itself (`/`, `/login`: APP_BOOT_FRAME_LOGIN): AuthLayout's
-         outline — its column on the page colour and, from 68.75rem, the stage panel
-         beside it (12px in, rounded), the logo at the column's 40px padding. */
+         outline — its column on the canvas and, from 68.75rem, the stage's pane of
+         glass beside it (12px in, rounded), the logo at the column's 40px padding. */
       .app-boot-frame-stage {
         display: none;
-      }
-      .app-boot-frame-login #app-boot-frame {
-        background: var(--color-background);
       }
       @media (min-width: 68.75rem) {
         .app-boot-frame-login .app-boot-frame-logo {
@@ -240,10 +251,7 @@
           inset-inline-end: 0.75rem;
           inset-inline-start: clamp(28rem, 38vw, 38rem);
           border-radius: calc(var(--radius-lg) * 2);
-          background: var(--color-muted);
-        }
-        .dark.app-boot-frame-login .app-boot-frame-stage {
-          background: var(--color-canvas);
+          background: color-mix(in oklab, var(--color-background) 52%, transparent);
         }
       }
       @media (min-width: 120rem) {

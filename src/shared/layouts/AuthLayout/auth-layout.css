@@ -9,7 +9,11 @@
    the form's column at the inline start (header, form, footer) and the stage
    beside it, a rounded panel held in view (sticky) while the column scrolls.
    The boot frame in index.html draws this outline before the app loads
-   (`app-boot-frame-login`); the two move together. */
+   (`app-boot-frame-login`); the two move together.
+
+   The surfaces are the signed-out canvas's (`public-canvas.css`): the aurora
+   behind the grid, the form in a glass card (`.auth-layout-card`), the stage a
+   second pane of glass (`auth-showcase.css`). */
 
 .auth-layout {
   --auth-form-column: clamp(28rem, 38vw, 38rem);
@@ -34,8 +38,11 @@
 }
 .auth-layout-block {
   width: 100%;
-  max-width: 24rem;
+  max-width: 27rem;
   margin-inline: auto;
+}
+.auth-layout-card {
+  padding: calc(var(--spacing) * 7) calc(var(--spacing) * 5);
 }
 .auth-layout-stage {
   grid-area: stage;
@@ -64,6 +71,9 @@
   }
   .auth-layout-header {
     padding-inline: calc(var(--spacing) * 10) calc(var(--spacing) * 8);
+  }
+  .auth-layout-card {
+    padding: calc(var(--spacing) * 9) calc(var(--spacing) * 8);
   }
   .auth-layout-main {
     align-items: center;
@@ -99,7 +109,7 @@
     --auth-form-column: 40rem;
   }
   .auth-layout-block {
-    max-width: 26rem;
+    max-width: 29rem;
   }
   .auth-layout-stage .tour-title {
     font-size: 3.25rem;

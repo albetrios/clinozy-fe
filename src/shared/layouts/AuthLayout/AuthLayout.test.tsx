@@ -85,7 +85,17 @@ describe('AuthLayout', () => {
     );
 
     const layout = await findByTestId('auth-layout');
-    expect(layout).toHaveClass('auth-layout', 'bg-background', 'min-h-dvh');
+    expect(layout).toHaveClass(
+      'auth-layout',
+      'public-canvas',
+      'bg-background',
+      'min-h-dvh',
+    );
+    // The signed-out canvas's aurora behind it, decorative.
+    expect(within(layout).getByTestId('public-aurora')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
     // The logo where the clinic header draws it.
     expect(within(layout).getByRole('img', { name: PRODUCT_NAME })).toHaveAttribute(
       'data-testid',
@@ -95,10 +105,13 @@ describe('AuthLayout', () => {
     const controls = getByTestId('public-frame-controls');
     expect(within(controls).getByTestId('theme-toggle')).toBeInTheDocument();
     expect(controls.closest('header')).toHaveClass('auth-layout-header');
-    // No card: the form sits on the page, in the column's block.
-    const block = (await findByTestId('auth-form-container')).parentElement;
-    expect(block).toHaveClass('auth-layout-block');
-    expect(block).not.toHaveAttribute('data-slot');
+    // The form sits in a glass card (the `card` slot, so the elevation axis
+    // lifts it), in the column's block.
+    const card = (await findByTestId('auth-form-container')).parentElement;
+    expect(card).toHaveAttribute('data-testid', 'auth-layout-card');
+    expect(card).toHaveAttribute('data-slot', 'card');
+    expect(card).toHaveClass('auth-layout-card', 'public-glass', 'rounded-2xl');
+    expect(card?.parentElement).toHaveClass('auth-layout-block');
     expect(within(layout).getByRole('main')).toHaveAttribute('id', 'main-content');
     // "Privacy choices" and the year's line in the footer.
     const footer = getByTestId('privacy-choices').closest('footer');

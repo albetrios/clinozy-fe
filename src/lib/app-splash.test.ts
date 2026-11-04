@@ -786,10 +786,13 @@ describe('app-splash', () => {
       expect(html).toMatch(
         new RegExp(`\\.${APP_BOOT_FRAME} #app-boot-frame \\{[^}]*z-index: -1;`),
       );
-      // The sign-in outline: the page colour, and from 68.75rem the stage panel.
+      // The signed-out canvas: the pastel base the public pages land on
+      // (public-canvas.css), and from 68.75rem the sign-in stage's pane of glass.
       const css = html.replaceAll(/\s+/g, ' ');
-      expect(css).toContain(
-        `.${APP_BOOT_FRAME_LOGIN} #app-boot-frame { background: var(--color-background); }`,
+      expect(css).toMatch(
+        new RegExp(
+          `\\.${APP_BOOT_FRAME} #app-boot-frame \\{[^}]*var\\(--pastel-lavender\\)[^}]*var\\(--public-canvas-base\\);`,
+        ),
       );
       expect(css).toMatch(
         new RegExp(

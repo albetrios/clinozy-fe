@@ -1,4 +1,7 @@
 export {
+  AgentOrb,
+  type AgentOrbProps,
+  PublicAurora,
   PublicCard,
   PublicCardHeader,
   type PublicCardHeaderProps,

@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { BrandLogo } from '@/shared/components/ProductMark/index.ts';
 import {
+  PublicAurora,
   PublicPrivacyChoices,
   PublicSkipLink,
 } from '@/shared/components/PublicFrame/index.ts';
@@ -44,19 +45,26 @@ const TOUR_AUTOPLAY_PATH = '/login';
  * email field before the tour's steps and pause button. The tour plays on its
  * own only on `/login`; the MFA and hand-off screens show it still. The grid
  * lives in `auth-layout.css`, which loads with this lazy chunk.
+ *
+ * The look is the signed-out canvas's "agent glow" (`public-canvas.css`, shared
+ * with `PublicFrame`): the pastel aurora behind the whole screen, the form
+ * in a glass card (the `card` slot, so the elevation axis still lifts it) whose
+ * pastel halo quickens while a sign-in method is in flight, and the stage as a
+ * second pane of glass.
  */
 export function AuthLayout({ children }: AuthLayoutProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   return (
     <div
       data-testid="auth-layout"
-      className="auth-layout bg-background text-foreground min-h-dvh"
+      className="auth-layout public-canvas bg-background text-foreground min-h-dvh"
     >
+      <PublicAurora />
       <PublicSkipLink />
       <header className="auth-layout-header flex min-h-13 items-center justify-between gap-3 px-(--room-header-pad-x) md:min-h-15">
         <BrandLogo wordmark="always" />
         <div
-          className="flex min-w-0 items-center gap-2"
+          className="public-controls flex min-w-0 items-center gap-2"
           data-testid="public-frame-controls"
         >
           <AuthControls surface="frame" />
@@ -64,8 +72,14 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       </header>
       <main id="main-content" className="auth-layout-main">
         <div className="auth-layout-block">
-          <AuthForm>{children}</AuthForm>
-          <AuthShowcasePrivacy className="mt-6" />
+          <div
+            data-slot="card"
+            data-testid="auth-layout-card"
+            className="auth-layout-card public-glass rounded-2xl border"
+          >
+            <AuthForm>{children}</AuthForm>
+          </div>
+          <AuthShowcasePrivacy className="mt-6 px-2" />
         </div>
       </main>
       <AuthShowcaseStage

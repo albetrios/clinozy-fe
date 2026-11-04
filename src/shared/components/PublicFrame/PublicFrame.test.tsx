@@ -14,7 +14,13 @@ import {
   resetConsentForTests,
 } from '@/tests/utils/consent-cookie.ts';
 
-import { PublicCard, PublicCardHeader, PublicFrame } from './PublicFrame.tsx';
+import {
+  AgentOrb,
+  PublicAurora,
+  PublicCard,
+  PublicCardHeader,
+  PublicFrame,
+} from './PublicFrame.tsx';
 
 describe('PublicFrame', () => {
   it('lays the signed-out canvas: the logo, the controls and a centred main', () => {
@@ -160,5 +166,57 @@ describe('PublicCardHeader', () => {
     const heading = screen.getByRole('heading', { level: 1, name: 'Welcome back' });
     expect(heading).toHaveClass('text-2xl', 'xl:text-3xl', 'font-semibold');
     expect(heading).not.toHaveClass('text-lg');
+  });
+});
+
+describe('the agent-glow canvas', () => {
+  it('paints the frame on the pastel canvas, the aurora behind it', () => {
+    render(
+      <PublicFrame testId="frame">
+        <p>body</p>
+      </PublicFrame>,
+    );
+    const frame = screen.getByTestId('frame');
+    expect(frame).toHaveClass('public-canvas', 'bg-canvas');
+    const aurora = within(frame).getByTestId('public-aurora');
+    expect(aurora).toHaveAttribute('aria-hidden', 'true');
+    // The aurora comes before the skip link, so it never enters the tab order first.
+    expect(frame.firstElementChild).toBe(aurora);
+  });
+
+  it('draws five pastel blobs and the dot grid', () => {
+    const { container } = render(<PublicAurora />);
+    const hues = [...container.querySelectorAll('.public-aurora-blob')].map((blob) =>
+      blob.getAttribute('data-hue'),
+    );
+    expect(hues).toEqual(['lavender', 'sky', 'peach', 'mint', 'butter']);
+    expect(container.querySelector('.public-aurora-grid')).not.toBeNull();
+  });
+
+  it('draws the orb decorative, at 40px or 56px', () => {
+    const { rerender } = render(<AgentOrb className="extra" />);
+    const orb = screen.getByTestId('agent-orb');
+    expect(orb).toHaveAttribute('aria-hidden', 'true');
+    expect(orb).toHaveAttribute('data-slot', 'agent-orb');
+    expect(orb).toHaveAttribute('data-size', 'md');
+    expect(orb).toHaveClass('agent-orb', 'extra');
+    rerender(<AgentOrb size="lg" />);
+    expect(screen.getByTestId('agent-orb')).toHaveAttribute('data-size', 'lg');
+  });
+
+  it('makes the card glass and opens its heading on the orb', () => {
+    render(
+      <PublicCard data-testid="card">
+        <PublicCardHeader title="Join Acme" />
+      </PublicCard>,
+    );
+    expect(screen.getByTestId('card')).toHaveClass('public-glass');
+    const header = screen.getByRole('heading', { level: 1 }).parentElement;
+    expect(header?.firstElementChild).toBe(screen.getByTestId('agent-orb'));
+  });
+
+  it('leaves the orb out when a step asks it to', () => {
+    render(<PublicCardHeader title="Step two" orb={false} />);
+    expect(screen.queryByTestId('agent-orb')).not.toBeInTheDocument();
   });
 });
