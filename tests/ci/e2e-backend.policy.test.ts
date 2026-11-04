@@ -153,6 +153,16 @@ describe('E2E against the backend image', () => {
     expect(WORKFLOW).toContain('-e DEPLOYMENT_TOTAL_REPLICA_COUNT=1');
   });
 
+  // clinozy-be v9.5.0 (#190) runs its global per-IP limit (RATE_LIMIT_MAX, 100 a minute) ahead of
+  // every route, and the whole suite is one runner IP: the nightly 429'd `/users/me` and onboarding
+  // stayed on its page. The relaxed caps cover the auth forms only; the global limit is its own key.
+  it('lifts both backend rate limits for the one runner IP the suite runs from', () => {
+    const boot = step(BOOT_STEP);
+    expect(boot).toContain('-e RATE_LIMIT_RELAXED_CAPS=true');
+    // The backend schema's ceiling for RATE_LIMIT_MAX (env-schema.ts: max 100_000).
+    expect(boot).toContain('-e RATE_LIMIT_MAX=100000');
+  });
+
   // OPS-01: the string above is pinned; this checks the sum. clinozy-be's #82 raised the pool to 70,
   // and every boot that stated no count asked 2 × (70 + 10) = 160 of the service's 90 and exited.
   it('boots the backend within the service Postgres connection budget, by arithmetic', () => {
