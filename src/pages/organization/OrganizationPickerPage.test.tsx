@@ -136,7 +136,7 @@ describe('OrganizationPickerPage', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Select organization' }),
     ).toBeInTheDocument();
-    expect(page.querySelector('[data-slot="card"]')).toHaveClass('max-w-90');
+    expect(page.querySelector('[data-slot="public-stage"]')).toHaveClass('max-w-90');
   });
 
   it('draws each organization as an All sections row — tone tile, name, slug, chevron', async () => {

@@ -1,3 +1,5 @@
+import './public-canvas.css';
+
 import type { ComponentProps, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -5,7 +7,6 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { BrandLogo } from '@/shared/components/ProductMark/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card } from '@/shared/components/ui/card.tsx';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
 
@@ -33,6 +34,10 @@ export interface PublicFrameProps {
  * viewport, then a footer of the header's height (so the centring holds) with
  * claude.com's "Privacy choices": it reopens the cookie card, so a signed-out
  * visitor can change their answer (D12; signed in, Settings › Privacy does).
+ *
+ * The canvas is the "agent glow" (`public-canvas.css`): the pastel base under
+ * {@link PublicAurora}, so every signed-out page shares one backdrop with the
+ * sign-in screen. `bg-canvas` stays as the fallback paint before that sheet.
  */
 export function PublicFrame({
   children,
@@ -44,14 +49,15 @@ export function PublicFrame({
   return (
     <div
       data-testid={testId}
-      className="bg-canvas text-foreground flex min-h-dvh flex-col"
+      className="public-canvas bg-canvas text-foreground flex min-h-dvh flex-col"
     >
+      <PublicAurora />
       <PublicSkipLink mainId={mainId} />
       <header className="flex min-h-13 flex-none items-center justify-between gap-3 px-(--room-header-pad-x) md:min-h-15">
         <BrandLogo wordmark="always" />
         {controls ? (
           <div
-            className="flex min-w-0 items-center gap-2"
+            className="public-controls flex min-w-0 items-center gap-2"
             data-testid="public-frame-controls"
           >
             {controls}
@@ -71,6 +77,51 @@ export function PublicFrame({
         <PublicPrivacyChoices />
       </footer>
     </div>
+  );
+}
+
+/** The aurora's blobs, back to front (`public-canvas.css` places and tints each). */
+const AURORA_HUES = ['lavender', 'sky', 'peach', 'mint', 'butter'] as const;
+
+/**
+ * The signed-out canvas's backdrop: five pastel blobs drifting behind a dot
+ * grid that fades out from the centre. Fixed behind the page, decorative
+ * (`aria-hidden`), still under reduced motion. Styled by `public-canvas.css`,
+ * so a page that renders it inside {@link PublicFrame} or the sign-in layout
+ * gets the canvas with it.
+ */
+export function PublicAurora() {
+  return (
+    <div aria-hidden="true" className="public-aurora" data-testid="public-aurora">
+      {AURORA_HUES.map((hue) => (
+        <span key={hue} className="public-aurora-blob" data-hue={hue} />
+      ))}
+      <span className="public-aurora-grid" />
+    </div>
+  );
+}
+
+/** Props for {@link AgentOrb}. */
+export interface AgentOrbProps {
+  /** `md` is 40px; `lg` is 56px (a page's heading). */
+  size?: 'md' | 'lg';
+  className?: string;
+}
+
+/**
+ * The agent orb: a small sphere of the pastel spectrum that turns slowly and
+ * breathes — and quickens while an action in its glass card is in flight
+ * (`public-canvas.css`). Decorative: it says nothing a screen reader needs.
+ */
+export function AgentOrb({ size = 'md', className }: AgentOrbProps) {
+  return (
+    <span
+      aria-hidden="true"
+      data-slot="agent-orb"
+      data-size={size}
+      data-testid="agent-orb"
+      className={cn('agent-orb', className)}
+    />
   );
 }
 
@@ -126,16 +177,21 @@ export type PublicCardProps = ComponentProps<'div'> & {
 };
 
 /**
- * The card on the signed-out canvas — the "Signed out" card (H:515): full width
- * up to 360px (or 480px), 28px top and bottom, the drawer's side inset
- * (`--drawer-pad-x`: 24 · 20 · 16px), 12px corners, a 1px border and the card's
- * lift (the `card` slot, so the elevation axis restyles it).
+ * A page's content on the signed-out canvas — no longer a box. Full width up to
+ * 360px (or 480px), 28px top and bottom, the drawer's side inset
+ * (`--drawer-pad-x`: 24 · 20 · 16px); no edge, no fill, no lift: it floats on
+ * the aurora with an edgeless pool of light behind it (`public-stage`,
+ * `public-canvas.css`). While one of its buttons is busy the pool warms and
+ * breathes, the orb quickens, and every other button on it dims and stops
+ * taking the pointer, so only one action runs at a time. (The name stays
+ * `PublicCard` for its callers; the "Signed out" card's metrics, H:515.)
  */
 export function PublicCard({ width = 'auth', className, ...props }: PublicCardProps) {
   return (
-    <Card
+    <div
+      data-slot="public-stage"
       className={cn(
-        'w-full gap-5 px-(--drawer-pad-x) py-7',
+        'public-stage flex w-full flex-col gap-5 px-(--drawer-pad-x) py-7',
         CARD_WIDTHS[width],
         className,
       )}
@@ -161,6 +217,8 @@ export interface PublicCardHeaderProps {
   titleTestId?: string;
   /** `card` (default) or `display` — the sign-in screen's larger heading. */
   size?: keyof typeof CARD_HEADER_SIZES;
+  /** The {@link AgentOrb} above the title — on by default; off for a step inside a flow. */
+  orb?: boolean;
   className?: string;
 }
 
@@ -168,18 +226,21 @@ export interface PublicCardHeaderProps {
  * A public card's heading — the page's `h1` — in the drawer title's anatomy
  * (18px/600, −0.01em, line height 1.2) with the 13px muted sub line under it
  * (`preset.md` Typography). The sign-in screens draw it at `display` size.
+ * The {@link AgentOrb} sits above the title, so every public card opens on it.
  */
 export function PublicCardHeader({
   title,
   description,
   titleTestId,
   size = 'card',
+  orb = true,
   className,
 }: PublicCardHeaderProps) {
   return (
     <header
       className={cn('flex flex-col gap-1.5', size === 'display' && 'gap-2', className)}
     >
+      {orb ? <AgentOrb size="lg" className="mb-4" /> : null}
       <h1
         data-testid={titleTestId}
         className={cn('font-semibold text-balance', CARD_HEADER_SIZES[size])}

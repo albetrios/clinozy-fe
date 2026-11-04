@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { BrandLogo } from '@/shared/components/ProductMark/index.ts';
 import {
+  PublicAurora,
   PublicPrivacyChoices,
   PublicSkipLink,
 } from '@/shared/components/PublicFrame/index.ts';
@@ -44,28 +45,39 @@ const TOUR_AUTOPLAY_PATH = '/login';
  * email field before the tour's steps and pause button. The tour plays on its
  * own only on `/login`; the MFA and hand-off screens show it still. The grid
  * lives in `auth-layout.css`, which loads with this lazy chunk.
+ *
+ * The look is the signed-out canvas's "agent glow" (`public-canvas.css`, shared
+ * with `PublicFrame`): the pastel aurora behind the whole screen and no boxes on
+ * it. The form floats on an edgeless pool of light (`public-stage`) that warms
+ * while a sign-in method is in flight; beside it the stage is a floating
+ * product stack — the Today sheet in front, two screens behind it in 3D.
  */
 export function AuthLayout({ children }: AuthLayoutProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   return (
     <div
       data-testid="auth-layout"
-      className="auth-layout bg-background text-foreground min-h-dvh"
+      className="auth-layout public-canvas bg-background text-foreground min-h-dvh"
     >
+      <PublicAurora />
       <PublicSkipLink />
       <header className="auth-layout-header flex min-h-13 items-center justify-between gap-3 px-(--room-header-pad-x) md:min-h-15">
         <BrandLogo wordmark="always" />
         <div
-          className="flex min-w-0 items-center gap-2"
+          className="public-controls flex min-w-0 items-center gap-2"
           data-testid="public-frame-controls"
         >
           <AuthControls surface="frame" />
         </div>
       </header>
       <main id="main-content" className="auth-layout-main">
-        <div className="auth-layout-block">
+        <div
+          data-slot="public-stage"
+          data-testid="auth-layout-block"
+          className="auth-layout-block public-stage"
+        >
           <AuthForm>{children}</AuthForm>
-          <AuthShowcasePrivacy className="mt-6" />
+          <AuthShowcasePrivacy className="mt-8" />
         </div>
       </main>
       <AuthShowcaseStage

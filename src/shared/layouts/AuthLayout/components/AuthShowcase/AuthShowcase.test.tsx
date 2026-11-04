@@ -393,6 +393,47 @@ describe('AuthShowcaseStage — the tour', () => {
     );
   });
 
+  it('floats the sheet in a stack: two screens behind it, decorative, the chapter’s one lifted', () => {
+    const { getByTestId } = renderStage(false);
+    const stack = within(getByTestId(IDS.stage)).getByTestId(IDS.stack);
+    const backs = [...stack.querySelectorAll('.tour-stack-back')];
+    expect(backs.map((back) => back.getAttribute('data-chapter'))).toEqual([
+      'patientFile',
+      'payments',
+    ]);
+    for (const back of backs) {
+      expect(back).toHaveAttribute('aria-hidden', 'true');
+      expect(back).not.toHaveAttribute('data-lifted');
+    }
+    // The live lens stays the one with the test id: the screens behind are at rest.
+    expect(within(stack).getAllByTestId(IDS.lens)).toHaveLength(1);
+    fireEvent.click(within(getByTestId(IDS.stage)).getByTestId(IDS.step(3)));
+    expect(
+      stack.querySelector('[data-chapter="patientFile"].tour-stack-back'),
+    ).toHaveAttribute('data-lifted');
+    fireEvent.click(within(getByTestId(IDS.stage)).getByTestId(IDS.step(5)));
+    expect(
+      stack.querySelector('[data-chapter="payments"].tour-stack-back'),
+    ).toHaveAttribute('data-lifted');
+  });
+
+  it('deals the sheet forward on every arrival', () => {
+    const { getByTestId } = renderStage(false);
+    const scene = getByTestId(IDS.stack).querySelector('.tour-stack-scene');
+    const before = scene?.getAttribute('data-deal');
+    fireEvent.click(getByTestId(IDS.step(2)));
+    expect(scene?.getAttribute('data-deal')).not.toBe(before);
+  });
+
+  it('leans toward the pointer and lets go when it leaves', () => {
+    const { getByTestId } = renderStage(false);
+    const stack = getByTestId(IDS.stack);
+    fireEvent.pointerMove(stack, { clientX: 0, clientY: 0 });
+    expect(stack.style.getPropertyValue('--lean-x')).not.toBe('');
+    fireEvent.pointerLeave(stack);
+    expect(stack.style.getPropertyValue('--lean-x')).toBe('');
+  });
+
   it('has no accessibility violations', async () => {
     vi.useRealTimers();
     const { container } = renderStage(false);

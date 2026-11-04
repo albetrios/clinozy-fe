@@ -209,7 +209,9 @@ describe('AcceptInvitePage', () => {
         screen.getByRole('heading', { level: 1, name: 'Joining organization' }),
       ).toBeInTheDocument();
       expect(
-        screen.getByTestId('accept-invite-page').querySelector('[data-slot="card"]'),
+        screen
+          .getByTestId('accept-invite-page')
+          .querySelector('[data-slot="public-stage"]'),
       ).toHaveClass('max-w-90');
     });
 

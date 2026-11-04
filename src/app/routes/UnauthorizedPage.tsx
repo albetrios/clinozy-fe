@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { CaptchaSlot } from '@/shared/auth/captcha/CaptchaSlot.tsx';
 import { logout } from '@/shared/auth/service.ts';
+import { PublicCard } from '@/shared/components/PublicFrame/index.ts';
 import {
   FALLBACK_BUTTON_CLASS,
   FallbackState,
@@ -37,36 +38,45 @@ export function Component() {
 
   return (
     <div className="flex w-full flex-col items-center" data-testid="unauthorized-page">
-      <FallbackState
-        headingLevel={1}
-        tone="stone"
-        icon={<Lock />}
-        emblem="locked"
-        label={t(ERRORS_KEYS.public.status, { status: 403 })}
-        title={t(ERRORS_KEYS.route.forbiddenTitle)}
-        description={t(ERRORS_KEYS.route.forbidden)}
-        // Two escapes so this page is never a dead-end: "Go Home" for the
-        // common case, and a guaranteed "Sign out" for when the resolved home
-        // would loop straight back here (e.g. a session whose active org
-        // denies its own landing surface).
-        actions={
-          <>
-            <Button asChild className={FALLBACK_BUTTON_CLASS}>
-              <Link to="/">{t(ERRORS_KEYS.route.goHome)}</Link>
-            </Button>
-            <Button
-              variant="outline"
-              className={FALLBACK_BUTTON_CLASS}
-              onClick={handleSignOut}
-              disabled={signingOut}
-              isLoading={signingOut}
-              data-testid="unauthorized-sign-out"
-            >
-              {t(signingOut ? ERRORS_KEYS.route.signingOut : ERRORS_KEYS.route.signOut)}
-            </Button>
-          </>
-        }
-      />
+      <PublicCard width="wizard" className="items-center py-10">
+        <FallbackState
+          headingLevel={1}
+          tone="stone"
+          icon={<Lock />}
+          emblem="locked"
+          label={t(ERRORS_KEYS.public.status, { status: 403 })}
+          title={t(ERRORS_KEYS.route.forbiddenTitle)}
+          description={t(ERRORS_KEYS.route.forbidden)}
+          // Two escapes so this page is never a dead-end: "Go Home" for the
+          // common case, and a guaranteed "Sign out" for when the resolved home
+          // would loop straight back here (e.g. a session whose active org
+          // denies its own landing surface).
+          actions={
+            <>
+              <Button asChild className={FALLBACK_BUTTON_CLASS}>
+                {/* Inert while signing out: one action at a time. */}
+                <Link
+                  to="/"
+                  disabled={signingOut}
+                  aria-disabled={signingOut || undefined}
+                >
+                  {t(ERRORS_KEYS.route.goHome)}
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                className={FALLBACK_BUTTON_CLASS}
+                onClick={handleSignOut}
+                disabled={signingOut}
+                isLoading={signingOut}
+                data-testid="unauthorized-sign-out"
+              >
+                {t(signingOut ? ERRORS_KEYS.route.signingOut : ERRORS_KEYS.route.signOut)}
+              </Button>
+            </>
+          }
+        />
+      </PublicCard>
 
       {/* An escalated background Turnstile challenge renders here, below the actions,
           instead of floating anywhere on its own. */}

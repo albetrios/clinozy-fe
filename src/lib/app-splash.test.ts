@@ -786,17 +786,21 @@ describe('app-splash', () => {
       expect(html).toMatch(
         new RegExp(`\\.${APP_BOOT_FRAME} #app-boot-frame \\{[^}]*z-index: -1;`),
       );
-      // The sign-in outline: the page colour, and from 68.75rem the stage panel.
+      // The signed-out canvas: the pastel base the public pages land on
+      // (public-canvas.css); from 68.75rem the logo sits at the form column's padding.
       const css = html.replaceAll(/\s+/g, ' ');
-      expect(css).toContain(
-        `.${APP_BOOT_FRAME_LOGIN} #app-boot-frame { background: var(--color-background); }`,
+      expect(css).toMatch(
+        new RegExp(
+          `\\.${APP_BOOT_FRAME} #app-boot-frame \\{[^}]*var\\(--pastel-lavender\\)[^}]*var\\(--public-canvas-base\\);`,
+        ),
       );
       expect(css).toMatch(
         new RegExp(
           `@media \\(min-width: 68\\.75rem\\) \\{ \\.${APP_BOOT_FRAME_LOGIN} \\.app-boot-frame-logo \\{ inset-inline-start: 2\\.5rem; \\}`,
         ),
       );
-      expect(html).toContain('<span class="app-boot-frame-stage"></span>');
+      // The stage is no panel any more (the agent constellation floats), so no outline of it.
+      expect(html).not.toContain('app-boot-frame-stage');
       expect(html).toMatch(
         new RegExp(
           `\\.${APP_SPLASH_STATIC} #app-splash \\*\\s*\\{[^}]*animation-duration: 1ms !important;`,

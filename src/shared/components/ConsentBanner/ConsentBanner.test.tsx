@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -303,6 +303,30 @@ describe('ConsentBanner', () => {
       expect(card).toHaveAttribute('data-floating');
       expect(cardClasses()).toContain('rounded-3xl');
       expect(cardClasses().filter((c) => c.includes('shadow'))).toEqual([]);
+    });
+
+    it('is inverted against a light page: the dark token scope on the card itself', () => {
+      render(<ConsentBanner />);
+      // A near-black card with light ink; the buttons and switches inside read the
+      // same scope, so they invert with it.
+      expect(cardClasses()).toEqual(expect.arrayContaining(['dark', 'bg-card']));
+      expect(screen.getByTestId('consent-banner')).not.toHaveAttribute('data-surface');
+    });
+
+    it('is inverted against a dark page: light-pinned, and it flips with the theme', async () => {
+      document.documentElement.classList.add('dark');
+      try {
+        render(<ConsentBanner />);
+        const card = screen.getByTestId('consent-banner');
+        expect(card).toHaveAttribute('data-surface', 'light-pinned');
+        expect(cardClasses()).not.toContain('dark');
+        // The theme flips back to light while the card is open: so does the card.
+        act(() => document.documentElement.classList.remove('dark'));
+        await waitFor(() => expect(cardClasses()).toContain('dark'));
+        expect(card).not.toHaveAttribute('data-surface');
+      } finally {
+        document.documentElement.classList.remove('dark');
+      }
     });
 
     it('honors reduced motion on its entrance', () => {

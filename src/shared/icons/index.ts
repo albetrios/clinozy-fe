@@ -40,6 +40,7 @@ import {
   File as LuFile,
   Fingerprint as LuFingerprint,
   FolderOpen as LuFolderOpen,
+  Globe as LuGlobe,
   House as LuHouse,
   Image as LuImage,
   Info as LuInfo,
@@ -163,6 +164,8 @@ export const Fingerprint: AppIcon = LuFingerprint;
 /** Lucide `folder-open`: a patient file's sections. */
 export const FolderOpen: AppIcon = LuFolderOpen;
 export const Github: AppIcon = LuGithub;
+/** A globe — the sign-in header's language control (beside the language's code). */
+export const Globe: AppIcon = LuGlobe;
 /** Lucide `house`: Today, walk-ins and who is in the clinic. */
 export const House: AppIcon = LuHouse;
 /** Lucide `image`: photos; named so it never shadows the DOM `Image`. */
