@@ -20,12 +20,18 @@ const canvas = read('src/shared/components/PublicFrame/public-canvas.css');
 const index = read('src/index.css');
 const bootFrame = readFileSync(join(root, 'index.html'), 'utf8');
 
-/** The declarations of the first rule whose selector list is exactly `selector`. */
+/**
+ * The declarations of the first rule whose selector list is exactly `selector` — a rule at the
+ * file's start or right after another rule's `}` (a plain scan, no pattern built from input).
+ */
 function ruleBody(css: string, selector: string): string {
-  const start = css.search(new RegExp(`(^|\\})\\s*${escapeForPattern(selector)}\\s*\\{`));
-  if (start === -1) throw new Error(`no rule for ${selector}`);
-  const open = css.indexOf('{', start + 1);
-  return css.slice(open + 1, css.indexOf('}', open));
+  for (let open = css.indexOf('{'); open !== -1; open = css.indexOf('{', open + 1)) {
+    const prelude = css.slice(css.lastIndexOf('}', open) + 1, open);
+    if (!prelude.includes('{') && prelude.trim() === selector) {
+      return css.slice(open + 1, css.indexOf('}', open));
+    }
+  }
+  throw new Error(`no rule for ${selector}`);
 }
 
 /** The body of `@keyframes name`, its nested braces included. */
@@ -39,10 +45,6 @@ function keyframes(css: string, name: string): string {
     if (depth === 0) return css.slice(start, index + 1);
   }
   throw new Error(`unclosed @keyframes ${name}`);
-}
-
-function escapeForPattern(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 const ONLY_HERE = ['--pastel-sky', '--pastel-mint', '--pastel-butter', '--pastel-rose'];
