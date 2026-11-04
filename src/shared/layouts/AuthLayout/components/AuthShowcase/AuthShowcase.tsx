@@ -1,6 +1,13 @@
 import './auth-showcase.css';
 
-import { Fragment, useEffect, useId, useState } from 'react';
+import {
+  Fragment,
+  type PointerEvent,
+  type ReactNode,
+  useEffect,
+  useId,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
@@ -77,6 +84,14 @@ function useViewerClock(): Date {
  * (closed, its next opening's); then Branches, the sheet one of a deck of the
  * clinic's branches.
  *
+ * Shown as a floating product stack, no panel round it: the Today sheet is the
+ * front screen, crisp, with the chapter's scene working beside Riya's row; the
+ * patient file and the paid receipt float behind it in 3D, tilted away, and
+ * the one the chapter is about comes forward. The stack leans a few degrees
+ * toward the pointer and deals the sheet forward as each chapter arrives
+ * ({@link TourStack}). The steps are dots, the current one a pill in its room's
+ * tone.
+ *
  * @remarks
  * Decorative but not silent: the sheet is one image with a name, the narration
  * is text, and the step buttons and the pause button are real controls. It
@@ -124,17 +139,21 @@ export function AuthShowcaseStage({
         <h2 id={titleId} className="tour-title">
           <TourTitleSentences text={t(K.title)} />
         </h2>
-        <TourBar tour={tour} />
-        <TourNarration chapter={chapter} announce={announce} day={day} now={now} />
       </div>
-      <TourSheet
-        chapter={chapter}
-        live={live}
-        run={run}
-        day={day}
-        now={now}
-        hours={hours}
-      />
+      <TourStack chapter={chapter} run={run} day={day} now={now} hours={hours}>
+        <TourSheet
+          chapter={chapter}
+          live={live}
+          run={run}
+          day={day}
+          now={now}
+          hours={hours}
+        />
+      </TourStack>
+      <div className="tour-foot">
+        <TourNarration chapter={chapter} announce={announce} day={day} now={now} />
+        <TourDots tour={tour} />
+      </div>
     </aside>
   );
 }
@@ -156,20 +175,24 @@ function TourTitleSentences({ text }: { text: string }) {
   ));
 }
 
-/** The eight step buttons (story bars that fill as a chapter plays) and the pause button. */
-function TourBar({ tour }: { tour: ReturnType<typeof useTour> }) {
+/**
+ * The eight steps as dots — the current one a pill in its room's tone — and the
+ * pause button. Each dot is a 24px target round its 8px mark.
+ */
+function TourDots({ tour }: { tour: ReturnType<typeof useTour> }) {
   const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const steps = TOUR_CHAPTERS.length;
   return (
     <div className="tour-bar" data-testid={AUTH_SHOWCASE_TEST_IDS.tour}>
-      <fieldset className="tour-steps">
+      <fieldset className="tour-dots">
         <legend className="sr-only">{t(K.tour.steps, { steps })}</legend>
         {TOUR_CHAPTERS.map((chapter, index) => (
           <button
             key={chapter.id}
             ref={tour.attachStep(index)}
             type="button"
-            className="tour-step"
+            className="tour-dot"
+            data-tone={chapter.tone}
             aria-label={t(K.tour.step, {
               step: index + 1,
               steps,
@@ -179,8 +202,7 @@ function TourBar({ tour }: { tour: ReturnType<typeof useTour> }) {
             data-testid={AUTH_SHOWCASE_TEST_IDS.step(index)}
             onClick={() => tour.goTo(index)}
           >
-            <span data-slot="pill" className="tour-step-track" />
-            <span data-slot="pill" className="tour-step-fill" />
+            <span aria-hidden="true" data-slot="pill" className="tour-dot-mark" />
           </button>
         ))}
       </fieldset>
@@ -200,6 +222,90 @@ function TourBar({ tour }: { tour: ReturnType<typeof useTour> }) {
           )}
         </button>
       ) : null}
+    </div>
+  );
+}
+
+/** The two screens behind the sheet: the patient file and the paid receipt. */
+const STACK_BACK_SCREENS = [
+  { chapter: 'patientFile', side: 'start' },
+  { chapter: 'payments', side: 'end' },
+] as const satisfies readonly { chapter: TourChapterId; side: 'start' | 'end' }[];
+
+/** The pointer's place over the stack, from −0.5 to 0.5 on each axis. */
+function leanOf(event: PointerEvent<HTMLDivElement>): { x: number; y: number } {
+  const box = event.currentTarget.getBoundingClientRect();
+  return {
+    x: (event.clientX - box.left) / box.width - 0.5,
+    y: (event.clientY - box.top) / box.height - 0.5,
+  };
+}
+
+/**
+ * The floating product stack (Apple's way of showing a product: real screens
+ * in space). The front screen is `children` (the Today sheet); behind it, in
+ * 3D, the patient file (inline start) and the paid receipt (inline end) at rest
+ * — decorative, their words are the narration's — and the one the current
+ * chapter is about comes forward (`data-lifted`). The whole scene leans toward
+ * the pointer (`--lean-x`, `--lean-y`, set on the element as the pointer moves,
+ * as `useTour` sets `--fill`), deals the sheet forward on each arrival
+ * (`data-deal` flips, so the keyframe replays) and stands on a pastel
+ * reflection. Reduced motion and phones: flat, no lean (auth-showcase.css).
+ */
+function TourStack({
+  chapter,
+  run,
+  day,
+  now,
+  hours,
+  children,
+}: {
+  chapter: number;
+  run: number;
+  day: TourDay;
+  now: Date;
+  hours: BranchHours;
+  children: ReactNode;
+}) {
+  const current = TOUR_CHAPTERS[chapter]?.id;
+  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const lean = leanOf(event);
+    event.currentTarget.style.setProperty('--lean-x', lean.x.toFixed(3));
+    event.currentTarget.style.setProperty('--lean-y', lean.y.toFixed(3));
+  };
+  const onPointerLeave = (event: PointerEvent<HTMLDivElement>) => {
+    event.currentTarget.style.removeProperty('--lean-x');
+    event.currentTarget.style.removeProperty('--lean-y');
+  };
+  return (
+    <div
+      className="tour-stack"
+      data-testid={AUTH_SHOWCASE_TEST_IDS.stack}
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
+    >
+      <div className="tour-stack-scene" data-deal={run % 2 === 0 ? 'even' : 'odd'}>
+        {STACK_BACK_SCREENS.map((screen) => (
+          <div
+            key={screen.chapter}
+            aria-hidden="true"
+            className="tour-stack-back"
+            data-side={screen.side}
+            data-chapter={screen.chapter}
+            data-lifted={screen.chapter === current ? '' : undefined}
+          >
+            <TourLens
+              chapter={screen.chapter}
+              live={false}
+              day={day}
+              now={now}
+              hours={hours}
+              decorative
+            />
+          </div>
+        ))}
+        <div className="tour-stack-front">{children}</div>
+      </div>
     </div>
   );
 }

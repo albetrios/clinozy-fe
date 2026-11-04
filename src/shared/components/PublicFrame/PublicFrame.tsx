@@ -7,7 +7,6 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { BrandLogo } from '@/shared/components/ProductMark/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card } from '@/shared/components/ui/card.tsx';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
 
@@ -104,7 +103,7 @@ export function PublicAurora() {
 
 /** Props for {@link AgentOrb}. */
 export interface AgentOrbProps {
-  /** `md` is 40px (a card's heading); `lg` is 56px. */
+  /** `md` is 40px; `lg` is 56px (a page's heading). */
   size?: 'md' | 'lg';
   className?: string;
 }
@@ -178,21 +177,21 @@ export type PublicCardProps = ComponentProps<'div'> & {
 };
 
 /**
- * The card on the signed-out canvas — the "Signed out" card (H:515): full width
- * up to 360px (or 480px), 28px top and bottom, the drawer's side inset
- * (`--drawer-pad-x`: 24 · 20 · 16px), 12px corners, a 1px border and the card's
- * lift (the `card` slot, so the elevation axis restyles it).
- *
- * On the canvas it is glass (`public-glass`): a frosted fill in an iridescent
- * hairline over a slowly turning pastel halo. While one of its buttons is busy
- * the halo quickens and every other button in it dims and stops taking the
- * pointer, so only one action runs at a time.
+ * A page's content on the signed-out canvas — no longer a box. Full width up to
+ * 360px (or 480px), 28px top and bottom, the drawer's side inset
+ * (`--drawer-pad-x`: 24 · 20 · 16px); no edge, no fill, no lift: it floats on
+ * the aurora with an edgeless pool of light behind it (`public-stage`,
+ * `public-canvas.css`). While one of its buttons is busy the pool warms and
+ * breathes, the orb quickens, and every other button on it dims and stops
+ * taking the pointer, so only one action runs at a time. (The name stays
+ * `PublicCard` for its callers; the "Signed out" card's metrics, H:515.)
  */
 export function PublicCard({ width = 'auth', className, ...props }: PublicCardProps) {
   return (
-    <Card
+    <div
+      data-slot="public-stage"
       className={cn(
-        'public-glass w-full gap-5 px-(--drawer-pad-x) py-7',
+        'public-stage flex w-full flex-col gap-5 px-(--drawer-pad-x) py-7',
         CARD_WIDTHS[width],
         className,
       )}
@@ -241,7 +240,7 @@ export function PublicCardHeader({
     <header
       className={cn('flex flex-col gap-1.5', size === 'display' && 'gap-2', className)}
     >
-      {orb ? <AgentOrb className="mb-3" /> : null}
+      {orb ? <AgentOrb size="lg" className="mb-4" /> : null}
       <h1
         data-testid={titleTestId}
         className={cn('font-semibold text-balance', CARD_HEADER_SIZES[size])}

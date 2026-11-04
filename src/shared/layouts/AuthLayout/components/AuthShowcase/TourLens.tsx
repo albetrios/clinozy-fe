@@ -512,19 +512,22 @@ export function TourLens({
   day,
   now,
   hours,
+  decorative = false,
 }: {
   chapter: TourChapterId;
   live: boolean;
   day: TourDay;
   now: Date;
   hours: BranchHours;
+  /** A screen at rest behind the stack's sheet (`TourStack`): no test id, so the live lens stays the one. */
+  decorative?: boolean;
 }) {
   const format = useTourFormat();
   const Scene = SCENES[chapter];
   return (
     <div
       className={cn('tour-lens', live && 'is-arriving')}
-      data-testid={AUTH_SHOWCASE_TEST_IDS.lens}
+      data-testid={decorative ? undefined : AUTH_SHOWCASE_TEST_IDS.lens}
       data-chapter={chapter}
     >
       <Scene scene={{ live, day, now, hours, format }} />

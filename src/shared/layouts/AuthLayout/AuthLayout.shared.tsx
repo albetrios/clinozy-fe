@@ -15,7 +15,8 @@ import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
 import { cn } from '@/lib/utils.ts';
 import type { PickerSingleProps } from '@/shared/components/Picker/index.ts';
 import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
-import { ChevronDown } from '@/shared/icons/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
+import { ChevronDown, Globe } from '@/shared/icons/index.ts';
 import { LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
@@ -32,24 +33,52 @@ const loadLocalePicker = onceAsync(() =>
   })),
 );
 
+/** The trigger's face: a globe, the language's code ("EN", "HI") and the chevron. */
+function LocaleTriggerFace({ code }: { code: string }) {
+  return (
+    <>
+      <Globe aria-hidden="true" className="text-foreground-soft size-3.5 flex-none" />
+      <span className="text-detail font-semibold tracking-[0.04em]">{code}</span>
+      <ChevronDown
+        aria-hidden="true"
+        className="text-muted-foreground size-3 flex-none"
+      />
+    </>
+  );
+}
+
+/** The trigger's classes: a 32px outline control beside the theme toggle. */
+const LOCALE_TRIGGER_CLASS = 'h-8 gap-1.5 ps-2.5 pe-2';
+
 /**
  * The language trigger as it looks before the picker arrives (and if its chunk
- * fails): the picker's `sm` field with the current language — inert, so the
- * real control replaces it without a shift.
+ * fails): the same face, inert, so the real control replaces it without a shift.
  */
-function LocaleTriggerPlaceholder({ label }: { label: string }) {
+function LocaleTriggerPlaceholder({ code }: { code: string }) {
   return (
     <span
       aria-hidden="true"
-      className="bg-background text-body flex min-h-8 min-w-[9.5rem] items-center gap-2 rounded-lg border ps-2.5 pe-2.5 shadow-(--elevation-control)"
+      className={cn(
+        'bg-background flex items-center rounded-lg border shadow-(--elevation-control)',
+        LOCALE_TRIGGER_CLASS,
+      )}
     >
-      <span className="min-w-0 flex-1 truncate">{label}</span>
-      <ChevronDown className="text-muted-foreground size-3.5 flex-none" />
+      <LocaleTriggerFace code={code} />
     </span>
   );
 }
 
-/** Compact language switcher — sets UI locale (and auto RTL for Arabic) on auth. */
+/** A locale's code as the trigger shows it: `en` → `EN`. */
+function localeCode(locale: string): string {
+  return locale.toUpperCase();
+}
+
+/**
+ * Compact language switcher — sets UI locale (and auto RTL for Arabic) on auth.
+ * The trigger shows the code only (a globe, "EN"); the list keeps each
+ * language's own full name, and the trigger's name (hidden text before the
+ * code) says the full one too, so the name holds the words it shows (WCAG 2.5.3).
+ */
 function AuthLocalePicker() {
   const { t } = useTranslation(LOCALE_NS);
   const locale = useLocaleStore((s) => s.locale);
@@ -62,11 +91,9 @@ function AuthLocalePicker() {
     key: code,
     label: t(LOCALE_LABEL_KEYS[code], { defaultValue: LOCALE_NATIVE_LABELS[code] }),
   }));
-  const placeholder = (
-    <LocaleTriggerPlaceholder
-      label={options.find((option) => option.key === locale)?.label ?? locale}
-    />
-  );
+  const code = localeCode(locale);
+  const fullName = options.find((option) => option.key === locale)?.label ?? locale;
+  const placeholder = <LocaleTriggerPlaceholder code={code} />;
   return (
     <ErrorBoundary fallback={placeholder}>
       <Suspense fallback={placeholder}>
@@ -82,7 +109,19 @@ function AuthLocalePicker() {
           align="end"
           minWidth={180}
           testId="auth-locale-select"
-          className="min-w-[9.5rem]"
+          renderTrigger={() => (
+            <Button
+              type="button"
+              variant="outline"
+              title={fullName}
+              data-testid="auth-locale-select"
+              className={LOCALE_TRIGGER_CLASS}
+            >
+              {/* The name from content: the full words first, then the code it shows. */}
+              <span className="sr-only">{`${t(LOCALE_KEYS.openAria)}: ${fullName}`}</span>
+              <LocaleTriggerFace code={code} />
+            </Button>
+          )}
         />
       </Suspense>
     </ErrorBoundary>

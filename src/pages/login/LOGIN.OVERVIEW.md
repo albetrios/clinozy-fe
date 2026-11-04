@@ -21,21 +21,25 @@ New passwordless users → `/onboarding` → app.
 
 The frame is `AuthLayout` (`shared/layouts/AuthLayout/AuthLayout.tsx`). From 68.75rem it is
 two columns: the **form's column** — the logo with the language picker and theme toggle, the
-form on the page (no card), the privacy line, and a footer with the year and "Privacy
-choices" — and the **stage** beside it, a rounded panel held in view (sticky) while the column
-scrolls. Below that it is one column, the form first: header → form → stage → "Privacy
+form on the page (no card: an edgeless pool of light, `public-stage`, on the pastel
+"agent glow" canvas), the privacy line, and a footer with the year and "Privacy choices" —
+and the **stage** beside it, no panel, held in view (sticky) while the column scrolls. Below that it is one column, the form first: header → form → stage → "Privacy
 choices". The stage (`src/shared/layouts/AuthLayout/components/AuthShowcase/`) is a **tour**
 of one patient's day in seven chapters (Leads → Appointments → Front desk → Patient file →
 Treatment → Payments → Tasks), then Branches — her sheet fanning into a deck of the clinic's
 branches and folding back into "All branches" — on a Today sheet set to the viewer's own clock and this
 device's branch hours (the branch last worked in here — the signed-in shell keeps them — else
 the defaults a new branch starts with); closed, it shows the branch's next opening. Each
-chapter's feature is shown working in a lens under her row. It plays on
+chapter's feature is shown working in a lens under her row. The sheet floats as the front
+screen of a **product stack**: the patient file and the paid receipt tilted behind it in 3D
+(the one the chapter is about comes forward), leaning toward the pointer on a pastel
+reflection; the steps are dots, the current one a pill in its room's tone. It plays on
 its own only here, on `/login` (never under reduced motion), once round before it rests on its
 first chapter, holds while the viewer is busy elsewhere (its frame loop parked), and has a pause
 button; the MFA and hand-off screens show it still. Its copy is
 `auth` › `showcase.*` (11 locales); the grid and the tour's motion ship as CSS with the lazy
 auth chunk (`src/shared/layouts/AuthLayout/auth-layout.css`,
+`src/shared/components/PublicFrame/public-canvas.css`,
 `src/shared/layouts/AuthLayout/components/AuthShowcase/auth-showcase.css`), never on the
 first paint.
 

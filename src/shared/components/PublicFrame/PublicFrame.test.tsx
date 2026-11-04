@@ -113,17 +113,18 @@ describe('PublicFrame', () => {
 });
 
 describe('PublicCard', () => {
-  it('is the "Signed out" card: 360px, the card slot, 12px corners, the drawer inset', () => {
+  it('is no box: 360px of stage at the drawer inset, the stage slot, no edge', () => {
     render(<PublicCard data-testid="card">Body</PublicCard>);
     const card = screen.getByTestId('card');
-    expect(card).toHaveAttribute('data-slot', 'card');
+    expect(card).toHaveAttribute('data-slot', 'public-stage');
     expect(card).toHaveClass(
+      'public-stage',
       'w-full',
       'max-w-90',
-      'rounded-xl',
       'px-(--drawer-pad-x)',
       'py-7',
     );
+    expect(card).not.toHaveClass('border', 'bg-card', 'rounded-xl');
   });
 
   it('widens to 480px for the wizard and takes extra classes', () => {
@@ -204,15 +205,17 @@ describe('the agent-glow canvas', () => {
     expect(screen.getByTestId('agent-orb')).toHaveAttribute('data-size', 'lg');
   });
 
-  it('makes the card glass and opens its heading on the orb', () => {
+  it('floats the page on a stage and opens its heading on the large orb', () => {
     render(
       <PublicCard data-testid="card">
         <PublicCardHeader title="Join Acme" />
       </PublicCard>,
     );
-    expect(screen.getByTestId('card')).toHaveClass('public-glass');
+    expect(screen.getByTestId('card')).toHaveClass('public-stage');
     const header = screen.getByRole('heading', { level: 1 }).parentElement;
-    expect(header?.firstElementChild).toBe(screen.getByTestId('agent-orb'));
+    const orb = screen.getByTestId('agent-orb');
+    expect(header?.firstElementChild).toBe(orb);
+    expect(orb).toHaveAttribute('data-size', 'lg');
   });
 
   it('leaves the orb out when a step asks it to', () => {

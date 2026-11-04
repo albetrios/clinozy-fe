@@ -2,28 +2,27 @@
    the lazy public chunks, never on the first paint (the initial-CSS budget):
    the same split as `auth-layout.css`.
 
-   Four layers, back to front:
+   No boxes. Content floats on the canvas; light, not borders, holds it:
 
    ```text
    .public-canvas      the page: the pastel base colour
    .public-aurora      fixed, behind everything: five drifting pastel blobs
                        and a dot grid that fades out from the centre
-   .public-glass       a card: frosted glass (::after) inside an iridescent
-                       hairline, over a blurred conic halo (::before) that
-                       turns slowly — and fast while an action is in flight
-   .agent-orb          the small turning sphere above a card's heading
+   .public-stage       a page's content (PublicCard, the sign-in form): no
+                       edge, no fill — an edgeless pool of light behind it that
+                       warms and breathes while an action is in flight
+   .agent-orb          the turning pastel sphere above a heading
    ```
 
    The palette is `--pastel-*` and `--public-canvas-base` (index.css, re-toned
-   under `.dark`), so both themes follow. Corners are radius steps, so the
-   Corner radius axis reaches the glass; the halo hides under the flat
-   elevation (border-only by design). Insets are logical. Reduced motion: the
-   aurora, the halo, the orb and the shimmer hold still.
+   under `.dark`), so both themes follow. Insets are logical. Reduced motion:
+   the aurora, the pool, the orb and the shimmer hold still.
 
-   While a button inside a glass card is busy (`aria-busy` on the shared
-   Button, its `isLoading` — a loading list alone does not count), every OTHER button and button-link in that card dims
-   and stops taking the pointer — one action at a time, visibly — and the busy
-   one carries a shimmer over its own 80% (button.tsx). */
+   While a button on a stage is busy (`aria-busy` on the shared Button, its
+   `isLoading` — a loading list alone does not count), every OTHER button and
+   button-link on that stage dims and stops taking the pointer — one action at
+   a time, visibly — and the busy one carries a shimmer over its own 80%
+   (button.tsx). */
 
 @property --agent-halo-angle {
   syntax: '<angle>';
@@ -36,6 +35,13 @@
 .public-canvas {
   position: relative;
   isolation: isolate;
+  overflow-x: clip;
+  background: var(--public-canvas-base);
+}
+
+/* The page's own end — the room a phone keeps below the cookie card
+   (index.css) — in the canvas's colour, not the plain background's. */
+:root:has(.public-canvas) body {
   background: var(--public-canvas-base);
 }
 
@@ -137,67 +143,33 @@
   }
 }
 
-/* ── The glass card ───────────────────────────────────────────────────── */
+/* ── The stage: no box, a pool of light ───────────────────────────────── */
 
-.public-glass {
-  --glass-fill: color-mix(in oklab, var(--color-card) 84%, transparent);
-  --glass-spectrum: conic-gradient(
-    from var(--agent-halo-angle),
-    var(--pastel-lavender),
-    var(--pastel-sky),
-    var(--pastel-mint),
-    var(--pastel-butter),
-    var(--pastel-peach),
-    var(--pastel-rose),
-    var(--pastel-lavender)
-  );
+.public-stage {
   position: relative;
-  border-color: transparent;
-  background: transparent;
 }
-.dark .public-glass {
-  --glass-fill: color-mix(in oklab, var(--color-card) 82%, transparent);
-}
-
-/* The halo: the spectrum, blurred, spilling past the card's edge. */
-.public-glass::before {
+.public-stage::before {
   content: '';
   position: absolute;
-  inset: -5px;
+  inset: -16% -20%;
   z-index: -1;
-  border-radius: inherit;
-  background: var(--glass-spectrum);
-  filter: blur(28px);
-  opacity: 0.75;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--color-background) 88%, transparent),
+    color-mix(in oklab, var(--color-background) 55%, transparent) 55%,
+    transparent
+  );
   pointer-events: none;
-  animation: agent-halo-spin 16s linear infinite;
-  transition:
-    opacity 400ms var(--ease-out-strong),
-    filter 400ms var(--ease-out-strong);
+  transition: background 400ms var(--ease-out-strong);
 }
-.dark .public-glass::before {
-  opacity: 0.45;
-}
-
-/* The glass: a frosted fill inside a 1px iridescent hairline (the spectrum
-   on the border box, the fill on the padding box). */
-.public-glass::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border: 1px solid transparent;
-  border-radius: inherit;
-  background:
-    linear-gradient(var(--glass-fill), var(--glass-fill)) padding-box,
-    var(--glass-spectrum) border-box;
-  backdrop-filter: blur(22px) saturate(1.5);
-  pointer-events: none;
-  animation: agent-halo-spin 16s linear infinite;
-}
-
-[data-elevation='flat'] .public-glass::before {
-  display: none;
+.dark .public-stage::before {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--color-background) 80%, transparent),
+    color-mix(in oklab, var(--color-background) 45%, transparent) 55%,
+    transparent
+  );
 }
 
 @keyframes agent-halo-spin {
@@ -299,7 +271,7 @@
     0 10px 22px -12px var(--pastel-lavender);
 }
 
-.public-glass [data-slot='input'] {
+.public-stage [data-slot='input'] {
   background-color: color-mix(in oklab, var(--color-background) 76%, transparent);
 }
 
@@ -311,10 +283,10 @@
 
 /* ── One action at a time ─────────────────────────────────────────────── */
 
-.public-glass:has([data-slot='button'][aria-busy='true']) {
+.public-stage:has([data-slot='button'][aria-busy='true']) {
   cursor: progress;
 }
-.public-glass:has([data-slot='button'][aria-busy='true'])
+.public-stage:has([data-slot='button'][aria-busy='true'])
   :is(button, a[data-slot='button']):not([aria-busy='true']) {
   opacity: 0.5;
   pointer-events: none;
@@ -323,25 +295,38 @@
     opacity 200ms ease,
     filter 200ms ease;
 }
-/* The agent works: the halo brightens and turns fast, the orb with it. */
-.public-glass:has([data-slot='button'][aria-busy='true'])::before {
-  opacity: 0.95;
-  filter: blur(30px);
-  animation-duration: 2.4s;
+/* The agent works: the pool warms to lavender and breathes, the orb quickens. */
+.public-stage:has([data-slot='button'][aria-busy='true'])::before {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--pastel-lavender) 34%, var(--color-background)),
+    color-mix(in oklab, var(--pastel-peach) 30%, transparent) 60%,
+    transparent
+  );
+  animation: public-pool-breathe 1.6s ease-in-out infinite;
 }
-.public-glass:has([data-slot='button'][aria-busy='true'])::after {
-  animation-duration: 2.4s;
-}
-.public-glass:has([data-slot='button'][aria-busy='true']) .agent-orb {
+.public-stage:has([data-slot='button'][aria-busy='true']) .agent-orb {
   animation-duration: 1.6s, 1.2s;
 }
 
-.public-glass [data-slot='button'][aria-busy='true'] {
+@keyframes public-pool-breathe {
+  0%,
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+  50% {
+    opacity: 0.75;
+    scale: 1.04;
+  }
+}
+
+.public-stage [data-slot='button'][aria-busy='true'] {
   position: relative;
   overflow: hidden;
   isolation: isolate;
 }
-.public-glass [data-slot='button'][aria-busy='true']::after {
+.public-stage [data-slot='button'][aria-busy='true']::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -355,7 +340,7 @@
   animation: agent-shimmer 1.4s var(--ease-in-out-strong) infinite;
   pointer-events: none;
 }
-[dir='rtl'] .public-glass [data-slot='button'][aria-busy='true']::after {
+[dir='rtl'] .public-stage [data-slot='button'][aria-busy='true']::after {
   animation-direction: reverse;
 }
 
@@ -376,10 +361,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .public-aurora-blob,
-  .public-glass::before,
-  .public-glass::after,
   .agent-orb,
-  .public-glass [data-slot='button'][aria-busy='true']::after {
+  .public-stage:has([data-slot='button'][aria-busy='true'])::before,
+  .public-stage [data-slot='button'][aria-busy='true']::after {
     animation: none;
   }
 }

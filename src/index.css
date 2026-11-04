@@ -524,7 +524,8 @@
    glass card's halo, the agent orb). Plain properties, not @theme, so no
    utilities are generated into the first paint; `index.html`'s boot frame
    reads `--public-canvas-base` and the first two hues so the cold load paints
-   the same canvas the sign-in screen lands on. `.dark` re-tones them. */
+   the same canvas the sign-in screen lands on. The `.dark` block below
+   re-tones them (kept inside it: the theme tests read that block). */
 :root {
   --public-canvas-base: oklch(0.986 0.007 300);
   --pastel-lavender: oklch(0.86 0.075 295);
@@ -534,7 +535,11 @@
   --pastel-peach: oklch(0.89 0.07 50);
   --pastel-rose: oklch(0.88 0.07 5);
 }
+
+/* ── Dark mode overrides via .dark class ── */
 .dark {
+  --tone-edge-ink: 15%;
+  /* The signed-out canvas's pastels, re-toned (the :root block above). */
   --public-canvas-base: oklch(0.165 0.018 285);
   --pastel-lavender: oklch(0.55 0.14 295);
   --pastel-sky: oklch(0.55 0.11 235);
@@ -542,11 +547,6 @@
   --pastel-butter: oklch(0.62 0.1 95);
   --pastel-peach: oklch(0.6 0.11 50);
   --pastel-rose: oklch(0.58 0.12 5);
-}
-
-/* ── Dark mode overrides via .dark class ── */
-.dark {
-  --tone-edge-ink: 15%;
   --color-background: oklch(0.145 0 0);
   --color-foreground: oklch(0.985 0 0);
   --color-card: oklch(0.205 0 0);

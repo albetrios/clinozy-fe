@@ -47,10 +47,10 @@ const TOUR_AUTOPLAY_PATH = '/login';
  * lives in `auth-layout.css`, which loads with this lazy chunk.
  *
  * The look is the signed-out canvas's "agent glow" (`public-canvas.css`, shared
- * with `PublicFrame`): the pastel aurora behind the whole screen, the form
- * in a glass card (the `card` slot, so the elevation axis still lifts it) whose
- * pastel halo quickens while a sign-in method is in flight, and the stage as a
- * second pane of glass.
+ * with `PublicFrame`): the pastel aurora behind the whole screen and no boxes on
+ * it. The form floats on an edgeless pool of light (`public-stage`) that warms
+ * while a sign-in method is in flight; beside it the stage is a floating
+ * product stack — the Today sheet in front, two screens behind it in 3D.
  */
 export function AuthLayout({ children }: AuthLayoutProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -71,15 +71,13 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         </div>
       </header>
       <main id="main-content" className="auth-layout-main">
-        <div className="auth-layout-block">
-          <div
-            data-slot="card"
-            data-testid="auth-layout-card"
-            className="auth-layout-card public-glass rounded-2xl border"
-          >
-            <AuthForm>{children}</AuthForm>
-          </div>
-          <AuthShowcasePrivacy className="mt-6 px-2" />
+        <div
+          data-slot="public-stage"
+          data-testid="auth-layout-block"
+          className="auth-layout-block public-stage"
+        >
+          <AuthForm>{children}</AuthForm>
+          <AuthShowcasePrivacy className="mt-8" />
         </div>
       </main>
       <AuthShowcaseStage

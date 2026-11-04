@@ -5,6 +5,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
 } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
@@ -42,6 +43,26 @@ const BUTTON_CLASS = 'h-auto min-h-9 min-w-0 px-2 whitespace-normal sm:px-3.5';
 
 type ConsentCardView = 'summary' | 'customize';
 
+/** Whether `<html>` carries the `dark` class now — the resolved theme, system mode included. */
+function isDocumentDark(): boolean {
+  return document.documentElement.classList.contains('dark');
+}
+
+/** Re-renders on every change to `<html>`'s classes (the theme store flips `dark` there). */
+function subscribeToDocumentClass(onChange: () => void): () => void {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
+  return () => observer.disconnect();
+}
+
+/** The resolved theme, live: `true` while the page is dark. */
+function useDocumentDark(): boolean {
+  return useSyncExternalStore(subscribeToDocumentClass, isDocumentDark, () => false);
+}
+
 /**
  * The cookie card, on claude.com's cookie banner (D1–D15): "Cookie settings", one paragraph and
  * the Privacy Policy link, then **Customize cookie settings · Reject all cookies · Accept all
@@ -56,6 +77,12 @@ type ConsentCardView = 'summary' | 'customize';
  * - **Reject is as easy as Accept**: on the first view, the same size.
  * - **Global Privacy Control** (D6): the card never opens on its own; opened from Privacy
  *   choices it says why Analytics is off, and Accept all and the Analytics switch are locked.
+ * - **Inverted against the theme, as claude.ai's**: on the light theme the card carries the `dark`
+ *   token scope — a near-black card with light ink, dark Customize and Reject, a light Accept; on
+ *   the dark theme it is `light-pinned` (index.css: the light ramp kept inside dark mode, as the
+ *   bulk-actions bar) — a white card with dark ink. It reads the live `dark` class on `<html>`
+ *   ({@link useDocumentDark}), so it flips the moment the theme does, and always stands apart from
+ *   the page instead of reading as part of it.
  * - **The bottom-START corner** (D8): the feedback trigger owns bottom-end. At most 456px wide
  *   (claude.com's), 24px in; below `sm` a full-width inset sheet that rides above the tab bar
  *   through `--floating-bottom-offset` (see `index.css`). Logical `start-*`, so it mirrors under RTL.
@@ -76,6 +103,8 @@ export function ConsentBanner() {
   const open = useConsentStore(selectConsentCardOpen);
   const preferences = useConsentStore((s) => s.preferences);
   const globalPrivacyControl = isGlobalPrivacyControlOn();
+  // Inverted against the page: dark on a light page, light-pinned on a dark one.
+  const pageDark = useDocumentDark();
   const [view, setView] = useState<ConsentCardView>('summary');
   const [analytics, setAnalytics] = useState(
     !globalPrivacyControl && preferences?.analytics === true,
@@ -138,7 +167,9 @@ export function ConsentBanner() {
       // `data-floating` gives it a default lift (it has no scrim) — index.css.
       data-slot="surface"
       data-floating=""
+      data-surface={pageDark ? 'light-pinned' : undefined}
       className={cn(
+        !pageDark && 'dark',
         'bg-card text-card-foreground fixed z-50 m-0 flex h-auto max-h-[calc(100dvh-1.5rem)] w-auto flex-col overflow-y-auto rounded-3xl border p-4 sm:p-6',
         'inset-x-3 bottom-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom,0rem)+0.75rem)]',
         'sm:inset-x-auto sm:start-6 sm:w-[28.5rem]',

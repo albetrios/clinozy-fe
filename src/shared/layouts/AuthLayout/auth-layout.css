@@ -12,8 +12,10 @@
    (`app-boot-frame-login`); the two move together.
 
    The surfaces are the signed-out canvas's (`public-canvas.css`): the aurora
-   behind the grid, the form in a glass card (`.auth-layout-card`), the stage a
-   second pane of glass (`auth-showcase.css`). */
+   behind the grid and no boxes on it — the form floats on a pool of light
+   (`.public-stage`), the stage is a floating product stack (`auth-showcase.css`),
+   no panel. While a sign-in method is in flight the stack's reflection breathes
+   with the form's light. */
 
 .auth-layout {
   --auth-form-column: clamp(28rem, 38vw, 38rem);
@@ -38,19 +40,12 @@
 }
 .auth-layout-block {
   width: 100%;
-  max-width: 27rem;
+  max-width: 24rem;
   margin-inline: auto;
-}
-.auth-layout-card {
-  padding: calc(var(--spacing) * 7) calc(var(--spacing) * 5);
 }
 .auth-layout-stage {
   grid-area: stage;
   margin-inline: var(--auth-stage-inset);
-}
-.auth-layout-stage .tour-glimpse {
-  flex: none;
-  height: 29rem;
 }
 .auth-layout-footer {
   grid-area: footer;
@@ -72,9 +67,6 @@
   .auth-layout-header {
     padding-inline: calc(var(--spacing) * 10) calc(var(--spacing) * 8);
   }
-  .auth-layout-card {
-    padding: calc(var(--spacing) * 9) calc(var(--spacing) * 8);
-  }
   .auth-layout-main {
     align-items: center;
     padding: calc(var(--spacing) * 10) calc(var(--spacing) * 8) calc(var(--spacing) * 10)
@@ -91,10 +83,6 @@
     padding-inline: clamp(2.5rem, 4.4vw, 4rem);
     padding-top: clamp(2.5rem, 6vh, 3.75rem);
   }
-  .auth-layout-stage .tour-glimpse {
-    flex: 1;
-    height: auto;
-  }
   .auth-layout-footer {
     justify-content: space-between;
     padding-inline: calc(var(--spacing) * 10) calc(var(--spacing) * 8);
@@ -109,12 +97,31 @@
     --auth-form-column: 40rem;
   }
   .auth-layout-block {
-    max-width: 29rem;
+    max-width: 26rem;
   }
   .auth-layout-stage .tour-title {
     font-size: 3.25rem;
   }
   .auth-layout-stage .tour-copy {
     max-width: 40rem;
+  }
+}
+
+/* The agent works: while a sign-in method is in flight, the stack's pastel
+   reflection breathes with the form's light. */
+.auth-layout:has(.public-stage [data-slot='button'][aria-busy='true'])
+  .tour-stack::after {
+  animation: auth-layout-reflection 1.6s ease-in-out infinite;
+}
+@keyframes auth-layout-reflection {
+  50% {
+    opacity: 0.55;
+    scale: 1.06 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-layout:has(.public-stage [data-slot='button'][aria-busy='true'])
+    .tour-stack::after {
+    animation: none;
   }
 }

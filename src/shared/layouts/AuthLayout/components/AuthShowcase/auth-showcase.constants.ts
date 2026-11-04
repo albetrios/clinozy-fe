@@ -179,6 +179,7 @@ export const AUTH_SHOWCASE_TEST_IDS = {
   sheet: 'auth-showcase-sheet',
   story: 'auth-showcase-story',
   lens: 'auth-showcase-lens',
+  stack: 'auth-showcase-stack',
   privacy: 'auth-showcase-privacy',
 } as const;
 

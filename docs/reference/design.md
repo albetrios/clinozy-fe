@@ -92,25 +92,38 @@ and dark-mode variants stay balanced.
 - **The signed-out canvas ("agent glow").** Every page before the clinic shell —
   sign-in, MFA, the OAuth hand-off, onboarding, an invitation, the organization
   picker, the 403 and the 404 — sits on one pastel canvas, the product's one
-  place for colour beyond the accent. The palette is `--public-canvas-base` and
-  six `--pastel-*` hues (lavender, sky, mint, butter, peach, rose) in
-  `index.css`, re-toned under `.dark`; plain properties, not `@theme`, so the
-  first paint carries no utilities for them. `public-canvas.css` (lazy, with
-  `PublicFrame`) draws four layers:
+  place for colour beyond the accent, and **draws no boxes on it**. The palette
+  is `--public-canvas-base` and six `--pastel-*` hues (lavender, sky, mint,
+  butter, peach, rose) in `index.css`, re-toned in the `.dark` block; plain
+  properties, not `@theme`, so the first paint carries no utilities for them.
+  `public-canvas.css` (lazy, with `PublicFrame`) draws:
 
   ```text
   .public-canvas    the page: the pastel base
   .public-aurora    fixed behind it: five drifting blobs + a dot grid fading from the centre
-  .public-glass     a card: frosted fill in an iridescent hairline, over a blurred
-                    conic halo that turns slowly (16s) — fast (2.4s) while busy
-  .agent-orb        the turning sphere above each public card's heading
+  .public-stage     a page's content (PublicCard, the sign-in form): no edge, no fill —
+                    an edgeless pool of light behind it that warms while an action runs
+  .agent-orb        the turning pastel sphere above each public heading
   ```
 
-  Ink stays ink: headings, body copy and the primary button keep their neutral
-  tokens, so every text pair still clears AA. The pastels only tint surfaces,
-  shadows and glows. The halo hides under the `flat` elevation; reduced motion
-  holds the aurora, halo, orb and shimmer still. `index.html`'s boot frame paints
-  the same base and first two hues, so a cold load does not change colour.
+  Beside the sign-in form the stage is a **floating product stack**
+  (`AuthShowcase`): the Today sheet in front, the patient file and the paid
+  receipt tilted behind it in 3D — the one the chapter is about comes forward —
+  leaning toward the pointer on a pastel reflection; the steps are dots, the
+  current one a pill in its room's tone. Ink stays ink: headings, body copy and
+  the primary button keep their neutral tokens, so every text pair still clears
+  AA; the pastels tint only light, shadows and glows. Reduced motion holds the
+  aurora, the orb, the pool and the stack still (phones get one flat screen).
+  `index.html`'s boot frame paints the same base and first two hues, so a cold
+  load does not change colour.
+
+- **The cookie card is inverted against the theme** (as claude.ai's): on a light
+  page it carries the `dark` token scope (a near-black card, light ink, a light
+  Accept); on a dark page it is `light-pinned` (the light ramp kept inside dark
+  mode). It reads the live `dark` class on `<html>`, so it flips with the theme.
+- **The sign-in language control is compact**: a globe and the language's code
+  (`EN`, `HI`); the list keeps each language's full native name, and the
+  trigger's accessible name says the full one too.
 
 Contrast is non-negotiable: every `*-foreground` token is chosen to clear WCAG AA
 on its surface, in both modes.
@@ -324,8 +337,8 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   `animate-spin`. Content waits as skeletons, never under a spinner.
 - **One action at a time.** While an action runs, every other button that could
   start a second one is disabled — at the plain `disabled` 50%. On the signed-out
-  canvas the glass card enforces it: while one of its buttons is `aria-busy`,
-  `public-canvas.css` dims every other button and button-link in that card and
+  canvas the stage enforces it: while one of its buttons is `aria-busy`,
+  `public-canvas.css` dims every other button and button-link on that stage and
   takes them off the pointer, and the busy button carries a shimmer.
 - Render known interface structure immediately: dialog titles, navigation, search,
   close controls, widget headings, and section labels are real UI, not skeletons.
