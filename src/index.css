@@ -520,20 +520,16 @@
   --tone-edge-ink: 45%;
 }
 
-/* The signed-out canvas's pastel palette (public-canvas.css: the aurora, the
-   glass card's halo, the agent orb). Plain properties, not @theme, so no
-   utilities are generated into the first paint; `index.html`'s boot frame
-   reads `--public-canvas-base` and the first two hues so the cold load paints
-   the same canvas the sign-in screen lands on. The `.dark` block below
-   re-tones them (kept inside it: the theme tests read that block). */
+/* The signed-out canvas's pastels that `index.html`'s boot frame reads — the
+   base, lavender and peach — so the cold load paints the same canvas the
+   sign-in screen lands on (public-canvas.css: the aurora, the pool, the orb;
+   it holds the four only it reads, off the first paint). Plain properties,
+   not @theme, so no utilities are generated into the first paint. The `.dark`
+   block below re-tones them (kept inside it: the theme tests read that block). */
 :root {
   --public-canvas-base: oklch(0.986 0.007 300);
   --pastel-lavender: oklch(0.86 0.075 295);
-  --pastel-sky: oklch(0.88 0.06 235);
-  --pastel-mint: oklch(0.9 0.07 165);
-  --pastel-butter: oklch(0.95 0.075 95);
   --pastel-peach: oklch(0.89 0.07 50);
-  --pastel-rose: oklch(0.88 0.07 5);
 }
 
 /* ── Dark mode overrides via .dark class ── */
@@ -542,11 +538,7 @@
   /* The signed-out canvas's pastels, re-toned (the :root block above). */
   --public-canvas-base: oklch(0.165 0.018 285);
   --pastel-lavender: oklch(0.55 0.14 295);
-  --pastel-sky: oklch(0.55 0.11 235);
-  --pastel-mint: oklch(0.58 0.1 165);
-  --pastel-butter: oklch(0.62 0.1 95);
   --pastel-peach: oklch(0.6 0.11 50);
-  --pastel-rose: oklch(0.58 0.12 5);
   --color-background: oklch(0.145 0 0);
   --color-foreground: oklch(0.985 0 0);
   --color-card: oklch(0.205 0 0);
@@ -1471,26 +1463,10 @@
   }
   /* Icon weight — the Lucide stroke. The launch's look draws the thin 1.5
      (the Appearance picker that varied it is retired; `--icon-stroke` stays
-     the one knob). */
+     the one knob). An icon takes its text's colour: the icon-colour axis
+     (`data-icon-color`) went with that picker, and nothing sets it. */
   svg.lucide {
     stroke-width: var(--icon-stroke, 1.5);
-    color: var(--icon-app-color, currentColor);
-  }
-
-  [data-icon-color='foreground'] svg.lucide {
-    --icon-app-color: var(--color-foreground);
-  }
-  [data-icon-color='muted'] svg.lucide {
-    --icon-app-color: var(--color-muted-foreground);
-  }
-  [data-icon-color='primary'] svg.lucide {
-    --icon-app-color: var(--color-primary);
-  }
-  [data-icon-color='accent'] svg.lucide {
-    --icon-app-color: var(--color-primary);
-  }
-  [data-icon-color='destructive'] svg.lucide {
-    --icon-app-color: var(--color-destructive);
   }
 
   /* ── Pointer cursor on interactive elements ──

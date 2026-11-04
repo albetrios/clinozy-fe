@@ -94,17 +94,25 @@ and dark-mode variants stay balanced.
   picker, the 403 and the 404 — sits on one pastel canvas, the product's one
   place for colour beyond the accent, and **draws no boxes on it**. The palette
   is `--public-canvas-base` and six `--pastel-*` hues (lavender, sky, mint,
-  butter, peach, rose) in `index.css`, re-toned in the `.dark` block; plain
-  properties, not `@theme`, so the first paint carries no utilities for them.
-  `public-canvas.css` (lazy, with `PublicFrame`) draws:
+  butter, peach, rose), each re-toned under `.dark`; plain properties, not
+  `@theme`, so the first paint carries no utilities for them. `index.css` holds
+  the three `index.html`'s boot frame reads (the base, lavender, peach);
+  `public-canvas.css` (lazy, with `PublicFrame`) holds the other four and draws:
 
   ```text
   .public-canvas    the page: the pastel base
-  .public-aurora    fixed behind it: five drifting blobs + a dot grid fading from the centre
+  .public-aurora    fixed behind it: five blobs that drift one slow pass on arrival and
+                    rest where they land + a dot grid fading from the centre
   .public-stage     a page's content (PublicCard, the sign-in form): no edge, no fill —
                     an edgeless pool of light behind it that warms while an action runs
   .agent-orb        the turning pastel sphere above each public heading
   ```
+
+  The motion stays off the main thread and the idle page idle: the orb's spectrum
+  is a still conic layer the compositor turns (`transform`, never a repaint — an
+  animated `@property` angle inside the gradient repainted it every frame), and
+  the aurora stops after its pass, since a running animation costs the
+  compositor a frame every vsync however slowly it moves.
 
   Beside the sign-in form the stage is a **floating product stack**
   (`AuthShowcase`): the Today sheet in front, the patient file and the paid

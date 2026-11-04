@@ -92,33 +92,42 @@
 }
 .tour-dot[aria-current='step'] .tour-dot-mark {
   width: 24px;
-  background: var(--tone-accent, var(--color-foreground));
+  background: var(--tour-tone-dot, var(--color-foreground));
   box-shadow: 0 0 12px
-    color-mix(in oklch, var(--tone-accent, var(--color-foreground)) 55%, transparent);
+    color-mix(in oklch, var(--tour-tone-dot, var(--color-foreground)) 55%, transparent);
 }
-.tour-dot[data-tone='lav'] {
-  --tone-accent: var(--color-tone-lav-dot);
+/* A room's tone, for its step dot and for Riya's row while she is in it. */
+.tour-stage [data-tone='lav'] {
+  --tour-tone: var(--color-tone-lav);
+  --tour-tone-dot: var(--color-tone-lav-dot);
 }
-.tour-dot[data-tone='sky'] {
-  --tone-accent: var(--color-tone-sky-dot);
+.tour-stage [data-tone='sky'] {
+  --tour-tone: var(--color-tone-sky);
+  --tour-tone-dot: var(--color-tone-sky-dot);
 }
-.tour-dot[data-tone='butter'] {
-  --tone-accent: var(--color-tone-butter-dot);
+.tour-stage [data-tone='butter'] {
+  --tour-tone: var(--color-tone-butter);
+  --tour-tone-dot: var(--color-tone-butter-dot);
 }
-.tour-dot[data-tone='blush'] {
-  --tone-accent: var(--color-tone-blush-dot);
+.tour-stage [data-tone='blush'] {
+  --tour-tone: var(--color-tone-blush);
+  --tour-tone-dot: var(--color-tone-blush-dot);
 }
-.tour-dot[data-tone='sage'] {
-  --tone-accent: var(--color-tone-sage-dot);
+.tour-stage [data-tone='sage'] {
+  --tour-tone: var(--color-tone-sage);
+  --tour-tone-dot: var(--color-tone-sage-dot);
 }
-.tour-dot[data-tone='peach'] {
-  --tone-accent: var(--color-tone-peach-dot);
+.tour-stage [data-tone='peach'] {
+  --tour-tone: var(--color-tone-peach);
+  --tour-tone-dot: var(--color-tone-peach-dot);
 }
-.tour-dot[data-tone='plum'] {
-  --tone-accent: var(--color-tone-plum-dot);
+.tour-stage [data-tone='plum'] {
+  --tour-tone: var(--color-tone-plum);
+  --tour-tone-dot: var(--color-tone-plum-dot);
 }
-.tour-dot[data-tone='stone'] {
-  --tone-accent: var(--color-tone-stone-dot);
+.tour-stage [data-tone='stone'] {
+  --tour-tone: var(--color-tone-stone);
+  --tour-tone-dot: var(--color-tone-stone-dot);
 }
 .tour-toggle {
   display: inline-grid;
@@ -376,29 +385,15 @@
 .tour-story .tour-what {
   color: var(--color-muted-foreground-strong);
 }
-.tour-story[data-tone='lav'] {
-  background: color-mix(in oklch, var(--color-tone-lav) 42%, var(--color-card));
-}
-.tour-story[data-tone='sky'] {
-  background: color-mix(in oklch, var(--color-tone-sky) 42%, var(--color-card));
-}
-.tour-story[data-tone='butter'] {
-  background: color-mix(in oklch, var(--color-tone-butter) 42%, var(--color-card));
-}
-.tour-story[data-tone='blush'] {
-  background: color-mix(in oklch, var(--color-tone-blush) 42%, var(--color-card));
-}
-.tour-story[data-tone='sage'] {
-  background: color-mix(in oklch, var(--color-tone-sage) 42%, var(--color-card));
-}
-.tour-story[data-tone='peach'] {
-  background: color-mix(in oklch, var(--color-tone-peach) 42%, var(--color-card));
-}
-.tour-story[data-tone='plum'] {
-  background: color-mix(in oklch, var(--color-tone-plum) 42%, var(--color-card));
+.tour-story[data-tone] {
+  background: color-mix(
+    in oklch,
+    var(--tour-tone) var(--tour-tint, 42%),
+    var(--color-card)
+  );
 }
 .tour-story[data-tone='stone'] {
-  background: color-mix(in oklch, var(--color-tone-stone) 70%, var(--color-card));
+  --tour-tint: 70%;
 }
 .tour-swap {
   animation: tour-swap 300ms var(--ease-out-strong) both;

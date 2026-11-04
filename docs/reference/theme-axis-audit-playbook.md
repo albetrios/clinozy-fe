@@ -121,20 +121,19 @@ motion, elevation, contrast, separation, focus rings, icon weight / colour / lib
 content widths) are gone from `src/shared/theme/presets.ts`. What renders is the
 launch's default for each — the table in `docs/reference/theming.md` (_The axes, at the
 launch's defaults_). The `[data-*]` blocks in `index.css` that implemented the other
-values remain, so an audit can still set one by hand:
+values remain, so an audit can still set one by hand (the base-colour and icon-colour
+blocks are gone: nothing set either attribute once the studio went):
 
-| Hook (on `<html>`) | Values the blocks implement                                   |
-| ------------------ | ------------------------------------------------------------- |
-| `data-shape`       | `mixed` · `pill` · `sharp` (default: none)                    |
-| `data-elevation`   | `flat` · `soft` · `lifted` · `floating`                       |
-| `data-contrast`    | `soft` · `crisp` · `dim` · `amoled` (dark)                    |
-| `data-separation`  | `hairline` · `shadow`                                         |
-| `data-focus`       | `glow` · `offset` · `underline` · `inset`                     |
-| `data-menu`        | `translucent` · `glass`                                       |
-| `data-base`        | `stone` · `slate` · `olive` · `zinc` · `warm`                 |
-| `data-icon-color`  | `foreground` · `muted` · `primary` · `accent` · `destructive` |
-| `--spacing`        | any rem (default 0.25rem)                                     |
-| `--radius-lg`      | any rem (default 0.5rem; the scale derives from it)           |
+| Hook (on `<html>`) | Values the blocks implement                         |
+| ------------------ | --------------------------------------------------- |
+| `data-shape`       | `mixed` · `pill` · `sharp` (default: none)          |
+| `data-elevation`   | `flat` · `soft` · `lifted` · `floating`             |
+| `data-contrast`    | `soft` · `crisp` · `dim` · `amoled` (dark)          |
+| `data-separation`  | `hairline` · `shadow`                               |
+| `data-focus`       | `glow` · `offset` · `underline` · `inset`           |
+| `data-menu`        | `translucent` · `glass`                             |
+| `--spacing`        | any rem (default 0.25rem)                           |
+| `--radius-lg`      | any rem (default 0.5rem; the scale derives from it) |
 
 ### Layout shells (one design each)
 
