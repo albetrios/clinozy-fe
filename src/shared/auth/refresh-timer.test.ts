@@ -143,6 +143,20 @@ describe('refresh-timer', () => {
     expect(vi.getTimerCount()).toBeGreaterThan(0);
   });
 
+  // A clock ~30 days behind the token's `exp` (an E2E's pinned date, or a device's) asked for a
+  // delay past setTimeout's 2^31 − 1 ms ceiling; the browser fired it at once, every reschedule.
+  it('never schedules past the setTimeout ceiling, so a far expiry does not fire at once', async () => {
+    const thirtyDaysAhead = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
+    vi.mocked(getTokenExpiry).mockReturnValue(thirtyDaysAhead);
+    const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+
+    scheduleTokenRefresh();
+
+    expect(setTimeoutSpy).toHaveBeenLastCalledWith(expect.any(Function), 2_147_483_647);
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(silentRefresh).not.toHaveBeenCalled();
+  });
+
   it('fires silentRefresh when the timer elapses and reschedules for the new token', async () => {
     setDocumentHidden(false);
     const futureExp = Math.floor(Date.now() / 1000) + 300;

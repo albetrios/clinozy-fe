@@ -23,6 +23,15 @@ const BUFFER_MS = 60_000;
 /** Minimum delay to prevent runaway loops */
 const MIN_DELAY_MS = 5_000;
 
+/**
+ * The longest delay `setTimeout` honours (2^31 − 1 ms, ~24.8 days). A longer one overflows and the
+ * browser fires the timer at once — so a device clock running ~25 days slow against the token's
+ * `exp` turned every reschedule into an immediate refresh, a loop racing each write against
+ * refresh-token rotation. Capped, the timer simply waits; a token that does lapse is refreshed by
+ * the 401 path as usual.
+ */
+const MAX_DELAY_MS = 2_147_483_647;
+
 let refreshTimerId: ReturnType<typeof setTimeout> | null = null;
 
 /**
@@ -47,7 +56,10 @@ export function scheduleTokenRefresh(): void {
   if (exp === null) return; // No token or no exp — nothing to schedule
 
   const expiresAt = exp * 1000; // convert to ms
-  const delay = Math.max(expiresAt - Date.now() - BUFFER_MS, MIN_DELAY_MS);
+  const delay = Math.min(
+    Math.max(expiresAt - Date.now() - BUFFER_MS, MIN_DELAY_MS),
+    MAX_DELAY_MS,
+  );
 
   refreshTimerId = setTimeout(() => {
     refreshTimerId = null;
