@@ -87,6 +87,8 @@ anybody out.
 - **The screen stays as it is until the login screen replaces it.** `forceLogout()`
   ends at once only what the screen does not show (`endSessionOffScreen()`: the
   work in flight, the token and its refresh timer, the session hint, the
+  stashed OAuth return-to path and invitation token (`invite-token-stash.ts`:
+  the next person to sign in on this tab must not accept with it), the
   onboarding progress saved on this device); what it shows — the user, the
   organization and its permissions, the query cache — is cleared on `pagehide`,
   as the page goes (`leaveForLogin()`). Clearing it before the browser left

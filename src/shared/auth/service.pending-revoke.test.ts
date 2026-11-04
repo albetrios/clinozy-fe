@@ -2,6 +2,10 @@ import { type Mock, vi } from 'vitest';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import type * as AuthStoreModule from '@/shared/store/useAuthStore/index.ts';
+import {
+  readStashedInviteToken,
+  stashInviteToken,
+} from '@/shared/tenancy/invite-token-stash.ts';
 import type { MeContext } from '@/shared/tenancy/me-context.ts';
 
 import type * as AuthServiceModule from './service.ts';
@@ -415,6 +419,26 @@ describe('auth/service — sign-outs that stay signed out', () => {
 
       expect(sessionStorage.getItem(RETURN_TO_KEY)).toBeNull();
       expect(localStorage.getItem(LAST_ACTIVITY_KEY)).toBeNull();
+    });
+
+    it.each(['logout', 'idle_timeout', 'session_expired'] as const)(
+      'forgets an invitation token stashed across the sign-in hop (%s)',
+      (reason) => {
+        stashInviteToken('inv_1', 'single-use-token');
+        expect(readStashedInviteToken('inv_1')).toBe('single-use-token');
+
+        service.forceLogout({ reason });
+
+        expect(readStashedInviteToken('inv_1')).toBe('');
+      },
+    );
+
+    it('forgets it in a sibling tab that hears the logout broadcast', () => {
+      stashInviteToken('inv_1', 'single-use-token');
+
+      service.handleCrossTabLogout();
+
+      expect(readStashedInviteToken('inv_1')).toBe('');
     });
   });
 
