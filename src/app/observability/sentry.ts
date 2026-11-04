@@ -4,9 +4,12 @@ import type { AnyRouter } from '@tanstack/react-router';
 import { platformConfig } from '@/core/config/env.ts';
 import { getCspConnectSrcOrigin } from '@/lib/csp-api-origin.ts';
 import {
+  scrubEventElementText,
   scrubEventUrls,
-  scrubRecordingEventUrls,
+  scrubRecordingEvent,
   scrubReplayEventUrls,
+  scrubSpanElementText,
+  scrubUiBreadcrumb,
 } from '@/lib/telemetry-scrub.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -46,15 +49,17 @@ function syncOrganizationTags(Sentry: SentryModule): void {
 const REPLAY_MASKED_ATTRIBUTES = ['title', 'placeholder', 'aria-label', 'href'];
 
 /**
- * Session recording, masked: no text, no media, no link targets, and no query string in a
- * recorded breadcrumb's or span's URL (`scrubRecordingEventUrls`).
+ * Session recording, masked: no text, no media, no link targets, no query string in a recorded
+ * breadcrumb's or span's URL, and no element text in a recorded click's element path or the
+ * attributes copied beside it (`scrubRecordingEvent`) — `maskAttributes` masks the DOM snapshot,
+ * not the path Replay reads off the live element.
  */
 function sessionReplayIntegration(Sentry: SentryModule) {
   return Sentry.replayIntegration({
     maskAllText: true,
     blockAllMedia: true,
     maskAttributes: REPLAY_MASKED_ATTRIBUTES,
-    beforeAddRecordingEvent: scrubRecordingEventUrls,
+    beforeAddRecordingEvent: scrubRecordingEvent,
   });
 }
 
@@ -211,35 +216,29 @@ export async function initSentry(router: AnyRouter): Promise<void> {
       /^\[vite\]/,
     ],
 
+    // A clicked element is named by its path, which spells its aria-label, title, alt and
+    // name — a patient's name on the patient rail. Every breadcrumb is scrubbed as it is
+    // recorded; the events below scrub theirs again, for one added past this hook.
+    beforeBreadcrumb: (breadcrumb) => scrubUiBreadcrumb(breadcrumb),
+
     beforeSend(event, hint) {
       // Expected client outcomes (validation 400/422, auth 401/403, missing
       // 404/409/429) are handled UX states, not defects — only transport
       // failures and 5xx responses are signal.
       const cause = hint?.originalException;
       if (cause instanceof HttpError && cause.status < 500) return null;
-      if (event.breadcrumbs) {
-        event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {
-          if (breadcrumb.category === 'ui.input') {
-            return { ...breadcrumb, message: '[Filtered]' };
-          }
-          return breadcrumb;
-        });
-      }
-      return scrubEventUrls(event);
+      return scrubEventUrls(scrubEventElementText(event));
     },
 
-    // Transactions skip beforeSend; pageload spans carry the full URL.
+    // Transactions skip beforeSend; pageload spans carry the full URL, and ui.interaction /
+    // web-vital spans the element path.
     beforeSendTransaction(event) {
-      if (event.breadcrumbs) {
-        event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {
-          if (breadcrumb.category === 'ui.input') {
-            return { ...breadcrumb, message: '[Filtered]' };
-          }
-          return breadcrumb;
-        });
-      }
-      return scrubEventUrls(event);
+      return scrubEventUrls(scrubEventElementText(event));
     },
+
+    // INP's ui.interaction span is standalone under the static lifecycle, so it skips
+    // beforeSendTransaction: its description and target are scrubbed here.
+    beforeSendSpan: Sentry.withStaticSpan((span) => scrubSpanElementText(span)),
   });
 
   // Replay events skip beforeSend: their page URLs are scrubbed here.

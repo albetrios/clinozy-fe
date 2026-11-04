@@ -40,9 +40,14 @@ capture settings are part of the threat model — verified:
   (no `networkDetailAllowUrls`), so the `Authorization: Bearer` header never
   reaches Sentry. `beforeSend` filters `ui.input` breadcrumbs and — together
   with `beforeSendTransaction` — drops every query string and fragment from
-  the event's URLs, breadcrumbs, spans, extras and contexts; replay segments skip
-  both, so an event processor scrubs their `urls`/`request.url`, `beforeAddRecordingEvent`
-  scrubs the recorded breadcrumbs and spans, and `maskAttributes` masks link `href`s
+  the event's URLs, breadcrumbs, spans, extras and contexts; a clicked element's
+  path (which spells its `aria-label`, `title`, `alt` and `name` — a patient's name
+  on the patient rail) keeps those attributes' names but not their values in every
+  `ui.*` breadcrumb (`beforeBreadcrumb`), `ui.*` span and selector attribute
+  (`beforeSendTransaction`, and a static `beforeSendSpan` for INP's standalone span);
+  replay segments skip both, so an event processor scrubs their `urls`/`request.url`,
+  `beforeAddRecordingEvent` scrubs the recorded breadcrumbs, spans and clicked elements,
+  and `maskAttributes` masks link `href`s
   (the meta event's `location.href` has no hook — see `docs/integrations/sentry-frontend.md`)
   (`lib/telemetry-scrub.ts`; an `HttpError`'s response body is not enumerable,
   so extraErrorData never copies it, and a query key is reported by its leading
