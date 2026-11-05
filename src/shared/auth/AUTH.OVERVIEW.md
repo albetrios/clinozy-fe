@@ -19,7 +19,7 @@ The split is the dependency rule at work: core may import this folder (runtime t
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `token.ts` (+ .test)                  | In-memory access-token holder (read by every request)                                                             |
 | `service.ts` (+ .test)                | `login()`, `logout()`, `silentRefresh()`, `refreshAccessToken()`, `forceLogout()` — API + token + store           |
-| `refresh-timer.ts` (+ .test)          | Background timer that calls `silentRefresh()` shortly before token expiry                                         |
+| `refresh-timer.ts` (+ .test)          | Background timer that calls `silentRefresh()` shortly before token expiry (delay 5 s … setTimeout's 2^31 − 1 ms)  |
 | `idle-timeout.ts` (+ .test)           | Idle timer: warn, then sign out. Wall-clock anchored, shared across tabs, and deaf to activity while warning      |
 | `session-lifetime.ts` (+ .test)       | Absolute session cap, plus `hasSessionHint()` — a boot-time guess at which chunks to warm, never an authorization |
 | `oauth-callback-sign-in.ts` (+ .test) | The OAuth hand-off's code exchange, started at boot by `main.tsx` and taken once by the callback page             |
