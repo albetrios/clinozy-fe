@@ -31,7 +31,7 @@ export interface RoomTableProps<TRow extends { id: string }> {
     CursorListResult<TRow>,
     'hasNextPage' | 'isFetchingNextPage' | 'fetchNextPage'
   >;
-  /** The skeleton shows (`useRoomList`). */
+  /** The first page is loading: the table's placeholder rows (`useRoomList`). */
   loading: boolean;
   /** Filters or a search apply: the empty state is the filtered one. */
   filtered: boolean;
@@ -62,7 +62,10 @@ export interface RoomTableProps<TRow extends { id: string }> {
   exportValue?: TableCsvExport<TRow>['cell'];
   /** The room's words for Export and its toast ("3 rows exported as CSV"). */
   exportCopy: { label: string; done: (count: number) => string };
-  /** Person rows: the skeleton leads with an avatar. */
+  /**
+   * Unused: the placeholder rows follow the columns now (a person column's
+   * cells draw the avatar). Kept until the room tabs that pass it drop it.
+   */
   avatar?: boolean;
   /** Extra bulk actions after Export. */
   bulkActions?: readonly DataTableBulkAction<TRow>[];
@@ -73,9 +76,10 @@ export interface RoomTableProps<TRow extends { id: string }> {
  * Clinic stock tabs: the shared table with folds on a tablet and rows on a
  * phone, selection and the bulk bar from `md` (Export as CSV with the
  * `export` ability, Q-P8), the row actions, infinite scroll over cursor pages,
- * the footer count and end line, and the room's states — the skeleton, the
- * empty state in the room's tone (no button — the toolbar holds the tab's "New …"),
- * the filtered one.
+ * the footer count and end line, and the room's states — the placeholder
+ * rows on the table's grid while the first page loads, the empty state in the
+ * room's tone (no button — the toolbar holds the tab's "New …"), the filtered
+ * one.
  */
 export function RoomTable<TRow extends { id: string }>({
   table,
@@ -99,7 +103,6 @@ export function RoomTable<TRow extends { id: string }>({
   exportCode,
   exportValue,
   exportCopy,
-  avatar = false,
   bulkActions = [],
 }: RoomTableProps<TRow>) {
   const access = useAppAccess();
@@ -139,17 +142,15 @@ export function RoomTable<TRow extends { id: string }>({
       hasNextPage={!loading && list.hasNextPage}
       isFetchingNextPage={list.isFetchingNextPage}
       fetchNextPage={list.fetchNextPage}
+      loading={loading}
       empty={
         <RoomTableEmpty
-          loading={loading}
           filtered={filtered}
           onClearFilters={onClearFilters}
           tone={tone}
           icon={icon}
           title={emptyTitle}
           description={emptyHint}
-          label={label}
-          avatar={avatar}
         />
       }
       className="m-(--room-card-margin) flex-1"

@@ -9,8 +9,12 @@ const SKELETON_ROWS = 8;
 
 /** Props of {@link RoomTableEmpty}. */
 export interface RoomTableEmptyProps {
-  /** The list is loading: the flat skeleton over the rows' place. */
-  loading: boolean;
+  /**
+   * The list is loading: the flat skeleton over the rows' place. A `DataTable`
+   * given its own `loading` draws placeholder rows on its grid instead and
+   * never shows this one while it loads — leave it off there.
+   */
+  loading?: boolean;
   /** Filters or a search apply: the filtered state with "Clear filters". */
   filtered: boolean;
   onClearFilters: () => void;
@@ -20,21 +24,22 @@ export interface RoomTableEmptyProps {
   icon: ReactNode;
   title: string;
   description: string;
-  /** What is loading, for screen readers ("Medicines"). */
-  label: string;
+  /** What is loading, for screen readers ("Medicines") — with `loading`. */
+  label?: string;
   /** Skeleton rows lead with a round avatar (person lists). */
   avatar?: boolean;
 }
 
 /**
- * What a room table shows with no rows (KICKOFF §6.0 States): the in-place
- * skeleton while it loads (the first load; a new search or filter), the
- * filtered state when filters hide everything, else the room's illustrated
- * empty state. No button (fix-empty-state-actions): the room's toolbar holds
- * the tab's "New …". Pass it as `DataTable`'s `empty`.
+ * What a room table shows with no rows (KICKOFF §6.0 States): the filtered
+ * state when filters hide everything, else the room's illustrated empty state
+ * — and, with `loading`, a flat skeleton for a table that does not draw its
+ * own (a `DataTable` given `loading` draws placeholder rows on its grid). No
+ * button (fix-empty-state-actions): the room's toolbar holds the tab's
+ * "New …". Pass it as `DataTable`'s `empty`.
  */
 export function RoomTableEmpty({
-  loading,
+  loading = false,
   filtered,
   onClearFilters,
   tone,

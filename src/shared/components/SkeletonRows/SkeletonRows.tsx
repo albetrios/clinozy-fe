@@ -5,6 +5,8 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 
+import { SKELETON_TEST_IDS } from './skeleton-rows.constants.ts';
+
 /**
  * Text bar widths, cycled per row: 64 / 48 / 60% (KICKOFF §3.5 Skeletons;
  * `_patterns.md:282`). The picker draws its own four title-and-sub rows
@@ -123,7 +125,7 @@ export function SkeletonRows({
   const { t } = useTranslation(LOCALE_NS);
   return (
     <div
-      data-testid="skeleton-rows"
+      data-testid={SKELETON_TEST_IDS.rows}
       aria-busy="true"
       className={cn('text-body flex cursor-progress flex-col', className)}
     >
@@ -138,7 +140,7 @@ export function SkeletonRows({
             // Placeholder rows never reorder: their position is their identity.
             key={row.id}
             aria-hidden="true"
-            data-testid="skeleton-row"
+            data-testid={SKELETON_TEST_IDS.row}
             className={cn(
               'pointer-events-none flex h-[1.28em] items-center gap-2.5',
               rowClassName,

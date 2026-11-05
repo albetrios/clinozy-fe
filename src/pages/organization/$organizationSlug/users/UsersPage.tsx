@@ -26,7 +26,6 @@ import {
   type RoomFilterFields,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
@@ -60,9 +59,6 @@ import {
 
 /** The exported file's name. */
 const EXPORT_FILE_NAME = 'users.csv';
-
-/** How many placeholder rows stand in for the Team while it loads. */
-const SKELETON_ROWS = 8;
 
 /** The Team's sort columns as the in-place comparator names them. */
 const SORT_KEY: Readonly<Record<TeamSortColumn, TeamSortKey>> = {
@@ -154,30 +150,19 @@ function useTeamRows(
 }
 
 /**
- * What the table shows while the Team is loading or nothing matches — the
- * in-place skeleton, the filtered empty state, or "No user matches" (the
- * Team itself can't be empty: you are on it; KICKOFF §6.12 States).
+ * What the table shows when nothing matches — the filtered empty state, or
+ * "No user matches" (the Team itself can't be empty: you are on it; KICKOFF
+ * §6.12 States). While the Team loads the table draws its own placeholder rows
+ * (its `loading`).
  */
 function TeamEmpty({
-  loading,
   filtered,
   onClearFilters,
 }: {
-  loading: boolean;
   filtered: boolean;
   onClearFilters: () => void;
 }) {
   const { t } = useTranslation(USERS_NS);
-  if (loading) {
-    return (
-      <SkeletonRows
-        rows={SKELETON_ROWS}
-        avatar
-        label={t(USERS_KEYS.manifest.title)}
-        rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
-      />
-    );
-  }
   if (filtered) return <EmptyState tone="lav" onClearFilters={onClearFilters} />;
   return (
     <EmptyState
@@ -372,9 +357,9 @@ export function UsersPage() {
             getRowTone={(row) => row.original.tone}
             rowActions={(row) => rowActions(row.original)}
             bulkActions={bulkActions}
+            loading={loading}
             empty={
               <TeamEmpty
-                loading={loading}
                 filtered={filters.count > 0}
                 onClearFilters={() => filters.apply({})}
               />

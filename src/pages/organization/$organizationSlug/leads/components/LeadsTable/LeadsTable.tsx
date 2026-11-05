@@ -36,7 +36,9 @@ export interface LeadsTableProps {
   openLeadId: string | null;
   /** A row was clicked, or Enter pressed on the j / k row. */
   onOpen: (lead: LeadRecord) => void;
-  /** No rows: the first load's bars, or the empty line. */
+  /** The first page is loading: the table's placeholder rows. */
+  loading: boolean;
+  /** No rows, loaded: the empty line. */
   empty: ReactNode;
 }
 
@@ -55,6 +57,7 @@ export function LeadsTable({
   list,
   openLeadId,
   onOpen,
+  loading,
   empty,
 }: LeadsTableProps) {
   const { t } = useTranslation(LEADS_NS);
@@ -82,6 +85,7 @@ export function LeadsTable({
         getRowTone={(row) => LEAD_STATUS_TONES[row.original.status]}
         // The lead rows' edge is the status dot colour (`leads.md:35`, H:5643).
         rowEdge="dot"
+        loading={loading}
         empty={empty}
         className="m-(--room-card-margin) flex-1"
       />

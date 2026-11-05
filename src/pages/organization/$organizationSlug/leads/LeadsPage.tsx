@@ -19,7 +19,6 @@ import { referrerFromPath } from '@/shared/app/app-referrer.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
-import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import {
@@ -308,17 +307,6 @@ export function LeadsPage() {
     contactActions,
   };
 
-  const empty = state.loading ? (
-    <SkeletonRows
-      rows={8}
-      avatar
-      label={t(LEADS_KEYS.manifest.title)}
-      rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
-    />
-  ) : (
-    <LeadsEmpty filtered={state.filtered} onClearFilters={state.clearFilters} />
-  );
-
   return (
     <section data-testid="leads-page" className="bg-canvas flex min-h-0 flex-1 flex-col">
       <LeadsToolbar
@@ -336,7 +324,10 @@ export function LeadsPage() {
         list={state.list}
         openLeadId={leadId ?? createdId}
         onOpen={openLead}
-        empty={empty}
+        loading={state.loading}
+        empty={
+          <LeadsEmpty filtered={state.filtered} onClearFilters={state.clearFilters} />
+        }
       />
       <Outlet />
       {drawer}

@@ -18,7 +18,6 @@ import {
   RoomToolbar,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { Building, FileIcon, PenLine } from '@/shared/icons/index.ts';
@@ -34,9 +33,6 @@ import { type BranchRow, useBranchRows } from './hooks/useBranchRows/index.ts';
 
 /** The exported file's name. */
 const EXPORT_FILE_NAME = 'branches.csv';
-
-/** How many placeholder rows stand in for the list while it loads. */
-const SKELETON_ROWS = 3;
 
 /** The Filters' one section (`users.md:204`): Created. */
 const BRANCH_FILTER_FIELDS: RoomFilterFields = {
@@ -70,26 +66,18 @@ function useBranchAccess() {
   };
 }
 
-/** What the table shows while the list loads or nothing matches. */
+/**
+ * What the table shows when nothing matches; while the list loads the table
+ * draws its own placeholder rows (its `loading`).
+ */
 function BranchesEmpty({
-  loading,
   filtered,
   onClearFilters,
 }: {
-  loading: boolean;
   filtered: boolean;
   onClearFilters: () => void;
 }) {
   const { t } = useTranslation(BRANCHES_NS);
-  if (loading) {
-    return (
-      <SkeletonRows
-        rows={SKELETON_ROWS}
-        label={t(BRANCHES_KEYS.manifest.title)}
-        rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
-      />
-    );
-  }
   if (filtered) return <EmptyState tone="lav" onClearFilters={onClearFilters} />;
   return (
     <EmptyState
@@ -216,9 +204,9 @@ export function BranchesPage() {
         getRowTone={(row) => row.original.branch.tone}
         rowActions={(row) => rowActions(row.original)}
         bulkActions={bulkActions}
+        loading={loading}
         empty={
           <BranchesEmpty
-            loading={loading}
             filtered={filters.count > 0}
             onClearFilters={() => filters.apply({})}
           />

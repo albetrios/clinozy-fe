@@ -51,7 +51,7 @@ const EXPORT_FILE_NAME = 'patients.csv';
 
 /**
  * The filter part of the list's params — a change to it (a search, "Apply
- * filter") shows the skeleton over the rows; a view or sort change keeps the
+ * filter") shows the table's placeholder rows in place of the rows; a view or sort change keeps the
  * rows until the new page arrives (`patients.md:253`).
  */
 function filterKeyOf(params: ReturnType<typeof patientListParamsOf>): string {
@@ -256,17 +256,15 @@ export function PatientsPage() {
         hasNextPage={!loading && list.hasNextPage}
         isFetchingNextPage={list.isFetchingNextPage}
         fetchNextPage={list.fetchNextPage}
+        loading={loading}
         empty={
           <RoomTableEmpty
-            loading={loading}
             filtered={filters.count > 0}
             onClearFilters={() => filters.apply({})}
             tone="sage"
             icon={<Users />}
             title={t(PATIENTS_KEYS.empty.title)}
             description={t(PATIENTS_KEYS.empty.description)}
-            label={t(PATIENTS_KEYS.manifest.title)}
-            avatar
           />
         }
         className="m-(--room-card-margin) flex-1"

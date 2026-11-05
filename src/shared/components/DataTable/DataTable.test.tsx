@@ -735,6 +735,64 @@ describe('DataTable — length (D7)', () => {
     expect(screen.getAllByTestId('patients-table-row').length).toBeLessThan(45);
   });
 
+  it('keeps its place when the next page takes the list past 60 rows', () => {
+    // jsdom lays nothing out: rows are 54px tall (not the 52px estimate), the
+    // scroller 540px, and its offset is ours to read and write.
+    const ROW = 54;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const height = this.dataset.slot === 'data-table-row' ? ROW : 0;
+      return {
+        x: 0,
+        y: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: height,
+        width: 0,
+        height,
+        toJSON: () => ({}),
+      };
+    });
+    vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(540);
+    const { rerender } = render(<Room data={many(50)} hasNextPage />);
+    const table = screen.getByRole('table');
+    const scroller = table.querySelector<HTMLDivElement>(
+      '[data-slot="data-table-body"]',
+    )?.parentElement;
+    if (!scroller) throw new Error('no scroller');
+    let top = 0;
+    const writes: number[] = [];
+    Object.defineProperty(scroller, 'scrollTop', {
+      configurable: true,
+      get: () => top,
+      set: (value: number) => {
+        top = value;
+      },
+    });
+    scroller.scrollTo = ((options: ScrollToOptions) => {
+      writes.push(options.top ?? 0);
+      top = options.top ?? 0;
+    }) as typeof scroller.scrollTo;
+    // Scrolled down the first page: row 27 (1500 / 54) is at the top.
+    top = 1500;
+
+    rerender(<Room data={many(80)} hasNextPage />);
+
+    expect(scroller.scrollTop).toBe(1500);
+    expect(writes).not.toContain(0);
+    const rendered = screen
+      .getAllByTestId('patients-table-row')
+      .map((row) => Number(row.dataset.index));
+    expect(rendered.length).toBeLessThan(80);
+    expect(rendered).toContain(Math.floor(1500 / ROW));
+    // The space above the window is the rows' real height, so the row at the
+    // top stays where it was.
+    const first = Math.min(...rendered);
+    expect(table.style.getPropertyValue('--dt-pad-top')).toBe(`${first * ROW}px`);
+  });
+
   it('ends with "All <records> loaded" once there is no next page', () => {
     const { rerender } = render(<Room data={many(3)} hasNextPage />);
     expect(screen.queryByTestId('patients-table-end')).not.toBeInTheDocument();
@@ -946,5 +1004,107 @@ describe('DataTable — refresh (KICKOFF §6.0)', () => {
     expect(screen.getByRole('table')).not.toHaveAttribute('aria-busy');
     await user.click(screen.getByTestId('patients-table-row'));
     expect(onRowClick).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('DataTable — loading (the first page, KICKOFF §6.0 States)', () => {
+  /** A placeholder row's cells: one per grid track. */
+  const cellsOf = (row: HTMLElement | undefined) => [...(row?.children ?? [])];
+
+  it('fills the body with placeholder rows on the table’s grid, under the header', async () => {
+    const { container } = render(
+      <Room data={[]} loading label="Patients" empty={<p>No patients</p>} />,
+    );
+    expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
+    // The header stays; the room's empty state waits for the load to end.
+    expect(headerLabels()).toEqual([
+      'ID',
+      'Patient',
+      'Type',
+      'Status',
+      'Follow-up',
+      'Due',
+      'Updated',
+    ]);
+    expect(screen.queryByText('No patients')).not.toBeInTheDocument();
+
+    const skeleton = screen.getByTestId('skeleton-rows');
+    expect(skeleton).toHaveAttribute('aria-busy', 'true');
+    expect(within(skeleton).getByRole('status')).toHaveTextContent('Loading Patients…');
+    const rows = screen.getAllByTestId('skeleton-row');
+    expect(rows).toHaveLength(12);
+    for (const row of rows) {
+      expect(row).toHaveAttribute('aria-hidden', 'true');
+      // The rows' own grid and box: a placeholder row is as tall as a row.
+      expect(row.className).toContain('grid-cols-(--dt-cols)');
+      expect(row.className).toContain('py-(--table-row-pad-y)');
+    }
+
+    // One placeholder per column, shaped by its kind.
+    const [id, person, type, , , due, updated] = cellsOf(rows[0]);
+    expect(cellsOf(rows[0])).toHaveLength(7);
+    expect(id?.querySelector('[data-slot="skeleton"]')?.className).toContain('w-14');
+    const [avatar, ...lines] = [
+      ...(person?.querySelectorAll('[data-slot="skeleton"]') ?? []),
+    ];
+    expect(avatar?.className).toContain('rounded-full');
+    expect(avatar?.className).toContain('size-8');
+    expect(lines).toHaveLength(2);
+    expect(type?.querySelector('[data-slot="skeleton"]')?.className).toContain(
+      'rounded-full',
+    );
+    // An end-aligned column's placeholder keeps to the end.
+    expect(due?.className).toContain('justify-end');
+    expect(updated?.querySelector('[data-slot="skeleton"]')?.className).toMatch(
+      /w-\[(64|48|60)%\]/,
+    );
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('keeps the selection track, and gives way to the rows or the empty state', () => {
+    const { rerender } = render(<Room data={[]} loading selectable />);
+    // The checkbox track leads, empty, so every placeholder sits under its header.
+    expect(cellsOf(screen.getAllByTestId('skeleton-row')[0])).toHaveLength(8);
+
+    rerender(<Room data={[patient(1)]} loading selectable />);
+    expect(screen.queryByTestId('skeleton-rows')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('patients-table-row')).toHaveLength(1);
+
+    rerender(<Room data={[]} selectable empty={<p>No patients</p>} />);
+    expect(screen.queryByTestId('skeleton-rows')).not.toBeInTheDocument();
+    expect(screen.getByText('No patients')).toBeInTheDocument();
+    expect(screen.getByRole('table')).not.toHaveAttribute('aria-busy');
+  });
+
+  it('keeps the actions track the rows had while a new search loads', () => {
+    const actions = () => patientActions();
+    const { rerender } = render(<Room data={[patient(1)]} rowActions={actions} />);
+    const template = () => screen.getByRole('table').style.getPropertyValue('--dt-cols');
+    const withRows = template();
+    rerender(<Room data={[]} loading rowActions={actions} />);
+    expect(template()).toBe(withRows);
+    expect(cellsOf(screen.getAllByTestId('skeleton-row')[0])).toHaveLength(8);
+  });
+
+  it('mirrors the phone row: the primary block, the key column at the end', () => {
+    viewport.tier = 'phone';
+    render(<Room data={[]} loading fold />);
+    const [row] = screen.getAllByTestId('skeleton-row');
+    expect(row?.className).toContain('flex-wrap');
+    const [primary, key] = cellsOf(row);
+    expect(primary?.className).toContain('flex-1');
+    expect(primary?.querySelector('[data-slot="skeleton"]')?.className).toContain(
+      'rounded-full',
+    );
+    expect(key?.className).toContain('max-w-[46%]');
+  });
+
+  it('draws the next page’s two placeholder rows in the rows’ shape', () => {
+    render(<Room data={[patient(1)]} hasNextPage isFetchingNextPage />);
+    const tail = screen.getByTestId('patients-table-loading-more');
+    const rows = tail.querySelectorAll('[data-slot="data-table-skeleton-row"]');
+    expect(rows).toHaveLength(2);
+    expect(rows[0]?.className).toContain('grid-cols-(--dt-cols)');
+    expect(rows[0]?.children).toHaveLength(7);
   });
 });
