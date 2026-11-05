@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.20.0](https://github.com/albetrios/clinozy-fe/compare/v1.19.0...v1.20.0) (2026-11-05)
+
+
+### Added
+
+* **auth:** pastel agent-glow redesign of the public pages ([#228](https://github.com/albetrios/clinozy-fe/issues/228)) ([aa0be68](https://github.com/albetrios/clinozy-fe/commit/aa0be68a043ec73786a15efea0a1a8ae4213ac2c))
+* **billing:** a bill line shows and edits its description ([#209](https://github.com/albetrios/clinozy-fe/issues/209)) ([7c609b7](https://github.com/albetrios/clinozy-fe/commit/7c609b7cf6f21dad9296d3a904fb743d97b12b14))
+* **leads:** a lead follows its bookings — Booked, walk-ins, win-back ([#206](https://github.com/albetrios/clinozy-fe/issues/206)) ([981eb35](https://github.com/albetrios/clinozy-fe/commit/981eb35eff40e0da382e6e8d70f4b6ac80e6abee))
+* **medical:** pharmacy screens edit HSN, pack, loose units, batch MRP, supplier contact, notes ([#210](https://github.com/albetrios/clinozy-fe/issues/210)) ([1ec6ab9](https://github.com/albetrios/clinozy-fe/commit/1ec6ab94464eb4d1ce02dc29a1311037020d428f))
+* **medical:** purchase lines carry GST and a monthly purchase GST summary ([#213](https://github.com/albetrios/clinozy-fe/issues/213)) ([deb9939](https://github.com/albetrios/clinozy-fe/commit/deb9939599483a089656d29036d38453e86a3a2e))
+* **medical:** receive goods takes received quantities; the order view marks short lines ([#216](https://github.com/albetrios/clinozy-fe/issues/216)) ([000773a](https://github.com/albetrios/clinozy-fe/commit/000773a9f0803bb9bc9b3c94d5e20b163e3b1849))
+* **patients:** photo grids show the 320 px thumbnail, the opened photo stays full size ([#211](https://github.com/albetrios/clinozy-fe/issues/211)) ([514a41a](https://github.com/albetrios/clinozy-fe/commit/514a41ae259c8ddd87ef9d7f5f5cc4d841511bbe))
+* **patients:** register a person by age — Birth date · Age, "approx." ages, age filters ([#208](https://github.com/albetrios/clinozy-fe/issues/208)) ([72da0b5](https://github.com/albetrios/clinozy-fe/commit/72da0b5c8d8905bec443b32f33c011a7b31849f3))
+
+
+### Fixed
+
+* **auth:** cap the proactive refresh delay at setTimeout's ceiling ([#233](https://github.com/albetrios/clinozy-fe/issues/233)) ([0fb255e](https://github.com/albetrios/clinozy-fe/commit/0fb255ee810f91d3ccde2855bff5136b9e8bb86e))
+* **ci:** a passing re-run clears a stale early failure alert ([#230](https://github.com/albetrios/clinozy-fe/issues/230)) ([ae97e3e](https://github.com/albetrios/clinozy-fe/commit/ae97e3e36c3f45afe92fb41afe0cd9780b5db5c9))
+* **deps:** clear the weekly audit's HIGH advisories and two dead doc links ([#227](https://github.com/albetrios/clinozy-fe/issues/227)) ([c043bf0](https://github.com/albetrios/clinozy-fe/commit/c043bf0697c5c176b3760193259e9dd48a807df8))
+* **e2e:** sign-in helpers answer the cookie card; invite specs find the token in sessionStorage ([#217](https://github.com/albetrios/clinozy-fe/issues/217)) ([7b3181d](https://github.com/albetrios/clinozy-fe/commit/7b3181d394636347b7023c545002ae56d13652f8)), closes [#215](https://github.com/albetrios/clinozy-fe/issues/215)
+* **env:** make the deploy env gates real; build-only keys drop VITE_ ([#221](https://github.com/albetrios/clinozy-fe/issues/221)) ([c6c392a](https://github.com/albetrios/clinozy-fe/commit/c6c392aa37076d963debcf324da17bdd3dadd481))
+* **security:** close the frontend findings of the 2026-10-31 security triage ([#212](https://github.com/albetrios/clinozy-fe/issues/212)) ([3cc1608](https://github.com/albetrios/clinozy-fe/commit/3cc1608e20fb48184f250475a3e1c56745e06d90))
+* **telemetry:** keep element text out of Sentry; calm /login and match CI's sign-in baselines ([#231](https://github.com/albetrios/clinozy-fe/issues/231)) ([839cf3f](https://github.com/albetrios/clinozy-fe/commit/839cf3f553960cf18658b290e9750c4de444288c))
+
+
+### Performance
+
+* **routes:** re-pin the public-route budgets to what main loads ([#200](https://github.com/albetrios/clinozy-fe/issues/200)) ([a6fa2a1](https://github.com/albetrios/clinozy-fe/commit/a6fa2a18e2009df715c6de830560c3b140322264))
+
+
+### Documentation
+
+* name no dead path in the babysit note ([#199](https://github.com/albetrios/clinozy-fe/issues/199)) ([55a8d53](https://github.com/albetrios/clinozy-fe/commit/55a8d53e21569fa8b7ac8abbc494510c7885c295))
+
 ## [1.19.0](https://github.com/albetrios/clinozy-fe/compare/v1.18.1...v1.19.0) (2026-10-25)
 
 
