@@ -189,7 +189,6 @@ function TourDots({ tour }: { tour: ReturnType<typeof useTour> }) {
         {TOUR_CHAPTERS.map((chapter, index) => (
           <button
             key={chapter.id}
-            ref={tour.attachStep(index)}
             type="button"
             className="tour-dot"
             data-tone={chapter.tone}
@@ -248,7 +247,7 @@ function leanOf(event: PointerEvent<HTMLDivElement>): { x: number; y: number } {
  * — decorative, their words are the narration's — and the one the current
  * chapter is about comes forward (`data-lifted`). The whole scene leans toward
  * the pointer (`--lean-x`, `--lean-y`, set on the element as the pointer moves,
- * as `useTour` sets `--fill`), deals the sheet forward on each arrival
+ * not rendered), deals the sheet forward on each arrival
  * (`data-deal` flips, so the keyframe replays) and stands on a pastel
  * reflection. Reduced motion and phones: flat, no lean (auth-showcase.css).
  */
