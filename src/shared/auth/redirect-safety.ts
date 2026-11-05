@@ -53,6 +53,26 @@ export function isSafeExternalHttpsUrl(value: unknown): value is string {
   }
 }
 
+/**
+ * Validate a link to a file or page the backend hands back (a presigned file URL, a billing
+ * provider's invoice page) before it goes into an `href` or `window.open`. Requires a parseable
+ * `https:` or `http:` URL with a host — `http:` stays allowed because a local or self-hosted object
+ * store (`S3_ENDPOINT`) serves plain http — and refuses `javascript:`, `data:`, relative and
+ * protocol-relative values. Stricter navigation (the OAuth hop) uses
+ * {@link isSafeExternalHttpsUrl}.
+ */
+export function isSafeExternalLinkUrl(value: unknown): value is string {
+  if (typeof value !== 'string' || value.length === 0) return false;
+  try {
+    const url = new URL(value);
+    return (
+      (url.protocol === 'https:' || url.protocol === 'http:') && url.hostname.length > 0
+    );
+  } catch {
+    return false;
+  }
+}
+
 const RETURN_TO_KEY = `${PRODUCT_NAMESPACE}-auth:return-to`;
 
 /**

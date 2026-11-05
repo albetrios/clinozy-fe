@@ -140,6 +140,24 @@ describe('Report view (KICKOFF §6.6; S:43)', () => {
     expect(within(drawer).queryByTestId('report-view-file-link')).not.toBeInTheDocument();
   });
 
+  it('offers no link or Download for a file whose URL is not a web link', async () => {
+    seedReports([
+      reportDouble({
+        fileKeys: ['organization-files/org_test/cbc.pdf'],
+        files: [
+          {
+            ...reportFileDouble('organization-files/org_test/cbc.pdf'),
+            fileUrl: 'javascript:alert(1)',
+          },
+        ],
+      }),
+    ]);
+    const { user, drawer } = await openView();
+    expect(within(drawer).queryByTestId('report-view-download')).not.toBeInTheDocument();
+    await user.click(within(drawer).getByTestId('report-view-step-details-trigger'));
+    expect(within(drawer).queryByTestId('report-view-file-link')).not.toBeInTheDocument();
+  });
+
   it('shows the notes and a report with no file yet', async () => {
     seedReports([
       reportDouble({ fileKeys: [], notes: 'TSH slightly high\nrecheck in 6 weeks' }),

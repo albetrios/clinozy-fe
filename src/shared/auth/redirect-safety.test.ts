@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   clearReturnTo,
   isSafeExternalHttpsUrl,
+  isSafeExternalLinkUrl,
   isSafeRedirectPath,
   popReturnTo,
   safeRedirect,
@@ -76,5 +77,26 @@ describe('stashReturnTo / popReturnTo', () => {
     stashReturnTo('/organization/acme/patients/pat_x');
     clearReturnTo();
     expect(popReturnTo()).toBeUndefined();
+  });
+});
+
+describe('isSafeExternalLinkUrl (backend-supplied file and invoice links)', () => {
+  it('accepts absolute https and http URLs with a host', () => {
+    expect(
+      isSafeExternalLinkUrl('https://files.example.com/a.pdf?X-Amz-Signature=1'),
+    ).toBe(true);
+
+    expect(isSafeExternalLinkUrl('http://localhost:9000/bucket/a.pdf')).toBe(true);
+  });
+
+  it('rejects script and data schemes, relative, and non-string values', () => {
+    expect(isSafeExternalLinkUrl('javascript:alert(1)')).toBe(false);
+    expect(isSafeExternalLinkUrl('JavaScript:alert(1)')).toBe(false);
+    expect(isSafeExternalLinkUrl('data:text/html,<script>')).toBe(false);
+    expect(isSafeExternalLinkUrl('//evil.example.com')).toBe(false);
+    expect(isSafeExternalLinkUrl('/relative/path')).toBe(false);
+    expect(isSafeExternalLinkUrl('not a url')).toBe(false);
+    expect(isSafeExternalLinkUrl('')).toBe(false);
+    expect(isSafeExternalLinkUrl(null)).toBe(false);
   });
 });
