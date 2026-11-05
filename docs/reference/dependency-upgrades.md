@@ -172,9 +172,9 @@ second list:
 The table below lists the same GHSA ids as `auditConfig.ignoreGhsas`
 (`tests/ci/audit-accepted-advisories.policy.test.ts` keeps them equal).
 
-| Advisory                                                                                        | Path                                                                                                                | Why accepted                                                                                                                                         |
-| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `deepmerge` >=4.2.0 <=4.3.1 — GHSA-gcqx-w48m-w2h4 (low, prototype poisoning in `mergeObject()`) | `shadcn` (CLI), `workbox-build` → `@rollup/plugin-node-resolve`, `netlify-cli` → `@netlify/config` — dev/build only | 4.3.1 is the newest release and no patched version exists; it merges this repository's own config, never untrusted input, and never ships to clients |
+| Advisory                                                                                        | Path                                                                                                                | Why accepted                                                                                                                                                                                                                                                                                                            |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `deepmerge` >=4.2.0 <=4.3.1 — GHSA-gcqx-w48m-w2h4 (low, prototype poisoning in `mergeObject()`) | `shadcn` (CLI), `workbox-build` → `@rollup/plugin-node-resolve`, `netlify-cli` → `@netlify/config` — dev/build only | 4.3.1 is the newest release and no patched version exists; it merges this repository's own config, never untrusted input, and never ships to clients. **Patched locally** by `patches/deepmerge@4.3.1.patch` (`patchedDependencies`), so the bug is closed; the id stays listed because `pnpm audit` matches by version |
 
 `image-size` <=2.0.2 (GHSA-w3rx-r6r6-pgpr, GHSA-5p2g-fcmc-qvqq) and `extract-zip` <=2.0.1
 (GHSA-jmr9-qjv8-65gv), the two earlier entries, left the tree with later `netlify-cli`
@@ -204,6 +204,10 @@ accepted one that now has a fix.
   - `minimatch` **>=11.0.1 <12** (was `>=10.2.5 <11`) — GHSA-g3hv-75wg-m249 (globparts DoS).
     clinozy-be accepts this one for its dev tools; here every consumer runs on 11, so it is fixed.
 - **Accepted list:** `deepmerge` GHSA-gcqx-w48m-w2h4 (low) — no patched release exists.
+- **Patched (same day):** `patches/deepmerge@4.3.1.patch` drops a `__proto__` key in `mergeObject()`,
+  which otherwise replaced the result's prototype when the target had none (`Object.create(null)`,
+  reproduced). Normal merges are byte-identical before and after; the GHSA stays in
+  `auditConfig.ignoreGhsas` only because `pnpm audit` matches by version.
 - **Result:** `pnpm audit` — 0 open (1 accepted low); `pnpm deps:audit:prod` — 0 advisories.
 
 ### Advisory floors — follow-redirects, systeminformation, re2js, seroval (2026-11-03) — ADOPTED

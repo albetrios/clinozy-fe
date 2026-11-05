@@ -41,8 +41,10 @@ auditConfig:
     # Path: dev/build tools only — shadcn (CLI), workbox-build > @rollup/plugin-node-resolve
     # (build-time, merges this repository's own config) and netlify-cli > @netlify/config. Never in
     # the shipped bundle; no untrusted input reaches it.
-    # No fix: 4.3.1 is the newest release and the advisory lists no patched version.
-    # Remove when: deepmerge publishes a fix — then override it instead.
+    # No fix: 4.3.1 is the newest release and the advisory lists no patched version. The bug is
+    # closed locally by patches/deepmerge@4.3.1.patch (patchedDependencies below); `pnpm audit`
+    # matches by version, so the id stays listed.
+    # Remove when: deepmerge publishes a fix — then override it and drop the patch.
     - GHSA-gcqx-w48m-w2h4
 
 # Transitive pins: patched floors for advisories upstream has not picked up yet.
@@ -122,3 +124,11 @@ peerDependencyRules:
 # entry exact, and drop it once that version is older than the window.
 minimumReleaseAgeExclude:
   - '@types/node@24.19.1'
+
+# Local fixes for advisories no release fixes yet. Each entry is version-keyed: bumping the package
+# without re-keying it fails the install, so a patch cannot silently outlive its version.
+patchedDependencies:
+  # GHSA-gcqx-w48m-w2h4 (low): mergeObject() let a `__proto__` key replace the returned object's
+  # prototype when the target had none. The patch drops that key, as a plain-object target already
+  # did; every other merge is unchanged. Drop it when deepmerge publishes a fix.
+  deepmerge@4.3.1: patches/deepmerge@4.3.1.patch
