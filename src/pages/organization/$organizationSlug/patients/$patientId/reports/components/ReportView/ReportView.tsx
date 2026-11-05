@@ -7,6 +7,7 @@ import type {
   PatientReport,
   PatientReportFile,
 } from '@/shared/api/app/patient-reports-contracts.ts';
+import { isSafeExternalLinkUrl } from '@/shared/auth/redirect-safety.ts';
 import {
   DrawerField,
   DrawerFieldGrid,
@@ -72,7 +73,7 @@ function ReportFileLinks({ files }: { files: readonly PatientReportFile[] }) {
     <ul data-testid={`${TEST_ID}-files`} className="mt-1.5 flex min-w-0 flex-col gap-1">
       {files.map((file) => (
         <li key={file.fileKey} className="text-body min-w-0 truncate">
-          {file.fileUrl ? (
+          {isSafeExternalLinkUrl(file.fileUrl) ? (
             <a
               href={file.fileUrl}
               target="_blank"
@@ -129,7 +130,9 @@ export function ReportView({ report, patientName, onClose }: ReportViewProps) {
   ]
     .filter(Boolean)
     .join(' · ');
-  const openable = report.files.flatMap((file) => (file.fileUrl ? [file.fileUrl] : []));
+  const openable = report.files.flatMap((file) =>
+    isSafeExternalLinkUrl(file.fileUrl) ? [file.fileUrl] : [],
+  );
   const download = () => {
     const [only] = openable;
     if (openable.length !== 1 || only === undefined) {

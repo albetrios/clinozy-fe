@@ -91,6 +91,14 @@ describe('BillingInvoicesTable', () => {
     expect(screen.queryByTestId('billing-invoice-view')).not.toBeInTheDocument();
   });
 
+  it('offers no link for an invoice whose URL is not a web link', () => {
+    answer([
+      { ...INVOICE, hostedInvoiceUrl: 'javascript:alert(1)', invoicePdfUrl: null },
+    ]);
+    renderTable();
+    expect(screen.queryByTestId('billing-invoice-view')).not.toBeInTheDocument();
+  });
+
   it('says so when there are no invoices yet', () => {
     answer([]);
     renderTable();

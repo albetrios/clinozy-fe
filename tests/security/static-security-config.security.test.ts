@@ -387,12 +387,12 @@ describe('supply-chain dependency floors (no downgrade past a known CVE)', () =>
     expect(atLeast(override('basic-ftp'), [5, 3, 1])).toBe(true);
   });
 
-  it('floors minimatch >=10.2.5 via pnpm override (ReDoS on the 10.1.x line)', () => {
-    expect(atLeast(override('minimatch'), [10, 2, 5])).toBe(true);
+  it('floors minimatch >=11.0.1 via pnpm override (globparts amplification DoS — GHSA-g3hv-75wg-m249)', () => {
+    expect(atLeast(override('minimatch'), [11, 0, 1])).toBe(true);
   });
 
   it('floors brace-expansion >=5.0.8 via pnpm override (unbounded-expansion OOM DoS — GHSA-mh99-v99m-4gvg)', () => {
-    // Reached through the minimatch 10.x line the override above pins.
+    // Reached through the minimatch 11.x line the override above pins.
     expect(atLeast(override('brace-expansion'), [5, 0, 8])).toBe(true);
   });
 

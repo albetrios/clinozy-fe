@@ -34,6 +34,16 @@ allowBuilds:
 # None is accepted today: node-forge (GHSA-86w9-cpqp-85rv), the last entry, left the
 # tree on 2026-11-03. The next accepted advisory goes under `auditConfig:` →
 # `ignoreGhsas:` as a block list, one `- GHSA-…` line under its comment.
+auditConfig:
+  ignoreGhsas:
+    # Package: deepmerge >=4.2.0 <=4.3.1 — GHSA-gcqx-w48m-w2h4 (low, `mergeObject()` lets a
+    # `__proto__` key poison the returned object).
+    # Path: dev/build tools only — shadcn (CLI), workbox-build > @rollup/plugin-node-resolve
+    # (build-time, merges this repository's own config) and netlify-cli > @netlify/config. Never in
+    # the shipped bundle; no untrusted input reaches it.
+    # No fix: 4.3.1 is the newest release and the advisory lists no patched version.
+    # Remove when: deepmerge publishes a fix — then override it instead.
+    - GHSA-gcqx-w48m-w2h4
 
 # Transitive pins: patched floors for advisories upstream has not picked up yet.
 # Prefer bounded ranges (>=x.y.z <nextMajor) so patches flow while the known-CVE
@@ -42,7 +52,7 @@ overrides:
   basic-ftp: '>=5.3.1 <6'
   esbuild: '>=0.28.1'
   protobufjs: '>=7.6.4 <8'
-  minimatch: '>=10.2.5 <11'
+  minimatch: '>=11.0.1 <12'
   nanoid@3: '>=3.3.18 <4'
   nanoid@5: '>=5.1.16 <6'
   multiparty: '>=4.3.0'
@@ -68,7 +78,7 @@ overrides:
   # repository's netlify.toml identically to 4.3.0. Remove when netlify-cli moves to toml 5.
   toml: '>=5.0.1 <6'
   svgo: '>=4.0.2 <5'
-  '@hono/node-server': '>=2.0.5 <3'
+  '@hono/node-server': '>=2.1.3 <3'
   hono: '>=4.13.11 <5'
   axios: '>=1.20.0 <2'
   markdown-it@14: '>=14.3.1 <15'
@@ -87,6 +97,20 @@ overrides:
   # katex ^0.16, and GHSA-238p-pmpm-9mq7 is fixed only in 0.18.2 — confined to that parent, as
   # in clinozy-be. Remove when micromark-extension-math allows katex 0.18.
   'micromark-extension-math>katex': '>=0.18.2 <1'
+  # qs <6.16.1 — GHSA-6pq8-jhm2-2vcw (moderate, `stringify` with arrayFormat 'comma' throws on a
+  # non-callable own `toString`). express 5 (via @modelcontextprotocol/sdk, dev only) resolved
+  # 6.16.0; bounded to the 6.x line, as in clinozy-be.
+  qs@6: '>=6.16.1 <7'
+  # Across the parents' major: glob >=9.0.0 <=14.0.1 — GHSA-3g3m-2fjr-6pw4 (moderate, a walk keeps
+  # traversing after its AbortSignal fires). workbox-build (via vite-plugin-pwa) declares glob ^11;
+  # @fastify/static and @vercel/nft (via netlify-cli) and @sentry/bundler-plugins (via
+  # @sentry/vite-plugin) declare glob 13; no 11.x/13.x fix exists, so the jump is confined to those
+  # four parents, as in clinozy-be. glob 14 keeps the `glob` and `globSync` exports they call.
+  # Remove when all four move to glob 14.
+  'workbox-build>glob': '>=14.0.2 <15'
+  '@fastify/static>glob': '>=14.0.2 <15'
+  '@vercel/nft>glob': '>=14.0.2 <15'
+  '@sentry/bundler-plugins>glob': '>=14.0.2 <15'
 
 peerDependencyRules:
   allowedVersions:

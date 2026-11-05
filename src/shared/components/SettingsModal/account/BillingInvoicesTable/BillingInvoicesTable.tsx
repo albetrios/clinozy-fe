@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { BillingInvoice } from '@/shared/api/billing-contracts.ts';
+import { isSafeExternalLinkUrl } from '@/shared/auth/redirect-safety.ts';
 import { type PillTone, TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import {
   DataTable,
@@ -67,7 +68,8 @@ function InvoicesTable({ invoices }: { invoices: BillingInvoice[] }) {
         cell: ({ row }) => {
           const { invoicePdfUrl, hostedInvoiceUrl } = row.original;
           const url = invoicePdfUrl ?? hostedInvoiceUrl;
-          if (!url) return <span className="text-muted-foreground text-body">—</span>;
+          if (!isSafeExternalLinkUrl(url))
+            return <span className="text-muted-foreground text-body">—</span>;
           return (
             <Button variant="link" size="sm" asChild data-testid="billing-invoice-view">
               <a
