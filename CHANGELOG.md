@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.1](https://github.com/albetrios/clinozy-fe/compare/v1.20.0...v1.20.1) (2026-11-05)
+
+
+### Performance
+
+* **login:** time the sign-in tour with one timer per chapter, not a frame loop ([#235](https://github.com/albetrios/clinozy-fe/issues/235)) ([6b81cab](https://github.com/albetrios/clinozy-fe/commit/6b81cab220f376847143694e7f3d04cca33c6ee4))
+
 ## [1.20.0](https://github.com/albetrios/clinozy-fe/compare/v1.19.0...v1.20.0) (2026-11-05)
 
 
