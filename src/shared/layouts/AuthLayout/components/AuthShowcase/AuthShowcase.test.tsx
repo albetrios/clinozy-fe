@@ -142,7 +142,7 @@ describe('AuthShowcaseStage — the tour', () => {
     expect(currentStep(stage)).toBe(1);
   });
 
-  /** Frames asked for while `body` runs — the tour's loop is the stage's only frame user. */
+  /** Frames asked for while `body` runs (the Payments scene's count-up is the only other user). */
   async function framesDuring(body: () => Promise<void>): Promise<number> {
     const frames = vi.spyOn(window, 'requestAnimationFrame');
     try {
@@ -153,16 +153,18 @@ describe('AuthShowcaseStage — the tour', () => {
     }
   }
 
-  it('asks for no frames while it holds still, nor once its round is over (G-5)', async () => {
+  // A frame loop wrote each dot's progress 60 times a second, and nothing read it: the
+  // engine is one timer per chapter now, so playing asks for no frames either (G-5).
+  it('asks for no frames: playing, held, paused or once its round is over (G-5)', async () => {
     const { getByTestId } = renderStage();
     const stage = getByTestId(IDS.stage);
-    expect(await framesDuring(() => play(1_000)), 'playing').toBeGreaterThan(30);
+    expect(await framesDuring(() => play(1_000)), 'playing').toBe(0);
 
     fireEvent.pointerEnter(stage);
     await play(50);
     expect(await framesDuring(() => play(5_000)), 'held').toBe(0);
     fireEvent.pointerLeave(stage);
-    expect(await framesDuring(() => play(1_000)), 'released').toBeGreaterThan(30);
+    expect(await framesDuring(() => play(1_000)), 'released').toBe(0);
 
     fireEvent.click(within(stage).getByTestId(IDS.toggle));
     expect(await framesDuring(() => play(5_000)), 'paused').toBe(0);
