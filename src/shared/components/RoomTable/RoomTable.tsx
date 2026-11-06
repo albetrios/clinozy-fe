@@ -62,11 +62,6 @@ export interface RoomTableProps<TRow extends { id: string }> {
   exportValue?: TableCsvExport<TRow>['cell'];
   /** The room's words for Export and its toast ("3 rows exported as CSV"). */
   exportCopy: { label: string; done: (count: number) => string };
-  /**
-   * Unused: the placeholder rows follow the columns now (a person column's
-   * cells draw the avatar). Kept until the room tabs that pass it drop it.
-   */
-  avatar?: boolean;
   /** Extra bulk actions after Export. */
   bulkActions?: readonly DataTableBulkAction<TRow>[];
 }

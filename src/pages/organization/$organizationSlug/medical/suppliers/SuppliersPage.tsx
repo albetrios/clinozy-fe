@@ -304,7 +304,6 @@ export function SuppliersPage() {
           }
           rowActions={rowActions}
           exportName="suppliers.csv"
-          avatar
         />
       )}
       <SupplierDrawer

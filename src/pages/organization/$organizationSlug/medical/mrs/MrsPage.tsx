@@ -196,7 +196,6 @@ export function MrsPage() {
           onRowClick={(mr) => nav.mrEdit(mr.id)}
           rowActions={rowActions}
           exportName="mrs.csv"
-          avatar
         />
       )}
       <MrDrawers dialog={dialog} close={close} stack={stack} />
