@@ -84,14 +84,12 @@ const OFFERING_CODES = {
  * (fix-empty-state-actions): the toolbar's "New offering" is the one way to add.
  */
 function TableEmpty({
-  loading,
   failed,
   filtered,
   searched,
   onClearFilters,
   onRetry,
 }: {
-  loading: boolean;
   /** The catalogue's read failed with nothing read before: the error in place, with Retry. */
   failed: boolean;
   filtered: boolean;
@@ -101,7 +99,7 @@ function TableEmpty({
 }) {
   const { t } = useTranslation(OFFERINGS_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
-  if (failed && !loading) {
+  if (failed) {
     return (
       <RetryError
         message={tErrors(ERRORS_KEYS.frontend.query.loadFailed)}
@@ -111,7 +109,6 @@ function TableEmpty({
   }
   return (
     <RoomTableEmpty
-      loading={loading}
       filtered={filtered}
       onClearFilters={onClearFilters}
       tone="sky"
@@ -122,7 +119,6 @@ function TableEmpty({
           ? OFFERINGS_KEYS.empty.noMatchDescription
           : OFFERINGS_KEYS.empty.description,
       )}
-      label={t(OFFERINGS_KEYS.manifest.title)}
     />
   );
 }
@@ -364,9 +360,9 @@ export function OfferingsPage() {
         onRowClick={(row) => openOffering(row.original.id)}
         rowActions={(row) => rowActions(row.original)}
         bulkActions={bulkActions}
+        loading={loading}
         empty={
           <TableEmpty
-            loading={loading}
             failed={catalogue.isError && !hasLastCopy}
             filtered={filters.count > 0}
             searched={Boolean(search.q)}

@@ -88,6 +88,7 @@ function Harness({
       }}
       openLeadId={openLeadId}
       onOpen={onOpen}
+      loading={false}
       empty={<p>No leads match</p>}
     />
   );

@@ -218,7 +218,6 @@ export function VendorsPage() {
           onRowClick={(vendor) => nav.vendorEdit(vendor.id)}
           rowActions={rowActions}
           exportName="clinic-stock-vendors.csv"
-          avatar
         />
       )}
       <StockVendorDrawer

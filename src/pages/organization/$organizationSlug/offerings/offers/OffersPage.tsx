@@ -17,7 +17,6 @@ import {
   type RoomFilterFields,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import {
   type AppAccess,
   canExportRows,
@@ -59,25 +58,21 @@ import { OFFER_STATE_FILTER, validateOffersSearch } from './offers.search.ts';
 /** The exported file's name. */
 const EXPORT_FILE_NAME = 'offers.csv';
 
-/** How many placeholder rows stand in for the list while it loads. */
-const SKELETON_ROWS = 4;
-
 /** The row grid's minimum width with every column side by side (H:5484). */
 const MIN_ROW_WIDTH = 1300;
 
 /**
- * What the table shows with no rows (KICKOFF §6.11 States): the bars while it
- * loads, Retry in place when the read failed with nothing to show, the
- * filtered state, else the design's empty line.
+ * What the table shows with no rows (KICKOFF §6.11 States): Retry in place
+ * when the read failed with nothing to show, the filtered state, else the
+ * design's empty line. While it loads the table draws its own placeholder rows
+ * (its `loading`).
  */
 function TableEmpty({
-  loading,
   failed,
   onRetry,
   filtered,
   onClearFilters,
 }: {
-  loading: boolean;
   /** The read failed and there is no copy to show. */
   failed: boolean;
   onRetry: () => void;
@@ -85,15 +80,6 @@ function TableEmpty({
   onClearFilters: () => void;
 }) {
   const { t } = useTranslation(OFFERS_NS);
-  if (loading) {
-    return (
-      <SkeletonRows
-        rows={SKELETON_ROWS}
-        label={t(OFFERS_KEYS.manifest.title)}
-        rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
-      />
-    );
-  }
   if (failed) return <RetryError onRetry={onRetry} />;
   if (filtered) return <EmptyState tone="sky" onClearFilters={onClearFilters} />;
   return (
@@ -324,9 +310,9 @@ export function OffersPage() {
         onRowClick={(row) => openOffer(row.original.id)}
         rowActions={(row) => rowActions(row.original)}
         bulkActions={bulkActions}
+        loading={loading}
         empty={
           <TableEmpty
-            loading={loading}
             failed={failed}
             onRetry={catalogue.refetch}
             filtered={filters.count > 0}

@@ -290,7 +290,6 @@ function CustomerCredits({ search }: { search: MedicalCreditsSearch }) {
         rowTone={(credit) => CREDIT_STATUS_TONES[credit.status]}
         rowActions={rowActions}
         exportName="medical-customer-credits.csv"
-        avatar
       />
       <SettleCreditDrawer credit={settling} onClose={() => setSettling(null)} />
     </>

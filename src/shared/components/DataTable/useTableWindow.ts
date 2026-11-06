@@ -1,5 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import type { RefObject } from 'react';
+import { type RefObject, useLayoutEffect, useRef } from 'react';
 
 import { useLoadMoreSentinel } from '@/shared/hooks/useLoadMoreSentinel/index.ts';
 
@@ -9,6 +9,8 @@ export const VIRTUALIZE_ABOVE = 60;
 export const ROW_HEIGHT = 52;
 /** Rows rendered beyond the visible ones (H:4117). */
 const OVERSCAN = 10;
+/** The body's entries as rendered: each carries its index in the list. */
+const ENTRY_SELECTOR = '[data-slot="data-table-body"] > [data-index]';
 
 interface TableWindowOptions<TItem extends { id: string }> {
   /** The body's entries in order — rows, and group headers when the table groups. */
@@ -38,11 +40,43 @@ export interface TableWindow<TItem extends { id: string }> {
   scrollToIndex: (index: number) => void;
 }
 
+/** The heights the entries had while every one of them rendered. */
+interface EntrySizes {
+  /** By the entry's id. */
+  byId: ReadonlyMap<string, number>;
+  /** The middle one — the estimate of an entry never seen; null before any. */
+  typical: number | null;
+}
+
+/**
+ * Reads each rendered entry's height off the DOM (an unlaid-out entry, 0 tall,
+ * is left out). Only while every entry renders — so the list that starts to
+ * virtualise knows the real height of each row above the fold.
+ */
+function measureEntries<TItem extends { id: string }>(
+  scroller: HTMLElement,
+  items: readonly TItem[],
+): EntrySizes {
+  const byId = new Map<string, number>();
+  for (const node of scroller.querySelectorAll<HTMLElement>(ENTRY_SELECTOR)) {
+    const item = items[Number(node.dataset.index)];
+    const height = node.getBoundingClientRect().height;
+    if (item && height > 0) byId.set(item.id, height);
+  }
+  const heights = [...byId.values()].sort((left, right) => left - right);
+  return { byId, typical: heights[Math.floor(heights.length / 2)] ?? null };
+}
+
 /**
  * The list's length (KICKOFF §3.5 Length; D7): above `virtualizeAbove` entries
  * only the visible ones plus 10 of overscan render, measured as they mount
  * (52px until then); the next cursor page loads when the end of the list
  * scrolls into view.
+ *
+ * A list that grows past the threshold — the next page lands — keeps its
+ * place: the virtualiser starts from the scroller's own offset (not 0) and
+ * from the heights the rows had while they all rendered, so the rows on
+ * screen stay where they were.
  */
 export function useTableWindow<TItem extends { id: string }>({
   items,
@@ -55,17 +89,36 @@ export function useTableWindow<TItem extends { id: string }>({
   fetchNextPage,
 }: TableWindowOptions<TItem>): TableWindow<TItem> {
   const virtualizing = items.length > virtualizeAbove;
+  const sizes = useRef<EntrySizes>({ byId: new Map(), typical: null });
+  // While every entry renders, keep their heights for the virtualiser to
+  // start from when the list grows past the threshold.
+  useLayoutEffect(() => {
+    const scroller = scrollerRef.current;
+    if (virtualizing || !scroller) return;
+    sizes.current = measureEntries(scroller, items);
+  }, [items, virtualizing, scrollerRef]);
+
   // The virtualizer re-renders this component as it scrolls; its stable
   // `measureElement` and `scrollToIndex` are all that leave the component.
   // eslint-disable-next-line react-hooks/incompatible-library -- see above
   const virtualizer = useVirtualizer<HTMLDivElement, HTMLDivElement>({
     count: items.length,
     getScrollElement: () => scrollerRef.current,
-    estimateSize: () => rowHeight,
+    // A row already seen keeps its height; a new one takes the rows' usual one.
+    estimateSize: (index) => {
+      const known = sizes.current;
+      const id = items[index]?.id;
+      return (
+        (id === undefined ? undefined : known.byId.get(id)) ?? known.typical ?? rowHeight
+      );
+    },
     // An unlaid-out row reads 0 tall; keep the estimate instead.
     measureElement: (element) => element.getBoundingClientRect().height || rowHeight,
     // The first render draws a window before the scroller is measured.
     initialRect: { width: 0, height: rowHeight * OVERSCAN },
+    // Turning on (the next page took the list past the threshold), it starts
+    // where the scroller already is — its default, 0, would jump to the top.
+    initialOffset: () => scrollerRef.current?.scrollTop ?? 0,
     overscan: OVERSCAN,
     enabled: virtualizing,
     getItemKey: (index) => items[index]?.id ?? index,

@@ -5,6 +5,7 @@
  */
 import type { Column, Row, RowData } from '@tanstack/react-table';
 
+import { cn } from '@/lib/utils.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 
 import {
@@ -31,6 +32,39 @@ export type TableColumn<TData extends RowData> = Column<
 
 /** How phone rows lay out (KICKOFF §3.5 Data table → Phone). */
 export type DataTablePhoneLayout = 'fold' | 'wrap' | 'regrid';
+
+/**
+ * A body row's box — the 3px status edge, a muted hairline and the row's
+ * padding — which the loading skeleton's rows share with `DataTableRow`, so a
+ * placeholder row is as tall as the row it stands in for.
+ */
+export const ROW_BOX =
+  'bg-card text-body relative border-s-3 border-b border-b-muted py-(--table-row-pad-y) ps-(--table-pad-start) pe-(--table-pad-x)';
+
+/**
+ * On the grid: on one grid with the header; on a phone: per layout (H:65,
+ * H:120). The column gap is 12px unless the table sets `--dt-gap` (the
+ * Agenda's 10px, H:2032) — only on a table that never folds: the fold engine
+ * plans with 12px.
+ */
+const GRID_ROW =
+  'grid min-w-(--dt-min-w) grid-cols-(--dt-cols) items-center gap-[var(--dt-gap,0.75rem)]';
+const FLEX_ROW = 'flex flex-wrap items-center gap-x-3 gap-y-1.5';
+
+/**
+ * A body row's layout classes in the tier — the table's grid on a tablet or
+ * desktop; a phone `regrid` row's own grid, else a wrapping flex row — for a
+ * row and for the placeholder rows that stand in for one.
+ */
+export function rowLayoutClass(tier: {
+  isPhone: boolean;
+  phoneLayout: DataTablePhoneLayout;
+  phoneGridClassName?: string;
+}): string {
+  if (!tier.isPhone) return GRID_ROW;
+  if (tier.phoneLayout === 'regrid') return cn('grid', tier.phoneGridClassName);
+  return FLEX_ROW;
+}
 
 /** Track of a column without `meta.track`. */
 const DEFAULT_TRACK = 'minmax(90px,1fr)';

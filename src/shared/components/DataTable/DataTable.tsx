@@ -12,6 +12,7 @@ import {
   type RefObject,
   type UIEvent,
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -24,7 +25,10 @@ import type { DataTableRowAction } from '@/shared/components/DataTableRowActions
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
-import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import {
+  useViewportTier,
+  type ViewportTier,
+} from '@/shared/hooks/useViewportTier/index.ts';
 import { FolderOpen } from '@/shared/icons/index.ts';
 
 import {
@@ -42,6 +46,7 @@ import {
 import {
   type DataTablePhoneLayout,
   planTableLayout,
+  type RowActionsSummary,
   summariseRowActions,
   type TableColumn,
   type TableLayout,
@@ -51,6 +56,7 @@ import {
 import { DataTableFooter } from './DataTableFooter.tsx';
 import { DataTableHeaderRow } from './DataTableHeaderRow.tsx';
 import { DataTableRow, type RowContext, type RowEdge } from './DataTableRow.tsx';
+import { DataTableSkeleton } from './DataTableSkeleton.tsx';
 import { DataTableTail } from './DataTableTail.tsx';
 import type { DataTableFeatures } from './table-features.ts';
 import { useRowKeyboardNav } from './useRowKeyboardNav.ts';
@@ -101,8 +107,15 @@ export interface DataTableProps<TData extends RowData> {
   table: ReactTable<DataTableFeatures, TData>;
   /** Message shown when the table has no rows. */
   emptyMessage?: string;
-  /** Replaces the empty message — e.g. the room's `EmptyState`. */
+  /** Replaces the empty message — e.g. the room's `EmptyState`. Not while `loading`. */
   empty?: ReactNode;
+  /**
+   * The first page is loading: with no rows yet the body shows placeholder
+   * rows on the table's own grid — under the header, each cell shaped by its
+   * column's `meta.kind` and alignment (`DataTableSkeleton`) — in place of
+   * `empty`, and the table is `aria-busy` (KICKOFF §6.0 States).
+   */
+  loading?: boolean;
   /** Stable id: scopes the test ids (`<tableId>-table…`). */
   tableId?: string;
   /** Accessible name of the table (defaults to `recordsLabel`). */
@@ -222,6 +235,52 @@ function resolveOptions(props: OptionProps): Options {
     rowHeight: props.rowHeight ?? ROW_HEIGHT,
     keyboardNav: props.keyboardNav ?? false,
   };
+}
+
+/**
+ * The actions track each table last sized from its rows, by table id and tier
+ * — kept for the session. While a load leaves the table without rows (the
+ * first page of a new search or filter), its header and placeholder rows keep
+ * that track, so the columns do not shift when the rows land.
+ */
+const ACTIONS_SEEN = new Map<string, RowActionsSummary>();
+
+/**
+ * The row actions' summary this render: the rows', or — loading with none —
+ * the one this table last had in this tier, if any. A table without an id or
+ * row actions keeps nothing.
+ */
+function useActionsSummary<TData extends RowData>({
+  rows,
+  rowActions,
+  tableId,
+  tier,
+  loadingEmpty,
+}: {
+  rows: readonly TableRow<TData>[];
+  rowActions: DataTableProps<TData>['rowActions'];
+  tableId: string | undefined;
+  tier: ViewportTier;
+  loadingEmpty: boolean;
+}): RowActionsSummary {
+  const live = summariseRowActions(rows, rowActions, tier === 'tablet' ? 36 : 32);
+  const key = tableId === undefined || !rowActions ? undefined : `${tableId}:${tier}`;
+  const { track, renderTrack, primaryLabelLength } = live;
+  useEffect(() => {
+    if (key !== undefined && track > 0) {
+      ACTIONS_SEEN.set(key, { track, renderTrack, primaryLabelLength });
+    }
+  }, [key, track, renderTrack, primaryLabelLength]);
+  const seen = loadingEmpty && key !== undefined ? ACTIONS_SEEN.get(key) : undefined;
+  return seen ?? live;
+}
+
+/** `aria-busy` while old rows stand in for new ones or the first page loads. */
+function busyOf(
+  refreshing: boolean | undefined,
+  loadingEmpty: boolean,
+): true | undefined {
+  return refreshing || loadingEmpty || undefined;
 }
 
 function pickColumns<TData extends RowData>(
@@ -361,8 +420,9 @@ function PinnedGroupHeader<TData extends RowData>({
 }
 
 /**
- * The rows' rowgroup — group headers among them — or the empty state in a
- * single full-width cell. While new rows load it carries `data-refreshing`:
+ * The rows' rowgroup — group headers among them — or, in a single full-width
+ * cell, the placeholder rows while the first page loads, else the empty
+ * state. While new rows load over old ones it carries `data-refreshing`:
  * the in-place skeleton every room shares (one `index.css` rule — clicks off,
  * every leaf text in a row a flat `muted-strong` bar, an avatar a plain disc,
  * an icon nothing, group headers kept; H:275).
@@ -375,6 +435,8 @@ function TableBody<TData extends RowData>({
   emptyMessage,
   columnCount,
   refreshing,
+  loading,
+  label,
 }: {
   tableWindow: TableWindow<TableEntry<TData>>;
   context: RowContext<TData>;
@@ -383,6 +445,10 @@ function TableBody<TData extends RowData>({
   emptyMessage?: string;
   columnCount: number;
   refreshing: boolean;
+  /** No rows yet and the first page is loading: the placeholder rows. */
+  loading: boolean;
+  /** What is loading, for screen readers. */
+  label?: string;
 }) {
   const { t } = useTranslation(TABLE_NS);
   const renderEntry = ({ item, index }: { item: TableEntry<TData>; index: number }) => {
@@ -412,6 +478,17 @@ function TableBody<TData extends RowData>({
     );
   };
   const hasRows = tableWindow.windowed.length > 0;
+  const skeleton = loading && !hasRows;
+  let placeholder: ReactNode = empty ?? (
+    <EmptyState
+      variant="compact"
+      tone="stone"
+      icon={<FolderOpen />}
+      title={emptyMessage ?? t(TABLE_KEYS.empty)}
+      className="px-(--table-pad-x) py-12"
+    />
+  );
+  if (skeleton) placeholder = <DataTableSkeleton context={context} label={label} />;
   return (
     <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
       role="rowgroup"
@@ -419,11 +496,12 @@ function TableBody<TData extends RowData>({
       data-refreshing={refreshing || undefined}
       data-empty={hasRows ? undefined : true}
       // With no rows the body, its row and its cell grow into the card, so the
-      // empty state's `my-auto` centres it there (change-empty-states, D7); a
-      // skeleton does not grow and keeps to the top.
+      // empty state's `my-auto` centres it there (change-empty-states, D7); the
+      // placeholder rows fill it from the top, the ones past its foot clipped.
       className={cn(
         'pt-(--dt-pad-top) pb-(--dt-pad-bottom)',
         hasRows ? 'shrink-0' : 'flex flex-1 flex-col',
+        skeleton && 'min-h-0 overflow-hidden',
       )}
     >
       {hasRows ? (
@@ -431,22 +509,14 @@ function TableBody<TData extends RowData>({
       ) : (
         <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
           role="row"
-          className="flex flex-1 flex-col"
+          className="flex min-h-0 flex-1 flex-col"
         >
           <div // NOSONAR(S6819): grid/flex ARIA table, see the note under the imports
             role="cell"
             aria-colspan={Math.max(1, columnCount)}
-            className="flex flex-1 flex-col"
+            className="flex min-h-0 flex-1 flex-col"
           >
-            {empty ?? (
-              <EmptyState
-                variant="compact"
-                tone="stone"
-                icon={<FolderOpen />}
-                title={emptyMessage ?? t(TABLE_KEYS.empty)}
-                className="px-(--table-pad-x) py-12"
-              />
-            )}
+            {placeholder}
           </div>
         </div>
       )}
@@ -475,8 +545,8 @@ function TableScroller<TData extends RowData>({
   context: RowContext<TData>;
   props: Pick<
     DataTableProps<TData>,
-    'groups' | 'empty' | 'emptyMessage' | 'refreshing' | 'recordsLabel'
-  >;
+    'groups' | 'empty' | 'emptyMessage' | 'refreshing' | 'recordsLabel' | 'loading'
+  > & { label?: string };
   options: Options;
   rowCount: number;
   columnCount: number;
@@ -510,6 +580,8 @@ function TableScroller<TData extends RowData>({
         emptyMessage={props.emptyMessage}
         columnCount={columnCount}
         refreshing={props.refreshing === true && tableWindow.windowed.length > 0}
+        loading={props.loading === true}
+        label={props.label ?? props.recordsLabel}
       />
       {options.hasNextPage ? (
         // The last 80px of the list: the next page loads as it scrolls in.
@@ -524,7 +596,7 @@ function TableScroller<TData extends RowData>({
         ended={rowCount > 0 && !options.hasNextPage && props.recordsLabel !== undefined}
         recordsLabel={props.recordsLabel}
         columnCount={columnCount}
-        prefix={options.prefix}
+        context={context}
       />
     </div>
   );
@@ -603,11 +675,15 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
   const body = tableEntries(rows, props.groups?.keyOf);
   const columns = table.getVisibleLeafColumns();
   const selection = useTableSelection(table, rows, options.selectable && !isPhone);
-  const actions = summariseRowActions(
+  // The first page is loading and no row is here yet: the placeholder rows.
+  const loadingEmpty = Boolean(props.loading) && rows.length === 0;
+  const actions = useActionsSummary({
     rows,
-    props.rowActions,
-    tier === 'tablet' ? 36 : 32,
-  );
+    rowActions: props.rowActions,
+    tableId,
+    tier,
+    loadingEmpty,
+  });
   const layout = planTableLayout({
     columns: columns.map(toFoldColumn),
     actions,
@@ -691,7 +767,7 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
           aria-rowcount={
             options.hasNextPage ? -1 : body.entries.length + context.firstRowIndex - 1
           }
-          aria-busy={props.refreshing || undefined}
+          aria-busy={busyOf(props.refreshing, loadingEmpty)}
           style={gridStyle}
           className="flex min-h-0 flex-1 flex-col"
         >
@@ -718,6 +794,8 @@ function DataTableInner<TData extends RowData>(props: DataTableProps<TData>) {
               emptyMessage,
               refreshing: props.refreshing,
               recordsLabel: props.recordsLabel,
+              loading: props.loading,
+              label: props.label,
             }}
             options={options}
             rowCount={rows.length}

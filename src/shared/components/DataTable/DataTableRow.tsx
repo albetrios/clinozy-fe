@@ -22,24 +22,16 @@ import { buildMetaLine, type MetaLineItem } from './data-table-fold.ts';
 import {
   type DataTablePhoneLayout,
   foldItem,
+  ROW_BOX,
+  rowLayoutClass,
   type TableColumn,
   type TableRow,
 } from './data-table-layout.ts';
 import type { TableSelection } from './useTableSelection.ts';
 
-// Hover `bg-canvas` 120ms, a muted hairline, the j / k focus bar (H:267, H:683).
-const ROW_BASE =
-  'group/row bg-card text-body relative border-s-3 border-b border-b-muted py-(--table-row-pad-y) ps-(--table-pad-start) pe-(--table-pad-x) transition-colors duration-120 outline-none hover:bg-canvas data-[selected=true]:bg-muted data-[active=true]:bg-muted data-[kfocus=true]:bg-canvas data-[kfocus=true]:shadow-[inset_2px_0_0_var(--color-border-strong)] rtl:data-[kfocus=true]:shadow-[inset_-2px_0_0_var(--color-border-strong)]';
-
-/**
- * On the grid: on one grid with the header; on a phone: per layout (H:65,
- * H:120). The column gap is 12px unless the table sets `--dt-gap` (the
- * Agenda's 10px, H:2032) — only on a table that never folds: the fold engine
- * plans with 12px.
- */
-const GRID_ROW =
-  'grid min-w-(--dt-min-w) grid-cols-(--dt-cols) items-center gap-[var(--dt-gap,0.75rem)]';
-const FLEX_ROW = 'flex flex-wrap items-center gap-x-3 gap-y-1.5';
+// The row's box (`ROW_BOX`); hover `bg-canvas` 120ms, a muted hairline, the
+// j / k focus bar (H:267, H:683).
+const ROW_BASE = `group/row ${ROW_BOX} transition-colors duration-120 outline-none hover:bg-canvas data-[selected=true]:bg-muted data-[active=true]:bg-muted data-[kfocus=true]:bg-canvas data-[kfocus=true]:shadow-[inset_2px_0_0_var(--color-border-strong)] rtl:data-[kfocus=true]:shadow-[inset_-2px_0_0_var(--color-border-strong)]`;
 
 // Sticky at the inline end with a solid background and a soft edge (H:225).
 const STICKY_ACTIONS =
@@ -379,12 +371,6 @@ function PhoneFlowCells<TData extends RowData>({
       />
     </>
   );
-}
-
-function rowLayoutClass<TData extends RowData>(context: RowContext<TData>): string {
-  if (!context.isPhone) return GRID_ROW;
-  if (context.phoneLayout === 'regrid') return cn('grid', context.phoneGridClassName);
-  return FLEX_ROW;
 }
 
 /** The 3px status edge: transparent without a tone, else its ink or its dot. */

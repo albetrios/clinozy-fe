@@ -250,7 +250,6 @@ export function PurchasesPage() {
           rowTone={(purchase) => STOCK_PURCHASE_STATUS_TONES[purchase.status]}
           rowActions={rowActions}
           exportName="clinic-stock-purchases.csv"
-          avatar
         />
       )}
       <StockPurchaseDrawer

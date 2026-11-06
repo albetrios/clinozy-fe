@@ -227,7 +227,6 @@ export function MedicalPaymentsPage() {
         rowTone={ledgerRowTone}
         rowActions={rowActions}
         exportName="medical-payments.csv"
-        avatar
       />
       <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
       <PaymentReverseConfirm entry={reversing} onClose={() => setReversing(null)} />

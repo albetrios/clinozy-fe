@@ -1,31 +1,35 @@
+import type { RowData } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
-
 import { TABLE_KEYS, TABLE_NS, TABLE_TEST_IDS } from './data-table.constants.ts';
+import type { RowContext } from './DataTableRow.tsx';
+import { DataTableSkeletonRow } from './DataTableSkeleton.tsx';
 
 /** Placeholder rows under the list while the next page loads (keys). */
-const LOADING_ROWS = ['first', 'second', 'third'] as const;
+const LOADING_ROWS = ['first', 'second'] as const;
 
 /**
- * What follows the last row (D7; H:6168): three placeholder rows and a
- * "Loading more <records>" status while the next page loads, then — once
- * there is no next page — "All <records> loaded" between two hairlines.
+ * What follows the last row (D7; H:6168): two placeholder rows in the rows'
+ * own shape (the grid's cells, or the phone layout's) and a "Loading more
+ * <records>" status while the next page loads, then — once there is no next
+ * page — "All <records> loaded" between two hairlines.
  */
-export function DataTableTail({
+export function DataTableTail<TData extends RowData>({
   loading,
   ended,
   recordsLabel,
   columnCount,
-  prefix,
+  context,
 }: {
   loading: boolean;
   /** Every page is loaded and the list has rows. */
   ended: boolean;
   recordsLabel?: string;
   columnCount: number;
-  prefix: string;
+  /** The rows' layout this render — the placeholders take their shape. */
+  context: RowContext<TData>;
 }) {
+  const { prefix } = context;
   const { t } = useTranslation(TABLE_NS);
   if (!(loading || ended)) return null;
   const span = Math.max(1, columnCount);
@@ -48,15 +52,8 @@ export function DataTableTail({
             <output className="sr-only">
               {t(TABLE_KEYS.length.loadingMore, { records: recordsLabel ?? '' })}
             </output>
-            {LOADING_ROWS.map((item) => (
-              <div
-                key={item}
-                aria-hidden="true"
-                className="border-b-muted flex h-14 items-center gap-3 border-b px-(--table-pad-x)"
-              >
-                <SkeletonBar shape="avatar" />
-                <SkeletonBar className="w-3/5" />
-              </div>
+            {LOADING_ROWS.map((item, index) => (
+              <DataTableSkeletonRow key={item} context={context} index={index} />
             ))}
           </div>
         </div>

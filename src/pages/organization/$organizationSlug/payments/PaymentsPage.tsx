@@ -36,7 +36,6 @@ import {
   type RoomFilterCopy,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
@@ -63,40 +62,25 @@ import { PaymentsToolbar } from './shared/components/PaymentsToolbar/index.ts';
 /** The exported file's name. */
 const EXPORT_FILE_NAME = 'payments.csv';
 
-/** How many placeholder rows stand in for the list while it loads. */
-const SKELETON_ROWS = 8;
-
 /** The ledger's minimum width with every column (`payments.md:30`). */
 const LEDGER_MIN_WIDTH = 1180;
 
 /**
- * What the table shows while the ledger's first page loads, or when nothing is
- * in it — the in-place skeleton, the room's empty state (a butter tile with
- * `Wallet` and "No entry matches" — no button, fix-empty-state-actions: the
- * toolbar's Receive is the one way to add), or the filtered one
- * (`payments.md:398`). A search, filter or Day close's day keeps the rows and
- * turns them to bars (the table's `refreshing`).
+ * What the table shows when nothing is in the ledger — the room's empty state
+ * (a butter tile with `Wallet` and "No entry matches" — no button,
+ * fix-empty-state-actions: the toolbar's Receive is the one way to add), or
+ * the filtered one (`payments.md:398`). While the first page loads the table
+ * draws its own placeholder rows (its `loading`); a search, filter or Day
+ * close's day keeps the rows and turns them to bars (its `refreshing`).
  */
 function LedgerEmpty({
-  loading,
   filtered,
   onClearFilters,
 }: {
-  loading: boolean;
   filtered: boolean;
   onClearFilters: () => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  if (loading) {
-    return (
-      <SkeletonRows
-        rows={SKELETON_ROWS}
-        avatar
-        label={t(PAYMENTS_KEYS.manifest.title)}
-        rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
-      />
-    );
-  }
   if (filtered) return <EmptyState tone="butter" onClearFilters={onClearFilters} />;
   return (
     <EmptyState
@@ -351,9 +335,9 @@ export function PaymentsPage() {
           isFetchingNextPage={list.isFetchingNextPage}
           fetchNextPage={list.fetchNextPage}
           refreshing={list.isRefreshing}
+          loading={list.isPending}
           empty={
             <LedgerEmpty
-              loading={list.isPending}
               filtered={filters.count > 0 || Boolean(search.q)}
               onClearFilters={() => filters.apply({})}
             />

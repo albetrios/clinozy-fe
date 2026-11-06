@@ -198,7 +198,6 @@ export function SalesPage() {
         exportValue={(columnId, sale) =>
           columnId === 'customer' ? (sale.customer?.name ?? '') : undefined
         }
-        avatar
       />
       <SaleDrawers />
       <MedicalFlowConfirm target={voiding} onClose={() => setVoiding(null)} />

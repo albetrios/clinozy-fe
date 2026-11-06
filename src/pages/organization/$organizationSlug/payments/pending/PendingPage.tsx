@@ -20,7 +20,6 @@ import {
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { SettleCreditDrawer } from '@/shared/components/SettleCreditDrawer/index.ts';
-import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useCreditList } from '@/shared/hooks/useCredits/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import {
@@ -62,9 +61,6 @@ import {
   type PendingSearch,
   validatePendingSearch,
 } from './pending.search.ts';
-
-/** How many placeholder rows stand in for the list while it loads. */
-const SKELETON_ROWS = 6;
 
 /** Pending's minimum width with every column (`payments.md:46`, and the 130px By). */
 const PENDING_MIN_WIDTH = 1370;
@@ -136,29 +132,18 @@ function PendingDrawers({
 }
 
 /**
- * The skeleton, the empty state ("Nothing pending" — no button, fix-empty-state-actions:
- * the toolbar's Add pending is the one way to add) or the filtered one.
+ * The empty state ("Nothing pending" — no button, fix-empty-state-actions: the
+ * toolbar's Add pending is the one way to add) or the filtered one; while the
+ * first page loads the table draws its own placeholder rows (its `loading`).
  */
 function PendingEmpty({
-  loading,
   filtered,
   onClearFilters,
 }: {
-  loading: boolean;
   filtered: boolean;
   onClearFilters: () => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  if (loading) {
-    return (
-      <SkeletonRows
-        rows={SKELETON_ROWS}
-        avatar
-        label={t(PAYMENTS_KEYS.tabs.pending)}
-        rowClassName="h-13.25 border-b border-b-muted px-(--table-pad-x)"
-      />
-    );
-  }
   if (filtered) return <EmptyState tone="butter" onClearFilters={onClearFilters} />;
   return (
     <EmptyState
@@ -376,9 +361,9 @@ export function PendingPage() {
           isFetchingNextPage={list.isFetchingNextPage}
           fetchNextPage={list.fetchNextPage}
           refreshing={list.isRefreshing}
+          loading={list.isPending}
           empty={
             <PendingEmpty
-              loading={list.isPending}
               filtered={filters.count > 0 || Boolean(search.q)}
               onClearFilters={() => filters.apply({})}
             />
