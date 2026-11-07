@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.20.2](https://github.com/albetrios/clinozy-fe/compare/v1.20.1...v1.20.2) (2026-11-07)
+
+
+### Fixed
+
+* **ci:** mark the test-env JWT fixture key gitleaks:allow ([#238](https://github.com/albetrios/clinozy-fe/issues/238)) ([19e925f](https://github.com/albetrios/clinozy-fe/commit/19e925fe0c98f957180456155a5f9d97e7869e82))
+* **deps:** patch deepmerge's __proto__ prototype poisoning (GHSA-gcqx-w48m-w2h4) ([#239](https://github.com/albetrios/clinozy-fe/issues/239)) ([69b799e](https://github.com/albetrios/clinozy-fe/commit/69b799e0c8b9db54181929062872d3d489f08e5e))
+* **security:** clear dependency advisories and check backend-supplied links ([#237](https://github.com/albetrios/clinozy-fe/issues/237)) ([db8589b](https://github.com/albetrios/clinozy-fe/commit/db8589bcb3f62d76af65490a5d847bf87a7dd591))
+* **tables:** keep the scroll position when a list grows; skeletons that match the columns ([#240](https://github.com/albetrios/clinozy-fe/issues/240)) ([fd65f52](https://github.com/albetrios/clinozy-fe/commit/fd65f52172c38377365885f3ad4761dba40bf7ec))
+
 ## [1.20.1](https://github.com/albetrios/clinozy-fe/compare/v1.20.0...v1.20.1) (2026-11-05)
 
 
